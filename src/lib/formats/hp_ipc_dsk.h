@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_HP_IPC_FORMAT;
+extern const hp_ipc_format FLOPPY_HP_IPC_FORMAT;
 
 #endif // MAME_FORMATS_HP_IPC_DSK_H

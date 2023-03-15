@@ -449,7 +449,9 @@ void ir_print_glsl_visitor::visit(ir_variable *ir)
 	
 	const char *const interp[] = { "", "smooth ", "flat ", "noperspective " };
 	
-	if (this->state->language_version >= 300 && ir->data.explicit_location)
+	bool built_in = (strstr(ir->name, "gl_") == ir->name);
+
+	if (this->state->language_version >= 300 && ir->data.explicit_location && !built_in)
 	{
 		const int binding_base = (this->state->stage == MESA_SHADER_VERTEX ? (int)VERT_ATTRIB_GENERIC0 : (int)FRAG_RESULT_DATA0);
 		const int location = ir->data.location - binding_base;
@@ -488,7 +490,7 @@ void ir_print_glsl_visitor::visit(ir_variable *ir)
 	}
 	
 	// keep invariant declaration for builtin variables
-	if (strstr(ir->name, "gl_") == ir->name) {
+	if (built_in) {
 		buffer.asprintf_append ("%s", inv);
 		print_var_name (ir);
 		return;
@@ -756,6 +758,16 @@ void ir_print_glsl_visitor::visit(ir_expression *ir)
 			buffer.asprintf_append (")");
 		}
 	}
+	else if (ir->operation == ir_triop_csel)
+	{
+		buffer.asprintf_append ("mix(");
+		ir->operands[2]->accept(this);
+		buffer.asprintf_append (", ");
+		ir->operands[1]->accept(this);
+		buffer.asprintf_append (", bvec%d(", ir->operands[1]->type->vector_elements);
+		ir->operands[0]->accept(this);
+		buffer.asprintf_append ("))");
+	}
 	else if (ir->operation == ir_binop_vector_extract)
 	{
 		// a[b]
@@ -899,8 +911,14 @@ void ir_print_glsl_visitor::visit(ir_texture *ir)
 	}
 
 	if (is_array && state->EXT_texture_array_enable)
+	{
+		if(state->language_version>=130)
+		{
+			buffer.asprintf_append ("%s", tex_sampler_dim_name[sampler_dim]);
+		}
 		buffer.asprintf_append ("Array");
-	if (ir->op == ir_tex && is_proj)
+	}
+	if ((ir->op == ir_tex || ir->op == ir_txl) && is_proj)
 		buffer.asprintf_append ("Proj");
 	if (ir->op == ir_txl)
 		buffer.asprintf_append ("Lod");
@@ -1338,7 +1356,7 @@ void print_float (string_buffer& buffer, float f)
 	// that so compiler output matches.
 	if (posE != NULL)
 	{
-		if((posE[1] == '+' || posE[1] == '-') && posE[2] == '0')
+		if((posE[1] == '+' || posE[1] == '-') && posE[2] == '0' && posE[3] == '0')
 		{
 			char* p = posE+2;
 			while (p[0])

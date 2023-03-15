@@ -238,7 +238,7 @@ struct {
  *  O3 (010) = MBEMPTY'
  * </PRE>
  */
-uint8_t* m_disp_a38;
+std::unique_ptr<uint8_t[]> m_disp_a38;
 
 //! output bits of PROM A38
 enum {
@@ -273,7 +273,7 @@ enum {
  * which happens to be very close to every 7th CPU microcycle.
  * </PRE>
  */
-uint8_t* m_disp_a63;
+std::unique_ptr<uint8_t[]> m_disp_a63;
 
 enum {
 	disp_a63_HBLANK     = (1 << 0),         //!< PROM a63 B0 is latched as HBLANK signal
@@ -293,7 +293,7 @@ enum {
  * Address lines are driven by H[1] to H[128] of the horz. line counters.
  * The PROM is enabled whenever H[256] and H[512] are both 0.
  */
-uint8_t* m_disp_a66;
+std::unique_ptr<uint8_t[]> m_disp_a66;
 
 enum {
 	disp_a66_VSYNC_ODD      = (1 << 0),     //!< Q1 (001) is VSYNC for the odd field (with H1024=1)

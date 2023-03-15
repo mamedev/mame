@@ -220,33 +220,6 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 
 
 //**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-//-------------------------------------------------
-//  rol32 - perform a 32-bit left rotate
-//-------------------------------------------------
-
-inline u32 rol32(u32 source, u8 count)
-{
-	count &= 31;
-	return (source << count) | (source >> (32 - count));
-}
-
-
-//-------------------------------------------------
-//  rol64 - perform a 64-bit left rotate
-//-------------------------------------------------
-
-inline u64 rol64(u64 source, u8 count)
-{
-	count &= 63;
-	return (source << count) | (source >> (64 - count));
-}
-
-
-
-//**************************************************************************
 //  UML CODE HANDLE
 //**************************************************************************
 
@@ -462,9 +435,9 @@ void uml::instruction::simplify()
 			{
 				assert(m_size == 4 || m_size == 8);
 				if (m_size == 4)
-					convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
+					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
 				else
-					convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
+					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
 			}
 			else if (m_param[2].is_immediate_value(0))
 			{
@@ -687,9 +660,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_32(m_param[1].immediate(), m_param[2].immediate()));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()));
+					convert_to_mov_immediate(rotl_64(m_param[1].immediate(), m_param[2].immediate()));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);
@@ -700,9 +673,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate() && m_param[2].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(rol32(m_param[1].immediate(), 32 - m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_32(m_param[1].immediate(), m_param[2].immediate()));
 				else if (m_size == 8)
-					convert_to_mov_immediate(rol64(m_param[1].immediate(), 64 - m_param[2].immediate()));
+					convert_to_mov_immediate(rotr_64(m_param[1].immediate(), m_param[2].immediate()));
 			}
 			else if (m_param[2].is_immediate_value(0))
 				convert_to_mov_param(1);

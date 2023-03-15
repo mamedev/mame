@@ -83,7 +83,7 @@ sbus_device::sbus_device(const machine_config &mconfig, const char *tag, device_
 sbus_device::sbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("SBus Space", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
+	, m_space_config("sbus", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_type1space(*this, finder_base::DUMMY_TAG, -1)
 	, m_irq_cb(*this)

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/iq151_dsk.h"
 
 iq151_format::iq151_format() : upd765_format(formats)
@@ -44,4 +42,4 @@ const iq151_format::format iq151_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_IQ151_FORMAT = &floppy_image_format_creator<iq151_format>;
+const iq151_format FLOPPY_IQ151_FORMAT;

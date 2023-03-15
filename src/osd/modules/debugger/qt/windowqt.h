@@ -3,10 +3,38 @@
 #ifndef MAME_DEBUGGER_QT_WINDOWQT_H
 #define MAME_DEBUGGER_QT_WINDOWQT_H
 
-#include "config.h"
+#include "../xmlconfig.h"
+
 #include "debugger.h"
 
 #include <QtWidgets/QMainWindow>
+
+#include <deque>
+#include <memory>
+
+
+namespace osd::debugger::qt {
+
+//============================================================
+//  The Qt debugger module interface
+//============================================================
+class DebuggerQt : public QObject
+{
+	Q_OBJECT
+
+public:
+	virtual ~DebuggerQt() { }
+
+	virtual running_machine &machine() const = 0;
+
+	void hideAll() { emit hideAllWindows(); }
+
+signals:
+	void exitDebugger();
+	void hideAllWindows();
+	void showAllWindows();
+	void saveConfiguration(util::xml::data_node &parentnode);
+};
 
 
 //============================================================
@@ -17,18 +45,9 @@ class WindowQt : public QMainWindow
 	Q_OBJECT
 
 public:
-	WindowQt(running_machine &machine, QWidget *parent = nullptr);
 	virtual ~WindowQt();
 
-	// The interface to an all-window refresh
-	void refreshAll() { s_refreshAll = true; }
-	bool wantsRefresh() { return s_refreshAll; }
-	void clearRefreshFlag() { s_refreshAll = false; }
-
-	void hideAll() { s_hideAll = true; }
-	bool wantsHide() { return s_hideAll; }
-	void clearHideFlag() { s_hideAll = false; }
-
+	virtual void restoreConfiguration(util::xml::data_node const &node);
 
 protected slots:
 	void debugActOpenMemory();
@@ -48,52 +67,48 @@ protected slots:
 	void debugActHardReset();
 	virtual void debugActClose();
 	void debugActQuit();
+	virtual void debuggerExit();
 
+private slots:
+	void saveConfiguration(util::xml::data_node &parentnode);
 
 protected:
-	running_machine &m_machine;
+	WindowQt(DebuggerQt &debugger, QWidget *parent = nullptr);
 
-	static bool s_refreshAll;
-	static bool s_hideAll;
+	virtual void saveConfigurationToNode(util::xml::data_node &node);
+
+	DebuggerQt &m_debugger;
+	running_machine &m_machine;
 };
 
 
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class WindowQtConfig
+//============================================================
+//  Command history helper
+//============================================================
+class CommandHistory
 {
 public:
-	enum WindowType
-	{
-		WIN_TYPE_UNKNOWN,
-		WIN_TYPE_MAIN,
-		WIN_TYPE_MEMORY,
-		WIN_TYPE_DASM,
-		WIN_TYPE_LOG,
-		WIN_TYPE_BREAK_POINTS,
-		WIN_TYPE_DEVICES,
-		WIN_TYPE_DEVICE_INFORMATION
-	};
+	CommandHistory();
+	~CommandHistory();
 
-public:
-	WindowQtConfig(const WindowType& type=WIN_TYPE_UNKNOWN) :
-		m_type(type),
-		m_size(800, 600),
-		m_position(120, 120)
-	{}
-	virtual ~WindowQtConfig() {}
+	void add(QString const &entry);
+	QString const *previous(QString const &current);
+	QString const *next(QString const &current);
+	void edit();
+	void reset();
+	void clear();
 
-	// Settings
-	WindowType m_type;
-	QPoint m_size;
-	QPoint m_position;
+	void restoreConfigurationFromNode(util::xml::data_node const &node);
+	void saveConfigurationToNode(util::xml::data_node &node);
 
-	virtual void buildFromQWidget(QWidget *widget);
-	virtual void applyToQWidget(QWidget *widget);
-	virtual void addToXmlDataNode(util::xml::data_node &node) const;
-	virtual void recoverFromXmlNode(util::xml::data_node const &node);
+private:
+	static inline constexpr unsigned CAPACITY = 100U;
+
+	std::deque<QString> m_history;
+	std::unique_ptr<QString> m_current;
+	int m_position;
 };
 
+} // namespace osd::debugger::qt
 
 #endif // MAME_DEBUGGER_QT_WINDOWQT_H

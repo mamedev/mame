@@ -44,26 +44,26 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
 	inline uint16_t read(offs_t offset);
-	inline void write(offs_t offset, uint16_t data);
+	inline void write(offs_t offset, u16 data);
 	inline void erase(offs_t offset);
 
 	uint16_t m_register[16];
 
 	int m_bits;
 	int m_state;
-	uint8_t m_command;
-	uint8_t m_address;
-	uint16_t m_data;
+	u8 m_command;
+	u8 m_address;
+	u16 m_data;
 	bool m_ewen;
-	int m_cs;
-	int m_sk;
-	int m_do;
-	int m_di;
+	bool m_cs;
+	bool m_sk;
+	bool m_do;
+	bool m_di;
 };
 
 

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+    These dumps seem to have blank ECC data, it might need to be reconstructed as done in eolith/ghosteo.cpp
+-->
+<softwarelist name="digiblast_cart" description="Nikko Entertainment B.V. / Grey Innovation digiBLAST cartridges">
+
+	<software name="sonicx1" supported="no">
+		<description>Sonic X 1 (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="sonic x 1 (ita esp).bin" size="0x4200000" crc="63c9ccc0" sha1="762a7b488a3c8b8ee37eaabf85245bfc3e71bbc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbsp1" supported="no">
+		<description>Sponge Bob Square Pants 1 (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="sponge bob square pants 1 (ita spa).bin" size="0x4200000" crc="56deccb3" sha1="251967cdc72cf06bb92957ecc3ad8a3b1573c91e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totsp1" supported="no">
+		<description>Totally Spies! 1 (Italy)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="totally spies 1 (ita).bin" size="0x4200000" crc="2f88baaf" sha1="5cda9f4844cd708e577426285a0d7f0024e83168" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yugi" supported="no">
+		<description>Yu-Gi-Oh! (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="yu-gi-oh (ita esp).bin" size="0x4200000" crc="2494e958" sha1="76594cebc642c61afa84d20370b40d18e9aabc80" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wxatari" supported="no">
+		<description>Winx Club + 5 Atari Games (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="winx club + 5 atari games (ita esp).bin" size="0x4200000" crc="09897866" sha1="df1b42368ae776d9028a27796874d5830bfd38c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winx1" supported="no">
+		<description>Winx Club 1 (Italy / Spain)</description>
+		<year>2005</year>
+		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
+		<part name="cart" interface="digiblast_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="winx club 1 (ita esp).bin" size="0x4200000" crc="a870766e" sha1="ade470b1e574761bf35254064b2437dccf1a3c2c" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

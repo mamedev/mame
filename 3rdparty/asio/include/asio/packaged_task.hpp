@@ -2,7 +2,7 @@
 // packaged_task.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +16,11 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
+#include "asio/detail/future.hpp"
 
-#if defined(ASIO_HAS_STD_FUTURE) \
+#if defined(ASIO_HAS_STD_FUTURE_CLASS) \
   || defined(GENERATING_DOCUMENTATION)
 
-#include <future>
 #include "asio/async_result.hpp"
 #include "asio/detail/type_traits.hpp"
 #include "asio/detail/variadic_templates.hpp"
@@ -120,7 +120,7 @@ private:
 
 #include "asio/detail/pop_options.hpp"
 
-#endif // defined(ASIO_HAS_STD_FUTURE)
+#endif // defined(ASIO_HAS_STD_FUTURE_CLASS)
        //   || defined(GENERATING_DOCUMENTATION)
 
 #endif // ASIO_PACKAGED_TASK_HPP

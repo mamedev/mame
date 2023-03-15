@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "mb86235.h"
-#include "debugger.h"
 
 /*********************
  *

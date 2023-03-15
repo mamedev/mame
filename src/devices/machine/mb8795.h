@@ -3,6 +3,8 @@
 #ifndef MAME_MACHINE_MB8795_H
 #define MAME_MACHINE_MB8795_H
 
+#include "dinetwork.h"
+
 class mb8795_device :   public device_t,
 						public device_network_interface
 {
@@ -22,9 +24,11 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void recv_cb(uint8_t *buf, int len) override;
+
+	TIMER_CALLBACK_MEMBER(tx_update);
+	TIMER_CALLBACK_MEMBER(rx_update);
 
 private:
 	enum { TIMER_TX, TIMER_RX };

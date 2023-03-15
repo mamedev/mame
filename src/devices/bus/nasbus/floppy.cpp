@@ -80,7 +80,7 @@ nascom_fdc_device::nascom_fdc_device(const machine_config &mconfig, const char *
 void nascom_fdc_device::device_start()
 {
 	// timer to turn off the drive motor line
-	m_motor = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nascom_fdc_device::motor_off), this));
+	m_motor = timer_alloc(FUNC(nascom_fdc_device::motor_off), this);
 
 	save_item(NAME(m_select));
 }

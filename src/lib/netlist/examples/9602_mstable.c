@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 /*
  * 9602_mstable.c
@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(74123_mstable)
+{
 
 	/*
 	 * Monoflog
@@ -50,4 +51,4 @@ NETLIST_START(74123_mstable)
 	NET_C(mf.12, V5)
 	NET_C(mf.13, V5)
 
-NETLIST_END()
+}

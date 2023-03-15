@@ -14,8 +14,8 @@
 
 #include "spirv-tools/libspirv.hpp"
 
+#include <cassert>
 #include <iostream>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -60,7 +60,9 @@ struct SpirvTools::Impl {
   spv_context context;  // C interface context object.
 };
 
-SpirvTools::SpirvTools(spv_target_env env) : impl_(new Impl(env)) {}
+SpirvTools::SpirvTools(spv_target_env env) : impl_(new Impl(env)) {
+  assert(env != SPV_ENV_WEBGPU_0);
+}
 
 SpirvTools::~SpirvTools() {}
 
@@ -97,7 +99,9 @@ bool SpirvTools::Disassemble(const uint32_t* binary, const size_t binary_size,
   spv_text spvtext = nullptr;
   spv_result_t status = spvBinaryToText(impl_->context, binary, binary_size,
                                         options, &spvtext, nullptr);
-  if (status == SPV_SUCCESS) {
+  if (status == SPV_SUCCESS &&
+      (options & SPV_BINARY_TO_TEXT_OPTION_PRINT) == 0) {
+    assert(spvtext);
     text->assign(spvtext->str, spvtext->str + spvtext->length);
   }
   spvTextDestroy(spvtext);

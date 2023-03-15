@@ -67,6 +67,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	else if (opcode >= 0x51 && opcode <= 0x5F)
 	{
 		util::stream_format(stream, "AISC %u", opcode & 0xF);
+		flags = STEP_COND;
 	}
 	else if (opcode >= 0x60 && opcode <= 0x63)
 	{
@@ -95,6 +96,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 1:
 			util::stream_format(stream, "SKMBZ 0");
+			flags = STEP_COND;
 			break;
 
 		case 2:
@@ -103,10 +105,12 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 3:
 			util::stream_format(stream, "SKMBZ 2");
+			flags = STEP_COND;
 			break;
 
 		case 4:
 			util::stream_format(stream, "XIS 0");
+			flags = STEP_COND;
 			break;
 
 		case 5:
@@ -119,14 +123,17 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 7:
 			util::stream_format(stream, "XDS 0");
+			flags = STEP_COND;
 			break;
 
 		case 0x10:
 			util::stream_format(stream, "CASC");
+			flags = STEP_COND;
 			break;
 
 		case 0x11:
 			util::stream_format(stream, "SKMBZ 1");
+			flags = STEP_COND;
 			break;
 
 		case 0x12:
@@ -135,10 +142,12 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x13:
 			util::stream_format(stream, "SKMBZ 3");
+			flags = STEP_COND;
 			break;
 
 		case 0x14:
 			util::stream_format(stream, "XIS 1");
+			flags = STEP_COND;
 			break;
 
 		case 0x15:
@@ -151,14 +160,17 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x17:
 			util::stream_format(stream, "XDS 1");
+			flags = STEP_COND;
 			break;
 
 		case 0x20:
 			util::stream_format(stream, "SKC");
+			flags = STEP_COND;
 			break;
 
 		case 0x21:
 			util::stream_format(stream, "SKE");
+			flags = STEP_COND;
 			break;
 
 		case 0x22:
@@ -186,6 +198,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x24:
 			util::stream_format(stream, "XIS 2");
+			flags = STEP_COND;
 			break;
 
 		case 0x25:
@@ -198,10 +211,12 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x27:
 			util::stream_format(stream, "XDS 2");
+			flags = STEP_COND;
 			break;
 
 		case 0x30:
 			util::stream_format(stream, "ASC");
+			flags = STEP_COND;
 			break;
 
 		case 0x31:
@@ -245,22 +260,27 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 				{
 				case 0x01:
 					util::stream_format(stream, "SKGBZ 0");
+					flags = STEP_COND;
 					break;
 
 				case 0x03:
 					util::stream_format(stream, "SKGBZ 2");
+					flags = STEP_COND;
 					break;
 
 				case 0x11:
 					util::stream_format(stream, "SKGBZ 1");
+					flags = STEP_COND;
 					break;
 
 				case 0x13:
 					util::stream_format(stream, "SKGBZ 3");
+					flags = STEP_COND;
 					break;
 
 				case 0x21:
 					util::stream_format(stream, "SKGZ");
+					flags = STEP_COND;
 					break;
 
 				case 0x28:
@@ -304,6 +324,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x34:
 			util::stream_format(stream, "XIS 3");
+			flags = STEP_COND;
 			break;
 
 		case 0x35:
@@ -316,6 +337,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x37:
 			util::stream_format(stream, "XDS 3");
+			flags = STEP_COND;
 			break;
 
 		case 0x40:
@@ -324,6 +346,7 @@ offs_t cop420_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 		case 0x41:
 			util::stream_format(stream, "SKT");
+			flags = STEP_COND;
 			break;
 
 		case 0x42:

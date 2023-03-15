@@ -30,7 +30,7 @@
 #include "emu.h"
 #include "myarcmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_MYARCMEM, bus::ti99::peb, myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
+DEFINE_DEVICE_TYPE(TI99_MYARCMEM, bus::ti99::peb::myarc_memory_expansion_device, "ti99_myarcmem", "Myarc Memory expansion card MEXP-1")
 
 namespace bus::ti99::peb {
 

@@ -104,7 +104,7 @@ namespace plib
 		istream_uptr stream(const pstring &name) override
 		{
 			if (name == m_name)
-				return istream_uptr(std::make_unique<std::stringstream>(putf8string(m_str)), name);
+				return {std::make_unique<std::stringstream>(putf8string(m_str)), name };
 
 			return istream_uptr();
 		}
@@ -131,7 +131,7 @@ namespace plib
 		{
 			static_assert(std::is_base_of<psource_t, S>::value, "S must inherit from plib::psource_t");
 
-			auto src(std::make_unique<S>(std::forward<Args>(args)...));
+			auto src = std::make_unique<S>(std::forward<Args>(args)...);
 			m_collection.push_back(std::move(src));
 		}
 
@@ -140,10 +140,9 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto *source(dynamic_cast<S *>(s.get()));
-				if (source)
+				if (auto source = plib::dynamic_downcast<S *>(s.get()))
 				{
-					auto strm = source->stream(name);
+					auto strm = (*source)->stream(name);
 					if (!strm.empty())
 						return strm;
 				}
@@ -156,10 +155,9 @@ namespace plib
 		{
 			for (auto &s : m_collection)
 			{
-				auto *source(dynamic_cast<S *>(s.get()));
-				if (source)
+				if (auto source = plib::dynamic_downcast<S *>(s.get()))
 				{
-					if (lambda(source))
+					if (lambda(*source))
 						return true;
 				}
 			}

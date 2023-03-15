@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/semaphore.h>
 
 #if BX_CONFIG_SUPPORTS_THREADING
@@ -20,6 +19,9 @@
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <limits.h>
 #	if BX_PLATFORM_XBOXONE
@@ -76,7 +78,7 @@ namespace bx
 
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 		si->m_handle = dispatch_semaphore_create(0);
-		BX_CHECK(NULL != si->m_handle, "dispatch_semaphore_create failed.");
+		BX_ASSERT(NULL != si->m_handle, "dispatch_semaphore_create failed.");
 	}
 
 	Semaphore::~Semaphore()
@@ -140,10 +142,10 @@ namespace bx
 		int result;
 
 		result = pthread_mutex_init(&si->m_mutex, NULL);
-		BX_CHECK(0 == result, "pthread_mutex_init %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_init %d", result);
 
 		result = pthread_cond_init(&si->m_cond, NULL);
-		BX_CHECK(0 == result, "pthread_cond_init %d", result);
+		BX_ASSERT(0 == result, "pthread_cond_init %d", result);
 
 		BX_UNUSED(result);
 	}
@@ -154,10 +156,10 @@ namespace bx
 
 		int result;
 		result = pthread_cond_destroy(&si->m_cond);
-		BX_CHECK(0 == result, "pthread_cond_destroy %d", result);
+		BX_ASSERT(0 == result, "pthread_cond_destroy %d", result);
 
 		result = pthread_mutex_destroy(&si->m_mutex);
-		BX_CHECK(0 == result, "pthread_mutex_destroy %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_destroy %d", result);
 
 		BX_UNUSED(result);
 	}
@@ -167,18 +169,18 @@ namespace bx
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 
 		int result = pthread_mutex_lock(&si->m_mutex);
-		BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_lock %d", result);
 
 		for (uint32_t ii = 0; ii < _count; ++ii)
 		{
 			result = pthread_cond_signal(&si->m_cond);
-			BX_CHECK(0 == result, "pthread_cond_signal %d", result);
+			BX_ASSERT(0 == result, "pthread_cond_signal %d", result);
 		}
 
 		si->m_count += _count;
 
 		result = pthread_mutex_unlock(&si->m_mutex);
-		BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_unlock %d", result);
 
 		BX_UNUSED(result);
 	}
@@ -188,7 +190,7 @@ namespace bx
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 
 		int result = pthread_mutex_lock(&si->m_mutex);
-		BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_lock %d", result);
 
 		if (-1 == _msecs)
 		{
@@ -219,7 +221,7 @@ namespace bx
 		}
 
 		result = pthread_mutex_unlock(&si->m_mutex);
-		BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
+		BX_ASSERT(0 == result, "pthread_mutex_unlock %d", result);
 
 		BX_UNUSED(result);
 
@@ -240,7 +242,7 @@ namespace bx
 #else
 		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
 #endif
-		BX_CHECK(NULL != si->m_handle, "Failed to create Semaphore!");
+		BX_ASSERT(NULL != si->m_handle, "Failed to create Semaphore!");
 	}
 
 	Semaphore::~Semaphore()

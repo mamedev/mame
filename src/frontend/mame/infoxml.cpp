@@ -13,16 +13,20 @@
 
 #include "mameopts.h"
 
+// devices
 #include "machine/ram.h"
 #include "sound/samples.h"
 
+// emu
 #include "config.h"
 #include "drivenum.h"
+#include "main.h"
 #include "romload.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+// lib/util
 #include "corestr.h"
 #include "xmlfile.h"
 
@@ -30,6 +34,7 @@
 #include <cctype>
 #include <cstring>
 #include <future>
+#include <locale>
 #include <queue>
 #include <type_traits>
 #include <unordered_set>
@@ -52,9 +57,52 @@ public:
 	bool operator()(const std::add_pointer_t<device_type> &lhs, const std::add_pointer_t<device_type> &rhs) const;
 };
 
-typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
-std::string normalize_string(const char *string);
+class device_filter
+{
+public:
+	device_filter(const std::function<bool(const char *shortname, bool &done)> &callback)
+		: m_callback(callback)
+		, m_done(false)
+	{
+	}
+
+	// methods
+	bool filter(const char *shortname);
+
+	// accessors
+	bool done() const { return m_done; }
+
+private:
+	const std::function<bool(const char *shortname, bool &done)> &  m_callback;
+	bool                                                            m_done;
+};
+
+
+class filtered_driver_enumerator
+{
+public:
+	filtered_driver_enumerator(driver_enumerator &drivlist, device_filter &devfilter)
+		: m_drivlist(drivlist)
+		, m_devfilter(devfilter)
+		, m_done(false)
+	{
+	}
+
+	// methods
+	std::vector<std::reference_wrapper<const game_driver>> next(int count);
+
+	// accessors
+	bool done() const { return m_done || m_devfilter.done(); }
+
+private:
+	driver_enumerator & m_drivlist;
+	device_filter &     m_devfilter;
+	bool                m_done;
+};
+
+
+typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 // internal helper
 void output_header(std::ostream &out, bool dtd);
@@ -63,7 +111,7 @@ void output_footer(std::ostream &out);
 void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
 void output_sampleof(std::ostream &out, device_t &device);
 void output_bios(std::ostream &out, device_t const &device);
-void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device);
+void output_rom(std::ostream &out, machine_config &config, driver_list const *drivlist, const game_driver *driver, device_t &device);
 void output_device_refs(std::ostream &out, device_t &root);
 void output_sample(std::ostream &out, device_t &device);
 void output_chips(std::ostream &out, device_t &device, const char *root_tag);
@@ -84,7 +132,9 @@ void output_ramoptions(std::ostream &out, device_t &root);
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
 void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
 
-const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
+char const *get_merge_name(driver_list const &drivlist, game_driver const &driver, util::hash_collection const &romhashes);
+char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes);
+char const *get_merge_name(tiny_rom_entry const *roms, util::hash_collection const &romhashes);
 
 
 //**************************************************************************
@@ -339,7 +389,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 			auto it = matched.begin();
 			for (const std::string &pat : patterns)
 			{
-				if (!core_strwildcmp(pat.c_str(), shortname))
+				if (!core_strwildcmp(pat, shortname))
 				{
 					// this driver matches the pattern - tell the caller
 					result = true;
@@ -348,7 +398,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 					if (!*it)
 					{
 						*it = true;
-						if (!core_iswildstr(pat.c_str()))
+						if (!core_iswildstr(pat))
 						{
 							exact_matches++;
 
@@ -384,16 +434,33 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 {
 	struct prepared_info
 	{
+		prepared_info() = default;
+		prepared_info(const prepared_info &) = delete;
+		prepared_info(prepared_info &&) = default;
+#if defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
+		// MSVCPRT currently requires default-constructible std::future promise types to be assignable
+		// remove this workaround when that's fixed
+		prepared_info &operator=(const prepared_info &) = default;
+#else
+		prepared_info &operator=(const prepared_info &) = delete;
+#endif
+
 		std::string     m_xml_snippet;
 		device_type_set m_dev_set;
 	};
 
+	// TODO: maybe not the best place for this as it affects the stream passed in
+	// if the device part is threaded, the local streams used by the tasks can be
+	// imbued and the stream passed in can be left alone
+	out.imbue(std::locale::classic());
+
 	// prepare a driver enumerator and the queue
 	driver_enumerator drivlist(m_lookup_options);
-	bool drivlist_done = false;
-	bool filter_done = false;
+	device_filter devfilter(filter);
+	filtered_driver_enumerator filtered_drivlist(drivlist, devfilter);
 	bool header_outputted = false;
 
+	// essentially a local method to emit the header if necessary
 	auto output_header_if_necessary = [this, &header_outputted](std::ostream &out)
 	{
 		if (!header_outputted)
@@ -404,79 +471,98 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	};
 
 	// only keep a device set when we're asked to track it
-	std::unique_ptr<device_type_set> devfilter;
+	std::optional<device_type_set> devset;
 	if (include_devices && filter)
-		devfilter = std::make_unique<device_type_set>();
+		devset.emplace();
 
-	// prepare a queue of futures
-	std::queue<std::future<prepared_info>> queue;
+	// prepare a queue of tasks - this is a FIFO queue because of the
+	// need to be deterministic
+	std::queue<std::future<prepared_info>> tasks;
 
-	// try enumerating drivers and outputting them
-	while (!queue.empty() || (!drivlist_done && !filter_done))
+	// while we want to be deterministic, asynchronous task scheduling is not; so we want to
+	// track the amount of active tasks so that we can keep on spawning tasks even if we're
+	// waiting on the task in the front of the queue
+	std::atomic<unsigned int> active_task_count = 0;
+	unsigned int maximum_active_task_count = std::thread::hardware_concurrency() + 10;
+	unsigned int maximum_outstanding_task_count = maximum_active_task_count + 20;
+
+	// loop until we're done enumerating drivers, and until there are no outstanding tasks
+	while (!filtered_drivlist.done() || !tasks.empty())
 	{
-		// try populating the queue
-		while (queue.size() < 20 && !drivlist_done && !filter_done)
+		// loop until there are as many outstanding tasks as possible (we want to separately cap outstanding
+		// tasks and active tasks)
+		while (!filtered_drivlist.done()
+			&& active_task_count < maximum_active_task_count
+			&& tasks.size() < maximum_outstanding_task_count)
 		{
-			if (!drivlist.next())
-			{
-				// at this point we are done enumerating through drivlist and it is no
-				// longer safe to call next(), so record that we're done
-				drivlist_done = true;
-			}
-			else if (!filter || filter(drivlist.driver().name, filter_done))
-			{
-				const game_driver &driver(drivlist.driver());
-				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter]
-				{
-					prepared_info result;
-					std::ostringstream stream;
+			// we want to launch a task; grab a packet of drivers to process
+			std::vector<std::reference_wrapper<const game_driver>> drivers = filtered_drivlist.next(20);
+			if (drivers.empty())
+				break;
 
-					output_one(stream, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
-					result.m_xml_snippet = stream.str();
-					return result;
-				});
-				queue.push(std::move(future_pi));
-			}
+			// do the dirty work asychronously
+			auto task_proc = [&drivlist, drivers{ std::move(drivers) }, include_devices, &active_task_count]
+			{
+				prepared_info result;
+				std::ostringstream stream;
+				stream.imbue(std::locale::classic());
+
+				// output each of the drivers
+				for (const game_driver &driver : drivers)
+					output_one(stream, drivlist, driver, include_devices ? &result.m_dev_set : nullptr);
+
+				// capture the XML snippet
+				result.m_xml_snippet = stream.str();
+
+				// we're done with the task; decrement the counter and return
+				active_task_count--;
+				return result;
+			};
+
+			// add this task to the queue
+			active_task_count++;
+			tasks.emplace(std::async(std::launch::async, std::move(task_proc)));
 		}
 
-		// now that we have the queue populated, try grabbing one (assuming that it is not empty)
-		if (!queue.empty())
+		// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
+		if (!tasks.empty())
 		{
-			// wait for the future to complete and get the info
-			prepared_info pi = queue.front().get();
-			queue.pop();
+			// wait for the task at the front of the queue to complete and get the info, in the
+			// spirit of determinism
+			prepared_info pi = tasks.front().get();
+			tasks.pop();
 
-			// emit the XML
+			// emit whatever XML we accumulated in the task
 			output_header_if_necessary(out);
 			out << pi.m_xml_snippet;
 
-			// merge devices into devfilter, if appropriate
-			if (devfilter)
+			// merge devices into devset, if appropriate
+			if (devset)
 			{
 				for (const auto &x : pi.m_dev_set)
-					devfilter->insert(x);
+					devset->insert(x);
 			}
 		}
 	}
 
 	// iterate through the device types if not everything matches a driver
-	if (devfilter && !filter_done)
+	if (devset && !devfilter.done())
 	{
 		for (device_type type : registered_device_types)
 		{
-			if (!filter || filter(type.shortname(), filter_done))
-				devfilter->insert(&type);
+			if (devfilter.filter(type.shortname()))
+				devset->insert(&type);
 
-			if (filter_done)
+			if (devfilter.done())
 				break;
 		}
 	}
 
 	// output devices (both devices with roms and slot devices)
-	if (include_devices && (!devfilter || !devfilter->empty()))
+	if (include_devices && (!devset || !devset->empty()))
 	{
 		output_header_if_necessary(out);
-		output_devices(out, m_lookup_options, devfilter.get());
+		output_devices(out, m_lookup_options, devset ? &*devset : nullptr);
 	}
 
 	if (header_outputted)
@@ -492,31 +578,39 @@ namespace
 {
 
 //-------------------------------------------------
-//  normalize_string
+//  device_filter::filter - apply the filter, if
+//  present
 //-------------------------------------------------
 
-std::string normalize_string(const char *string)
+bool device_filter::filter(const char *shortname)
 {
-	std::ostringstream stream;
+	return !m_done && (!m_callback || m_callback(shortname, m_done));
+}
 
-	if (string != nullptr)
+
+//-------------------------------------------------
+//  filtered_driver_enumerator::next - take a number
+//  of game_drivers, while applying filters
+//-------------------------------------------------
+
+std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerator::next(int count)
+{
+	std::vector<std::reference_wrapper<const game_driver>> results;
+	while (!done() && results.size() < count)
 	{
-		while (*string)
+		if (!m_drivlist.next())
 		{
-			switch (*string)
-			{
-			case '\"': stream << "&quot;"; break;
-			case '&': stream << "&amp;"; break;
-			case '<': stream << "&lt;"; break;
-			case '>': stream << "&gt;"; break;
-			default:
-				stream << *string;
-				break;
-			}
-			++string;
+			// at this point we are done enumerating through drivlist and it is no
+			// longer safe to call next(), so record that we're done
+			m_done = true;
+		}
+		else if (m_devfilter.filter(m_drivlist.driver().name))
+		{
+			const game_driver &driver(m_drivlist.driver());
+			results.push_back(driver);
 		}
 	}
-	return stream.str();
+	return results;
 }
 
 
@@ -539,7 +633,9 @@ void output_header(std::ostream &out, bool dtd)
 	}
 
 	// top-level tag
-	out << util::string_format("<%s build=\"%s\" debug=\""
+	assert(emulator_info::get_build_version() != nullptr);
+	util::stream_format(out,
+			"<%s build=\"%s\" debug=\""
 #ifdef MAME_DEBUG
 			"yes"
 #else
@@ -547,8 +643,8 @@ void output_header(std::ostream &out, bool dtd)
 #endif
 			"\" mameconfig=\"%d\">\n",
 			XML_ROOT,
-			normalize_string(emulator_info::get_build_version()),
-			CONFIG_VERSION);
+			util::xml::normalize_string(emulator_info::get_build_version()),
+			configuration_manager::CONFIG_VERSION);
 }
 
 
@@ -559,7 +655,7 @@ void output_header(std::ostream &out, bool dtd)
 void output_footer(std::ostream &out)
 {
 	// close the top level tag
-	out << util::string_format("</%s>\n", XML_ROOT);
+	util::stream_format(out, "</%s>\n", XML_ROOT);
 }
 
 
@@ -570,6 +666,8 @@ void output_footer(std::ostream &out)
 
 void output_one(std::ostream &out, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes)
 {
+	using util::xml::normalize_string;
+
 	machine_config config(driver, drivlist.options());
 	device_enumerator iter(config.root_device());
 
@@ -618,14 +716,16 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	}
 
 	// print the header and the machine name
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
+	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
-	const char *start = strrchr(driver.type.source(), '/');
-	if (!start)
-		start = strrchr(driver.type.source(), '\\');
-	start = start ? (start + 1) : driver.type.source();
-	out << util::string_format(" sourcefile=\"%s\"", normalize_string(start));
+	std::string_view src(driver.type.source());
+	auto prefix(src.find("src/mame/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\mame\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 9);
+	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(src));
 
 	// append bios and runnable flags
 	if (driver.flags & machine_flags::IS_BIOS_ROOT)
@@ -636,9 +736,9 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	// display clone information
 	int clone_of = drivlist.find(driver.parent);
 	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
-		out << util::string_format(" cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		util::stream_format(out, " cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
 	if (clone_of != -1)
-		out << util::string_format(" romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		util::stream_format(out, " romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
 
 	// display sample information and close the game tag
 	output_sampleof(out, config.root_device());
@@ -646,19 +746,19 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// output game description
 	if (driver.type.fullname() != nullptr)
-		out << util::string_format("\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
+		util::stream_format(out, "\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
 
 	// print the year only if is a number or another allowed character (? or +)
-	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
-		out << util::string_format("\t\t<year>%s</year>\n", normalize_string(driver.year));
+	if (driver.year && strspn(driver.year, "0123456789?+") == strlen(driver.year))
+		util::stream_format(out, "\t\t<year>%s</year>\n", normalize_string(driver.year));
 
 	// print the manufacturer information
 	if (driver.manufacturer != nullptr)
-		out << util::string_format("\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
+		util::stream_format(out, "\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
 
 	// now print various additional information
 	output_bios(out, config.root_device());
-	output_rom(out, &drivlist, &driver, config.root_device());
+	output_rom(out, config, &drivlist, &driver, config.root_device());
 	output_device_refs(out, config.root_device());
 	output_sample(out, config.root_device());
 	output_chips(out, config.root_device(), "");
@@ -677,7 +777,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
-	out << util::string_format("\t</%s>\n", XML_TOP);
+	util::stream_format(out, "\t</%s>\n", XML_TOP);
 }
 
 
@@ -688,6 +788,8 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag)
 {
+	using util::xml::normalize_string;
+
 	bool has_speaker = false, has_input = false;
 	// check if the device adds speakers to the system
 	sound_interface_enumerator snditer(device);
@@ -716,15 +818,23 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 			}
 
 	// start to output info
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
-	std::string src(device.source());
-	strreplace(src,"../", "");
-	out << util::string_format(" sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src.c_str()));
+	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
+	std::string_view src(device.source());
+	auto prefix(src.find("src/"));
+	if (std::string_view::npos == prefix)
+		prefix = src.find("src\\");
+	if (std::string_view::npos != prefix)
+		src.remove_prefix(prefix + 4);
+	util::stream_format(out, " sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src));
+	auto const parent(device.type().parent_rom_device_type());
+	if (parent)
+		util::stream_format(out, " romof=\"%s\"", normalize_string(parent->shortname()));
 	output_sampleof(out, device);
-	out << ">\n" << util::string_format("\t\t<description>%s</description>\n", normalize_string(device.name()));
+	out << ">\n";
+	util::stream_format(out, "\t\t<description>%s</description>\n", normalize_string(device.name()));
 
 	output_bios(out, device);
-	output_rom(out, nullptr, nullptr, device);
+	output_rom(out, config, nullptr, nullptr, device);
 	output_device_refs(out, device);
 
 	if (device.type().type() != typeid(samples_device)) // ignore samples_device itself
@@ -743,7 +853,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	output_images(out, device, devtag);
 	output_slots(out, config, device, devtag, nullptr);
 	output_software_lists(out, device, devtag);
-	out << util::string_format("\t</%s>\n", XML_TOP);
+	util::stream_format(out, "\t</%s>\n", XML_TOP);
 }
 
 
@@ -798,7 +908,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
-			out << util::string_format("\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
+			util::stream_format(out, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
 }
 
 
@@ -815,7 +925,7 @@ void output_sampleof(std::ostream &out, device_t &device)
 		samples_iterator sampiter(samples);
 		if (sampiter.altbasename() != nullptr)
 		{
-			out << util::string_format(" sampleof=\"%s\"", normalize_string(sampiter.altbasename()));
+			util::stream_format(out, " sampleof=\"%s\"", util::xml::normalize_string(sampiter.altbasename()));
 
 			// must stop here, as there can only be one attribute of the same name
 			return;
@@ -843,8 +953,8 @@ void output_bios(std::ostream &out, device_t const &device)
 	{
 		// output extracted name and descriptions'
 		out << "\t\t<biosset";
-		out << util::string_format(" name=\"%s\"", normalize_string(bios.get_name()));
-		out << util::string_format(" description=\"%s\"", normalize_string(bios.get_description()));
+		util::stream_format(out, " name=\"%s\"", util::xml::normalize_string(bios.get_name()));
+		util::stream_format(out, " description=\"%s\"", util::xml::normalize_string(bios.get_description()));
 		if (defaultname && !std::strcmp(defaultname, bios.get_name()))
 			out << " default=\"yes\"";
 		out << "/>\n";
@@ -857,7 +967,7 @@ void output_bios(std::ostream &out, device_t const &device)
 //  the XML output
 //-------------------------------------------------
 
-void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_driver *driver, device_t &device)
+void output_rom(std::ostream &out, machine_config &config, driver_list const *drivlist, const game_driver *driver, device_t &device)
 {
 	enum class type { BIOS, NORMAL, DISK };
 	std::map<u32, char const *> biosnames;
@@ -895,7 +1005,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 				// loop until we run out of reloads
 				do
 				{
-					// loop until we run out of continues/ignores */
+					// loop until we run out of continues/ignores
 					u32 curlength(ROM_GETLENGTH(romp++));
 					while (ROMENTRY_ISCONTINUE(romp) || ROMENTRY_ISIGNORE(romp))
 						curlength += ROM_GETLENGTH(romp++);
@@ -909,12 +1019,14 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			};
 
 	// iterate over 3 different ROM "types": BIOS, ROMs, DISKs
-	bool const do_merge_name = drivlist && dynamic_cast<driver_device *>(&device);
+	bool const driver_merge = drivlist && dynamic_cast<driver_device *>(&device);
 	for (type pass : { type::BIOS, type::NORMAL, type::DISK })
 	{
 		tiny_rom_entry const *region(nullptr);
 		for (tiny_rom_entry const *rom = device.rom_region(); rom && !ROMENTRY_ISEND(rom); ++rom)
 		{
+			using util::xml::normalize_string;
+
 			if (ROMENTRY_ISREGION(rom))
 				region = rom;
 			else if (ROMENTRY_ISSYSTEM_BIOS(rom))
@@ -928,7 +1040,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			if ((type::DISK == pass) != is_disk)
 				continue;
 
-			// BIOS ROMs only apply to bioses
+			// BIOS ROMs only apply to BIOSes
 			// FIXME: disk images associated with a system BIOS will never be listed
 			u32 const biosno(ROM_GETBIOSFLAGS(rom));
 			if ((type::BIOS == pass) != bool(biosno))
@@ -937,7 +1049,10 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 
 			// if we have a valid ROM and we are a clone, see if we can find the parent ROM
 			util::hash_collection const hashes(rom->hashdata);
-			char const *const merge_name((do_merge_name && !hashes.flag(util::hash_collection::FLAG_NO_DUMP)) ? get_merge_name(*drivlist, *driver, hashes) : nullptr);
+			char const *const merge_name(
+					hashes.flag(util::hash_collection::FLAG_NO_DUMP) ? nullptr :
+					driver_merge ? get_merge_name(*drivlist, *driver, hashes) :
+					get_merge_name(config, device, hashes));
 
 			// opening tag
 			if (is_disk)
@@ -945,16 +1060,16 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			else
 				out << "\t\t<rom";
 
-			// add name, merge, bios, and size tags */
+			// add name, merge, bios, and size tags
 			char const *const name(rom->name);
 			if (name && name[0])
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
+				util::stream_format(out, " name=\"%s\"", normalize_string(name));
 			if (merge_name)
-				out << util::string_format(" merge=\"%s\"", normalize_string(merge_name));
+				util::stream_format(out, " merge=\"%s\"", normalize_string(merge_name));
 			if (bios_name)
-				out << util::string_format(" bios=\"%s\"", normalize_string(bios_name));
+				util::stream_format(out, " bios=\"%s\"", normalize_string(bios_name));
 			if (!is_disk)
-				out << util::string_format(" size=\"%u\"", rom_file_size(rom));
+				util::stream_format(out, " size=\"%u\"", rom_file_size(rom));
 
 			// dump checksum information only if there is a known dump
 			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
@@ -963,17 +1078,17 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 				out << " status=\"nodump\"";
 
 			// append a region name
-			out << util::string_format(" region=\"%s\"", region->name);
+			util::stream_format(out, " region=\"%s\"", region->name);
 
 			if (!is_disk)
 			{
 				// for non-disk entries, print offset
-				out << util::string_format(" offset=\"%x\"", ROM_GETOFFSET(rom));
+				util::stream_format(out, " offset=\"%x\"", ROM_GETOFFSET(rom));
 			}
 			else
 			{
 				// for disk entries, add the disk index
-				out << util::string_format(" index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
+				util::stream_format(out, " index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
 			}
 
 			// add optional flag
@@ -1006,7 +1121,7 @@ void output_sample(std::ostream &out, device_t &device)
 				continue;
 
 			// output the sample name
-			out << util::string_format("\t\t<sample name=\"%s\"/>\n", normalize_string(samplename));
+			util::stream_format(out, "\t\t<sample name=\"%s\"/>\n", util::xml::normalize_string(samplename));
 		}
 	}
 }
@@ -1019,6 +1134,8 @@ void output_sample(std::ostream &out, device_t &device)
 
 void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 {
+	using util::xml::normalize_string;
+
 	// iterate over executable devices
 	for (device_execute_interface &exec : execute_interface_enumerator(device))
 	{
@@ -1029,9 +1146,9 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 
 			out << "\t\t<chip";
 			out << " type=\"cpu\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(exec.device().name()));
-			out << util::string_format(" clock=\"%d\"", exec.device().clock());
+			util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
+			util::stream_format(out, " name=\"%s\"", normalize_string(exec.device().name()));
+			util::stream_format(out, " clock=\"%d\"", exec.device().clock());
 			out << "/>\n";
 		}
 	}
@@ -1046,10 +1163,10 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 
 			out << "\t\t<chip";
 			out << " type=\"audio\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(sound.device().name()));
+			util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
+			util::stream_format(out, " name=\"%s\"", normalize_string(sound.device().name()));
 			if (sound.device().clock() != 0)
-				out << util::string_format(" clock=\"%d\"", sound.device().clock());
+				util::stream_format(out, " clock=\"%d\"", sound.device().clock());
 			out << "/>\n";
 		}
 	}
@@ -1071,7 +1188,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			std::string newtag(screendev.tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
-			out << util::string_format("\t\t<display tag=\"%s\"", normalize_string(newtag.c_str()));
+			util::stream_format(out, "\t\t<display tag=\"%s\"", util::xml::normalize_string(newtag));
 
 			switch (screendev.screen_type())
 			{
@@ -1115,12 +1232,12 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
 			{
 				const rectangle &visarea = screendev.visible_area();
-				out << util::string_format(" width=\"%d\"", visarea.width());
-				out << util::string_format(" height=\"%d\"", visarea.height());
+				util::stream_format(out, " width=\"%d\"", visarea.width());
+				util::stream_format(out, " height=\"%d\"", visarea.height());
 			}
 
 			// output refresh rate
-			out << util::string_format(" refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			util::stream_format(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
@@ -1128,13 +1245,13 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			{
 				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
 
-				out << util::string_format(" pixclock=\"%d\"", pixclock);
-				out << util::string_format(" htotal=\"%d\"", screendev.width());
-				out << util::string_format(" hbend=\"%d\"", screendev.visible_area().min_x);
-				out << util::string_format(" hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				out << util::string_format(" vtotal=\"%d\"", screendev.height());
-				out << util::string_format(" vbend=\"%d\"", screendev.visible_area().min_y);
-				out << util::string_format(" vbstart=\"%d\"", screendev.visible_area().max_y+1);
+				util::stream_format(out, " pixclock=\"%d\"", pixclock);
+				util::stream_format(out, " htotal=\"%d\"", screendev.width());
+				util::stream_format(out, " hbend=\"%d\"", screendev.visible_area().min_x);
+				util::stream_format(out, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
+				util::stream_format(out, " vtotal=\"%d\"", screendev.height());
+				util::stream_format(out, " vbend=\"%d\"", screendev.visible_area().min_y);
+				util::stream_format(out, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
 			}
 			out << " />\n";
 		}
@@ -1157,7 +1274,7 @@ void output_sound(std::ostream &out, device_t &device)
 	if (snditer.first() == nullptr)
 		speakers = 0;
 
-	out << util::string_format("\t\t<sound channels=\"%d\"/>\n", speakers);
+	util::stream_format(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
 }
 
 
@@ -1183,7 +1300,7 @@ void output_ioport_condition(std::ostream &out, const ioport_condition &conditio
 	case ioport_condition::NOTLESSTHAN:     rel = "ge"; break;
 	}
 
-	out << util::string_format("<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", normalize_string(condition.tag()), condition.mask(), rel, condition.value());
+	util::stream_format(out, "<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", util::xml::normalize_string(condition.tag()), condition.mask(), rel, condition.value());
 }
 
 //-------------------------------------------------
@@ -1245,14 +1362,14 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		int             player;         // player which the input belongs to
 		int             nbuttons;       // total number of buttons
 		int             reqbuttons;     // total number of non-optional buttons
-		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
+		uint32_t        maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
-		uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
-		int32_t           min;            // analog minimum value
-		int32_t           max;            // analog maximum value
-		int32_t           sensitivity;    // default analog sensitivity
-		int32_t           keydelta;       // default analog keydelta
+		uint8_t         helper[3];      // for dual joysticks [possibly to be removed soonish]
+		int32_t         min;            // analog minimum value
+		int32_t         max;            // analog maximum value
+		int32_t         sensitivity;    // default analog sensitivity
+		int32_t         keydelta;       // default analog keydelta
 		bool            reverse;        // default analog reverse setting
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 
@@ -1260,7 +1377,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 
 	// tracking info as we iterate
 	int nplayer = 0;
-	int ncoin = 0;
+	uint32_t ncoin = 0;
 	bool service = false;
 	bool tilt = false;
 
@@ -1269,7 +1386,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
 		bool ctrl_analog = false;
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 		{
 			// track the highest player number
 			if (nplayer < field.player() + 1)
@@ -1586,37 +1703,39 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	// Output the input info
 	// First basic info
 	out << "\t\t<input";
-	out << util::string_format(" players=\"%d\"", nplayer);
+	util::stream_format(out, " players=\"%d\"", nplayer);
 	if (ncoin != 0)
-		out << util::string_format(" coins=\"%d\"", ncoin);
+		util::stream_format(out, " coins=\"%u\"", ncoin);
 	if (service)
-		out << util::string_format(" service=\"yes\"");
+		util::stream_format(out, " service=\"yes\"");
 	if (tilt)
-		out << util::string_format(" tilt=\"yes\"");
+		util::stream_format(out, " tilt=\"yes\"");
 	out << ">\n";
 
 	// Then controller specific ones
 	for (auto & elem : control_info)
 		if (elem.type != nullptr)
 		{
+			using util::xml::normalize_string;
+
 			//printf("type %s - player %d - buttons %d\n", elem.type, elem.player, elem.nbuttons);
 			if (elem.analog)
 			{
-				out << util::string_format("\t\t\t<control type=\"%s\"", normalize_string(elem.type));
+				util::stream_format(out, "\t\t\t<control type=\"%s\"", normalize_string(elem.type));
 				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
+					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
 				if (elem.min != 0 || elem.max != 0)
-					out << util::string_format(" minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
+					util::stream_format(out, " minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
 				if (elem.sensitivity != 0)
-					out << util::string_format(" sensitivity=\"%d\"", elem.sensitivity);
+					util::stream_format(out, " sensitivity=\"%d\"", elem.sensitivity);
 				if (elem.keydelta != 0)
-					out << util::string_format(" keydelta=\"%d\"", elem.keydelta);
+					util::stream_format(out, " keydelta=\"%d\"", elem.keydelta);
 				if (elem.reverse)
 					out << " reverse=\"yes\"";
 
@@ -1628,14 +1747,14 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (elem.helper[0] == 0 && elem.helper[1] != 0) { elem.helper[0] = elem.helper[1]; elem.helper[1] = 0; }
 				if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
 				const char *joys = (elem.helper[2] != 0) ? "triple" : (elem.helper[1] != 0) ? "double" : "";
-				out << util::string_format("\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
+				util::stream_format(out, "\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
 				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
+					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
 				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
 				{
@@ -1645,7 +1764,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					switch (elem.helper[lp] & (DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT))
 					{
 						case DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT:
-							helper = string_format("%d", (elem.ways == 0) ? 8 : elem.ways);
+							helper = util::string_format(std::locale::classic(), "%d", (elem.ways == 0) ? 8 : elem.ways);
 							ways = helper.c_str();
 							break;
 						case DIR_LEFT | DIR_RIGHT:
@@ -1670,7 +1789,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 							ways = "strange2";
 							break;
 					}
-					out << util::string_format(" ways%s=\"%s\"", plural, ways);
+					util::stream_format(out, " ways%s=\"%s\"", plural, ways);
 				}
 				out << "/>\n";
 			}
@@ -1692,20 +1811,23 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 		for (ioport_field const &field : port.second->fields())
 			if (field.type() == type)
 			{
+				using util::xml::normalize_string;
+
 				std::string newtag(port.second->tag()), oldtag(":");
 				newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 				// output the switch name information
-				std::string const normalized_field_name(normalize_string(field.name()));
-				std::string const normalized_newtag(normalize_string(newtag.c_str()));
-				out << util::string_format("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
+				assert(field.specific_name() != nullptr);
+				std::string const normalized_field_name(normalize_string(field.specific_name()));
+				std::string const normalized_newtag(normalize_string(newtag));
+				util::stream_format(out, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name, normalized_newtag, field.mask());
 				if (!field.condition().none())
 					output_ioport_condition(out, field.condition(), 3);
 
 				// loop over locations
 				for (ioport_diplocation const &diploc : field.diplocations())
 				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
+					util::stream_format(out, "\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
 					if (diploc.inverted())
 						out << " inverted=\"yes\"";
 					out << "/>\n";
@@ -1714,7 +1836,7 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 				// loop over settings
 				for (ioport_setting const &setting : field.settings())
 				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
+					util::stream_format(out, "\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
 					if (setting.value() == field.defvalue())
 						out << " default=\"yes\"";
 					if (setting.condition().none())
@@ -1725,12 +1847,12 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 					{
 						out << ">\n";
 						output_ioport_condition(out, setting.condition(), 4);
-						out << util::string_format("\t\t\t</%s>\n", innertag);
+						util::stream_format(out, "\t\t\t</%s>\n", innertag);
 					}
 				}
 
 				// terminate the switch entry
-				out << util::string_format("\t\t</%s>\n", outertag);
+				util::stream_format(out, "\t\t</%s>\n", outertag);
 			}
 }
 
@@ -1743,13 +1865,13 @@ void output_ports(std::ostream &out, const ioport_list &portlist)
 	// cycle through ports
 	for (auto &port : portlist)
 	{
-		out << util::string_format("\t\t<port tag=\"%s\">\n", normalize_string(port.second->tag()));
+		util::stream_format(out, "\t\t<port tag=\"%s\">\n", util::xml::normalize_string(port.second->tag()));
 		for (ioport_field const &field : port.second->fields())
 		{
 			if (field.is_analog())
-				out << util::string_format("\t\t\t<analog mask=\"%u\"/>\n", field.mask());
+				util::stream_format(out, "\t\t\t<analog mask=\"%u\"/>\n", field.mask());
 		}
-		out << util::string_format("\t\t</port>\n");
+		util::stream_format(out, "\t\t</port>\n");
 	}
 
 }
@@ -1766,7 +1888,7 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 		for (ioport_field const &field : port.second->fields())
 			if (field.type() == IPT_ADJUSTER)
 			{
-				out << util::string_format("\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
+				util::stream_format(out, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", util::xml::normalize_string(field.specific_name()), field.defvalue());
 			}
 }
 
@@ -1841,7 +1963,7 @@ void output_features(std::ostream &out, device_type type, device_t::feature_type
 	{
 		if (flags & feature.first)
 		{
-			out << util::string_format("\t\t<feature type=\"%s\"", feature.second);
+			util::stream_format(out, "\t\t<feature type=\"%s\"", feature.second);
 			if (type.unemulated_features() & feature.first)
 			{
 				out << " status=\"unemulated\"";
@@ -1872,16 +1994,19 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 	{
 		if (strcmp(imagedev.device().tag(), device.tag()))
 		{
+			using util::xml::normalize_string;
+
 			bool loadable = imagedev.user_loadable();
 			std::string newtag(imagedev.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
-			out << util::string_format("\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
+			assert(imagedev.image_type_name() != nullptr);
+			util::stream_format(out, "\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
 
 			// does this device have a tag?
 			if (imagedev.device().tag())
-				out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
+				util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
 
 			// is this device available as media switch?
 			if (!loadable)
@@ -1892,7 +2017,7 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 				out << " mandatory=\"1\"";
 
 			if (imagedev.image_interface() && imagedev.image_interface()[0])
-				out << util::string_format(" interface=\"%s\"", normalize_string(imagedev.image_interface()));
+				util::stream_format(out, " interface=\"%s\"", normalize_string(imagedev.image_interface()));
 
 			// close the XML tag
 			out << ">\n";
@@ -1903,8 +2028,8 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 				char const *const shortname = imagedev.brief_instance_name().c_str();
 
 				out << "\t\t\t<instance";
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
-				out << util::string_format(" briefname=\"%s\"", normalize_string(shortname));
+				util::stream_format(out, " name=\"%s\"", normalize_string(name));
+				util::stream_format(out, " briefname=\"%s\"", normalize_string(shortname));
 				out << "/>\n";
 
 				char const *extensions(imagedev.file_extensions());
@@ -1913,7 +2038,7 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 					char const *end(extensions);
 					while (*end && (',' != *end))
 						++end;
-					out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string(extensions, end).c_str()));
+					util::stream_format(out, "\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string_view(extensions, end - extensions)));
 					extensions = *end ? (end + 1) : nullptr;
 				}
 			}
@@ -1936,13 +2061,15 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 		if (devtypes || listed)
 		{
+			using util::xml::normalize_string;
+
 			machine_config::token const tok(config.begin_configuration(slot.device()));
 			std::string newtag(slot.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
 			if (listed)
-				out << util::string_format("\t\t<slot name=\"%s\">\n", normalize_string(newtag.c_str()));
+				util::stream_format(out, "\t\t<slot name=\"%s\">\n", normalize_string(newtag));
 
 			for (auto &option : slot.option_list())
 			{
@@ -1957,9 +2084,9 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 					if (listed && option.second->selectable())
 					{
-						out << util::string_format("\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
-						out << util::string_format(" devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
+						util::stream_format(out, "\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
+						util::stream_format(out, " devname=\"%s\"", normalize_string(dev->shortname()));
+						if (slot.default_option() && !strcmp(slot.default_option(), option.second->name()))
 							out << " default=\"yes\"";
 						out << "/>\n";
 					}
@@ -1984,6 +2111,8 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 {
 	for (const software_list_device &swlist : software_list_device_enumerator(root))
 	{
+		using util::xml::normalize_string;
+
 		if (&static_cast<const device_t &>(swlist) == &root)
 		{
 			assert(swlist.list_name().empty());
@@ -1992,10 +2121,10 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 
 		std::string newtag(swlist.tag()), oldtag(":");
 		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
+		util::stream_format(out, "\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag), normalize_string(swlist.list_name()), swlist.is_original() ? "original" : "compatible");
 
 		if (swlist.filter())
-			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
+			util::stream_format(out, " filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";
 	}
 }
@@ -2021,15 +2150,15 @@ void output_ramoptions(std::ostream &out, device_t &root)
 				{
 					assert(!havedefault);
 					havedefault = true;
-					out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
 				}
 				else
 				{
-					out << util::string_format("\t\t<ramoption name=\"%s\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					util::stream_format(out, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
 				}
 			}
 			if (!havedefault)
-				out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+				util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
 			break;
 		}
 	}
@@ -2041,21 +2170,51 @@ void output_ramoptions(std::ostream &out, device_t &root)
 //  parent set
 //-------------------------------------------------
 
-const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes)
+char const *get_merge_name(driver_list const &drivlist, game_driver const &driver, util::hash_collection const &romhashes)
 {
+	char const *result = nullptr;
+
 	// walk the parent chain
-	for (int clone_of = drivlist.find(driver.parent); 0 <= clone_of; clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+	for (int clone_of = drivlist.find(driver.parent); !result && (0 <= clone_of); clone_of = drivlist.find(drivlist.driver(clone_of).parent))
+		result = get_merge_name(drivlist.driver(clone_of).rom, romhashes);
+
+	return result;
+}
+
+
+char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes)
+{
+	char const *result = nullptr;
+
+	// check for a parent type
+	auto const parenttype(device.type().parent_rom_device_type());
+	if (parenttype)
 	{
+		// instantiate the parent device
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
+		device_t *const parent = config.device_add("_parent", *parenttype, 0);
+
 		// look in the parent's ROMs
-		for (romload::region const &pregion : romload::entries(drivlist.driver(clone_of).rom).get_regions())
+		result = get_merge_name(parent->rom_region(), romhashes);
+
+		// remember to remove the device
+		config.device_remove("_parent");
+	}
+
+	return result;
+}
+
+
+char const *get_merge_name(tiny_rom_entry const *roms, util::hash_collection const &romhashes)
+{
+	for (romload::region const &pregion : romload::entries(roms).get_regions())
+	{
+		for (romload::file const &prom : pregion.get_files())
 		{
-			for (romload::file const &prom : pregion.get_files())
-			{
-				// stop when we find a match
-				util::hash_collection const phashes(prom.get_hashdata());
-				if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
-					return prom.get_name();
-			}
+			// stop when we find a match
+			util::hash_collection const phashes(prom.get_hashdata());
+			if (!phashes.flag(util::hash_collection::FLAG_NO_DUMP) && (romhashes == phashes))
+				return prom.get_name();
 		}
 	}
 

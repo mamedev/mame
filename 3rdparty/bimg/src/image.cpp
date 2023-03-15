@@ -1,12 +1,12 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
 #include "bimg_p.h"
 #include <bx/hash.h>
 
-#include <astc-codec/astc-codec.h>
+#include <astcenc.h>
 
 #include <bx/debug.h>
 
@@ -46,11 +46,19 @@ namespace bimg
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ATCE
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ATCI
 		{   8,  4, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC4x4
+		{   6,  5, 4, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC5x4
 		{   6,  5, 5, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC5x5
+		{   4,  6, 5, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC6x5
 		{   4,  6, 6, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC6x6
 		{   4,  8, 5, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC8x5
 		{   3,  8, 6, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC8x6
+		{   2,  8, 8, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC8x8
 		{   3, 10, 5, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC10x5
+		{   2, 10, 6, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC10x6
+		{   2, 10, 8, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC10x8
+		{   1, 10,10, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC10x10
+		{   1, 12,10, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC12x10
+		{   1, 12,12, 16, 1, 1,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // ASTC12x12
 		{   0,  0, 0,  0, 0, 0,  0, 0,  0,  0,  0,  0, uint8_t(bx::EncodingType::Count) }, // Unknown
 		{   1,  8, 1,  1, 1, 1,  0, 0,  1,  0,  0,  0, uint8_t(bx::EncodingType::Unorm) }, // R1
 		{   8,  1, 1,  1, 1, 1,  0, 0,  0,  0,  0,  8, uint8_t(bx::EncodingType::Unorm) }, // A8
@@ -96,8 +104,11 @@ namespace bimg
 		{ 128,  1, 1, 16, 1, 1,  0, 0, 32, 32, 32, 32, uint8_t(bx::EncodingType::Int  ) }, // RGBA32I
 		{ 128,  1, 1, 16, 1, 1,  0, 0, 32, 32, 32, 32, uint8_t(bx::EncodingType::Uint ) }, // RGBA32U
 		{ 128,  1, 1, 16, 1, 1,  0, 0, 32, 32, 32, 32, uint8_t(bx::EncodingType::Float) }, // RGBA32F
+		{  16,  1, 1,  2, 1, 1,  0, 0,  5,  6,  5,  0, uint8_t(bx::EncodingType::Unorm) }, // B5G6R5
 		{  16,  1, 1,  2, 1, 1,  0, 0,  5,  6,  5,  0, uint8_t(bx::EncodingType::Unorm) }, // R5G6B5
+		{  16,  1, 1,  2, 1, 1,  0, 0,  4,  4,  4,  4, uint8_t(bx::EncodingType::Unorm) }, // BGRA4
 		{  16,  1, 1,  2, 1, 1,  0, 0,  4,  4,  4,  4, uint8_t(bx::EncodingType::Unorm) }, // RGBA4
+		{  16,  1, 1,  2, 1, 1,  0, 0,  5,  5,  5,  1, uint8_t(bx::EncodingType::Unorm) }, // BGR5A1
 		{  16,  1, 1,  2, 1, 1,  0, 0,  5,  5,  5,  1, uint8_t(bx::EncodingType::Unorm) }, // RGB5A1
 		{  32,  1, 1,  4, 1, 1,  0, 0, 10, 10, 10,  2, uint8_t(bx::EncodingType::Unorm) }, // RGB10A2
 		{  32,  1, 1,  4, 1, 1,  0, 0, 11, 11, 10,  0, uint8_t(bx::EncodingType::Unorm) }, // RG11B10F
@@ -136,11 +147,19 @@ namespace bimg
 		"ATCE",       // ATCE
 		"ATCI",       // ATCI
 		"ASTC4x4",    // ASTC4x4
+		"ASTC5x4",    // ASTC5x4
 		"ASTC5x5",    // ASTC5x5
+		"ASTC6x5",    // ASTC6x5
 		"ASTC6x6",    // ASTC6x6
 		"ASTC8x5",    // ASTC8x5
 		"ASTC8x6",    // ASTC8x6
+		"ASTC8x8",    // ASTC8x8
 		"ASTC10x5",   // ASTC10x5
+		"ASTC10x6",   // ASTC10x6
+		"ASTC10x8",   // ASTC10x8
+		"ASTC10x10",  // ASTC10x10
+		"ASTC12x10",  // ASTC12x10
+		"ASTC12x12",  // ASTC12x12
 		"<unknown>",  // Unknown
 		"R1",         // R1
 		"A8",         // A8
@@ -186,11 +205,14 @@ namespace bimg
 		"RGBA32I",    // RGBA32I
 		"RGBA32U",    // RGBA32U
 		"RGBA32F",    // RGBA32F
+		"B5G6R5",     // B5G6R5
 		"R5G6B5",     // R5G6B5
+		"BGRA4",      // BGRA4
 		"RGBA4",      // RGBA4
+		"BGR5A1",     // BGR5A1
 		"RGB5A1",     // RGB5A1
 		"RGB10A2",    // RGB10A2
-		"RG11B10F", // RG11B10F
+		"RG11B10F",   // RG11B10F
 		"<unknown>",  // UnknownDepth
 		"D16",        // D16
 		"D24",        // D24
@@ -346,7 +368,7 @@ namespace bimg
 		return size;
 	}
 
-	void imageSolid(void* _dst, uint32_t _width, uint32_t _height, uint32_t _solid)
+	BX_NO_INLINE void imageSolid(void* _dst, uint32_t _width, uint32_t _height, uint32_t _solid)
 	{
 		uint32_t* dst = (uint32_t*)_dst;
 		for (uint32_t ii = 0, num = _width*_height; ii < num; ++ii)
@@ -355,7 +377,7 @@ namespace bimg
 		}
 	}
 
-	void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
+	BX_NO_INLINE void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
 	{
 		uint32_t* dst = (uint32_t*)_dst;
 		for (uint32_t yy = 0; yy < _height; ++yy)
@@ -571,8 +593,8 @@ namespace bimg
 
 		for (uint16_t side = 0; side < numSides; ++side)
 		{
-			bimg::ImageMip mip;
-			bimg::imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
+			ImageMip mip;
+			imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
 
 			const uint32_t pitch = _imageContainer->m_width*16;
 			const uint32_t slice = _imageContainer->m_height*pitch;
@@ -617,8 +639,8 @@ namespace bimg
 
 		for (uint16_t side = 0; side < numSides; ++side)
 		{
-			bimg::ImageMip mip;
-			bimg::imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
+			ImageMip mip;
+			imageGetRawData(*_imageContainer, side, 0, _imageContainer->m_data, _imageContainer->m_size, mip);
 
 			const uint32_t pitch = _imageContainer->m_width*16;
 			const uint32_t slice = _imageContainer->m_height*pitch;
@@ -1058,11 +1080,19 @@ namespace bimg
 		{ NULL,               NULL                 }, // ATCE
 		{ NULL,               NULL                 }, // ATCI
 		{ NULL,               NULL                 }, // ASTC4x4
+		{ NULL,               NULL                 }, // ASTC5x4
 		{ NULL,               NULL                 }, // ASTC5x5
+		{ NULL,               NULL                 }, // ASTC6x5
 		{ NULL,               NULL                 }, // ASTC6x6
 		{ NULL,               NULL                 }, // ASTC8x5
 		{ NULL,               NULL                 }, // ASTC8x6
+		{ NULL,               NULL                 }, // ASTC8x8
 		{ NULL,               NULL                 }, // ASTC10x5
+		{ NULL,               NULL                 }, // ASTC10x6
+		{ NULL,               NULL                 }, // ASTC10x8
+		{ NULL,               NULL                 }, // ASTC10x10
+		{ NULL,               NULL                 }, // ASTC12x10
+		{ NULL,               NULL                 }, // ASTC12x12
 		{ NULL,               NULL                 }, // Unknown
 		{ NULL,               NULL                 }, // R1
 		{ bx::packA8,         bx::unpackA8         }, // A8
@@ -1108,8 +1138,11 @@ namespace bimg
 		{ bx::packRgba32I,    bx::unpackRgba32I    }, // RGBA32I
 		{ bx::packRgba32U,    bx::unpackRgba32U    }, // RGBA32U
 		{ bx::packRgba32F,    bx::unpackRgba32F    }, // RGBA32F
+		{ bx::packB5G6R5,     bx::unpackB5G6R5     }, // B5G6R5
 		{ bx::packR5G6B5,     bx::unpackR5G6B5     }, // R5G6B5
+		{ bx::packBgra4,      bx::unpackBgra4      }, // BGRA4
 		{ bx::packRgba4,      bx::unpackRgba4      }, // RGBA4
+		{ bx::packBgr5a1,     bx::unpackBgr5a1     }, // BGR5A1
 		{ bx::packRgb5a1,     bx::unpackRgb5a1     }, // RGB5A1
 		{ bx::packRgb10A2,    bx::unpackRgb10A2    }, // RGB10A2
 		{ bx::packRG11B10F,   bx::unpackRG11B10F   }, // RG11B10F
@@ -1123,7 +1156,7 @@ namespace bimg
 		{ bx::packR32F,       bx::unpackR32F       }, // D32F
 		{ bx::packR8,         bx::unpackR8         }, // D0S8
 	};
-	BX_STATIC_ASSERT(TextureFormat::Count ==       BX_COUNTOF(s_packUnpack) );
+	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_packUnpack) );
 
 	PackFn getPack(TextureFormat::Enum _format)
 	{
@@ -1264,7 +1297,7 @@ namespace bimg
 						, mip.m_height
 						, mip.m_depth
 						);
-					BX_CHECK(ok, "Conversion from %s to %s failed!"
+					BX_ASSERT(ok, "Conversion from %s to %s failed!"
 							, getName(_input.m_format)
 							, getName(output->m_format)
 							);
@@ -1284,11 +1317,15 @@ namespace bimg
 		bx::MemoryReader reader(_src, _size);
 
 		uint32_t magic;
-		bx::read(&reader, magic);
+		bx::read(&reader, magic, bx::ErrorIgnore{});
 
 		ImageContainer imageContainer;
-		if (magicT != magic
-		|| !parseFnT(imageContainer, &reader, _err) )
+		if (magicT != magic)
+		{
+			return NULL;
+		}
+
+		if (!parseFnT(imageContainer, &reader, _err) )
 		{
 			return NULL;
 		}
@@ -1325,7 +1362,7 @@ namespace bimg
 		return output;
 	}
 
-	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
+	static uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
 	{
 		using namespace bx;
 		uint32_t tmp0   = uint32_sll(1, _to);
@@ -1341,8 +1378,13 @@ namespace bimg
 		return uint8_t(result);
 	}
 
-	void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
+		{
+			return;
+		}
+
 		uint8_t colors[4*3];
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
@@ -1372,8 +1414,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC1 || BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
+		{
+			return;
+		}
+
 		uint8_t colors[4*4];
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
@@ -1423,8 +1470,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC2) )
+		{
+			return;
+		}
+
 		for (uint32_t ii = 0, next = 0; ii < 16*4; ii += 4, next += 4)
 		{
 			uint32_t c0 = (_src[next>>3] >> (next&7) ) & 0xf;
@@ -1432,8 +1484,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC3 || BIMG_DECODE_BC4 || BIMG_DECODE_BC5) )
+		{
+			return;
+		}
+
 		uint8_t alpha[8];
 		alpha[0] = _src[0];
 		alpha[1] = _src[1];
@@ -1549,69 +1606,69 @@ namespace bimg
 	static const uint32_t s_bptcP3[] =
 	{ //  76543210     0000   1111   2222   3333   4444   5555   6666   7777
 		0xaa685050, // 0, 0,  1, 1,  0, 0,  1, 1,  0, 2,  2, 1,  2, 2,  2, 2
-		0x6a5a5040,	// 0, 0,  0, 1,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  2, 1
-		0x5a5a4200,	// 0, 0,  0, 0,  2, 0,  0, 1,  2, 2,  1, 1,  2, 2,  1, 1
-		0x5450a0a8,	// 0, 2,  2, 2,  0, 0,  2, 2,  0, 0,  1, 1,  0, 1,  1, 1
-		0xa5a50000,	// 0, 0,  0, 0,  0, 0,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2
-		0xa0a05050,	// 0, 0,  1, 1,  0, 0,  1, 1,  0, 0,  2, 2,  0, 0,  2, 2
-		0x5555a0a0,	// 0, 0,  2, 2,  0, 0,  2, 2,  1, 1,  1, 1,  1, 1,  1, 1
-		0x5a5a5050,	// 0, 0,  1, 1,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  1, 1
-		0xaa550000,	// 0, 0,  0, 0,  0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2
-		0xaa555500,	// 0, 0,  0, 0,  1, 1,  1, 1,  1, 1,  1, 1,  2, 2,  2, 2
-		0xaaaa5500,	// 0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  2, 2,  2, 2
-		0x90909090,	// 0, 0,  1, 2,  0, 0,  1, 2,  0, 0,  1, 2,  0, 0,  1, 2
-		0x94949494,	// 0, 1,  1, 2,  0, 1,  1, 2,  0, 1,  1, 2,  0, 1,  1, 2
-		0xa4a4a4a4,	// 0, 1,  2, 2,  0, 1,  2, 2,  0, 1,  2, 2,  0, 1,  2, 2
-		0xa9a59450,	// 0, 0,  1, 1,  0, 1,  1, 2,  1, 1,  2, 2,  1, 2,  2, 2
-		0x2a0a4250,	// 0, 0,  1, 1,  2, 0,  0, 1,  2, 2,  0, 0,  2, 2,  2, 0
-		0xa5945040,	// 0, 0,  0, 1,  0, 0,  1, 1,  0, 1,  1, 2,  1, 1,  2, 2
-		0x0a425054,	// 0, 1,  1, 1,  0, 0,  1, 1,  2, 0,  0, 1,  2, 2,  0, 0
-		0xa5a5a500,	// 0, 0,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  1, 1,  2, 2
-		0x55a0a0a0,	// 0, 0,  2, 2,  0, 0,  2, 2,  0, 0,  2, 2,  1, 1,  1, 1
-		0xa8a85454,	// 0, 1,  1, 1,  0, 1,  1, 1,  0, 2,  2, 2,  0, 2,  2, 2
-		0x6a6a4040,	// 0, 0,  0, 1,  0, 0,  0, 1,  2, 2,  2, 1,  2, 2,  2, 1
-		0xa4a45000,	// 0, 0,  0, 0,  0, 0,  1, 1,  0, 1,  2, 2,  0, 1,  2, 2
-		0x1a1a0500,	// 0, 0,  0, 0,  1, 1,  0, 0,  2, 2,  1, 0,  2, 2,  1, 0
-		0x0050a4a4,	// 0, 1,  2, 2,  0, 1,  2, 2,  0, 0,  1, 1,  0, 0,  0, 0
-		0xaaa59090,	// 0, 0,  1, 2,  0, 0,  1, 2,  1, 1,  2, 2,  2, 2,  2, 2
-		0x14696914,	// 0, 1,  1, 0,  1, 2,  2, 1,  1, 2,  2, 1,  0, 1,  1, 0
-		0x69691400,	// 0, 0,  0, 0,  0, 1,  1, 0,  1, 2,  2, 1,  1, 2,  2, 1
-		0xa08585a0,	// 0, 0,  2, 2,  1, 1,  0, 2,  1, 1,  0, 2,  0, 0,  2, 2
-		0xaa821414,	// 0, 1,  1, 0,  0, 1,  1, 0,  2, 0,  0, 2,  2, 2,  2, 2
-		0x50a4a450,	// 0, 0,  1, 1,  0, 1,  2, 2,  0, 1,  2, 2,  0, 0,  1, 1
-		0x6a5a0200,	// 0, 0,  0, 0,  2, 0,  0, 0,  2, 2,  1, 1,  2, 2,  2, 1
-		0xa9a58000,	// 0, 0,  0, 0,  0, 0,  0, 2,  1, 1,  2, 2,  1, 2,  2, 2
-		0x5090a0a8,	// 0, 2,  2, 2,  0, 0,  2, 2,  0, 0,  1, 2,  0, 0,  1, 1
-		0xa8a09050,	// 0, 0,  1, 1,  0, 0,  1, 2,  0, 0,  2, 2,  0, 2,  2, 2
-		0x24242424,	// 0, 1,  2, 0,  0, 1,  2, 0,  0, 1,  2, 0,  0, 1,  2, 0
-		0x00aa5500,	// 0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  0, 0,  0, 0
-		0x24924924,	// 0, 1,  2, 0,  1, 2,  0, 1,  2, 0,  1, 2,  0, 1,  2, 0
-		0x24499224,	// 0, 1,  2, 0,  2, 0,  1, 2,  1, 2,  0, 1,  0, 1,  2, 0
-		0x50a50a50,	// 0, 0,  1, 1,  2, 2,  0, 0,  1, 1,  2, 2,  0, 0,  1, 1
-		0x500aa550,	// 0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  0, 0,  0, 0,  1, 1
-		0xaaaa4444,	// 0, 1,  0, 1,  0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2
-		0x66660000,	// 0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  2, 1,  2, 1,  2, 1
-		0xa5a0a5a0,	// 0, 0,  2, 2,  1, 1,  2, 2,  0, 0,  2, 2,  1, 1,  2, 2
-		0x50a050a0,	// 0, 0,  2, 2,  0, 0,  1, 1,  0, 0,  2, 2,  0, 0,  1, 1
-		0x69286928,	// 0, 2,  2, 0,  1, 2,  2, 1,  0, 2,  2, 0,  1, 2,  2, 1
-		0x44aaaa44,	// 0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2,  0, 1,  0, 1
-		0x66666600,	// 0, 0,  0, 0,  2, 1,  2, 1,  2, 1,  2, 1,  2, 1,  2, 1
-		0xaa444444,	// 0, 1,  0, 1,  0, 1,  0, 1,  0, 1,  0, 1,  2, 2,  2, 2
-		0x54a854a8,	// 0, 2,  2, 2,  0, 1,  1, 1,  0, 2,  2, 2,  0, 1,  1, 1
-		0x95809580,	// 0, 0,  0, 2,  1, 1,  1, 2,  0, 0,  0, 2,  1, 1,  1, 2
-		0x96969600,	// 0, 0,  0, 0,  2, 1,  1, 2,  2, 1,  1, 2,  2, 1,  1, 2
-		0xa85454a8,	// 0, 2,  2, 2,  0, 1,  1, 1,  0, 1,  1, 1,  0, 2,  2, 2
-		0x80959580,	// 0, 0,  0, 2,  1, 1,  1, 2,  1, 1,  1, 2,  0, 0,  0, 2
-		0xaa141414,	// 0, 1,  1, 0,  0, 1,  1, 0,  0, 1,  1, 0,  2, 2,  2, 2
-		0x96960000,	// 0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  1, 2,  2, 1,  1, 2
-		0xaaaa1414,	// 0, 1,  1, 0,  0, 1,  1, 0,  2, 2,  2, 2,  2, 2,  2, 2
-		0xa05050a0,	// 0, 0,  2, 2,  0, 0,  1, 1,  0, 0,  1, 1,  0, 0,  2, 2
-		0xa0a5a5a0,	// 0, 0,  2, 2,  1, 1,  2, 2,  1, 1,  2, 2,  0, 0,  2, 2
-		0x96000000,	// 0, 0,  0, 0,  0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  1, 2
-		0x40804080,	// 0, 0,  0, 2,  0, 0,  0, 1,  0, 0,  0, 2,  0, 0,  0, 1
-		0xa9a8a9a8,	// 0, 2,  2, 2,  1, 2,  2, 2,  0, 2,  2, 2,  1, 2,  2, 2
-		0xaaaaaa44,	// 0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2,  2, 2,  2, 2
-		0x2a4a5254,	// 0, 1,  1, 1,  2, 0,  1, 1,  2, 2,  0, 1,  2, 2,  2, 0
+		0x6a5a5040, // 0, 0,  0, 1,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  2, 1
+		0x5a5a4200, // 0, 0,  0, 0,  2, 0,  0, 1,  2, 2,  1, 1,  2, 2,  1, 1
+		0x5450a0a8, // 0, 2,  2, 2,  0, 0,  2, 2,  0, 0,  1, 1,  0, 1,  1, 1
+		0xa5a50000, // 0, 0,  0, 0,  0, 0,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2
+		0xa0a05050, // 0, 0,  1, 1,  0, 0,  1, 1,  0, 0,  2, 2,  0, 0,  2, 2
+		0x5555a0a0, // 0, 0,  2, 2,  0, 0,  2, 2,  1, 1,  1, 1,  1, 1,  1, 1
+		0x5a5a5050, // 0, 0,  1, 1,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  1, 1
+		0xaa550000, // 0, 0,  0, 0,  0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2
+		0xaa555500, // 0, 0,  0, 0,  1, 1,  1, 1,  1, 1,  1, 1,  2, 2,  2, 2
+		0xaaaa5500, // 0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  2, 2,  2, 2
+		0x90909090, // 0, 0,  1, 2,  0, 0,  1, 2,  0, 0,  1, 2,  0, 0,  1, 2
+		0x94949494, // 0, 1,  1, 2,  0, 1,  1, 2,  0, 1,  1, 2,  0, 1,  1, 2
+		0xa4a4a4a4, // 0, 1,  2, 2,  0, 1,  2, 2,  0, 1,  2, 2,  0, 1,  2, 2
+		0xa9a59450, // 0, 0,  1, 1,  0, 1,  1, 2,  1, 1,  2, 2,  1, 2,  2, 2
+		0x2a0a4250, // 0, 0,  1, 1,  2, 0,  0, 1,  2, 2,  0, 0,  2, 2,  2, 0
+		0xa5945040, // 0, 0,  0, 1,  0, 0,  1, 1,  0, 1,  1, 2,  1, 1,  2, 2
+		0x0a425054, // 0, 1,  1, 1,  0, 0,  1, 1,  2, 0,  0, 1,  2, 2,  0, 0
+		0xa5a5a500, // 0, 0,  0, 0,  1, 1,  2, 2,  1, 1,  2, 2,  1, 1,  2, 2
+		0x55a0a0a0, // 0, 0,  2, 2,  0, 0,  2, 2,  0, 0,  2, 2,  1, 1,  1, 1
+		0xa8a85454, // 0, 1,  1, 1,  0, 1,  1, 1,  0, 2,  2, 2,  0, 2,  2, 2
+		0x6a6a4040, // 0, 0,  0, 1,  0, 0,  0, 1,  2, 2,  2, 1,  2, 2,  2, 1
+		0xa4a45000, // 0, 0,  0, 0,  0, 0,  1, 1,  0, 1,  2, 2,  0, 1,  2, 2
+		0x1a1a0500, // 0, 0,  0, 0,  1, 1,  0, 0,  2, 2,  1, 0,  2, 2,  1, 0
+		0x0050a4a4, // 0, 1,  2, 2,  0, 1,  2, 2,  0, 0,  1, 1,  0, 0,  0, 0
+		0xaaa59090, // 0, 0,  1, 2,  0, 0,  1, 2,  1, 1,  2, 2,  2, 2,  2, 2
+		0x14696914, // 0, 1,  1, 0,  1, 2,  2, 1,  1, 2,  2, 1,  0, 1,  1, 0
+		0x69691400, // 0, 0,  0, 0,  0, 1,  1, 0,  1, 2,  2, 1,  1, 2,  2, 1
+		0xa08585a0, // 0, 0,  2, 2,  1, 1,  0, 2,  1, 1,  0, 2,  0, 0,  2, 2
+		0xaa821414, // 0, 1,  1, 0,  0, 1,  1, 0,  2, 0,  0, 2,  2, 2,  2, 2
+		0x50a4a450, // 0, 0,  1, 1,  0, 1,  2, 2,  0, 1,  2, 2,  0, 0,  1, 1
+		0x6a5a0200, // 0, 0,  0, 0,  2, 0,  0, 0,  2, 2,  1, 1,  2, 2,  2, 1
+		0xa9a58000, // 0, 0,  0, 0,  0, 0,  0, 2,  1, 1,  2, 2,  1, 2,  2, 2
+		0x5090a0a8, // 0, 2,  2, 2,  0, 0,  2, 2,  0, 0,  1, 2,  0, 0,  1, 1
+		0xa8a09050, // 0, 0,  1, 1,  0, 0,  1, 2,  0, 0,  2, 2,  0, 2,  2, 2
+		0x24242424, // 0, 1,  2, 0,  0, 1,  2, 0,  0, 1,  2, 0,  0, 1,  2, 0
+		0x00aa5500, // 0, 0,  0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  0, 0,  0, 0
+		0x24924924, // 0, 1,  2, 0,  1, 2,  0, 1,  2, 0,  1, 2,  0, 1,  2, 0
+		0x24499224, // 0, 1,  2, 0,  2, 0,  1, 2,  1, 2,  0, 1,  0, 1,  2, 0
+		0x50a50a50, // 0, 0,  1, 1,  2, 2,  0, 0,  1, 1,  2, 2,  0, 0,  1, 1
+		0x500aa550, // 0, 0,  1, 1,  1, 1,  2, 2,  2, 2,  0, 0,  0, 0,  1, 1
+		0xaaaa4444, // 0, 1,  0, 1,  0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2
+		0x66660000, // 0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  2, 1,  2, 1,  2, 1
+		0xa5a0a5a0, // 0, 0,  2, 2,  1, 1,  2, 2,  0, 0,  2, 2,  1, 1,  2, 2
+		0x50a050a0, // 0, 0,  2, 2,  0, 0,  1, 1,  0, 0,  2, 2,  0, 0,  1, 1
+		0x69286928, // 0, 2,  2, 0,  1, 2,  2, 1,  0, 2,  2, 0,  1, 2,  2, 1
+		0x44aaaa44, // 0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2,  0, 1,  0, 1
+		0x66666600, // 0, 0,  0, 0,  2, 1,  2, 1,  2, 1,  2, 1,  2, 1,  2, 1
+		0xaa444444, // 0, 1,  0, 1,  0, 1,  0, 1,  0, 1,  0, 1,  2, 2,  2, 2
+		0x54a854a8, // 0, 2,  2, 2,  0, 1,  1, 1,  0, 2,  2, 2,  0, 1,  1, 1
+		0x95809580, // 0, 0,  0, 2,  1, 1,  1, 2,  0, 0,  0, 2,  1, 1,  1, 2
+		0x96969600, // 0, 0,  0, 0,  2, 1,  1, 2,  2, 1,  1, 2,  2, 1,  1, 2
+		0xa85454a8, // 0, 2,  2, 2,  0, 1,  1, 1,  0, 1,  1, 1,  0, 2,  2, 2
+		0x80959580, // 0, 0,  0, 2,  1, 1,  1, 2,  1, 1,  1, 2,  0, 0,  0, 2
+		0xaa141414, // 0, 1,  1, 0,  0, 1,  1, 0,  0, 1,  1, 0,  2, 2,  2, 2
+		0x96960000, // 0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  1, 2,  2, 1,  1, 2
+		0xaaaa1414, // 0, 1,  1, 0,  0, 1,  1, 0,  2, 2,  2, 2,  2, 2,  2, 2
+		0xa05050a0, // 0, 0,  2, 2,  0, 0,  1, 1,  0, 0,  1, 1,  0, 0,  2, 2
+		0xa0a5a5a0, // 0, 0,  2, 2,  1, 1,  2, 2,  1, 1,  2, 2,  0, 0,  2, 2
+		0x96000000, // 0, 0,  0, 0,  0, 0,  0, 0,  0, 0,  0, 0,  2, 1,  1, 2
+		0x40804080, // 0, 0,  0, 2,  0, 0,  0, 1,  0, 0,  0, 2,  0, 0,  0, 1
+		0xa9a8a9a8, // 0, 2,  2, 2,  1, 2,  2, 2,  0, 2,  2, 2,  1, 2,  2, 2
+		0xaaaaaa44, // 0, 1,  0, 1,  2, 2,  2, 2,  2, 2,  2, 2,  2, 2,  2, 2
+		0x2a4a5254, // 0, 1,  1, 1,  2, 0,  1, 1,  2, 2,  0, 1,  2, 2,  2, 0
 	};
 
 	static const uint8_t s_bptcA2[] =
@@ -1689,7 +1746,7 @@ namespace bimg
 		uint16_t m_bitPos;
 	};
 
-	uint16_t bc6hUnquantize(uint16_t _value, bool _signed, uint8_t _endpointBits)
+	static uint16_t bc6hUnquantize(uint16_t _value, bool _signed, uint8_t _endpointBits)
 	{
 		const uint16_t maxValue = 1<<(_endpointBits-1);
 
@@ -1739,7 +1796,7 @@ namespace bimg
 		return ( (_value<<15) + 0x4000) >> (_endpointBits-1);
 	}
 
-	uint16_t bc6hUnquantizeFinal(uint16_t _value, bool _signed)
+	static uint16_t bc6hUnquantizeFinal(uint16_t _value, bool _signed)
 	{
 		if (_signed)
 		{
@@ -1752,7 +1809,7 @@ namespace bimg
 		return (_value * 31) >> 6;
 	}
 
-	uint16_t signExtend(uint16_t _value, uint8_t _numBits)
+	static uint16_t signExtend(uint16_t _value, uint8_t _numBits)
 	{
 		const uint16_t mask   = 1 << (_numBits - 1);
 		const uint16_t result = (_value ^ mask) - mask;
@@ -1807,329 +1864,347 @@ namespace bimg
 		{ 0, 0,  0, {  0,  0,  0 } }, // -
 	};
 
-	void decodeBlockBc6h(uint16_t _dst[16*3], const uint8_t _src[16], bool _signed)
+	static void decodeBlockBc6h(uint16_t _dst[16*3], const uint8_t _src[16], bool _signed)
 	{
-		BitReader bit(_src);
-
-		uint8_t mode = uint8_t(bit.read(2) );
-		if (mode & 2)
+		if (!BX_ENABLED(BIMG_DECODE_BC6) )
 		{
-			// 5-bit mode
-			mode |= bit.read(3) << 2;
-		}
-
-		const Bc6hModeInfo& mi = s_bc6hModeInfo[mode];
-		if (0 == mi.endpointBits)
-		{
-			bx::memSet(_dst, 0, 16*3*2);
 			return;
 		}
+
+		uint8_t src[16];
+		bx::memCopy(src, _src, 16);
+
+		BitReader bit(src);
+
+		uint8_t mode = uint8_t(bit.read(2));
 
 		uint16_t epR[4] = { /* rw, rx, ry, rz */ };
 		uint16_t epG[4] = { /* gw, gx, gy, gz */ };
 		uint16_t epB[4] = { /* bw, bx, by, bz */ };
 
-		switch (mode)
+		if (mode & 2)
 		{
-		case 0:
-			epG[2] |= bit.read( 1) <<  4;
-			epB[2] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			// 5-bit mode
+			mode |= bit.read(3) << 2;
 
-		case 1:
-			epG[2] |= bit.read( 1) <<  5;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[3] |= bit.read( 1) <<  5;
-			epR[0] |= bit.read( 7) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 7) <<  0;
-			epB[2] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 7) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			if (0 == s_bc6hModeInfo[mode].endpointBits)
+			{
+				bx::memSet(_dst, 0, 16*3*2);
+				return;
+			}
 
-		case 2:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 5) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			switch (mode)
+			{
+			case 2:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 5) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 3:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read(10) <<  0;
-			epG[1] |= bit.read(10) <<  0;
-			epB[1] |= bit.read(10) <<  0;
-			break;
+			case 3:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read(10) <<  0;
+				epG[1] |= bit.read(10) <<  0;
+				epB[1] |= bit.read(10) <<  0;
+				break;
 
-		case 6:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 4) <<  0;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 6:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 4) <<  0;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 7:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 9) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 9) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 9) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 7:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 9) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 9) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 9) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 10:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 10;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 10;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[0] |= bit.read( 1) << 10;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 4) <<  0;
-			epB[3] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 10:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 10;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 10;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[0] |= bit.read( 1) << 10;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 4) <<  0;
+				epB[3] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 11:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 8) <<  0;
-			epR[0] |= bit.read( 1) << 11;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 8) <<  0;
-			epG[0] |= bit.read( 1) << 11;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 8) <<  0;
-			epB[0] |= bit.read( 1) << 11;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 11:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 8) <<  0;
+				epR[0] |= bit.read( 1) << 11;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 8) <<  0;
+				epG[0] |= bit.read( 1) << 11;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 8) <<  0;
+				epB[0] |= bit.read( 1) << 11;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 14:
-			epR[0] |= bit.read( 9) <<  0;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 9) <<  0;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 9) <<  0;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 14:
+				epR[0] |= bit.read( 9) <<  0;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 9) <<  0;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 9) <<  0;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 15:
-			epR[0] |= bit.read(10) <<  0;
-			epG[0] |= bit.read(10) <<  0;
-			epB[0] |= bit.read(10) <<  0;
-			epR[1] |= bit.read( 4) <<  0;
-			epR[0] |= bit.read( 1) << 15;
-			epR[0] |= bit.read( 1) << 14;
-			epR[0] |= bit.read( 1) << 13;
-			epR[0] |= bit.read( 1) << 12;
-			epR[0] |= bit.read( 1) << 11;
-			epR[0] |= bit.read( 1) << 10;
-			epG[1] |= bit.read( 4) <<  0;
-			epG[0] |= bit.read( 1) << 15;
-			epG[0] |= bit.read( 1) << 14;
-			epG[0] |= bit.read( 1) << 13;
-			epG[0] |= bit.read( 1) << 12;
-			epG[0] |= bit.read( 1) << 11;
-			epG[0] |= bit.read( 1) << 10;
-			epB[1] |= bit.read( 4) <<  0;
-			epB[0] |= bit.read( 1) << 15;
-			epB[0] |= bit.read( 1) << 14;
-			epB[0] |= bit.read( 1) << 13;
-			epB[0] |= bit.read( 1) << 12;
-			epB[0] |= bit.read( 1) << 11;
-			epB[0] |= bit.read( 1) << 10;
-			break;
+			case 15:
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 4) <<  0;
+				epR[0] |= bit.read( 1) << 15;
+				epR[0] |= bit.read( 1) << 14;
+				epR[0] |= bit.read( 1) << 13;
+				epR[0] |= bit.read( 1) << 12;
+				epR[0] |= bit.read( 1) << 11;
+				epR[0] |= bit.read( 1) << 10;
+				epG[1] |= bit.read( 4) <<  0;
+				epG[0] |= bit.read( 1) << 15;
+				epG[0] |= bit.read( 1) << 14;
+				epG[0] |= bit.read( 1) << 13;
+				epG[0] |= bit.read( 1) << 12;
+				epG[0] |= bit.read( 1) << 11;
+				epG[0] |= bit.read( 1) << 10;
+				epB[1] |= bit.read( 4) <<  0;
+				epB[0] |= bit.read( 1) << 15;
+				epB[0] |= bit.read( 1) << 14;
+				epB[0] |= bit.read( 1) << 13;
+				epB[0] |= bit.read( 1) << 12;
+				epB[0] |= bit.read( 1) << 11;
+				epB[0] |= bit.read( 1) << 10;
+				break;
 
-		case 18:
-			epR[0] |= bit.read( 8) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			case 18:
+				epR[0] |= bit.read( 8) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
 
-		case 22:
-			epR[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epG[2] |= bit.read( 1) <<  5;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epG[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 22:
+				epR[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epG[2] |= bit.read( 1) <<  5;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epG[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 26:
-			epR[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 8) <<  0;
-			epB[2] |= bit.read( 1) <<  5;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 8) <<  0;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 5) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  2;
-			epR[3] |= bit.read( 5) <<  0;
-			epB[3] |= bit.read( 1) <<  3;
-			break;
+			case 26:
+				epR[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 8) <<  0;
+				epB[2] |= bit.read( 1) <<  5;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 8) <<  0;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
 
-		case 30:
-			epR[0] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 1) <<  4;
-			epB[3] |= bit.read( 1) <<  0;
-			epB[3] |= bit.read( 1) <<  1;
-			epB[2] |= bit.read( 1) <<  4;
-			epG[0] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 1) <<  5;
-			epB[2] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  2;
-			epG[2] |= bit.read( 1) <<  4;
-			epB[0] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  3;
-			epB[3] |= bit.read( 1) <<  5;
-			epB[3] |= bit.read( 1) <<  4;
-			epR[1] |= bit.read( 6) <<  0;
-			epG[2] |= bit.read( 4) <<  0;
-			epG[1] |= bit.read( 6) <<  0;
-			epG[3] |= bit.read( 4) <<  0;
-			epB[1] |= bit.read( 6) <<  0;
-			epB[2] |= bit.read( 4) <<  0;
-			epR[2] |= bit.read( 6) <<  0;
-			epR[3] |= bit.read( 6) <<  0;
-			break;
+			case 30:
+				epR[0] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 1) <<  5;
+				epB[2] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
 
-		default:
-			break;
+			default:
+				break;
+			}
 		}
+		else
+		{
+			switch (mode)
+			{
+			case 0:
+				epG[2] |= bit.read( 1) <<  4;
+				epB[2] |= bit.read( 1) <<  4;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[0] |= bit.read(10) <<  0;
+				epG[0] |= bit.read(10) <<  0;
+				epB[0] |= bit.read(10) <<  0;
+				epR[1] |= bit.read( 5) <<  0;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  2;
+				epR[3] |= bit.read( 5) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				break;
+
+			case 1:
+				epG[2] |= bit.read( 1) <<  5;
+				epG[3] |= bit.read( 1) <<  4;
+				epG[3] |= bit.read( 1) <<  5;
+				epR[0] |= bit.read( 7) <<  0;
+				epB[3] |= bit.read( 1) <<  0;
+				epB[3] |= bit.read( 1) <<  1;
+				epB[2] |= bit.read( 1) <<  4;
+				epG[0] |= bit.read( 7) <<  0;
+				epB[2] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  2;
+				epG[2] |= bit.read( 1) <<  4;
+				epB[0] |= bit.read( 7) <<  0;
+				epB[3] |= bit.read( 1) <<  3;
+				epB[3] |= bit.read( 1) <<  5;
+				epB[3] |= bit.read( 1) <<  4;
+				epR[1] |= bit.read( 6) <<  0;
+				epG[2] |= bit.read( 4) <<  0;
+				epG[1] |= bit.read( 6) <<  0;
+				epG[3] |= bit.read( 4) <<  0;
+				epB[1] |= bit.read( 6) <<  0;
+				epB[2] |= bit.read( 4) <<  0;
+				epR[2] |= bit.read( 6) <<  0;
+				epR[3] |= bit.read( 6) <<  0;
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		const Bc6hModeInfo mi = s_bc6hModeInfo[mode];
 
 		if (_signed)
 		{
@@ -2214,8 +2289,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockBc6h(float _dst[16*4], const uint8_t _src[16])
+	static void decodeBlockBc6h(float _dst[16*4], const uint8_t _src[16])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC6) )
+		{
+			return;
+		}
+
 		uint16_t tmp[16*3];
 
 		decodeBlockBc6h(tmp, _src, true);
@@ -2262,8 +2342,13 @@ namespace bimg
 		{ 2, 6, 0, 0, 5, 5, 1, 0, { 2, 0 } }, // 7
 	};
 
-	void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
+	static void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC7) )
+		{
+			return;
+		}
+
 		BitReader bit(_src);
 
 		uint8_t mode = 0;
@@ -2451,8 +2536,13 @@ namespace bimg
 
 	// ATC
 	//
-	void decodeBlockATC(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockATC(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_ATC) )
+		{
+			return;
+		}
+
 		uint8_t colors[4*4];
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
@@ -2519,7 +2609,7 @@ namespace bimg
 
 	static const uint8_t s_etc2Mod[] = { 3, 6, 11, 16, 23, 32, 41, 64 };
 
-	uint8_t uint8_sat(int32_t _a)
+	static uint8_t uint8_sat(int32_t _a)
 	{
 		using namespace bx;
 		const uint32_t min    = uint32_imin(_a, 255);
@@ -2527,19 +2617,19 @@ namespace bimg
 		return (uint8_t)result;
 	}
 
-	uint8_t uint8_satadd(int32_t _a, int32_t _b)
+	static uint8_t uint8_satadd(int32_t _a, int32_t _b)
 	{
 		const int32_t add = _a + _b;
 		return uint8_sat(add);
 	}
 
-	void decodeBlockEtc2ModeT(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModeT(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		uint8_t rgb[16];
 
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
-		// ...rr.rrggggbbbbrrrrggggbbbbDDD.mmmmmmmmmmmmmmmmllllllllllllllll
+		// ...rr.rrggggbbbbrrrrggggbbbbDD.Dmmmmmmmmmmmmmmmmllllllllllllllll
 		//    ^            ^           ^   ^               ^
 		//    +-- c0       +-- c1      |   +-- msb         +-- lsb
 		//                             +-- dist
@@ -2561,7 +2651,7 @@ namespace bimg
 		rgb[ 9] = bitRangeConvert(rgb[ 9], 4, 8);
 		rgb[10] = bitRangeConvert(rgb[10], 4, 8);
 
-		uint8_t dist = (_src[3] >> 1) & 0x7;
+		uint8_t dist = ((_src[3] >> 1) & 0x6) | (_src[3] & 0x1);
 		int32_t mod = s_etc2Mod[dist];
 
 		rgb[ 4] = uint8_satadd(rgb[ 8],  mod);
@@ -2592,13 +2682,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc2ModeH(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModeH(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		uint8_t rgb[16];
 
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
-		// .rrrrggg...gb.bbbrrrrggggbbbbDD.mmmmmmmmmmmmmmmmllllllllllllllll
+		// .rrrrggg...gb.bbbrrrrggggbbbbD.Dmmmmmmmmmmmmmmmmllllllllllllllll
 		//  ^               ^           ^  ^               ^
 		//  +-- c0          +-- c1      |  +-- msb         +-- lsb
 		//                              +-- dist
@@ -2616,7 +2706,7 @@ namespace bimg
 		rgb[ 9] = ( (_src[2] << 1) & 0xe)
 				|   (_src[3] >> 7)
 				;
-		rgb[10] = (_src[2] >> 3) & 0xf;
+		rgb[10] = (_src[3] >> 3) & 0xf;
 
 		rgb[ 0] = bitRangeConvert(rgb[ 0], 4, 8);
 		rgb[ 1] = bitRangeConvert(rgb[ 1], 4, 8);
@@ -2627,7 +2717,7 @@ namespace bimg
 
 		uint32_t col0 = uint32_t(rgb[0]<<16) | uint32_t(rgb[1]<<8) | uint32_t(rgb[ 2]);
 		uint32_t col1 = uint32_t(rgb[8]<<16) | uint32_t(rgb[9]<<8) | uint32_t(rgb[10]);
-		uint8_t  dist = (_src[3] & 0x6) | (col0 >= col1);
+		uint8_t  dist = (_src[3] & 0x4) | ((_src[3]<<1)&0x2) | (col0 >= col1);
 		int32_t  mod  = s_etc2Mod[dist];
 
 		rgb[ 4] = uint8_satadd(rgb[ 0], -mod);
@@ -2666,7 +2756,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc2ModePlanar(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModePlanar(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
@@ -2758,8 +2848,13 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_ETC1 || BIMG_DECODE_ETC2) )
+		{
+			return;
+		}
+
 		bool flipBit = 0 != (_src[3] & 0x1);
 		bool diffBit = 0 != (_src[3] & 0x2);
 
@@ -2872,6 +2967,52 @@ namespace bimg
 		}
 	}
 
+	static const int8_t s_etc2aMod[16][8] =
+	{
+		{ -3, -6,  -9, -15, 2, 5, 8, 14 },
+		{ -3, -7, -10, -13, 2, 6, 9, 12 },
+		{ -2, -5,  -8, -13, 1, 4, 7, 12 },
+		{ -2, -4,  -6, -13, 1, 3, 5, 12 },
+		{ -3, -6,  -8, -12, 2, 5, 7, 11 },
+		{ -3, -7,  -9, -11, 2, 6, 8, 10 },
+		{ -4, -7,  -8, -11, 3, 6, 7, 10 },
+		{ -3, -5,  -8, -11, 2, 4, 7, 10 },
+		{ -2, -6,  -8, -10, 1, 5, 7,  9 },
+		{ -2, -5,  -8, -10, 1, 4, 7,  9 },
+		{ -2, -4,  -8, -10, 1, 3, 7,  9 },
+		{ -2, -5,  -7, -10, 1, 4, 6,  9 },
+		{ -3, -4,  -7, -10, 2, 3, 6,  9 },
+		{ -1, -2,  -3, -10, 0, 1, 2,  9 },
+		{ -4, -6,  -8,  -9, 3, 5, 7,  8 },
+		{ -3, -5,  -7,  -9, 2, 4, 6,  8 }
+	};
+
+	void decodeBlockEtc2Alpha(uint8_t _dst[16 * 4], const uint8_t _src[8])
+	{
+		if (!BX_ENABLED(BIMG_DECODE_ETC2))
+		{
+			return;
+		}
+
+		const int32_t bc = _src[0];
+		const int8_t *modTable = s_etc2aMod[_src[1] & 0x0f];
+		const int32_t mult = (_src[1] & 0xf0) >> 4;
+		const uint64_t indices = ((uint64_t)_src[2] << 40)
+			| ((uint64_t)_src[3] << 32)
+			| ((uint64_t)_src[4] << 24)
+			| ((uint64_t)_src[5] << 16)
+			| ((uint64_t)_src[6] << 8)
+			| _src[7];
+
+		for (int ii = 0; ii < 16; ii++) {
+			const uint32_t idx = (ii & 0xc) | ((ii & 0x3) << 4);
+			const  int32_t mod = modTable[(indices >> (45 - ii * 3)) & 0x7];
+
+			_dst[idx + 3] = uint8_satadd(bc, mod*mult);
+		}
+	}
+
+
 	static const uint8_t s_pvrtcFactors[16][4] =
 	{
 		{  4,  4,  4,  4 },
@@ -2928,7 +3069,7 @@ namespace bimg
 			;
 	}
 
-	void decodeBlockPtc14RgbAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	static void decodeBlockPtc14RgbAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<15) ) )
 		{
@@ -2944,7 +3085,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14RgbAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	static void decodeBlockPtc14RgbAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<31) ) )
 		{
@@ -2960,7 +3101,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	static void decodeBlockPtc14(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
@@ -3032,7 +3173,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14ARgbaAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	static void decodeBlockPtc14ARgbaAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<15) ) )
 		{
@@ -3050,7 +3191,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14ARgbaAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	static void decodeBlockPtc14ARgbaAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<31) ) )
 		{
@@ -3068,7 +3209,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14A(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	static void decodeBlockPtc14A(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
@@ -3158,7 +3299,7 @@ namespace bimg
 		const uint8_t numMips = _hasMips ? imageGetNumMips(_format, _width, _height, _depth) : 1;
 		uint32_t size = imageGetSize(NULL, _width, _height, _depth, _cubeMap, _hasMips, _numLayers, _format);
 
-		ImageContainer* imageContainer = (ImageContainer*)BX_ALIGNED_ALLOC(_allocator, size + BX_ALIGN_16(sizeof(ImageContainer) ), 16);
+		ImageContainer* imageContainer = (ImageContainer*)BX_ALIGNED_ALLOC(_allocator, size + bx::alignUp(sizeof(ImageContainer), 16), 16);
 
 		imageContainer->m_allocator   = _allocator;
 		imageContainer->m_data        = bx::alignPtr(imageContainer + 1, 0, 16);
@@ -3174,6 +3315,7 @@ namespace bimg
 		imageContainer->m_hasAlpha    = false;
 		imageContainer->m_cubeMap     = _cubeMap;
 		imageContainer->m_ktx         = false;
+		imageContainer->m_pvr3        = false;
 		imageContainer->m_ktxLE       = false;
 		imageContainer->m_srgb        = false;
 
@@ -3183,6 +3325,7 @@ namespace bimg
 		}
 
 		return imageContainer;
+
 	}
 
 	void imageFree(ImageContainer* _imageContainer)
@@ -3205,20 +3348,28 @@ namespace bimg
 #define DDS_BC5U BX_MAKEFOURCC('B', 'C', '5', 'U')
 #define DDS_DX10 BX_MAKEFOURCC('D', 'X', '1', '0')
 
-#define DDS_ETC1     BX_MAKEFOURCC('E', 'T', 'C', '1')
-#define DDS_ETC2     BX_MAKEFOURCC('E', 'T', 'C', '2')
-#define DDS_ET2A     BX_MAKEFOURCC('E', 'T', '2', 'A')
-#define DDS_PTC2     BX_MAKEFOURCC('P', 'T', 'C', '2')
-#define DDS_PTC4     BX_MAKEFOURCC('P', 'T', 'C', '4')
-#define DDS_ATC      BX_MAKEFOURCC('A', 'T', 'C', ' ')
-#define DDS_ATCE     BX_MAKEFOURCC('A', 'T', 'C', 'E')
-#define DDS_ATCI     BX_MAKEFOURCC('A', 'T', 'C', 'I')
-#define DDS_ASTC4x4  BX_MAKEFOURCC('A', 'S', '4', '4')
-#define DDS_ASTC5x5  BX_MAKEFOURCC('A', 'S', '5', '5')
-#define DDS_ASTC6x6  BX_MAKEFOURCC('A', 'S', '6', '6')
-#define DDS_ASTC8x5  BX_MAKEFOURCC('A', 'S', '8', '5')
-#define DDS_ASTC8x6  BX_MAKEFOURCC('A', 'S', '8', '6')
-#define DDS_ASTC10x5 BX_MAKEFOURCC('A', 'S', ':', '5')
+#define DDS_ETC1      BX_MAKEFOURCC('E', 'T', 'C', '1')
+#define DDS_ETC2      BX_MAKEFOURCC('E', 'T', 'C', '2')
+#define DDS_ET2A      BX_MAKEFOURCC('E', 'T', '2', 'A')
+#define DDS_PTC2      BX_MAKEFOURCC('P', 'T', 'C', '2')
+#define DDS_PTC4      BX_MAKEFOURCC('P', 'T', 'C', '4')
+#define DDS_ATC       BX_MAKEFOURCC('A', 'T', 'C', ' ')
+#define DDS_ATCE      BX_MAKEFOURCC('A', 'T', 'C', 'E')
+#define DDS_ATCI      BX_MAKEFOURCC('A', 'T', 'C', 'I')
+#define DDS_ASTC4x4   BX_MAKEFOURCC('A', 'S', '4', '4')
+#define DDS_ASTC5x4   BX_MAKEFOURCC('A', 'S', '5', '4')
+#define DDS_ASTC5x5   BX_MAKEFOURCC('A', 'S', '5', '5')
+#define DDS_ASTC6x5   BX_MAKEFOURCC('A', 'S', '6', '5')
+#define DDS_ASTC6x6   BX_MAKEFOURCC('A', 'S', '6', '6')
+#define DDS_ASTC8x5   BX_MAKEFOURCC('A', 'S', '8', '5')
+#define DDS_ASTC8x6   BX_MAKEFOURCC('A', 'S', '8', '6')
+#define DDS_ASTC8x8   BX_MAKEFOURCC('A', 'S', '8', '8')
+#define DDS_ASTC10x5  BX_MAKEFOURCC('A', 'S', ':', '5')
+#define DDS_ASTC10x6  BX_MAKEFOURCC('A', 'S', ':', '6')
+#define DDS_ASTC10x8  BX_MAKEFOURCC('A', 'S', ':', '8')
+#define DDS_ASTC10x10 BX_MAKEFOURCC('A', 'S', ':', ':')
+#define DDS_ASTC12x10 BX_MAKEFOURCC('A', 'S', '<', ':')
+#define DDS_ASTC12x12 BX_MAKEFOURCC('A', 'S', '<', '<')
 
 #define DDS_R8G8B8         20
 #define DDS_A8R8G8B8       21
@@ -3346,11 +3497,19 @@ namespace bimg
 		{ DDS_ATCE,                  TextureFormat::ATCE,     false },
 		{ DDS_ATCI,                  TextureFormat::ATCI,     false },
 		{ DDS_ASTC4x4,               TextureFormat::ASTC4x4,  false },
+		{ DDS_ASTC5x4,               TextureFormat::ASTC5x4,  false },
 		{ DDS_ASTC5x5,               TextureFormat::ASTC5x5,  false },
+		{ DDS_ASTC6x5,               TextureFormat::ASTC6x5,  false },
 		{ DDS_ASTC6x6,               TextureFormat::ASTC6x6,  false },
 		{ DDS_ASTC8x5,               TextureFormat::ASTC8x5,  false },
 		{ DDS_ASTC8x6,               TextureFormat::ASTC8x6,  false },
+		{ DDS_ASTC8x8,               TextureFormat::ASTC8x8,  false },
 		{ DDS_ASTC10x5,              TextureFormat::ASTC10x5, false },
+		{ DDS_ASTC10x6,              TextureFormat::ASTC10x6, false },
+		{ DDS_ASTC10x8,              TextureFormat::ASTC10x8, false },
+		{ DDS_ASTC10x10,             TextureFormat::ASTC10x10,false },
+		{ DDS_ASTC12x10,             TextureFormat::ASTC12x10,false },
+		{ DDS_ASTC12x12,             TextureFormat::ASTC12x12,false },
 
 		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,   false },
 		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,  false },
@@ -3369,11 +3528,15 @@ namespace bimg
 		{ DDS_A16B16G16R16,          TextureFormat::RGBA16,   false },
 		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F,  false },
 		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F,  false },
+		{ DDS_R5G6B5,                TextureFormat::B5G6R5,   false },
 		{ DDS_R5G6B5,                TextureFormat::R5G6B5,   false },
+		{ DDS_A4R4G4B4,              TextureFormat::BGRA4,    false },
 		{ DDS_A4R4G4B4,              TextureFormat::RGBA4,    false },
+		{ DDS_A1R5G5B5,              TextureFormat::BGR5A1,   false },
 		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1,   false },
 		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2,  false },
 	};
+
 
 	static const TranslateDdsFormat s_translateDxgiFormat[] =
 	{
@@ -3408,8 +3571,11 @@ namespace bimg
 		{ DDS_FORMAT_R16G16B16A16_FLOAT,  TextureFormat::RGBA16F,    false },
 		{ DDS_FORMAT_R32G32B32A32_UINT,   TextureFormat::RGBA32U,    false },
 		{ DDS_FORMAT_R32G32B32A32_FLOAT,  TextureFormat::RGBA32F,    false },
+		{ DDS_FORMAT_B5G6R5_UNORM,        TextureFormat::B5G6R5,     false },
 		{ DDS_FORMAT_B5G6R5_UNORM,        TextureFormat::R5G6B5,     false },
+		{ DDS_FORMAT_B4G4R4A4_UNORM,      TextureFormat::BGRA4,      false },
 		{ DDS_FORMAT_B4G4R4A4_UNORM,      TextureFormat::RGBA4,      false },
+		{ DDS_FORMAT_B5G5R5A1_UNORM,      TextureFormat::BGR5A1,     false },
 		{ DDS_FORMAT_B5G5R5A1_UNORM,      TextureFormat::RGB5A1,     false },
 		{ DDS_FORMAT_R10G10B10A2_UNORM,   TextureFormat::RGB10A2,    false },
 		{ DDS_FORMAT_R11G11B10_FLOAT,     TextureFormat::RG11B10F,   false },
@@ -3428,8 +3594,11 @@ namespace bimg
 		{  8, DDPF_LUMINANCE,            { 0x000000ff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R8      },
 		{ 16, DDPF_BUMPDUDV,             { 0x000000ff, 0x0000ff00, 0x00000000, 0x00000000 }, TextureFormat::RG8S    },
 		{ 16, DDPF_RGB,                  { 0x0000ffff, 0x00000000, 0x00000000, 0x00000000 }, TextureFormat::R16U    },
+		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x0000000f, 0x000000f0, 0x00000f00, 0x0000f000 }, TextureFormat::BGRA4   },
 		{ 16, DDPF_RGB|DDPF_ALPHAPIXELS, { 0x00000f00, 0x000000f0, 0x0000000f, 0x0000f000 }, TextureFormat::RGBA4   },
+		{ 16, DDPF_RGB,                  { 0x0000001f, 0x000007e0, 0x0000f800, 0x00000000 }, TextureFormat::B5G6R5  },
 		{ 16, DDPF_RGB,                  { 0x0000f800, 0x000007e0, 0x0000001f, 0x00000000 }, TextureFormat::R5G6B5  },
+		{ 16, DDPF_RGB,                  { 0x0000001f, 0x000003e0, 0x00007c00, 0x00008000 }, TextureFormat::BGR5A1  },
 		{ 16, DDPF_RGB,                  { 0x00007c00, 0x000003e0, 0x0000001f, 0x00008000 }, TextureFormat::RGB5A1  },
 		{ 24, DDPF_RGB,                  { 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000 }, TextureFormat::RGB8    },
 		{ 24, DDPF_RGB,                  { 0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000 }, TextureFormat::RGB8    },
@@ -3456,6 +3625,7 @@ namespace bimg
 		if (!_err->isOk()
 		||  headerSize < DDS_HEADER_SIZE)
 		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "DDS: Invalid header size.");
 			return false;
 		}
 
@@ -3535,6 +3705,8 @@ namespace bimg
 			uint32_t miscFlags2;
 			total += bx::read(_reader, miscFlags2, _err);
 		}
+
+		BX_UNUSED(total);
 
 		if (!_err->isOk() )
 		{
@@ -3627,6 +3799,7 @@ namespace bimg
 		_imageContainer.m_cubeMap     = cubeMap;
 		_imageContainer.m_ktx         = false;
 		_imageContainer.m_ktxLE       = false;
+		_imageContainer.m_pvr3        = false;
 		_imageContainer.m_srgb        = srgb;
 
 		return true;
@@ -3679,17 +3852,33 @@ namespace bimg
 #define KTX_ATC_RGBA_EXPLICIT_ALPHA_AMD               0x8C93
 #define KTX_ATC_RGBA_INTERPOLATED_ALPHA_AMD           0x87EE
 #define KTX_COMPRESSED_RGBA_ASTC_4x4_KHR              0x93B0
+#define KTX_COMPRESSED_RGBA_ASTC_5x4_KHR              0x93B1
 #define KTX_COMPRESSED_RGBA_ASTC_5x5_KHR              0x93B2
+#define KTX_COMPRESSED_RGBA_ASTC_6x5_KHR              0x93B3
 #define KTX_COMPRESSED_RGBA_ASTC_6x6_KHR              0x93B4
 #define KTX_COMPRESSED_RGBA_ASTC_8x5_KHR              0x93B5
 #define KTX_COMPRESSED_RGBA_ASTC_8x6_KHR              0x93B6
+#define KTX_COMPRESSED_RGBA_ASTC_8x8_KHR              0x93B7
 #define KTX_COMPRESSED_RGBA_ASTC_10x5_KHR             0x93B8
+#define KTX_COMPRESSED_RGBA_ASTC_10x6_KHR             0x93B9
+#define KTX_COMPRESSED_RGBA_ASTC_10x8_KHR             0x93BA
+#define KTX_COMPRESSED_RGBA_ASTC_10x10_KHR            0x93BB
+#define KTX_COMPRESSED_RGBA_ASTC_12x10_KHR            0x93BC
+#define KTX_COMPRESSED_RGBA_ASTC_12x12_KHR            0x93BD
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR      0x93D0
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR      0x93D1
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR      0x93D2
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR      0x93D3
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR      0x93D4
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR      0x93D5
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR      0x93D6
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR      0x93D7
 #define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR     0x93D8
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR     0x93D9
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR     0x93DA
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR    0x93DB
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR    0x93DC
+#define KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR    0x93DD
 
 #define KTX_A8                                        0x803C
 #define KTX_R8                                        0x8229
@@ -3803,11 +3992,19 @@ namespace bimg
 		{ KTX_ATC_RGBA_EXPLICIT_ALPHA_AMD,              KTX_ZERO,                                       KTX_ATC_RGBA_EXPLICIT_ALPHA_AMD,              KTX_ZERO,                         }, // ATCE
 		{ KTX_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          KTX_ZERO,                                       KTX_ATC_RGBA_INTERPOLATED_ALPHA_AMD,          KTX_ZERO,                         }, // ATCI
 		{ KTX_COMPRESSED_RGBA_ASTC_4x4_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR,       KTX_COMPRESSED_RGBA_ASTC_4x4_KHR,             KTX_ZERO,                         }, // ASTC4x4
+		{ KTX_COMPRESSED_RGBA_ASTC_5x4_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR,       KTX_COMPRESSED_RGBA_ASTC_5x4_KHR,             KTX_ZERO,                         }, // ASTC5x4
 		{ KTX_COMPRESSED_RGBA_ASTC_5x5_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR,       KTX_COMPRESSED_RGBA_ASTC_5x5_KHR,             KTX_ZERO,                         }, // ASTC5x5
+		{ KTX_COMPRESSED_RGBA_ASTC_6x5_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR,       KTX_COMPRESSED_RGBA_ASTC_6x5_KHR,             KTX_ZERO,                         }, // ASTC6x5
 		{ KTX_COMPRESSED_RGBA_ASTC_6x6_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR,       KTX_COMPRESSED_RGBA_ASTC_6x6_KHR,             KTX_ZERO,                         }, // ASTC6x6
 		{ KTX_COMPRESSED_RGBA_ASTC_8x5_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR,       KTX_COMPRESSED_RGBA_ASTC_8x5_KHR,             KTX_ZERO,                         }, // ASTC8x5
 		{ KTX_COMPRESSED_RGBA_ASTC_8x6_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR,       KTX_COMPRESSED_RGBA_ASTC_8x6_KHR,             KTX_ZERO,                         }, // ASTC8x6
+		{ KTX_COMPRESSED_RGBA_ASTC_8x8_KHR,             KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR,       KTX_COMPRESSED_RGBA_ASTC_8x8_KHR,             KTX_ZERO,                         }, // ASTC8x8
 		{ KTX_COMPRESSED_RGBA_ASTC_10x5_KHR,            KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR,      KTX_COMPRESSED_RGBA_ASTC_10x5_KHR,            KTX_ZERO,                         }, // ASTC10x5
+		{ KTX_COMPRESSED_RGBA_ASTC_10x6_KHR,            KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR,      KTX_COMPRESSED_RGBA_ASTC_10x6_KHR,            KTX_ZERO,                         }, // ASTC10x6
+		{ KTX_COMPRESSED_RGBA_ASTC_10x8_KHR,            KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR,      KTX_COMPRESSED_RGBA_ASTC_10x8_KHR,            KTX_ZERO,                         }, // ASTC10x8
+		{ KTX_COMPRESSED_RGBA_ASTC_10x10_KHR,           KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR,     KTX_COMPRESSED_RGBA_ASTC_10x10_KHR,           KTX_ZERO,                         }, // ASTC10x10
+		{ KTX_COMPRESSED_RGBA_ASTC_12x10_KHR,           KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR,     KTX_COMPRESSED_RGBA_ASTC_12x10_KHR,           KTX_ZERO,                         }, // ASTC12x10
+		{ KTX_COMPRESSED_RGBA_ASTC_12x12_KHR,           KTX_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR,     KTX_COMPRESSED_RGBA_ASTC_12x12_KHR,           KTX_ZERO,                         }, // ASTC12x12
 		{ KTX_ZERO,                                     KTX_ZERO,                                       KTX_ZERO,                                     KTX_ZERO,                         }, // Unknown
 		{ KTX_ZERO,                                     KTX_ZERO,                                       KTX_ZERO,                                     KTX_ZERO,                         }, // R1
 		{ KTX_ALPHA,                                    KTX_ZERO,                                       KTX_ALPHA,                                    KTX_UNSIGNED_BYTE,                }, // A8
@@ -3853,8 +4050,11 @@ namespace bimg
 		{ KTX_RGBA32I,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_INT,                          }, // RGBA32I
 		{ KTX_RGBA32UI,                                 KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_INT,                 }, // RGBA32U
 		{ KTX_RGBA32F,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_FLOAT,                        }, // RGBA32F
+		{ KTX_RGB565,                                   KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_SHORT_5_6_5,         }, // B5G6R5
 		{ KTX_RGB565,                                   KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_SHORT_5_6_5,         }, // R5G6B5
+		{ KTX_RGBA4,                                    KTX_ZERO,                                       KTX_BGRA,                                     KTX_UNSIGNED_SHORT_4_4_4_4,       }, // BGRA4
 		{ KTX_RGBA4,                                    KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT_4_4_4_4,       }, // RGBA4
+		{ KTX_RGB5_A1,                                  KTX_ZERO,                                       KTX_BGRA,                                     KTX_UNSIGNED_SHORT_5_5_5_1,       }, // BGR5A1
 		{ KTX_RGB5_A1,                                  KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_SHORT_5_5_5_1,       }, // RGB5A1
 		{ KTX_RGB10_A2,                                 KTX_ZERO,                                       KTX_RGBA,                                     KTX_UNSIGNED_INT_2_10_10_10_REV,  }, // RGB10A2
 		{ KTX_R11F_G11F_B10F,                           KTX_ZERO,                                       KTX_RGB,                                      KTX_UNSIGNED_INT_10F_11F_11F_REV, }, // RG11B10F
@@ -3881,66 +4081,81 @@ namespace bimg
 		BX_ERROR_SCOPE(_err);
 
 		uint8_t identifier[8];
-		bx::read(_reader, identifier);
+		bx::read(_reader, identifier, _err);
 
 		if (identifier[1] != '1'
 		&&  identifier[2] != '1')
 		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "KTX: Unrecognized version.");
 			return false;
 		}
 
 		uint32_t endianness;
-		bx::read(_reader, endianness);
+		bx::read(_reader, endianness, _err);
 
 		bool fromLittleEndian = 0x04030201 == endianness;
 
 		uint32_t glType;
-		bx::readHE(_reader, glType, fromLittleEndian);
+		bx::readHE(_reader, glType, fromLittleEndian, _err);
 
 		uint32_t glTypeSize;
-		bx::readHE(_reader, glTypeSize, fromLittleEndian);
+		bx::readHE(_reader, glTypeSize, fromLittleEndian, _err);
 
 		uint32_t glFormat;
-		bx::readHE(_reader, glFormat, fromLittleEndian);
+		bx::readHE(_reader, glFormat, fromLittleEndian, _err);
 
 		uint32_t glInternalFormat;
-		bx::readHE(_reader, glInternalFormat, fromLittleEndian);
+		bx::readHE(_reader, glInternalFormat, fromLittleEndian, _err);
 
 		uint32_t glBaseInternalFormat;
-		bx::readHE(_reader, glBaseInternalFormat, fromLittleEndian);
+		bx::readHE(_reader, glBaseInternalFormat, fromLittleEndian, _err);
 
 		uint32_t width;
-		bx::readHE(_reader, width, fromLittleEndian);
+		bx::readHE(_reader, width, fromLittleEndian, _err);
 
 		uint32_t height;
-		bx::readHE(_reader, height, fromLittleEndian);
+		bx::readHE(_reader, height, fromLittleEndian, _err);
 
 		uint32_t depth;
-		bx::readHE(_reader, depth, fromLittleEndian);
+		bx::readHE(_reader, depth, fromLittleEndian, _err);
 
 		uint32_t numberOfArrayElements;
-		bx::readHE(_reader, numberOfArrayElements, fromLittleEndian);
+		bx::readHE(_reader, numberOfArrayElements, fromLittleEndian, _err);
 
 		uint32_t numFaces;
-		bx::readHE(_reader, numFaces, fromLittleEndian);
+		bx::readHE(_reader, numFaces, fromLittleEndian, _err);
 
 		uint32_t numMips;
-		bx::readHE(_reader, numMips, fromLittleEndian);
+		bx::readHE(_reader, numMips, fromLittleEndian, _err);
 
 		uint32_t metaDataSize;
-		bx::readHE(_reader, metaDataSize, fromLittleEndian);
+		bx::readHE(_reader, metaDataSize, fromLittleEndian, _err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
 
 		// skip meta garbage...
 		int64_t offset = bx::skip(_reader, metaDataSize);
 
 		TextureFormat::Enum format = TextureFormat::Unknown;
 		bool hasAlpha = false;
+		bool srgb = false;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateKtxFormat); ++ii)
 		{
 			if (s_translateKtxFormat[ii].m_internalFmt == glInternalFormat)
 			{
 				format = TextureFormat::Enum(ii);
+				break;
+			}
+
+			if (s_translateKtxFormat[ii].m_internalFmtSrgb == glInternalFormat
+			&&  s_translateKtxFormat[ii].m_fmt == glBaseInternalFormat)
+                        {
+				format = TextureFormat::Enum(ii);
+				srgb = true;
 				break;
 			}
 		}
@@ -3972,11 +4187,12 @@ namespace bimg
 		_imageContainer.m_cubeMap     = numFaces > 1;
 		_imageContainer.m_ktx         = true;
 		_imageContainer.m_ktxLE       = fromLittleEndian;
-		_imageContainer.m_srgb        = false;
+		_imageContainer.m_pvr3        = false;
+		_imageContainer.m_srgb        = srgb;
 
 		if (TextureFormat::Unknown == format)
 		{
-			BX_ERROR_SET(_err, BIMG_ERROR, "Unrecognized image format.");
+			BX_ERROR_SET(_err, BIMG_ERROR, "KTX: Unrecognized image format.");
 			return false;
 		}
 
@@ -4017,8 +4233,11 @@ namespace bimg
 #define PVR3_BGRA8            PVR3_MAKE8CC('b', 'g', 'r', 'a',  8,  8,  8,  8)
 #define PVR3_RGBA16           PVR3_MAKE8CC('r', 'g', 'b', 'a', 16, 16, 16, 16)
 #define PVR3_RGBA32           PVR3_MAKE8CC('r', 'g', 'b', 'a', 32, 32, 32, 32)
+#define PVR3_BGR565           PVR3_MAKE8CC('b', 'g', 'r',   0,  5,  6,  5,  0)
 #define PVR3_RGB565           PVR3_MAKE8CC('r', 'g', 'b',   0,  5,  6,  5,  0)
+#define PVR3_BGRA4            PVR3_MAKE8CC('b', 'g', 'r', 'a',  4,  4,  4,  4)
 #define PVR3_RGBA4            PVR3_MAKE8CC('r', 'g', 'b', 'a',  4,  4,  4,  4)
+#define PVR3_BGRA51           PVR3_MAKE8CC('b', 'g', 'r', 'a',  5,  5,  5,  1)
 #define PVR3_RGBA51           PVR3_MAKE8CC('r', 'g', 'b', 'a',  5,  5,  5,  1)
 #define PVR3_RGB10A2          PVR3_MAKE8CC('r', 'g', 'b', 'a', 10, 10, 10,  2)
 
@@ -4063,8 +4282,11 @@ namespace bimg
 		{ PVR3_RGBA16,           PVR3_CHANNEL_TYPE_FLOAT, TextureFormat::RGBA16F },
 		{ PVR3_RGBA32,           PVR3_CHANNEL_TYPE_ANY,   TextureFormat::RGBA32U },
 		{ PVR3_RGBA32,           PVR3_CHANNEL_TYPE_FLOAT, TextureFormat::RGBA32F },
+		{ PVR3_RGB565,           PVR3_CHANNEL_TYPE_ANY,   TextureFormat::B5G6R5  },
 		{ PVR3_RGB565,           PVR3_CHANNEL_TYPE_ANY,   TextureFormat::R5G6B5  },
+		{ PVR3_BGRA4,            PVR3_CHANNEL_TYPE_ANY,   TextureFormat::BGRA4   },
 		{ PVR3_RGBA4,            PVR3_CHANNEL_TYPE_ANY,   TextureFormat::RGBA4   },
+		{ PVR3_BGRA51,           PVR3_CHANNEL_TYPE_ANY,   TextureFormat::BGR5A1  },
 		{ PVR3_RGBA51,           PVR3_CHANNEL_TYPE_ANY,   TextureFormat::RGB5A1  },
 		{ PVR3_RGB10A2,          PVR3_CHANNEL_TYPE_ANY,   TextureFormat::RGB10A2 },
 	};
@@ -4074,37 +4296,42 @@ namespace bimg
 		BX_ERROR_SCOPE(_err);
 
 		uint32_t flags;
-		bx::read(_reader, flags);
+		bx::read(_reader, flags, _err);
 
 		uint64_t pixelFormat;
-		bx::read(_reader, pixelFormat);
+		bx::read(_reader, pixelFormat, _err);
 
 		uint32_t colorSpace;
-		bx::read(_reader, colorSpace); // 0 - linearRGB, 1 - sRGB
+		bx::read(_reader, colorSpace, _err); // 0 - linearRGB, 1 - sRGB
 
 		uint32_t channelType;
-		bx::read(_reader, channelType);
+		bx::read(_reader, channelType, _err);
 
 		uint32_t height;
-		bx::read(_reader, height);
+		bx::read(_reader, height, _err);
 
 		uint32_t width;
-		bx::read(_reader, width);
+		bx::read(_reader, width, _err);
 
 		uint32_t depth;
-		bx::read(_reader, depth);
+		bx::read(_reader, depth, _err);
 
 		uint32_t numSurfaces;
-		bx::read(_reader, numSurfaces);
+		bx::read(_reader, numSurfaces, _err);
 
 		uint32_t numFaces;
-		bx::read(_reader, numFaces);
+		bx::read(_reader, numFaces, _err);
 
 		uint32_t numMips;
-		bx::read(_reader, numMips);
+		bx::read(_reader, numMips, _err);
 
 		uint32_t metaDataSize;
-		bx::read(_reader, metaDataSize);
+		bx::read(_reader, metaDataSize, _err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
 
 		// skip meta garbage...
 		int64_t offset = bx::skip(_reader, metaDataSize);
@@ -4137,6 +4364,7 @@ namespace bimg
 		_imageContainer.m_cubeMap     = numFaces > 1;
 		_imageContainer.m_ktx         = false;
 		_imageContainer.m_ktxLE       = false;
+		_imageContainer.m_pvr3        = true;
 		_imageContainer.m_srgb        = colorSpace > 0;
 
 		return TextureFormat::Unknown != format;
@@ -4173,7 +4401,7 @@ namespace bimg
 		else if (BIMG_CHUNK_MAGIC_TEX == magic)
 		{
 			TextureCreate tc;
-			bx::read(_reader, tc);
+			bx::read(_reader, tc, _err);
 
 			_imageContainer.m_format      = tc.m_format;
 			_imageContainer.m_orientation = Orientation::R0;
@@ -4198,6 +4426,7 @@ namespace bimg
 			_imageContainer.m_cubeMap   = tc.m_cubeMap;
 			_imageContainer.m_ktx       = false;
 			_imageContainer.m_ktxLE     = false;
+			_imageContainer.m_pvr3      = false;
 			_imageContainer.m_srgb      = false;
 
 			return _err->isOk();
@@ -4255,106 +4484,147 @@ namespace bimg
 		switch (_srcFormat)
 		{
 		case TextureFormat::BC1:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC1) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt1(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt1(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC1 decoder is disabled (BIMG_DECODE_BC1).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC2:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC2) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt23A(temp+3, src);
-					src += 8;
-					decodeBlockDxt(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt23A(temp+3, src);
+						src += 8;
+						decodeBlockDxt(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC2 decoder is disabled (BIMG_DECODE_BC2).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC3:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC3) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp+3, src);
-					src += 8;
-					decodeBlockDxt(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt45A(temp+3, src);
+						src += 8;
+						decodeBlockDxt(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC3 decoder is disabled (BIMG_DECODE_BC3).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC4:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC4) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt45A(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC4 decoder is disabled (BIMG_DECODE_BC4).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC5:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC5) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp+2, src);
-					src += 8;
-					decodeBlockDxt45A(temp+1, src);
-					src += 8;
-
-					for (uint32_t ii = 0; ii < 16; ++ii)
+					for (uint32_t xx = 0; xx < width; ++xx)
 					{
-						float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
-						float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
-						float nz = bx::sqrt(1.0f - nx*nx - ny*ny);
-						temp[ii*4+0] = uint8_t( (nz + 1.0f)*255.0f/2.0f);
-						temp[ii*4+3] = 0;
-					}
+						decodeBlockDxt45A(temp+2, src);
+						src += 8;
+						decodeBlockDxt45A(temp+1, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						for (uint32_t ii = 0; ii < 16; ++ii)
+						{
+							float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
+							float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
+							float nz = bx::sqrt(1.0f - nx*nx - ny*ny);
+							temp[ii*4+0] = uint8_t( (nz + 1.0f)*255.0f/2.0f);
+							temp[ii*4+3] = 0;
+						}
+
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC5 decoder is disabled (BIMG_DECODE_BC5).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC6H:
+			if (BX_ENABLED(BIMG_DECODE_BC6) )
 			{
 				ImageContainer* rgba32f = imageAlloc(_allocator
 					, TextureFormat::RGBA32F
@@ -4369,46 +4639,89 @@ namespace bimg
 				imageConvert(_allocator, _dst, TextureFormat::BGRA8, rgba32f->m_data, TextureFormat::RGBA32F, _width, _height, 1, _width*16, _dstPitch);
 				imageFree(rgba32f);
 			}
+			else
+			{
+				BX_WARN(false, "BC6 decoder is disabled (BIMG_DECODE_BC6).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+			}
 			break;
 
 		case TextureFormat::BC7:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC7) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockBc7(temp, src);
-					src += 16;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockBc7(temp, src);
+						src += 16;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC7 decoder is disabled (BIMG_DECODE_BC7).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::ETC1:
 		case TextureFormat::ETC2:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_ETC1 || BIMG_DECODE_ETC2) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockEtc12(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockEtc12(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "ETC1/ETC2 decoder is disabled (BIMG_DECODE_ETC1/ETC2).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::ETC2A:
-			BX_WARN(false, "ETC2A decoder is not implemented.");
-			imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
+			if (BX_ENABLED(BIMG_DECODE_ETC2))
+			{
+				for (uint32_t yy = 0; yy < height; ++yy)
+				{
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockEtc12(temp, src + 8);
+						decodeBlockEtc2Alpha(temp, src);
+
+						src += 16;
+
+						uint8_t* block = &dst[yy*_dstPitch * 4 + xx * 16];
+						bx::memCopy(&block[0 * _dstPitch], &temp[0], 16);
+						bx::memCopy(&block[1 * _dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2 * _dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3 * _dstPitch], &temp[48], 16);
+					}
+				}
+			}
+			else
+			{
+				BX_WARN(false, "ETC2 decoder is disabled (BIMG_DECODE_ETC2).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00));
+			}
 			break;
 
 		case TextureFormat::ETC2A1:
@@ -4524,11 +4837,19 @@ namespace bimg
 			break;
 
 		case TextureFormat::ASTC4x4:
+		case TextureFormat::ASTC5x4:
 		case TextureFormat::ASTC5x5:
+		case TextureFormat::ASTC6x5:
 		case TextureFormat::ASTC6x6:
 		case TextureFormat::ASTC8x5:
 		case TextureFormat::ASTC8x6:
+		case TextureFormat::ASTC8x8:
 		case TextureFormat::ASTC10x5:
+		case TextureFormat::ASTC10x6:
+		case TextureFormat::ASTC10x8:
+		case TextureFormat::ASTC10x10:
+		case TextureFormat::ASTC12x10:
+		case TextureFormat::ASTC12x12:
 			imageDecodeToRgba8(_allocator, _dst, _src, _width, _height, _dstPitch, _srcFormat);
 			imageSwizzleBgra8(_dst, _dstPitch, _width, _height, _dst, _dstPitch);
 			break;
@@ -4582,28 +4903,94 @@ namespace bimg
 			break;
 
 		case TextureFormat::ASTC4x4:
+		case TextureFormat::ASTC5x4:
 		case TextureFormat::ASTC5x5:
+		case TextureFormat::ASTC6x5:
 		case TextureFormat::ASTC6x6:
 		case TextureFormat::ASTC8x5:
 		case TextureFormat::ASTC8x6:
+		case TextureFormat::ASTC8x8:
 		case TextureFormat::ASTC10x5:
-			if (!astc_codec::ASTCDecompressToRGBA(
-				  (const uint8_t*)_src
-				, imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, _srcFormat)
-				, _width
-				, _height
-				, TextureFormat::ASTC4x4  == _srcFormat ? astc_codec::FootprintType::k4x4
-				: TextureFormat::ASTC5x5  == _srcFormat ? astc_codec::FootprintType::k5x5
-				: TextureFormat::ASTC6x6  == _srcFormat ? astc_codec::FootprintType::k6x6
-				: TextureFormat::ASTC8x5  == _srcFormat ? astc_codec::FootprintType::k8x5
-				: TextureFormat::ASTC8x6  == _srcFormat ? astc_codec::FootprintType::k8x6
-				:                                         astc_codec::FootprintType::k10x5
-				, (uint8_t*)_dst
-				, _width*_height*4
-				, _dstPitch
-				) )
+		case TextureFormat::ASTC10x6:
+		case TextureFormat::ASTC10x8:
+		case TextureFormat::ASTC10x10:
+		case TextureFormat::ASTC12x10:
+		case TextureFormat::ASTC12x12:
+			if (BX_ENABLED(BIMG_DECODE_ASTC) )
 			{
-				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+					const bimg::ImageBlockInfo& astcBlockInfo = bimg::getBlockInfo(_srcFormat);
+
+					astcenc_config config{};
+
+					astcenc_error status = astcenc_config_init(
+						  ASTCENC_PRF_LDR
+						, astcBlockInfo.blockWidth
+						, astcBlockInfo.blockHeight
+						, 1
+						, ASTCENC_PRE_MEDIUM
+						, ASTCENC_FLG_DECOMPRESS_ONLY
+						, &config
+						);
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in config init %s", astcenc_get_error_string(status));
+						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+						break;
+					}
+
+					astcenc_context* context;
+					status = astcenc_context_alloc(&config, 1, &context);
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in context alloc %s", astcenc_get_error_string(status));
+						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+						break;
+					}
+
+					//Put image data into an astcenc_image
+					astcenc_image image{};
+					image.dim_x     = _width;
+					image.dim_y     = _height;
+					image.dim_z     = 1;
+					image.data_type = ASTCENC_TYPE_U8;
+					image.data      = &_dst;
+
+					const uint32_t size = imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, _srcFormat);
+
+					static const astcenc_swizzle swizzle
+					{   //0123/rgba swizzle corresponds to ASTC_RGBA
+						ASTCENC_SWZ_R,
+						ASTCENC_SWZ_G,
+						ASTCENC_SWZ_B,
+						ASTCENC_SWZ_A,
+					};
+
+					status = astcenc_decompress_image(
+						  context
+						, (const uint8_t*)_src
+						, size
+						, &image
+						, &swizzle
+						, 0
+						);
+
+					if (status != ASTCENC_SUCCESS)
+					{
+						BX_TRACE("astc error in compress image %s", astcenc_get_error_string(status));
+						imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffff00) );
+
+						astcenc_context_free(context);
+						break;
+					}
+
+					astcenc_context_free(context);
+			}
+			else
+			{
+				BX_WARN(false, "ASTC decoder is disabled (BIMG_DECODE_ASTC).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
@@ -4805,7 +5192,7 @@ namespace bimg
 		const uint8_t* data = (const uint8_t*)_data;
 		const uint16_t numSides = _imageContainer.m_numLayers * (_imageContainer.m_cubeMap ? 6 : 1);
 
-		if (_imageContainer.m_ktx)
+		if (_imageContainer.m_ktx || _imageContainer.m_pvr3)
 		{
 			uint32_t width  = _imageContainer.m_width;
 			uint32_t height = _imageContainer.m_height;
@@ -4818,16 +5205,20 @@ namespace bimg
 				depth  = bx::max<uint32_t>(1, depth);
 
 				const uint32_t mipSize = width/blockWidth * height/blockHeight * depth * blockSize;
-				const uint32_t size    = mipSize*numSides;
-				uint32_t imageSize = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
-				BX_CHECK(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
-				BX_UNUSED(size, imageSize);
 
-				offset += sizeof(uint32_t);
+				if (_imageContainer.m_ktx)
+				{
+					const uint32_t size = mipSize * numSides;
+					uint32_t imageSize  = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
+					BX_ASSERT(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
+					BX_UNUSED(size, imageSize);
+
+					offset += sizeof(uint32_t);
+				}
 
 				for (uint16_t side = 0; side < numSides; ++side)
 				{
-					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_ASSERT(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
 
 					if (side == _side
 					&&  lod  == _lod)
@@ -4864,7 +5255,7 @@ namespace bimg
 
 				for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
 				{
-					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
+					BX_ASSERT(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
 
 					width  = bx::max<uint32_t>(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 					height = bx::max<uint32_t>(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
@@ -5249,13 +5640,13 @@ namespace bimg
 		return total;
 	}
 
-	static int32_t imageWriteDdsHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, bx::Error* _err)
+	static int32_t imageWriteDdsHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		uint32_t ddspf        = UINT32_MAX;
 		uint32_t dxgiFormat   = UINT32_MAX;
-        uint32_t fourccFormat = UINT32_MAX;
+		uint32_t fourccFormat = UINT32_MAX;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(s_translateDdsPixelFormat); ++ii)
 		{
@@ -5326,7 +5717,6 @@ namespace bimg
 		total += bx::write(_writer, pitchOrLinearSize, _err);
 		total += bx::write(_writer, _depth, _err);
 		total += bx::write(_writer, uint32_t(_numMips), _err);
-
 		total += bx::writeRep(_writer, 0, 44, _err); // reserved1
 
 		if (UINT32_MAX != ddspf)
@@ -5344,13 +5734,17 @@ namespace bimg
 			total += bx::write(_writer, uint32_t(8*sizeof(uint32_t) ), _err); // pixelFormatSize
 			total += bx::write(_writer, uint32_t(DDPF_FOURCC), _err);
 
-            if (UINT32_MAX != fourccFormat)
-                total += bx::write(_writer, fourccFormat, _err);
-            else
-                total += bx::write(_writer, uint32_t(DDS_DX10), _err);
+			if (UINT32_MAX != fourccFormat)
+			{
+				total += bx::write(_writer, fourccFormat, _err);
+			}
+			else
+			{
+				total += bx::write(_writer, uint32_t(DDS_DX10), _err);
+			}
 
-            total += bx::write(_writer, uint32_t(0), _err); // bitCount
-            total += bx::writeRep(_writer, 0, 4*sizeof(uint32_t), _err); // bitmask
+			total += bx::write(_writer, uint32_t(0), _err); // bitCount
+			total += bx::writeRep(_writer, 0, 4*sizeof(uint32_t), _err); // bitmask
 		}
 
 		uint32_t caps[4] =
@@ -5360,7 +5754,8 @@ namespace bimg
 			0,
 			0,
 		};
-		total += bx::write(_writer, caps, sizeof(caps) );
+
+		total += bx::write(_writer, caps, sizeof(caps), _err);
 
 		total += bx::writeRep(_writer, 0, 4, _err); // reserved2
 
@@ -5372,10 +5767,10 @@ namespace bimg
 
 		if (UINT32_MAX != dxgiFormat)
 		{
-			total += bx::write(_writer, dxgiFormat);
+			total += bx::write(_writer, dxgiFormat, _err);
 			total += bx::write(_writer, uint32_t(1 < _depth ? DDS_DX10_DIMENSION_TEXTURE3D : DDS_DX10_DIMENSION_TEXTURE2D), _err); // dims
 			total += bx::write(_writer, uint32_t(_cubeMap   ? DDS_DX10_MISC_TEXTURECUBE    : 0), _err); // miscFlags
-			total += bx::write(_writer, uint32_t(1), _err); // arraySize
+			total += bx::write(_writer, uint32_t(_numLayers), _err); // arraySize
 			total += bx::write(_writer, uint32_t(0), _err); // miscFlags2
 
 			BX_WARN(total-headerStart == DDS_HEADER_SIZE+20
@@ -5401,6 +5796,7 @@ namespace bimg
 			, _imageContainer.m_height
 			, _imageContainer.m_depth
 			, _imageContainer.m_numMips
+			, _imageContainer.m_numLayers
 			, _err
 			);
 
@@ -5409,7 +5805,7 @@ namespace bimg
 			return total;
 		}
 
-		for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides && _err->isOk(); ++side)
+		for (uint8_t side = 0, numSides = _imageContainer.m_numLayers * (_imageContainer.m_cubeMap ? 6 : 1); side < numSides && _err->isOk(); ++side)
 		{
 			for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num && _err->isOk(); ++lod)
 			{
@@ -5424,11 +5820,16 @@ namespace bimg
 		return total;
 	}
 
-	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bx::Error* _err)
+	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bool _srgb, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		const KtxFormatInfo& tfi = s_translateKtxFormat[_format];
+
+		uint32_t internalFmt = tfi.m_internalFmt;
+		if (_srgb && tfi.m_internalFmtSrgb != KTX_ZERO) {
+			internalFmt = tfi.m_internalFmtSrgb;
+		}
 
 		int32_t total = 0;
 		total += bx::write(_writer, "\xabKTX 11\xbb\r\n\x1a\n", 12, _err);
@@ -5436,7 +5837,7 @@ namespace bimg
 		total += bx::write(_writer, uint32_t(0), _err); // glType
 		total += bx::write(_writer, uint32_t(1), _err); // glTypeSize
 		total += bx::write(_writer, uint32_t(0), _err); // glFormat
-		total += bx::write(_writer, tfi.m_internalFmt, _err); // glInternalFormat
+		total += bx::write(_writer, internalFmt, _err); // glInternalFormat
 		total += bx::write(_writer, tfi.m_fmt, _err); // glBaseInternalFormat
 		total += bx::write(_writer, _width, _err);
 		total += bx::write(_writer, _height, _err);
@@ -5450,12 +5851,12 @@ namespace bimg
 		return total;
 	}
 
-	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, const void* _src, bx::Error* _err)
+	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bool _srgb, const void* _src, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		int32_t total = 0;
-		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _numLayers, _err);
+		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _numLayers, _srgb, _err);
 
 		if (!_err->isOk() )
 		{
@@ -5492,8 +5893,8 @@ namespace bimg
 			{
 				for (uint8_t side = 0; side < numSides && _err->isOk(); ++side)
 				{
-					total += bx::write(_writer, src, size, _err);
-					src += size;
+					total += bx::write(_writer, src, mipSize, _err);
+					src += mipSize;
 				}
 			}
 
@@ -5518,6 +5919,7 @@ namespace bimg
 			, _imageContainer.m_depth
 			, _imageContainer.m_numMips
 			, _imageContainer.m_numLayers
+			, _imageContainer.m_srgb
 			, _err
 			);
 

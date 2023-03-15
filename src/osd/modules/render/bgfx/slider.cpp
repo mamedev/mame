@@ -6,13 +6,15 @@
 //
 //============================================================
 
-#include "emu.h"
-
 #include "slider.h"
 #include "../frontend/mame/ui/slider.h"
 
-bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings)
-	: m_name(name)
+#include "strformat.h"
+
+#include <utility>
+
+bgfx_slider::bgfx_slider(running_machine &machine, std::string &&name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings)
+	: m_name(std::move(name))
 	, m_step(step)
 	, m_type(type)
 	, m_screen_type(screen)
@@ -66,7 +68,7 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
 			}
 			if (str != nullptr)
 			{
-				*str = string_format(m_format, m_strings[as_int()]);
+				*str = util::string_format(m_format, m_strings[as_int()]);
 			}
 			return as_int();
 		}
@@ -79,7 +81,7 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
 			}
 			if (str != nullptr)
 			{
-				*str = string_format(m_format, as_int());
+				*str = util::string_format(m_format, as_int());
 			}
 			return as_int();
 		}
@@ -93,7 +95,7 @@ int32_t bgfx_slider::update(std::string *str, int32_t newval)
 			}
 			if (str != nullptr)
 			{
-				*str = string_format(m_format, *val_ptr);
+				*str = util::string_format(m_format, *val_ptr);
 			}
 			return int32_t(floor(*val_ptr / m_step + 0.5f));
 		}

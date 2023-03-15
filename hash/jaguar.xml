@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Undumped:
   CD Diagnostic Cartridge
@@ -9,7 +9,6 @@ Undumped:
   Diagnostic Cartridge
   Iron Soldier (Prototype)
   Skycopter (Carousel Entertainment)(K-Mart and Walmart any different?)
-  Speedster II (Carousel Entertainment)(K-Mart and Walmart any different?)
 
 Homebrew:
   GORF pluz - Earth GOD's Troopers (FORCE Design)(finished?)
@@ -106,7 +105,7 @@ Unreleased (possibly no prototypes exist):
   World Cup                           1-2?        ?               Anco Software   Sports
   Zzyorxx II                          1?          ?               Virtual Exp.    Action/Shooter
 
-  -->
+-->
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
 	<!-- boot OK, gameplay graphics are in shades of blue, pause message gets cut off -->
@@ -447,7 +446,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- RSoD on Jaguar logo -->
 	<software name="fforlife1" cloneof="fforlife" supported="no">
-		<description>Fight for Life (Alt)</description>
+		<description>Fight for Life (alt)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9037E 705037-002"/><!-- could be different -->
@@ -777,7 +776,7 @@ Unreleased (possibly no prototypes exist):
 	<!-- RSoD on Jaguar logo -->
 	<software name="soccerkd1" cloneof="soccerkd" supported="no">
 		<!-- uses BIOS security skipping hardware -->
-		<description>Soccer Kid (Re-release)</description>
+		<description>Soccer Kid (re-release)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF3002"/>
@@ -795,7 +794,7 @@ Unreleased (possibly no prototypes exist):
 	<!-- boot OK -->
 	<software name="soccerkd1h" cloneof="soccerkd">
 		<!-- uses universal header, only way to boot this at moment -->
-		<description>Soccer Kid (Re-release, Hacked)</description>
+		<description>Soccer Kid (re-release, hacked)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<info name="serial" value="CF3002"/>
@@ -820,7 +819,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- gets to title screen (with wrong GFX width) then hangs -->
 	<software name="spacewarp" cloneof="spacewar" supported="no">
-		<description>Space War 2000 (Prototype)</description>
+		<description>Space War 2000 (prototype)</description>
 		<year>19??</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -829,6 +828,18 @@ Unreleased (possibly no prototypes exist):
 				<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />
 				-->
 				<rom name="space war 2000 (world).j64" size="2097152" crc="45aa46ba" sha1="0e7aacd65ecd6210d914e1c00a98dce5d00569af" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- crashes when coin is input (P1 Pause) -->
+	<software name="speedst2" supported="no">
+		<description>Speedster II</description>
+		<year>1995?</year>
+		<publisher>Carousel Entertainment</publisher>
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="2097152" width="32" endianness="big">
+				<rom name="speedster_ii.j64" size="2097152" crc="f7cfe6e6" sha1="508692e1b9bb57cdec35bb95829b23e49d6ec17e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -994,7 +1005,7 @@ Unreleased (possibly no prototypes exist):
 
 	<!-- RSoD on Jaguar logo -->
 	<software name="ultravor1" cloneof="ultravor" supported="no">
-		<description>Ultra Vortek (v0.94, Prototype)</description>
+		<description>Ultra Vortek (v0.94, prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9082E 700782-002"/>
@@ -1100,7 +1111,7 @@ Unreleased (possibly no prototypes exist):
 These have been converted to j64 format with the universal header -->
 
 	<software name="atarikrtp" cloneof="atarikrt" supported="no">
-		<description>Atari Karts (Prototype)</description>
+		<description>Atari Karts (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1111,7 +1122,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="barkleyp" cloneof="barkley" supported="no">
-		<description>Barkley Shut Up and Jam! (Prototype)</description>
+		<description>Barkley Shut Up and Jam! (prototype)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1122,7 +1133,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="bretthp" cloneof="bretth" supported="no">
-		<description>Brett Hull NHL Hockey (Prototype)</description>
+		<description>Brett Hull NHL Hockey (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1133,7 +1144,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="breakoutp" cloneof="breakout" supported="no">
-		<description>Breakout 2000 (Prototype, xx0327)</description>
+		<description>Breakout 2000 (prototype, xx0327)</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1144,7 +1155,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="cybermorp" cloneof="cybermor" supported="no">
-		<description>Cybermorph (Prototype)</description>
+		<description>Cybermorph (prototype)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1156,7 +1167,7 @@ These have been converted to j64 format with the universal header -->
 
 	<!-- black screen -->
 	<software name="cybrgolf" supported="no">
-		<description>Jack Nicklaus Cyber Golf examples (Prototype, v0.01, 19940704)</description>
+		<description>Jack Nicklaus Cyber Golf examples (prototype, v0.01, 19940704)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1168,7 +1179,7 @@ These have been converted to j64 format with the universal header -->
 
 	<!-- black screen -->
 	<software name="cybrgolfa" cloneof="cybrgolf" supported="no">
-		<description>Cyber Golf (Prototype)</description>
+		<description>Cyber Golf (prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1180,7 +1191,7 @@ These have been converted to j64 format with the universal header -->
 
 	<!-- black screen -->
 	<software name="cybrgolfb" cloneof="cybrgolf" supported="no">
-		<description>Cyber Golf (Prototype, Alt)</description>
+		<description>Cyber Golf (prototype, alt)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1191,7 +1202,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="defenderp" cloneof="defender" supported="no">
-		<description>Defender 2000 (Prototype)</description>
+		<description>Defender 2000 (prototype)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1202,7 +1213,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="fforlifep" cloneof="fforlife" supported="no">
-		<description>Fight for Life (Prototype, xx0907)</description>
+		<description>Fight for Life (prototype, xx0907)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1213,7 +1224,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="fforlifep1" cloneof="fforlife" supported="no">
-		<description>Fight for Life (Prototype, xx0322)</description>
+		<description>Fight for Life (prototype, xx0322)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1249,7 +1260,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="raymanp" cloneof="rayman" supported="no">
-		<description>Rayman (Prototype)</description>
+		<description>Rayman (prototype)</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1260,7 +1271,7 @@ These have been converted to j64 format with the universal header -->
 	</software>
 
 	<software name="ttoonadvp" cloneof="ttoonadv" supported="no">
-		<description>Tiny Toon Adventures (Prototype)</description>
+		<description>Tiny Toon Adventures (prototype)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -1272,7 +1283,7 @@ These have been converted to j64 format with the universal header -->
 
 	<!-- black screen -->
 	<software name="ultbrain" supported="no">
-		<description>Ultimate Brain Games (Prototype)</description>
+		<description>Ultimate Brain Games (prototype)</description>
 		<year>199?</year>
 		<publisher>Crazy Ace</publisher>
 		<part name="cart" interface="jaguar_cart">

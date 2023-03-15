@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ekara_japan_web" description="Takara e-kara (Japan) Web cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
@@ -31,15 +31,45 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- this one has some songs programmed into it (TODO, list them here for reference) -->
-
+	<!-- this one has some songs programmed into it:
+	     河内おとこ節              中村美律子      Kawachi Otokobushi          Nakamura Mitsuko
+	     珍島(チンド)物語          天童よしみ      Chindo Monogatari           Tendō Yoshimi
+	     こころ酒                  藤あや子        Kokoro Sake                 Fuji Ayako
+	     夜桜お七                  坂本冬美        Yozakura O-shichi           Sakamoto Fuyumi
+	     愛燦燦(あいさんさん)      美空ひばり      Ai Sansan                   Misora Hibari
+	     川の流れのように          美空ひばり      Kawa no Nagare no Yō ni     Misora Hibari
+	     真赤な太陽                美空ひばり      Makkana TaiYō               Misora Hibari -->
 	<software name="ekaraweb12a">
-		<description>e-kara Web cartridge 12M (used, with 7 Songs) (Japan)</description>
+		<description>e-kara Web cartridge 12M (used, with 7 songs) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	     さくらんぼ                  大塚愛              Sakuranbo                                  Ōtsuka Ai
+	     花                          ORANGE RANGE        Hana                                       Orange Range
+	     ロコローション              ORANGE RANGE        Locolotion                                 Orange Range
+	     solitude～真実のサヨナラ～  KinKi Kids          Solitude - Shinjitsu no Sayonara           KinKi Kids
+	     薄荷キャンディー            KinKi Kids          Hakka Candy                                KinKi Kids
+	     ボクの背中には羽根がある    KinKi Kids          Boku no Senaka ni wa Hane ga Aru           KinKi Kids
+	     愛の温度℃                   ぴちぴちピッチ      Ai no Ondo °C                              Pichi Pichi Pitch
+	     世界で一番早く朝が来る場所  ぴちぴちピッチ      Sekai de Ichiban Hayaku Asa ga Kuru Basho  Pichi Pichi Pitch
+	     YUME日和                    島谷ひとみ          Yume Biyori                                Shimatani Hitomi
+	     LOVE LOVE LOVE              DREAMS COME TRUE    Love Love Love                             Dreams Come True
+	     キラリ☆セーラードリーム     小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
+	     夏祭り                      Whiteberry          Natsu Matsuri                              Whiteberry -->
+	<software name="ekaraweb12b">
+		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
 			</dataarea>
 		</part>
 	</software>

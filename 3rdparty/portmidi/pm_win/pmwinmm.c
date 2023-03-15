@@ -56,15 +56,15 @@ typedef UINT32                              FPTR;
 
 /* callback routines */
 static void CALLBACK winmm_in_callback(HMIDIIN hMidiIn,
-                                       WORD wMsg, DWORD dwInstance, 
-                                       DWORD dwParam1, DWORD dwParam2);
+                                       UINT wMsg, DWORD_PTR dwInstance, 
+                                       DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 static void CALLBACK winmm_streamout_callback(HMIDIOUT hmo, UINT wMsg,
-                                              DWORD dwInstance, DWORD dwParam1, 
-                                              DWORD dwParam2);
+                                              DWORD_PTR dwInstance, DWORD_PTR dwParam1, 
+                                              DWORD_PTR dwParam2);
 #ifdef USE_SYSEX_BUFFERS
 static void CALLBACK winmm_out_callback(HMIDIOUT hmo, UINT wMsg,
-                                        DWORD dwInstance, DWORD dwParam1, 
-                                        DWORD dwParam2);
+                                        DWORD_PTR dwInstance, DWORD_PTR dwParam1, 
+                                        DWORD_PTR dwParam2);
 #endif
 
 extern pm_fns_node pm_winmm_in_dictionary;
@@ -686,10 +686,10 @@ static PmError winmm_in_close(PmInternal *midi)
 /* Callback function executed via midiInput SW interrupt (via midiInOpen). */
 static void FAR PASCAL winmm_in_callback(
     HMIDIIN hMidiIn,    /* midiInput device Handle */
-    WORD wMsg,          /* midi msg */
-    DWORD dwInstance,   /* application data */
-    DWORD dwParam1,     /* MIDI data */
-    DWORD dwParam2)    /* device timestamp (wrt most recent midiInStart) */
+    UINT wMsg,          /* midi msg */
+    DWORD_PTR dwInstance,   /* application data */
+    DWORD_PTR dwParam1,     /* MIDI data */
+    DWORD_PTR dwParam2)    /* device timestamp (wrt most recent midiInStart) */
 {
     //static int entry = 0;
     PmInternal *midi = (PmInternal *)(FPTR) dwInstance;
@@ -729,8 +729,8 @@ static void FAR PASCAL winmm_in_callback(
             PmEvent event;
             if (midi->time_proc)
                 dwParam2 = (*midi->time_proc)(midi->time_info);
-            event.timestamp = dwParam2;
-            event.message = dwParam1;
+            event.timestamp = (PmTimestamp)dwParam2;
+            event.message = (PmMessage)dwParam1;
             pm_read_short(midi, &event);
         }
         LeaveCriticalSection(&m->lock);
@@ -751,7 +751,7 @@ static void FAR PASCAL winmm_in_callback(
         /* assume yes and iterate through them */
         while (remaining > 0) {
             unsigned int amt = pm_read_bytes(midi, data + processed, 
-                                             remaining, dwParam2);
+                                             remaining, (PmTimestamp)dwParam2);
             remaining -= amt;
             processed += amt;
         }
@@ -1327,8 +1327,8 @@ static PmTimestamp winmm_synchronize(PmInternal *midi)
 #ifdef USE_SYSEX_BUFFERS
 /* winmm_out_callback -- recycle sysex buffers */
 static void CALLBACK winmm_out_callback(HMIDIOUT hmo, UINT wMsg,
-                                        DWORD dwInstance, DWORD dwParam1, 
-                                        DWORD dwParam2)
+                                        DWORD_PTR dwInstance, DWORD_PTR dwParam1, 
+                                        DWORD_PTR dwParam2)
 {
     PmInternal *midi = (PmInternal *) dwInstance;
     midiwinmm_type m = (midiwinmm_type) midi->descriptor;
@@ -1357,7 +1357,7 @@ static void CALLBACK winmm_out_callback(HMIDIOUT hmo, UINT wMsg,
 
 /* winmm_streamout_callback -- unprepare (free) buffer header */
 static void CALLBACK winmm_streamout_callback(HMIDIOUT hmo, UINT wMsg,
-        DWORD dwInstance, DWORD dwParam1, DWORD dwParam2)
+        DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
 {
     PmInternal *midi = (PmInternal *)(FPTR) dwInstance;
     LPMIDIHDR hdr = (LPMIDIHDR)(FPTR) dwParam1;

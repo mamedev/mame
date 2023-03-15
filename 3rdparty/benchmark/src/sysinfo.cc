@@ -16,9 +16,9 @@
 #include "internal_macros.h"
 
 #ifdef BENCHMARK_OS_WINDOWS
-#include <Shlwapi.h>
-#include <Windows.h>
-#include <VersionHelpers.h>
+#include <shlwapi.h>
+#include <windows.h>
+#include <versionhelpers.h>
 #else
 #include <fcntl.h>
 #include <sys/resource.h>

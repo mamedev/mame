@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_PYLDIN_FORMAT;
+extern const pyldin_format FLOPPY_PYLDIN_FORMAT;
 
 #endif // MAME_FORMATS_PYLDIN_DSK_H

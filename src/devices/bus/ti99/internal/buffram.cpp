@@ -16,7 +16,7 @@
 
 #define BUFFRAM_TAG "buffered_ram"
 
-DEFINE_DEVICE_TYPE_NS(BUFF_RAM, bus::ti99::internal, buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
+DEFINE_DEVICE_TYPE(BUFF_RAM, bus::ti99::internal::buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
 
 namespace bus::ti99::internal {
 
@@ -26,7 +26,6 @@ namespace bus::ti99::internal {
 buffered_ram_device::buffered_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:  device_t(mconfig, BUFF_RAM, tag, owner, clock),
 	   device_nvram_interface(mconfig, *this),
-	   m_buffered(true),
 	   m_size(0),
 	   m_mem(nullptr)
 {
@@ -46,16 +45,16 @@ void buffered_ram_device::nvram_default()
 	std::fill_n(m_mem.get(), m_size, 0x00);
 }
 
-void buffered_ram_device::nvram_read(emu_file &file)
+bool buffered_ram_device::nvram_read(util::read_stream &file)
 {
-	if (m_buffered)
-		file.read(m_mem.get(), m_size);
+	size_t actual;
+	return !file.read(m_mem.get(), m_size, actual) && actual == m_size;
 }
 
-void buffered_ram_device::nvram_write(emu_file &file)
+bool buffered_ram_device::nvram_write(util::write_stream &file)
 {
-	if (m_buffered)
-		file.write(m_mem.get(), m_size);
+	size_t actual;
+	return !file.write(m_mem.get(), m_size, actual) && actual == m_size;
 }
 
 } // end namespace bus::ti99::internal

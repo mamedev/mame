@@ -39,8 +39,9 @@ public:
 	static constexpr u32 SUPPORTED       = 0x80000000;   // are disassembly flags supported?
 	static constexpr u32 STEP_OUT        = 0x40000000;   // this instruction should be the end of a step out sequence
 	static constexpr u32 STEP_OVER       = 0x20000000;   // this instruction should be stepped over by setting a breakpoint afterwards
-	static constexpr u32 OVERINSTMASK    = 0x18000000;   // number of extra instructions to skip when stepping over
-	static constexpr u32 OVERINSTSHIFT   = 27;           // bits to shift after masking to get the value
+	static constexpr u32 STEP_COND       = 0x10000000;   // this instruction may conditionally result in a program transfer or short skip
+	static constexpr u32 OVERINSTMASK    = 0x0c000000;   // number of extra instructions to skip when stepping over
+	static constexpr u32 OVERINSTSHIFT   = 26;           // bits to shift after masking to get the value
 	static constexpr u32 LENGTHMASK      = 0x0000ffff;   // the low 16-bits contain the actual length
 
 	static inline u32 step_over_extra(u32 x) {

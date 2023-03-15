@@ -91,7 +91,7 @@
  * ----------------------------------------------------------
  * 000000 - 000007 Initialisation vectors from system EPROM
  * 000008 - 001FFF Local SRAM
- * 002000 - 01FFFF Dynamic Dual Port RAM VME bus accessable
+ * 002000 - 01FFFF Dynamic Dual Port RAM VME bus accessible
  * C40000 - C4001F SCSIbus controller
  * C80000 - C800FF DMAC
  * CC0000 - CC0007 FDC
@@ -145,7 +145,7 @@
 #include "emu.h"
 #include "vme_fcscsi.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
@@ -329,7 +329,6 @@ vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, 
 void vme_fcscsi1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	set_vme_device();
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xe00000);

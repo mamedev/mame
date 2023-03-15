@@ -153,7 +153,7 @@ void v3021_device::device_validity_check(validity_checker &valid) const
 void v3021_device::device_start()
 {
 	/* let's call the timer callback every second */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v3021_device::timer_callback), this));
+	m_timer = timer_alloc(FUNC(v3021_device::timer_callback), this);
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
 	copy_clock_to_ram();

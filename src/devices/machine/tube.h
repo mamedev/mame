@@ -30,6 +30,7 @@ public:
 	auto hirq_handler() { return m_hirq_handler.bind(); }
 	auto pnmi_handler() { return m_pnmi_handler.bind(); }
 	auto pirq_handler() { return m_pirq_handler.bind(); }
+	auto prst_handler() { return m_prst_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
 	uint8_t host_r(offs_t offset);
@@ -58,11 +59,13 @@ private:
 	int m_ph3pos;
 	int m_hp3pos;
 
+	void soft_reset();
 	void update_interrupts();
 
 	devcb_write_line m_hirq_handler;
 	devcb_write_line m_pnmi_handler;
 	devcb_write_line m_pirq_handler;
+	devcb_write_line m_prst_handler;
 	devcb_write_line m_drq_handler;
 };
 

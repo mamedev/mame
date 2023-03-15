@@ -425,7 +425,7 @@ void pcm_channel::load_wavetable()
 	// for some reason that is unclear
 	m_endpos = read_pcm(wavheader + 5) << 8;
 	m_endpos |= read_pcm(wavheader + 6);
-	m_endpos = -m_endpos << 16;
+	m_endpos = -int32_t(m_endpos) << 16;
 
 	// remaining data values set registers
 	m_owner.write(0x80 + m_choffs, read_pcm(wavheader + 7));
@@ -433,6 +433,9 @@ void pcm_channel::load_wavetable()
 	m_owner.write(0xb0 + m_choffs, read_pcm(wavheader + 9));
 	m_owner.write(0xc8 + m_choffs, read_pcm(wavheader + 10));
 	m_owner.write(0xe0 + m_choffs, read_pcm(wavheader + 11));
+
+	// reset the envelope so we don't continue playing mid-sample from previous key ons
+	m_env_attenuation = 0x3ff;
 }
 
 
@@ -560,9 +563,9 @@ int16_t pcm_channel::fetch_sample() const
 	// 12-bit PCM: assemble out of half of 3 bytes
 	addr += (pos / 2) * 3;
 	if ((pos & 1) == 0)
-		return (read_pcm(addr + 0) << 8) | ((read_pcm(addr + 1) << 0) & 0xf0);
+		return (read_pcm(addr + 0) << 8) | ((read_pcm(addr + 1) << 4) & 0xf0);
 	else
-		return (read_pcm(addr + 2) << 8) | ((read_pcm(addr + 1) << 4) & 0xf0);
+		return (read_pcm(addr + 2) << 8) | ((read_pcm(addr + 1) << 0) & 0xf0);
 }
 
 

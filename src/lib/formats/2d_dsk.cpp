@@ -38,4 +38,4 @@ const _2d_format::format _2d_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_2D_FORMAT = &floppy_image_format_creator<_2d_format>;
+const _2d_format FLOPPY_2D_FORMAT;

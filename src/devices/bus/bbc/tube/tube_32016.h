@@ -57,9 +57,11 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
-	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler m_rom_shadow_tap;
 
 	void tube_32016_mem(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(prst_w);
 };
 
 

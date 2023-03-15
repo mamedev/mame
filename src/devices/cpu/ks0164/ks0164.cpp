@@ -6,14 +6,8 @@
 #include "emu.h"
 #include "ks0164.h"
 #include "ks0164d.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device, "ks0164cpu", "Samsung KS0164 audio processor")
-
-const u16 ks0164_cpu_device::imask[16] = {
-	0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
-	0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
-};
 
 ks0164_cpu_device::ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, KS0164CPU, tag, owner, clock)
@@ -28,7 +22,6 @@ void ks0164_cpu_device::device_start()
 
 	state_add(STATE_GENPC,     "GENPC",     m_r[R_PC]).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_r[R_PC]).callexport().noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_r[R_SP]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[R_PSW]).callimport().formatstr("%8s").noshow();
 	state_add(KS0164_PC,       "PC",        m_r[R_PC]).callimport();
 	state_add(KS0164_PSW,      "PSW",       m_r[R_PSW]).callimport();
@@ -107,7 +100,7 @@ void ks0164_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void ks0164_cpu_device::handle_irq()
 {
-	u16 mask = m_irq & imask[m_r[R_PSW] & 15];
+	u16 mask = m_irq & util::make_bitmask<u16>((m_r[R_PSW] & 15) + 1);
 	if(mask) {
 		int index;
 		for(index = 0; !(mask & (1 << index)); index ++);
@@ -115,6 +108,7 @@ void ks0164_cpu_device::handle_irq()
 			// Normal irq (not reset), save pc and psw
 			if(m_r[R_PSW] & F_I)
 				return;
+			standard_irq_callback(0, m_r[R_PC]);
 			m_program.write_word(m_r[R_SP] - 2, m_r[R_PC]);
 			m_program.write_word(m_r[R_SP] - 4, m_r[R_PSW]);
 			m_r[R_SP] -= 4;
@@ -125,8 +119,6 @@ void ks0164_cpu_device::handle_irq()
 		m_r[R_PSW] = (m_r[R_PSW] & 0xfff0) | (index ? index - 1 : 0);
 		m_r[R_PC] = m_program_cache.read_word(index*2);
 		m_icount --;
-		if(index)
-			standard_irq_callback(0);
 	}
 }
 
@@ -267,10 +259,7 @@ void ks0164_cpu_device::execute_run()
 			case 0xf: default: cond = true; break;
 			}
 			if(cond) {
-				if(opcode & 0x200)
-					m_r[R_PC] += opcode | 0xfc00;
-				else
-					m_r[R_PC] += opcode & 0x3ff;
+				m_r[R_PC] += util::sext(opcode, 10);
 			}
 			break;
 		}

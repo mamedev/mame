@@ -20,7 +20,7 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, s32 param)
+#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, s32 param)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,7 +32,7 @@ class timer_device : public device_t
 {
 public:
 	// a timer callbacks look like this
-	typedef device_delegate<void (timer_device &, void *, s32)> expired_delegate;
+	typedef device_delegate<void (timer_device &, s32)> expired_delegate;
 
 	// construction/destruction
 	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -81,12 +81,10 @@ public:
 
 	// property getters
 	int param() const { return m_timer->param(); }
-	void *ptr() const { return m_ptr; }
 	bool enabled() const { return m_timer->enabled(); }
 
 	// property setters
 	void set_param(int param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
-	void set_ptr(void *ptr) { m_ptr = ptr; }
 	void enable(bool enable = true) const { m_timer->enable(enable); }
 
 	// adjustments
@@ -99,10 +97,10 @@ public:
 	}
 
 	// timing information
-	attotime time_elapsed() const { return m_timer->elapsed(); }
-	attotime time_left() const { return m_timer->remaining(); }
-	attotime start_time() const { return m_timer->start(); }
-	attotime fire_time() const { return m_timer->expire(); }
+	attotime elapsed() const { return m_timer->elapsed(); }
+	attotime remaining() const { return m_timer->remaining(); }
+	attotime start() const { return m_timer->start(); }
+	attotime expire() const { return m_timer->expire(); }
 	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:
@@ -110,7 +108,9 @@ private:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(generic_tick);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	// timer types
 	enum timer_type
@@ -123,7 +123,6 @@ private:
 	// configuration data
 	timer_type              m_type;             // type of timer
 	expired_delegate        m_callback;         // the timer's callback function
-	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only
 	attotime                m_start_delay;      // delay before the timer fires for the first time

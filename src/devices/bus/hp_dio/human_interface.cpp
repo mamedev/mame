@@ -19,7 +19,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_HUMAN_INTERFACE, bus::hp_dio, human_interface_device, "human_interface", "HP human interface card")
+DEFINE_DEVICE_TYPE(HPDIO_HUMAN_INTERFACE, bus::hp_dio::human_interface_device, "human_interface", "HP human interface card")
 
 namespace bus::hp_dio {
 

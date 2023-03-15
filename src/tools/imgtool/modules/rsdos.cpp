@@ -8,12 +8,17 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
-#include "formats/coco_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/coco_dsk.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /* this structure mirrors the structure of an RS-DOS directory entry on disk */
 struct rsdos_dirent
@@ -103,7 +108,7 @@ static imgtoolerr_t lookup_rsdos_file(imgtool::image &f, const char *fname, rsdo
 		if (ent.filename[0] != -1)
 			fnamebuf = get_dirent_fname(ent);
 	}
-	while((ent.filename[0] != -1) && core_stricmp(fnamebuf.c_str(), fname));
+	while((ent.filename[0] != -1) && core_stricmp(fnamebuf, fname));
 
 	if (ent.filename[0] == -1)
 		return IMGTOOLERR_FILENOTFOUND;

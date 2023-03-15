@@ -21,14 +21,19 @@
 #include "debugger.h"
 #include "drivenum.h"
 #include "emuopts.h"
+#include "fileio.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
+#include "screen.h"
 #include "softlist.h"
 #include "uiinput.h"
 
 #include "corestr.h"
+#include "notifier.h"
 
+#include <condition_variable>
 #include <cstring>
+#include <mutex>
 #include <thread>
 
 
@@ -36,14 +41,10 @@
 //  LUA ENGINE
 //**************************************************************************
 
-extern "C" {
-
 int luaopen_zlib(lua_State *L);
-int luaopen_lfs(lua_State *L);
+extern "C" int luaopen_lfs(lua_State *L);
 int luaopen_linenoise(lua_State *L);
 int luaopen_lsqlite3(lua_State *L);
-
-} // extern "C"
 
 
 template <typename T>
@@ -59,61 +60,115 @@ struct lua_engine::devenum
 
 namespace {
 
-void do_draw_box(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
+struct thread_context
 {
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
-}
+private:
+	std::string m_result;
+	std::mutex m_guard;
+	std::condition_variable m_sync;
 
-void do_draw_line(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-}
+public:
+	bool m_busy = false;
+	bool m_yield = false;
 
-void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y, const char *msg, rgb_t fgcolor, rgb_t bgcolor)
+	bool start(char const *scr)
+	{
+		std::unique_lock<std::mutex> caller_lock(m_guard);
+		if (m_busy)
+			return false;
+
+		std::string script(scr);
+		std::thread th(
+				[this, script = std::string(scr)] ()
+				{
+					sol::state thstate;
+					thstate.open_libraries();
+					thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
+					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
+					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+					sol::load_result res = thstate.load(script);
+					std::unique_lock<std::mutex> result_lock(m_guard, std::defer_lock);
+					if (res.valid())
+					{
+						sol::protected_function func = res.get<sol::protected_function>();
+						thstate.set_function(
+								"yield",
+								[this, &thstate]()
+								{
+									std::unique_lock<std::mutex> yield_lock(m_guard);
+									m_result = thstate["status"];
+									m_yield = true;
+									m_sync.wait(yield_lock);
+									m_yield = false;
+									thstate["status"] = m_result;
+								});
+						auto ret = func();
+						result_lock.lock();
+						if (ret.valid())
+						{
+							auto result = ret.get<std::optional<char const *> >();
+							if (!result)
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
+							else if (!*result)
+								m_result.clear();
+							else
+								m_result = *result;
+						}
+						else
+						{
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
+					}
+					else
+					{
+						result_lock.lock();
+						sol::error err = res;
+						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
+					}
+					assert(result_lock);
+					m_busy = false;
+			});
+		m_busy = true;
+		m_yield = false;
+		th.detach(); // FIXME: this is unsafe as the thread function modifies members of the object
+		return true;
+	}
+
+	void resume(char const *val)
+	{
+		std::unique_lock<std::mutex> lock(m_guard);
+		if (m_yield)
+		{
+			if (val)
+				m_result = val;
+			else
+				m_result.clear();
+			m_sync.notify_all();
+		}
+	}
+
+	char const *result()
+	{
+		std::unique_lock<std::mutex> lock(m_guard);
+		if (m_busy && !m_yield)
+			return "";
+		else
+			return m_result.c_str();
+	}
+};
+
+
+struct device_state_entries
 {
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::LEFT;
-	float x = 0;
-	if (xobj.is<float>())
-	{
-		x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
-	}
-	else if (xobj.is<char const *>())
-	{
-		char const *const justifystr(xobj.as<char const *>());
-		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::LEFT;
-		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::RIGHT;
-		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::CENTER;
-	}
-	else
-	{
-		luaL_error(L, "Error in param 1 to draw_text");
-		return;
-	}
-	y = std::clamp(y, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_text_full(
-			sdev.container(),
-			msg,
-			x, y, (1.0f - x),
-			justify, ui::text_layout::WORD,
-			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
-}
+	device_state_entries(device_state_interface const &s) : state(s) { }
+	device_state_interface::entrylist_type const &items() { return state.state_entries(); }
+
+	static device_state_entry const &unwrap(device_state_interface::entrylist_type::const_iterator const &it) { return **it; }
+	static int push_key(lua_State *L, device_state_interface::entrylist_type::const_iterator const &it, std::size_t ix) { return sol::stack::push_reference(L, (*it)->symbol()); }
+
+	device_state_interface const &state;
+};
 
 
 struct image_interface_formats
@@ -142,23 +197,11 @@ struct plugin_options_plugins
 } // anonymous namespace
 
 
-namespace sol
-{
+namespace sol {
 
+template <> struct is_container<device_state_entries> : std::true_type { };
 template <> struct is_container<image_interface_formats> : std::true_type { };
 template <> struct is_container<plugin_options_plugins> : std::true_type { };
-
-
-sol::buffer *sol_lua_get(sol::types<buffer *>, lua_State *L, int index, sol::stack::record &tracking)
-{
-	return new sol::buffer(stack::get<int>(L, index), L);
-}
-
-int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value)
-{
-	delete value;
-	return 1;
-}
 
 
 template <typename T>
@@ -265,6 +308,34 @@ public:
 
 
 template <>
+struct usertype_container<device_state_entries> : lua_engine::immutable_sequence_helper<device_state_entries, device_state_interface::entrylist_type const, device_state_interface::entrylist_type::const_iterator>
+{
+private:
+	using entrylist_type = device_state_interface::entrylist_type;
+
+public:
+	static int get(lua_State *L)
+	{
+		device_state_entries &self(get_self(L));
+		char const *const symbol(stack::unqualified_get<char const *>(L));
+		auto const found(std::find_if(
+					self.state.state_entries().begin(),
+					self.state.state_entries().end(),
+					[&symbol] (std::unique_ptr<device_state_entry> const &v) { return !std::strcmp(v->symbol(), symbol); }));
+		if (self.state.state_entries().end() != found)
+			return stack::push_reference(L, std::cref(**found));
+		else
+			return stack::push(L, lua_nil);
+	}
+
+	static int index_get(lua_State *L)
+	{
+		return get(L);
+	}
+};
+
+
+template <>
 struct usertype_container<image_interface_formats> : lua_engine::immutable_sequence_helper<image_interface_formats, device_image_interface::formatlist_type const, device_image_interface::formatlist_type::const_iterator>
 {
 private:
@@ -280,7 +351,7 @@ public:
 					self.image.formatlist().end(),
 					[&name] (std::unique_ptr<image_device_format> const &v) { return v->name() == name; }));
 		if (self.image.formatlist().end() != found)
-			return stack::push_reference(L, **found);
+			return stack::push_reference(L, std::cref(**found));
 		else
 			return stack::push(L, lua_nil);
 	}
@@ -308,7 +379,7 @@ public:
 					self.options.plugins().end(),
 					[&name] (plugin_options::plugin const &p) { return p.m_name == name; }));
 		if (self.options.plugins().end() != found)
-			return stack::push_reference(L, *found);
+			return stack::push_reference(L, std::cref(*found));
 		else
 			return stack::push(L, lua_nil);
 	}
@@ -322,48 +393,12 @@ public:
 } // namespace sol
 
 
-int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
+int sol_lua_push(sol::types<std::error_condition>, lua_State *L, std::error_condition &&value)
 {
-	const char *strerror;
-	switch(value)
-	{
-		case osd_file::error::NONE:
-			return sol::stack::push(L, sol::lua_nil);
-		case osd_file::error::FAILURE:
-			strerror = "failure";
-			break;
-		case osd_file::error::OUT_OF_MEMORY:
-			strerror = "out_of_memory";
-			break;
-		case osd_file::error::NOT_FOUND:
-			strerror = "not_found";
-			break;
-		case osd_file::error::ACCESS_DENIED:
-			strerror = "access_denied";
-			break;
-		case osd_file::error::ALREADY_OPEN:
-			strerror = "already_open";
-			break;
-		case osd_file::error::TOO_MANY_FILES:
-			strerror = "too_many_files";
-			break;
-		case osd_file::error::INVALID_DATA:
-			strerror = "invalid_data";
-			break;
-		case osd_file::error::INVALID_ACCESS:
-			strerror = "invalid_access";
-			break;
-		default:
-			strerror = "unknown_error";
-			break;
-	}
-	return sol::stack::push(L, strerror);
-}
-
-template <typename Handler>
-bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
-{
-	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+	if (!value)
+		return sol::stack::push(L, sol::lua_nil);
+	else
+		return sol::stack::push(L, value.message());
 }
 
 
@@ -454,64 +489,75 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 {
 	std::string field = "cb_" + name;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), in);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
 		}
 		else
+		{
 			return res.get<sol::object>();
+		}
 	}
 	return sol::lua_nil;
 }
 
-void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
+std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags)
 {
 	std::string field = "menu_pop_" + menu;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>());
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_populate: %s\n", err.what());
 		}
 		else
 		{
-			sol::table table = res;
-			for(auto &entry : table)
+			std::tuple<sol::table, std::optional<long>, std::optional<std::string> > table = res;
+			for (auto &entry : std::get<0>(table))
 			{
-				if(entry.second.is<sol::table>())
+				if (entry.second.is<sol::table>())
 				{
 					sol::table enttable = entry.second.as<sol::table>();
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
+			if (std::get<2>(table))
+				flags = *std::get<2>(table);
+			else
+				flags.clear();
+			return std::get<1>(table);
 		}
 	}
+	flags.clear();
+	return std::nullopt;
 }
 
-bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
+std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	bool ret = false;
+	std::pair<std::optional<bool>, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), index, event);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_callback: %s\n", err.what());
 		}
 		else
+		{
 			ret = res;
+		}
 	}
-	return ret;
+	return std::make_pair(std::get<0>(ret) && *std::get<0>(ret), std::get<1>(ret));
 }
 
 void lua_engine::set_machine(running_machine *machine)
@@ -519,9 +565,10 @@ void lua_engine::set_machine(running_machine *machine)
 	m_machine = machine;
 }
 
-int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback)
+template <typename T>
+size_t lua_engine::enumerate_functions(const char *id, T &&callback)
 {
-	int count = 0;
+	size_t count = 0;
 	sol::object functable = sol().registry()[id];
 	if (functable.is<sol::table>())
 	{
@@ -535,23 +582,24 @@ int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol
 					break;
 			}
 		}
-		return true;
 	}
 	return count;
 }
 
 bool lua_engine::execute_function(const char *id)
 {
-	int count = enumerate_functions(id, [this](const sol::protected_function &func)
-	{
-		auto ret = invoke(func);
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
-		}
-		return true;
-	});
+	size_t count = enumerate_functions(
+			id,
+			[] (const sol::protected_function &func)
+			{
+				auto ret = invoke(func);
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
+				}
+				return true;
+			});
 	return count > 0;
 }
 
@@ -617,21 +665,23 @@ void lua_engine::on_periodic()
 bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 {
 	bool handled = false;
-	enumerate_functions("LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE", [this, &instance_name, &handled](const sol::protected_function &func)
-	{
-		auto ret = invoke(func, instance_name);
+	enumerate_functions(
+			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
+			[&instance_name, &handled] (const sol::protected_function &func)
+			{
+				auto ret = invoke(func, instance_name);
 
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
-		}
-		else if (ret.get<bool>())
-		{
-			handled = true;
-		}
-		return !handled;
-	});
+				if (!ret.valid())
+				{
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in on_missing_mandatory_image: %s\n", err.what());
+				}
+				else if (ret.get<bool>())
+				{
+					handled = true;
+				}
+				return !handled;
+			});
 	return handled;
 }
 
@@ -702,10 +752,11 @@ void lua_engine::initialize()
  * emu.register_before_load_settings(callback) - register callback to be run before settings are loaded
  * emu.show_menu(menu_name) - show menu by name and pause the machine
  *
- * emu.print_verbose(str) - output to stderr at verbose level
- * emu.print_error(str) - output to stderr at error level
- * emu.print_info(str) - output to stderr at info level
- * emu.print_debug(str) - output to stderr at debug level
+ * emu.print_verbose(str) - log message at verbose level
+ * emu.print_error(str) - log message at error level
+ * emu.print_warning(str) - log message at error level
+ * emu.print_info(str) - log message at info level
+ * emu.print_debug(str) - log message at debug level
  *
  * emu.device_enumerator(dev) - get device enumerator starting at arbitrary point in tree
  * emu.screen_enumerator(dev) - get screen device enumerator starting at arbitrary point in tree
@@ -775,8 +826,11 @@ void lua_engine::initialize()
 		};
 	emu["print_verbose"] = [] (const char *str) { osd_printf_verbose("%s\n", str); };
 	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
+	emu["print_warning"] = [] (const char *str) { osd_printf_warning("%s\n", str); };
 	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
 	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
+	emu["osd_ticks"] = &osd_ticks;
+	emu["osd_ticks_per_second"] = &osd_ticks_per_second;
 	emu["driver_find"] =
 		[] (sol::this_state s, const char *driver) -> sol::object
 		{
@@ -794,21 +848,20 @@ void lua_engine::initialize()
 				if (ret == 1)
 					return luaL_error(L, "cannot wait from outside coroutine");
 				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
+				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref);
 				return lua_yield(L, 0);
 			});
-	emu["lang_translate"] = &lang_translate;
+	emu["lang_translate"] = sol::overload(
+			static_cast<char const *(*)(char const *)>(&lang_translate),
+			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu["subst_env"] =
-		[] (const std::string &str)
-		{
-			std::string result;
-			osd_subst_env(result, str);
-			return result;
-		};
+	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
+	emu["palette_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<palette_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<palette_interface_enumerator>(dev, maxdepth); });
 	emu["screen_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<screen_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<screen_device_enumerator>(dev, maxdepth); });
@@ -821,6 +874,38 @@ void lua_engine::initialize()
 	emu["slot_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
+
+
+	auto notifier_subscription_type = sol().registry().new_usertype<util::notifier_subscription>("notifier_subscription", sol::no_constructor);
+	notifier_subscription_type["unsubscribe"] = &util::notifier_subscription::reset;
+	notifier_subscription_type["is_active"] = sol::property(&util::notifier_subscription::operator bool);
+
+	auto attotime_type = emu.new_usertype<attotime>(
+			"attotime",
+			sol::call_constructor, sol::constructors<attotime(), attotime(seconds_t, attoseconds_t), attotime(attotime const &)>());
+	attotime_type["from_double"] = &attotime::from_double;
+	attotime_type["from_ticks"] = static_cast<attotime (*)(u64, u32)>(&attotime::from_ticks);
+	attotime_type["from_seconds"] = &attotime::from_seconds;
+	attotime_type["from_msec"] = &attotime::from_msec;
+	attotime_type["from_usec"] = &attotime::from_usec;
+	attotime_type["from_nsec"] = &attotime::from_nsec;
+	attotime_type["as_double"] = &attotime::as_double;
+	attotime_type["as_hz"] = &attotime::as_hz;
+	attotime_type["as_khz"] = &attotime::as_khz;
+	attotime_type["as_mhz"] = &attotime::as_mhz;
+	attotime_type["as_ticks"] = static_cast<u64 (attotime::*)(u32) const>(&attotime::as_ticks);
+	attotime_type["is_zero"] = sol::property(&attotime::is_zero);
+	attotime_type["is_never"] = sol::property(&attotime::is_never);
+	attotime_type["attoseconds"] = sol::property(&attotime::attoseconds);
+	attotime_type["seconds"] = sol::property(&attotime::seconds);
+	attotime_type["msec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_MILLISECOND; });
+	attotime_type["usec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_MICROSECOND; });
+	attotime_type["nsec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_NANOSECOND; });
+	attotime_type[sol::meta_function::to_string] = &attotime::to_string;
+	attotime_type[sol::meta_function::addition] = static_cast<attotime (*)(attotime const &, attotime const &)>(&operator+);
+	attotime_type[sol::meta_function::subtraction] = static_cast<attotime (*)(attotime const &, attotime const &)>(&operator-);
+	attotime_type[sol::meta_function::multiplication] = static_cast<attotime (*)(attotime const &, u32)>(&operator*);
+	attotime_type[sol::meta_function::division] = static_cast<attotime (*)(attotime const &, u32)>(&operator/);
 
 
 /* emu_file library
@@ -882,10 +967,20 @@ void lua_engine::initialize()
 					}
 					new (&file) emu_file(path, flags);
 				}));
-	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
+	file_type.set("read",
+			[] (emu_file &file, sol::this_state s, size_t len)
+			{
+				buffer_helper buf(s);
+				auto space = buf.prepare(len);
+				space.add(file.read(space.get(), len));
+				buf.push();
+				return sol::make_reference(s, sol::stack_reference(s, -1));
+			});
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("open", static_cast<osd_file::error (emu_file::*)(std::string_view)>(&emu_file::open));
+	file_type.set("puts", &emu_file::puts);
+	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
+	file_type.set("close", &emu_file::close);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
 			[this] (emu_file &file, s64 offset, int whence) -> sol::object {
@@ -929,70 +1024,12 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
  */
 
-	auto thread_type = emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
-	thread_type.set("start", [](context &ctx, const char *scr) {
-			std::string script(scr);
-			if (ctx.busy)
-				return false;
-			std::thread th([&ctx, script]() {
-					sol::state thstate;
-					thstate.open_libraries();
-					thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
-					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
-					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
-					sol::load_result res = thstate.load(script);
-					if(res.valid())
-					{
-						sol::protected_function func = res.get<sol::protected_function>();
-						thstate["yield"] = [&ctx, &thstate]() {
-								std::mutex m;
-								std::unique_lock<std::mutex> lock(m);
-								ctx.result = thstate["status"];
-								ctx.yield = true;
-								ctx.sync.wait(lock);
-								ctx.yield = false;
-								thstate["status"] = ctx.result;
-							};
-						auto ret = func();
-						if (ret.valid())
-						{
-							const char *tmp = ret.get<const char *>();
-							if (tmp != nullptr)
-								ctx.result = tmp;
-							else
-								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
-						}
-						else
-						{
-							sol::error err = ret;
-							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
-						}
-					}
-					else
-					{
-						sol::error err = res;
-						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
-					}
-					ctx.busy = false;
-				});
-			ctx.busy = true;
-			ctx.yield = false;
-			th.detach();
-			return true;
-		});
-	thread_type.set("continue", [](context &ctx, const char *val) {
-			if (!ctx.yield)
-				return;
-			ctx.result = val;
-			ctx.sync.notify_all();
-		});
-	thread_type.set("result", sol::property([](context &ctx) -> std::string {
-			if (ctx.busy && !ctx.yield)
-				return "";
-			return ctx.result;
-		}));
-	thread_type.set("busy", sol::readonly(&context::busy));
-	thread_type.set("yield", sol::readonly(&context::yield));
+	auto thread_type = emu.new_usertype<thread_context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
+	thread_type.set_function("start", &thread_context::start);
+	thread_type.set_function("continue", &thread_context::resume);
+	thread_type["result"] = sol::property(&thread_context::result);
+	thread_type["busy"] = sol::readonly(&thread_context::m_busy);
+	thread_type["yield"] = sol::readonly(&thread_context::m_yield);
 
 
 /*  save_item library
@@ -1024,12 +1061,14 @@ void lua_engine::initialize()
 				}));
 	item_type.set("size", sol::readonly(&save_item::size));
 	item_type.set("count", sol::readonly(&save_item::count));
-	item_type.set("read", [this](save_item &item, int offset) -> sol::object {
-			if(!item.base || (offset >= item.count))
+	item_type.set("read",
+		[this] (save_item &item, int offset) -> sol::object
+		{
+			if (!item.base || (offset >= item.count))
 				return sol::lua_nil;
 			const void *const data = reinterpret_cast<const uint8_t *>(item.base) + (item.stride * (offset / item.valcount));
 			uint64_t ret = 0;
-			switch(item.size)
+			switch (item.size)
 			{
 				case 1:
 				default:
@@ -1047,29 +1086,38 @@ void lua_engine::initialize()
 			}
 			return sol::make_object(sol(), ret);
 		});
-	item_type.set("read_block", [](save_item &item, int offset, sol::buffer *buff) {
-			if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
+	item_type.set("read_block",
+		[] (save_item &item, sol::this_state s, uint32_t offset, size_t len) -> sol::object
+		{
+			if (!item.base)
 			{
-				buff->set_len(0);
+				luaL_error(s, "Invalid save item");
+				return sol::lua_nil;
 			}
-			else
+
+			if ((offset + len) > (item.size * item.count))
 			{
-				const uint32_t blocksize = item.size * item.valcount;
-				uint32_t remaining = buff->get_len();
-				uint8_t *dest = reinterpret_cast<uint8_t *>(buff->get_ptr());
-				while(remaining)
-				{
-					const uint32_t blockno = offset / blocksize;
-					const uint32_t available = blocksize - (offset % blocksize);
-					const uint32_t chunk = (available < remaining) ? available : remaining;
-					const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
-					std::memcpy(dest, source, chunk);
-					offset += chunk;
-					remaining -= chunk;
-					dest += chunk;
-				}
+				luaL_error(s, "Range extends beyond end of save item");
+				return sol::lua_nil;
 			}
-			return buff;
+
+			luaL_Buffer buff;
+			uint8_t *dest = reinterpret_cast<uint8_t *>(luaL_buffinitsize(s, &buff, len));
+			const uint32_t blocksize = item.size * item.valcount;
+			size_t remaining = len;
+			while (remaining)
+			{
+				const uint32_t blockno = offset / blocksize;
+				const uint32_t available = blocksize - (offset % blocksize);
+				const uint32_t chunk = (available < remaining) ? available : remaining;
+				const void *const source = reinterpret_cast<const uint8_t *>(item.base) + (blockno * item.stride) + (offset % blocksize);
+				std::memcpy(dest, source, chunk);
+				offset += chunk;
+				remaining -= chunk;
+				dest += chunk;
+			}
+			luaL_pushresultsize(&buff, len);
+			return sol::make_reference(s, sol::stack_reference(s, -1));
 		});
 	item_type.set("write", [](save_item &item, int offset, uint64_t value) {
 			if(!item.base || (offset >= item.count))
@@ -1187,25 +1235,25 @@ void lua_engine::initialize()
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
 		[this](core_options::entry &e, bool val) {
-			if(e.type() != OPTION_BOOLEAN)
+			if(e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, float val) {
-			if(e.type() != OPTION_FLOAT)
+			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, int val) {
-			if(e.type() != OPTION_INTEGER)
+			if(e.type() != core_options::option_type::INTEGER)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
-			if(e.type() != OPTION_STRING)
+			if(e.type() != core_options::option_type::STRING && e.type() != core_options::option_type::PATH && e.type() != core_options::option_type::MULTIPATH)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
@@ -1233,65 +1281,66 @@ void lua_engine::initialize()
 
 
 	auto machine_type = sol().registry().new_usertype<running_machine>("machine", sol::no_constructor);
-	machine_type["exit"] = &running_machine::schedule_exit;
-	machine_type["hard_reset"] = &running_machine::schedule_hard_reset;
-	machine_type["soft_reset"] = &running_machine::schedule_soft_reset;
-	machine_type["save"] = &running_machine::schedule_save; // TODO: some kind of completion notification?
-	machine_type["load"] = &running_machine::schedule_load; // TODO: some kind of completion notification?
-	machine_type["buffer_save"] =
-		[] (running_machine &m, sol::this_state s)
-		{
-			// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			lua_State *L = s;
-			luaL_Buffer buff;
-			int size = ram_state::get_size(m.save());
-			u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
-			save_error error = m.save().write_buffer(ptr, size);
-			if (error == STATERR_NONE)
+	machine_type.set_function("exit", &running_machine::schedule_exit);
+	machine_type.set_function("hard_reset", &running_machine::schedule_hard_reset);
+	machine_type.set_function("soft_reset", &running_machine::schedule_soft_reset);
+	machine_type.set_function("save", &running_machine::schedule_save); // TODO: some kind of completion notification?
+	machine_type.set_function("load", &running_machine::schedule_load); // TODO: some kind of completion notification?
+	machine_type.set_function("buffer_save",
+			[] (running_machine &m, sol::this_state s)
 			{
-				luaL_pushresultsize(&buff, size);
-				return sol::make_reference(L, sol::stack_reference(L, -1));
-			}
-			luaL_error(L, "State save error.");
-			return sol::make_reference(L, nullptr);
-		};
-	machine_type["buffer_load"] =
-		[] (running_machine &m, sol::this_state s, std::string str)
-		{
-			// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
-			// right now it's broken by anonymous timers, synchronize, etc.
-			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
-			if (error == STATERR_NONE)
+				// FIXME: this needs to schedule saving to a buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				lua_State *L = s;
+				luaL_Buffer buff;
+				int size = ram_state::get_size(m.save());
+				u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
+				save_error error = m.save().write_buffer(ptr, size);
+				if (error == STATERR_NONE)
+				{
+					luaL_pushresultsize(&buff, size);
+					return sol::make_reference(L, sol::stack_reference(L, -1));
+				}
+				luaL_error(L, "State save error.");
+				return sol::make_reference(L, nullptr);
+			});
+	machine_type.set_function("buffer_load",
+			[] (running_machine &m, sol::this_state s, std::string str)
 			{
-				return true;
-			}
-			else
+				// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
+				// right now it's broken by anonymous timers, synchronize, etc.
+				save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
+				if (error == STATERR_NONE)
+				{
+					return true;
+				}
+				else
+				{
+					luaL_error(s,"State load error.");
+					return false;
+				}
+			});
+	machine_type.set_function("popmessage",
+			[] (running_machine &m, std::optional<const char *> str)
 			{
-				luaL_error(s,"State load error.");
-				return false;
-			}
-		};
-	machine_type["popmessage"] =
-		[] (running_machine &m, const char *str)
-		{
-			if (str)
-				m.popmessage("%s", str);
-			else
-				m.popmessage();
-		};
-	machine_type["logerror"]  = [] (running_machine &m, std::string const *str) { m.logerror("[luaengine] %s\n", str); };
+				if (str)
+					m.popmessage("%s", *str);
+				else
+					m.popmessage();
+			});
+	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
+	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
+	machine_type["parameters"] = sol::property(&running_machine::parameters);
 	machine_type["video"] = sol::property(&running_machine::video);
 	machine_type["sound"] = sol::property(&running_machine::sound);
-	machine_type["render"] = sol::property(&running_machine::render);
-	machine_type["ioport"] = sol::property(&running_machine::ioport);
-	machine_type["parameters"] = sol::property(&running_machine::parameters);
-	machine_type["memory"] = sol::property(&running_machine::memory);
-	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["output"] = sol::property(&running_machine::output);
+	machine_type["memory"] = sol::property(&running_machine::memory);
+	machine_type["ioport"] = sol::property(&running_machine::ioport);
 	machine_type["input"] = sol::property(&running_machine::input);
+	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
 	machine_type["uiinput"] = sol::property(&running_machine::ui_input);
+	machine_type["render"] = sol::property(&running_machine::render);
 	machine_type["debugger"] = sol::property(
 			[] (running_machine &m, sol::this_state s) -> sol::object
 			{
@@ -1300,12 +1349,13 @@ void lua_engine::initialize()
 				else
 					return sol::lua_nil;
 			});
-	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
-	machine_type["paused"] = sol::property(&running_machine::paused);
+	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
+	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
@@ -1319,7 +1369,7 @@ void lua_engine::initialize()
 	game_driver_type["manufacturer"] = sol::readonly(&game_driver::manufacturer);
 	game_driver_type["parent"] = sol::readonly(&game_driver::parent);
 	game_driver_type["compatible_with"] = sol::property([] (game_driver const &driver) { return strcmp(driver.compatible_with, "0") ? driver.compatible_with : nullptr; });
-	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return &driver.type.source()[0]; });
+	game_driver_type["source_file"] = sol::property([] (game_driver const &driver) { return driver.type.source(); });
 	game_driver_type["orientation"] = sol::property(
 			[] (game_driver const &driver)
 			{
@@ -1346,29 +1396,6 @@ void lua_engine::initialize()
 				}
 				return rot;
 			});
-	game_driver_type["type"] = sol::property(
-			[] (game_driver const &driver)
-			{
-				// FIXME: this shouldn't be called type - there's potendial for confusion with the device type
-				// also, this should eventually go away in favour of richer flags
-				std::string type;
-				switch (driver.flags & machine_flags::MASK_TYPE)
-				{
-				case machine_flags::TYPE_ARCADE:
-					type = "arcade";
-					break;
-				case machine_flags::TYPE_CONSOLE:
-					type = "console";
-					break;
-				case machine_flags::TYPE_COMPUTER:
-					type = "computer";
-					break;
-				default:
-					type = "other";
-					break;
-				}
-				return type;
-			});
 	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
 	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
 	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
@@ -1382,15 +1409,16 @@ void lua_engine::initialize()
 
 
 	auto device_type = sol().registry().new_usertype<device_t>("device", sol::no_constructor);
-	device_type["subtag"] = &device_t::subtag;
-	device_type["siblingtag"] = &device_t::siblingtag;
-	device_type["memregion"] = &device_t::memregion;
-	device_type["memshare"] = &device_t::memshare;
-	device_type["membank"] = &device_t::membank;
-	device_type["ioport"] = &device_t::ioport;
-	device_type["subdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice);
-	device_type["siblingdevice"] = static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice);
-	device_type["parameter"] = &device_t::parameter;
+	device_type.set_function(sol::meta_function::to_string, [] (device_t &d) { return util::string_format("%s(%s)", d.shortname(), d.tag()); });
+	device_type.set_function("subtag", &device_t::subtag);
+	device_type.set_function("siblingtag", &device_t::siblingtag);
+	device_type.set_function("memregion", &device_t::memregion);
+	device_type.set_function("memshare", &device_t::memshare);
+	device_type.set_function("membank", &device_t::membank);
+	device_type.set_function("ioport", &device_t::ioport);
+	device_type.set_function("subdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::subdevice));
+	device_type.set_function("siblingdevice", static_cast<device_t *(device_t::*)(std::string_view) const>(&device_t::siblingdevice));
+	device_type.set_function("parameter", &device_t::parameter);
 	device_type["tag"] = sol::property(&device_t::tag);
 	device_type["basetag"] = sol::property(&device_t::basetag);
 	device_type["name"] = sol::property(&device_t::name);
@@ -1419,17 +1447,13 @@ void lua_engine::initialize()
 				}
 				return sp_table;
 			});
-	// FIXME: improve this
 	device_type["state"] = sol::property(
-			[this] (device_t &dev)
+			[] (device_t &dev, sol::this_state s) -> sol::object
 			{
-				sol::table st_table = sol().create_table();
-				if(!dynamic_cast<device_state_interface *>(&dev))
-					return st_table;
-				// XXX: refrain from exporting non-visible entries?
-				for(auto &s : dev.state().state_entries())
-					st_table[s->symbol()] = s.get();
-				return st_table;
+				device_state_interface const *state;
+				if (!dev.interface(state))
+					return sol::lua_nil;
+				return sol::make_object(s, device_state_entries(*state));
 			});
 	// FIXME: turn into a wrapper - it's stupid slow to walk on every property access
 	// also, this mixes up things like RAM areas with stuff saved by the device itself, so there's potential for key conflicts
@@ -1465,99 +1489,209 @@ void lua_engine::initialize()
 			});
 
 
+	auto dipalette_type = sol().registry().new_usertype<device_palette_interface>("dipalette", sol::no_constructor);
+	dipalette_type.set_function("pen", &device_palette_interface::pen);
+	dipalette_type.set_function(
+			"pen_color",
+			[] (device_palette_interface const &pal, pen_t pen)
+			{
+				return uint32_t(pal.pen_color(pen));
+			});
+	dipalette_type.set_function("pen_contrast", &device_palette_interface::pen_contrast);
+	dipalette_type.set_function("pen_indirect", &device_palette_interface::pen_indirect);
+	dipalette_type.set_function(
+			"indirect_color",
+			[] (device_palette_interface const &pal, int index)
+			{
+				return uint32_t(pal.indirect_color(index));
+			});
+	dipalette_type["set_pen_color"] = sol::overload(
+			[] (device_palette_interface &pal, pen_t pen, uint32_t color)
+			{
+				pal.set_pen_color(pen, rgb_t(color));
+			},
+			static_cast<void (device_palette_interface::*)(pen_t, uint8_t, uint8_t, uint8_t)>(&device_palette_interface::set_pen_color));
+	dipalette_type.set_function("set_pen_red_level", &device_palette_interface::set_pen_red_level);
+	dipalette_type.set_function("set_pen_green_level", &device_palette_interface::set_pen_green_level);
+	dipalette_type.set_function("set_pen_blue_level", &device_palette_interface::set_pen_blue_level);
+	dipalette_type.set_function("set_pen_contrast", &device_palette_interface::set_pen_contrast);
+	dipalette_type.set_function("set_pen_indirect", &device_palette_interface::set_pen_indirect);
+	dipalette_type["set_indirect_color"] = sol::overload(
+			[] (device_palette_interface &pal, int index, uint32_t color)
+			{
+				pal.set_indirect_color(index, rgb_t(color));
+			},
+			[] (device_palette_interface &pal, int index, uint8_t r, uint8_t g, uint8_t b)
+			{
+				pal.set_indirect_color(index, rgb_t(r, g, b));
+			});
+	dipalette_type.set_function("set_shadow_factor", &device_palette_interface::set_shadow_factor);
+	dipalette_type.set_function("set_highlight_factor", &device_palette_interface::set_highlight_factor);
+	dipalette_type.set_function("set_shadow_mode", &device_palette_interface::set_shadow_mode);
+	dipalette_type["palette"] = sol::property(
+			[] (device_palette_interface &pal)
+			{
+				return pal.palette()
+					? std::optional<palette_wrapper>(std::in_place, *pal.palette())
+					: std::optional<palette_wrapper>();
+			});
+	dipalette_type["entries"] = sol::property(&device_palette_interface::entries);
+	dipalette_type["indirect_entries"] = sol::property(&device_palette_interface::indirect_entries);
+	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
+	dipalette_type["white_pen"] = sol::property(&device_palette_interface::white_pen);
+	dipalette_type["shadows_enabled"] = sol::property(&device_palette_interface::shadows_enabled);
+	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::hilights_enabled);
+	dipalette_type["device"] = sol::property(static_cast<device_t & (device_palette_interface::*)()>(&device_palette_interface::device));
+
+
 	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type["draw_box"] = sol::overload(
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, bgcolor); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, mame_machine_manager::instance()->ui().colors().background_color()); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ auto const &colors(mame_machine_manager::instance()->ui().colors()); do_draw_box(sdev, x1, y1, x2, y2, colors.text_color(), colors.background_color()); });
-	screen_dev_type["draw_line"] = sol::overload(
-			&do_draw_line,
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ do_draw_line(sdev, x1, y1, x2, y2, mame_machine_manager::instance()->ui().colors().text_color()); });
-	screen_dev_type["draw_text"] = sol::overload(
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, bgcolor); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, 0); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, mame_machine_manager::instance()->ui().colors().text_color(), 0); });
-	screen_dev_type["orientation"] =
-		[] (screen_device &sdev)
-		{
-			uint32_t flags = sdev.orientation();
-			int rotation_angle = 0;
-			switch (flags)
+	screen_dev_type.set_function(
+			"draw_box",
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
 			{
-			case ORIENTATION_SWAP_XY:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
-				rotation_angle = 90;
-				flags ^= ORIENTATION_FLIP_X;
-				break;
-			case ORIENTATION_FLIP_Y:
-			case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 180;
-				flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
-				break;
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
-			case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
-				rotation_angle = 270;
-				flags ^= ORIENTATION_FLIP_Y;
-				break;
-			}
-			return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
-		};
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = ui.colors().background_color();
+				ui.draw_outlined_box(sdev.container(), x1, y1, x2, y2, *fgcolor, *bgcolor);
+			});
+	screen_dev_type.set_function(
+			"draw_line",
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				if (!color)
+					color = mame_machine_manager::instance()->ui().colors().text_color();
+				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			});
+	screen_dev_type.set_function(
+			"draw_text",
+			[this] (screen_device &sdev, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				auto justify = ui::text_layout::text_justify::LEFT;
+				float x = 0;
+				if (xobj.is<float>())
+				{
+					x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
+				}
+				else if (xobj.is<char const *>())
+				{
+					char const *const justifystr(xobj.as<char const *>());
+					if (!strcmp(justifystr, "left"))
+						justify = ui::text_layout::text_justify::LEFT;
+					else if (!strcmp(justifystr, "right"))
+						justify = ui::text_layout::text_justify::RIGHT;
+					else if (!strcmp(justifystr, "center"))
+						justify = ui::text_layout::text_justify::CENTER;
+				}
+				else
+				{
+					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					return;
+				}
+				y = std::clamp(y, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = 0;
+				ui.draw_text_full(
+						sdev.container(),
+						msg,
+						x, y, (1.0f - x),
+						justify, ui::text_layout::word_wrapping::WORD,
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+			});
+	screen_dev_type.set_function(
+			"orientation",
+			[] (screen_device &sdev)
+			{
+				uint32_t flags = sdev.orientation();
+				int rotation_angle = 0;
+				switch (flags)
+				{
+				case ORIENTATION_SWAP_XY:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+					rotation_angle = 90;
+					flags ^= ORIENTATION_FLIP_X;
+					break;
+				case ORIENTATION_FLIP_Y:
+				case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 180;
+					flags ^= ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;
+					break;
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+				case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+					rotation_angle = 270;
+					flags ^= ORIENTATION_FLIP_Y;
+					break;
+				}
+				return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
+			});
 	screen_dev_type["time_until_pos"] = sol::overload(
 			[] (screen_device &sdev, int vpos) { return sdev.time_until_pos(vpos).as_double(); },
 			[] (screen_device &sdev, int vpos, int hpos) { return sdev.time_until_pos(vpos, hpos).as_double(); });
-	screen_dev_type["time_until_vblank_start"] = &screen_device::time_until_vblank_start;
-	screen_dev_type["time_until_vblank_end"] = &screen_device::time_until_vblank_end;
-	screen_dev_type["snapshot"] =
-		[this] (screen_device &sdev, char const *filename) -> sol::object
-		{
-			// FIXME: this shouldn't be a member of the screen device
-			// the screen is only used as a hint when configured for native snapshots and may be ignored
-			std::string snapstr;
-			bool is_absolute_path = false;
-			if (filename)
+	screen_dev_type.set_function("time_until_vblank_start", &screen_device::time_until_vblank_start);
+	screen_dev_type.set_function("time_until_vblank_end", &screen_device::time_until_vblank_end);
+	screen_dev_type.set_function(
+			"snapshot",
+			[this] (screen_device &sdev, char const *filename) -> sol::object
 			{
-				// a filename was specified; if it isn't absolute post-process it
-				snapstr = process_snapshot_filename(machine(), filename);
-				is_absolute_path = osd_is_absolute_path(snapstr);
-			}
+				// FIXME: this shouldn't be a member of the screen device
+				// the screen is only used as a hint when configured for native snapshots and may be ignored
+				std::string snapstr;
+				bool is_absolute_path = false;
+				if (filename)
+				{
+					// a filename was specified; if it isn't absolute post-process it
+					snapstr = process_snapshot_filename(machine(), filename);
+					is_absolute_path = osd_is_absolute_path(snapstr);
+				}
 
-			// open the file
-			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr;
-			if (!snapstr.empty())
-				filerr = file.open(snapstr);
-			else
-				filerr = machine().video().open_next(file, "png");
-			if (filerr != osd_file::error::NONE)
-				return sol::make_object(sol(), filerr);
+				// open the file
+				emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				std::error_condition filerr;
+				if (!snapstr.empty())
+					filerr = file.open(snapstr);
+				else
+					filerr = machine().video().open_next(file, "png");
+				if (filerr)
+					return sol::make_object(sol(), filerr);
 
-			// and save the snapshot
-			machine().video().save_snapshot(&sdev, file);
-			return sol::lua_nil;
-		};
-	screen_dev_type["pixel"] = [] (screen_device &sdev, s32 x, s32 y) { return sdev.pixel(x, y); };
-	screen_dev_type["pixels"] =
-		[] (screen_device &sdev, sol::this_state s)
-		{
-			// TODO: would be better if this could return a tuple of (buffer, width, height)
-			const rectangle &visarea = sdev.visible_area();
-			luaL_Buffer buff;
-			int size = visarea.height() * visarea.width() * 4;
-			u32 *ptr = (u32 *)luaL_buffinitsize(s, &buff, size);
-			sdev.pixels(ptr);
-			luaL_pushresultsize(&buff, size);
-			return sol::make_reference(s, sol::stack_reference(s, -1));
-		};
+				// and save the snapshot
+				machine().video().save_snapshot(&sdev, file);
+				return sol::lua_nil;
+			});
+	screen_dev_type.set_function("pixel", &screen_device::pixel);
+	screen_dev_type.set_function(
+			"pixels",
+			[] (screen_device &sdev, sol::this_state s)
+			{
+				const rectangle &visarea = sdev.visible_area();
+				luaL_Buffer buff;
+				int size = visarea.height() * visarea.width() * 4;
+				u32 *const ptr = reinterpret_cast<u32 *>(luaL_buffinitsize(s, &buff, size));
+				sdev.pixels(ptr);
+				luaL_pushresultsize(&buff, size);
+				return std::make_tuple(sol::make_reference(s, sol::stack_reference(s, -1)), visarea.width(), visarea.height());
+			});
 	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
@@ -1572,6 +1706,7 @@ void lua_engine::initialize()
 	screen_dev_type["frame_period"] = sol::property([] (screen_device &sdev) { return sdev.frame_period().as_double(); });
 	screen_dev_type["frame_number"] = &screen_device::frame_number;
 	screen_dev_type["container"] = sol::property(&screen_device::container);
+	screen_dev_type["palette"] = sol::property([] (screen_device const &sdev) { return sdev.has_palette() ? &sdev.palette() : nullptr; });
 
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
@@ -1593,7 +1728,7 @@ void lua_engine::initialize()
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
 
-	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
+	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
 	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
 	image_type["unload"] = &device_image_interface::unload;
@@ -1639,6 +1774,38 @@ void lua_engine::initialize()
 				return si ? si->parentname().c_str() : nullptr;
 			});
 	image_type["device"] = sol::property(static_cast<device_t & (device_image_interface::*)()>(&device_image_interface::device));
+
+
+	auto state_entry_type = sol().registry().new_usertype<device_state_entry>("state_entry", sol::no_constructor);
+	state_entry_type["value"] = sol::property(
+			[] (device_state_entry const &entry, sol::this_state s) -> sol::object
+			{
+				if (entry.is_float())
+					return sol::make_object(s, entry.dvalue());
+				else
+					return sol::make_object(s, entry.value());
+			},
+			[] (device_state_entry const &entry, sol::this_state s, sol::object value)
+			{
+				if (!entry.writeable())
+					luaL_error(s, "cannot set value of read-only device state entry");
+				else if (entry.is_float())
+					entry.set_dvalue(value.as<double>());
+				else
+					entry.set_value(value.as<u64>());
+			});
+	state_entry_type["symbol"] = sol::property(&device_state_entry::symbol);
+	state_entry_type["visible"] = sol::property(&device_state_entry::visible);
+	state_entry_type["writeable"] = sol::property(&device_state_entry::writeable);
+	state_entry_type["is_float"] = sol::property(&device_state_entry::is_float);
+	state_entry_type["datamask"] = sol::property(
+			[] (device_state_entry const &entry)
+			{
+				return entry.is_float() ? std::optional<u64>() : std::optional<u64>(entry.datamask());
+			});
+	state_entry_type["datasize"] = sol::property(&device_state_entry::datasize);
+	state_entry_type["max_length"] = sol::property(&device_state_entry::max_length);
+	state_entry_type[sol::meta_function::to_string] = &device_state_entry::to_string;
 
 
 	auto format_type = sol().registry().new_usertype<image_device_format>("image_format", sol::no_constructor);
@@ -1761,50 +1928,20 @@ void lua_engine::initialize()
 
 	auto ui_type = sol().registry().new_usertype<mame_ui_manager>("ui", sol::no_constructor);
 	// sol converts char32_t to a string
-	ui_type["get_char_width"] = [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); };
-	ui_type["get_string_width"] = &mame_ui_manager::get_string_width;
-	ui_type["set_aggressive_input_focus"] = [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); };
+	ui_type.set_function("get_char_width", [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
+	ui_type.set_function("get_string_width", static_cast<float (mame_ui_manager::*)(std::string_view)>(&mame_ui_manager::get_string_width));
+	ui_type.set_function("set_aggressive_input_focus", [] (mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
+	ui_type["get_general_input_setting"] = sol::overload(
+			// TODO: overload with sequence type string - parser isn't available here
+			[] (mame_ui_manager &ui, ioport_type type, int player) { return ui.get_general_input_setting(type, player, SEQ_TYPE_STANDARD); },
+			[] (mame_ui_manager &ui, ioport_type type) { return ui.get_general_input_setting(type, 0, SEQ_TYPE_STANDARD); });
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
-	ui_type["line_height"] = sol::property(&mame_ui_manager::get_line_height);
+	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
-
-
-/*  device_state_entry library
- *
- * manager:machine().devices[device_tag].state[state_name]
- *
- * state:name() - get device state name
- * state:is_visible() - is state visible in debugger
- * state:is_divider() - is state a divider
- *
- * state.value - get device state value
- */
-
-	auto dev_state_type = sol().registry().new_usertype<device_state_entry>("dev_state", "new", sol::no_constructor);
-	dev_state_type.set("name", &device_state_entry::symbol);
-	dev_state_type.set("value", sol::property(
-		[this](device_state_entry &entry) -> uint64_t {
-			device_state_interface *state = entry.parent_state();
-			if(state)
-			{
-				machine().save().dispatch_presave();
-				return state->state_int(entry.index());
-			}
-			return 0;
-		},
-		[this](device_state_entry &entry, uint64_t val) {
-			device_state_interface *state = entry.parent_state();
-			if(state)
-			{
-				state->set_state_int(entry.index(), val);
-				machine().save().dispatch_presave();
-			}
-		}));
-	dev_state_type.set("is_visible", &device_state_entry::visible);
-	dev_state_type.set("is_divider", &device_state_entry::divider);
+	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
 
 
 /* rom_entry library
@@ -1890,49 +2027,48 @@ void lua_engine::close()
 	}
 }
 
-void lua_engine::resume(void *ptr, int nparam)
+void lua_engine::resume(int nparam)
 {
 	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
 	lua_State *L = lua_tothread(m_lua_state, -1);
 	lua_pop(m_lua_state, 1);
-	int stat = lua_resume(L, nullptr, 0);
+	int nresults = 0;
+	int stat = lua_resume(L, nullptr, 0, &nresults);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+	else
+	{
+		lua_pop(L, nresults);
+	}
 	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
-void lua_engine::run(sol::load_result res)
+//-------------------------------------------------
+//  load_script - load script from file path
+//-------------------------------------------------
+
+sol::load_result lua_engine::load_script(std::string const &filename)
 {
-	if(res.valid())
-	{
-		auto ret = invoke(res.get<sol::protected_function>());
-		if(!ret.valid())
-		{
-			sol::error err = ret;
-			osd_printf_error("[LUA ERROR] in run: %s\n", err.what());
-		}
-	}
-	else
-		osd_printf_error("[LUA ERROR] %d loading Lua script\n", (int)res.status());
+	return sol().load_file(filename);
 }
 
 //-------------------------------------------------
-//  execute - load and execute script
+//  load_string - load script from string
 //-------------------------------------------------
 
-void lua_engine::load_script(const char *filename)
+sol::load_result lua_engine::load_string(std::string const &value)
 {
-	run(sol().load_file(filename));
+	return sol().load(value);
 }
 
 //-------------------------------------------------
-//  execute_string - execute script from string
+//  make_environment - make a sandbox
 //-------------------------------------------------
 
-void lua_engine::load_string(const char *value)
+sol::environment lua_engine::make_environment()
 {
-	run(sol().load(value));
+	return sol::environment(sol(), sol::create, sol().globals());
 }

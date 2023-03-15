@@ -63,13 +63,13 @@ DISCRETE_STEP(dsd_555_astbl)
 
 	int     count_f = 0;
 	int     count_r = 0;
-	double  dt;                             /* change in time */
-	double  x_time  = 0;                    /* time since change happened */
+	double  dt;                         /* change in time */
+	double  x_time  = 0;                /* time since change happened */
 	double  v_cap   = m_cap_voltage;    /* Current voltage on capacitor, before dt */
-	double  v_cap_next = 0;                 /* Voltage on capacitor, after dt */
+	double  v_cap_next = 0;             /* Voltage on capacitor, after dt */
 	double  v_charge, exponent = 0;
-	uint8_t   flip_flop = m_flip_flop;
-	uint8_t   update_exponent = 0;
+	uint8_t flip_flop = m_flip_flop;
+	uint8_t update_exponent = 0;
 	double  v_out = 0.0;
 
 	/* put commonly used stuff in local variables for speed */

@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="tntell" description="Touch &amp; Tell modules">
-
 
 	<software name="alphabet">
 		<description>Alphabet Fun</description>
@@ -90,6 +89,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

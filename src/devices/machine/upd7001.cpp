@@ -85,8 +85,8 @@ void upd7001_device::device_start()
 		m_fck_rc = attotime::from_double(m_res * m_cap * 1.97);
 
 	// initialize timers
-	m_conv_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7001_device::conversion_done), this));
-	m_scsk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(upd7001_device::output_enabled), this));
+	m_conv_timer = timer_alloc(FUNC(upd7001_device::conversion_done), this);
+	m_scsk_timer = timer_alloc(FUNC(upd7001_device::output_enabled), this);
 
 	// save state
 	save_item(NAME(m_cs_active));

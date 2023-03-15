@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "diablo1300.h"
 #include "diablo1300dasm.h"
 

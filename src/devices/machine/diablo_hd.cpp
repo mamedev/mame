@@ -102,7 +102,6 @@ diablo_hd_device::diablo_hd_device(const machine_config &mconfig, const char *ta
 	m_sector_callback(nullptr),
 	m_timer(nullptr),
 	m_image(nullptr),
-	m_handle(nullptr),
 	m_disk(nullptr)
 {
 	memset(m_description, 0x00, sizeof(m_description));
@@ -312,7 +311,7 @@ void diablo_hd_device::read_sector()
 		// allocate a buffer for this page
 		m_cache[m_page] = std::make_unique<uint8_t[]>(sizeof(diablo_sector_t));
 		// and read the page from the hard_disk image
-		if (hard_disk_read(m_disk, m_page, m_cache[m_page].get())) {
+		if (m_disk->read(m_page, m_cache[m_page].get())) {
 			LOG_DRIVE(2,"[DHD%u]   CHS:%03d/%d/%02d => page:%d loaded\n", m_unit, m_cylinder, m_head, m_sector, m_page);
 		} else {
 			LOG_DRIVE(0,"[DHD%u]   CHS:%03d/%d/%02d => page:%d read failed\n", m_unit, m_cylinder, m_head, m_sector, m_page);
@@ -770,7 +769,7 @@ void diablo_hd_device::squeeze_sector()
 	m_bits[m_page].reset();
 
 	if (m_disk) {
-		if (!hard_disk_write(m_disk, m_page, m_cache[m_page].get())) {
+		if (!m_disk->write(m_page, m_cache[m_page].get())) {
 			LOG_DRIVE(0,"[DHD%u]   write failed for page #%d\n", m_unit, m_page);
 		}
 	} else {
@@ -1317,7 +1316,7 @@ void diablo_hd_device::device_start()
 
 	m_packs = 1;        // FIXME: get from configuration?
 	m_unit = strstr(m_image->tag(), "diablo0") ? 0 : 1;
-	m_timer = timer_alloc(1, nullptr);
+	m_timer = timer_alloc(FUNC(diablo_hd_device::sector_mark_tick), this);
 }
 
 void diablo_hd_device::device_reset()
@@ -1328,8 +1327,7 @@ void diablo_hd_device::device_reset()
 			m_cache[page] = nullptr;
 	// free previous bits cache
 	m_bits.reset();
-	m_handle = m_image->get_chd_file();
-	m_diablo31 = true;  // FIXME: get from m_handle meta data?
+	m_diablo31 = true;  // FIXME: get from disk meta data?
 	m_disk = m_image->get_hard_disk_file();
 	if (m_diablo31) {
 		snprintf(m_description, sizeof(m_description), "DIABLO31");
@@ -1350,7 +1348,6 @@ void diablo_hd_device::device_reset()
 		m_cylinders = 2 * DIABLO_CYLINDERS;
 		m_pages = 2 * DIABLO_PAGES;
 	}
-	LOG_DRIVE(0,"[DHD%u]   m_handle            : %p\n", m_unit, reinterpret_cast<void const *>(m_handle));
 	LOG_DRIVE(0,"[DHD%u]   m_disk              : %p\n", m_unit, reinterpret_cast<void const *>(m_disk));
 	LOG_DRIVE(0,"[DHD%u]   rotation time       : %.0fns\n", m_unit, m_rotation_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
 	LOG_DRIVE(0,"[DHD%u]   sector time         : %.0fns\n", m_unit, m_sector_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
@@ -1385,11 +1382,11 @@ void diablo_hd_device::device_reset()
 	m_rdfirst = -1;
 	m_rdlast = -1;
 
-	if (!m_handle)
+	if (!m_image)
 		return;
 	// for units with a CHD assigned to them start the timer
 	m_bits = std::make_unique<std::unique_ptr<uint32_t[]>[]>(m_pages);
-	timer_set(m_sector_time - m_sector_mark_0_time, 1, 0);
+	m_timer->adjust(m_sector_time - m_sector_mark_0_time);
 	read_sector();
 }
 
@@ -1404,9 +1401,9 @@ void diablo_hd_device::device_reset()
  * @param id timer id
  * @param arg argument supplied to timer_insert (unused)
  */
-void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(diablo_hd_device::sector_mark_tick)
 {
-	LOG_DRIVE(9,"[DHD%u]   TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
+	LOG_DRIVE(9, "[DHD%u]   TIMER param=%d @%.0fns\n", m_unit, param, m_timer->elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
 	if (!m_disk)
 		return;
 
@@ -1415,20 +1412,20 @@ void diablo_hd_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		// assert sector mark
 		sector_mark_0();
 		// next sector timer event is in the middle between sector_mark going 0 and back to 1
-		timer.adjust(m_sector_mark_0_time, 1);
+		m_timer->adjust(m_sector_mark_0_time, 1);
 		break;
 	case 1:
 		/* call the sector_callback, if any */
 		if (m_sector_callback)
 			(void)(*m_sector_callback)(m_sector_callback_cookie, m_unit);
 		// next sector timer event is deassert of sector_mark_0 (set to 1)
-		timer.adjust(m_sector_mark_1_time, 2);
+		m_timer->adjust(m_sector_mark_1_time, 2);
 		break;
 	case 2:
 		// deassert sector mark
 		sector_mark_1();
 		// next sector timer event is sector_mark_0 for next sector
-		timer.adjust(m_sector_time - m_sector_mark_0_time, 0);
+		m_timer->adjust(m_sector_time - m_sector_mark_0_time, 0);
 		break;
 	}
 }

@@ -1,29 +1,68 @@
 name: CI (Windows)
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+    - '.github/workflows/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+  pull_request:
+    paths:
+    - '.github/workflows/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+
+permissions:
+  contents: read
 
 jobs:
 
-  build-windows-gcc:
+  build-windows:
     runs-on: windows-latest
     defaults:
       run:
         shell: msys2 {0}
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+            subtarget: mame
+            executable: mame
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+            subtarget: tiny
+            executable: mametiny
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
+        install: git make mingw-w64-x86_64-${{ matrix.compiler }} mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-libc++
     - uses: actions/checkout@master
     - name: Build
       env:
         MINGW64: "/mingw64"
-        ARCHOPTS: "-fuse-ld=lld"
         OVERRIDE_AR: "llvm-ar"
+        OVERRIDE_CC: ${{ matrix.cc }}
+        OVERRIDE_CXX: ${{ matrix.cxx }}
+        ARCHOPTS: "-fuse-ld=lld"
+        SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
       run: make -j2
     - name: Validate
-      run: ./mame -validate
+      run: ./${{ matrix.executable }}.exe -validate
     - uses: actions/upload-artifact@master
       with:
-        name: mame-windows-gcc-${{ github.sha }}
-        path: mame.exe
+        name: ${{ matrix.executable }}-windows-${{ matrix.compiler }}-${{ github.sha }}
+        path: |
+          ${{ matrix.executable }}.exe
+          chdman.exe
+          unidasm.exe

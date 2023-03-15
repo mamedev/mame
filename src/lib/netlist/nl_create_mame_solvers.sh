@@ -1,7 +1,7 @@
 #!/bin/sh
 
 GENERATED=src/lib/netlist/generated/static_solvers.cpp
-FILES=`ls src/mame/machine/nl_*.cpp src/mame/audio/nl_*.cpp | grep -v pongdoubles`
+FILES=`find src/mame -name "nl_*.cpp" | grep -v pongdoubles`
 
 OUTDIR=/tmp/static_syms
 
@@ -14,7 +14,9 @@ fi
 rm -rf ${OUTDIR}
 mkdir ${OUTDIR}
 
-if ${NLTOOL} --cmd static --output=${GENERATED}.tmp --include=src/mame/audio ${FILES}; then
+#--dir src/lib/netlist/generated/static --static-include
+
+if ${NLTOOL} --cmd static --output=${GENERATED}.tmp --include=src/mame/audio ${FILES} ; then
 	mv -f ${GENERATED}.tmp ${GENERATED}
 	echo Created ${GENERATED} file
 else

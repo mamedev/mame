@@ -49,6 +49,18 @@ bool IsMerge(IRContext* context, BasicBlock* block) {
   return IsMerge(context, block->id());
 }
 
+// Returns true if |id| is the continue target of a merge instruction.
+bool IsContinue(IRContext* context, uint32_t id) {
+  return !context->get_def_use_mgr()->WhileEachUse(
+      id, [](Instruction* user, uint32_t index) {
+        SpvOp op = user->opcode();
+        if (op == SpvOpLoopMerge && index == 1u) {
+          return false;
+        }
+        return true;
+      });
+}
+
 // Removes any OpPhi instructions in |block|, which should have exactly one
 // predecessor, replacing uses of OpPhi ids with the ids associated with the
 // predecessor.
@@ -86,9 +98,9 @@ bool CanMergeWithSuccessor(IRContext* context, BasicBlock* block) {
     return false;
   }
 
-  // Don't bother trying to merge unreachable blocks.
-  if (auto dominators = context->GetDominatorAnalysis(block->GetParent())) {
-    if (!dominators->IsReachable(block)) return false;
+  if (pred_is_merge && IsContinue(context, lab_id)) {
+    // Cannot merge a continue target with a merge block.
+    return false;
   }
 
   Instruction* merge_inst = block->GetMergeInst();
@@ -113,6 +125,26 @@ bool CanMergeWithSuccessor(IRContext* context, BasicBlock* block) {
       return false;
     }
   }
+
+  if (succ_is_merge || IsContinue(context, lab_id)) {
+    auto* struct_cfg = context->GetStructuredCFGAnalysis();
+    auto switch_block_id = struct_cfg->ContainingSwitch(block->id());
+    if (switch_block_id) {
+      auto switch_merge_id = struct_cfg->SwitchMergeBlock(switch_block_id);
+      const auto* switch_inst =
+          &*block->GetParent()->FindBlock(switch_block_id)->tail();
+      for (uint32_t i = 1; i < switch_inst->NumInOperands(); i += 2) {
+        auto target_id = switch_inst->GetSingleWordInOperand(i);
+        if (target_id == block->id() && target_id != switch_merge_id) {
+          // Case constructs must be structurally dominated by the OpSwitch.
+          // Since the successor is the merge/continue for another construct,
+          // merging the blocks would break that requirement.
+          return false;
+        }
+      }
+    }
+  }
+
   return true;
 }
 
@@ -154,8 +186,24 @@ void MergeWithSuccessor(IRContext* context, Function* func,
       // flow declaration.
       context->KillInst(merge_inst);
     } else {
+      // Move OpLine/OpNoLine information to merge_inst. This solves
+      // the validation error that OpLine is placed between OpLoopMerge
+      // and OpBranchConditional.
+      auto terminator = bi->terminator();
+      auto& vec = terminator->dbg_line_insts();
+      if (vec.size() > 0) {
+        merge_inst->ClearDbgLineInsts();
+        auto& new_vec = merge_inst->dbg_line_insts();
+        new_vec.insert(new_vec.end(), vec.begin(), vec.end());
+        terminator->ClearDbgLineInsts();
+        for (auto& l_inst : new_vec)
+          context->get_def_use_mgr()->AnalyzeInstDefUse(&l_inst);
+      }
+      // Clear debug scope of terminator to avoid DebugScope
+      // emitted between terminator and merge.
+      terminator->SetDebugScope(DebugScope(kNoDebugScope, kNoInlinedAt));
       // Move the merge instruction to just before the terminator.
-      merge_inst->InsertBefore(bi->terminator());
+      merge_inst->InsertBefore(terminator);
     }
   }
   context->ReplaceAllUsesWith(lab_id, bi->id());

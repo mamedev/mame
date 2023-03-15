@@ -303,7 +303,7 @@ void scsp_device::device_clock_changed()
 	m_stream->set_sample_rate(clock() / 512);
 }
 
-void scsp_device::rom_bank_updated()
+void scsp_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -436,13 +436,13 @@ TIMER_CALLBACK_MEMBER(scsp_device::timerC_cb)
 int scsp_device::Get_AR(int base, int R)
 {
 	int Rate = base + (R << 1);
-	return m_ARTABLE[std::min(63, std::max(0, Rate))];
+	return m_ARTABLE[std::clamp(Rate, 0, 63)];
 }
 
 int scsp_device::Get_DR(int base, int R)
 {
 	int Rate = base + (R << 1);
-	return m_DRTABLE[std::min(63, std::max(0, Rate))];
+	return m_DRTABLE[std::clamp(Rate, 0, 63)];
 }
 
 void scsp_device::Compute_EG(SCSP_SLOT *slot)
@@ -579,9 +579,9 @@ void scsp_device::init()
 	m_MidiOutR = m_MidiOutW = 0;
 
 	m_DSP.space = &this->space();
-	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerA_cb), this));
-	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerB_cb), this));
-	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scsp_device::timerC_cb), this));
+	m_timerA = timer_alloc(FUNC(scsp_device::timerA_cb), this);
+	m_timerB = timer_alloc(FUNC(scsp_device::timerB_cb), this);
+	m_timerC = timer_alloc(FUNC(scsp_device::timerC_cb), this);
 
 	for (i = 0; i < 0x400; ++i)
 	{
@@ -1426,14 +1426,6 @@ void scsp_device::exec_dma()
 		m_irq_cb(DecodeSCI(SCIDMA), HOLD_LINE);
 	}
 }
-
-#ifdef UNUSED_FUNCTION
-int IRQCB(void *param)
-{
-	CheckPendingIRQ(param);
-	return -1;
-}
-#endif
 
 
 u16 scsp_device::read(offs_t offset)

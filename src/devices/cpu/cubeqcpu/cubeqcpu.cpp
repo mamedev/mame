@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cubeqcpu.h"
 #include "cubedasm.h"
 

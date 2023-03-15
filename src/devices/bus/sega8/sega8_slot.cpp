@@ -83,11 +83,11 @@ device_sega8_cart_interface::~device_sega8_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sega8_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_sega8_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(S8SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 		m_rom_page_count = size / 0x4000;
 		if (!m_rom_page_count)
@@ -118,7 +118,7 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 
 sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_sega8_cart_interface>(mconfig, *this)
 	, m_type(SEGA8_BASE_ROM)
 	, m_is_card(is_card)
@@ -223,6 +223,7 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_NEMESIS, "nemesis" },
 	{ SEGA8_JANGGUN, "janggun" },
 	{ SEGA8_KOREAN, "korean" },
+	{ SEGA8_KOREAN_188IN1, "korean_188in1" },
 	{ SEGA8_KOREAN_NOBANK, "korean_nb" },
 	{ SEGA8_OTHELLO, "othello" },
 	{ SEGA8_CASTLE, "castle" },
@@ -397,7 +398,7 @@ image_init_result sega8_cart_slot_device::call_load()
 
 		if (m_is_card && len > 0x8000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a card larger than 32KB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a card larger than 32KB");
 			return image_init_result::FAIL;
 		}
 
@@ -412,7 +413,7 @@ image_init_result sega8_cart_slot_device::call_load()
 		if (len & 0x3fff)
 			len = ((len >> 14) + 1) << 14;
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
@@ -666,18 +667,17 @@ std::string sega8_cart_slot_device::get_default_card_software(get_default_card_s
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size(), offset = 0;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		if ((len % 0x4000) == 512)
-			offset = 512;
+		uint32_t const offset = ((len % 0x4000) == 512) ? 512 : 0;
 
-		type = get_cart_type(&rom[offset], len - offset);
-		slot_string = sega8_get_slot(type);
+		int const type = get_cart_type(&rom[offset], len - offset);
+		char const *const slot_string = sega8_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 
@@ -917,6 +917,7 @@ void sg1000mk3_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 	device.option_add_internal("seojin",  SEGA8_ROM_SEOJIN);
 	device.option_add_internal("othello",  SEGA8_ROM_OTHELLO);
@@ -938,6 +939,7 @@ void sms_cart(device_slot_interface &device)
 	device.option_add_internal("janggun",  SEGA8_ROM_JANGGUN);
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
+	device.option_add_internal("korean_188in1",  SEGA8_ROM_KOREAN_188);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
 }
 

@@ -96,7 +96,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 #include "sh_dasm.h"
-#include "debugger.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -395,6 +394,7 @@ inline void sh2_device::RTE()
 inline void sh2_device::TRAPA(uint32_t i)
 {
 	uint32_t imm = i & 0xff;
+	debugger_exception_hook(imm);
 
 	m_sh2_state->ea = m_sh2_state->vbr + imm * 4;
 
@@ -412,6 +412,8 @@ inline void sh2_device::TRAPA(uint32_t i)
 inline void sh2_device::ILLEGAL()
 {
 	//logerror("Illegal opcode at %08x\n", m_sh2_state->pc - 2);
+	debugger_exception_hook(4);
+
 	m_sh2_state->r[15] -= 4;
 	WL( m_sh2_state->r[15], m_sh2_state->sr );     /* push SR onto stack */
 	m_sh2_state->r[15] -= 4;
@@ -515,15 +517,15 @@ void sh2_device::device_start()
 {
 	sh_common_execution::device_start();
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
+	m_timer = timer_alloc(FUNC(sh2_device::sh2_timer_callback), this);
 	m_timer->adjust(attotime::never);
-	m_wdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_wdtimer_callback), this));
+	m_wdtimer = timer_alloc(FUNC(sh2_device::sh2_wdtimer_callback), this);
 	m_wdtimer->adjust(attotime::never);
 
-	m_dma_current_active_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
+	m_dma_current_active_timer[0] = timer_alloc(FUNC(sh2_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[0]->adjust(attotime::never);
 
-	m_dma_current_active_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
+	m_dma_current_active_timer[1] = timer_alloc(FUNC(sh2_device::sh2_dma_current_active_callback), this);
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
 	/* resolve callbacks */
@@ -799,12 +801,12 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 		{
 			if(m_vecmd == true)
 			{
-				vector = standard_irq_callback(irqline);
+				vector = standard_irq_callback(irqline, m_sh2_state->pc);
 				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
 			}
 			else
 			{
-				standard_irq_callback(irqline);
+				standard_irq_callback(irqline, m_sh2_state->pc);
 				vector = 64 + irqline/2;
 				LOG("SH-2 exception #%d (autovector: $%x) after [%s]\n", irqline, vector, message);
 			}
@@ -815,6 +817,7 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 		vector = 11;
 		LOG("SH-2 nmi exception (autovector: $%x) after [%s]\n", vector, message);
 	}
+	debugger_exception_hook(vector);
 
 	if (m_isdrc)
 	{
@@ -861,7 +864,6 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 #include "sh2.h"
 #include "sh2comn.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 const opcode_desc* sh2_device::get_desclist(offs_t pc)

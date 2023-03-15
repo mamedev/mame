@@ -2,10 +2,12 @@
 // copyright-holders:Olivier Galibert
 #include "ipf_dsk.h"
 
-#include <cassert>
+#include "ioprocs.h"
+
+#include <cstring>
 
 
-const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
+const ipf_format FLOPPY_IPF_FORMAT;
 
 const char *ipf_format::name() const
 {
@@ -27,26 +29,29 @@ bool ipf_format::supports_save() const
 	return false;
 }
 
-int ipf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	static const uint8_t refh[12] = { 0x43, 0x41, 0x50, 0x53, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0xd5, 0x73, 0xba };
 	uint8_t h[12];
-	io_generic_read(io, h, 0, 12);
+	size_t actual;
+	io.read_at(0, h, 12, actual);
 
 	if(!memcmp(h, refh, 12))
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool ipf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ipf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
-	ipf_decode dec;
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
 	std::vector<uint8_t> data(size);
-	io_generic_read(io, &data[0], 0, size);
-	bool res = dec.parse(data, image);
-	return res;
+	size_t actual;
+	io.read_at(0, &data[0], size, actual);
+	ipf_decode dec;
+	return dec.parse(data, image);
 }
 
 uint32_t ipf_format::ipf_decode::r32(const uint8_t *p)

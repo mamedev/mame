@@ -71,10 +71,10 @@ protected:
 	void op_illegal();
 	void op_todo();
 
-	virtual bool op_is_tr(u8 op) override { return (op & 0xf0) == 0x30; };
-	virtual bool op_is_eob(u8 op) { return (op & 0xfc) == 0x1c; };
-	virtual bool op_is_lb(u8 op) { return (op & 0xf0) == 0x20; };
-	virtual bool op_is_lai(u8 op) { return (op & 0xf0) == 0x70; };
+	virtual bool op_is_tr(u8 op) override { return (op & 0xf0) == 0x30; }
+	virtual bool op_is_eob(u8 op) { return (op & 0xfc) == 0x1c; }
+	virtual bool op_is_lb(u8 op) { return (op & 0xf0) == 0x20; }
+	virtual bool op_is_lai(u8 op) { return (op & 0xf0) == 0x70; }
 
 	// opcode handlers
 	virtual void op_xab();

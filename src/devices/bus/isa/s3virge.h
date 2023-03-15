@@ -59,6 +59,10 @@ public:
 	uint32_t get_linear_address_size_full() { return s3virge.linear_address_size_full; }
 	bool is_linear_address_active() { return s3virge.linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
+	uint16_t src_stride()
+	{
+		return (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 0) & 0xfff8;
+	}
 	uint16_t dest_stride()
 	{
 //      if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x0000001c) == 0x08)
@@ -73,12 +77,6 @@ public:
 	}
 
 	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
-
-	enum
-	{
-		TIMER_DRAW_STEP = 10
-	};
-
 
 protected:
 	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -184,59 +182,17 @@ protected:
 		} s3d;
 	} s3virge;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
-	{
-		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
-			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
-				return;
-		vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
-		vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
-		vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
-		vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 24) & 0xff;
-	}
-	void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val)
-	{
-		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
-			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
-				return;
-		vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
-		vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
-		vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 16) & 0xff;
-	}
-	void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val)
-	{
-		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
-			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
-				return;
-		vga.memory[(base + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = val & 0xff;
-		vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] = (val >> 8) & 0xff;
-	}
-	void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val)
-	{
-		if(s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x00000002)
-			if(x < s3virge.s3d.clip_l || x > s3virge.s3d.clip_r || y < s3virge.s3d.clip_t || y > s3virge.s3d.clip_b)
-				return;
-		vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size] = val;
-	}
-	uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y)
-	{
-		return (vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 24) | (vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16)
-			| (vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) | vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size];
-	}
-	uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y)
-	{
-		return (vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size]) | (vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8)
-			| (vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16);
-	}
-	uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y)
-	{
-		return (vga.memory[(base + (x*2) + (y*dest_stride()) % vga.svga_intf.vram_size)]) | (vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8);
-	}
-	uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y)
-	{
-		return vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size];
-	}
+	TIMER_CALLBACK_MEMBER(draw_step_tick);
+
+	inline void write_pixel32(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
+	inline void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
+	inline void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val);
+	inline void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val);
+	inline uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+
 	uint32_t GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat);
 	bool advance_pixel();
 

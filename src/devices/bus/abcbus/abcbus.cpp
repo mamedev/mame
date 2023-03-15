@@ -52,14 +52,14 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 	m_write_xint4(*this),
 	m_write_xint5(*this),
 	m_card(nullptr),
-	m_irq(CLEAR_LINE),
-	m_nmi(CLEAR_LINE),
+	m_irq(1),
+	m_nmi(1),
 	m_pren(1),
 	m_trrq(1),
-	m_xint2(CLEAR_LINE),
-	m_xint3(CLEAR_LINE),
-	m_xint4(CLEAR_LINE),
-	m_xint5(CLEAR_LINE)
+	m_xint2(1),
+	m_xint3(1),
+	m_xint4(1),
+	m_xint5(1)
 {
 }
 
@@ -83,6 +83,18 @@ void abcbus_slot_device::device_start()
 	m_write_xint3.resolve_safe();
 	m_write_xint4.resolve_safe();
 	m_write_xint5.resolve_safe();
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abcbus_slot_device::device_reset()
+{
+	m_write_irq(1);
+	m_write_pren(1);
+	m_write_trrq(1);
 }
 
 

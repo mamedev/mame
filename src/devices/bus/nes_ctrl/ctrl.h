@@ -34,15 +34,20 @@ public:
 	// construction/destruction
 	virtual ~device_nes_control_port_interface();
 
-	virtual uint8_t read_bit0() { return 0; }
-	virtual uint8_t read_bit34() { return 0; }
-	virtual uint8_t read_exp(offs_t offset) { return 0; }
-	virtual void write(uint8_t data) { }
+	virtual u8 read_bit0() { return 0; }
+	virtual u8 read_bit2() { return 0; } // intended only for P2 microphone
+	virtual u8 read_bit34() { return 0; }
+	virtual u8 read_exp(offs_t offset) { return 0; }
+	virtual void write(u8 data) { }
 
 protected:
 	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
 
+	// helper to keep track of strobe bit, returns true on 1 to 0 transitions
+	bool write_strobe(u8 data) { u8 prev = m_strobe; m_strobe = data & 1; return prev && !m_strobe; }
+
 	nes_control_port_device *m_port;
+	u8 m_strobe;
 };
 
 
@@ -55,20 +60,21 @@ public:
 	// construction/destruction
 	template <typename T>
 	nes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: nes_control_port_device(mconfig, tag, owner, (uint32_t)0)
+		: nes_control_port_device(mconfig, tag, owner, (u32)0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~nes_control_port_device();
 
-	uint8_t read_bit0();
-	uint8_t read_bit34();
-	uint8_t read_exp(offs_t offset);
-	void write(uint8_t data);
+	u8 read_bit0();
+	u8 read_bit2();
+	u8 read_bit34();
+	u8 read_exp(offs_t offset);
+	void write(u8 data);
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	// for peripherals that interact with the machine's screen
@@ -88,9 +94,11 @@ DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 
 void nes_control_port1_devices(device_slot_interface &device);
 void nes_control_port2_devices(device_slot_interface &device);
+void nes_control_special_devices(device_slot_interface &device);
 void fc_control_port1_devices(device_slot_interface &device);
 void fc_control_port2_devices(device_slot_interface &device);
 void fc_expansion_devices(device_slot_interface &device);
-
+void famibox_control_port12_devices(device_slot_interface &device);
+void famibox_control_port3_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_NES_CTRL_CTRL_H

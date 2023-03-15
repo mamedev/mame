@@ -44,7 +44,7 @@ namespace plib
 			return f.good();
 		}
 
-		pstring buildpath(std::initializer_list<pstring> list )
+		pstring build_path(std::initializer_list<pstring> list )
 		{
 			pstring ret = "";
 			for( const auto &elem : list )

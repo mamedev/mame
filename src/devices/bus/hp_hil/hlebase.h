@@ -29,7 +29,7 @@ protected:
 	// device_hp_hil_interface overrides
 	virtual bool hil_write(uint16_t *data) override;
 	virtual void hil_idd() = 0;
-	virtual void hil_typematic(uint8_t command) {};
+	virtual void hil_typematic(uint8_t command) {}
 	virtual int hil_poll() = 0;
 private:
 

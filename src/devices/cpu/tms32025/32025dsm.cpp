@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tony La Porta, hap
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*              Texas Instruments TMS320x25 DSP Disassembler                *
 	*                                                                          *
@@ -37,9 +37,9 @@
 #include <stdexcept>
 
 
-const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" } ;
-const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" } ;
-const char *const tms32025_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" } ;
+const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" };
+const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" };
+const char *const tms32025_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" };
 
 
 const char *const tms32025_disassembler::TMS32025Formats[] = {
@@ -315,9 +315,8 @@ tms32025_disassembler::tms32025_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = TMS32025Formats; i = 0;
+	ops = TMS32025Formats;
 	while (*ops)
 	{
 		p = *ops;
@@ -356,7 +355,6 @@ tms32025_disassembler::tms32025_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 
@@ -440,32 +438,32 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if ((code & 0xfe000000) == 0x5e000000 || (code >= 0xf0000000 && code < 0xfc000000))
+		flags = STEP_COND;
 
 	while (*cp)
 	{
 		if (*cp == '%')
 		{
-			char num[30];
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"%02Xh",a); break;
-				case 'B': sprintf(num,"%04Xh",b); break;
-				case 'C': sprintf(num,"%s",cmpmode[c]); break;
-				case 'D': sprintf(num,"%02Xh",d); break;
-				case 'K': sprintf(num,"%d",k); break;
-				case 'M': sprintf(num,"%s",arith[m]); break;
-				case 'N': sprintf(num,"%s",nextar[n]); break;
-				case 'P': sprintf(num,"PA$%01X",p); break;
-				case 'R': sprintf(num,"AR%d",r); break;
-				case 'S': sprintf(num,",%d",s); break;
-				case 'T': sprintf(num,"%01Xh",t); break;
-				case 'W': sprintf(num,"%04Xh",w); break;
+				case 'A': util::stream_format(stream,"%02Xh",a); break;
+				case 'B': util::stream_format(stream,"%04Xh",b); break;
+				case 'C': stream << cmpmode[c]; break;
+				case 'D': util::stream_format(stream,"%02Xh",d); break;
+				case 'K': util::stream_format(stream,"%d",k); break;
+				case 'M': stream << arith[m]; break;
+				case 'N': stream << nextar[n]; break;
+				case 'P': util::stream_format(stream,"PA$%01X",p); break;
+				case 'R': util::stream_format(stream,"AR%d",r); break;
+				case 'S': util::stream_format(stream,",%d",s); break;
+				case 'T': util::stream_format(stream,"%01Xh",t); break;
+				case 'W': util::stream_format(stream,"%04Xh",w); break;
 				case 'X': break;
 				default:
 					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
-			stream << num;
 		}
 		else
 		{

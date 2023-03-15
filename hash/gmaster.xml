@@ -1,42 +1,55 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
-Undumped:
-- Bomb Disposer
-- S-Race
+All known games are dumped, 18 total.
+
+Some of the games don't match box/cart label with what's on the title screen:
+- Car Racing: Super F-1
+- Continental Galaxy: Continental Galaxy 2020
+- Dungeon Advanture: Dungeon Adventure
+- Kung Fu: Kung Fu Challenge
+- Soccer: 3 on 3 Soccer
+- Tennis: Tennis Master
+
+Regarding this softwarelist, let's go for what it says on the cartridge, except
+for the one with the typo.
+
 -->
+
 <softwarelist name="gmaster" description="Hartung Game Master cartridges">
-	<software name="bublboy" supported="no">
+
+	<software name="bublboy">
 		<description>Bubble Boy</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="bubbleboy.bin" size="16384" crc="edd0679d" sha1="5f6f81b1a5ba6d21e5fb5bc38aa9ee0770b46b97"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="bubbleboy.bin" size="0x4000" crc="edd0679d" sha1="5f6f81b1a5ba6d21e5fb5bc38aa9ee0770b46b97"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="carracing">
-		<description>Car Racing</description>
+		<!-- as noted above, cartridge label is a complete mismatch with title screen -->
+		<description>Car Racing (Super F-1)</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="carracing.bin" size="32768" crc="71babd86" sha1="8f45fea8e9d01a1ed71a7ed5a8a6690bd40834f9"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="carracing.bin" size="0x8000" crc="71babd86" sha1="8f45fea8e9d01a1ed71a7ed5a8a6690bd40834f9"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cg2020" supported="no">
-		<description>Continental Galaxy 2020</description>
+	<software name="cgalaxy">
+		<description>Continental Galaxy</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="cg2020.bin" size="16384" crc="fedec9d5" sha1="f2afe09e8b6368cf2fb956afe7fd055107f943ee"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="cgalaxy.bin" size="0x4000" crc="fedec9d5" sha1="f2afe09e8b6368cf2fb956afe7fd055107f943ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,19 +59,19 @@ Undumped:
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="dungeona.bin" size="32768" crc="60afb4b5" sha1="6048a84ac5a5a51a6522c662398e44cdf2934588"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="dungeona.bin" size="0x8000" crc="60afb4b5" sha1="6048a84ac5a5a51a6522c662398e44cdf2934588"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fallbloc">
-		<description>Falling Block!</description>
+		<description>Falling Block</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="fallblock.bin" size="8192" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48ab"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="fallblock.bin" size="0x2000" crc="58e409fb" sha1="f6f7e3dae361fbd56d4a8457d81bb4f3828c48ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -68,30 +81,19 @@ Undumped:
 		<year>199?</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="finite_zone.bin" size="16384" crc="35741cd9" sha1="148dc46f748f8b16d2e292400cd5fbe3f4891b91"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="finite_zone.bin" size="0x4000" crc="35741cd9" sha1="148dc46f748f8b16d2e292400cd5fbe3f4891b91"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fussball" supported ="partial"> <!-- some gfx corruption -->
-		<description>3-on-3 Soccer (Fuss-ball)</description>
-		<year>1990</year>
-		<publisher>Hartung</publisher>
-		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="0x8000">
-				<rom name="fussball.bin" size="0x8000" crc="76cf4c92" sha1="a4b6e7f98e953e47f5aa427752e8a936e7582bc9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gobang" supported="no">
+	<software name="gobang">
 		<description>Go Bang</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="gobang.bin" size="16384" crc="fda2c4e6" sha1="959c16b1657154bb352cb4d6a3e177d7b46850c6"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gobang.bin" size="0x4000" crc="fda2c4e6" sha1="959c16b1657154bb352cb4d6a3e177d7b46850c6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -101,96 +103,107 @@ Undumped:
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="hyperspace.bin" size="32768" crc="95e0ceac" sha1="b3f95ea3dbc881262e734a2e35feb44a1ddd5641"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="hyperspace.bin" size="0x8000" crc="95e0ceac" sha1="b3f95ea3dbc881262e734a2e35feb44a1ddd5641"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="kungfu" supported="no">
-		<description>Kung Fu Challenge</description>
+	<software name="kungfu">
+		<description>Kung Fu</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="kungfu.bin" size="32768" crc="3ea0670b" sha1="01647f87f59f2b05bb46f7bdb2fab38bcd8e3d6e"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="kungfu.bin" size="0x8000" crc="3ea0670b" sha1="01647f87f59f2b05bb46f7bdb2fab38bcd8e3d6e"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="moveit">
 		<description>Move It</description>
-		<year>199?</year>
-		<publisher>Hartung</publisher>
+		<year>1992</year>
+		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="moveit.bin" size="32768" crc="3be5590c" sha1="68bcf5f97ee09f716c66f67fa304b40769b44ea8"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="moveit.bin" size="0x8000" crc="3be5590c" sha1="68bcf5f97ee09f716c66f67fa304b40769b44ea8"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pinball" supported="no">
+	<software name="pinball">
 		<description>Pin Ball</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="pinball.bin" size="32768" crc="f5ffc768" sha1="1a30e6b969a8f3824e1aae0bbeb38dabbc75da8b"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="pinball.bin" size="0x8000" crc="f5ffc768" sha1="1a30e6b969a8f3824e1aae0bbeb38dabbc75da8b"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scastle" supported="no">
+	<software name="soccer">
+		<description>Soccer (3 on 3)</description>
+		<year>1990</year>
+		<publisher>Hartung</publisher>
+		<part name="cart" interface="gmaster_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="soccer.bin" size="0x8000" crc="76cf4c92" sha1="a4b6e7f98e953e47f5aa427752e8a936e7582bc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scastle">
 		<description>Space Castle</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="scastle.bin" size="16384" crc="11d734f1" sha1="6b213a19fc65e967b1b6beba4c4e9e1491b59268"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="scastle.bin" size="0x4000" crc="11d734f1" sha1="6b213a19fc65e967b1b6beba4c4e9e1491b59268"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spaceinv" supported="no">
+	<software name="spaceinv">
 		<description>Space Invader</description>
 		<year>1992</year>
-		<publisher>Hartung</publisher>
+		<publisher>Bon Treasure</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="space_invader.bin" size="32768" crc="7c8318c4" sha1="abe9a6c98b06adcec1ba8e4ee1cbda26689bbb87"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="space_invader.bin" size="0x8000" crc="7c8318c4" sha1="abe9a6c98b06adcec1ba8e4ee1cbda26689bbb87"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="swarrior" supported="no">
+	<software name="swarrior">
 		<description>Space Warrior</description>
 		<year>199?</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="space_warrior.bin" size="32768" crc="af61d552" sha1="7fb7731716013277c42712bfa6c5ab7cc2467349"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="space_warrior.bin" size="0x8000" crc="af61d552" sha1="7fb7731716013277c42712bfa6c5ab7cc2467349"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tankwar" supported="no">
+	<software name="tankwar">
 		<description>Tank War</description>
 		<year>199?</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="tank_war.bin" size="32768" crc="50ce2e30" sha1="f570dae807af62c29f3364cff53a51b51efd60fe"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tank_war.bin" size="0x8000" crc="50ce2e30" sha1="f570dae807af62c29f3364cff53a51b51efd60fe"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tennism" supported="no">
-		<description>Tennis Master</description>
+	<software name="tennis">
+		<description>Tennis</description>
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="tennism.bin" size="32768" crc="48d425cf" sha1="080642009569d7cfdb3d1afe0ce5315842ce4ae8"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="tennis.bin" size="0x8000" crc="48d425cf" sha1="080642009569d7cfdb3d1afe0ce5315842ce4ae8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -200,8 +213,8 @@ Undumped:
 		<year>1990</year>
 		<publisher>Hartung</publisher>
 		<part name="cart" interface="gmaster_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="urbanchamp.bin" size="32768" crc="d53e6cac" sha1="0bea8b120b3cb02136519010cb217fd0b819617d"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="urbanchamp.bin" size="0x8000" crc="d53e6cac" sha1="0bea8b120b3cb02136519010cb217fd0b819617d"/>
 			</dataarea>
 		</part>
 	</software>

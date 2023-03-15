@@ -29,12 +29,12 @@ const char *cgenie_format::extensions() const
 	return "dsk";
 }
 
-int cgenie_format::get_track_dam_fm(const format &f, int head, int track)
+int cgenie_format::get_track_dam_fm(const format &f, int head, int track) const
 {
 	return (track == f.track_count/2) ? FM_DDAM : FM_DAM;
 }
 
-int cgenie_format::get_track_dam_mfm(const format &f, int head, int track)
+int cgenie_format::get_track_dam_mfm(const format &f, int head, int track) const
 {
 	return (track == f.track_count/2) ? MFM_DDAM : MFM_DAM;
 }
@@ -76,4 +76,4 @@ const cgenie_format::format cgenie_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_CGENIE_FORMAT = &floppy_image_format_creator<cgenie_format>;
+const cgenie_format FLOPPY_CGENIE_FORMAT;

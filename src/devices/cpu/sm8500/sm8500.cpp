@@ -22,7 +22,6 @@ they are internally.
 #include "emu.h"
 #include "sm8500.h"
 #include "sm8500d.h"
-#include "debugger.h"
 
 
 DEFINE_DEVICE_TYPE(SM8500, sm8500_cpu_device, "sm8500", "Sharp SM8500")

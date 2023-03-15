@@ -111,7 +111,22 @@ void spvValidatorOptionsSetScalarBlockLayout(spv_validator_options options,
   options->scalar_block_layout = val;
 }
 
+void spvValidatorOptionsSetWorkgroupScalarBlockLayout(spv_validator_options options,
+                                                      bool val) {
+  options->workgroup_scalar_block_layout = val;
+}
+
 void spvValidatorOptionsSetSkipBlockLayout(spv_validator_options options,
                                            bool val) {
   options->skip_block_layout = val;
+}
+
+void spvValidatorOptionsSetAllowLocalSizeId(spv_validator_options options,
+                                            bool val) {
+  options->allow_localsizeid = val;
+}
+
+void spvValidatorOptionsSetFriendlyNames(spv_validator_options options,
+                                         bool val) {
+  options->use_friendly_names = val;
 }

@@ -33,9 +33,8 @@ SVT - The full explanation may be found on the Solace web site,
       escaped characters
 
 ********************************************************************/
-#include "sol_cas.h"
 
-#include <cassert>
+#include "sol_cas.h"
 
 
 #define WAVEENTRY_LOW  -32768

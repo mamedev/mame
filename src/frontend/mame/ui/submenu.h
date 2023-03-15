@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "emuopts.h"
 #include "ui/menu.h"
+
+#include "emuopts.h"
 
 #include <string>
 #include <vector>
@@ -41,10 +42,10 @@ public:
 	struct option
 	{
 		option_type type;
-		const char  *description;
-		const char  *name;
+		const char *description = nullptr;
+		const char *name = nullptr;
 		core_options::entry::shared_ptr entry;
-		core_options *options;
+		core_options *options = nullptr;
 		std::vector<std::string> value;
 	};
 
@@ -59,14 +60,15 @@ public:
 	//static std::vector<option> export_options();
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<option> m_options;
-	game_driver const   *m_driver;
+	game_driver const *const m_driver;
 };
 
 } // namespace ui

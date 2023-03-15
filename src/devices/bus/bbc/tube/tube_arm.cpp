@@ -59,6 +59,7 @@ void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_maincpu, ARM_FIRQ_LINE);
 	m_ula->pirq_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ula->prst_handler().set(FUNC(bbc_tube_arm_device::prst_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0);
@@ -113,20 +114,32 @@ void bbc_tube_arm_device::device_reset()
 	/* enable the reset vector to be fetched from ROM */
 	m_maincpu->space(AS_PROGRAM).install_rom(0x000000, 0x003fff, 0x3fc000, m_bootstrap->base());
 
-	m_rom_shadow_tap = program.install_write_tap(0x0000000, 0x03fffff, "rom_shadow_w",[this](offs_t offset, u32 &data, u32 mem_mask)
-	{
-		/* delete this tap */
-		m_rom_shadow_tap->remove();
+	m_rom_shadow_tap.remove();
+	m_rom_shadow_tap = program.install_write_tap(
+			0x0000000, 0x03fffff,
+			"rom_shadow_w",
+			[this] (offs_t offset, u32 &data, u32 mem_mask)
+			{
+				/* delete this tap */
+				m_rom_shadow_tap.remove();
 
-		/* install ram */
-		m_maincpu->space(AS_PROGRAM).install_ram(0x0000000, 0x03fffff, m_ram->pointer());
-	});
+				/* install ram */
+				m_maincpu->space(AS_PROGRAM).install_ram(0x0000000, 0x03fffff, m_ram->pointer());
+			},
+			&m_rom_shadow_tap);
 }
 
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_arm_device::prst_w)
+{
+	device_reset();
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_arm_device::host_r(offs_t offset)
 {

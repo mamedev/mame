@@ -882,46 +882,46 @@ offs_t fr_disassembler::disassemble(std::ostream &stream, offs_t pc, const fr_di
 		return dasm_branch(stream, pc, "BNO", (opcode & 0x00ff) << 1);
 
 	case 0xe2:
-		return dasm_branch(stream, pc, "BEQ", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BEQ", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe3:
-		return dasm_branch(stream, pc, "BNE", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNE", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe4:
-		return dasm_branch(stream, pc, "BC", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BC", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe5:
-		return dasm_branch(stream, pc, "BNC", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNC", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe6:
-		return dasm_branch(stream, pc, "BN", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BN", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe7:
-		return dasm_branch(stream, pc, "BP", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BP", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe8:
-		return dasm_branch(stream, pc, "BV", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BV", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xe9:
-		return dasm_branch(stream, pc, "BNV", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNV", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xea:
-		return dasm_branch(stream, pc, "BLT", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLT", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xeb:
-		return dasm_branch(stream, pc, "BGE", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BGE", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xec:
-		return dasm_branch(stream, pc, "BLE", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLE", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xed:
-		return dasm_branch(stream, pc, "BGT", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BGT", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xee:
-		return dasm_branch(stream, pc, "BLS", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLS", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xef:
-		return dasm_branch(stream, pc, "BHI", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BHI", (opcode & 0x00ff) << 1) | STEP_COND;
 
 	case 0xf0:
 		return dasm_branch(stream, pc, "BRA:D", (opcode & 0x00ff) << 1);
@@ -930,46 +930,46 @@ offs_t fr_disassembler::disassemble(std::ostream &stream, offs_t pc, const fr_di
 		return dasm_branch(stream, pc, "BNO:D", (opcode & 0x00ff) << 1);
 
 	case 0xf2:
-		return dasm_branch(stream, pc, "BEQ:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BEQ:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf3:
-		return dasm_branch(stream, pc, "BNE:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNE:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf4:
-		return dasm_branch(stream, pc, "BC:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BC:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf5:
-		return dasm_branch(stream, pc, "BNC:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNC:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf6:
-		return dasm_branch(stream, pc, "BN:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BN:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf7:
-		return dasm_branch(stream, pc, "BP:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BP:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf8:
-		return dasm_branch(stream, pc, "BV:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BV:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xf9:
-		return dasm_branch(stream, pc, "BNV:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BNV:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xfa:
-		return dasm_branch(stream, pc, "BLT:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLT:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xfb:
-		return dasm_branch(stream, pc, "BGE:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BGE:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xfc:
-		return dasm_branch(stream, pc, "BLE:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLE:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xfd:
-		return dasm_branch(stream, pc, "BGT:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BGT:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xfe:
-		return dasm_branch(stream, pc, "BLS:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BLS:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	case 0xff:
-		return dasm_branch(stream, pc, "BHI:D", (opcode & 0x00ff) << 1);
+		return dasm_branch(stream, pc, "BHI:D", (opcode & 0x00ff) << 1) | STEP_COND | step_over_extra(1);
 
 	default:
 		return dasm_invalid(stream, opcode);

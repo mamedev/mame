@@ -31,6 +31,7 @@
 #define RS232_BAUD_2000 (0x13)
 #define RS232_BAUD_3600 (0x14)
 #define RS232_BAUD_7200 (0x15)
+#define RS232_BAUD_111900 (0x16)
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
@@ -56,6 +57,7 @@
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
 	PORT_CONFSETTING( RS232_BAUD_38400, "38400") \
 	PORT_CONFSETTING( RS232_BAUD_57600, "57600") \
+	PORT_CONFSETTING( RS232_BAUD_111900, "111900") \
 	PORT_CONFSETTING( RS232_BAUD_115200, "115200")
 
 #define RS232_DATABITS_5 (0x00)
@@ -128,20 +130,20 @@ public:
 	auto rxc_handler() { return m_rxc_handler.bind(); }
 	auto txc_handler() { return m_txc_handler.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
-	DECLARE_WRITE_LINE_MEMBER( write_dtr );
-	DECLARE_WRITE_LINE_MEMBER( write_rts );
-	DECLARE_WRITE_LINE_MEMBER( write_etc );
-	DECLARE_WRITE_LINE_MEMBER( write_spds );
+	DECLARE_WRITE_LINE_MEMBER( write_txd );                 // DB25 pin  2  V.24 circuit 103   Transmitted data
+	DECLARE_WRITE_LINE_MEMBER( write_dtr );                 // DB25 pin 20  V.24 circuit 108/2 Data terminal ready
+	DECLARE_WRITE_LINE_MEMBER( write_rts );                 // DB25 pin  4  V.24 circuit 105   Request to send
+	DECLARE_WRITE_LINE_MEMBER( write_etc );                 // DB25 pin 24  V.24 circuit 113   Transmitter signal element timing (DTE)
+	DECLARE_WRITE_LINE_MEMBER( write_spds );                // DB25 pin 23  V.24 circuit 111   Data signal rate selector (DTE)
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
-	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }
-	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }
-	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }
-	DECLARE_READ_LINE_MEMBER( si_r )  { return m_si; }
-	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
-	DECLARE_READ_LINE_MEMBER( rxc_r ) { return m_dce_rxc; }
-	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; }
+	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }     // DB25 pin  3  V.24 circuit 104   Received data
+	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }     // DB25 pin  8  V.24 circuit 109   Data channel received line signal detector
+	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }     // DB25 pin  6  V.24 circuit 107   Data set ready
+	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }      // DB25 pin 22  V.24 circuit 125   Calling indicator
+	DECLARE_READ_LINE_MEMBER( si_r )  { return m_si; }      //              V.24 circuit 112   Data signal rate selector (DCE)
+	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }     // DB25 pin  5  V.24 circuit 106   Ready for sending
+	DECLARE_READ_LINE_MEMBER( rxc_r ) { return m_dce_rxc; } // DB25 pin 17  V.24 circuit 115   Receiver signal element timing (DCE)
+	DECLARE_READ_LINE_MEMBER( txc_r ) { return m_dce_txc; } // DB25 pin 15  V.24 circuit 114   Transmitter signal element timing (DCE)
 
 protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -226,7 +228,8 @@ protected:
 			1800,
 			2000,
 			3600,
-			7200
+			7200,
+			111900
 		};
 
 		return values[baud];

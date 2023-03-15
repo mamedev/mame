@@ -5,7 +5,7 @@ local exports = {}
 exports.name = "console"
 exports.version = "0.0.1"
 exports.description = "Console plugin"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local console = exports
@@ -23,16 +23,6 @@ function console.startplugin()
 	local matches = {}
 	local lastindex = 0
 	local consolebuf
-	_G.history = function (index)
-		local history = ln.historyget()
-		if index then
-			ln.preload(history[index])
-			return
-		end
-		for num, line in ipairs(history) do
-			print(num, line)
-		end
-	end
 	print("       /|  /|    /|     /|  /|    _______")
 	print("      / | / |   / |    / | / |   /      /")
 	print("     /  |/  |  /  |   /  |/  |  /  ____/ ")
@@ -51,11 +41,14 @@ function console.startplugin()
 	ln.historysetmaxlen(50)
 	local scr = [[
 		local ln = require('linenoise')
-		ln.setcompletion(function(c, str, pos)
-				status = str .. "\x01" .. tostring(pos)
+		ln.setcompletion(
+			function(c, str)
+				status = str
 				yield()
-				ln.addcompletion(c, status:match("([^\x01]*)\x01(.*)"))
-		end)
+				for candidate in status:gmatch('([^\001]+)') do
+					ln.addcompletion(c, candidate)
+				end
+			end)
 		local ret = ln.linenoise('$PROMPT')
 		if ret == nil then
 			return "\n"
@@ -72,7 +65,7 @@ function console.startplugin()
 	-- Main completion function. It evaluates the current sub-expression
 	-- to determine its type. Currently supports tables fields, global
 	-- variables and function prototype completion.
-	local function contextual_list(expr, sep, str, word)
+	local function contextual_list(expr, sep, str, word, strs)
 		local function add(value)
 			value = tostring(value)
 			if value:match("^" .. word) then
@@ -92,7 +85,7 @@ function console.startplugin()
 		end
 
 		if expr and expr ~= "" then
-			local v = load("return " .. expr)
+			local v = load("local STRING = {'" .. table.concat(strs,"','") .. "'} return " .. expr)
 			if v then
 				err, v = pcall(v)
 				if (not err) or (not v) then
@@ -158,6 +151,7 @@ function console.startplugin()
 	-- separator item ( '.', ':', '[', '(' ) and the current string in case
 	-- of an unfinished string literal.
 	local function simplify_expression(expr, word)
+		local strs = {}
 		-- Replace annoying sequences \' and \" inside literal strings
 		expr = expr:gsub("\\(['\"])", function (c)
 				return string.format("\\%03d", string.byte(c))
@@ -177,7 +171,10 @@ function console.startplugin()
 				idx, startpat, endpat = idx2, sign, sign
 			end
 			if expr:sub(idx):find("^" .. startpat .. ".-" .. endpat) then
-				expr = expr:gsub(startpat .. "(.-)" .. endpat, " STRING ")
+				expr = expr:gsub(startpat .. "(.-)" .. endpat, function (str)
+						strs[#strs + 1] = str
+						return " STRING[" .. #strs .. "] "
+					end)
 			else
 				expr = expr:gsub(startpat .. "(.*)", function (str)
 						curstring = str
@@ -194,14 +191,11 @@ function console.startplugin()
 		expr = expr:gsub("(%w)%s+(%w)","%1|%2")
 		expr = expr:gsub("%s+", "") -- Remove now useless spaces
 		-- This main regular expression looks for table indexes and function calls.
-		return curstring, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
+		return curstring, strs, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
 	end
 
-	local function get_completions(line, endpos)
+	local function get_completions(line)
 		matches = {}
-		local endstr = line:sub(endpos + 1, -1)
-		line = line:sub(1, endpos)
-		endstr = endstr or ""
 		local start, word = line:match("^(.*[ \t\n\"\\'><=;:%+%-%*/%%^~#{}%(%)%[%].,])(.-)$")
 		if not start then
 			start = ""
@@ -210,18 +204,20 @@ function console.startplugin()
 			word = word or ""
 		end
 
-		local str, expr, sep = simplify_expression(line, word)
-		contextual_list(expr, sep, str, word)
-		if #matches > 1 then
-			print("\n")
-			for k, v in pairs(matches) do
-				print(v)
-			end
-			return "\x01" .. "-1"
+		local str, strs, expr, sep = simplify_expression(line, word)
+		contextual_list(expr, sep, str, word, strs)
+		if #matches == 0 then
+			return line
 		elseif #matches == 1 then
-			return start .. matches[1] .. endstr .. "\x01" .. (#start + #matches[1])
+			return start .. matches[1]
 		end
-		return "\x01" .. "-1"
+		print("")
+		result = { }
+		for k, v in pairs(matches) do
+			print(v)
+			table.insert(result, start .. v)
+		end
+		return table.concat(result, '\001')
 	end
 
 	emu.register_start(function()
@@ -239,7 +235,7 @@ function console.startplugin()
 		end
 		if (not started) then
 			-- options are not available in startplugin, so we load the history here
-			local homepath = emu.subst_env(manager.options.entries.homepath:value():match("([^;]+)"))
+			local homepath = manager.options.entries.homepath:value():match("([^;]+)")
 			history_fullpath = homepath .. '/' .. history_file
 			ln.loadhistory(history_fullpath)
 			started = true
@@ -252,10 +248,10 @@ function console.startplugin()
 				lastindex = lastindex + 1
 				print(consolebuf[lastindex])
 			end
-			ln.refresh()
+			-- ln.refresh() FIXME: how to replicate this now that the API has been removed?
 		end
 		if conth.yield then
-			conth:continue(get_completions(conth.result:match("([^\x01]*)\x01(.*)")))
+			conth:continue(get_completions(conth.result))
 			return
 		elseif conth.busy then
 			return

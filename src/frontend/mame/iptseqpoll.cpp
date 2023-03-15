@@ -12,7 +12,8 @@
 
 input_code_poller::input_code_poller(input_manager &manager) noexcept :
 	m_manager(manager),
-	m_axis_memory()
+	m_axis_memory(),
+	m_switch_memory()
 {
 }
 
@@ -26,6 +27,7 @@ void input_code_poller::reset()
 {
 	// iterate over device classes and devices
 	m_axis_memory.clear();
+	m_switch_memory.clear();
 	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
 	{
 		input_class &devclass(m_manager.device_class(classno));
@@ -53,22 +55,7 @@ void input_code_poller::reset()
 }
 
 
-
-switch_code_poller_base::switch_code_poller_base(input_manager &manager) noexcept :
-	input_code_poller(manager),
-	m_switch_memory()
-{
-}
-
-
-void switch_code_poller_base::reset()
-{
-	m_switch_memory.clear();
-	input_code_poller::reset();
-}
-
-
-bool switch_code_poller_base::code_pressed_once(input_code code, bool moved)
+bool input_code_poller::code_pressed_once(input_code code, bool moved)
 {
 	// look for the code in the memory
 	bool const pressed(m_manager.code_pressed(code));
@@ -95,21 +82,80 @@ bool switch_code_poller_base::code_pressed_once(input_code code, bool moved)
 
 
 axis_code_poller::axis_code_poller(input_manager &manager) noexcept :
-	input_code_poller(manager)
+	input_code_poller(manager),
+	m_axis_active()
 {
+}
+
+
+void axis_code_poller::reset()
+{
+	input_code_poller::reset();
+	m_axis_active.clear();
+	m_axis_active.resize(m_axis_memory.size(), false);
 }
 
 
 input_code axis_code_poller::poll()
 {
 	// iterate over the axis items we found
-	for (auto memory = m_axis_memory.begin(); m_axis_memory.end() != memory; ++memory)
+	for (std::size_t i = 0; m_axis_memory.size() > i; ++i)
 	{
-		input_code const code = memory->first->code();
-		if (memory->first->check_axis(code.item_modifier(), memory->second))
+		auto &memory = m_axis_memory[i];
+		input_code code = memory.first->code();
+		if (!memory.first->check_axis(code.item_modifier(), memory.second))
 		{
-			m_axis_memory.erase(memory);
+			m_axis_active[i] = false;
+		}
+		else if (!m_axis_active[i])
+		{
+			if (code.item_class() == ITEM_CLASS_ABSOLUTE)
+			{
+				m_axis_active[i] = true;
+			}
+			else
+			{
+				// can only cycle modifiers on a relative item with append
+				m_axis_memory.erase(m_axis_memory.begin() + i);
+				m_axis_active.erase(m_axis_active.begin() + i);
+			}
+			if (!m_manager.device_class(memory.first->device().devclass()).multi())
+				code.set_device_index(0);
 			return code;
+		}
+	}
+
+	// iterate over device classes and devices, skipping disabled classes
+	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
+	{
+		input_class &devclass(m_manager.device_class(classno));
+		if (!devclass.enabled())
+			continue;
+
+		for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
+		{
+			// fetch the device; ignore if nullptr
+			input_device *const device(devclass.device(devnum));
+			if (!device)
+				continue;
+
+			// iterate over items within each device
+			for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
+			{
+				input_device_item *const item(device->item(itemid));
+				if (!item)
+					continue;
+
+				input_code code = item->code();
+				if (item->itemclass() == ITEM_CLASS_SWITCH)
+				{
+					// item is natively a switch, poll it
+					if (code_pressed_once(code, true))
+						return code;
+					else
+						continue;
+				}
+			}
 		}
 	}
 
@@ -120,7 +166,7 @@ input_code axis_code_poller::poll()
 
 
 switch_code_poller::switch_code_poller(input_manager &manager) noexcept :
-	switch_code_poller_base(manager)
+	input_code_poller(manager)
 {
 }
 
@@ -210,7 +256,7 @@ input_code switch_code_poller::poll()
 
 
 keyboard_code_poller::keyboard_code_poller(input_manager &manager) noexcept :
-	switch_code_poller_base(manager)
+	input_code_poller(manager)
 {
 }
 
@@ -300,8 +346,8 @@ bool input_sequence_poller::poll()
 		m_modified = true;
 	}
 
-	// if we're recorded at least one item and 2/3 of a second has passed, we're done
-	if (m_last_ticks && ((m_last_ticks + (osd_ticks_per_second() * 2 / 3)) < newticks))
+	// if we've recorded at least one item and one second has passed, we're done
+	if (m_last_ticks && ((m_last_ticks + osd_ticks_per_second()) < newticks))
 		return true;
 
 	// return false to indicate we are still polling
@@ -336,42 +382,93 @@ input_code axis_sequence_poller::do_poll()
 		lastcode = m_sequence[curlen - 2];
 	input_code newcode = m_code_poller.poll();
 
-	// if the last code doesn't match absolute/relative of this code, ignore the new one
-	input_item_class const lastclass = lastcode.item_class();
-	input_item_class const newclass = newcode.item_class();
-	if (((ITEM_CLASS_ABSOLUTE == lastclass) && (ITEM_CLASS_ABSOLUTE != newclass)) ||
-		((ITEM_CLASS_RELATIVE == lastclass) && (ITEM_CLASS_RELATIVE != newclass)))
-		newcode = INPUT_CODE_INVALID;
-
-	// if the new code is valid, check for half-axis toggles on absolute controls
-	if ((INPUT_CODE_INVALID != newcode) && curlen && (ITEM_CLASS_ABSOLUTE == newclass))
+	// if not empty, see if it's the same control again to cycle modifiers
+	if ((INPUT_CODE_INVALID != newcode) && curlen)
 	{
+		input_item_class const newclass = newcode.item_class();
 		input_code last_nomodifier = lastcode;
 		last_nomodifier.set_item_modifier(ITEM_MODIFIER_NONE);
 		if (newcode == last_nomodifier)
 		{
-			// increment the modifier, wrapping back to none
-			switch (lastcode.item_modifier())
+			if (ITEM_CLASS_ABSOLUTE == newclass)
 			{
-			case ITEM_MODIFIER_NONE:
-				newcode.set_item_modifier(ITEM_MODIFIER_POS);
-				break;
-			case ITEM_MODIFIER_POS:
-				newcode.set_item_modifier(ITEM_MODIFIER_NEG);
-				break;
-			default:
-			case ITEM_MODIFIER_NEG:
-				newcode.set_item_modifier(ITEM_MODIFIER_NONE);
-				break;
-			}
+				// increment the modifier, wrapping back to none
+				switch (lastcode.item_modifier())
+				{
+				case ITEM_MODIFIER_NONE:
+					newcode.set_item_modifier(ITEM_MODIFIER_POS);
+					break;
+				case ITEM_MODIFIER_POS:
+					newcode.set_item_modifier(ITEM_MODIFIER_NEG);
+					break;
+				case ITEM_MODIFIER_NEG:
+					newcode.set_item_modifier(ITEM_MODIFIER_REVERSE);
+					break;
+				default:
+				case ITEM_MODIFIER_REVERSE:
+					newcode.set_item_modifier(ITEM_MODIFIER_NONE);
+					break;
+				}
 
-			// back up over the previous code so we can re-append
-			if (has_or)
+				// back up over the previous code so we can re-append
+				if (has_or)
+					m_sequence.backspace();
 				m_sequence.backspace();
-			m_sequence.backspace();
+			}
+			else if (ITEM_CLASS_RELATIVE == newclass)
+			{
+				// increment the modifier, wrapping back to none
+				switch (lastcode.item_modifier())
+				{
+				case ITEM_MODIFIER_NONE:
+					newcode.set_item_modifier(ITEM_MODIFIER_REVERSE);
+					break;
+				default:
+				case ITEM_MODIFIER_REVERSE:
+					newcode.set_item_modifier(ITEM_MODIFIER_NONE);
+					break;
+				}
+
+				// back up over the previous code so we can re-append
+				if (has_or)
+					m_sequence.backspace();
+				m_sequence.backspace();
+			}
+			else if (!has_or && (ITEM_CLASS_SWITCH == newclass))
+			{
+				// back up over the existing code
+				m_sequence.backspace();
+
+				// if there was a NOT preceding it, delete it as well, otherwise append a fresh one
+				if (m_sequence[curlen - 2] == input_seq::not_code)
+					m_sequence.backspace();
+				else
+					m_sequence += input_seq::not_code;
+			}
+		}
+		else if (!has_or && (ITEM_CLASS_SWITCH == newclass))
+		{
+			// ignore switches following axes
+			if (ITEM_CLASS_SWITCH != lastcode.item_class())
+			{
+				// hack to stop it timing out so user can cancel
+				m_sequence.backspace();
+				newcode = lastcode;
+			}
 		}
 	}
-	return newcode;
+
+	// hack to stop it timing out before assigning an axis
+	if (ITEM_CLASS_SWITCH == newcode.item_class())
+	{
+		m_sequence += newcode;
+		set_modified();
+		return INPUT_CODE_INVALID;
+	}
+	else
+	{
+		return newcode;
+	}
 }
 
 

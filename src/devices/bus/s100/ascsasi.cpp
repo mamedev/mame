@@ -89,8 +89,8 @@ asc_sasi_device::asc_sasi_device(const machine_config &mconfig, const char *tag,
 void asc_sasi_device::device_start()
 {
 	// initialize timers
-	m_sel_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asc_sasi_device::sel_off), this));
-	m_rst_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(asc_sasi_device::rst_off), this));
+	m_sel_off_timer = timer_alloc(FUNC(asc_sasi_device::sel_off), this);
+	m_rst_off_timer = timer_alloc(FUNC(asc_sasi_device::rst_off), this);
 
 	// save state
 	save_item(NAME(m_data_latch));

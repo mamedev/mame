@@ -16,7 +16,6 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 #define LOG_GENERAL      (1U << 0)
@@ -228,14 +227,14 @@ inline void tms340x0_device::RESET_ST()
 }
 
 /* shortcuts for reading opcodes */
-uint32_t tms34010_device::ROPCODE()
+uint16_t tms34010_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
 	return m_cache.read_word(pc);
 }
 
-uint32_t tms34020_device::ROPCODE()
+uint16_t tms34020_device::ROPCODE()
 {
 	uint32_t pc = m_pc;
 	m_pc += 2 << 3;
@@ -692,15 +691,15 @@ void tms340x0_device::check_interrupt()
 	/* if we took something, generate it */
 	if (vector)
 	{
+		/* call the callback for externals */
+		if (irqline >= 0)
+			standard_irq_callback(irqline, m_pc);
+
 		PUSH(m_pc);
 		PUSH(m_st);
 		RESET_ST();
 		m_pc = RLONG(vector);
 		COUNT_CYCLES(16);
-
-		/* call the callback for externals */
-		if (irqline >= 0)
-			standard_irq_callback(irqline);
 	}
 }
 
@@ -727,7 +726,6 @@ void tms340x0_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
 		state_add(TMS34010_SP,     "SP",        m_regs[15].reg);
-		state_add(STATE_GENSP,     "GENSP",     m_regs[15].reg).noshow();
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
@@ -742,7 +740,7 @@ void tms340x0_device::device_start()
 	}
 
 	/* allocate a scanline timer and set it to go off at the start */
-	m_scantimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms340x0_device::scanline_callback), this));
+	m_scantimer = timer_alloc(FUNC(tms340x0_device::scanline_callback), this);
 	m_scantimer->adjust(attotime::zero);
 
 	save_item(NAME(m_pc));
@@ -888,7 +886,7 @@ void tms340x0_device::execute_run()
 			uint16_t op;
 			m_ppc = m_pc;
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	else
@@ -899,10 +897,20 @@ void tms340x0_device::execute_run()
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
-			(this->*s_opcode_table[op >> 4])(op);
+			execute_op(op);
 		} while (m_icount > 0);
 	}
 	m_executing = false;
+}
+
+void tms34010_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
+}
+
+void tms34020_device::execute_op(uint16_t op)
+{
+	(this->*s_opcode_table[op >> 4])(op);
 }
 
 
@@ -965,14 +973,14 @@ void tms340x0_device::set_pixel_function()
 
 const tms340x0_device::raster_op_func tms340x0_device::s_raster_ops[32] =
 {
-				nullptr, &tms340x0_device::raster_op_1 , &tms340x0_device::raster_op_2 , &tms340x0_device::raster_op_3,
-	&tms340x0_device::raster_op_4 , &tms340x0_device::raster_op_5 , &tms340x0_device::raster_op_6 , &tms340x0_device::raster_op_7,
-	&tms340x0_device::raster_op_8 , &tms340x0_device::raster_op_9 , &tms340x0_device::raster_op_10, &tms340x0_device::raster_op_11,
+	nullptr,                        &tms340x0_device::raster_op_1,  &tms340x0_device::raster_op_2,  &tms340x0_device::raster_op_3,
+	&tms340x0_device::raster_op_4,  &tms340x0_device::raster_op_5,  &tms340x0_device::raster_op_6,  &tms340x0_device::raster_op_7,
+	&tms340x0_device::raster_op_8,  &tms340x0_device::raster_op_9,  &tms340x0_device::raster_op_10, &tms340x0_device::raster_op_11,
 	&tms340x0_device::raster_op_12, &tms340x0_device::raster_op_13, &tms340x0_device::raster_op_14, &tms340x0_device::raster_op_15,
 	&tms340x0_device::raster_op_16, &tms340x0_device::raster_op_17, &tms340x0_device::raster_op_18, &tms340x0_device::raster_op_19,
-	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21,            nullptr,            nullptr,
-				nullptr,            nullptr,            nullptr,            nullptr,
-				nullptr,            nullptr,            nullptr,            nullptr,
+	&tms340x0_device::raster_op_20, &tms340x0_device::raster_op_21, nullptr,                        nullptr,
+	nullptr,                        nullptr,                        nullptr,                        nullptr,
+	nullptr,                        nullptr,                        nullptr,                        nullptr,
 };
 
 
@@ -1014,7 +1022,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(nullptr, TMS34010_DI);
+		internal_interrupt_callback(TMS34010_DI);
 	}
 
 	/* at the start of VBLANK, load the starting display address */

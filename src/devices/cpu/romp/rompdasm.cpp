@@ -43,7 +43,11 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 	switch (op >> 12)
 	{
 		// JI format
-	case 0x0: util::stream_format(stream, "j%-4s  0x%x", cc[(op >> 8) & 15], pc + (s32(s8(op)) << 1)); break; // jump on [not] condition bit
+	case 0x0: // jump on [not] condition bit
+		util::stream_format(stream, "j%-4s  0x%x", cc[(op >> 8) & 15], pc + (s32(s8(op)) << 1));
+		if (((op >> 8) & 7) != 0)
+			flags = STEP_COND;
+		break;
 
 		// DS format
 	case 0x1: util::stream_format(stream, "stcs   %s,%s", gpr[R2], R3_0((op >> 8) & 15, R3)); break; // store character short
@@ -74,8 +78,16 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 			case 0x8b: util::stream_format(stream, "balax  0x%x", b & 0x00fffffeU); flags |= STEP_OVER | step_over_extra(1); break; // branch and link absolute with execute
 			case 0x8c: util::stream_format(stream, "bali   %s,0x%x", gpr[R2], pc + (s32(b << 12) >> 11)); flags |= STEP_OVER; break; // branch and link immediate
 			case 0x8d: util::stream_format(stream, "balix  %s,0x%x", gpr[R2], pc + (s32(b << 12) >> 11)); flags |= STEP_OVER | step_over_extra(1); break; // branch and link immediate with execute
-			case 0x8e: util::stream_format(stream, "b%-4s  0x%x", cc[N], pc + (s32(b << 12) >> 11)); break; // branch on condition bit immediate
-			case 0x8f: util::stream_format(stream, "b%-4s  0x%x", util::string_format("%sx", cc[N]), pc + (s32(b << 12) >> 11)); break; // branch on condition bit immediate with execute
+			case 0x8e: // branch on condition bit immediate
+				util::stream_format(stream, "b%-4s  0x%x", cc[N], pc + (s32(b << 12) >> 11));
+				if (N != 8)
+					flags |= STEP_COND;
+				break;
+			case 0x8f: // branch on condition bit immediate with execute
+				util::stream_format(stream, "b%-4s  0x%x", util::string_format("%sx", cc[N]), pc + (s32(b << 12) >> 11));
+				if (N != 8)
+					flags |= STEP_COND | step_over_extra(1);
+				break;
 			}
 		}
 		break;
@@ -101,7 +113,11 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 			case 0xc9: util::stream_format(stream, "lm     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load multiple
 			case 0xca: util::stream_format(stream, "lha    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load half algebraic
 			case 0xcb: util::stream_format(stream, "ior    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // input/output read
-			case 0xcc: util::stream_format(stream, "t%-4s  %s,0x%x", tc[R2 & 7], gpr[R3], s16(i)); break; // trap on condition immediate
+			case 0xcc: // trap on condition immediate
+				util::stream_format(stream, "t%-4s  %s,0x%x", tc[R2 & 7], gpr[R3], s16(i));
+				if ((R2 & 7) != 0)
+					flags |= STEP_OVER | STEP_COND;
+				break;
 			case 0xcd: util::stream_format(stream, "l      %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load
 			case 0xce: util::stream_format(stream, "lc     %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // load character
 			case 0xcf: util::stream_format(stream, "tsh    %s,%s", gpr[R2], R3_0(s16(i), R3)); break; // test and set half
@@ -190,14 +206,38 @@ offs_t romp_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buff
 		case 0xe5: util::stream_format(stream, "n      %s,%s", gpr[R2], gpr[R3]); break; // and
 		case 0xe6: util::stream_format(stream, "m      %s,%s", gpr[R2], gpr[R3]); break; // multiply step
 		case 0xe7: util::stream_format(stream, "x      %s,%s", gpr[R2], gpr[R3]); break; // exclusive or
-		case 0xe8: util::stream_format(stream, "b%-5s %s", util::string_format("%sr",  cc[N - 8]), gpr[R3]); break; // branch on not condition bit
-		case 0xe9: util::stream_format(stream, "b%-5s %s", util::string_format("%srx", cc[N - 8]), gpr[R3]); break; // branch on not condition bit with execute
+		case 0xe8: // branch on not condition bit
+			util::stream_format(stream, "b%-5s %s", util::string_format("%sr",  cc[N - 8]), gpr[R3]);
+			if (N != 8)
+				flags |= STEP_COND;
+			if (R3 == 15)
+				flags |= STEP_OUT;
+			break;
+		case 0xe9: // branch on not condition bit with execute
+			util::stream_format(stream, "b%-5s %s", util::string_format("%srx", cc[N - 8]), gpr[R3]);
+			if (N != 8)
+				flags |= STEP_COND | step_over_extra(1);
+			if (R3 == 15)
+				flags |= STEP_OUT | step_over_extra(1);
+			break;
 		// ea
 		case 0xeb: util::stream_format(stream, "lhs    %s,0(%s)", gpr[R2], gpr[R3]); break; // load half short
 		case 0xec: util::stream_format(stream, "balr   %s,%s", gpr[R2], gpr[R3]); flags |= STEP_OVER; break; // branch and link
 		case 0xed: util::stream_format(stream, "balrx  %s,%s", gpr[R2], gpr[R3]); flags |= STEP_OVER | step_over_extra(1); break; // branch and link with execute
-		case 0xee: util::stream_format(stream, "b%-5s %s", util::string_format("%sr",  cc[N]), gpr[R3]); break; // branch on condition bit
-		case 0xef: util::stream_format(stream, "b%-5s %s", util::string_format("%srx", cc[N]), gpr[R3]); break; // branch on condition bit with execute
+		case 0xee: // branch on condition bit
+			util::stream_format(stream, "b%-5s %s", util::string_format("%sr",  cc[N]), gpr[R3]); break;
+			if (N != 8)
+				flags |= STEP_COND;
+			if (R3 == 15)
+				flags |= STEP_OUT;
+			break;
+		case 0xef: // branch on condition bit with execute
+			util::stream_format(stream, "b%-5s %s", util::string_format("%srx", cc[N]), gpr[R3]);
+			if (N != 8)
+				flags |= STEP_COND | step_over_extra(1);
+			if (R3 == 15)
+				flags |= STEP_OUT | step_over_extra(1);
+			break;
 
 		case 0xf0: util::stream_format(stream, "wait"); break; // wait
 		case 0xf1: util::stream_format(stream, "ae     %s,%s", gpr[R2], gpr[R3]); break; // add extended

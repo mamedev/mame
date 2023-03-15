@@ -1,5 +1,5 @@
+#include <asio/any_io_executor.hpp>
 #include <asio/defer.hpp>
-#include <asio/executor.hpp>
 #include <asio/post.hpp>
 #include <asio/strand.hpp>
 #include <asio/system_executor.hpp>
@@ -10,8 +10,8 @@
 #include <typeinfo>
 #include <vector>
 
+using asio::any_io_executor;
 using asio::defer;
-using asio::executor;
 using asio::post;
 using asio::strand;
 using asio::system_executor;
@@ -106,7 +106,7 @@ public:
 
 protected:
   // Construct the actor to use the specified executor for all message handlers.
-  actor(executor e)
+  actor(any_io_executor e)
     : executor_(std::move(e))
   {
   }
@@ -124,7 +124,7 @@ protected:
   template <class Actor, class Message>
   void deregister_handler(void (Actor::* mf)(Message, actor_address))
   {
-    const std::type_info& id = typeid(message_handler<Message>);
+    const std::type_info& id = typeid(Message);
     for (auto iter = handlers_.begin(); iter != handlers_.end(); ++iter)
     {
       if ((*iter)->message_id() == id)
@@ -171,7 +171,7 @@ private:
   // All messages associated with a single actor object should be processed
   // non-concurrently. We use a strand to ensure non-concurrent execution even
   // if the underlying executor may use multiple threads.
-  strand<executor> executor_;
+  strand<any_io_executor> executor_;
 
   std::vector<std::shared_ptr<message_handler_base>> handlers_;
 };
@@ -221,7 +221,7 @@ using asio::thread_pool;
 class member : public actor
 {
 public:
-  explicit member(executor e)
+  explicit member(any_io_executor e)
     : actor(std::move(e))
   {
     register_handler(&member::init_handler);

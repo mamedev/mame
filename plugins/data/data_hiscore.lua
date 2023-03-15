@@ -1,11 +1,11 @@
--- to use this get the package from http://greatstone.free.fr/hi2txt/
+-- to use this get the package from https://greatstoneex.github.io/hi2txt-doc/
 -- extract the hi2txt.zip and place it in your history path
 
 local dat = {}
 local env = {}
 local output
 local curset
-local path = emu.subst_env(mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt"))
+local path = mame_manager.ui.options.entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")
 local htmlentites = {
 	["amp"] = "&",
 	["quot"] = utf8.char(34),
@@ -355,7 +355,7 @@ local htmlentites = {
 function env.open(file, size, swap)
 	if file == ".hi" then
 		local path = "hi"
-		local ini = emu.file(emu.subst_env(manager.options.entries.inipath:value()), 1)
+		local ini = emu.file(manager.options.entries.inipath:value(), 1)
 		local ret = ini:open("hiscore.ini")
 		if not ret then
 			local inifile = ini:read(ini:size())
@@ -369,7 +369,7 @@ function env.open(file, size, swap)
 		end
 		file = path .. "/" .. curset .. ".hi"
 	else
-		file = emu.subst_env(manager.options.entries.nvram_directory:value()) .. "/" .. curset .. "/" .. file
+		file = manager.options.entries.nvram_directory:value() .. "/" .. curset .. "/" .. file
 	end
 	local f = io.open(file, "rb")
 	local content = f:read("*all")
@@ -547,7 +547,7 @@ function env.basechar(bytes, base)
 		end
 		return newbytes
 	end
-	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented\n")
+	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented")
 	return bytes
 end
 
@@ -566,7 +566,7 @@ function env.charset_conv(bytes, charset, aoffset)
 			end
 			return bytes
 		end
-		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
+		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented")
 		return bytes
 	end
 	for num, char in ipairs(bytes) do
@@ -1217,7 +1217,7 @@ function dat.check(set, softlist)
 
 	if curset == set then
 		if output then
-			return _("High Scores")
+			return _p("plugin-data", "High Scores")
 		else
 			return nil
 		end
@@ -1265,7 +1265,7 @@ function dat.check(set, softlist)
 		end
 	end
 	if output then
-		return _("High Scores")
+		return _p("plugin-data", "High Scores")
 	else
 		return nil
 	end

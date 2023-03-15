@@ -12,10 +12,12 @@
 
 #include "emuopts.h"
 #include "romload.h"
+#include "softlist.h"
 
 #include <cstring>
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 
@@ -26,13 +28,14 @@
 DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nintendo Virtual Boy Cartridge Slot")
 
 
+
 //**************************************************************************
 //  vboy_cart_slot_device
 //**************************************************************************
 
 vboy_cart_slot_device::vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
 	m_intcro(*this),
 	m_exp_space(*this, finder_base::DUMMY_TAG, -1, 32),
@@ -54,25 +57,25 @@ image_init_result vboy_cart_slot_device::call_load()
 	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 	if (loaded_through_softlist() && !romregion)
 	{
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Software list item has no 'rom' data area");
+		seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
 		return image_init_result::FAIL;
 	}
 
 	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
 	if ((0x0000'0003 & len) || (0x0100'0000 < len))
 	{
-		seterror(IMAGE_ERROR_UNSUPPORTED, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
+		seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size (must be a multiple of 4 bytes no larger than 16 MiB)");
 		return image_init_result::FAIL;
 	}
 
 	if (!loaded_through_softlist())
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
-		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 4, ENDIANNESS_LITTLE);
+		romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Error reading cartridge file");
+			seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
 			return image_init_result::FAIL;
 		}
 	}
@@ -124,27 +127,38 @@ void vboy_cart_slot_device::device_start()
 
 std::string vboy_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	std::string const image_name(mconfig().options().image_option(instance_name()).value());
-	software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
-	if (part)
+	if (hook.image_file())
 	{
-		//printf("[%s] Found software part for image name '%s'\n", tag(), image_name.c_str());
-		for (rom_entry const &entry : part->romdata())
-		{
-			if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
-			{
-				//printf("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
-				return "flatrom_sram";
-			}
-		}
+		// TODO: is there a header field or something indicating presence of save RAM?
+		osd_printf_verbose("[%s] Assuming plain ROM cartridge\n", tag());
+		return "flatrom";
 	}
 	else
 	{
-		//printf("[%s] No software part found for image name '%s'\n", tag(), image_name.c_str());
+		std::string const image_name(mconfig().options().image_option(instance_name()).value());
+		software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
+		if (part)
+		{
+			osd_printf_verbose("[%s] Found software part for image name '%s'\n", tag(), image_name);
+			for (rom_entry const &entry : part->romdata())
+			{
+				if (ROMENTRY_ISREGION(entry) && (entry.name() == "sram"))
+				{
+					osd_printf_verbose("[%s] Found 'sram' data area, enabling cartridge backup RAM\n", tag());
+					return "flatrom_sram";
+				}
+			}
+			osd_printf_verbose("[%s] No 'sram' data area found, assuming plain ROM cartridge\n", tag());
+			return "flatrom";
+		}
+		else
+		{
+			osd_printf_verbose("[%s] No software part found for image name '%s'\n", tag(), image_name);
+		}
 	}
 
-	//printf("[%s] Assuming plain ROM cartridge\n", tag());
-	return "flatrom";
+	// leave the slot empty
+	return std::string();
 }
 
 

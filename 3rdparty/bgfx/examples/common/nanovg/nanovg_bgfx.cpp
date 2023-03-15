@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 //
@@ -762,12 +762,24 @@ namespace
 
 		if (gl->ncalls > 0)
 		{
+			int avail = bgfx::getAvailTransientVertexBuffer(gl->nverts, s_nvgLayout);
+			if (avail < gl->nverts)
+			{
+				gl->nverts = avail;
+				BX_WARN(true, "Vertex number truncated due to transient vertex buffer overflow");
+				if (gl->nverts < 2)
+				{
+					goto _cleanup;
+				}
+			}
+
 			bgfx::allocTransientVertexBuffer(&gl->tvb, gl->nverts, s_nvgLayout);
 
 			int allocated = gl->tvb.size/gl->tvb.stride;
 
 			if (allocated < gl->nverts)
 			{
+				// this branch should never be taken as we've already checked the transient vertex buffer size
 				gl->nverts = allocated;
 				BX_WARN(true, "Vertex number truncated due to transient vertex buffer overflow");
 			}
@@ -805,6 +817,7 @@ namespace
 			}
 		}
 
+_cleanup:
 		// Reset calls
 		gl->nverts    = 0;
 		gl->npaths    = 0;
@@ -1229,6 +1242,61 @@ NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* _ctx, int32_t _width, int32
 	return framebuffer;
 }
 
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int32_t imageFlags, bgfx::ViewId viewId)
+{
+	NVGLUframebuffer* framebuffer = nvgluCreateFramebuffer(ctx, imageFlags);
+
+	if (framebuffer != NULL)
+	{
+		nvgluSetViewFramebuffer(viewId, framebuffer);
+	}
+
+	return framebuffer;
+}
+
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* _ctx, int32_t _imageFlags)
+{
+	BX_UNUSED(_imageFlags);
+	bgfx::TextureHandle textures[] =
+	{
+		bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT),
+		bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT | BGFX_TEXTURE_RT_WRITE_ONLY)
+	};
+	bgfx::FrameBufferHandle fbh = bgfx::createFrameBuffer(
+		  BX_COUNTOF(textures)
+		, textures
+		, true
+		);
+
+	if (!bgfx::isValid(fbh) )
+	{
+		return NULL;
+	}
+
+	struct NVGparams* params = nvgInternalParams(_ctx);
+	struct GLNVGcontext* gl = (struct GLNVGcontext*)params->userPtr;
+	struct GLNVGtexture* tex = glnvg__allocTexture(gl);
+
+	if (NULL == tex)
+	{
+		bgfx::destroy(fbh);
+		return NULL;
+	}
+
+	tex->width  = 0;
+	tex->height = 0;
+	tex->type   = NVG_TEXTURE_RGBA;
+	tex->flags  = _imageFlags | NVG_IMAGE_PREMULTIPLIED;
+	tex->id     = bgfx::getTexture(fbh);
+
+	NVGLUframebuffer* framebuffer = BX_NEW(gl->allocator, NVGLUframebuffer);
+	framebuffer->ctx    = _ctx;
+	framebuffer->image  = tex->id.idx;
+	framebuffer->handle = fbh;
+
+	return framebuffer;
+}
+
 void nvgluBindFramebuffer(NVGLUframebuffer* _framebuffer)
 {
 	static NVGcontext* s_prevCtx = NULL;
@@ -1268,4 +1336,20 @@ void nvgluSetViewFramebuffer(bgfx::ViewId _viewId, NVGLUframebuffer* _framebuffe
 	_framebuffer->viewId = _viewId;
 	bgfx::setViewFrameBuffer(_viewId, _framebuffer->handle);
 	bgfx::setViewMode(_viewId, bgfx::ViewMode::Sequential);
+}
+
+int nvgCreateBgfxTexture(struct NVGcontext *_ctx,
+                         bgfx::TextureHandle _id,
+                         int _width,
+                         int _height,
+                         int _flags) {
+    struct NVGparams *params = nvgInternalParams(_ctx);
+    struct GLNVGcontext *gl = (struct GLNVGcontext *)params->userPtr;
+    struct GLNVGtexture *tex = glnvg__allocTexture(gl);
+    tex->id = _id;
+    tex->width = _width;
+    tex->height = _height;
+    tex->flags = _flags;
+    tex->type = NVG_TEXTURE_RGBA;
+    return tex->id.idx;
 }

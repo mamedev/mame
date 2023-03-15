@@ -8,6 +8,7 @@
 
 #include "arm7.h"
 #include "arm7core.h"
+#include "machine/vic_pl192.h"
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -36,10 +37,6 @@ public:
 
 	void write_timer(int timer, int offset, uint32_t data, uint32_t mem_mask);
 	uint32_t read_timer(int timer, int offset, uint32_t mem_mask);
-
-	// VIC
-	uint32_t vic_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vic_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// PIN select block
 	uint32_t pin_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -81,6 +78,8 @@ protected:
 
 private:
 	address_space_config m_program_config;
+
+	required_device<vic_pl190_device> m_vic;
 };
 
 

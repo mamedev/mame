@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 /*
  * mm5837_noise.c
@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(ne555_astable)
+{
 
 	/*
 	 * Astable ne555
@@ -35,4 +36,4 @@ NETLIST_START(ne555_astable)
 
 	LOG(log3, NOISE.3)
 
-NETLIST_END()
+}

@@ -94,6 +94,7 @@ void ata_hle_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_device_control));
 	save_item(NAME(m_revert_to_defaults));
+	save_item(NAME(m_8bit_data_transfers));
 
 	save_item(NAME(m_single_device));
 	save_item(NAME(m_resetting));
@@ -109,8 +110,8 @@ void ata_hle_device::device_start()
 
 	save_item(NAME(m_identify_buffer));
 
-	m_busy_timer = timer_alloc(TID_BUSY);
-	m_buffer_empty_timer = timer_alloc(TID_BUFFER_EMPTY);
+	m_busy_timer = timer_alloc(FUNC(ata_hle_device::busy_tick), this);
+	m_buffer_empty_timer = timer_alloc(FUNC(ata_hle_device::empty_tick), this);
 }
 
 void ata_hle_device::device_reset()
@@ -150,20 +151,16 @@ void ata_hle_device::soft_reset()
 	start_busy(DIAGNOSTIC_TIME, PARAM_DIAGNOSTIC);
 }
 
-void ata_hle_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(ata_hle_device::busy_tick)
 {
-	switch(id)
-	{
-	case TID_BUSY:
-		m_status &= ~IDE_STATUS_BSY;
+	m_status &= ~IDE_STATUS_BSY;
+	finished_busy(param);
+}
 
-		finished_busy(param);
-		break;
-	case TID_BUFFER_EMPTY:
-		m_buffer_empty_timer->enable(false);
-		fill_buffer();
-		break;
-	}
+TIMER_CALLBACK_MEMBER(ata_hle_device::empty_tick)
+{
+	m_buffer_empty_timer->enable(false);
+	fill_buffer();
 }
 
 void ata_hle_device::finished_busy(int param)
@@ -586,10 +583,6 @@ uint16_t ata_hle_device::read_dma()
 
 uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
-	/* logit */
-//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read at %X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask));
-
 	uint16_t result = 0xffff;
 
 	if (device_selected() || m_single_device)
@@ -697,6 +690,10 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 			}
 		}
 	}
+
+	/* logit */
+//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
+		LOG(("%s:IDE cs0 read %X at %X (err: %X), mem_mask=%X\n", machine().describe_context(), result, offset, m_error, mem_mask));
 
 	/* return the result */
 	return result;
@@ -893,6 +890,7 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
 					m_command = data;
+					m_error = IDE_ERROR_NONE;
 
 					/* implicitly clear interrupts & dmarq here */
 					set_irq(CLEAR_LINE);

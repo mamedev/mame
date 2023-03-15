@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "tlcs870.h"
 #include "tlcs870d.h"
-#include "debugger.h"
 
 // Main dispatch handlers for these
 

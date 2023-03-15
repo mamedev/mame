@@ -14,8 +14,15 @@ Default initial input pin(s) state:
 - ALL_LOW: 0
 
 TODO:
-- call output handler at reset? eg. a NAND gate whose inputs are low at
-  power-on should output 1.
+- Change the strange initial input state, eg. right now it's all 1 for an AND
+  gate. All 0 for all devices would be more intuitive, but that would need a
+  config handler for setting the number of input pins since otherwise it can't
+  know if the state is active or not.
+- Call m_output_handler at reset, eg. a NOR gate whose inputs are low at power-on
+  should output 1 (to avoid surprises, this should be done after machine_reset).
+- Related to currently not calling m_output_handler at reset, if the hardware
+  1st value written equals the initial state, m_output_handler is not called,
+  eg. writing 1 to an AND gate pin when the default initial state is 1.
 
 ***************************************************************************/
 

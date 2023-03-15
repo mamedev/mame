@@ -18,6 +18,8 @@
 #include <string>
 
 
+namespace osd::debugger::win {
+
 class editwin_info : public debugwin_info
 {
 public:
@@ -27,6 +29,8 @@ public:
 	virtual bool restore_field(HWND wnd) override;
 
 	virtual bool set_default_focus() override;
+
+	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
 
 protected:
 	constexpr static DWORD  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
@@ -38,6 +42,8 @@ protected:
 	void set_edit_defstr(const std::string &string) { m_edit_defstr = string; }
 
 	virtual void draw_contents(HDC dc) override;
+
+	virtual void save_configuration_to_node(util::xml::data_node &node) override;
 
 private:
 	typedef std::deque<std::basic_string<TCHAR> > history_deque;
@@ -55,4 +61,6 @@ private:
 	int                     m_last_history;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_EDITWININFO_H

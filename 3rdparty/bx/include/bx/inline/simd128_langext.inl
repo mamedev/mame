@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_SIMD_T_H_HEADER_GUARD
@@ -343,6 +343,14 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	{
 		simd128_langext_t result;
 		result.vi = _a.vf == _b.vf;
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_langext_t simd_cmpneq(simd128_langext_t _a, simd128_langext_t _b)
+	{
+		simd128_langext_t result;
+		result.vi = _a.vf != _b.vf;
 		return result;
 	}
 

@@ -1,0 +1,366 @@
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Sat May 14 18:10:42 2022 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>NLTOOL</title>
+
+</head>
+<body>
+
+<h1 align="center">NLTOOL</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#EXAMPLES">EXAMPLES</a><br>
+<a href="#AUTHOR">AUTHOR</a><br>
+<a href="#COPYRIGHT">COPYRIGHT</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">nltool &minus;
+manual page for nltool (netlist) 0.14</p>
+
+<h2>SYNOPSIS
+<a name="SYNOPSIS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>nltool</b>
+[<i>option</i>]... [<i>files</i>]...</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">nltool serves
+as the Swiss Army knife to run, test and convert
+netlists.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Commands may
+accept one or more files depending on the functionality. If
+no file is provided, standard input is used.</p>
+
+<h2>OPTIONS
+<a name="OPTIONS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>General
+options:</b></p>
+
+<p style="margin-left:22%;">The following options apply to
+all commands.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="89%">
+
+
+<p style="margin-top: 1em"><b>&minus;c</b>,
+<b>&minus;&minus;cmd</b>=<i>run</i>|validate|convert|listdevices|listmodels|static|header|docheader|tests</p> </td></tr>
+</table>
+
+
+<p style="margin-left:22%; margin-top: 1em">run|validate|convert|listdevices|listmodels|static|header|docheader|tests</p>
+
+<p><b>&minus;I</b>,
+<b>&minus;&minus;include</b>=<i>Value</i></p> </table>
+
+<p style="margin-left:22%;">Add the directory to the list
+of directories to be searched for header files. This option
+may be specified repeatedly.</p>
+
+<p style="margin-left:11%;"><b>&minus;D</b>,
+<b>&minus;&minus;define</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">predefine value as macro, e.g.
+<b>&minus;Dname</b>=<i>value</i>. If &rsquo;=value&rsquo; is
+omitted predefine it as 1. This option may be specified
+repeatedly.</p>
+
+<p style="margin-left:11%;"><b>&minus;r</b>,
+<b>&minus;&minus;rom</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">where to look for data
+files</p>
+
+<p style="margin-left:11%;"><b>&minus;v</b>,
+<b>&minus;&minus;verbose</b></p>
+
+<p style="margin-left:22%;">be verbose &minus; this
+produces lots of output</p>
+
+<p style="margin-left:11%;"><b>&minus;q</b>,
+<b>&minus;&minus;quiet</b></p>
+
+<p style="margin-left:22%;">be quiet &minus; no
+warnings</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;prepro</b></p>
+
+<p style="margin-left:22%;">output preprocessor output to
+stderr</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;progress</b></p>
+
+<p style="margin-left:22%;">show progress bar on longer
+operations</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;version</b></p>
+
+<p style="margin-left:22%;">display version and exit</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">display help and exit</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+run and static commands:</b></p>
+
+<p style="margin-left:22%;">These options apply to run and
+static commands.</p>
+
+<p style="margin-left:11%;"><b>&minus;n</b>,
+<b>&minus;&minus;name</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">the netlist in file specified
+by <b>&minus;f</b> option to run; default is first one</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+static command:</b></p>
+
+<p style="margin-left:22%;">These options apply to static
+command.</p>
+
+<p style="margin-left:11%;"><b>&minus;d</b>,
+<b>&minus;&minus;dir</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">output directory for the
+generated files.</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">single output file for the
+generated code. Either <b>&minus;&minus;dir</b> or
+<b>&minus;&minus;output</b> can be specificied</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;static_include</b></p>
+
+<p style="margin-left:22%;">write static solvers to
+individual files included by file specified with
+<b>&minus;&minus;output</b>. <b>&minus;&minus;dir</b> must
+be path to &quot;generated/static&quot; path in netlist
+folder.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+run command:</b></p>
+
+<p style="margin-left:22%;">These options are only used by
+the run command.</p>
+
+<p style="margin-left:11%;"><b>&minus;t</b>,
+<b>&minus;&minus;time_to_run</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">time to run the emulation
+(seconds)</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;boost_lib</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">generic: will use generic
+solvers. builtin: Use optimized solvers compiled in.
+somelib.so: Use library with precompiled solvers.</p>
+
+<p style="margin-left:11%;"><b>&minus;s</b>,
+<b>&minus;&minus;statistics</b></p>
+
+<p style="margin-left:22%;">gather runtime statistics</p>
+
+<p style="margin-left:11%;"><b>&minus;l</b>,
+<b>&minus;&minus;log</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">define terminal to log. This
+option may be specified repeatedly.</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b>,
+<b>&minus;&minus;input</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">input file to process (default
+is none)</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;loadstate</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">load state from file and
+continue from there</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;savestate</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">save state to file at end of
+run</p>
+
+<p style="margin-left:11%;"><b>&minus;&minus;fperr</b></p>
+
+<p style="margin-left:22%;">raise exception on floating
+point errors. This is intended to be used during
+debugging.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+convert command:</b></p>
+
+<p style="margin-left:22%;">These options are only used by
+the convert command.</p>
+
+<p style="margin-left:11%;"><b>&minus;y</b>,
+<b>&minus;&minus;type</b>=<i>spice</i>|eagle|rinf</p>
+
+<p style="margin-left:22%;">type of file to be converted:
+spice,eagle,rinf</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+validate command:</b></p>
+
+<p style="margin-left:22%;">These options are only used by
+the validate command.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>Options for
+header command:</b></p>
+
+<p style="margin-left:22%;">These options are only used by
+the header command.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;tab&minus;width</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">Tab width for output.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;line&minus;width</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">Line width for output.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;pattern</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">Pattern to match against device
+names. If the device name contains pattern, the device will
+be included in the output. Multiple patterns can be
+specified, if none is given, all devices will be output.</p>
+
+<h2>EXAMPLES
+<a name="EXAMPLES"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">nltool &minus;c
+run &minus;t 3.5 &minus;n cap_delay nl_examples/cdelay.c</p>
+
+<p style="margin-left:22%; margin-top: 1em">Run netlist
+&quot;cap_delay&quot; from file nl_examples/cdelay.c for 3.5
+seconds</p>
+
+<p style="margin-left:11%; margin-top: 1em">nltool
+&minus;&minus;cmd=listdevices</p>
+
+<p style="margin-left:22%; margin-top: 1em">List all known
+devices.</p>
+
+<p style="margin-left:11%; margin-top: 1em">nltool
+&minus;&minus;cmd=header &minus;&minus;tab&minus;width=8
+&minus;&minus;line&minus;width=80</p>
+
+<p style="margin-left:22%; margin-top: 1em">Create the
+header file needed for including netlists as code.</p>
+
+<p style="margin-left:11%; margin-top: 1em">nltool
+&minus;&minus;cmd static &minus;&minus;output</p>
+
+
+<p style="margin-left:22%; margin-top: 1em">src/lib/netlist/generated/static_solvers.cpp
+src/mame/audio/nl_*.cpp src/mame/machine/nl_*.cpp</p>
+
+<p style="margin-left:22%; margin-top: 1em">Create static
+solvers for the MAME project using one single source
+file.</p>
+
+<p style="margin-left:11%; margin-top: 1em">nltool
+&minus;&minus;cmd static &minus;&minus;output</p>
+
+
+<p style="margin-left:22%; margin-top: 1em">src/lib/netlist/generated/static_solvers.cpp
+&minus;&minus;dir src/lib/netlist/generated/static
+&minus;&minus;static_include src/mame/audio/nl_*.cpp
+src/mame/machine/nl_*.cpp</p>
+
+<p style="margin-left:22%; margin-top: 1em">Create static
+solvers for the MAME project using a single source file
+which includes generated solvers written to
+&minus;&minus;dir folder.</p>
+
+<p style="margin-left:11%; margin-top: 1em">nltool
+&minus;&minus;cmd tests</p>
+
+<p style="margin-left:22%; margin-top: 1em">Run unit tests.
+In case the unit tests are not linked in, this will do
+nothing.</p>
+
+<h2>AUTHOR
+<a name="AUTHOR"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Written by
+Couriersud.</p>
+
+<h2>COPYRIGHT
+<a name="COPYRIGHT"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Copyright
+&copy; 2021 Couriersud License BSD&minus;3&minus;Clause <br>
+This is free software: you are free to change and
+redistribute it. There is NO WARRANTY, to the extent
+permitted by law.</p>
+
+<h2>SEE ALSO
+<a name="SEE ALSO"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">More
+documentation for the <b>nltool</b> program is available in
+doxygen format.</p>
+<hr>
+</body>
+</html>

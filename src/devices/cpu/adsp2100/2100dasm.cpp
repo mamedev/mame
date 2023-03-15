@@ -278,10 +278,13 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			if (op & 1)
 			{
 				util::stream_format(stream, "%s", "CALL ");
-				dasmflags = STEP_OVER;
+				dasmflags = STEP_OVER | STEP_COND;
 			}
 			else
+			{
 				util::stream_format(stream, "%s", "JUMP ");
+				dasmflags = STEP_COND;
+			}
 			temp = ((op >> 4) & 0x0fff) | ((op << 10) & 0x3000);
 			util::stream_format(stream, "$%04X", temp);
 			break;
@@ -347,6 +350,8 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 				else
 					util::stream_format(stream, "%s", "RTS");
 				dasmflags = STEP_OUT;
+				if ((op & 15) != 15)
+					dasmflags |= STEP_COND;
 			}
 			else
 				util::stream_format(stream, "??? (%06X)", op);
@@ -363,6 +368,8 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 				}
 				else
 					util::stream_format(stream, "JUMP (I%d)", 4 + ((op >> 6) & 3));
+				if ((op & 15) != 15)
+					dasmflags |= STEP_COND;
 			}
 			else
 				util::stream_format(stream, "??? (%06X)", op);
@@ -441,6 +448,8 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			}
 			else
 				util::stream_format(stream, "%sJUMP $%04X", condition[op & 15], (op >> 4) & 0x3fff);
+			if ((op & 15) != 15)
+				dasmflags |= STEP_COND;
 			break;
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 			/* 00100xxx xxxxxxxx xxxxxxxx  conditional ALU/MAC */

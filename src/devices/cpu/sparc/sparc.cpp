@@ -16,6 +16,7 @@
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
+//      - Finish SPARClite peripherals
 //
 //================================================================
 
@@ -23,19 +24,62 @@
 #include "sparc.h"
 #include "sparcdefs.h"
 
-#include "debugger.h"
-
 #include "softfloat3/source/include/softfloat.h"
+
+#define LOG_BIU_CTRL            (1U << 1)
+#define LOG_LOCK_CTRL           (1U << 2)
+#define LOG_LOCK_CTRL_SAVE      (1U << 3)
+#define LOG_CACHE_STATUS        (1U << 4)
+#define LOG_RESTORE_LOCK_CTRL   (1U << 5)
+#define LOG_SYSTEM_CTRL         (1U << 6)
+#define LOG_SAME_PAGE_MASK      (1U << 7)
+#define LOG_ADDR_RANGE          (1U << 8)
+#define LOG_ADDR_MASK           (1U << 9)
+#define LOG_WAIT_STATE          (1U << 10)
+#define LOG_TIMER               (1U << 11)
+#define LOG_TIMER_PRELOAD       (1U << 12)
+#define LOG_UNMAPPED            (1U << 13)
+#define LOG_ICACHE_LOCK         (1U << 14)
+#define LOG_ICACHE_TAG          (1U << 15)
+#define LOG_ICACHE_DATA         (1U << 16)
+#define LOG_DCACHE_LOCK         (1U << 17)
+#define LOG_DCACHE_TAG          (1U << 18)
+#define LOG_DCACHE_DATA         (1U << 19)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SPARCV7, sparcv7_device, "sparcv7", "Sun SPARC v7")
 DEFINE_DEVICE_TYPE(SPARCV8, sparcv8_device, "sparcv8", "Sun SPARC v8")
-
-const int sparc_base_device::NWINDOWS = 7;
+DEFINE_DEVICE_TYPE(MB86930, mb86930_device, "mb86930", "Fujitsu MB86930 'SPARClite'")
 
 #if LOG_FCODES
 #include "ss1fcode.ipp"
 #endif
 
+namespace
+{
+const sparc_disassembler::asi_desc_map::value_type mb86930_asi_desc[] =
+{
+	{ 0x01, { nullptr, "Control Registers"          } },
+	{ 0x02, { nullptr, "Instruction Cache Lock"     } },
+	{ 0x03, { nullptr, "Data Cache Lock"            } },
+	{ 0x08, { nullptr, "User Instruction"           } },
+	{ 0x09, { nullptr, "Supervisor Instruction"     } },
+	{ 0x0a, { nullptr, "User Data"                  } },
+	{ 0x0b, { nullptr, "Supervisor Data"            } },
+	{ 0x0c, { nullptr, "Instruction Cache Tag RAM"  } },
+	{ 0x0d, { nullptr, "Instruction Cache Data RAM" } },
+	{ 0x0e, { nullptr, "Data Cache Tag RAM"         } },
+	{ 0x0f, { nullptr, "Data Cache Data RAM"        } }
+};
+} // anonymous namespace
+
+const char *const sparc_base_device::DEFAULT_ASI_NAMES[16] =
+{
+	"asi0",  "asi1",  "asi2",  "asi3",  "asi4",  "asi5",  "asi6",  "asi7",
+	"asi8",  "asi9",  "asi10", "asi11", "asi12", "asi13", "asi14", "asi15"
+};
 
 //-------------------------------------------------
 //  sparc_base_device - constructor
@@ -45,22 +89,29 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
-	char asi_buf[10];
 	m_debugger_config = address_space_config("debug", ENDIANNESS_BIG, 32, 32);
-	for (int i = 0; i < 0x10; i++)
+
+	if (type != MB86930)
 	{
-		snprintf(asi_buf, std::size(asi_buf), "asi%X", i);
-		m_asi_config[i] = address_space_config(asi_buf, ENDIANNESS_BIG, 32, 32);
+		for (int i = 0; i < 0x10; i++)
+		{
+			m_asi_config[i] = address_space_config(DEFAULT_ASI_NAMES[i], ENDIANNESS_BIG, 32, 32);
+		}
 	}
 }
 
 
 //-------------------------------------------------
-//  sparcv7_device - constructor
+//  sparcv7_device - constructors
 //-------------------------------------------------
 
 sparcv7_device::sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sparc_base_device(mconfig, SPARCV7, tag, owner, clock)
+	: sparcv7_device(mconfig, SPARCV7, tag, owner, clock)
+{
+}
+
+sparcv7_device::sparcv7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sparc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -70,8 +121,44 @@ sparcv7_device::sparcv7_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sparcv8_device::sparcv8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sparc_base_device(mconfig, SPARCV8, tag, owner, clock)
+	: sparcv8_device(mconfig, SPARCV8, tag, owner, clock)
 {
+}
+
+
+sparcv8_device::sparcv8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sparc_base_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  mb86930_device - constructor
+//-------------------------------------------------
+
+mb86930_device::mb86930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sparcv8_device(mconfig, MB86930, tag, owner, clock)
+	, m_cs_r(*this)
+	, m_cs_w(*this)
+{
+	m_asi_config[0x00] = address_space_config("debugger",       ENDIANNESS_BIG, 32, 32);
+	m_asi_config[0x01] = address_space_config("system_control", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::control_map), this));
+	m_asi_config[0x02] = address_space_config("icache_lock",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_lock_map), this));
+	m_asi_config[0x03] = address_space_config("dcache_lock",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_lock_map), this));
+	m_asi_config[0x04] = address_space_config("asi4",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<4>), this));
+	m_asi_config[0x05] = address_space_config("asi5",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<5>), this));
+	m_asi_config[0x06] = address_space_config("asi6",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<6>), this));
+	m_asi_config[0x07] = address_space_config("asi7",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<7>), this));
+	m_asi_config[0x08] = address_space_config("user_insn",      ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<8>), this));
+	m_asi_config[0x09] = address_space_config("super_insn",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<9>), this));
+	m_asi_config[0x0a] = address_space_config("user_data",      ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<10>), this));
+	m_asi_config[0x0b] = address_space_config("super_data",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<11>), this));
+	m_asi_config[0x0c] = address_space_config("icache_tag",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_tag_map), this));
+	m_asi_config[0x0d] = address_space_config("icache_data",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_data_map), this));
+	m_asi_config[0x0e] = address_space_config("dcache_tag",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_tag_map), this));
+	m_asi_config[0x0f] = address_space_config("dcache_data",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_data_map), this));
+
+	add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(mb86930_asi_desc); });
 }
 
 
@@ -159,6 +246,11 @@ void sparc_base_device::device_start()
 	m_log_fcodes = false;
 #endif
 
+	NWINDOWS = 7;
+	PSR = 0;
+	m_ver = 0;
+	m_impl = 0;
+
 	m_bp_reset_in = false;
 	m_bp_fpu_present = true;
 	m_bp_cp_present = false;
@@ -177,13 +269,13 @@ void sparc_base_device::device_start()
 		space(i).specific(m_asi[i]);
 	}
 
-	memset(m_dbgregs, 0, 24 * sizeof(uint32_t));
+	std::fill_n(m_dbgregs, std::size(m_dbgregs), 0);
 
-	memset(m_illegal_instruction_asr, 0, 32 * sizeof(bool));
-	memset(m_privileged_asr, 1, 32 * sizeof(bool));
+	std::fill_n(m_illegal_instruction_asr, std::size(m_illegal_instruction_asr), false);
+	std::fill_n(m_privileged_asr, std::size(m_privileged_asr), true);
 	m_privileged_asr[0] = false;
 
-	memset(m_alu_setcc, 0, 64 * sizeof(bool));
+	std::fill_n(m_alu_setcc, std::size(m_alu_setcc), false);
 	m_alu_setcc[OP3_ADDCC] = true;
 	m_alu_setcc[OP3_ANDCC] = true;
 	m_alu_setcc[OP3_ORCC] = true;
@@ -200,7 +292,7 @@ void sparc_base_device::device_start()
 	m_alu_setcc[OP3_TSUBCCTV] = true;
 	m_alu_setcc[OP3_MULSCC] = true;
 
-	memset(m_alu_op3_assigned, 0, 64 * sizeof(bool));
+	std::fill_n(m_alu_op3_assigned, std::size(m_alu_op3_assigned), false);
 	m_alu_op3_assigned[OP3_ADD] = true;
 	m_alu_op3_assigned[OP3_AND] = true;
 	m_alu_op3_assigned[OP3_OR] = true;
@@ -248,7 +340,7 @@ void sparc_base_device::device_start()
 	m_alu_op3_assigned[OP3_SAVE] = true;
 	m_alu_op3_assigned[OP3_RESTORE] = true;
 
-	memset(m_ldst_op3_assigned, 0, 64 * sizeof(bool));
+	std::fill_n(m_ldst_op3_assigned, std::size(m_ldst_op3_assigned), false);
 	m_ldst_op3_assigned[OP3_LD] = true;
 	m_ldst_op3_assigned[OP3_LDUB] = true;
 	m_ldst_op3_assigned[OP3_LDUH] = true;
@@ -316,7 +408,7 @@ void sparc_base_device::device_start()
 	for (int i = 0; i < 32; i++)
 		state_add(SPARC_F0 + i, util::string_format("f%d", i).c_str(), m_fpr[i]);
 
-	for (int i = 0; i < 120; i++)
+	for (int i = 0; i < 136; i++)
 		state_add(SPARC_R0 + i, util::string_format("r%d", i).c_str(), m_r[i]).formatstr("%08X");
 
 	save_item(NAME(m_r));
@@ -376,13 +468,12 @@ void sparc_base_device::device_start()
 	save_item(NAME(m_alu_op3_assigned));
 	save_item(NAME(m_ldst_op3_assigned));
 	save_item(NAME(m_alu_setcc));
+	save_item(NAME(m_nwindows));
 	save_item(NAME(m_privileged_asr));
 	save_item(NAME(m_illegal_instruction_asr));
 	save_item(NAME(m_mae));
 	save_item(NAME(m_no_annul));
 	save_item(NAME(m_hold_bus));
-	save_item(NAME(m_icount));
-	save_item(NAME(m_stashed_icount));
 	save_item(NAME(m_insn_space));
 	save_item(NAME(m_data_space));
 
@@ -402,40 +493,41 @@ void sparc_base_device::device_start()
 
 void sparc_base_device::device_resolve_objects()
 {
-	m_mmu->set_host(this);
+	if (m_mmu.found())
+		m_mmu->set_host(this);
 }
 
 void sparc_base_device::device_reset()
 {
-	m_trap = 0;
+	m_trap = false;
 	m_tt = 0;
 	m_ticc_trap_type = 0;
-	m_privileged_instruction = 0;
-	m_illegal_instruction = 0;
-	m_mem_address_not_aligned = 0;
-	m_fp_disabled = 0;
-	m_fp_exception = 0;
-	m_fp_exception_pending = 0;
+	m_interrupt_level = 0;
+	m_privileged_instruction = false;
+	m_illegal_instruction = false;
+	m_mem_address_not_aligned = false;
+	m_fp_disabled = false;
+	m_cp_disabled = false;
+	m_fp_exception = false;
+	m_fp_exception_pending = false;
 	m_fpr_pending = 0;
 	m_pending_fpr = std::size(m_fpr);
+	m_cp_exception = false;
+	m_instruction_access_exception = false;
+	m_data_access_exception = false;
+	m_trap_instruction = false;
+	m_window_underflow = false;
+	m_window_overflow = false;
+	m_tag_overflow = false;
+	m_reset_mode = true;
+	m_reset_trap = false;
+	m_execute_mode = false;
+	m_error_mode = false;
 	m_fpu_sequence_err = 0;
-	m_cp_disabled = 0;
-	m_cp_exception = 0;
 	m_cp_sequence_err = 0;
-	m_instruction_access_exception = 0;
-	m_trap_instruction = 0;
-	m_window_underflow = 0;
-	m_window_overflow = 0;
-	m_tag_overflow = 0;
-	m_reset_mode = 1;
-	m_reset_trap = 0;
-	m_execute_mode = 0;
-	m_error_mode = 0;
 
 	m_bp_irl = 0;
 	m_irq_state = 0;
-
-	m_stashed_icount = -1;
 
 	MAE = false;
 	HOLD_BUS = false;
@@ -443,16 +535,23 @@ void sparc_base_device::device_reset()
 
 	PC = 0;
 	nPC = 4;
-	memset(m_r, 0, sizeof(uint32_t) * 120);
-	memset(m_fpr, 0, sizeof(uint32_t) * 32);
+	std::fill_n(m_r, std::size(m_r), 0);
+	std::fill_n(m_fpr, std::size(m_fpr), 0);
 
 	WIM = 0;
 	TBR = 0;
 	Y = 0;
 
-	PSR = PSR_S_MASK | PSR_PS_MASK;
+	PSR = (PSR & PSR_ZERO_MASK) | (PSR_S_MASK | PSR_PS_MASK);
 	m_s = true;
+	m_ps = true;
 	m_data_space = 11;
+	m_pil = 0;
+	m_et = false;
+	m_icc = 0;
+	m_ec = false;
+	m_ef = false;
+	m_cwp = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -517,6 +616,450 @@ void sparcv8_device::device_reset()
 	m_division_by_zero = 0;
 }
 
+
+//-------------------------------------------------
+//  mb86930_device - initializers
+//-------------------------------------------------
+
+void mb86930_device::device_start()
+{
+	sparcv8_device::device_start();
+
+	NWINDOWS = 8;
+	PSR |= 2 << PSR_VER_SHIFT;
+	m_ver = 2;
+
+	m_bp_cp_present = false;
+	m_bp_fpu_present = false;
+
+	m_alu_setcc[OP3_DIVSCC] = true;
+
+	m_alu_op3_assigned[OP3_DIVSCC] = true;
+	m_alu_op3_assigned[OP3_SCAN] = true;
+
+	save_item(NAME(m_ssctrl));
+	save_item(NAME(m_spmr));
+	save_item(NAME(m_spmr_mask));
+	save_item(NAME(m_arsr));
+	save_item(NAME(m_amr));
+	save_item(NAME(m_wssr));
+	save_item(NAME(m_last_masked_addr));
+
+	std::fill_n(&m_arsr[0], 6, 0);
+	std::fill_n(&m_amr[0], 6, 0);
+
+	m_cs_r.resolve_all_safe(0);
+	m_cs_w.resolve_all_safe();
+}
+
+void mb86930_device::device_reset()
+{
+	sparcv8_device::device_reset();
+
+	m_ssctrl = 0x08;
+	m_spmr = 0;
+	m_spmr_mask = ~0ULL;
+	m_last_masked_addr = 0ULL;
+
+	std::fill_n(&m_wssr[0], 3, 0);
+	m_wssr[0] = 0x1ffd << 6;
+
+	m_arsr[0] = (9 << 23);
+	m_amr[0] = (0x1f << 1);
+
+	update_addr_masks();
+	update_wait_states();
+}
+
+
+//-------------------------------------------------
+//  mb86930_device - internal maps
+//-------------------------------------------------
+
+void mb86930_device::control_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(FUNC(mb86930_device::biu_ctrl_r), FUNC(mb86930_device::biu_ctrl_w));
+	map(0x00000004, 0x00000007).rw(FUNC(mb86930_device::lock_ctrl_r), FUNC(mb86930_device::lock_ctrl_w));
+	map(0x00000008, 0x0000000b).rw(FUNC(mb86930_device::lock_ctrl_save_r), FUNC(mb86930_device::lock_ctrl_save_w));
+	map(0x0000000c, 0x0000000f).rw(FUNC(mb86930_device::cache_status_r), FUNC(mb86930_device::cache_status_w));
+	map(0x00000010, 0x00000013).rw(FUNC(mb86930_device::restore_lock_ctrl_r), FUNC(mb86930_device::restore_lock_ctrl_w));
+	map(0x00000080, 0x00000083).rw(FUNC(mb86930_device::system_support_ctrl_r), FUNC(mb86930_device::system_support_ctrl_w));
+	map(0x00000120, 0x00000123).rw(FUNC(mb86930_device::same_page_mask_r), FUNC(mb86930_device::same_page_mask_w));
+	map(0x00000124, 0x00000137).rw(FUNC(mb86930_device::addr_range_spec_r), FUNC(mb86930_device::addr_range_spec_w));
+	map(0x00000140, 0x00000157).rw(FUNC(mb86930_device::addr_mask_r), FUNC(mb86930_device::addr_mask_w));
+	map(0x00000160, 0x0000016b).rw(FUNC(mb86930_device::wait_specifier_r), FUNC(mb86930_device::wait_specifier_w));
+	map(0x00000174, 0x00000177).rw(FUNC(mb86930_device::timer_r), FUNC(mb86930_device::timer_w));
+	map(0x00000178, 0x0000017b).rw(FUNC(mb86930_device::timer_preload_r), FUNC(mb86930_device::timer_preload_w));
+}
+
+void mb86930_device::icache_lock_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::icache_lock_r), FUNC(mb86930_device::icache_lock_w));
+}
+
+void mb86930_device::dcache_lock_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::dcache_lock_r), FUNC(mb86930_device::dcache_lock_w));
+}
+
+void mb86930_device::icache_tag_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::icache_tag_r), FUNC(mb86930_device::icache_tag_w));
+}
+
+void mb86930_device::icache_data_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::icache_data_r), FUNC(mb86930_device::icache_data_w));
+}
+
+void mb86930_device::dcache_tag_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::dcache_tag_r), FUNC(mb86930_device::dcache_tag_w));
+}
+
+void mb86930_device::dcache_data_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::dcache_data_r), FUNC(mb86930_device::dcache_data_w));
+}
+
+
+//-------------------------------------------------
+//  mb86930_device - cache control (TODO)
+//-------------------------------------------------
+
+uint32_t mb86930_device::icache_lock_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_ICACHE_LOCK, "%s: icache_lock_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::icache_lock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_ICACHE_LOCK, "%s: icache_lock_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::dcache_lock_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_DCACHE_LOCK, "%s: dcache_lock_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::dcache_lock_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_DCACHE_LOCK, "%s: dcache_lock_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::icache_tag_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_ICACHE_TAG, "%s: icache_tag_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::icache_tag_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_ICACHE_TAG, "%s: icache_tag_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::icache_data_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_ICACHE_DATA, "%s: icache_data_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::icache_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_ICACHE_DATA, "%s: icache_data_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::dcache_tag_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_DCACHE_TAG, "%s: dcache_tag_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::dcache_tag_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_DCACHE_TAG, "%s: dcache_tag_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::dcache_data_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_DCACHE_DATA, "%s: dcache_data_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::dcache_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_DCACHE_DATA, "%s: dcache_data_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  mb86930_device - MMU map and handlers
+//-------------------------------------------------
+
+template <uint8_t Asi>
+void mb86930_device::mmu_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(mb86930_device::mmu_r<Asi>), FUNC(mb86930_device::mmu_w<Asi>));
+}
+
+template <uint8_t Asi>
+uint32_t mb86930_device::mmu_r(offs_t offset, uint32_t mem_mask)
+{
+	const uint64_t full_addr = ((uint64_t)Asi << 30) | offset;
+
+	const uint64_t masked_addr = full_addr & m_spmr_mask;
+	const bool is_same_page = (masked_addr == m_last_masked_addr);
+	m_last_masked_addr = masked_addr;
+
+	for (int cs = 0; cs < 6; cs++)
+	{
+		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
+		{
+			m_icount -= is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs];
+			return m_cs_r[cs](offset, mem_mask);
+		}
+	}
+	LOGMASKED(LOG_UNMAPPED, "%s: mmu_r, unmapped access: ASI %d, address %08x & %08x\n", machine().describe_context(), Asi, offset << 2, mem_mask);
+	return 0;
+}
+
+template <uint8_t Asi> void mb86930_device::mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	const uint64_t full_addr = ((uint64_t)Asi << 30) | offset;
+
+	const uint64_t masked_addr = full_addr & m_spmr_mask;
+	const bool is_same_page = (masked_addr == m_last_masked_addr);
+	m_last_masked_addr = masked_addr;
+
+	for (int cs = 0; cs < 6; cs++)
+	{
+		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
+		{
+			m_icount -= is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs];
+			m_cs_w[cs](offset, data, mem_mask);
+			return;
+		}
+	}
+	LOGMASKED(LOG_UNMAPPED, "%s: mmu_w, unmapped access: ASI %d, address %08x = %08x & %08x\n", machine().describe_context(), Asi, offset << 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  mb86930_device - system control handlers
+//-------------------------------------------------
+
+void mb86930_device::update_addr_masks()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		m_full_masks[i] = ~(((uint64_t)m_amr[i] << 7) | 0xff);
+		m_full_ranges[i] = ((uint64_t)m_arsr[i] << 7) & m_full_masks[i];
+	}
+}
+
+void mb86930_device::update_wait_states()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		const uint8_t shift = (i & 1) ? 19 : 6;
+		const bool enable = bool(BIT(m_wssr[i >> 1], shift + 2));
+		const bool single = bool(BIT(m_wssr[i >> 1], shift + 1));
+		//const bool override = bool(BIT(m_wssr[i >> 1], shift + 0));
+
+		if (BIT(m_ssctrl, 3) && !single && enable)
+		{
+			const uint8_t count1 = ((m_wssr[i >> 1] >> (shift + 8)) & 0x1f) + 1;
+			const uint8_t count2 = ((m_wssr[i >> 1] >> (shift + 3)) & 0x1f) + 1;
+			m_other_page_waits[i] = count1;
+			m_same_page_waits[i] = BIT(m_ssctrl, 5) ? count2 : count1;
+		}
+		else
+		{
+			m_other_page_waits[i] = 0;
+			m_same_page_waits[i] = 0;
+		}
+	}
+}
+
+uint32_t mb86930_device::biu_ctrl_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_BIU_CTRL, "%s: biu_ctrl_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_BIU_CTRL, "%s: biu_ctrl_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::lock_ctrl_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_LOCK_CTRL, "%s: lock_ctrl_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::lock_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_LOCK_CTRL, "%s: lock_ctrl_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::lock_ctrl_save_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_LOCK_CTRL_SAVE, "%s: lock_ctrl_save_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::lock_ctrl_save_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_LOCK_CTRL_SAVE, "%s: lock_ctrl_save_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::cache_status_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_CACHE_STATUS, "%s: cache_status_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::cache_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_CACHE_STATUS, "%s: cache_status_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::restore_lock_ctrl_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_RESTORE_LOCK_CTRL, "%s: restore_lock_ctrl_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::restore_lock_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_RESTORE_LOCK_CTRL, "%s: restore_lock_ctrl_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::system_support_ctrl_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = m_ssctrl;
+	LOGMASKED(LOG_SYSTEM_CTRL, "%s: system_ctrl_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::system_support_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_SYSTEM_CTRL, "%s: system_ctrl_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_ssctrl);
+	update_wait_states();
+}
+
+
+uint32_t mb86930_device::same_page_mask_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = m_spmr;
+	LOGMASKED(LOG_SAME_PAGE_MASK, "%s: same_page_mask_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::same_page_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_SAME_PAGE_MASK, "%s: same_page_mask_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_spmr);
+	m_spmr_mask = ~(((uint64_t)m_spmr << 7) | 0xff);
+}
+
+
+uint32_t mb86930_device::addr_range_spec_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = m_arsr[offset + 1];
+	LOGMASKED(LOG_ADDR_RANGE, "%s: addr_range_spec_r[%d]: %08x & %08x\n", machine().describe_context(), offset + 1, data, mem_mask);
+	return data;
+}
+
+void mb86930_device::addr_range_spec_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_ADDR_RANGE, "%s: addr_range_spec_w[%d]: %08x & %08x\n", machine().describe_context(), offset + 1, data, mem_mask);
+	COMBINE_DATA(&m_arsr[offset + 1]);
+	update_addr_masks();
+}
+
+
+uint32_t mb86930_device::addr_mask_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = m_amr[offset];
+	LOGMASKED(LOG_ADDR_MASK, "%s: addr_mask_r[%d]: %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
+	return data;
+}
+
+void mb86930_device::addr_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_ADDR_MASK, "%s: addr_mask_w[%d]: %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
+	COMBINE_DATA(&m_amr[offset]);
+	update_addr_masks();
+}
+
+
+uint32_t mb86930_device::wait_specifier_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = m_wssr[offset];
+	LOGMASKED(LOG_WAIT_STATE, "%s: wait_state_r[%d]: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::wait_specifier_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_WAIT_STATE, "%s: wait_state_w[%d]: %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
+	COMBINE_DATA(&m_wssr[offset]);
+	update_wait_states();
+}
+
+
+uint32_t mb86930_device::timer_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_TIMER, "%s: timer_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::timer_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_TIMER, "%s: timer_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
+uint32_t mb86930_device::timer_preload_r(offs_t offset, uint32_t mem_mask)
+{
+	uint32_t data = 0;
+	LOGMASKED(LOG_TIMER_PRELOAD, "%s: timer_preload_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+void mb86930_device::timer_preload_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	LOGMASKED(LOG_TIMER_PRELOAD, "%s: timer_preload_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+}
+
+
 //-------------------------------------------------
 //  device_post_load - update register pointers
 //  after loading a savestate
@@ -525,6 +1068,13 @@ void sparcv8_device::device_reset()
 void sparc_base_device::device_post_load()
 {
 	update_gpr_pointers();
+}
+
+void mb86930_device::device_post_load()
+{
+	sparcv8_device::device_post_load();
+	update_addr_masks();
+	update_wait_states();
 }
 
 
@@ -615,11 +1165,27 @@ void sparc_base_device::state_string_export(const device_state_entry &entry, std
 
 std::unique_ptr<util::disasm_interface> sparc_base_device::create_disassembler()
 {
-	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), 7);
-	m_asi_desc_adder(dasm.get());
+	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::v7);
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
 	return std::move(dasm);
 }
 
+std::unique_ptr<util::disasm_interface> sparcv8_device::create_disassembler()
+{
+	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::v8);
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
+	return std::move(dasm);
+}
+
+std::unique_ptr<util::disasm_interface> mb86930_device::create_disassembler()
+{
+	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), sparc_disassembler::sparclite);
+	if (m_asi_desc_adder)
+		m_asi_desc_adder(dasm.get());
+	return std::move(dasm);
+}
 
 //**************************************************************************
 //  CORE EXECUTION LOOP
@@ -722,28 +1288,8 @@ void sparc_base_device::execute_set_input(int inputnum, int state)
 
 void sparc_base_device::execute_add(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Add Instructions" (SPARCv8.pdf, pg. 170)
+	// The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Add Instructions" (SPARCv8.pdf, pg. 170)
 
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	if (ADD or ADDcc) then
-	    result <- r[rs1] + operand2;
-	else if (ADDX or ADDXcc) then
-	    result <= r[rs1] + operand2 + C;
-	next;
-
-	if (rd != 0) then
-	    r[rd] <- result;
-
-	if (ADDcc or ADDXcc) then (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- (r[rs1]<31> and operand2<31> and (not result<31>)) or
-	        ((not r[rs1]<31>) and (not operand2<31>) and result<31>);
-	    C <- (r[rs1]<31> and operand2<31>) or
-	        ((not result<31>) and (r[rs1]<31> or operand2<31>))
-	);
-	*/
 	uint32_t rs1 = RS1REG;
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
@@ -779,31 +1325,8 @@ void sparc_base_device::execute_add(uint32_t op)
 
 void sparc_base_device::execute_taddcc(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Tagged Add Instructions" (SPARCv8.pdf, pg. 170)
+	// The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Tagged Add Instructions" (SPARCv8.pdf, pg. 170)
 
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	result <- r[rs1] + operand2;
-	next;
-
-	temp_V <- (r[rs1]<31> and operand2<31> and (not result<31>)) or
-	          ((not r[rs1]<31>) and (not operand2<31>) and result<31>) or
-	          (r[rs1]<1:0> != 0 or operand2<1:0> != 0);
-	next;
-
-	if (TADDccTV and (temp_V = 1)) then (
-	    trap <- 1;
-	    tag_overflow <- 1
-	) else (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- temp_V;
-	    C <- (r[rs1]<31> and operand2<31>) or
-	         ((not result<31>) and (r[rs1]<31> or operand2<31>));
-	    if (rd != 0) then
-	        r[rd] <- result;
-	);
-	*/
 	uint32_t rs1 = RS1REG;
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
@@ -817,8 +1340,6 @@ void sparc_base_device::execute_taddcc(uint32_t op)
 	{
 		m_trap = 1;
 		m_tag_overflow = true;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -844,28 +1365,8 @@ void sparc_base_device::execute_taddcc(uint32_t op)
 
 void sparc_base_device::execute_sub(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Subtract Instructions" (SPARCv8.pdf, pg. 171)
+	// The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	if (SUB or SUBcc) then
-	    result <- r[rs1] - operand2;
-	else if (SUBX or SUBXcc) then
-	    result <= r[rs1] - operand2 - C;
-	next;
-
-	if (rd != 0) then
-	    r[rd] <- result;
-
-	if (SUBcc or SUBXcc) then (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- (r[rs1]<31> and (not operand2<31>) and (not result<31>)) or
-	         ((not r[rs1]<31>) and operand2<31> and result<31>);
-	    C <- ((not r[rs1]<31>) and operand2<31>) or
-	         (result<31> and ((not r[rs1]<31>) or operand2<31>))
-	);
-	*/
 	uint32_t rs1 = RS1REG;
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
@@ -901,31 +1402,7 @@ void sparc_base_device::execute_sub(uint32_t op)
 
 void sparc_base_device::execute_tsubcc(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Tagged Subtract Instructions" (SPARCv8.pdf, pg. 171)
-
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	result <- r[rs1] - operand2;
-	next;
-
-	temp_V <- (r[rs1]<31> and (not operand2<31>) and (not result<31>)) or
-	          ((not r[rs1]<31>) and operand2<31> and result<31>) or
-	          (r[rs1]<1:0> != 0 or operand2<1:0> != 0);
-	next;
-
-	if (TSUBccTV and (temp_V = 1)) then (
-	    trap <- 1;
-	    tag_overflow <- 1
-	) else (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- temp_V;
-	    C <- ((not r[rs1]<31>) and operand2<31>) or
-	         (result<31> and ((not r[rs1]<31>) or operand2<31>));
-	    if (rd != 0) then
-	        r[rd] <- result;
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Tagged Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
 	uint32_t rs1 = RS1REG;
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
@@ -940,8 +1417,6 @@ void sparc_base_device::execute_tsubcc(uint32_t op)
 	{
 		m_trap = 1;
 		m_tag_overflow = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -960,27 +1435,7 @@ void sparc_base_device::execute_tsubcc(uint32_t op)
 }
 
 
-/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
-
-operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-if ( AND or  ANDcc) then result <- r[rs1] and operand2
-if (ANDN or ANDNcc) then result <- r[rs1] and not operand2
-if (  OR or   ORcc) then result <- r[rs1] or operand2
-if ( ORN or  ORNcc) then result <- r[rs1] or not operand2
-if ( XOR or  XORcc) then result <- r[rs1] xor operand2
-if (XNOR or XNORcc) then result <- r[rs1] xor not operand2;
-next;
-
-if (rd != 0) then r[rd] <- result;
-
-if (ANDcccc or ANDNcc or ORcc or ORNcc or XORcc or XNORcc) then (
-    N <- result<31>;
-    Z <- if (result = 0) then 1 else 0;
-    V <- 0
-    C <- 0
-);
-*/
+// The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Logical Instructions" (SPARCv8.pdf, pg. 169)
 
 template <sparc_base_device::set_cc SETCC>
 void sparc_base_device::execute_and(const uint32_t op)
@@ -1097,17 +1552,8 @@ void sparc_base_device::execute_xnor(const uint32_t op)
 
 void sparc_base_device::execute_shift(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Shift Instructions" (SPARCv8.pdf, pg. 169)
+	// The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Shift Instructions" (SPARCv8.pdf, pg. 169)
 
-	shift_count := if (i = 0) then r[rs2]<4:0> else shcnt;
-
-	if (SLL and (rd != 0) ) then
-	    r[rd] <- shift_left_logical(r[rs1], shift_count)
-	else if (SRL and (rd != 0) ) then
-	    r[rd] <- shift_right_logical(r[rs1], shift_count)
-	else if (SRA and (rd != 0) ) then
-	    r[rd] <- shift_right_arithmetic(r[rs1], shift_count)
-	*/
 	uint32_t shift_count = USEIMM ? (SIMM13 & 31) : (RS2REG & 31);
 
 	if (RDBITS)
@@ -1131,29 +1577,8 @@ void sparc_base_device::execute_shift(uint32_t op)
 
 void sparc_base_device::execute_mulscc(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Step Instruction" (SPARCv8.pdf, pg. 172)
+	// The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Step Instruction" (SPARCv8.pdf, pg. 172)
 
-	operand1 := (N xor V) [] (r[rs1]<31:1>);
-
-	operand2 := (
-	    if (Y<0> = 0) then 0
-	    else if (i = 0) then r[rs2] else sign_extend(simm13)
-	);
-
-	result <- operand1 + operand2;
-	Y <- r[rs1]<0> [] Y<31:1>;
-	next;
-
-	if (rd != 0) then (
-	    r[rd] <- result;
-	)
-	N <- result<31>;
-	Z <- if (result = 0) then 1 else 0;
-	V <- (operand1<31> and operand2<31> and (not result<31>)) or
-	     ((not operand1<31>) and (not operand2<31>) and result<31>);
-	C <- (operand1<31> and operand2<31>) or
-	     ((not result<31>) and (operand1<31> or operand2<31>))
-	*/
 	uint32_t operand1 = ((ICC_N != ICC_V) ? 0x80000000 : 0) | (RS1REG >> 1);
 
 	uint32_t operand2 = (Y & 1) ? (USEIMM ? SIMM13 : RS2REG) : 0;
@@ -1184,38 +1609,26 @@ void sparc_base_device::execute_mulscc(uint32_t op)
 
 void sparc_base_device::execute_rdsr(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
+	// The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
-	if ((RDPSR or RDWIM or RDBTR
-	    or (RDASR and (privileged_ASR(rs1) = 1))) and (S = 0)) then (
-	    trap <- 1;
-	    privileged_instruction <- 1;
-	else if (illegal_instruction_ASR(rs1) = 1) then (
-	    trap <- 1;
-	    illegal_instruction <- 1
-	else if (rd != 0) then (
-	    if        (RDY) then r[rd] <- Y
-	    else if (RDASR) then r[rd] <- ASR[rs1]
-	    else if (RDPSR) then r[rd] <- PSR
-	    else if (RDWIM) then r[rd] <- WIM
-	    else if (RDTBR) then r[rd] <- TBR;
-	);
-	*/
+	if (RDASR && RS1 == 15 && RD == 0)
+	{
+		// Store Barrier instruction - not implemented, as stores are always consistent in the context of MAME
+		PC = nPC;
+		nPC = nPC + 4;
+		return;
+	}
 
-	if (((WRPSR || WRWIM || WRTBR) || (WRASR && m_privileged_asr[RS1])) && IS_USER)
+	if (((RDPSR || RDWIM || RDTBR) || (RDASR && m_privileged_asr[RS1])) && IS_USER)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (m_illegal_instruction_asr[RS1])
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -1250,49 +1663,8 @@ void sparc_base_device::execute_rdsr(uint32_t op)
 
 void sparc_base_device::execute_wrsr(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 183, "Appendix C - ISP Descriptions - Write State Register Instructions" (SPARCv8.pdf, pg. 180)
+	// The SPARC Instruction Manual: Version 8, page 183, "Appendix C - ISP Descriptions - Write State Register Instructions" (SPARCv8.pdf, pg. 180)
 
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-	result := r[rs1] xor operand2;
-
-	if (WRY) then (
-	    Y'''' <- result
-	) else if (WRASR) then (
-	    if ( (privileged_ASR(rd) = 1) and (S = 0) ) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else if (illegal_instruction_ASR(rd) = 1) then (
-	        trap <- 1;
-	        illegal_instruction <- 1
-	    ) else (
-	        ASR[rd]'''' <- result
-	    )
-	) else if (WRPSR) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else if (result<4:0> >= NWINDOWS) then (
-	        trap <- 1;
-	        illegal_instruction <- 1
-	    ) else (
-	        PSR'''' <- result
-	    )
-	) else if (WRWIM) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else (
-	        WIM'''' <- result
-	    )
-	) else if (WRBTR) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else (
-	        WIM'''' <- result
-	    )
-	);
-	*/
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
 
 	uint32_t result = RS1REG ^ operand2;
@@ -1309,16 +1681,12 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		else if (m_illegal_instruction_asr[RD])
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		else
@@ -1334,20 +1702,16 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		else if ((result & 31) >= NWINDOWS)
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 
-		PSR = result &~ PSR_ZERO_MASK;
+		PSR = (PSR & PSR_ZERO_MASK) | (result & ~PSR_ZERO_MASK);
 		update_gpr_pointers();
 
 		m_et = PSR & PSR_ET_MASK;
@@ -1362,6 +1726,12 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 			m_data_space = 10;
 		}
 
+		if (m_et && (m_bp_irl == 15 || m_bp_irl > m_pil) && m_interrupt_level == 0)
+		{
+			m_trap = 1;
+			m_interrupt_level = m_bp_irl;
+		}
+
 		PC = nPC;
 		nPC = nPC + 4;
 	}
@@ -1371,8 +1741,6 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 
@@ -1386,8 +1754,6 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 
@@ -1405,41 +1771,7 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 
 void sparc_base_device::execute_rett(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 181, "Appendix C - ISP Descriptions - Return from Trap Instructions" (SPARCv8.pdf, pg. 178)
-
-	new_cwp <- (CWP + 1) modulo NWINDOWS;
-	address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	next;
-	if (ET = 1) then (
-	    trap <- 1;
-	    if (S = 0) then privileged_instruction <- 1
-	    else if (S != 0) then illegal_instruction <- 1
-	) else if (S = 0) then (
-	    trap <- 1;
-	    privileged_instruction <- 1
-	    tt <- 00000011; { trap type for privileged_instruction }
-	    execute_mode <- 0;
-	    error_mode = 1
-	) else if ((WIM and (1 << new_cwp)) != 0) then (
-	    trap <- 1;
-	    window_underflow <- 1;
-	    tt <- 00000110; { trap type for window_underflow }
-	    execute_mode = 0;
-	    error_mode = 1
-	) else if (address<1:0> != 0) then (
-	    trap = 1;
-	    mem_address_not_aligned = 1;
-	    tt = 7; { trap type for mem_address_not_aligned }
-	    execute_mode = 0;
-	    error_mode = 1
-	) else (
-	    ET <- 1;
-	    PC <- nPC;
-	    nPC <- address;
-	    CWP <- new_cwp;
-	    S <- PS
-	)
-	*/
+	// The SPARC Instruction Manual: Version 8, page 181, "Appendix C - ISP Descriptions - Return from Trap Instructions" (SPARCv8.pdf, pg. 178)
 
 	uint8_t new_cwp = ((PSR & PSR_CWP_MASK) + 1) % NWINDOWS;
 	uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
@@ -1454,8 +1786,6 @@ void sparc_base_device::execute_rett(uint32_t op)
 		{
 			m_illegal_instruction = 1;
 		}
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (IS_USER)
@@ -1465,8 +1795,6 @@ void sparc_base_device::execute_rett(uint32_t op)
 		m_tt = 3;
 		m_execute_mode = 0;
 		m_error_mode = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if ((WIM & (1 << new_cwp)) != 0)
@@ -1476,8 +1804,6 @@ void sparc_base_device::execute_rett(uint32_t op)
 		m_tt = 6;
 		m_execute_mode = 0;
 		m_error_mode = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (address & 3)
@@ -1487,8 +1813,6 @@ void sparc_base_device::execute_rett(uint32_t op)
 		m_tt = 7;
 		m_execute_mode = 0;
 		m_error_mode = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -1514,6 +1838,12 @@ void sparc_base_device::execute_rett(uint32_t op)
 	}
 
 	update_gpr_pointers();
+
+	if (m_et && (m_bp_irl == 15 || m_bp_irl > m_pil) && m_interrupt_level == 0)
+	{
+		m_trap = 1;
+		m_interrupt_level = m_bp_irl;
+	}
 }
 
 
@@ -1525,35 +1855,7 @@ void sparc_base_device::execute_rett(uint32_t op)
 
 void sparc_base_device::execute_saverestore(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 177, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 174)
-
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	if (SAVE) then (
-	    new_cwp <- (CWP - 1) modulo NWINDOWS;
-	    next;
-	    if ((WIM and (1 << new_cwp)) != 0) then (
-	        trap <- 1;
-	        window_overflow <- 1
-	    ) else (
-	        result <- r[rs1] + operand2; { operands from old window }
-	        CWP <- new_cwp
-	    )
-	) else if (RESTORE) then (
-	    new_cwp <- (CWP + 1) modulo NWINDOWS;
-	    next;
-	    if ((WIM and (1 << new_cwp)) != 0) then (
-	        trap <- 1;
-	        window_overflow <- 1
-	    ) else (
-	        result <- r[rs1] + operand2; { operands from old window }
-	        CWP <- new_cwp
-	    )
-	);
-	next;
-	if ((trap = 0) and (rd != 0)) then
-	    r[rd] <- result { destination in new window }
-	*/
+	// The SPARC Instruction Manual: Version 8, page 177, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 174)
 
 	uint32_t rs1 = RS1REG;
 	uint32_t operand2 = USEIMM ? SIMM13 : RS2REG;
@@ -1566,8 +1868,6 @@ void sparc_base_device::execute_saverestore(uint32_t op)
 		{
 			m_trap = 1;
 			m_window_overflow = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 
@@ -1582,8 +1882,6 @@ void sparc_base_device::execute_saverestore(uint32_t op)
 		{
 			m_trap = 1;
 			m_window_underflow = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 
@@ -1608,19 +1906,7 @@ void sparc_base_device::execute_saverestore(uint32_t op)
 
 void sparc_base_device::execute_jmpl(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 180, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 177)
-
-	jump_address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	next;
-	if (jump_address<1:0> != 0) then (
-	    trap <- 1;
-	    mem_address_not_aligned <- 1
-	) else (
-	    if (rd != 0) then r[rd] <- PC;
-	    PC <- nPC;
-	    nPC <- jump_address
-	)
-	*/
+	// The SPARC Instruction Manual: Version 8, page 180, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 177)
 
 	uint32_t jump_address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -1628,8 +1914,6 @@ void sparc_base_device::execute_jmpl(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 	}
 	else
 	{
@@ -1741,8 +2025,6 @@ inline void sparc_base_device::execute_group2(uint32_t op)
 			{
 				m_trap = 1;
 				m_fp_disabled = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 			}
 			complete_fp_execution(op);
 			return;
@@ -1776,8 +2058,6 @@ inline void sparc_base_device::execute_group2(uint32_t op)
 				logerror("illegal instruction at %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_illegal_instruction = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 			}
 			break;
 	}
@@ -1787,12 +2067,16 @@ inline void sparc_base_device::execute_group2(uint32_t op)
 //-------------------------------------------------
 //  update_extra_group2 - execute a group2
 //  instruction belonging to a newer SPARC version
-//  than v7
+//  than v7, or which can be overridden from v7
 //-------------------------------------------------
 
 bool sparcv7_device::execute_extra_group2(uint32_t op)
 {
-	return false;
+	switch (OP3)
+	{
+		default:
+			return false;
+	}
 }
 
 bool sparcv8_device::execute_extra_group2(uint32_t op)
@@ -1818,9 +2102,46 @@ bool sparcv8_device::execute_extra_group2(uint32_t op)
 			logerror("cpop @ %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_cp_disabled = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return true;
+
+		default:
+			return false;
+	}
+}
+
+void mb86930_device::execute_divscc(uint32_t op)
+{
+	fatalerror("Not yet supported: divscc at %08x\n", PC);
+	/*const bool n_flag = (PSR & PSR_N_MASK);
+	const bool v_flag = (PSR & PSR_V_MASK);
+	const bool true_sign = n_flag ^ v_flag;
+	const uint64_t dividend = ((uint64_t)m_y << 32) | RS1REG;
+	const uint32_t remainder = m_y << 1;
+	const uint32_t divisor = (USEIMM ? SIMM13 : RS2REG);*/
+}
+
+void mb86930_device::execute_scan(uint32_t op)
+{
+	fatalerror("Not yet supported: scan at %08x\n", PC);
+}
+
+bool mb86930_device::execute_extra_group2(uint32_t op)
+{
+	switch (OP3)
+	{
+		case OP3_DIVSCC:
+			execute_divscc(op);
+			return true;
+
+		case OP3_SCAN:
+			execute_scan(op);
+			return true;
+
+		case OP3_UMUL:
+		case OP3_SMUL:
+		case OP3_UMULCC:
+		case OP3_SMULCC:
+			return sparcv8_device::execute_extra_group2(op);
 
 		default:
 			return false;
@@ -1850,139 +2171,18 @@ void sparc_base_device::update_gpr_pointers()
 
 void sparc_base_device::execute_store(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 165, "Appendix C - ISP Descriptions - Store Instructions" (SPARCv8.pdf, pg. 162)
-
-	if ( (S = 0) and (STDA or STA or STHA or STBA or STDFQ or STDCQ) ) then (
-	    trap <- 1;
-	    privileged_instruction <- 1
-	) else if ((i = 1) and (STDA or STA or STHA or STBA)) then (
-	    trap <- 1;
-	    illegal_instruction <- 1
-	);
-	next;
-	if (trap = 0) then (
-	    if (STD or ST or STH or STB or STF or STDF or STFSR or STDFQ or STCSR or STC or STDC or STDCQ) then (
-	        address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	        addr_space <- (if (S = 0) then 10 else 11)
-	    ) else if (STDA or STA or STHA or STBA) then (
-	        address <- r[rs1] + r[rs2];
-	        addr_space <- asi
-	    );
-	    if ((STF or STDF or STFSR or STDFQ) and
-	       ((EF = 0) or (bp_FPU_present = 0)) ) then (
-	        trap <- 1;
-	        fp_disabled <- 1;
-	    );
-	    if ((STC or STDC or STCSR or STDCQ) and
-	       ((EC = 0) or (bp_CP_present = 0)) ) then (
-	        trap <- 1;
-	        cp_disabled <- 1;
-	    )
-	);
-	next;
-	if (trap = 0) then (
-	    if ((STH or STHA) and (address<0> != 0)) then (
-	        trap <- 1;
-	        mem_address_not_aligned <- 1
-	    ) else if ((ST or STA or STF or STFSR or STC or STCSR) and (address<1:0> != 0)) then (
-	        trap <- 1;
-	        mem_address_not_aligned <- 1
-	    ) else if ((STD or STDA or STDF or STDFQ or STDC or STDCQ) and (address<2:0> != 0)) then (
-	        trap <- 1;
-	        mem_address_not_aligned <- 1
-	    ) else (
-	        if (STDFQ and ((implementation has no floating-point queue) or (FSR.qne = 0))) then (
-	            trap <- 1;
-	            fp_exception <- 1;
-	            ftt <- sequence_error;
-	        );
-	        if (STDCQ and ((implementation has no coprocessor queue)) then (
-	            trap <- 1;
-	            cp_exception <- 1;
-	            { possibly additional implementation-dependent actions }
-	        );
-	        if (STDF and (rd<0> != 0)) then (
-	            trap <- 1;
-	            fp_exception <- 1;
-	            ftt <- invalid_fp_register;
-	        )
-	    )
-	);
-	next;
-	if (trap = 0) then (
-	    if (STF) then ( byte_mask <- 1111; data0 <- f[rd] )
-	    else if (STC) then ( byte_mask <- 1111; data0 <- implementation_dependent_value )
-	    else if (STDF) then ( byte_mask <- 1111; data0 <- f[rd & 0x1e] )
-	    else if (STDC) then ( byte_mask <- 1111; data0 <- implementation_dependent_value )
-	    else if (STD or STDA) then ( byte_mask <- 1111; data0 <- r[rd & 0x1e] )
-	    else if (STDFQ) then ( byte_mask <- 1111; data0 <- implementation_dependent_value )
-	    else if (STDCQ) then ( byte_mask <- 1111; data0 <- implementation_dependent_value )
-	    else if (STFSR) then (
-	        while ((FSR.qne = 1) and (trap = 0)) (
-	            // wait for pending floating-point instructions to complete
-	        )
-	        next;
-	        byte_mask <- 1111; data0 <- FSR
-	    ) else if (STCSR) then (
-	        { implementation-dependent actions }
-	        byte_mask <- 1111; data0 <- CSR
-	    ) else if (ST or STA) then ( byte_mask <- 1111; data0 = r[rd] )
-	    else if (STH or STHA) then (
-	        if (address<1:0> = 0) then (
-	            byte_mask <- 1100; data0 <- shift_left_logical(r[rd], 16) )
-	        else if (address<1:0> = 2) then (
-	            byte_mask <- 0011; data0 <- r[rd] )
-	    ) else if (STB or STBA) then (
-	        if (address<1:0> = 0) then (
-	            byte_mask <- 1000; data0 <- shift_left_logical(r[rd], 24) )
-	        ) else if (address<1:0> = 1) then (
-	            byte_mask <- 0100; data0 <- shift_left_logical(r[rd], 16) )
-	        ) else if (address<1:0> = 2) then (
-	            byte_mask <- 0010; data0 <- shift_left_logical(r[rd], 8) )
-	        ) else if (address<1:0> = 3) then (
-	            byte_mask <- 0001; data0 <- r[rd] )
-	        )
-	    );
-	);
-	next;
-	if (trap = 0) then (
-	    MAE <- memory_write(addr_space, address, byte_mask, data1);
-	    next;
-	    if (MAE = 1) then (
-	        trap <- 1;
-	        data_access_exception <- 1
-	    )
-	);
-	if ((trap = 0) and (STD or STDA or STDF or STDC or STDFQ or STDCQ)) then (
-	    if (STD or STDA) then ( data1 <- r[rd or 00001] )
-	    else if (STDF) then ( data1 <- f[rd or 00001] )
-	    else if (STDC) then ( data1 <- implementation_dependent_value }
-	    else if (STDFQ) then ( data1 <- implementation_dependent_value }
-	    else if (STDCQ) then ( data1 <- implementation_dependent_value }
-	    next;
-	    MAE <- memory_write(addr_space, address + 4, 1111, data1);
-	    next;
-	    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-	        trap <- 1;
-	        data_access_exception <- 1
-	    )
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 165, "Appendix C - ISP Descriptions - Store Instructions" (SPARCv8.pdf, pg. 162)
 
 	if (IS_USER && (STDA || STA || STHA || STBA || STDFQ || STDCQ))
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
-	else if (USEIMM && (STDA || STA || STHA || STBA))
+	else if ((USEIMM && (STDA || STA || STHA || STBA)) || ((STD || STDA) && (RD & 1)))
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2002,24 +2202,18 @@ void sparc_base_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	if ((STC || STDC || STCSR || STDCQ) && (!(PSR & PSR_EC_MASK) || !m_bp_cp_present))
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
 	if ((STH || STHA) && ((address & 1) != 0))
 	{
 		m_trap = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		m_mem_address_not_aligned = 1;
 		return;
 	}
@@ -2027,16 +2221,12 @@ void sparc_base_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if ((STD || STDA || STDF || STDFQ || STDC || STDCQ) && ((address & 7) != 0))
 	{
 		m_mem_address_not_aligned = 1;
 		m_trap = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2050,8 +2240,6 @@ void sparc_base_device::execute_store(uint32_t op)
 		// assume no coprocessor queue for now
 		m_trap = 1;
 		m_cp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		// { possibly additional implementation-dependent actions }
 		return;
 	}
@@ -2171,8 +2359,6 @@ void sparc_base_device::execute_store(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2183,8 +2369,6 @@ void sparc_base_device::execute_store(uint32_t op)
 		{
 			m_trap = 1;
 			m_data_access_exception = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 	}
@@ -2193,116 +2377,24 @@ void sparc_base_device::execute_store(uint32_t op)
 	nPC = nPC + 4;
 }
 
-/* The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
-
-if (LDD or LD or LDSH or LDUH or LDSB or LDUB or LDDF or LDF or LDFSR or LDDC or LDC or LDCSR) then (
-    address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-    addr_space <- (if (S = 0) then 10 else 11)
-) else if (LDDA or LDA or LDSHA or LDUHA or LDSBA or LDUBA) then (
-    if (S = 0) then (
-        trap <- 1;
-        privileged_instruction <- 1
-    ) else if (i = 1) then (
-        trap <- 1;
-        illegal_instruction <- 1
-    ) else (
-        address <- r[rs1] + r[rs2];
-        addr_space <- asi
-    )
-)
-next;
-if (trap = 0) then (
-    if ( (LDF or LDDF or LDFSR) and ((EF = 0) or (bp_FPU_present = 0)) then (
-        trap <- 1;
-        fp_disabled <- 1
-    ) else if ( (LDC or LDDC or LDCSR) and ((EC = 0) or (bp_CP_present = 0)) then (
-        trap <- 1;
-        cp_disabled <- 1
-    ) else if ( ( (LDD or LDDA or LDDF or LDDC) and (address<2:0> != 0)) or
-        ((LD or LDA or LDF or LDFSR or LDC or LDCSR) and (address<1:0> != 0)) or
-        ((LDSH or LDSHA or LDUH or LDUHA) and address<0> != 0) ) then (
-        trap <- 1;
-        mem_address_not_aligned <- 1
-    ) else if (LDDF and (rd<0> != 0)) then (
-        trap <- 1;
-        fp_exception <- 1;
-        ftt <- invalid_fpr_register
-    ) else if ((LDF or LDDF or LDFSR) and (an FPU sequence error is detected)) then (
-        trap <- 1;
-        fp_exception <- 1;
-        ftt <- sequence_error
-    ) else if ((LDC or LDDC or LDCSR) and (a CP sequence error is detected)) then (
-        trap <- 1;
-        cp_exception <- 1;
-        { possibly additional implementation-dependent actions }
-    )
-);
-next;
-if (trap = 0) then {
-    (data, MAE) <- memory_read(addr_space, address);
-    next;
-    if (MAE = 1) then (
-        trap <- 1;
-        data_access_exception <- 1;
-    ) else (
-        if (LDSB or LDSBA or LDUB or LDUBA) then (
-            if      (address<1:0> = 0) then byte <- data<31:24>
-            else if (address<1:0> = 1) then byte <- data<23:16>
-            else if (address<1:0> = 2) then byte <- data<15: 8>
-            else if (address<1:0> = 3) then byte <- data< 7: 0>
-            next;
-            if (LDSB or LDSBA) then
-                word0 <- sign_extend_byte(byte)
-            else
-                word0 <- zero_extend_byte(byte)
-        ) else if (LDSH or LDSHA or LDUH or LDUHA) then (
-            if      (address<1:0> = 0) then halfword <- data<31:16>
-            else if (address<1:0> = 2) then halfword <- data<15: 0>
-            next;
-            if (LDSH or LDSHA) then
-                word0 <- sign_extend_halfword(halfword)
-            else
-                word0 <- zero_extend_halfword(halfword)
-        ) else
-            word0 <- data
-    )
-);
-next;
-if (trap = 0) then (
-    if ( (rd != 0) and (LD or LDA or LDSH or LDSHA
-        or LDUHA or LDUH or LDSB or LDSBA or LDUB or LDUBA) ) then
-            r[rd] <- word0
-    else if (LDF) then f[rd] <- word0
-    else if (LDC) then { implementation-dependent actions }
-    else if (LDFSR) then FSR <- word0
-    else if (LDCSR) then CSR <- word0
-    else if (LDD or LDDA) then r[rd and 11110] <- word0
-    else if (LDDF) then f[rd and 11110] <- word0
-    else if (LDDC) then { implementation-dependent actions }
-);
-next;
-if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
-    (word1, MAE) <- memory_read(addr_space, address + 4);
-    next;
-    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-        trap <- 1;
-        data_access_exception <- 1 )
-    else if (LDD or LDDA) then r[rd or 1] <- word1
-    else if (LDDF) then f[rd or 1] <- word1
-    else if (LDDC) then { implementation-dependent actions }
-);
-*/
+// The SPARC Instruction Manual: Version 8, page 163, "Appendix C - ISP Descriptions - C.9. Instruction Defintions - Load Instructions" (SPARCv8.pdf, pg. 160)
 
 inline void sparc_base_device::execute_ldd(uint32_t op)
 {
+	if (RD & 1)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		return;
+	}
+
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
 	if (address & 7)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
+		return;
 	}
 
 	const uint32_t data = read_word(m_data_space, address);
@@ -2311,8 +2403,6 @@ inline void sparc_base_device::execute_ldd(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2324,8 +2414,6 @@ inline void sparc_base_device::execute_ldd(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2343,8 +2431,6 @@ inline void sparc_base_device::execute_ld(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2354,8 +2440,6 @@ inline void sparc_base_device::execute_ld(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2374,8 +2458,6 @@ inline void sparc_base_device::execute_ldsh(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2386,8 +2468,6 @@ inline void sparc_base_device::execute_ldsh(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2409,8 +2489,6 @@ inline void sparc_base_device::execute_lduh(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2421,8 +2499,6 @@ inline void sparc_base_device::execute_lduh(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2447,8 +2523,6 @@ inline void sparc_base_device::execute_ldsb(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2476,8 +2550,6 @@ inline void sparc_base_device::execute_ldub(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2499,8 +2571,6 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2508,8 +2578,6 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2519,8 +2587,6 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2534,8 +2600,6 @@ inline void sparc_base_device::execute_lddfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2559,8 +2623,6 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2568,8 +2630,6 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2579,8 +2639,6 @@ inline void sparc_base_device::execute_ldfpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2603,8 +2661,6 @@ inline void sparc_base_device::execute_ldfsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_fp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2612,8 +2668,6 @@ inline void sparc_base_device::execute_ldfsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2623,8 +2677,6 @@ inline void sparc_base_device::execute_ldfsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2650,8 +2702,6 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2659,8 +2709,6 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2668,8 +2716,6 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		// possibly additional implementation-dependent actions
 		return;
 	}
@@ -2679,8 +2725,6 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2691,8 +2735,6 @@ inline void sparc_base_device::execute_lddcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2710,8 +2752,6 @@ inline void sparc_base_device::execute_ldcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2719,8 +2759,6 @@ inline void sparc_base_device::execute_ldcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2728,8 +2766,6 @@ inline void sparc_base_device::execute_ldcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		// possibly additional implementation-dependent actions
 		return;
 	}
@@ -2740,8 +2776,6 @@ inline void sparc_base_device::execute_ldcpr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2759,8 +2793,6 @@ inline void sparc_base_device::execute_ldcsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_disabled = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2768,8 +2800,6 @@ inline void sparc_base_device::execute_ldcsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2777,8 +2807,6 @@ inline void sparc_base_device::execute_ldcsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_cp_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		// possibly additional implementation-dependent actions
 		return;
 	}
@@ -2789,8 +2817,6 @@ inline void sparc_base_device::execute_ldcsr(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2806,16 +2832,12 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
-	else if (USEIMM)
+	else if (USEIMM || (RD & 1))
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2826,8 +2848,6 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2837,8 +2857,6 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2850,8 +2868,6 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2867,16 +2883,12 @@ inline void sparc_base_device::execute_lda(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (USEIMM)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2886,8 +2898,6 @@ inline void sparc_base_device::execute_lda(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2897,8 +2907,6 @@ inline void sparc_base_device::execute_lda(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2915,16 +2923,12 @@ inline void sparc_base_device::execute_ldsha(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (USEIMM)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2934,8 +2938,6 @@ inline void sparc_base_device::execute_ldsha(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2946,8 +2948,6 @@ inline void sparc_base_device::execute_ldsha(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2967,16 +2967,12 @@ inline void sparc_base_device::execute_lduha(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (USEIMM)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2985,8 +2981,6 @@ inline void sparc_base_device::execute_lduha(uint32_t op)
 	{
 		m_trap = 1;
 		m_mem_address_not_aligned = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -2997,8 +2991,6 @@ inline void sparc_base_device::execute_lduha(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3018,16 +3010,12 @@ inline void sparc_base_device::execute_ldsba(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (USEIMM)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3039,8 +3027,6 @@ inline void sparc_base_device::execute_ldsba(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3062,16 +3048,12 @@ inline void sparc_base_device::execute_lduba(uint32_t op)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 	else if (USEIMM)
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3083,8 +3065,6 @@ inline void sparc_base_device::execute_lduba(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3108,64 +3088,7 @@ inline void sparc_base_device::execute_lduba(uint32_t op)
 
 void sparc_base_device::execute_ldstub(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
-
-	if (LDSTUB) then (
-	    address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	    addr_space <- (if (S = 0) then 10 else 11)
-	} else if (LDSTUBA) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else if (i = 1) then (
-	        trap <- 1;
-	        illegal_instruction <- 1
-	    ) else (
-	        address <- r[rs1] + r[rs2];
-	        addr_space <- asi
-	    )
-	);
-	next;
-	if (trap = 0) then (
-	    while ( (pb_block_ldst_byte = 1) or (pb_block_ldst_word = 1) ) then (
-	        { wait for lock(s) to be lifted }
-	        { an implementation actually need only block when another LDSTUB or SWAP
-	          is pending on the same byte in memory as the one addressed by this LDSTUB }
-	    };
-	    next;
-	    pb_block_ldst_byte <- 1;
-	    next;
-	    (data, MAE) <- memory_read(addr_space, address);
-	    next;
-	    if (MAE = 1) then (
-	        trap <- 1;
-	        data_access_exception <- 1
-	    )
-	)
-	next;
-	if (trap = 0) then (
-	    if      (address<1:0> = 0) then ( byte_mask <- 1000 )
-	    else if (address<1:0> = 1) then ( byte_mask <- 0100 )
-	    else if (address<1:0> = 2) then ( byte_mask <- 0010 )
-	    else if (address<1:0> = 3) then ( byte_mask <- 0001 )
-	    ;
-	    next;
-	    MAE <- memory_write(addr_space, address, byte_mask, FFFFFFFF);
-	    next;
-	    pb_block_ldst_byte <- 0;
-	    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-	        trap <- 1;
-	        data_access_exception <- 1
-	    ) else (
-	        if      (address<1:0> = 0) then word <- zero_extend_byte(data<31:24>)
-	        else if (address<1:0> = 1) then word <- zero_extend_byte(data<23:24>)
-	        else if (address<1:0> = 2) then word <- zero_extend_byte(data<15: 8>)
-	        else if (address<1:0> = 3) then word <- zero_extend_byte(data< 7: 0>)
-	        next;
-	        if (rd != 0) then r[rd] <- word
-	    )
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
 	uint32_t address = 0;
 	uint8_t addr_space = 0;
@@ -3180,27 +3103,21 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		else if (USEIMM)
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		else
 		{
 			address = RS1REG + RS2REG;
 			addr_space = ASI;
-			return;
 		}
 	}
 
-	uint32_t data(0);
 	//while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
 	//{
 		// { wait for lock(s) to be lifted }
@@ -3211,14 +3128,12 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 	m_pb_block_ldst_byte = 1;
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
-	data = read_word(addr_space, address, mask8[address & 3]);
+	uint32_t data = read_word(addr_space, address, mask8[address & 3]);
 
 	if (MAE)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3230,8 +3145,6 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 	{
 		m_trap = 1;
 		m_data_access_exception = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
 		return;
 	}
 
@@ -3365,8 +3278,6 @@ inline void sparc_base_device::execute_group3(uint32_t op)
 				logerror("illegal instruction at %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_illegal_instruction = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 			}
 			break;
 	}
@@ -3526,37 +3437,7 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 
 void sparc_base_device::execute_bicc(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 178, "Appendix C - ISP Descriptions - Branch on Integer Condition Instructions" (SPARCv8.pdf, pg. 175)
-
-	eval_icc := (
-	    if (BNE)    then (if (Z = 0) then 1 else 0);
-	    if (BE)     then (if (Z = 1) then 1 else 0);
-	    if (BG)     then (if ((Z or (N xor V)) = 0) then 1 else 0);
-	    if (BLE)    then (if ((Z or (N xor V)) = 1) then 1 else 0);
-	    if (BGE)    then (if ((N xor V) = 0) then 1 else 0);
-	    if (BL)     then (if ((N xor V) = 1) then 1 else 0);
-	    if (BGU)    then (if ((C = 0) and (Z = 0)) then 1 else 0);
-	    if (BLEU)   then (if ((C = 1) or (Z = 1)) then 1 else 0);
-	    if (BCC)    then (if (C = 0) then 1 else 0);
-	    if (BCS)    then (if (C = 1) then 1 else 0);
-	    if (BPOS)   then (if (N = 0) then 1 else 0);
-	    if (BNEG)   then (if (N = 1) then 1 else 0);
-	    if (BVC)    then (if (V = 0) then 1 else 0);
-	    if (BVS)    then (if (V = 1) then 1 else 0);
-	    if (BA)     then 1;
-	    if (BN)     then 0;
-	)
-	PC <- nPC;
-	if (eval_icc = 1) then (
-	    nPC <- PC + sign_extend(disp22[]00);
-	    if (BA and (a = 1)) then
-	        annul <- 1 { only for annulling Branch-Always }
-	) else (
-	    nPC <- nPC + 4;
-	    if (a = 1) then
-	        annul <- 1 { only for annulling branches other than BA }
-	)
-	*/
+	// The SPARC Instruction Manual: Version 8, page 178, "Appendix C - ISP Descriptions - Branch on Integer Condition Instructions" (SPARCv8.pdf, pg. 175)
 
 	bool branch_taken = evaluate_condition(op);
 	uint32_t pc = PC;
@@ -3582,40 +3463,7 @@ void sparc_base_device::execute_bicc(uint32_t op)
 
 void sparc_base_device::execute_ticc(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Trap on Integer Condition Instructions" (SPARCv8.pdf, pg. 179)
-
-	trap_eval_icc := (
-	    if (TNE)    then (if (Z = 0) then 1 else 0);
-	    if (TE)     then (if (Z = 1) then 1 else 0);
-	    if (TG)     then (if ((Z or (N xor V)) = 0) then 1 else 0);
-	    if (TLE)    then (if ((Z or (N xor V)) = 1) then 1 else 0);
-	    if (TGE)    then (if ((N xor V) = 0) then 1 else 0);
-	    if (TL)     then (if ((N xor V) = 1) then 1 else 0);
-	    if (TGU)    then (if ((C = 0) and (Z = 0)) then 1 else 0);
-	    if (TLEU)   then (if ((C = 1) or (Z = 1)) then 1 else 0);
-	    if (TCC)    then (if (C = 0) then 1 else 0);
-	    if (TCS)    then (if (C = 1) then 1 else 0);
-	    if (TPOS)   then (if (N = 0) then 1 else 0);
-	    if (TNEG)   then (if (N = 1) then 1 else 0);
-	    if (TVC)    then (if (V = 0) then 1 else 0);
-	    if (TVS)    then (if (V = 1) then 1 else 0);
-	    if (TA)     then 1;
-	    if (TN)     then 0;
-	)
-
-	trap_number := r[rs1] + (if (i = 0) then r[rs2] else sign_extend(software_trap#));
-
-	if (Ticc) then (
-	    if (trap_eval_icc = 1) then (
-	        trap <- 1;
-	        trap_instruction <- 1;
-	        ticc_trap_type <- trap_number<6:0>
-	    ) else (
-	        PC <- nPC;
-	        nPC <- nPC + 4;
-	    )
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Trap on Integer Condition Instructions" (SPARCv8.pdf, pg. 179)
 
 	bool trap_eval_icc = evaluate_condition(op);
 
@@ -3628,8 +3476,6 @@ void sparc_base_device::execute_ticc(uint32_t op)
 			m_trap = 1;
 			m_trap_instruction = 1;
 			m_ticc_trap_type = trap_number & 0x7f;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 		}
 		else
 		{
@@ -3660,7 +3506,6 @@ void sparc_base_device::select_trap()
 	{
 		m_execute_mode = 0;
 		m_error_mode = 1;
-		m_stashed_icount = m_icount;
 		m_icount = 0;
 	}
 	else
@@ -3786,84 +3631,7 @@ void sparcv8_device::update_tt()
 
 void sparc_base_device::execute_trap()
 {
-	/* The SPARC Instruction Manual: Version 8, page 161, "Appendix C - C.8. Traps" (SPARCv8.pdf, pg. 158)
-
-	select_trap; { see below }
-	next;
-
-	if (error_mode = 0) then (
-	    ET <- 0;
-	    PS <- S;
-	    CWP <- (CWP - 1) modulo NWINDOWS;
-
-	    next;
-	    if (annul = 0) then (
-	        r[17] <- PC;
-	        r[18] <- nPC;
-	    ) else { annul != 0) } (
-	        r[17] <- nPC;
-	        r[18] <- nPC + 4;
-	        annul <- 0;
-	    )
-
-	    next;
-	    S <- 1;
-	    if (reset_trap = 0) then (
-	        PC <- TBR;
-	        nPC <- TBR + 4;
-	    ) else { reset_trap = 1 } (
-	        PC <- 0;
-	        nPC <- 4;
-	        reset_trap <- 0;
-	    )
-	);
-
-	select_trap := (
-	    if (reset_trap = 1) then { ignore ET, and leave tt unchanged }
-	    else if (ET = 0) then (
-	        execute_mode <- 0;
-	        error_mode <- 1 )
-	    else if (data_store_error = 1) then tt <- 00101011
-	    else if (instruction_access_error = 1) then tt <- 00100001
-	    else if (r_register_access_error = 1) then tt <- 00100000
-	    else if (instruction_access_exception = 1) then tt <- 00000001
-	    else if (privileged_instruction = 1) then tt <- 00000011
-	    else if (illegal_instruction = 1) then tt <- 00000010
-	    else if (fp_disabled = 1) then tt <- 00000100
-	    else if (cp_disabled = 1) then tt <- 00100100
-	    else if (unimplemented_FLUSH = 1) then tt <- 00100101
-	    else if (window_overflow = 1) then tt <- 00000101
-	    else if (window_underflow = 1) then tt <- 00000110
-	    else if (mem_address_not_aligned = 1) then tt <- 00000111
-	    else if (fp_exception = 1) then tt <- 00001000
-	    else if (cp_exception = 1) then tt <- 00101000
-	    else if (data_access_error = 1) then tt <- 00101001
-	    else if (data_access_exception = 1) then tt <- 00001001
-	    else if (tag_overflow = 1) then tt <- 00001010
-	    else if (division_by_zero = 1) then tt <- 00101010
-	    else if (trap_instruction = 1) then tt <- 1[]ticc_trap_type
-	    else if (interrupt_level > 0) then tt <- 0001[]interrupt_level;
-
-	    next;
-
-	    trap <- 0;
-	    instruction_access_exception <- 0;
-	    illegal_instruction <- 0;
-	    privileged_instruction <- 0;
-	    fp_disabled <- 0;
-	    cp_disabled <- 0;
-	    window_overflow <- 0;
-	    window_underflow <- 0;
-	    mem_address_not_aligned <- 0;
-	    fp_exception <- 0;
-	    cp_exception <- 0;
-	    data_access_exception <- 0;
-	    tag_overflow <- 0;
-	    division_by_zero <- 0;
-	    trap_instruction <- 0;
-	    interrupt_level <- 0;
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 161, "Appendix C - C.8. Traps" (SPARCv8.pdf, pg. 158)
 
 	if (!m_trap)
 	{
@@ -3926,31 +3694,7 @@ void sparc_base_device::execute_trap()
 //  single fetched instruction.
 //-------------------------------------------------
 
-/* The SPARC Instruction Manual: Version 8, page 159, "Appendix C - ISP Descriptions - C.6. Instruction Dispatch" (SPARCv8.pdf, pg. 156)
-
-illegal_IU_instr :- (
-    if ( ( (op == 00) and (op2 == 000) ) { UNIMP instruction }
-       or
-       ( ((op=11) or (op=10)) and (op3=unassigned) )
-       then 1 else 0
-
-if (illegal_IU_instr = 1) then (
-    trap <- 1
-    illegal_instruction <- 1
-);
-if ((FPop1 or FPop2 or FBfcc) and ((EF = 0) or (bp_FPU_present = 0))) then (
-    trap <- 1;
-    fp_disabled <- 1
-);
-if (CPop1 or CPop2 or CBccc) and ((EC = 0) or (bp_CP_present = 0))) then (
-    trap <- 1;
-    cp_disabled <- 1
-);
-next;
-if (trap = 0) then (
-    { code for specific instruction, defined below }
-);
-*/
+// The SPARC Instruction Manual: Version 8, page 159, "Appendix C - ISP Descriptions - C.6. Instruction Dispatch" (SPARCv8.pdf, pg. 156)
 
 inline void sparc_base_device::dispatch_instruction(uint32_t op)
 {
@@ -3966,9 +3710,8 @@ inline void sparc_base_device::dispatch_instruction(uint32_t op)
 		case OP2_BICC: // branch on integer condition codes
 			execute_bicc(op);
 			break;
-		case OP2_SETHI: // sethi
-			*m_regs[RD] = op << 10;
-			m_r[0] = 0;
+		case OP2_SETHI: // sethi or nop
+			if (RDBITS) RDREG = op << 10;
 			PC = nPC;
 			nPC = nPC + 4;
 			break;
@@ -3977,8 +3720,6 @@ inline void sparc_base_device::dispatch_instruction(uint32_t op)
 			{
 				m_trap = 1;
 				m_fp_disabled = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 				return;
 			}
 			execute_fbfcc(op);
@@ -3989,8 +3730,6 @@ inline void sparc_base_device::dispatch_instruction(uint32_t op)
 				logerror("illegal instruction at %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_illegal_instruction = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 			}
 			return;
 		}
@@ -4036,8 +3775,6 @@ bool sparcv8_device::dispatch_extra_instruction(uint32_t op)
 				logerror("cbccc @ %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_cp_disabled = 1;
-				m_stashed_icount = m_icount;
-				m_icount = 0;
 				return true;
 			}
 			return true;
@@ -4466,54 +4203,7 @@ void sparc_base_device::complete_fp_execution(uint32_t op)
 
 void sparcv8_device::execute_swap(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
-
-	if (SWAP) then (
-	    address <- r[rs1] + (if (i = 0) then r[rs2] else sign_extend(simm13));
-	    addr_space <- (if (S = 0) then 10 else 11)
-	) else if (SWAPA) then (
-	    if (S = 0) then (
-	        trap <- 1;
-	        privileged_instruction <- 1
-	    ) else if (i = 1) then (
-	        trap <- 1;
-	        illegal_instruction <- 1
-	    ) else (
-	        address <- r[rs1] + r[rs1];
-	        addr_space <- asi
-	    )
-	);
-	next;
-	if (trap = 0) then (
-	    temp <- r[rd];
-	    while ( (pb_block_ldst_byte = 1) or (pb_block_ldst_word = 1) ) (
-	        { wait for lock(s) to be lifted }
-	        { an implementation actually need only block when another SWAP is pending on
-	          the same word in memory as the one addressed by this SWAP, or a LDSTUB is
-	          pending on any byte of the word in memory addressed by this SWAP }
-	    );
-	    next;
-	    pb_block_ldst_word <- 1;
-	    next;
-	    (word, MAE) <- memory_read(addr_space, address);
-	    next;
-	    if (MAE = 1) then (
-	        trap <- 1;
-	        data_access_exception = 1
-	    )
-	next;
-	if (trap = 0) then (
-	    MAE <- memory_write(addr_space, address, 1111, temp);
-	    next;
-	    pb_block_ldst_word <- 0;
-	    if (MAE = 1) then ( { MAE = 1 only due to a "non-resumable machine-check error" }
-	        trap <- 1;
-	        data_access_exception <- 1
-	    ) else (
-	        if (rd != 0) then r[rd] <- word
-	    )
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
 	uint32_t address = 0;
 	uint8_t addr_space = 0;
@@ -4528,11 +4218,13 @@ void sparcv8_device::execute_swap(uint32_t op)
 		{
 			m_trap = 1;
 			m_privileged_instruction = 1;
+			return;
 		}
 		else if (USEIMM)
 		{
 			m_trap = 1;
 			m_illegal_instruction = 1;
+			return;
 		}
 		else
 		{
@@ -4541,45 +4233,51 @@ void sparcv8_device::execute_swap(uint32_t op)
 		}
 	}
 
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		return;
+	}
+
 	uint32_t word = 0;
-	uint32_t temp = 0;
-	if (!m_trap)
+	uint32_t data = RDREG;
+
+	//while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
+	//{
+		// { wait for lock(s) to be lifted }
+		// { an implementation actually need only block when another SWAP is pending on
+		//   the same word in memory as the one addressed by this SWAP, or a LDSTUB is
+		//   pending on any byte of the word in memory addressed by this SWAP }
+	//}
+
+	m_pb_block_ldst_word = 1;
+
+	word = read_word(addr_space, address);
+
+	if (MAE)
 	{
-		temp = RDREG;
-		while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
-		{
-			// { wait for lock(s) to be lifted }
-			// { an implementation actually need only block when another SWAP is pending on
-			//   the same word in memory as the one addressed by this SWAP, or a LDSTUB is
-			//   pending on any byte of the word in memory addressed by this SWAP }
-		}
-
-		m_pb_block_ldst_word = 1;
-
-		word = read_word(addr_space, address);
-
-		if (MAE)
-		{
-			m_trap = 1;
-			m_data_access_exception = 1;
-		}
+		m_trap = 1;
+		m_data_access_exception = 1;
+		return;
 	}
-	if (!m_trap)
+
+	write_word(addr_space, address, data);
+
+	m_pb_block_ldst_word = 0;
+
+	if (MAE)
 	{
-		write_word(addr_space, address, temp);
-
-		m_pb_block_ldst_word = 0;
-		if (MAE)
-		{
-			m_trap = 1;
-			m_data_access_exception = 1;
-		}
-		else
-		{
-			if (RD != 0)
-				RDREG = word;
-		}
+		m_trap = 1;
+		m_data_access_exception = 1;
+		return;
 	}
+
+	if (RDBITS)
+		RDREG = word;
+
+	PC = nPC;
+	nPC = nPC + 4;
 }
 
 
@@ -4589,23 +4287,7 @@ void sparcv8_device::execute_swap(uint32_t op)
 
 void sparcv8_device::execute_mul(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 172)
-
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	if (UMUL or UMULScc) then (Y, result) <- multiply_unsigned(r[rs1], operand2)
-	else if (SMUL or SMULcc) then (Y, result) <- multiply_signed(r[rs1], operand2)
-	next;
-	if (rd != 0) then (
-	    r[rd] <- result;
-	)
-	if (UMULcc or SMULcc) then (
-	    N <- result<31>;
-	    Z <- if (result = 0) then 1 else 0;
-	    V <- 0
-	    C <- 0
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 172)
 
 	uint32_t operand2 = (USEIMM ? SIMM13 : RS2REG);
 
@@ -4623,7 +4305,7 @@ void sparcv8_device::execute_mul(uint32_t op)
 		result = (uint32_t)dresult;
 	}
 
-	if (RD != 0)
+	if (RDBITS)
 	{
 		RDREG = result;
 	}
@@ -4633,6 +4315,9 @@ void sparcv8_device::execute_mul(uint32_t op)
 		PSR |= BIT31(result) ? PSR_N_MASK : 0;
 		PSR |= (result == 0) ? PSR_Z_MASK : 0;
 	}
+
+	PC = nPC;
+	nPC = nPC + 4;
 }
 
 
@@ -4642,50 +4327,7 @@ void sparcv8_device::execute_mul(uint32_t op)
 
 void sparcv8_device::execute_div(uint32_t op)
 {
-	/* The SPARC Instruction Manual: Version 8, page 176, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 173)
-
-	operand2 := if (i = 0) then r[rs2] else sign_extend(simm13);
-
-	next;
-	if (operand2 = 0) then (
-	    trap <- 1;
-	    division_by_zero <- 1
-	) else (
-	    if (UDIV or UDIVcc) then (
-	        temp_64bit <- divide_unsigned(Y[]r[rs1], operand2);
-	        next;
-	        result <- temp_64bit<31:0>;
-	        temp_V <- if (temp_64bit<63:32> = 0) then 0 else 1;
-	    ) else if (SDIV or SDIVcc) then (
-	        temp_64bit <- divide_signed(Y[]r[rs1], operand2);
-	        next;
-	        result <- temp_64bit<31:0>;
-	        temp_V <- if (temp_64bit<63:31> = 0) or
-	                     (temp_64bit<63:31> = (2^33 - 1)) ) then 0 else 1;
-	    ) ;
-	    next;
-
-	    if (temp_V) then (
-	        { result overflowed 32 bits; return largest appropriate integer }
-	        if (UDIV or UDIVcc) then result <- 2^32 - 1;
-	        else if (SDIV or SDIVcc) then (
-	            if (temp_64bit > 0) then result <- 2^31 - 1;
-	            else result <- -2^31
-	        )
-	    );
-	    next;
-
-	    if (rd != 0) then (
-	        r[rd] <- result
-	    ) ;
-	    if (UDIVcc or SDIVcc) then (
-	        N <- result<31>;
-	        Z <- if (result = 0) then 1 else 0;
-	        V <- temp_V;
-	        C <- 0
-	    )
-	);
-	*/
+	// The SPARC Instruction Manual: Version 8, page 176, "Appendix C - ISP Descriptions - Multiply Instructions" (SPARCv8.pdf, pg. 173)
 
 	uint32_t operand2 = (USEIMM ? SIMM13 : RS2REG);
 
@@ -4693,6 +4335,7 @@ void sparcv8_device::execute_div(uint32_t op)
 	{
 		m_trap = 1;
 		m_division_by_zero = 1;
+		return;
 	}
 	else
 	{
@@ -4705,7 +4348,7 @@ void sparcv8_device::execute_div(uint32_t op)
 
 			result = uint32_t(temp_64bit);
 
-			temp_v = ((temp_64bit & 0xffffffff00000000) == 0) ? false : true;
+			temp_v = ((temp_64bit & 0xffffffff00000000ULL) == 0) ? false : true;
 		}
 		else if (SDIV || SDIVCC)
 		{
@@ -4714,7 +4357,7 @@ void sparcv8_device::execute_div(uint32_t op)
 			result = uint32_t(temp_64bit);
 
 			uint64_t shifted = uint64_t(temp_64bit) >> 31;
-			temp_v = (shifted == 0 || shifted == 0x1ffffffff) ? false : true;
+			temp_v = (shifted == 0 || shifted == 0x1ffffffffULL) ? false : true;
 		}
 
 		if (temp_v)
@@ -4732,7 +4375,7 @@ void sparcv8_device::execute_div(uint32_t op)
 			}
 		}
 
-		if (RD != 0)
+		if (RDBITS)
 			RDREG = result;
 
 		if (UDIVCC || SDIVCC)
@@ -4743,6 +4386,9 @@ void sparcv8_device::execute_div(uint32_t op)
 			PSR |= temp_v ? PSR_V_MASK : 0;
 		}
 	}
+
+	PC = nPC;
+	nPC = nPC + 4;
 }
 
 
@@ -4753,58 +4399,7 @@ void sparcv8_device::execute_div(uint32_t op)
 
 inline void sparc_base_device::execute_step()
 {
-	/* The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
-
-	if (bp_reset_in = 1) then (
-	    execute_mode <- 0;
-	    reset_mode <- 1;
-	    break { out of while (execute_mode = 1) loop }
-	) else if ((ET = 1) and ((bp_IRL = 15) or (bp_IRL > PIL))) then (
-	    trap <- 1;
-	    interrupt_level <- bp_IRL
-	);
-	next;
-
-	if (trap = 1) then execute_trap; { See Section C.8 }
-
-	if (execute_mode = 1) then ( { execute_trap may have set execute_mode to 0 }
-
-	    { the following code emulates the delayed nature of the write-state-register instructions.
-	    PSR <- PSR'; PSR' <- PSR''; PSR'' <- PSR'''; PSR''' <- PSR'''';
-	    ASR <- ASR'; ASR' <- ASR''; ASR'' <- ASR'''; ASR''' <- ASR'''';
-	    TBR <- TBR'; TBR' <- TBR''; TBR'' <- TBR'''; TBR''' <- TBR'''';
-	    WIM <- WIM'; WIM' <- WIM''; WIM'' <- WIM'''; WIM''' <- WIM'''';
-	      Y <-   Y';   Y' <-   Y'';   Y'' <-   Y''';   Y''' <-   Y'''';
-	    next;
-
-	    addr_space := (if (S = 0) then 8 else 9);
-	    (instruction, MAE) <- memory_read(addr_space, PC);
-	    next;
-
-	    if ( (MAE = 1) and (annul = 0) ) then (
-	        trap <- 1;
-	        instruction_access_exception <- 1
-	    ) else (
-	        if (annul = 0) then (
-	            dispatch_instruction ; { See Section C.6 }
-	            next;
-	            if (FPop1 or FPop2) then (
-	                complete_fp_execution { See Section C.7 }
-	            )
-	            next;
-	            if ( (trap = 0) and
-	                  not (CALL or RETT or JMPL or Bicc or FBfcc or CBccc or Ticc) ) then (
-	                PC <- nPC;
-	                nPC <- nPC + 4
-	            )
-	        ) else { annul != 0 } (
-	            annul <- 0;
-	            PC <- nPC;
-	            nPC <- nPC + 4
-	        )
-	    )
-	)
-	*/
+	// The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
 
 	// write-state-register delay not yet implemented
 
@@ -4823,8 +4418,6 @@ inline void sparc_base_device::execute_step()
 		{
 			m_trap = 1;
 			m_instruction_access_exception = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
 			return;
 		}
 		dispatch_instruction(op);
@@ -4838,10 +4431,8 @@ inline void sparc_base_device::execute_step()
 				if (m_fp_exception_pending)
 				{
 					m_fp_exception_pending = false;
-					m_fp_exception = 1;
 					m_trap = 1;
-					m_stashed_icount = m_icount;
-					m_icount = 0;
+					m_fp_exception = 1;
 					return;
 				}
 			}
@@ -4862,27 +4453,12 @@ inline void sparc_base_device::execute_step()
 
 void sparc_base_device::reset_step()
 {
-	/* The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
+	// The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
 
-	while (reset_mode = 1) (
-	    if (bp_reset_in = 0) then (
-	        reset_mode <- 0;
-	        execute_mode <- 1;
-	        trap <- 1;
-	        reset_trap <- 1;
-	    )
-	);
-	*/
-
-	if (!m_bp_reset_in)
-	{
-		m_reset_mode = 0;
-		m_execute_mode = 1;
-		m_trap = 1;
-		m_reset_trap = 1;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-	}
+	m_reset_mode = 0;
+	m_execute_mode = 1;
+	m_trap = 1;
+	m_reset_trap = 1;
 }
 
 
@@ -4892,25 +4468,10 @@ void sparc_base_device::reset_step()
 
 void sparc_base_device::error_step()
 {
-	/* The SPARC Instruction Manual: Version 8, page 157, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 154)
+	// The SPARC Instruction Manual: Version 8, page 157, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 154)
 
-	while (error_mode = 1) (
-	    if (bp_reset_in = 1) then (
-	        error_mode <- 0;
-	        reset_mode <- 1;
-	        pb_error <- 0
-	    )
-	);
-	*/
-
-	if (m_bp_reset_in)
-	{
-		m_error_mode = 0;
-		m_reset_mode = 1;
-		m_pb_error = 0;
-		m_stashed_icount = m_icount;
-		m_icount = 0;
-	}
+	// waiting for SPARC_RESET
+	m_icount = 0;
 }
 
 template <bool CHECK_DEBUG, sparc_base_device::running_mode MODE>
@@ -4950,7 +4511,7 @@ void sparc_base_device::run_loop()
 			}
 		}
 		--m_icount;
-	} while (m_icount >= 0);
+	} while (m_icount > 0 && !m_trap);
 }
 
 //-------------------------------------------------
@@ -4964,10 +4525,14 @@ void sparc_base_device::execute_run()
 
 	if (m_bp_reset_in)
 	{
+		if (m_error_mode)
+		{
+			m_pb_error = 0;
+		}
+
 		m_execute_mode = 0;
 		m_error_mode = 0;
 		m_reset_mode = 1;
-		m_stashed_icount = m_icount;
 		m_icount = 0;
 		return;
 	}
@@ -5002,13 +4567,7 @@ void sparc_base_device::execute_run()
 			else
 				run_loop<false, MODE_EXECUTE>();
 		}
-
-		if (m_stashed_icount >= 0)
-		{
-			m_icount = m_stashed_icount;
-			m_stashed_icount = -1;
-		}
-	} while (m_icount >= 0);
+	} while (m_icount > 0);
 }
 
 

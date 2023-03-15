@@ -20,6 +20,9 @@ public:
 	// construction/destruction
 	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// used by F3850 systems that override the normal zero reset address
+	auto romc08_callback() { return m_romc08_callback.bind(); }
+
 protected:
 	enum
 	{
@@ -30,6 +33,7 @@ protected:
 	};
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -55,6 +59,8 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_regs_config;
 	address_space_config m_io_config;
+
+	devcb_read8 m_romc08_callback;
 
 	u16  m_pc0;    /* program counter 0 */
 	u16  m_pc1;    /* program counter 1 */

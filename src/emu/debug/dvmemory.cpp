@@ -20,25 +20,42 @@
 
 
 //**************************************************************************
+//  HELPER FUNCTIONS
+//**************************************************************************
+
+namespace {
+
+constexpr u8 sanitise_character(u8 ch)
+{
+	// assume ISO-8859-1 (low 256 Unicode codepoints) - tab, soft hyphen, C0 and C1 cause problems
+	return ('\t' == ch) ? ' ' : (0xadU == ch) ? '-' : ((' ' > ch) || (('~' < ch) && (0xa0U > ch))) ? '.' : ch;
+}
+
+} // anonymous namespace
+
+//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[12] =
+const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[16] =
 {
-	/* 0 bytes per chunk:                         */ {  0, { 0 } },
-	/* 1 byte  per chunk: 00 11 22 33 44 55 66 77 */ {  3, { 0x04, 0x00, 0x80 } },
-	/* 2 bytes per chunk:  0011  2233  4455  6677 */ {  6, { 0x8c, 0x0c, 0x08, 0x04, 0x00, 0x80 } },
-	/* 3 bytes per chunk:                         */ {  0, { 0 } },
-	/* 4 bytes per chunk:   00112233    44556677  */ { 12, { 0x9c, 0x9c, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80 } },
-	/* 5 bytes per chunk:                         */ {  0, { 0 } },
-	/* 6 bytes per chunk:                         */ {  0, { 0 } },
-	/* 7 bytes per chunk:                         */ {  0, { 0 } },
-	/* 8 bytes per chunk:     0011223344556677    */ { 24, { 0xbc, 0xbc, 0xbc, 0xbc, 0x3c, 0x38, 0x34, 0x30, 0x2c, 0x28, 0x24, 0x20, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80, 0x80, 0x80 } },
-	/* 32 bit floating point:                     */ { 16, { 0 } },
-	/* 64 bit floating point:                     */ { 32, { 0 } },
-	/* 80 bit floating point:                     */ { 32, { 0 } },
+	/* 0 bytes per chunk:                         */ {  0,  0, { 0 } },
+	/* 1 byte  per chunk: 00 11 22 33 44 55 66 77 */ {  1,  3, { 0x04, 0x00, 0x80 } },
+	/* 2 bytes per chunk:  0011  2233  4455  6677 */ {  2,  6, { 0x8c, 0x0c, 0x08, 0x04, 0x00, 0x80 } },
+	/* 3 bytes per chunk:                         */ {  0,  0, { 0 } },
+	/* 4 bytes per chunk:   00112233    44556677  */ {  4, 12, { 0x9c, 0x9c, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80 } },
+	/* 5 bytes per chunk:                         */ {  0,  0, { 0 } },
+	/* 6 bytes per chunk:                         */ {  0,  0, { 0 } },
+	/* 7 bytes per chunk:                         */ {  0,  0, { 0 } },
+	/* 8 bytes per chunk:     0011223344556677    */ {  8, 24, { 0xbc, 0xbc, 0xbc, 0xbc, 0x3c, 0x38, 0x34, 0x30, 0x2c, 0x28, 0x24, 0x20, 0x1c, 0x18, 0x14, 0x10, 0x0c, 0x08, 0x04, 0x00, 0x80, 0x80, 0x80, 0x80 } },
+	/* 32 bit floating point:                     */ {  4, 16, { 0 } },
+	/* 64 bit floating point:                     */ {  8, 32, { 0 } },
+	/* 80 bit floating point:                     */ { 10, 32, { 0 } },
+	/* 8 bit octal:                               */ {  1,  4, { 0x06, 0x03, 0x00, 0x80 } },
+	/* 16 bit octal:                              */ {  2,  8, { 0x8f, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x00, 0x80 } },
+	/* 32 bit octal:                              */ {  4, 15, { 0x9e, 0x9e, 0x1e, 0x1b, 0x18, 0x15, 0x12, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x00, 0x80, 0x80 } },
+	/* 64 bit octal:                              */ {  8, 28, { 0xbf, 0xbf, 0xbf, 0x3f, 0x3c, 0x39, 0x36, 0x33, 0x30, 0x2d, 0x2a, 0x27, 0x24, 0x21, 0x1e, 0x1b, 0x18, 0x15, 0x12, 0x0f, 0x0c, 0x09, 0x06, 0x03, 0x00, 0x80, 0x80, 0x80 } },
 };
-
 
 
 //**************************************************************************
@@ -71,7 +88,7 @@ debug_view_memory_source::debug_view_memory_source(std::string &&name, memory_re
 	, m_blocklength(region.bytes())
 	, m_numblocks(1)
 	, m_blockstride(0)
-	, m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1))
+	, m_offsetxor(region.endianness() == ENDIANNESS_NATIVE ? 0 : region.bytewidth() - 1)
 	, m_endianness(region.endianness())
 	, m_prefsize(std::min<u8>(region.bytewidth(), 8))
 {
@@ -107,11 +124,13 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 		m_chunks_per_row(16),
 		m_bytes_per_chunk(1),
 		m_steps_per_chunk(1),
-		m_data_format(1),
+		m_data_format(data_format::HEX_8BIT),
 		m_reverse_view(false),
 		m_ascii_view(true),
 		m_no_translation(false),
 		m_edit_enabled(true),
+		m_shift_bits(4),
+		m_address_radix(16),
 		m_maxaddr(0),
 		m_bytes_per_row(16),
 		m_byte_offset(0)
@@ -214,12 +233,33 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		m_bytes_per_chunk = source.m_prefsize;
 		if (m_bytes_per_chunk > 8)
 			m_bytes_per_chunk = 8;
-		m_data_format = m_bytes_per_chunk;
+		bool octal = source.m_space != nullptr && source.m_space->is_octal();
+		switch (m_bytes_per_chunk)
+		{
+		case 1:
+			m_data_format = octal ? data_format::OCTAL_8BIT : data_format::HEX_8BIT;
+			break;
+
+		case 2:
+			m_data_format = octal ? data_format::OCTAL_16BIT : data_format::HEX_16BIT;
+			break;
+
+		case 4:
+			m_data_format = octal ? data_format::OCTAL_32BIT : data_format::HEX_32BIT;
+			break;
+
+		case 8:
+			m_data_format = octal ? data_format::OCTAL_64BIT : data_format::HEX_64BIT;
+			break;
+		}
+		m_shift_bits = octal ? 3 : 4;
 		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
 		if (source.m_space != nullptr)
 			m_expression.set_context(&source.m_space->device().debug()->symtable());
 		else
 			m_expression.set_context(nullptr);
+		m_address_radix = octal ? 8 : 16;
+		m_expression.set_default_base(m_address_radix);
 	}
 }
 
@@ -264,7 +304,7 @@ static inline float u64_to_double(u64 value)
 void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *destmax, debug_view_char *destrow, offs_t address)
 {
 	// get positional data
-	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
+	const memory_view_pos &posdata = get_posdata(m_data_format);
 	int spacing = posdata.m_spacing;
 
 	// generate the address
@@ -275,9 +315,9 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 		if (dest >= destmin && dest < destmax)
 			dest->byte = addrtext[ch];
 
-	// generate the data and the ascii string
+	// generate the data and the ASCII string
 	std::string chunkascii;
-	if (m_data_format <= 8)
+	if (m_shift_bits != 0)
 	{
 		for (int chunknum = 0; chunknum < m_chunks_per_row; chunknum++)
 		{
@@ -291,13 +331,13 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 				{
 					u8 shift = posdata.m_shift[ch];
 					if (shift < 64)
-						dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
+						dest->byte = ismapped ? "0123456789ABCDEF"[BIT(chunkdata, shift, m_shift_bits)] : '*';
 				}
 
 			for (int i = 0; i < m_bytes_per_chunk; i++)
 			{
 				u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
-				chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+				chunkascii += char(ismapped ? sanitise_character(chval) : '.');
 			}
 		}
 	}
@@ -310,7 +350,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 			extFloat80_t chunkdata80 = { 0, 0 };
 			bool ismapped;
 
-			if (m_data_format != 11)
+			if (m_data_format != data_format::FLOAT_80BIT)
 				ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata);
 			else
 				ismapped = read(m_bytes_per_chunk, address + chunknum * m_steps_per_chunk, chunkdata80);
@@ -318,15 +358,19 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 			if (ismapped)
 				switch (m_data_format)
 				{
-				case 9:
+				case data_format::FLOAT_32BIT:
 					sprintf(valuetext, "%.8g", u32_to_float(u32(chunkdata)));
 					break;
-				case 10:
+				case data_format::FLOAT_64BIT:
 					sprintf(valuetext, "%.24g", u64_to_double(chunkdata));
 					break;
-				case 11:
+				case data_format::FLOAT_80BIT:
+				{
 					float64_t f64 = extF80M_to_f64(&chunkdata80);
 					sprintf(valuetext, "%.24g", u64_to_double(f64.v));
+					break;
+				}
+				default:
 					break;
 				}
 			else
@@ -350,7 +394,7 @@ void debug_view_memory::generate_row(debug_view_char *destmin, debug_view_char *
 			for (int i = 0; i < m_bytes_per_chunk; i++)
 			{
 				u8 chval = chunkdata >> (8 * (m_bytes_per_chunk - i - 1));
-				chunkascii += char((ismapped && isprint(chval)) ? chval : '.');
+				chunkascii += char(ismapped ? sanitise_character(chval) : '.');
 			}
 		}
 	}
@@ -461,12 +505,12 @@ void debug_view_memory::view_char(int chval)
 
 		case DCH_HOME:
 			pos.m_address -= pos.m_address % m_bytes_per_row;
-			pos.m_shift = (m_bytes_per_chunk * 8) - 4;
+			pos.m_shift = get_posdata(m_data_format).m_shift[0] & 0x7f;
 			break;
 
 		case DCH_CTRLHOME:
 			pos.m_address = m_byte_offset;
-			pos.m_shift = (m_bytes_per_chunk * 8) - 4;
+			pos.m_shift = get_posdata(m_data_format).m_shift[0] & 0x7f;
 			break;
 
 		case DCH_END:
@@ -493,40 +537,32 @@ void debug_view_memory::view_char(int chval)
 			{
 				static const char hexvals[] = "0123456789abcdef";
 				char *hexchar = (char *)strchr(hexvals, tolower(chval));
-				if (hexchar == nullptr)
+				if (hexchar == nullptr || (m_shift_bits == 3 && chval >= '8'))
 					break;
 
-				const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-				offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(pos.m_address) : pos.m_address;
-				u64 data;
-				bool ismapped = read(m_bytes_per_chunk, address, data);
-				if (!ismapped)
-					break;
-
-				data &= ~(u64(0x0f) << pos.m_shift);
-				data |= u64(hexchar - hexvals) << pos.m_shift;
-				write(m_bytes_per_chunk, address, data);
+				if (!write_digit(pos.m_address, pos.m_shift, hexchar - hexvals))
+					break; // TODO: alert OSD?
 			}
 			// fall through to the right-arrow press
 			[[fallthrough]];
 		case DCH_RIGHT:
-			if (pos.m_shift == 0 && pos.m_address != m_maxaddr)
+			if (pos.m_shift != 0)
+				pos.m_shift -= m_shift_bits;
+			else if (pos.m_address != m_maxaddr)
 			{
-				pos.m_shift = m_bytes_per_chunk * 8 - 4;
+				pos.m_shift = get_posdata(m_data_format).m_shift[0] & 0x7f;
 				pos.m_address += m_bytes_per_chunk;
 			}
-			else
-				pos.m_shift -= 4;
 			break;
 
 		case DCH_LEFT:
-			if (pos.m_shift == m_bytes_per_chunk * 8 - 4 && pos.m_address != m_byte_offset)
+			if (pos.m_shift != (get_posdata(m_data_format).m_shift[0] & 0x7f))
+				pos.m_shift += m_shift_bits;
+			else if (pos.m_address != m_byte_offset)
 			{
 				pos.m_shift = 0;
 				pos.m_address -= m_bytes_per_chunk;
 			}
-			else
-				pos.m_shift += 4;
 			break;
 	}
 
@@ -583,19 +619,42 @@ void debug_view_memory::recompute()
 	{
 		m_maxaddr = m_no_translation ? source.m_space->addrmask() : source.m_space->logaddrmask();
 		maxbyte = source.m_space->address_to_byte_end(m_maxaddr);
-		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
+		if (m_address_radix == 8)
+			addrchars = ((m_no_translation ? source.m_space->addr_width() : source.m_space->logaddr_width()) + 2) / 3;
+		else
+			addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
 	{
 		maxbyte = m_maxaddr = (source.m_blocklength * source.m_numblocks) - 1;
-		addrchars = string_format("%X", m_maxaddr).size();
+		if (m_address_radix == 8)
+			addrchars = string_format("%o", m_maxaddr).size();
+		else
+			addrchars = string_format("%X", m_maxaddr).size();
 	}
 
 	// generate an 8-byte aligned format for the address
-	if (!m_reverse_view)
-		m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
-	else
-		m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+	switch (m_address_radix)
+	{
+	case 8:
+		if (!m_reverse_view)
+			m_addrformat = string_format("%*s%%0%do", 11 - addrchars, "", addrchars);
+		else
+			m_addrformat = string_format("%%0%do%*s", addrchars, 11 - addrchars, "");
+		break;
+
+	case 10:
+		// omit leading zeros for decimal addresses
+		m_addrformat = m_reverse_view ? "%-10d" : "%10d";
+		break;
+
+	case 16:
+		if (!m_reverse_view)
+			m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
+		else
+			m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+		break;
+	}
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
 	// BAD
@@ -620,14 +679,21 @@ void debug_view_memory::recompute()
 	m_byte_offset = val % m_bytes_per_row;
 
 	// compute the section widths
-	m_section[0].m_width = 1 + 8 + 1;
-	if (m_data_format <= 8)
-		m_section[1].m_width = 1 + 3 * m_bytes_per_row + 1;
-	else {
-		const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
+	switch (m_address_radix)
+	{
+	case 8:
+		m_section[0].m_width = 1 + 11 + 1;
+		break;
 
-		m_section[1].m_width = 1 + posdata.m_spacing * m_chunks_per_row + 1;
+	case 10:
+		m_section[0].m_width = 1 + 10 + 1;
+		break;
+
+	case 16:
+		m_section[0].m_width = 1 + 8 + 1;
+		break;
 	}
+	m_section[1].m_width = 1 + get_posdata(m_data_format).m_spacing * m_chunks_per_row + 1;
 	m_section[2].m_width = m_ascii_view ? (1 + m_bytes_per_row + 1) : 0;
 
 	// compute the section positions
@@ -693,11 +759,11 @@ debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos(const debug_view
 {
 	// start with the base address for this row
 	cursor_pos pos;
-	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
+	const memory_view_pos &posdata = get_posdata(m_data_format);
 	pos.m_address = m_byte_offset + cursor.y * m_bytes_per_chunk * m_chunks_per_row;
 
 	// determine the X position within the middle section, clamping as necessary
-	if (m_data_format <= 8) {
+	if (posdata.m_shift[0] != 0) {
 		int xposition = cursor.x - m_section[1].m_pos - 1;
 		if (xposition < 0)
 			xposition = 0;
@@ -744,7 +810,7 @@ debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos(const debug_view
 
 void debug_view_memory::set_cursor_pos(cursor_pos pos)
 {
-	const memory_view_pos &posdata = s_memory_pos_table[m_data_format];
+	const memory_view_pos &posdata = get_posdata(m_data_format);
 
 	// offset the address by the byte offset
 	if (pos.m_address < m_byte_offset)
@@ -759,7 +825,7 @@ void debug_view_memory::set_cursor_pos(cursor_pos pos)
 	if (m_reverse_view)
 		chunknum = m_chunks_per_row - 1 - chunknum;
 
-	if (m_data_format <= 8) {
+	if (posdata.m_shift[0] != 0) {
 		// scan within the chunk to find the shift
 		for (m_cursor.x = 0; m_cursor.x < posdata.m_spacing; m_cursor.x++)
 			if (posdata.m_shift[m_cursor.x] == pos.m_shift)
@@ -920,15 +986,41 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	if (offs >= (source.m_blocklength * source.m_numblocks))
 		return;
 	*(reinterpret_cast<u8 *>(source.m_base) + (offs / source.m_blocklength * source.m_blockstride) + (offs % source.m_blocklength)) = data;
+}
 
-// hack for FD1094 editing
-#ifdef FD1094_HACK
-	if (source.m_base == machine().root_device().memregion("user2"))
+
+//-------------------------------------------------
+//  write_digit - write one hex or octal digit
+//  at the given address and bit position
+//-------------------------------------------------
+
+bool debug_view_memory::write_digit(offs_t offs, u8 pos, u8 digit)
+{
+	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
+	offs_t address = (source.m_space != nullptr) ? source.m_space->byte_to_address(offs) : offs;
+	u64 data;
+	bool ismapped = read(m_bytes_per_chunk, address, data);
+	if (!ismapped)
+		return false;
+
+	// clamp to chunk size
+	if (m_bytes_per_chunk * 8 < pos + m_shift_bits)
 	{
-		extern void fd1094_regenerate_key(running_machine &machine);
-		fd1094_regenerate_key(machine());
+		assert(m_bytes_per_chunk * 8 > pos);
+		digit &= util::make_bitmask<u8>(m_bytes_per_chunk * 8 - pos);
 	}
-#endif
+
+	u64 write_data = (data & ~(util::make_bitmask<u64>(m_shift_bits) << pos)) | (u64(digit) << pos);
+	write(m_bytes_per_chunk, address, write_data);
+
+	// verify that data reads back as it was written
+	if (source.m_space != nullptr)
+	{
+		read(m_bytes_per_chunk, address, data);
+		return data == write_data;
+	}
+	else
+		return true;
 }
 
 
@@ -965,15 +1057,15 @@ void debug_view_memory::set_chunks_per_row(u32 rowchunks)
 
 //-------------------------------------------------
 //  set_data_format - specify what kind of values
-//  are shown, 1-8 8-64 bits, 9 32bit floating point
+//  are shown
 //-------------------------------------------------
 
-void debug_view_memory::set_data_format(int format)
+void debug_view_memory::set_data_format(data_format format)
 {
 	cursor_pos pos;
 
 	// should never be
-	if ((format <= 0) || (format > 11))
+	if (!is_valid_format(format))
 		return;
 	// no need to change
 	if (format == m_data_format)
@@ -981,47 +1073,42 @@ void debug_view_memory::set_data_format(int format)
 
 	pos = begin_update_and_get_cursor_pos();
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
-	if ((format <= 8) && (m_data_format <= 8)) {
-
+	if (is_hex_format(format) && is_hex_format(m_data_format)) {
 		pos.m_address += (pos.m_shift / 8) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1));
 		pos.m_shift %= 8;
 
-		m_bytes_per_chunk = format;
+		m_bytes_per_chunk = get_posdata(format).m_bytes;
 		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
-		m_chunks_per_row = m_bytes_per_row / format;
+		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
 		if (m_chunks_per_row < 1)
 			m_chunks_per_row = 1;
 
 		pos.m_shift += 8 * ((pos.m_address % m_bytes_per_chunk) ^ ((source.m_endianness == ENDIANNESS_LITTLE) ? 0 : (m_bytes_per_chunk - 1)));
 		pos.m_address -= pos.m_address % m_bytes_per_chunk;
 	} else {
-		if (format <= 8) {
+		if (is_hex_format(format)) {
 			m_supports_cursor = true;
 			m_edit_enabled = true;
-
-			m_bytes_per_chunk = format;
+			m_shift_bits = 4;
+		}
+		else if (is_octal_format(format)) {
+			m_supports_cursor = true;
+			m_edit_enabled = true;
+			m_shift_bits = 3;
 		}
 		else {
 			m_supports_cursor = false;
 			m_edit_enabled = false;
 			m_cursor_visible = false;
-
-			switch (format)
-			{
-			case 9:
-				m_bytes_per_chunk = 4;
-				break;
-			case 10:
-				m_bytes_per_chunk = 8;
-				break;
-			case 11:
-				m_bytes_per_chunk = 10;
-				break;
-			}
+			m_shift_bits = 0;
 		}
+
+		m_bytes_per_chunk = get_posdata(format).m_bytes;
 		m_chunks_per_row = m_bytes_per_row / m_bytes_per_chunk;
+		if (m_chunks_per_row < 1)
+			m_chunks_per_row = 1;
 		m_steps_per_chunk = source.m_space ? source.m_space->byte_to_address(m_bytes_per_chunk) : m_bytes_per_chunk;
-		pos.m_shift = 0;
+		pos.m_shift = get_posdata(format).m_shift[0] & 0x7f;
 		pos.m_address -= pos.m_address % m_bytes_per_chunk;
 	}
 	m_recompute = m_update_pending = true;
@@ -1067,6 +1154,25 @@ void debug_view_memory::set_physical(bool physical)
 {
 	cursor_pos pos = begin_update_and_get_cursor_pos();
 	m_no_translation = physical;
+	m_recompute = m_update_pending = true;
+	end_update_and_set_cursor_pos(pos);
+}
+
+
+//-------------------------------------------------
+//  set_address_radix - specify whether the memory
+//  view should display addresses in base 8, base
+//  10 or base 16
+//-------------------------------------------------
+
+void debug_view_memory::set_address_radix(int radix)
+{
+	if (radix != 8 && radix != 10 && radix != 16)
+		return;
+
+	cursor_pos pos = begin_update_and_get_cursor_pos();
+	m_address_radix = radix;
+	m_expression.set_default_base(radix);
 	m_recompute = m_update_pending = true;
 	end_update_and_set_cursor_pos(pos);
 }

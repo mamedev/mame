@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16", "UNSP" }
+DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "ARM7", "ADSP21062", "MB86235", "DSP16", "UNSP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -123,14 +123,50 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_00to01.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_02to03.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_jumps.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_loop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_aux.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_3f_zop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_3x.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_06to0b.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0c_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0d_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0e_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_07_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_12to16_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_17_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_18_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_19_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1ato1c_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1dto1f_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_helper.ipp",
 	}
 end
 
 if opt_tool(CPUS, "ARCOMPACT") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompact_common.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_dispatch.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_internal.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_00to01.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_02to03.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_sop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_3f_zop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_3x.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05_2f_sop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_06to0b.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_16bit.cpp")
 end
 
 --------------------------------------------------
@@ -160,6 +196,8 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.h",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
@@ -551,6 +589,7 @@ end
 --------------------------------------------------
 -- DEC PDP-8
 --@src/devices/cpu/pdp8/pdp8.h,CPUS["PDP8"] = true
+--@src/devices/cpu/pdp8/hd6120.h,CPUS["PDP8"] = true
 --------------------------------------------------
 
 if CPUS["PDP8"] then
@@ -700,6 +739,8 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h8_sci.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.h",
+		MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/gt913.h",
 	}
 
 	dependency {
@@ -707,6 +748,7 @@ if CPUS["H8"] then
 		{ MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",      GEN_DIR .. "emu/cpu/h8/h8h.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/h8/h8s2000.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2000.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/h8/h8s2600.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2600.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",    GEN_DIR .. "emu/cpu/h8/gt913.hxx" },
 	}
 
 	custombuildtask {
@@ -714,19 +756,22 @@ if CPUS["H8"] then
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8h.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H source file...",  PYTHON .. " $(1) $(<) s h   $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2000.hxx",  { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 source file...", PYTHON .. " $(1) $(<) s s20 $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2600.hxx",  { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 source file...", PYTHON .. " $(1) $(<) s s26 $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/h8/gt913.lst" , GEN_DIR .. "emu/cpu/h8/gt913.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating GT913 source file...",    PYTHON .. " $(1) $(<) s g   $(@)" }},
 	}
 end
 
 if opt_tool(CPUS, "H8") then
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8d.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300 disassembler source file...",   PYTHON .. " $(1) $(<) d o   $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8hd.hxx",     { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H disassembler source file...",  PYTHON .. " $(1) $(<) d h   $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 disassembler source file...", PYTHON .. " $(1) $(<) d s20 $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 disassembler source file...", PYTHON .. " $(1) $(<) d s26 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8d.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300 disassembler source file...",   PYTHON .. " $(1) $(<) d o   $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8hd.hxx",     { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H disassembler source file...",  PYTHON .. " $(1) $(<) d h   $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 disassembler source file...", PYTHON .. " $(1) $(<) d s20 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 disassembler source file...", PYTHON .. " $(1) $(<) d s26 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/gt913.lst" , GEN_DIR .. "emu/cpu/h8/gt913d.hxx",   { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating GT913 disassembler source file...",    PYTHON .. " $(1) $(<) d g   $(@)" }})
 
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8d.cpp",       GEN_DIR .. "emu/cpu/h8/h8d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8hd.cpp",      GEN_DIR .. "emu/cpu/h8/h8hd.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8s2000d.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8s2600d.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/gt913d.cpp",    GEN_DIR .. "emu/cpu/h8/gt913d.hxx" })
 
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8d.h")
@@ -736,6 +781,8 @@ if opt_tool(CPUS, "H8") then
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2000d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.h")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/gt913d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/gt913d.h")
 end
 
 --------------------------------------------------
@@ -1080,16 +1127,31 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.cpp",
-		MAME_DIR .. "src/devices/cpu/mcs51/axc51-core.h",
 	}
 end
 
 if opt_tool(CPUS, "MCS51") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/axc51-core_dasm.h")
+end
+
+--------------------------------------------------
+-- Appotech AXC-51 (extended Intel 8051)
+--@src/devices/cpu/axc51/axc51.h,CPUS["AXC51"] = true
+--------------------------------------------------
+
+if CPUS["AXC51"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.cpp",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51.h",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/axc51/axc51extops.hxx",
+	}
+end
+
+if opt_tool(CPUS, "AXC51") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/axc51/axc51dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/acx51/axc51dasm.h")
 end
 
 --------------------------------------------------
@@ -1529,29 +1591,31 @@ end
 
 --------------------------------------------------
 -- Mostek 6502 and its many derivatives
---@src/devices/cpu/m6502/m6502.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/deco16.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m4510.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m65ce02.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m65c02.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/r65c02.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/r65c19.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m50734.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6500_1.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m6502.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6504.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6507.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6509.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6510.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m6510t.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m65ce02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m65c02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m65sc02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/m740.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m7501.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m8502.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/n2a03.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m740.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
---@src/devices/cpu/m6502/m5074x.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/r65c02.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/r65c19.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/rp2a03.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/st2xxx.h,CPUS["ST2XXX"] = true
 --@src/devices/cpu/m6502/st2204.h,CPUS["ST2XXX"] = true
 --@src/devices/cpu/m6502/st2205u.h,CPUS["ST2XXX"] = true
+--@src/devices/cpu/m6502/w65c02s.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX2000"] = true
 
@@ -1561,18 +1625,18 @@ if CPUS["M6502"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m6502.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m65c02.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m65c02.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m50734.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m50734.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m5074x.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m5074x.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",
@@ -1583,50 +1647,56 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m6510.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6510t.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6510t.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m65c02.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m65c02.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m65ce02.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m65sc02.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/m740.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m7501.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m7501.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m8502.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m8502.h",
-		MAME_DIR .. "src/devices/cpu/m6502/n2a03.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/n2a03.h",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c02.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c02.h",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c19.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/r65c19.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m740.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
-		MAME_DIR .. "src/devices/cpu/m6502/m5074x.cpp",
-		MAME_DIR .. "src/devices/cpu/m6502/m5074x.h",
+		MAME_DIR .. "src/devices/cpu/m6502/rp2a03.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/rp2a03.h",
+		MAME_DIR .. "src/devices/cpu/m6502/w65c02s.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/w65c02s.h",
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6502/odeco16.lst",  GEN_DIR .. "emu/cpu/m6502/deco16.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/ddeco16.lst"  }, {"@echo Generating deco16 disassembler source file...", PYTHON .. " $(1) s deco16 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om4510.lst",   GEN_DIR .. "emu/cpu/m6502/m4510.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm4510.lst"   }, {"@echo Generating m4510 disassembler source file...", PYTHON .. " $(1) s m4510 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om6502.lst",   GEN_DIR .. "emu/cpu/m6502/m6502.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6502.lst"   }, {"@echo Generating m6502 disassembler source file...", PYTHON .. " $(1) s m6502 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om65c02.lst",  GEN_DIR .. "emu/cpu/m6502/m65c02.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65c02.lst"  }, {"@echo Generating m65c02 disassembler source file...", PYTHON .. " $(1) s m65c02 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om65ce02.lst", GEN_DIR .. "emu/cpu/m6502/m65ce02.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65ce02.lst" }, {"@echo Generating m65ce02 disassembler source file...", PYTHON .. " $(1) s m65ce02 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om6509.lst",   GEN_DIR .. "emu/cpu/m6502/m6509.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6509.lst"   }, {"@echo Generating m6509 disassembler source file...", PYTHON .. " $(1) s m6509 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om6510.lst",   GEN_DIR .. "emu/cpu/m6502/m6510.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6510.lst"   }, {"@echo Generating m6510 disassembler source file...", PYTHON .. " $(1) s m6510 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/on2a03.lst",   GEN_DIR .. "emu/cpu/m6502/n2a03.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dn2a03.lst"   }, {"@echo Generating n2a03 disassembler source file...", PYTHON .. " $(1) s n2a03_core $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/om740.lst" ,   GEN_DIR .. "emu/cpu/m6502/m740.hxx",    { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm740.lst"    }, {"@echo Generating m740 disassembler source file...", PYTHON .. " $(1) s m740 $(<) $(2) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/dr65c02.lst",  GEN_DIR .. "emu/cpu/m6502/r65c02.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",                                                     }, {"@echo Generating r65c02 disassembler source file...", PYTHON .. " $(1) s r65c02 - $(<) $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6502/or65c19.lst",  GEN_DIR .. "emu/cpu/m6502/r65c19.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dr65c19.lst"  }, {"@echo Generating r65c19 disassembler source file...", PYTHON .. " $(1) s r65c19 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/odeco16.lst",  GEN_DIR .. "emu/cpu/m6502/deco16.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/ddeco16.lst"  }, {"@echo Generating deco16 instruction source file...", PYTHON .. " $(1) s deco16 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om4510.lst",   GEN_DIR .. "emu/cpu/m6502/m4510.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm4510.lst"   }, {"@echo Generating m4510 instruction source file...", PYTHON .. " $(1) s m4510 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om6502.lst",   GEN_DIR .. "emu/cpu/m6502/m6502.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6502.lst"   }, {"@echo Generating m6502 instruction source file...", PYTHON .. " $(1) s m6502 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om65c02.lst",  GEN_DIR .. "emu/cpu/m6502/m65c02.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65c02.lst"  }, {"@echo Generating m65c02 instruction source file...", PYTHON .. " $(1) s m65c02 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om65ce02.lst", GEN_DIR .. "emu/cpu/m6502/m65ce02.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65ce02.lst" }, {"@echo Generating m65ce02 instruction source file...", PYTHON .. " $(1) s m65ce02 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om6509.lst",   GEN_DIR .. "emu/cpu/m6502/m6509.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6509.lst"   }, {"@echo Generating m6509 instruction source file...", PYTHON .. " $(1) s m6509 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om6510.lst",   GEN_DIR .. "emu/cpu/m6502/m6510.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6510.lst"   }, {"@echo Generating m6510 instruction source file...", PYTHON .. " $(1) s m6510 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/om740.lst" ,   GEN_DIR .. "emu/cpu/m6502/m740.hxx",    { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm740.lst"    }, {"@echo Generating m740 instruction source file...", PYTHON .. " $(1) s m740 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/dr65c02.lst",  GEN_DIR .. "emu/cpu/m6502/r65c02.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",                                                     }, {"@echo Generating r65c02 instruction source file...", PYTHON .. " $(1) s r65c02 - $(<) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/or65c19.lst",  GEN_DIR .. "emu/cpu/m6502/r65c19.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dr65c19.lst"  }, {"@echo Generating r65c19 instruction source file...", PYTHON .. " $(1) s r65c19 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/orp2a03.lst",  GEN_DIR .. "emu/cpu/m6502/rp2a03.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/drp2a03.lst"  }, {"@echo Generating rp2a03 instruction source file...", PYTHON .. " $(1) s rp2a03_core $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/ow65c02s.lst", GEN_DIR .. "emu/cpu/m6502/w65c02s.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dw65c02s.lst" }, {"@echo Generating w65c02s instruction source file...", PYTHON .. " $(1) s w65c02s $(<) $(2) $(@)" }},
 	}
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",   GEN_DIR .. "emu/cpu/m6502/deco16.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",    GEN_DIR .. "emu/cpu/m6502/m4510.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m6502.cpp",    GEN_DIR .. "emu/cpu/m6502/m6502.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/m65c02.cpp",   GEN_DIR .. "emu/cpu/m6502/m65c02.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/m65ce02.cpp",  GEN_DIR .. "emu/cpu/m6502/m65ce02.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m6509.cpp",    GEN_DIR .. "emu/cpu/m6502/m6509.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/m6510.cpp",    GEN_DIR .. "emu/cpu/m6502/m6510.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/n2a03.cpp",    GEN_DIR .. "emu/cpu/m6502/n2a03.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/m65c02.cpp",   GEN_DIR .. "emu/cpu/m6502/m65c02.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/m65ce02.cpp",  GEN_DIR .. "emu/cpu/m6502/m65ce02.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",     GEN_DIR .. "emu/cpu/m6502/m740.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/r65c02.cpp",   GEN_DIR .. "emu/cpu/m6502/r65c02.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/m6502/r65c19.cpp",   GEN_DIR .. "emu/cpu/m6502/r65c19.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/m740.cpp",     GEN_DIR .. "emu/cpu/m6502/m740.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/rp2a03.cpp",   GEN_DIR .. "emu/cpu/m6502/rp2a03.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/w65c02s.cpp",  GEN_DIR .. "emu/cpu/m6502/w65c02s.hxx" },
 	}
 end
 
@@ -1639,14 +1709,6 @@ if CPUS["ST2XXX"] then
 		MAME_DIR .. "src/devices/cpu/m6502/st2205u.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/st2205u.h",
 	}
-
-	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6502/ost2xxx.lst" , GEN_DIR .. "emu/cpu/m6502/st2xxx.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dst2xxx.lst"  }, {"@echo Generating st2xxx disassembler source file...", PYTHON .. " $(1) s st2xxx $(<) $(2) $(@)" }},
-	}
-
-	dependency {
-		{ MAME_DIR .. "src/devices/cpu/m6502/st2xxx.cpp",   GEN_DIR .. "emu/cpu/m6502/st2xxx.hxx" },
-	}
 end
 
 if CPUS["XAVIX"] then
@@ -1656,7 +1718,7 @@ if CPUS["XAVIX"] then
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix.lst",   GEN_DIR .. "emu/cpu/m6502/xavix.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix.lst"   }, {"@echo Generating xavix disassembler source file...", PYTHON .. " $(1) s xavix $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix.lst",   GEN_DIR .. "emu/cpu/m6502/xavix.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix.lst"   }, {"@echo Generating xavix instruction source file...", PYTHON .. " $(1) s xavix $(<) $(2) $(@)" }},
 	}
 
 	dependency {
@@ -1671,7 +1733,7 @@ if CPUS["XAVIX2000"] then
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix2000.lst",   GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating xavix2000 disassembler source file...", PYTHON .. " $(1) s xavix2000 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix2000.lst",   GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating xavix2000 instruction source file...", PYTHON .. " $(1) s xavix2000 $(<) $(2) $(@)" }},
 	}
 
 	dependency {
@@ -1687,22 +1749,22 @@ if opt_tool(CPUS, "M6502") then
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/om65ce02.lst", GEN_DIR .. "emu/cpu/m6502/m65ce02d.hxx", { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm65ce02.lst" }, {"@echo Generating m65ce02 disassembler source file...", PYTHON .. " $(1) d m65ce02 $(<) $(2) $(@)" }})
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/om6509.lst",   GEN_DIR .. "emu/cpu/m6502/m6509d.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6509.lst"   }, {"@echo Generating m6509 disassembler source file...", PYTHON .. " $(1) d m6509 $(<) $(2) $(@)" }})
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/om6510.lst",   GEN_DIR .. "emu/cpu/m6502/m6510d.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm6510.lst"   }, {"@echo Generating m6510 disassembler source file...", PYTHON .. " $(1) d m6510 $(<) $(2) $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/on2a03.lst",   GEN_DIR .. "emu/cpu/m6502/n2a03d.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dn2a03.lst"   }, {"@echo Generating n2a03 disassembler source file...", PYTHON .. " $(1) d n2a03 $(<) $(2) $(@)" }})
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/om740.lst" ,   GEN_DIR .. "emu/cpu/m6502/m740d.hxx",    { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dm740.lst"    }, {"@echo Generating m740 disassembler source file...", PYTHON .. " $(1) d m740 $(<) $(2) $(@)" }})
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/dr65c02.lst",  GEN_DIR .. "emu/cpu/m6502/r65c02d.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",                                                     }, {"@echo Generating r65c02 disassembler source file...", PYTHON .. " $(1) d r65c02 - $(<) $(@)" }})
 	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/or65c19.lst",  GEN_DIR .. "emu/cpu/m6502/r65c19d.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dr65c19.lst"  }, {"@echo Generating r65c19 disassembler source file...", PYTHON .. " $(1) d r65c19 $(<) $(2) $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/orp2a03.lst",  GEN_DIR .. "emu/cpu/m6502/rp2a03d.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/drp2a03.lst"  }, {"@echo Generating rp2a03 disassembler source file...", PYTHON .. " $(1) d rp2a03 $(<) $(2) $(@)" }})
 
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/deco16d.cpp",   GEN_DIR .. "emu/cpu/m6502/deco16d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m4510d.cpp",    GEN_DIR .. "emu/cpu/m6502/m4510d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m6502d.cpp",    GEN_DIR .. "emu/cpu/m6502/m6502d.hxx" })
-	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m65c02d.cpp",   GEN_DIR .. "emu/cpu/m6502/m65c02d.hxx" })
-	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m65ce02d.cpp",  GEN_DIR .. "emu/cpu/m6502/m65ce02d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m6509d.cpp",    GEN_DIR .. "emu/cpu/m6502/m6509d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m6510d.cpp",    GEN_DIR .. "emu/cpu/m6502/m6510d.hxx" })
-	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/n2a03d.cpp",    GEN_DIR .. "emu/cpu/m6502/n2a03d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m65c02d.cpp",   GEN_DIR .. "emu/cpu/m6502/m65c02d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m65ce02d.cpp",  GEN_DIR .. "emu/cpu/m6502/m65ce02d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m740d.cpp",     GEN_DIR .. "emu/cpu/m6502/m740d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/r65c02d.cpp",   GEN_DIR .. "emu/cpu/m6502/r65c02d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/r65c19d.cpp",   GEN_DIR .. "emu/cpu/m6502/r65c19d.hxx" })
-	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/m740d.cpp",     GEN_DIR .. "emu/cpu/m6502/m740d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/rp2a03d.cpp",   GEN_DIR .. "emu/cpu/m6502/rp2a03d.hxx" })
 
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/deco16d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/deco16d.h")
@@ -1720,12 +1782,12 @@ if opt_tool(CPUS, "M6502") then
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/m65ce02d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/m740d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/m740d.h")
-	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/n2a03d.cpp")
-	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/n2a03d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/r65c02d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/r65c02d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/r65c19d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/r65c19d.h")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/rp2a03d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/rp2a03d.h")
 end
 
 if opt_tool(CPUS, "XAVIX") then
@@ -1815,9 +1877,9 @@ if CPUS["M6809"] then
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/m6809/m6809.ops"  , GEN_DIR .. "emu/cpu/m6809/m6809.hxx",   { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating m6809 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6809/hd6309.ops" , GEN_DIR .. "emu/cpu/m6809/hd6309.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating hd6309 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
-		{ MAME_DIR .. "src/devices/cpu/m6809/konami.ops" , GEN_DIR .. "emu/cpu/m6809/konami.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.ops"  }, {"@echo Generating konami source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/m6809.lst"  , GEN_DIR .. "emu/cpu/m6809/m6809.hxx",   { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating m6809 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/hd6309.lst" , GEN_DIR .. "emu/cpu/m6809/hd6309.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating hd6309 source file...", PYTHON .. " $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6809/konami.lst" , GEN_DIR .. "emu/cpu/m6809/konami.hxx",  { MAME_DIR .. "src/devices/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/devices/cpu/m6809/base6x09.lst"  }, {"@echo Generating konami source file...", PYTHON .. " $(1) $(<) > $(@)" }},
 	}
 end
 
@@ -1848,6 +1910,14 @@ end
 --------------------------------------------------
 -- Motorola 68000 series
 --@src/devices/cpu/m68000/m68000.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68008.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68010.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68020.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68030.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/m68040.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/scc68070.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/fscpu32.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/mcf5206e.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if CPUS["M680X0"] then
@@ -1856,9 +1926,41 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcpu.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kops.h",
-		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kfpu.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68kmmu.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kmusashi.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.lst",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000gen.py",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-decode.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-head.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdf.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sif.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdp.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sip.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdfm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sifm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdpm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sipm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68010.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68020.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68020.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68030.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68030.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68040.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68040.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/scc68070.h",
+		MAME_DIR .. "src/devices/cpu/m68000/scc68070.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.h",
+		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.h",
+		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.cpp",
 	}
 end
 
@@ -2075,6 +2177,7 @@ end
 --------------------------------------------------
 -- NEC uPD7810 series
 --@src/devices/cpu/upd7810/upd7810.h,CPUS["UPD7810"] = true
+--@src/devices/cpu/upd7810/upd7811.h,CPUS["UPD7810"] = true
 --------------------------------------------------
 
 if CPUS["UPD7810"] then
@@ -2143,39 +2246,6 @@ if CPUS["RSP"] then
 		MAME_DIR .. "src/devices/cpu/rsp/rsp.cpp",
 		MAME_DIR .. "src/devices/cpu/rsp/rsp.h",
 		MAME_DIR .. "src/devices/cpu/rsp/rspdefs.h",
-		MAME_DIR .. "src/devices/cpu/rsp/rspdrc.cpp",
-		MAME_DIR .. "src/devices/cpu/rsp/rspfe.cpp",
-		MAME_DIR .. "src/devices/cpu/rsp/rspfe.h",
-		MAME_DIR .. "src/devices/cpu/rsp/rspcp2.cpp",
-		MAME_DIR .. "src/devices/cpu/rsp/rspcp2.h",
-		MAME_DIR .. "src/devices/cpu/rsp/rspcp2d.cpp",
-		MAME_DIR .. "src/devices/cpu/rsp/rspcp2d.h",
-		MAME_DIR .. "src/devices/cpu/rsp/clamp.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vabs.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vadd.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vaddc.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vand.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vch.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vcl.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vcmp.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vcr.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vdivh.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vldst.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmac.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmov.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmrg.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmudh.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmul.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmulh.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmull.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmulm.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vmuln.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vor.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vrcpsq.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vrsq.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vsub.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vsubc.h",
-		MAME_DIR .. "src/devices/cpu/rsp/vxor.h",
 		MAME_DIR .. "src/devices/cpu/rsp/rspdiv.h",
 	}
 end
@@ -2241,25 +2311,32 @@ end
 --------------------------------------------------
 -- Sharp SM510 series
 --@src/devices/cpu/sm510/sm510.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm511.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm530.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm590.h,CPUS["SM510"] = true
+--@src/devices/cpu/sm510/sm5a.h,CPUS["SM510"] = true
 --------------------------------------------------
 
 if CPUS["SM510"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/sm510/sm510base.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510base.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm510core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm511core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm500core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm5acore.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm590.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm590core.cpp",
 	}
 end
 
@@ -2413,6 +2490,8 @@ end
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1100.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1400.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2100.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/tms2400.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0970.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
@@ -2431,6 +2510,10 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1100.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms1400.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2100.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/tms2400.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0970.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0980.cpp",
@@ -2623,15 +2706,17 @@ if CPUS["TMS57002"] then
 		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsops.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" },
 	}
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" } }
+		{ MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) s $(<) $(@)" } }
 	}
 end
 
 if opt_tool(CPUS, "TMS57002") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms57002/57002dsm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms57002/57002dsm.h")
+	table.insert(disasm_dependency , { MAME_DIR .. "src/devices/cpu/tms57002/57002dsm.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002d.hxx" } )
 	table.insert(disasm_dependency , { MAME_DIR .. "src/devices/cpu/tms57002/57002dsm.cpp",  GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx" } )
-	table.insert(disasm_custombuildtask , { MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" }})
+	table.insert(disasm_custombuildtask , { MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002d.hxx",   { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) d $(<) $(@)" }})
+	table.insert(disasm_custombuildtask , { MAME_DIR .. "src/devices/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.hxx",    { MAME_DIR .. "src/devices/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) s $(<) $(@)" }})
 end
 
 --------------------------------------------------
@@ -2732,8 +2817,14 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.h",
+		MAME_DIR .. "src/devices/cpu/z80/ez80.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/ez80.h",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
+		MAME_DIR .. "src/devices/cpu/z80/mc8123.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/mc8123.h",
+		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 	}
 end
 
@@ -2747,6 +2838,8 @@ if CPUS["KC80"] then
 		MAME_DIR .. "src/devices/cpu/z80/kl5c80a16.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp63.h",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/kp64.h",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/kp69.h",
 		MAME_DIR .. "src/devices/cpu/z80/ky80.cpp",
@@ -2797,9 +2890,13 @@ if CPUS["Z180"] then
 		MAME_DIR .. "src/devices/cpu/z180/z180ed.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180fd.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180op.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
-		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180asci.h",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.h",
 	}
 end
 
@@ -2863,6 +2960,44 @@ end
 if opt_tool(CPUS, "SUPERFX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/superfx/sfx_dasm.h")
+end
+
+--------------------------------------------------
+-- Rockwell A/B5000 family
+--@src/devices/cpu/rw5000/a5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5500.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/a5900.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b5500.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6000.h,CPUS["RW5000"] = true
+--@src/devices/cpu/rw5000/b6100.h,CPUS["RW5000"] = true
+--------------------------------------------------
+
+if CPUS["RW5000"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/rw5000base.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5000op.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b5500.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/b6100.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5000.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5500.h",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.cpp",
+		MAME_DIR .. "src/devices/cpu/rw5000/a5900.h",
+	}
+end
+
+if opt_tool(CPUS, "RW5000") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/rw5000/rw5000d.h")
 end
 
 --------------------------------------------------
@@ -3101,6 +3236,36 @@ if opt_tool(CPUS, "ALPHA") then
 end
 
 --------------------------------------------------
+-- Hewlett-Packard HP2100 (disassembler only)
+--@src/devices/cpu/hp2100/hp2100.h,CPUS["HP2100"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "HP2100") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/hp2100/hp2100d.h")
+end
+
+--------------------------------------------------
+-- SDS Sigma 2 (disassembler only)
+--@src/devices/cpu/sigma2/sigma2.h,CPUS["SIGMA2"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "SIGMA2") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sigma2/sigma2d.h")
+end
+
+--------------------------------------------------
+-- Control Data Corporation 1700 (disassembler only)
+--@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC1700") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc1700/cdc1700d.h")
+end
+
+--------------------------------------------------
 -- National Semiconductor HPC
 --@src/devices/cpu/hpc/hpc.h,CPUS["HPC"] = true
 --------------------------------------------------
@@ -3218,8 +3383,8 @@ if CPUS["F2MC16"] then
 end
 
 if opt_tool(CPUS, "F2MC16") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/f2mc16/f2mc16d.h")
 end
 
 --------------------------------------------------
@@ -3280,6 +3445,16 @@ end
 if opt_tool(CPUS, "DSP56000") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.h")
+end
+
+--------------------------------------------------
+-- DEC VAX, disassembler only
+--@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "VAX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.h")
 end
 
 --------------------------------------------------
@@ -3406,6 +3581,7 @@ end
 --@src/devices/cpu/upd78k/upd78k0.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k2.h,CPUS["UPD78K"] = true
 --@src/devices/cpu/upd78k/upd78k3.h,CPUS["UPD78K"] = true
+--@src/devices/cpu/upd78k/upd78k4.h,CPUS["UPD78K"] = true
 --------------------------------------------------
 
 if CPUS["UPD78K"] then
@@ -3416,6 +3592,8 @@ if CPUS["UPD78K"] then
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k2.h",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.cpp",
 		MAME_DIR .. "src/devices/cpu/upd78k/upd78k3.h",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.cpp",
+		MAME_DIR .. "src/devices/cpu/upd78k/upd78k4.h",
 	}
 end
 
@@ -3430,6 +3608,8 @@ if opt_tool(CPUS, "UPD78K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k2d.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k3d.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/upd78k/upd78k4d.h")
 end
 
 --------------------------------------------------
@@ -3525,11 +3705,86 @@ if opt_tool(CPUS, "MK1") then
 end
 
 --------------------------------------------------
--- Motorola M68HC16 (CPU16) - Disassembler only
---@src/devices/cpu/m68hc16/m68hc16.h,CPUS["M68HC16"] = true
+-- Motorola M68HC16 (CPU16)
+--@src/devices/cpu/m68hc16/cpu16.h,CPUS["M68HC16"] = true
 --------------------------------------------------
+
+if CPUS["M68HC16"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.cpp",
+		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.h",
+		MAME_DIR .. "src/devices/cpu/m68hc16/m68hc16z.cpp",
+		MAME_DIR .. "src/devices/cpu/m68hc16/m68hc16z.h",
+	}
+end
 
 if opt_tool(CPUS, "M68HC16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.h")
+end
+
+--------------------------------------------------
+-- Varian 620, disassembler only
+--------------------------------------------------
+
+if opt_tool(CPUS, "V620") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
+end
+
+--------------------------------------------------
+-- Panafacom MN1610, disassembler only
+--@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1610") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
+end
+
+--------------------------------------------------
+-- Altera Nios II
+--@src/devices/cpu/nios2/nios2.h,CPUS["NIOS2"] = true
+--------------------------------------------------
+
+if CPUS["NIOS2"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/nios2/nios2.cpp",
+		MAME_DIR .. "src/devices/cpu/nios2/nios2.h",
+	}
+end
+
+if opt_tool(CPUS, "NIOS2") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nios2/nios2dasm.h")
+end
+
+--------------------------------------------------
+-- IBM 1800, disassembler only
+--@src/devices/cpu/ibm1800/ibm1800.h,CPUS["IBM1800"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "IBM1800") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ibm1800/ibm1800d.h")
+end
+
+--------------------------------------------------
+-- Data General Nova, disassembler only
+--@src/devices/cpu/nova/nova.h,CPUS["NOVA"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "NOVA") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.h")
+end
+
+--------------------------------------------------
+-- Interdata Series 16, disassembler only
+--@src/devices/cpu/interdata16/interdata16.h,CPUS["INTERDATA16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "INTERDATA16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
 end

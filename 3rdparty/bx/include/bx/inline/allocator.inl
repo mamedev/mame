@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_ALLOCATOR_H_HEADER_GUARD
@@ -22,20 +22,12 @@ namespace bx
 	{
 	}
 
-	inline bool isAligned(const void* _ptr, size_t _align)
-	{
-		union { const void* ptr; uintptr_t addr; } un;
-		un.ptr = _ptr;
-		return 0 == (un.addr & (_align-1) );
-	}
-
 	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align)
 	{
 		union { void* ptr; uintptr_t addr; } un;
 		un.ptr = _ptr;
 		uintptr_t unaligned = un.addr + _extra; // space for header
-		uintptr_t mask = _align-1;
-		uintptr_t aligned = BX_ALIGN_MASK(unaligned, mask);
+		uintptr_t aligned = bx::alignUp(unaligned, int32_t(_align) );
 		un.addr = aligned;
 		return un.ptr;
 	}
@@ -57,7 +49,7 @@ namespace bx
 
 	inline void* alignedAlloc(AllocatorI* _allocator, size_t _size, size_t _align, const char* _file, uint32_t _line)
 	{
-		const size_t align = max(_align, sizeof(uint32_t) );;
+		const size_t align = max(_align, sizeof(uint32_t) );
 		const size_t total = _size + align;
 		uint8_t* ptr = (uint8_t*)alloc(_allocator, total, 0, _file, _line);
 		uint8_t* aligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), align);

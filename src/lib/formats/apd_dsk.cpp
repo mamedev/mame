@@ -60,8 +60,16 @@
 
 *********************************************************************/
 
-#include <zlib.h>
 #include "formats/apd_dsk.h"
+
+#include "ioprocs.h"
+
+#include "osdcore.h" // osd_printf_*, little_endianize_int32
+
+#include <zlib.h>
+
+#include <cstring>
+
 
 static const uint8_t APD_HEADER[8] = { 'A', 'P', 'D', 'X', '0', '0', '0', '1' };
 static const uint8_t GZ_HEADER[2] = { 0x1f, 0x8b };
@@ -85,11 +93,15 @@ const char *apd_format::extensions() const
 	return "apd";
 }
 
-int apd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size) || !size)
+		return 0;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	int err;
 	std::vector<uint8_t> gz_ptr(8);
@@ -117,17 +129,21 @@ int apd_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	}
 
 	if (!memcmp(&img[0], APD_HEADER, sizeof(APD_HEADER))) {
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;
 }
 
-bool apd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	int err;
 	std::vector<uint8_t> gz_ptr;
@@ -194,4 +210,4 @@ bool apd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_APD_FORMAT = &floppy_image_format_creator<apd_format>;
+const apd_format FLOPPY_APD_FORMAT;

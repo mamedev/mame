@@ -53,7 +53,6 @@ enum
 	MSM6242_REG_CF
 };
 
-#define TIMER_RTC_CALLBACK      1
 
 
 
@@ -100,8 +99,10 @@ void msm6242_device::device_start()
 	m_out_int_handler.resolve();
 
 	// let's call the timer callback every tick
-	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
+	m_timer = timer_alloc(FUNC(msm6242_device::rtc_timer_callback), this);
 	m_timer->adjust(attotime::zero);
+	m_timer_irq_clear = timer_alloc(FUNC(msm6242_device::rtc_irq_pulse_timer_callback), this);
+	m_timer_irq_clear->adjust(attotime::zero);
 
 	// set up registers
 	m_tick = 0;
@@ -164,22 +165,6 @@ void msm6242_device::device_post_load()
 
 
 //-------------------------------------------------
-//  device_timer - called whenever a device timer
-//  fires
-//-------------------------------------------------
-
-void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case TIMER_RTC_CALLBACK:
-			rtc_timer_callback();
-			break;
-	}
-}
-
-
-//-------------------------------------------------
 //  set_irq - set the IRQ flag and output
 //-------------------------------------------------
 
@@ -192,6 +177,14 @@ void msm6242_device::set_irq(bool active)
 
 	if (!m_out_int_handler.isnull())
 		m_out_int_handler(active ? ASSERT_LINE : CLEAR_LINE);
+
+	if (active)
+	{
+		if (!BIT(m_reg[1], 1)) // irq is pulsed
+		{
+			m_timer_irq_clear->adjust(attotime::from_nsec(7812500));
+		}
+	}
 }
 
 
@@ -278,7 +271,7 @@ void msm6242_device::update_rtc_registers()
 		return;
 
 	// ticks
-	if ((m_tick % 200) != int((delta + m_tick) % 0x200))
+	if ((m_tick / 0x200) != int((delta + m_tick) / 0x200))
 		irq(IRQ_64THSECOND);
 	delta = bump(RTC_TICKS, delta, 0, 0x8000);
 	if (delta == 0)
@@ -377,10 +370,21 @@ void msm6242_device::rtc_clock_updated(int year, int month, int day, int day_of_
 //  rtc_timer_callback
 //-------------------------------------------------
 
-void msm6242_device::rtc_timer_callback()
+TIMER_CALLBACK_MEMBER(msm6242_device::rtc_timer_callback)
 {
 	update_rtc_registers();
 	update_timer();
+}
+
+
+
+//-------------------------------------------------
+//  rtc_irq_pulse_timer_callback
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(msm6242_device::rtc_irq_pulse_timer_callback)
+{
+	set_irq(false);
 }
 
 
@@ -535,6 +539,7 @@ void msm6242_device::write(offs_t offset, u8 data)
 			{
 				LOGIRQENABLE("%s: MSM6242 acknowledging irq\n", machine().describe_context());
 				set_irq(false);
+				m_timer_irq_clear->adjust(attotime::zero);
 			}
 			m_reg[0] = (data & 0x09) | (m_reg[0] & 0x06);
 			break;
@@ -544,7 +549,7 @@ void msm6242_device::write(offs_t offset, u8 data)
 			//  --x- STD
 			//  ---x MASK
 			m_reg[1] = data & 0x0f;
-			if((data & 3) == 0) // MASK & STD = 0
+			if((data & 1) == 0) // MASK = 0
 			{
 				m_irq_flag = 1;
 				m_irq_type = (data & 0xc) >> 2;

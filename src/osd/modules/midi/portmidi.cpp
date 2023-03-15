@@ -2,18 +2,27 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    portmap.c
+    portmidi.cpp
 
     Midi implementation based on portmidi library
 
 *******************************************************************c********/
 
+#include "midi_module.h"
+
+#include "modules/osdmodule.h"
+
 #ifndef NO_USE_MIDI
 
 #include <portmidi.h>
-#include "osdcore.h"
-#include "modules/osdmodule.h"
-#include "midi_module.h"
+
+#include <cstdio>
+#include <cstring>
+
+
+namespace osd {
+
+namespace {
 
 class pm_module : public osd_module, public midi_module
 {
@@ -24,8 +33,8 @@ public:
 	}
 	virtual ~pm_module() { }
 
-	virtual int init(const osd_options &options)override;
-	virtual void exit()override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
+	virtual void exit() override;
 
 	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
 	virtual void list_midi_devices() override;
@@ -64,7 +73,7 @@ std::unique_ptr<osd_midi_device> pm_module::create_midi_device()
 }
 
 
-int pm_module::init(const osd_options &options)
+int pm_module::init(osd_interface &osd, const osd_options &options)
 {
 	Pm_Initialize();
 	return 0;
@@ -463,12 +472,16 @@ void osd_midi_device_pm::write(uint8_t data)
 	}
 
 }
-#else
-	#include "modules/osdmodule.h"
-	#include "midi_module.h"
 
-	MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm")
+} // anonymous namespace
+
+} // namespace osd
+
+#else
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm") } }
+
 #endif
 
 
-MODULE_DEFINITION(MIDI_PM, pm_module)
+MODULE_DEFINITION(MIDI_PM, osd::pm_module)

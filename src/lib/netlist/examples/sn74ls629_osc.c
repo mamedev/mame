@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 /*
  * ne555_astable.c
@@ -8,6 +8,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(ls629)
+{
 
 	/*
 	 * Astable ne555
@@ -32,4 +33,4 @@ NETLIST_START(ls629)
 
 	LOG(log2, OSC.Y)
 
-NETLIST_END()
+}

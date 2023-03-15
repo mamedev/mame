@@ -101,7 +101,7 @@ ds1202_device::ds1202_device(const machine_config &mconfig, const char *tag, dev
 void ds1302_device::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(ds1302_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	m_clk = 0;
@@ -129,10 +129,10 @@ void ds1302_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the clock if enabled
 //-------------------------------------------------
 
-void ds1302_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(ds1302_device::clock_tick)
 {
 	if (!CLOCK_HALT)
 	{
@@ -157,9 +157,10 @@ void ds1302_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void ds1302_device::nvram_read(emu_file &file)
+bool ds1302_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.read(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 
@@ -168,9 +169,10 @@ void ds1302_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void ds1302_device::nvram_write(emu_file &file)
+bool ds1302_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_ram[0], m_ram_size);
+	size_t actual;
+	return !file.write(&m_ram[0], m_ram_size, actual) && actual == m_ram_size;
 }
 
 

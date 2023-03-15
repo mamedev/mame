@@ -20,10 +20,14 @@
 #include <stdlib.h>
 #include <poll.h>
 
+#include <mutex>
 #include <thread>
 #include <pulse/pulseaudio.h>
 
 #include "modules/lib/osdobj_common.h"
+
+using osd::s16;
+using osd::u32;
 
 class sound_pulse : public osd_module, public sound_module
 {
@@ -34,7 +38,7 @@ public:
 	}
 	virtual ~sound_pulse() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 	virtual void update_audio_stream(bool is_throttled, const s16 *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
@@ -269,7 +273,7 @@ void sound_pulse::stop_mainloop(int err)
 	pa_mainloop_quit(m_mainloop, err);
 }
 
-int sound_pulse::init(osd_options const &options)
+int sound_pulse::init(osd_interface &osd, osd_options const &options)
 {
 	m_last_sample = 0;
 	m_setting_volume = false;
@@ -292,20 +296,26 @@ int sound_pulse::init(osd_options const &options)
 	if(res != 'r')
 		return 1;
 
+	const int sample_rate = options.sample_rate();
+
 	pa_sample_spec ss;
-	ss.format = ENDIANNESS_NATIVE == ENDIANNESS_BIG ? PA_SAMPLE_S16BE : PA_SAMPLE_S16LE;
-	ss.rate = sample_rate();
+#ifdef LSB_FIRST
+	ss.format = PA_SAMPLE_S16LE;
+#else
+	ss.format = PA_SAMPLE_S16BE;
+#endif
+	ss.rate = sample_rate;
 	ss.channels = 2;
 	m_stream = pa_stream_new(m_context, "main output", &ss, nullptr);
 	pa_stream_set_state_callback(m_stream, i_stream_notify, this);
 	pa_stream_set_write_callback(m_stream, i_stream_write_request, this);
 
 	pa_buffer_attr battr;
-	battr.fragsize = sample_rate() / 1000;
+	battr.fragsize = sample_rate / 1000;
 	battr.maxlength = uint32_t(-1);
-	battr.minreq = sample_rate() / 1000;
+	battr.minreq = sample_rate / 1000;
 	battr.prebuf = uint32_t(-1);
-	battr.tlength = sample_rate() / 1000;
+	battr.tlength = sample_rate / 1000;
 
 	err = pa_stream_connect_playback(m_stream, nullptr, &battr, PA_STREAM_ADJUST_LATENCY, nullptr, nullptr);
 	if(err)

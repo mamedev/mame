@@ -91,7 +91,7 @@ void z8038_device::device_start()
 
 	//save_item(NAME(m_fifo));
 
-	m_int_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8038_device::int_check), this));
+	m_int_check = timer_alloc(FUNC(z8038_device::int_check), this);
 
 	// suppress startup interrupt line changes
 	m_port[0].int_asserted = false;
@@ -305,7 +305,7 @@ u8 z8038_device::byte_count_r(u8 const port)
 {
 	/*
 	 * Bit 6 is reset upon completion of the CPU read of the Byte Count
-	 * register. The ongoing count appears in t he Byte Count register after
+	 * register. The ongoing count appears in the Byte Count register after
 	 * the read.
 	 */
 	if (m_port[port].control_1 & CR1_FBCR)

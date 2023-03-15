@@ -25,6 +25,7 @@ namespace netlist::devices {
 	NETLIB_OBJECT(mk28000_prom)
 	{
 		NETLIB_CONSTRUCTOR(mk28000_prom)
+		, m_TE(*this, "FORCE_TRISTATE_LOGIC", 0)
 		, m_enable_lo(*this, "m_enable_lo", false)
 		, m_enable_hi(*this, "m_enable_hi", false)
 		, m_latched_rom(*this, "m_latched_rom", 0)
@@ -32,7 +33,7 @@ namespace netlist::devices {
 		, m_ARQ(*this, "ARQ", NETLIB_DELEGATE(addr))
 		, m_OE1(*this, "OE1", NETLIB_DELEGATE(oe1))
 		, m_OE2(*this, "OE2", NETLIB_DELEGATE(oe2))
-		, m_O(*this, 1, "O{}", 0)
+		, m_O(*this, 1, "O{}", m_TE())
 		, m_ROM(*this, "ROM")
 		, m_power_pins(*this)
 		{
@@ -81,6 +82,7 @@ namespace netlist::devices {
 			}
 		}
 
+		param_logic_t m_TE;
 		state_var<bool> m_enable_lo;
 		state_var<bool> m_enable_hi;
 		state_var<uint8_t> m_latched_rom;
@@ -169,9 +171,13 @@ namespace netlist::devices {
 		, m_A(*this, 0, "A{}", NETLIB_DELEGATE(addr))
 		, m_CEQ(*this, 1,
 			D::chip_enable_mask::value ^ static_cast<size_t>(0xffff), pstring("CE{}"),
-			std::array<nldelegate, 3>{ NETLIB_DELEGATE(ce<0>),
-			  NETLIB_DELEGATE(ce<1>),
-			  NETLIB_DELEGATE(ce<2>)})
+			// Causes a expected primary expression before { with gcc9
+			//std::array<nl_delegate, 3>{NETLIB_DELEGATE(ce<0>),
+			//  NETLIB_DELEGATE(ce<1>),
+			//  NETLIB_DELEGATE(ce<2>)})
+			std::array<nl_delegate, 3>{nl_delegate(& NETLIB_NAME(generic_prom) :: ce<0>, this),
+				nl_delegate(& NETLIB_NAME(generic_prom) :: ce<1>, this),
+				nl_delegate(& NETLIB_NAME(generic_prom) :: ce<2>, this)})
 		, m_O(*this, D::data_name_offset::value, "O{}", m_TE())
 		, m_ROM(*this, "ROM")
 		, m_power_pins(*this)

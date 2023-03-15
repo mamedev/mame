@@ -56,7 +56,7 @@ public:
 	void dma_w(uint8_t val);
 
 	void ctrl_write(uint32_t value, uint32_t mask) { scsi_bus->ctrl_w(scsi_refid, value, mask); scsi_ctrl_changed(); }
-	uint32_t data_read() { return scsi_bus->data_r(); };
+	uint32_t data_read() { return scsi_bus->data_r(); }
 protected:
 	mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

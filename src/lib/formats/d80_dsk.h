@@ -27,12 +27,12 @@ public:
 protected:
 	const format *formats;
 
-	virtual int get_physical_track(const format &f, int head, int track) override;
-	virtual uint32_t get_cell_size(const format &f, int track) override;
-	virtual int get_sectors_per_track(const format &f, int track) override;
-	virtual int get_disk_id_offset(const format &f) override;
-	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2) override;
-	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) override;
+	virtual int get_physical_track(const format &f, int head, int track) const override;
+	virtual uint32_t get_cell_size(const format &f, int track) const override;
+	virtual int get_sectors_per_track(const format &f, int track) const override;
+	virtual int get_disk_id_offset(const format &f) const override;
+	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2) const override;
+	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) const override;
 
 	static const format file_formats[];
 
@@ -41,6 +41,6 @@ protected:
 	static const int d80_sectors_per_track[];
 };
 
-extern const floppy_format_type FLOPPY_D80_FORMAT;
+extern const d80_format FLOPPY_D80_FORMAT;
 
 #endif // MAME_FORMATS_D80_DSK_H

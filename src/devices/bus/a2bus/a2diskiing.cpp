@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 #include "formats/ap2_dsk.h"
+#include "formats/as_dsk.h"
 #include "a2diskiing.h"
 
 /***************************************************************************
@@ -24,6 +25,8 @@
 DEFINE_DEVICE_TYPE(A2BUS_DISKIING, a2bus_diskiing_device, "a2diskiing", "Apple Disk II NG controller (16-sector)")
 DEFINE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device, "diskii13", "Apple Disk II NG controller (13-sector)")
 DEFINE_DEVICE_TYPE(A2BUS_APPLESURANCE, a2bus_applesurance_device, "a2surance", "Applesurance Diagnostic Controller")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT7_FDC, a2bus_agat7flop_device, "agat7_flop", "Agat-7 140K floppy card")
+DEFINE_DEVICE_TYPE(A2BUS_AGAT9_FDC, a2bus_agat9flop_device, "agat9_flop", "Agat-9 140K floppy card")
 
 #define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"
@@ -48,9 +51,20 @@ ROM_START( applesurance )
 	ROM_LOAD( "applesurance 3.0 - 2732.bin", 0x000000, 0x001000, CRC(64eafec7) SHA1(723dc6cd32de5a0f27af7503764185ac58904c05) )
 ROM_END
 
+ROM_START( agat7 )
+	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "shugart7.rom", 0x0000, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34) )
+ROM_END
+
+ROM_START( agat9 )
+	ROM_REGION(0x100, DISKII_ROM_REGION, 0)
+	ROM_LOAD( "shugart9.rom", 0x0000, 0x0100, CRC(964a0ce2) SHA1(bf955189ebffe874c20ef649a3db8177dc16af61) )
+ROM_END
+
 void diskiing_device::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_A216S_DOS_FORMAT);
+	fr.add(FLOPPY_A216S_PRODOS_FORMAT);
 	fr.add(FLOPPY_RWTS18_FORMAT);
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
@@ -101,6 +115,16 @@ const tiny_rom_entry *a2bus_applesurance_device::device_rom_region() const
 	return ROM_NAME( applesurance );
 }
 
+const tiny_rom_entry *a2bus_agat7flop_device::device_rom_region() const
+{
+	return ROM_NAME(agat7);
+}
+
+const tiny_rom_entry *a2bus_agat9flop_device::device_rom_region() const
+{
+	return ROM_NAME(agat9);
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -127,6 +151,16 @@ a2bus_diskiing13_device::a2bus_diskiing13_device(const machine_config &mconfig, 
 a2bus_applesurance_device::a2bus_applesurance_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	diskiing_device(mconfig, A2BUS_APPLESURANCE, tag, owner, clock),
 	m_c800_bank(1)
+{
+}
+
+a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	diskiing_device(mconfig, A2BUS_AGAT7_FDC, tag, owner, clock)
+{
+}
+
+a2bus_agat9flop_device::a2bus_agat9flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	diskiing_device(mconfig, A2BUS_AGAT9_FDC, tag, owner, clock)
 {
 }
 

@@ -31,9 +31,8 @@
 DEFINE_DEVICE_TYPE(NES_BENSHIENG, nes_benshieng_device, "nes_benshieng", "NES Cart Benshieng PCB")
 
 
-nes_benshieng_device::nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BENSHIENG, tag, owner, clock)
-	, m_dipsetting(0)
+nes_benshieng_device::nes_benshieng_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BENSHIENG, tag, owner, clock), m_dipsetting(0)
 {
 }
 
@@ -44,20 +43,17 @@ void nes_benshieng_device::device_start()
 {
 	common_start();
 	save_item(NAME(m_dipsetting));
-	save_item(NAME(m_mmc_prg_bank));
-	save_item(NAME(m_mmc_vrom_bank));
 }
 
 void nes_benshieng_device::pcb_reset()
 {
-	m_dipsetting = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		prg8_x(i, 0x0f);
+		chr2_x(2 * i, 0x00, CHRROM);
+	}
 
-	m_mmc_prg_bank[0] = 0xff;
-	m_mmc_prg_bank[1] = 0xff;
-	m_mmc_prg_bank[2] = 0xff;
-	m_mmc_prg_bank[3] = 0xff;
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-	update_banks();
+	m_dipsetting = 0;
 }
 
 
@@ -72,35 +68,27 @@ void nes_benshieng_device::pcb_reset()
 
  Games: a few 4 in 1 multicarts
 
+ NES 2.0: mapper 286
+
  -------------------------------------------------*/
 
-void nes_benshieng_device::update_banks()
+void nes_benshieng_device::write_h(offs_t offset, u8 data)
 {
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-	prg8_cd(m_mmc_prg_bank[2]);
-	prg8_ef(m_mmc_prg_bank[3]);
-	chr2_0(m_mmc_vrom_bank[0], CHRROM);
-	chr2_2(m_mmc_vrom_bank[1], CHRROM);
-	chr2_4(m_mmc_vrom_bank[2], CHRROM);
-	chr2_6(m_mmc_vrom_bank[3], CHRROM);
-}
-
-void nes_benshieng_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t helper = (offset & 0xc00) >> 10;
 	LOG_MMC(("benshieng write_h, offset: %04x, data: %02x\n", offset, data));
 //  m_mmc_dipsetting = ioport("CARTDIPS")->read();
+
+	u8 bank = BIT(offset, 10, 2);
 
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			m_mmc_vrom_bank[helper] = offset & 0x1f;
+		case 0x1000:
+			chr2_x(2 * bank, offset & 0x1f, CHRROM);
 			break;
 		case 0x2000:
-			if (BIT(offset, m_dipsetting + 4))  // mmc_dipsetting is always zero atm, given we have no way to add cart-based DIPs
-				m_mmc_prg_bank[helper] = offset & 0x0f;
+		case 0x3000:
+			if (BIT(offset, m_dipsetting + 4))  // m_dipsetting is always zero atm, given we have no way to add cart-based DIPs
+				prg8_x(bank, offset & 0x0f);
 			break;
 	}
-	update_banks();
 }

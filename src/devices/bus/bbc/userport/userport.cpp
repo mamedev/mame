@@ -135,6 +135,7 @@ void bbc_userport_slot_device::write_cb2(int state)
 #include "m4000.h"
 #include "palext.h"
 #include "pointer.h"
+#include "sdcard.h"
 #include "usersplit.h"
 //#include "vci.h"
 #include "voicebox.h"
@@ -154,6 +155,8 @@ void bbc_userport_devices(device_slot_interface &device)
 	device.option_add("lcd",        BBC_LCD);             /* Sprow LCD Display */
 	device.option_add("m4000",      BBC_M4000);           /* Hybrid Music 4000 Keyboard */
 	device.option_add("m512mouse",  BBC_M512MOUSE);       /* Acorn Mouse (provided with Master 512) */
+	device.option_add("sdcard",     BBC_SDCARD);          /* SD Card */
+	device.option_add("sdcardt",    BBC_SDCARDT);         /* Turbo SD Card */
 	device.option_add("tracker",    BBC_TRACKER);         /* Marconi RB2 Tracker Ball / Acorn Tracker Ball */
 	device.option_add("usersplit",  BBC_USERSPLIT);       /*User Port Splitter (Watford Electronics) */
 	//device.option_add("vci",        BBC_VCI);             /* Video Camera Interface (Data Harvest) */

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * trident.c
+ * trident.cpp
  *
  * Implementation of Trident VGA GUI accelerators
  *
@@ -14,14 +14,24 @@
 #include "debugger.h"
 #include "screen.h"
 
+#define LOG_WARN  (1U << 1)
+#define LOG_TODO  (1U << 2)
+#define LOG_ACCEL (1U << 3)
+#define LOG_CRTC  (1U << 4)
+
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_ACCEL | LOG_TODO | LOG_CRTC)
+
+#include "logmacro.h"
+
+#define LOGWARN(...)      LOGMASKED(LOG_WARN,   __VA_ARGS__)
+#define LOGACCEL(...)     LOGMASKED(LOG_ACCEL,  __VA_ARGS__)
+#define LOGTODO(...)      LOGMASKED(LOG_TODO,   __VA_ARGS__)
+#define LOGCRTC(...)      LOGMASKED(LOG_CRTC,   __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860")
 DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000")
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
-
-#define LOG (1)
-#define LOG_ACCEL (1)
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -160,8 +170,7 @@ void trident_vga_device::device_start()
 {
 	zero();
 
-	int i;
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		set_pen_color(i, 0, 0, 0);
 
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
@@ -170,20 +179,20 @@ void trident_vga_device::device_start()
 
 	// copy over interfaces
 	vga.read_dipswitch.set(nullptr); //read_dipswitch;
-	vga.svga_intf.vram_size = 0x200000;
-
-	vga.memory.resize(vga.svga_intf.vram_size);
+	vga.memory = std::make_unique<uint8_t []>(vga.svga_intf.vram_size);
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
-	save_item(NAME(vga.memory));
+
+	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
 	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
 	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
-	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
 	vga.svga_intf.seq_regcount = 0x0f;
 	vga.svga_intf.crtc_regcount = 0x60;
+	svga.ignore_chain4 = true;
 	memset(&tri, 0, sizeof(tri));
 }
 
@@ -439,10 +448,10 @@ uint8_t trident_vga_device::trident_seq_reg_read(uint8_t index)
 				break;
 			default:
 				res = vga.sequencer.data[index];
-				if(!LOG) logerror("Trident: Sequencer index %02x read\n",index);
+				LOGWARN("Trident: Sequencer index %02x read\n",index);
 		}
 	}
-	if(LOG) logerror("Trident SR%02X: read %02x\n",index,res);
+	LOG("Trident SR%02X: read %02x\n",index,res);
 	return res;
 }
 
@@ -499,10 +508,10 @@ void trident_vga_device::trident_seq_reg_write(uint8_t index, uint8_t data)
 				tri.sr0f = data;
 				break;
 			default:
-				if(!LOG) logerror("Trident: Sequencer index %02x read\n",index);
+				LOGWARN("Trident: Sequencer index %02x read\n",index);
 		}
 	}
-	if(LOG) logerror("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
+	LOG("Trident SR%02X: %s mode write %02x\n",index,tri.new_mode ? "new" : "old",data);
 }
 
 uint8_t trident_vga_device::trident_crtc_reg_read(uint8_t index)
@@ -602,11 +611,11 @@ uint8_t trident_vga_device::trident_crtc_reg_read(uint8_t index)
 			break;
 		default:
 			res = vga.crtc.data[index];
-			if(!LOG) logerror("Trident: CRTC index %02x read\n",index);
+			LOGWARN("Trident: CRTC index %02x read\n",index);
 			break;
 		}
 	}
-	if(LOG) logerror("Trident CR%02X: read %02x\n",index,res);
+	LOG("Trident CR%02X: read %02x\n",index,res);
 	return res;
 }
 void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
@@ -623,6 +632,7 @@ void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
 		case 0x1e:  // Module Testing Register
 			tri.cr1e = data;
 			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			trident_define_video_mode();
 			break;
 		case 0x1f:
 			tri.cr1f = data;  // "Software Programming Register"  written to by the BIOS
@@ -712,11 +722,11 @@ void trident_vga_device::trident_crtc_reg_write(uint8_t index, uint8_t data)
 			tri.cursor_ctrl = data;
 			break;
 		default:
-			if(!LOG) logerror("Trident: 3D4 index %02x write %02x\n",index,data);
+			LOGWARN("Trident: 3D4 index %02x write %02x\n",index,data);
 			break;
 		}
 	}
-	if(LOG) logerror("Trident CR%02X: write %02x\n",index,data);
+	LOG("Trident CR%02X: write %02x\n",index,data);
 }
 
 uint8_t trident_vga_device::trident_gc_reg_read(uint8_t index)
@@ -740,11 +750,11 @@ uint8_t trident_vga_device::trident_gc_reg_read(uint8_t index)
 			break;
 		default:
 			res = 0xff;
-			if(!LOG) logerror("Trident: Sequencer index %02x read\n",index);
+			LOGWARN("Trident: Sequencer index %02x read\n",index);
 			break;
 		}
 	}
-	if(LOG) logerror("Trident GC%02X: read %02x\n",index,res);
+	LOG("Trident GC%02X: read %02x\n",index,res);
 	return res;
 }
 
@@ -754,7 +764,7 @@ void trident_vga_device::trident_gc_reg_write(uint8_t index, uint8_t data)
 		gc_reg_write(index,data);
 	else
 	{
-		if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
+		LOG("Trident GC%02X: write %02x\n",index,data);
 		switch(index)
 		{
 		case 0x0e:  // New Source Address Register (bit 1 is inverted here, also)
@@ -773,11 +783,11 @@ void trident_vga_device::trident_gc_reg_write(uint8_t index, uint8_t data)
 			tri.gc2f = data;
 			break;
 		default:
-			if(!LOG) logerror("Trident: Unimplemented GC register %02x write %02x\n",index,data);
+			LOGWARN("Trident: Unimplemented GC register %02x write %02x\n",index,data);
 			break;
 		}
 	}
-	if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
+	LOG("Trident GC%02X: write %02x\n",index,data);
 }
 
 uint8_t trident_vga_device::port_03c0_r(offs_t offset)
@@ -905,11 +915,11 @@ void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 				if(tri.gc0f & 0x04)  // if enabled
 				{
 					svga.bank_w = data & 0x3f;
-					if(LOG) logerror("Trident: Write Bank set to %02x\n",data);
+					LOG("Trident: Write Bank set to %02x\n",data);
 					if(!(tri.gc0f & 0x01))  // if bank regs are not separated
 					{
 						svga.bank_r = data & 0x3f; // then this is also the read bank register
-						if(LOG) logerror("Trident: Read Bank set to %02x\n",data);
+						LOG("Trident: Read Bank set to %02x\n",data);
 					}
 				}
 				break;
@@ -919,7 +929,7 @@ void trident_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 					if(tri.gc0f & 0x01)  // and if bank regs are separated
 					{
 						svga.bank_r = data & 0x3f;
-						if(LOG) logerror("Trident: Read Bank set to %02x\n",data);
+						LOG("Trident: Read Bank set to %02x\n",data);
 					}
 				}
 				break;
@@ -962,28 +972,28 @@ void trident_vga_device::port_43c6_w(offs_t offset, uint8_t data)
 		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.mem_clock = (tri.mem_clock & 0xff00) | (data);
-			if(LOG) logerror("Trident: Memory clock write %04x\n",tri.mem_clock);
+			LOG("Trident: Memory clock write %04x\n",tri.mem_clock);
 		}
 		break;
 	case 3:
 		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.mem_clock = (tri.mem_clock & 0x00ff) | (data << 8);
-			if(LOG) logerror("Trident: Memory clock write %04x\n",tri.mem_clock);
+			LOG("Trident: Memory clock write %04x\n",tri.mem_clock);
 		}
 		break;
 	case 4:
 		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.vid_clock = (tri.vid_clock & 0xff00) | (data);
-			if(LOG) logerror("Trident: Video clock write %04x\n",tri.vid_clock);
+			LOG("Trident: Video clock write %04x\n",tri.vid_clock);
 		}
 		break;
 	case 5:
 		if(!(tri.sr0e_new & 0x02) && (tri.sr0e_new & 0x80))
 		{
 			tri.vid_clock = (tri.vid_clock & 0x00ff) | (data << 8);
-			if(LOG) logerror("Trident: Video clock write %04x\n",tri.vid_clock);
+			LOG("Trident: Video clock write %04x\n",tri.vid_clock);
 		}
 		break;
 	}
@@ -998,11 +1008,11 @@ uint8_t trident_vga_device::port_83c6_r(offs_t offset)
 	{
 	case 2:
 		res = tri.lutdac_reg[tri.lutdac_index];
-		if(LOG) logerror("Trident: LUTDAC reg read %02x\n",res);
+		LOG("Trident: LUTDAC reg read %02x\n",res);
 		break;
 	case 4:
 		res = tri.lutdac_index;
-		if(LOG) logerror("Trident: LUTDAC index read %02x\n",res);
+		LOG("Trident: LUTDAC index read %02x\n",res);
 		break;
 	}
 	return res;
@@ -1013,11 +1023,11 @@ void trident_vga_device::port_83c6_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 	case 2:
-		if(LOG) logerror("Trident: LUTDAC reg write %02x\n",data);
+		LOG("Trident: LUTDAC reg write %02x\n",data);
 		tri.lutdac_reg[tri.lutdac_index] = data;
 		break;
 	case 4:
-		if(LOG) logerror("Trident: LUTDAC index write %02x\n",data);
+		LOG("Trident: LUTDAC index write %02x\n",data);
 		tri.lutdac_index = data;
 		break;
 	}
@@ -1218,7 +1228,7 @@ uint8_t trident_vga_device::accel_r(offs_t offset)
 		res = tri.accel_fmix;
 		break;
 	default:
-		logerror("Trident: unimplemented acceleration register offset %02x read\n",offset);
+		LOGTODO("Trident: unimplemented acceleration register offset %02x read\n",offset);
 	}
 	return res;
 }
@@ -1235,11 +1245,11 @@ void trident_vga_device::accel_w(offs_t offset, uint8_t data)
 	{
 	case 0x02:  // Operation Mode
 		tri.accel_opermode = (tri.accel_opermode & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
+		LOGACCEL("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
 		break;
 	case 0x03:
 		tri.accel_opermode = (tri.accel_opermode & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
+		LOGACCEL("Trident: Operation Mode set to %04x\n",tri.accel_opermode);
 		break;
 	case 0x04:  // Command register
 		tri.accel_command = data;
@@ -1247,210 +1257,210 @@ void trident_vga_device::accel_w(offs_t offset, uint8_t data)
 		break;
 	case 0x07:  // Foreground Mix?
 		tri.accel_fmix = data;
-		if(LOG_ACCEL) logerror("Trident: FMIX set to %02x\n",data);
+		LOGACCEL("Trident: FMIX set to %02x\n",data);
 		break;
 	case 0x08:  // Draw flags
 		tri.accel_drawflags = (tri.accel_drawflags & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		LOGACCEL("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
 		break;
 	case 0x09:
 		tri.accel_drawflags = (tri.accel_drawflags & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		LOGACCEL("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
 		break;
 	case 0x0a:
 		tri.accel_drawflags = (tri.accel_drawflags & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		LOGACCEL("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
 		break;
 	case 0x0b:
 		tri.accel_drawflags = (tri.accel_drawflags & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
+		LOGACCEL("Trident: Draw flags set to %08x\n",tri.accel_drawflags);
 		break;
 	case 0x0c:  // Foreground Colour
 		tri.accel_fgcolour = (tri.accel_fgcolour & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		LOGACCEL("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
 		break;
 	case 0x0d:
 		tri.accel_fgcolour = (tri.accel_fgcolour & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		LOGACCEL("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
 		break;
 	case 0x0e:
 		tri.accel_fgcolour = (tri.accel_fgcolour & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		LOGACCEL("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
 		break;
 	case 0x0f:
 		tri.accel_fgcolour = (tri.accel_fgcolour & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
+		LOGACCEL("Trident: Foreground Colour set to %08x\n",tri.accel_fgcolour);
 		break;
 	case 0x10:  // Background Colour
 		tri.accel_bgcolour = (tri.accel_bgcolour & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		LOGACCEL("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
 		break;
 	case 0x11:
 		tri.accel_bgcolour = (tri.accel_bgcolour & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		LOGACCEL("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
 		break;
 	case 0x12:
 		tri.accel_bgcolour = (tri.accel_bgcolour & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		LOGACCEL("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
 		break;
 	case 0x13:
 		tri.accel_bgcolour = (tri.accel_bgcolour & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
+		LOGACCEL("Trident: Background Colour set to %08x\n",tri.accel_bgcolour);
 		break;
 	case 0x14:  // Pattern Location
 		tri.accel_pattern_loc = (tri.accel_pattern_loc & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
+		LOGACCEL("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
 		break;
 	case 0x15:
 		tri.accel_pattern_loc = (tri.accel_pattern_loc & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
+		LOGACCEL("Trident: Pattern Location set to %04x\n",tri.accel_pattern_loc);
 		break;
 	case 0x18:  // Destination X
 		tri.accel_dest_x = (tri.accel_dest_x & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Destination X set to %04x\n",tri.accel_dest_x);
+		LOGACCEL("Trident: Destination X set to %04x\n",tri.accel_dest_x);
 		break;
 	case 0x19:
 		tri.accel_dest_x = (tri.accel_dest_x & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Destination X set to %04x\n",tri.accel_dest_x);
+		LOGACCEL("Trident: Destination X set to %04x\n",tri.accel_dest_x);
 		break;
 	case 0x1a:  // Destination Y
 		tri.accel_dest_y = (tri.accel_dest_y & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
+		LOGACCEL("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
 		break;
 	case 0x1b:
 		tri.accel_dest_y = (tri.accel_dest_y & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
+		LOGACCEL("Trident: Destination Y set to %04x\n",tri.accel_dest_y);
 		break;
 	case 0x1c:  // Source X
 		tri.accel_source_x = (tri.accel_source_x & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Source X set to %04x\n",tri.accel_source_x);
+		LOGACCEL("Trident: Source X set to %04x\n",tri.accel_source_x);
 		break;
 	case 0x1d:
 		tri.accel_source_x = (tri.accel_source_x & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Source X set to %04x\n",tri.accel_source_x);
+		LOGACCEL("Trident: Source X set to %04x\n",tri.accel_source_x);
 		break;
 	case 0x1e:  // Source Y
 		tri.accel_source_y = (tri.accel_source_y & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Source Y set to %04x\n",tri.accel_source_y);
+		LOGACCEL("Trident: Source Y set to %04x\n",tri.accel_source_y);
 		break;
 	case 0x1f:
 		tri.accel_source_y = (tri.accel_source_y & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Source Y set to %04x\n",tri.accel_source_y);
+		LOGACCEL("Trident: Source Y set to %04x\n",tri.accel_source_y);
 		break;
 	case 0x20:  // Dimension(?) X
 		tri.accel_dim_x = (tri.accel_dim_x & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
+		LOGACCEL("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
 		break;
 	case 0x21:
 		tri.accel_dim_x = (tri.accel_dim_x & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
+		LOGACCEL("Trident: Dimension X set to %04x\n",tri.accel_dim_x);
 		break;
 	case 0x22:  // Dimension(?) Y
 		tri.accel_dim_y = (tri.accel_dim_y & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
+		LOGACCEL("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
 		break;
 	case 0x23:
 		tri.accel_dim_y = (tri.accel_dim_y & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
+		LOGACCEL("Trident: Dimension y set to %04x\n",tri.accel_dim_y);
 		break;
 	case 0x24:  // Style
 		tri.accel_style = (tri.accel_style & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Style set to %08x\n",tri.accel_style);
+		LOGACCEL("Trident: Style set to %08x\n",tri.accel_style);
 		break;
 	case 0x25:
 		tri.accel_style = (tri.accel_style & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Style set to %08x\n",tri.accel_style);
+		LOGACCEL("Trident: Style set to %08x\n",tri.accel_style);
 		break;
 	case 0x26:
 		tri.accel_style = (tri.accel_style & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: Style set to %08x\n",tri.accel_style);
+		LOGACCEL("Trident: Style set to %08x\n",tri.accel_style);
 		break;
 	case 0x27:
 		tri.accel_style = (tri.accel_style & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: Style set to %08x\n",tri.accel_style);
+		LOGACCEL("Trident: Style set to %08x\n",tri.accel_style);
 		break;
 	case 0x28:  // Source Clip X
 		tri.accel_source_x_clip = (tri.accel_source_x_clip & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
+		LOGACCEL("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
 		break;
 	case 0x29:
 		tri.accel_source_x_clip = (tri.accel_source_x_clip & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
+		LOGACCEL("Trident: Source X Clip set to %04x\n",tri.accel_source_x_clip);
 		break;
 	case 0x2a:  // Source Clip Y
 		tri.accel_source_y_clip = (tri.accel_source_y_clip & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
+		LOGACCEL("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
 		break;
 	case 0x2b:
 		tri.accel_source_y_clip = (tri.accel_source_y_clip & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
+		LOGACCEL("Trident: Source Y Clip set to %04x\n",tri.accel_source_y_clip);
 		break;
 	case 0x2c:  // Destination Clip X
 		tri.accel_dest_x_clip = (tri.accel_dest_x_clip & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
+		LOGACCEL("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
 		break;
 	case 0x2d:
 		tri.accel_dest_x_clip = (tri.accel_dest_x_clip & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
+		LOGACCEL("Trident: Destination X Clip set to %04x\n",tri.accel_dest_x_clip);
 		break;
 	case 0x2e:  // Destination Clip Y
 		tri.accel_dest_y_clip = (tri.accel_dest_y_clip & 0xff00) | data;
-		if(LOG_ACCEL) logerror("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
+		LOGACCEL("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
 		break;
 	case 0x2f:
 		tri.accel_dest_y_clip = (tri.accel_dest_y_clip & 0x00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
+		LOGACCEL("Trident: Destination Y Clip set to %04x\n",tri.accel_dest_y_clip);
 		break;
 	case 0x48:  // CKEY (Chromakey?)
 		tri.accel_ckey = (tri.accel_ckey & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		LOGACCEL("Trident: CKey set to %08x\n",tri.accel_ckey);
 		break;
 	case 0x49:
 		tri.accel_ckey = (tri.accel_ckey & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		LOGACCEL("Trident: CKey set to %08x\n",tri.accel_ckey);
 		break;
 	case 0x4a:
 		tri.accel_ckey = (tri.accel_ckey & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		LOGACCEL("Trident: CKey set to %08x\n",tri.accel_ckey);
 		break;
 	case 0x4b:
 		tri.accel_ckey = (tri.accel_ckey & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: CKey set to %08x\n",tri.accel_ckey);
+		LOGACCEL("Trident: CKey set to %08x\n",tri.accel_ckey);
 		break;
 	case 0x58:  // Foreground Pattern Colour
 		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		LOGACCEL("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
 		break;
 	case 0x59:
 		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		LOGACCEL("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
 		break;
 	case 0x5a:
 		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		LOGACCEL("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
 		break;
 	case 0x5b:
 		tri.accel_fg_pattern_colour = (tri.accel_fg_pattern_colour & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
+		LOGACCEL("Trident: FG Pattern Colour set to %08x\n",tri.accel_fg_pattern_colour);
 		break;
 	case 0x5c:  // Background Pattern Colour
 		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xffffff00) | data;
-		if(LOG_ACCEL) logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		LOGACCEL("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
 		break;
 	case 0x5d:
 		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xffff00ff) | (data << 8);
-		if(LOG_ACCEL) logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		LOGACCEL("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
 		break;
 	case 0x5e:
 		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0xff00ffff) | (data << 16);
-		if(LOG_ACCEL) logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		LOGACCEL("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
 		break;
 	case 0x5f:
 		tri.accel_bg_pattern_colour = (tri.accel_bg_pattern_colour & 0x00ffffff) | (data << 24);
-		if(LOG_ACCEL) logerror("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
+		LOGACCEL("Trident: BG Pattern Colour set to %08x\n",tri.accel_bg_pattern_colour);
 		break;
 	default:
-		logerror("Trident: unimplemented acceleration register offset %02x write %02x\n",offset,data);
+		LOGTODO("Trident: unimplemented acceleration register offset %02x write %02x\n",offset,data);
 	}
 }
 
@@ -1459,41 +1469,41 @@ void trident_vga_device::accel_command()
 	switch(tri.accel_command)
 	{
 	case 0x00:
-		if(LOG) logerror("Trident: Command: NOP\n");
+		LOG("Trident: Command: NOP\n");
 		break;
 	case 0x01:
-		if(LOG) logerror("Trident: Command: BitBLT ROP3 (Source %i,%i Dest %i,%i Size %i,%i)\n",tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,tri.accel_dim_x,tri.accel_dim_y);
-		if(LOG) logerror("BitBLT: Drawflags = %08x FMIX = %02x\n",tri.accel_drawflags,tri.accel_fmix);
+		LOG("Trident: Command: BitBLT ROP3 (Source %i,%i Dest %i,%i Size %i,%i)\n",tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,tri.accel_dim_x,tri.accel_dim_y);
+		LOG("BitBLT: Drawflags = %08x FMIX = %02x\n",tri.accel_drawflags,tri.accel_fmix);
 		accel_bitblt();
 		break;
 	case 0x02:
-		if(LOG) logerror("Trident: Command: BitBLT ROP4\n");
+		LOG("Trident: Command: BitBLT ROP4\n");
 		break;
 	case 0x03:
-		if(LOG) logerror("Trident: Command: Scanline\n");
+		LOG("Trident: Command: Scanline\n");
 		break;
 	case 0x04:
-		if(LOG) logerror("Trident: Command: Bresenham Line (Source %i,%i Dest %i,%i Size %i,%i)\n",tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,tri.accel_dim_x,tri.accel_dim_y);
-		if(LOG) logerror("BLine: Drawflags = %08x FMIX = %02x\n",tri.accel_drawflags,tri.accel_fmix);
+		LOG("Trident: Command: Bresenham Line (Source %i,%i Dest %i,%i Size %i,%i)\n",tri.accel_source_x,tri.accel_source_y,tri.accel_dest_x,tri.accel_dest_y,tri.accel_dim_x,tri.accel_dim_y);
+		LOG("BLine: Drawflags = %08x FMIX = %02x\n",tri.accel_drawflags,tri.accel_fmix);
 		accel_line();
 		break;
 	case 0x05:
-		if(LOG) logerror("Trident: Command: Short Vector\n");
+		LOG("Trident: Command: Short Vector\n");
 		break;
 	case 0x06:
-		if(LOG) logerror("Trident: Command: Fast Line\n");
+		LOG("Trident: Command: Fast Line\n");
 		break;
 	case 0x07:
-		if(LOG) logerror("Trident: Command: Trapezoid Fill\n");
+		LOG("Trident: Command: Trapezoid Fill\n");
 		break;
 	case 0x08:
-		if(LOG) logerror("Trident: Command: Ellipse\n");
+		LOG("Trident: Command: Ellipse\n");
 		break;
 	case 0x09:
-		if(LOG) logerror("Trident: Command: Ellipse Fill\n");
+		LOG("Trident: Command: Ellipse Fill\n");
 		break;
 	default:
-		logerror("Trident: Unknown acceleration command %02x\n",tri.accel_command);
+		LOGTODO("Trident: Unknown acceleration command %02x\n",tri.accel_command);
 	}
 }
 
@@ -1623,4 +1633,77 @@ void trident_vga_device::accel_data_write(uint32_t data)
 		if(tri.accel_mem_y > tri.accel_dest_y+tri.accel_dim_y || tri.accel_mem_y < tri.accel_dest_y-tri.accel_dim_y)
 			tri.accel_memwrite_active = false;  // completed
 	}
+}
+
+// tvga9000 CRTC override
+// not extensively tested, just enough for pntnpuzl to not throw a 168 Hz refresh rate.
+void tvga9000_device::trident_define_video_mode()
+{
+	int divisor = 1;
+	int xtal;
+
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	xtal_select |= (tri.sr0d_new & 0x01) << 2;
+	xtal_select |= (tri.sr0d_new & 0x40) >> 3;
+
+	switch(xtal_select)
+	{
+		case 0:  xtal = 25174800; break;
+		case 1:  xtal = 28636363; break;
+		case 2:  xtal = 44900000; break;
+		case 3:  xtal = 36000000; break;
+		case 4:  xtal = 57272000; break;
+		case 5:  xtal = 65000000; break;
+		case 6:  xtal = 50350000; break;
+		case 7:  xtal = 40000000; break;
+		case 8:  xtal = 25174800; break;
+		case 9:  xtal = 28636363; break;
+		case 10: xtal = 62300000; break;
+		case 11: xtal = 44900000; break;
+		case 12: xtal = 72000000; break;
+		case 13: xtal = 77000000; break;
+		case 14: xtal = 80000000; break;
+		case 15: xtal = 75000000; break;
+	}
+
+	LOGCRTC("trident_define_video_mode: %d (%d)\n", xtal_select, xtal);
+
+	switch((tri.sr0d_new & 0x06) >> 1)
+	{
+		case 0: break; // no division
+		case 1: xtal /= 2; break;
+		case 2: xtal /= 4; break;
+		case 3: xtal /= 1.5; break;
+	}
+
+	if(tri.gc0f & 0x08)  // 16 pixels per character clock
+		xtal = xtal / 2;
+
+	if(tri.port_3db & 0x20)
+		xtal = xtal / 2;  // correct?
+
+	LOGCRTC("division setting %d %02x %02x (new xtal %d)\n", (tri.sr0d_new & 0x06) >> 1, tri.gc0f, tri.port_3db, xtal);
+
+	svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb32_en = 0;
+	switch((tri.pixel_depth & 0x0c) >> 2)
+	{
+	case 0:
+	default: if(!(tri.pixel_depth & 0x10) || (tri.cr1e & 0x80)) svga.rgb8_en = 1; break;
+	case 1:  if((tri.dac & 0xf0) == 0x30) svga.rgb16_en = 1; else svga.rgb15_en = 1; break;
+	case 2:  svga.rgb32_en = 1; break;
+	}
+
+	// TODO: is this right?
+	// documentation claims to be "host address bit 16"
+	// pntnpuzl definitely needs to halve divisor and xtal otherwise it will draw in 800 x 240.
+	if(BIT(tri.cr1e, 7))
+	{
+		divisor = 2;
+		xtal /= 2;
+	}
+	// TODO: tri.cr1e bit 2 for interlace
+
+	LOGCRTC("pixel depth %02x module testing %02x\n", tri.pixel_depth, tri.cr1e);
+
+	recompute_params_clock(divisor, xtal);
 }

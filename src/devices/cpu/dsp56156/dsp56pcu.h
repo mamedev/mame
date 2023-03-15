@@ -13,6 +13,7 @@ namespace DSP_56156
 void pcu_reset(dsp56156_core* cpustate);
 void pcu_init(dsp56156_core* cpustate, device_t *device);
 #define PC  (cpustate->PCU.pc)
+#define IPC (cpustate->PCU.ipc)
 #define LA  (cpustate->PCU.la)
 #define LC  (cpustate->PCU.lc)
 #define SR  (cpustate->PCU.sr)
@@ -103,7 +104,7 @@ void C_bit_set(dsp56156_core* cpustate, uint8_t value);
 /* 1-28 OPERATING MODE REGISTER (OMR) BITS */
 //uint8_t CD_bit(const dsp56156_core* cpustate);
 //uint8_t SD_bit(const dsp56156_core* cpustate);
-//uint8_t R_bit(const dsp56156_core* cpustate);
+uint8_t R_bit(const dsp56156_core* cpustate);
 //uint8_t SA_bit(const dsp56156_core* cpustate);
 //uint8_t MC_bit(const dsp56156_core* cpustate);
 uint8_t MB_bit(const dsp56156_core* cpustate);
@@ -121,8 +122,8 @@ void MA_bit_set(dsp56156_core* cpustate, uint8_t value);
 uint8_t UF_bit(const dsp56156_core* cpustate);
 uint8_t SE_bit(const dsp56156_core* cpustate);
 
-//void UF_bit_set(dsp56156_core* cpustate, uint8_t value) {};
-//void SE_bit_set(dsp56156_core* cpustate, uint8_t value) {};
+//void UF_bit_set(dsp56156_core* cpustate, uint8_t value) {}
+//void SE_bit_set(dsp56156_core* cpustate, uint8_t value) {}
 
 
 // HACK - Bootstrap modes

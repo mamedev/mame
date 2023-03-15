@@ -117,7 +117,7 @@
  *  - add PIT and DUSCC interrupts
  *  - add port mapping to self test jumper
  *  - add VME bus driver
- *  - write and map a 68153 device (accessable from VME side)
+ *  - write and map a 68153 device (accessible from VME side)
  *
  *  Status: passes Self test and get stuck on no ticks for the scheduler.
  *          Schematics of the IRQ routing needed or a good trace of how the
@@ -127,7 +127,7 @@
 #include "emu.h"
 #include "vme_fcisio.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
@@ -405,7 +405,6 @@ vme_fcisio1_card_device::vme_fcisio1_card_device(const machine_config &mconfig, 
 void vme_fcisio1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	set_vme_device();
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xf00000);
@@ -462,4 +461,4 @@ uint8_t vme_fcisio1_card_device::config_rd(){
 
 // This info isn't kept in a card driver atm so storing it as a comment for later use
 //      YEAR  NAME           PARENT  COMPAT  MACHINE       INPUT    CLASS             INIT COMPANY                  FULLNAME           FLAGS
-//COMP( 1986, fcisio1,       0,      0,      fcisio1,      fcisio1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/ISIO-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP( 1986, fcisio1,       0,      0,      fcisio1,      fcisio1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/ISIO-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

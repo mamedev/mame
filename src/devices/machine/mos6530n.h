@@ -101,7 +101,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(update);
 
 	enum
 	{
@@ -221,10 +222,6 @@ public:
 
 	virtual void ram_map(address_map &map);
 	virtual void io_map(address_map &map);
-
-	// is there a better way to access the memory map when not using m()?
-	uint8_t io_r(offs_t offset);
-	void io_w(offs_t offset, uint8_t data);
 };
 
 

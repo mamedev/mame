@@ -15,10 +15,11 @@
 #include "debugbaseinfo.h"
 
 
+namespace osd::debugger::win {
+
 class debugwin_info : protected debugbase_info
 {
 public:
-	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != nullptr; }
@@ -40,6 +41,7 @@ public:
 	void show() const { smart_show_window(m_wnd, true); }
 	void hide() const { smart_show_window(m_wnd, false); }
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
+	void redraw();
 	void destroy();
 
 	virtual bool set_default_focus();
@@ -48,6 +50,9 @@ public:
 	virtual bool restore_field(HWND wnd) { return false; }
 
 	virtual bool handle_key(WPARAM wparam, LPARAM lparam);
+
+	void save_configuration(util::xml::data_node &parentnode);
+	virtual void restore_configuration_from_node(util::xml::data_node const &node);
 
 protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
@@ -75,13 +80,20 @@ protected:
 		ID_SOFT_RESET,
 		ID_EXIT,
 
-		ID_1_BYTE_CHUNKS,
-		ID_2_BYTE_CHUNKS,
-		ID_4_BYTE_CHUNKS,
-		ID_8_BYTE_CHUNKS,
-		ID_FLOATING_POINT_32BIT,
-		ID_FLOATING_POINT_64BIT,
-		ID_FLOATING_POINT_80BIT,
+		ID_1_BYTE_CHUNKS_HEX,
+		ID_2_BYTE_CHUNKS_HEX,
+		ID_4_BYTE_CHUNKS_HEX,
+		ID_8_BYTE_CHUNKS_HEX,
+		ID_1_BYTE_CHUNKS_OCT,
+		ID_2_BYTE_CHUNKS_OCT,
+		ID_4_BYTE_CHUNKS_OCT,
+		ID_8_BYTE_CHUNKS_OCT,
+		ID_FLOAT_32BIT,
+		ID_FLOAT_64BIT,
+		ID_FLOAT_80BIT,
+		ID_HEX_ADDRESSES,
+		ID_DEC_ADDRESSES,
+		ID_OCT_ADDRESSES,
 		ID_LOGICAL_ADDRESSES,
 		ID_PHYSICAL_ADDRESSES,
 		ID_REVERSE_VIEW,
@@ -97,11 +109,18 @@ protected:
 
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
+		ID_SHOW_REGISTERPOINTS,
 
 		ID_CLEAR_LOG,
 
+		ID_SAVE_WINDOWS,
+		ID_LIGHT_BACKGROUND,
+		ID_DARK_BACKGROUND,
+
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
+
+	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
 
 	bool is_main_console() const { return m_is_main_console; }
 	HWND window() const { return m_wnd; }
@@ -116,6 +135,8 @@ protected:
 	virtual void draw_contents(HDC dc);
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
+
+	virtual void save_configuration_to_node(util::xml::data_node &node);
 
 	std::unique_ptr<debugview_info>    m_views[MAX_VIEWS];
 
@@ -133,12 +154,14 @@ private:
 	HWND            m_wnd;
 	WNDPROC const   m_handler;
 
-	uint32_t          m_minwidth, m_maxwidth;
-	uint32_t          m_minheight, m_maxheight;
+	uint32_t        m_minwidth, m_maxwidth;
+	uint32_t        m_minheight, m_maxheight;
 
-	uint16_t          m_ignore_char_lparam;
+	uint16_t        m_ignore_char_lparam;
 
 	static bool     s_window_class_registered;
 };
 
-#endif
+} // namespace osd::debugger::win
+
+#endif // MAME_DEBUGGER_WIN_DEBUGWININFO_H

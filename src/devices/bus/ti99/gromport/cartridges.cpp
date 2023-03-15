@@ -15,7 +15,10 @@
 #include "emu.h"
 #include "cartridges.h"
 
+#include "fileio.h"
+
 #include "corestr.h"
+#include "formats/rpk.h"
 
 #define LOG_WARN         (1U<<1)   // Warnings
 #define LOG_CONFIG       (1U<<2)   // Configuration
@@ -24,19 +27,17 @@
 #define LOG_CRU          (1U<<5)   // CRU access
 #define LOG_READ         (1U<<6)   // Read operation
 #define LOG_WRITE        (1U<<7)   // Write operation
-#define LOG_GROM         (1U<<8)   // GROM access
-#define LOG_RPK          (1U<<9)   // RPK handler
-#define LOG_WARNW        (1U<<10)  // Warn when writing to cartridge space
+#define LOG_RPK          (1U<<8)   // RPK handler
+#define LOG_WARNW        (1U<<9)   // Warn when writing to cartridge space
 
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN | LOG_CONFIG )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_CART, bus::ti99::gromport, ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
+DEFINE_DEVICE_TYPE(TI99_CART, bus::ti99::gromport::ti99_cartridge_device, "ti99cart", "TI-99 cartridge")
 
 namespace bus::ti99::gromport {
 
 #define CARTGROM_TAG "grom_contents"
-#define CARTROM_TAG "rom_contents"
 #define GROM3_TAG "grom3"
 #define GROM4_TAG "grom4"
 #define GROM5_TAG "grom5"
@@ -59,21 +60,21 @@ enum
 	PCB_PAGED7
 };
 
-static const pcb_type pcbdefs[] =
+static char const *const pcbdefs[] =
 {
-	{ PCB_STANDARD, "standard" },
-	{ PCB_PAGED12K, "paged12k" },
-	{ PCB_PAGED16K, "paged" },
-	{ PCB_MINIMEM, "minimem" },
-	{ PCB_SUPER, "super" },
-	{ PCB_MBX, "mbx" },
-	{ PCB_PAGED379I, "paged379i" },
-	{ PCB_PAGED378, "paged378" },
-	{ PCB_PAGED377, "paged377" },
-	{ PCB_PAGEDCRU, "pagedcru" },
-	{ PCB_GROMEMU, "gromemu" },
-	{ PCB_PAGED7, "paged7" },
-	{ 0, nullptr}
+	"standard",     // PCB_STANDARD
+	"paged12k",     // PCB_PAGED12K
+	"paged",        // PCB_PAGED16K
+	"minimem",      // PCB_MINIMEM
+	"super",        // PCB_SUPER
+	"mbx",          // PCB_MBX
+	"paged379i",    // PCB_PAGED379I
+	"paged378",     // PCB_PAGED378
+	"paged377",     // PCB_PAGED377
+	"pagedcru",     // PCB_PAGEDCRU
+	"gromemu",      // PCB_GROMEMU
+	"paged7",       // PCB_PAGED7
+	nullptr
 };
 
 static const pcb_type sw_pcbdefs[] =
@@ -91,24 +92,22 @@ static const pcb_type sw_pcbdefs[] =
 
 ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 :   device_t(mconfig, TI99_CART, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_pcbtype(0),
 	m_slot(0),
 	m_pcb(nullptr),
-	m_connector(nullptr),
-	m_rpk(nullptr)
+	m_connector(nullptr)
 {
 }
 
 void ti99_cartridge_device::prepare_cartridge()
 {
-	int rom2_length;
+	int rom1_length = 0;
+	int rom2_length = 0;
 
 	uint8_t* grom_ptr;
 	uint8_t* rom_ptr;
-
 	memory_region *regg;
-	memory_region *regr;
 
 	// Initialize some values.
 	m_pcb->m_rom_page = 0;
@@ -120,7 +119,10 @@ void ti99_cartridge_device::prepare_cartridge()
 	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = nullptr;
 
 	m_pcb->m_grom_size = loaded_through_softlist() ? get_software_region_length("grom") : m_rpk->get_resource_length("grom_socket");
-	LOGMASKED(LOG_CONFIG, "grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
+	if (m_pcb->m_grom_size == 0)
+		LOGMASKED(LOG_CONFIG, "No GROM dump\n");
+	else
+		LOGMASKED(LOG_CONFIG, "GROM dump size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
@@ -138,50 +140,85 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->m_grom_size > 0x8000) m_pcb->set_grom_pointer(4, subdevice(GROM7_TAG));
 	}
 
-	m_pcb->m_rom_size = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
+	rom1_length = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
 	m_pcb->m_bank_mask = 0;
 
-	if (m_pcb->m_rom_size > 0)
+	if (rom1_length > 0)
 	{
-		if (m_pcb->m_rom_size > 0x200000) fatalerror("Cartridge ROM size exceeding 2 MiB");
-		LOGMASKED(LOG_CONFIG, "rom size=0x%04x\n", m_pcb->m_rom_size);
+		LOGMASKED(LOG_CONFIG, "ROM dump size=0x%04x\n", rom1_length);
 
-		// Determine the bank mask for flexible ROM sizes in gromemu
-		int rsizet = m_pcb->m_rom_size;
-		int msizet = 0x2000;
+		// Round up to 8K multiple; dumps may be shorter, but we have
+		// a cartridge ROM window of 8K
+		// TODO: Allow for mirroring?
+		m_pcb->m_rom_size = rom1_length;
 
-		while (msizet < rsizet)
+		if ((rom1_length % 0x2000)!=0)
+			m_pcb->m_rom_size = (rom1_length + 0x2000) & ~0x1fff;
+
+		// Softlist uses only one ROM area, no second socket
+		if (!loaded_through_softlist())
 		{
-			m_pcb->m_bank_mask = (m_pcb->m_bank_mask<<1) | 1;
-			msizet <<= 1;
+			rom2_length = m_rpk->get_resource_length("rom2_socket");
 		}
-		LOGMASKED(LOG_CONFIG, "rom bank mask=0x%04x\n", m_pcb->m_bank_mask);
 
-		regr = memregion(CARTROM_TAG);
-		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
-		memcpy(regr->base(), rom_ptr, m_pcb->m_rom_size);
-		// Set both pointers to the same region for now
-		m_pcb->m_rom_ptr = regr->base();
-	}
-
-	// Softlist uses only one ROM area, no second socket
-	if (!loaded_through_softlist())
-	{
-		rom2_length = m_rpk->get_resource_length("rom2_socket");
+		// Using ROM2 socket automatically implies paged12, paged16,
+		// or gromemu schemes
 		if (rom2_length > 0)
 		{
-			// sizes do not differ between rom and rom2
-			// We use the large cartrom space for the second bank as well
-			regr = memregion(CARTROM_TAG);
-			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
-			memcpy(regr->base() + 0x2000, rom_ptr, rom2_length);
+			LOGMASKED(LOG_CONFIG, "Second ROM dump size = 0x%04x\n", rom2_length);
+			if (rom2_length > 0x2000)
+			{
+				LOGMASKED(LOG_WARN, "Can only use 8K for second socket; dump truncated\n");
+				rom2_length = 0x2000;
+			}
 
-			// Configurations with ROM1+ROM2 have exactly two banks; only
-			// the first 8K are used from ROM1.
+			if (m_pcb->m_rom_size > 0x2000)
+			{
+				m_pcb->m_rom_size = 0x2000;
+				LOGMASKED(LOG_WARN, "Can only use 8K for first socket when there is a second socket; dump truncated.\n");
+			}
+
+			// We assign 16K for both rom1 and rom2, so this is properly
+			// aligned with the 8K spaces even when the dumps are shorter
+			m_romspace = make_unique_clear<u8[]>(0x4000);
+
+			// Load the contents of the second socket in the upper half
+			// The contents of the first socket are copied later
+			rom_ptr = m_rpk->get_contents_of_socket("rom2_socket");
+			memcpy(m_romspace.get() + 0x2000, rom_ptr, rom2_length);
+
 			m_pcb->m_bank_mask = 1;
-			LOGMASKED(LOG_CONFIG, "rom bank mask=0x0001 (using rom/rom2)\n");
+			LOGMASKED(LOG_CONFIG, "ROM bank mask=0x0001 (using ROM1/ROM2)\n");
 		}
+		else
+		{
+			m_romspace = make_unique_clear<u8[]>(m_pcb->m_rom_size);
+
+			// Determine the bank mask for flexible ROM sizes in gromemu
+			int rsizet = m_pcb->m_rom_size;
+			int msizet = 0x2000;
+			int banks = 1;
+
+			while (msizet < rsizet)
+			{
+				m_pcb->m_bank_mask = (m_pcb->m_bank_mask<<1) | 1;
+				banks<<=1;
+				msizet <<= 1;
+			}
+			if (banks > 1)
+				LOGMASKED(LOG_CONFIG, "ROM bank mask=0x%04x (%d banks)\n", m_pcb->m_bank_mask, banks);
+		}
+
+		rom_ptr = loaded_through_softlist() ? get_software_region("rom") : m_rpk->get_contents_of_socket("rom_socket");
+		memcpy(m_romspace.get(), rom_ptr, rom1_length);
+
+		m_pcb->m_rom_ptr = m_romspace.get();
 	}
+	else
+	{
+		LOGMASKED(LOG_CONFIG, "No ROM dump\n");
+	}
+
 
 	// (NV)RAM cartridges
 	if (loaded_through_softlist())
@@ -193,6 +230,7 @@ void ti99_cartridge_device::prepare_cartridge()
 			m_pcb->m_nvram.resize(m_pcb->m_ram_size);
 			m_pcb->m_ram_ptr = &m_pcb->m_nvram[0];
 			battery_load(m_pcb->m_ram_ptr, m_pcb->m_ram_size, 0xff);
+			LOGMASKED(LOG_CONFIG, "NVRAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 
 		// Do we have RAM?
@@ -201,6 +239,7 @@ void ti99_cartridge_device::prepare_cartridge()
 			m_pcb->m_ram_size = get_software_region_length("ram");
 			m_pcb->m_ram.resize(m_pcb->m_ram_size);
 			m_pcb->m_ram_ptr = &m_pcb->m_ram[0];
+			LOGMASKED(LOG_CONFIG, "RAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 	}
 	else
@@ -208,8 +247,8 @@ void ti99_cartridge_device::prepare_cartridge()
 		m_pcb->m_ram_size = m_rpk->get_resource_length("ram_socket");
 		if (m_pcb->m_ram_size > 0)
 		{
-			// TODO: Consider to use a region as well. If so, do not forget to memcpy.
 			m_pcb->m_ram_ptr = m_rpk->get_contents_of_socket("ram_socket");
+			LOGMASKED(LOG_CONFIG, "RAM size=0x%04x\n", m_pcb->m_ram_size);
 		}
 	}
 }
@@ -253,23 +292,22 @@ image_init_result ti99_cartridge_device::call_load()
 			i++;
 		} while (sw_pcbdefs[i].id != 0);
 		LOGMASKED(LOG_CONFIG, "Cartridge type is %s (%d)\n", pcb, m_pcbtype);
-		m_rpk = nullptr;
+		m_rpk.reset();
 	}
 	else
 	{
-		auto reader = std::make_unique<rpk_reader>(pcbdefs);
-		try
+		util::core_file::ptr proxy;
+		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		if (!err)
+			err = rpk_open(machine().options(), std::move(proxy), machine().system().name, m_rpk);
+		if (err)
 		{
-			m_rpk = reader->open(machine().options(), filename(), machine().system().name);
-			m_pcbtype = m_rpk->get_type();
-		}
-		catch (rpk_exception& err)
-		{
-			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.to_string().c_str());
-			m_rpk = nullptr;
-			m_err = IMAGE_ERROR_INVALIDIMAGE;
+			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());
+			m_rpk.reset();
+			m_err = image_error::INVALIDIMAGE;
 			return image_init_result::FAIL;
 		}
+		m_pcbtype = m_rpk->get_type();
 	}
 
 	switch (m_pcbtype)
@@ -338,7 +376,7 @@ void ti99_cartridge_device::call_unload()
 	if (m_rpk != nullptr)
 	{
 		m_rpk->close(); // will write NVRAM contents
-		delete m_rpk;
+		m_rpk.reset();
 	}
 	else
 	{
@@ -432,13 +470,12 @@ void ti99_cartridge_device::device_add_mconfig(machine_config& config)
 }
 
 /*
-    Memory area for one cartridge. For most cartridges we only need 8 KiB for
-    ROM contents, but cartridges of the "paged377" type have up to 2 MiB
-    organised as selectable banks, so we must be sure there is enough space.
+    Memory area for one cartridge. This only covers the GROM area, since we
+    assign portions of the memory to subdevices (TMC0430). For the ROM area,
+    we use a dynamically allocated space, since the sizes vary strongly.
 */
 ROM_START( cartridge_memory )
 	ROM_REGION(0xa000, CARTGROM_TAG, ROMREGION_ERASE00)
-	ROM_REGION(0x200000, CARTROM_TAG, ROMREGION_ERASE00)
 ROM_END
 
 const tiny_rom_entry *ti99_cartridge_device::device_rom_region() const
@@ -1334,16 +1371,15 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, uint8_t data)
   If rom2_socket is used, we assume that rom_socket and rom2_socket contain
   8K ROM each, so we have exactly two banks, regardless of the ROM length.
 
+  The maximum ROM size is 32 MiB (4096 pages of 8 KiB)
+
 ******************************************************************************/
 
 void ti99_gromemu_cartridge::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
-	if (m_grom_ptr != nullptr)
-	{
-		m_grom_selected = (gsq == ASSERT_LINE);
-		m_grom_read_mode = (mline == ASSERT_LINE);
-		m_grom_address_mode = (moline == ASSERT_LINE);
-	}
+	m_grom_selected = (gsq == ASSERT_LINE);
+	m_grom_read_mode = (mline == ASSERT_LINE);
+	m_grom_address_mode = (moline == ASSERT_LINE);
 }
 
 void ti99_gromemu_cartridge::readz(offs_t offset, uint8_t *value)
@@ -1408,7 +1444,8 @@ void ti99_gromemu_cartridge::gromemureadz(offs_t offset, uint8_t *value)
 	if (id > 2)
 	{
 		// Cartridge space (0x6000 - 0xffff)
-		*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
+		if (m_grom_ptr != nullptr)
+			*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
 	}
 
 	// The GROM emulation does not wrap at 8K boundaries.
@@ -1446,47 +1483,6 @@ void ti99_gromemu_cartridge::gromemuwrite(offs_t offset, uint8_t data)
 /****************************************************************************
 
     RPK loader
-
-    RPK format support
-
-    A RPK file ("rompack") contains a collection of dump files and a layout
-    file that defines the kind of circuit board (PCB) used in the cartridge
-    and the mapping of dumps to sockets on the board.
-
-Example:
-    <?xml version="1.0" encoding="utf-8"?>
-    <romset>
-        <resources>
-            <rom id="gromimage" file="ed-assmg.bin" />
-        </resources>
-        <configuration>
-            <pcb type="standard">
-                <socket id="grom_socket" uses="gromimage"/>
-            </pcb>
-        </configuration>
-    </romset>
-
-DTD:
-    <!ELEMENT romset (resources, configuration)>
-    <!ELEMENT resources (rom|ram)+>
-    <!ELEMENT rom EMPTY>
-    <!ELEMENT ram EMPTY>
-    <!ELEMENT configuration (pcb)>
-    <!ELEMENT pcb (socket)+>
-    <!ELEMENT socket EMPTY>
-    <!ATTLIST romset version CDATA #IMPLIED>
-    <!ATTLIST rom id ID #REQUIRED
-    <!ATTLIST rom file CDATA #REQUIRED>
-    <!ATTLIST rom crc CDATA #IMPLIED>
-    <!ATTLIST rom sha1 CDATA #IMPLIED>
-    <!ATTLIST ram id ID #REQUIRED>
-    <!ATTLIST ram type (volatile|persistent) #IMPLIED>
-    <!ATTLIST ram store (internal|external) #IMPLIED>
-    <!ATTLIST ram file CDATA #IMPLIED>
-    <!ATTLIST ram length CDATA #REQUIRED>
-    <!ATTLIST pcb type CDATA #REQUIRED>
-    <!ATTLIST socket id ID #REQUIRED>
-    <!ATTLIST socket uses IDREF #REQUIRED>
 
 ****************************************************************************/
 
@@ -1531,7 +1527,7 @@ int ti99_cartridge_device::rpk::get_resource_length(const char *socket_name)
 	return socket->second->get_content_length();
 }
 
-void ti99_cartridge_device::rpk::add_socket(const char* id, std::unique_ptr<rpk_socket> newsock)
+void ti99_cartridge_device::rpk::add_socket(const char* id, std::unique_ptr<ti99_rpk_socket> &&newsock)
 {
 	m_sockets.emplace(id, std::move(newsock));
 }
@@ -1553,8 +1549,8 @@ void ti99_cartridge_device::rpk::close()
 				throw emu_fatalerror("ti99_cartridge_device::rpk::close: Buffer is null or length is 0");
 
 			emu_file file(m_options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = file.open(socket.second->get_pathname());
-			if (filerr == osd_file::error::NONE)
+			std::error_condition const filerr = file.open(socket.second->get_pathname());
+			if (!filerr)
 				file.write(socket.second->get_contents(), socket.second->get_content_length());
 
 		}
@@ -1567,178 +1563,68 @@ void ti99_cartridge_device::rpk::close()
     not a network socket)
 ***************************************************************/
 
-ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, std::unique_ptr<uint8_t []> &&contents, std::string &&pathname)
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents, std::string &&pathname)
 	: m_id(id), m_length(length), m_contents(std::move(contents)), m_pathname(std::move(pathname))
 {
 }
 
-ti99_cartridge_device::rpk_socket::rpk_socket(const char* id, int length, std::unique_ptr<uint8_t []> &&contents)
-	: rpk_socket(id, length, std::move(contents), "")
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents)
+	: ti99_rpk_socket(id, length, std::move(contents), "")
 {
-}
-
-/*
-    Locate a file in the ZIP container
-*/
-int ti99_cartridge_device::rpk_reader::find_file(util::archive_file &zip, const char *filename, uint32_t crc)
-{
-	for (int header = zip.first_file(); header >= 0; header = zip.next_file())
-	{
-		// Ignore directories
-		if (!zip.current_is_directory())
-		{
-			// We don't check for CRC == 0.
-			if (crc != 0)
-			{
-				// if the CRC and name both match, we're good
-				// if the CRC matches and the name doesn't, we're still good
-				if (zip.current_crc() == crc)
-					return header;
-			}
-			else
-			{
-				if (core_stricmp(zip.current_name().c_str(), filename) == 0)
-				{
-					return header;
-				}
-			}
-		}
-	}
-	return -1;
 }
 
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_rom_resource(util::archive_file &zip, util::xml::data_node const* rom_resource_node, const char* socketname)
+std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result)
 {
-	// find the file attribute (required)
-	std::string const *const file = rom_resource_node->get_attribute_string_ptr("file");
-	if (file == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<rom> must have a 'file' attribute");
+	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socket.id(), socket.filename());
 
-	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socketname, *file);
-
-	// check for crc
-	std::string const *const crcstr = rom_resource_node->get_attribute_string_ptr("crc");
-	int header;
-	if (crcstr==nullptr)
-	{
-		// no CRC, just find the file in the RPK
-		header = find_file(zip, file->c_str(), 0);
-	}
-	else
-	{
-		uint32_t crc = strtoul(crcstr->c_str(), nullptr, 16);
-		header = find_file(zip, file->c_str(), crc);
-	}
-	if (header < 0) throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
-
-	int length = zip.current_uncompressed_length();
-
-	// Allocate storage
-	std::unique_ptr<uint8_t []> contents;
-	try { contents = make_unique_clear<uint8_t []>(length); }
-	catch (std::bad_alloc const &) { throw rpk_exception(RPK_OUT_OF_MEMORY); }
-
-	// and unzip file from the zip file
-	util::archive_file::error ziperr = zip.decompress(contents.get(), length);
-	if (ziperr != util::archive_file::error::NONE)
-	{
-		if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
-		else throw rpk_exception(RPK_ZIP_ERROR);
-	}
-
-	// check for sha1
-	std::string const *const sha1 = rom_resource_node->get_attribute_string_ptr("sha1");
-	if (sha1 != nullptr)
-	{
-		util::hash_collection actual_hashes;
-		actual_hashes.compute(contents.get(), length, util::hash_collection::HASH_TYPES_CRC_SHA1);
-
-		util::hash_collection expected_hashes;
-		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, *sha1);
-
-		if (actual_hashes != expected_hashes) throw rpk_exception(RPK_INVALID_FILE_REF, "SHA1 check failed");
-	}
+	std::vector<uint8_t> contents;
+	std::error_condition err =  socket.read_file(contents);
+	if (err)
+		return err;
 
 	// Create a socket instance
-	return std::make_unique<rpk_socket>(socketname, length, std::move(contents));
+	result = std::make_unique<ti99_rpk_socket>(socket.id().c_str(), contents.size(), std::move(contents));
+	return std::error_condition();
 }
 
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_ram_resource(emu_options &options, util::xml::data_node const* ram_resource_node, const char* socketname, const char* system_name)
+std::unique_ptr<ti99_cartridge_device::ti99_rpk_socket> ti99_cartridge_device::rpk_load_ram_resource(emu_options &options, const rpk_socket &socket, const char *system_name)
 {
-	// find the length attribute
-	std::string const *const length_string = ram_resource_node->get_attribute_string_ptr("length");
-	if (length_string == nullptr) throw rpk_exception(RPK_MISSING_RAM_LENGTH);
-
-	// parse it
-	unsigned int length;
-	char suffix = '\0';
-	sscanf(length_string->c_str(), "%u%c", &length, &suffix);
-	switch(tolower(suffix))
-	{
-		case 'k': // kilobytes
-			length *= 1024;
-			break;
-
-		case 'm':
-			/* megabytes */
-			length *= 1024*1024;
-			break;
-
-		case '\0':
-			break;
-
-		default:  // failed
-			throw rpk_exception(RPK_INVALID_RAM_SPEC);
-	}
-
 	// Allocate memory for this resource
-	std::unique_ptr<uint8_t []> contents;
-	try { contents = make_unique_clear<uint8_t []>(length); }
-	catch (std::bad_alloc const &) { throw rpk_exception(RPK_OUT_OF_MEMORY); }
+	std::vector<uint8_t> contents;
+	contents.resize(socket.length());
+	std::fill(contents.begin(), contents.end(), 0);
 
-	LOGMASKED(LOG_RPK, "[RPK handler] Allocating RAM buffer (%d bytes) for socket '%s'\n", length, socketname);
+	LOGMASKED(LOG_RPK, "[RPK handler] Allocating RAM buffer (%d bytes) for socket '%s'\n", socket.length(), socket.id());
 
 	// That's it for pure RAM. Now check whether the RAM is "persistent", i.e. NVRAM.
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
-	std::string const *const ram_type = ram_resource_node->get_attribute_string_ptr("type");
 	std::string ram_pname;
-	if (ram_type != nullptr)
+	if (socket.type() == rpk_socket::socket_type::PERSISTENT_RAM)
 	{
-		if (*ram_type == "persistent")
-		{
-			// Get the file name (required if persistent)
-			std::string const *const ram_filename = ram_resource_node->get_attribute_string_ptr("file");
-			if (ram_filename==nullptr)
-				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
+		ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(socket.filename());
+		// load, and fill rest with 00
+		LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname);
 
-			ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(*ram_filename);
-			// load, and fill rest with 00
-			LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname.c_str());
+		// try to open the battery file and read it if possible
+		emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
+		std::error_condition const filerr = file.open(ram_pname);
+		int bytes_read = 0;
+		if (!filerr)
+			bytes_read = file.read(&contents[0], contents.size());
 
-			// Load the NVRAM contents
-			if (!contents || (length <= 0))
-				throw emu_fatalerror("ti99_cartridge_device::rpk_reader::load_ram_resource: Buffer is null or length is 0");
-
-			// try to open the battery file and read it if possible
-			emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
-			osd_file::error filerr = file.open(ram_pname);
-			int bytes_read = 0;
-			if (filerr == osd_file::error::NONE)
-				bytes_read = file.read(contents.get(), length);
-
-			// fill remaining bytes (if necessary)
-			std::fill_n(&contents[bytes_read], length - bytes_read, 0x00);
-		}
+		// fill remaining bytes (if necessary)
+		std::fill_n(&contents[bytes_read], contents.size() - bytes_read, 0x00);
 	}
 
 	// Create a socket instance
-	return std::make_unique<rpk_socket>(socketname, length, std::move(contents), std::move(ram_pname));
+	return std::make_unique<ti99_rpk_socket>(socket.id().c_str(), socket.length(), std::move(contents), std::move(ram_pname));
 }
 
 /*-------------------------------------------------
@@ -1747,126 +1633,47 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
     system_name - name of the driver (also just for NVRAM handling)
 -------------------------------------------------*/
 
-ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options &options, const char *filename, const char *system_name)
+std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name, std::unique_ptr<rpk> &result)
 {
-	util::archive_file::error ziperr;
+	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
-	util::archive_file::ptr zipfile;
+	rpk_reader reader(pcbdefs, true);
 
-	std::vector<char> layout_text;
+	// open the RPK
+	rpk_file::ptr file;
+	std::error_condition err = reader.read(std::move(stream), file);
+	if (err)
+		return err;
 
-	int i;
+	// specify the PCB
+	newrpk->m_type = file->pcb_type() + 1;
+	LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcbdefs[file->pcb_type()]);
 
-	auto newrpk = new rpk(options, system_name);
-
-	try
+	for (const rpk_socket &socket : file->sockets())
 	{
-		/* open the ZIP file */
-		ziperr = util::archive_file::open_zip(filename, zipfile);
-		if (ziperr != util::archive_file::error::NONE) throw rpk_exception(RPK_NOT_ZIP_FORMAT);
+		std::unique_ptr<ti99_rpk_socket> ti99_socket;
 
-		/* find the layout.xml file */
-		if (find_file(*zipfile, "layout.xml", 0) < 0) throw rpk_exception(RPK_MISSING_LAYOUT);
-
-		/* reserve space for the layout file contents (+1 for the termination) */
-		layout_text.resize(zipfile->current_uncompressed_length() + 1);
-
-		/* uncompress the layout text */
-		ziperr = zipfile->decompress(&layout_text[0], zipfile->current_uncompressed_length());
-		if (ziperr != util::archive_file::error::NONE)
+		switch (socket.type())
 		{
-			if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
-			else throw rpk_exception(RPK_ZIP_ERROR);
-		}
+		case rpk_socket::socket_type::ROM:
+			err = rpk_load_rom_resource(socket, ti99_socket);
+			if (err)
+				return err;
+			newrpk->add_socket(socket.id().c_str(), std::move(ti99_socket));
+			break;
 
-		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
+		case rpk_socket::socket_type::RAM:
+		case rpk_socket::socket_type::PERSISTENT_RAM:
+			newrpk->add_socket(socket.id().c_str(), rpk_load_ram_resource(options, socket, system_name));
+			break;
 
-		/* parse the layout text */
-		util::xml::file::ptr const layout_xml = util::xml::file::string_read(&layout_text[0], nullptr);
-		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
-
-		// Now we work within the XML tree
-
-		// romset is the root node
-		util::xml::data_node const *const romset_node = layout_xml->get_child("romset");
-		if (!romset_node) throw rpk_exception(RPK_INVALID_LAYOUT, "document element must be <romset>");
-
-		// resources is a child of romset
-		util::xml::data_node const *const resources_node = romset_node->get_child("resources");
-		if (!resources_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <resources> child");
-
-		// configuration is a child of romset; we're actually interested in ...
-		util::xml::data_node const *const configuration_node = romset_node->get_child("configuration");
-		if (!configuration_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <configuration> child");
-
-		// ... pcb, which is a child of configuration
-		util::xml::data_node const *const pcb_node = configuration_node->get_child("pcb");
-		if (!pcb_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
-
-		// We'll try to find the PCB type on the provided type list.
-		std::string const *const pcb_type = pcb_node->get_attribute_string_ptr("type");
-		if (!pcb_type) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
-		LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", *pcb_type);
-
-		i=0;
-		do
-		{
-			if (*pcb_type == m_types[i].name)
-			{
-				newrpk->m_type = m_types[i].id;
-				break;
-			}
-			i++;
-		} while (m_types[i].id != 0);
-
-		if (m_types[i].id==0) throw rpk_exception(RPK_UNKNOWN_PCB_TYPE);
-
-		// Find the sockets and load their respective resource
-		for (util::xml::data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
-		{
-			if (strcmp(socket_node->get_name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
-			std::string const *const id = socket_node->get_attribute_string_ptr("id");
-			if (!id) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
-			std::string const *const uses_name = socket_node->get_attribute_string_ptr("uses");
-			if (!uses_name) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
-
-			bool found = false;
-			// Locate the resource node
-			for (util::xml::data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
-			{
-				std::string const *const resource_name = resource_node->get_attribute_string_ptr("id");
-				if (!resource_name) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");
-
-				if (*resource_name == *uses_name)
-				{
-					// found it
-					if (strcmp(resource_node->get_name(), "rom")==0)
-					{
-						newrpk->add_socket(id->c_str(), load_rom_resource(*zipfile, resource_node, id->c_str()));
-					}
-					else
-					{
-						if (strcmp(resource_node->get_name(), "ram")==0)
-						{
-							newrpk->add_socket(id->c_str(), load_ram_resource(options, resource_node, id->c_str(), system_name));
-						}
-						else throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must be <rom> or <ram>");
-					}
-					found = true;
-				}
-			}
-			if (!found) throw rpk_exception(RPK_INVALID_RESOURCE_REF, uses_name->c_str());
+		default:
+			throw false;
 		}
 	}
-	catch (rpk_exception &)
-	{
-		newrpk->close();
 
-		// rethrow the exception
-		throw;
-	}
-
-	return newrpk;
+	result = std::move(newrpk);
+	return std::error_condition();
 }
 
 } // end namespace bus::ti99::gromport

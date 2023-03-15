@@ -29,26 +29,27 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
+	virtual bool custom_ui_back() override { return !m_search.empty(); }
 
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	// internal methods
 	void build_driver_list();
-	void inkey_select(const event *menu_event);
+	bool inkey_select(const event &menu_event);
 	void inkey_cancel();
-	void inkey_special(const event *menu_event);
+	void inkey_special(const event &menu_event);
 
 	// internal state
+	bool                    m_nomatch;
 	bool                    m_error;
 	bool                    m_rerandomize;
 	std::string             m_search;
-	int                     m_skip_main_items;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *>    m_driverlist;
 	std::unique_ptr<driver_enumerator>  m_drivlist;

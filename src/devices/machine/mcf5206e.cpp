@@ -661,7 +661,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 	// technically we should do the vector check in the IRQ callback as well as various checks based on the IRQ masks before asserting the interrupt
 	if (ICR & 0x80) // AVEC
 	{
-		if (!(m_IMR & 0x0200)) m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
+		if (!(m_IMR & 0x0200)) m_maincpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
 	}
 
 	LOGMASKED(LOG_TIMER, "timer1_callback\n");
@@ -826,8 +826,8 @@ DEFINE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device, "mcf5206e_pe
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
+		m_maincpu(*this, finder_base::DUMMY_TAG),
 		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, address_map_constructor(FUNC(mcf5206e_peripheral_device::coldfire_regs_map), this))
-
 {
 }
 
@@ -846,7 +846,7 @@ void mcf5206e_peripheral_device::device_start()
 {
 	init_regs(true);
 
-	m_timer1 = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( mcf5206e_peripheral_device::timer1_callback ), this) );
+	m_timer1 = timer_alloc( FUNC( mcf5206e_peripheral_device::timer1_callback ), this );
 
 	save_item(NAME(m_ICR));
 	save_item(NAME(m_CSAR));
@@ -870,8 +870,6 @@ void mcf5206e_peripheral_device::device_start()
 
 void mcf5206e_peripheral_device::device_reset()
 {
-	m_cpu = (cpu_device*)machine().device(":maincpu"); // hack. this device should really be attached to a modern CPU core
-
 	init_regs(false);
 	m_timer1->adjust(attotime::never);
 }

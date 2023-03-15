@@ -36,8 +36,6 @@ e. A checksum byte (8-bit addition)
 
 #include "formats/apf_apt.h"
 
-#include <cassert>
-
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 

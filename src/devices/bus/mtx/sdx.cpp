@@ -152,16 +152,13 @@ void mtx_sdxcpm_device::device_add_mconfig(machine_config &config)
 
 	/* 80 column video card - required to be installed in MTX internally */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_refresh_hz(50);
-	m_screen->set_size(960, 313);
-	m_screen->set_visarea(00, 640 - 1, 0, 240 - 1);
-	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	m_screen->set_raw(15_MHz_XTAL, 960, 0, 640, 313, 0, 240);
+	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_mtx_sdx);
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	MC6845(config, m_crtc, 15_MHz_XTAL / 8);
+	HD6845S(config, m_crtc, 15_MHz_XTAL / 8);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
@@ -255,8 +252,8 @@ void mtx_sdxcpm_device::device_reset()
 
 	/* 80 column */
 	io_space().install_readwrite_handler(0x30, 0x33, read8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_r)), write8sm_delegate(*this, FUNC(mtx_sdxcpm_device::mtx_80col_w)));
-	io_space().install_readwrite_handler(0x38, 0x38, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
-	io_space().install_readwrite_handler(0x39, 0x39, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	io_space().install_readwrite_handler(0x38, 0x38, read8smo_delegate(*m_crtc, FUNC(hd6845s_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	io_space().install_readwrite_handler(0x39, 0x39, read8smo_delegate(*m_crtc, FUNC(hd6845s_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 
 	memset(m_80col_char_ram, 0, sizeof(m_80col_char_ram));
 	memset(m_80col_attr_ram, 0, sizeof(m_80col_attr_ram));

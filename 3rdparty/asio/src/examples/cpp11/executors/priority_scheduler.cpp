@@ -8,6 +8,7 @@
 
 using asio::dispatch;
 using asio::execution_context;
+namespace execution = asio::execution;
 
 class priority_scheduler : public execution_context
 {
@@ -21,45 +22,18 @@ public:
     {
     }
 
-    priority_scheduler& context() const noexcept
+    priority_scheduler& query(execution::context_t) const noexcept
     {
       return context_;
     }
 
-    void on_work_started() const noexcept
+    template <class Func>
+    void execute(Func f) const
     {
-      // This executor doesn't count work. Instead, the scheduler simply runs
-      // until explicitly stopped.
-    }
-
-    void on_work_finished() const noexcept
-    {
-      // This executor doesn't count work. Instead, the scheduler simply runs
-      // until explicitly stopped.
-    }
-
-    template <class Func, class Alloc>
-    void dispatch(Func&& f, const Alloc& a) const
-    {
-      post(std::forward<Func>(f), a);
-    }
-
-    template <class Func, class Alloc>
-    void post(Func f, const Alloc& a) const
-    {
-      auto p(std::allocate_shared<item<Func>>(
-            typename std::allocator_traits<
-              Alloc>::template rebind_alloc<char>(a),
-            priority_, std::move(f)));
+      auto p(std::make_shared<item<Func>>(priority_, std::move(f)));
       std::lock_guard<std::mutex> lock(context_.mutex_);
       context_.queue_.push(p);
       context_.condition_.notify_one();
-    }
-
-    template <class Func, class Alloc>
-    void defer(Func&& f, const Alloc& a) const
-    {
-      post(std::forward<Func>(f), a);
     }
 
     friend bool operator==(const executor_type& a,
@@ -78,6 +52,12 @@ public:
     priority_scheduler& context_;
     int priority_;
   };
+
+  ~priority_scheduler() noexcept
+  {
+    shutdown();
+    destroy();
+  }
 
   executor_type get_executor(int pri = 0) noexcept
   {

@@ -19,8 +19,8 @@
     Start the PET emulator with the D9060 attached on the IEEE-488 bus,
     with the new CHD mounted:
 
-    $ mess pet8032 -ieee8 d9060 -hard tm602s.chd
-    $ mess pet8032 -ieee8 d9090 -hard tm603s.chd
+    $ mame pet8032 -ieee8 d9060 -hard tm602s.chd
+    $ mame pet8032 -ieee8 d9090 -hard tm603s.chd
 
     Enter 'HEADER "LABEL",D0,I01' to format the hard drive.
     Wait up to 1 hour and 20 minutes.

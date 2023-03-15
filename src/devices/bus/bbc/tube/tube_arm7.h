@@ -67,6 +67,8 @@ private:
 
 	void arm7_map(address_map& map);
 
+	DECLARE_WRITE_LINE_MEMBER(prst_w);
+
 	uint32_t oki_reg_r(offs_t offset);
 	void oki_reg_w(offs_t offset, uint32_t data);
 

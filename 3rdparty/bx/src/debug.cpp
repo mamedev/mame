@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/debug.h>
 #include <bx/string.h>       // isPrint
 #include <bx/readerwriter.h> // WriterI
@@ -142,7 +141,7 @@ namespace bx
 
 		if (NULL != _data)
 		{
-			const uint8_t* data = reinterpret_cast<const uint8_t*>(_data);
+			const uint8_t* data = (const uint8_t*)_data;
 			char hex[HEX_DUMP_WIDTH*3+1];
 			char ascii[HEX_DUMP_WIDTH+1];
 			uint32_t hexPos = 0;

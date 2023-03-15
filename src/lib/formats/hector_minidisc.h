@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_HMD_FORMAT;
+extern const hmd_format FLOPPY_HMD_FORMAT;
 
 #endif // MAME_FORMATS_HECTOR_MINIDISC_H

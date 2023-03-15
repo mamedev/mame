@@ -9,34 +9,35 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_BGFX_EFFECTMANAGER_H
+#define MAME_RENDER_BGFX_EFFECTMANAGER_H
+
 #pragma once
 
-#ifndef __DRAWBGFX_EFFECT_MANAGER__
-#define __DRAWBGFX_EFFECT_MANAGER__
-
 #include <map>
+#include <memory>
 #include <string>
 
-#include <bgfx/bgfx.h>
-
-#include "shadermanager.h"
 
 class bgfx_effect;
+class osd_options;
+class shader_manager;
 
-class effect_manager {
+class effect_manager
+{
 public:
-	effect_manager(osd_options& options, shader_manager& shaders) : m_options(options), m_shaders(shaders) { }
+	effect_manager(shader_manager& shaders);
 	~effect_manager();
 
 	// Getters
-	bgfx_effect* effect(std::string name);
+	bgfx_effect* get_or_load_effect(const osd_options &options, const std::string &name);
+	static bool validate_effect(const osd_options &options, const std::string &name);
 
 private:
-	bgfx_effect* load_effect(std::string name);
+	bgfx_effect* load_effect(const osd_options &options, const std::string &name);
 
-	osd_options&                        m_options;
-	shader_manager&                     m_shaders;
-	std::map<std::string, bgfx_effect*> m_effects;
+	shader_manager &m_shaders;
+	std::map<std::string, std::unique_ptr<bgfx_effect> > m_effects;
 };
 
-#endif // __DRAWBGFX_EFFECT_MANAGER__
+#endif // MAME_RENDER_BGFX_EFFECTMANAGER_H

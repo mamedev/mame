@@ -99,24 +99,24 @@ void spg2xx_io_device::device_start()
 
 	m_fiq_vector_w.resolve_safe();
 
-	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::tmb_timer_tick<0>), this));
-	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::tmb_timer_tick<1>), this));
+	m_tmb1 = timer_alloc(FUNC(spg2xx_io_device::tmb_timer_tick<0>), this);
+	m_tmb2 = timer_alloc(FUNC(spg2xx_io_device::tmb_timer_tick<1>), this);
 
-	m_uart_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::uart_transmit_tick), this));
-	m_uart_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::uart_receive_tick), this));
+	m_uart_tx_timer = timer_alloc(FUNC(spg2xx_io_device::uart_transmit_tick), this);
+	m_uart_rx_timer = timer_alloc(FUNC(spg2xx_io_device::uart_receive_tick), this);
 
-	m_4khz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::system_timer_tick), this));
+	m_4khz_timer = timer_alloc(FUNC(spg2xx_io_device::system_timer_tick), this);
 
-	m_timer_src_ab = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::timer_ab_tick), this));
-	m_timer_src_c = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::timer_c_tick), this));
-	m_rng_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::rng_clock_tick), this));
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::watchdog_tick), this));
-	m_spi_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::spi_tx_tick), this));
+	m_timer_src_ab = timer_alloc(FUNC(spg2xx_io_device::timer_ab_tick), this);
+	m_timer_src_c = timer_alloc(FUNC(spg2xx_io_device::timer_c_tick), this);
+	m_rng_timer = timer_alloc(FUNC(spg2xx_io_device::rng_clock_tick), this);
+	m_watchdog_timer = timer_alloc(FUNC(spg2xx_io_device::watchdog_tick), this);
+	m_spi_tx_timer = timer_alloc(FUNC(spg2xx_io_device::spi_tx_tick), this);
 
-	m_adc_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<0>), this));
-	m_adc_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<1>), this));
-	m_adc_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<2>), this));
-	m_adc_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<3>), this));
+	m_adc_timer[0] = timer_alloc(FUNC(spg2xx_io_device::adc_convert_tick<0>), this);
+	m_adc_timer[1] = timer_alloc(FUNC(spg2xx_io_device::adc_convert_tick<1>), this);
+	m_adc_timer[2] = timer_alloc(FUNC(spg2xx_io_device::adc_convert_tick<2>), this);
+	m_adc_timer[3] = timer_alloc(FUNC(spg2xx_io_device::adc_convert_tick<3>), this);
 
 	save_item(NAME(m_io_regs));
 

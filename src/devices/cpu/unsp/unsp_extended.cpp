@@ -5,8 +5,6 @@
 #include "unsp.h"
 #include "unspfe.h"
 
-#include "debugger.h"
-
 #include "unspdasm.h"
 
 // TODO: the call conventions and general use of 'do_basic_alu_ops' from unsp_other.cpp could be cleaned up

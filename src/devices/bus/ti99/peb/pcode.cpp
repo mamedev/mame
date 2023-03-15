@@ -86,7 +86,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_P_CODE, bus::ti99::peb, ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
+DEFINE_DEVICE_TYPE(TI99_P_CODE, bus::ti99::peb::ti_pcode_card_device, "ti99_pcode", "TI-99 P-Code Card")
 
 namespace bus::ti99::peb {
 
@@ -142,14 +142,14 @@ void ti_pcode_card_device::setaddress_dbin(offs_t offset, int state)
 	}
 }
 
-void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(offs_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && in_dsr_space(offset, true))
 	{
 		bool isrom0 = ((offset & 0xf000)==0x4000);
 		bool isrom12 = ((offset & 0xf000)==0x5000);
-		if (isrom0) value = m_rom[m_address & 0x0fff];
+		if (isrom0) value = m_rom[offset & 0x0fff];
 		else
 			if (isrom12) value = m_rom[(m_bank_select<<12) | (offset & 0x0fff)];
 	}
@@ -161,6 +161,7 @@ void ti_pcode_card_device::readz(offs_t offset, uint8_t *value)
 	if (machine().side_effects_disabled())
 	{
 		debugger_read(offset, *value);
+		return;
 	}
 
 	if (m_active && m_inDsrArea && m_selected)

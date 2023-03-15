@@ -146,6 +146,10 @@ void rocvfd_device::device_start()
 	m_brightness = std::make_unique<output_finder<1> >(*this, "vfdduty%u", unsigned(m_port_val));
 	m_brightness->resolve();
 
+	m_sclk = 0;
+	m_data = 0;
+	m_por = 0;
+
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_size));
 	save_item(NAME(m_shift_count));
@@ -155,28 +159,27 @@ void rocvfd_device::device_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_data));
+	save_item(NAME(m_por));
 	save_item(NAME(m_duty));
-	save_item(NAME(m_disp));
+
+	std::fill(std::begin(m_chars), std::end(m_chars), 0);
+	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
+
 }
 
 void rocvfd_device::device_reset()
 {
+	//We don't clear the buffers on reset as JPM games rely on the buffers being intact after POR
+	//On real hardware, garbage patterns can appear unless specifically cleared, so this makes sense.
 	m_cursor_pos = 0;
 	m_window_size = 16;
 	m_shift_count = 0;
 	m_shift_data = 0;
 	m_pcursor_pos = 0;
-	m_count=0;
-	m_duty=31;
-	m_disp = 0;
-	m_sclk = 0;
-	m_data = 0;
-
-	std::fill(std::begin(m_chars), std::end(m_chars), 0);
-	std::fill(std::begin(*m_outputs), std::end(*m_outputs), 0);
+	m_count = 0;
+	m_duty = 0;
 
 	(*m_brightness)[0] = 0;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -204,7 +207,14 @@ WRITE_LINE_MEMBER( rocvfd_device::sclk )
 
 WRITE_LINE_MEMBER( rocvfd_device::data )
 {
-	m_data = state;
+	if (state)
+	{
+		m_data = 1;
+	}
+	else
+	{
+		m_data = 0;
+	}
 }
 
 WRITE_LINE_MEMBER( rocvfd_device::por )
@@ -214,6 +224,7 @@ WRITE_LINE_MEMBER( rocvfd_device::por )
 	{
 		reset();
 	}
+	m_por = state;
 }
 
 
@@ -222,7 +233,7 @@ void rocvfd_device::shift_clock(int state)
 	if (m_sclk != state)
 	{
 		//Clock data on FALLING edge
-		if (!m_sclk)
+		if (!m_sclk && m_por)
 		{
 			m_shift_data <<= 1;
 
@@ -235,10 +246,9 @@ void rocvfd_device::shift_clock(int state)
 				m_shift_data  = 0;
 			}
 			update_display();
-
 		}
+		m_sclk = state;
 	}
-	m_sclk = state;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -290,12 +300,11 @@ void rocvfd_device::write_char(int data)
 		else if ( (data & 0xE0) == 0x80 ) // 100x ---
 		{ // 100x xxxx Test mode
 			popmessage("TEST MODE ENABLED!");
-			m_duty = 4;
 		}
 	}
 	else
 	{ // Display data
-//      data &= 0x3F;
+		data &= 0x3F;
 
 		switch ( data )
 		{

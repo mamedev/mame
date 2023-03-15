@@ -119,10 +119,12 @@ offs_t mcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	offs_t flags(0U);
 	if (format::ILL != desc.m_format)
 	{
-		if (0x50U == (opcode & 0xf0U)) // JMS
+		if (0x50 == (opcode & 0xf0)) // JMS
 			flags = STEP_OVER;
 		else if ((0xc0 == (opcode & 0xf0)) || (0x02 == opcode)) // BBL/BBS
 			flags = STEP_OUT;
+		else if (0x10 == (opcode & 0xf0) || 0x70 == (opcode & 0xf0)) // JCN/ISZ
+			flags = STEP_COND;
 	}
 
 	return (npc - pc) | flags | SUPPORTED;

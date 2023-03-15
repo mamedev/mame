@@ -13,14 +13,17 @@
 #include "rendlay.h"
 
 #include "emuopts.h"
+#include "fileio.h"
+#include "main.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "video/rgbutil.h"
 
-#include "nanosvg.h"
-#include "unicode.h"
-#include "vecstream.h"
-#include "xmlfile.h"
+#include "util/nanosvg.h"
+#include "util/path.h"
+#include "util/unicode.h"
+#include "util/vecstream.h"
+#include "util/xmlfile.h"
 
 #include <cctype>
 #include <algorithm>
@@ -56,6 +59,9 @@
 
 // screenless layouts
 #include "noscreens.lh"
+
+// single screen layouts
+#include "monitors.lh"
 
 // dual screen layouts
 #include "dualhsxs.lh"
@@ -219,12 +225,18 @@ private:
 			{
 				if (m_float_valid)
 				{
-					m_text = std::to_string(m_float);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_float;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 				else if (m_int_valid)
 				{
-					m_text = std::to_string(m_int);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_int;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 			}
@@ -1119,6 +1131,121 @@ inline render_color interpolate_color(emu::render::detail::color_vector const &s
 	}
 }
 
+
+unsigned get_state_shift(ioport_value mask)
+{
+	// get shift to right-align LSB
+	unsigned result(0U);
+	while (mask && !BIT(mask, 0))
+	{
+		++result;
+		mask >>= 1;
+	}
+	return result;
+}
+
+std::string make_child_output_tag(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	if (childnode)
+		return std::string(env.get_attribute_string(*childnode, "name"));
+	else
+		return std::string();
+}
+
+std::string make_child_input_tag(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	return childnode ? env.get_attribute_subtag(*childnode, "inputtag") : std::string();
+}
+
+ioport_value make_child_mask(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	return childnode ? env.get_attribute_int(*childnode, "mask", ~ioport_value(0)) : ~ioport_value(0);
+}
+
+bool make_child_wrap(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	return childnode ? env.get_attribute_bool(*childnode, "wrap", false) : false;
+}
+
+float make_child_size(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	return std::clamp(childnode ? env.get_attribute_float(*childnode, "size", 1.0f) : 1.0f, 0.01f, 1.0f);
+}
+
+ioport_value make_child_min(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	return childnode ? env.get_attribute_int(*childnode, "min", ioport_value(0)) : ioport_value(0);
+}
+
+ioport_value make_child_max(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode,
+		char const *child,
+		ioport_value mask)
+{
+	util::xml::data_node const *const childnode(itemnode.get_child(child));
+	ioport_value const dflt(mask >> get_state_shift(mask));
+	return childnode ? env.get_attribute_int(*childnode, "max", dflt) : dflt;
+}
+
+std::string make_input_tag(
+		emu::render::detail::view_environment &env,
+		util::xml::data_node const &itemnode)
+{
+	return env.get_attribute_subtag(itemnode, "inputtag");
+}
+
+int get_blend_mode(emu::render::detail::view_environment &env, util::xml::data_node const &itemnode)
+{
+	// see if there's a blend mode attribute
+	std::string const *const mode(itemnode.get_attribute_string_ptr("blend"));
+	if (mode)
+	{
+		if (*mode == "none")
+			return BLENDMODE_NONE;
+		else if (*mode == "alpha")
+			return BLENDMODE_ALPHA;
+		else if (*mode == "multiply")
+			return BLENDMODE_RGB_MULTIPLY;
+		else if (*mode == "add")
+			return BLENDMODE_ADD;
+		else
+			throw layout_syntax_error(util::string_format("unknown blend mode %s", *mode));
+	}
+
+	// fall back to implicit blend mode based on element type
+	if (!strcmp(itemnode.get_name(), "screen"))
+		return -1; // magic number recognised by render.cpp to allow per-element blend mode
+	else if (!strcmp(itemnode.get_name(), "overlay"))
+		return BLENDMODE_RGB_MULTIPLY;
+	else
+		return BLENDMODE_ALPHA;
+}
+
 } // anonymous namespace
 
 
@@ -1130,13 +1257,9 @@ inline render_color interpolate_color(emu::render::detail::color_vector const &s
 layout_element::make_component_map const layout_element::s_make_component{
 	{ "image",         &make_component<image_component>         },
 	{ "text",          &make_component<text_component>          },
-	{ "dotmatrix",     &make_dotmatrix_component<8>             },
-	{ "dotmatrix5dot", &make_dotmatrix_component<5>             },
-	{ "dotmatrixdot",  &make_dotmatrix_component<1>             },
 	{ "simplecounter", &make_component<simplecounter_component> },
 	{ "reel",          &make_component<reel_component>          },
 	{ "led7seg",       &make_component<led7seg_component>       },
-	{ "led8seg_gts1",  &make_component<led8seg_gts1_component>  },
 	{ "led14seg",      &make_component<led14seg_component>      },
 	{ "led14segsc",    &make_component<led14segsc_component>    },
 	{ "led16seg",      &make_component<led16seg_component>      },
@@ -1713,12 +1836,10 @@ private:
 			std::string filename;
 			if (!m_searchpath.empty())
 				filename = m_dirname;
-			if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-				filename.append(PATH_SEPARATOR);
-			filename.append(m_imagefile);
+			util::path_append(filename, m_imagefile);
 			LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load image file '%s'\n", filename);
-			osd_file::error const imgerr = file.open(filename);
-			if (osd_file::error::NONE == imgerr)
+			std::error_condition const imgerr = file.open(filename);
+			if (!imgerr)
 			{
 				if (!load_bitmap(file))
 				{
@@ -1729,7 +1850,8 @@ private:
 			}
 			else
 			{
-				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s'\n", filename);
+				LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open image file '%s' (%s:%d %s)\n",
+						filename, imgerr.category().name(), imgerr.value(), imgerr.message());
 			}
 		}
 		else if (!m_data.empty())
@@ -1745,12 +1867,10 @@ private:
 				std::string filename;
 				if (!m_searchpath.empty())
 					filename = m_dirname;
-				if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-					filename.append(PATH_SEPARATOR);
-				filename.append(m_alphafile);
+				util::path_append(filename, m_alphafile);
 				LOGMASKED(LOG_IMAGE_LOAD, "Image component attempt to load alpha channel from file '%s'\n", filename);
-				osd_file::error const alferr = file.open(filename);
-				if (osd_file::error::NONE == alferr)
+				std::error_condition const alferr = file.open(filename);
+				if (!alferr)
 				{
 					// TODO: no way to detect corner case where we had alpha from the image but the alpha PNG makes it entirely opaque
 					if (render_load_png(m_bitmap, file, true))
@@ -1759,7 +1879,8 @@ private:
 				}
 				else
 				{
-					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s'\n", filename);
+					LOGMASKED(LOG_IMAGE_LOAD, "Image component unable to open alpha channel file '%s' (%s:%d %s)\n",
+							filename, alferr.category().name(), alferr.value(), alferr.message());
 				}
 			}
 			else if (m_svg)
@@ -1841,8 +1962,8 @@ private:
 
 		// make a file wrapper for the data and see if it looks like a bitmap
 		util::core_file::ptr file;
-		osd_file::error const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
-		bool const bitmapdata((osd_file::error::NONE == filerr) && file && load_bitmap(*file));
+		std::error_condition const filerr(util::core_file::open_ram(m_data.c_str(), m_data.size(), OPEN_FLAG_READ, file));
+		bool const bitmapdata(!filerr && file && load_bitmap(*file));
 		file.reset();
 
 		// if it didn't look like a bitmap, see if it looks like it might be XML and hence SVG
@@ -1861,7 +1982,7 @@ private:
 		}
 	}
 
-	bool load_bitmap(util::core_file &file)
+	bool load_bitmap(util::random_read &file)
 	{
 		ru_imgformat const format = render_detect_image(file);
 		switch (format)
@@ -1891,9 +2012,16 @@ private:
 		}
 	}
 
-	void load_svg(util::core_file &file)
+	void load_svg(util::random_read &file)
 	{
-		u64 len(file.size());
+		std::error_condition filerr;
+		u64 len;
+		filerr = file.length(len);
+		if (filerr)
+		{
+			osd_printf_warning("Error getting length of component image '%s'\n", m_imagefile);
+			return;
+		}
 		if ((std::numeric_limits<size_t>::max() - 1) < len)
 		{
 			osd_printf_warning("Component image '%s' is too large to read into memory\n", m_imagefile);
@@ -1908,9 +2036,9 @@ private:
 		svgbuf[len] = '\0';
 		for (char *ptr = svgbuf.get(); len; )
 		{
-			u32 const block(u32(std::min<u64>(std::numeric_limits<u32>::max(), len)));
-			u32 const read(file.read(ptr, block));
-			if (!read)
+			size_t read;
+			filerr = file.read(ptr, size_t(len), read);
+			if (filerr || !read)
 			{
 				osd_printf_warning("Error reading component image '%s'\n", m_imagefile);
 				return;
@@ -1991,7 +2119,7 @@ protected:
 		}
 		else if (c.a)
 		{
-			// compute premultiplied colors
+			// compute premultiplied color
 			u32 const a(c.a * 255.0F);
 			u32 const r(u32(c.r * (255.0F * 255.0F)) * a);
 			u32 const g(u32(c.g * (255.0F * 255.0F)) * a);
@@ -2027,9 +2155,9 @@ public:
 		render_color const c(color(state));
 		u32 const f(rgb_t(u8(c.r * 255), u8(c.g * 255), u8(c.b * 255)));
 		u32 const a(c.a * 255.0F);
-		u32 const r(c.r * c.a * (255.0F * 255.0F * 255.0F));
-		u32 const g(c.g * c.a * (255.0F * 255.0F * 255.0F));
-		u32 const b(c.b * c.a * (255.0F * 255.0F * 255.0F));
+		u32 const r(c.r * (255.0F * 255.0F) * a);
+		u32 const g(c.g * (255.0F * 255.0F) * a);
+		u32 const b(c.b * (255.0F * 255.0F) * a);
 		u32 const inva(255 - a);
 		if (!a)
 			return;
@@ -2347,6 +2475,7 @@ public:
 	led7seg_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 	{
+		m_invert = env.get_attribute_int(compnode, "invert", 0);
 	}
 
 protected:
@@ -2355,8 +2484,8 @@ protected:
 
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(m_invert ? 0x20 : 0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(m_invert ? 0xff : 0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int const bmwidth = 250;
@@ -2398,74 +2527,8 @@ protected:
 		// resample to the target size
 		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
-};
-
-
-// 8-segment fluorescent (Gottlieb System 1)
-class layout_element::led8seg_gts1_component : public component
-{
-public:
-	// construction/destruction
-	led8seg_gts1_component(environment &env, util::xml::data_node const &compnode)
-		: component(env, compnode)
-	{
-	}
-
-protected:
-	// overrides
-	virtual int maxstate() const override { return 255; }
-
-	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
-	{
-		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
-		rgb_t const backpen = rgb_t(0x00, 0x00, 0x00, 0x00);
-
-		// sizes for computation
-		int const bmwidth = 250;
-		int const bmheight = 400;
-		int const segwidth = 40;
-		int const skewwidth = 40;
-
-		// allocate a temporary bitmap for drawing
-		bitmap_argb32 tempbitmap(bmwidth + skewwidth, bmheight);
-		tempbitmap.fill(backpen);
-
-		// top bar
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 0)) ? onpen : offpen);
-
-		// top-right bar
-		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, (state & (1 << 1)) ? onpen : offpen);
-
-		// bottom-right bar
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, (state & (1 << 2)) ? onpen : offpen);
-
-		// bottom bar
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, (state & (1 << 3)) ? onpen : offpen);
-
-		// bottom-left bar
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 4)) ? onpen : offpen);
-
-		// top-left bar
-		draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, (state & (1 << 5)) ? onpen : offpen);
-
-		// horizontal bars
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, 2*bmwidth/3 - 2*segwidth/3, bmheight/2, segwidth, (state & (1 << 6)) ? onpen : offpen);
-		draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3 + bmwidth/2, bmwidth - 2*segwidth/3, bmheight/2, segwidth, (state & (1 << 6)) ? onpen : offpen);
-
-		// vertical bars
-		draw_segment_vertical(tempbitmap, 0 + segwidth/3 - 8, bmheight/2 - segwidth/3 + 2, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
-		draw_segment_vertical(tempbitmap, 0 + segwidth/3, bmheight/2 - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (state & (1 << 7)) ? onpen : offpen);
-
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3 - 2, bmheight - segwidth/3 + 8, 2*bmwidth/3 - segwidth/2 - 4, segwidth + 8, backpen);
-		draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - segwidth/3, 2*bmwidth/3 - segwidth/2 - 4, segwidth, (state & (1 << 7)) ? onpen : offpen);
-
-		// apply skew
-		apply_skew(tempbitmap, 40);
-
-		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
-	}
+private:
+	int m_invert = 0;
 };
 
 
@@ -2958,47 +3021,6 @@ protected:
 };
 
 
-// row of dots for a dotmatrix
-class layout_element::dotmatrix_component : public component
-{
-public:
-	// construction/destruction
-	dotmatrix_component(int dots, environment &env, util::xml::data_node const &compnode)
-		: component(env, compnode)
-		, m_dots(dots)
-	{
-	}
-
-protected:
-	// overrides
-	virtual int maxstate() const override { return (1 << m_dots) - 1; }
-
-	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
-	{
-		const rgb_t onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
-		const rgb_t offpen = rgb_t(0xff, 0x20, 0x20, 0x20);
-
-		// sizes for computation
-		int bmheight = 300;
-		int dotwidth = 250;
-
-		// allocate a temporary bitmap for drawing
-		bitmap_argb32 tempbitmap(dotwidth*m_dots, bmheight);
-		tempbitmap.fill(rgb_t(0xff, 0x00, 0x00, 0x00));
-
-		for (int i = 0; i < m_dots; i++)
-			draw_segment_decimal(tempbitmap, ((dotwidth / 2) + (i * dotwidth)), bmheight / 2, dotwidth, BIT(state, i) ? onpen : offpen);
-
-		// resample to the target size
-		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
-	}
-
-private:
-	// internal state
-	int m_dots;
-};
-
-
 // simple counter
 class layout_element::simplecounter_component : public component
 {
@@ -3042,6 +3064,8 @@ public:
 		, m_searchpath(env.search_path() ? env.search_path() : "")
 		, m_dirname(env.directory_name() ? env.directory_name() : "")
 	{
+		osd_printf_warning("Warning: layout file contains deprecated reel component\n");
+
 		std::string_view symbollist = env.get_attribute_string(compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
@@ -3098,7 +3122,7 @@ protected:
 		// shift the reels a bit based on this param, allows fine tuning
 		int use_state = (state + m_stateoffset) % max_state_used;
 
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const r = c.r * 255.0f;
 		u32 const g = c.g * 255.0f;
@@ -3180,10 +3204,10 @@ protected:
 						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
-						aspect *= 0.9f;
+						aspect *= 0.95f;
 					}
 
-					s32 curx = bounds.left() + (bounds.width() - width) / 2;
+					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
 
 					// loop over characters
 					std::string_view s = m_stopnames[fruit];
@@ -3210,7 +3234,7 @@ protected:
 								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
-									int effx = curx + x + chbounds.left();
+									int effx = int(curx) + x + chbounds.left();
 									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
@@ -3250,7 +3274,7 @@ private:
 		// shift the reels a bit based on this param, allows fine tuning
 		int use_state = (state + m_stateoffset) % max_state_used;
 
-		// compute premultiplied colors
+		// compute premultiplied color
 		render_color const c(color(state));
 		u32 const r = c.r * 255.0f;
 		u32 const g = c.g * 255.0f;
@@ -3328,10 +3352,10 @@ private:
 						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
 						if (width < bounds.width())
 							break;
-						aspect *= 0.9f;
+						aspect *= 0.95f;
 					}
 
-					s32 curx = bounds.left();
+					float curx = bounds.left();
 
 					// allocate a temporary bitmap
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
@@ -3361,7 +3385,7 @@ private:
 								u32 *const d = &dest.pix(effy);
 								for (int x = 0; x < chbounds.width(); x++)
 								{
-									int effx = basex + curx + x;
+									int effx = basex + int(curx) + x;
 									if (effx >= bounds.left() && effx <= bounds.right())
 									{
 										u32 spix = rgb_t(src[x]).a();
@@ -3398,12 +3422,10 @@ private:
 		std::string filename;
 		if (!m_searchpath.empty())
 			filename = m_dirname;
-		if (!filename.empty() && !util::is_directory_separator(filename[filename.size() - 1]))
-			filename.append(PATH_SEPARATOR);
-		filename.append(m_imagefile[number]);
+		util::path_append(filename, m_imagefile[number]);
 
 		// load the basic bitmap
-		if (file.open(filename) == osd_file::error::NONE)
+		if (!file.open(filename))
 			render_load_png(m_bitmap[number], file);
 
 		// if we can't load the bitmap just use text rendering
@@ -3436,18 +3458,6 @@ template <typename T>
 layout_element::component::ptr layout_element::make_component(environment &env, util::xml::data_node const &compnode)
 {
 	return std::make_unique<T>(env, compnode);
-}
-
-
-//-------------------------------------------------
-//  make_component - create dotmatrix component
-//  with given vertical resolution
-//-------------------------------------------------
-
-template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(environment &env, util::xml::data_node const &compnode)
-{
-	return std::make_unique<dotmatrix_component>(D, env, compnode);
 }
 
 
@@ -3682,7 +3692,7 @@ void layout_element::component::draw_text(
 		int align,
 		const render_color &color)
 {
-	// compute premultiplied colors
+	// compute premultiplied color
 	u32 const r(color.r * 255.0f);
 	u32 const g(color.g * 255.0f);
 	u32 const b(color.b * 255.0f);
@@ -3697,11 +3707,11 @@ void layout_element::component::draw_text(
 		width = font.string_width(bounds.height(), aspect, str);
 		if (width < bounds.width())
 			break;
-		aspect *= 0.9f;
+		aspect *= 0.95f;
 	}
 
 	// get alignment
-	s32 curx;
+	float curx;
 	switch (align)
 	{
 		// left
@@ -3716,7 +3726,7 @@ void layout_element::component::draw_text(
 
 		// default to center
 		default:
-			curx = bounds.left() + (bounds.width() - width) / 2;
+			curx = bounds.left() + (bounds.width() - width) / 2.0f;
 			break;
 	}
 
@@ -3746,7 +3756,7 @@ void layout_element::component::draw_text(
 				u32 *const d = &dest.pix(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
-					int effx = curx + x + chbounds.left();
+					int effx = int(curx) + x + chbounds.left();
 					if (effx >= bounds.left() && effx <= bounds.right())
 					{
 						u32 spix = rgb_t(src[x]).a();
@@ -4092,7 +4102,7 @@ layout_view::~layout_view()
 //  get_item - get item by ID
 //-------------------------------------------------
 
-layout_view::item *layout_view::get_item(std::string const &id)
+layout_view_item *layout_view::get_item(std::string const &id)
 {
 	auto const found(m_items_by_id.find(id));
 	return (m_items_by_id.end() != found) ? &found->second : nullptr;
@@ -4498,10 +4508,10 @@ std::string layout_view::make_name(layout_environment &env, util::xml::data_node
 //**************************************************************************
 
 //-------------------------------------------------
-//  item - constructor
+//  layout_view_item - constructor
 //-------------------------------------------------
 
-layout_view::item::item(
+layout_view_item::layout_view_item(
 		view_environment &env,
 		util::xml::data_node const &itemnode,
 		element_map &elemmap,
@@ -4510,11 +4520,29 @@ layout_view::item::item(
 		render_color const &color)
 	: m_element(find_element(env, itemnode, elemmap))
 	, m_output(env.device(), std::string(env.get_attribute_string(itemnode, "name")))
-	, m_animoutput(env.device(), make_animoutput_tag(env, itemnode))
+	, m_animoutput(env.device(), make_child_output_tag(env, itemnode, "animate"))
+	, m_scrollxoutput(env.device(), make_child_output_tag(env, itemnode, "xscroll"))
+	, m_scrollyoutput(env.device(), make_child_output_tag(env, itemnode, "yscroll"))
 	, m_animinput_port(nullptr)
+	, m_scrollxinput_port(nullptr)
+	, m_scrollyinput_port(nullptr)
+	, m_scrollwrapx(make_child_wrap(env, itemnode, "xscroll"))
+	, m_scrollwrapy(make_child_wrap(env, itemnode, "yscroll"))
 	, m_elem_state(m_element ? m_element->default_state() : 0)
-	, m_animmask(make_animmask(env, itemnode))
+	, m_scrollsizex(make_child_size(env, itemnode, "xscroll"))
+	, m_scrollsizey(make_child_size(env, itemnode, "yscroll"))
+	, m_scrollposx(0.0f)
+	, m_scrollposy(0.0f)
+	, m_animmask(make_child_mask(env, itemnode, "animate"))
+	, m_scrollxmask(make_child_mask(env, itemnode, "xscroll"))
+	, m_scrollymask(make_child_mask(env, itemnode, "yscroll"))
+	, m_scrollxmin(make_child_min(env, itemnode, "xscroll"))
+	, m_scrollymin(make_child_min(env, itemnode, "yscroll"))
+	, m_scrollxmax(make_child_max(env, itemnode, "xscroll", m_scrollxmask))
+	, m_scrollymax(make_child_max(env, itemnode, "yscroll", m_scrollymask))
 	, m_animshift(get_state_shift(m_animmask))
+	, m_scrollxshift(get_state_shift(m_scrollxmask))
+	, m_scrollyshift(get_state_shift(m_scrollymask))
 	, m_input_port(nullptr)
 	, m_input_field(nullptr)
 	, m_input_mask(env.get_attribute_int(itemnode, "inputmask", 0))
@@ -4527,11 +4555,15 @@ layout_view::item::item(
 	, m_visibility_mask(env.visibility_mask())
 	, m_id(env.get_attribute_string(itemnode, "id"))
 	, m_input_tag(make_input_tag(env, itemnode))
-	, m_animinput_tag(make_animinput_tag(env, itemnode))
+	, m_animinput_tag(make_child_input_tag(env, itemnode, "animate"))
+	, m_scrollxinput_tag(make_child_input_tag(env, itemnode, "xscroll"))
+	, m_scrollyinput_tag(make_child_input_tag(env, itemnode, "yscroll"))
 	, m_rawbounds(make_bounds(env, itemnode, trans))
 	, m_have_output(!env.get_attribute_string(itemnode, "name").empty())
 	, m_input_raw(env.get_attribute_bool(itemnode, "inputraw", 0))
-	, m_have_animoutput(!make_animoutput_tag(env, itemnode).empty())
+	, m_have_animoutput(!make_child_output_tag(env, itemnode, "animate").empty())
+	, m_have_scrollxoutput(!make_child_output_tag(env, itemnode, "xscroll").empty())
+	, m_have_scrollyoutput(!make_child_output_tag(env, itemnode, "yscroll").empty())
 	, m_has_clickthrough(!env.get_attribute_string(itemnode, "clickthrough").empty())
 {
 	// fetch common data
@@ -4558,6 +4590,14 @@ layout_view::item::item(
 	{
 		throw layout_syntax_error(util::string_format("item of type %s requires an element tag", itemnode.get_name()));
 	}
+	else if (m_scrollxmin == m_scrollxmax)
+	{
+		throw layout_syntax_error(util::string_format("item X scroll minimum and maximum both equal to %u", m_scrollxmin));
+	}
+	else if (m_scrollymin == m_scrollymax)
+	{
+		throw layout_syntax_error(util::string_format("item Y scroll minimum and maximum both equal to %u", m_scrollymin));
+	}
 
 	// this can be called before resolving tags, make it return something valid
 	m_bounds = m_rawbounds;
@@ -4566,10 +4606,10 @@ layout_view::item::item(
 
 
 //-------------------------------------------------
-//  item - destructor
+//  layout_view_item - destructor
 //-------------------------------------------------
 
-layout_view::item::~item()
+layout_view_item::~layout_view_item()
 {
 }
 
@@ -4579,7 +4619,7 @@ layout_view::item::~item()
 //  obtain element state value
 //-------------------------------------------------
 
-void layout_view::item::set_element_state_callback(state_delegate &&handler)
+void layout_view_item::set_element_state_callback(state_delegate &&handler)
 {
 	if (!handler.isnull())
 		m_get_elem_state = std::move(handler);
@@ -4593,7 +4633,7 @@ void layout_view::item::set_element_state_callback(state_delegate &&handler)
 //  obtain animation state
 //-------------------------------------------------
 
-void layout_view::item::set_animation_state_callback(state_delegate &&handler)
+void layout_view_item::set_animation_state_callback(state_delegate &&handler)
 {
 	if (!handler.isnull())
 		m_get_anim_state = std::move(handler);
@@ -4607,7 +4647,7 @@ void layout_view::item::set_animation_state_callback(state_delegate &&handler)
 //  bounds
 //-------------------------------------------------
 
-void layout_view::item::set_bounds_callback(bounds_delegate &&handler)
+void layout_view_item::set_bounds_callback(bounds_delegate &&handler)
 {
 	if (!handler.isnull())
 		m_get_bounds = std::move(handler);
@@ -4621,7 +4661,7 @@ void layout_view::item::set_bounds_callback(bounds_delegate &&handler)
 //  color
 //-------------------------------------------------
 
-void layout_view::item::set_color_callback(color_delegate &&handler)
+void layout_view_item::set_color_callback(color_delegate &&handler)
 {
 	if (!handler.isnull())
 		m_get_color = std::move(handler);
@@ -4631,10 +4671,66 @@ void layout_view::item::set_color_callback(color_delegate &&handler)
 
 
 //-------------------------------------------------
+//  set_scroll_size_x_callback - set callback to
+//  obtain horizontal scroll window size
+//-------------------------------------------------
+
+void layout_view_item::set_scroll_size_x_callback(scroll_size_delegate &&handler)
+{
+	if (!handler.isnull())
+		m_get_scroll_size_x = std::move(handler);
+	else
+		m_get_scroll_size_x = default_get_scroll_size_x();
+}
+
+
+//-------------------------------------------------
+//  set_scroll_size_y_callback - set callback to
+//  obtain vertical scroll window size
+//-------------------------------------------------
+
+void layout_view_item::set_scroll_size_y_callback(scroll_size_delegate &&handler)
+{
+	if (!handler.isnull())
+		m_get_scroll_size_y = std::move(handler);
+	else
+		m_get_scroll_size_y = default_get_scroll_size_y();
+}
+
+
+//-------------------------------------------------
+//  set_scroll_pos_x_callback - set callback to
+//  obtain horizontal scroll position
+//-------------------------------------------------
+
+void layout_view_item::set_scroll_pos_x_callback(scroll_pos_delegate &&handler)
+{
+	if (!handler.isnull())
+		m_get_scroll_pos_x = std::move(handler);
+	else
+		m_get_scroll_pos_x = default_get_scroll_pos_x();
+}
+
+
+//-------------------------------------------------
+//  set_scroll_pos_y_callback - set callback to
+//  obtain vertical scroll position
+//-------------------------------------------------
+
+void layout_view_item::set_scroll_pos_y_callback(scroll_pos_delegate &&handler)
+{
+	if (!handler.isnull())
+		m_get_scroll_pos_y = std::move(handler);
+	else
+		m_get_scroll_pos_y = default_get_scroll_pos_y();
+}
+
+
+//-------------------------------------------------
 //  resolve_tags - resolve tags, if any are set
 //-------------------------------------------------
 
-void layout_view::item::resolve_tags()
+void layout_view_item::resolve_tags()
 {
 	// resolve element state output and set default value
 	if (m_have_output)
@@ -4644,13 +4740,21 @@ void layout_view::item::resolve_tags()
 			m_output = m_element->default_state();
 	}
 
-	// resolve animation state output
+	// resolve animation state and scroll outputs
 	if (m_have_animoutput)
 		m_animoutput.resolve();
+	if (m_have_scrollxoutput)
+		m_scrollxoutput.resolve();
+	if (m_have_scrollyoutput)
+		m_scrollyoutput.resolve();
 
-	// resolve animation state input
+	// resolve animation state and scroll inputs
 	if (!m_animinput_tag.empty())
 		m_animinput_port = m_element->machine().root_device().ioport(m_animinput_tag);
+	if (!m_scrollxinput_tag.empty())
+		m_scrollxinput_port = m_element->machine().root_device().ioport(m_scrollxinput_tag);
+	if (!m_scrollyinput_tag.empty())
+		m_scrollyinput_port = m_element->machine().root_device().ioport(m_scrollyinput_tag);
 
 	// resolve element state input
 	if (!m_input_tag.empty())
@@ -4659,7 +4763,7 @@ void layout_view::item::resolve_tags()
 		if (m_input_port)
 		{
 			// if there's a matching unconditional field, cache it
-			for (ioport_field &field : m_input_port->fields())
+			for (ioport_field const &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
 				{
@@ -4680,6 +4784,10 @@ void layout_view::item::resolve_tags()
 	m_get_anim_state = default_get_anim_state();
 	m_get_bounds = default_get_bounds();
 	m_get_color = default_get_color();
+	m_get_scroll_size_x = default_get_scroll_size_x();
+	m_get_scroll_size_y = default_get_scroll_size_y();
+	m_get_scroll_pos_x = default_get_scroll_pos_x();
+	m_get_scroll_pos_y = default_get_scroll_pos_y();
 }
 
 
@@ -4688,18 +4796,18 @@ void layout_view::item::resolve_tags()
 //  state handler
 //-------------------------------------------------
 
-layout_view::item::state_delegate layout_view::item::default_get_elem_state()
+layout_view_item::state_delegate layout_view_item::default_get_elem_state()
 {
 	if (m_have_output)
-		return state_delegate(&item::get_output, this);
+		return state_delegate(&layout_view_item::get_output, this);
 	else if (!m_input_port)
-		return state_delegate(&item::get_state, this);
+		return state_delegate(&layout_view_item::get_state, this);
 	else if (m_input_raw)
-		return state_delegate(&item::get_input_raw, this);
+		return state_delegate(&layout_view_item::get_input_raw, this);
 	else if (m_input_field)
-		return state_delegate(&item::get_input_field_cached, this);
+		return state_delegate(&layout_view_item::get_input_field_cached, this);
 	else
-		return state_delegate(&item::get_input_field_conditional, this);
+		return state_delegate(&layout_view_item::get_input_field_conditional, this);
 }
 
 
@@ -4708,12 +4816,12 @@ layout_view::item::state_delegate layout_view::item::default_get_elem_state()
 //  state handler
 //-------------------------------------------------
 
-layout_view::item::state_delegate layout_view::item::default_get_anim_state()
+layout_view_item::state_delegate layout_view_item::default_get_anim_state()
 {
 	if (m_have_animoutput)
-		return state_delegate(&item::get_anim_output, this);
+		return state_delegate(&layout_view_item::get_anim_output, this);
 	else if (m_animinput_port)
-		return state_delegate(&item::get_anim_input, this);
+		return state_delegate(&layout_view_item::get_anim_input, this);
 	else
 		return default_get_elem_state();
 }
@@ -4723,11 +4831,11 @@ layout_view::item::state_delegate layout_view::item::default_get_anim_state()
 //  default_get_bounds - get default bounds handler
 //-------------------------------------------------
 
-layout_view::item::bounds_delegate layout_view::item::default_get_bounds()
+layout_view_item::bounds_delegate layout_view_item::default_get_bounds()
 {
 	return (m_bounds.size() == 1U)
 			? bounds_delegate(&emu::render::detail::bounds_step::get, &m_bounds.front())
-			: bounds_delegate(&item::get_interpolated_bounds, this);
+			: bounds_delegate(&layout_view_item::get_interpolated_bounds, this);
 }
 
 
@@ -4735,11 +4843,65 @@ layout_view::item::bounds_delegate layout_view::item::default_get_bounds()
 //  default_get_color - get default color handler
 //-------------------------------------------------
 
-layout_view::item::color_delegate layout_view::item::default_get_color()
+layout_view_item::color_delegate layout_view_item::default_get_color()
 {
 	return (m_color.size() == 1U)
 			? color_delegate(&emu::render::detail::color_step::get, &const_cast<emu::render::detail::color_step &>(m_color.front()))
-			: color_delegate(&item::get_interpolated_color, this);
+			: color_delegate(&layout_view_item::get_interpolated_color, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_scroll_size_x - get default
+//  horizontal scroll window size handler
+//-------------------------------------------------
+
+layout_view_item::scroll_size_delegate layout_view_item::default_get_scroll_size_x()
+{
+	return scroll_size_delegate(&layout_view_item::get_scrollsizex, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_scroll_size_y - get default
+//  vertical scroll window size handler
+//-------------------------------------------------
+
+layout_view_item::scroll_size_delegate layout_view_item::default_get_scroll_size_y()
+{
+	return scroll_size_delegate(&layout_view_item::get_scrollsizey, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_scroll_pos_x - get default
+//  horizontal scroll position handler
+//-------------------------------------------------
+
+layout_view_item::scroll_pos_delegate layout_view_item::default_get_scroll_pos_x()
+{
+	if (m_have_scrollxoutput)
+		return scroll_pos_delegate(m_scrollwrapx ? &layout_view_item::get_scrollx_output<true> : &layout_view_item::get_scrollx_output<false>, this);
+	else if (m_scrollxinput_port)
+		return scroll_pos_delegate(m_scrollwrapx ? &layout_view_item::get_scrollx_input<true> : &layout_view_item::get_scrollx_input<false>, this);
+	else
+		return scroll_pos_delegate(&layout_view_item::get_scrollposx, this);
+}
+
+
+//-------------------------------------------------
+//  default_get_scroll_pos_y - get default
+//  vertical scroll position handler
+//-------------------------------------------------
+
+layout_view_item::scroll_pos_delegate layout_view_item::default_get_scroll_pos_y()
+{
+	if (m_have_scrollyoutput)
+		return scroll_pos_delegate(m_scrollwrapy ? &layout_view_item::get_scrolly_output<true> : &layout_view_item::get_scrolly_output<false>, this);
+	else if (m_scrollyinput_port)
+		return scroll_pos_delegate(m_scrollwrapy ? &layout_view_item::get_scrolly_input<true> : &layout_view_item::get_scrolly_input<false>, this);
+	else
+		return scroll_pos_delegate(&layout_view_item::get_scrollposy, this);
 }
 
 
@@ -4747,7 +4909,7 @@ layout_view::item::color_delegate layout_view::item::default_get_color()
 //  get_state - get state when no bindings
 //-------------------------------------------------
 
-int layout_view::item::get_state() const
+int layout_view_item::get_state() const
 {
 	return m_elem_state;
 }
@@ -4757,7 +4919,7 @@ int layout_view::item::get_state() const
 //  get_output - get element state output
 //-------------------------------------------------
 
-int layout_view::item::get_output() const
+int layout_view_item::get_output() const
 {
 	assert(m_have_output);
 	return int(s32(m_output));
@@ -4768,7 +4930,7 @@ int layout_view::item::get_output() const
 //  get_input_raw - get element state input
 //-------------------------------------------------
 
-int layout_view::item::get_input_raw() const
+int layout_view_item::get_input_raw() const
 {
 	assert(m_input_port);
 	return int(std::make_signed_t<ioport_value>((m_input_port->read() & m_input_mask) >> m_input_shift));
@@ -4779,7 +4941,7 @@ int layout_view::item::get_input_raw() const
 //  get_input_field_cached - element state
 //-------------------------------------------------
 
-int layout_view::item::get_input_field_cached() const
+int layout_view_item::get_input_field_cached() const
 {
 	assert(m_input_port);
 	assert(m_input_field);
@@ -4791,7 +4953,7 @@ int layout_view::item::get_input_field_cached() const
 //  get_input_field_conditional - element state
 //-------------------------------------------------
 
-int layout_view::item::get_input_field_conditional() const
+int layout_view_item::get_input_field_conditional() const
 {
 	assert(m_input_port);
 	assert(!m_input_field);
@@ -4804,7 +4966,7 @@ int layout_view::item::get_input_field_conditional() const
 //  get_anim_output - get animation output
 //-------------------------------------------------
 
-int layout_view::item::get_anim_output() const
+int layout_view_item::get_anim_output() const
 {
 	assert(m_have_animoutput);
 	return int(unsigned((u32(s32(m_animoutput) & m_animmask) >> m_animshift)));
@@ -4815,7 +4977,7 @@ int layout_view::item::get_anim_output() const
 //  get_anim_input - get animation input
 //-------------------------------------------------
 
-int layout_view::item::get_anim_input() const
+int layout_view_item::get_anim_input() const
 {
 	assert(m_animinput_port);
 	return int(std::make_signed_t<ioport_value>((m_animinput_port->read() & m_animmask) >> m_animshift));
@@ -4823,13 +4985,116 @@ int layout_view::item::get_anim_input() const
 
 
 //-------------------------------------------------
+//  get_scrollsizex - get horizontal scroll window
+//  size
+//-------------------------------------------------
+
+float layout_view_item::get_scrollsizex() const
+{
+	return m_scrollsizex;
+}
+
+
+//-------------------------------------------------
+//  get_scrollsizey - get vertical scroll window
+//  size
+//-------------------------------------------------
+
+float layout_view_item::get_scrollsizey() const
+{
+	return m_scrollsizey;
+}
+
+
+//-------------------------------------------------
+//  get_scrollposx - get horizontal scroll
+//  position
+//-------------------------------------------------
+
+float layout_view_item::get_scrollposx() const
+{
+	return m_scrollposx;
+}
+
+
+//-------------------------------------------------
+//  get_scrollposy - get vertical scroll position
+//-------------------------------------------------
+
+float layout_view_item::get_scrollposy() const
+{
+	return m_scrollposy;
+}
+
+
+//-------------------------------------------------
+//  get_scrollx_output - get scaled horizontal
+//  scroll output
+//-------------------------------------------------
+
+template <bool Wrap>
+float layout_view_item::get_scrollx_output() const
+{
+	assert(m_have_scrollxoutput);
+	u32 const unscaled(((u32(s32(m_scrollxoutput)) & m_scrollxmask) >> m_scrollxshift) - m_scrollxmin);
+	float const range(std::make_signed_t<ioport_value>(m_scrollxmax - m_scrollxmin) + (!Wrap ? 0 : (m_scrollxmin < m_scrollxmax) ? 1 : -1));
+	return float(s32(unscaled)) / range;
+}
+
+
+//-------------------------------------------------
+//  get_scrollx_input - get scaled horizontal
+//  scroll input
+//-------------------------------------------------
+
+template <bool Wrap>
+float layout_view_item::get_scrollx_input() const
+{
+	assert(m_scrollxinput_port);
+	ioport_value const unscaled(((m_scrollxinput_port->read() & m_scrollxmask) >> m_scrollxshift) - m_scrollxmin);
+	float const range(std::make_signed_t<ioport_value>(m_scrollxmax - m_scrollxmin) + (!Wrap ? 0 : (m_scrollxmin < m_scrollxmax) ? 1 : -1));
+	return float(std::make_signed_t<ioport_value>(unscaled)) / range;
+}
+
+
+//-------------------------------------------------
+//  get_scrolly_output - get scaled vertical
+//  scroll output
+//-------------------------------------------------
+
+template <bool Wrap>
+float layout_view_item::get_scrolly_output() const
+{
+	assert(m_have_scrollyoutput);
+	u32 const unscaled(((u32(s32(m_scrollyoutput)) & m_scrollymask) >> m_scrollyshift) - m_scrollymin);
+	float const range(std::make_signed_t<ioport_value>(m_scrollymax - m_scrollymin) + (!Wrap ? 0 : (m_scrollymin < m_scrollymax) ? 1 : -1));
+	return float(s32(unscaled)) / range;
+}
+
+
+//-------------------------------------------------
+//  get_scrolly_input - get scaled vertical scroll
+//  input
+//-------------------------------------------------
+
+template <bool Wrap>
+float layout_view_item::get_scrolly_input() const
+{
+	assert(m_scrollyinput_port);
+	ioport_value const unscaled(((m_scrollyinput_port->read() & m_scrollymask) >> m_scrollyshift) - m_scrollymin);
+	float const range(std::make_signed_t<ioport_value>(m_scrollymax - m_scrollymin) + (!Wrap ? 0 : (m_scrollymin < m_scrollymax) ? 1 : -1));
+	return float(std::make_signed_t<ioport_value>(unscaled)) / range;
+}
+
+
+//-------------------------------------------------
 //  get_interpolated_bounds - animated bounds
 //-------------------------------------------------
 
-void layout_view::item::get_interpolated_bounds(render_bounds &result) const
+render_bounds layout_view_item::get_interpolated_bounds() const
 {
 	assert(m_bounds.size() > 1U);
-	result = interpolate_bounds(m_bounds, m_get_anim_state());
+	return interpolate_bounds(m_bounds, m_get_anim_state());
 }
 
 
@@ -4837,10 +5102,10 @@ void layout_view::item::get_interpolated_bounds(render_bounds &result) const
 //  get_interpolated_color - animated color
 //-------------------------------------------------
 
-void layout_view::item::get_interpolated_color(render_color &result) const
+render_color layout_view_item::get_interpolated_color() const
 {
 	assert(m_color.size() > 1U);
-	result = interpolate_color(m_color, m_get_anim_state());
+	return interpolate_color(m_color, m_get_anim_state());
 }
 
 
@@ -4848,7 +5113,7 @@ void layout_view::item::get_interpolated_color(render_color &result) const
 //  find_element - find element definition
 //-------------------------------------------------
 
-layout_element *layout_view::item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
+layout_element *layout_view_item::find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap)
 {
 	std::string const name(env.get_attribute_string(itemnode, !strcmp(itemnode.get_name(), "element") ? "ref" : "element"));
 	if (name.empty())
@@ -4867,7 +5132,7 @@ layout_element *layout_view::item::find_element(view_environment &env, util::xml
 //  make_bounds - get transformed bounds
 //-------------------------------------------------
 
-layout_view::item::bounds_vector layout_view::item::make_bounds(
+layout_view_item::bounds_vector layout_view_item::make_bounds(
 		view_environment &env,
 		util::xml::data_node const &itemnode,
 		layout_group::transform const &trans)
@@ -4900,7 +5165,7 @@ layout_view::item::bounds_vector layout_view::item::make_bounds(
 //  make_color - get color inflection points
 //-------------------------------------------------
 
-layout_view::item::color_vector layout_view::item::make_color(
+layout_view_item::color_vector layout_view_item::make_color(
 		view_environment &env,
 		util::xml::data_node const &itemnode,
 		render_color const &mult)
@@ -4925,101 +5190,6 @@ layout_view::item::color_vector layout_view::item::make_color(
 		for (emu::render::detail::color_step &step : result)
 			step.color *= mult;
 		set_color_deltas(result);
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  make_animoutput_tag - get animation output tag
-//-------------------------------------------------
-
-std::string layout_view::item::make_animoutput_tag(view_environment &env, util::xml::data_node const &itemnode)
-{
-	util::xml::data_node const *const animate(itemnode.get_child("animate"));
-	if (animate)
-		return std::string(env.get_attribute_string(*animate, "name"));
-	else
-		return std::string();
-}
-
-
-//-------------------------------------------------
-//  make_animmask - get animation state mask
-//-------------------------------------------------
-
-ioport_value layout_view::item::make_animmask(view_environment &env, util::xml::data_node const &itemnode)
-{
-	util::xml::data_node const *const animate(itemnode.get_child("animate"));
-	return animate ? env.get_attribute_int(*animate, "mask", ~ioport_value(0)) : ~ioport_value(0);
-}
-
-
-//-------------------------------------------------
-//  make_animinput_tag - get absolute tag for
-//  animation input
-//-------------------------------------------------
-
-std::string layout_view::item::make_animinput_tag(view_environment &env, util::xml::data_node const &itemnode)
-{
-	util::xml::data_node const *const animate(itemnode.get_child("animate"));
-	return animate ? env.get_attribute_subtag(*animate, "inputtag") : std::string();
-}
-
-
-//-------------------------------------------------
-//  make_input_tag - get absolute input tag
-//-------------------------------------------------
-
-std::string layout_view::item::make_input_tag(view_environment &env, util::xml::data_node const &itemnode)
-{
-	return env.get_attribute_subtag(itemnode, "inputtag");
-}
-
-
-//-------------------------------------------------
-//  get_blend_mode - explicit or implicit blend
-//-------------------------------------------------
-
-int layout_view::item::get_blend_mode(view_environment &env, util::xml::data_node const &itemnode)
-{
-	// see if there's a blend mode attribute
-	std::string const *const mode(itemnode.get_attribute_string_ptr("blend"));
-	if (mode)
-	{
-		if (*mode == "none")
-			return BLENDMODE_NONE;
-		else if (*mode == "alpha")
-			return BLENDMODE_ALPHA;
-		else if (*mode == "multiply")
-			return BLENDMODE_RGB_MULTIPLY;
-		else if (*mode == "add")
-			return BLENDMODE_ADD;
-		else
-			throw layout_syntax_error(util::string_format("unknown blend mode %s", *mode));
-	}
-
-	// fall back to implicit blend mode based on element type
-	if (!strcmp(itemnode.get_name(), "screen"))
-		return -1; // magic number recognised by render.cpp to allow per-element blend mode
-	else if (!strcmp(itemnode.get_name(), "overlay"))
-		return BLENDMODE_RGB_MULTIPLY;
-	else
-		return BLENDMODE_ALPHA;
-}
-
-
-//-------------------------------------------------
-//  get_state_shift - shift to right-align LSB
-//-------------------------------------------------
-
-unsigned layout_view::item::get_state_shift(ioport_value mask)
-{
-	unsigned result(0U);
-	while (mask && !BIT(mask, 0))
-	{
-		++result;
-		mask >>= 1;
 	}
 	return result;
 }

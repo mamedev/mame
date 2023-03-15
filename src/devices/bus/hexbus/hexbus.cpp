@@ -158,7 +158,7 @@
 #include "logmacro.h"
 
 // Hexbus instance
-DEFINE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device,  "hexbus",  "Hexbus connector")
+DEFINE_DEVICE_TYPE(HEXBUS, bus::hexbus::hexbus_device,  "hexbus",  "Hexbus connector")
 
 namespace bus::hexbus {
 

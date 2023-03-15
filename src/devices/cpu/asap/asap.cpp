@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "asap.h"
 #include "asapdasm.h"
-#include "debugger.h"
 
 
 //**************************************************************************
@@ -187,7 +186,6 @@ void asap_device::device_start()
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flagsio).callimport().callexport().formatstr("%6s").noshow();
 	state_add(ASAP_PC,         "PC",        m_pc);
 	state_add(ASAP_PS,         "PS",        m_flagsio).callimport().callexport();
@@ -457,8 +455,8 @@ inline void asap_device::check_irqs()
 {
 	if (m_irq_state && m_iflag)
 	{
+		standard_irq_callback(ASAP_IRQ0, m_pc);
 		generate_exception(EXCEPTION_INTERRUPT);
-		standard_irq_callback(ASAP_IRQ0);
 	}
 }
 
@@ -614,9 +612,9 @@ void asap_device::bsp()
 {
 	if ((int32_t)m_znflag > 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -629,9 +627,9 @@ void asap_device::bmz()
 {
 	if ((int32_t)m_znflag <= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -644,9 +642,9 @@ void asap_device::bgt()
 {
 	if (m_znflag != 0 && (int32_t)(m_znflag ^ m_vflag) >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -659,9 +657,9 @@ void asap_device::ble()
 {
 	if (m_znflag == 0 || (int32_t)(m_znflag ^ m_vflag) < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -674,9 +672,9 @@ void asap_device::bge()
 {
 	if ((int32_t)(m_znflag ^ m_vflag) >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -689,9 +687,9 @@ void asap_device::blt()
 {
 	if ((int32_t)(m_znflag ^ m_vflag) < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -704,9 +702,9 @@ void asap_device::bhi()
 {
 	if (m_znflag != 0 && m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -719,9 +717,9 @@ void asap_device::bls()
 {
 	if (m_znflag == 0 || !m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -734,9 +732,9 @@ void asap_device::bcc()
 {
 	if (!m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -749,9 +747,9 @@ void asap_device::bcs()
 {
 	if (m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -764,9 +762,9 @@ void asap_device::bpl()
 {
 	if ((int32_t)m_znflag >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -779,9 +777,9 @@ void asap_device::bmi()
 {
 	if ((int32_t)m_znflag < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -794,9 +792,9 @@ void asap_device::bne()
 {
 	if (m_znflag != 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -809,9 +807,9 @@ void asap_device::beq()
 {
 	if (m_znflag == 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -824,9 +822,9 @@ void asap_device::bvc()
 {
 	if ((int32_t)m_vflag >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -839,9 +837,9 @@ void asap_device::bvs()
 {
 	if ((int32_t)m_vflag < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-		fetch_instruction();
+		fetch_instruction_debug();
 		m_pc = m_nextpc;
 		m_nextpc = ~0;
 
@@ -855,9 +853,9 @@ void asap_device::bvs()
 void asap_device::bsr()
 {
 	DSTVAL = m_pc + 4;
-	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+	m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -867,9 +865,9 @@ void asap_device::bsr()
 
 void asap_device::bsr_0()
 {
-	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+	m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1559,25 +1557,19 @@ void asap_device::ashl_c0()
 
 void asap_device::rotl()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	DSTVAL = (src1 << src2) | (src1 >> (32 - src2));
+	DSTVAL = rotl_32(SRC1VAL, SRC2VAL);
 }
 
 void asap_device::rotl_c()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	uint32_t dst = (src1 << src2) | (src1 >> (32 - src2));
+	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 	DSTVAL = dst;
 }
 
 void asap_device::rotl_c0()
 {
-	uint32_t src1 = SRC1VAL;
-	uint32_t src2 = SRC2VAL & 31;
-	uint32_t dst = (src1 << src2) | (src1 >> (32 - src2));
+	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 }
 
@@ -1604,7 +1596,7 @@ void asap_device::jsr()
 	DSTVAL = m_pc + 4;
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1616,7 +1608,7 @@ void asap_device::jsr_0()
 {
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1630,7 +1622,7 @@ void asap_device::jsr_c()
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 	m_iflag = m_pflag;
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 
@@ -1644,7 +1636,7 @@ void asap_device::jsr_c0()
 	m_nextpc = SRC1VAL + (SRC2VAL << 2);
 	m_iflag = m_pflag;
 
-	fetch_instruction();
+	fetch_instruction_debug();
 	m_pc = m_nextpc;
 	m_nextpc = ~0;
 

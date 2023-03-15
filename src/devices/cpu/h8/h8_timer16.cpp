@@ -329,7 +329,7 @@ void h8_timer16_device::device_start()
 {
 	memset(timer_channel, 0, sizeof(timer_channel));
 	for(int i=0; i<timer_count; i++) {
-		char tm[2];
+		char tm[0x10];
 		sprintf(tm, "%d", i);
 		timer_channel[i] = subdevice<h8_timer16_channel_device>(tm);
 	}

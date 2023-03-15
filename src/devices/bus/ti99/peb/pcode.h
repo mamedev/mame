@@ -51,7 +51,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pcpage_w);
 	DECLARE_WRITE_LINE_MEMBER(ekrpg_w);
 
-	void debugger_read(uint16_t addr, uint8_t& value);
+	void debugger_read(offs_t addr, uint8_t& value);
 
 	required_device_array<tmc0430_device, 8> m_groms;
 

@@ -9,12 +9,37 @@
 #include "emu.h"
 #include "bus/a2gameio/joystick.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+namespace {
 
-// device type definition
-DEFINE_DEVICE_TYPE(APPLE2_JOYSTICK, apple2_joystick_device, "a2joy", "Apple II analog joysticks")
+// ======================> apple2_joystick_device
+
+class apple2_joystick_device : public device_t, public device_a2gameio_interface
+{
+public:
+	// construction/destruction
+	apple2_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+	// device_a2gameio_interface overrides
+	virtual u8 pdl0_r() override;
+	virtual u8 pdl1_r() override;
+	virtual u8 pdl2_r() override;
+	virtual u8 pdl3_r() override;
+	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
+	virtual DECLARE_READ_LINE_MEMBER(sw1_r) override;
+	virtual DECLARE_READ_LINE_MEMBER(sw2_r) override;
+	virtual DECLARE_READ_LINE_MEMBER(sw3_r) override;
+
+private:
+	// input ports
+	required_ioport_array<2> m_joy_x;
+	required_ioport_array<2> m_joy_y;
+	required_ioport m_buttons;
+};
 
 //**************************************************************************
 //  PARAMETERS
@@ -35,8 +60,6 @@ static INPUT_PORTS_START( apple2_joystick )
 	PORT_KEYDELTA(JOYSTICK_DELTA)
 	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
 	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_4_PAD)    PORT_CODE_INC(KEYCODE_6_PAD)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
 	PORT_START("joystick_1_y")      /* Joystick 1 Y Axis */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P1 Joystick Y")
@@ -44,8 +67,6 @@ static INPUT_PORTS_START( apple2_joystick )
 	PORT_KEYDELTA(JOYSTICK_DELTA)
 	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
 	PORT_MINMAX(0,0xff) PORT_PLAYER(1)
-	PORT_CODE_DEC(KEYCODE_8_PAD)    PORT_CODE_INC(KEYCODE_2_PAD)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 
 	PORT_START("joystick_2_x")      /* Joystick 2 X Axis */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_NAME("P2 Joystick X")
@@ -53,7 +74,6 @@ static INPUT_PORTS_START( apple2_joystick )
 	PORT_KEYDELTA(JOYSTICK_DELTA)
 	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
 	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH)    PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
 	PORT_START("joystick_2_y")      /* Joystick 2 Y Axis */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y) PORT_NAME("P2 Joystick Y")
@@ -61,7 +81,6 @@ static INPUT_PORTS_START( apple2_joystick )
 	PORT_KEYDELTA(JOYSTICK_DELTA)
 	PORT_CENTERDELTA(JOYSTICK_AUTOCENTER)
 	PORT_MINMAX(0,0xff) PORT_PLAYER(2)
-	PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH)      PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 
 	PORT_START("joystick_buttons")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)   PORT_PLAYER(1)            PORT_CODE(KEYCODE_0_PAD)    PORT_CODE(JOYCODE_BUTTON1)
@@ -131,3 +150,13 @@ READ_LINE_MEMBER(apple2_joystick_device::sw3_r)
 {
 	return BIT(m_buttons->read(), 7);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(APPLE2_JOYSTICK, device_a2gameio_interface, apple2_joystick_device, "a2joy", "Apple II analog joysticks")

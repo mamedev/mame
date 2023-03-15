@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
@@ -108,7 +108,7 @@ Other:
   SONY販促用ディスク3
   SONY販促用ディスク4
 
-Known to be dumped, but no longer available: (If you do have any of these please contact the MESS development team)
+Known to be dumped, but no longer available: (If you do have any of these please contact the MAME development team)
   SMC Paint
   PIC->BMPコンバータ
   GIFファイルローダー
@@ -215,7 +215,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<description>Striz B.H.</description>
 		<year>1984</year>
 		<publisher>Sony</publisher>
-		<info name="alt_title" value="ストリッツb.h." />
+		<info name="alt_title" value="ストリッツ・ベーハー" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="305328">
@@ -241,7 +241,7 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<description>Yakyuu-Kyou</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="ヤキュウキョウ" />
+		<info name="alt_title" value="野球狂" />
 		<!-- Crashes after displaying "ヤキュウキョウ" -->
 
 		<part name="flop1" interface="floppy_3_5">

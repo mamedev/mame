@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_XDF_FORMAT;
+extern const xdf_format FLOPPY_XDF_FORMAT;
 
 #endif // MAME_FORMATS_XDF_DSK_H

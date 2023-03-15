@@ -88,11 +88,11 @@ device_sns_cart_interface::~device_sns_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_sns_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_sns_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(SNSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -188,6 +188,30 @@ uint8_t device_sns_cart_interface::read_open_bus()
 	return 0xff;
 }
 
+//-------------------------------------------------
+//  scanlines_r - get motherboard scanline count
+//-------------------------------------------------
+
+int device_sns_cart_interface::scanlines_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->scanlines_r();
+
+	return 0xff;
+}
+
+//-------------------------------------------------
+//  address_r - get address pin from S-CPU
+//-------------------------------------------------
+
+offs_t device_sns_cart_interface::address_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->address_r();
+
+	return 0xff;
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -197,7 +221,7 @@ uint8_t device_sns_cart_interface::read_open_bus()
 //-------------------------------------------------
 base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
 	m_addon(ADDON_NONE),
 	m_type(SNES_MODE20),
@@ -645,7 +669,7 @@ image_init_result base_sns_cart_slot_device::call_load()
 
 		len = !loaded_through_softlist() ? (length() - offset) : get_software_region_length("rom");
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 		ROM = m_cart->get_rom_base();
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -827,37 +851,37 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 		switch (m_addon)
 		{
 			case ADDON_DSP1:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP1B:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP2:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP3:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP4:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_ST010:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 			case ADDON_ST011:
-				ROM = machine().root_device().memregion(region.c_str())->base();
+				ROM = machine().root_device().memregion(region)->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
@@ -1021,13 +1045,14 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
 		uint32_t offset;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large file
 		std::vector<uint8_t> rom(len);
 		int type = 0, addon = 0;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check for error result or read returning short
 
 		offset = snes_skip_header(&rom[0], len);
 
@@ -1070,7 +1095,7 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 				break;
 		}
 
-		slot_string = sns_get_slot(type);
+		char const *const slot_string = sns_get_slot(type);
 
 		return std::string(slot_string);
 	}
@@ -1151,26 +1176,12 @@ void base_sns_cart_slot_device::chip_write(offs_t offset, uint8_t data)
 /* We use this to convert the company_id in the header to int value to be passed in companies[] */
 static int char_to_int_conv( char id )
 {
-	int value;
-
-	if (id == '1') value = 0x01;
-	else if (id == '2') value = 0x02;
-	else if (id == '3') value = 0x03;
-	else if (id == '4') value = 0x04;
-	else if (id == '5') value = 0x05;
-	else if (id == '6') value = 0x06;
-	else if (id == '7') value = 0x07;
-	else if (id == '8') value = 0x08;
-	else if (id == '9') value = 0x09;
-	else if (id == 'A') value = 0x0a;
-	else if (id == 'B') value = 0x0b;
-	else if (id == 'C') value = 0x0c;
-	else if (id == 'D') value = 0x0d;
-	else if (id == 'E') value = 0x0e;
-	else if (id == 'F') value = 0x0f;
-	else value = 0x00;
-
-	return value;
+	if (id >= '0' && id <= '9')
+		return id - '0';
+	else if (id >= 'A' && id <= 'F')
+		return id - 'A' + 0x0a;
+	else
+		return 0;
 }
 
 #define UNK  "UNKNOWN"
@@ -1360,7 +1371,7 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 	logerror( "HEADER DETAILS\n" );
 	logerror( "==============\n\n" );
 	logerror( "\tName:          %.21s\n", title );
-	logerror( "\tSpeed:         %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf0) ? "FastROM" : "SlowROM", (ROM[hilo_mode + 0x15] & 0xf0) >> 4);
+	logerror( "\tSpeed:         %s [%d]\n", (ROM[hilo_mode + 0x15] & 0x10) ? "FastROM" : "SlowROM", (ROM[hilo_mode + 0x15] & 0xf0) >> 4);
 	logerror( "\tBank size:     %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf) ? "HiROM" : "LoROM", ROM[hilo_mode + 0x15] & 0xf);
 
 	logerror( "\tType:          %s", cart_types[type]);
@@ -1378,10 +1389,10 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 		logerror( "\tCountry:       Unknown [%d]\n", ROM[hilo_mode + 0x19]);
 	logerror( "\tLicense:       %s [%X]\n", companies[ROM[hilo_mode + 0x1a]], ROM[hilo_mode + 0x1a]);
 	logerror( "\tVersion:       1.%d\n", ROM[hilo_mode + 0x1b]);
-	logerror( "\tInv Checksum:  %X %X\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
-	logerror( "\tChecksum:      %X %X\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
-	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
-	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
+	logerror( "\tInv Checksum:  %02X%02Xh\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
+	logerror( "\tChecksum:      %02X%02Xh\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
+	logerror( "\tNMI Address:   %02X%02Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
+	logerror( "\tStart Address: %02X%02Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
 
 	logerror( "\tMode: %d\n", type);
 }

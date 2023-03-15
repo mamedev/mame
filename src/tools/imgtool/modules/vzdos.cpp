@@ -8,14 +8,20 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cmath>
 #include "imgtool.h"
-#include "formats/imageutl.h"
-#include "formats/vt_dsk_legacy.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/vt_dsk_legacy.h"
+
+#include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 /*
 

@@ -222,13 +222,13 @@ protected:
 	uint16_t xor16( uint16_t a, uint16_t b);
 	uint32_t xor32( uint32_t a, uint32_t b);
 	void ldcf8( uint8_t a, uint8_t b );
-	void ldcf16( uint8_t a, uint8_t b );
+	void ldcf16( uint8_t a, uint16_t b );
 	void andcf8( uint8_t a, uint8_t b );
-	void andcf16( uint8_t a, uint8_t b );
+	void andcf16( uint8_t a, uint16_t b );
 	void orcf8( uint8_t a, uint8_t b );
-	void orcf16( uint8_t a, uint8_t b );
+	void orcf16( uint8_t a, uint16_t b );
 	void xorcf8( uint8_t a, uint8_t b );
-	void xorcf16( uint8_t a, uint8_t b );
+	void xorcf16( uint8_t a, uint16_t b );
 	uint8_t rl8( uint8_t a, uint8_t s );
 	uint16_t rl16( uint16_t a, uint8_t s );
 	uint32_t rl32( uint32_t a, uint8_t s );

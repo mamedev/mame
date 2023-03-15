@@ -181,7 +181,7 @@ void z80dma_device::device_start()
 	m_out_iorq_cb.resolve_safe();
 
 	// allocate timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80dma_device::timerproc), this));
+	m_timer = timer_alloc(FUNC(z80dma_device::timerproc), this);
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -197,6 +197,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_addressA));
 	save_item(NAME(m_addressB));
 	save_item(NAME(m_count));
+	save_item(NAME(m_byte_counter));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_is_read));
@@ -334,7 +335,12 @@ int z80dma_device::is_ready()
 void z80dma_device::interrupt_check()
 {
 	m_out_int_cb(m_ip ? ASSERT_LINE : CLEAR_LINE);
-	m_out_ieo_cb(m_iei && !m_ip);
+
+	int ieo = m_iei;
+	if (m_ip) {
+		ieo = 0;
+	}
+	m_out_ieo_cb(ieo);
 }
 
 
@@ -448,16 +454,11 @@ void z80dma_device::do_search()
 	}
 }
 
-int z80dma_device::do_write()
+void z80dma_device::do_write()
 {
-	int done;
 	uint8_t mode;
 
 	mode = TRANSFER_MODE;
-	if (m_count == 0x0000)
-	{
-		//FIXME: Any signal here
-	}
 	switch(mode) {
 		case TM_TRANSFER:
 			do_transfer_write();
@@ -480,14 +481,7 @@ int z80dma_device::do_write()
 	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
-	m_count--;
-	done = (m_count == 0xFFFF); //correct?
-
-	if (done)
-	{
-		//FIXME: interrupt ?
-	}
-	return done;
+	m_byte_counter++;
 }
 
 
@@ -497,8 +491,6 @@ int z80dma_device::do_write()
 
 TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 {
-	int done;
-
 	if (--m_cur_cycle)
 	{
 		return;
@@ -510,18 +502,20 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 	{
 		/* TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function! */
 		do_read();
-		done = 0;
 		m_is_read = false;
 		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
 	}
 	else
 	{
-		done = do_write();
+		do_write();
 		m_is_read = true;
 		m_cur_cycle = (PORTB_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
+
+		// param==1 indicates final transfer
+		m_timer->set_param(m_byte_counter == m_count);
 	}
 
-	if (done)
+	if (m_is_read && param)
 	{
 		m_dma_enabled = 0; //FIXME: Correct?
 		m_status = 0x09;
@@ -546,7 +540,9 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 			m_addressA = PORTA_ADDRESS;
 			m_addressB = PORTB_ADDRESS;
 			m_count = BLOCKLEN;
+			m_byte_counter = 0;
 			m_status |= 0x30;
+			m_timer->set_param(0);
 		}
 	}
 }
@@ -558,20 +554,17 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 
 void z80dma_device::update_status()
 {
-	uint16_t pending_transfer;
-	attotime next;
-
 	// no transfer is active right now; is there a transfer pending right now?
-	pending_transfer = is_ready() & m_dma_enabled;
+	bool const pending_transfer = is_ready() && m_dma_enabled;
 
 	if (pending_transfer)
 	{
 		m_is_read = true;
 		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
-		next = attotime::from_hz(clock());
+		attotime const next = attotime::from_hz(clock());
 		m_timer->adjust(
 			attotime::zero,
-			0,
+			m_timer->param(),
 			// 1 byte transferred in 4 clock cycles
 			next);
 	}
@@ -698,6 +691,7 @@ void z80dma_device::write(uint8_t data)
 					m_read_regs_follow[0] = m_status;
 					break;
 				case COMMAND_RESET_AND_DISABLE_INTERRUPTS:
+					LOG("Z80DMA Reset and Disable Interrupts\n");
 					WR3 &= ~0x20;
 					m_ip = 0;
 					m_ius = 0;
@@ -708,8 +702,8 @@ void z80dma_device::write(uint8_t data)
 					LOG("Z80DMA Initiate Read Sequence\n");
 					m_read_cur_follow = m_read_num_follow = 0;
 					if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
-					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+					if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+					if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
 					if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
 					if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
 					if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)
@@ -739,7 +733,9 @@ void z80dma_device::write(uint8_t data)
 					m_addressA = PORTA_ADDRESS;
 					m_addressB = PORTB_ADDRESS;
 					m_count = BLOCKLEN;
+					m_byte_counter = 0;
 					m_status |= 0x30;
+					m_timer->set_param(0);
 
 					LOG("Z80DMA Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
 					break;
@@ -750,7 +746,6 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_ENABLE_DMA:
 					LOG("Z80DMA Enable DMA\n");
 					m_dma_enabled = 1;
-					update_status();
 					break;
 				case COMMAND_READ_MASK_FOLLOWS:
 					LOG("Z80DMA Set Read Mask\n");
@@ -759,9 +754,11 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_CONTINUE:
 					LOG("Z80DMA Continue\n");
 					m_count = BLOCKLEN;
+					m_byte_counter = 0;
 					m_dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					m_status |= 0x30;
+					m_timer->set_param(0);
 					break;
 				case COMMAND_RESET_PORT_A_TIMING:
 					LOG("Z80DMA Reset Port A Timing\n");
@@ -774,7 +771,6 @@ void z80dma_device::write(uint8_t data)
 				case COMMAND_FORCE_READY:
 					LOG("Z80DMA Force Ready\n");
 					m_force_ready = 1;
-					update_status();
 					break;
 				case COMMAND_ENABLE_INTERRUPTS:
 					LOG("Z80DMA Enable IRQ\n");
@@ -796,6 +792,7 @@ void z80dma_device::write(uint8_t data)
 				default:
 					logerror("Z80DMA Unknown WR6 command %02x\n", data);
 			}
+			update_status();
 		}
 		else if(data == 0x8e) //newtype on Sharp X1, unknown purpose
 			logerror("Z80DMA Unknown base register %02x\n", data);
@@ -826,8 +823,8 @@ void z80dma_device::write(uint8_t data)
 			m_read_cur_follow = m_read_num_follow = 0;
 
 			if(READ_MASK & 0x01) { m_read_regs_follow[m_read_num_follow++] = m_status; }
-			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_count & 0xff; } //byte counter (low)
-			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_count >> 8; } //byte counter (high)
+			if(READ_MASK & 0x02) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter & 0xff; } //byte counter (low)
+			if(READ_MASK & 0x04) { m_read_regs_follow[m_read_num_follow++] = m_byte_counter >> 8; } //byte counter (high)
 			if(READ_MASK & 0x08) { m_read_regs_follow[m_read_num_follow++] = m_addressA & 0xff; } //port A address (low)
 			if(READ_MASK & 0x10) { m_read_regs_follow[m_read_num_follow++] = m_addressA >> 8; } //port A address (high)
 			if(READ_MASK & 0x20) { m_read_regs_follow[m_read_num_follow++] = m_addressB & 0xff; } //port B address (low)

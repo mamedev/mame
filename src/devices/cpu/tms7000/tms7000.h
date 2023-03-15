@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "debugger.h"
-
 enum { TMS7000_PC=1, TMS7000_SP, TMS7000_ST, TMS7000_A, TMS7000_B };
 
 enum
@@ -49,8 +47,8 @@ public:
 	void set_divide_by_2() { m_divider = 2; }
 	void set_divide_by_4() { m_divider = 4; }
 
-	uint8_t tms7000_unmapped_rf_r(offs_t offset) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
-	void tms7000_unmapped_rf_w(offs_t offset, uint8_t data) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
+	uint8_t tms7000_unmapped_rf_r(offs_t offset) { if (!machine().side_effects_disabled()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; }
+	void tms7000_unmapped_rf_w(offs_t offset, uint8_t data) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); }
 
 	uint8_t tms7000_pf_r(offs_t offset);
 	void tms7000_pf_w(offs_t offset, uint8_t data);
@@ -84,7 +82,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + m_divider - 1) / 2; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + m_divider - 1) / m_divider; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * m_divider); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 49; }

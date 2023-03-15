@@ -21,7 +21,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(HD61830, hd61830_device, "hd61830", "Hitachi HD61830B LCD Controller")
-decltype(HD61830) HD61830B = HD61830;
 
 
 // default address map
@@ -98,7 +97,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 void hd61830_device::device_start()
 {
 	// allocate timers
-	m_busy_timer = timer_alloc();
+	m_busy_timer = timer_alloc(FUNC(hd61830_device::clear_busy_flag), this);
 
 	// resolve callbacks
 	m_read_rd.resolve_safe(0);
@@ -135,12 +134,11 @@ void hd61830_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clear_busy_flag -
 //-------------------------------------------------
 
-void hd61830_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(hd61830_device::clear_busy_flag)
 {
-	// clear busy flag
 	m_bf = false;
 }
 
@@ -483,8 +481,8 @@ void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 			md1 = readbyte(rac2);
 			md2 = readbyte(rac2+1);
 
-			draw_char(bitmap, cliprect, ma, x, y + rows, md1);
-			draw_char(bitmap, cliprect, ma+1, x+1, y + rows, md2);
+			draw_char(bitmap, cliprect, ma + (rows * m_hn), x, y + rows, md1);
+			draw_char(bitmap, cliprect, ma+1 + (rows * m_hn), x+1, y + rows, md2);
 
 			ma+=2;
 			rac1+=2;

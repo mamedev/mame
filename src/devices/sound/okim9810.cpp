@@ -200,10 +200,11 @@ void okim9810_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void okim9810_device::rom_bank_updated()
+void okim9810_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -223,6 +224,12 @@ void okim9810_device::sound_stream_update(sound_stream &stream, std::vector<read
 	// iterate over voices and accumulate sample data
 	for (auto & elem : m_voice)
 		elem.generate_audio(*this, outputs, m_global_volume, m_filter_type);
+
+	for (int i = 0; i < outputs[0].samples(); i++)
+	{
+		outputs[0].put(i, std::clamp(outputs[0].getraw(i), -1.0f, 1.0f));
+		outputs[1].put(i, std::clamp(outputs[1].getraw(i), -1.0f, 1.0f));
+	}
 }
 
 

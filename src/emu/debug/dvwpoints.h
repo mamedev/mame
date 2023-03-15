@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
     dvwpoints.h
@@ -7,14 +7,13 @@
     Watchpoint debugger view.
 
 ***************************************************************************/
-
 #ifndef MAME_EMU_DEBUG_DVWPOINTS_H
 #define MAME_EMU_DEBUG_DVWPOINTS_H
 
 #pragma once
 
-#include "debugvw.h"
 #include "debugcpu.h"
+#include "debugvw.h"
 
 
 //**************************************************************************

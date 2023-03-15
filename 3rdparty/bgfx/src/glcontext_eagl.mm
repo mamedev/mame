@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -102,7 +102,7 @@ namespace bgfx { namespace gl
 			GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
 			GLenum err = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			BX_CHECK(GL_FRAMEBUFFER_COMPLETE == err, "glCheckFramebufferStatus failed 0x%08x", err);
+			BX_ASSERT(GL_FRAMEBUFFER_COMPLETE == err, "glCheckFramebufferStatus failed 0x%08x", err);
 			BX_UNUSED(err);
 
 			makeCurrent();
@@ -159,10 +159,10 @@ namespace bgfx { namespace gl
 		GLint m_height;
 	};
 
-	void GlContext::create(uint32_t _width, uint32_t _height)
+	void GlContext::create(uint32_t _width, uint32_t _height, uint32_t /*_flags*/)
 	{
 		s_opengles = bx::dlopen("/System/Library/Frameworks/OpenGLES.framework/OpenGLES");
-		BX_CHECK(NULL != s_opengles, "OpenGLES dynamic library is not found!");
+		BX_ASSERT(NULL != s_opengles, "OpenGLES dynamic library is not found!");
 
 		BX_UNUSED(_width, _height);
 		CAEAGLLayer* layer = (__bridge CAEAGLLayer*)g_platformData.nwh;
@@ -185,7 +185,7 @@ namespace bgfx { namespace gl
 				context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 			}
 		}
-		BX_CHECK(NULL != context, "No valid OpenGLES context.");
+		BX_ASSERT(NULL != context, "No valid OpenGLES context.");
 
 		m_context = (__bridge void*)context;
 		[EAGLContext setCurrentContext:context];
@@ -212,7 +212,7 @@ namespace bgfx { namespace gl
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
-		BX_CHECK(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
+		BX_ASSERT(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
 			, "glCheckFramebufferStatus failed 0x%08x"
 			, glCheckFramebufferStatus(GL_FRAMEBUFFER)
 			);
@@ -298,7 +298,7 @@ namespace bgfx { namespace gl
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 
-		BX_CHECK(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
+		BX_ASSERT(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
 			, "glCheckFramebufferStatus failed 0x%08x"
 			, glCheckFramebufferStatus(GL_FRAMEBUFFER)
 			);

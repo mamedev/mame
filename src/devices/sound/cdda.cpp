@@ -29,7 +29,7 @@ void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 void cdda_device::device_start()
 {
 	/* allocate an audio cache */
-	m_audio_cache = std::make_unique<uint8_t[]>(CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	m_audio_cache = std::make_unique<uint8_t[]>(cdrom_file::MAX_SECTOR_DATA * MAX_SECTORS );
 
 	m_stream = stream_alloc(0, 2, clock());
 
@@ -47,7 +47,7 @@ void cdda_device::device_start()
 	save_item( NAME(m_audio_ended_normally) );
 	save_item( NAME(m_audio_lba) );
 	save_item( NAME(m_audio_length) );
-	save_pointer( NAME(m_audio_cache), CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	save_pointer( NAME(m_audio_cache), cdrom_file::MAX_SECTOR_DATA * MAX_SECTORS );
 	save_item( NAME(m_audio_samples) );
 	save_item( NAME(m_audio_bptr) );
 }
@@ -114,7 +114,7 @@ void cdda_device::pause_audio(int pause)
 uint32_t cdda_device::get_audio_lba()
 {
 	m_stream->update();
-	return m_audio_lba - ((m_audio_samples + (CD_MAX_SECTOR_DATA / 4) - 1) / (CD_MAX_SECTOR_DATA / 4));
+	return m_audio_lba - ((m_audio_samples + (cdrom_file::MAX_SECTOR_DATA / 4) - 1) / (cdrom_file::MAX_SECTOR_DATA / 4));
 }
 
 
@@ -207,12 +207,12 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 
 			for (i = 0; i < sectors; i++)
 			{
-				cdrom_read_data(m_disc, m_audio_lba, &m_audio_cache[CD_MAX_SECTOR_DATA*i], CD_TRACK_AUDIO);
+				m_disc->read_data(m_audio_lba, &m_audio_cache[cdrom_file::MAX_SECTOR_DATA*i], cdrom_file::CD_TRACK_AUDIO);
 
 				m_audio_lba++;
 			}
 
-			m_audio_samples = (CD_MAX_SECTOR_DATA*sectors)/4;
+			m_audio_samples = (cdrom_file::MAX_SECTOR_DATA*sectors)/4;
 			m_audio_length -= sectors;
 
 			/* reset feedout ptr */

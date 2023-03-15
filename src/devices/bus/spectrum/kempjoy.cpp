@@ -71,9 +71,9 @@ void spectrum_kempjoy_device::device_start()
 
 uint8_t spectrum_kempjoy_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
-	if ((offset & 0x00ff) == 0x1f)
+	if ((offset & 0xe0) == 0)  // 000- ----   uses 0x1f
 	{
 		data = m_joy->read() & 0x1f;
 	}

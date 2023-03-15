@@ -12,7 +12,6 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "upd7725.h"
 #include "dasm7725.h"
 
@@ -438,7 +437,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 		case 12: r = (q << 1) | (c ? 1 : 0); break;   //SHL1 (ROL)
 		case 13: r = (q << 2) | 3; break;             //SHL2
 		case 14: r = (q << 4) | 15; break;            //SHL4
-		case 15: r = (q << 8) | (q >> 8); break;      //XCHG
+		case 15: r = swapendian_int16(q); break;      //XCHG
 	}
 
 	flag.s0 = (r & 0x8000);

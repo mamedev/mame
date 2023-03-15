@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "pluginopts.h"
+
 #include "options.h"
+#include "path.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -47,13 +49,12 @@ void plugin_options::scan_directory(const std::string &path, bool recursive)
 		{
 			if (entry->type == osd::directory::entry::entry_type::FILE && !strcmp(entry->name, "plugin.json"))
 			{
-				std::string curfile = std::string(path).append(PATH_SEPARATOR).append(entry->name);
-				load_plugin(curfile);
+				load_plugin(util::path_concat(path, entry->name));
 			}
 			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
 				if (recursive && strcmp(entry->name, ".") && strcmp(entry->name, ".."))
-					scan_directory(path + PATH_SEPARATOR + entry->name, recursive);
+					scan_directory(util::path_concat(path, entry->name), recursive);
 			}
 		}
 	}
@@ -131,7 +132,7 @@ static core_options create_core_options(const plugin_options &plugin_opts)
 	// the data back
 	static const options_entry s_option_entries[] =
 	{
-		{ nullptr, nullptr, OPTION_HEADER, "PLUGINS OPTIONS" },
+		{ nullptr, nullptr, core_options::option_type::HEADER, "PLUGINS OPTIONS" },
 		{ nullptr }
 	};
 

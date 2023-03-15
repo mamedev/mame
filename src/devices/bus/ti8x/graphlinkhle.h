@@ -18,50 +18,7 @@
 
 #include "ti8x.h"
 
-#include "bus/rs232/rs232.h"
 
-#include "diserial.h"
-
-#include <memory>
-
-
-namespace bus::ti8x {
-
-class graph_link_hle_device
-		: public device_t
-		, public device_ti8x_link_port_byte_interface
-		, public device_serial_interface
-{
-public:
-	graph_link_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	virtual void byte_collision() override;
-	virtual void byte_send_timeout() override;
-	virtual void byte_receive_timeout() override;
-	virtual void byte_sent() override;
-	virtual void byte_received(u8 data) override;
-
-	virtual void rcv_complete() override;
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-
-private:
-	static constexpr unsigned BUFLEN = 1U << 16;
-
-	required_device<rs232_port_device>  m_serial_port;
-	std::unique_ptr<u8 []>              m_buffer;
-	unsigned                            m_head, m_tail;
-	bool                                m_empty, m_ready;
-};
-
-} // namespace bus::ti8x
-
-
-DECLARE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device)
+DECLARE_DEVICE_TYPE(TI8X_GRAPH_LINK_HLE, device_ti8x_link_port_interface)
 
 #endif // MAME_BUS_TI8X_GRAPHLINKHLE_H

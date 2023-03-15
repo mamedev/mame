@@ -6,11 +6,19 @@
 
     Controls execution of the core MAME system.
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_MAME_MAME_H
 #define MAME_FRONTEND_MAME_MAME_H
 
 #pragma once
+
+#include "main.h"
+
+
+namespace sol {
+
+struct load_result;
+
+} // namespace sol
 
 class plugin_options;
 class osd_interface;
@@ -71,19 +79,20 @@ private:
 	mame_machine_manager &operator=(mame_machine_manager const &) = delete;
 	mame_machine_manager &operator=(mame_machine_manager &&) = delete;
 
-	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
-	std::unique_ptr<lua_engine> m_lua;
+	std::unique_ptr<plugin_options>    m_plugins;           // pointer to plugin options
+	std::unique_ptr<lua_engine>        m_lua;
 
-	const game_driver *     m_new_driver_pending;   // pointer to the next pending driver
+	const game_driver *     m_new_driver_pending;           // pointer to the next pending driver
 	bool                    m_firstrun;
 
-	static mame_machine_manager *s_manager;
-	emu_timer               *m_autoboot_timer;      // autoboot timer
-	std::unique_ptr<mame_ui_manager> m_ui;                  // internal data from ui.cpp
-	std::unique_ptr<cheat_manager> m_cheat;            // internal data from cheat.cpp
-	std::unique_ptr<inifile_manager>   m_inifile;      // internal data from inifile.c for INIs
-	std::unique_ptr<favorite_manager>  m_favorite;     // internal data from inifile.c for favorites
+	emu_timer *                        m_autoboot_timer;    // auto-boot timer
+	std::unique_ptr<sol::load_result>  m_autoboot_script;   // auto-boot script
+	std::unique_ptr<mame_ui_manager>   m_ui;                // internal data from ui.cpp
+	std::unique_ptr<cheat_manager>     m_cheat;             // internal data from cheat.cpp
+	std::unique_ptr<inifile_manager>   m_inifile;           // internal data from inifile.c for INIs
+	std::unique_ptr<favorite_manager>  m_favorite;          // internal data from inifile.c for favorites
 
+	static mame_machine_manager *s_manager;
 };
 
 //**************************************************************************
@@ -92,5 +101,6 @@ private:
 
 extern const char build_version[];
 extern const char bare_build_version[];
+extern const char bare_vcs_revision[];
 
 #endif // MAME_FRONTEND_MAME_MAME_H

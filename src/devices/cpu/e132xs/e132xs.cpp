@@ -146,8 +146,6 @@
 #include "e132xs.h"
 #include "e132xsfe.h"
 
-#include "debugger.h"
-
 #include "32xsdefs.h"
 
 //#define VERBOSE 1
@@ -937,56 +935,56 @@ void hyperstone_device::check_interrupts()
 		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
 		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
 		{
+			standard_irq_callback(IRQ_IO3, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO3));
-			standard_irq_callback(IRQ_IO3);
 			return;
 		}
 
 		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
 		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT1, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT1));
-			standard_irq_callback(IRQ_INT1);
 			return;
 		}
 
 		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
 		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT2, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT2));
-			standard_irq_callback(IRQ_INT2);
 			return;
 		}
 
 		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
 		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT3, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT3));
-			standard_irq_callback(IRQ_INT3);
 			return;
 		}
 
 		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
 		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT4, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT4));
-			standard_irq_callback(IRQ_INT4);
 			return;
 		}
 
 		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
 		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
 		{
+			standard_irq_callback(IRQ_IO1, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO1));
-			standard_irq_callback(IRQ_IO1);
 			return;
 		}
 
 		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
 		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
 		{
+			standard_irq_callback(IRQ_IO2, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO2));
-			standard_irq_callback(IRQ_IO2);
 			return;
 		}
 	}
@@ -995,8 +993,8 @@ void hyperstone_device::check_interrupts()
 		/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
 		if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
 		{
+			standard_irq_callback(IRQ_IO3, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO3));
-			standard_irq_callback(IRQ_IO3);
 			return;
 		}
 
@@ -1011,8 +1009,8 @@ void hyperstone_device::check_interrupts()
 		/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
 		if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT1, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT1));
-			standard_irq_callback(IRQ_INT1);
 			return;
 		}
 
@@ -1027,8 +1025,8 @@ void hyperstone_device::check_interrupts()
 		/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
 		if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT2, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT2));
-			standard_irq_callback(IRQ_INT2);
 			return;
 		}
 
@@ -1043,8 +1041,8 @@ void hyperstone_device::check_interrupts()
 		/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
 		if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT3, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT3));
-			standard_irq_callback(IRQ_INT3);
 			return;
 		}
 
@@ -1059,24 +1057,24 @@ void hyperstone_device::check_interrupts()
 		/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
 		if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
 		{
+			standard_irq_callback(IRQ_INT4, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_INT4));
-			standard_irq_callback(IRQ_INT4);
 			return;
 		}
 
 		/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
 		if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
 		{
+			standard_irq_callback(IRQ_IO1, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO1));
-			standard_irq_callback(IRQ_IO1);
 			return;
 		}
 
 		/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
 		if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
 		{
+			standard_irq_callback(IRQ_IO2, m_core->global_regs[0]);
 			execute_int(get_trap_addr(TRAPNO_IO2));
-			standard_irq_callback(IRQ_IO2);
 			return;
 		}
 	}
@@ -1142,7 +1140,7 @@ void hyperstone_device::init(int scale_mask)
 	}
 	m_io = &space(AS_IO);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
+	m_timer = timer_alloc(FUNC(hyperstone_device::timer_callback), this);
 	m_core->clock_scale_mask = scale_mask;
 
 	for (uint8_t i = 0; i < 16; i++)

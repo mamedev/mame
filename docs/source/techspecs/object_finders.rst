@@ -239,7 +239,7 @@ the object finders in the device class (with all distractions removed):
         }
 
         sbus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-            device_t(mconfig, type, tag, owner, clock),
+            device_t(mconfig, SBUS, tag, owner, clock),
             device_memory_interface(mconfig, *this),
             m_maincpu(*this, finder_base::DUMMY_TAG),
             m_type1space(*this, finder_base::DUMMY_TAG, -1)

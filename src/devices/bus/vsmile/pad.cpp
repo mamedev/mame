@@ -49,8 +49,7 @@ void vsmile_pad_device::device_start()
 {
 	vsmile_ctrl_device_base::device_start();
 
-	m_idle_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_pad_device::handle_idle), this));
+	m_idle_timer = timer_alloc(FUNC(vsmile_pad_device::handle_idle), this);
 	m_idle_timer->adjust(attotime::from_seconds(1));
 
 	m_sent_joy = 0x0000U;

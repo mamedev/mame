@@ -83,7 +83,7 @@ class BasicBlock {
   const Instruction* GetMergeInst() const;
   Instruction* GetMergeInst();
 
-  // Returns the OpLoopMerge instruciton in this basic block, if it exists.
+  // Returns the OpLoopMerge instruction in this basic block, if it exists.
   // Otherwise return null.  May be used whenever tail() can be used.
   const Instruction* GetLoopMergeInst() const;
   Instruction* GetLoopMergeInst();
@@ -214,7 +214,7 @@ class BasicBlock {
   void KillAllInsts(bool killLabel);
 
   // Splits this basic block into two. Returns a new basic block with label
-  // |labelId| containing the instructions from |iter| onwards. Instructions
+  // |label_id| containing the instructions from |iter| onwards. Instructions
   // prior to |iter| remain in this basic block.  The new block will be added
   // to the function immediately after the original block.
   BasicBlock* SplitBasicBlock(IRContext* context, uint32_t label_id,

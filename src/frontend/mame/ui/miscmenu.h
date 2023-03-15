@@ -12,13 +12,16 @@
 
 #pragma once
 
-#include "ui/menu.h"
+#include "ui/textbox.h"
 
 #include "crsshair.h"
 #include "emuopts.h"
 
 #include <utility>
 #include <vector>
+
+
+struct ui_system_info;
 
 
 namespace ui {
@@ -30,22 +33,27 @@ public:
 	virtual ~menu_network_devices();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
-class menu_bookkeeping : public menu
+class menu_bookkeeping : public menu_textbox
 {
 public:
 	menu_bookkeeping(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_bookkeeping();
 
+protected:
+	virtual void menu_activated() override;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	attotime prevtime;
 };
+
 
 class menu_crosshair : public menu
 {
@@ -73,23 +81,13 @@ private:
 		std::string next_name;
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<crosshair_item_data> m_data;
 	std::vector<std::string> m_pics;
 };
 
-class menu_quit_game : public menu
-{
-public:
-	menu_quit_game(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_quit_game();
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-};
 
 class menu_bios_selection : public menu
 {
@@ -98,8 +96,8 @@ public:
 	virtual ~menu_bios_selection();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -114,11 +112,12 @@ public:
 	virtual ~menu_export();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<const game_driver*> m_list;
 };
+
 
 //-------------------------------------------------
 //  machine configure menu
@@ -130,13 +129,9 @@ public:
 	menu_machine_configure(
 			mame_ui_manager &mui,
 			render_container &container,
-			game_driver const &drv,
-			std::function<void (bool, bool)> &&handler = nullptr,
-			float x0 = 0.0f, float y0 = 0.0f);
+			ui_system_info const &info,
+			std::function<void (bool, bool)> &&handler = nullptr);
 	virtual ~menu_machine_configure();
-
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
 	using s_bios = std::vector<std::pair<std::string, int>>;
@@ -146,28 +141,27 @@ private:
 		ADDFAV = 1,
 		DELFAV,
 		SAVE,
-		CONTROLLER,
 		VIDEO,
+		CONTROLLER,
 		BIOS,
 		ADVANCED,
 		LAST = ADVANCED
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	void setup_bios();
 
 	std::function<void (bool, bool)> const m_handler;
-	game_driver const &m_drv;
+	ui_system_info const &m_sys;
 	emu_options m_opts;
-	float const m_x0;
-	float const m_y0;
 	s_bios m_bios;
 	std::size_t m_curbios;
 	bool const m_was_favorite;
 	bool m_want_favorite;
 };
+
 
 //-------------------------------------------------
 //  plugins configure menu
@@ -180,10 +174,8 @@ public:
 	virtual ~menu_plugins_configure();
 
 protected:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 } // namespace ui

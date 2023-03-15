@@ -62,8 +62,8 @@ mc6846_device::mc6846_device(const machine_config &mconfig, const char *tag, dev
 
 void mc6846_device::device_start()
 {
-	m_interval = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_expire), this));
-	m_one_shot = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6846_device::timer_one_shot), this));
+	m_interval = timer_alloc(FUNC(mc6846_device::timer_expire), this);
+	m_one_shot = timer_alloc(FUNC(mc6846_device::timer_one_shot), this);
 
 	m_out_port_cb.resolve();  /* 8-bit output */
 	m_out_cp2_cb.resolve();   /* 1-bit output */

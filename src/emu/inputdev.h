@@ -13,28 +13,12 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// relative devices return ~512 units per onscreen pixel
-constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
-
-// absolute devices return values between -65536 and +65536
-constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
-constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
-
-// invalid memory value for axis polling
-constexpr s32 INVALID_AXIS_VALUE = 0x7fffffff;
+#include "interface/inputdev.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// callback for getting the value of an item on a device
-typedef s32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
 // ======================> joystick_map
 
@@ -87,23 +71,21 @@ private:
 // a single item on an input device
 class input_device_item
 {
-protected:
-	// construction/destruction
-	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
-
 public:
+	using item_get_state_func = osd::input_device::item_get_state_func;
+
 	virtual ~input_device_item();
 
 	// getters
 	input_device &device() const { return m_device; }
 	input_manager &manager() const;
 	running_machine &machine() const;
-	const char *name() const { return m_name.c_str(); }
+	const std::string &name() const { return m_name; }
 	void *internal() const { return m_internal; }
 	input_item_id itemid() const { return m_itemid; }
 	input_item_class itemclass() const { return m_itemclass; }
 	input_code code() const;
-	const char *token() const { return m_token.c_str(); }
+	const std::string &token() const { return m_token; }
 	s32 current() const { return m_current; }
 
 	// helpers
@@ -117,6 +99,16 @@ public:
 	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) = 0;
 
 protected:
+	// construction/destruction
+	input_device_item(
+			input_device &device,
+			std::string_view name,
+			std::string_view tokenhint,
+			void *internal,
+			input_item_id itemid,
+			item_get_state_func getstate,
+			input_item_class itemclass);
+
 	// internal state
 	input_device &          m_device;               // reference to our owning device
 	std::string             m_name;                 // string name of item
@@ -134,33 +126,41 @@ protected:
 // ======================> input_device
 
 // a logical device of a given class that can provide input
-class input_device
+class input_device : public osd::input_device
 {
 	friend class input_class;
 
 public:
 	// construction/destruction
-	input_device(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 	virtual ~input_device();
 
 	// getters
 	input_manager &manager() const { return m_manager; }
 	running_machine &machine() const { return m_manager.machine(); }
 	input_device_class devclass() const { return device_class(); }
-	const char *name() const { return m_name.c_str(); }
-	const char *id() const { return m_id.c_str(); }
+	const std::string &name() const { return m_name; }
+	const std::string &id() const { return m_id; }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
+	const assignment_vector &default_assignments() const { return m_default_assignments; }
 	input_item_id maxitem() const { return m_maxitem; }
 	void *internal() const { return m_internal; }
+	s32 threshold() const { return m_threshold; }
 	bool steadykey_enabled() const { return m_steadykey_enabled; }
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
 	// setters
 	void set_devindex(int devindex) { m_devindex = devindex; }
 
-	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
+	// interface for host input device
+	virtual input_item_id add_item(
+			std::string_view name,
+			std::string_view tokenhint,
+			input_item_id itemid,
+			item_get_state_func getstate,
+			void *internal) override;
+	virtual void set_default_assignments(assignment_vector &&assignments) override;
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
@@ -178,11 +178,13 @@ private:
 	std::string             m_id;                   // id of device
 	int                     m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
+	assignment_vector       m_default_assignments;  // additional assignments
 	input_item_id           m_maxitem;              // maximum item index
-	void *                  m_internal;             // internal callback pointer
+	void *const             m_internal;             // internal callback pointer
 
-	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
-	bool                    m_lightgun_reload_button; // lightgun reload hack
+	s32 const               m_threshold;            // threshold for treating absolute axis as active
+	bool const              m_steadykey_enabled;    // steadykey enabled for keyboards
+	bool const              m_lightgun_reload_button; // lightgun reload hack
 };
 
 
@@ -192,7 +194,7 @@ class input_device_keyboard : public input_device
 {
 public:
 	// construction/destruction
-	input_device_keyboard(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 	// helpers
 	void apply_steadykey() const;
@@ -209,7 +211,7 @@ class input_device_mouse : public input_device
 {
 public:
 	// construction/destruction
-	input_device_mouse(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 protected:
 	// specific overrides
@@ -223,7 +225,7 @@ class input_device_lightgun : public input_device
 {
 public:
 	// construction/destruction
-	input_device_lightgun(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 protected:
 	// specific overrides
@@ -238,7 +240,7 @@ class input_device_joystick : public input_device
 {
 public:
 	// construction/destruction
-	input_device_joystick(input_manager &manager, const char *_name, const char *_id, void *_internal);
+	input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 
 	// getters
 	joystick_map &joymap() { return m_joymap; }
@@ -253,9 +255,10 @@ protected:
 
 private:
 	// joystick information
-	joystick_map            m_joymap;               // joystick map for this device
-	s32                     m_joystick_deadzone;    // deadzone for joystick
-	s32                     m_joystick_saturation;  // saturation position for joystick
+	joystick_map    m_joymap;      // joystick map for this device
+	s32 const       m_deadzone;    // deadzone for joystick
+	s32 const       m_saturation;  // saturation position for joystick
+	s64 const       m_range;       // difference between saturation and deadzone
 };
 
 
@@ -284,8 +287,7 @@ public:
 	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
-	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
-	input_device *add_device(std::unique_ptr<input_device> &&new_device);
+	input_device &add_device(std::string_view name, std::string_view id, void *internal = nullptr);
 
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid) const;
@@ -293,10 +295,11 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) = 0;
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) = 0;
 
 private:
-	// indexing helpers
+	// internal helpers
+	input_device &add_device(std::unique_ptr<input_device> &&new_device);
 	int newindex(input_device &device);
 
 	// internal state
@@ -321,7 +324,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_keyboard>(manager(), name, id, internal);
 	}
@@ -343,7 +346,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_mouse>(manager(), name, id, internal);
 	}
@@ -361,7 +364,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_lightgun>(manager(), name, id, internal);
 	}
@@ -386,7 +389,7 @@ public:
 
 protected:
 	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) override
+	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
 	{
 		return std::make_unique<input_device_joystick>(manager(), name, id, internal);
 	}

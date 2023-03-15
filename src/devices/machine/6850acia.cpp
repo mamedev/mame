@@ -97,6 +97,8 @@ acia6850_device::acia6850_device(const machine_config &mconfig, device_type type
 	, m_tx_irq_enable(false)
 	, m_rxc(0)
 	, m_rxd(1)
+	, m_rx_state(0)
+	, m_rx_counter(0)
 	, m_rx_irq_enable(false)
 {
 }

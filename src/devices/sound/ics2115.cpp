@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Alex Marshall,nimitz,austere
+// copyright-holders:Alex Marshall, nimitz, austere
 /*
     ICS2115 by Raiden II team (c) 2010
     members: austere, nimitz, Alex Marshal
@@ -9,25 +9,23 @@
     Use tab size = 4 for your viewing pleasure.
 
     TODO:
-    - Implement Panning, Chip has support stereo
-    - Verify BYTE/ROMEN pin behaviors
+    - Verify BYTE/ROMEN pin behavior
     - DRAM, DMA, MIDI interface is unimplemented
     - Verify interrupt, envelope, timer period
     - Verify unemulated registers
 
-    Changelog:
-
-    25th july 2020 [cam900]:
-    - Improve envelope behavior, Improve debugging registers, Fix ramping
 */
 
 #include "emu.h"
 #include "ics2115.h"
+
 #include <algorithm>
 #include <cmath>
 
+
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115 WaveFront Synthesizer")
@@ -61,8 +59,8 @@ void ics2115_device::device_start()
 
 	space(0).cache(m_cache);
 
-	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
-	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
+	m_timer[0].timer = timer_alloc(FUNC(ics2115_device::timer_cb_0), this);
+	m_timer[1].timer = timer_alloc(FUNC(ics2115_device::timer_cb_1), this);
 	m_stream = stream_alloc(0, 2, clock() / (32 * 32));
 
 	m_irq_cb.resolve_safe();
@@ -85,13 +83,20 @@ void ics2115_device::device_start()
 	const u16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for (int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
+
+	//pan law level
+	//log2(256*128) = 15 for -3db + 1 must be confirmed by real hardware owners
+	constexpr int PAN_LEVEL = 16;
+
 	for (int i = 0; i < 256; i++)
 	{
 		u8 exponent = (~i >> 4) & 0x07;
 		u8 mantissa = ~i & 0x0f;
 		s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
+		m_panlaw[i] = PAN_LEVEL - (31 - count_leading_zeros_32(i)); //m_panlaw[i] = PAN_LEVEL - log2(i)
 	}
+	m_panlaw[0] = 0xfff; //all bits to one when no pan
 
 	save_item(NAME(m_timer[0].period));
 	save_item(NAME(m_timer[0].scale));
@@ -201,9 +206,33 @@ device_memory_interface::space_config_vector ics2115_device::memory_space_config
 }
 
 
-//TODO: improve using next-state logic from column 126 of patent 5809466
+/*
+    Using next-state logic from column 126 of patent 5809466.
+    VOL(L) = vol.acc
+    VINC = vol.inc
+    DIR = invert
+    BC = boundary cross (start or end )
+    BLEN = bi directional loop enable
+    LEN loop enable
+    UVOL   LEN   BLEN    DIR     BC      Next VOL(L)
+    0      x     x       x       x       VOL(L) // no change no vol envelope
+    1      x     x       0       0       VOL(L) + VINC // forward dir no bc
+    1      x     x       1       0       VOL(L) - VINC // invert no bc
+    1      0     x       x       1       VOL(L) // no env len no vol envelope
+   ----------------------------------------------------------------------------
+    1      1     0       0       1       start - ( end - (VOL(L)  + VINC) )
+    1      1     0       1       1       end + ( (VOL(L) - VINC) - start)
+    1      1     1       0       1       end + (end - (VOL(L) + VINC) ) // here
+    1      1     1       1       1       start - ( (VOL(L) - VINC)- start)
+*/
 int ics2115_device::ics2115_voice::update_volume_envelope()
 {
+
+	// test for boundary cross
+	bool bc = false;
+	if (vol.acc >= vol.end || vol.acc <= vol.end)
+		bc = true;
+
 	int ret = 0;
 	if (vol_ctrl.bitflags.done || vol_ctrl.bitflags.stop)
 		return ret;
@@ -233,13 +262,23 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 
 	if (vol_ctrl.bitflags.loop)
 	{
-		if (vol_ctrl.bitflags.loop_bidir)
-			vol_ctrl.bitflags.invert = !vol_ctrl.bitflags.invert;
-
-		if (vol_ctrl.bitflags.invert)
-			vol.acc = vol.end + vol.left;
-		else
-			vol.acc = vol.start - vol.left;
+		if (bc)
+		{
+			if (!vol_ctrl.bitflags.loop_bidir)
+			{
+				if (!vol_ctrl.bitflags.invert)
+					vol.acc = vol.start - (vol.end - (vol.acc + vol.incr));   //  uvol = 1*     len = 1*   blen =  0     dir =  0     bc =  1*      start - ( end - (VOL(L)  + VINC) )
+				else
+					vol.acc = vol.end + ((vol.acc - vol.incr) - vol.start);   //         1            1    blen =  0     dir =  1           1       end + ( (VOL(L) - VINC) - start)
+			}
+			else
+			{
+				if (!vol_ctrl.bitflags.invert)
+					vol.acc = vol.end + (vol.end - (vol.acc + vol.incr));     //         1            1     blen = 1      dir = 0           1       end + (end - (VOL(L) + VINC) )
+				else
+					vol.acc = vol.start - ((vol.acc - vol.incr) - vol.start); //         1            1     beln = 1      dir = 1           1       start - ( (VOL(L) - VINC)- start)
+			}
+		}
 	}
 	else
 		vol_ctrl.bitflags.done = true;
@@ -393,10 +432,13 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		const u32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		const u32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
-		const u16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		const u16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		constexpr int RAMP_SHIFT = 6;
+		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
+		const s16 vlefti = volacc - m_panlaw[255 - voice.vol.pan]; // left index from acc - pan law
+		const s16 vrighti = volacc - m_panlaw[voice.vol.pan]; // right index from acc - pan law
+		//check negative values so no cracks, is it a hardware feature ?
+		const u16 vleft = vlefti > 0 ? (m_volume[vlefti] * voice.state.ramp >> RAMP_SHIFT) : 0;
+		const u16 vright = vrighti > 0 ? (m_volume[vrighti] * voice.state.ramp >> RAMP_SHIFT) : 0;
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -406,10 +448,9 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 		s32 sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
+		//if (voice.playing())
 		if (!m_vmode || voice.playing())
 		{
-		/*if (voice.playing())
-		{*/
 			outputs[0].add_int(i, (sample * vleft) >> (5 + volume_bits), 32768);
 			outputs[1].add_int(i, (sample * vright) >> (5 + volume_bits), 32768);
 		}
@@ -576,7 +617,8 @@ u16 ics2115_device::reg_read()
 			ret = m_active_osc;
 			break;
 
-		case 0x0f:{// [osc] Interrupt source/oscillator
+		case 0x0f: // [osc] Interrupt source/oscillator
+		{
 			ret = 0xff;
 			for (int i = 0; i <= m_active_osc; i++)
 			{
@@ -601,7 +643,8 @@ u16 ics2115_device::reg_read()
 				}
 			}
 			ret <<= 8;
-			break;}
+			break;
+		}
 
 		case 0x10: // [osc] Oscillator Control
 			ret = voice.osc.ctl << 8;
@@ -1037,7 +1080,7 @@ void ics2115_device::recalc_irq()
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
 	for (int i = 0; (!irq) && (i < 32); i++)
-		irq |=  m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
+		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending && m_voice[i].osc_conf.bitflags.irq_pending;
 	m_irq_on = irq;
 	if (!m_irq_cb.isnull())
 		m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
@@ -1045,33 +1088,32 @@ void ics2115_device::recalc_irq()
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
 {
-	m_irq_pending |= 1 << 0;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 0)))
+	{
+		m_irq_pending |= 1 << 0;
+		recalc_irq();
+	}
 }
 
 TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
 {
-	m_irq_pending |= 1 << 1;
-	recalc_irq();
+	if (!(m_irq_pending & (1 << 1)))
+	{
+		m_irq_pending |= 1 << 1;
+		recalc_irq();
+	}
 }
 
 void ics2115_device::recalc_timer(int timer)
 {
-	//Old regression-based formula (minus constant)
-	//u64 period = m_timer[timer].preset * (m_timer[timer].scale << 16) / 60;
-
-	//New formula based on O.Galibert's reverse engineering of ICS2115 card firmware
-	// TODO : Related to input clock?
 	u64 period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
-	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646;
+	period = period << (4 + (m_timer[timer].scale >> 5));
 
 	if (m_timer[timer].period != period)
 	{
+		attotime tp = attotime::from_ticks(period, clock());
+		logerror("Timer %d period %dns (%dHz)\n", timer, int(tp.as_double()*1e9), int(1/tp.as_double()));
 		m_timer[timer].period = period;
-		// Adjust the timer lengths
-		if (period) // Reset the length
-			m_timer[timer].timer->adjust(attotime::from_nsec(period), 0, attotime::from_nsec(period));
-		else // Kill the timer if length == 0
-			m_timer[timer].timer->adjust(attotime::never);
+		m_timer[timer].timer->adjust(tp, 0, tp);
 	}
 }

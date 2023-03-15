@@ -8,48 +8,43 @@
 /// \file nld_solver.h
 ///
 
-#include "../nl_base.h"
-#include "../plib/pstream.h"
 #include "nld_matrix_solver.h"
+
+#include "core/core_device.h"
+#include "core/logic.h"
+#include "core/state_var.h"
+
+#include "../plib/pstream.h"
 
 #include <map>
 #include <memory>
 #include <vector>
 
-// ----------------------------------------------------------------------------------------
-// solver
-// ----------------------------------------------------------------------------------------
+namespace netlist::devices
+{
+	// -------------------------------------------------------------------------
+	// solver
+	// -------------------------------------------------------------------------
 
-namespace netlist
-{
-namespace devices
-{
-	NETLIB_OBJECT(solver)
+	class nld_solver : public device_t
 	{
 	public:
-		using queue_type = detail::queue_base<solver::matrix_solver_t, false>;
 		using solver_arena = device_arena;
+		using queue_type = detail::queue_base<solver_arena,
+											  solver::matrix_solver_t>;
 
-		NETLIB_CONSTRUCTOR(solver)
-		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
-		, m_Q_step(*this, "Q_step")
-		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-		, m_queue(config::MAX_SOLVER_QUEUE_SIZE::value,
-			queue_type::id_delegate(&NETLIB_NAME(solver) :: get_solver_id, this),
-			queue_type::obj_delegate(&NETLIB_NAME(solver) :: solver_by_id, this))
-		{
-			// internal stuff
-			state().save(*this, static_cast<plib::state_manager_t::callback_t &>(m_queue), this->name(), "m_queue");
-
-			connect("FB_step", "Q_step");
-		}
+		nld_solver(constructor_param_t data);
 
 		void post_start();
 		void stop();
 
-		auto gmin() const -> decltype(solver::solver_parameters_t::m_gmin()) { return m_params.m_gmin(); }
+		auto gmin() const -> decltype(solver::solver_parameters_t::m_gmin())
+		{
+			return m_params.m_gmin();
+		}
 
-		solver::static_compile_container create_solver_code(solver::static_compile_target target);
+		solver::static_compile_container
+		create_solver_code(solver::static_compile_target target);
 
 		NETLIB_RESETI();
 		// NETLIB_UPDATE_PARAMI();
@@ -61,35 +56,36 @@ namespace devices
 		void reschedule(solver::matrix_solver_t *solv, netlist_time ts);
 
 	private:
-		using params_uptr = solver_arena::unique_ptr<solver::solver_parameters_t>;
+		using params_uptr = solver_arena::unique_ptr<
+			solver::solver_parameters_t>;
 
-		template<bool KEEP_STATS>
+		template <bool KEEP_STATS>
 		NETLIB_HANDLERI(fb_step);
 
-		logic_input_t m_fb_step;
+		logic_input_t  m_fb_step;
 		logic_output_t m_Q_step;
 
 		// FIXME: these should be created in device space
 		std::vector<params_uptr> m_mat_params;
-		std::vector<solver_ptr> m_mat_solvers;
+		std::vector<solver_ptr>  m_mat_solvers;
 
 		solver::solver_parameters_t m_params;
-		queue_type m_queue;
+		queue_type                  m_queue;
 
 		template <typename FT, int SIZE>
-		solver_ptr create_solver(std::size_t size, const pstring &solvername,
-			const solver::solver_parameters_t *params,net_list_t &nets);
+		solver_ptr create_solver(std::size_t size, const pstring &solver_name,
+								 const solver::solver_parameters_t *params,
+								 net_list_t &                       nets);
 
 		template <typename FT>
-		solver_ptr create_solvers(const pstring &sname,
-			const solver::solver_parameters_t *params, net_list_t &nets);
+		solver_ptr create_solvers(const pstring &                    sname,
+								  const solver::solver_parameters_t *params,
+								  net_list_t &                       nets);
 
 		std::size_t get_solver_id(const solver::matrix_solver_t *net) const;
 		solver::matrix_solver_t *solver_by_id(std::size_t id) const;
-
 	};
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NLD_SOLVER_H_

@@ -2,7 +2,7 @@
 // async_result.hpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,19 +19,35 @@ struct lazy_handler
 {
 };
 
-struct concrete_handler
+template <typename Signature>
+struct concrete_handler;
+
+template <typename R, typename Arg1>
+struct concrete_handler<R(Arg1)>
 {
   concrete_handler(lazy_handler)
   {
   }
 
-  template <typename Arg1>
-  void operator()(Arg1)
+  void operator()(typename asio::decay<Arg1>::type)
   {
   }
 
-  template <typename Arg1, typename Arg2>
-  void operator()(Arg1, Arg2)
+#if defined(ASIO_HAS_MOVE)
+  concrete_handler(concrete_handler&&) {}
+private:
+  concrete_handler(const concrete_handler&);
+#endif // defined(ASIO_HAS_MOVE)
+};
+
+template <typename R, typename Arg1, typename Arg2>
+struct concrete_handler<R(Arg1, Arg2)>
+{
+  concrete_handler(lazy_handler)
+  {
+  }
+
+  void operator()(typename asio::decay<Arg1>::type, typename asio::decay<Arg2>::type)
   {
   }
 
@@ -51,7 +67,7 @@ class async_result<archetypes::lazy_handler, Signature>
 {
 public:
   // The concrete completion handler type.
-  typedef archetypes::concrete_handler completion_handler_type;
+  typedef archetypes::concrete_handler<Signature> completion_handler_type;
 
   // The return type of the initiating function.
   typedef int return_type;

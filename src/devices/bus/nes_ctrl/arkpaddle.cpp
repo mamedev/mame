@@ -5,6 +5,25 @@
     Nintendo Family Computer & Entertainment System -
     Arkanoid Paddle input device
 
+ TODO: Investigate the differences between the 3 paddles released with
+ Arkanoid (US), Arkanoid (JP), Arkanoid II (JP). At the moment we only
+ emulate the US and daisy-chainable Famicom (Ark2) paddles.
+
+ Known differences: NES and Ark2 paddles have screws to adjust range
+ of returned values, Ark2 paddle has an extra expansion port.
+
+ The Ark2 paddle's expansion port is NOT a passthru. OUT0 ($4016 bit 0)
+ is passed along when writing. Pins 13 and 7 (normally read as bit 1
+ from $4016 and $4017) are read from the daisy chained device and passed
+ to the Famicom expansion port pins 5 and 4 (i.e. the Famicom sees them
+ as bits 3,4 at $4017). Due to the limited pin connections the Famicom
+ Keyboard cannot be daisy chained, so the Data Recorder cannot be used
+ simultaneously with the paddle when saving and loading user made levels.
+
+ All paddles return the ones' complement of a 9-bit value from their
+ potentiometers, MSB first. The three commercial releases, Arkanoids
+ and Chase HQ, only read 8-bits, ignoring the LSB.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -20,9 +39,12 @@ DEFINE_DEVICE_TYPE(NES_ARKPADDLE_FC, nes_vausfc_device, "nes_vausfc", "FC Arkano
 
 static INPUT_PORTS_START( arkanoid_paddle )
 	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CENTERDELTA(0) PORT_MINMAX(0x62,0xf2)
+	// MINMAX range large enough to encompass what Taito games expect, Ark1 will glitch if MIN is too low
+	// This may be too wide compared with real paddles, even accounting for those with adjustment screws
+	PORT_BIT( 0x1ff, 0x130, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(35) PORT_CENTERDELTA(0) PORT_MINMAX(0x78, 0x1f8)
+
 	PORT_START("BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Paddle button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paddle button")
 INPUT_PORTS_END
 
 
@@ -35,6 +57,23 @@ ioport_constructor nes_vaus_device::device_input_ports() const
 	return INPUT_PORTS_NAME( arkanoid_paddle );
 }
 
+static void vausfc_daisy(device_slot_interface &device)
+{
+	device.option_add("vaus", NES_ARKPADDLE_FC);
+}
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_vausfc_device::device_add_mconfig(machine_config &config)
+{
+	// expansion port to allow daisy chaining
+	NES_CONTROL_PORT(config, m_daisychain, vausfc_daisy, nullptr);
+	if (m_port != nullptr)
+		m_daisychain->set_screen_tag(m_port->m_screen);
+}
 
 
 //**************************************************************************
@@ -45,22 +84,23 @@ ioport_constructor nes_vaus_device::device_input_ports() const
 //  nes_vaus_device - constructor
 //-------------------------------------------------
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_paddle(*this, "PADDLE")
 	, m_button(*this, "BUTTON")
-	, m_start_conv(0), m_latch(0)
+	, m_latch(0)
 {
 }
 
-nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_vaus_device::nes_vaus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_vaus_device(mconfig, NES_ARKPADDLE, tag, owner, clock)
 {
 }
 
-nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_vaus_device(mconfig, NES_ARKPADDLE_FC, tag, owner, clock)
+	, m_daisychain(*this, "subexp")
 {
 }
 
@@ -72,18 +112,7 @@ nes_vausfc_device::nes_vausfc_device(const machine_config &mconfig, const char *
 void nes_vaus_device::device_start()
 {
 	save_item(NAME(m_latch));
-	save_item(NAME(m_start_conv));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_vaus_device::device_reset()
-{
-	m_latch = 0;
-	m_start_conv = 0;
+	save_item(NAME(m_strobe));
 }
 
 
@@ -91,25 +120,25 @@ void nes_vaus_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_vaus_device::read_bit34()
+u8 nes_vaus_device::read_bit34()
 {
-	uint8_t ret = (m_button->read() << 3);
-	ret |= (m_latch & 0x80) >> 3;
+	u8 ret = m_button->read() << 3;
+	ret |= (m_latch & 0x100) >> 4;
 	m_latch <<= 1;
-	m_latch &= 0xff;
 	return ret;
 }
 
-uint8_t nes_vausfc_device::read_exp(offs_t offset)
+u8 nes_vausfc_device::read_exp(offs_t offset)
 {
-	uint8_t ret;
+	u8 ret;
 	if (offset == 0)    //$4016
 		ret = m_button->read() << 1;
 	else    //$4017
 	{
-		ret = (m_latch & 0x80) >> 6;
+		ret = (m_latch & 0x100) >> 7;
 		m_latch <<= 1;
-		m_latch &= 0xff;
+		ret |= (m_daisychain->read_exp(0) & 0x02) << 2;
+		ret |= (m_daisychain->read_exp(1) & 0x02) << 3;
 	}
 	return ret;
 }
@@ -118,12 +147,14 @@ uint8_t nes_vausfc_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_vaus_device::write(uint8_t data)
+void nes_vaus_device::write(u8 data)
 {
-	int old = m_start_conv;
+	if (write_strobe(data))
+		m_latch = ~m_paddle->read();
+}
 
-	if (data == 0 && old == 1)
-		m_latch = (uint8_t) (m_paddle->read() ^ 0xff);
-
-	m_start_conv = data;
+void nes_vausfc_device::write(u8 data)
+{
+	m_daisychain->write(data & 1);
+	nes_vaus_device::write(data);
 }

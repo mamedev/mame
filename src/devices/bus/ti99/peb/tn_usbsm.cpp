@@ -48,7 +48,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
+DEFINE_DEVICE_TYPE(TI99_USBSM, bus::ti99::peb::nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
 
 namespace bus::ti99::peb {
 

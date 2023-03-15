@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "sharc.h"
 #include "sharcfe.h"
 #include "cpu/drcfe.h"
@@ -2350,7 +2349,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 				case 0x0c:          // do until counter expired             |000|01100|
 				{
 					uint16_t data = (uint16_t)(opcode >> 24);
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 					uint32_t address = desc->pc + offset;
 
 					UML_MOV(block, LCNTR, data);
@@ -2371,7 +2370,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 				case 0x0d:          // do until counter expired             |000|01101|
 				{
 					int ureg = (opcode >> 32) & 0xff;
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 					uint32_t address = desc->pc + offset;
 
 					generate_read_ureg(block, compiler, desc, ureg, false);
@@ -2392,7 +2391,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x0e:          // do until                             |000|01110|
 				{
-					int offset = SIGN_EXTEND24(opcode & 0xffffff);
+					int offset = util::sext(opcode & 0xffffff, 24);
 					uint32_t address = desc->pc + offset;
 
 					// push pc
@@ -3031,7 +3030,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 				int g = (opcode >> 40) & 0x1;
 				int dreg = (opcode >> 23) & 0xf;
 				int i = (opcode >> 41) & 0x7;
-				int mod = SIGN_EXTEND6((opcode >> 27) & 0x3f);
+				int mod = util::sext((opcode >> 27) & 0x3f, 6);
 				int compute = opcode & 0x7fffff;
 
 				bool has_condition = !if_condition_always_true(cond);
@@ -5234,11 +5233,11 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 		case 0x10:      // FEXT Rx BY <bit6>:<len6>
 			if (bit == 0)
 			{
-				UML_AND(block, REG(rn), REG(rx), MAKE_EXTRACT_MASK(bit, len));
+				UML_AND(block, REG(rn), REG(rx), util::make_bitmask<uint32_t>(len));
 			}
 			else
 			{
-				UML_AND(block, I0, REG(rx), MAKE_EXTRACT_MASK(bit, len));
+				UML_AND(block, I0, REG(rx), util::make_bitmask<uint32_t>(len) << bit);
 				UML_SHR(block, REG(rn), I0, bit);
 			}
 			if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
@@ -5248,7 +5247,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 			return;
 
 		case 0x12:      // FEXT Rx BY <bit6>:<len6> (SE)
-			UML_AND(block, I0, REG(rx), MAKE_EXTRACT_MASK(bit, len));
+			UML_AND(block, I0, REG(rx), util::make_bitmask<uint32_t>(len) << bit);
 			UML_SHL(block, I0, I0, 32 - (bit + len));
 			UML_SAR(block, REG(rn), I0, 32 - (bit + len) + bit);
 			if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
@@ -5258,7 +5257,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 			return;
 
 		case 0x19:      // Rn = Rn OR FDEP Rx BY <bit6>:<len6>
-			UML_AND(block, I0, REG(rx), MAKE_EXTRACT_MASK(0, len));
+			UML_AND(block, I0, REG(rx), util::make_bitmask<uint32_t>(len));
 			if (bit > 0)
 				UML_SHL(block, I0, I0, bit);
 			UML_OR(block, REG(rn), REG(rn), I0);

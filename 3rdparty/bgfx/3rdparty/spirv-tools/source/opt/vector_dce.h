@@ -73,6 +73,11 @@ class VectorDCE : public MemPass {
   bool RewriteInstructions(Function* function,
                            const LiveComponentMap& live_components);
 
+  // Makes all DebugValue instructions that use |composite| for their values as
+  // dead instructions by putting them into |dead_dbg_value|.
+  void MarkDebugValueUsesAsDead(Instruction* composite,
+                                std::vector<Instruction*>* dead_dbg_value);
+
   // Rewrites the OpCompositeInsert instruction |current_inst| to avoid
   // unnecessary computes given that the only components of the result that are
   // live are |live_components|.
@@ -83,16 +88,20 @@ class VectorDCE : public MemPass {
   // If the composite input to |current_inst| is not live, then it is replaced
   // by and OpUndef in |current_inst|.
   bool RewriteInsertInstruction(Instruction* current_inst,
-                                const utils::BitVector& live_components);
+                                const utils::BitVector& live_components,
+                                std::vector<Instruction*>* dead_dbg_value);
 
   // Returns true if the result of |inst| is a vector or a scalar.
   bool HasVectorOrScalarResult(const Instruction* inst) const;
 
-  // Returns true if the result of |inst| is a scalar.
+  // Returns true if the result of |inst| is a vector.
   bool HasVectorResult(const Instruction* inst) const;
 
-  // Returns true if the result of |inst| is a vector.
+  // Returns true if the result of |inst| is a scalar.
   bool HasScalarResult(const Instruction* inst) const;
+
+  // Returns the number of elements in the vector type with id |type_id|.
+  uint32_t GetVectorComponentCount(uint32_t type_id);
 
   // Adds |work_item| to |work_list| if it is not already live according to
   // |live_components|.  |live_components| is updated to indicate that

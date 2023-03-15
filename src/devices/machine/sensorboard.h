@@ -59,6 +59,7 @@ public:
 	// handle pieces
 	void cancel_hand();
 	void remove_hand();
+	int get_handpos() { return m_handpos; }
 	bool drop_piece(u8 x, u8 y);
 	bool pickup_piece(u8 x, u8 y);
 
@@ -85,9 +86,9 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
-	virtual bool nvram_can_write() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual bool nvram_can_write() const override;
 
 private:
 	output_finder<0x10, 0x10> m_out_piece;
@@ -128,7 +129,7 @@ private:
 	u32 m_usize;
 
 	bool m_nvram_auto;
-	bool nvram_on();
+	bool nvram_on() const;
 
 	emu_timer *m_undotimer;
 	TIMER_CALLBACK_MEMBER(undo_tick);

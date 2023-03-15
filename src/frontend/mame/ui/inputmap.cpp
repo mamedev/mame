@@ -26,13 +26,14 @@ namespace ui {
 
 menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
+	set_heading(_("Input Assignments (general)"));
 }
 
 menu_input_groups::~menu_input_groups()
 {
 }
 
-void menu_input_groups::populate(float &customtop, float &custombottom)
+void menu_input_groups::populate()
 {
 	// build up the menu
 	item_append(_("User Interface"), 0, (void *)uintptr_t(IPG_UI + 1));
@@ -45,12 +46,18 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_input_groups::handle()
+bool menu_input_groups::handle(event const *ev)
 {
-	// process the menu
-	const event *const menu_event = process(0);
-	if (menu_event && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_input_general>(ui(), container(), int(uintptr_t(menu_event->itemref) - 1));
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
+	{
+		menu::stack_push<menu_input_general>(
+				ui(),
+				container(),
+				int(uintptr_t(ev->itemref) - 1),
+				util::string_format(_("Input Assignments (%1$s)"), ev->item->text()));
+	}
+
+	return false;
 }
 
 
@@ -59,17 +66,24 @@ void menu_input_groups::handle()
     input menu
 -------------------------------------------------*/
 
-menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &container, int _group)
+menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &container, int _group, std::string &&heading)
 	: menu_input(mui, container)
 	, group(_group)
 {
+	set_heading(std::move(heading));
 }
 
 menu_input_general::~menu_input_general()
 {
 }
 
-void menu_input_general::populate(float &customtop, float &custombottom)
+void menu_input_general::menu_activated()
+{
+	// scripts can change settings out from under us
+	reset(reset_options::REMEMBER_POSITION);
+}
+
+void menu_input_general::populate()
 {
 	if (data.empty())
 	{
@@ -79,26 +93,30 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 		for (const input_type_entry &entry : machine().ioport().types())
 		{
 			// add if we match the group and we have a valid name
-			if ((entry.group() == group) && entry.name() && entry.name()[0])
+			if (entry.group() == group)
 			{
-				// loop over all sequence types
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+				std::string name = entry.name();
+				if (!name.empty())
 				{
-					// build an entry for the standard sequence
-					input_item_data &item(data.emplace_back());
-					item.ref = &entry;
-					item.seqtype = seqtype;
-					item.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
-					item.defseq = &entry.defseq(seqtype);
-					item.group = entry.group();
-					item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-					item.is_optional = false;
-					item.name = entry.name();
-					item.owner = nullptr;
+					// loop over all sequence types
+					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+					{
+						// build an entry for the standard sequence
+						input_item_data &item(data.emplace_back());
+						item.ref = &entry;
+						item.seqtype = seqtype;
+						item.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
+						item.defseq = &entry.defseq(seqtype);
+						item.group = entry.group();
+						item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+						item.is_optional = false;
+						item.name = name;
+						item.owner = nullptr;
 
-					// stop after one, unless we're analog
-					if (item.type == INPUT_TYPE_DIGITAL)
-						break;
+						// stop after one, unless we're analog
+						if (item.type == INPUT_TYPE_DIGITAL)
+							break;
+					}
 				}
 			}
 		}
@@ -113,7 +131,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 	}
 
 	// populate the menu in a standard fashion
-	populate_sorted(customtop, custombottom);
+	populate_sorted();
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -121,6 +139,7 @@ void menu_input_general::update_input(input_item_data &seqchangeditem)
 {
 	const input_type_entry &entry = *reinterpret_cast<const input_type_entry *>(seqchangeditem.ref);
 	machine().ioport().set_type_seq(entry.type(), entry.player(), seqchangeditem.seqtype, seqchangeditem.seq);
+	seqchangeditem.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqchangeditem.seqtype);
 }
 
 
@@ -131,13 +150,22 @@ void menu_input_general::update_input(input_item_data &seqchangeditem)
 
 menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container &container) : menu_input(mui, container)
 {
+	set_heading(_("Input Assignments (this system)"));
 }
 
 menu_input_specific::~menu_input_specific()
 {
 }
 
-void menu_input_specific::populate(float &customtop, float &custombottom)
+void menu_input_specific::menu_activated()
+{
+	// scripts can change settings out from under us
+	assert(!pollingitem);
+	data.clear();
+	reset(reset_options::REMEMBER_POSITION);
+}
+
+void menu_input_specific::populate()
 {
 	if (data.empty())
 	{
@@ -203,7 +231,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						return true;
 					if (!codes2.empty() && (codes1.empty() || codes1[0] > codes2[0]))
 						return false;
-					cmp = strcmp(i1.name, i2.name);
+					cmp = i1.name.compare(i2.name);
 					if (cmp < 0)
 						return true;
 					if (cmp > 0)
@@ -222,9 +250,9 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 
 	// populate the menu in a standard fashion
 	if (!data.empty())
-		populate_sorted(customtop, custombottom);
+		populate_sorted();
 	else
-		item_append(_("This machine has no input map."), FLAG_DISABLE, nullptr);
+		item_append(_("[no assignable inputs are enabled]"), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 }
@@ -234,15 +262,24 @@ void menu_input_specific::update_input(input_item_data &seqchangeditem)
 	ioport_field::user_settings settings;
 
 	// yeah, the const_cast is naughty, but we know we stored a non-const reference in it
-	reinterpret_cast<const ioport_field *>(seqchangeditem.ref)->get_user_settings(settings);
+	ioport_field const &field(*reinterpret_cast<ioport_field const *>(seqchangeditem.ref));
+	field.get_user_settings(settings);
 	settings.seq[seqchangeditem.seqtype] = seqchangeditem.seq;
-	reinterpret_cast<ioport_field *>(const_cast<void *>(seqchangeditem.ref))->set_user_settings(settings);
+	if (seqchangeditem.seq.is_default())
+		settings.cfg[seqchangeditem.seqtype].clear();
+	else if (!seqchangeditem.seq.length())
+		settings.cfg[seqchangeditem.seqtype] = "NONE";
+	else
+		settings.cfg[seqchangeditem.seqtype] = machine().input().seq_to_tokens(seqchangeditem.seq);
+	const_cast<ioport_field &>(field).set_user_settings(settings);
+	seqchangeditem.seq = field.seq(seqchangeditem.seqtype);
 }
 
 
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
+
 menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 	, data()
@@ -254,11 +291,13 @@ menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	, record_next(false)
 	, modified_ticks(0)
 {
+	set_process_flags(PROCESS_LR_ALWAYS);
 }
 
 menu_input::~menu_input()
 {
 }
+
 
 /*-------------------------------------------------
     toggle_none_default - toggle between "NONE"
@@ -268,10 +307,20 @@ menu_input::~menu_input()
 void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
 {
 	if (original_seq.empty()) // if we used to be "none", toggle to the default value
-		selected_seq = selected_defseq;
+		selected_seq.set_default();
 	else // otherwise, toggle to "none"
 		selected_seq.reset();
 }
+
+
+void menu_input::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// leave space for showing the input sequence below the menu
+	set_custom_space(0.0F, 2.0F * line_height() + 3.0F * tb_border());
+}
+
 
 void menu_input::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
@@ -281,9 +330,9 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 		char const *const text[] = { seqname.c_str() };
 		draw_text_box(
 				std::begin(text), std::end(text),
-				x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+				x1, x2, y2 + tb_border(), y2 + bottom,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
+				ui().colors().text_color(), ui().colors().background_color());
 	}
 	else
 	{
@@ -298,9 +347,9 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 			char const *const text[] = { errormsg.c_str() };
 			draw_text_box(
 					std::begin(text), std::end(text),
-					x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+					x1, x2, y2 + tb_border(), y2 + bottom,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
+					ui().colors().text_color(), UI_RED_COLOR);
 		}
 		else if (selectedref)
 		{
@@ -310,9 +359,9 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 				char const *const text[] = { _("Pressed") };
 				draw_text_box(
 						std::begin(text), std::end(text),
-						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-						ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-						ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+						x1, x2, y2 + tb_border(), y2 + bottom,
+						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
+						ui().colors().text_color(), ui().colors().background_color());
 			}
 			else
 			{
@@ -321,21 +370,21 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 					(!item.seq.empty() || item.defseq->empty()) ? clearprompt.c_str() : defaultprompt.c_str() };
 				draw_text_box(
 						std::begin(text), std::end(text),
-						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-						ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-						ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+						x1, x2, y2 + tb_border(), y2 + bottom,
+						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
+						ui().colors().text_color(), ui().colors().background_color());
 			}
 		}
 	}
 }
 
-void menu_input::handle()
+bool menu_input::handle(event const *ev)
 {
 	input_item_data *seqchangeditem = nullptr;
 	bool invalidate = false;
+	bool redraw = false;
 
 	// process the menu
-	const event *const menu_event = process((pollingitem != nullptr) ? PROCESS_NOKEYS : 0);
 	if (pollingitem)
 	{
 		// if we are polling, handle as a special case
@@ -347,25 +396,17 @@ void menu_input::handle()
 
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
-			// if UI_CANCEL is pressed, abort
+			// if UI_CANCEL is pressed, abort and abandon changes
 			pollingitem = nullptr;
-			if (!seq_poll->modified() || modified_ticks == osd_ticks())
-			{
-				// cancelled immediately - toggle between default and none
-				record_next = false;
-				toggle_none_default(item->seq, starting_seq, *item->defseq);
-				seqchangeditem = item;
-			}
-			else
-			{
-				// entered something before cancelling - abandon change
-				invalidate = true;
-			}
+			set_process_flags(PROCESS_LR_ALWAYS);
+			invalidate = true;
 			seq_poll.reset();
+			machine().ui_input().reset();
 		}
 		else if (seq_poll->poll()) // poll again; if finished, update the sequence
 		{
 			pollingitem = nullptr;
+			set_process_flags(PROCESS_LR_ALWAYS);
 			if (seq_poll->valid())
 			{
 				record_next = true;
@@ -376,19 +417,27 @@ void menu_input::handle()
 			{
 				// entered invalid sequence - abandon change
 				invalidate = true;
-				errormsg = _("Invalid sequence entered");
+				errormsg = _("Invalid combination entered");
 				erroritem = item;
 			}
 			seq_poll.reset();
+			machine().ui_input().reset();
+		}
+		else
+		{
+			// always redraw to ensure it updates as soon as possible in response to changes
+			redraw = true;
 		}
 	}
-	else if (menu_event && menu_event->itemref)
+	else if (ev && ev->itemref)
 	{
 		// otherwise, handle the events
-		input_item_data &item = *reinterpret_cast<input_item_data *>(menu_event->itemref);
-		switch (menu_event->iptkey)
+		input_item_data &item = *reinterpret_cast<input_item_data *>(ev->itemref);
+		input_item_data *newsel = &item;
+		switch (ev->iptkey)
 		{
 		case IPT_UI_SELECT: // an item was selected: begin polling
+			set_process_flags(PROCESS_NOKEYS);
 			errormsg.clear();
 			erroritem = nullptr;
 			modified_ticks = 0;
@@ -413,10 +462,59 @@ void menu_input::handle()
 			record_next = false;
 			seqchangeditem = &item;
 			break;
+
+		case IPT_UI_PREV_GROUP:
+			{
+				auto current = std::distance(data.data(), &item);
+				bool found_break = false;
+				while (0 < current)
+				{
+					if (!found_break)
+					{
+						if (data[--current].owner != item.owner)
+							found_break = true;
+					}
+					else if (data[current].owner != data[current - 1].owner)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+					else
+					{
+						--current;
+					}
+					if (found_break && !current)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+				}
+			}
+			break;
+
+		case IPT_UI_NEXT_GROUP:
+			{
+				auto current = std::distance(data.data(), &item);
+				while (data.size() > ++current)
+				{
+					if (data[current].owner != item.owner)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+				}
+			}
+			break;
 		}
 
 		// if the selection changed, reset the "record next" flag
-		if (&item != lastitem)
+		if (newsel != lastitem)
 		{
 			if (erroritem)
 			{
@@ -425,6 +523,23 @@ void menu_input::handle()
 			}
 			record_next = false;
 			lastitem = &item;
+			redraw = true;
+		}
+
+		// flip between set and append
+		// not very discoverable, but with the prompt it isn't completely opaque
+		if ((IPT_UI_LEFT == ev->iptkey) || (IPT_UI_RIGHT == ev->iptkey))
+		{
+			if (erroritem)
+			{
+				errormsg.clear();
+				erroritem = nullptr;
+			}
+			else if (record_next || !item.seq.empty())
+			{
+				record_next = !record_next;
+			}
+			redraw = true;
 		}
 	}
 
@@ -440,6 +555,8 @@ void menu_input::handle()
 	// if the menu is invalidated, clear it now
 	if (invalidate)
 		reset(reset_options::REMEMBER_POSITION);
+
+	return redraw && !invalidate;
 }
 
 
@@ -449,20 +566,19 @@ void menu_input::handle()
 //  menu from them
 //-------------------------------------------------
 
-void menu_input::populate_sorted(float &customtop, float &custombottom)
+void menu_input::populate_sorted()
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 
 	// create a mini lookup table for name format based on type
-	nameformat[INPUT_TYPE_DIGITAL] = "%s";
-	nameformat[INPUT_TYPE_ANALOG] = "%s Analog";
-	nameformat[INPUT_TYPE_ANALOG_INC] = "%s Analog Inc";
-	nameformat[INPUT_TYPE_ANALOG_DEC] = "%s Analog Dec";
+	nameformat[INPUT_TYPE_DIGITAL] = "%1$s";
+	nameformat[INPUT_TYPE_ANALOG] = _("input-name", "%1$s Analog");
+	nameformat[INPUT_TYPE_ANALOG_INC] = _("input-name", "%1$s Analog Inc");
+	nameformat[INPUT_TYPE_ANALOG_DEC] = _("input-name", "%1$s Analog Dec");
 
 	// build the menu
 	std::string text, subtext;
 	const device_t *prev_owner = nullptr;
-	bool first_entry = true;
 	for (input_item_data &item : data)
 	{
 		// generate the name of the item itself, based off the base name and the type
@@ -470,14 +586,10 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 
 		if (item.owner && (item.owner != prev_owner))
 		{
-			if (first_entry)
-				first_entry = false;
-			else
-				item_append(menu_item_type::SEPARATOR);
 			if (item.owner->owner())
-				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			else
-				item_append(string_format(_("[root%1$s]"), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("[root%1$s]"), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			prev_owner = item.owner;
 		}
 
@@ -504,13 +616,10 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 	}
 
 	// pre-format messages
-	assignprompt = util::string_format(_("Press %1$s to set\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));
-	appendprompt = util::string_format(_("Press %1$s to append\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));
-	clearprompt = util::string_format(_("Press %1$s to clear\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
-	defaultprompt = util::string_format(_("Press %1$s to restore default\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
-
-	// leave space for showing the input sequence below the menu
-	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	assignprompt = util::string_format(_("Press %1$s to set\n"), ui().get_general_input_setting(IPT_UI_SELECT));
+	appendprompt = util::string_format(_("Press %1$s to append\n"), ui().get_general_input_setting(IPT_UI_SELECT));
+	clearprompt = util::string_format(_("Press %1$s to clear\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
+	defaultprompt = util::string_format(_("Press %1$s to restore default\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
 }
 
 } // namespace ui

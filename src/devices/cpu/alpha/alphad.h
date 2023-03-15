@@ -20,10 +20,10 @@ public:
 	alpha_disassembler(alpha_disassembler::dasm_type type = TYPE_UNKNOWN)
 		: m_dasm_type(type)
 	{
-	};
+	}
 	virtual ~alpha_disassembler() = default;
 
-	virtual u32 opcode_alignment() const override { return 4; };
+	virtual u32 opcode_alignment() const override { return 4; }
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:

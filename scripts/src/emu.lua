@@ -111,8 +111,6 @@ files {
 	MAME_DIR .. "src/emu/driver.h",
 	MAME_DIR .. "src/emu/drivenum.cpp",
 	MAME_DIR .. "src/emu/drivenum.h",
-	MAME_DIR .. "src/emu/emualloc.cpp",
-	MAME_DIR .. "src/emu/emualloc.h",
 	MAME_DIR .. "src/emu/emucore.cpp",
 	MAME_DIR .. "src/emu/emucore.h",
 	MAME_DIR .. "src/emu/emumem.cpp",
@@ -146,6 +144,8 @@ files {
 	MAME_DIR .. "src/emu/emumem_hep.h",
 	MAME_DIR .. "src/emu/emumem_het.cpp",
 	MAME_DIR .. "src/emu/emumem_het.h",
+	MAME_DIR .. "src/emu/emumem_hws.cpp",
+	MAME_DIR .. "src/emu/emumem_hws.h",
 	MAME_DIR .. "src/emu/emuopts.cpp",
 	MAME_DIR .. "src/emu/emuopts.h",
 	MAME_DIR .. "src/emu/emupal.cpp",
@@ -163,6 +163,7 @@ files {
 	MAME_DIR .. "src/emu/ioport.cpp",
 	MAME_DIR .. "src/emu/ioport.h",
 	MAME_DIR .. "src/emu/inpttype.ipp",
+	MAME_DIR .. "src/emu/inpttype.h",
 	MAME_DIR .. "src/emu/logmacro.h",
 	MAME_DIR .. "src/emu/machine.cpp",
 	MAME_DIR .. "src/emu/machine.h",
@@ -240,6 +241,8 @@ files {
 	MAME_DIR .. "src/emu/debug/dvmemory.h",
 	MAME_DIR .. "src/emu/debug/dvbpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvbpoints.h",
+	MAME_DIR .. "src/emu/debug/dvrpoints.cpp",
+	MAME_DIR .. "src/emu/debug/dvrpoints.h",
 	MAME_DIR .. "src/emu/debug/dvwpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvwpoints.h",
 	MAME_DIR .. "src/emu/debug/dvstate.cpp",
@@ -268,8 +271,7 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 3 files do not include emu.h
-nopch(MAME_DIR .. "src/emu/emualloc.cpp")
+-- 2 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
 
@@ -282,12 +284,13 @@ dependency {
 	-------------------------------------------------
 	-- core layouts
 	--------------------------------------------------
+	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/monitors.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhovu.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhsxs.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhuov.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/triphsxs.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/quadhsxs.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
 }
 
 custombuildtask {
@@ -297,12 +300,13 @@ custombuildtask {
 custombuildtask {
 	{ MAME_DIR .. "src/frontend/mame/ui/uicmd14.png", GEN_DIR .. "emu/ui/uicmd14.fh", { MAME_DIR.. "scripts/build/png2bdc.py",  MAME_DIR .. "scripts/build/file2str.py" }, { "@echo Converting uicmd14.png...", PYTHON .. " $(1) $(<) temp_cmd.bdc", PYTHON .. " $(2) temp_cmd.bdc $(@) font_uicmd14 uint8_t" } },
 
+	layoutbuildtask("emu/layout", "noscreens"),
+	layoutbuildtask("emu/layout", "monitors"),
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),
 	layoutbuildtask("emu/layout", "dualhuov"),
 	layoutbuildtask("emu/layout", "triphsxs"),
 	layoutbuildtask("emu/layout", "quadhsxs"),
-	layoutbuildtask("emu/layout", "noscreens"),
 }
 
 project ("precompile")

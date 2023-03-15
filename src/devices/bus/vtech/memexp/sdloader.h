@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "machine/spi_sdcard.h"
 #include "memexp.h"
 
 
@@ -30,6 +31,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -37,9 +39,13 @@ protected:
 	virtual void io_map(address_map &map) override;
 
 private:
+	required_device<spi_sdcard_device> m_sdcard;
 	required_memory_bank m_dosbank;
 	memory_view m_dosview;
 	memory_bank_creator m_expbank;
+
+	TIMER_CALLBACK_MEMBER(spi_clock);
+	void spi_miso_w(int state);
 
 	void mapper_w(uint8_t data);
 	void sdcfg_w(uint8_t data);
@@ -49,6 +55,14 @@ private:
 
 	uint8_t exp_ram_r(offs_t offset);
 	void exp_ram_w(offs_t offset, uint8_t data);
+
+	emu_timer *m_spi_clock;
+	bool m_spi_clock_state;
+	bool m_spi_clock_sysclk;
+	int m_spi_clock_cycles;
+	int m_in_bit;
+	uint8_t m_in_latch;
+	uint8_t m_out_latch;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	bool m_vz300_mode;

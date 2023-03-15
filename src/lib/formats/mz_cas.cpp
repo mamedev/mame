@@ -3,7 +3,6 @@
 #include "mz_cas.h"
 
 #include <cstring>
-#include <cassert>
 
 #ifndef VERBOSE
 #define VERBOSE 0

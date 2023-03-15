@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_QL_FORMAT;
+extern const ql_format FLOPPY_QL_FORMAT;
 
 #endif // MAME_FORMATS_QL_DSK_H

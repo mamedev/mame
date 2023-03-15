@@ -12,12 +12,10 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "osdepend.h"
-
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -25,9 +23,13 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class osd_interface;
 class osd_options;
 
-// ======================> osd_module
+
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
 
 class osd_module
 {
@@ -39,7 +41,7 @@ public:
 
 	virtual bool probe() { return true; }
 
-	virtual int init(const osd_options &options) = 0;
+	virtual int init(osd_interface &osd, const osd_options &options) = 0;
 	virtual void exit() { }
 
 protected:
@@ -51,8 +53,10 @@ private:
 	std::string const m_type;
 };
 
+
 // a module_type is simply a pointer to its alloc function
 typedef std::unique_ptr<osd_module> (*module_type)();
+
 
 // this template function creates a stub which constructs a module
 template <class ModuleClass>
@@ -60,6 +64,7 @@ std::unique_ptr<osd_module> module_creator()
 {
 	return std::unique_ptr<osd_module>(new ModuleClass);
 }
+
 
 class osd_module_manager
 {
@@ -73,16 +78,14 @@ public:
 	osd_module *get_module_generic(const char *type, const char *name);
 
 	template<class C>
-	C select_module(const char *type, const char *name = "")
+	C &select_module(osd_interface &osd, const osd_options &options, const char *type, const char *name = "")
 	{
-		return dynamic_cast<C>(select_module(type, name));
+		return dynamic_cast<C &>(select_module(osd, options, type, name));
 	}
 
-	osd_module *select_module(const char *type, const char *name = "");
+	osd_module &select_module(osd_interface &osd, const osd_options &options, const char *type, const char *name = "");
 
-	void get_module_names(const char *type, const int max, int &num, const char *names[]) const;
-
-	void init(const osd_options &options);
+	std::vector<std::string_view> get_module_names(const char *type) const;
 
 	void exit();
 
@@ -93,18 +96,20 @@ private:
 	std::vector<std::reference_wrapper<osd_module> > m_selected;
 };
 
+
 #define MODULE_DEFINITION(mod_id, mod_class) \
-	extern const module_type mod_id ;  \
-	const module_type mod_id = &module_creator< mod_class >;
+		extern const module_type mod_id ;  \
+		const module_type mod_id = &module_creator<mod_class>;
 
 
 #define MODULE_NOT_SUPPORTED(mod_class, mod_type, mod_name) \
-	class mod_class : public osd_module { \
-	public: \
-		mod_class () : osd_module(mod_type, mod_name) { } \
-		virtual ~mod_class() { } \
-		virtual int init(const osd_options &options) override { return -1; } \
-		virtual bool probe() override { return false; } \
-	};
+		class mod_class : public osd_module \
+		{ \
+		public: \
+			mod_class () : osd_module(mod_type, mod_name) { } \
+			virtual ~mod_class() { } \
+			virtual int init(osd_interface &osd, const osd_options &options) override { return -1; } \
+			virtual bool probe() override { return false; } \
+		};
 
 #endif  /* MAME_OSD_MODULES_OSDMODULE_H */

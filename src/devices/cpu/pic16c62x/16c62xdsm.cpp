@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tony La Porta
+// copyright-holders:Tony La Porta, Samuele Zannoli
 	/**************************************************************************\
 	*                  Microchip PIC16C62X Emulator                            *
 	*                                                                          *
@@ -92,9 +92,8 @@ pic16c62x_disassembler::pic16c62x_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = PIC16C62xFormats; i = 0;
+	ops = PIC16C62xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -126,9 +125,7 @@ pic16c62x_disassembler::pic16c62x_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
-
 }
 
 offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -202,6 +199,8 @@ offs_t pic16c62x_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if (!strncmp(cp, "btfs", 4) || !strncmp(cp + 2, "cfsz", 4))
+		flags = STEP_COND;
 
 	while (*cp)
 	{

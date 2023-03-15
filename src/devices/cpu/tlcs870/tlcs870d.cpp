@@ -2268,9 +2268,16 @@ offs_t tlcs870_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	util::stream_format         (stream, "%-5s",                op_names[ m_op ] );
 
+	offs_t flags = 0;
 	if (m_param1_type)
 	{
 		disassemble_param(stream, pc, opcodes, params, m_param1_type, m_param1);
+		if ((m_param1_type & MODE_MASK) == CONDITIONAL)
+			flags = STEP_COND;
+		else if (m_op == CALL || m_op == CALLP || m_op == CALLV || m_op == SWI)
+			flags = STEP_OVER;
+		else if (m_op == RET || m_op == RETI || m_op == RETN)
+			flags = STEP_OUT;
 	}
 
 	if (m_param2_type)
@@ -2281,5 +2288,5 @@ offs_t tlcs870_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	}
 
-	return (m_addr - pc) | SUPPORTED;
+	return (m_addr - pc) | flags | SUPPORTED;
 }

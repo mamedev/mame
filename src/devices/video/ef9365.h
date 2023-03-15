@@ -4,7 +4,7 @@
 
     ef9365.h
 
-    Thomson EF9365/EF9366 video controller
+    Thomson EF9365/EF9366/EF9367 video controller
 
 *********************************************************************/
 
@@ -35,6 +35,7 @@ public:
 	static constexpr int DISPLAY_MODE_512x256    = 0x02;
 	static constexpr int DISPLAY_MODE_128x128    = 0x03;
 	static constexpr int DISPLAY_MODE_64x64      = 0x04;
+	static constexpr int DISPLAY_MODE_1024x512   = 0x05;
 
 	// construction/destruction
 	ef9365_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -61,7 +62,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_config_memory_interface overrides
@@ -70,18 +70,20 @@ protected:
 	// address space configurations
 	const address_space_config      m_space_config;
 
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
+
 private:
-	int get_char_pix( unsigned char c, int x, int y );
-	void plot(int x_pos,int y_pos);
-	int draw_character( unsigned char c, int block, int smallblock );
-	int draw_vector(uint16_t start_x,uint16_t start_y,short delta_x,short delta_y);
+	int get_char_pix(uint8_t c, int x, int y);
+	void plot(int x_pos, int y_pos);
+	int draw_character(uint8_t c, bool block, bool smallblock);
+	int draw_vector(uint16_t start_x, uint16_t start_y, int16_t delta_x, int16_t delta_y);
 	uint16_t get_x_reg();
 	uint16_t get_y_reg();
 	void set_x_reg(uint16_t x);
 	void set_y_reg(uint16_t y);
-	void screen_scanning( int force_clear );
+	void screen_scanning(bool force_clear);
 	void set_busy_flag(int period);
-	void set_video_mode(void);
+	void set_video_mode();
 	void draw_border(uint16_t line);
 	void ef9365_exec(uint8_t cmd);
 	int  cycles_to_us(int cycles);
@@ -91,8 +93,6 @@ private:
 	void ef9365(address_map &map);
 
 	// internal state
-	static constexpr device_timer_id BUSY_TIMER = 0;
-
 	required_region_ptr<uint8_t> m_charset;
 	address_space *m_videoram;
 

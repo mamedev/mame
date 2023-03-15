@@ -52,14 +52,13 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bubble"; }
+	virtual const char *image_type_name() const noexcept override { return "bubble"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "mbm"; }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -68,7 +67,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(general_continue);
 
 	int m_data_size;
 
@@ -169,34 +169,37 @@ private:
 	void update_drq();
 
 	void start_command(int cmd);
-	void general_continue(bubble_info &bi);
-	void command_end(bubble_info &bi, bool success);
+	void command_end(bool success);
 
-	void command_fail_start(bubble_info &bi);
-	void command_fail_continue(bubble_info &bi);
+	void command_fail_start();
+	void command_fail_continue();
 
-	void init_start(bubble_info &bi);
-	void init_continue(bubble_info &bi);
+	void init_start();
+	void init_continue();
 
-	void read_fsa_start(bubble_info &bi);
-	void read_fsa_continue(bubble_info &bi);
+	void read_fsa_start();
+	void read_fsa_continue();
 
-	void read_data_start(bubble_info &bi);
-	void read_data_continue(bubble_info &bi);
+	void read_data_start();
+	void read_data_continue();
 
-	void write_data_start(bubble_info &bi);
-	void write_data_continue(bubble_info &bi);
+	void write_data_start();
+	void write_data_continue();
 
 	void fifo_clear();
 	void fifo_push(uint8_t val);
 	uint8_t fifo_pop();
 
-	int main_phase;
-	bool drq, irq;
-	bubble_info bi;
+	int m_main_phase;
+	bool m_drq;
+	bool m_irq;
+	bubble_info m_bi;
 
-	uint8_t buf[32];
-	int blr_count, blr_nfc, ar_addr, ar_mbm;
+	uint8_t m_buf[32];
+	int m_blr_count;
+	int m_blr_nfc;
+	int m_ar_addr;
+	int m_ar_mbm;
 
 	devcb_write_line intrq_cb;
 	devcb_write_line drq_cb;

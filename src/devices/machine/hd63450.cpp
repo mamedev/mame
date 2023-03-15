@@ -50,7 +50,7 @@ void hd63450_device::device_start()
 
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
-		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd63450_device::dma_transfer_timer), this));
+		m_timer[x] = timer_alloc(FUNC(hd63450_device::dma_transfer_timer), this);
 
 	save_item(STRUCT_MEMBER(m_reg, csr));
 	save_item(STRUCT_MEMBER(m_reg, cer));
@@ -520,6 +520,8 @@ void hd63450_device::set_error(int channel, uint8_t code)
 	m_reg[channel].cer = code;
 	m_reg[channel].ccr &= ~0xc0;
 
+	if (((m_reg[channel].dcr & 0xc0) == 0x00) || ((m_reg[channel].ocr & 3) == 1))
+		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); // if the cpu is halted resume it
 	set_irq(channel);
 }
 

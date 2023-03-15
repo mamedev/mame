@@ -295,7 +295,8 @@ z80ctc_channel_device::z80ctc_channel_device(const machine_config &mconfig, cons
 		m_down(0),
 		m_extclk(0),
 		m_timer(nullptr),
-		m_int_state(0)
+		m_int_state(0),
+		m_zc_to_timer(nullptr)
 {
 }
 
@@ -307,7 +308,8 @@ z80ctc_channel_device::z80ctc_channel_device(const machine_config &mconfig, cons
 void z80ctc_channel_device::device_start()
 {
 	// initialize state
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ctc_channel_device::timer_callback), this));
+	m_timer = timer_alloc(FUNC(z80ctc_channel_device::timer_callback), this);
+	m_zc_to_timer = timer_alloc(FUNC(z80ctc_channel_device::zc_to_callback), this);
 
 	// register for save states
 	save_item(NAME(m_mode));
@@ -495,7 +497,7 @@ void z80ctc_channel_device::trigger(bool state)
 			{
 				// if we hit zero, do the same thing as for a timer interrupt
 				if (--m_down == 0)
-					timer_callback(nullptr,0);
+					timer_callback(0);
 			}
 		}
 	}
@@ -529,10 +531,15 @@ TIMER_CALLBACK_MEMBER(z80ctc_channel_device::timer_callback)
 		m_device->interrupt_check();
 	}
 
-	// generate the clock pulse (FIXME: pulse width is based on bus clock)
+	// generate the clock pulse
 	m_device->m_zc_cb[m_index](1);
-	m_device->m_zc_cb[m_index](0);
+	m_zc_to_timer->adjust(m_device->clocks_to_attotime(1));
 
 	// reset the down counter
 	m_down = m_tconst;
+}
+
+TIMER_CALLBACK_MEMBER(z80ctc_channel_device::zc_to_callback)
+{
+	m_device->m_zc_cb[m_index](0);
 }

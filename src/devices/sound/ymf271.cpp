@@ -12,13 +12,13 @@
     - EN and EXT Out bits
     - Src B and Src NOTE bits
     - statusreg Busy flag
-    - timer register 0x11
     - PFM (FM using external PCM waveform)
     - detune (should be same as on other Yamaha chips)
     - Acc On bit (some sound effects in viprp1?). The documentation says
       "determines if slot output is accumulated(1), or output directly(0)"
-    - Is memory handling 100% correct? At the moment, seibuspi.c is the only
+    - Is memory handling 100% correct? At the moment, seibuspi.cpp is the only
       hardware currently emulated that uses external handlers.
+    - *16 multiplier for timer B is free-running like other yamaha FM chips?
 */
 
 #include "emu.h"
@@ -253,11 +253,11 @@ inline void ymf271_device::calculate_status_end(int slotnum, bool state)
 	if(slotnum & 3)
 		return;
 
-   /*
-    bit scheme is kinda twisted
-    status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
-    status2 End44 End32 End20 End8  End40 End28 End16 End4
-    */
+	/*
+	bit scheme is kinda twisted
+	status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
+	status2 End44 End32 End20 End8  End40 End28 End16 End4
+	*/
 	uint8_t subbit = slotnum / 12;
 	uint8_t bankbit = ((slotnum % 12) >> 2);
 
@@ -1309,46 +1309,38 @@ void ymf271_device::ymf271_write_pcm(uint8_t address, uint8_t data)
 	}
 }
 
-void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(ymf271_device::timer_a_expired)
 {
-	switch(id)
+	m_status |= 1;
+
+	// assert IRQ
+	if (m_enable & 4)
 	{
-		case 0:
-			m_status |= 1;
+		m_irqstate |= 1;
 
-			// assert IRQ
-			if (m_enable & 4)
-			{
-				m_irqstate |= 1;
-
-				if (!m_irq_handler.isnull())
-					m_irq_handler(1);
-			}
-
-			// reload timer
-			m_timA->adjust(clocks_to_attotime(384 * 4 * (256 - m_timerA)), 0);
-			break;
-
-		case 1:
-			m_status |= 2;
-
-			// assert IRQ
-			if (m_enable & 8)
-			{
-				m_irqstate |= 2;
-
-				if (!m_irq_handler.isnull())
-					m_irq_handler(1);
-			}
-
-			// reload timer
-			m_timB->adjust(clocks_to_attotime(384 * 16 * (256 - m_timerB)), 0);
-			break;
-
-		default:
-			throw emu_fatalerror("Unknown id in ymf271_device::device_timer");
-			break;
+		if (!m_irq_handler.isnull())
+			m_irq_handler(1);
 	}
+
+	// reload timer
+	m_timA->adjust(clocks_to_attotime(384 * (1024 - m_timerA)), 0);
+}
+
+TIMER_CALLBACK_MEMBER(ymf271_device::timer_b_expired)
+{
+	m_status |= 2;
+
+	// assert IRQ
+	if (m_enable & 8)
+	{
+		m_irqstate |= 2;
+
+		if (!m_irq_handler.isnull())
+			m_irq_handler(1);
+	}
+
+	// reload timer
+	m_timB->adjust(clocks_to_attotime(384 * 16 * (256 - m_timerB)), 0);
 }
 
 void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
@@ -1371,14 +1363,13 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 		switch (address)
 		{
 			case 0x10:
-				m_timerA = data;
+				m_timerA = (m_timerA & 0x003) | (data << 2); // High 8 bit of Timer A period
 				break;
 
 			case 0x11:
-				// According to Yamaha's documentation, this sets timer A upper 2 bits
-				// (it says timer A is 10 bits). But, PCB audio recordings proves
-				// otherwise: it doesn't affect timer A frequency. (see ms32.c tetrisp)
-				// Does this register have another function regarding timer A/B?
+				// Timer A is 10 bit, split high 8 bit and low 2 bit like other Yamaha FM chips
+				// unlike Yamaha's documentation; it says 0x11 writes timer A upper 2 bits.
+				m_timerA = (m_timerA & 0x3fc) | (data & 0x03); // Low 2 bit of Timer A period
 				break;
 
 			case 0x12:
@@ -1389,7 +1380,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 				// timer A load
 				if (~m_enable & data & 1)
 				{
-					attotime period = clocks_to_attotime(384 * 4 * (256 - m_timerA));
+					attotime period = clocks_to_attotime(384 * (1024 - m_timerA));
 					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
 
@@ -1733,8 +1724,8 @@ void ymf271_device::init_state()
 
 void ymf271_device::device_start()
 {
-	m_timA = timer_alloc(0);
-	m_timB = timer_alloc(1);
+	m_timA = timer_alloc(FUNC(ymf271_device::timer_a_expired), this);
+	m_timB = timer_alloc(FUNC(ymf271_device::timer_b_expired), this);
 
 	m_irq_handler.resolve();
 
@@ -1790,7 +1781,7 @@ void ymf271_device::device_clock_changed()
 	calculate_clock_correction();
 }
 
-void ymf271_device::rom_bank_updated()
+void ymf271_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

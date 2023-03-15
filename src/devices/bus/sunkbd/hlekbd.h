@@ -6,6 +6,7 @@
 #pragma once
 
 #include "sunkbd.h"
+
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 #include "diserial.h"
@@ -37,7 +38,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_buffered_serial_interface overrides
 	virtual void tra_callback() override;
@@ -49,6 +49,8 @@ protected:
 
 	// customised transmit_byte method
 	void transmit_byte(uint8_t byte);
+
+	TIMER_CALLBACK_MEMBER(click_off);
 
 	required_ioport m_dips;
 
@@ -102,111 +104,14 @@ private:
 	uint8_t   m_beeper_state;
 };
 
-
-class hle_type4_device_base : public hle_device_base
-{
-protected:
-	using hle_device_base::hle_device_base;
-
-private:
-	virtual uint8_t ident_byte() override;
-};
-
-
-class hle_type3_device : public hle_device_base
-{
-public:
-	hle_type3_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-
-private:
-	virtual uint8_t ident_byte() override;
-};
-
-
-class hle_type4_device : public hle_type4_device_base
-{
-public:
-	hle_type4_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
-
-class hle_type5_device : public hle_type4_device_base
-{
-public:
-	hle_type5_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
-
-class hle_type5_gb_device : public hle_type4_device_base
-{
-public:
-	hle_type5_gb_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
-
-class hle_type5_se_device : public hle_type4_device_base
-{
-public:
-	hle_type5_se_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
-
-class hle_type5_jp_device : public hle_type4_device_base
-{
-public:
-	hle_type5_jp_device(
-			machine_config const &mconfig,
-			char const *tag,
-			device_t *owner,
-			uint32_t clock);
-
-protected:
-	virtual ioport_constructor device_input_ports() const override;
-};
-
 } // namespace bus::sunkbd
 
 
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_type3_device)
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_type4_device)
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_type5_device)
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_type5_gb_device)
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_type5_se_device)
-DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_device)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_device_base)
 
 #endif // MAME_DEVICES_SUNKBD_HLEKBD_H

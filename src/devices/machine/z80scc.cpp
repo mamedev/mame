@@ -136,14 +136,8 @@ baud rate:
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-/* LOCAL _BRG is set in z80scc.h, local timer based BRG is not complete and will be removed if not needed for synchrounous mode */
-#if Z80SCC_USE_LOCAL_BRG
-#define START_BIT_HUNT 1
-#define START_BIT_ADJUST 1
-#else
 #define START_BIT_HUNT 0
 #define START_BIT_ADJUST 0
-#endif
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
@@ -422,6 +416,7 @@ inline void z80scc_channel::out_dtr_cb(int state)
 z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_z80daisy_interface(mconfig, *this),
+	m_wr9(0),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG),
 	m_rxca(0),
@@ -1019,11 +1014,9 @@ void z80scc_device::ab_dc_w(offs_t offset, uint8_t data)
 z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80SCC_CHANNEL, tag, owner, clock),
 		device_serial_interface(mconfig, *this),
-#if Z80SCC_USE_LOCAL_BRG
+		m_baudtimer(0),
 		m_brg_counter(0),
-#else
 		m_brg_rate(0),
-#endif
 		m_delayed_tx_brg_change(0),
 		m_rx_error(0),
 		m_rx_clock(0),
@@ -1077,10 +1070,10 @@ void z80scc_channel::device_start()
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
 	m_tx_fifo_wp = m_tx_fifo_rp = 0;
 
-#if Z80SCC_USE_LOCAL_BRG
-	// baudrate clocks and timers
-	baudtimer = timer_alloc(TIMER_ID_BAUD);
-#endif
+	m_rxc   = 0x00;
+	m_txc   = 0x00;
+
+	m_baudtimer = timer_alloc(FUNC(z80scc_channel::brg_tick), this);
 
 	// state saving
 	save_item(NAME(m_rr0));
@@ -1137,6 +1130,12 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_tx_int_disarm));
 	save_item(NAME(m_sync_pattern));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rcv_mode));
+	save_item(NAME(m_index));
+	save_item(NAME(m_brg_rate));
+	save_item(NAME(m_delayed_tx_brg_change));
+	save_item(NAME(m_brg_counter));
 }
 
 
@@ -1183,39 +1182,14 @@ void z80scc_channel::device_reset()
 		m_uart->reset_interrupts();
 	}
 	m_extint_states = m_rr0;
+	m_baudtimer->adjust(attotime::never);
+	m_brg_counter = 0;
 }
 
-void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(z80scc_channel::brg_tick)
 {
-//  LOG("%s %d\n", FUNCNAME, id);
-
-#if Z80SCC_USE_LOCAL_BRG
-	switch(id)
-	{
-	case TIMER_ID_BAUD:
-		{
-			//int brconst = m_wr13 << 8 | m_wr12 | 1; // If the counter is 1 the effect is passthrough ehh?! To avoid div0...
-			if (m_wr14 & WR14_BRG_ENABLE)
-			{
-				//  int rate = owner()->clock() / brconst;
-				//  attotime attorate = attotime::from_hz(rate);
-				//  timer.adjust(attorate, id, attorate);
-				txc_w(m_brg_counter & 1);
-				rxc_w(m_brg_counter & 1);
-				m_brg_counter++; // Will just keep track of state in timer mode, not hardware counter value.
-			}
-			else
-			{
-				LOG(" - turning off Baudrate timer\n");
-				timer.adjust(attotime::never, 0, attotime::never);
-			}
-		}
-		break;
-	default:
-		logerror("Spurious timer %d event\n", id);
-		break;
-	}
-#endif
+	// wr15 & WR15_ZEROCOUNT is implied by this timer being running at all
+	m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 }
 
 
@@ -1287,7 +1261,7 @@ void z80scc_channel::tra_complete()
 				set_rts(1);
 		}
 
-		check_waitrequest();
+		check_dma_request();
 
 		if (m_wr1 & WR1_TX_INT_ENABLE && m_tx_int_disarm == 0)
 		{
@@ -1407,8 +1381,12 @@ void z80scc_channel::update_rts()
 					set_rts(!m_rts);
 		}
 
-		// data terminal ready output follows the state programmed into the DTR bit*/
-		set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
+		// data terminal ready output follows the state programmed into the DTR bit
+		// unless configured to use the DTR pin as the transmit REQ pin for DMA
+		if (!(m_wr14 & WR14_DTR_REQ_FUNC))
+		{
+			set_dtr((m_wr5 & WR5_DTR) ? 0 : 1);
+		}
 }
 
 //-------------------------------------------------
@@ -1615,14 +1593,6 @@ uint8_t z80scc_channel::do_sccreg_rr7()
 	}
 	return m_rr3;
 }
-
-#if 0 // Short cutted in control_read()
-/* RR8 is the Receive Data register. */
-uint8_t z80scc_channel::do_sccreg_rr8()
-{
-	return data_read():
-}
-#endif
 
 /* (ESCC and 85C30 Only)
  On the ESCC, Read Register 9 reflects the contents of Write Register 3 provided the Extended
@@ -1928,7 +1898,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	LOG("- Wait/DMA Request Function %s\n", (data & WR1_WREQ_FUNCTION) ? "Request" : "Wait");
 	LOG("- Wait/DMA Request on %s\n", (data & WR1_WREQ_ON_RX_TX) ? "Receive" : "Transmit");
 
-	check_waitrequest();
+	check_dma_request();
 
 	switch (data & WR1_RX_INT_MODE_MASK)
 	{
@@ -1948,7 +1918,7 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		LOG("- Receiver Interrupt on Special Conditions only\n");
 		break;
 	}
-	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
 	m_uart->check_interrupts();
 }
@@ -2032,7 +2002,7 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 		safe_transmit_register_reset();
 		update_rts(); // Will also update DTR accordingly
 
-		check_waitrequest();
+		check_dma_request();
 	}
 }
 
@@ -2223,6 +2193,8 @@ void z80scc_channel::do_sccreg_wr13(uint8_t data)
  WR14 contains some miscellaneous control bits */
 void z80scc_channel::do_sccreg_wr14(uint8_t data)
 {
+	bool brg_change = false;
+
 	switch (data & WR14_DPLL_CMD_MASK)
 	{
 	case WR14_CMD_NULL:
@@ -2283,23 +2255,13 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	/* Based on baudrate code from 8530scc.cpp */
 	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator being enabled?
 	{
+		brg_change = true;
 		LOG("%s: Misc Control Bits Baudrate generator enabled with %s source\n", FUNCNAME, (data & WR14_BRG_SOURCE) ? "PCLK" : "external clock");
-		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
-		{
-#if Z80SCC_USE_LOCAL_BRG
-			baudtimer->adjust(attotime::from_hz(rate), TIMER_ID_BAUD, attotime::from_hz(rate)); // Start the baudrate generator
-#if START_BIT_HUNT
-			m_rcv_mode = RCV_SEEKING;
-#endif
-#endif
-		}
 	}
 	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
-#if Z80SCC_USE_LOCAL_BRG
-		baudtimer->adjust(attotime::never, TIMER_ID_BAUD, attotime::never); // Stop the baudrate generator
+		m_baudtimer->adjust(attotime::never); // Stop the baudrate generator
 		m_brg_counter = 0;
-#endif
 	}
 
 	if (!(m_wr14 & WR14_LOCAL_LOOPBACK) && (data & WR14_LOCAL_LOOPBACK))
@@ -2308,6 +2270,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	// TODO: Add info on the other bits of this register
 	m_wr14 = data;
 	update_serial();
+	if (brg_change) update_baudtimer();
 }
 
 /* WR15 is the External/Status Source Control register. If the External/Status interrupts are enabled
@@ -2328,7 +2291,13 @@ void z80scc_channel::do_sccreg_wr15(uint8_t data)
 	LOG("CTS ints           : %s\n", data & WR15_CTS         ? WR15EN : "disabled");
 	LOG("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled");
 	LOG("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled");
+
+	const uint8_t old_reg = m_wr15;
 	m_wr15 = data;
+	if ((old_reg & WR15_ZEROCOUNT) != (m_wr15 & WR15_ZEROCOUNT))
+	{
+		update_baudtimer();
+	}
 }
 
 void z80scc_channel::scc_register_write(uint8_t reg, uint8_t data)
@@ -2453,6 +2422,8 @@ uint8_t z80scc_channel::data_read()
 				m_uart->check_interrupts();
 			}
 		}
+
+		check_dma_request();
 	}
 	else
 	{
@@ -2551,7 +2522,7 @@ void z80scc_channel::data_write(uint8_t data)
 		}
 	}
 
-	check_waitrequest();
+	check_dma_request();
 
 	/* Transmitter enabled?  */
 	if (m_wr5 & WR5_TX_ENABLE)
@@ -2630,6 +2601,7 @@ void z80scc_channel::receive_data(uint8_t data)
 	}
 
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
+	check_dma_request();
 
 	// receive interrupt on FIRST and ALL character
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
@@ -2769,34 +2741,7 @@ void z80scc_channel::sync_w(int state)
 //-------------------------------------------------
 void z80scc_channel::rxc_w(int state)
 {
-/* Support for external clock as source for BRG yet to be finished */
-#if 0
-	//LOG("Receiver Clock Pulse\n");
-	if ( ((m_wr3 & WR3_RX_ENABLE) | (m_wr5 & WR5_TX_ENABLE)) && m_wr14 & WR14_BRG_ENABLE)
-	{
-		if (!(m_wr14 & WR14_BRG_SOURCE)) // Is the Baud rate Generator driven by RTxC?
-		{
-			printf("x");
-			if (!m_brg_counter) // Zero crossing?!
-			{
-				printf(".");
-				m_brg_counter =  m_wr13 << 8 | m_wr12; // Reload BRG counter
-				if ((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_BR) // Is transmitt clock driven by BRG?
-				{
-					printf("+");
-					txc_w(state);
-				}
-			}
-			else
-			{
-				m_brg_counter--;
-				if ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_BR) // Is receive clock driven by BRG and not zero cross
-					return;
-			}
-		}
-	}
-#endif
-
+	/* Support for external clock as source for BRG has not been added */
 	if (m_wr3 & WR3_RX_ENABLE)
 	{
 		int clocks = get_clock_mode();
@@ -2881,6 +2826,39 @@ unsigned int z80scc_channel::get_brg_rate()
 	}
 
 	return (rate / (2 * get_clock_mode()));
+}
+
+void z80scc_channel::update_baudtimer()
+{
+	unsigned int rate;
+	unsigned int brg_const;
+
+	if (m_wr14 & WR14_BRG_ENABLE)
+	{
+		brg_const = 2 + (m_wr13 << 8 | m_wr12);
+		if (m_wr14 & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
+		{
+			rate = owner()->clock() / (brg_const == 0 ? 1 : brg_const);
+		}
+		else // Else we use the RTxC as BRG source
+		{
+			unsigned int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
+			rate = source / (brg_const == 0 ? 1 : brg_const);
+		}
+
+		if (m_wr15 & WR15_ZEROCOUNT)
+		{
+			m_baudtimer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+		}
+		else
+		{
+			m_baudtimer->adjust(attotime::never);
+		}
+	}
+	else
+	{
+		m_baudtimer->adjust(attotime::never);
+	}
 }
 
 //-------------------------------------------------
@@ -2990,28 +2968,36 @@ void z80scc_channel::write_rx(int state)
 }
 
 /*
- * This is a partial implementation of the "wait/dma request" functionality of the SCC controlled by
+ * This is a partial implementation of the "wait/dma request" and "dtr request" DMA functionality of the SCC controlled by
  * bits D7, D6 and D5 in WR1. This implementation is sufficient to support DMA request on transmit
- * used by the InterPro driver.
+ * used by the InterPro driver and DMA request on receive by the NWS-5000X driver.
  *
  * TODO:
  *  - wait function (D6=0)
  *  - wait/request function on receive (D5=1)
+ *  - Synchronous mode timing differences
+ *  - Configuration of WREQ and DTR/REQ timing (see datasheet)
+ *  - Interaction with locked fifo on error condition
  */
-void z80scc_channel::check_waitrequest()
+void z80scc_channel::check_dma_request()
 {
-	// don't do anything if wait/request function is not enabled
-	if ((m_wr1 & WR1_WREQ_ENABLE) == 0)
-		return;
-
-	// wait/request function for receive not implemented
-	if (m_wr1 & WR1_WREQ_ON_RX_TX)
-		return;
-
-	// if dma request function is enabled
-	if (m_wr1 & WR1_WREQ_FUNCTION)
+	if (m_wr14 & WR14_DTR_REQ_FUNC)
 	{
-		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
-		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		// assert /DTR//REQ if transmit buffer is empty
+		set_dtr((m_rr0 & RR0_TX_BUFFER_EMPTY) ? 0 : 1);
+	}
+
+	if ((m_wr1 & WR1_WREQ_ENABLE) && (m_wr1 & WR1_WREQ_FUNCTION))
+	{
+		if (m_wr1 & WR1_WREQ_ON_RX_TX)
+		{
+			// assert /W//REQ if receive buffer has a character avaliable
+			m_uart->m_out_wreq_cb[m_index]((m_rr0 & RR0_RX_CHAR_AVAILABLE) ? 0 : 1);
+		}
+		else
+		{
+			// assert /W//REQ if transmit buffer is empty and transmitter is enabled
+			m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
+		}
 	}
 }

@@ -1,0 +1,268 @@
+// license:BSD-3-Clause
+// copyright-holders:Phil Stroffolino, Aaron Giles, Alex W. Jackson
+/**************************************************************************************************************/
+/*
+    Land Line Buffer
+    Land Generator
+        0xf,0x7,0xe,0x6,0xd,0x5,0xc,0x4,
+        0xb,0x3,0xa,0x2,0x9,0x1,0x8,0x0
+
+*/
+
+/* Preliminary!  The road circuitry is identical for all the driving games.
+ *
+ * There are several chunks of RAM
+ *
+ *  Road Tilemap:
+ *      0x00000..0x0ffff    64x512 tilemap
+ *
+ *  Road Tiles:
+ *      0x10000..0x1f9ff    16x16x2bpp tiles
+ *
+ *
+ *  Line Attributes:
+ *
+ *      0x1fa00..0x1fbdf    xxx- ---- ---- ----     priority
+ *                          ---- xxxx xxxx xxxx     xscroll
+ *
+ *      0x1fbfe             horizontal adjust? (Thunder Ceptor suggests maybe not although isn't on Namco System 2)
+ *                          0x0017 (Suzuka 8 Hours / Four Trax / Lucky & Wild)
+ *                          0x0018 (Final Lap / Thunder Ceptor)
+ *
+ *      0x1fc00..0x1fddf    selects line in source bitmap
+ *      0x1fdfe             yscroll
+ *
+ *      0x1fe00..0x1ffdf    ---- --xx xxxx xxxx     zoomx
+ *      0x1fffd             always 0xffff 0xffff?
+ */
+
+#include "emu.h"
+#include "namco_c45road.h"
+
+
+//****************************************************************************
+//  CONSTANTS
+//****************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(NAMCO_C45_ROAD, namco_c45_road_device, "namco_c45_road", "Namco C45 Road")
+
+
+const gfx_layout namco_c45_road_device::tilelayout =
+{
+	ROAD_TILE_SIZE, ROAD_TILE_SIZE,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 8 },
+	{ STEP8(0, 1), STEP8(16, 1) },
+	{ STEP16(0, 32) },
+	0x200 // offset to next tile
+};
+
+
+GFXDECODE_MEMBER( namco_c45_road_device::gfxinfo )
+	GFXDECODE_DEVICE_RAM( "tileram", 0, tilelayout, 0xf00, 64 )
+GFXDECODE_END
+
+
+void namco_c45_road_device::map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().w(FUNC(namco_c45_road_device::tilemap_w)).share("tmapram");
+	map(0x10000, 0x1f9ff).ram().w(FUNC(namco_c45_road_device::tileram_w)).share("tileram");
+	map(0x1fa00, 0x1ffff).ram().share("lineram");
+}
+
+
+//-------------------------------------------------
+//  namco_c45_road_device -- constructor
+//-------------------------------------------------
+
+namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NAMCO_C45_ROAD, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_memory_interface(mconfig, *this),
+	m_space_config("c45", ENDIANNESS_BIG, 16, 17, 0, address_map_constructor(FUNC(namco_c45_road_device::map), this)),
+	m_tmapram(*this, "tmapram"),
+	m_tileram(*this, "tileram"),
+	m_lineram(*this, "lineram"),
+	m_clut(*this, "clut"),
+	m_transparent_color(~0),
+	m_xoffset(0)
+{
+}
+
+
+
+// We need these trampolines for now because uplift_submaps()
+// can't deal with address maps that contain RAM.
+// We need to explicitly use device_memory_interface::space()
+// because read/write handlers have a parameter called 'space'
+
+//-------------------------------------------------
+//  read -- CPU read from our address space
+//-------------------------------------------------
+
+uint16_t namco_c45_road_device::read(offs_t offset)
+{
+	return device_memory_interface::space().read_word(offset*2);
+}
+
+
+//-------------------------------------------------
+//  write -- CPU write to our address space
+//-------------------------------------------------
+
+void namco_c45_road_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	device_memory_interface::space().write_word(offset*2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  tilemap_w -- write to tilemap RAM
+//-------------------------------------------------
+
+void namco_c45_road_device::tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_tmapram[offset]);
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+
+//-------------------------------------------------
+//  tileram_w -- write to tile RAM
+//-------------------------------------------------
+
+void namco_c45_road_device::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_tileram[offset]);
+	gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);
+}
+
+
+//-------------------------------------------------
+//  draw -- render to the target bitmap
+//-------------------------------------------------
+
+void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+{
+	bitmap_ind16 &source_bitmap = m_tilemap->pixmap();
+	unsigned yscroll = m_lineram[0x3fe/2];
+
+	// loop over scanlines
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		// skip if we are not the right priority
+		int screenx = m_lineram[y + 15];
+		if (pri != ((screenx & 0xf000) >> 12))
+			continue;
+
+		// skip if we don't have a valid zoom factor
+		unsigned zoomx = m_lineram[0x400/2 + y + 15] & 0x3ff;
+		if (zoomx == 0)
+			continue;
+
+		// skip if we don't have a valid source increment
+		unsigned sourcey = m_lineram[0x200/2 + y + 15] + yscroll;
+		const uint16_t *source_gfx = &source_bitmap.pix(sourcey & (ROAD_TILEMAP_HEIGHT - 1));
+		unsigned dsourcex = (ROAD_TILEMAP_WIDTH << 16) / zoomx;
+		if (dsourcex == 0)
+			continue;
+
+		// mask off priority bits and sign-extend
+		screenx &= 0x0fff;
+		if (screenx & 0x0800)
+			screenx |= ~0x7ff;
+
+		// adjust the horizontal placement
+		screenx += m_xoffset; // needs adjustment to left
+
+		int numpixels = (44 * ROAD_TILE_SIZE << 16) / dsourcex;
+		unsigned sourcex = 0;
+
+		// crop left
+		int clip_pixels = cliprect.min_x - screenx;
+		if (clip_pixels > 0)
+		{
+			numpixels -= clip_pixels;
+			sourcex += dsourcex*clip_pixels;
+			screenx = cliprect.min_x;
+		}
+
+		// crop right
+		clip_pixels = (screenx + numpixels) - (cliprect.max_x + 1);
+		if (clip_pixels > 0)
+			numpixels -= clip_pixels;
+
+		// TBA: work out palette mapping for Final Lap, Suzuka
+
+		// BUT: support transparent color for Thunder Ceptor
+		uint16_t *dest = &bitmap.pix(y);
+		if (m_transparent_color != ~0)
+		{
+			while (numpixels-- > 0)
+			{
+				int pen = source_gfx[sourcex >> 16];
+				if (palette().pen_indirect(pen) != m_transparent_color)
+				{
+					if (m_clut != nullptr)
+						pen = (pen & ~0xff) | m_clut[pen & 0xff];
+					dest[screenx] = pen;
+				}
+				screenx++;
+				sourcex += dsourcex;
+			}
+		}
+		else
+		{
+			while (numpixels-- > 0)
+			{
+				int pen = source_gfx[sourcex >> 16];
+				if (m_clut != nullptr)
+					pen = (pen & ~0xff) | m_clut[pen & 0xff];
+				dest[screenx++] = pen;
+				sourcex += dsourcex;
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start -- device startup
+//-------------------------------------------------
+
+void namco_c45_road_device::device_start()
+{
+	// create a tilemap for the road
+	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namco_c45_road_device::get_road_info)),
+			TILEMAP_SCAN_ROWS, ROAD_TILE_SIZE, ROAD_TILE_SIZE, ROAD_COLS, ROAD_ROWS);
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector namco_c45_road_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+
+//-------------------------------------------------
+//  get_road_info -- tilemap callback
+//-------------------------------------------------
+
+TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
+{
+	// ------xx xxxxxxxx tile number
+	// xxxxxx-- -------- palette select
+	uint16_t data = m_tmapram[tile_index];
+	int tile = data & 0x3ff;
+	int color = data >> 10;
+	tileinfo.set(0, tile, color, 0);
+}

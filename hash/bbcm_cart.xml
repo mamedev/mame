@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Acorn BBC Master ROM Cartridges
 
@@ -116,6 +116,30 @@ Acorn BBC Master ROM Cartridges
 			</dataarea>
 			<dataarea name="uprom" size="16384">
 				<rom name="Lisp_2.rom" size="16384" crc="2eb56fc0" sha1="bdf09e553578d27a0cc202d409484dd8c2c3c085" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastersd">
+		<description>Master SD</description>
+		<year>2020</year>
+		<publisher>Ramtop</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mastersd" />
+			<dataarea name="rom" size="16384">
+				<rom name="swmmfs-1.44.rom" size="16384" crc="a2891718" sha1="5dbd871f9f0c77016869d051657d2403b432addb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mastersdr2" cloneof="mastersd">
+		<description>Master SD R2</description>
+		<year>2020</year>
+		<publisher>Ramtop</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mastersdr2" />
+			<dataarea name="rom" size="16384">
+				<rom name="swmmfs-1.44r2.rom" size="16384" crc="36bc3af1" sha1="6086e31b3dd46595403a03e3027a5acd4d74d60b"/>
 			</dataarea>
 		</part>
 	</software>

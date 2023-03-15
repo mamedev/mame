@@ -7,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "ssem.h"
 #include "ssemdasm.h"
 

@@ -51,7 +51,7 @@ protected:
 	void set_latch_written(bool latch_written);
 
 private:
-	void init_callback(void *ptr, s32 param);
+	void init_callback(s32 param);
 
 	bool                    m_separate_acknowledge;
 	bool                    m_latch_written;
@@ -78,7 +78,7 @@ public:
 protected:
 	virtual void device_start() override;
 
-	void sync_callback(void *ptr, s32 param);
+	void sync_callback(s32 param);
 
 private:
 	u8 m_latched_value;
@@ -104,7 +104,7 @@ public:
 protected:
 	virtual void device_start() override;
 
-	void sync_callback(void *ptr, s32 param);
+	void sync_callback(s32 param);
 
 private:
 	u16 m_latched_value;

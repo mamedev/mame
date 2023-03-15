@@ -73,8 +73,6 @@ enum cop400_cko_bond {
 class cop400_cpu_device : public cpu_device
 {
 public:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	// L pins: 8-bit bi-directional
 	auto read_l() { return m_read_l.bind(); }
 	auto write_l() { return m_write_l.bind(); }
@@ -113,8 +111,14 @@ public:
 	void set_cko(cop400_cko_bond cko) { m_cko = cko; }
 	void set_microbus(bool has_microbus) { m_has_microbus = has_microbus; }
 
-	uint8_t microbus_rd();
-	void microbus_wr(uint8_t data);
+	// output pin state accessors
+	int so_r() { return m_so_output; }
+	int sk_r() { return m_sk_output; }
+	uint8_t l_r() { return m_l_output; }
+
+	// microbus
+	uint8_t microbus_r();
+	void microbus_w(uint8_t data);
 
 	void data_128b(address_map &map);
 	void data_32b(address_map &map);
@@ -147,6 +151,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	TIMER_CALLBACK_MEMBER(advance_counter);
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -214,6 +220,9 @@ protected:
 	uint8_t m_il;              // IN latch
 	uint8_t m_in[4];           // IN port shift register
 	uint8_t m_si;              // serial input
+	int m_so_output;           // SO pin output state
+	int m_sk_output;           // SK pin output state
+	uint8_t m_l_output;        // L pins output state
 
 	// skipping logic
 	bool m_skip;               // skip next instruction

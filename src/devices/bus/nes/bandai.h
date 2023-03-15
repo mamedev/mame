@@ -45,19 +45,18 @@ public:
 	// construction/destruction
 	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void fcg_write(offs_t offset, uint8_t data);
 	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
-	static constexpr device_timer_id TIMER_IRQ = 0;
-
 	nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 	uint16_t   m_irq_count;
 	int        m_irq_enable;
@@ -74,7 +73,6 @@ public:
 	// construction/destruction
 	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
 	virtual void write_h(offs_t offset, uint8_t data) override { fcg_write(offset, data); }
 
 protected:

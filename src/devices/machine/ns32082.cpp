@@ -44,6 +44,9 @@ enum reg_mask : unsigned
 {
 	BPR0 = 0x0, // breakpoint register 0
 	BPR1 = 0x1, // breakpoint register 1
+	PF0  = 0x4, // program flow register 0 (removed at rev L)
+	PF1  = 0x5, // program flow register 1 (removed at rev L)
+	SC   = 0x8, // sequential count register (removed at rev L)
 	MSR  = 0xa, // memory management status register
 	BCNT = 0xb, // breakpoint counter register
 	PTB0 = 0xc, // page table base register 0
@@ -69,9 +72,12 @@ enum msr_mask : u32
 	MSR_BEN = 0x00100000, // breakpoint enable
 	MSR_UB  = 0x00200000, // user-only breakpointing
 	MSR_AI  = 0x00400000, // abort/interrupt
+	MSR_FT  = 0x00800000, // flow trace (removed at rev L)
+	MSR_UT  = 0x01000000, // user trace (removed at rev L)
+	MSR_NT  = 0x02000000, // nonsequential trace (removed at rev L)
 
 	MSR_ERC = 0x00000007,
-	MSR_WM  = 0x007f0000,
+	MSR_WM  = 0x03ff0000,
 };
 
 enum msr_tet_mask : u32
@@ -141,8 +147,11 @@ enum st_mask : unsigned
 
 ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NS32082, tag, owner, clock)
+	, ns32000_slow_slave_interface(mconfig, *this)
 	, ns32000_mmu_interface(mconfig, *this)
 	, m_bpr{}
+	, m_pf{}
+	, m_sc(0)
 	, m_msr(0)
 	, m_bcnt(0)
 	, m_ptb{}
@@ -153,6 +162,8 @@ ns32082_device::ns32082_device(machine_config const &mconfig, char const *tag, d
 void ns32082_device::device_start()
 {
 	save_item(NAME(m_bpr));
+	save_item(NAME(m_pf));
+	save_item(NAME(m_sc));
 	save_item(NAME(m_msr));
 	save_item(NAME(m_bcnt));
 	save_item(NAME(m_ptb));
@@ -267,8 +278,10 @@ void ns32082_device::write_op(u16 data)
 			switch ((m_opword >> 2) & 15)
 			{
 			case 0: // rdval
+				m_op[0].expected = size + 1;
 				break;
 			case 1: // wrval
+				m_op[0].expected = size + 1;
 				break;
 			case 2: // lmr
 				m_op[0].expected = size + 1;
@@ -331,6 +344,9 @@ void ns32082_device::execute()
 				{
 				case BPR0: m_bpr[0] = m_op[0].value & u32(0xfcffffff); break;
 				case BPR1: m_bpr[1] = m_op[0].value & u32(0xf8ffffff); break;
+				case PF0: m_pf[0] = m_op[0].value & u32(0x00ffffff); break;
+				case PF1: m_pf[1] = m_op[0].value & u32(0x00ffffff); break;
+				case SC: m_sc = m_op[0].value; break;
 				case MSR: set_msr(m_op[0].value); break;
 				case BCNT: m_bcnt = m_op[0].value & u32(0x00ffffff); break;
 				case PTB0: m_ptb[0] = m_op[0].value & u32(0xfffffc00); break;
@@ -347,6 +363,9 @@ void ns32082_device::execute()
 				{
 				case BPR0: m_op[2].value = m_bpr[0]; break;
 				case BPR1: m_op[2].value = m_bpr[1]; break;
+				case PF0: m_op[2].value = m_pf[0]; break;
+				case PF1: m_op[2].value = m_pf[1]; break;
+				case SC: m_op[2].value = m_sc; break;
 				case MSR: m_op[2].value = m_msr; break;
 				case BCNT: m_op[2].value = m_bcnt; break;
 				case PTB0: m_op[2].value = m_ptb[0]; break;
@@ -384,13 +403,22 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-/*
- * FIXME: RDVAL/WRVAL don't trigger abort on protection failures, but it's not
- * clear if the memory access is cancelled on a protection failure or invalid
- * level 2 page table entry. Also not clear if MSR/EIA are updated.
- */
-ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool debug)
+ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool debug)
 {
+	// update program flow trace state
+	if (pfs && (m_msr & MSR_FT))
+	{
+		if (st == ST_NIF)
+		{
+			m_pf[1] = m_pf[0];
+			m_pf[0] = address;
+
+			m_sc = m_sc << 16;
+		}
+
+		m_sc++;
+	}
+
 	// check translation required
 	if ((!(m_msr & MSR_TU) && user) || (!(m_msr & MSR_TS) && !user))
 		return COMPLETE;
@@ -406,9 +434,6 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	LOGMASKED(LOG_TRANSLATE, "translate address_space %d access_level %d page table 0x%08x address 0x%08x\n", address_space, access_level, ptb, address);
 
-	if (m_state == IDLE && !debug)
-		m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
-
 	// read level 1 page table entry
 	u32 const pte1_address = ptb | ((address & VA_INDEX1) >> 14);
 	u32 const pte1 = space.read_dword(pte1_address);
@@ -418,6 +443,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	{
 		if (m_state == IDLE && !debug)
 		{
+			// reset error status
+			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
+
 			m_msr |= (write ? 0 : MSR_ED) | ((st & 7) << 10) | MSR_TE;
 			if (access_level > (pte1 & PTE_PL))
 				m_msr |= TET_PL;
@@ -457,6 +485,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	{
 		if (m_state == IDLE && !debug)
 		{
+			// reset error status
+			m_msr &= ~(MSR_EST | MSR_ED | MSR_TET | MSR_TE);
+
 			m_msr |= (write ? 0 : MSR_ED) | ((st & 7) << 10) | MSR_TE;
 			if (access_level > (pte2 & PTE_PL))
 				m_msr |= TET_PL;
@@ -487,6 +518,9 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 
 	address = ((pte1 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);
 	LOGMASKED(LOG_TRANSLATE, "translate complete 0x%08x\n", address);
+
+	if (m_state == RDVAL || m_state == WRVAL)
+		m_state = STATUS;
 
 	return COMPLETE;
 }

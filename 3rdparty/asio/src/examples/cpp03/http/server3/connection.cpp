@@ -2,7 +2,7 @@
 // connection.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 
 #include "connection.hpp"
 #include <vector>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "request_handler.hpp"
 
 namespace http {
@@ -18,8 +18,8 @@ namespace server3 {
 
 connection::connection(asio::io_context& io_context,
     request_handler& handler)
-  : strand_(io_context),
-    socket_(io_context),
+  : strand_(asio::make_strand(io_context)),
+    socket_(strand_),
     request_handler_(handler)
 {
 }
@@ -32,10 +32,9 @@ asio::ip::tcp::socket& connection::socket()
 void connection::start()
 {
   socket_.async_read_some(asio::buffer(buffer_),
-      asio::bind_executor(strand_,
-        boost::bind(&connection::handle_read, shared_from_this(),
-          asio::placeholders::error,
-          asio::placeholders::bytes_transferred)));
+      boost::bind(&connection::handle_read, shared_from_this(),
+        asio::placeholders::error,
+        asio::placeholders::bytes_transferred));
 }
 
 void connection::handle_read(const asio::error_code& e,
@@ -51,25 +50,22 @@ void connection::handle_read(const asio::error_code& e,
     {
       request_handler_.handle_request(request_, reply_);
       asio::async_write(socket_, reply_.to_buffers(),
-          asio::bind_executor(strand_,
-            boost::bind(&connection::handle_write, shared_from_this(),
-              asio::placeholders::error)));
+          boost::bind(&connection::handle_write, shared_from_this(),
+            asio::placeholders::error));
     }
     else if (!result)
     {
       reply_ = reply::stock_reply(reply::bad_request);
       asio::async_write(socket_, reply_.to_buffers(),
-          asio::bind_executor(strand_,
-            boost::bind(&connection::handle_write, shared_from_this(),
-              asio::placeholders::error)));
+          boost::bind(&connection::handle_write, shared_from_this(),
+            asio::placeholders::error));
     }
     else
     {
       socket_.async_read_some(asio::buffer(buffer_),
-          asio::bind_executor(strand_,
-            boost::bind(&connection::handle_read, shared_from_this(),
-              asio::placeholders::error,
-              asio::placeholders::bytes_transferred)));
+          boost::bind(&connection::handle_read, shared_from_this(),
+            asio::placeholders::error,
+            asio::placeholders::bytes_transferred));
     }
   }
 

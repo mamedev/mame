@@ -34,7 +34,7 @@ public:
 		m_user_password_enable = (password != nullptr);
 	}
 
-	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; };
+	void set_dma_transfer_time(const attotime time) { m_dma_transfer_time = time; }
 protected:
 	ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -44,7 +44,7 @@ protected:
 	virtual int write_sector(uint32_t lba, const void *buffer) = 0;
 	virtual attotime seek_time();
 
-	void ide_build_identify_device();
+	virtual void ide_build_identify_device();
 
 	static const int IDE_DISK_SECTOR_SIZE = 512;
 	virtual int sector_length() override { return IDE_DISK_SECTOR_SIZE; }
@@ -102,11 +102,10 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : hard_disk_read(m_disk, lba, buffer); }
-	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : hard_disk_write(m_disk, lba, buffer); }
+	virtual int read_sector(uint32_t lba, void *buffer) override { return !m_disk ? 0 : m_disk->read(lba, buffer); }
+	virtual int write_sector(uint32_t lba, const void *buffer) override { return !m_disk ? 0 : m_disk->write(lba, buffer); }
 	virtual uint8_t calculate_status() override;
 
-	chd_file       *m_handle;
 	hard_disk_file *m_disk;
 
 	enum
@@ -120,7 +119,23 @@ private:
 	emu_timer *     m_last_status_timer;
 };
 
+// ======================> ide_cf_device
+
+class ide_cf_device : public ide_hdd_device
+{
+public:
+	// construction/destruction
+	ide_cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	void ide_build_identify_device() override;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device)
+DECLARE_DEVICE_TYPE(ATA_CF, ide_cf_device)
 
 #endif // MAME_BUS_ATA_IDEHD_H

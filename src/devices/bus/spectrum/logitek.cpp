@@ -170,7 +170,7 @@ uint8_t spectrum_proceed_device::mreq_r(offs_t offset)
 
 uint8_t spectrum_proceed_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
 	if (!BIT(offset, 5))
 		data = m_z80pio->read((offset >> 6) & 3);

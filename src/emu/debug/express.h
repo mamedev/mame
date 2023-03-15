@@ -18,6 +18,7 @@
 #include <deque>
 #include <functional>
 #include <list>
+#include <string_view>
 #include <unordered_map>
 
 
@@ -33,13 +34,13 @@ enum expression_space
 	EXPSPACE_PROGRAM_LOGICAL,
 	EXPSPACE_DATA_LOGICAL,
 	EXPSPACE_IO_LOGICAL,
-	EXPSPACE_SPACE3_LOGICAL,
+	EXPSPACE_OPCODE_LOGICAL,
 	EXPSPACE_PROGRAM_PHYSICAL,
 	EXPSPACE_DATA_PHYSICAL,
 	EXPSPACE_IO_PHYSICAL,
-	EXPSPACE_SPACE3_PHYSICAL,
-	EXPSPACE_OPCODE,
-	EXPSPACE_RAMWRITE,
+	EXPSPACE_OPCODE_PHYSICAL,
+	EXPSPACE_PRGDIRECT,
+	EXPSPACE_OPDIRECT,
 	EXPSPACE_REGION
 };
 
@@ -85,17 +86,19 @@ public:
 	};
 
 	// construction/destruction
-	expression_error(error_code code, int offset = 0, int num = 0)
-		: m_code(code),
-			m_offset(offset),
-			m_num(num) { }
+	constexpr expression_error(error_code code, int offset = 0, int num = 0)
+		: m_code(code)
+		, m_offset(offset)
+		, m_num(num)
+	{
+	}
 
 	// operators
-	operator error_code() const { return m_code; }
+	constexpr operator error_code() const { return m_code; }
 
 	// getters
-	error_code code() const { return m_code; }
-	int offset() const { return m_offset; }
+	constexpr error_code code() const { return m_code; }
+	constexpr int offset() const { return m_offset; }
 	std::string code_string() const;
 
 private:
@@ -174,15 +177,16 @@ public:
 	// getters
 	const std::unordered_map<std::string, std::unique_ptr<symbol_entry>> &entries() const { return m_symlist; }
 	symbol_table *parent() const { return m_parent; }
+	running_machine &machine() { return m_machine; }
 
 	// setters
 	void set_memory_modified_func(memory_modified_func modified);
 
 	// symbol access
-	void add(const char *name, read_write rw, u64 *ptr = nullptr);
-	void add(const char *name, u64 constvalue);
-	void add(const char *name, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
-	void add(const char *name, int minparams, int maxparams, execute_func execute);
+	symbol_entry &add(const char *name, read_write rw, u64 *ptr = nullptr);
+	symbol_entry &add(const char *name, u64 constvalue);
+	symbol_entry &add(const char *name, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
+	symbol_entry &add(const char *name, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
@@ -203,7 +207,7 @@ private:
 	u64 read_memory_region(const char *rgntag, offs_t address, int size);
 	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	device_t *expression_get_device(const char *tag);
+	expression_error expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory);
 	void notify_memory_modified();
 
 	// internal state
@@ -223,7 +227,8 @@ class parsed_expression
 {
 public:
 	// construction/destruction
-	parsed_expression(symbol_table &symtable, const char *expression = nullptr, int default_base = 16);
+	parsed_expression(symbol_table &symtable);
+	parsed_expression(symbol_table &symtable, std::string_view expression, int default_base = 16);
 	parsed_expression(const parsed_expression &src);
 	parsed_expression(parsed_expression &&src) = default;
 
@@ -241,7 +246,7 @@ public:
 	void set_default_base(int base) { assert(base == 8 || base == 10 || base == 16); m_default_base = base; }
 
 	// execution
-	void parse(const char *string);
+	void parse(std::string_view string);
 	u64 execute() { return execute_tokens(); }
 
 private:

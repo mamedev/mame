@@ -30,4 +30,4 @@ const atom_format::format atom_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_ATOM_FORMAT = &floppy_image_format_creator<atom_format>;
+const atom_format FLOPPY_ATOM_FORMAT;

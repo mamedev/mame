@@ -644,7 +644,7 @@ void tlcs900_device::ldcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900_device::ldcf16( uint8_t a, uint8_t b )
+void tlcs900_device::ldcf16( uint8_t a, uint16_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l |= FLAG_CF;
@@ -662,7 +662,7 @@ void tlcs900_device::andcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900_device::andcf16( uint8_t a, uint8_t b )
+void tlcs900_device::andcf16( uint8_t a, uint16_t b )
 {
 	if ( ( b & ( 1 << ( a & 0x0f ) ) ) && ( m_sr.b.l & FLAG_CF ) )
 		m_sr.b.l |= FLAG_CF;
@@ -678,7 +678,7 @@ void tlcs900_device::orcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900_device::orcf16( uint8_t a, uint8_t b )
+void tlcs900_device::orcf16( uint8_t a, uint16_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l |= FLAG_CF;
@@ -692,7 +692,7 @@ void tlcs900_device::xorcf8( uint8_t a, uint8_t b )
 }
 
 
-void tlcs900_device::xorcf16( uint8_t a, uint8_t b )
+void tlcs900_device::xorcf16( uint8_t a, uint16_t b )
 {
 	if ( b & ( 1 << ( a & 0x0f ) ) )
 		m_sr.b.l ^= FLAG_CF;

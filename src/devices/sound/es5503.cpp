@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.2
+  ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.3
   By R. Belmont.
 
   Copyright R. Belmont.
@@ -33,6 +33,8 @@
   2.1.2 (RB) - Fixed SoundSmith POLY.SYNTH inst where one-shot on the even oscillator and swap on the odd should loop.
                Conversely, the intro voice in FTA Delta Demo has swap on the even and one-shot on the odd and doesn't
                want to loop.
+  2.1.3 (RB) - Fixed oscillator enable register off-by-1 which caused everything to be half a step sharp.
+  2.2 (RB) - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
 */
 
 #include "emu.h"
@@ -66,25 +68,25 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
-//  device_timer - called when our device timer expires
+//  delayed_stream_update -
 //-------------------------------------------------
 
-void es5503_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(es5503_device::delayed_stream_update)
 {
 	m_stream->update();
 }
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void es5503_device::rom_bank_updated()
+void es5503_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
 
 // halt_osc: handle halting an oscillator
-// chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
 void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int resshift)
@@ -102,28 +104,28 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	else    // preserve the relative phase of the oscillator when looping
 	{
 		uint16_t wtsize = pOsc->wtsize - 1;
-		uint32_t altram = (*accumulator) >> resshift;
-
-		if (altram > wtsize)
-		{
-			altram -= wtsize;
-		}
-		else
-		{
-			altram = 0;
-		}
-
-		*accumulator = altram << resshift;
+		*accumulator -= (wtsize << resshift);
 	}
 
-	// if we're in swap mode or we're the even oscillator and the partner is in swap mode,
-	// start the partner.
-	if ((mode == MODE_SWAP) || ((partnerMode == MODE_SWAP) && ((onum & 1)==0)))
+	// if we're in swap mode, start the partner
+	if (mode == MODE_SWAP)
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
 	}
+	else
+	{
+		// if we're not swap and we're the even oscillator of the pair and the partner's swap
+		// but we aren't, we retrigger (!!!)  Verified on IIgs hardware.
+		if ((partnerMode == MODE_SWAP) && ((onum & 1)==0))
+		{
+			pOsc->control &= ~1;
 
+			// preserve the phase in this case too
+			uint16_t wtsize = pOsc->wtsize - 1;
+			*accumulator -= (wtsize << resshift);
+		}
+	}
 	// IRQ enabled for this voice?
 	if (pOsc->control & 0x08)
 	{
@@ -144,7 +146,7 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 	for (int chan = 0; chan < output_channels; chan++)
 	{
-		for (osc = 0; osc < (oscsenabled+1); osc++)
+		for (osc = 0; osc < oscsenabled; osc++)
 		{
 			ES5503Osc *pOsc = &oscillators[osc];
 
@@ -230,17 +232,16 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(oscillators, accumulator), 32);
 	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
 
-	output_rate = (clock() / 8) / (2 + oscsenabled);
+	oscsenabled = 1;
+	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
-	m_timer = timer_alloc(0, nullptr);
-	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
-	m_timer->adjust(update_rate, 0, update_rate);
+	m_timer = timer_alloc(FUNC(es5503_device::delayed_stream_update), this);
 }
 
 void es5503_device::device_clock_changed()
 {
-	output_rate = (clock() / 8) / (2 + oscsenabled);
+	output_rate = (clock() / 8) / (oscsenabled + 2);
 	m_stream->set_sample_rate(output_rate);
 
 	m_mix_buffer.resize((output_rate/50)*8);
@@ -268,10 +269,9 @@ void es5503_device::device_reset()
 	}
 
 	oscsenabled = 1;
+	notify_clock_changed();
 
 	m_channel_strobe = 0;
-
-	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 }
 
 u8 es5503_device::read(offs_t offset)
@@ -327,7 +327,7 @@ u8 es5503_device::read(offs_t offset)
 				m_irq_func(0);
 
 				// scan all oscillators
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -343,7 +343,7 @@ u8 es5503_device::read(offs_t offset)
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -355,7 +355,7 @@ u8 es5503_device::read(offs_t offset)
 				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
-				return oscsenabled<<1;
+				return (oscsenabled - 1) << 1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();
@@ -397,7 +397,7 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xa0:  // oscillator control
-				// if a fresh key-on, reset the accumulator
+				// key on?
 				if ((oscillators[osc].control & 1) && (!(data&1)))
 				{
 					oscillators[osc].accumulator = 0;
@@ -429,18 +429,11 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0xe1:  // oscillator enable
-			{
-				oscsenabled = (data>>1) & 0x1f;
-
-				output_rate = (clock()/8)/(2+oscsenabled);
-				m_stream->set_sample_rate(output_rate);
-
-				m_mix_buffer.resize((output_rate/50)*8);
-
-				attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
-				m_timer->adjust(update_rate, 0, update_rate);
+				// The number here is the number of oscillators to enable -1 times 2.  You can never
+				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
+				oscsenabled = ((data>>1) & 0x1f) + 1;
+				notify_clock_changed();
 				break;
-			}
 
 			case 0xe2:  // A/D converter
 				break;

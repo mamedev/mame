@@ -9,6 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "http.h"
+#include "server_http.hpp"
+#include "server_ws.hpp"
 
 #ifdef __sun
 #define ASIO_DISABLE_DEV_POLL
@@ -331,7 +334,7 @@ http_manager::http_manager(bool active, short port, const char *root)
 	};
 
 	m_server->on_upgrade = [this](auto socket, auto request) {
-		auto connection = std::make_shared<webpp::ws_server::Connection>(socket);
+		auto connection = std::make_shared<webpp::ws_server::Connection>(*m_io_context, socket);
 		connection->method = std::move(request->method);
 		connection->path = std::move(request->path);
 		connection->http_version = std::move(request->http_version);
@@ -422,8 +425,8 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 	std::ostringstream full_path;
 	full_path << m_root << path;
 	util::core_file::ptr f;
-	osd_file::error e = util::core_file::open(full_path.str(), OPEN_FLAG_READ, f);
-	if (e == osd_file::error::NONE)
+	std::error_condition const e = util::core_file::open(full_path.str(), OPEN_FLAG_READ, f);
+	if (!e)
 	{
 		int c;
 		while ((c = f->getc()) >= 0)
@@ -431,7 +434,7 @@ bool http_manager::read_file(std::ostream &os, const std::string &path) {
 			os.put(c);
 		}
 	}
-	return e == osd_file::error::NONE;
+	return !e;
 }
 
 void http_manager::serve_document(http_request_ptr request, http_response_ptr response, const std::string &filename) {

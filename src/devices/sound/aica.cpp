@@ -14,7 +14,14 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
+    - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
+    - Derive from SCSP device;
+    - Sound clips a bit too much (cfr. deathcox, bdrdown, samba title screen, cfield).
+      According to skmp note: "The [ADX] sound decompression code on the sh4 uses FTRC
+      (float -> int) to convert the samples. Make sure you saturate the value when converting"
+      -> Verify this statement.
+
 */
 
 #include "emu.h"
@@ -22,8 +29,8 @@
 
 #include <algorithm>
 
-static constexpr s32 clip16(int x) { return std::min(32767, std::max(-32768, x)); }
-static constexpr s32 clip18(int x) { return std::min(131071, std::max(-131072, x)); }
+static constexpr s32 clip16(int x) { return std::clamp(x, -32768, 32767); }
+static constexpr s32 clip18(int x) { return std::clamp(x, -131072, 131071); }
 
 #define SHIFT   12
 #define FIX(v)  ((u32)((float)(1 << SHIFT) * (v)))
@@ -437,9 +444,9 @@ void aica_device::Init()
 
 	space().specific(m_DSP.space);
 	space().cache(m_DSP.cache);
-	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
-	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerB_cb), this));
-	m_timerC = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerC_cb), this));
+	m_timerA = timer_alloc(FUNC(aica_device::timerA_cb), this);
+	m_timerB = timer_alloc(FUNC(aica_device::timerB_cb), this);
+	m_timerC = timer_alloc(FUNC(aica_device::timerC_cb), this);
 
 	for (i = 0; i < 0x400; ++i)
 	{
@@ -810,6 +817,7 @@ void aica_device::UpdateRegR(int reg)
 				u16 LP;
 				if (!(AFSEL()))
 				{
+					// AEG monitor
 					LP = slot->lpend ? 0x8000 : 0x0000;
 					slot->lpend = 0;
 					u16 SGC = (slot->EG.state << 13) & 0x6000;
@@ -822,7 +830,9 @@ void aica_device::UpdateRegR(int reg)
 				}
 				else
 				{
+					// FEG monitor
 					LP = slot->lpend ? 0x8000 : 0x0000;
+					// TODO: no EG monitoring? Documentation suggests otherwise
 					m_udata.data[0x10 / 2] = LP;
 				}
 			}
@@ -834,19 +844,10 @@ void aica_device::UpdateRegR(int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot = m_Slots + slotnum;
-				u32 CA;
-
-				if (PCMS(slot) == 0)    // 16-bit samples
-				{
-					CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;
-				}
-				else    // 8-bit PCM and 4-bit ADPCM
-				{
-					CA = (slot->cur_addr >> SHIFT);
-				}
-
-				//printf("%08x %08x\n",CA,slot->cur_addr & ~1);
-
+				// NB: despite previous implementation this does not depend on PCMS setting.
+				// Was "CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;" on 16-bit path,
+				// causing repeated samples/hangs in several ADX driven entries.
+				u32 CA = (slot->cur_addr >> SHIFT);
 				m_udata.data[0x14 / 2] = CA;
 			}
 			break;
@@ -913,7 +914,12 @@ void aica_device::w16(u32 addr,u16 val)
 		else if (addr < 0x3300)
 			*((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2)) = val;
 		else if (addr < 0x3400)
-			popmessage("AICADSP write to undocumented reg %04x -> %04x", addr, val);
+		{
+			// 3300-fc zapped along with the full 0x3000-0x3bfc range,
+			// most likely done by the SDK for convenience in resetting DSP in one go.
+			if (val)
+				logerror("%s: AICADSP write to undocumented reg %04x -> %04x\n", machine().describe_context(), addr, val);
+		}
 		else if (addr < 0x3c00)
 		{
 			*((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2)) = val;
@@ -973,12 +979,13 @@ u16 aica_device::r16(u32 addr)
 			v = m_EFSPAN[addr & 0x7f];
 		}
 		else if (addr < 0x2800)
-			popmessage("AICA read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICA read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x28be)
 		{
 			UpdateRegR(addr & 0xff);
 			v= *((u16 *)(m_udata.datab+((addr & 0xff))));
-			if ((addr & 0xfffe) == 0x2810) m_udata.data[0x10 / 2] &= 0x7FFF;   // reset LP on read
 		}
 		else if (addr == 0x2d00)
 		{
@@ -997,11 +1004,15 @@ u16 aica_device::r16(u32 addr)
 		else if (addr < 0x3300)
 			v= *((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2));
 		else if (addr < 0x3400)
-			popmessage("AICADSP read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x3c00)
 			v= *((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2));
 		else if (addr < 0x4000)
-			popmessage("AICADSP read undocumented reg %04x",addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x4400)
 		{
 			if (addr & 4)
@@ -1032,7 +1043,6 @@ u16 aica_device::r16(u32 addr)
 }
 
 
-#ifdef UNUSED_FUNCTION
 void aica_device::TimersAddTicks(int ticks)
 {
 	if (m_TimCnt[0] <= 0xff00)
@@ -1071,7 +1081,6 @@ void aica_device::TimersAddTicks(int ticks)
 		m_udata.data[0x98 / 2] |= m_TimCnt[2] >> 8;
 	}
 }
-#endif
 
 s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 {
@@ -1188,8 +1197,6 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 				StopSlot(slot,0);
 			}
 			break;
-		// TODO: causes an hang in Border Down/Metal Slug 6/Karous etc.
-		//       for mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow)
 		case 1: //normal loop
 			if (*addr[addr_select] >= chanlea)
 			{
@@ -1374,14 +1381,6 @@ void aica_device::exec_dma()
 	m_mcipd |= 0x10;
 	CheckPendingIRQ_SH4();
 }
-
-#ifdef UNUSED_FUNCTION
-int aica_device::IRQCB(void *param)
-{
-	CheckPendingIRQ(param);
-	return -1;
-}
-#endif
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
   Undumped games
 
@@ -13,15 +13,15 @@ license:CC0
 
   Taiwanese releases for the Aaronix Mark III
   - White Gold Cartridges
-  GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
-  GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
-  GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
-  GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
+  GB1301 - Fantasy Zone / Kuàilè Xiǎo Fēidié (快樂小飛碟)  [dumped]
+  GB1303 - Hokuto no Ken / Běidǒu Shén Quán (北斗神拳)  [dumped]
+  GB1310 - Space Harrier / ???  [verified to be the same as the Japan release]
+  GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Japan release]
   - Yellow Gold Cartridges
-  K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
+  K307 - Great Soccer / Shìjiè Bēi Zúqiú Sài (世界杯足球賽)  [dumped]
   K313 - F-16 Fighting Falcon / F-16  [dumped]
-  K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
-  K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
+  K317 - Comical Machine Gun Joe / Dàzhàn Hēishǒu Dǎng (大戰黑手黨)  [dumped]
+  K321 - Spy Vs. Spy / Dié Duì Dié (諜對諜)  [dumped]
 -->
 
 <softwarelist name="sms" description="Sega Master System cartridges">
@@ -29,7 +29,7 @@ license:CC0
 <!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures and other sources -->
 
 	<software name="4pak">
-		<description>4 PAK All Action (Aus)</description>
+		<description>4 PAK All Action (Australia)</description>
 		<year>1995</year>
 		<publisher>HES</publisher>
 		<part name="cart" interface="sms_cart">
@@ -41,7 +41,7 @@ license:CC0
 	</software>
 
 	<software name="20em1">
-		<description>20 em 1 (Bra)</description>
+		<description>20 em 1 (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="0002"/>
@@ -65,7 +65,7 @@ license:CC0
 	</software>
 
 	<software name="3dragon">
-		<description>The Three Dragon Story (Kor)</description>
+		<description>The Three Dragon Story (Korea)</description>
 		<year>19??</year>
 		<publisher>Zemina?</publisher>
 		<info name="alt_title" value="용의 전설" />
@@ -77,7 +77,7 @@ license:CC0
 	</software>
 
 	<software name="94swc">
-		<description>94 Super World Cup Soccer (Kor)</description>
+		<description>94 Super World Cup Soccer (Korea)</description>
 		<year>1994</year>
 		<publisher>Daou Infosys</publisher>
 		<info name="serial" value="DS-G403"/>
@@ -90,7 +90,7 @@ license:CC0
 	</software>
 
 	<software name="aceoface">
-		<description>Ace of Aces (Euro)</description>
+		<description>Ace of Aces (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7054"/>
@@ -103,7 +103,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg">
-		<description>Action Fighter (Euro, USA, Bra, v2)</description>
+		<description>Action Fighter (Europe, USA, Brazil, v2)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5055"/>
@@ -119,7 +119,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg1" cloneof="actionfg">
-		<description>Action Fighter (Euro, Jpn, v1)</description>
+		<description>Action Fighter (Europe, Japan, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1305, 5055, 41008"/>
@@ -170,9 +170,8 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="addfam">
-		<description>The Addams Family (Euro)</description>
+		<description>The Addams Family (Europe)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27067-50"/>
@@ -184,7 +183,7 @@ license:CC0
 	</software>
 
 	<software name="aerialas">
-		<description>Aerial Assault (Euro, Bra)</description>
+		<description>Aerial Assault (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7041"/>
@@ -234,7 +233,7 @@ license:CC0
 
 	<software name="agidooly" cloneof="dinodool">
 		<!-- Korean version of dinodool (which is also a Korean cart, but in English) -->
-		<description>Agigongnyong Dooly (Kor)</description>
+		<description>Agigongnyong Dooly (Korea)</description>
 		<year>1991</year>
 		<publisher>Daou Infosys</publisher>
 		<part name="cart" interface="sms_cart">
@@ -245,7 +244,7 @@ license:CC0
 	</software>
 
 	<software name="airresc">
-		<description>Air Rescue (Euro, Bra, Kor)</description>
+		<description>Air Rescue (Europe, Brazil, Korea)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7102, GB2018JG"/>
@@ -257,7 +256,7 @@ license:CC0
 	</software>
 
 	<software name="aladdin">
-		<description>Disney's Aladdin (Euro, Bra, Kor)</description>
+		<description>Disney's Aladdin (Europe, Brazil, Korea)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9027, 028.420, GB94001JG"/>
@@ -270,7 +269,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="aleste" cloneof="pstrike">
-		<description>Aleste (Jpn)</description>
+		<description>Aleste (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1352"/>
@@ -285,7 +284,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="alexbmx">
-		<description>Alex Kidd BMX Trial (Jpn)</description>
+		<description>Alex Kidd BMX Trial (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1330"/>
@@ -300,7 +299,7 @@ license:CC0
 	</software>
 
 	<software name="alexhitw">
-		<description>Alex Kidd - High-Tech World (Euro, USA)</description>
+		<description>Alex Kidd - High-Tech World (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5116, 023.020"/>
@@ -328,7 +327,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- MPR-11047 according to SMS Power, but not clear which version these correspond to -->
 	<software name="alexkidd">
-		<description>Alex Kidd in Miracle World (Euro, USA, v1)</description>
+		<description>Alex Kidd in Miracle World (Europe, USA, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5067"/>
@@ -341,7 +340,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkidd1" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Euro, USA, v0)</description>
+		<description>Alex Kidd in Miracle World (Europe, USA, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -353,7 +352,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkiddb" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Bra, v1, Pirate)</description>
+		<description>Alex Kidd in Miracle World (Brazil, v1, pirate)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -365,7 +364,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="alexkiddj" cloneof="alexkidd">
-		<description>Alex Kidd no Miracle World (Jpn)</description>
+		<description>Alex Kidd no Miracle World (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1306"/>
@@ -412,7 +411,7 @@ license:CC0
 	</software>
 
 	<software name="alexshin">
-		<description>Alex Kidd in Shinobi World (Euro, USA, Bra)</description>
+		<description>Alex Kidd in Shinobi World (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7044"/>
@@ -424,7 +423,7 @@ license:CC0
 	</software>
 
 	<software name="alf">
-		<description>Alf (USA, Bra)</description>
+		<description>Alf (USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5111"/>
@@ -436,7 +435,7 @@ license:CC0
 	</software>
 
 	<software name="alibaba">
-		<description>Alibaba and 40 Thieves (Kor)</description>
+		<description>Alibaba and 40 Thieves (Korea)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
 		<info name="alt_title" value="아리바바"/>
@@ -448,7 +447,7 @@ license:CC0
 	</software>
 
 	<software name="alien3">
-		<description>Alien³ (Euro, Bra)</description>
+		<description>Alien³ (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="MK-27043-50"/>
@@ -461,7 +460,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="altbeast">
-		<description>Altered Beast (Euro, USA, Bra)</description>
+		<description>Altered Beast (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7018"/>
@@ -477,7 +476,7 @@ license:CC0
 	</software>
 
 	<software name="ameribb">
-		<description>American Baseball (Euro, Bra)</description>
+		<description>American Baseball (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7019"/>
@@ -492,7 +491,7 @@ license:CC0
 	</software>
 
 	<software name="ameripf">
-		<description>American Pro Football (Euro)</description>
+		<description>American Pro Football (Europe)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7020"/>
@@ -504,7 +503,7 @@ license:CC0
 	</software>
 
 	<software name="agassi">
-		<description>Andre Agassi Tennis (Euro, Bra)</description>
+		<description>Andre Agassi Tennis (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>TecMagik</publisher>
 		<info name="serial" value="MK-27051-50, 025.420"/>
@@ -517,7 +516,7 @@ license:CC0
 
 	<!-- Notes: the Western release, "Alex Kidd High-Tech World" is quite different -->
 	<software name="anmitsu" cloneof="alexhitw">
-		<description>Anmitsu Hime (Jpn)</description>
+		<description>Anmitsu Hime (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1328"/>
@@ -531,7 +530,7 @@ license:CC0
 	</software>
 
 	<software name="arcadesh">
-		<description>Arcade Smash Hits (Euro)</description>
+		<description>Arcade Smash Hits (Europe)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="27032-50"/>
@@ -543,7 +542,7 @@ license:CC0
 	</software>
 
 	<software name="argosnj">
-		<description>Argos no Juujiken (Jpn)</description>
+		<description>Argos no Juujiken (Japan)</description>
 		<year>1988</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="S-001"/>
@@ -557,7 +556,7 @@ license:CC0
 	</software>
 
 	<software name="argosnj1" cloneof="argosnj">
-		<description>Argos no Juujiken (Jpn, Pirate?)</description>
+		<description>Argos no Juujiken (Japan, pirate?)</description>
 		<year>1988</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="sms_cart">
@@ -568,7 +567,7 @@ license:CC0
 	</software>
 
 	<software name="ariel">
-		<description>Disney's Ariel The Little Mermaid (Bra)</description>
+		<description>Disney's Ariel The Little Mermaid (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="026.350"/>
@@ -580,7 +579,7 @@ license:CC0
 	</software>
 
 	<software name="ashura" cloneof="secret">
-		<description>Ashura (Jpn)</description>
+		<description>Ashura (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1307"/>
@@ -598,7 +597,7 @@ license:CC0
 	</software>
 
 	<software name="assaultc">
-		<description>Assault City (Euro, Bra, Light Phaser version)</description>
+		<description>Assault City (Europe, Brazil, Light Phaser version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7040"/>
@@ -611,7 +610,7 @@ license:CC0
 	</software>
 
 	<software name="assaultc1" cloneof="assaultc">
-		<description>Assault City (Euro)</description>
+		<description>Assault City (Europe)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7034"/>
@@ -623,7 +622,7 @@ license:CC0
 	</software>
 
 	<software name="astergre">
-		<description>Astérix and the Great Rescue (Euro, Bra)</description>
+		<description>Astérix and the Great Rescue (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9032, 028.490"/>
@@ -635,7 +634,7 @@ license:CC0
 	</software>
 
 	<software name="asterix">
-		<description>Asterix (Euro, v1)</description>
+		<description>Asterix (Europe, v1)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9008"/>
@@ -647,7 +646,7 @@ license:CC0
 	</software>
 
 	<software name="asterix1" cloneof="asterix">
-		<description>Asterix (Euro, Bra, v0)</description>
+		<description>Asterix (Europe, Brazil, v0)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9008"/>
@@ -663,7 +662,7 @@ license:CC0
 	</software>
 
 	<software name="astermis">
-		<description>Asterix and the Secret Mission (Euro)</description>
+		<description>Asterix and the Secret Mission (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9023"/>
@@ -675,7 +674,7 @@ license:CC0
 	</software>
 
 	<software name="astorm">
-		<description>Alien Storm (Euro, Bra)</description>
+		<description>Alien Storm (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7075"/>
@@ -692,7 +691,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- This has been found in unlicensed GG compilation too (or has it been ripped from such a compilation only?) -->
 	<software name="astrofl1" cloneof="transbot">
-		<description>Astro Flash (Jpn, Pirate)</description>
+		<description>Astro Flash (Japan, pirate)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -704,7 +703,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astropit">
-		<description>Astro Warrior &amp; Pit Pot (Euro)</description>
+		<description>Astro Warrior &amp; Pit Pot (Europe)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="6081, 41011"/>
@@ -718,9 +717,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="astropita" cloneof="astropit">
+		<description>Astro Warrior &amp; Pit Pot (Europe, alt)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5374" />
+			<dataarea name="rom" size="131072">
+				<rom name="astro-pit 0" size="65536" crc="5f39d77e" sha1="901720035bf97dcacb877a51b6fa7fe64a1c3c5f" offset="0x00000" />
+				<rom name="astro-pit 1" size="65536" crc="ef17a1f2" sha1="3dc1a02116eff59eef09d4294f5c4491c998ad26" offset="0x10000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astrow">
-		<description>Astro Warrior (Jpn, USA, Bra)</description>
+		<description>Astro Warrior (Japan, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1312, 5069"/>
@@ -739,7 +752,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="aliensyn">
-		<description>Alien Syndrome (Euro, USA, Bra)</description>
+		<description>Alien Syndrome (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7006"/>
@@ -755,7 +768,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="aliensynj" cloneof="aliensyn">
-		<description>Alien Syndrome (Jpn)</description>
+		<description>Alien Syndrome (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1339"/>
@@ -781,7 +794,7 @@ license:CC0
 	</software>
 
 	<software name="smgp2">
-		<description>Ayrton Senna's Super Monaco GP II (Euro, Bra, Kor)</description>
+		<description>Ayrton Senna's Super Monaco GP II (Europe, Brazil, Korea)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9011"/>
@@ -794,7 +807,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="aztecadv">
-		<description>Aztec Adventure - The Golden Road to Paradise (Euro, USA) ~ Nazca '88 - The Golden Road to Paradise (Jpn)</description>
+		<description>Aztec Adventure - The Golden Road to Paradise (Europe, USA) ~ Nazca '88 - The Golden Road to Paradise (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1335, 5100"/>
@@ -811,7 +824,7 @@ license:CC0
 	</software>
 
 	<software name="backtof2">
-		<description>Back to the Future Part II (Euro, Bra)</description>
+		<description>Back to the Future Part II (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
 		<info name="serial" value="27010-50"/>
@@ -823,7 +836,7 @@ license:CC0
 	</software>
 
 	<software name="backtof3">
-		<description>Back to the Future Part III (Euro)</description>
+		<description>Back to the Future Part III (Europe)</description>
 		<year>1992</year>
 		<publisher>Image Works</publisher>
 		<info name="usage" value="Only runs with PAL/50Hz drivers, e.g. smspal" />
@@ -836,7 +849,7 @@ license:CC0
 	</software>
 
 	<software name="bakubaku">
-		<description>Baku Baku Animal (Bra)</description>
+		<description>Baku Baku Animal (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="025.470"/>
@@ -849,7 +862,7 @@ license:CC0
 	</software>
 
 	<software name="bankp">
-		<description>Bank Panic (Euro)</description>
+		<description>Bank Panic (Europe)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4584 (Cart), 41022"/>
@@ -877,7 +890,7 @@ license:CC0
 	</software>
 
 	<software name="bartvssm">
-		<description>The Simpsons - Bart vs. The Space Mutants (Euro, Bra)</description>
+		<description>The Simpsons - Bart vs. The Space Mutants (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27031-50"/>
@@ -889,7 +902,7 @@ license:CC0
 	</software>
 
 	<software name="bartvsw">
-		<description>The Simpsons - Bart vs. The World (Euro, Bra)</description>
+		<description>The Simpsons - Bart vs. The World (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27053-50, 027.210"/>
@@ -904,7 +917,7 @@ license:CC0
 	</software>
 
 	<software name="basketn">
-		<description>Basket Ball Nightmare (Euro, Bra)</description>
+		<description>Basket Ball Nightmare (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7025"/>
@@ -930,8 +943,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="basketnp1" cloneof="basketn">
+		<description>Basket Ball Nightmare (early prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="262144">
+				<rom name="nightmare_0.ic1" size="131072" crc="31715c15" sha1="f0437f9d2716f56b1424f6441854eaf0101ee1cc" offset="0x00000" /> <!-- original label: ナイトメア 0 -->
+				<rom name="nightmare_1.ic2" size="131072" crc="08835d51" sha1="396f9cd1416a152545d150107970746e362a9400" offset="0x20000" /> <!-- original label: ナイトメア 1 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanrn">
-		<description>Batman Returns (Euro, Bra)</description>
+		<description>Batman Returns (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7112, 7112-50"/>
@@ -943,7 +970,7 @@ license:CC0
 	</software>
 
 	<software name="bmaniacs">
-		<description>Battlemaniacs (Bra)</description>
+		<description>Battlemaniacs (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="027.376"/>
@@ -955,7 +982,7 @@ license:CC0
 	</software>
 
 	<software name="battleor">
-		<description>Battle Out Run (Euro, Bra)</description>
+		<description>Battle Out Run (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7033"/>
@@ -967,7 +994,7 @@ license:CC0
 	</software>
 
 	<software name="beast">
-		<description>Shadow of the Beast (Euro, Bra)</description>
+		<description>Shadow of the Beast (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>TecMagik</publisher>
 		<info name="serial" value="27019-50, 025.270"/>
@@ -985,7 +1012,7 @@ license:CC0
 -->
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Hang-On) -->
 	<software name="hicom3a">
-		<description>The Best Game Collection - Hang On + Pit Pot + Spy vs Spy (Kor)</description>
+		<description>The Best Game Collection - Hang On + Pit Pot + Spy vs Spy (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -998,7 +1025,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3b">
-		<description>The Best Game Collection - Great Baseball + Great Soccer + Super Tennis (Kor)</description>
+		<description>The Best Game Collection - Great Baseball + Great Soccer + Super Tennis (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1011,7 +1038,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3c">
-		<description>The Best Game Collection - Teddy Boy Blues + Pit-Pot + Astro Flash (Kor)</description>
+		<description>The Best Game Collection - Teddy Boy Blues + Pit-Pot + Astro Flash (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1024,7 +1051,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3d">
-		<description>The Best Game Collection - Teddy Boy Blues + Great Soccer + Comical Machine Gun Joe (Kor)</description>
+		<description>The Best Game Collection - Teddy Boy Blues + Great Soccer + Comical Machine Gun Joe (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1037,7 +1064,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3e">
-		<description>The Best Game Collection - Ghost House + Teddy Boy Blues + Seishun Scandal (Kor)</description>
+		<description>The Best Game Collection - Ghost House + Teddy Boy Blues + Seishun Scandal (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1050,7 +1077,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection) -->
 	<software name="hicom3f">
-		<description>The Best Game Collection - Satellite-7 + Great Baseball + Seishun Scandal (Kor)</description>
+		<description>The Best Game Collection - Satellite-7 + Great Baseball + Seishun Scandal (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1063,7 +1090,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Hyper Sports 2, Monkey Academy) -->
 	<software name="hicom8a">
-		<description>The Best Game Collection (Kor, 8 in 1 Ver. A)</description>
+		<description>The Best Game Collection (Korea, 8 in 1 Ver. A)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1076,7 +1103,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection, King's Valley, Magical Tree, Hang-On) -->
 	<software name="hicom8b">
-		<description>The Best Game Collection (Kor, 8 in 1 Ver. B)</description>
+		<description>The Best Game Collection (Korea, 8 in 1 Ver. B)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1089,7 +1116,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support (except for game selection, Athletic Land, Bomb Jack, Circus Charlie, Yie Ar Kung-Fu) -->
 	<software name="hicom8c">
-		<description>The Best Game Collection (Kor, 8 in 1 Ver. C)</description>
+		<description>The Best Game Collection (Korea, 8 in 1 Ver. C)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1102,7 +1129,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="blackblt">
-		<description>Black Belt (Euro, USA)</description>
+		<description>Black Belt (Europe, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5054"/>
@@ -1144,7 +1171,7 @@ license:CC0
 	</software>
 
 	<software name="blockhol">
-		<description>Block Hole (Kor)</description>
+		<description>Block Hole (Korea)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="사각의 비밀 (Sagak-ui Bimil)" />
@@ -1186,7 +1213,7 @@ license:CC0
 	</software>
 
 	<software name="bnzabros">
-		<description>Bonanza Bros. (Euro, Bra)</description>
+		<description>Bonanza Bros. (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7073"/>
@@ -1198,7 +1225,7 @@ license:CC0
 	</software>
 
 	<software name="bonkers">
-		<description>Disney's Bonkers Wax Up! (Bra)</description>
+		<description>Disney's Bonkers Wax Up! (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.600"/>
@@ -1211,7 +1238,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="borgman" cloneof="cyborgh">
-		<description>Chouon Senshi Borgman (Jpn)</description>
+		<description>Chouon Senshi Borgman (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1371"/>
@@ -1226,7 +1253,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="borgmanp" cloneof="cyborgh">
-		<description>Chouon Senshi Borgman (Jpn, prototype)</description>
+		<description>Chouon Senshi Borgman (Japan, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1237,7 +1264,7 @@ license:CC0
 	</software>
 
 	<software name="dracula">
-		<description>Bram Stoker's Dracula (Euro)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="MK-27065-50"/>
@@ -1261,7 +1288,7 @@ license:CC0
 	</software>
 
 	<software name="bublbokc">
-		<description>Bubble Bobble (Kor, Clover)</description>
+		<description>Bubble Bobble (Korea, Clover)</description>
 		<year>1990</year>
 		<publisher>Clover</publisher>
 		<info name="alt_title" value="Bobble Bobble (Box)" />
@@ -1273,7 +1300,7 @@ license:CC0
 	</software>
 
 	<software name="bublboky">
-		<description>Bubble Bobble (Kor, YM Soft)</description>
+		<description>Bubble Bobble (Korea, YM Soft)</description>
 		<year>1990</year>
 		<publisher>YM Soft</publisher>
 		<info name="alt_title" value="파워 보글 보글 (Power Boggle Boggle, Box)" />
@@ -1286,7 +1313,7 @@ license:CC0
 	</software>
 
 	<software name="suprbubl">
-		<description>Super Bubble Bobble (Kor)</description>
+		<description>Super Bubble Bobble (Korea)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="슈퍼 바블 바블"/>
@@ -1298,7 +1325,7 @@ license:CC0
 	</software>
 
 	<software name="newbogl2">
-		<description>New Boggle Boggle 2 (Kor)</description>
+		<description>New Boggle Boggle 2 (Korea)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="뉴 보글 보글 2"/>
@@ -1311,7 +1338,7 @@ license:CC0
 
 	<!-- Alt. Title: Dragon Maze (Bra Box?) -->
 	<software name="bublbobl">
-		<description>Bubble Bobble (Euro, Bra)</description>
+		<description>Bubble Bobble (Europe, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7077"/>
@@ -1326,7 +1353,7 @@ license:CC0
 	</software>
 
 	<software name="buggyrun">
-		<description>Buggy Run (Euro, Bra)</description>
+		<description>Buggy Run (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9025, 028.340"/>
@@ -1341,7 +1368,7 @@ license:CC0
 	</software>
 
 	<software name="cso">
-		<description>C_So! (Kor)</description>
+		<description>C_So! (Korea)</description>
 		<year>198?</year>
 		<publisher>Joy Soft</publisher>
 		<info name="alt_title" value="시소" />
@@ -1354,7 +1381,7 @@ license:CC0
 	</software>
 
 	<software name="calgame2">
-		<description>California Games II (Euro)</description>
+		<description>California Games II (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7105"/>
@@ -1369,7 +1396,7 @@ license:CC0
 	</software>
 
 	<software name="calgame2b" cloneof="calgame2">
-		<description>California Games II (Bra, Kor)</description>
+		<description>California Games II (Brazil, Korea)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="025.190, GB93006JG"/>
@@ -1382,7 +1409,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="calgames">
-		<description>California Games (Euro, USA, Bra)</description>
+		<description>California Games (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7014"/>
@@ -1398,7 +1425,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="captsilv">
-		<description>Captain Silver (Euro, Jpn)</description>
+		<description>Captain Silver (Europe, Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1356, 7008"/>
@@ -1441,7 +1468,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="casino">
-		<description>Casino Games (Euro, USA)</description>
+		<description>Casino Games (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7021"/>
@@ -1456,7 +1483,7 @@ license:CC0
 	</software>
 
 	<software name="castelo">
-		<description>Castelo Rá-Tim-Bum (Bra)</description>
+		<description>Castelo Rá-Tim-Bum (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.720"/>
@@ -1468,7 +1495,7 @@ license:CC0
 	</software>
 
 	<software name="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (Euro, Bra)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7053"/>
@@ -1506,7 +1533,7 @@ license:CC0
 	</software>
 
 	<software name="champeur">
-		<description>Champions of Europe (Euro, Bra)</description>
+		<description>Champions of Europe (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>TecMagik</publisher>
 		<info name="serial" value="27034-50, 025.430"/>
@@ -1522,7 +1549,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chapolim" cloneof="ghosth">
-		<description>Chapolim x Dracula - Um Duelo Assustador (Bra)</description>
+		<description>Chapolim x Dracula - Um Duelo Assustador (Brazil)</description>
 		<year>1990</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.430"/>
@@ -1534,7 +1561,7 @@ license:CC0
 	</software>
 
 	<software name="chasehq">
-		<description>Taito Chase H.Q. (Euro)</description>
+		<description>Taito Chase H.Q. (Europe)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7038"/>
@@ -1557,7 +1584,7 @@ license:CC0
 	</software>
 
 	<software name="cheese">
-		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Euro, Bra)</description>
+		<description>Cheese Cat-astrophe Starring Speedy Gonzales (Europe, Brazil)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9033-50, 028550"/>
@@ -1569,7 +1596,7 @@ license:CC0
 	</software>
 
 	<software name="champhck">
-		<description>Championship Hockey (Euro)</description>
+		<description>Championship Hockey (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="27084-50"/>
@@ -1582,7 +1609,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="choplift">
-		<description>Choplifter (Euro, USA, Bra)</description>
+		<description>Choplifter (Europe, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5051, 41001"/>
@@ -1598,7 +1625,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="chopliftj" cloneof="choplift">
-		<description>Choplifter (Jpn, prototype)</description>
+		<description>Choplifter (Japan, prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1621,7 +1648,7 @@ license:CC0
 	</software>
 
 	<software name="chuckrck">
-		<description>Chuck Rock (Euro, Bra)</description>
+		<description>Chuck Rock (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-29004-50, 028.040"/>
@@ -1633,7 +1660,7 @@ license:CC0
 	</software>
 
 	<software name="chukrck2">
-		<description>Chuck Rock II - Son of Chuck (Euro)</description>
+		<description>Chuck Rock II - Son of Chuck (Europe)</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="MK-29019-50"/>
@@ -1645,7 +1672,7 @@ license:CC0
 	</software>
 
 	<software name="chukrck2b" cloneof="chukrck2">
-		<description>Chuck Rock II - Son of Chuck (Bra)</description>
+		<description>Chuck Rock II - Son of Chuck (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.440"/>
@@ -1658,7 +1685,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="circuit" cloneof="worldgp">
-		<description>The Circuit (Jpn)</description>
+		<description>The Circuit (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1304"/>
@@ -1673,7 +1700,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="cloudmst">
-		<description>Cloud Master (Euro, USA)</description>
+		<description>Cloud Master (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7027"/>
@@ -1697,7 +1724,7 @@ license:CC0
 
 	<!-- Alt. Title: Shapes and Columns (Bra Box?) -->
 	<software name="columns">
-		<description>Columns (Euro, USA, Bra, Kor)</description>
+		<description>Columns (Europe, USA, Brazil, Korea)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5120,GB-1001, GB-1002JG"/>
@@ -1723,7 +1750,7 @@ license:CC0
 	</software>
 
 	<software name="comicbak">
-		<description>Comic Bakery (Kor)</description>
+		<description>Comic Bakery (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1735,7 +1762,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comicaltw" cloneof="comical">
-		<description>Comical Machine Gun Joe (Tw)</description>
+		<description>Comical Machine Gun Joe (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-317"/>
@@ -1749,7 +1776,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comicalk" cloneof="comical">
-		<description>Comical Machine Gun Joe (Kor)</description>
+		<description>Comical Machine Gun Joe (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="코메디권총사죠" />
@@ -1761,7 +1788,7 @@ license:CC0
 	</software>
 
 	<software name="coolspot">
-		<description>Cool Spot (Euro)</description>
+		<description>Cool Spot (Europe)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27068-50"/>
@@ -1774,7 +1801,7 @@ license:CC0
 
 	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="cosmic">
-		<description>Cosmic Spacehead (Euro)</description>
+		<description>Cosmic Spacehead (Europe)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
@@ -1788,7 +1815,7 @@ license:CC0
 	</software>
 
 	<software name="cybers">
-		<description>The Cyber Shinobi (Euro, Bra)</description>
+		<description>The Cyber Shinobi (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7050"/>
@@ -1812,7 +1839,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="cyborgh">
-		<description>Cyborg Hunter (Euro, USA, Bra)</description>
+		<description>Cyborg Hunter (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="QC-002, 25003"/>
@@ -1836,7 +1863,7 @@ license:CC0
 
 	<!-- Note: This dump should work also in a MSX1 -->
 	<software name="cyborgz">
-		<description>Cyborg Z (Kor)</description>
+		<description>Cyborg Z (Korea)</description>
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1848,7 +1875,7 @@ license:CC0
 	</software>
 
 	<software name="daffy">
-		<description>Daffy Duck in Hollywood (Euro, Bra)</description>
+		<description>Daffy Duck in Hollywood (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9031, 028.360"/>
@@ -1860,7 +1887,7 @@ license:CC0
 	</software>
 
 	<software name="dallye">
-		<description>Dallyeora Pigu-Wang (Kor)</description>
+		<description>Dallyeora Pigu-Wang (Korea)</description>
 		<year>1995</year>
 		<publisher>Game Line</publisher>
 		<info name="serial" value="G9511-RP4"/>
@@ -1873,7 +1900,7 @@ license:CC0
 	</software>
 
 	<software name="danan">
-		<description>Danan: The Jungle Fighter (Euro, Bra)</description>
+		<description>Danan: The Jungle Fighter (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7049"/>
@@ -1904,7 +1931,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="ddragonk" cloneof="ddragon">
-		<description>Double Dragon (Kor)</description>
+		<description>Double Dragon (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="더블드래곤" />
@@ -1916,7 +1943,7 @@ license:CC0
 	</software>
 
 	<software name="deadang">
-		<description>Dead Angle (Euro, USA)</description>
+		<description>Dead Angle (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7030"/>
@@ -1930,8 +1957,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deadangp" cloneof="deadang">
+		<description>Dead Angle (prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="dead angle [proto].bin" size="262144" crc="f9271c3d" sha1="34b11d5ad93c6b95493c6503d8ec25692a5a0a7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deepduck">
-		<description>Deep Duck Trouble Starring Donald Duck (Euro, Bra)</description>
+		<description>Deep Duck Trouble Starring Donald Duck (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9022"/>
@@ -1943,7 +1981,7 @@ license:CC0
 	</software>
 
 	<software name="desert">
-		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Euro, Bra)</description>
+		<description>Desert Speedtrap Starring Road Runner and Wile E. Coyote (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7122, 027.250"/>
@@ -1957,7 +1995,7 @@ license:CC0
 	</software>
 
 	<software name="dicktr">
-		<description>Dick Tracy (Euro, USA, Bra)</description>
+		<description>Dick Tracy (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7057"/>
@@ -1972,7 +2010,7 @@ license:CC0
 	</software>
 
 	<software name="dinobash">
-		<description>Dinobasher Starring Bignose the Caveman (Euro, prototype)</description>
+		<description>Dinobasher Starring Bignose the Caveman (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1984,7 +2022,7 @@ license:CC0
 	</software>
 
 	<software name="dinodool">
-		<description>The Dinosaur Dooley (Kor)</description>
+		<description>The Dinosaur Dooley (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1996,7 +2034,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="dokidoki" cloneof="pengland">
-		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn)</description>
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1334"/>
@@ -2014,7 +2052,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="dokidokip" cloneof="pengland">
-		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn, prototype)</description>
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Japan, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2028,7 +2066,7 @@ license:CC0
 	</software>
 
 	<software name="doublhwk">
-		<description>Double Hawk (Euro)</description>
+		<description>Double Hawk (Europe)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7036"/>
@@ -2040,7 +2078,7 @@ license:CC0
 	</software>
 
 	<software name="doublhwkp" cloneof="doublhwk">
-		<description>Double Hawk (Euro, prototype)</description>
+		<description>Double Hawk (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2051,7 +2089,7 @@ license:CC0
 	</software>
 
 	<software name="doubltgt" cloneof="quartet">
-		<description>Double Target - Cynthia no Nemuri (Jpn)</description>
+		<description>Double Target - Cynthia no Nemuri (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1314"/>
@@ -2065,7 +2103,7 @@ license:CC0
 	</software>
 
 	<software name="dragon">
-		<description>Dragon - The Bruce Lee Story (Euro)</description>
+		<description>Dragon - The Bruce Lee Story (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27079-50"/>
@@ -2077,7 +2115,7 @@ license:CC0
 	</software>
 
 	<software name="dcrystal">
-		<description>Dragon Crystal (Euro, Bra)</description>
+		<description>Dragon Crystal (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5123, 023.440"/>
@@ -2089,7 +2127,7 @@ license:CC0
 	</software>
 
 	<software name="drhello">
-		<description>Dr. HELLO (Kor)</description>
+		<description>Dr. HELLO (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2100,7 +2138,7 @@ license:CC0
 	</software>
 
 	<software name="drrobotn">
-		<description>Dr. Robotnik's Mean Bean Machine (Euro, Bra)</description>
+		<description>Dr. Robotnik's Mean Bean Machine (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7123"/>
@@ -2112,7 +2150,7 @@ license:CC0
 	</software>
 
 	<software name="dstrike">
-		<description>Desert Strike (Euro)</description>
+		<description>Desert Strike (Europe)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-29010-50"/>
@@ -2125,7 +2163,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="dumpmats" cloneof="prowres">
-		<description>Gokuaku Doumei Dump Matsumoto (Jpn)</description>
+		<description>Gokuaku Doumei Dump Matsumoto (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1302"/>
@@ -2139,7 +2177,7 @@ license:CC0
 	</software>
 
 	<software name="dynduke">
-		<description>Dynamite Duke (Euro, Bra)</description>
+		<description>Dynamite Duke (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7067"/>
@@ -2151,7 +2189,7 @@ license:CC0
 	</software>
 
 	<software name="ddux">
-		<description>Dynamite Dux (Euro, Bra)</description>
+		<description>Dynamite Dux (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7029"/>
@@ -2162,8 +2200,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dduxp" cloneof="ddux">
+		<description>Dynamite Dux (prototype)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-7029-S1"/>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="262144">
+				<rom name="d-dux 9798 0.ic1" size="131072" crc="e9bb8717" sha1="3b7fb221d281bc0a5b797bc7b0f233762ed46a6b" offset="0x00000" />
+				<rom name="d-dux 88a5 1.ic2" size="131072" crc="02ccf5f2" sha1="3ca7d02c5aff375f384b98337e82caf47e60b0e1" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dhead">
-		<description>Dynamite Headdy (Bra)</description>
+		<description>Dynamite Headdy (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.570"/>
@@ -2175,7 +2228,7 @@ license:CC0
 	</software>
 
 	<software name="exainnov">
-		<description>E.I. - Exa Innova (Kor)</description>
+		<description>E.I. - Exa Innova (Korea)</description>
 		<year>19??</year>
 		<publisher>HiCom</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2186,7 +2239,7 @@ license:CC0
 	</software>
 
 	<software name="eagles5">
-		<description>Eagles 5 (Kor)</description>
+		<description>Eagles 5 (Korea)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="독수리5형제 (Doksuri 5 Hyeongjae)" />
@@ -2198,7 +2251,7 @@ license:CC0
 	</software>
 
 	<software name="ecco">
-		<description>Ecco the Dolphin (Euro, Bra)</description>
+		<description>Ecco the Dolphin (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9029"/>
@@ -2210,7 +2263,7 @@ license:CC0
 	</software>
 
 	<software name="ecco2">
-		<description>Ecco - The Tides of Time (Bra)</description>
+		<description>Ecco - The Tides of Time (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.630"/>
@@ -2222,7 +2275,7 @@ license:CC0
 	</software>
 
 	<software name="ejim">
-		<description>Earthworm Jim (Bra)</description>
+		<description>Earthworm Jim (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.690"/>
@@ -2235,7 +2288,7 @@ license:CC0
 
 	<!-- Alt. Title: Super Cross (Bra Box?) -->
 	<software name="enduro">
-		<description>Enduro Racer (Euro, USA, Bra)</description>
+		<description>Enduro Racer (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5077"/>
@@ -2250,7 +2303,7 @@ license:CC0
 	</software>
 
 	<software name="enduroj" cloneof="enduro">
-		<description>Enduro Racer (Jpn)</description>
+		<description>Enduro Racer (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1322"/>
@@ -2267,7 +2320,7 @@ license:CC0
 	</software>
 
 	<software name="eswatc">
-		<description>E-SWAT - City Under Siege (Euro, USA, Easy Version)</description>
+		<description>E-SWAT - City Under Siege (Europe, USA, easy version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7042"/>
@@ -2279,7 +2332,7 @@ license:CC0
 	</software>
 
 	<software name="eswatc1" cloneof="eswatc">
-		<description>E-SWAT - City Under Siege (Euro, USA, Bra, Hard Version)</description>
+		<description>E-SWAT - City Under Siege (Europe, USA, Brazil, hard version)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2327,7 +2380,7 @@ license:CC0
 
 	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="excdizzy" supported="no">
-		<description>The Excellent Dizzy Collection (Euro, USA, prototype)</description>
+		<description>The Excellent Dizzy Collection (Europe, USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
@@ -2340,7 +2393,7 @@ license:CC0
 	</software>
 
 	<software name="f1">
-		<description>F1 (Euro, Bra)</description>
+		<description>F1 (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-27072-50, 026.330"/>
@@ -2355,7 +2408,7 @@ license:CC0
 	</software>
 
 	<software name="f1spirit">
-		<description>F-1 Spirit - The way to Formula-1 (Kor)</description>
+		<description>F-1 Spirit - The way to Formula-1 (Korea)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2382,7 +2435,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- Alt. Title: F-16 -->
 	<software name="f16falctw" cloneof="f16fight">
-		<description>F-16 Fighting Falcon (Tw)</description>
+		<description>F-16 Fighting Falcon (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-313"/>
@@ -2395,7 +2448,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16fight">
-		<description>F-16 Fighter (Euro, USA)</description>
+		<description>F-16 Fighter (Europe, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4581 (Euro Cart re-release?), 4081, 4005M, 41005"/>
@@ -2410,7 +2463,7 @@ license:CC0
 	</software>
 
 	<software name="fatetris">
-		<description>FA Tetris (Kor)</description>
+		<description>FA Tetris (Korea)</description>
 		<year>1989</year>
 		<publisher>FA Soft</publisher>
 		<info name="alt_title" value="에프에이 테트리스" />
@@ -2424,7 +2477,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="family" cloneof="parlour">
-		<description>Family Games (Jpn)</description>
+		<description>Family Games (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1342"/>
@@ -2442,7 +2495,7 @@ license:CC0
 
 	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="fantdizz">
-		<description>Fantastic Dizzy (Euro)</description>
+		<description>Fantastic Dizzy (Europe)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
@@ -2457,7 +2510,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="fantzon2">
-		<description>Fantasy Zone II - The Tears of Opa-Opa (Euro, USA, Bra)</description>
+		<description>Fantasy Zone II - The Tears of Opa-Opa (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7004"/>
@@ -2473,7 +2526,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="fantzon2j" cloneof="fantzon2">
-		<description>Fantasy Zone II - Opa Opa no Namida (Jpn)</description>
+		<description>Fantasy Zone II - Opa Opa no Namida (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1329"/>
@@ -2521,7 +2574,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzonej" cloneof="fantzone">
-		<description>Fantasy Zone (Jpn, v0)</description>
+		<description>Fantasy Zone (Japan, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1301"/>
@@ -2537,7 +2590,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="fantzonetw" cloneof="fantzone">
-		<description>Fantasy Zone (Tw)</description>
+		<description>Fantasy Zone (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="alt_title" value="快樂小飛碟 (Kuàilè xiǎo fēidié)" />
@@ -2550,7 +2603,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="fantzonm">
-		<description>Fantasy Zone - The Maze (Euro, USA)</description>
+		<description>Fantasy Zone - The Maze (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5108"/>
@@ -2562,7 +2615,7 @@ license:CC0
 	</software>
 
 	<software name="finalbb" cloneof="bublbobl">
-		<description>Final Bubble Bobble (Jpn)</description>
+		<description>Final Bubble Bobble (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1362"/>
@@ -2576,7 +2629,7 @@ license:CC0
 	</software>
 
 	<software name="ferias">
-		<description>Férias Frustradas do Pica-Pau (Bra)</description>
+		<description>Férias Frustradas do Pica-Pau (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.660"/>
@@ -2588,7 +2641,7 @@ license:CC0
 	</software>
 
 	<software name="fifa">
-		<description>FIFA International Soccer (Bra)</description>
+		<description>FIFA International Soccer (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.670"/>
@@ -2600,7 +2653,7 @@ license:CC0
 	</software>
 
 	<software name="fireforg">
-		<description>Fire &amp; Forget II (Euro)</description>
+		<description>Fire &amp; Forget II (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus Arcade</publisher>
 		<info name="serial" value="27009-50"/>
@@ -2612,7 +2665,7 @@ license:CC0
 	</software>
 
 	<software name="fireice">
-		<description>Fire &amp; Ice (Bra)</description>
+		<description>Fire &amp; Ice (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="027.360"/>
@@ -2624,7 +2677,7 @@ license:CC0
 	</software>
 
 	<software name="flash">
-		<description>The Flash (Euro, Bra)</description>
+		<description>The Flash (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7506"/>
@@ -2638,7 +2691,7 @@ license:CC0
 	</software>
 
 	<software name="fpoint">
-		<description>Flashpoint (Kor)</description>
+		<description>Flashpoint (Korea)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2700,7 +2753,7 @@ license:CC0
 	</software>
 
 	<software name="flint">
-		<description>The Flintstones (Euro, Bra)</description>
+		<description>The Flintstones (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Grandslam</publisher>
 		<info name="serial" value="MK-27013-50"/>
@@ -2715,7 +2768,7 @@ license:CC0
 	</software>
 
 	<software name="georgeko">
-		<description>George Foreman's KO Boxing (Euro, Bra)</description>
+		<description>George Foreman's KO Boxing (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27041-50, 026.180"/>
@@ -2727,7 +2780,7 @@ license:CC0
 	</software>
 
 	<software name="forgottn">
-		<description>Forgotten Worlds (Euro, Bra, Aus)</description>
+		<description>Forgotten Worlds (Europe, Brazil, Australia)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7056"/>
@@ -2743,7 +2796,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="pitpot1" cloneof="pitpot">
-		<description>Fushigi no Oshiro Pit Pot (Jpn, Pirate?)</description>
+		<description>Fushigi no Oshiro Pit Pot (Japan, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2754,7 +2807,7 @@ license:CC0
 	</software>
 
 	<software name="gaegujan">
-		<description>Gaegujangi Ggachi (Kor)</description>
+		<description>Gaegujangi Ggachi (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="GB-4001"/>
@@ -2766,7 +2819,7 @@ license:CC0
 	</software>
 
 	<software name="gground">
-		<description>Gain Ground (Euro, Bra)</description>
+		<description>Gain Ground (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7045"/>
@@ -2778,7 +2831,7 @@ license:CC0
 	</software>
 
 	<software name="ggroundp" cloneof="gground">
-		<description>Gain Ground (Euro, prototype)</description>
+		<description>Gain Ground (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7045"/>
@@ -2789,11 +2842,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support; game uses input code for some unreleased international version of the paddle that must have been in development, glitches heavily on machines that fail Japan region check -->
 	<software name="galactpr">
-		<description>Galactic Protector (Jpn)</description>
+		<description>Galactic Protector (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Input works only with drivers of Japanese region, e.g. sms1kr,smsj" />
 		<info name="serial" value="G-1348"/>
 		<info name="release" value="19880221"/>
 		<info name="alt_title" value="ギャラクティック プロテクター" />
@@ -2810,7 +2864,7 @@ license:CC0
 	</software>
 
 	<software name="galaxian">
-		<description>Galaxian (Kor)</description>
+		<description>Galaxian (Korea)</description>
 		<year>199?</year>
 		<publisher>HiCom</publisher>
 		<info name="alt_title" value="갤럭시안" />
@@ -2823,7 +2877,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="gforce">
-		<description>Galaxy Force (Euro, Bra)</description>
+		<description>Galaxy Force (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="29001"/>
@@ -2853,7 +2907,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="gamebox">
-		<description>Game Box Série Esportes Radicais (Bra)</description>
+		<description>Game Box Série Esportes Radicais (Brazil)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.480"/>
@@ -2873,7 +2927,7 @@ license:CC0
 	</software>
 
 	<software name="gamcheck">
-		<description>Game de Check! Koutsuu Anzen (Jpn, prototype)</description>
+		<description>Game de Check! Koutsuu Anzen (Japan, prototype)</description>
 		<year>1987</year>
 		<publisher>Tokio Marine</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2884,7 +2938,7 @@ license:CC0
 	</software>
 
 	<software name="robocop">
-		<description>Gangcheol RoboCop (Kor)</description>
+		<description>Gangcheol RoboCop (Korea)</description>
 		<year>1992</year>
 		<publisher>Sieco</publisher>
 		<info name="alt_title" value="강철 로보캅" />
@@ -2896,7 +2950,7 @@ license:CC0
 	</software>
 
 	<software name="gangster">
-		<description>Gangster Town (Euro, USA, Bra)</description>
+		<description>Gangster Town (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5074, 023.120"/>
@@ -2913,7 +2967,7 @@ license:CC0
 	</software>
 
 	<software name="gauntlet">
-		<description>Gauntlet (Euro, Bra)</description>
+		<description>Gauntlet (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="25006"/>
@@ -2925,7 +2979,7 @@ license:CC0
 	</software>
 
 	<software name="goldnaxe">
-		<description>Golden Axe (Euro, USA)</description>
+		<description>Golden Axe (Europe, USA)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9004, 028.060"/>
@@ -2939,8 +2993,22 @@ license:CC0
 		</part>
 	</software>
 
+<!-- no sound on smsj -->
+	<software name="goldaxed">
+		<description>Golden Axe (CES demo)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="131072">
+				<rom name="g-axe_2ca8_ces.ic1" size="131072" crc="a471f450" sha1="201ae127514a1debea786e7a1a3dae617937b539" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gaxewarr">
-		<description>Golden Axe Warrior (Euro, USA, Bra)</description>
+		<description>Golden Axe Warrior (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7505"/>
@@ -2958,9 +3026,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="game188" supported="no">
+		<description>Game Mo-eumjip 188 Hap (Korea)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="게임모음집188합" />
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean_188in1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="game mo-eumjip 188 hap (kr).bin" size="1048576" crc="380d7400" sha1="35a5f9a52cce6d702ba7e68daa7b5a07bce5ca87" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="gerald" cloneof="teddyboy">
-		<description>Geraldinho (Bra)</description>
+		<description>Geraldinho (Brazil)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="021.080"/>
@@ -2973,7 +3055,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghostbst">
-		<description>Ghostbusters (Euro, USA, Kor)</description>
+		<description>Ghostbusters (Europe, USA, Korea)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5065, GB1024JG"/>
@@ -2989,7 +3071,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosth">
-		<description>Ghost House (Euro, USA, Bra)</description>
+		<description>Ghost House (Europe, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4002 (Card), 4502 (Cart)"/>
@@ -3005,7 +3087,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthj1" cloneof="ghosth">
-		<description>Ghost House (Jpn, Pirate?)</description>
+		<description>Ghost House (Japan, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3017,7 +3099,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthk" cloneof="ghosth">
-		<description>Ghost House (Kor)</description>
+		<description>Ghost House (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="유령의 집 (Yuyryeong-ui Jip)" />
@@ -3029,7 +3111,7 @@ license:CC0
 	</software>
 
 	<software name="ghouls">
-		<description>Ghouls'n Ghosts (Euro, USA, Bra)</description>
+		<description>Ghouls'n Ghosts (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7055, 025.170"/>
@@ -3041,7 +3123,7 @@ license:CC0
 	</software>
 
 	<software name="ghoulsd" cloneof="ghouls">
-		<description>Ghouls'n Ghosts (USA, Demo)</description>
+		<description>Ghouls'n Ghosts (USA, demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3053,7 +3135,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="globald">
-		<description>Global Defense (Euro, USA)</description>
+		<description>Global Defense (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5102"/>
@@ -3069,7 +3151,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="globaldp" cloneof="globald">
-		<description>Global Defense (Euro, USA, prototype)</description>
+		<description>Global Defense (Europe, USA, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3080,7 +3162,7 @@ license:CC0
 	</software>
 
 	<software name="gloc">
-		<description>G-LOC Air Battle (Euro, Bra, Kor)</description>
+		<description>G-LOC Air Battle (Europe, Brazil, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7071, GB2009JG"/>
@@ -3093,7 +3175,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="golfaman">
-		<description>Golfamania (Euro, Bra)</description>
+		<description>Golfamania (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7502"/>
@@ -3129,7 +3211,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="golvell">
-		<description>Golvellius (Euro, USA)</description>
+		<description>Golvellius (Europe, USA)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7017"/>
@@ -3144,7 +3226,7 @@ license:CC0
 	</software>
 
 	<software name="gprider">
-		<description>GP Rider (Euro, Bra)</description>
+		<description>GP Rider (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9013, 028.200"/>
@@ -3156,7 +3238,7 @@ license:CC0
 	</software>
 
 	<software name="greatbas">
-		<description>Great Baseball (Euro, USA, Bra)</description>
+		<description>Great Baseball (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5061"/>
@@ -3172,7 +3254,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatbasj1" cloneof="greatbas">
-		<description>Great Baseball (Jpn, Pirate?)</description>
+		<description>Great Baseball (Japan, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3218,7 +3300,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="greatglf">
-		<description>Great Golf (Euro, USA) ~ Masters Golf (Japan)</description>
+		<description>Great Golf (Europe, USA) ~ Masters Golf (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1332, 5057"/>
@@ -3236,7 +3318,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="greatglf1" cloneof="greatglf">
-		<description>Great Golf (Euro, USA, v1.0)</description>
+		<description>Great Golf (Europe, USA, v1.0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3259,7 +3341,7 @@ license:CC0
 	</software>
 
 	<software name="greatglj">
-		<description>Great Golf (Jpn)</description>
+		<description>Great Golf (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1313"/>
@@ -3273,7 +3355,7 @@ license:CC0
 	</software>
 
 	<software name="greatglk" cloneof="greatglj">
-		<description>Great Golf (Kor)</description>
+		<description>Great Golf (Korea)</description>
 		<year>19??</year>
 		<publisher>Samsung?</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3285,12 +3367,12 @@ license:CC0
 
 	<!-- Notes: FM support, in Japan only 1000 copies were manufactured as a prize for a contest -->
 	<software name="greatice">
-		<description>Great Ice Hockey (Jpn, USA)</description>
+		<description>Great Ice Hockey (Japan, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5062 (USA)"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power (Jpn cart) -->
 			<feature name="pcb" value="171-5552" />
@@ -3303,7 +3385,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscr">
-		<description>Great Soccer (Euro)</description>
+		<description>Great Soccer (Europe)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4082 (Euro card), 41018"/>
@@ -3316,7 +3398,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrtw" cloneof="greatscr">
-		<description>Great Soccer (Tw)</description>
+		<description>Great Soccer (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-307"/>
@@ -3329,7 +3411,7 @@ license:CC0
 	</software>
 
 	<software name="greatvol">
-		<description>Great Volleyball (Euro, USA, Bra)</description>
+		<description>Great Volleyball (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5070, 023.170, 028.560"/>
@@ -3341,7 +3423,7 @@ license:CC0
 	</software>
 
 	<software name="greatvolj" cloneof="greatvol">
-		<description>Great Volleyball (Jpn)</description>
+		<description>Great Volleyball (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1317"/>
@@ -3355,7 +3437,7 @@ license:CC0
 	</software>
 
 	<software name="gunsmoke">
-		<description>Gun.Smoke (Kor)</description>
+		<description>Gun.Smoke (Korea)</description>
 		<year>1990</year>
 		<publisher>ProSoft</publisher>
 		<info name="alt_title" value="건스모크" />
@@ -3368,7 +3450,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="hajafuin" cloneof="miracle">
-		<description>Haja no Fuuin (Jpn)</description>
+		<description>Haja no Fuuin (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1331"/>
@@ -3385,7 +3467,7 @@ license:CC0
 	</software>
 
 	<software name="hangon">
-		<description>Hang-On (Euro, Bra, Aus)</description>
+		<description>Hang-On (Europe, Brazil, Australia)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4080 (Card), 4580 (Cart)"/>
@@ -3450,7 +3532,7 @@ license:CC0
 	</software>
 
 	<software name="heavyw">
-		<description>Heavyweight Champ (Euro)</description>
+		<description>Heavyweight Champ (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7063"/>
@@ -3475,7 +3557,7 @@ license:CC0
 	</software>
 
 	<software name="herolanc">
-		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Euro, Bra)</description>
+		<description>Advanced Dungeons &amp; Dragons - Heroes of the Lance (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29003-50"/>
@@ -3498,7 +3580,7 @@ license:CC0
 	</software>
 
 	<software name="highsc">
-		<description>High School! Kimengumi (Jpn)</description>
+		<description>High School! Kimengumi (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1309"/>
@@ -3514,7 +3596,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
-		<description>Hokuto no Ken (Jpn)</description>
+		<description>Hokuto no Ken (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1303"/>
@@ -3529,7 +3611,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="hokutotw" cloneof="blackblt">
-		<description>Hokuto no Ken (Tw)</description>
+		<description>Hokuto no Ken (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="alt_title" value="北斗神拳 (Běidǒu shén quán)" />
@@ -3541,7 +3623,7 @@ license:CC0
 	</software>
 
 	<software name="homea">
-		<description>Home Alone (Euro)</description>
+		<description>Home Alone (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7109"/>
@@ -3553,7 +3635,7 @@ license:CC0
 	</software>
 
 	<software name="hongkd">
-		<description>Hong Kil Dong (Kor)</description>
+		<description>Hong Kil Dong (Korea)</description>
 		<year>1991</year>
 		<publisher>Clover</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3565,7 +3647,7 @@ license:CC0
 	</software>
 
 	<software name="hook">
-		<description>Hook (Euro, prototype)</description>
+		<description>Hook (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3577,7 +3659,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="hoshiw">
-		<description>Hoshi wo Sagashite... (Jpn)</description>
+		<description>Hoshi wo Sagashite... (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1354"/>
@@ -3595,7 +3677,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="hwaran" cloneof="kenseid">
-		<description>Hwarang Ui Geom (Kor)</description>
+		<description>Hwarang Ui Geom (Korea)</description>
 		<year>1988</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="GB-2356"/>
@@ -3607,7 +3689,7 @@ license:CC0
 	</software>
 
 	<software name="impmiss">
-		<description>Impossible Mission (Euro, Bra)</description>
+		<description>Impossible Mission (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="25007-50"/>
@@ -3619,7 +3701,7 @@ license:CC0
 	</software>
 
 	<software name="impmissp" cloneof="impmiss">
-		<description>Impossible Mission (Euro, prototype)</description>
+		<description>Impossible Mission (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3630,7 +3712,7 @@ license:CC0
 	</software>
 
 	<software name="crashdum">
-		<description>The Incredible Crash Dummies (Euro, Bra)</description>
+		<description>The Incredible Crash Dummies (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27057-50"/>
@@ -3642,7 +3724,7 @@ license:CC0
 	</software>
 
 	<software name="hulk">
-		<description>The Incredible Hulk (Euro, Bra)</description>
+		<description>The Incredible Hulk (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29016-50"/>
@@ -3654,7 +3736,7 @@ license:CC0
 	</software>
 
 	<software name="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro, Bra)</description>
+		<description>Indiana Jones and the Last Crusade (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="27008-50, 027.079"/>
@@ -3669,7 +3751,7 @@ license:CC0
 	</software>
 
 	<software name="indycrusp" cloneof="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro, prototype)</description>
+		<description>Indiana Jones and the Last Crusade (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3703,7 +3785,7 @@ license:CC0
 	</software>
 
 	<software name="jb007">
-		<description>James Bond 007 - The Duel (Euro)</description>
+		<description>James Bond 007 - The Duel (Europe)</description>
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-27046-50"/>
@@ -3718,7 +3800,7 @@ license:CC0
 	</software>
 
 	<software name="jb007b" cloneof="jb007">
-		<description>James Bond 007 - The Duel (Bra)</description>
+		<description>James Bond 007 - The Duel (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="027.230"/>
@@ -3730,7 +3812,7 @@ license:CC0
 	</software>
 
 	<software name="janggun">
-		<description>Janggun ui Adeul (Kor)</description>
+		<description>Janggun ui Adeul (Korea)</description>
 		<year>1992</year>
 		<publisher>Daou Infosys</publisher>
 		<info name="alt_title" value="장군의 아들"/>
@@ -3743,7 +3825,7 @@ license:CC0
 	</software>
 
 	<software name="jangpun2">
-		<description>Jang Pung II (Kor)</description>
+		<description>Jang Pung II (Korea)</description>
 		<year>1993</year>
 		<publisher>Sieco</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3755,7 +3837,7 @@ license:CC0
 	</software>
 
 	<software name="jangpun3">
-		<description>Jang Pung 3 (Kor)</description>
+		<description>Jang Pung 3 (Korea)</description>
 		<year>1994</year>
 		<publisher>Sanghun</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3767,7 +3849,7 @@ license:CC0
 	</software>
 
 	<software name="joemont">
-		<description>Joe Montana Football (Euro, USA, Bra)</description>
+		<description>Joe Montana Football (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7062"/>
@@ -3783,7 +3865,7 @@ license:CC0
 
 	<!-- Alt. Titles: Le Livre de la Jungle (Fra Box), Das Dschungelbuch (Ger Box) -->
 	<software name="jungle">
-		<description>The Jungle Book (Euro, Bra)</description>
+		<description>The Jungle Book (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27069-50, MK-27069-09, MK-27069-18, 027.330"/>
@@ -3798,7 +3880,7 @@ license:CC0
 	</software>
 
 	<software name="jpark">
-		<description>Jurassic Park (Euro)</description>
+		<description>Jurassic Park (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9030, 027.330"/>
@@ -3811,7 +3893,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="kenseid">
-		<description>Kenseiden (Euro, USA, Bra)</description>
+		<description>Kenseiden (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7013"/>
@@ -3824,7 +3906,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="kenseidj" cloneof="kenseid">
-		<description>Kenseiden (Jpn)</description>
+		<description>Kenseiden (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1358"/>
@@ -3863,8 +3945,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kingqstp1" cloneof="kingqst">
+		<description>King's Quest - Quest for the Crown (USA, prototype, 19890203)</description>
+		<year>1989</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="ic3" value="315-5235" /> <!-- Sega Memory Controller -->
+			<dataarea name="rom" size="0x20000">
+				<rom name="king's quest 2-3-89.ic1" size="0x20000" crc="fd27bef1" sha1="9811eb06f4e67bea9c08c4e3446eafed78e2d275" /> <!-- original label: KING'S QUEST 2/3/89 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingball">
-		<description>King &amp; Balloon (Kor)</description>
+		<description>King &amp; Balloon (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="왕과풍선 (Wang-gwa Pungseon)" />
@@ -3876,7 +3970,7 @@ license:CC0
 	</software>
 
 	<software name="klax">
-		<description>Klax (Euro)</description>
+		<description>Klax (Europe)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301040-0160"/>
@@ -3888,7 +3982,7 @@ license:CC0
 	</software>
 
 	<software name="knightm2">
-		<description>Knightmare II - The Maze of Galious (Kor)</description>
+		<description>Knightmare II - The Maze of Galious (Korea)</description>
 		<year>199?</year>
 		<publisher>Zemina?</publisher>
 		<info name="alt_title" value="마성전설 II (Maseong Jeonseol II)" />
@@ -3901,7 +3995,7 @@ license:CC0
 	</software>
 
 	<software name="krustyfh">
-		<description>Krusty's Fun House (Euro, Bra)</description>
+		<description>Krusty's Fun House (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27056-50, 026.280"/>
@@ -3914,7 +4008,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="kujaku" cloneof="spellcst">
-		<description>Kujaku Ou (Jpn)</description>
+		<description>Kujaku Ou (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1366"/>
@@ -3928,7 +4022,7 @@ license:CC0
 	</software>
 
 	<software name="kungfuk">
-		<description>Kung Fu Kid (Euro, USA, Bra)</description>
+		<description>Kung Fu Kid (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5078"/>
@@ -3943,7 +4037,7 @@ license:CC0
 	</software>
 
 	<software name="landill">
-		<description>Land of Illusion Starring Mickey Mouse (Euro, Bra)</description>
+		<description>Land of Illusion Starring Mickey Mouse (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9014"/>
@@ -3959,7 +4053,7 @@ license:CC0
 
 	<!-- Notes: optional Light Phaser support -->
 	<software name="lghost">
-		<description>Laser Ghost (Euro)</description>
+		<description>Laser Ghost (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7074"/>
@@ -3971,7 +4065,7 @@ license:CC0
 	</software>
 
 	<software name="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Bra)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Brazil)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.750"/>
@@ -3986,7 +4080,7 @@ license:CC0
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Euro, Bra, Kor)</description>
+		<description>Lemmings (Europe, Brazil, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7108, 025.204, GB2032JG"/>
@@ -4001,7 +4095,7 @@ license:CC0
 	</software>
 
 	<software name="lemmingsp" cloneof="lemmings">
-		<description>Lemmings (Euro, prototype)</description>
+		<description>Lemmings (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4012,7 +4106,7 @@ license:CC0
 	</software>
 
 	<software name="lemming2">
-		<description>Lemmings 2 - The Tribes (Euro, prototype)</description>
+		<description>Lemmings 2 - The Tribes (Europe, prototype)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4024,7 +4118,7 @@ license:CC0
 
 	<!-- Notes: 3D glasses support -->
 	<software name="loffire">
-		<description>Line of Fire (Euro, Bra, Kor)</description>
+		<description>Line of Fire (Europe, Brazil, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="To play in 3-D on SMS1, hold buttons 1 and 2 while powering up the system." />
@@ -4038,7 +4132,7 @@ license:CC0
 
 	<!-- Alt. Titles: El Rey Leon (Spa Box), Le Roi Lion (Fra Box), Der Konig Der Lowen (Ger Box) -->
 	<software name="lionking">
-		<description>Disney's The Lion King (Euro, Bra)</description>
+		<description>Disney's The Lion King (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27081-50, MK-27081-06, MK-27081-09, MK-27081-18, 028.450"/>
@@ -4051,7 +4145,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="lordswrd">
-		<description>Lord of the Sword (Euro, USA, Bra)</description>
+		<description>Lord of the Sword (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7016"/>
@@ -4064,7 +4158,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="lordswrdj" cloneof="lordswrd">
-		<description>Lord of Sword (Jpn)</description>
+		<description>Lord of Sword (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1361"/>
@@ -4080,7 +4174,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
-		<description>Loretta no Shouzou (Jpn)</description>
+		<description>Loretta no Shouzou (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1315"/>
@@ -4098,7 +4192,7 @@ license:CC0
 	</software>
 
 	<software name="luckydim">
-		<description>The Lucky Dime Caper Starring Donald Duck (Euro, Bra)</description>
+		<description>The Lucky Dime Caper Starring Donald Duck (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7072"/>
@@ -4113,7 +4207,7 @@ license:CC0
 	</software>
 
 	<software name="luckydimp" cloneof="luckydim">
-		<description>The Lucky Dime Caper Starring Donald Duck (Euro, prototype)</description>
+		<description>The Lucky Dime Caper Starring Donald Duck (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4124,7 +4218,7 @@ license:CC0
 	</software>
 
 	<software name="mjsengok">
-		<description>Mahjong Sengoku Jidai (Jpn, HK)</description>
+		<description>Mahjong Sengoku Jidai (Japan, Hong Kong)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1337"/>
@@ -4141,7 +4235,7 @@ license:CC0
 	</software>
 
 	<software name="mjsengokp" cloneof="mjsengok">
-		<description>Mahjong Sengoku Jidai (Jpn, prototype)</description>
+		<description>Mahjong Sengoku Jidai (Japan, prototype)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4152,7 +4246,7 @@ license:CC0
 	</software>
 
 	<software name="makairet" cloneof="kungfuk">
-		<description>Makai Retsuden (Jpn)</description>
+		<description>Makai Retsuden (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1324"/>
@@ -4171,7 +4265,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="maougolv" cloneof="golvell">
-		<description>Maou Golvellius (Jpn)</description>
+		<description>Maou Golvellius (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1363"/>
@@ -4186,7 +4280,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="maougolvp" cloneof="golvell">
-		<description>Maou Golvellius (Jpn, prototype)</description>
+		<description>Maou Golvellius (Japan, prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4197,7 +4291,7 @@ license:CC0
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness (Euro)</description>
+		<description>Marble Madness (Europe)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="27024-50"/>
@@ -4209,7 +4303,7 @@ license:CC0
 	</software>
 
 	<software name="marksman">
-		<description>Marksman Shooting &amp; Trap Shooting &amp; Safari Hunt (Euro, Bra)</description>
+		<description>Marksman Shooting &amp; Trap Shooting &amp; Safari Hunt (Europe, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="6080"/>
@@ -4239,7 +4333,7 @@ license:CC0
 	</software>
 
 	<software name="mastcomb">
-		<description>Masters of Combat (Euro, Bra, Aus)</description>
+		<description>Masters of Combat (Europe, Brazil, Australia)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7124, 9028"/>
@@ -4251,7 +4345,7 @@ license:CC0
 	</software>
 
 	<software name="mastdark">
-		<description>Master of Darkness (Euro, Bra)</description>
+		<description>Master of Darkness (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7107, 7107-50, 025.112"/>
@@ -4267,7 +4361,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support -->
 	<software name="mazehunt">
-		<description>Maze Hunter 3-D (Euro, USA, Bra)</description>
+		<description>Maze Hunter 3-D (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8003"/>
@@ -4283,7 +4377,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support -->
 	<software name="mazewalk" cloneof="mazehunt">
-		<description>Maze Walker (Jpn)</description>
+		<description>Maze Walker (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1345"/>
@@ -4301,7 +4395,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="megumi">
-		<description>Megumi Rescue (Jpn)</description>
+		<description>Megumi Rescue (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1359"/>
@@ -4316,7 +4410,7 @@ license:CC0
 	</software>
 
 	<software name="mercs">
-		<description>Mercs (Euro, Bra)</description>
+		<description>Mercs (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9007"/>
@@ -4332,7 +4426,7 @@ license:CC0
 	</software>
 
 	<software name="mickeyuc">
-		<description>Mickey's Ultimate Challenge (Bra)</description>
+		<description>Mickey's Ultimate Challenge (Brazil)</description>
 		<year>1998</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.700"/>
@@ -4344,7 +4438,7 @@ license:CC0
 	</software>
 
 	<software name="mickmack">
-		<description>Mick &amp; Mack as the Global Gladiators (Euro, Bra)</description>
+		<description>Mick &amp; Mack as the Global Gladiators (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27062-50, 027.090"/>
@@ -4360,7 +4454,7 @@ license:CC0
 
 	<!-- Notes: Requires an extra-height video mode absent on the 315-5124 VDP -->
 	<software name="micromac">
-		<description>Micro Machines (Euro)</description>
+		<description>Micro Machines (Europe)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="Video mode is correct only on SMS 2 drivers, e.g. smspal" />
@@ -4374,7 +4468,7 @@ license:CC0
 	</software>
 
 	<software name="sdmilhao">
-		<description>Show do Milhão (Bra, prototype)</description>
+		<description>Show do Milhão (Brazil, prototype)</description>
 		<year>2003</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4386,7 +4480,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="miracle">
-		<description>Miracle Warriors - Seal of the Dark Lord (Euro, USA, Bra)</description>
+		<description>Miracle Warriors - Seal of the Dark Lord (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7500"/>
@@ -4417,7 +4511,7 @@ license:CC0
 
 	<!-- Notes: 3D glasses support -->
 	<software name="missil3d">
-		<description>Missile Defense 3-D (Euro, USA, Bra)</description>
+		<description>Missile Defense 3-D (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8001, 023.230"/>
@@ -4447,7 +4541,7 @@ license:CC0
 	</software>
 
 	<software name="mk">
-		<description>Mortal Kombat (Euro, Bra)</description>
+		<description>Mortal Kombat (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="MK-29021-50, 028.240"/>
@@ -4462,7 +4556,7 @@ license:CC0
 	</software>
 
 	<software name="mk2">
-		<description>Mortal Kombat II (Euro, Bra)</description>
+		<description>Mortal Kombat II (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="MK-29029-50, 028.530"/>
@@ -4474,7 +4568,7 @@ license:CC0
 	</software>
 
 	<software name="mk3">
-		<description>Mortal Kombat 3 (Bra)</description>
+		<description>Mortal Kombat 3 (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.730"/>
@@ -4487,7 +4581,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="monica" cloneof="wboymlnd">
-		<description>Mônica no Castelo do Dragao (Bra)</description>
+		<description>Mônica no Castelo do Dragao (Brazil)</description>
 		<year>1991</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4498,7 +4592,7 @@ license:CC0
 	</software>
 
 	<software name="monopoly">
-		<description>Monopoly (Euro)</description>
+		<description>Monopoly (Europe)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4528,6 +4622,20 @@ license:CC0
 
 	<software name="monopolyp" cloneof="monopoly">
 		<description>Monopoly (USA, prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="monopoly [proto 1].bin" size="0x20000" crc="e0d1049b" sha1="6d100d43cddfb761d3560786c26e345873452a4b" />
+			</dataarea>
+			<dataarea name="ram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopolyp1" cloneof="monopoly">
+		<description>Monopoly (USA, prototype, alt)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4567,7 +4675,7 @@ license:CC0
 	</software>
 
 	<software name="mopirang">
-		<description>Mopiranger (Kor)</description>
+		<description>Mopiranger (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="포피레인저" />
@@ -4579,7 +4687,7 @@ license:CC0
 	</software>
 
 	<software name="mspacman">
-		<description>Ms. Pac-Man (Euro, Bra)</description>
+		<description>Ms. Pac-Man (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301030-0160"/>
@@ -4591,7 +4699,7 @@ license:CC0
 	</software>
 
 	<software name="mwalk">
-		<description>Michael Jackson's Moonwalker (Euro, USA, Bra, Kor)</description>
+		<description>Michael Jackson's Moonwalker (Europe, USA, Brazil, Korea)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7052, GB2004JG"/>
@@ -4614,7 +4722,7 @@ license:CC0
 	</software>
 
 	<software name="xevious">
-		<description>The Micro Xevious (Kor)</description>
+		<description>The Micro Xevious (Korea)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="마이크로 제비우스"/>
@@ -4627,7 +4735,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="myhero">
-		<description>My Hero (Euro, USA, Bra)</description>
+		<description>My Hero (Europe, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4001 (Card), 4501 (Cart), 021.030, 41004"/>
@@ -4639,7 +4747,7 @@ license:CC0
 	</software>
 
 	<software name="nbajam">
-		<description>NBA Jam (Euro, prototype)</description>
+		<description>NBA Jam (Europe, prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim</publisher>
 		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
@@ -4667,7 +4775,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="nekkyu">
-		<description>Nekkyuu Koushien (Jpn)</description>
+		<description>Nekkyuu Koushien (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1367"/>
@@ -4684,7 +4792,7 @@ license:CC0
 	</software>
 
 	<software name="nemesis">
-		<description>Nemesis (Kor)</description>
+		<description>Nemesis (Korea)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="그라디우스 ~ Gradius (Box)"/>
@@ -4697,7 +4805,7 @@ license:CC0
 	</software>
 
 	<software name="nemesis2">
-		<description>Nemesis 2 (Kor)</description>
+		<description>Nemesis 2 (Korea)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="그라디우 2 ~ Gradius 2 (Box?)"/>
@@ -4711,7 +4819,7 @@ license:CC0
 
 	<!-- Alt. Title: I Ninja (Ita Box) -->
 	<software name="ninja">
-		<description>The Ninja (Euro, USA)</description>
+		<description>The Ninja (Europe, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5066"/>
@@ -4726,7 +4834,7 @@ license:CC0
 	</software>
 
 	<software name="ninjaj" cloneof="ninja">
-		<description>The Ninja (Jpn)</description>
+		<description>The Ninja (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1308"/>
@@ -4744,7 +4852,7 @@ license:CC0
 	</software>
 
 	<software name="ngaiden">
-		<description>Ninja Gaiden (Euro, Bra)</description>
+		<description>Ninja Gaiden (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7101"/>
@@ -4759,7 +4867,7 @@ license:CC0
 	</software>
 
 	<software name="ngaidenp" cloneof="ngaiden">
-		<description>Ninja Gaiden (Euro, prototype)</description>
+		<description>Ninja Gaiden (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4770,7 +4878,7 @@ license:CC0
 	</software>
 
 	<software name="olympgld">
-		<description>Olympic Gold (Euro)</description>
+		<description>Olympic Gold (Europe)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="MK-27030-50, MK-27030-05, MK-27030-06, MK-27030-09, MK-27030-18"/>
@@ -4785,7 +4893,7 @@ license:CC0
 	</software>
 
 	<software name="olympgldk" cloneof="olympgld">
-		<description>Olympic Gold (Kor)</description>
+		<description>Olympic Gold (Korea)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="GB2023JG"/>
@@ -4798,7 +4906,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="opaopa" cloneof="fantzonm">
-		<description>Opa Opa (Jpn)</description>
+		<description>Opa Opa (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1343"/>
@@ -4812,7 +4920,7 @@ license:CC0
 	</software>
 
 	<software name="opwolf">
-		<description>Operation Wolf (Euro, Bra)</description>
+		<description>Operation Wolf (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7039"/>
@@ -4825,7 +4933,7 @@ license:CC0
 	</software>
 
 	<software name="ottifant">
-		<description>The Ottifants (Euro, Bra)</description>
+		<description>The Ottifants (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7120, 025.450"/>
@@ -4856,7 +4964,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support, optional Paddle Control support -->
 	<software name="outrun3d">
-		<description>Out Run 3-D (Euro, Bra)</description>
+		<description>Out Run 3-D (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8007"/>
@@ -4882,7 +4990,7 @@ license:CC0
 	</software>
 
 	<software name="outrneur">
-		<description>Out Run Europa (Euro, Bra)</description>
+		<description>Out Run Europa (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="27016-50"/>
@@ -4894,7 +5002,7 @@ license:CC0
 	</software>
 
 	<software name="pacmania">
-		<description>Pac-Mania (Euro)</description>
+		<description>Pac-Mania (Europe)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="25010-50"/>
@@ -4906,7 +5014,7 @@ license:CC0
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy (Euro, v0)</description>
+		<description>Paperboy (Europe, v0)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="25008-50"/>
@@ -4918,7 +5026,7 @@ license:CC0
 	</software>
 
 	<software name="paperboyu" cloneof="paperboy">
-		<description>Paperboy (USA, Bra, v1)</description>
+		<description>Paperboy (USA, Brazil, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5121"/>
@@ -4934,7 +5042,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="parlour">
-		<description>Parlour Games (Euro, USA)</description>
+		<description>Parlour Games (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5013"/>
@@ -4961,7 +5069,7 @@ license:CC0
 	</software>
 
 	<software name="pengadv">
-		<description>Penguin Adventure (Kor)</description>
+		<description>Penguin Adventure (Korea)</description>
 		<year>199?</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="꿈의대륙 (Kkum Ui Dai Ryuk)" />
@@ -4975,7 +5083,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="pengland">
-		<description>Penguin Land (Euro, USA)</description>
+		<description>Penguin Land (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5501"/>
@@ -4996,7 +5104,7 @@ license:CC0
 	</software>
 
 	<software name="pgatour">
-		<description>PGA Tour Golf (Euro)</description>
+		<description>PGA Tour Golf (Europe)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="27070-50, 301045-0160"/>
@@ -5008,7 +5116,7 @@ license:CC0
 	</software>
 
 	<software name="pitfight">
-		<description>PitFighter - The Ultimate Challenge (Euro)</description>
+		<description>PitFighter - The Ultimate Challenge (Europe)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-29009-50"/>
@@ -5020,7 +5128,7 @@ license:CC0
 	</software>
 
 	<software name="pitfightb" cloneof="pitfight">
-		<description>PitFighter - The Ultimate Challenge (Bra)</description>
+		<description>PitFighter - The Ultimate Challenge (Brazil)</description>
 		<year>1991</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.250"/>
@@ -5032,7 +5140,7 @@ license:CC0
 	</software>
 
 	<software name="pooyan">
-		<description>Pooyan (Kor)</description>
+		<description>Pooyan (Korea)</description>
 		<year>19??</year>
 		<publisher>HiCom</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5043,7 +5151,7 @@ license:CC0
 	</software>
 
 	<software name="populous">
-		<description>Populous (Euro, Bra)</description>
+		<description>Populous (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>TecMagik</publisher>
 		<info name="serial" value="27014-50"/>
@@ -5056,7 +5164,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support -->
 	<software name="poseidon">
-		<description>Poseidon Wars 3-D (Euro, USA, Bra)</description>
+		<description>Poseidon Wars 3-D (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8006"/>
@@ -5072,7 +5180,7 @@ license:CC0
 
 	<!-- Notes: FM support, optional SK-1100 keyboard support -->
 	<software name="pstrike">
-		<description>Power Strike (Euro, Bra, Kor)</description>
+		<description>Power Strike (Europe, Brazil, Korea)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5109, GB-1004"/>
@@ -5087,7 +5195,7 @@ license:CC0
 	</software>
 
 	<software name="pstrike2">
-		<description>Power Strike II (Euro, Bra)</description>
+		<description>Power Strike II (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9024"/>
@@ -5102,7 +5210,7 @@ license:CC0
 	</software>
 
 	<software name="ppersia">
-		<description>Prince of Persia (Euro, Bra)</description>
+		<description>Prince of Persia (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="27022-50, 027.270"/>
@@ -5114,7 +5222,7 @@ license:CC0
 	</software>
 
 	<software name="predatr2">
-		<description>Predator 2 (Euro)</description>
+		<description>Predator 2 (Europe)</description>
 		<year>1992</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="MK-27026-50"/>
@@ -5126,7 +5234,7 @@ license:CC0
 	</software>
 
 	<software name="predatr2b" cloneof="predatr2">
-		<description>Predator 2 (Bra)</description>
+		<description>Predator 2 (Brazil)</description>
 		<year>1992?</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5138,7 +5246,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="prowres">
-		<description>Pro Wrestling (Euro, USA, Bra)</description>
+		<description>Pro Wrestling (Europe, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5056"/>
@@ -5153,7 +5261,7 @@ license:CC0
 	</software>
 
 	<software name="proyakyu">
-		<description>The Pro Yakyuu Pennant Race (Jpn)</description>
+		<description>The Pro Yakyuu Pennant Race (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1323"/>
@@ -5171,7 +5279,7 @@ license:CC0
 	</software>
 
 	<software name="pstar">
-		<description>Phantasy Star (Euro, USA, v3)</description>
+		<description>Phantasy Star (Europe, USA, v3)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9500"/>
@@ -5193,7 +5301,7 @@ license:CC0
 	</software>
 
 	<software name="pstar1" cloneof="pstar">
-		<description>Phantasy Star (Euro, USA, v2)</description>
+		<description>Phantasy Star (Europe, USA, v2)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5207,7 +5315,7 @@ license:CC0
 	</software>
 
 	<software name="pstarb" cloneof="pstar">
-		<description>Phantasy Star (Bra)</description>
+		<description>Phantasy Star (Brazil)</description>
 		<year>1987</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="029.010"/>
@@ -5223,7 +5331,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="pstarj" cloneof="pstar">
-		<description>Phantasy Star (Jpn)</description>
+		<description>Phantasy Star (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1341"/>
@@ -5247,13 +5355,14 @@ license:CC0
 	<!-- This is the MegaDrive version (released in 1994), also included in "Phantasy Star Collection" for the Sega Saturn -->
 	<!-- It currently does not work in the megadrij driver -->
 	<software name="pstarjmd" cloneof="pstar">
-		<description>Phantasy Star (Jpn, MD / Saturn Collection CD)</description>
+		<description>Phantasy Star (Japan, MD / Saturn Collection CD)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="G-4534"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="524288">
-				<rom name="phantasy star (j) (from saturn collection cd).bin" size="524288" crc="07301f83" sha1="b3ae447dc739256616b44cbd77cb903c9f19e980" offset="000000" />
+				<rom name="phantasy star (j) (from saturn collection cd).bin" size="524288" crc="07301f83" sha1="b3ae447dc739256616b44cbd77cb903c9f19e980" offset="000000" status="baddump"/>
 			</dataarea>
 			<dataarea name="ram" size="8192">
 			</dataarea>
@@ -5261,7 +5370,7 @@ license:CC0
 	</software>
 
 	<software name="pstark" cloneof="pstar">
-		<description>Phantasy Star (Kor)</description>
+		<description>Phantasy Star (Korea)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GB-4014KS"/>
@@ -5276,7 +5385,7 @@ license:CC0
 	</software>
 
 	<software name="psychicw">
-		<description>Psychic World (Euro, Bra)</description>
+		<description>Psychic World (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7066"/>
@@ -5288,7 +5397,7 @@ license:CC0
 	</software>
 
 	<software name="psychof">
-		<description>Psycho Fox (Euro, USA, Bra)</description>
+		<description>Psycho Fox (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7032"/>
@@ -5299,8 +5408,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="psychofp" cloneof="psychof">
+		<description>Psycho Fox (prototype)</description>
+		<year>1989</year>
+		<publisher>Aimo</publisher>
+		<part name="cart" interface="sms_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5486" />
+			<dataarea name="rom" size="262144">
+				<rom name="fox-0_5a04.ic1" size="131072" crc="601f6aec" sha1="92cd843a8278e33632207a667d2447f9d901de30" offset="0x00000" />
+				<rom name="fox-1_dd75.ic2" size="131072" crc="d875bff5" sha1="ea4124286e8e93975ee89db67b2441c43da365dc" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puttputt">
-		<description>Putt &amp; Putter (Euro, Bra)</description>
+		<description>Putt &amp; Putter (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5122"/>
@@ -5312,7 +5435,7 @@ license:CC0
 	</software>
 
 	<software name="puttputtp" cloneof="puttputt">
-		<description>Putt &amp; Putter (Euro, prototype)</description>
+		<description>Putt &amp; Putter (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5323,7 +5446,7 @@ license:CC0
 	</software>
 
 	<software name="puznic">
-		<description>Puznic (Kor)</description>
+		<description>Puznic (Korea)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5334,7 +5457,7 @@ license:CC0
 	</software>
 
 	<software name="quartet">
-		<description>Quartet (Euro, USA)</description>
+		<description>Quartet (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5073"/>
@@ -5349,7 +5472,7 @@ license:CC0
 	</software>
 
 	<software name="shavnyak">
-		<description>Quest for the Shaven Yak Starring Ren Hoëk &amp; Stimpy (Bra)</description>
+		<description>Quest for the Shaven Yak Starring Ren Hoëk &amp; Stimpy (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.540"/>
@@ -5361,7 +5484,7 @@ license:CC0
 	</software>
 
 	<software name="rbisland">
-		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Euro)</description>
+		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7117"/>
@@ -5373,7 +5496,7 @@ license:CC0
 	</software>
 
 	<software name="rbislandb" cloneof="rbisland">
-		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Bra)</description>
+		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="026.360"/>
@@ -5400,7 +5523,7 @@ license:CC0
 	</software>
 
 	<software name="rambo3">
-		<description>Rambo III (Euro, USA, Bra)</description>
+		<description>Rambo III (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7015"/>
@@ -5417,7 +5540,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="rampage">
-		<description>Rampage (Euro, USA, Bra)</description>
+		<description>Rampage (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="27005, QC-001 (USA)"/>
@@ -5431,8 +5554,21 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Notes: FM support -->
+	<software name="rampagep" cloneof="rampage">
+		<description>Rampage (prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="epr-rampage.ic1" size="131072" crc="90b925f1" sha1="b4830bae47bd9dff5751638b8cfd20bd13e484f9" offset="0x00000" />
+				<rom name="epr-rampage.ic2" size="131072" crc="e3bc8019" sha1="e3085e94f820cba580b44e58f3f3b68dd449a2c6" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampart">
-		<description>Rampart (Euro)</description>
+		<description>Rampart (Europe)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301026-0160"/>
@@ -5445,7 +5581,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="rastan">
-		<description>Rastan (Euro, USA, Bra)</description>
+		<description>Rastan (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7022"/>
@@ -5469,7 +5605,7 @@ license:CC0
 	</software>
 
 	<software name="rcgp">
-		<description>R.C. Grand Prix (Euro, USA, Bra)</description>
+		<description>R.C. Grand Prix (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="27007"/>
@@ -5507,7 +5643,7 @@ license:CC0
 	</software>
 
 	<software name="renegade">
-		<description>Renegade (Euro, Bra)</description>
+		<description>Renegade (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7116"/>
@@ -5520,7 +5656,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="rescuems">
-		<description>Rescue Mission (Euro, USA, Bra)</description>
+		<description>Rescue Mission (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5106"/>
@@ -5536,7 +5672,7 @@ license:CC0
 	</software>
 
 	<software name="roadfght">
-		<description>Road Fighter (Kor)</description>
+		<description>Road Fighter (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="로드화이터" />
@@ -5548,7 +5684,7 @@ license:CC0
 	</software>
 
 	<software name="roadrash">
-		<description>Road Rash (Euro, Bra)</description>
+		<description>Road Rash (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="MK-29012-50, 028.410"/>
@@ -5560,7 +5696,7 @@ license:CC0
 	</software>
 
 	<software name="robocod">
-		<description>James Pond 2 - Codename RoboCod (Euro, Bra)</description>
+		<description>James Pond 2 - Codename RoboCod (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29013-50, 028.580"/>
@@ -5572,7 +5708,7 @@ license:CC0
 	</software>
 
 	<software name="robocop3">
-		<description>RoboCop 3 (Euro, Bra)</description>
+		<description>RoboCop 3 (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27064-50, 027.350"/>
@@ -5584,7 +5720,7 @@ license:CC0
 	</software>
 
 	<software name="roboterm">
-		<description>RoboCop versus The Terminator (Euro, Bra)</description>
+		<description>RoboCop versus The Terminator (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-29022-50, 29022-50, 028.520"/>
@@ -5644,7 +5780,7 @@ license:CC0
 	</software>
 
 	<software name="running">
-		<description>Running Battle (Euro, Bra)</description>
+		<description>Running Battle (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7037, 024.300"/>
@@ -5659,7 +5795,7 @@ license:CC0
 	</software>
 
 	<software name="sagaia">
-		<description>Sagaia (Euro, Bra)</description>
+		<description>Sagaia (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7078"/>
@@ -5671,7 +5807,7 @@ license:CC0
 	</software>
 
 	<software name="sangoku3">
-		<description>Sangokushi 3 (Kor)</description>
+		<description>Sangokushi 3 (Korea)</description>
 		<year>1994</year>
 		<publisher>Game Line</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5683,7 +5819,7 @@ license:CC0
 	</software>
 
 	<software name="sapomestr" cloneof="kungfuk">
-		<description>Sapo Xulé - O Mestre do Kung Fu (Bra)</description>
+		<description>Sapo Xulé - O Mestre do Kung Fu (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.500"/>
@@ -5696,7 +5832,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="saposos" cloneof="astrow">
-		<description>S.O.S Lagoa Poluida (Bra)</description>
+		<description>S.O.S Lagoa Poluida (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.510"/>
@@ -5709,7 +5845,7 @@ license:CC0
 	</software>
 
 	<software name="sapoxule" cloneof="psychof">
-		<description>Sapo Xulé vs. Os Invasores do Brejo (Bra)</description>
+		<description>Sapo Xulé vs. Os Invasores do Brejo (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="026.340"/>
@@ -5722,7 +5858,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="satell7a" cloneof="satell7">
-		<description>Satellite 7 (Jpn, Pirate?)</description>
+		<description>Satellite 7 (Japan, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5733,7 +5869,7 @@ license:CC0
 	</software>
 
 	<software name="smurfs2">
-		<description>The Smurfs 2 (Euro)</description>
+		<description>The Smurfs 2 (Europe)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="27085-50"/>
@@ -5746,7 +5882,7 @@ license:CC0
 	</software>
 
 	<software name="smurfs2p" cloneof="smurfs2">
-		<description>The Smurfs 2 (Euro, prototype)</description>
+		<description>The Smurfs 2 (Europe, prototype)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5757,7 +5893,7 @@ license:CC0
 	</software>
 
 	<software name="sci">
-		<description>Special Criminal Investigation (Euro)</description>
+		<description>Special Criminal Investigation (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7079"/>
@@ -5769,7 +5905,7 @@ license:CC0
 	</software>
 
 	<software name="scip" cloneof="sci">
-		<description>Special Criminal Investigation (Euro, prototype)</description>
+		<description>Special Criminal Investigation (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5781,7 +5917,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="sspirits">
-		<description>Scramble Spirits (Euro, Bra)</description>
+		<description>Scramble Spirits (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7031"/>
@@ -5794,7 +5930,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="sdi" cloneof="globald">
-		<description>SDI (Jpn)</description>
+		<description>SDI (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1338"/>
@@ -5811,7 +5947,7 @@ license:CC0
 
 	<!-- Id; 5081 -->
 	<software name="secret">
-		<description>Secret Command (Euro)</description>
+		<description>Secret Command (Europe)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5822,7 +5958,7 @@ license:CC0
 	</software>
 
 	<software name="segachss">
-		<description>Sega Chess (Euro, Bra)</description>
+		<description>Sega Chess (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7069"/>
@@ -5834,7 +5970,7 @@ license:CC0
 	</software>
 
 	<software name="segagfx">
-		<description>Sega Graphic Board (Jpn, prototype v2.0)</description>
+		<description>Sega Graphic Board (Japan, prototype v2.0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="ctrl1_default" value="graphic" />
@@ -5846,7 +5982,7 @@ license:CC0
 	</software>
 
 	<software name="segawtg">
-		<description>Sega World Tournament Golf (Euro, Bra, Kor)</description>
+		<description>Sega World Tournament Golf (Europe, Brazil, Korea)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7103, 024.420,GB2038JG"/>
@@ -5859,7 +5995,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="seishun1" cloneof="myhero">
-		<description>Seishun Scandal (Jpn, Pirate?)</description>
+		<description>Seishun Scandal (Japan, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5870,7 +6006,7 @@ license:CC0
 	</software>
 
 	<software name="sensible">
-		<description>Sensible Soccer (Euro)</description>
+		<description>Sensible Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="8011, MK-25014-50"/>
@@ -5883,7 +6019,7 @@ license:CC0
 
 	<!-- port of an MSX title -->
 	<software name="skyfight">
-		<description>Sky Fighter (Kor)</description>
+		<description>Sky Fighter (Korea)</description>
 		<year>1990</year>
 		<publisher>Clover Soft</publisher>
 		<info name="alt_title" value="보라매 전사"/>
@@ -5895,7 +6031,7 @@ license:CC0
 	</software>
 
 	<software name="skyjag">
-		<description>Sky Jaguar (Kor)</description>
+		<description>Sky Jaguar (Korea)</description>
 		<year>199?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="스카이쟈가"/>
@@ -5907,7 +6043,7 @@ license:CC0
 	</software>
 
 	<software name="skyjag1" cloneof="skyjag">
-		<description>Sky Jaguar (Kor, Clover)</description>
+		<description>Sky Jaguar (Korea, Clover)</description>
 		<year>199?</year>
 		<publisher>Clover</publisher>
 		<info name="alt_title" value="스카이쟈가"/>
@@ -5919,7 +6055,7 @@ license:CC0
 	</software>
 
 	<software name="sf2">
-		<description>Street Fighter II (Bra)</description>
+		<description>Street Fighter II (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="030.010"/>
@@ -5931,7 +6067,7 @@ license:CC0
 	</software>
 
 	<software name="shdancer">
-		<description>Shadow Dancer (Euro, Bra, Kor)</description>
+		<description>Shadow Dancer (Europe, Brazil, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9009, GB4010JG"/>
@@ -5944,7 +6080,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="shanghai">
-		<description>Shanghai (Euro, USA)</description>
+		<description>Shanghai (Europe, USA)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5110"/>
@@ -5969,7 +6105,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="sharrier">
-		<description>Space Harrier (Euro)</description>
+		<description>Space Harrier (Europe)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7080"/>
@@ -5985,7 +6121,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support -->
 	<software name="sharr3d">
-		<description>Space Harrier 3-D (Euro, USA, Bra)</description>
+		<description>Space Harrier 3-D (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="8004"/>
@@ -6001,7 +6137,7 @@ license:CC0
 
 	<!-- Notes: FM support, 3D glasses support -->
 	<software name="sharr3dj" cloneof="sharr3d">
-		<description>Space Harrier 3D (Jpn)</description>
+		<description>Space Harrier 3D (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1349"/>
@@ -6016,7 +6152,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="sharrierju" cloneof="sharrier">
-		<description>Space Harrier (Jpn, USA)</description>
+		<description>Space Harrier (Japan, USA)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1310, 7001, 7080"/>
@@ -6037,7 +6173,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="shinobi">
-		<description>Shinobi (Euro, USA, Bra, v1)</description>
+		<description>Shinobi (Europe, USA, Brazil, v1)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7009"/>
@@ -6050,7 +6186,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="shinobij" cloneof="shinobi">
-		<description>Shinobi (Jpn, Bra, v0)</description>
+		<description>Shinobi (Japan, Brazil, v0)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1353, 028.380"/>
@@ -6064,7 +6200,7 @@ license:CC0
 	</software>
 
 	<software name="shooting">
-		<description>Shooting Gallery (Euro, USA, Bra)</description>
+		<description>Shooting Gallery (Europe, USA, Brazil)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5072"/>
@@ -6080,7 +6216,7 @@ license:CC0
 	</software>
 
 	<software name="sitio">
-		<description>Sítio do Picapau Amarelo (Bra)</description>
+		<description>Sítio do Picapau Amarelo (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.710"/>
@@ -6104,7 +6240,7 @@ license:CC0
 	</software>
 
 	<software name="slapshota" cloneof="slapshot">
-		<description>Slap Shot (Euro, v1)</description>
+		<description>Slap Shot (Europe, v1)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6115,7 +6251,7 @@ license:CC0
 	</software>
 
 	<software name="slapshotb" cloneof="slapshot">
-		<description>Slap Shot (Euro, v0)</description>
+		<description>Slap Shot (Europe, v0)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6140,7 +6276,7 @@ license:CC0
 	</software>
 
 	<software name="supcol">
-		<description>Super Columns &amp; Tetris (Kor)</description>
+		<description>Super Columns &amp; Tetris (Korea)</description>
 		<year>1990</year>
 		<publisher>Hi-Com</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6151,7 +6287,7 @@ license:CC0
 	</software>
 
 	<software name="smgp">
-		<description>Super Monaco GP (Euro, Bra)</description>
+		<description>Super Monaco GP (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7043"/>
@@ -6180,7 +6316,7 @@ license:CC0
 	</software>
 
 	<software name="smgpp1" cloneof="smgp">
-		<description>Super Monaco GP (Euro, prototype)</description>
+		<description>Super Monaco GP (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6191,7 +6327,7 @@ license:CC0
 	</software>
 
 	<software name="smgpp2" cloneof="smgp">
-		<description>Super Monaco GP (Euro, older prototype)</description>
+		<description>Super Monaco GP (Europe, older prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6201,8 +6337,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="smgpup" cloneof="smgp">
+		<description>Super Monaco GP (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="171-5486" />
+			<feature name="ic3" value="315-5235" /> <!-- Sega Memory Controller -->
+			<dataarea name="rom" size="0x40000">
+				<!-- Differs from final release by only 3 header bytes -->
+				<rom name="super monaco 7-18-90.ic1" size="0x20000" crc="e17df02f" sha1="deb24d9b3bbb740ab4e1834328e190b689e85329" offset="0x00000" /> <!-- original label: SUPER MONACO 7/18/90 -->
+				<rom name="ic2" size="0x20000" crc="22418c88" sha1="ddf9c5089cae542d4c752edc98d20dfba81696e7" offset="0x20000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sms3samp">
-		<description>Promocao Especial M. System III Compact (Bra, Sample)</description>
+		<description>Promocao Especial M. System III Compact (Brazil, sample)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6213,7 +6364,7 @@ license:CC0
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Euro, Bra)</description>
+		<description>The Smurfs (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="MK-27082-50, 027.380"/>
@@ -6227,7 +6378,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="solomon">
-		<description>Solomon no Kagi - Oujo Rihita no Namida (Jpn)</description>
+		<description>Solomon no Kagi - Oujo Rihita no Namida (Japan)</description>
 		<year>1988</year>
 		<publisher>Salio</publisher>
 		<info name="serial" value="002"/>
@@ -6254,7 +6405,7 @@ license:CC0
 	</software>
 
 	<software name="sonic">
-		<description>Sonic The Hedgehog (Euro, USA, Bra)</description>
+		<description>Sonic The Hedgehog (Europe, USA, Brazil)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7076"/>
@@ -6269,7 +6420,7 @@ license:CC0
 	</software>
 
 	<software name="sonic2">
-		<description>Sonic The Hedgehog 2 (Euro, Bra, Kor, v1)</description>
+		<description>Sonic The Hedgehog 2 (Europe, Brazil, Korea, v1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9015, 028.120, GB-4030JG"/>
@@ -6281,7 +6432,7 @@ license:CC0
 	</software>
 
 	<software name="sonic2a" cloneof="sonic2">
-		<description>Sonic The Hedgehog 2 (Euro, Bra, v0)</description>
+		<description>Sonic The Hedgehog 2 (Europe, Brazil, v0)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9015, 028.120"/>
@@ -6296,7 +6447,7 @@ license:CC0
 	</software>
 
 	<software name="sonicbls">
-		<description>Sonic Blast (Bra)</description>
+		<description>Sonic Blast (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="030.030"/>
@@ -6312,7 +6463,7 @@ license:CC0
 	</software>
 
 	<software name="sonicc">
-		<description>Sonic The Hedgehog Chaos (Euro, Bra)</description>
+		<description>Sonic The Hedgehog Chaos (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9021, 028.120"/>
@@ -6328,7 +6479,7 @@ license:CC0
 
 	<!-- Notes: Sega of Japan labels, unfortunately crashes after title screen -->
 	<software name="sonicc630" cloneof="sonicc" supported="no">
-		<description>Sonic the Hedgehog Chaos (Euro, "Ver 0.20", prototype 19930630)</description>
+		<description>Sonic the Hedgehog Chaos (Europe, "Ver 0.20", prototype 19930630)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6343,7 +6494,7 @@ license:CC0
 
 	<!-- Notes: Sega UK labels, mistakenly marked GG; internal version has not changed since sonicc630 and therefore is not ideal for reference -->
 	<software name="sonicc713" cloneof="sonicc">
-		<description>Sonic the Hedgehog Chaos (Euro, prototype 19930713)</description>
+		<description>Sonic the Hedgehog Chaos (Europe, prototype 19930713)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6358,7 +6509,7 @@ license:CC0
 
 	<software name="sonicedu">
 		<description>Sonic's Edusoft (prototype)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -6368,7 +6519,7 @@ license:CC0
 	</software>
 
 	<software name="sspin">
-		<description>Sonic The Hedgehog Spinball (Euro, Bra)</description>
+		<description>Sonic The Hedgehog Spinball (Europe, Brazil)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9034, 028.489"/>
@@ -6380,7 +6531,7 @@ license:CC0
 	</software>
 
 	<software name="sor">
-		<description>Streets of Rage (Euro, Bra)</description>
+		<description>Streets of Rage (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9019"/>
@@ -6392,7 +6543,7 @@ license:CC0
 	</software>
 
 	<software name="sor2">
-		<description>Streets of Rage II (Euro, Bra)</description>
+		<description>Streets of Rage II (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9026, 028.300"/>
@@ -6404,7 +6555,7 @@ license:CC0
 	</software>
 
 	<software name="spacegun">
-		<description>Space Gun (Euro)</description>
+		<description>Space Gun (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9010"/>
@@ -6421,7 +6572,7 @@ license:CC0
 	</software>
 
 	<software name="speedbl">
-		<description>Speedball (Image Works) (Euro)</description>
+		<description>Speedball (Image Works) (Europe)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
 		<info name="serial" value="25009-50"/>
@@ -6433,7 +6584,7 @@ license:CC0
 	</software>
 
 	<software name="speedbl2">
-		<description>Speedball 2 (Euro)</description>
+		<description>Speedball 2 (Europe)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="27039-50"/>
@@ -6445,7 +6596,7 @@ license:CC0
 	</software>
 
 	<software name="speedblv">
-		<description>Speedball (Virgin) (Euro, USA)</description>
+		<description>Speedball (Virgin) (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="25013-50"/>
@@ -6458,7 +6609,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="spellcst">
-		<description>SpellCaster (Euro, USA, Bra)</description>
+		<description>SpellCaster (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9003"/>
@@ -6474,7 +6625,7 @@ license:CC0
 	</software>
 
 	<software name="spidermn">
-		<description>Spider-Man - Return of the Sinister Six (Euro, Bra)</description>
+		<description>Spider-Man - Return of the Sinister Six (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27055-50, 026.290"/>
@@ -6486,7 +6637,7 @@ license:CC0
 	</software>
 
 	<software name="spidking">
-		<description>Spider-Man vs. The Kingpin (Euro, USA, Bra)</description>
+		<description>Spider-Man vs. The Kingpin (Europe, USA, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7065"/>
@@ -6505,8 +6656,8 @@ license:CC0
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5060"/>
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad football (usa).bin" size="131072" crc="e42e4998" sha1="556d9ab4ba3c3a34440b36c6fc8e972f70f16d72" offset="000000" />
@@ -6527,14 +6678,14 @@ license:CC0
 	<!-- This ROM has a player 2 input bug when operates in Mark III compatible
 	mode: it reads part of player 1 data instead (see sportsjp.cpp). -->
 	<software name="sportssc" cloneof="worldsoc">
-		<description>Sports Pad Soccer (Jpn)</description>
+		<description>Sports Pad Soccer (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
-		<sharedfeat name="ctrl1_default" value="sportspad" />
-		<sharedfeat name="ctrl2_default" value="sportspad" />
+		<sharedfeat name="ctrl1_default" value="sports" />
+		<sharedfeat name="ctrl2_default" value="sports" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />
@@ -6544,7 +6695,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspy">
-		<description>Spy vs. Spy (Euro, USA, Bra)</description>
+		<description>Spy vs. Spy (Europe, USA, Brazil)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4083 (Card), 4583 (Cart), 41021"/>
@@ -6558,7 +6709,7 @@ license:CC0
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<!-- same dump was released as a MyCard in Japan -->
 	<software name="spyvsspyk" cloneof="spyvsspy">
-		<description>Spy vs Spy (Kor)</description>
+		<description>Spy vs Spy (Korea)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="SG15C"/>
@@ -6571,7 +6722,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyj1" cloneof="spyvsspy">
-		<description>Spy vs. Spy (Jpn, Pirate?)</description>
+		<description>Spy vs. Spy (Japan, pirate?)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6583,7 +6734,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspytw" cloneof="spyvsspy">
-		<description>Spy vs Spy (Tw)</description>
+		<description>Spy vs Spy (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="K-321"/>
@@ -6608,7 +6759,7 @@ license:CC0
 	</software>
 
 	<software name="ssinv">
-		<description>Super Space Invaders (Euro)</description>
+		<description>Super Space Invaders (Europe)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-27023-50"/>
@@ -6620,7 +6771,7 @@ license:CC0
 	</software>
 
 	<software name="smashtv">
-		<description>Smash T.V. (Euro)</description>
+		<description>Smash T.V. (Europe)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="27044-50"/>
@@ -6633,7 +6784,7 @@ license:CC0
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Euro, Bra)</description>
+		<description>Star Wars (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29014-50, 028.260"/>
@@ -6645,7 +6796,7 @@ license:CC0
 	</software>
 
 	<software name="strtmast">
-		<description>Street Master (Kor)</description>
+		<description>Street Master (Korea)</description>
 		<year>1992</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6657,7 +6808,7 @@ license:CC0
 	</software>
 
 	<software name="strider">
-		<description>Strider (Euro, USA, Bra, Kor)</description>
+		<description>Strider (Europe, USA, Brazil, Korea)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9005, GB4028JG"/>
@@ -6683,7 +6834,7 @@ license:CC0
 	</software>
 
 	<software name="strider2">
-		<description>Strider II (Euro, Bra)</description>
+		<description>Strider II (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29005-50"/>
@@ -6695,7 +6846,7 @@ license:CC0
 	</software>
 
 	<software name="submarin">
-		<description>Submarine Attack (Euro)</description>
+		<description>Submarine Attack (Europe)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7048"/>
@@ -6707,7 +6858,7 @@ license:CC0
 	</software>
 
 	<software name="suhocheo">
-		<description>Suho Jeonsa (Kor)</description>
+		<description>Suho Jeonsa (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="DS-G402"/>
@@ -6719,12 +6870,12 @@ license:CC0
 	</software>
 
 	<software name="sukeban">
-		<description>Sukeban Deka II - Shoujo Tekkamen Densetsu (Jpn)</description>
+		<description>Sukeban Deka II - Shoujo Tekkamen Densetsu (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1318"/>
 		<info name="release" value="19870419"/>
-		<info name="alt_title" value="デカ - スケバン刑事II 少女鉄仮面伝説" />
+		<info name="alt_title" value="スケバン刑事II 少女鉄仮面伝説" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sukeban deka ii - shoujo tekkamen densetsu (japan).bin" size="131072" crc="b13df647" sha1="5cd041990c7418ba63cde54f83d3e0e323b42c3b" offset="000000" />
@@ -6733,7 +6884,7 @@ license:CC0
 	</software>
 
 	<software name="sumgames">
-		<description>Summer Games (Euro)</description>
+		<description>Summer Games (Europe)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5119"/>
@@ -6746,7 +6897,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="sumgamesp" cloneof="sumgames">
-		<description>Summer Games (Euro, prototype)</description>
+		<description>Summer Games (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6756,8 +6907,20 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Notes: most menu items don't work nor does sound -->
+	<software name="sumgamesp1" cloneof="sumgames">
+		<description>Summer Games (Europe, early prototype)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="epr-summer games.ic1" size="131072" crc="4f530cb2" sha1="d2aa43c08e295b5ae1ff347de574ca6eb6a12ca4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superman">
-		<description>Superman - The Man of Steel (Euro, Bra)</description>
+		<description>Superman - The Man of Steel (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27050-50, 027.190"/>
@@ -6774,7 +6937,7 @@ license:CC0
 	<!-- Notes: This clone replaced the original paddle code with code for the regular controller, but like the former it is used only when
 	the system region is detected as Japanese, what happens with Korean Mark-III/SMS1 versions, but not with Korean SMS2 versions. -->
 	<software name="superark" cloneof="woodypop">
-		<description>Super Arkanoid (Kor)</description>
+		<description>Super Arkanoid (Korea)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
 		<info name="usage" value="Input works only with drivers of Japanese region, e.g. sms1kr,smsj" />
@@ -6788,8 +6951,8 @@ license:CC0
 	</software>
 
 	<software name="suprbskt">
-		<description>Super Basketball (USA, CES Demo)</description>
-		<year>1989?</year>
+		<description>Super Basketball (USA, CES demo)</description>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">
@@ -6799,7 +6962,7 @@ license:CC0
 	</software>
 
 	<software name="sbioman1">
-		<description>Super Bioman 1 (Kor)</description>
+		<description>Super Bioman 1 (Korea)</description>
 		<year>1992</year>
 		<publisher>HiCom</publisher>
 		<info name="alt_title" value="슈퍼바이오맨 I" />
@@ -6811,7 +6974,7 @@ license:CC0
 	</software>
 
 	<software name="sboy1">
-		<description>Super Boy I (Kor)</description>
+		<description>Super Boy I (Korea)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 I" />
@@ -6824,7 +6987,7 @@ license:CC0
 	</software>
 
 	<software name="sboy2">
-		<description>Super Boy II (Kor)</description>
+		<description>Super Boy II (Korea)</description>
 		<year>1989</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 II" />
@@ -6836,7 +6999,7 @@ license:CC0
 	</software>
 
 	<software name="sboy3">
-		<description>Super Boy 3 (Kor)</description>
+		<description>Super Boy 3 (Korea)</description>
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6848,7 +7011,7 @@ license:CC0
 	</software>
 
 	<software name="sboy4">
-		<description>Super Boy 4 (Kor)</description>
+		<description>Super Boy 4 (Korea)</description>
 		<year>1992</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="수퍼보이 IV" />
@@ -6859,8 +7022,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sfutebol2" cloneof="wcup90">
+		<description>Super Futebol II (Brazil)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="super futebol ii [game box serie esportes] (br).bin" size="131072" crc="551e6f51" sha1="3cc678040b5da8a9b443dd0f459b2d395270255b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skickoff">
-		<description>Super Kick Off (Euro, Bra)</description>
+		<description>Super Kick Off (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="27017-50"/>
@@ -6875,7 +7049,7 @@ license:CC0
 	</software>
 
 	<software name="superoff">
-		<description>Super Off Road (Euro)</description>
+		<description>Super Off Road (Europe)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27059-50"/>
@@ -6899,7 +7073,7 @@ license:CC0
 
 	<!-- Notes: FM support, optional Paddle Control support -->
 	<software name="superrac">
-		<description>Super Racing (Jpn)</description>
+		<description>Super Racing (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1357"/>
@@ -6914,7 +7088,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="stennis">
-		<description>Super Tennis (Euro, USA)</description>
+		<description>Super Tennis (Europe, USA)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4507, 4007, 41010"/>
@@ -6929,7 +7103,7 @@ license:CC0
 	</software>
 
 	<software name="t2ag">
-		<description>T2 - The Arcade Game (Euro)</description>
+		<description>T2 - The Arcade Game (Europe)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="MK-27061-50"/>
@@ -6944,7 +7118,7 @@ license:CC0
 	</software>
 
 	<software name="tazmania">
-		<description>Taz-Mania (Euro, Bra)</description>
+		<description>Taz-Mania (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7111, 027.150"/>
@@ -6959,7 +7133,7 @@ license:CC0
 	</software>
 
 	<software name="tazmaniap" cloneof="tazmania">
-		<description>Taz-Mania (Euro, prototype)</description>
+		<description>Taz-Mania (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6970,7 +7144,7 @@ license:CC0
 	</software>
 
 	<software name="tazmars">
-		<description>Taz in Escape from Mars (Bra)</description>
+		<description>Taz in Escape from Mars (Brazil)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.620"/>
@@ -6982,7 +7156,7 @@ license:CC0
 	</software>
 
 	<software name="tecmow92">
-		<description>Tecmo World Cup '92 (Euro, prototype)</description>
+		<description>Tecmo World Cup '92 (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -6993,7 +7167,7 @@ license:CC0
 	</software>
 
 	<software name="tecmow93">
-		<description>Tecmo World Cup '93 (Euro)</description>
+		<description>Tecmo World Cup '93 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7106"/>
@@ -7006,7 +7180,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboy">
-		<description>Teddy Boy (Euro, USA, Bra)</description>
+		<description>Teddy Boy (Europe, USA, Brazil)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4003 (Card), 4503 (Cart), 021.060"/>
@@ -7027,7 +7201,7 @@ license:CC0
 	The cartridge contains three 16kB EPROM chips, the last chip seems to have
 	only 48 bytes of metadata used by the machine and the rest is all $ff. -->
 	<software name="teddyboyjp" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Ep-MyCard, prototype)</description>
+		<description>Teddy Boy Blues (Japan, Ep-MyCard, prototype)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7039,7 +7213,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyj1" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, Pirate?)</description>
+		<description>Teddy Boy Blues (Japan, pirate?)</description>
 		<year>1985</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7051,7 +7225,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="tennis">
-		<description>Tennis Ace (Euro, Bra)</description>
+		<description>Tennis Ace (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7028"/>
@@ -7064,7 +7238,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="bakabon">
-		<description>Tensai Bakabon (Jpn)</description>
+		<description>Tensai Bakabon (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1355"/>
@@ -7078,7 +7252,7 @@ license:CC0
 	</software>
 
 	<software name="term2">
-		<description>Terminator 2 - Judgment Day (Euro)</description>
+		<description>Terminator 2 - Judgment Day (Europe)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="MK-27052-50"/>
@@ -7090,7 +7264,7 @@ license:CC0
 	</software>
 
 	<software name="termntr">
-		<description>The Terminator (Euro)</description>
+		<description>The Terminator (Europe)</description>
 		<year>1992</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27025-50"/>
@@ -7110,7 +7284,7 @@ license:CC0
 	</software>
 
 	<software name="termntrb" cloneof="termntr">
-		<description>The Terminator (Bra)</description>
+		<description>The Terminator (Brazil)</description>
 		<year>1992</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="027.320"/>
@@ -7125,7 +7299,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="tblade">
-		<description>Thunder Blade (Euro, USA, Bra)</description>
+		<description>Thunder Blade (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7011"/>
@@ -7141,7 +7315,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="tbladej" cloneof="tblade">
-		<description>Thunder Blade (Jpn)</description>
+		<description>Thunder Blade (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1360"/>
@@ -7155,8 +7329,20 @@ license:CC0
 	</software>
 
 	<!-- Notes: FM support -->
+	<software name="tbladep" cloneof="tblade">
+		<description>Thunder Blade (prototype)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="thunder blade [proto] (jp).bin" size="262144" crc="bab9533b" sha1="72afa81622e165437aa05b61b8966ec2977699e9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: FM support -->
 	<software name="timesold">
-		<description>Time Soldiers (Euro, USA, Bra)</description>
+		<description>Time Soldiers (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7024"/>
@@ -7171,7 +7357,7 @@ license:CC0
 	</software>
 
 	<software name="tnzs">
-		<description>The New Zealand Story (Euro)</description>
+		<description>The New Zealand Story (Europe)</description>
 		<year>1992</year>
 		<publisher>TecMagik</publisher>
 		<info name="serial" value="27035-50"/>
@@ -7183,7 +7369,7 @@ license:CC0
 	</software>
 
 	<software name="tomjermv">
-		<description>Tom and Jerry - The Movie (Euro, Bra)</description>
+		<description>Tom and Jerry - The Movie (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7070, 026.150"/>
@@ -7206,7 +7392,7 @@ license:CC0
 	</software>
 
 	<software name="totowld3">
-		<description>Toto World 3 (Kor)</description>
+		<description>Toto World 3 (Korea)</description>
 		<year>1993</year>
 		<publisher>Open Corp.</publisher>
 		<info name="serial" value="DS-G301"/>
@@ -7219,7 +7405,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbot">
-		<description>TransBot (Euro, USA, Bra)</description>
+		<description>TransBot (Europe, USA, Brazil)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4004 (Card), 4504 (Cart), 41003, 021.050"/>
@@ -7246,7 +7432,7 @@ license:CC0
 	</software>
 
 	<software name="trivial">
-		<description>Trivial Pursuit - Genus Edition (Euro)</description>
+		<description>Trivial Pursuit - Genus Edition (Europe)</description>
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK29008-50"/>
@@ -7260,7 +7446,7 @@ license:CC0
 	<!-- G-37 -->
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ttoriui" cloneof="myhero">
-		<description>Ttoriui Moheom (Kor)</description>
+		<description>Ttoriui Moheom (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7272,7 +7458,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="turmamon" cloneof="wboy3">
-		<description>Turma da Mônica em O Resgate (Bra)</description>
+		<description>Turma da Mônica em O Resgate (Brazil)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="026.260"/>
@@ -7287,7 +7473,7 @@ license:CC0
 	</software>
 
 	<software name="tvcolos" cloneof="asterix">
-		<description>As Aventuras da TV Colosso (Bra)</description>
+		<description>As Aventuras da TV Colosso (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.650"/>
@@ -7300,7 +7486,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="ultima4">
-		<description>Ultima IV - Quest of the Avatar (Euro, Bra)</description>
+		<description>Ultima IV - Quest of the Avatar (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9501"/>
@@ -7321,7 +7507,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="ultima4p" cloneof="ultima4">
-		<description>Ultima IV - Quest of the Avatar (Euro, prototype)</description>
+		<description>Ultima IV - Quest of the Avatar (Europe, prototype)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7335,7 +7521,7 @@ license:CC0
 	</software>
 
 	<software name="ultsoccr">
-		<description>Ultimate Soccer (Euro, Bra)</description>
+		<description>Ultimate Soccer (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7119, 024.440"/>
@@ -7347,7 +7533,7 @@ license:CC0
 	</software>
 
 	<software name="vampire" cloneof="mastdark">
-		<description>Vampire (Euro, prototype)</description>
+		<description>Vampire (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7358,7 +7544,7 @@ license:CC0
 	</software>
 
 	<software name="vfa">
-		<description>Virtua Fighter Animation (Bra)</description>
+		<description>Virtua Fighter Animation (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="030.020"/>
@@ -7371,7 +7557,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="vigilant">
-		<description>Vigilante (Euro, USA, Bra)</description>
+		<description>Vigilante (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7023"/>
@@ -7411,7 +7597,7 @@ license:CC0
 	</software>
 
 	<software name="wanted">
-		<description>Wanted (Euro, USA, Bra)</description>
+		<description>Wanted (Europe, USA, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5118"/>
@@ -7428,7 +7614,7 @@ license:CC0
 
 	<!-- MPR-10744F on 171-5519 according to SMS Power, but not clear which version these correspond to -->
 	<software name="wboy">
-		<description>Wonder Boy (Euro, USA, Bra, v1)</description>
+		<description>Wonder Boy (Europe, USA, Brazil, v1)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5068"/>
@@ -7440,7 +7626,7 @@ license:CC0
 	</software>
 
 	<software name="wboya" cloneof="wboy">
-		<description>Wonder Boy (Euro, Kor, v0) ~ Super Wonder Boy (Jpn, v0)</description>
+		<description>Wonder Boy (Europe, Korea, v0) ~ Super Wonder Boy (Japan, v0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1316, 5068, GB-1003"/>
@@ -7455,7 +7641,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="wboy3">
-		<description>Wonder Boy III - The Dragon's Trap (Euro, USA, Kor)</description>
+		<description>Wonder Boy III - The Dragon's Trap (Europe, USA, Korea)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7026, GB-2004"/>
@@ -7471,7 +7657,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="wboymlnd">
-		<description>Wonder Boy in Monster Land (Euro, USA)</description>
+		<description>Wonder Boy in Monster Land (Europe, USA)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7007"/>
@@ -7487,7 +7673,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="wboymlndp" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (prototype)</description>
+		<description>Super Wonder Boy - Monster Land (prototype)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7499,7 +7685,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="wboymlndj" cloneof="wboymlnd">
-		<description>Super Wonder Boy - Monster World (Jpn)</description>
+		<description>Super Wonder Boy - Monster World (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1346"/>
@@ -7516,7 +7702,7 @@ license:CC0
 	<!-- From Bock: "This hack does two things: force the game to run in Japanese mode (with an harder difficulty level), and allows to
 	Pause the game by pressing LEFT+RIGHT+Button 2 on joypad 1 (a combination that cannot be done on a normal SMS joypad). -->
 	<software name="wboymlnda" cloneof="wboymlnd">
-		<description>Wonder Boy in Monster Land (Euro, USA, Hacked?)</description>
+		<description>Super Wonder Boy - Monster World (Japan, hacked?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7527,7 +7713,7 @@ license:CC0
 	</software>
 
 	<software name="wboymwld">
-		<description>Wonder Boy in Monster World (Euro, Kor)</description>
+		<description>Wonder Boy in Monster World (Europe, Korea)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="9012, 9012-50, GB4021JG"/>
@@ -7542,7 +7728,7 @@ license:CC0
 	</software>
 
 	<software name="wboymwldp" cloneof="wboymwld">
-		<description>Wonder Boy in Monster World (Euro, prototype)</description>
+		<description>Wonder Boy in Monster World (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7553,7 +7739,7 @@ license:CC0
 	</software>
 
 	<software name="wonsiin">
-		<description>Wonsiin (Kor)</description>
+		<description>Wonsiin (Korea)</description>
 		<year>1991</year>
 		<publisher>Zemina</publisher>
 		<info name="alt_title" value="원시인"/>
@@ -7566,7 +7752,7 @@ license:CC0
 	</software>
 
 	<software name="wclead">
-		<description>World Class Leader Board (Euro, Bra)</description>
+		<description>World Class Leader Board (Europe, Brazil)</description>
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="27015-50, 025.330"/>
@@ -7578,7 +7764,7 @@ license:CC0
 	</software>
 
 	<software name="wcup90">
-		<description>World Cup Italia '90 (Euro, Bra)</description>
+		<description>World Cup Italia '90 (Europe, Brazil)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5084, 023.340"/>
@@ -7593,7 +7779,7 @@ license:CC0
 	</software>
 
 	<software name="wcup90d" cloneof="wcup90">
-		<description>World Cup Italia '90 (USA, Demo)</description>
+		<description>World Cup Italia '90 (USA, demo)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7604,7 +7790,7 @@ license:CC0
 	</software>
 
 	<software name="wcup94">
-		<description>World Cup USA 94 (Euro, Bra)</description>
+		<description>World Cup USA 94 (Europe, Brazil)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="29028-50, 29028-05, 29028-06, 29028-09, 29028-18, 028.430"/>
@@ -7616,7 +7802,7 @@ license:CC0
 	</software>
 
 	<software name="wimbled2">
-		<description>Wimbledon II (Euro, Bra)</description>
+		<description>Wimbledon II (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7115, 024.390"/>
@@ -7628,7 +7814,7 @@ license:CC0
 	</software>
 
 	<software name="wimbled">
-		<description>Wimbledon (Euro)</description>
+		<description>Wimbledon (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7100"/>
@@ -7642,8 +7828,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wimbledb" cloneof="wimbled">
+		<description>Wimbledon (Brazil)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="wimbledon [v0] [game box serie esportes] (br).bin" size="262144" crc="b14b6195" sha1="c1b9e6983f7bef612d238183e3a2a9fc1481a967" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wintol">
-		<description>Winter Olympics - Lillehammer '94 (Euro)</description>
+		<description>Winter Olympics - Lillehammer '94 (Europe)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="29015-50, 29015-09, 29015-18"/>
@@ -7655,7 +7852,7 @@ license:CC0
 	</software>
 
 	<software name="wintolb" cloneof="wintol">
-		<description>Winter Olympics - Lillehammer '94 (Bra)</description>
+		<description>Winter Olympics - Lillehammer '94 (Brazil)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="028.350"/>
@@ -7667,7 +7864,7 @@ license:CC0
 	</software>
 
 	<software name="wolfchld">
-		<description>Wolfchild (Euro, Bra)</description>
+		<description>Wolfchild (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="MK-27060-50"/>
@@ -7682,7 +7879,7 @@ license:CC0
 	</software>
 
 	<software name="wldgames">
-		<description>World Games (Euro, Bra)</description>
+		<description>World Games (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5114"/>
@@ -7694,7 +7891,7 @@ license:CC0
 	</software>
 
 	<software name="wldgamesp" cloneof="wldgames">
-		<description>World Games (Euro, prototype)</description>
+		<description>World Games (Europe, prototype)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7706,7 +7903,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgp">
-		<description>World Grand Prix (Euro)</description>
+		<description>World Grand Prix (Europe)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080"/>
@@ -7721,7 +7918,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="worldgpu" cloneof="worldgp">
-		<description>World Grand Prix (USA, Bra, Kor)</description>
+		<description>World Grand Prix (USA, Brazil, Korea)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5080, GB-1304"/>
@@ -7750,7 +7947,7 @@ license:CC0
 
 	<!-- Notes: optional Sports Pad (US model) support -->
 	<software name="worldsoc">
-		<description>World Soccer (Euro, Jpn, Kor) ~ Great Soccer (USA)</description>
+		<description>World Soccer (Europe, Japan, Korea) ~ Great Soccer (USA)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1327, 5059"/>
@@ -7767,7 +7964,7 @@ license:CC0
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania - Steel Cage Challenge (Euro, Bra)</description>
+		<description>WWF Wrestlemania - Steel Cage Challenge (Europe, Brazil)</description>
 		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="27054-50, 026.270"/>
@@ -7791,7 +7988,7 @@ license:CC0
 	</software>
 
 	<software name="carmnwldb" cloneof="carmnwld">
-		<description>Where in the World is Carmen Sandiego? (Bra)</description>
+		<description>Where in the World is Carmen Sandiego? (Brazil)</description>
 		<year>1989</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="023.450"/>
@@ -7803,7 +8000,7 @@ license:CC0
 	</software>
 
 	<software name="xenon2">
-		<description>Xenon 2 - Megablast (Image Works) (Euro)</description>
+		<description>Xenon 2 - Megablast (Image Works) (Europe)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
 		<info name="serial" value="27012-50"/>
@@ -7815,7 +8012,7 @@ license:CC0
 	</software>
 
 	<software name="xenon2v">
-		<description>Xenon 2 - Megablast (Virgin) (Euro)</description>
+		<description>Xenon 2 - Megablast (Virgin) (Europe)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="27038-50"/>
@@ -7827,7 +8024,7 @@ license:CC0
 	</software>
 
 	<software name="xmenmojo">
-		<description>X-Men - Mojo World (Bra)</description>
+		<description>X-Men - Mojo World (Brazil)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.740"/>
@@ -7839,7 +8036,7 @@ license:CC0
 	</software>
 
 	<software name="xyzolog">
-		<description>Xyzolog (Kor)</description>
+		<description>Xyzolog (Korea)</description>
 		<year>19??</year>
 		<publisher>Taito?</publisher>
 		<part name="cart" interface="sms_cart">
@@ -7852,7 +8049,7 @@ license:CC0
 
 	<!-- Notes: FM support, video code relies on the tilemap mirroring bug of the 315-5124 VDP -->
 	<software name="ysj" cloneof="ys">
-		<description>Ys (Jpn)</description>
+		<description>Ys (Japan)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="Video only works correctly on drivers with SMS1 VDP, e.g. smsj" />
@@ -7870,7 +8067,7 @@ license:CC0
 	</software>
 
 	<software name="ys">
-		<description>Ys - The Vanished Omens (Euro, USA, Bra)</description>
+		<description>Ys - The Vanished Omens (Europe, USA, Brazil)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="7501"/>
@@ -7890,7 +8087,7 @@ license:CC0
 
 	<!-- Notes: FM support, video code relies on the tilemap mirroring bug of the 315-5124 VDP -->
 	<software name="ysd" cloneof="ys">
-		<description>Ys (USA, Demo)</description>
+		<description>Ys (USA, demo)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<info name="usage" value="Video only works correctly on drivers with SMS1 VDP, e.g. smsj" />
@@ -7933,7 +8130,7 @@ license:CC0
 
 	<!-- MPR-11068 according to SMS Power, but not clear which version these correspond to -->
 	<software name="zillion">
-		<description>Zillion (Euro, v2)</description>
+		<description>Zillion (Europe, v2)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="5075"/>
@@ -7945,7 +8142,7 @@ license:CC0
 	</software>
 
 	<software name="zillionb" cloneof="zillion">
-		<description>Zillion (Euro, v0) ~ Akai Koudan Zillion (Jpn, v0)</description>
+		<description>Zillion (Europe, v0) ~ Akai Koudan Zillion (Japan, v0)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1325, 5075"/>
@@ -7972,7 +8169,7 @@ license:CC0
 
 	<!-- Notes: FM support -->
 	<software name="zillion2">
-		<description>Zillion II - The Tri Formation (Euro, USA) ~ Tri Formation (Jpn)</description>
+		<description>Zillion II - The Tri Formation (Europe, USA) ~ Tri Formation (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1344, 5105"/>
@@ -7998,7 +8195,7 @@ license:CC0
 	</software>
 
 	<software name="zool">
-		<description>Zool - Ninja of the 'Nth' Dimension (Euro)</description>
+		<description>Zool - Ninja of the 'Nth' Dimension (Europe)</description>
 		<year>1993</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="serial" value="27075-50"/>
@@ -8017,7 +8214,7 @@ license:CC0
 	   The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
 	   data from it -->
 	<software name="smssgame">
-		<description>Super Game 11-in-1 (Kor)</description>
+		<description>Super Game 11-in-1 (Korea)</description>
 		<year>1990</year>
 		<publisher>Seo Jin</publisher>
 		<part name="cart" interface="sms_cart">
@@ -8034,7 +8231,7 @@ license:CC0
   It is unsure if Probe has ever written any game code for these licensed titles -->
 
 	<software name="sn_ateam">
-		<description>The A-Team (Music prototype)</description>
+		<description>The A-Team (music prototype)</description>
 		<year>1992</year>
 		<publisher>Probe</publisher>
 		<part name="cart" interface="sms_cart">
@@ -8045,7 +8242,7 @@ license:CC0
 	</software>
 
 	<software name="sn_lwep3">
-		<description>Lethal Weapon 3 (Music prototype)</description>
+		<description>Lethal Weapon 3 (music prototype)</description>
 		<year>1992</year>
 		<publisher>Probe</publisher>
 		<part name="cart" interface="sms_cart">
@@ -8060,7 +8257,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="astrofl" cloneof="transbot">
-		<description>Astro Flash (Jpn, MyCard)</description>
+		<description>Astro Flash (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-503"/>
@@ -8073,7 +8270,7 @@ license:CC0
 	</software>
 
 	<software name="bankpc" cloneof="bankp">
-		<description>Bank Panic (Euro, Sega Card)</description>
+		<description>Bank Panic (Europe, Sega Card)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4084"/>
@@ -8086,7 +8283,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="comical">
-		<description>Comical Machine Gun Joe (Jpn, MyCard)</description>
+		<description>Comical Machine Gun Joe (Japan, MyCard)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-511"/>
@@ -8100,7 +8297,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="f16fightc" cloneof="f16fight">
-		<description>F-16 Fighter (Euro, USA, Sega Card)</description>
+		<description>F-16 Fighter (Europe, USA, Sega Card)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4081, 4005M"/>
@@ -8134,7 +8331,7 @@ license:CC0
 	         each instance to start playing the game.
 	-->
 	<software name="f16falcjc" cloneof="f16fight">
-		<description>F-16 Fighting Falcon (Jpn, MyCard)</description>
+		<description>F-16 Fighting Falcon (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-508"/>
@@ -8161,7 +8358,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="pitpot">
-		<description>Fushigi no Oshiro Pit Pot (Jpn, MyCard)</description>
+		<description>Fushigi no Oshiro Pit Pot (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-507"/>
@@ -8175,7 +8372,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthc" cloneof="ghosth">
-		<description>Ghost House (Euro, USA, Bra, Sega Card)</description>
+		<description>Ghost House (Europe, USA, Brazil, Sega Card)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4002"/>
@@ -8200,7 +8397,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="ghosthj" cloneof="ghosth">
-		<description>Ghost House (Jpn, MyCard)</description>
+		<description>Ghost House (Japan, MyCard)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-512"/>
@@ -8214,7 +8411,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatbasj" cloneof="greatbas">
-		<description>Great Baseball (Jpn, MyCard)</description>
+		<description>Great Baseball (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-505"/>
@@ -8228,7 +8425,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrc" cloneof="greatscr">
-		<description>Great Soccer (Euro, Sega Card)</description>
+		<description>Great Soccer (Europe, Sega Card)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4082"/>
@@ -8241,7 +8438,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greatscrj" cloneof="greatscr">
-		<description>Great Soccer (Jpn, MyCard)</description>
+		<description>Great Soccer (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-504"/>
@@ -8255,7 +8452,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="greattns" cloneof="stennis">
-		<description>Great Tennis (Jpn, MyCard)</description>
+		<description>Great Tennis (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-515"/>
@@ -8268,7 +8465,7 @@ license:CC0
 	</software>
 
 	<software name="hangonc" cloneof="hangon">
-		<description>Hang-On (Euro, Bra, Aus, Sega Card)</description>
+		<description>Hang-On (Europe, Brazil, Australia, Sega Card)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4080"/>
@@ -8281,7 +8478,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="hangonj" cloneof="hangon">
-		<description>Hang-On (Jpn, MyCard)</description>
+		<description>Hang-On (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-502"/>
@@ -8295,7 +8492,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="myheroc" cloneof="myhero">
-		<description>My Hero (Euro, USA, Bra, Sega Card)</description>
+		<description>My Hero (Europe, USA, Brazil, Sega Card)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4001"/>
@@ -8308,7 +8505,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="satell7">
-		<description>Satellite 7 (Jpn, MyCard)</description>
+		<description>Satellite 7 (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-506"/>
@@ -8322,7 +8519,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="seishun" cloneof="myhero">
-		<description>Seishun Scandal (Jpn, MyCard)</description>
+		<description>Seishun Scandal (Japan, MyCard)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-510"/>
@@ -8336,7 +8533,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyc" cloneof="spyvsspy">
-		<description>Spy vs. Spy (Euro, USA, Bra, Sega Card)</description>
+		<description>Spy vs. Spy (Europe, USA, Brazil, Sega Card)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4083"/>
@@ -8349,7 +8546,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="spyvsspyj" cloneof="spyvsspy">
-		<description>Spy vs Spy (Jpn, MyCard)</description>
+		<description>Spy vs Spy (Japan, MyCard)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-514"/>
@@ -8363,7 +8560,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="stennisc" cloneof="stennis">
-		<description>Super Tennis (Euro, USA, Sega Card)</description>
+		<description>Super Tennis (Europe, USA, Sega Card)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4507, 4007"/>
@@ -8376,7 +8573,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyc" cloneof="teddyboy">
-		<description>Teddy Boy (Euro, USA, Bra, Sega Card)</description>
+		<description>Teddy Boy (Europe, USA, Brazil, Sega Card)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4003"/>
@@ -8389,7 +8586,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="teddyboyj" cloneof="teddyboy">
-		<description>Teddy Boy Blues (Jpn, MyCard)</description>
+		<description>Teddy Boy Blues (Japan, MyCard)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-501"/>
@@ -8403,7 +8600,7 @@ license:CC0
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="transbotc" cloneof="transbot">
-		<description>TransBot (Euro, USA, Bra, Sega Card)</description>
+		<description>TransBot (Europe, USA, Brazil, Sega Card)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4004"/>
@@ -8415,7 +8612,7 @@ license:CC0
 	</software>
 
 	<software name="woodypop">
-		<description>Woody Pop - Shinjinrui no Block Kuzushi (Jpn, MyCard)</description>
+		<description>Woody Pop - Shinjinrui no Block Kuzushi (Japan, MyCard)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-519"/>

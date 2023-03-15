@@ -17,6 +17,7 @@ u32 diablo1300_disassembler::opcode_alignment() const
 offs_t diablo1300_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint16_t op = opcodes.r16(pc);
+	uint32_t flags = 0;
 
 	switch (op & 0x0007)
 	{
@@ -27,6 +28,7 @@ offs_t diablo1300_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 	case 1: // JNC Addr
 		util::stream_format(stream, "JNC    %03X", ((op & 0xff00) >> 8) + ((op & 0x0008) ? 0x100 : 0));
+		flags = STEP_COND;
 		break;
 	case 2: // RST #Dport
 		util::stream_format(stream, "RST    dv%d", (op & 0x0700) >> 8);
@@ -78,5 +80,5 @@ offs_t diablo1300_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 	}
 
-	return 1 | SUPPORTED;
+	return 1 | flags | SUPPORTED;
 }

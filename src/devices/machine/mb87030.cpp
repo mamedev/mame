@@ -433,8 +433,8 @@ void mb87030_device::step(bool timeout)
 
 void mb87030_device::device_start()
 {
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb87030_device::timeout), this));
-	m_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mb87030_device::delay_timeout), this));
+	m_timer = timer_alloc(FUNC(mb87030_device::timeout), this);
+	m_delay_timer = timer_alloc(FUNC(mb87030_device::delay_timeout), this);
 	m_irq_handler.resolve_safe();
 	m_dreq_handler.resolve_safe();
 

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -46,12 +46,12 @@ license:CC0
 	<element name="text_g"><text string="G"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_h"><text string="H"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
-	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
-	<element name="text_p3"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
-	<element name="text_p4"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
-	<element name="text_p5"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
-	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.1" /></rect></element>
+	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p3"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p4"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p5"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
+	<element name="text_p6"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.12" /></rect></element>
 
 	<element name="text_rb00"><text string="Referee"><color red="0.51" green="0.5" blue="0.49" /></text></element>
 	<element name="text_rb01"><text string="Print Board"><color red="0.51" green="0.5" blue="0.49" /></text></element>
@@ -362,7 +362,7 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-12.5" right="108.5" top="0.5" bottom="99" />
+		<bounds left="-12.5" right="108.5" top="0.5" bottom="97.25" />
 
 		<element ref="static_red"><bounds x="4" y="2.5" width="102.5" height="81" /></element>
 		<element ref="blackb"><bounds x="85" y="3" width="21" height="80" /></element>
@@ -502,8 +502,8 @@ license:CC0
 		<element ref="static_gray"><bounds x="86" y="62.75" width="19" height="0.5" /></element>
 		<element ref="static_gray"><bounds x="86" y="72.75" width="19" height="0.5" /></element>
 
-		<screen index="0"><bounds x="80.5" y="89" width="26" height="8" /></screen>
-		<element ref="lcdm" blend="multiply"><bounds x="80" y="88.5" width="27" height="9" /></element>
+		<screen index="0"><bounds x="84.5" y="88.5" width="22" height="6.77" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="82" y="88" width="30" height="10" /></element>
 	</view>
 
 </mamelayout>

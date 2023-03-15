@@ -62,22 +62,22 @@ namespace netlist::devices {
 			, m_modacc(m_stmodel)
 			, m_last_state(*this, "m_last_var", 1)
 		{
-			register_subalias("Q", "RVO.1");
+			register_sub_alias("Q", "RVO.1");
 
 			connect("A", "RVI.1");
 			// FIXME: need a symbolic reference from connect as well
-			connect(m_supply.GND(), m_RVI.N());
-			connect(m_supply.GND(), m_RVO.N());
+			connect(m_supply.GND(), m_RVI().N());
+			connect(m_supply.GND(), m_RVO().N());
 		}
 
 	protected:
 		NETLIB_RESETI()
 		{
 			m_last_state = 1;
-			m_RVI.reset();
-			m_RVO.reset();
-			m_RVI.set_G_V_I(plib::reciprocal(m_modacc.m_RI()), m_modacc.m_VI, nlconst::zero());
-			m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
+			m_RVI().reset();
+			m_RVO().reset();
+			m_RVI().set_G_V_I(plib::reciprocal(m_modacc.m_RI()), m_modacc.m_VI, nlconst::zero());
+			m_RVO().set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 		}
 
 	private:
@@ -89,9 +89,9 @@ namespace netlist::devices {
 				if (va < m_modacc.m_VTM)
 				{
 					m_last_state = 0;
-					m_RVO.change_state([this]()
+					m_RVO().change_state([this]()
 					{
-						m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROH()), m_modacc.m_VOH, nlconst::zero());
+						m_RVO().set_G_V_I(plib::reciprocal(m_modacc.m_ROH()), m_modacc.m_VOH, nlconst::zero());
 					});
 				}
 			}
@@ -100,9 +100,9 @@ namespace netlist::devices {
 				if (va > m_modacc.m_VTP)
 				{
 					m_last_state = 1;
-					m_RVO.change_state([this]()
+					m_RVO().change_state([this]()
 					{
-						m_RVO.set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
+						m_RVO().set_G_V_I(plib::reciprocal(m_modacc.m_ROL()), m_modacc.m_VOL, nlconst::zero());
 					});
 				}
 			}
@@ -110,8 +110,8 @@ namespace netlist::devices {
 
 		analog_input_t m_A;
 		NETLIB_NAME(power_pins) m_supply;
-		analog::NETLIB_SUB(twoterm) m_RVI;
-		analog::NETLIB_SUB(twoterm) m_RVO;
+		NETLIB_SUB_NS(analog, two_terminal) m_RVI;
+		NETLIB_SUB_NS(analog, two_terminal) m_RVO;
 		param_model_t m_stmodel;
 		schmitt_trigger_model_t m_modacc;
 		state_var<int> m_last_state;

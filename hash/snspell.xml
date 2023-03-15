@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="snspell" description="Speak &amp; Spell modules">
-
 
 <!-- Speak N Spell (US) -->
 
@@ -170,6 +169,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

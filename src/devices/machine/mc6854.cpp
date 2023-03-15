@@ -194,7 +194,7 @@ void mc6854_device::device_start()
 	m_out_rts_cb.resolve_safe();
 	m_out_dtr_cb.resolve_safe();
 
-	m_ttimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc6854_device::tfifo_cb), this));
+	m_ttimer = timer_alloc(FUNC(mc6854_device::tfifo_cb), this);
 
 	save_item(NAME(m_cr1));
 	save_item(NAME(m_cr2));

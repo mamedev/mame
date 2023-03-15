@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="famicom_cass" description="Nintendo Famicom Family BASIC cassettes">
 
@@ -53,13 +53,13 @@ It's so difficult to find any of these, that they are definitely worth preservat
 
 <!-- These come from a book titled 任天堂のファミリーコンピュータ - ファミリーベーシック - がわかる本
 (Nintendo Family Computer & Family BASIC ga wakaru hon) and have been typed in and saved to
-tape by UglyJoe of famicomworld  -->
+tape by UglyJoe of famicomworld -->
 
 	<software name="kanitori">
 		<description>Kanitori Game</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="カニトリ　ゲーム" />
+		<info name="alt_title" value="カニトリ ゲーム" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -80,7 +80,7 @@ tape by UglyJoe of famicomworld  -->
 		<description>Keyboard Lesson</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="キーボード　レッスン" />
+		<info name="alt_title" value="キーボード レッスン" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -122,7 +122,7 @@ tape by UglyJoe of famicomworld  -->
 		<description>Starship</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="スターシップ " />
+		<info name="alt_title" value="スターシップ" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -156,7 +156,7 @@ tape by UglyJoe of famicomworld  -->
 		<description>Bound Bon-Bon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="バウンド　ボンボン" />
+		<info name="alt_title" value="バウンド ボンボン" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -177,7 +177,7 @@ tape by UglyJoe of famicomworld  -->
 		<description>Daimajin Attack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="ダイマジン　アタック" />
+		<info name="alt_title" value="ダイマジン アタック" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -198,7 +198,7 @@ tape by UglyJoe of famicomworld  -->
 		<description>Mario Shooter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="マリオ　シューター" />
+		<info name="alt_title" value="マリオ シューター" />
 		<info name="usage" value="Requires BASIC v2; load BG first, then Program" />
 		<part name="cass1" interface="fc_cass">
 			<feature name="part_id" value="BG Data" />
@@ -257,5 +257,298 @@ tape by UglyJoe of famicomworld  -->
 		</part>
 	</software>
 
+
+<!-- These are from various issues of マイコン (Micom) BASIC Magazine and were typed in and saved to tape by ozidual. -->
+
+	<software name="abunaipp">
+		<description>Abunai Penpen!</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="危ないPENPEN!" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="777119">
+				<rom name="dangerous penpen (tomokazu taniyama).wav" size="777119" crc="7b337314" sha1="aeb73e26a2ec421b1be435c3d3a8cf1f617ac0f0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2805897">
+				<rom name="dangerous penpen bg (tomokazu taniyama).wav" size="2805897" crc="9b514231" sha1="563d77bf4b7f74f8fcb3d2cd1b5bd7d7331e8aae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitpan">
+		<description>Fruit Panic</description>
+		<year>1984</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="フルーツ・パニック" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="782095">
+				<rom name="fruit panic (kimura-kun).wav" size="782095" crc="e9f92878" sha1="253adb55a3be457ec587a9b7d77f9e4510dc4476"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2832197">
+				<rom name="fruit panic bg (kimura-kun).wav" size="2832197" crc="308a3ba6" sha1="320bba5ffcc9efed8d3d46cb4d822d98ce858e53"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itazurak">
+		<description>Itazura Karasu</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="イタズラカラス" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="940834">
+				<rom name="mischievous crow (aoba).wav" size="940834" crc="9d002961" sha1="13ae3c4b2e41911bf9fcd084f503a11f6f750301"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2825150">
+				<rom name="mischievous crow bg (aoba).wav" size="2825150" crc="ccbb40e1" sha1="1eb35cd30128f8ab169d822b6e44c906946ff3d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kanihata">
+		<description>Kani-san no Hatahakobi</description>
+		<year>1984</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="カニさんの旗運び" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="976575">
+				<rom name="crab carry the flag (kazuyuki nishiyama).wav" size="976575" crc="a275e9eb" sha1="fc42a7b31494f989d9d95e6052d2ee54a241ab1c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2818617">
+				<rom name="crab carry the flag bg (kazuyuki nishiyama).wav" size="2818617" crc="528c19f7" sha1="c7ed17210da6b06958153feca69f6ba49f17cd0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stardust">
+		<description>Star Dust</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="969682">
+				<rom name="star dust (hisanori takeuchi).wav" size="969682" crc="0a191300" sha1="660e0d35704f196aa2782ecbcbf0c9a315b9faf5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2815158">
+				<rom name="star dust bg (hisanori takeuchi).wav" size="2815158" crc="385f6917" sha1="110707fa408080470e625cacb0969d3748ffe60d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starsgo">
+		<description>Star Ship Go!!</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<info name="alt_title" value="スターシップゴー" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="997874">
+				<rom name="star ship go (gokudon).wav" size="997874" crc="9dd752dc" sha1="e57f97af7f10cf242ee07edaafccaebf835397ce"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2874261">
+				<rom name="star ship go bg (gokudon).wav" size="2874261" crc="7874d8a9" sha1="10e57a4e9b1ba9ede4e6a0fa16d6b7941a032887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargame">
+		<description>War Game</description>
+		<year>1985</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<info name="alt_title" value="ウォーゲーム" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="977402">
+				<rom name="war game (junichi kato).wav" size="977402" crc="439fa15e" sha1="9b2b9f0165daebaf4a51f4a39500b29c863f9437"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2820349">
+				<rom name="war game bg (junichi kato).wav" size="2820349" crc="8f311782" sha1="b3ff05c3dbee022fd402651aa214639c6c75ff0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flies">
+		<description>Flies</description>
+		<year>1986</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="ハエ!" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1297610">
+				<rom name="Micom Basic 1986 01 - 1 - Flies.wav" size="1297610" crc="13c8a420" sha1="b06caac03fad41dbab9653cbf04c229c151e2024"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2823677">
+				<rom name="Micom Basic 1986 01 - 1 - Flies BG.wav" size="2823677" crc="a92c81a5" sha1="89940421b952c0357b66b73393a643ceb695e003"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dark">
+		<description>Dark</description>
+		<year>1986</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="ダーク" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1382309">
+				<rom name="Micom Basic 1986 01 - 2 - Dark.wav" size="1382309" crc="7ebb800c" sha1="8fdcda0ca952d3232f253b85ec702bd8dd98ed4f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2819950">
+				<rom name="Micom Basic 1986 01 - 2 - Dark BG.wav" size="2819950" crc="d1a939ea" sha1="254ae8cd88d72406ef8f5909e44dd0656c306ec8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penpen">
+		<description>Pen Pen</description>
+		<year>1987</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="ペンペン" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1447269">
+				<rom name="Micom Basic 1987 01 - 3 - -Pen Pen-.wav" size="1447269" crc="11314b26" sha1="6d1c4ba0eea028316c1d25d1fc3021c81d4bd29d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fisraduth">
+		<description>Fisraduth - Castle of Tyramis</description>
+		<year>1988</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="FISRADUTH - ティラミスの城" />
+		<info name="usage" value="Requires BASIC v3; LOAD data for Program first, then LOADS data for BG" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1486139">
+				<rom name="Micom Basic 1988 01 - 3 - Fisraduth.wav" size="1486139" crc="29601681" sha1="759f60f8fee4659ebe805f9c7fed66635a3504d2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="BG Data" />
+			<dataarea name="cass" size="2821015">
+				<rom name="Micom Basic 1988 01 - 3 - Fisraduth BG.wav" size="2821015" crc="769853e9" sha1="a65ccbd11eb306056e9756504446ecb6997ad5ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satan">
+		<description>The Spirit of Satan</description>
+		<year>1989</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD part 1, RUN, LOAD part 2, then RUN again" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="718584">
+				<rom name="Micom Basic 1989 01 - 3 - The Spirit of Satan Part 1.wav" size="718584" crc="6ff6af5d" sha1="b0bd17bd8eb70c586172786c1a1093417636404f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1462711">
+				<rom name="Micom Basic 1989 01 - 3 - The Spirit of Satan Part 2.wav" size="1462711" crc="6dc33b65" sha1="33a2bc4b36bfce0f343d3e4ad3e899342b3d3003"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metalarm">
+		<description>Metal Arms</description>
+		<year>1990</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="usage" value="Requires BASIC v3; LOAD part 1, RUN, LOAD part 2, then RUN again. Do not LOAD part 3 unless prompted" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1276161">
+				<rom name="Micom Basic 1990 01 - 3 - MetalArms Part1.wav" size="1276161" crc="4083d439" sha1="2d71f43662fef31482ed025a1096619c3116f362"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1305635">
+				<rom name="Micom Basic 1990 01 - 3 - MetalArms Part2.wav" size="1305635" crc="f96eaebf" sha1="b4d0967582651b59e14bb26bd90f1b465d88a82c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="919602">
+				<rom name="Micom Basic 1990 01 - 3 - MetalArms Part3.wav" size="919602" crc="29ca8868" sha1="43492d171d055c7bd333e2ce30351e93aafd1fb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ryuhyokn">
+		<description>Ryuuhyoukan no Sangeki</description>
+		<year>1994</year>
+		<publisher>Micom BASIC</publisher>
+		<info name="alt_title" value="流氷館の惨劇" />
+		<info name="usage" value="Requires BASIC v3; LOAD part 1, RUN, LOAD part 2, then RUN again" />
+		<part name="cass1" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1127955">
+				<rom name="Micom Basic 1994 01 - The Tragedy of the Ryuhyokan Part 1.wav" size="1127955" crc="498e7314" sha1="e93d3f50db3f1f7d3e1096bab17ed90626aa6335"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="fc_cass">
+			<feature name="part_id" value="Program Data" />
+			<dataarea name="cass" size="1395088">
+				<rom name="Micom Basic 1994 01 - The Tragedy of the Ryuhyokan Part 2.wav" size="1395088" crc="16bcca1e" sha1="e2b46986cf72b51c0ae03cf8a4bd9c604999678c"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

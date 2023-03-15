@@ -10,8 +10,6 @@
 #include "sharcfe.h"
 #include "sharcdsm.h"
 
-#include "debugger.h"
-
 
 #define DISABLE_FAST_REGISTERS      1
 
@@ -363,9 +361,9 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 
 		// DMA 7
 		case 0x1d:
-		{			
+		{
 			m_core->dma[7].control = data;
-			if (data & 0x1)			
+			if (data & 0x1)
 			{
 				sharc_iop_delayed_w(0x1d, data, 30);
 			}
@@ -448,7 +446,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
 	first internal RAM location, before they are used by the DMA controller.
 	*/
-	
+
 	switch ((m_core->dma[6].control >> 6) & 0x3)
 	{
 		case 2:         // 16/48 packing
@@ -582,7 +580,7 @@ void adsp21062_device::device_start()
 	m_core->cache_dirty = 1;
 
 
-	m_core->delayed_iop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this));
+	m_core->delayed_iop_timer = timer_alloc(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this);
 
 	for (auto & elem : m_core->dma_op)
 	{
@@ -596,7 +594,7 @@ void adsp21062_device::device_start()
 		elem.pmode = 0;
 		elem.chained_direction = 0;
 		elem.active = false;
-		elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_dma_callback), this));
+		elem.timer = timer_alloc(FUNC(adsp21062_device::sharc_dma_callback), this);
 	}
 
 	for (int i=0; i < 16; i++)
@@ -1063,7 +1061,7 @@ void adsp21062_device::execute_run()
 					dma_run_cycle(7);
 				}
 				dma_count--;
-			}		
+			}
 
 			m_core->icount = 0;
 			debugger_instruction_hook(m_core->daddr);
@@ -1072,7 +1070,7 @@ void adsp21062_device::execute_run()
 		{
 			check_interrupts();
 			m_core->idle = 0;
-		}	
+		}
 
 		while (m_core->icount > 0 && !m_core->idle && !m_core->write_stalled)
 		{

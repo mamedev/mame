@@ -1,21 +1,21 @@
-{	"name": "Default Nearest-Neighbor Filter",
+{   "name": "Default Nearest-Neighbor Filter",
 	"author": "Ryan Holtz",
 	"targets": [
-		{	"name": "temp",
+		{   "name": "temp",
 			"mode": "guest",
-			"bilinear": true
+			"bilinear": true,
+			"user_prescale": true
 		}
 	],
 	"passes": [
-		{	"effect": "misc/blit",
-			"applytint": true,
+		{   "effect": "misc/blit",
 			"name": "Copy To Filtered Texture",
 			"input": [
 				{ "sampler": "s_tex", "texture": "screen" }
 			],
 			"output": "temp"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Final Upscale",
 			"input": [
 				{ "sampler": "s_tex", "target": "temp" }

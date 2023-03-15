@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "dinetwork.h"
+
 
 // device stuff
 
@@ -30,7 +32,7 @@ protected:
 	};
 
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE varian, float bandwidth);
+	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE varian, u32 bandwidth);
 
 	// device-level overrides
 	virtual void device_start() override;

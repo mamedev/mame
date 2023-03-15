@@ -7,9 +7,11 @@ Build status:
 
 | OS/Compiler   | Status        | 
 | ------------- |:-------------:| 
-| Linux/GCC and Clang | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) [![Build Status](https://travis-ci.org/mamedev/mame.svg?branch=master)](https://travis-ci.org/mamedev/mame) |
-| Windows/GCC and MSVC | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
-| macOS/Clang | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
+| Linux/GCC and clang | ![CI (Linux)](https://github.com/mamedev/mame/workflows/CI%20(Linux)/badge.svg) |
+| Windows/MinGW GCC | ![CI (Windows)](https://github.com/mamedev/mame/workflows/CI%20(Windows)/badge.svg) |
+| macOS/clang | ![CI (macOS)](https://github.com/mamedev/mame/workflows/CI%20(macOS)/badge.svg) |
+| UI Translations | ![Compile UI translations](https://github.com/mamedev/mame/workflows/Compile%20UI%20translations/badge.svg) |
+| Documentation | ![Build documentation](https://github.com/mamedev/mame/workflows/Build%20documentation/badge.svg) |
 
 Static analysis status for entire build (except for third-party parts of project):
 
@@ -25,7 +27,7 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 How to compile?
 ===============
 
-If you're on a *NIX or OSX system, it could be as easy as typing
+If you're on a UNIX-like system (including Linux and macOS), it could be as easy as typing
 
 ```
 make
@@ -43,11 +45,11 @@ for an arcade-only build, or
 make SUBTARGET=mess
 ```
 
-for MESS build.
+for a MESS build.
 
-See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for Mac OS X and popular Linux distributions.
+See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for macOS and popular Linux distributions.
 
-For recent versions of OSX you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
+For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://www.libsdl.org/download-2.0.php).
 
 For Windows users, we provide a ready-made [build environment](http://mamedev.org/tools/) based on MinGW-w64.
 
@@ -67,9 +69,9 @@ make vs2019 MSBUILD=1
 Where can I find out more?
 =============
 
-* [Official MAME Development Team Site](http://mamedev.org/) (includes binary downloads, wiki, forums, and more)
+* [Official MAME Development Team Site](https://mamedev.org/) (includes binary downloads, wiki, forums, and more)
 * [Official MESS Wiki](http://mess.redump.net/)
-* [MAME Testers](http://mametesters.org/) (official bug tracker for MAME and MESS)
+* [MAME Testers](https://mametesters.org/) (official bug tracker for MAME and MESS)
 
 
 Contributing
@@ -83,8 +85,12 @@ Some parts of the code follow [Allman style](https://en.wikipedia.org/wiki/Inden
 
 All contributors need to either add a standard header for license info (on new files) or inform us of their wishes regarding which of the following licenses they would like their code to be made available under: the [BSD-3-Clause](http://opensource.org/licenses/BSD-3-Clause) license, the [LGPL-2.1](http://opensource.org/licenses/LGPL-2.1), or the [GPL-2.0](http://opensource.org/licenses/GPL-2.0).
 
+See more specific [C++ Coding Guidelines](https://docs.mamedev.org/contributing/cxx.html) on our documentation web site.
+
+
 License
 =======
+
 The MAME project as a whole is made available under the terms of the
 [GNU General Public License, version 2](http://opensource.org/licenses/GPL-2.0)
 or later (GPL-2.0+), since it contains code made available under multiple

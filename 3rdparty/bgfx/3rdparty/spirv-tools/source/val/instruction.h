@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "source/ext_inst.h"
 #include "source/table.h"
 #include "spirv-tools/libspirv.h"
 
@@ -85,6 +86,17 @@ class Instruction {
     return inst_.ext_inst_type;
   }
 
+  bool IsNonSemantic() const {
+    return opcode() == SpvOp::SpvOpExtInst &&
+           spvExtInstIsNonSemantic(inst_.ext_inst_type);
+  }
+
+  /// True if this is an OpExtInst for debug info extension.
+  bool IsDebugInfo() const {
+    return opcode() == SpvOp::SpvOpExtInst &&
+           spvExtInstIsDebugInfo(inst_.ext_inst_type);
+  }
+
   // Casts the words belonging to the operand under |index| to |T| and returns.
   template <typename T>
   T GetOperandAs(size_t index) const {
@@ -120,6 +132,9 @@ bool operator<(const Instruction& lhs, const Instruction& rhs);
 bool operator<(const Instruction& lhs, uint32_t rhs);
 bool operator==(const Instruction& lhs, const Instruction& rhs);
 bool operator==(const Instruction& lhs, uint32_t rhs);
+
+template <>
+std::string Instruction::GetOperandAs<std::string>(size_t index) const;
 
 }  // namespace val
 }  // namespace spvtools

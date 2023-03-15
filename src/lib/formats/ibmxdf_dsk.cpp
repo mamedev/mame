@@ -31,6 +31,9 @@
 *********************************************************************/
 
 #include "ibmxdf_dsk.h"
+#include "imageutl.h"
+
+#include "ioprocs.h"
 
 
 ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
@@ -52,18 +55,20 @@ const char *ibmxdf_format::extensions() const
 	return "xdf,img";
 }
 
-int ibmxdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ibmxdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 75;
+		return FIFID_SIZE;
 	return 0;
 }
 
-int ibmxdf_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ibmxdf_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return -1;
 
 	if (size != 1884160)
 		return -1;
@@ -71,12 +76,12 @@ int ibmxdf_format::find_size(io_generic *io, uint32_t form_factor, const std::ve
 	return 0;
 }
 
-int ibmxdf_format::get_image_offset(const format &f, int head, int track)
+int ibmxdf_format::get_image_offset(const format &f, int head, int track) const
 {
 	return (2 * track) * compute_track_size(formats[0]);
 }
 
-const wd177x_format::format &ibmxdf_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &ibmxdf_format::get_track_format(const format &f, int head, int track) const
 {
 	int n = -1;
 
@@ -173,7 +178,7 @@ const ibmxdf_format::format ibmxdf_format::formats_head1_track0[] = {
 	{}
 };
 
-bool ibmxdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ibmxdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	int type = find_size(io, form_factor, variants);
 	if(type == -1)
@@ -207,8 +212,9 @@ bool ibmxdf_format::load(io_generic *io, uint32_t form_factor, const std::vector
 			desc[16].p1 = get_track_dam_mfm(tf, head, track);
 
 			build_sector_description(tf, sectdata, sectors, track, head);
-			int track_size = compute_track_size(f) * 2; // read both sides at once
-			io_generic_read(io, sectdata, get_image_offset(f, head, track), track_size);
+			int const track_size = compute_track_size(f) * 2; // read both sides at once
+			size_t actual;
+			io.read_at(get_image_offset(f, head, track), sectdata, track_size, actual);
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
@@ -258,5 +264,5 @@ void ibmxdf_format::build_sector_description(const format &f, uint8_t *sectdata,
 	}
 }
 
-const floppy_format_type FLOPPY_IBMXDF_FORMAT = &floppy_image_format_creator<ibmxdf_format>;
+const ibmxdf_format FLOPPY_IBMXDF_FORMAT;
 

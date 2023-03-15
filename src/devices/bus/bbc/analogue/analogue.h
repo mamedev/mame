@@ -81,8 +81,8 @@ private:
 class device_bbc_analogue_interface : public device_interface
 {
 public:
-	virtual uint8_t ch_r(int channel) { return 0x00; };
-	virtual uint8_t pb_r() { return 0x30; };
+	virtual uint8_t ch_r(int channel) { return 0x00; }
+	virtual uint8_t pb_r() { return 0x30; }
 
 protected:
 	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);

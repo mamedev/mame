@@ -7,20 +7,21 @@
     Internal menu for the plugin interface.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_PLUGINOPT_H
 #define MAME_FRONTEND_UI_PLUGINOPT_H
 
-#include "ui/ui.h"
+#pragma once
+
 #include "ui/menu.h"
+#include "ui/ui.h"
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 
 namespace ui {
+
 class menu_plugin : public menu
 {
 public:
@@ -31,25 +32,30 @@ public:
 	virtual ~menu_plugin();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<std::string> &m_plugins;
 };
 
+
 class menu_plugin_opt : public menu
 {
 public:
-	menu_plugin_opt(mame_ui_manager &mui, render_container &container, char *menu);
+	menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu);
 	virtual ~menu_plugin_opt();
 
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+protected:
+	virtual bool custom_ui_back() override { return true; }
 
-	std::string m_menu;
+private:
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
+
+	std::string const m_menu;
+	bool m_need_idle;
 };
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_PLUGINOPT_H */
+#endif // MAME_FRONTEND_UI_PLUGINOPT_H

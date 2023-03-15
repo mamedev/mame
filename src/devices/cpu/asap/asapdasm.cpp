@@ -57,7 +57,7 @@ offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 	switch (opcode)
 	{
 		case 0x00:  util::stream_format(stream, "trap   $00"); flags = STEP_OVER;                              break;
-		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + ((int32_t)(op << 10) >> 8));   break;
+		case 0x01:  util::stream_format(stream, "b%s    $%08x", condition[rdst & 15], pc + util::sext(op << 2, 24)); flags = STEP_COND | step_over_extra(1); break;
 		case 0x02:  if ((op & 0x003fffff) == 3)
 					{
 						uint32_t nextop = opcodes.r32(pc+4);
@@ -71,10 +71,10 @@ offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 					if (rdst)
 					{
 						flags = STEP_OVER | step_over_extra(1);
-						util::stream_format(stream, "bsr    %s,$%08x", reg[rdst], pc + ((int32_t)(op << 10) >> 8));
+						util::stream_format(stream, "bsr    %s,$%08x", reg[rdst], pc + util::sext(op << 2, 24));
 					}
 					else
-						util::stream_format(stream, "bra    $%08x", pc + ((int32_t)(op << 10) >> 8));
+						util::stream_format(stream, "bra    $%08x", pc + util::sext(op << 2, 24));
 					break;
 		case 0x03:  util::stream_format(stream, "lea%s  %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,2), reg[rdst]);  break;
 		case 0x04:  util::stream_format(stream, "leah%s %s[%s],%s", setcond[cond], reg[rsrc1], src2(op,1), reg[rdst]);  break;
@@ -132,7 +132,7 @@ offs_t asap_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 					else if (rsrc2_iszero)
 					{
 						if (rsrc1 == 28)
-							flags = STEP_OUT;
+							flags = STEP_OUT | step_over_extra(1);
 						util::stream_format(stream, "jmp%s  %s", setcond[cond], reg[rsrc1]);
 					}
 					else

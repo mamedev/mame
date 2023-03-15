@@ -59,16 +59,13 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual bool is_x86() const { return m_is_x86; }
 
+	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+
 private:
-	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
-
-	inline void set_timer() { timer_set(attotime::zero, TIMER_CHECK_IRQ); }
 	void set_irq_line(int irq, int state);
-
 
 	enum class state_t : u8
 	{
@@ -83,6 +80,7 @@ private:
 	devcb_read_line m_in_sp_func;
 	devcb_read8 m_read_slave_ack_func;
 
+	emu_timer *m_irq_timer;
 	state_t m_state;
 
 	uint8_t m_isr;
@@ -127,7 +125,17 @@ protected:
 	virtual bool is_x86() const override { return true; }
 };
 
+class mk98pic_device : public pic8259_device
+{
+public:
+	mk98pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual bool is_x86() const override { return true; }
+};
+
 DECLARE_DEVICE_TYPE(PIC8259, pic8259_device)
 DECLARE_DEVICE_TYPE(V5X_ICU, v5x_icu_device)
+DECLARE_DEVICE_TYPE(MK98PIC, mk98pic_device)
 
 #endif // MAME_MACHINE_PIC8259_H

@@ -57,7 +57,7 @@ void C_bit_set(dsp56156_core* cpustate, uint8_t value) { if (value) (SR |= 0x000
 /* ************************************************************************* */
 // uint8_t CD_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0080) != 0); }
 // uint8_t SD_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0040) != 0); }
-// uint8_t  R_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0020) != 0); }
+uint8_t  R_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0020) != 0); }
 // uint8_t SA_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0010) != 0); }
 // uint8_t MC_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0004) != 0); }
 uint8_t MB_bit(const dsp56156_core* cpustate) { return ((OMR & 0x0002) != 0); }
@@ -113,6 +113,7 @@ void pcu_init(dsp56156_core* cpustate, device_t *device)
 	device->save_item(NAME(cpustate->PCU.ss));
 	device->save_item(NAME(cpustate->PCU.pending_interrupts));
 	device->save_item(NAME(cpustate->PCU.reset_vector));
+	device->save_item(NAME(cpustate->PCU.ipc));
 }
 
 void pcu_reset(dsp56156_core* cpustate)
@@ -272,8 +273,7 @@ void pcu_service_interrupts(dsp56156_core* cpustate)
 		/* 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here) */
 		if (priority >= I_bits(cpustate))
 		{
-			/* TODO: Implement long interrupts & fast interrupts correctly! */
-			/*       Right now they are handled in the JSR & BSR ops.  SupahLame. */
+			IPC = PC;
 
 			/* Are you anything but the Host Command interrupt? */
 			if (interrupt_index != 22)

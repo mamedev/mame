@@ -7,10 +7,10 @@
     Format code for Sord M5 cassette files
 
 **************************************************************************/
+
 #include "sord_cas.h"
 
 #include <cstring>
-#include <cassert>
 
 #define SORDM5_WAVESAMPLES_HEADER  1
 #define SORDM5_WAVESAMPLES_TRAILER 1

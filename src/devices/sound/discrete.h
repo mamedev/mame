@@ -7,6 +7,7 @@
 
 #include "machine/rescap.h"
 
+#include <memory>
 #include <vector>
 
 
@@ -4177,8 +4178,6 @@ class discrete_sound_output_interface;
 
 class discrete_device : public device_t
 {
-	//friend class discrete_base_node;
-
 protected:
 	// construction/destruction
 	discrete_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -4292,7 +4291,7 @@ public:
 		set_intf(intf);
 	}
 	discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~discrete_sound_device() { };
+	virtual ~discrete_sound_device() { }
 
 	/* --------------------------------- */
 
@@ -4344,7 +4343,7 @@ public:
 	virtual void stop() { }
 	virtual void save_state();
 
-	virtual int max_output() { return 1; };
+	virtual int max_output() { return 1; }
 
 	inline bool interface(discrete_step_interface *&intf) const { intf = m_step_intf; return (intf != nullptr); }
 	inline bool interface(discrete_input_interface *&intf) const { intf = m_input_intf; return (intf != nullptr); }
@@ -4410,7 +4409,7 @@ class discrete_node_factory
 public:
 	static std::unique_ptr<discrete_base_node> create(discrete_device &pdev, const discrete_block &block)
 	{
-		std::unique_ptr<discrete_base_node> r = make_unique_clear<C>();
+		std::unique_ptr<discrete_base_node> r = std::make_unique<C>();
 
 		r->init(&pdev, &block);
 		return r;

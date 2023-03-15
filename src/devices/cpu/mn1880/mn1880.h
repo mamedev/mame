@@ -21,13 +21,15 @@ public:
 		MN1880_YPL, MN1880_YPH,
 		MN1880_SP, MN1880_SPA, MN1880_SPB,
 		MN1880_LP, MN1880_LPA, MN1880_LPB,
+		MN1880_IE, MN1880_IEA, MN1880_IEB,
+		MN1880_IEMASK, MN1880_IEMASKA, MN1880_IEMASKB,
 		MN1880_DIVIDER1, MN1880_DIVIDER2,
-		MN1880_IE0, MN1880_IE1,
+		MN1880_IF,
 		MN1880_CPUM
 	};
 
 protected:
-	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor data_map);
+	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,14 +45,17 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
+	void internal_data_map(address_map &map);
+
 private:
 	struct cpu_registers
 	{
-		cpu_registers() : ip(0), irp(0), ir(0), fs(0), xp(0), yp(0), sp(0), lp(0), wait(0) { }
+		cpu_registers() : ip(0), irp(0), ir(0), fs(0), xp(0), yp(0), sp(0), lp(0), wait(0), ie(0), iemask(false) { }
 
 		u8 addcz(u8 data1, u8 data2, bool carry, bool holdz);
 		u8 adddcz(u8 data1, u8 data2, bool carry);
@@ -70,6 +75,8 @@ private:
 		u16 sp;
 		u16 lp;
 		u16 wait;
+		u16 ie;
+		bool iemask;
 	};
 
 	enum class microstate : u8 {
@@ -165,12 +172,20 @@ private:
 		BRFC_1,
 		CALLFD_1,
 		RDTBL_1, RDTBL_2, RDTBL_3,
-		PI_1,
+		PI_1, PI_2, PI_3, PI_4,
 		UNKNOWN
 	};
 
 	static void setl(u16 &pr, u8 data) { pr = (pr & 0xff00) | data; }
 	static void seth(u16 &pr, u8 data) { pr = (pr & 0x00ff) | (data << 8); }
+
+	cpu_registers &get_active_cpu() { return m_cpu[BIT(m_cpum, 4)]; }
+	const cpu_registers &get_active_cpu() const { return m_cpu[BIT(m_cpum, 4)]; }
+	bool output_queued() const { return m_output_queue_state != 0xff; }
+	void set_output_queued() { m_output_queue_state = BIT(m_cpum, 4); }
+
+	offs_t mmu_psen_translate(u16 addr) const { return BIT(m_mmu_enable, 6) && BIT(addr + 0x4000, 15) ? u32(m_mmu_bank[BIT(addr, 15)]) << 14 | (addr & 0x3fff) : addr; }
+	offs_t mmu_data_translate(u16 addr) const { return BIT(m_mmu_enable, 7) && BIT(addr + 0x4000, 15) ? u32(m_mmu_bank[BIT(addr, 15) + 2]) << 14 | (addr & 0x3fff) : addr; }
 
 	u8 ie0_r();
 	void ie0_w(u8 data);
@@ -179,7 +194,10 @@ private:
 	u8 cpum_r();
 	void cpum_w(u8 data);
 
-	void internal_data_map(address_map &map);
+	u8 mmu_bank_r(offs_t offset);
+	void mmu_bank_w(offs_t offset, u8 data);
+	u8 mmu_enable_r();
+	void mmu_enable_w(u8 data);
 
 	void swap_cpus();
 	void next_instruction(u8 input);
@@ -193,22 +211,34 @@ private:
 	address_space_config m_data_config;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
+	const bool m_has_mmu;
 
 	// execution state
 	cpu_registers m_cpu[2];
-	bool m_cpu_select;
 	u8 m_cpum;
 	microstate m_ustate;
 	u16 m_da;
 	u16 m_tmp1;
 	u16 m_tmp2;
-	bool m_output_queued;
+	u8 m_output_queue_state;
 	s32 m_icount;
 
 	// interrupt state
-	u8 m_ie[2];
+	u16 m_if;
+	u16 m_irq;
+
+	// MMU state
+	u8 m_mmu_bank[4];
+	u8 m_mmu_enable;
+};
+
+class mn18801a_device : public mn1880_device
+{
+public:
+	mn18801a_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)
+DECLARE_DEVICE_TYPE(MN18801A, mn18801a_device)
 
 #endif // MAME_CPU_MN1880_MN1880_H

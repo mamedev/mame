@@ -67,12 +67,9 @@ void vsmile_keyboard_device::device_start()
 {
 	vsmile_ctrl_device_base::device_start();
 
-	m_idle_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_keyboard_device::handle_idle), this));
-	m_hello_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_keyboard_device::handle_hello), this));
-	m_hello_timeout_timer = machine().scheduler().timer_alloc(
-			timer_expired_delegate(FUNC(vsmile_keyboard_device::handle_hello_timeout), this));
+	m_idle_timer = timer_alloc(FUNC(vsmile_keyboard_device::handle_idle), this);
+	m_hello_timer = timer_alloc(FUNC(vsmile_keyboard_device::handle_hello), this);
+	m_hello_timeout_timer = timer_alloc(FUNC(vsmile_keyboard_device::handle_hello_timeout), this);
 
 	save_item(NAME(m_state));
 	save_item(NAME(m_sent_joy));

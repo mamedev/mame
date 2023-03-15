@@ -2,7 +2,7 @@
 // detail/consuming_buffers.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,19 +26,37 @@
 namespace asio {
 namespace detail {
 
+// Helper template to determine the maximum number of prepared buffers.
+template <typename Buffers>
+struct prepared_buffers_max
+{
+  enum { value = buffer_sequence_adapter_base::max_buffers };
+};
+
+template <typename Elem, std::size_t N>
+struct prepared_buffers_max<boost::array<Elem, N> >
+{
+  enum { value = N };
+};
+
+#if defined(ASIO_HAS_STD_ARRAY)
+
+template <typename Elem, std::size_t N>
+struct prepared_buffers_max<std::array<Elem, N> >
+{
+  enum { value = N };
+};
+
+#endif // defined(ASIO_HAS_STD_ARRAY)
 
 // A buffer sequence used to represent a subsequence of the buffers.
-template <typename Buffer>
+template <typename Buffer, std::size_t MaxBuffers>
 struct prepared_buffers
 {
   typedef Buffer value_type;
   typedef const Buffer* const_iterator;
 
-  enum
-  {
-    max_buffers = buffer_sequence_adapter_base::max_buffers < 8
-      ? buffer_sequence_adapter_base::max_buffers : 8
-  };
+  enum { max_buffers = MaxBuffers < 16 ? MaxBuffers : 16 };
 
   prepared_buffers() : count(0) {}
   const_iterator begin() const { return elems; }
@@ -53,14 +71,18 @@ template <typename Buffer, typename Buffers, typename Buffer_Iterator>
 class consuming_buffers
 {
 public:
+  typedef prepared_buffers<Buffer, prepared_buffers_max<Buffers>::value>
+    prepared_buffers_type;
+
   // Construct to represent the entire list of buffers.
   explicit consuming_buffers(const Buffers& buffers)
     : buffers_(buffers),
-      total_size_(asio::buffer_size(buffers)),
       total_consumed_(0),
       next_elem_(0),
       next_elem_offset_(0)
   {
+    using asio::buffer_size;
+    total_size_ = buffer_size(buffers);
   }
 
   // Determine if we are at the end of the buffers.
@@ -70,16 +92,16 @@ public:
   }
 
   // Get the buffer for a single transfer, with a size.
-  prepared_buffers<Buffer> prepare(std::size_t max_size)
+  prepared_buffers_type prepare(std::size_t max_size)
   {
-    prepared_buffers<Buffer> result;
+    prepared_buffers_type result;
 
     Buffer_Iterator next = asio::buffer_sequence_begin(buffers_);
     Buffer_Iterator end = asio::buffer_sequence_end(buffers_);
 
     std::advance(next, next_elem_);
     std::size_t elem_offset = next_elem_offset_;
-    while (next != end && max_size > 0 && result.count < result.max_buffers)
+    while (next != end && max_size > 0 && (result.count) < result.max_buffers)
     {
       Buffer next_buf = Buffer(*next) + elem_offset;
       result.elems[result.count] = asio::buffer(next_buf, max_size);
@@ -378,7 +400,7 @@ public:
     // No-op.
   }
 
-  std::size_t total_consume() const
+  std::size_t total_consumed() const
   {
     return 0;
   }

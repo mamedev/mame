@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 
     Missing stuff:
@@ -583,7 +583,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-		<software name="bankrobr" cloneof="fortknox">
+	<software name="bankrobr" cloneof="fortknox">
 		<description>Bank Robber</description>
 		<!-- Earlier version of "Raid on Fort Knox". -->
 		<year>1982</year>
@@ -1175,7 +1175,7 @@ B-2007 : Innovative Computing
 		</part>
 	</software>
 
-		<software name="deadskys">
+	<software name="deadskys">
 		<description>Deadly Skies (PAL)</description>
 		<year>1983</year>
 		<publisher>Tronix</publisher>
@@ -2576,7 +2576,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="road race (aka midnight  drive) (commodore)(1981)(vic-1909).a0" size="0x2000" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
+				<rom name="road race (aka midnight drive) (commodore)(1981)(vic-1909).a0" size="0x2000" crc="49ed41da" sha1="5cb8f3cc2529a0144b1e66e1cd7af41ad1ba78b4" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3626,7 +3626,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="menagerie  (commodore)(1982)(vic-1926)(jue).a0" size="0x2000" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
+				<rom name="menagerie (commodore)(1982)(vic-1926)(jue).a0" size="0x2000" crc="a3c74629" sha1="aec46a3e6f9797b116cbe6a8792e00530234ae80" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3781,7 +3781,7 @@ B-2007 : Innovative Computing
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-					<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a2].a0" size="0x2000" crc="ee5d7a91" sha1="94f2ac4d58e9ffe4861c00de5551bdcb60b9dbf7" offset="0x0000" />
+				<rom name="visible solar system (commodore)(1982)(vic-1930)(jue)[a2].a0" size="0x2000" crc="ee5d7a91" sha1="94f2ac4d58e9ffe4861c00de5551bdcb60b9dbf7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

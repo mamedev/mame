@@ -152,10 +152,15 @@ public:
 		m_iospace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, memory_bank *bank);
 	void install_rom(device_t *dev, offs_t start, offs_t end, const char *region);
 	template<typename R, typename W> void install_memory(offs_t start, offs_t end, R rhandler, W whandler)
 	{
 		install_space(AS_ISA_MEM, start, end, rhandler, whandler);
+	}
+	template<typename T> void install_memory(offs_t addrstart, offs_t addrend, T &device, void (T:: *map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_memspace->install_device(addrstart, addrend, device, map, unitmask);
 	}
 
 	void unmap_device(offs_t start, offs_t end) const { m_iospace->unmap_readwrite(start, end); }
@@ -245,12 +250,9 @@ DECLARE_DEVICE_TYPE(ISA8, isa8_device)
 class device_isa8_card_interface : public device_interface
 {
 	friend class isa8_device;
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_isa8_card_interface();
-
-	device_isa8_card_interface *next() const { return m_next; }
 
 	void set_isa_device();
 	// configuration access
@@ -269,9 +271,6 @@ public:
 
 	isa8_device  *m_isa;
 	device_t     *m_isa_dev;
-
-private:
-	device_isa8_card_interface *m_next;
 };
 
 class isa16_device;

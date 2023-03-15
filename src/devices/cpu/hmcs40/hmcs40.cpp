@@ -11,16 +11,14 @@ References:
   (verified a while later after new documentation was found)
 
 TODO:
-- How the stack works, is probably m_stack_levels+1 program counters, and
-  an index pointing to the current program counter. Then push/pop simply
-  decrements/increments the index. The way it is implemented right now
-  behaves the same.
+- Which opcodes block interrupt on next cycle? LPU is obvious, and Gakken Crazy Kong
+  (VFD tabletop game) locks up if CAL doesn't do it. Maybe BR? But that's a
+  dangerous assumption since tight infinite loops wouldn't work right anymore.
 
 */
 
 #include "emu.h"
 #include "hmcs40.h"
-#include "debugger.h"
 #include "hmcs40d.h"
 
 #define IS_PMOS 0
@@ -199,12 +197,6 @@ std::unique_ptr<util::disasm_interface> hmcs40_cpu_device::create_disassembler()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-enum
-{
-	HMCS40_PC=1, HMCS40_A, HMCS40_B,
-	HMCS40_X, HMCS40_SPX, HMCS40_Y, HMCS40_SPY
-};
-
 void hmcs40_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -221,7 +213,6 @@ void hmcs40_cpu_device::device_start()
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
-	m_sp = 0;
 	m_op = 0;
 	m_prev_op = 0;
 	m_i = 0;
@@ -246,12 +237,12 @@ void hmcs40_cpu_device::device_start()
 	memset(m_if, 0, sizeof(m_if));
 	m_tf = 0;
 	memset(m_int, 0, sizeof(m_int));
+	m_block_int = false;
 	memset(m_r, 0, sizeof(m_r));
 	m_d = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_i));
@@ -277,22 +268,23 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_if));
 	save_item(NAME(m_tf));
 	save_item(NAME(m_int));
-
+	save_item(NAME(m_block_int));
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
 
 	// register state for debugger
-	state_add(HMCS40_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(HMCS40_A,   "A",   m_a).formatstr("%01X");
-	state_add(HMCS40_B,   "B",   m_b).formatstr("%01X");
-	state_add(HMCS40_X,   "X",   m_x).formatstr("%01X");
-	state_add(HMCS40_SPX, "SPX", m_spx).formatstr("%01X");
-	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
-	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "A", m_a).formatstr("%01X"); // 2
+	state_add(++m_state_count, "B", m_b).formatstr("%01X"); // 3
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 4
+	state_add(++m_state_count, "SPX", m_spx).formatstr("%01X"); // 5
+	state_add(++m_state_count, "Y", m_y).formatstr("%01X"); // 6
+	state_add(++m_state_count, "SPY", m_spy).formatstr("%01X"); // 7
 
 	set_icountptr(m_icount);
 }
@@ -462,6 +454,7 @@ void hmcs40_cpu_device::do_interrupt()
 
 	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
 	int line = (m_iri) ? m_eint_line : 2;
+	standard_irq_callback(line, m_pc);
 
 	// vector $3f, on page 0(timer/counter), or page 1(external)
 	// external interrupt has priority over t/c interrupt
@@ -471,7 +464,6 @@ void hmcs40_cpu_device::do_interrupt()
 	else
 		m_irt = 0;
 
-	standard_irq_callback(line);
 	m_prev_pc = m_pc;
 
 	cycle();
@@ -572,15 +564,17 @@ void hmcs40_cpu_device::execute_run()
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 
-		// check/handle interrupt, but not in the middle of a long jump
-		if (m_ie && (m_iri || m_irt) && (m_prev_op & 0x3e0) != 0x340)
+		// check/handle interrupt
+		if (m_ie && (m_iri || m_irt) && !m_block_int)
 			do_interrupt();
+		m_block_int = false;
 
 		// fetch next opcode
 		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_word(m_pc) & 0x3ff;
 		m_i = bitswap<4>(m_op,0,1,2,3); // reversed bit-order for 4-bit immediate param (except for XAMR)
 		increment_pc();
+		cycle();
 
 		// handle opcode
 		switch (m_op)
@@ -811,7 +805,5 @@ void hmcs40_cpu_device::execute_run()
 			default:
 				op_illegal(); break;
 		} /* big switch */
-
-		cycle();
 	}
 }

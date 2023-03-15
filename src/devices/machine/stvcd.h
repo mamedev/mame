@@ -82,7 +82,7 @@ private:
 	{
 		int32_t size; // size of block
 		int32_t FAD;  // FAD on disc
-		uint8_t data[CD_MAX_SECTOR_DATA];
+		uint8_t data[cdrom_file::MAX_SECTOR_DATA];
 		uint8_t chan; // channel
 		uint8_t fnum; // file number
 		uint8_t subm; // subchannel mode

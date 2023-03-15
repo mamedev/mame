@@ -9,10 +9,13 @@
 ****************************************************************************/
 
 #include "imgtool.h"
-#include "formats/imageutl.h"
-#include "formats/pc_dsk_legacy.h"
 #include "fat.h"
 #include "iflopimg.h"
+
+#include "formats/imageutl.h"
+#include "formats/pc_dsk_legacy.h"
+
+#include "opresolv.h"
 
 #define FAT_SECLEN              512
 

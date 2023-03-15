@@ -37,8 +37,6 @@
 #include "m6805defs.h"
 #include "6805dasm.h"
 
-#include "debugger.h"
-
 #include <algorithm>
 
 #define OP(name)        (&m6805_base_device::name<big>)
@@ -482,7 +480,7 @@ void m6805_base_device::interrupt()
 		}
 		SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
-		standard_irq_callback(0);
+		standard_irq_callback(0, m_pc.w.l);
 
 		if (m_params.m_addr_width > 13)
 			rm16<true>(0x1ffc, m_pc);
@@ -513,7 +511,7 @@ void m6805_base_device::interrupt()
 			}
 			SEI;
 			/* no vectors supported, just do the callback to clear irq_state if needed */
-			standard_irq_callback(0);
+			standard_irq_callback(0, m_pc.w.l);
 
 			interrupt_vector();
 

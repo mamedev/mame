@@ -28,7 +28,7 @@
 #include "emu.h"
 #include "samsmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_SAMSMEM, bus::ti99::peb, sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
+DEFINE_DEVICE_TYPE(TI99_SAMSMEM, bus::ti99::peb::sams_memory_expansion_device, "ti99_sams", "SuperAMS memory expansion card")
 
 namespace bus::ti99::peb {
 

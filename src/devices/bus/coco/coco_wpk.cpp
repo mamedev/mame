@@ -51,7 +51,6 @@ coco_wpk_device::coco_wpk_device(const machine_config &mconfig, device_type type
 	, m_palette(*this, "palette")
 	, m_chargen(*this, "chargen")
 	, m_video_addr(0)
-	, m_video_data(0)
 {
 }
 

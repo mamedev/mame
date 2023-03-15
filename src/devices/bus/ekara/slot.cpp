@@ -38,11 +38,11 @@ device_ekara_cart_interface::~device_ekara_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_ekara_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_ekara_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(EKARASLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_BIG)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -56,7 +56,7 @@ void device_ekara_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //-------------------------------------------------
 ekara_cart_slot_device::ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EKARA_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_ekara_cart_interface>(mconfig, *this),
 	m_type(EKARA_PLAIN),
 	m_cart(nullptr)
@@ -134,7 +134,7 @@ image_init_result ekara_cart_slot_device::call_load()
 		uint8_t *ROM;
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		m_cart->rom_alloc(len, tag());
+		m_cart->rom_alloc(len);
 
 		ROM = m_cart->get_rom_base();
 
@@ -184,17 +184,17 @@ std::string ekara_cart_slot_device::get_default_card_software(get_default_card_s
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = ekara_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = ekara_get_slot(type);
 
-		printf("type: %s\n", slot_string);
+		//printf("type: %s\n", slot_string);
 
 		return std::string(slot_string);
 	}

@@ -8,65 +8,61 @@
 
 #include "input_module.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 
-// MAMEOS headers
+#include "input_windows.h"
+
+#include "window.h"
 #include "winmain.h"
 
-#include "input_common.h"
-#include "input_windows.h"
+#include "util/language.h"
+
+#include "osdepend.h"
+
 
 bool windows_osd_interface::should_hide_mouse() const
 {
-	bool hidemouse = false;
-	wininput_module* mod;
+	if (!winwindow_has_focus())
+		return false;
 
-	mod = dynamic_cast<wininput_module*>(m_keyboard_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
+	if (machine().paused())
+		return false;
 
-	mod = dynamic_cast<wininput_module*>(m_mouse_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
+	// track if mouse/lightgun is enabled, for mouse hiding purposes
+	bool const mouse_enabled = machine().input().class_enabled(DEVICE_CLASS_MOUSE);
+	bool const lightgun_enabled = machine().input().class_enabled(DEVICE_CLASS_LIGHTGUN);
+	if (!mouse_enabled && !lightgun_enabled)
+		return false;
 
-	mod = dynamic_cast<wininput_module*>(m_lightgun_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
-
-	mod = dynamic_cast<wininput_module*>(m_joystick_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
-
-	return hidemouse;
+	return true;
 }
 
-bool windows_osd_interface::handle_input_event(input_event eventid, void* eventdata) const
+bool windows_osd_interface::handle_input_event(input_event eventid, void *eventdata) const
 {
 	bool handled = false;
 
-	wininput_module* mod;
+	wininput_event_handler *mod;
 
-	mod = dynamic_cast<wininput_module*>(m_keyboard_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_keyboard_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module*>(m_mouse_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_mouse_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module*>(m_lightgun_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_lightgun_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module*>(m_joystick_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_joystick_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
 	return handled;
-}
-
-void windows_osd_interface::poll_input(running_machine &machine) const
-{
-	m_keyboard_input->poll_if_necessary(machine);
-	m_mouse_input->poll_if_necessary(machine);
-	m_lightgun_input->poll_if_necessary(machine);
-	m_joystick_input->poll_if_necessary(machine);
 }
 
 //============================================================
@@ -75,56 +71,45 @@ void windows_osd_interface::poll_input(running_machine &machine) const
 
 void windows_osd_interface::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
-	const char* uimode;
-
 	// loop over the defaults
 	for (input_type_entry &entry : typelist)
 		switch (entry.type())
 		{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
-			case IPT_UI_CONFIGURE:
+			case IPT_UI_MENU:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
-#else
-			// UWP: Hotkey Select + X => UI_CONFIGURE (Menu)
-			case IPT_UI_CONFIGURE:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::or_code, JOYCODE_SELECT, JOYCODE_BUTTON3);
-				break;
-
-			// UWP: Hotkey Select + Start => CANCEL
-			case IPT_UI_CANCEL:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
-				break;
-#endif
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = options().ui_mode_key();
-				if (strcmp(uimode, "auto"))
 				{
-					std::string fullmode = "ITEM_ID_";
-					fullmode += uimode;
-					input_item_id const mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode.c_str());
-					if (ITEM_ID_INVALID != mameid_code)
+					char const *const uimode = options().ui_mode_key();
+					if (uimode && *uimode && strcmp(uimode, "auto"))
 					{
-						input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
-						entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
+						std::string fullmode("ITEM_ID_");
+						fullmode.append(uimode);
+						input_item_id const mameid_code = keyboard_trans_table::instance().lookup_mame_code(fullmode.c_str());
+						if (ITEM_ID_INVALID != mameid_code)
+						{
+							input_code const ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+							entry.defseq(SEQ_TYPE_STANDARD).set(ui_code);
+						}
 					}
 				}
 				break;
 
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				entry.configure_osd("TOGGLE_FULLSCREEN", "Toggle Fullscreen");
+				entry.configure_osd("TOGGLE_FULLSCREEN", N_p("input-name", "Toggle Fullscreen"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, KEYCODE_LALT, input_seq::or_code, KEYCODE_ENTER, KEYCODE_RALT);
 				break;
 
 			// lalt-F12 for fullscreen snap (HLSL)
 			case IPT_OSD_2:
-				entry.configure_osd("RENDER_SNAP", "Take Rendered Snapshot");
+				entry.configure_osd("RENDER_SNAP", N_p("input-name", "Take Rendered Snapshot"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LALT, input_seq::not_code, KEYCODE_LSHIFT);
 				break;
+
 			// add a NOT-lalt to our default F12
 			case IPT_UI_SNAPSHOT: // emu/input.c: input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT)
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
@@ -132,7 +117,7 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 
 			// lshift-lalt-F12 for fullscreen video (HLSL, BGFX)
 			case IPT_OSD_3:
-				entry.configure_osd("RENDER_AVI", "Record Rendered Video");
+				entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 				break;
 
@@ -146,19 +131,10 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
 				break;
 
-			// add a NOT-lalt to write timecode file
-			case IPT_UI_TIMECODE: // emu/input.c: input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT)
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
-				break;
-
 			// lctrl-lalt-F5 to toggle post-processing
 			case IPT_OSD_4:
-				entry.configure_osd("POST_PROCESS", "Toggle Post-Processing");
+				entry.configure_osd("POST_PROCESS", N_p("input-name", "Toggle Post-Processing"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LALT, KEYCODE_LCONTROL);
-				break;
-			// add a NOT-lctrl-lalt to our default F5
-			case IPT_UI_TOGGLE_DEBUG: // emu/input.c: input_seq(KEYCODE_F5)
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
 				break;
 
 			// leave everything else alone
@@ -167,4 +143,4 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 		}
 }
 
-#endif
+#endif // defined(OSD_WINDOWS)

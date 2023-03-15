@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The purpose of this list is to document the .raw files of e-reader, which may be supported later in GBA driver
 It's based in No-Intro e-reader set
@@ -42,7 +42,7 @@ Author: Shideravan
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="ereader">
 			<dataarea name="rom" size="2912">
-					<rom name="animal crossing-e - series 1 - apollo (usa).raw" size="2912" crc="f8deff39" sha1="6b3b9edb8fe574244a2f7a395856529fc9c39993"/>
+				<rom name="animal crossing-e - series 1 - apollo (usa).raw" size="2912" crc="f8deff39" sha1="6b3b9edb8fe574244a2f7a395856529fc9c39993"/>
 			</dataarea>
 		</part>
 	</software>

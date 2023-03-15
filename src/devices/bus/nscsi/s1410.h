@@ -64,11 +64,21 @@ protected:
 		SC_WRITE_LONG           = 0xe6
 	};
 
+	// SCSI sense keys
+	enum {
+		SK_NO_ERROR             = 0x00,
+		SK_DRIVE_NOT_READY      = 0x04,
+		SK_FORMAT_ERROR         = 0x1a
+	};
+
 	virtual void device_reset() override;
 
+	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual attotime scsi_data_byte_period() override;
+	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t params[8];
 };

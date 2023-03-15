@@ -15,7 +15,7 @@
 
 #include "kc_cas.h"
 
-#include <cassert>
+#include <cstring>
 
 #define SMPLO       -32768
 #define SMPHI       32767

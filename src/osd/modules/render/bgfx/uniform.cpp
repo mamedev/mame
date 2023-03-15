@@ -7,13 +7,15 @@
 //============================================================
 
 #include "uniform.h"
-#include <cstring>
 
-bgfx_uniform::bgfx_uniform(std::string name, bgfx::UniformType::Enum type)
-	: m_name(name)
+#include <cstring>
+#include <utility>
+
+bgfx_uniform::bgfx_uniform(std::string &&name, bgfx::UniformType::Enum type)
+	: m_name(std::move(name))
 	, m_type(type)
 {
-	m_handle = bgfx::createUniform(m_name.c_str(), m_type);
+	m_handle = BGFX_INVALID_HANDLE;
 	m_data_size = get_size_for_type(type);
 	if (m_data_size > 0)
 	{
@@ -23,8 +25,16 @@ bgfx_uniform::bgfx_uniform(std::string name, bgfx::UniformType::Enum type)
 
 bgfx_uniform::~bgfx_uniform()
 {
-	bgfx::destroy(m_handle);
+	if (m_handle.idx != bgfx::kInvalidHandle)
+	{
+		bgfx::destroy(m_handle);
+	}
 	delete [] m_data;
+}
+
+void bgfx_uniform::create()
+{
+	m_handle = bgfx::createUniform(m_name.c_str(), m_type);
 }
 
 void bgfx_uniform::upload()

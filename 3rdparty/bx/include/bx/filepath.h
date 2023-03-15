@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_FILEPATH_H_HEADER_GUARD
@@ -9,11 +9,11 @@
 #include "error.h"
 #include "string.h"
 
-BX_ERROR_RESULT(BX_ERROR_ACCESS,        BX_MAKEFOURCC('b', 'x', 0, 0) );
-BX_ERROR_RESULT(BX_ERROR_NOT_DIRECTORY, BX_MAKEFOURCC('b', 'x', 0, 1) );
-
 namespace bx
 {
+	BX_ERROR_RESULT(kErrorAccess,       BX_MAKEFOURCC('b', 'x', 1, 1) );
+	BX_ERROR_RESULT(kErrorNotDirectory, BX_MAKEFOURCC('b', 'x', 1, 2) );
+
 	constexpr int32_t kMaxFilePath = 1024;
 
 	/// Special predefined OS directories.

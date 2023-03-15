@@ -2,7 +2,7 @@
 // detail/impl/null_event.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -39,7 +39,7 @@ namespace detail {
 void null_event::do_wait()
 {
 #if defined(ASIO_WINDOWS_RUNTIME)
-  std::this_thread::sleep_until(std::chrono::steady_clock::time_point::max());
+  std::this_thread::sleep_until((std::chrono::steady_clock::time_point::max)());
 #elif defined(ASIO_WINDOWS) || defined(__CYGWIN__)
   ::Sleep(INFINITE);
 #else

@@ -11,19 +11,18 @@
 #ifndef MAME_OSD_SDL_WINDOW_H
 #define MAME_OSD_SDL_WINDOW_H
 
-#include "osdsdl.h"
-#include "video.h"
-
 #include "modules/osdwindow.h"
+#include "osdsync.h"
 
 #include <cstdint>
 #include <memory>
-#include <list>
 
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+struct SDL_Window;
 
 class render_target;
 
@@ -38,7 +37,11 @@ typedef uintptr_t HashT;
 class sdl_window_info : public osd_window_t<SDL_Window*>
 {
 public:
-	sdl_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
+	sdl_window_info(
+			running_machine &a_machine,
+			render_module &renderprovider,
+			int index,
+			const std::shared_ptr<osd_monitor_info> &a_monitor,
 			const osd_window_config *config);
 
 	~sdl_window_info();
@@ -98,38 +101,5 @@ private:
 	void measure_fps(int update);
 
 };
-
-struct osd_draw_callbacks
-{
-	osd_renderer *(*create)(osd_window *window);
-};
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-//============================================================
-// PROTOTYPES - drawsdl.c
-//============================================================
-
-int drawsdl_scale_mode(const char *s);
-
-//============================================================
-// PROTOTYPES - drawogl.c
-//============================================================
-
-int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - draw13.c
-//============================================================
-
-int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - drawbgfx.c
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
 
 #endif // MAME_OSD_SDL_WINDOW_H

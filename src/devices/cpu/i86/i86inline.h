@@ -378,7 +378,7 @@ inline uint16_t i8086_common_cpu_device::GetRMWord()
 
 inline uint16_t i8086_common_cpu_device::GetnextRMWord()
 {
-	return read_word((m_ea & ~0xffff) | ((m_ea + 2) & 0xffff));
+	return read_word((m_ea - m_eo) + ((m_eo + 2) & 0xffff));
 }
 
 

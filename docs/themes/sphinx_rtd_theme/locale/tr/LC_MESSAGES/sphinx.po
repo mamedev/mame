@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sphinx_rtd_theme 0.4.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-05-06 13:38-0600\n"
+"POT-Creation-Date: 2021-08-17 10:02-0600\n"
 "PO-Revision-Date: 2019-07-16 21:44+0000\n"
 "Last-Translator: BouRock, 2020\n"
 "Language-Team: Turkish (https://www.transifex.com/readthedocs/teams/101354/tr/)\n"
@@ -22,42 +22,37 @@ msgstr ""
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: sphinx_rtd_theme/breadcrumbs.html:43 sphinx_rtd_theme/breadcrumbs.html:45
+#: sphinx_rtd_theme/breadcrumbs.html:37 sphinx_rtd_theme/breadcrumbs.html:39
 msgid "Edit on GitHub"
 msgstr "GitHub'da Düzenle"
 
-#: sphinx_rtd_theme/breadcrumbs.html:50 sphinx_rtd_theme/breadcrumbs.html:52
+#: sphinx_rtd_theme/breadcrumbs.html:44 sphinx_rtd_theme/breadcrumbs.html:46
 msgid "Edit on Bitbucket"
 msgstr "Bitbucket'ta Düzenle"
 
-#: sphinx_rtd_theme/breadcrumbs.html:57 sphinx_rtd_theme/breadcrumbs.html:59
+#: sphinx_rtd_theme/breadcrumbs.html:51 sphinx_rtd_theme/breadcrumbs.html:53
 msgid "Edit on GitLab"
 msgstr "GitLab'ta Düzenle"
 
-#: sphinx_rtd_theme/breadcrumbs.html:62 sphinx_rtd_theme/breadcrumbs.html:64
+#: sphinx_rtd_theme/breadcrumbs.html:56 sphinx_rtd_theme/breadcrumbs.html:58
 msgid "View page source"
 msgstr "Sayfa kaynağını görüntüle"
 
-#: sphinx_rtd_theme/breadcrumbs.html:74 sphinx_rtd_theme/footer.html:5
-msgid "Next"
-msgstr "Sonraki"
-
-#: sphinx_rtd_theme/breadcrumbs.html:77 sphinx_rtd_theme/footer.html:8
+#: sphinx_rtd_theme/breadcrumbs.html:69 sphinx_rtd_theme/footer.html:6
 msgid "Previous"
 msgstr "Önceki"
 
-#: sphinx_rtd_theme/footer.html:21 sphinx_rtd_theme/footer.html:24
-#: sphinx_rtd_theme/layout.html:96
-msgid "Copyright"
-msgstr "Telif hakkı"
+#: sphinx_rtd_theme/breadcrumbs.html:72 sphinx_rtd_theme/footer.html:9
+msgid "Next"
+msgstr "Sonraki"
 
 #. Build is a noun, not a verb
-#: sphinx_rtd_theme/footer.html:31
+#: sphinx_rtd_theme/footer.html:30
 msgid "Build"
 msgstr "Oluşturma"
 
 #. the phrase "revision" comes from Git, referring to a commit
-#: sphinx_rtd_theme/footer.html:37
+#: sphinx_rtd_theme/footer.html:36
 msgid "Revision"
 msgstr "Gözden geçirme"
 
@@ -68,49 +63,53 @@ msgstr "Son olarak %(last_updated)s tarihinde güncellendi."
 
 #. "theme" refers to a theme for Sphinx, which alters the appearance of the
 #. generated documenation
-#: sphinx_rtd_theme/footer.html:54
+#: sphinx_rtd_theme/footer.html:55
 msgid "theme"
 msgstr "tema"
 
 #. this is always used as "provided by Read the Docs", and should not imply
 #. Read the Docs is an author of the generated documentation.
-#: sphinx_rtd_theme/footer.html:56
+#: sphinx_rtd_theme/footer.html:57
 #, python-format
 msgid "provided by %(readthedocs_web)s"
 msgstr "kullanılarak %(readthedocs_web)s tarafından sağlanmasıyla oluşturuldu"
 
-#: sphinx_rtd_theme/layout.html:79
+#: sphinx_rtd_theme/layout.html:97
 #, python-format
 msgid "Search within %(docstitle)s"
 msgstr "%(docstitle)s içinde ara"
 
-#: sphinx_rtd_theme/layout.html:87
+#: sphinx_rtd_theme/layout.html:105
 msgid "About these documents"
 msgstr "Bu belgeler hakkında"
 
-#: sphinx_rtd_theme/layout.html:90
+#: sphinx_rtd_theme/layout.html:108
 msgid "Index"
 msgstr "Dizin"
 
-#: sphinx_rtd_theme/layout.html:93 sphinx_rtd_theme/search.html:11
+#: sphinx_rtd_theme/layout.html:111 sphinx_rtd_theme/search.html:11
 msgid "Search"
 msgstr "Arama"
 
-#: sphinx_rtd_theme/layout.html:128
+#: sphinx_rtd_theme/layout.html:114
+msgid "Copyright"
+msgstr "Telif hakkı"
+
+#: sphinx_rtd_theme/layout.html:147 sphinx_rtd_theme/layout.html:149
 msgid "Logo"
 msgstr "Logo"
 
-#: sphinx_rtd_theme/search.html:29
+#: sphinx_rtd_theme/search.html:31
 msgid "Please activate JavaScript to enable the search functionality."
 msgstr ""
 "Arama işlevselliğini etkinleştirmek için lütfen JavaScript'i etkinleştirin."
 
 #. Search is a noun, not a verb
-#: sphinx_rtd_theme/search.html:37
+#: sphinx_rtd_theme/search.html:39
 msgid "Search Results"
 msgstr "Arama Sonuçları"
 
-#: sphinx_rtd_theme/search.html:39
+#: sphinx_rtd_theme/search.html:41
 msgid ""
 "Your search did not match any documents. Please make sure that all words are"
 " spelled correctly and that you've selected enough categories."
@@ -122,7 +121,7 @@ msgstr ""
 msgid "Search docs"
 msgstr "Belgeleri arayın"
 
-#: sphinx_rtd_theme/versions.html:11
+#: sphinx_rtd_theme/versions.html:3 sphinx_rtd_theme/versions.html:11
 msgid "Versions"
 msgstr "Sürümler"
 
@@ -143,5 +142,11 @@ msgstr "Proje Ana Sayfa"
 msgid "Builds"
 msgstr "Oluşturmalar"
 
+#~ msgid "Docs"
+#~ msgstr "Belgeler"
+
 #~ msgid "Free document hosting provided by"
 #~ msgstr "Ücretsiz belge barındırmayı sağlayan"
+
+#~ msgid "Documentation Home"
+#~ msgstr "Belgelendirme Giriş"

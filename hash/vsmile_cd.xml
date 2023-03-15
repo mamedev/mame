@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 NOTE: This list is here only to document available dumps and it's not used (yet) by MAME
 
@@ -136,7 +136,7 @@ ________________________________________________________________________________
 		<rom name="93064_000.bin" size="378956592" crc="5039f062" sha1="80a0ae321273a4b7190ba79854b21fdfb96b75f4" />
 		<rom name="93064_000.cue" size="75" crc="625117d5" sha1="bf84b7e572d27fffa7b32a760a02fb3a1718832d" />
 		-->
-		<description>Spider-Man - Angriff der Super-Schurken (Ger)</description>
+		<description>Spider-Man - Angriff der Super-Schurken (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093064" />
@@ -157,7 +157,7 @@ ________________________________________________________________________________
 	Ring 2: "07/07/07 &minus;&minus; 149550 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="spidermns" cloneof="spidermnr2" supported="no">
-		<description>El Asombroso Spider-Man - Persecución en la Ciudad (Spa)</description>
+		<description>El Asombroso Spider-Man - Persecución en la Ciudad (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093067" />
@@ -197,7 +197,7 @@ ________________________________________________________________________________
 	Ring 2: "03/17/08 &minus;&minus; 157050 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="bratzs" cloneof="bratz" supported="no">
-		<description>Bratz - El Misterio del Collar (Spa)</description>
+		<description>Bratz - El Misterio del Collar (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093167" />
@@ -274,7 +274,7 @@ ________________________________________________________________________________
 		 <rom name="93104_000.bin" size="562353792" crc="e487ef85" sha1="2794bb37d03435c1318ee632d067d64aaecbbebf" />
 		 <rom name="93104_000.cue" size="75" crc="80141b8e" sha1="c2c1e974ee5e063ff320034a7ea82da346f303a9" />
 		 -->
-		<description>Cars - Auf der Überholspur (Ger)</description>
+		<description>Cars - Auf der Überholspur (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093104" />
@@ -295,7 +295,7 @@ ________________________________________________________________________________
 	Ring 2: "08/15/07 &minus;&minus; 150750 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="carss" cloneof="carsr1" supported="no">
-		<description>Cars - El Carril Rápido (Spa)</description>
+		<description>Cars - El Carril Rápido (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093107" />
@@ -331,7 +331,7 @@ ________________________________________________________________________________
 		 <rom name="93004.bin" size="467570544" crc="f919071f" sha1="d50f91fb7c79b8851cb3b6fbb80b66d78def511e" />
 		 <rom name="93004.cue" size="71" crc="0af679dd" sha1="7e7e773aac1f9f8d2102cacbe5367340ac5198ba" />
 		 -->
-		<description>Disney Princess - Das zauberhafte Märchen-Abenteuer (Ger)</description>
+		<description>Disney Princess - Das zauberhafte Märchen-Abenteuer (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093004" />
@@ -352,7 +352,7 @@ ________________________________________________________________________________
 	Ring 2: "07/07/07 &minus;&minus; 149549 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="princesss" cloneof="princess" supported="no">
-		<description>Disney Princess - El Castillo de las Princesas (Spa)</description>
+		<description>Disney Princess - El Castillo de las Princesas (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093007" />
@@ -387,7 +387,7 @@ ________________________________________________________________________________
 		<rom name="93024.bin" size="365481984" crc="4ac35678" sha1="6745971dab69942f85d32a4e1484b9d79c2163ee" />
 		<rom name="93024.cue" size="71" crc="bdb0bf7c" sha1="c88846f050ef65c9e8655e7d47c07f3f11a9c493" />
 		-->
-		<description>Disney/Pixar Die Unglaublichen - In unglaublicher Mission (Ger)</description>
+		<description>Disney/Pixar Die Unglaublichen - In unglaublicher Mission (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093024" />
@@ -408,7 +408,7 @@ ________________________________________________________________________________
 	Ring 2: "08/16/07 &minus;&minus; 150762 &minus;&minus; A", "IFPI LQ35", "V"
 	-->
 	<software name="incredibs" cloneof="incredib" supported="no">
-		<description>Disney/Pixar Los Increíbles - Misión Increíble (Spa)</description>
+		<description>Disney/Pixar Los Increíbles - Misión Increíble (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093027" />
@@ -425,7 +425,7 @@ ________________________________________________________________________________
 		 <rom name="93204_000.bin" size="295248912" crc="fd73e33a" sha1="091567e473d996182c5157f2f34b729f2bc7dcff" />
 		 <rom name="93204_000.cue" size="75" crc="cca73127" sha1="faf73ec0967f7811a58293e7eac8c29e52ca06e4" />
 		 -->
-		<description>Multisports (Ger)</description>
+		<description>Multisports (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093204" />
@@ -465,7 +465,7 @@ ________________________________________________________________________________
 	Ring 2: "07/10/07 &minus;&minus; 049620 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="scoobys" cloneof="scooby" supported="no">
-		<description>Scooby-Doo: Viaje al Pasado (Spa)</description>
+		<description>Scooby-Doo: Viaje al Pasado (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093087" />
@@ -521,7 +521,7 @@ ________________________________________________________________________________
 		<rom name="93144_000.bin" size="623663376" crc="968ff493" sha1="28c486e6b5b9c6e4e79aa3151be82534f0f1245f" />
 		<rom name="93144_000.cue" size="75" crc="7cc3a9b3" sha1="3741a362931c0aa19b110490fd368c862fdc334f" />
 		-->
-		<description>Shrek Der Dritte - Die Suche nach Arthus (Ger)</description>
+		<description>Shrek Der Dritte - Die Suche nach Arthus (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093144" />
@@ -541,7 +541,7 @@ ________________________________________________________________________________
 	Ring 2: "11/15/07 &minus;&minus; 153583 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="shrek3s" cloneof="shrek3" supported="no">
-		<description>Shrek Tercero - ¿Dónde Está Arturo? (Spa)</description>
+		<description>Shrek Tercero - ¿Dónde Está Arturo? (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093147" />
@@ -617,7 +617,7 @@ ________________________________________________________________________________
 	Ring 2: "07/07/07 &minus;&minus; 149551 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="spongeisg" cloneof="spongeisr2" supported="no">
-		<description>Nick SpongeBob Schwammkopf: Ein Schwamm voller Ideen (Ger)</description>
+		<description>Nick SpongeBob Schwammkopf: Ein Schwamm voller Ideen (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093044" />
@@ -638,7 +638,7 @@ ________________________________________________________________________________
 	Ring 2: "02/01/06 &minus;&minus; 155691 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="spongeiss" cloneof="spongeisr2" supported="no">
-		<description>Nickelodeon Bob Esponja - Misión Esponja (Spa)</description>
+		<description>Nickelodeon Bob Esponja - Misión Esponja (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093047" />
@@ -713,7 +713,7 @@ ________________________________________________________________________________
 		<rom name="93124_000.bin" size="457901472" crc="92a0ebe0" sha1="a3a8e54d5f12094bfc0c89954987cc793d83d3f9" />
 		<rom name="93124_000.cue" size="75" crc="13c741b0" sha1="7a5b6a928922cee744fc579a7f8a785c0537a5ac" />
 		-->
-		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Ger)</description>
+		<description>Das verrückte Rennen der Hüpf-Bohnel Insel (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093124" />
@@ -732,7 +732,7 @@ ________________________________________________________________________________
 	Ring 2: "07/12/07 &minus;&minus; 149610 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="wackyracs" cloneof="wackyracr3" supported="no">
-		<description>Carrera Loca en la Isla de las Vainas Fritas (Spa)</description>
+		<description>Carrera Loca en la Isla de las Vainas Fritas (Spain)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-93127" />

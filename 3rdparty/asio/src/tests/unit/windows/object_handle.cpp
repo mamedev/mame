@@ -2,7 +2,7 @@
 // object_handle.cpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -43,6 +43,7 @@ void test()
   try
   {
     io_context ioc;
+    const io_context::executor_type ioc_ex = ioc.get_executor();
     archetypes::lazy_handler lazy;
     asio::error_code ec;
 
@@ -50,27 +51,30 @@ void test()
 
     win::object_handle handle1(ioc);
     HANDLE native_handle1 = INVALID_HANDLE_VALUE;
+#if defined(ASIO_MSVC) && (_MSC_VER < 1910)
+    // Skip this on older MSVC due to mysterious ambiguous overload errors.
+#else
     win::object_handle handle2(ioc, native_handle1);
+#endif
+
+    win::object_handle handle3(ioc_ex);
+    HANDLE native_handle2 = INVALID_HANDLE_VALUE;
+    win::object_handle handle4(ioc_ex, native_handle2);
 
 #if defined(ASIO_HAS_MOVE)
-    win::object_handle handle3(std::move(handle2));
+    win::object_handle handle5(std::move(handle4));
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_object_handle operators.
 
 #if defined(ASIO_HAS_MOVE)
     handle1 = win::object_handle(ioc);
-    handle1 = std::move(handle2);
+    handle1 = std::move(handle3);
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_io_object functions.
 
-#if !defined(ASIO_NO_DEPRECATED)
-    io_context& ioc_ref = handle1.get_io_context();
-    (void)ioc_ref;
-#endif !defined(ASIO_NO_DEPRECATED)
-
-    io_context::executor_type ex = handle1.get_executor();
+    win::object_handle::executor_type ex = handle1.get_executor();
     (void)ex;
 
     // basic_handle functions.
@@ -79,13 +83,13 @@ void test()
       = handle1.lowest_layer();
     (void)lowest_layer;
 
-    const win::object_handle& handle4 = handle1;
-    const win::object_handle::lowest_layer_type& lowest_layer2
-      = handle4.lowest_layer();
-    (void)lowest_layer2;
+    const win::object_handle& handle6 = handle1;
+    const win::object_handle::lowest_layer_type& lowest_layer3
+      = handle6.lowest_layer();
+    (void)lowest_layer3;
 
-    HANDLE native_handle2 = INVALID_HANDLE_VALUE;
-    handle1.assign(native_handle2);
+    HANDLE native_handle4 = INVALID_HANDLE_VALUE;
+    handle1.assign(native_handle4);
 
     bool is_open = handle1.is_open();
     (void)is_open;

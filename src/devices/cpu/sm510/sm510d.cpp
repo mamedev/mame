@@ -74,9 +74,8 @@ const char *const sm510_common_disassembler::s_mnemonics[] =
 	"INIS",
 
 	// SM590
-	"NOP", "CCTRL", "INBL", "DEBL", "XBLA", "ADCS", "TR",
-	// "
-	"TAX", "LBLX", "MTR", "STR", "INBM", "DEBM", "RTA", "BLTA", "EXAX", "TBA", "ADS", "ADC", "LBMX", "TLS"
+	"TAX", "LBLX", "MTR", "STR", "INBM", "DEBM", "RTA", "BLTA", "EXAX", "TBA", "ADS", "ADC", "LBMX", "TLS",
+	"NOP", "CCTRL", "INBL", "DEBL", "XBLA", "ADCS", "TR"
 };
 
 // number of bits per opcode parameter, 8 or larger means 2-byte opcode
@@ -108,42 +107,40 @@ const u8 sm510_common_disassembler::s_bits[] =
 	0,
 
 	// SM590
-	0, 0, 0, 0, 0, 0, 7,
-	// "
-	4, 4, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 2+8
+	4, 4, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 2+8,
+	0, 0, 0, 0, 0, 0, 7
 };
 
 const u32 sm510_common_disassembler::s_flags[] =
 {
 	// SM510
 	0, 0,
-	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, STEP_OUT, STEP_OUT, 0, STEP_OVER, STEP_OVER, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, STEP_COND, STEP_COND, 0, 0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND, STEP_COND,
 	0, 0,
 	0, 0, 0, 0,
 	0, STEP_OVER, 0, 0, 0, 0, 0,
 
 	// SM500
 	0, STEP_OUT, STEP_OUT, 0, 0, STEP_OVER, 0,
-	0, 0, 0, 0,
+	STEP_COND, 0, 0, 0,
 	0, 0, 0,
 	0, 0, 0,
-	0, 0, 0,
+	STEP_COND, STEP_COND, STEP_COND,
 
 	// SM530
 	0, 0, 0,
-	0, 0,
+	STEP_COND, STEP_COND,
 	0, 0, 0, 0,
 	0,
 
 	// SM590
-	0, 0, 0, 0, 0, 0, STEP_OVER,
-	// "
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER
+	STEP_COND, 0, 0, 0, 0, 0, 0, 0, 0, STEP_COND, 0, 0, 0, STEP_OVER,
+	0, 0, 0, 0, 0, 0, STEP_OVER
 };
 
 
@@ -172,7 +169,7 @@ offs_t sm510_common_disassembler::common_disasm(const u8 *lut_mnemonic, const u8
 		instr = lut_extended[param];
 
 	// disassemble it
-	util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-8s", s_mnemonics[instr]);
 	if (bits > 0)
 	{
 		if (bits <= 4)
@@ -361,7 +358,7 @@ offs_t sm5a_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 const u8 sm530_disassembler::sm530_mnemonic[0x100] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
-	mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 0 - note: $00 has synonym SKIP
+	mSKIP, mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  mADX,  // 0
 	mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  mLAX,  // 1
 	mLDA,  mLDA,  mLDA,  mLDA,  mEXC,  mEXC,  mEXC,  mEXC,  mEXCI, mEXCI, mEXCI, mEXCI, mEXCD, mEXCD, mEXCD, mEXCD, // 2
 	mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   mLB,   // 3

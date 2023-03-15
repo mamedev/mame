@@ -275,7 +275,7 @@ void zsg2_device::filter_samples(zchan *ch)
 		ch->emphasis_filter_state += raw_samples[i]-((ch->emphasis_filter_state+EMPHASIS_ROUNDING)>>EMPHASIS_FILTER_SHIFT);
 
 		int32_t sample = ch->emphasis_filter_state >> EMPHASIS_OUTPUT_SHIFT;
-		ch->samples[i+1] = std::min<int32_t>(std::max<int32_t>(sample, -32768), 32767);
+		ch->samples[i+1] = std::clamp<int32_t>(sample, -32768, 32767);
 	}
 }
 

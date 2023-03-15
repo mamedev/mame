@@ -1,12 +1,11 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_OS_H_HEADER_GUARD
 #define BX_OS_H_HEADER_GUARD
 
-#include "debug.h"
 #include "filepath.h"
 
 #if BX_PLATFORM_OSX
@@ -41,6 +40,10 @@ namespace bx
 	void* dlsym(void* _handle, const StringView& _symbol);
 
 	///
+	template<typename ProtoT>
+	ProtoT dlsym(void* _handle, const StringView& _symbol);
+
+	///
 	bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name);
 
 	///
@@ -52,6 +55,11 @@ namespace bx
 	///
 	void* exec(const char* const* _argv);
 
+	///
+	BX_NO_RETURN void exit(int32_t _exitCode);
+
 } // namespace bx
+
+#include "inline/os.inl"
 
 #endif // BX_OS_H_HEADER_GUARD

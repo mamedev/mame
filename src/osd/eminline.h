@@ -474,6 +474,74 @@ inline unsigned population_count_64(uint64_t val)
 #endif
 
 
+/*-------------------------------------------------
+    rotl_32 - circularly shift a 32-bit value left
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#ifndef rotl_32
+constexpr uint32_t rotl_32(uint32_t val, int shift)
+{
+	shift &= 31;
+	if (shift)
+		return val << shift | val >> (32 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotr_32 - circularly shift a 32-bit value right
+    by the specified number of bits (modulo 32)
+-------------------------------------------------*/
+
+#ifndef rotr_32
+constexpr uint32_t rotr_32(uint32_t val, int shift)
+{
+	shift &= 31;
+	if (shift)
+		return val >> shift | val << (32 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotl_64 - circularly shift a 64-bit value left
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifndef rotl_64
+constexpr uint64_t rotl_64(uint64_t val, int shift)
+{
+	shift &= 63;
+	if (shift)
+		return val << shift | val >> (64 - shift);
+	else
+		return val;
+}
+#endif
+
+
+/*-------------------------------------------------
+    rotr_64 - circularly shift a 64-bit value right
+    by the specified number of bits (modulo 64)
+-------------------------------------------------*/
+
+#ifndef rotr_64
+constexpr uint64_t rotr_64(uint64_t val, int shift)
+{
+	shift &= 63;
+	if (shift)
+		return val >> shift | val << (64 - shift);
+	else
+		return val;
+}
+#endif
+
+
 /***************************************************************************
     INLINE TIMING FUNCTIONS
 ***************************************************************************/

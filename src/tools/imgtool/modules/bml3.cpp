@@ -18,11 +18,16 @@
    -   (used with MP-1802 floppy disk controller card)
 */
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define MAX_SECTOR_SIZE 256
 

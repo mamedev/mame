@@ -38,7 +38,7 @@
 
 namespace netlist::devices {
 
-	template<bool HasQQ>
+	template <bool HasQQ>
 	NETLIB_OBJECT(7475_GATE_BASE)
 	{
 		NETLIB_CONSTRUCTOR(7475_GATE_BASE)

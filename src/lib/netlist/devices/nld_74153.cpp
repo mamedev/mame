@@ -48,7 +48,7 @@ namespace netlist::devices {
 
 	// FIXME: timing is not 100% accurate, Strobe and Select inputs have a
 	//        slightly longer timing .
-	// FIXME: Truthtable candidate
+	// FIXME: Truth table candidate
 
 	NETLIB_OBJECT(74153)
 	{

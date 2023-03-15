@@ -121,7 +121,7 @@
 #define VERBOSE ( LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT, bus::ti99::gromport, gromport_device, "gromport", "TI-99 Cartridge port")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT, bus::ti99::gromport::gromport_device, "gromport", "TI-99 Cartridge port")
 
 namespace bus::ti99::gromport {
 

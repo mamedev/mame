@@ -2797,9 +2797,6 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 7:7 234fc:4
 	u32 dst = DY();
 	u32 res = dst - src;
 
-	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(m_ir & 7, src);
-
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
 	m_v_flag = VFLAG_SUB_32(src, dst, res);
@@ -4919,6 +4916,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -4973,6 +4971,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 			break;
@@ -5026,6 +5025,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			m_cacr = REG_DA()[(word2 >> 12) & 15];
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -5063,6 +5063,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 			{
 				m_pmmu_enabled = 0;
 			}
+			m_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
 			break;
 		case 0x004:         /* ITT0 */
 			m_mmu_itt0 = REG_DA()[(word2 >> 12) & 15];
@@ -5112,6 +5113,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 234fc:5
 
 			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
+				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
 			break;
 		case 0x800:            /* USP */
@@ -6226,7 +6228,7 @@ f000 fe00 pmmu     l .          234fc:8p
 f548 ffd8 ptest    l .          4:8p
 	if(m_has_pmmu)
 	{
-		logerror("68040: unhandled PTEST\n");
+		//logerror("68040: unhandled PTEST\n");
 	}
 	else
 	{
@@ -6236,10 +6238,9 @@ f548 ffd8 ptest    l .          4:8p
 
 4e70 ffff reset    . .          071234fc:0p
 	if(m_s_flag) {
-		if(!m_reset_instr_callback.isnull())
-			(m_reset_instr_callback)(1);
-		m68k_reset_peripherals();
+		m_reset_cb(1);
 		m_icount -= m_cyc_reset;
+		m_reset_cb(0);
 	} else {
 		m68ki_exception_privilege_violation();
 	}
@@ -6850,8 +6851,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_sr;
 		u32 new_pc;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		new_sr = m68ki_pull_16();
@@ -6872,8 +6871,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
@@ -6886,16 +6883,12 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* type 1000 stack frame */
+			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
 			{
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
-				m68ki_fake_pull_16();   /* format word */
-				m68ki_jump(new_pc);
-				m68ki_set_sr(new_sr);
-				m_instr_mode = INSTRUCTION_YES;
-				m_run_mode = RUN_MODE_NORMAL;
-				m68ki_fake_pull_16();  /* special status */
+				m68ki_fake_pull_16();  /* format word */
+				m68ki_fake_pull_16();  /* special status word */
 				m68ki_fake_pull_32();  /* fault address */
 				m68ki_fake_pull_32();  /* reserved and data output buffer */
 				m68ki_fake_pull_32();  /* reserved and data input buffer */
@@ -6908,6 +6901,10 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
+				m68ki_jump(new_pc);
+				m68ki_set_sr(new_sr);
+				m_instr_mode = INSTRUCTION_YES;
+				m_run_mode = RUN_MODE_NORMAL;
 			}
 			else
 			{
@@ -6927,8 +6924,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 	rte_loop:
@@ -7799,15 +7794,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 4e40 fff0 trap     . .          071234fc:4
@@ -7820,10 +7807,12 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 
 
 50fa ffff trapt    w .          234fc:6
+	m_pc += 2; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
 50fb ffff trapt    l .          234fc:8
+	m_pc += 4; // increase before else stackframe & return addresses are incorrect
 	m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
 
 
@@ -7844,18 +7833,16 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 
 
 50fa f0ff trapcc   w .          234fc:6
+	m_pc += 2;    /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(M68KMAKE_CC) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 2;
 	}
 
 
 50fb f0ff trapcc   l .          234fc:8
+	m_pc += 4;  /* increase _before_ calling handler or 1) stackframe is incorrect 2) RTE address is wrong if trap is taken */
 	if(M68KMAKE_CC) {
 		m68ki_exception_trap(EXCEPTION_TRAPV);  /* HJB 990403 */
-	} else {
-		m_pc += 4;
 	}
 
 
@@ -8105,7 +8092,6 @@ f400 ff20 cinv     l .          4:16
 
 
 f420 ff20 cpush    l .          4:16
-	logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-					tag(), m_ppc, m_ir);
+	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
 
 

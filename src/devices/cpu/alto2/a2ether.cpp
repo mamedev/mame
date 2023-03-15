@@ -483,7 +483,7 @@ uint32_t f9401_7(uint32_t crc, uint32_t data)
  * This is probably lacking the updates to one or more of
  * the status flip flops.
  */
-void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
+void alto2_cpu_device::rx_breath_of_life(int32_t arg)
 {
 	uint32_t data;
 
@@ -533,7 +533,7 @@ void alto2_cpu_device::rx_breath_of_life(void* ptr, int32_t arg)
  * @param ptr unused pointer
  * @param arg word count if >= 0, -1 if CRC is to be transmitted (last word)
  */
-void alto2_cpu_device::tx_packet(void* ptr, int32_t arg)
+void alto2_cpu_device::tx_packet(int32_t arg)
 {
 	uint32_t data;
 
@@ -1318,17 +1318,17 @@ void alto2_cpu_device::init_ether(int task)
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.breath_of_life));
 
-	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
-	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
-	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
+	m_ether_a41 = prom_load<uint8_t>(machine(), &pl_enet_a41, memregion("ether_a41")->base());
+	m_ether_a42 = prom_load<uint8_t>(machine(), &pl_enet_a42, memregion("ether_a42")->base());
+	m_ether_a49 = prom_load<uint8_t>(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
 	m_eth.rx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 	m_eth.tx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 
-	m_eth.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::tx_packet),this));
+	m_eth.tx_timer = timer_alloc(FUNC(alto2_cpu_device::tx_packet), this);
 	m_eth.tx_timer->reset();
 
-	m_eth.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alto2_cpu_device::rx_breath_of_life),this));
+	m_eth.rx_timer = timer_alloc(FUNC(alto2_cpu_device::rx_breath_of_life), this);
 	m_eth.rx_timer->reset();
 }
 

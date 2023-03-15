@@ -34,6 +34,7 @@ tube_device::tube_device(const machine_config &mconfig, const char *tag, device_
 	, m_hirq_handler(*this)
 	, m_pnmi_handler(*this)
 	, m_pirq_handler(*this)
+	, m_prst_handler(*this)
 	, m_drq_handler(*this)
 {
 }
@@ -49,6 +50,7 @@ void tube_device::device_start()
 	m_hirq_handler.resolve_safe();
 	m_pnmi_handler.resolve_safe();
 	m_pirq_handler.resolve_safe();
+	m_prst_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
 	// register for state saving
@@ -75,9 +77,14 @@ void tube_device::device_start()
 
 void tube_device::device_reset()
 {
+	m_r1stat = 0;
+	soft_reset();
+}
+
+void tube_device::soft_reset()
+{
 	m_ph1pos = m_hp3pos = 0;
 	m_ph3pos = 1;
-	m_r1stat = 0;
 	m_hstat[0] = m_hstat[1] = m_hstat[3] = 0x40;
 	m_hstat[2] = 0xc0;
 	m_pstat[0] = m_pstat[1] = m_pstat[2] = m_pstat[3] = 0x40;
@@ -167,11 +174,23 @@ void tube_device::host_w(offs_t offset, uint8_t data)
 	switch (offset & 0x07)
 	{
 	case 0: /* Status flags */
-		if (BIT(data, 7))
-			m_r1stat |= (data & 0x3f);
-		else
-			m_r1stat &= ~(data & 0x3f);
 		m_hstat[0] = (m_hstat[0] & 0xc0) | (data & 0x3f);
+		if (BIT(data, 7))
+		{
+			m_r1stat |= (data & 0x3f);
+			if (BIT(data, 6))
+			{
+				soft_reset();
+			}
+		}
+		else
+		{
+			m_r1stat &= ~(data & 0x3f);
+		}
+		if (BIT(data, 5))
+		{
+			m_prst_handler(BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
+		}
 		break;
 
 	case 1: /* Register 1 (1 byte write only) */

@@ -72,7 +72,7 @@ DEFINE_DEVICE_TYPE(NES_KSEXPANSION_SLOT, nes_kstudio_slot_device, "nes_ks_slot",
 
 nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_KSEXPANSION_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<kstudio_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -198,7 +198,6 @@ void nes_karaokestudio_device::device_start()
 
 void nes_karaokestudio_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef((m_prg_chunks - 1) ^ 0x08);
 	chr8(0, m_chr_source);

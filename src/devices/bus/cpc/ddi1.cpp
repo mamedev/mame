@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "ddi1.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 void cpc_exp_cards(device_slot_interface &device);
 

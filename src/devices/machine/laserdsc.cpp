@@ -10,12 +10,13 @@
 
 #include "emu.h"
 #include "laserdsc.h"
-#include "avhuff.h"
-#include "vbiparse.h"
+
 #include "config.h"
 #include "render.h"
 #include "romload.h"
+
 #include "chd.h"
+#include "xmlfile.h"
 
 
 
@@ -54,6 +55,9 @@ const uint32_t VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINA
 //  CORE IMPLEMENTATION
 //**************************************************************************
 
+ALLOW_SAVE_TYPE(laserdisc_device::player_state);
+ALLOW_SAVE_TYPE(laserdisc_device::slider_position);
+
 //-------------------------------------------------
 //  laserdisc_device - constructor
 //-------------------------------------------------
@@ -69,11 +73,12 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_overclip(0, -1, 0, -1),
 		m_overupdate_rgb32(*this),
 		m_disc(nullptr),
+		m_is_cav_disc(false),
 		m_width(0),
 		m_height(0),
 		m_fps_times_1million(0),
 		m_samplerate(0),
-		m_readresult(CHDERR_NONE),
+		m_readresult(),
 		m_chdtracks(0),
 		m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
 		m_audiosquelch(0),
@@ -187,8 +192,10 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		screen.container().empty();
 
 		// add the video texture
-		if (m_videoenable)
-			screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0xff,0xff,0xff), m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		rgb_t videocolor = 0xffffffff; // Fully visible, white
+		if (!m_videoenable)
+			videocolor = 0xff000000; // Blank the texture's RGB of the texture
+		screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, videocolor, m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 		// add the overlay
 		if (m_overenable && overbitmap.valid())
@@ -222,8 +229,81 @@ void laserdisc_device::device_start()
 	init_video();
 	init_audio();
 
+	// register our timer
+	m_vbi_fetch_timer = timer_alloc(FUNC(laserdisc_device::fetch_vbi_data), this);
+
 	// register callbacks
-	machine().configuration().config_register("laserdisc", config_load_delegate(&laserdisc_device::config_load, this), config_save_delegate(&laserdisc_device::config_save, this));
+	machine().configuration().config_register(
+			"laserdisc",
+			configuration_manager::load_delegate(&laserdisc_device::config_load, this),
+			configuration_manager::save_delegate(&laserdisc_device::config_save, this));
+
+	// register state
+	save_item(NAME(m_player_state.m_state));
+	save_item(NAME(m_player_state.m_substate));
+	save_item(NAME(m_player_state.m_param));
+	save_item(NAME(m_player_state.m_endtime));
+
+	save_item(NAME(m_saved_state.m_state));
+	save_item(NAME(m_saved_state.m_substate));
+	save_item(NAME(m_saved_state.m_param));
+	save_item(NAME(m_saved_state.m_endtime));
+
+	save_item(NAME(m_overposx));
+	save_item(NAME(m_overposy));
+	save_item(NAME(m_overscalex));
+	save_item(NAME(m_overscaley));
+
+	save_item(NAME(m_orig_config.m_overposx));
+	save_item(NAME(m_orig_config.m_overposy));
+	save_item(NAME(m_orig_config.m_overscalex));
+	save_item(NAME(m_orig_config.m_overscaley));
+
+	save_item(NAME(m_overwidth));
+	save_item(NAME(m_overheight));
+	save_item(NAME(m_overclip.min_x));
+	save_item(NAME(m_overclip.max_x));
+	save_item(NAME(m_overclip.min_y));
+	save_item(NAME(m_overclip.max_y));
+
+	save_item(NAME(m_vbidata));
+	save_item(NAME(m_is_cav_disc));
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
+	save_item(NAME(m_fps_times_1million));
+	save_item(NAME(m_samplerate));
+	save_item(NAME(m_chdtracks));
+
+	save_item(NAME(m_audiosquelch));
+	save_item(NAME(m_videosquelch));
+	save_item(NAME(m_fieldnum));
+	save_item(NAME(m_curtrack));
+	save_item(NAME(m_maxtrack));
+	save_item(NAME(m_attospertrack));
+	save_item(NAME(m_sliderupdate));
+
+	save_item(STRUCT_MEMBER(m_frame, m_numfields));
+	save_item(STRUCT_MEMBER(m_frame, m_lastfield));
+	save_item(NAME(m_videoindex));
+
+	save_item(NAME(m_audiobuffer[0]));
+	save_item(NAME(m_audiobuffer[1]));
+	save_item(NAME(m_audiobufsize));
+	save_item(NAME(m_audiobufin));
+	save_item(NAME(m_audiobufout));
+	save_item(NAME(m_audiocursamples));
+	save_item(NAME(m_audiomaxsamples));
+
+	save_item(STRUCT_MEMBER(m_metadata, white));
+	save_item(STRUCT_MEMBER(m_metadata, line16));
+	save_item(STRUCT_MEMBER(m_metadata, line17));
+	save_item(STRUCT_MEMBER(m_metadata, line18));
+	save_item(STRUCT_MEMBER(m_metadata, line1718));
+
+	save_item(NAME(m_videoenable));
+
+	save_item(NAME(m_overenable));
+	save_item(NAME(m_overindex));
 }
 
 
@@ -275,35 +355,30 @@ void laserdisc_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+
 //-------------------------------------------------
-//  device_timer - handle timers set by this
-//  device
+//  fetch_vbi_data - perform an update and
+//  process the track that was read, including
+//  VBI data
 //-------------------------------------------------
 
-void laserdisc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(laserdisc_device::fetch_vbi_data)
 {
-	switch (id)
-	{
-		case TID_VBI_FETCH:
-		{
-			// wait for previous read and decode to finish
-			process_track_data();
+	// wait for previous read and decode to finish
+	process_track_data();
 
-			// update current track based on slider speed
-			update_slider_pos();
+	// update current track based on slider speed
+	update_slider_pos();
 
-			// update the state
-			add_and_clamp_track(player_update(m_metadata[m_fieldnum], m_fieldnum, machine().time()));
+	// update the state
+	add_and_clamp_track(player_update(m_metadata[m_fieldnum], m_fieldnum, machine().time()));
 
-			// flush any audio before we read more
-			m_stream->update();
+	// flush any audio before we read more
+	m_stream->update();
 
-			// start reading the track data for the next round
-			m_fieldnum ^= 1;
-			read_track_data();
-			break;
-		}
-	}
+	// start reading the track data for the next round
+	m_fieldnum ^= 1;
+	read_track_data();
 }
 
 
@@ -395,7 +470,9 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 
 	// negative values store negative times
 	else
+	{
 		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
+	}
 
 	if (LOG_SLIDER)
 		printf("Slider speed = %d\n", tracks_per_vsync);
@@ -658,8 +735,9 @@ void laserdisc_device::init_disc()
 
 		// read the metadata
 		std::string metadata;
-		chd_error err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
-		if (err != CHDERR_NONE)
+		std::error_condition err;
+		err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
+		if (err)
 			throw emu_fatalerror("Non-A/V CHD file specified");
 
 		// extract the metadata
@@ -679,8 +757,25 @@ void laserdisc_device::init_disc()
 
 		// allocate memory for the precomputed per-frame metadata
 		err = m_disc->read_metadata(AV_LD_METADATA_TAG, 0, m_vbidata);
-		if (err != CHDERR_NONE || m_vbidata.size() != totalhunks * VBI_PACKED_BYTES)
+		if (err || (m_vbidata.size() != totalhunks * VBI_PACKED_BYTES))
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
+
+		m_is_cav_disc = false;
+		vbi_metadata vbidata_even = { 0 };
+		vbi_metadata_unpack(&vbidata_even, nullptr, &m_vbidata[m_chdtracks * VBI_PACKED_BYTES]);
+		if ((vbidata_even.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+		{
+			m_is_cav_disc = true;
+		}
+		else
+		{
+			vbi_metadata vbidata_odd = { 0 };
+			vbi_metadata_unpack(&vbidata_odd, nullptr, &m_vbidata[(m_chdtracks + 1) * VBI_PACKED_BYTES]);
+			if ((vbidata_odd.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+			{
+				m_is_cav_disc = true;
+			}
+		}
 	}
 	m_maxtrack = std::max(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
 }
@@ -854,8 +949,8 @@ void laserdisc_device::vblank_state_changed(screen_device &screen, bool vblank_s
 		// call the player's VSYNC callback
 		player_vsync(m_metadata[m_fieldnum], m_fieldnum, machine().time());
 
-		// set a timer to begin fetching the next frame just before the VBI data would be fetched
-		timer_set(screen.time_until_pos(16*2), TID_VBI_FETCH);
+		// set our timer to begin fetching the next frame just before the VBI data would be fetched
+		m_vbi_fetch_timer->adjust(screen.time_until_pos(16*2));
 	}
 }
 
@@ -956,14 +1051,14 @@ void laserdisc_device::read_track_data()
 	}
 
 	// configure the codec and then read
-	m_readresult = CHDERR_FILE_NOT_FOUND;
-	if (m_disc != nullptr && !m_videosquelch)
+	m_readresult = std::errc::no_such_file_or_directory;
+	if (m_disc && !m_videosquelch)
 	{
 		m_readresult = m_disc->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &m_avhuff_config);
-		if (m_readresult == CHDERR_NONE)
+		if (!m_readresult)
 		{
 			m_queued_hunknum = readhunk;
-			m_readresult = CHDERR_OPERATION_PENDING;
+			m_readresult = chd_file::error::OPERATION_PENDING;
 			osd_work_item_queue(m_work_queue, read_async_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		}
 	}
@@ -991,12 +1086,12 @@ void *laserdisc_device::read_async_static(void *param, int threadid)
 void laserdisc_device::process_track_data()
 {
 	// wait for the async operation to complete
-	if (m_readresult == CHDERR_OPERATION_PENDING)
+	if (m_readresult == chd_file::error::OPERATION_PENDING)
 		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
-	assert(m_readresult != CHDERR_OPERATION_PENDING);
+	assert(m_readresult != chd_file::error::OPERATION_PENDING);
 
 	// remove the video if we had an error
-	if (m_readresult != CHDERR_NONE)
+	if (m_readresult)
 		m_avhuff_video.reset();
 
 	// count the field as read if we are successful
@@ -1040,20 +1135,16 @@ void laserdisc_device::process_track_data()
 //  configuration file
 //-------------------------------------------------
 
-void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void laserdisc_device::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// might not have any data
-	if (parentnode == nullptr)
+	// we only care system-specific configuration
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// iterate over overlay nodes
 	for (util::xml::data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
 	{
-		const char *devtag = ldnode->get_attribute_string("tag", "");
+		char const *const devtag = ldnode->get_attribute_string("tag", "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
@@ -1078,13 +1169,13 @@ void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node co
 
 void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// create a node
 	util::xml::data_node *const ldnode = parentnode->add_child("device", nullptr);
-	if (ldnode != nullptr)
+	if (ldnode)
 	{
 		// output the basics
 		ldnode->set_attribute("tag", tag());

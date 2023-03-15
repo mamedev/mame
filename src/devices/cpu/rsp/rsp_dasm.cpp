@@ -157,6 +157,8 @@ void rsp_disassembler::disasm_cop2(std::ostream &stream, uint32_t op)
 				case 0x2b:  util::stream_format(stream, "vnor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
 				case 0x2c:  util::stream_format(stream, "vxor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
 				case 0x2d:  util::stream_format(stream, "vnxor  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2e:  util::stream_format(stream, "v056   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
+				case 0x2f:  util::stream_format(stream, "v057   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
 				case 0x30:  util::stream_format(stream, "vrcp   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x31:  util::stream_format(stream, "vrcpl  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x32:  util::stream_format(stream, "vrcph  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
@@ -165,6 +167,8 @@ void rsp_disassembler::disasm_cop2(std::ostream &stream, uint32_t op)
 				case 0x35:  util::stream_format(stream, "vrsql  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x36:  util::stream_format(stream, "vrsqh  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
 				case 0x37:  util::stream_format(stream, "vnop"); break;
+				case 0x3b:  util::stream_format(stream, "v073   %s, %s[%c]", vreg[dest], vreg[s2], element2[el][s1 & 7]); break;
+				case 0x3f:  util::stream_format(stream, "vnull"); break;
 				default:    util::stream_format(stream, "??? (VECTOR OP)"); break;
 			}
 			break;
@@ -264,7 +268,7 @@ offs_t rsp_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 				case 0x04:  util::stream_format(stream, "sllv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
 				case 0x06:  util::stream_format(stream, "srlv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
 				case 0x07:  util::stream_format(stream, "srav   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
-				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = STEP_OUT; break;
+				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = STEP_OUT | step_over_extra(1); break;
 				case 0x09:
 				{
 					if (rd == 31)
@@ -299,10 +303,10 @@ offs_t rsp_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 		{
 			switch ((op >> 16) & 0x1f)
 			{
-				case 0x00:  util::stream_format(stream, "bltz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x01:  util::stream_format(stream, "bgez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x10:  util::stream_format(stream, "bltzal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x11:  util::stream_format(stream, "bgezal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x00:  util::stream_format(stream, "bltz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
+				case 0x01:  util::stream_format(stream, "bgez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
+				case 0x10:  util::stream_format(stream, "bltzal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); if (rs != 0) flags = STEP_OVER | STEP_COND | step_over_extra(1); break;
+				case 0x11:  util::stream_format(stream, "bgezal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); flags = STEP_OVER | step_over_extra(1); if (rs != 0) flags |= STEP_COND; break;
 
 				default:    util::stream_format(stream, "???"); break;
 			}
@@ -311,10 +315,10 @@ offs_t rsp_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 
 		case 0x02:  util::stream_format(stream, "j      $%08X", (op & 0x03ffffff) << 2); break;
 		case 0x03:  util::stream_format(stream, "jal    $%08X", (op & 0x03ffffff) << 2); break;
-		case 0x04:  util::stream_format(stream, "beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x05:  util::stream_format(stream, "bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x06:  util::stream_format(stream, "blez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x07:  util::stream_format(stream, "bgtz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x04:  util::stream_format(stream, "beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); if (rs != rt) flags = STEP_COND | step_over_extra(1); break;
+		case 0x05:  util::stream_format(stream, "bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); if (rs != rt) flags = STEP_COND | step_over_extra(1); break;
+		case 0x06:  util::stream_format(stream, "blez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
+		case 0x07:  util::stream_format(stream, "bgtz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); if (rs != 0) flags = STEP_COND | step_over_extra(1); break;
 		case 0x08:  util::stream_format(stream, "addi   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
 		case 0x09:  util::stream_format(stream, "addiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
 		case 0x0a:  util::stream_format(stream, "slti   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;

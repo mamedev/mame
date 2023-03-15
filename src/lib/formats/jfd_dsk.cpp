@@ -158,8 +158,14 @@
 
 *********************************************************************/
 
-#include <zlib.h>
 #include "formats/jfd_dsk.h"
+
+#include "ioprocs.h"
+
+#include "osdcore.h" // osd_printf_*
+
+#include <zlib.h>
+
 
 static const uint8_t JFD_HEADER[4] = { 'J', 'F', 'D', 'I' };
 static const uint8_t GZ_HEADER[2] = { 0x1f, 0x8b };
@@ -183,11 +189,15 @@ const char *jfd_format::extensions() const
 	return "jfd";
 }
 
-int jfd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int jfd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size) || !size)
+		return 0;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	int err;
 	std::vector<uint8_t> gz_ptr(4);
@@ -215,17 +225,21 @@ int jfd_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	}
 
 	if (!memcmp(&img[0], JFD_HEADER, sizeof(JFD_HEADER))) {
-		return 100;
+		return FIFID_SIGN;
 	}
 
 	return 0;
 }
 
-bool jfd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool jfd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	int err;
 	std::vector<uint8_t> gz_ptr;
@@ -362,4 +376,4 @@ bool jfd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_JFD_FORMAT = &floppy_image_format_creator<jfd_format>;
+const jfd_format FLOPPY_JFD_FORMAT;

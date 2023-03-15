@@ -130,7 +130,7 @@
 #include "emu.h"
 #include "vme_mvme350.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/68230pit.h"
 
 #define LOG_GENERAL 0x01
@@ -224,7 +224,6 @@ vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, 
 void vme_mvme350_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_device();
 
 	/* Setup r/w handlers for shared memory area */
 #if 0

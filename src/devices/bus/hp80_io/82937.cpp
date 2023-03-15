@@ -18,7 +18,6 @@
 
 #include "emu.h"
 #include "82937.h"
-#include "coreutil.h"
 
 // Debugging
 #define VERBOSE 0

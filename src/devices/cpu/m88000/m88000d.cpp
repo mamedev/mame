@@ -83,10 +83,10 @@ const std::map<u32, const mc88100_disassembler::instruction> mc88100_disassemble
 	{ 0x64000000, { 0xfc000000, "subu",        mc88100_disassembler::addressing::IMM16 }},
 	{ 0x68000000, { 0xfc000000, "divu",        mc88100_disassembler::addressing::IMM16 }},
 	{ 0x6c000000, { 0xfc000000, "mul",         mc88100_disassembler::addressing::IMM16 }},
-	{ 0x70000000, { 0xfc000000, "add",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x74000000, { 0xfc000000, "sub",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x78000000, { 0xfc000000, "div",         mc88100_disassembler::addressing::SIMM16 }},
-	{ 0x7c000000, { 0xfc000000, "cmp",         mc88100_disassembler::addressing::SIMM16 }},
+	{ 0x70000000, { 0xfc000000, "add",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x74000000, { 0xfc000000, "sub",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x78000000, { 0xfc000000, "div",         mc88100_disassembler::addressing::IMM16 }},
+	{ 0x7c000000, { 0xfc000000, "cmp",         mc88100_disassembler::addressing::IMM16 }},
 	{ 0x80004000, { 0xfc00f800, "ldcr",        mc88100_disassembler::addressing::CR }}, // privileged; S1, S2 not used
 	{ 0x80004800, { 0xfc00f800, "fldcr",       mc88100_disassembler::addressing::CR }}, // S1, S2 not used
 	{ 0x80008000, { 0xfc00f800, "stcr",        mc88100_disassembler::addressing::CR }}, // privileged; D not used
@@ -1143,10 +1143,12 @@ offs_t m88000_disassembler::dasm_jump(std::ostream &stream, const char *mnemonic
 	util::stream_format(stream, "%-12sr%d", mnemonic, inst & 0x0000001f);
 
 	// Set flags for jump to subroutine, return to r1 and/or optional delay slot
-	return 4 | SUPPORTED |
-			((inst & 0x0000081f) == 0x00000001 ? STEP_OUT : 0) |
-			(BIT(inst, 11) ? STEP_OVER : 0) |
-			(BIT(inst, 10) ? STEP_OVER | step_over_extra(1) : 0);
+	if (BIT(inst, 11))
+		return 4 | SUPPORTED | STEP_OVER | (BIT(inst, 10) ? step_over_extra(1) : 0);
+	else if ((inst & 0x0000001f) == 0x00000001)
+		return 4 | SUPPORTED | STEP_OUT | (BIT(inst, 10) ? step_over_extra(1) : 0);
+	else
+		return 4 | SUPPORTED;
 }
 
 offs_t m88000_disassembler::dasm_vec9(std::ostream &stream, const char *mnemonic, u32 inst)
@@ -1173,7 +1175,7 @@ offs_t m88000_disassembler::dasm_d16(std::ostream &stream, const char *mnemonic,
 	util::stream_format(stream, ",r%d,$%08x", (inst & 0x001f0000) >> 16, pc + disp);
 
 	// Set flags for optional delay slot
-	return 4 | SUPPORTED | (BIT(inst, 26) ? STEP_OVER | step_over_extra(1) : 0);
+	return 4 | SUPPORTED | STEP_COND | (BIT(inst, 26) ? step_over_extra(1) : 0);
 }
 
 offs_t m88000_disassembler::dasm_d26(std::ostream &stream, const char *mnemonic, u32 inst, offs_t pc)
@@ -1183,9 +1185,10 @@ offs_t m88000_disassembler::dasm_d26(std::ostream &stream, const char *mnemonic,
 	util::stream_format(stream, "%-12s$%08x", mnemonic, pc + disp);
 
 	// Set flags for branch to subroutine and/or optional delay slot
-	return 4 | SUPPORTED |
-			(BIT(inst, 27) ? STEP_OVER : 0) |
-			(BIT(inst, 26) ? STEP_OVER | step_over_extra(1) : 0);
+	if (BIT(inst, 27))
+		return 4 | SUPPORTED | STEP_OVER | (BIT(inst, 26) ? step_over_extra(1) : 0);
+	else
+		return 4 | SUPPORTED;
 }
 
 offs_t m88000_disassembler::dasm_none(std::ostream &stream, const char *mnemonic, u32 inst)

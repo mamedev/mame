@@ -144,7 +144,8 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_manager_type["count_players"] = &ioport_manager::count_players;
 	ioport_manager_type["type_pressed"] = sol::overload(
 			&ioport_manager::type_pressed,
-			[] (ioport_manager &im, ioport_type type) { return im.type_pressed(type, 0); });
+			[] (ioport_manager &im, ioport_type type) { return im.type_pressed(type, 0); },
+			[] (ioport_manager &im, input_type_entry const &type) { return im.type_pressed(type.type(), type.player()); });
 	ioport_manager_type["type_name"] = sol::overload(
 			&ioport_manager::type_name,
 			[] (ioport_manager &im, ioport_type type) { return im.type_name(type, 0); });
@@ -152,23 +153,52 @@ void lua_engine::initialize_input(sol::table &emu)
 			&ioport_manager::type_group,
 			[] (ioport_manager &im, ioport_type type) { return im.type_group(type, 0); });
 	ioport_manager_type["type_seq"] = sol::overload(
-			[] (ioport_manager &im, ioport_type type, int player, char const *seq_type_string)
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string)
 			{
-				input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-				return im.type_seq(type, player, seq_type);
+				if (!player)
+					player = 0;
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				return im.type_seq(type, *player, seq_type);
 			},
-			[] (ioport_manager &im, ioport_type type, int player) { return im.type_seq(type, player, SEQ_TYPE_STANDARD); },
-			[] (ioport_manager &im, ioport_type type) { return im.type_seq(type, 0, SEQ_TYPE_STANDARD); });
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player)
+			{
+				if (!player)
+					player = 0;
+				return im.type_seq(type, *player);
+			},
+			[] (ioport_manager &im, input_type_entry const &type, std::optional<char const *> seq_type_string)
+			{
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				return im.type_seq(type.type(), type.player(), seq_type);
+			},
+			[] (ioport_manager &im, input_type_entry const &type)
+			{
+				return im.type_seq(type.type(), type.player());
+			});
+	ioport_manager_type["set_type_seq"] = sol::overload(
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string, input_seq const &seq)
+			{
+				if (!player)
+					player = 0;
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				im.set_type_seq(type, *player, seq_type, seq);
+			},
+			[] (ioport_manager &im, input_type_entry const &type, std::optional<char const *> seq_type_string, input_seq const &seq)
+			{
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				im.set_type_seq(type.type(), type.player(), seq_type, seq);
+			});
 	ioport_manager_type["token_to_input_type"] =
-		[] (ioport_manager &im, std::string const &string)
-		{
-			int player;
-			ioport_type const type = im.token_to_input_type(string.c_str(), player);
-			return std::make_tuple(type, player);
-		};
+			[] (ioport_manager &im, std::string const &string)
+			{
+				int player;
+				ioport_type const type = im.token_to_input_type(string.c_str(), player);
+				return std::make_tuple(type, player);
+			};
 	ioport_manager_type["input_type_to_token"] = sol::overload(
-			&ioport_manager::input_type_to_token,
-			[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
+				&ioport_manager::input_type_to_token,
+				[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
+	ioport_manager_type["types"] = sol::property(&ioport_manager::types);
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
 
 
@@ -203,7 +233,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor);
+	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", sol::no_constructor);
 	ioport_port_type["read"] = &ioport_port::read;
 	ioport_port_type["write"] = &ioport_port::write;
 	ioport_port_type["field"] = &ioport_port::field;
@@ -237,6 +267,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_field_type = sol().registry().new_usertype<ioport_field>("ioport_field", sol::no_constructor);
 	ioport_field_type["set_value"] = &ioport_field::set_value;
+	ioport_field_type["clear_value"] = &ioport_field::clear_value;
 	ioport_field_type["set_input_seq"] =
 		[] (ioport_field &f, std::string const &seq_type_string, const input_seq &seq)
 		{
@@ -244,6 +275,12 @@ void lua_engine::initialize_input(sol::table &emu)
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
+			if (seq.is_default())
+				settings.cfg[seq_type].clear();
+			else if (!seq.length())
+				settings.cfg[seq_type] = "NONE";
+			else
+				settings.cfg[seq_type] = f.port().device().machine().input().seq_to_tokens(seq);
 			f.set_user_settings(settings);
 		};
 	ioport_field_type["input_seq"] =
@@ -279,17 +316,31 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["type"] = sol::property(&ioport_field::type);
 	ioport_field_type["name"] = sol::property(&ioport_field::name);
 	ioport_field_type["default_name"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
 			});
 	ioport_field_type["player"] = sol::property(&ioport_field::player, &ioport_field::set_player);
 	ioport_field_type["mask"] = sol::property(&ioport_field::mask);
 	ioport_field_type["defvalue"] = sol::property(&ioport_field::defvalue);
-	ioport_field_type["sensitivity"] = sol::property(&ioport_field::sensitivity);
+	ioport_field_type["minvalue"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.minval()) : std::nullopt;
+			});
+	ioport_field_type["maxvalue"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.maxval()) : std::nullopt;
+			});
+	ioport_field_type["sensitivity"] = sol::property(
+			[] (ioport_field const &f)
+			{
+				return f.is_analog() ? std::make_optional(f.sensitivity()) : std::nullopt;
+			});
 	ioport_field_type["way"] = sol::property(&ioport_field::way);
 	ioport_field_type["type_class"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				switch (f.type_class())
 				{
@@ -317,7 +368,7 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["crosshair_scale"] = sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale);
 	ioport_field_type["crosshair_offset"] = sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset);
 	ioport_field_type["user_value"] = sol::property(
-			[] (ioport_field &f)
+			[] (ioport_field const &f)
 			{
 				ioport_field::user_settings settings;
 				f.get_user_settings(settings);
@@ -334,7 +385,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			[this] (ioport_field &f)
 			{
 				sol::table result = sol().create_table();
-				for (ioport_setting &setting : f.settings())
+				for (ioport_setting const &setting : f.settings())
 					if (setting.enabled())
 						result[setting.value()] = setting.name();
 				return result;
@@ -343,6 +394,15 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto ioport_field_live_type = sol().registry().new_usertype<ioport_field_live>("ioport_field_live", sol::no_constructor);
 	ioport_field_live_type["name"] = &ioport_field_live::name;
+
+
+	auto input_type_entry_type = sol().registry().new_usertype<input_type_entry>("input_type_entry", sol::no_constructor);
+	input_type_entry_type["type"] = sol::property(&input_type_entry::type);
+	input_type_entry_type["group"] = sol::property(&input_type_entry::group);
+	input_type_entry_type["player"] = sol::property(&input_type_entry::player);
+	input_type_entry_type["token"] = sol::property(&input_type_entry::token);
+	input_type_entry_type["name"] = sol::property(&input_type_entry::name);
+	input_type_entry_type["is_analog"] = sol::property([] (input_type_entry const &type) { return ioport_manager::type_is_analog(type.type()); });
 
 
 	auto input_type = sol().registry().new_usertype<input_manager>("input", sol::no_constructor);
@@ -396,6 +456,17 @@ void lua_engine::initialize_input(sol::table &emu)
 	seqpoll_type["modified"] = sol::property(&input_sequence_poller::modified);
 
 
+	auto iptseq_type = emu.new_usertype<input_seq>(
+			"input_seq",
+			sol::call_constructor, sol::constructors<input_seq(), input_seq(input_seq const &)>());
+	iptseq_type["reset"] = &input_seq::reset;
+	iptseq_type["set_default"] = &input_seq::set_default;
+	iptseq_type["empty"] = sol::property(&input_seq::empty);
+	iptseq_type["length"] = sol::property(&input_seq::length);
+	iptseq_type["is_valid"] = sol::property(&input_seq::is_valid);
+	iptseq_type["is_default"] = sol::property(&input_seq::is_default);
+
+
 	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);
 	input_class_type["name"] = sol::property(&input_class::name);
 	input_class_type["enabled"] = sol::property(&input_class::enabled);
@@ -423,7 +494,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			[this] (input_device &dev)
 			{
 				sol::table result = sol().create_table();
-				for (input_item_id id = ITEM_ID_FIRST_VALID; id < dev.maxitem(); id++)
+				for (input_item_id id = ITEM_ID_FIRST_VALID; id <= dev.maxitem(); id++)
 				{
 					input_device_item *item = dev.item(id);
 					if (item)
@@ -441,16 +512,18 @@ void lua_engine::initialize_input(sol::table &emu)
 
 
 	auto uiinput_type = sol().registry().new_usertype<ui_input_manager>("uiinput", sol::no_constructor);
-	uiinput_type["find_mouse"] =
+	uiinput_type.set_function("reset", &ui_input_manager::reset);
+	uiinput_type.set_function(
+		"find_mouse",
 		[] (ui_input_manager &ui)
 		{
 			int32_t x, y;
 			bool button;
 			render_target *rt = ui.find_mouse(&x, &y, &button);
 			return std::make_tuple(x, y, button, rt);
-		};
-	uiinput_type["pressed"] = &ui_input_manager::pressed;
-	uiinput_type["pressed_repeat"] = &ui_input_manager::pressed_repeat;
+		});
+	uiinput_type.set_function("pressed", &ui_input_manager::pressed);
+	uiinput_type.set_function("pressed_repeat", &ui_input_manager::pressed_repeat);
 	uiinput_type["presses_enabled"] = sol::property(&ui_input_manager::presses_enabled, &ui_input_manager::set_presses_enabled);
 
 }

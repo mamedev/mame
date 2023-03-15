@@ -212,10 +212,11 @@ void qs1000_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  rom_bank_updated - the rom bank has changed
+//  rom_bank_pre_change - refresh the stream if the
+//  ROM banking changes
 //-------------------------------------------------
 
-void qs1000_device::rom_bank_updated()
+void qs1000_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }
@@ -308,15 +309,6 @@ void qs1000_device::device_reset()
 	{
 		elem.m_flags = 0;
 	}
-}
-
-
-//-------------------------------------------------
-//  device_timer - handle deferred writes and
-//  resets as a timer callback
-//-------------------------------------------------
-void qs1000_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
 }
 
 

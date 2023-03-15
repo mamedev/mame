@@ -5662,7 +5662,7 @@ void z8002_device::ZB0_dddd_0000()
 void z8002_device::ZB1_dddd_0000()
 {
 	GET_DST(OP0,NIB2);
-	RW(dst) = (RW(dst) & 0xff) | ((RW(dst) & S08) ? 0xff00 : 0x0000);
+	RW(dst) = (int16_t)(int8_t)RW(dst);
 }
 
 /******************************************
@@ -5672,8 +5672,7 @@ void z8002_device::ZB1_dddd_0000()
 void z8002_device::ZB1_dddd_0111()
 {
 	GET_DST(OP0,NIB2);
-	RQ(dst) = concat_64((RQ(dst) & S32) ?
-		0xfffffffful : 0, extract_64lo(RQ(dst)));
+	RQ(dst) = (int64_t)(int32_t)RQ(dst);
 }
 
 /******************************************
@@ -5683,8 +5682,7 @@ void z8002_device::ZB1_dddd_0111()
 void z8002_device::ZB1_dddd_1010()
 {
 	GET_DST(OP0,NIB2);
-	RL(dst) = (RL(dst) & 0xffff) | ((RL(dst) & S16) ?
-		0xffff0000ul : 0x00000000ul);
+	RL(dst) = (int32_t)(int16_t)RL(dst);
 }
 
 /******************************************

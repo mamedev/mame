@@ -32,6 +32,14 @@ const char *msx_format::extensions() const
 
 // Unverified gap sizes
 const msx_format::format msx_format::formats[] = {
+	{   /*  180K 5 1/4 inch double density single sided */
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+		2000,  9, 40, 1, 512, {}, 1, {}, 80, 50, 22, 80
+	},
+	{   /*  360K 5 1/4 inch double density */
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000,  9, 40, 2, 512, {}, 1, {}, 80, 50, 22, 80
+	},
 	{   /*  3 1/2 inch single sided double density */
 		// 80x4e 12x00 3xf6 fc
 		// 26x4e 12x00 3xf5 fe 2x00 01 02 f7 24x4e 12x00 3xf5 fb 512xe5 f7
@@ -58,4 +66,4 @@ const msx_format::format msx_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_MSX_FORMAT = &floppy_image_format_creator<msx_format>;
+const msx_format FLOPPY_MSX_FORMAT;

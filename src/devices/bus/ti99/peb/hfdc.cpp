@@ -74,7 +74,7 @@
 #define VERBOSE ( LOG_GENERAL | LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
+DEFINE_DEVICE_TYPE(TI99_HFDC, bus::ti99::peb::myarc_hfdc_device, "ti99_hfdc", "Myarc Hard and Floppy Disk Controller")
 
 namespace bus::ti99::peb {
 
@@ -83,8 +83,6 @@ namespace bus::ti99::peb {
 #define CLOCK_TAG "mm58274c"
 
 #define NONE -1
-
-#define MOTOR_TIMER 1
 
 #define TAPE_ADDR   0x0fc0
 #define HDC_R_ADDR  0x0fd0
@@ -507,7 +505,7 @@ void myarc_hfdc_device::cruwrite(offs_t offset, uint8_t data)
 /*
     Monoflop has gone back to the OFF state.
 */
-void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(myarc_hfdc_device::motor_off)
 {
 	set_floppy_motors_running(false);
 }
@@ -885,7 +883,7 @@ void myarc_hfdc_device::write_buffer(uint8_t data)
 void myarc_hfdc_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
-	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
+	m_motor_on_timer = timer_alloc(FUNC(myarc_hfdc_device::motor_off), this);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = nullptr;
 	m_current_harddisk = nullptr;

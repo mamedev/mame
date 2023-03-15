@@ -32,6 +32,8 @@ public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_int_dis_hack(bool hack) { m_int_dis_hack = hack; }
+
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto enlg_wr_callback() { return m_write_enlg.bind(); }
 
@@ -57,6 +59,8 @@ private:
 
 	devcb_write_line   m_write_int;
 	devcb_write_line   m_write_enlg;
+
+	bool m_int_dis_hack;
 
 	int m_inte;                 // interrupt enable
 	int m_int_dis;              // interrupt (latch) disable flip-flop

@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "snapquik.h"
 
+#include "softlist_dev.h"
+
 // device type definition
 DEFINE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device, "snapsot_image", "Snapshot")
 
@@ -47,6 +49,8 @@ snapshot_image_device::~snapshot_image_device()
 
 TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
+	check_for_file();
+
 	/* invoke the load */
 	m_load(*this);
 }
@@ -60,7 +64,7 @@ void snapshot_image_device::device_start()
 	m_load.resolve();
 
 	/* allocate a timer */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snapshot_image_device::process_snapshot_or_quickload),this));
+	m_timer = timer_alloc(FUNC(snapshot_image_device::process_snapshot_or_quickload), this);
 }
 
 /*-------------------------------------------------
@@ -72,6 +76,12 @@ image_init_result snapshot_image_device::call_load()
 	m_timer->adjust(m_delay, 0);
 	return image_init_result::PASS;
 }
+
+const software_list_loader &snapshot_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
+}
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(QUICKLOAD, quickload_image_device, "quickload", "Quickload")

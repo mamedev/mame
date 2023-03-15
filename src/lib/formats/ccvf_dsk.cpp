@@ -11,6 +11,7 @@
 #include "formats/ccvf_dsk.h"
 
 #include "coretmpl.h" // BIT
+#include "ioprocs.h"
 
 
 ccvf_format::ccvf_format()
@@ -46,13 +47,13 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 	{}
 };
 
-int ccvf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int ccvf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[36];
-
-	io_generic_read(io, h, 0, 36);
-	if(!memcmp(h, "Compucolor Virtual Floppy Disk Image", 36))
-		return 100;
+	size_t actual;
+	io.read_at(0, h, 36, actual);
+	if (!memcmp(h, "Compucolor Virtual Floppy Disk Image", 36))
+		return FIFID_SIGN;
 
 	return 0;
 }
@@ -87,13 +88,17 @@ floppy_image_format_t::desc_e* ccvf_format::get_desc_8n1(const format &f, int &c
 	return desc;
 }
 
-bool ccvf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	const format &f = formats[0];
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	std::vector<uint8_t> img(size);
-	io_generic_read(io, &img[0], 0, size);
+	size_t actual;
+	io.read_at(0, &img[0], size, actual);
 
 	std::string ccvf = std::string((const char *)&img[0], size);
 	std::vector<uint8_t> bytes(78720);
@@ -151,4 +156,4 @@ bool ccvf_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_CCVF_FORMAT = &floppy_image_format_creator<ccvf_format>;
+const ccvf_format FLOPPY_CCVF_FORMAT;

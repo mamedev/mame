@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma once
-
 #include "rs232.h"
 #include "machine/keyboard.h"
 

@@ -165,6 +165,8 @@ offs_t m680x_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		flags = STEP_OVER;
 	else if (opcode == rti || opcode == rts)
 		flags = STEP_OUT;
+	else if (args == rel && opcode != bra && opcode != brn && opcode != bsr)
+		flags = STEP_COND;
 
 	if ( invalid & invalid_mask )   /* invalid for this cpu type ? */
 	{

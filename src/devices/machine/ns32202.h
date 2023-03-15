@@ -26,13 +26,13 @@ protected:
 	void set_int(bool int_state);
 	void set_cout(bool cout_state);
 
-	void interrupt(void *buf, s32 param);
+	void interrupt(s32 param);
 	u8 interrupt_acknowledge(bool side_effects);
 	u8 interrupt_return(bool side_effects);
 
 	void interrupt_update();
 
-	template <unsigned N> void counter(void *buf, s32 param);
+	template <unsigned N> void counter(s32 param);
 
 	template <unsigned ST1, bool SideEffects> u8 hvct_r();
 
@@ -80,7 +80,7 @@ protected:
 	void fprtl_w(u8 data);
 	void fprth_w(u8 data) {}
 
-	void mctl_w(u8 data) { m_mctl = data; }
+	void mctl_w(u8 data);
 	void ocasn_w(u8 data) { m_ocasn = data; }
 	void ciptr_w(u8 data) { m_ciptr = data; }
 	void pdat_w(u8 data) {}
@@ -91,8 +91,10 @@ protected:
 
 	template <unsigned N> void csvl_w(u8 data) { m_csv[N] = (m_csv[N] & 0xff00) | data; }
 	template <unsigned N> void csvh_w(u8 data) { m_csv[N] = (u16(data) << 8) | u8(m_csv[N]); }
-	template <unsigned N> void ccvl_w(u8 data) { m_ccv[N] = (m_ccv[N] & 0xff00) | data; }
-	template <unsigned N> void ccvh_w(u8 data) { m_ccv[N] = (u16(data) << 8) | u8(m_ccv[N]); }
+	template <unsigned N> void ccvl_w(u8 data);
+	template <unsigned N> void ccvh_w(u8 data);
+
+	void update_ccv();
 
 private:
 	devcb_write_line m_out_int;

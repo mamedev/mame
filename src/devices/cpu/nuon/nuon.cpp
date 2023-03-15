@@ -11,23 +11,6 @@
 #include "emu.h"
 #include "nuon.h"
 #include "nuondasm.h"
-#include "debugger.h"
-
-#define VERBOSE_LEVEL   (0)
-
-#define ENABLE_VERBOSE_LOG (0)
-
-static inline void ATTR_PRINTF(3, 4) verboselogout(device_t &dev, uint32_t pc, const char *s_fmt, ...)
-{
-	va_list v;
-	char buf[32768];
-	va_start(v, s_fmt);
-	vsprintf(buf, s_fmt, v);
-	va_end(v);
-	dev.logerror("%08x: %s", pc, buf);
-}
-
-#define verboselog(x,y,...) do { if (ENABLE_VERBOSE_LOG && (VERBOSE_LEVEL >= y)) verboselogout(*this, x, __VA_ARGS__); } while (false)
 
 //**************************************************************************
 //  DEVICE INTERFACE

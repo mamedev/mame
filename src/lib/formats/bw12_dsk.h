@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_BW12_FORMAT;
+extern const bw12_format FLOPPY_BW12_FORMAT;
 
 #endif // MAME_FORMATS_BW12_DSK_H

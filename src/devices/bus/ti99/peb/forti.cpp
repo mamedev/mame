@@ -41,7 +41,7 @@
 #define FORTI_GEN3_TAG "soundchip3"
 #define FORTI_GEN4_TAG "soundchip4"
 
-DEFINE_DEVICE_TYPE_NS(TI99_FORTI, bus::ti99::peb, forti_device, "ti99_forti", "FORTi Sound Card")
+DEFINE_DEVICE_TYPE(TI99_FORTI, bus::ti99::peb::forti_device, "ti99_forti", "FORTi Sound Card")
 
 namespace bus::ti99::peb {
 

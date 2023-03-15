@@ -26,9 +26,16 @@ constexpr uintptr_t ITEM_KBDEV_FIRST    = 0x00000200;
 
 menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
+	set_heading(_("menu-keyboard", "Keyboard Selection"));
 }
 
-void menu_keyboard_mode::populate(float &customtop, float &custombottom)
+void menu_keyboard_mode::menu_activated()
+{
+	// scripts could have changed something behind our back
+	reset(reset_options::REMEMBER_POSITION);
+}
+
+void menu_keyboard_mode::populate()
 {
 	natural_keyboard &natkbd(machine().natkeyboard());
 
@@ -36,8 +43,8 @@ void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 	{
 		bool const natmode(natkbd.in_use());
 		item_append(
-				_("Keyboard Mode"),
-				natmode ? _("Natural") : _("Emulated"),
+				_("menu-keyboard", "Keyboard Mode"),
+				natmode ? _("menu-keyboard", "Natural") : _("menu-keyboard", "Emulated"),
 				natmode ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW,
 				reinterpret_cast<void *>(ITEM_KBMODE));
 		item_append(menu_item_type::SEPARATOR);
@@ -64,35 +71,51 @@ menu_keyboard_mode::~menu_keyboard_mode()
 {
 }
 
-void menu_keyboard_mode::handle()
+bool menu_keyboard_mode::handle(event const *ev)
 {
-	event const *const menu_event(process(0));
-	if (menu_event && uintptr_t(menu_event->itemref))
+	if (!ev || !uintptr_t(ev->itemref))
+		return false;
+
+	natural_keyboard &natkbd(machine().natkeyboard());
+	uintptr_t const ref(uintptr_t(ev->itemref));
+	bool left(IPT_UI_LEFT == ev->iptkey);
+	bool right(IPT_UI_RIGHT == ev->iptkey);
+	if (ITEM_KBMODE == ref)
 	{
-		natural_keyboard &natkbd(machine().natkeyboard());
-		uintptr_t const ref(uintptr_t(menu_event->itemref));
-		bool const left(IPT_UI_LEFT == menu_event->iptkey);
-		bool const right(IPT_UI_RIGHT == menu_event->iptkey);
-		if (ITEM_KBMODE == ref)
+		if (IPT_UI_SELECT == ev->iptkey)
 		{
-			if ((left || right) && (natkbd.in_use() != right))
-			{
-				natkbd.set_in_use(right);
-				reset(reset_options::REMEMBER_REF);
-			}
+			left = natkbd.in_use();
+			right = !left;
 		}
-		else if (ITEM_KBDEV_FIRST <= ref)
+		if ((left || right) && (natkbd.in_use() != right))
 		{
-			if ((left || right) && (natkbd.keyboard_enabled(ref - ITEM_KBDEV_FIRST) != right))
-			{
-				if (right)
-					natkbd.enable_keyboard(ref - ITEM_KBDEV_FIRST);
-				else
-					natkbd.disable_keyboard(ref - ITEM_KBDEV_FIRST);
-				reset(reset_options::REMEMBER_REF);
-			}
+			natkbd.set_in_use(right);
+			ev->item->set_subtext(right ? _("menu-keyboard", "Natural") : _("menu-keyboard", "Emulated"));
+			ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
+			return true;
 		}
 	}
+	else if (ITEM_KBDEV_FIRST <= ref)
+	{
+		auto const kbdno(ref - ITEM_KBDEV_FIRST);
+		if (IPT_UI_SELECT == ev->iptkey)
+		{
+			left = natkbd.keyboard_enabled(kbdno);
+			right = !left;
+		}
+		if ((left || right) && (natkbd.keyboard_enabled(kbdno) != right))
+		{
+			if (right)
+				natkbd.enable_keyboard(kbdno);
+			else
+				natkbd.disable_keyboard(kbdno);
+			ev->item->set_subtext(right ? _("Enabled") : _("Disabled"));
+			ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 } // namespace ui

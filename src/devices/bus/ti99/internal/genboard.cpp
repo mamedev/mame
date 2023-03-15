@@ -434,9 +434,9 @@
 #include "genboard.h"
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY, bus::ti99::internal, geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
-DEFINE_DEVICE_TYPE_NS(GENMOD_DECODER,    bus::ti99::internal, genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
-DEFINE_DEVICE_TYPE_NS(GENEVE_PAL,        bus::ti99::internal, geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
+DEFINE_DEVICE_TYPE(GENEVE_GATE_ARRAY, bus::ti99::internal::geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE(GENMOD_DECODER,    bus::ti99::internal::genmod_decoder_device, "genmod_decoder", "GenMod decoder circuit")
+DEFINE_DEVICE_TYPE(GENEVE_PAL,        bus::ti99::internal::geneve_pal_device, "geneve_pal", "Geneve PAL circuit")
 
 namespace bus::ti99::internal {
 
@@ -1372,7 +1372,11 @@ void geneve_pal_device::set_ready()
 			  (pin4_9 && m_pin17q && m_pin16q && m_pin15q) ||
 			  !m_pin19;
 
-	if (m_prev_ready != ready_line) LOGMASKED(LOG_WAIT, "READY = %d (%d %d %d %d, %d %d %d, %d %d)\n", ready_line, m_pin14d, m_pin15d, m_pin16d, m_pin17d, m_pin3, m_pin4, m_pin9, m_pin5, m_pin19 );   m_prev_ready = ready_line;
+	if (m_prev_ready != ready_line)
+	{
+		LOGMASKED(LOG_WAIT, "READY = %d (%d %d %d %d, %d %d %d, %d %d)\n", ready_line, m_pin14d, m_pin15d, m_pin16d, m_pin17d, m_pin3, m_pin4, m_pin9, m_pin5, m_pin19);
+		m_prev_ready = ready_line;
+	}
 	m_ready(ready_line);
 }
 

@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_GUAB_FORMAT;
+extern const guab_format FLOPPY_GUAB_FORMAT;
 
 #endif // MAME_FORMATS_GUAB_DSK_H

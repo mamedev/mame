@@ -179,6 +179,10 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		util::stream_format(stream, "h'%04x", opcodes.r16(pc+2));
 		break;
 
+	case DASM_abs22e:
+		util::stream_format(stream, "h'%06x", opcodes.r32(pc) & 0x3fffff);
+		break;
+
 	case DASM_abs24e:
 		util::stream_format(stream, "h'%06x", opcodes.r32(pc) & 0xffffff);
 		break;
@@ -217,6 +221,10 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 		util::stream_format(stream, "#%x", (opcode >> 4) & 7);
 		break;
 
+	case DASM_imm6l:
+		util::stream_format(stream, "#%x", opcode & 0x3f);
+		break;
+
 	case DASM_imm8:
 		util::stream_format(stream, "#h'%02x", opcodes.r8(epc-1));
 		break;
@@ -235,6 +243,14 @@ void h8_disassembler::disassemble_am(std::ostream &stream, int am, offs_t pc, co
 
 	case DASM_exr:
 		util::stream_format(stream, "exr");
+		break;
+
+	case DASM_bankl:
+		util::stream_format(stream, "bankl");
+		break;
+
+	case DASM_bankh:
+		util::stream_format(stream, "bankh");
 		break;
 
 	case DASM_macl:

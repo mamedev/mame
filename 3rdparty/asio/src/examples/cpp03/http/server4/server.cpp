@@ -2,7 +2,7 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -45,7 +45,7 @@ void server::operator()(asio::error_code ec, std::size_t length)
       do
       {
         // Create a new socket for the next incoming connection.
-        socket_.reset(new tcp::socket(acceptor_->get_executor().context()));
+        socket_.reset(new tcp::socket(acceptor_->get_executor()));
 
         // Accept a new connection. The "yield" pseudo-keyword saves the current
         // line number and exits the coroutine's "reenter" block. We use the

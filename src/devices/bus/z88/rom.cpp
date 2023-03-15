@@ -37,7 +37,12 @@ z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, const char
 }
 
 z88_32k_rom_device::z88_32k_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), device_z88cart_interface(mconfig, *this), m_rom(nullptr)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, device_z88cart_interface(mconfig, *this)
+	, m_rom(nullptr)
+	, m_vpp_state(0)
+	, m_modified(false)
 {
 }
 
@@ -66,6 +71,10 @@ z88_256k_rom_device::z88_256k_rom_device(const machine_config &mconfig, const ch
 void z88_32k_rom_device::device_start()
 {
 	m_rom = machine().memory().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
+	std::fill_n(m_rom, get_cart_size(), 0xff);
+
+	save_item(NAME(m_vpp_state));
+	save_item(NAME(m_modified));
 }
 
 /*-------------------------------------------------
@@ -85,3 +94,20 @@ uint8_t z88_32k_rom_device::read(offs_t offset)
 {
 	return m_rom[offset & (get_cart_size() - 1)];
 }
+
+/*-------------------------------------------------
+    write
+-------------------------------------------------*/
+
+void z88_32k_rom_device::write(offs_t offset, uint8_t data)
+{
+	if (m_vpp_state)
+	{
+		const uint32_t offset_mask = get_cart_size() - 1;
+		if (m_rom[offset & offset_mask] & ~data)
+			m_modified = true;
+
+		m_rom[offset & offset_mask] &= data;
+	}
+}
+

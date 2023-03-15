@@ -15,6 +15,8 @@
 #include "emuopts.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -26,7 +28,13 @@ class input_device_switch_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_switch_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_switch_item(
+			input_device &device,
+			std::string_view name,
+			std::string_view tokenhint,
+			void *internal,
+			input_item_id itemid,
+			item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -52,7 +60,13 @@ class input_device_relative_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_relative_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_relative_item(
+			input_device &device,
+			std::string_view name,
+			std::string_view tokenhint,
+			void *internal,
+			input_item_id itemid,
+			item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -69,7 +83,13 @@ class input_device_absolute_item : public input_device_item
 {
 public:
 	// construction/destruction
-	input_device_absolute_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
+	input_device_absolute_item(
+			input_device &device,
+			std::string_view name,
+			std::string_view tokenhint,
+			void *internal,
+			input_item_id itemid,
+			item_get_state_func getstate);
 
 	// readers
 	virtual s32 read_as_switch(input_item_modifier modifier) override;
@@ -77,6 +97,8 @@ public:
 	virtual s32 read_as_absolute(input_item_modifier modifier) override;
 	virtual bool item_check_axis(input_item_modifier modifier, s32 memory) override;
 };
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -229,8 +251,8 @@ std::string joystick_map::to_string() const
 u8 joystick_map::update(s32 xaxisval, s32 yaxisval)
 {
 	// now map the X and Y axes to a 9x9 grid using the raw values
-	xaxisval = ((xaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
-	yaxisval = ((yaxisval - INPUT_ABSOLUTE_MIN) * 9) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN + 1);
+	xaxisval = ((xaxisval - osd::input_device::ABSOLUTE_MIN) * 9) / (osd::input_device::ABSOLUTE_MAX - osd::input_device::ABSOLUTE_MIN + 1);
+	yaxisval = ((yaxisval - osd::input_device::ABSOLUTE_MIN) * 9) / (osd::input_device::ABSOLUTE_MAX - osd::input_device::ABSOLUTE_MIN + 1);
 	u8 mapval = m_map[yaxisval][xaxisval];
 
 	// handle stickiness
@@ -253,15 +275,16 @@ u8 joystick_map::update(s32 xaxisval, s32 yaxisval)
 //  input_device - constructor
 //-------------------------------------------------
 
-input_device::input_device(input_manager &manager, const char *name, const char *id, void *internal)
-	: m_manager(manager),
-		m_name(name),
-		m_id(id),
-		m_devindex(-1),
-		m_maxitem(input_item_id(0)),
-		m_internal(internal),
-		m_steadykey_enabled(manager.machine().options().steadykey()),
-		m_lightgun_reload_button(manager.machine().options().offscreen_reload())
+input_device::input_device(input_manager &manager, std::string_view name, std::string_view id, void *internal)
+	: m_manager(manager)
+	, m_name(name)
+	, m_id(id)
+	, m_devindex(-1)
+	, m_maxitem(input_item_id(0))
+	, m_internal(internal)
+	, m_threshold(std::max<s32>(s32(manager.machine().options().joystick_threshold() * osd::input_device::ABSOLUTE_MAX), 1))
+	, m_steadykey_enabled(manager.machine().options().steadykey())
+	, m_lightgun_reload_button(manager.machine().options().offscreen_reload())
 {
 }
 
@@ -279,11 +302,15 @@ input_device::~input_device()
 //  add_item - add a new item to an input device
 //-------------------------------------------------
 
-input_item_id input_device::add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal)
+input_item_id input_device::add_item(
+		std::string_view name,
+		std::string_view tokenhint,
+		input_item_id itemid,
+		item_get_state_func getstate,
+		void *internal)
 {
 	if (machine().phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call input_device::add_item at init time!");
-	assert(name != nullptr);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != nullptr);
 
@@ -302,15 +329,15 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	switch (m_manager.device_class(devclass()).standard_item_class(originalid))
 	{
 		case ITEM_CLASS_SWITCH:
-			m_item[itemid] = std::make_unique<input_device_switch_item>(*this, name, internal, itemid, getstate);
+			m_item[itemid] = std::make_unique<input_device_switch_item>(*this, name, tokenhint, internal, itemid, getstate);
 			break;
 
 		case ITEM_CLASS_RELATIVE:
-			m_item[itemid] = std::make_unique<input_device_relative_item>(*this, name, internal, itemid, getstate);
+			m_item[itemid] = std::make_unique<input_device_relative_item>(*this, name, tokenhint, internal, itemid, getstate);
 			break;
 
 		case ITEM_CLASS_ABSOLUTE:
-			m_item[itemid] = std::make_unique<input_device_absolute_item>(*this, name, internal, itemid, getstate);
+			m_item[itemid] = std::make_unique<input_device_absolute_item>(*this, name, tokenhint, internal, itemid, getstate);
 			break;
 
 		default:
@@ -321,6 +348,17 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 	// assign the new slot and update the maximum
 	m_maxitem = std::max(m_maxitem, itemid);
 	return itemid;
+}
+
+
+//-------------------------------------------------
+//  set_default_assignments - set additional input
+//  assignments suitable for device
+//-------------------------------------------------
+
+void input_device::set_default_assignments(assignment_vector &&assignments)
+{
+	m_default_assignments = std::move(assignments);
 }
 
 
@@ -346,7 +384,7 @@ bool input_device::match_device_id(std::string_view deviceid) const
 //  input_device_keyboard - constructor
 //-------------------------------------------------
 
-input_device_keyboard::input_device_keyboard(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_keyboard::input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -387,7 +425,7 @@ void input_device_keyboard::apply_steadykey() const
 //  input_device_mouse - constructor
 //-------------------------------------------------
 
-input_device_mouse::input_device_mouse(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_mouse::input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -397,7 +435,7 @@ input_device_mouse::input_device_mouse(input_manager &manager, const char *_name
 //  input_device_lightgun - constructor
 //-------------------------------------------------
 
-input_device_lightgun::input_device_lightgun(input_manager &manager, const char *_name, const char *_id, void *_internal)
+input_device_lightgun::input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
 	: input_device(manager, _name, _id, _internal)
 {
 }
@@ -407,10 +445,11 @@ input_device_lightgun::input_device_lightgun(input_manager &manager, const char 
 //  input_device_joystick - constructor
 //-------------------------------------------------
 
-input_device_joystick::input_device_joystick(input_manager &manager, const char *_name, const char *_id, void *_internal)
-	: input_device(manager, _name, _id, _internal),
-		m_joystick_deadzone(s32(manager.machine().options().joystick_deadzone() * INPUT_ABSOLUTE_MAX)),
-		m_joystick_saturation(s32(manager.machine().options().joystick_saturation() * INPUT_ABSOLUTE_MAX))
+input_device_joystick::input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal)
+	: input_device(manager, _name, _id, _internal)
+	, m_deadzone(s32(manager.machine().options().joystick_deadzone() * osd::input_device::ABSOLUTE_MAX))
+	, m_saturation(s32(manager.machine().options().joystick_saturation() * osd::input_device::ABSOLUTE_MAX))
+	, m_range(m_saturation - m_deadzone)
 {
 	// get the default joystick map
 	const char *mapstring = machine().options().joystick_map();
@@ -437,24 +476,16 @@ input_device_joystick::input_device_joystick(input_manager &manager, const char 
 s32 input_device_joystick::adjust_absolute_value(s32 result) const
 {
 	// properties are symmetric
-	bool negative = false;
-	if (result < 0)
-	{
-		negative = true;
+	bool const negative = result < 0;;
+	if (negative)
 		result = -result;
-	}
 
-	// if in the deadzone, return 0
-	if (result < m_joystick_deadzone)
+	if (result < m_deadzone)            // if in the deadzone, return 0
 		result = 0;
-
-	// if saturated, return the max
-	else if (result > m_joystick_saturation)
-		result = INPUT_ABSOLUTE_MAX;
-
-	// otherwise, scale
-	else
-		result = s64(result - m_joystick_deadzone) * s64(INPUT_ABSOLUTE_MAX) / s64(m_joystick_saturation - m_joystick_deadzone);
+	else if (result >= m_saturation)    // if saturated, return the max
+		result = osd::input_device::ABSOLUTE_MAX;
+	else                                // otherwise, scale
+		result = s64(result - m_deadzone) * s64(osd::input_device::ABSOLUTE_MAX) / m_range;
 
 	// re-apply sign and return
 	return negative ? -result : result;
@@ -494,18 +525,16 @@ input_class::~input_class()
 //  add_device - add a new input device
 //-------------------------------------------------
 
-input_device *input_class::add_device(const char *name, const char *id, void *internal)
+input_device &input_class::add_device(std::string_view name, std::string_view id, void *internal)
 {
 	if (machine().phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call input_class::add_device at init time!");
-	assert(name != nullptr);
-	assert(id != nullptr);
 
 	// allocate a new device and add it to the index
 	return add_device(make_device(name, id, internal));
 }
 
-input_device *input_class::add_device(std::unique_ptr<input_device> &&new_device)
+input_device &input_class::add_device(std::unique_ptr<input_device> &&new_device)
 {
 	assert(new_device->devclass() == m_devclass);
 
@@ -518,12 +547,12 @@ input_device *input_class::add_device(std::unique_ptr<input_device> &&new_device
 			m_maxindex = std::max(m_maxindex, devindex);
 
 			if (new_device->id()[0] == 0)
-				osd_printf_verbose("Input: Adding %s #%d: %s\n", m_name, devindex, new_device->name());
+				osd_printf_verbose("Input: Adding %s #%d: %s\n", m_name, devindex + 1, new_device->name());
 			else
-				osd_printf_verbose("Input: Adding %s #%d: %s (device id: %s)\n", m_name, devindex, new_device->name(), new_device->id());
+				osd_printf_verbose("Input: Adding %s #%d: %s (device id: %s)\n", m_name, devindex + 1, new_device->name(), new_device->id());
 
 			m_device[devindex] = std::move(new_device);
-			return m_device[devindex].get();
+			return *m_device[devindex];
 		}
 
 	throw emu_fatalerror("Input: Too many %s devices\n", m_name);
@@ -537,17 +566,21 @@ input_device *input_class::add_device(std::unique_ptr<input_device> &&new_device
 
 input_item_class input_class::standard_item_class(input_item_id itemid) const
 {
-	// most everything standard is a switch, apart from the axes
 	if (itemid == ITEM_ID_OTHER_SWITCH || itemid < ITEM_ID_XAXIS || (itemid > ITEM_ID_SLIDER2 && itemid < ITEM_ID_ADD_ABSOLUTE1))
+	{
+		// most everything standard is a switch, apart from the axes
 		return ITEM_CLASS_SWITCH;
-
-	// standard mouse axes are relative
+	}
 	else if (m_devclass == DEVICE_CLASS_MOUSE || itemid == ITEM_ID_OTHER_AXIS_RELATIVE || (itemid >= ITEM_ID_ADD_RELATIVE1 && itemid <= ITEM_ID_ADD_RELATIVE16))
+	{
+		// standard mouse axes are relative
 		return ITEM_CLASS_RELATIVE;
-
-	// all other standard axes are absolute
+	}
 	else
+	{
+		// all other standard axes are absolute
 		return ITEM_CLASS_ABSOLUTE;
+	}
 }
 
 
@@ -666,25 +699,37 @@ bool input_class_joystick::set_global_joystick_map(const char *mapstring)
 //  input_device_item - constructor
 //-------------------------------------------------
 
-input_device_item::input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass)
-	: m_device(device),
-		m_name(name),
-		m_internal(internal),
-		m_itemid(itemid),
-		m_itemclass(itemclass),
-		m_getstate(getstate),
-		m_current(0)
+input_device_item::input_device_item(
+		input_device &device,
+		std::string_view name,
+		std::string_view tokenhint,
+		void *internal,
+		input_item_id itemid,
+		item_get_state_func getstate,
+		input_item_class itemclass)
+	: m_device(device)
+	, m_name(name)
+	, m_internal(internal)
+	, m_itemid(itemid)
+	, m_itemclass(itemclass)
+	, m_getstate(getstate)
+	, m_current(0)
 {
 	const char *standard_token = manager().standard_token(itemid);
 	if (standard_token)
 	{
-		// use a standard token name for know item IDs
-		m_token.assign(standard_token);
+		// use a standard token name for known item IDs
+		m_token = standard_token;
+	}
+	else if (!tokenhint.empty())
+	{
+		// fall back to token hint if supplied
+		m_token = tokenhint;
 	}
 	else
 	{
 		// otherwise, create a tokenized name
-		m_token.assign(strmakeupper(name));
+		m_token = strmakeupper(name);
 		strdelchr(m_token, ' ');
 		strdelchr(m_token, '_');
 	}
@@ -707,8 +752,8 @@ input_device_item::~input_device_item()
 
 bool input_device_item::check_axis(input_item_modifier modifier, s32 memory)
 {
-	// use INVALID_AXIS_VALUE as a short-circuit
-	return (memory != INVALID_AXIS_VALUE) && item_check_axis(modifier, memory);
+	// use osd::INVALID_AXIS_VALUE as a short-circuit
+	return (memory != osd::input_device::INVALID_AXIS_VALUE) && item_check_axis(modifier, memory);
 }
 
 
@@ -720,10 +765,16 @@ bool input_device_item::check_axis(input_item_modifier modifier, s32 memory)
 //  input_device_switch_item - constructor
 //-------------------------------------------------
 
-input_device_switch_item::input_device_switch_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
-	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_SWITCH),
-		m_steadykey(0),
-		m_oldkey(0)
+input_device_switch_item::input_device_switch_item(
+		input_device &device,
+		std::string_view name,
+		std::string_view tokenhint,
+		void *internal,
+		input_item_id itemid,
+		item_get_state_func getstate)
+	: input_device_item(device, name, tokenhint, internal, itemid, getstate, ITEM_CLASS_SWITCH)
+	, m_steadykey(0)
+	, m_oldkey(0)
 {
 }
 
@@ -825,8 +876,14 @@ bool input_device_switch_item::steadykey_changed()
 //  input_device_relative_item - constructor
 //-------------------------------------------------
 
-input_device_relative_item::input_device_relative_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
-	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_RELATIVE)
+input_device_relative_item::input_device_relative_item(
+		input_device &device,
+		std::string_view name,
+		std::string_view tokenhint,
+		void *internal,
+		input_item_id itemid,
+		item_get_state_func getstate)
+	: input_device_item(device, name, tokenhint, internal, itemid, getstate, ITEM_CLASS_RELATIVE)
 {
 }
 
@@ -839,13 +896,20 @@ input_device_relative_item::input_device_relative_item(input_device &device, con
 s32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
 {
 	// process according to modifiers
-	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
-		return (update_value() > 0);
-	else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)
-		return (update_value() < 0);
-
+	switch (modifier)
+	{
+	case ITEM_MODIFIER_POS:
+	case ITEM_MODIFIER_RIGHT:
+	case ITEM_MODIFIER_DOWN:
+		return update_value() > 0;
+	case ITEM_MODIFIER_NEG:
+	case ITEM_MODIFIER_LEFT:
+	case ITEM_MODIFIER_UP:
+		return update_value() < 0;
 	// all other cases just return 0
-	return 0;
+	default:
+		return 0;
+	}
 }
 
 
@@ -857,7 +921,10 @@ s32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
 s32 input_device_relative_item::read_as_relative(input_item_modifier modifier)
 {
 	// just return directly
-	return update_value();
+	if (ITEM_MODIFIER_REVERSE == modifier)
+		return -update_value();
+	else
+		return update_value();
 }
 
 
@@ -883,7 +950,7 @@ bool input_device_relative_item::item_check_axis(input_item_modifier modifier, s
 	const s32 curval = read_as_relative(modifier);
 
 	// for relative axes, look for ~20 pixels movement
-	return std::abs(curval - memory) > (20 * INPUT_RELATIVE_PER_PIXEL);
+	return std::abs(curval - memory) > (20 * osd::input_device::RELATIVE_PER_PIXEL);
 }
 
 
@@ -896,8 +963,14 @@ bool input_device_relative_item::item_check_axis(input_item_modifier modifier, s
 //  input_device_absolute_item - constructor
 //-------------------------------------------------
 
-input_device_absolute_item::input_device_absolute_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
-	: input_device_item(device, name, internal, itemid, getstate, ITEM_CLASS_ABSOLUTE)
+input_device_absolute_item::input_device_absolute_item(
+		input_device &device,
+		std::string_view name,
+		std::string_view tokenhint,
+		void *internal,
+		input_item_id itemid,
+		item_get_state_func getstate)
+	: input_device_item(device, name, tokenhint, internal, itemid, getstate, ITEM_CLASS_ABSOLUTE)
 {
 }
 
@@ -910,8 +983,7 @@ input_device_absolute_item::input_device_absolute_item(input_device &device, con
 s32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 {
 	// start with the current value
-	s32 result = m_device.adjust_absolute(update_value());
-	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
+	s32 const result = update_value();
 
 	// left/right/up/down: if this is a joystick, fetch the paired X/Y axis values and convert
 	if (m_device.devclass() == DEVICE_CLASS_JOYSTICK && modifier >= ITEM_MODIFIER_LEFT && modifier <= ITEM_MODIFIER_DOWN)
@@ -929,18 +1001,24 @@ s32 input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 
 			// now map the X and Y axes to a 9x9 grid using the raw values
 			joystick_map &joymap = downcast<input_device_joystick &>(m_device).joymap();
-			return (joymap.update(xaxis_item->current(), yaxis_item->current()) >> (modifier - ITEM_MODIFIER_LEFT)) & 1;
+			return BIT(joymap.update(xaxis_item->current(), yaxis_item->current()), modifier - ITEM_MODIFIER_LEFT);
 		}
 	}
 
-	// positive/negative: true if past the deadzone in either direction
-	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
-		return (result > 0);
-	else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)
-		return (result < 0);
-
-	// all other cases just return 0
-	return 0;
+	// positive/negative: true if past the threshold in either direction, otherwise zero
+	switch (modifier)
+	{
+	case ITEM_MODIFIER_POS:
+	case ITEM_MODIFIER_RIGHT:
+	case ITEM_MODIFIER_DOWN:
+		return result >= m_device.threshold();
+	case ITEM_MODIFIER_NEG:
+	case ITEM_MODIFIER_LEFT:
+	case ITEM_MODIFIER_UP:
+		return -result >= m_device.threshold();
+	default:
+		return 0;
+	}
 }
 
 
@@ -966,7 +1044,7 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 {
 	// start with the current value
 	s32 result = m_device.adjust_absolute(update_value());
-	assert(result >= INPUT_ABSOLUTE_MIN && result <= INPUT_ABSOLUTE_MAX);
+	assert(result >= osd::input_device::ABSOLUTE_MIN && result <= osd::input_device::ABSOLUTE_MAX);
 
 	// if we're doing a lightgun reload hack, override the value
 	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN && m_device.lightgun_reload_button())
@@ -974,14 +1052,16 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 		// if it is pressed, return (min,max)
 		input_device_item *button2_item = m_device.item(ITEM_ID_BUTTON2);
 		if (button2_item != nullptr && button2_item->update_value())
-			result = (m_itemid == ITEM_ID_XAXIS) ? INPUT_ABSOLUTE_MIN : INPUT_ABSOLUTE_MAX;
+			result = (m_itemid == ITEM_ID_XAXIS) ? osd::input_device::ABSOLUTE_MIN : osd::input_device::ABSOLUTE_MAX;
 	}
 
 	// positive/negative: scale to full axis
-	if (modifier == ITEM_MODIFIER_POS)
-		result = std::max(result, 0) * 2 + INPUT_ABSOLUTE_MIN;
-	if (modifier == ITEM_MODIFIER_NEG)
-		result = std::max(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
+	if (modifier == ITEM_MODIFIER_REVERSE)
+		result = -result;
+	else if (modifier == ITEM_MODIFIER_POS)
+		result = std::max(result, 0) * 2 + osd::input_device::ABSOLUTE_MIN;
+	else if (modifier == ITEM_MODIFIER_NEG)
+		result = std::max(-result, 0) * 2 + osd::input_device::ABSOLUTE_MIN;
 	return result;
 }
 
@@ -997,9 +1077,9 @@ bool input_device_absolute_item::item_check_axis(input_item_modifier modifier, s
 	// so the selection will not be affected by a gun going out of range
 	const s32 curval = read_as_absolute(modifier);
 	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN &&
-		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
+		(curval == osd::input_device::ABSOLUTE_MAX || curval == osd::input_device::ABSOLUTE_MIN))
 		return false;
 
 	// for absolute axes, look for 25% of maximum
-	return std::abs(curval - memory) > ((INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4);
+	return std::abs(curval - memory) > ((osd::input_device::ABSOLUTE_MAX - osd::input_device::ABSOLUTE_MIN) / 4);
 }

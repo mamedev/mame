@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ngpc" description="SNK Neo Geo Pocket Color cartridges">
 
@@ -19,7 +19,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00647) -->
 	<software name="bakumats">
 		<!-- NGPC only -->
-		<description>Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Jpn)</description>
+		<description>Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00640" />
@@ -35,7 +35,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: S-Neo -->
 	<software name="bigbang" cloneof="wrestmad">
 		<!-- NGPC only -->
-		<description>Big Bang Pro Wrestling (Jpn)</description>
+		<description>Big Bang Pro Wrestling (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00660" />
@@ -51,7 +51,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Sega Toys -->
 	<software name="bikkuri">
 		<!-- NGPC only -->
-		<description>Bikkuriman 2000 - Viva! Pocket Festiva! (Jpn)</description>
+		<description>Bikkuriman 2000 - Viva! Pocket Festiva! (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega Toys</publisher>
 		<info name="serial" value="NeoP00830" />
@@ -65,7 +65,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="biomotor">
-		<description>BioMotor Unitron (Euro, USA)</description>
+		<description>BioMotor Unitron (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00530" />
@@ -78,7 +78,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Yumekobo -->
 	<software name="biomotorj" cloneof="biomotor">
-		<description>BioMotor Unitron (Jpn)</description>
+		<description>BioMotor Unitron (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00100" />
@@ -119,7 +119,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="bamp" cloneof="pbobble">
-		<description>Bust-A-Move Pocket (Prototype)</description>
+		<description>Bust-A-Move Pocket (prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -132,7 +132,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: UEP Systems -->
 	<software name="coolboar">
 		<!-- NGPC only -->
-		<description>Cool Boarders Pocket (Euro, Jpn)</description>
+		<description>Cool Boarders Pocket (Europe, Japan)</description>
 		<year>2000</year>
 		<publisher>UEP Systems</publisher>
 		<info name="serial" value="NeoP00750" />
@@ -147,7 +147,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="coolcool">
 		<!-- NGPC only -->
-		<description>Cool Cool Jam (Euro, USA, Sample)</description>
+		<description>Cool Cool Jam (Europe, USA, sample)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -160,7 +160,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK -->
 	<software name="coolcoolj" cloneof="coolcool">
 		<!-- NGPC only -->
-		<description>Cool Cool Jam (Jpn)</description>
+		<description>Cool Cool Jam (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01000" />
@@ -174,7 +174,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="cotton">
-		<description>Fantastic Night Dreams Cotton (Euro)</description>
+		<description>Fantastic Night Dreams Cotton (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01050" />
@@ -187,7 +187,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Magitec -->
 	<software name="cottonj" cloneof="cotton">
-		<description>Fantastic Night Dreams Cotton (Jpn)</description>
+		<description>Fantastic Night Dreams Cotton (Japan)</description>
 		<year>2000</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="NeoP00800" />
@@ -217,7 +217,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: SNK -->
 	<software name="darkarms">
-		<description>Dark Arms - Beast Buster 1999 (Euro, USA) ~ Beast Buster - Yami no Seitai Heiki (Jpn)</description>
+		<description>Dark Arms - Beast Buster 1999 (Europe, USA) ~ Beast Buster - Yami no Seitai Heiki (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00450" />
@@ -231,7 +231,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="darkarmsp" cloneof="darkarms">
-		<description>Dark Arms - Beast Buster 1999 (Prototype)</description>
+		<description>Dark Arms - Beast Buster 1999 (prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -243,7 +243,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: IOSYS -->
 	<software name="deltawrp">
-		<description>Delta Warp (Jpn)</description>
+		<description>Delta Warp (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01030" />
@@ -258,7 +258,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Taito -->
 	<software name="dendego2">
-		<description>Densha de Go! 2 on Neo Geo Pocket (Jpn)</description>
+		<description>Densha de Go! 2 on Neo Geo Pocket (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00600" />
@@ -272,7 +272,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="dendego2p" cloneof="dendego2">
-		<description>Densha de Go! 2 on Neo Geo Pocket (Jpn, Prototype)</description>
+		<description>Densha de Go! 2 on Neo Geo Pocket (Japan, prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00600" />
@@ -284,7 +284,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="divealrm">
-		<description>Dive Alert - Matt's Version (Euro, USA)</description>
+		<description>Dive Alert - Matt's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00880" />
@@ -296,7 +296,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="divealrb">
-		<description>Dive Alert - Becky's Version (Euro, USA)</description>
+		<description>Dive Alert - Becky's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00890" />
@@ -309,7 +309,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sacnoth -->
 	<software name="divealrmj" cloneof="divealrm">
-		<description>Dive Alert - Barn Hen (Jpn)</description>
+		<description>Dive Alert - Barn Hen (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00360" />
@@ -323,7 +323,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="divealrmjp" cloneof="divealrm">
-		<description>Dive Alert - Barn Hen (Jpn, Prototype)</description>
+		<description>Dive Alert - Barn Hen (Japan, prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -335,7 +335,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sacnoth -->
 	<software name="divealrbj" cloneof="divealrb">
-		<description>Dive Alert - Rebecca Hen (Jpn)</description>
+		<description>Dive Alert - Rebecca Hen (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00370" />
@@ -350,7 +350,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="dokodemo">
-		<description>Dokodemo Mahjong (Jpn)</description>
+		<description>Dokodemo Mahjong (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00330" />
@@ -365,7 +365,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="dynaslug">
-		<description>Dynamite Slugger (Euro, Jpn)</description>
+		<description>Dynamite Slugger (Europe, Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00710" />
@@ -380,7 +380,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="evolutn">
 		<!-- NGPC only -->
-		<description>Evolution - Eternal Dungeons (Euro)</description>
+		<description>Evolution - Eternal Dungeons (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00990" />
@@ -394,7 +394,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Entertainment Software Publishing -->
 	<software name="evolutnj" cloneof="evolutn">
 		<!-- NGPC only -->
-		<description>Shinki Sekai Evolution - Hateshinai Dungeon (Jpn)</description>
+		<description>Shinki Sekai Evolution - Hateshinai Dungeon (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00820" />
@@ -408,7 +408,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="faselei">
-		<description>Faselei! (Euro)</description>
+		<description>Faselei! (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00900" />
@@ -421,7 +421,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sacnoth -->
 	<software name="faseleij" cloneof="faselei">
-		<description>Faselei! (Jpn)</description>
+		<description>Faselei! (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00510" />
@@ -450,7 +450,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="fatfuryd" cloneof="fatfury">
-		<description>Pocket Fighting Series - Garou Densetsu First Contact ~ Fatal Fury F-Contact (World, Demo)</description>
+		<description>Pocket Fighting Series - Garou Densetsu First Contact ~ Fatal Fury F-Contact (World, demo)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -463,7 +463,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK -->
 	<software name="ganbaren">
 		<!-- NGPC only -->
-		<description>Ganbare Neo Poke-kun (Jpn)</description>
+		<description>Ganbare Neo Poke-kun (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00970" />
@@ -479,7 +479,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: KID -->
 	<software name="infinity">
 		<!-- NGPC only -->
-		<description>Infinity Cure (Jpn)</description>
+		<description>Infinity Cure (Japan)</description>
 		<year>2000</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="NeoP01090" />
@@ -495,7 +495,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Yumekobo -->
 	<software name="kikousei">
 		<!-- NGPC only -->
-		<description>Kikou Seiki Unitron - Sono Tsuide. Hikari Umareru Chi Yori. (Jpn)</description>
+		<description>Kikou Seiki Unitron - Sono Tsuide. Hikari Umareru Chi Yori. (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00500" />
@@ -511,7 +511,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK -->
 	<software name="kofpara">
 		<!-- NGPC only -->
-		<description>The King of Fighters - Battle de Paradise (Jpn)</description>
+		<description>The King of Fighters - Battle de Paradise (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00920" />
@@ -540,7 +540,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="kofr2d" cloneof="kofr2">
-		<description>Pocket Fighting Series - King of Fighters R-2 (World, Demo)</description>
+		<description>Pocket Fighting Series - King of Fighters R-2 (World, demo)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -552,7 +552,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="kofr2d2" cloneof="kofr2">
 	<!-- This has a Version 2 on the cart label, but it probably refers to Demo Version 2, rather than KOFR2 Version 2, given the title screen is unchanged -->
-		<description>Pocket Fighting Series - King of Fighters R-2 (World, Demo Version 2)</description>
+		<description>Pocket Fighting Series - King of Fighters R-2 (World, demo version 2)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -565,7 +565,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Visco -->
 	<software name="koikoi">
 		<!-- NGPC only -->
-		<description>Koi Koi Mahjong (Jpn)</description>
+		<description>Koi Koi Mahjong (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00910" />
@@ -580,7 +580,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="lastblad">
 		<!-- NGPC only -->
-		<description>The Last Blade - Beyond the Destiny (Euro)</description>
+		<description>The Last Blade - Beyond the Destiny (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00950" />
@@ -593,7 +593,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 <!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="magdrop">
-		<description>Magical Drop Pocket (Euro, USA)</description>
+		<description>Magical Drop Pocket (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00580" />
@@ -606,7 +606,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sakata SAS -->
 	<software name="magdropj" cloneof="magdrop">
-		<description>Magical Drop Pocket (Jpn)</description>
+		<description>Magical Drop Pocket (Japan)</description>
 		<year>1999</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="NeoP00480" />
@@ -620,7 +620,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="magdropjd" cloneof="magdrop">
-		<description>Magical Drop Pocket (Demo)</description>
+		<description>Magical Drop Pocket (demo)</description>
 		<year>1999</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -633,7 +633,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: KID -->
 	<software name="memories">
 		<!-- NGPC only -->
-		<description>Memories Off - Pure (Jpn)</description>
+		<description>Memories Off - Pure (Japan)</description>
 		<year>2000</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="NeoP00870" />
@@ -649,7 +649,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK -->
 	<software name="mezase">
 		<!-- NGPC only -->
-		<description>Mezase! Kanji Ou (Jpn)</description>
+		<description>Mezase! Kanji Ou (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00630" />
@@ -665,7 +665,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Ukiyotei -->
 	<software name="mizuki">
 		<!-- NGPC only -->
-		<description>Mizuki Shigeru no Youkai Shashinkan (Jpn)</description>
+		<description>Mizuki Shigeru no Youkai Shashinkan (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00620" />
@@ -693,6 +693,18 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
+	<software name="mslug1stp" cloneof="mslug1st">
+		<description>Metal Slug - 1st Mission (prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="メタルスラッグ ファーストミッション" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="METALSLUG1STP.ngp" size="2097152" crc="c44d7a40" sha1="8ff881940ea6e44414f034a214c5de735b34861a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developer: Ukiyotei - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00617) -->
 	<software name="mslug2nd">
 		<!-- NGPC only -->
@@ -710,7 +722,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="mslug2ndd" cloneof="mslug2nd">
-		<description>Metal Slug - 2nd Mission (Demo)</description>
+		<description>Metal Slug - 2nd Mission (demo)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -721,7 +733,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neo21">
-		<description>Pocket Casino Series - Neo 21 (Euro, USA)</description>
+		<description>Pocket Casino Series - Neo 21 (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00700" />
@@ -733,7 +745,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neobacca">
-		<description>Pocket Casino Series - Neo Baccarat (Euro)</description>
+		<description>Pocket Casino Series - Neo Baccarat (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00980" />
@@ -745,7 +757,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neobaccap" cloneof="neobacca">
-		<description>Pocket Casino Series - Neo Baccarat (Prototype)</description>
+		<description>Pocket Casino Series - Neo Baccarat (prototype)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -772,7 +784,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="neochercp" cloneof="neocherc">
-		<description>Pocket Casino Series - Neo Cherry Master Color (World, Prototype)</description>
+		<description>Pocket Casino Series - Neo Cherry Master Color (World, prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00240" />
@@ -800,7 +812,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Dyna -->
 	<software name="neoderby">
-		<description>Neo Derby Champ Daiyosou (Jpn)</description>
+		<description>Neo Derby Champ Daiyosou (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00170" />
@@ -861,7 +873,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="neoproyk">
-		<description>Pocket Sport Series - Neo Poke Pro Yakyuu (Jpn)</description>
+		<description>Pocket Sport Series - Neo Poke Pro Yakyuu (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00260" />
@@ -892,7 +904,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Denno Eizo -->
 	<software name="nigeronp">
 		<!-- NGPC only -->
-		<description>Nige-ron-pa (Jpn)</description>
+		<description>Nige-ron-pa (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00960" />
@@ -908,7 +920,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Success -->
 	<software name="oekakip">
 		<!-- NGPC only -->
-		<description>Oekaki Puzzle (Jpn)</description>
+		<description>Oekaki Puzzle (Japan)</description>
 		<year>2000</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="NeoP00810" />
@@ -924,7 +936,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Quest -->
 	<software name="ogrebatl">
 		<!-- NGPC only -->
-		<description>Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Jpn)</description>
+		<description>Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00850" />
@@ -939,7 +951,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Japan Vistec -->
 	<software name="pachinko">
-		<description>Pachinko Hisshou Guide - Pocket Parlor (Jpn)</description>
+		<description>Pachinko Hisshou Guide - Pocket Parlor (Japan)</description>
 		<year>1999</year>
 		<publisher>Japan Vistec</publisher>
 		<info name="serial" value="NeoP00460" />
@@ -948,6 +960,18 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pachinko hisshou guide - pocket parlor (japan).bin" size="1048576" crc="c3d6b28b" sha1="941b168ecee1de8dd773464a8754c6c8c736b492" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pachinkop" cloneof="pachinko">
+		<description>Pachinko Hisshou Guide - Pocket Parlor (Japan, prototype)</description>
+		<year>1999</year>
+		<publisher>Japan Vistec</publisher>
+		<info name="alt_title" value="パチンコ必勝ガイド ポケットパーラー" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="jv pachi.bin" size="1048576" crc="ccf07c2f" sha1="63fd9e4be7ba482e70fcafde6e50773046a5fe40" />
 			</dataarea>
 		</part>
 	</software>
@@ -969,7 +993,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Taito / Ukiyotei -->
 	<software name="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Jpn, v10)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v10)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00200" />
@@ -983,7 +1007,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="pbobblea" cloneof="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Jpn, v09)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v09)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00200 (JPN)" />
@@ -997,7 +1021,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="pbobbleb" cloneof="pbobble">
-		<description>Puzzle Bobble Mini (Euro, Jpn, v09 Prototype?)</description>
+		<description>Puzzle Bobble Mini (Europe, Japan, v09 prototype?)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1008,7 +1032,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="picturep">
-		<description>Picture Puzzle (Euro, USA)</description>
+		<description>Picture Puzzle (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01060" />
@@ -1021,7 +1045,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: KID -->
 	<software name="poktlove">
-		<description>Pocket Love if (Jpn)</description>
+		<description>Pocket Love if (Japan)</description>
 		<year>1999</year>
 		<publisher>KID</publisher>
 		<info name="serial" value="NeoP00440" />
@@ -1036,7 +1060,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<software name="pockrev">
 		<!-- NGPC only -->
-		<description>Pocket Reversi (Euro)</description>
+		<description>Pocket Reversi (Europe)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01040" />
@@ -1050,7 +1074,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Success -->
 	<software name="pockrevj">
 		<!-- NGPC only -->
-		<description>Pocket Reversi (Jpn)</description>
+		<description>Pocket Reversi (Japan)</description>
 		<year>2000</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="NeoP00790" />
@@ -1065,7 +1089,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="prtymail">
-		<description>Party Mail (Jpn)</description>
+		<description>Party Mail (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00320" />
@@ -1079,7 +1103,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="prtymailp" cloneof="prtymail">
-		<description>Party Mail (Prototype)</description>
+		<description>Party Mail (prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1092,7 +1116,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotazt">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Azteca (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Azteca (Japan)</description>
 		<year>2000</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP00740" />
@@ -1108,7 +1132,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotdk2">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Dekahel 2 (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Dekahel 2 (Japan)</description>
 		<year>2001</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP01080" />
@@ -1124,7 +1148,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotds2">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Delsol 2 (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Delsol 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP01070" />
@@ -1140,7 +1164,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotecp">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - e-Cup (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - e-Cup (Japan)</description>
 		<year>2001</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP01120" />
@@ -1155,7 +1179,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Aruze -->
 	<software name="pslothan">
-		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v5)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Japan, v5)</description>
 		<year>1999</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP00520" />
@@ -1169,7 +1193,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="pslothana" cloneof="pslothan">
-		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v3)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Japan, v3)</description>
 		<year>1999</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP00520" />
@@ -1185,7 +1209,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotooh">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Oohanabi (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Oohanabi (Japan)</description>
 		<year>2000</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP01100" />
@@ -1201,7 +1225,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotpc2">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Porcano 2 (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Porcano 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP01020" />
@@ -1217,7 +1241,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Aruze -->
 	<software name="pslotwrd">
 		<!-- NGPC only -->
-		<description>Pachi-Slot Aruze Oukoku Pocket - Ward of Lights (Jpn)</description>
+		<description>Pachi-Slot Aruze Oukoku Pocket - Ward of Lights (Japan)</description>
 		<year>2000</year>
 		<publisher>Aruze</publisher>
 		<info name="serial" value="NeoP00840" />
@@ -1247,7 +1271,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sega -->
 	<software name="puyopop">
-		<description>Puyo Pop (World, v6) ~ Puyo Pyuo Tsuu (Jpn, v6)</description>
+		<description>Puyo Pop (World, v6) ~ Puyo Pyuo Tsuu (Japan, v6)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00410" />
@@ -1261,7 +1285,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="puyopopa" cloneof="puyopop">
-		<description>Puyo Pop (World, v5) ~ Puyo Pyuo Tsuu (Jpn, v5)</description>
+		<description>Puyo Pop (World, v5) ~ Puyo Pyuo Tsuu (Japan, v5)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00410" />
@@ -1275,7 +1299,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="puzzlink">
-		<description>Puzzle Link (Euro)</description>
+		<description>Puzzle Link (Europe)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00540" />
@@ -1288,7 +1312,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 <!-- The prototype found and released by NeoTurfMasta has only different NVRAM data compared to the final version -->
 	<software name="puzzlnk2">
-		<description>Puzzle Link 2 (Euro, USA)</description>
+		<description>Puzzle Link 2 (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00760" />
@@ -1301,7 +1325,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Yumekobo -->
 	<software name="tsunapnc" cloneof="puzzlink">
-		<description>Renketsu Puzzle Tsunagete Pon! Color (Jpn)</description>
+		<description>Renketsu Puzzle Tsunagete Pon! Color (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00290" />
@@ -1316,7 +1340,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Capcom -->
 	<software name="rockmanb">
-		<description>Rockman - Battle &amp; Fighters (Jpn)</description>
+		<description>Rockman - Battle &amp; Fighters (Japan)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NeoP00940" />
@@ -1331,7 +1355,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Capcom -->
 	<software name="rockmanbd">
-		<description>Rockman - Battle &amp; Fighters (Jpn, Demo)</description>
+		<description>Rockman - Battle &amp; Fighters (Japan, demo)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NeoP00940" />
@@ -1375,7 +1399,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="shanghaipu" cloneof="shanghai">
-		<description>Shanghai Mini (USA, Prototype)</description>
+		<description>Shanghai Mini (USA, prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1386,7 +1410,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="shanghaipj" cloneof="shanghai">
-		<description>Shanghai Mini (Jpn, Prototype)</description>
+		<description>Shanghai Mini (Japan, prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1398,7 +1422,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: ADK -->
 	<software name="shougic">
-		<description>Shougi no Tatsujin Color (Jpn)</description>
+		<description>Shougi no Tatsujin Color (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00270" />
@@ -1412,7 +1436,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="snkgals">
-		<description>SNK Gals' Fighters (Euro, USA)</description>
+		<description>SNK Gals' Fighters (Europe, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00930" />
@@ -1426,7 +1450,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Yumekobo - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00657) -->
 	<software name="snkgalsj" cloneof="snkgals">
 		<!-- NGPC only -->
-		<description>SNK Gals' Fighters (Jpn)</description>
+		<description>SNK Gals' Fighters (Japan)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00650" />
@@ -1457,7 +1481,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Sega -->
 	<software name="sonicp" cloneof="sonic">
-		<description>Sonic the Hedgehog - Pocket Adventure (World, Prototype)</description>
+		<description>Sonic the Hedgehog - Pocket Adventure (World, prototype)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1476,7 +1500,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	           -Some sound effects are missing from the prototype.
 	-->
 	<software name="sonicp2" cloneof="sonic">
-		<description>Sonic the Hedgehog - Pocket Adventure (World, Oct 22 1999 Prototype)</description>
+		<description>Sonic the Hedgehog - Pocket Adventure (World, Oct 22 1999 prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1488,7 +1512,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: Dyna -->
 	<software name="hanadojo">
-		<description>Soreike!! Hanafuda Doujou (Jpn)</description>
+		<description>Soreike!! Hanafuda Doujou (Japan)</description>
 		<year>1999</year>
 		<publisher>Dyna</publisher>
 		<info name="serial" value="NeoP00780" />
@@ -1504,7 +1528,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Seta -->
 	<software name="srmp">
 	<!-- NGPC only, rated "Over 18" -->
-		<description>Super Real Mahjong - Premium Collection (Jpn)</description>
+		<description>Super Real Mahjong - Premium Collection (Japan)</description>
 		<year>2001</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01110" />
@@ -1520,7 +1544,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: SNK - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00697) -->
 	<software name="svc">
 		<!-- NGPC only -->
-		<description>SNK vs. Capcom - The Match of the Millennium (World) ~ Choujou Kessen Saikyou Fighters - SNK vs Capcom (Jpn)</description>
+		<description>SNK vs. Capcom - The Match of the Millennium (World) ~ Choujou Kessen Saikyou Fighters - SNK vs Capcom (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00690" />
@@ -1533,10 +1557,23 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<!-- Developer: SNK -->
-	<software name="svccard2" supported="partial"> <!-- lots of glitches -->
+	<software name="svct" cloneof="svc">
 		<!-- NGPC only -->
-		<description>SNK vs. Capcom - Card Fighters 2 - Expand Edition (Jpn)</description>
+		<description>Choujou Kessen Saikyou Fighters - SNK vs Capcom - Taikenban (Japan)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="頂上決戦 最強ファイターズ エス・エヌ・ケイ バーサス カプコン 体験版" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="svc f1 trial.bin" size="2097152" crc="1e19e307" sha1="ebdd4188d2fdfd0098d61913d234d2e23adaaf9d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Developer: SNK -->
+	<software name="svccard2">
+		<!-- NGPC only -->
+		<description>SNK vs. Capcom - Card Fighters 2 - Expand Edition (Japan)</description>
 		<year>2001</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP01160" />
@@ -1550,7 +1587,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccardc">
-		<description>SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Euro, USA)</description>
+		<description>SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00680" />
@@ -1563,7 +1600,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: SNK - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00577) -->
 	<software name="svccardcj" cloneof="svccardc">
-		<description>SNK vs. Capcom - Gekitotsu Card Fighters - Capcom Supporters Version (Jpn)</description>
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - Capcom Supporters Version (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00570" />
@@ -1577,7 +1614,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccardp" cloneof="svccards">
-		<description>SNK vs. Capcom - Gekitotsu Card Fighters (Jpn, Demo)</description>
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters (Japan, demo)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1588,7 +1625,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccards">
-		<description>SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Euro, USA)</description>
+		<description>SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Europe, USA)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00670" />
@@ -1601,7 +1638,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 	<!-- Developer: SNK - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00567) -->
 	<software name="svccardsj" cloneof="svccards">
-		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn, v7)</description>
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Japan, v7)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00560" />
@@ -1615,7 +1652,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="svccardsja" cloneof="svccards">
-		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn, v6)</description>
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Japan, v6)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00560" />
@@ -1631,7 +1668,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	<!-- Developer: Yumekobo -->
 	<software name="tsunapn2" cloneof="puzzlnk2">
 		<!-- NGPC only -->
-		<description>Tsunagete Pon! 2 (Jpn)</description>
+		<description>Tsunagete Pon! 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NeoP00490" />
@@ -1645,7 +1682,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<software name="wrestmad">
-		<description>Wrestling Madness (Euro, USA, Prototype)</description>
+		<description>Wrestling Madness (Europe, USA, prototype)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="ngp_cart">
@@ -1657,7 +1694,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 
 <!-- what is this?!? -->
 	<software name="ppaa01">
-		<description>Prize Game - PP-AA01 Pusher Program (Jpn)</description>
+		<description>Prize Game - PP-AA01 Pusher Program (Japan)</description>
 		<year>19??</year>
 		<publisher>Aruze</publisher>
 		<part name="cart" interface="ngp_cart">

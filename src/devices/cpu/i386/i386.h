@@ -6,8 +6,8 @@
 #pragma once
 
 // SoftFloat 2 lacks an include guard
-#ifndef softfloat_h
-#define softfloat_h 1
+#ifndef softfloat2_h
+#define softfloat2_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #endif
@@ -274,8 +274,9 @@ protected:
 	uint32_t m_dr[8];       // Debug registers
 	uint32_t m_tr[8];       // Test registers
 
-	memory_passthrough_handler* m_dr_breakpoints[4];
-	int m_notifier;
+	memory_passthrough_handler m_dr_breakpoints[4];
+	util::notifier_subscription m_notifier;
+	bool m_dri_changed_active;
 
 	//386 Debug Register change handlers.
 	inline void dri_changed();
@@ -386,6 +387,8 @@ protected:
 	uint8_t m_opcode_bytes[16];
 	uint32_t m_opcode_pc;
 	int m_opcode_bytes_length;
+	offs_t m_opcode_addrs[16];
+	uint32_t m_opcode_addrs_index;
 
 	uint64_t m_debugger_temp;
 
@@ -1356,6 +1359,7 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
+	int x87_ck_over_stack();
 	int x87_check_exceptions(bool store = false);
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
@@ -1528,9 +1532,9 @@ public:
 	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); };
-	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); };
-	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); };
+	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); }
+	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); }
+	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); }
 
 	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
 	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;
@@ -1647,6 +1651,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void opcode_cpuid() override;
 };
 
 

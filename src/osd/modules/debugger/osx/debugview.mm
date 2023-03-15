@@ -51,6 +51,26 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 @implementation MAMEDebugView
 
 + (void)initialize {
+	// 10.15 and better get full adaptive Dark Mode support
+#if defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_15
+	DefaultForeground = [[NSColor textColor] retain];
+	ChangedForeground = [[NSColor systemRedColor] retain];
+	CommentForeground = [[NSColor systemGreenColor] retain];
+	// DCA_INVALID and DCA_DISABLED currently are not set by the core, so these 4 are unused
+	InvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0] retain];
+	DisabledChangedForeground = [[NSColor colorWithCalibratedRed:0.5 green:0.125 blue:0.125 alpha:1.0] retain];
+	DisabledInvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:0.5 alpha:1.0] retain];
+	DisabledCommentForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.25 blue:0.0 alpha:1.0] retain];
+
+	DefaultBackground = [[NSColor textBackgroundColor] retain];
+	VisitedBackground = [[NSColor systemTealColor] retain];
+	AncillaryBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	SelectedBackground = [[NSColor selectedContentBackgroundColor] retain];
+	CurrentBackground = [[NSColor selectedControlColor] retain];
+	SelectedCurrentBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	InactiveSelectedBackground = [[NSColor unemphasizedSelectedContentBackgroundColor] retain];
+	InactiveSelectedCurrentBackground = [[NSColor systemGrayColor] retain];
+#else
 	DefaultForeground = [[NSColor colorWithCalibratedWhite:0.0 alpha:1.0] retain];
 	ChangedForeground = [[NSColor colorWithCalibratedRed:0.875 green:0.0 blue:0.0 alpha:1.0] retain];
 	InvalidForeground = [[NSColor colorWithCalibratedRed:0.0 green:0.0 blue:1.0 alpha:1.0] retain];
@@ -67,6 +87,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	SelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.625 blue:0.875 alpha:1.0] retain];
 	InactiveSelectedBackground = [[NSColor colorWithCalibratedWhite:0.875 alpha:1.0] retain];
 	InactiveSelectedCurrentBackground = [[NSColor colorWithCalibratedRed:0.875 green:0.5 blue:0.625 alpha:1.0] retain];
+#endif
 
 	NonWhiteCharacters = [[[NSCharacterSet whitespaceAndNewlineCharacterSet] invertedSet] retain];
 }
@@ -493,22 +514,22 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	if (view->cursor_supported())
 	{
-		util::xml::data_node *const selection = node->add_child("selection", nullptr);
+		util::xml::data_node *const selection = node->add_child(osd::debugger::NODE_WINDOW_SELECTION, nullptr);
 		if (selection)
 		{
 			debug_view_xy const pos = view->cursor_position();
-			selection->set_attribute_int("visible", view->cursor_visible() ? 1 : 0);
-			selection->set_attribute_int("start_x", pos.x);
-			selection->set_attribute_int("start_y", pos.y);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
 		}
 	}
 
-	util::xml::data_node *const scroll = node->add_child("scroll", nullptr);
+	util::xml::data_node *const scroll = node->add_child(osd::debugger::NODE_WINDOW_SCROLL, nullptr);
 	if (scroll)
 	{
 		NSRect const visible = [self visibleRect];
-		scroll->set_attribute_float("position_x", visible.origin.x);
-		scroll->set_attribute_float("position_y", visible.origin.y);
+		scroll->set_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_X, visible.origin.x);
+		scroll->set_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_Y, visible.origin.y);
 	}
 }
 
@@ -516,23 +537,23 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
 	if (view->cursor_supported())
 	{
-		util::xml::data_node const *const selection = node->get_child("selection");
+		util::xml::data_node const *const selection = node->get_child(osd::debugger::NODE_WINDOW_SELECTION);
 		if (selection)
 		{
 			debug_view_xy pos = view->cursor_position();
-			view->set_cursor_visible(0 != selection->get_attribute_int("visible", view->cursor_visible() ? 1 : 0));
-			pos.x = selection->get_attribute_int("start_x", pos.x);
-			pos.y = selection->get_attribute_int("start_y", pos.y);
+			view->set_cursor_visible(0 != selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_VISIBLE, view->cursor_visible() ? 1 : 0));
+			pos.x = selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_X, pos.x);
+			pos.y = selection->get_attribute_int(osd::debugger::ATTR_SELECTION_CURSOR_Y, pos.y);
 			view->set_cursor_position(pos);
 		}
 	}
 
-	util::xml::data_node const *const scroll = node->get_child("scroll");
+	util::xml::data_node const *const scroll = node->get_child(osd::debugger::NODE_WINDOW_SCROLL);
 	if (scroll)
 	{
 		NSRect visible = [self visibleRect];
-		visible.origin.x = scroll->get_attribute_float("position_x", visible.origin.x);
-		visible.origin.y = scroll->get_attribute_float("position_y", visible.origin.y);
+		visible.origin.x = scroll->get_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_X, visible.origin.x);
+		visible.origin.y = scroll->get_attribute_float(osd::debugger::ATTR_SCROLL_ORIGIN_Y, visible.origin.y);
 		[self scrollRectToVisible:visible];
 	}
 }
@@ -675,7 +696,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		NSUInteger  start = 0, length = 0;
 		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
-			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
+			[[text mutableString] appendFormat:@"%C", unichar(data[col - origin.x].byte)];
 			if ((start < length) && (attr != data[col - origin.x].attrib))
 			{
 				NSRange const run = NSMakeRange(start, length - start);

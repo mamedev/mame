@@ -249,12 +249,13 @@ void eeprom_base_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_base_device::nvram_read(emu_file &file)
+bool eeprom_base_device::nvram_read(util::read_stream &file)
 {
 	uint32_t eeprom_length = 1 << m_address_bits;
 	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
+	size_t actual_bytes;
 
-	file.read(&m_data[0], eeprom_bytes);
+	return !file.read(&m_data[0], eeprom_bytes, actual_bytes) && actual_bytes == eeprom_bytes;
 }
 
 
@@ -263,12 +264,13 @@ void eeprom_base_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void eeprom_base_device::nvram_write(emu_file &file)
+bool eeprom_base_device::nvram_write(util::write_stream &file)
 {
 	uint32_t eeprom_length = 1 << m_address_bits;
 	uint32_t eeprom_bytes = eeprom_length * m_data_bits / 8;
+	size_t actual_bytes;
 
-	file.write(&m_data[0], eeprom_bytes);
+	return !file.write(&m_data[0], eeprom_bytes, actual_bytes) && actual_bytes == eeprom_bytes;
 }
 
 

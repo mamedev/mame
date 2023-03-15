@@ -64,7 +64,7 @@ enum
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(LMC1992, lmc1992_device, "lmc1992", "LMC1992")
+DEFINE_DEVICE_TYPE(LMC1992, lmc1992_device, "lmc1992", "LMC1992 Stereo Tone and Volume")
 
 
 

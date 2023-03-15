@@ -65,11 +65,10 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 
-	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmpea, m_tmp16aux;
+	u16 m_pc, m_usp, m_ssp, m_ps, m_tmp16, m_tmp16aux;
 	u8 m_pcb, m_dtb, m_usb, m_ssb, m_adb, m_dpr, m_tmp8, m_prefix;
-	u32 m_acc, m_temp, m_tmp32, m_tmp32aux;
+	u32 m_acc, m_temp, m_tmp32, m_tmpea;
 	s32 m_icount;
-	u64 m_tmp64;
 	bool m_prefix_valid;
 
 	inline u8 read_8(u32 addr)
@@ -190,11 +189,26 @@ private:
 
 			case 3:
 			case 7:
-				return (m_usb<<16) | uBankAddr;
+				if (m_ps & F_S)
+					return (m_ssb<<16) | uBankAddr;
+				else
+					return (m_usb<<16) | uBankAddr;
 		}
 
 		// this can't happen, but GCC insists
 		return (m_dtb<<16) | uBankAddr;
+	}
+
+	// get the full 24 bit address for a short direct access
+	inline u32 getdirbank(u8 uDirAddr)
+	{
+		if (m_prefix_valid)
+		{
+			m_prefix_valid = false;
+			return (m_prefix<<16) | (m_dpr<<8) | uDirAddr;
+		}
+		else
+			return (m_dtb<<16) | (m_dpr<<8) | uDirAddr;
 	}
 
 	inline void push_8(u8 val)
@@ -321,51 +335,21 @@ private:
 
 	inline void doCMP_8(u8 lhs, u8 rhs)
 	{
-		u16 tmp16 = lhs - rhs;
-		setNZ_16(tmp16 & 0xff);
-		m_ps &= ~(F_C|F_V);
-		if (tmp16 & 0x100)
-		{
-			m_ps |= F_C;
-		}
-		if ((lhs ^ rhs) & (lhs ^ (tmp16 & 0xff)) & 0x80)
-		{
-			m_ps |= F_V;
-		}
+		(void)doSUB_8(lhs, rhs);
 	}
 	inline void doCMP_16(u16 lhs, u16 rhs)
 	{
-		u32 tmp32 = lhs - rhs;
-		setNZ_16(tmp32 & 0xffff);
-		m_ps &= ~(F_C|F_V);
-		if (tmp32 & 0x10000)
-		{
-			m_ps |= F_C;
-		}
-		if ((lhs ^ rhs) & (lhs ^ (tmp32 & 0xffff)) & 0x8000)
-		{
-			m_ps |= F_V;
-		}
+		(void)doSUB_16(lhs, rhs);
 	}
 	inline void doCMP_32(u32 lhs, u32 rhs)
 	{
-		u64 tmp64 = lhs - rhs;
-		setNZ_32(tmp64 & 0xffffffff);
-		m_ps &= ~(F_C|F_V);
-		if (tmp64 & 0x100000000)
-		{
-			m_ps |= F_C;
-		}
-		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x80000000)
-		{
-			m_ps |= F_V;
-		}
+		(void)doSUB_32(lhs, rhs);
 	}
 
 	inline u8 doSUB_8(u8 lhs, u8 rhs)
 	{
 		u16 tmp16 = lhs - rhs;
-		setNZ_16(tmp16 & 0xff);
+		setNZ_8(tmp16 & 0xff);
 		m_ps &= ~(F_C|F_V);
 		if (tmp16 & 0x100)
 		{
@@ -376,7 +360,7 @@ private:
 			m_ps |= F_V;
 		}
 
-		return m_tmp16 & 0xff;
+		return tmp16 & 0xff;
 	}
 	inline u16 doSUB_16(u16 lhs, u16 rhs)
 	{
@@ -403,7 +387,7 @@ private:
 		{
 			m_ps |= F_C;
 		}
-		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x8000000)
+		if ((lhs ^ rhs) & (lhs ^ (tmp64 & 0xffffffff)) & 0x80000000)
 		{
 			m_ps |= F_V;
 		}
@@ -457,6 +441,74 @@ private:
 		setNZ_32(tmp64 & 0xffffffff);
 
 		return tmp64 & 0xffffffff;
+	}
+
+	inline u8 doINC_8(u8 val)
+	{
+		val++;
+		setNZ_8(val);
+		if (val == 0x80)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
+	}
+	inline u16 doINC_16(u16 val)
+	{
+		val++;
+		setNZ_16(val);
+		if (val == 0x8000)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
+	}
+	inline u32 doINC_32(u32 val)
+	{
+		val++;
+		setNZ_32(val);
+		if (val == 0x80000000)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
+	}
+
+	inline u8 doDEC_8(u8 val)
+	{
+		val--;
+		setNZ_8(val);
+		if (val == 0x7f)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
+	}
+	inline u16 doDEC_16(u16 val)
+	{
+		val--;
+		setNZ_16(val);
+		if (val == 0x7fff)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
+	}
+	inline u32 doDEC_32(u32 val)
+	{
+		val--;
+		setNZ_32(val);
+		if (val == 0x7fffffff)
+			m_ps |= F_V;
+		else
+			m_ps &= ~F_V;
+
+		return val;
 	}
 
 	inline void take_branch()

@@ -31,7 +31,7 @@ public:
 	virtual void device_post_load() override;
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	void set_sdram_size(int index, int size) { m_sdram_size[index] = size; };
+	void set_sdram_size(int index, int size) { m_sdram_size[index] = size; }
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 

@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_IQ151_FORMAT;
+extern const iq151_format FLOPPY_IQ151_FORMAT;
 
 #endif // MAME_FORMATS_IQ151_DSK_H

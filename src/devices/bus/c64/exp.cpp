@@ -59,7 +59,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_c64_expansion_card_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_read_dma_cd(*this),
 	m_write_dma_cd(*this),
 	m_write_irq(*this),
@@ -191,7 +191,7 @@ image_init_result c64_expansion_slot_device::call_load()
 
 		if ((m_card->m_roml_size & (m_card->m_roml_size - 1)) || (m_card->m_romh_size & (m_card->m_romh_size - 1)))
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "ROM size must be power of 2");
+			seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
 			return image_init_result::FAIL;
 		}
 	}
@@ -368,6 +368,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "westermann.h"
 #include "xl80.h"
 #include "zaxxon.h"
+#include "z80videopak.h"
 
 void c64_expansion_cards(device_slot_interface &device)
 {
@@ -443,4 +444,5 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add_internal("westermann", C64_WESTERMANN);
 	device.option_add_internal("zaxxon", C64_ZAXXON);
 	device.option_add_internal("xl80", C64_XL80);
+	device.option_add_internal("z80videopak", C64_Z80VIDEOPAK);
 }

@@ -40,7 +40,8 @@ public:
 	void write_64be(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
-	void set_father(const char *father) { m_father = father; }
+	template <typename T>
+	void set_father(T &&tag) { m_father.set_tag(std::forward<T>(tag)); }
 
 	template <typename F, typename G>
 	void set_device(int num, F &&read, const char *rname, G &&write, const char *wname)
@@ -69,7 +70,7 @@ private:
 	uint8_t             m_busnum;
 	pci_bus_legacy_read_delegate::array<32> m_read_callback;
 	pci_bus_legacy_write_delegate::array<32> m_write_callback;
-	const char *        m_father;
+	optional_device<pci_bus_legacy_device> m_father;
 	pci_bus_legacy_device * m_siblings[8];
 	uint8_t             m_siblings_busnum[8];
 	int                 m_siblings_count;

@@ -27,8 +27,8 @@
         16  A3                 33  GND
         17  A5                 34  GND
 
-	SEL is an input to the MC-10 that allows the cartridge to remove
-	the internal chips from the bus.
+    SEL is an input to the MC-10 that allows the cartridge to remove
+    the internal chips from the bus.
 
 *********************************************************************/
 
@@ -58,7 +58,7 @@ DEFINE_DEVICE_TYPE(MC10CART_SLOT, mc10cart_slot_device, "mc10cart_slot", "MC-10 
 mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MC10CART_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_mc10cart_interface>(mconfig, *this),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	m_nmi_callback(*this),
 	m_cart(nullptr),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1)
@@ -96,25 +96,25 @@ image_init_result mc10cart_slot_device::call_load()
 	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 	if (loaded_through_softlist() && !romregion)
 	{
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Software list item has no 'rom' data area");
+		seterror(image_error::INVALIDIMAGE, "Software list item has no 'rom' data area");
 		return image_init_result::FAIL;
 	}
 
 	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
 	if (len > m_cart->max_rom_length())
 	{
-		seterror(IMAGE_ERROR_UNSUPPORTED, "Unsupported cartridge size");
+		seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
 	if (!loaded_through_softlist())
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
-		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 1, ENDIANNESS_BIG);
+		romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_BIG);
 		u32 const cnt(fread(romregion->base(), len));
 		if (cnt != len)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Error reading cartridge file");
+			seterror(image_error::UNSPECIFIED, "Error reading cartridge file");
 			return image_init_result::FAIL;
 		}
 	}

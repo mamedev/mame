@@ -222,7 +222,7 @@ void tms7000_device::device_start()
 
 	for (int tmr = 0; tmr < 2; tmr++)
 	{
-		m_timer_handle[tmr] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms7000_device::simple_timer_cb), this));
+		m_timer_handle[tmr] = timer_alloc(FUNC(tms7000_device::simple_timer_cb), this);
 		m_timer_handle[tmr]->adjust(attotime::never, tmr);
 
 		m_timer_data[tmr] = 0;
@@ -260,7 +260,6 @@ void tms7000_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENSP, "GENSP", m_sp).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
 
@@ -421,12 +420,12 @@ void tms7000_device::do_interrupt(int irqline)
 	else
 		m_icount -= 19;
 
+	standard_irq_callback(irqline, m_pc);
+
 	push8(m_sr);
 	push16(m_pc);
 	m_sr = 0;
 	m_pc = read_mem16(0xfffc - irqline * 2);
-
-	standard_irq_callback(irqline);
 }
 
 

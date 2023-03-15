@@ -30,7 +30,6 @@
 #include "emu.h"
 #include "v810.h"
 #include "v810dasm.h"
-#include "debugger.h"
 
 #define clkIF 3
 #define clkMEM 3
@@ -1030,7 +1029,7 @@ void v810_device::opXB(uint32_t op)
 {
 	int val=GETREG(GET2);
 	SET_OV(0);
-	val = (val & 0xffff0000) | ((val & 0xff) << 8) | ((val & 0xff00) >> 8);
+	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
 	SET_Z((val==0.0f)?1:0);
 	SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);
@@ -1316,7 +1315,6 @@ void v810_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
-	state_add(STATE_GENSP, "GENSP", SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);

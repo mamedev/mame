@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "debugger.h"
 #include "tms9900.h"
 
 enum

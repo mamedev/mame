@@ -86,8 +86,8 @@ bool MemPass::IsPtr(uint32_t ptrId) {
   }
   const SpvOp op = ptrInst->opcode();
   if (op == SpvOpVariable || IsNonPtrAccessChain(op)) return true;
-  if (op != SpvOpFunctionParameter) return false;
   const uint32_t varTypeId = ptrInst->type_id();
+  if (varTypeId == 0) return false;
   const Instruction* varTypeInst = get_def_use_mgr()->GetDef(varTypeId);
   return varTypeInst->opcode() == SpvOpTypePointer;
 }
@@ -96,6 +96,11 @@ Instruction* MemPass::GetPtr(uint32_t ptrId, uint32_t* varId) {
   *varId = ptrId;
   Instruction* ptrInst = get_def_use_mgr()->GetDef(*varId);
   Instruction* varInst;
+
+  if (ptrInst->opcode() == SpvOpConstantNull) {
+    *varId = 0;
+    return ptrInst;
+  }
 
   if (ptrInst->opcode() != SpvOpVariable &&
       ptrInst->opcode() != SpvOpFunctionParameter) {
@@ -220,6 +225,11 @@ MemPass::MemPass() {}
 
 bool MemPass::HasOnlySupportedRefs(uint32_t varId) {
   return get_def_use_mgr()->WhileEachUser(varId, [this](Instruction* user) {
+    auto dbg_op = user->GetCommonDebugOpcode();
+    if (dbg_op == CommonDebugInfoDebugDeclare ||
+        dbg_op == CommonDebugInfoDebugValue) {
+      return true;
+    }
     SpvOp op = user->opcode();
     if (op != SpvOpStore && op != SpvOpLoad && op != SpvOpName &&
         !IsNonTypeDecorate(op)) {

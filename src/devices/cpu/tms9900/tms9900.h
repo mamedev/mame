@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "debugger.h"
 #include "tms99com.h"
 
 enum

@@ -21,7 +21,13 @@
 // Gets the type of the extended instruction set with the specified name.
 spv_ext_inst_type_t spvExtInstImportTypeGet(const char* name);
 
-// Finds the named extented instruction of the given type in the given extended
+// Returns true if the extended instruction set is non-semantic
+bool spvExtInstIsNonSemantic(const spv_ext_inst_type_t type);
+
+// Returns true if the extended instruction set is debug info
+bool spvExtInstIsDebugInfo(const spv_ext_inst_type_t type);
+
+// Finds the named extended instruction of the given type in the given extended
 // instruction table. On success, returns SPV_SUCCESS and writes a handle of
 // the instruction entry into *entry.
 spv_result_t spvExtInstTableNameLookup(const spv_ext_inst_table table,
@@ -29,7 +35,7 @@ spv_result_t spvExtInstTableNameLookup(const spv_ext_inst_table table,
                                        const char* name,
                                        spv_ext_inst_desc* entry);
 
-// Finds the extented instruction of the given type in the given extended
+// Finds the extended instruction of the given type in the given extended
 // instruction table by value. On success, returns SPV_SUCCESS and writes a
 // handle of the instruction entry into *entry.
 spv_result_t spvExtInstTableValueLookup(const spv_ext_inst_table table,

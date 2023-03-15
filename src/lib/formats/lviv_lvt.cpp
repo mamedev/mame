@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Krzysztof Strzecha
 /* .LVT tape images */
-#include "lviv_lvt.h"
 
-#include <cassert>
+#include "lviv_lvt.h"
 
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767

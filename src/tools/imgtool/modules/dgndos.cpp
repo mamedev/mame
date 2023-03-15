@@ -10,12 +10,17 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include "imgtool.h"
-#include "formats/coco_dsk.h"
+#include "filter.h"
 #include "iflopimg.h"
+
+#include "formats/coco_dsk.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _MSC_VER
 #pragma pack(push,1)
@@ -132,7 +137,7 @@ static imgtoolerr_t lookup_dgndos_file(uint8_t *entire_track, const char *fname,
 
 		fnamebuf = get_dirent_fname(ent);
 	}
-	while(core_stricmp(fnamebuf.c_str(), fname));
+	while(core_stricmp(fnamebuf, fname));
 
 	if (position)
 		*position = i - 1;

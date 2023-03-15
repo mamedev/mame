@@ -134,12 +134,16 @@
 
 ****************************************************************************/
 
-#include <ctime>
-#include <cctype>
-#include "imgtool.h"
-#include "formats/imageutl.h"
-#include "unicode.h"
 #include "fat.h"
+
+#include "formats/imageutl.h"
+
+#include "corestr.h"
+#include "unicode.h"
+
+#include <cctype>
+#include <cstdio>
+#include <ctime>
 
 #define FAT_DIRENT_SIZE         32
 #define FAT_SECLEN              512
@@ -364,14 +368,12 @@ static imgtoolerr_t fat_write_sector(imgtool::partition &partition, uint32_t sec
 }
 
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t fat_clear_sector(imgtool::partition &partition, uint32_t sector_index, uint8_t data)
+[[maybe_unused]] static imgtoolerr_t fat_clear_sector(imgtool::partition &partition, uint32_t sector_index, uint8_t data)
 {
 	char buf[FAT_SECLEN];
 	memset(buf, data, sizeof(buf));
 	return fat_write_sector(partition, sector_index, 0, buf, sizeof(buf));
 }
-#endif
 
 
 static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t first_block, uint64_t block_count)

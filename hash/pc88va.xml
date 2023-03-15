@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pc88va" description="NEC PC-88VA disk images">
 
@@ -17,6 +17,7 @@ license:CC0
     * Igo-mei-kyoku Shuu '87 ~ 囲碁名局集'87, by GAM
     * Death Bringer ~ デス・ブリンガー, by Telenet Japan
     * Arantia (Atlantia?) VA Special ~ アランティアVAスペシャル, by Victor Music Industry
+    * Go Kichi-kun ~ 碁キチくん, by GAM
     * Go Kichi-kun 2 ~ 碁キチくん2, by GAM
     * Ultima V ~ ウルティマⅤ, by Pony Canyon
     * The Bard's Tale ~ ザ バーズテイル, by Pony Canyon
@@ -28,7 +29,7 @@ license:CC0
     * Ishin no Arashi ~ 維新の嵐, by Koei
     * Teitoku no Ketsudan ~ 提督の決断, by Koei
     * Nobunaga no Yabou - Sengoku Gunyou Den ~ 信長の野望・戦国群雄伝, by Koei
-    * Suikoden ~ 水滸伝, by Koei
+    * Suikoden - Tenmei no Chikai ~ 水滸伝 天命の誓い, by Koei
     * Kawaiso Monogatari ~ かわいそう物語, by System Software
     * Fantasy III ~ ファンタジーⅢ, by Starcraft
     * Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
@@ -37,6 +38,10 @@ license:CC0
     * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
     * Heroes of the Lance ~ ヒーローオブランス, by Pony Canyon
     * Lightning Bacchus? ~ ライトニングバッカス, by NCS
+    * Record of Lodoss War ~ ロードス島戦記 by Humming Bird Soft
+
+PC88VA software
+    * The Print Shop II ~ プリントショップ Ⅱ (Broderbund Japan)
 
 PC88VA doujin games (mostly undumped)
 
@@ -67,15 +72,29 @@ PC88VA doujin games (mostly undumped)
     * 翼君の宝箱14 (by Wing software, 1999)
     * くるッ★彡 (by Cenkeil, 1999)
     * Frail Rulers (by Fredia, 1999)
+    * Voltige Aerienne / ディスクイメージ (2008?)
+
+Operating Systems
+    * MS-DOS 2.11
+    * MS-DOS 3.1
+    * CDOS
+
 -->
 
 
 <!-- Demos and Utilities -->
 
-	<software name="pc88vad" supported="no">
+	<!-- These three demos all have the same sequences, mislabeled? -->
+	<software name="pc88vad" cloneof="88va2d" supported="no">
 		<description>PC88-VA Demo</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">   <!-- Data CRC16: 2729 -->
 				<rom name="pc88-va demo.d88" size="1296112" crc="56097ca5" sha1="833ef5f645fbaf1683b53d423e506a2f72e1e83e"/>
@@ -86,10 +105,16 @@ PC88VA doujin games (mostly undumped)
 
 <!-- These were in a folder called 基本システムセット, i.e. Kihon System Set (AKA Basic System Set) -->
 
-	<software name="88va1td" supported="no">
+	<software name="88va1td" cloneof="88va2d" supported="no">
 		<description>88VA1 Tentou Demo</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
+]]></notes>
 		<info name="alt_title" value="88VA1 店頭デモ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -101,7 +126,13 @@ PC88VA doujin games (mostly undumped)
 	<software name="88va2d" supported="no">
 		<description>88VA2 Demo</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="nec pc-88va2 demo.d88" size="1331888" crc="ca33e185" sha1="7895ffebce522bacef50397b23414e09bce7e9d0"/>
@@ -110,9 +141,13 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 	<software name="animefrm" supported="no">
-		<description>AnimeFramer</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- PS88-VA101-HMW subtitle on cover -->
+		<description>Anime Framer (v1.0)</description>
+		<year>1987</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+[gfx] status bar has wrong colors [OFX/OFY]
+]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
@@ -127,33 +162,41 @@ PC88VA doujin games (mostly undumped)
 				<rom name="animeframer - data disk.d88" size="1338960" crc="9b5cd907" sha1="80f1558a3d5c6d21d1c42d8325ae55e320674ef7"/>
 			</dataarea>
 		</part>
+
+		<!-- Package also contains a CD-ROM, what for? -->
 	</software>
 
-<!-- Is this an Alt version of the program above (mistranslated), or another program? -->
-	<software name="paint" supported="no">
-		<description>Paint?</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="paint" cloneof="animefrm" supported="no">
+		<description>Anime Framer (v1.0 alt)</description>
+		<year>1987</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+[gfx] status bar has wrong colors [OFX/OFY]
+]]></notes>
+		<!-- labels were swapped -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="paint - prog disk.d88" size="1331888" crc="08107401" sha1="aab13d4437358f0fac7adec31cf83d1a22608616"/>
+				<rom name="paint - data disk.d88" size="1331888" crc="73739619" sha1="60f493e7ab24ad8fc57367224a994b0ecf0ad5e2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1338960">
-				<rom name="paint - data disk.d88" size="1331888" crc="73739619" sha1="60f493e7ab24ad8fc57367224a994b0ecf0ad5e2"/>
+				<rom name="paint - prog disk.d88" size="1331888" crc="08107401" sha1="aab13d4437358f0fac7adec31cf83d1a22608616"/>
 			</dataarea>
 		</part>
-
 	</software>
 
 	<software name="micromus" supported="no">
-		<description>Micromusician VA</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Micro Musician VA</description>
+		<year>1989</year>
+		<publisher>Music Network</publisher>
+		<notes><![CDATA[
+Very broken GFXs with extensive $510 [ROP] writes
+Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.php/article/88va/vafaq/71
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="micromusician va.d88" size="1331888" crc="f2ff8069" sha1="a201a60330c701f1f2021b73664582e535dc9b7e"/>
@@ -163,8 +206,13 @@ PC88VA doujin games (mostly undumped)
 
 	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Has HDFORM.COM utility
+Unsupported features in batch files
+Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
+]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1338960">
@@ -173,13 +221,19 @@ PC88VA doujin games (mostly undumped)
 		</part>
 	</software>
 
-	<software name="pce11" supported="no">
+	<software name="pce11" cloneof="pceva2tb" supported="no">
 		<description>PC-Engine v1.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Has HDFORM.COM utility
+Unsupported features in batch files
+Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
+]]></notes>
+		<!-- baddump: NEC_SAMP directory edited in 2010 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b"/>
+				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -191,7 +245,14 @@ PC88VA doujin games (mostly undumped)
 		<description>Family Stadium</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+[SGP] playfield artifacts
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
+How to exit from attract mode once you enter it?
+]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
+		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
@@ -214,11 +275,20 @@ PC88VA doujin games (mostly undumped)
 		</part>
 	</software>
 
-	<software name="famist89" supported="no">
-		<description>Family Stadium '89 - Pennant Race Hen</description>
+	<!-- Mislabeled disk -->
+	<software name="famist89" cloneof="famista" supported="no">
+		<description>Family Stadium (alt)</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
-		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+		<notes><![CDATA[
+[SGP] playfield artifacts
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
+How to exit from attract mode once you enter it?
+]]></notes>
+
+		<info name="alt_title" value="ファミリースタジアム" />
+		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<!--combined image-->
 		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a"/-->
 
@@ -237,10 +307,17 @@ PC88VA doujin games (mostly undumped)
 		</part>
 	</software>
 
-	<software name="famist89a" cloneof="famist89" supported="no">
-		<description>Family Stadium '89 (Alt?)</description>
+	<software name="famist89a" supported="no">
+		<description>Family Stadium '89 - Pennant Race Hen</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
+		<notes><![CDATA[
+[SGP] playfield artifacts
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
+]]></notes>
+		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1298608">
@@ -267,11 +344,16 @@ PC88VA doujin games (mostly undumped)
 		<description>Might &amp; Magic</description>
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+Main menu clearing artifacts [ROP]
+]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
+		<info name="usage" value="Boot with Disk C in drive 1"/>
+
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - User" />
-			<dataarea name="flop" size="1094592">
-				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
+			<feature name="part_id" value="Disk C - Boot" />
+			<dataarea name="flop" size="1331888">
+				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc"/>
 			</dataarea>
 		</part>
 
@@ -283,9 +365,9 @@ PC88VA doujin games (mostly undumped)
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C - Boot" />
-			<dataarea name="flop" size="1331888">
-				<rom name="might &amp; magic(diskc_bootdisk) (star craft).d88" size="1331888" crc="f3c56b5e" sha1="ab39d96aa7a5446a8cb8b929978f6211746d02bc"/>
+			<feature name="part_id" value="Disk A - User" />
+			<dataarea name="flop" size="1094592">
+				<rom name="might &amp; magic(diska_userdisk) (star craft).d88" size="1094592" crc="de68bba5" sha1="d6be57c867a3cca8b694bc2b129705c653ae44da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,6 +376,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Might &amp; Magic Book 2</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
+]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
@@ -328,7 +413,14 @@ PC88VA doujin games (mostly undumped)
 		<description>Olteus</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+Map select uses [ROP]
+Needs graphic [OFX/OFY] scroll on gameplay
+Unplayable with [keyboard]
+Gameplay start with [cliprect] mask effect
+]]></notes>
 		<info name="alt_title" value="オルテウス" />
+		<info name="usage" value="Kana Lock on pauses the game"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
@@ -360,10 +452,18 @@ PC88VA doujin games (mostly undumped)
 
 <!-- First 4th disk in TOSEC has diff crc than the one above -->
 	<software name="olteusa" cloneof="olteus" supported="no">
-		<description>Olteus (Alt Disk D)</description>
+		<description>Olteus (alt disk D)</description>
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
+		<notes><![CDATA[
+Map select uses [ROP]
+Needs graphic [OFX/OFY] scroll on gameplay
+Unplayable with [keyboard]
+Gameplay start with [cliprect] mask effect
+]]></notes>
 		<info name="alt_title" value="オルテウス" />
+		<info name="usage" value="Kana Lock on pauses the game"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
@@ -395,8 +495,13 @@ PC88VA doujin games (mostly undumped)
 
 	<software name="rtype" supported="no">
 		<description>R-Type</description>
-		<year>1988?</year>
+		<year>1988</year>
 		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Various [SGP] issues during gameplay
+Intro uses [cliprect] effects
+Needs graphic [OFX/OFY] scroll
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
 				<rom name="r-type(disk1) (irem).d88" size="1296112" crc="5d24bb7f" sha1="2f8ee8495ebc68dae466e753c7e38c0df4c654b8"/>
@@ -414,6 +519,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Rogue Alliance</description>
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
+		<notes><![CDATA[
+Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(38, 0, 1, 256)
+]]></notes>
 		<info name="alt_title" value="ローグアライアンス" />
 
 		<part name="flop1" interface="floppy_5_25">
@@ -442,6 +550,13 @@ PC88VA doujin games (mostly undumped)
 		<description>Shanghai</description>
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
+		<notes><![CDATA[
+Needs [dac1bit] clicks on gameplay
+[mouse] is a requirement?
+May crash with disk error when entering winning animation (verify)
+Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
+[OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
+]]></notes>
 		<info name="alt_title" value="上海" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -454,7 +569,13 @@ PC88VA doujin games (mostly undumped)
 		<description>Shinra Bansho</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Opening has a few weird places for [gfx] priority and half height [gfx]
+Has [SGP] and [ROP] artifacts
+Omake: if sound irqs don't run then needs to press key 0 pad to move on
+]]></notes>
 		<info name="alt_title" value="神羅万象"/>
+		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -474,6 +595,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<notes><![CDATA[
+Enables [FDC] PIO mode, black screen
+]]></notes>
 		<info name="release" value="19880617"/>
 		<info name="alt_title" value="ソーサリアン"/>
 
@@ -566,7 +690,7 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 	<software name="sorcerexp4" cloneof="sorcer" supported="no">
-		<description>Sorcerian New Scenario Vol.1 - Uchuu Kara no Homonsha</description>
+		<description>Sorcerian New Scenario Vol.1 - Uchuu kara no Houmonsha</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<info name="release" value="19890809"/>
@@ -660,6 +784,10 @@ PC88VA doujin games (mostly undumped)
 		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+Uses direct color layers, white screens with sound, bypass by changing m_video_pri_reg in debugger to ab89 0000
+Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen with annoying SFX covering the BGM
+]]></notes>
 		<info name="release" value="19881222"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -670,11 +798,17 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 <!-- Dual floppies, should work both on the PC88VA and on the PC98 (usually you just have to switch the first two disks depending on the system) -->
+	<!-- TODO: move to a shared SW list -->
 
 	<software name="illcity" supported="no">
 		<description>Illusion City - Genei Toshi</description>
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Heavy [ROP] artifacts on setup menu and opening, crashes with black screen at the end
+Crashes if directly selecting new game
+Has unemulated [MIDI] options
+]]></notes>
 		<info name="release" value="199201xx"/>
 		<info name="alt_title" value="幻影都市 ～イリュージョンシティ～"/>
 
@@ -732,23 +866,30 @@ PC88VA doujin games (mostly undumped)
 		<description>Xak II</description>
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Half height [gfx]s
+Heavy [ROP] artifacts during gameplay
+Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
+]]></notes>
 		<info name="release" value="19901102"/>
+		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
 
+		<!-- status: baddump for non-factory save 1 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce"/>
+				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2"/>
+				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2" status="baddump"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
-				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33"/>
+				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -757,8 +898,15 @@ PC88VA doujin games (mostly undumped)
 		<description>Fray - In Magical Adventure</description>
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
+		<notes><![CDATA[
+Heavy [ROP] artifacts on intro
+Sprites don't draw properly during gameplay [ROP]
+Ugly pitch for [OPNA] voice samples on intro
+[gfx]s have halved height
+]]></notes>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="フレイ"/>
+		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
@@ -786,11 +934,16 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 <!-- Dual floppies, should work both on the PC88VA and on the X68000 (usually you just have to switch the first two disks depending on the system) -->
+	<!-- TODO: move to a shared SW list -->
+	<!-- TODO: all these .xdf entries wants Disk B as drive A: for 88VA -->
 
 	<software name="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
+		<notes><![CDATA[
+Loads N88 BASIC then jumps to lalaland [FDC]
+]]></notes>
 		<info name="release" value="198910xx"/>
 		<info name="alt_title" value="あぶない天狗伝説 (or あぶないてんぐ伝説 )"/>
 
@@ -820,6 +973,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Crescent Moon Girl</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
+		<notes><![CDATA[
+Loads N88 BASIC then jumps to lalaland [FDC]
+]]></notes>
 		<info name="release" value="198908xx"/>
 		<info name="alt_title" value="クレセントムーンがぁる"/>
 
@@ -849,6 +1005,9 @@ PC88VA doujin games (mostly undumped)
 		<description>D.P.S - Dream Program System</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
+		<notes><![CDATA[
+Loads N88 BASIC then jumps to lalaland [FDC]
+]]></notes>
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="ディー・ピー・エス - ドリームプログラムシステム"/>
 
@@ -873,6 +1032,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="199008xx"/>
 		<info name="alt_title" value="ディー・ピー・エス SG"/>
+		<!-- Data disk for dps? -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
@@ -909,6 +1069,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="199104xx"/>
 		<info name="alt_title" value="ディー・ピー・エス SG2"/>
+		<!-- Data disk for dps? -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
@@ -945,6 +1106,7 @@ PC88VA doujin games (mostly undumped)
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ディー・ピー・エス SG3"/>
+		<!-- Data disk for dps? -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
@@ -979,6 +1141,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Rance - Hikari wo Motomete</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
+		<notes><![CDATA[
+Loads N88 BASIC then jumps to lalaland [FDC]
+]]></notes>
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="ランス 光を求めて"/>
 
@@ -1015,6 +1180,9 @@ PC88VA doujin games (mostly undumped)
 		<description>Rance 2 - Hangyaku no Shojo-tachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
+		<notes><![CDATA[
+All disks fail initial bootstrap [FDC]
+]]></notes>
 		<info name="release" value="199005xx"/>
 		<info name="alt_title" value="ランス2-反逆の少女たち-"/>
 		<part name="flop1" interface="floppy_5_25">
@@ -1067,6 +1235,12 @@ PC88VA doujin games (mostly undumped)
 		<description>Balloon Breaker</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Requires [ROP] for intro and title screen
+Has badly colored sprites on character select
+Doesn't draw background in gameplay, uses direct color layers
+Has unemulated [SGP] operand for shot 1
+]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1080,6 +1254,10 @@ PC88VA doujin games (mostly undumped)
 		<description>Boomering</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Title screen has [SGP] artifacts
+Needs graphic [OFX/OFY] scroll on gameplay
+]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -1090,8 +1268,13 @@ PC88VA doujin games (mostly undumped)
 
 	<software name="harehare" supported="no">
 		<description>Hare Hare Yukai</description>
-		<year>19??</year>
+		<!-- "PC88VA 20th Anniversary" -->
+		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Broken graphics [SGP] or [cliprect]
+15.7 kHz has doubled height [gfx]
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1108,9 +1291,14 @@ PC88VA doujin games (mostly undumped)
 	</software>
 
 	<software name="hatisora" supported="no">
+		<!-- "Hati in the Sky" -->
 		<description>Hati no Sora de</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Title screen doesn't show text layer, [cliprect]? (verify)
+Needs [OFX/OFY] on gameplay
+]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1124,6 +1312,11 @@ PC88VA doujin games (mostly undumped)
 		<description>Saishuu Heiki UPO (Pre-Release)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Broken Upyolic logo [ROP]
+Needs joystick in otherwise it loops on title screen
+Gameplay don't mask bullets on right side, [cliprect]
+]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1133,12 +1326,15 @@ PC88VA doujin games (mostly undumped)
 		</part>
 	</software>
 
-<!-- According to the guy who posted of this d88, this can be started from V3 BASIC with the command BASIC PACMAN.BAS... to be verified when emulation progresses -->
 	<software name="pacman" supported="no">
 		<description>Pac-Man</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[SGP] and [ROP] issues on gameplay
+]]></notes>
 		<info name="developer" value="Shinra" />
+		<info name="usage" value="Boot a PC Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1"/>
@@ -1146,11 +1342,14 @@ PC88VA doujin games (mostly undumped)
 		</part>
 	</software>
 
-<!-- Is this the same program as above or a diff one? -->
+	<!-- autobootable version of above, with PC Engine OS embedded -->
 	<software name="pacmana" cloneof="pacman" supported="no">
-		<description>Pac-Man (Alt?)</description>
+		<description>Pac-Man (auto-bootable)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[SGP] and [ROP] issues on gameplay
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
@@ -1162,6 +1361,7 @@ PC88VA doujin games (mostly undumped)
 
 <!-- PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
+	<!-- TODO: None of the disks are bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
 	<software name="midgarts" supported="no">
 		<description>Mid Garts (VA patched?)</description>
 		<year>19??</year>

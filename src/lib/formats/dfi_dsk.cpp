@@ -13,7 +13,10 @@
 
 #include "dfi_dsk.h"
 
-#include <zlib.h>
+#include "ioprocs.h"
+
+#include "osdcore.h" // osd_printf_*
+
 
 #define NUMBER_OF_MULTIREADS 3
 // thresholds for brickwall windowing
@@ -56,32 +59,36 @@ bool dfi_format::supports_save() const
 	return false;
 }
 
-int dfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dfi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char sign[4];
-	io_generic_read(io, sign, 0, 4);
-	return memcmp(sign, "DFE2", 4) ? 0 : 100;
+	size_t actual;
+	io.read_at(0, sign, 4, actual);
+	return memcmp(sign, "DFE2", 4) ? 0 : FIFID_SIGN;
 }
 
-bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dfi_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
+	size_t actual;
 	char sign[4];
-	io_generic_read(io, sign, 0, 4);
-	if (memcmp(sign, "DFER", 4) == 0)
-	{
-		osd_printf_error("dfi_dsk: Old type Discferret image detected; the mess Discferret decoder will not handle this properly, bailing out!\n");
+	io.read_at(0, sign, 4, actual);
+	if(memcmp(sign, "DFER", 4) == 0) {
+		osd_printf_error("dfi_dsk: Old type Discferret image detected; the MAME Discferret decoder will not handle this properly, bailing out!\n");
 		return false;
 	}
 
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if(io.length(size))
+		return false;
+
 	uint64_t pos = 4;
 	std::vector<uint8_t> data;
 	int onerev_time = 0; // time for one revolution, used to guess clock and rpm for DFE2 files
 	unsigned long clock_rate = 100000000; // sample clock rate in megahertz
-	int rpm=360; // drive rpm
+	[[maybe_unused]] int rpm=360; // drive rpm
 	while(pos < size) {
 		uint8_t h[10];
-		io_generic_read(io, h, pos, 10);
+		io.read_at(pos, h, 10, actual);
 		uint16_t track = (h[0] << 8) | h[1];
 		uint16_t head  = (h[2] << 8) | h[3];
 		// Ignore sector
@@ -97,7 +104,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		data.resize(tsize);
 
 		pos += 10; // skip the header, we already read it
-		io_generic_read(io, &data[0], pos, tsize);
+		io.read_at(pos, &data[0], tsize, actual);
 		pos += tsize; // for next time we read, increment to the beginning of next header
 
 		int index_time = 0; // what point the last index happened
@@ -154,8 +161,6 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			osd_printf_verbose("dfi_dsk: Actual rpm based on index: %f\n", ((double)clock_rate/(double)onerev_time)*60);
 		}
 
-		rpm += 0;   // HACK: prevent GCC 4.6+ from warning "variable set but unused"
-
 		if(!index_time)
 			index_time = total_time;
 
@@ -172,9 +177,7 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 #endif
 		index_count = 0;
 		//index_polarity = 0;
-		uint32_t mg = floppy_image::MG_A;
 		int tpos = 0;
-		buf[tpos++] = mg;
 		for(int i=0; i<tsize; i++) {
 			uint8_t v = data[i];
 			if((v & 0x7f) == 0x7f) // 0x7F : no transition, but a carry (FF is a board-on-fire error and is checked for above)
@@ -197,23 +200,19 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				//if (trans_time <= MIN_THRESH) osd_printf_verbose("dfi_dsk: Throwing out short transition of length %d\n", trans_time);
 				// the normal case: write the transition at the appropriate time
 				if ((prev_time == 0) || ((trans_time > MIN_THRESH) && (trans_time <= MAX_THRESH))) {
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t((200000000ULL*cur_time)/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*cur_time)/index_time);
 					prev_time = cur_time;
 				}
 				// the long case: we probably missed a transition, stuff an extra guessed one in there to see if it helps
 				if (trans_time > MAX_THRESH) {
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 					if (((track%2)==0)&&(head==0)) osd_printf_info("dfi_dsk: missed transition, total time for transition is %d\n",trans_time);
 #ifndef FAKETRANS_ONE
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-(trans_time/2)))/index_time); // generate imaginary transition at half period
 #else
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t((200000000ULL*(cur_time-(trans_time/3)))/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-((trans_time*2)/3)))/index_time);
+					buf[tpos++] = floppy_image::MG_F | uint32_t((200000000ULL*(cur_time-(trans_time/3)))/index_time);
 #endif
-					mg = mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
-					buf[tpos++] = mg | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
+					buf[tpos++] = floppy_image::MG_F | uint32_t(200000000ULL*cur_time/index_time); // generate transition now
 					prev_time = cur_time;
 				}
 			}
@@ -234,4 +233,4 @@ bool dfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-const floppy_format_type FLOPPY_DFI_FORMAT = &floppy_image_format_creator<dfi_format>;
+const dfi_format FLOPPY_DFI_FORMAT;

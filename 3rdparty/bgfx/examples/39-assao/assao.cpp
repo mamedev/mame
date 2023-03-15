@@ -1,6 +1,6 @@
 /*
 * Copyright 2018 Attila Kocsis. All rights reserved.
-* License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+* License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 */
 
 /*
@@ -267,12 +267,13 @@ namespace
 			m_reset = BGFX_RESET_VSYNC;
 
 			bgfx::Init init;
-			init.type = args.m_type;
-
+			init.type     = args.m_type;
 			init.vendorId = args.m_pciId;
-			init.resolution.width = m_width;
+			init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+			init.platformData.ndt  = entry::getNativeDisplayHandle();
+			init.resolution.width  = m_width;
 			init.resolution.height = m_height;
-			init.resolution.reset = m_reset;
+			init.resolution.reset  = m_reset;
 			bgfx::init(init);
 
 			// Enable debug text.
@@ -471,7 +472,7 @@ namespace
 				}
 
 				// Update camera
-				cameraUpdate(deltaTime*0.15f, m_mouseState);
+				cameraUpdate(deltaTime*0.15f, m_mouseState, ImGui::MouseOverArea() );
 
 				// Set up matrices for gbuffer
 				cameraGetViewMtx(m_view);
@@ -929,8 +930,8 @@ namespace
 
 			bgfx::TextureHandle gbufferTex[3];
 			gbufferTex[GBUFFER_RT_NORMAL] = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-			gbufferTex[GBUFFER_RT_COLOR] = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-			gbufferTex[GBUFFER_RT_DEPTH] = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::D24, tsFlags);
+			gbufferTex[GBUFFER_RT_COLOR]  = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
+			gbufferTex[GBUFFER_RT_DEPTH]  = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::D32F,  tsFlags);
 			m_gbuffer = bgfx::createFrameBuffer(BX_COUNTOF(gbufferTex), gbufferTex, true);
 
 			for (int32_t i = 0; i < 4; i++)
@@ -939,13 +940,13 @@ namespace
 			}
 
 			m_pingPongHalfResultA = bgfx::createTexture2D(uint16_t(m_halfSize[0]), uint16_t(m_halfSize[1]), false, 2, bgfx::TextureFormat::RG8, BGFX_TEXTURE_COMPUTE_WRITE);
-			m_pingPongHalfResultB = bgfx::createTexture2D(uint16_t(m_halfSize[0]), uint16_t(m_halfSize[1]),  false, 2, bgfx::TextureFormat::RG8, BGFX_TEXTURE_COMPUTE_WRITE);
+			m_pingPongHalfResultB = bgfx::createTexture2D(uint16_t(m_halfSize[0]), uint16_t(m_halfSize[1]), false, 2, bgfx::TextureFormat::RG8, BGFX_TEXTURE_COMPUTE_WRITE);
 
 			m_finalResults = bgfx::createTexture2D(uint16_t(m_halfSize[0]), uint16_t(m_halfSize[1]),  false, 4, bgfx::TextureFormat::RG8, BGFX_TEXTURE_COMPUTE_WRITE | SAMPLER_LINEAR_CLAMP);
 
 			m_normals = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]),  false, 1, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_COMPUTE_WRITE);
 
-			m_importanceMap = bgfx::createTexture2D(uint16_t(m_quarterSize[0]), uint16_t(m_quarterSize[1]), false, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_COMPUTE_WRITE | SAMPLER_LINEAR_CLAMP);
+			m_importanceMap     = bgfx::createTexture2D(uint16_t(m_quarterSize[0]), uint16_t(m_quarterSize[1]), false, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_COMPUTE_WRITE | SAMPLER_LINEAR_CLAMP);
 			m_importanceMapPong = bgfx::createTexture2D(uint16_t(m_quarterSize[0]), uint16_t(m_quarterSize[1]), false, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_COMPUTE_WRITE | SAMPLER_LINEAR_CLAMP);
 
 			m_aoMap = bgfx::createTexture2D(uint16_t(m_size[0]), uint16_t(m_size[1]), false, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_COMPUTE_WRITE | SAMPLER_POINT_CLAMP);

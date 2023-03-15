@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     ROLM 9751 CBX Software
 
@@ -53,7 +53,7 @@ license:CC0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
 				<rom name="Siemens.9751.CBX.Release.9005.6.84.Disk3.img" size="1474560" crc="2c0226e2" sha1="08fca05de78e6325881deb3f062235a7bcc4ea10"/>
-				</dataarea>
+			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
@@ -196,7 +196,7 @@ license:CC0
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1474560">
-					<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk6.img" size="1474560" crc="e750915c" sha1="70cd126b465ce38520808fd9e8285411c9d4875c"/>
+				<rom name="Siemens.9751.CBX.Release.9005.2.79.Disk6.img" size="1474560" crc="e750915c" sha1="70cd126b465ce38520808fd9e8285411c9d4875c"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">

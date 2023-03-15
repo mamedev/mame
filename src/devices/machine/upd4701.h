@@ -39,8 +39,8 @@ public:
 	auto sf_cb() { return m_sf_cb.bind(); }
 	auto open_bus_cb() { return m_open_bus_cb.bind(); }
 
-	void x_add(s16 data);
-	void y_add(s16 data);
+	void update();
+	void recalibrate();
 
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(xy_w);
@@ -72,7 +72,8 @@ protected:
 
 private:
 	// internal helpers
-	void analog_update();
+	void x_add(s16 data);
+	void y_add(s16 data);
 	void switch_update(u8 mask, bool state);
 
 	// control lines
@@ -91,6 +92,8 @@ private:
 	s16 m_starty;
 	s16 m_x;
 	s16 m_y;
+	u16 m_last_x_read;
+	u16 m_last_y_read;
 
 	// switch state
 	u8 m_switches;

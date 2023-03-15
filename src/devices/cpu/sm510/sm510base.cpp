@@ -13,28 +13,15 @@
   Default external frequency of these is 32.768kHz, forwarding a clockrate in the
   MAME machine config is optional. Newer revisions can have an internal oscillator.
 
-  TODO:
-  - source organiziation between files is a mess
-  - wake up after CEND doesn't work right
-
-  for more, see the *core.cpp file notes
-
 */
 
 #include "emu.h"
-#include "sm510.h"
-#include "debugger.h"
+#include "sm510base.h"
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	SM510_PC=1, SM510_ACC, SM510_X, SM510_BL, SM510_BM,
-	SM510_C, SM510_W
-};
 
 void sm510_base_device::device_start()
 {
@@ -42,6 +29,7 @@ void sm510_base_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_pagemask = 0x3f;
 
 	// resolve callbacks
 	m_read_k.resolve_safe(0);
@@ -52,7 +40,7 @@ void sm510_base_device::device_start()
 	m_write_segs.resolve_safe();
 
 	// init/zerofill
-	memset(m_stack, 0, sizeof(m_stack));
+	std::fill_n(m_stack, std::size(m_stack), 0);
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_op = 0;
@@ -61,16 +49,15 @@ void sm510_base_device::device_start()
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
-	m_sbl = false;
-	m_sbm = false;
+	m_bmask = 0;
 	m_c = 0;
 	m_skip = false;
 	m_w = 0;
 	m_r = 0;
 	m_r_out = 0;
 	m_div = 0;
-	m_1s = false;
-	m_k_active = false;
+	m_gamma = 0;
+	m_ext_wakeup = false;
 	m_l = 0;
 	m_x = 0;
 	m_y = 0;
@@ -94,16 +81,15 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
-	save_item(NAME(m_sbl));
-	save_item(NAME(m_sbm));
+	save_item(NAME(m_bmask));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_w));
 	save_item(NAME(m_r));
 	save_item(NAME(m_r_out));
 	save_item(NAME(m_div));
-	save_item(NAME(m_1s));
-	save_item(NAME(m_k_active));
+	save_item(NAME(m_gamma));
+	save_item(NAME(m_ext_wakeup));
 	save_item(NAME(m_l));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
@@ -118,17 +104,18 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_clk_div));
 
 	// register state for debugger
-	state_add(SM510_PC,  "PC",  m_pc).formatstr("%04X");
-	state_add(SM510_ACC, "ACC", m_acc).formatstr("%01X");
-	state_add(SM510_X,   "X",   m_x).formatstr("%01X");
-	state_add(SM510_BL,  "BL",  m_bl).formatstr("%01X");
-	state_add(SM510_BM,  "BM",  m_bm).formatstr("%01X");
-	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
-	state_add(SM510_W,   "W",   m_w).formatstr("%02X");
-
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
+
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%04X"); // 1
+	state_add(++m_state_count, "ACC", m_acc).formatstr("%01X"); // 2
+	state_add(++m_state_count, "X", m_x).formatstr("%01X"); // 3
+	state_add(++m_state_count, "BL", m_bl).formatstr("%01X"); // 4
+	state_add(++m_state_count, "BM", m_bm).formatstr("%01X"); // 5
+	state_add(++m_state_count, "C", m_c).formatstr("%01X"); // 6
+	state_add(++m_state_count, "W", m_w).formatstr("%02X"); // 7
 
 	set_icountptr(m_icount);
 
@@ -138,6 +125,13 @@ void sm510_base_device::device_start()
 	init_melody();
 }
 
+device_memory_interface::space_config_vector sm510_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 
 //-------------------------------------------------
@@ -149,8 +143,7 @@ void sm510_base_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
-	m_sbl = false;
-	m_sbm = false;
+	m_bmask = 0;
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
@@ -165,7 +158,6 @@ void sm510_base_device::device_reset()
 }
 
 
-
 //-------------------------------------------------
 //  lcd driver
 //-------------------------------------------------
@@ -173,7 +165,7 @@ void sm510_base_device::device_reset()
 inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
-	if (ram == nullptr || m_bc || !m_bp)
+	if (ram == nullptr || m_bc || !(m_bp & 1))
 		return 0;
 
 	u16 rowdata = 0;
@@ -183,28 +175,20 @@ inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 	return rowdata;
 }
 
-device_memory_interface::space_config_vector sm510_base_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
-}
-
 void sm510_base_device::lcd_update()
 {
 	// 4 columns
 	for (int h = 0; h < 4; h++)
 	{
 		// 16 segments per row from upper part of RAM
-		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a));
+		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b));
+		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c));
 
 		// bs output from L/X and Y regs
 		u8 blink = (m_div & 0x4000) ? m_y : 0;
 		u8 bs = ((m_l & ~blink) >> h & 1) | ((m_x*2) >> h & 2);
-		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
+		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !(m_bp & 1)) ? 0 : bs);
 	}
 }
 
@@ -216,60 +200,57 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 void sm510_base_device::init_lcd_driver()
 {
 	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
-	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
+	m_lcd_timer = timer_alloc(FUNC(sm510_base_device::lcd_timer_cb), this);
 	attotime period = attotime::from_ticks(0x20, unscaled_clock()); // default 1kHz
 	m_lcd_timer->adjust(period, 0, period);
 }
 
 
-
 //-------------------------------------------------
-//  interrupt/divider
+//  divider
 //-------------------------------------------------
-
-bool sm510_base_device::wake_me_up()
-{
-	// in halt mode, wake up after 1S signal or K input
-	if (m_k_active || m_1s)
-	{
-		// note: official doc warns that Bl/Bm and the stack are undefined
-		// after waking up, but we leave it unchanged
-		m_halt = false;
-		wakeup_vector();
-
-		standard_irq_callback(0);
-		return true;
-	}
-	else
-		return false;
-}
-
-void sm510_base_device::execute_set_input(int line, int state)
-{
-	if (line != SM510_INPUT_LINE_K)
-		return;
-
-	// set K input lines active state
-	m_k_active = (state != 0);
-}
 
 TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
 	m_div = (m_div + 1) & 0x7fff;
 
-	// 1S signal on overflow(falling edge of F1)
+	// 1S(gamma) signal on overflow(falling edge of F1)
 	if (m_div == 0)
-		m_1s = true;
+		m_gamma |= 1;
 
 	clock_melody();
 }
 
 void sm510_base_device::init_divider()
 {
-	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::div_timer_cb), this));
-	m_div_timer->adjust(attotime::from_ticks(1, unscaled_clock()), 0, attotime::from_ticks(1, unscaled_clock()));
+	m_div_timer = timer_alloc(FUNC(sm510_base_device::div_timer_cb), this);
+	attotime period = attotime::from_ticks(1, unscaled_clock());
+	m_div_timer->adjust(period, 0, period);
 }
 
+
+//-------------------------------------------------
+//  interrupt
+//-------------------------------------------------
+
+void sm510_base_device::execute_set_input(int line, int state)
+{
+	if (line != SM510_EXT_WAKEUP_LINE)
+		return;
+
+	m_ext_wakeup = bool(state);
+}
+
+void sm510_base_device::do_interrupt()
+{
+	standard_irq_callback(0, m_pc);
+
+	// note: official doc warns that Bl/Bm and the stack are undefined
+	// after waking up, but we leave it unchanged
+	m_icount--;
+	m_halt = false;
+	wakeup_vector();
+}
 
 
 //-------------------------------------------------
@@ -280,22 +261,29 @@ void sm510_base_device::increment_pc()
 {
 	// PL(program counter low 6 bits) is a simple LFSR: newbit = (bit0==bit1)
 	// PU,PM(high bits) specify page, PL specifies steps within page
-	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x20;
-	m_pc = feed | (m_pc >> 1 & 0x1f) | (m_pc & ~0x3f);
+	int msb = m_pagemask >> 1 ^ m_pagemask;
+	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : msb;
+	m_pc = feed | (m_pc >> 1 & m_pagemask >> 1) | (m_pc & ~m_pagemask);
 }
 
 void sm510_base_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		m_icount--;
-
-		if (m_halt && !wake_me_up())
+		// in halt mode, wake up after gamma signal or K input
+		if (m_halt)
 		{
-			// got nothing to do
-			m_icount = 0;
-			return;
+			if (m_ext_wakeup || m_gamma)
+				do_interrupt();
+			else
+			{
+				// got nothing to do
+				m_icount = 0;
+				return;
+			}
 		}
+
+		m_icount--;
 
 		// remember previous state
 		m_prev_op = m_op;
@@ -306,7 +294,14 @@ void sm510_base_device::execute_run()
 			debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
-		get_opcode_param();
+
+		// 2-byte opcodes
+		if (op_argument())
+		{
+			m_icount--;
+			m_param = m_program->read_byte(m_pc);
+			increment_pc();
+		}
 
 		// handle opcode if it's not skipped
 		if (m_skip)

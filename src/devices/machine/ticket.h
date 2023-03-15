@@ -61,6 +61,8 @@ public:
 		m_hopper_type = hopper_type;
 	}
 
+	auto dispense_handler() { return m_dispense_handler.bind(); }
+
 	// read/write handlers
 	DECLARE_READ_LINE_MEMBER( line_r );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
@@ -69,9 +71,10 @@ protected:
 	ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	TIMER_CALLBACK_MEMBER(update_output_state);
 
 	// configuration state
 	uint8_t m_motor_sense;
@@ -88,6 +91,7 @@ protected:
 	bool m_power;
 	emu_timer *m_timer;
 	output_finder<> m_output;
+	devcb_write_line m_dispense_handler;
 };
 
 class hopper_device : public ticket_dispenser_device
@@ -101,6 +105,9 @@ public:
 		set_senses(motor_sense, status_sense, true);
 	}
 	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+private:
+
 };
 
 #endif // MAME_MACHINE_TICKET_H

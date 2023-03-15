@@ -16,6 +16,7 @@
 
 #include <list>
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -223,7 +224,7 @@ public:
 	static ptr create();
 
 	// parse an XML file into its nodes
-	static ptr read(util::core_file &file, parse_options const *opts);
+	static ptr read(read_stream &file, parse_options const *opts);
 
 	// parse an XML string into its nodes
 	static ptr string_read(const char *string, parse_options const *opts);
@@ -245,7 +246,7 @@ private:
 /* ----- miscellaneous interfaces ----- */
 
 /* normalize a string into something that can be written to an XML file */
-const char *normalize_string(const char *string);
+std::string normalize_string(std::string_view string);
 
 } // namespace util::xml
 

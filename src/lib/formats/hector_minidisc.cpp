@@ -38,4 +38,4 @@ const hmd_format::format hmd_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_HMD_FORMAT = &floppy_image_format_creator<hmd_format>;
+const hmd_format FLOPPY_HMD_FORMAT;

@@ -6,14 +6,23 @@
 */
 
 #include "font_module.h"
-#include "modules/osdmodule.h"
+
 #include "modules/lib/osdlib.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
+
+#include "corestr.h"
+
+#include "winutil.h"
+
+#include "osdcore.h"
+#include "strconv.h"
+
+#include <cmath>
+#include <memory>
+#include <stdexcept>
 
 #include <windows.h>
-
-#include <memory>
 
 // Windows Imaging Components
 #include <wincodec.h>
@@ -32,9 +41,10 @@ DEFINE_GUID(GUID_WICPixelFormat8bppAlpha, 0xe6cd0116, 0xeeba, 0x4161, 0xaa, 0x85
 #include <wrl/client.h>
 #undef interface
 
-#include "strconv.h"
-#include "corestr.h"
-#include "winutil.h"
+
+namespace osd {
+
+namespace {
 
 using namespace Microsoft::WRL;
 
@@ -226,7 +236,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted subtraction of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted subtraction of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits - other.m_designUnits);
@@ -236,7 +246,7 @@ public:
 	{
 		if (m_designUnitsPerEm != other.m_designUnitsPerEm || m_emSizeInDip != other.m_emSizeInDip)
 		{
-			throw emu_fatalerror("Attempted addition of FontDimension with different scale.");
+			throw std::invalid_argument("Attempted addition of FontDimension with different scale.");
 		}
 
 		return FontDimension(m_designUnitsPerEm, m_emSizeInDip, m_designUnits + other.m_designUnits);
@@ -353,16 +363,12 @@ public:
 		// accept qualifiers from the name
 		std::string name(_name);
 		if (name.compare("default") == 0)
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-			name = "Tahoma";
-#else
 			name = "Segoe UI";
-#endif
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 		// convert the face name
-		std::wstring familyName = osd::text::to_wstring(name.c_str());
+		std::wstring familyName = text::to_wstring(name);
 
 		// find the font
 		HR_RET0(find_font(
@@ -624,7 +630,7 @@ private:
 		HR_RETHR(fonts->FindFamilyName(familyName.c_str(), &family_index, &exists));
 		if (!exists)
 		{
-			osd_printf_error("Font with family name %s does not exist.\n", osd::text::from_wstring(familyName));
+			osd_printf_error("Font with family name %s does not exist.\n", text::from_wstring(familyName));
 			return E_FAIL;
 		}
 
@@ -675,7 +681,7 @@ public:
 		return true;
 	}
 
-	virtual int init(const osd_options &options) override
+	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
 		HRESULT result;
 
@@ -743,7 +749,7 @@ public:
 			std::unique_ptr<WCHAR[]> name = nullptr;
 			HR_RET0(get_localized_familyname(names, name));
 
-			std::string utf8_name = osd::text::from_wstring(name.get());
+			std::string utf8_name = text::from_wstring(name.get());
 			name.reset();
 
 			// Review: should the config name, be unlocalized?
@@ -807,8 +813,15 @@ private:
 	}
 };
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
-MODULE_NOT_SUPPORTED(font_dwrite, OSD_FONT_PROVIDER, "dwrite")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(font_dwrite, OSD_FONT_PROVIDER, "dwrite") } }
+
 #endif
 
-MODULE_DEFINITION(FONT_DWRITE, font_dwrite)
+
+MODULE_DEFINITION(FONT_DWRITE, osd::font_dwrite)

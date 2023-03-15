@@ -100,7 +100,7 @@ namespace netlist::devices {
 
 				for (auto &e : b)
 					/* use pstring::sprintf, it is a LOT faster */
-					m_writer.writeline(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
+					m_writer.write_line(plib::pfmt("{1:.9} {2}").e(e.t.as_fp<nl_fptype>()).e(e.v));
 				b.clear();
 				m_sem_r.release();
 				m_r++;
@@ -117,6 +117,7 @@ namespace netlist::devices {
 		static constexpr std::size_t BUF_SIZE=16384;
 		static constexpr std::size_t BUFFERS=4;
 		analog_input_t m_I;
+	private:
 		plib::ofstream m_strm;
 		plib::putf8_writer m_writer;
 		bool m_reset;
@@ -129,14 +130,17 @@ namespace netlist::devices {
 		std::thread m_write_thread;
 	};
 
-	NETLIB_OBJECT_DERIVED(logD, log)
+	class NETLIB_NAME(logD) : public NETLIB_NAME(log)
 	{
-		NETLIB_CONSTRUCTOR(logD)
-		, m_I2(*this, "I2", nldelegate(&NETLIB_NAME(logD)::input, this))
+	public:
+		NETLIB_NAME(logD)(constructor_param_t data)
+		: NETLIB_NAME(log)(data)
+		, m_I2(*this, "I2", nl_delegate(&NETLIB_NAME(logD)::input, this))
 		{
-			m_I.set_delegate(nldelegate(&NETLIB_NAME(logD)::input, this));
+			m_I.set_delegate(nl_delegate(&NETLIB_NAME(logD)::input, this));
 		}
 
+	private:
 		NETLIB_HANDLERI(input)
 		{
 			log_value(static_cast<nl_fptype>(m_I() - m_I2()));
@@ -151,7 +155,7 @@ namespace netlist::devices {
 		~NETLIB_NAME(wav)();
 		analog_input_t m_I;
 	private:
-		// FIXME: rewrite sound/wavwrite.h to be an object ...
+		// FIXME: rewrite `sound/wavwrite.h` to be an object ...
 		void *m_file;
 	);
 	#endif
@@ -160,7 +164,7 @@ namespace netlist::devices {
 
 
 	// FIXME: Implement wav later, this must be clock triggered device where the input to be written
-	//        is on a subdevice ..
+	//        is on a sub device ..
 	#if 0
 	NETLIB_START(wav)
 	{

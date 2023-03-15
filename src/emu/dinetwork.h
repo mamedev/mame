@@ -8,7 +8,7 @@ class osd_netdev;
 class device_network_interface : public device_interface
 {
 public:
-	device_network_interface(const machine_config &mconfig, device_t &device, float bandwidth);
+	device_network_interface(const machine_config &mconfig, device_t &device, u32 bandwidth, u32 mtu = 1500);
 	virtual ~device_network_interface();
 
 	void interface_pre_start() override;
@@ -39,7 +39,10 @@ protected:
 
 	bool m_promisc;
 	char m_mac[6];
-	float m_bandwidth;
+	// bandwidth in bytes per second
+	u32 m_bandwidth;
+	// maximum transmission unit, used for device polling time
+	u32 m_mtu;
 	std::unique_ptr<osd_netdev> m_dev;
 	int m_intf;
 	bool m_loopback_control;

@@ -26,7 +26,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	typedef enum pps4_token_e {
+	typedef enum pps4_token_e : uint32_t {
 		t_AD,       t_ADC,      t_ADSK,     t_ADCSK,    t_ADI,
 		t_DC,       t_AND,      t_OR,       t_EOR,      t_COMP,
 		t_SC,       t_RC,       t_SF1,      t_RF1,      t_SF2,
@@ -48,11 +48,12 @@ private:
 		t_I8   = 1 << 12,   /* immediate 8 bit constant (I/O port number) */
 		t_I8c  = 1 << 13,   /* immediate 8 bit constant inverted */
 		t_OVER = 1 << 14,   /* Debugger step over (CALL) */
-		t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
+		t_OUT  = 1 << 15,   /* Debugger step out (RETURN) */
+		t_COND = 1 << 16    /* Debugger conditional branch */
 	}   pps4_token_e;
 
 	static char const *const token_str[t_COUNT];
-	static uint16_t const table[];
+	static uint32_t const table[];
 
 };
 

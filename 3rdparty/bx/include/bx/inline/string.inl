@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_STRING_H_HEADER_GUARD
@@ -37,22 +37,6 @@ namespace bx
 		va_end(argList);
 	}
 
-	template <typename Ty>
-	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
-	{
-		Ty str = _str;
-		typename Ty::size_type startPos = 0;
-		const typename Ty::size_type fromLen = strLen(_from);
-		const typename Ty::size_type toLen   = strLen(_to);
-		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
-		{
-			str.replace(startPos, fromLen, _to);
-			startPos += toLen;
-		}
-
-		return str;
-	}
-
 	inline StringView::StringView()
 	{
 		clear();
@@ -75,19 +59,9 @@ namespace bx
 		return *this;
 	}
 
-	inline StringView::StringView(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
-	}
-
 	inline StringView::StringView(const char* _ptr)
 	{
 		set(_ptr, INT32_MAX);
-	}
-
-	inline StringView::StringView(char* _ptr, int32_t _len)
-	{
-		set(_ptr, _len);
 	}
 
 	inline StringView::StringView(const char* _ptr, int32_t _len)
@@ -98,17 +72,6 @@ namespace bx
 	inline StringView::StringView(const char* _ptr, const char* _term)
 	{
 		set(_ptr, _term);
-	}
-
-	template<typename Ty>
-	inline StringView::StringView(const Ty& _container)
-	{
-		set(_container);
-	}
-
-	inline void StringView::set(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
 	}
 
 	inline void StringView::set(const char* _ptr)
@@ -124,18 +87,13 @@ namespace bx
 		{
 			m_len = INT32_MAX == _len ? strLen(_ptr) : _len;
 			m_ptr = _ptr;
+			m_0terminated = INT32_MAX == _len;
 		}
 	}
 
 	inline void StringView::set(const char* _ptr, const char* _term)
 	{
 		set(_ptr, int32_t(_term-_ptr) );
-	}
-
-	template<typename Ty>
-	inline void StringView::set(const Ty& _container)
-	{
-		set(_container.data(), int32_t(_container.length() ) );
 	}
 
 	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)
@@ -149,6 +107,7 @@ namespace bx
 	{
 		m_ptr = "";
 		m_len = 0;
+		m_0terminated = true;
 	}
 
 	inline const char* StringView::getPtr() const
@@ -171,28 +130,31 @@ namespace bx
 		return m_len;
 	}
 
+	inline bool StringView::is0Terminated() const
+	{
+		return m_0terminated;
+	}
+
 	template<bx::AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT()
 		: StringView()
+		, m_capacity(0)
 	{
+		clear();
 	}
 
 	template<bx::AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringT<AllocatorT>& _rhs)
 		: StringView()
+		, m_capacity(0)
 	{
 		set(_rhs);
-	}
-
-	template<bx::AllocatorI** AllocatorT>
-	inline StringT<AllocatorT>& StringT<AllocatorT>::operator=(const StringT<AllocatorT>& _rhs)
-	{
-		set(_rhs);
-		return *this;
 	}
 
 	template<bx::AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringView& _rhs)
+		: StringView()
+		, m_capacity(0)
 	{
 		set(_rhs);
 	}
@@ -201,6 +163,13 @@ namespace bx
 	inline StringT<AllocatorT>::~StringT()
 	{
 		clear();
+	}
+
+	template<bx::AllocatorI** AllocatorT>
+	inline StringT<AllocatorT>& StringT<AllocatorT>::operator=(const StringT<AllocatorT>& _rhs)
+	{
+		set(_rhs);
+		return *this;
 	}
 
 	template<bx::AllocatorI** AllocatorT>
@@ -215,25 +184,49 @@ namespace bx
 	{
 		if (0 != _str.getLength() )
 		{
-			int32_t old = m_len;
-			int32_t len = m_len + strLen(_str);
-			char* ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_len ? const_cast<char*>(m_ptr) : NULL, len+1);
+			const int32_t old = m_len;
+			const int32_t len = m_len + _str.getLength();
+
+			char* ptr = const_cast<char*>(m_ptr);
+
+			if (len+1 > m_capacity)
+			{
+				const int32_t capacity = alignUp(len+1, 256);
+				ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
+
+				*const_cast<char**>(&m_ptr) = ptr;
+				m_capacity = capacity;
+			}
+
 			m_len = len;
 			strCopy(ptr + old, len-old+1, _str);
-
-			*const_cast<char**>(&m_ptr) = ptr;
 		}
+	}
+
+	template<bx::AllocatorI** AllocatorT>
+	inline void StringT<AllocatorT>::append(const char* _ptr, const char* _term)
+	{
+		append(StringView(_ptr, _term) );
 	}
 
 	template<bx::AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::clear()
 	{
-		if (0 != m_len)
+		m_0terminated = true;
+
+		if (0 != m_capacity)
 		{
 			BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
 
 			StringView::clear();
+			m_capacity = 0;
 		}
+	}
+
+	template<bx::AllocatorI** AllocatorT>
+	inline const char* StringT<AllocatorT>::getCPtr() const
+	{
+		return getPtr();
 	}
 
 	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)
@@ -264,7 +257,7 @@ namespace bx
 
 			StringView line(curr.getPtr(), m_curr.getPtr() );
 
-			return strRTrim(line, "\n\r");
+			return strRTrim(strRTrim(line, "\n"), "\r");
 		}
 
 		return m_curr;
@@ -278,6 +271,42 @@ namespace bx
 	inline uint32_t LineReader::getLine() const
 	{
 		return m_line;
+	}
+
+	inline bool hasPrefix(const StringView& _str, const StringView& _prefix)
+	{
+		const int32_t len = _prefix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(_str, _prefix, len)
+			;
+	}
+
+	inline bool hasSuffix(const StringView& _str, const StringView& _suffix)
+	{
+		const int32_t len = _suffix.getLength();
+		return _str.getLength() >= len
+			&& 0 == strCmp(StringView(_str.getTerm() - len, _str.getTerm() ), _suffix, len)
+			;
+	}
+
+	inline StringView strTrimPrefix(const StringView& _str, const StringView& _prefix)
+	{
+		if (hasPrefix(_str, _prefix) )
+		{
+			return StringView(_str.getPtr() + _prefix.getLength(), _str.getTerm() );
+		}
+
+		return _str;
+	}
+
+	inline StringView strTrimSuffix(const StringView& _str, const StringView& _suffix)
+	{
+		if (hasSuffix(_str, _suffix) )
+		{
+			return StringView(_str.getPtr(), _str.getTerm() - _suffix.getLength() );
+		}
+
+		return _str;
 	}
 
 } // namespace bx

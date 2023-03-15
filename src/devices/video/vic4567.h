@@ -134,7 +134,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface override
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 private:
 	static constexpr unsigned SPRITE_BASE_X_SIZE = 24;
@@ -191,7 +191,8 @@ private:
 
 	uint16_t m_c64_bitmap[2], m_bitmapmulti[4], m_mono[2], m_multi[4], m_ecmcolor[2], m_colors[4], m_spritemulti[4];
 
-	int m_lastline, m_rasterline;
+	int m_lastline;
+	int m_rasterline;
 
 	int m_interlace;
 	int m_columns, m_rows;

@@ -18,8 +18,8 @@ public:
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_hd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_hd );
+	image_init_result load_hd(device_image_interface &image);
+	void unload_hd(device_image_interface &image);
 
 	template <typename T> void set_memory_space(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto int_cb() { return m_interrupt_callback.bind(); }

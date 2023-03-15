@@ -39,8 +39,7 @@ namespace opt {
 // (https://link.springer.com/chapter/10.1007/978-3-642-37051-9_6)
 class SSARewriter {
  public:
-  SSARewriter(MemPass* pass)
-      : pass_(pass), first_phi_id_(pass_->get_module()->IdBound()) {}
+  SSARewriter(MemPass* pass) : pass_(pass) {}
 
   // Rewrites SSA-target variables in function |fp| into SSA.  This is the
   // entry point for the SSA rewrite algorithm.  SSA-target variables are
@@ -193,6 +192,10 @@ class SSARewriter {
     }
   }
 
+  // Returns the value of |var_id| at |bb| if |defs_at_block_| contains it.
+  // Otherwise, returns 0.
+  uint32_t GetValueAtBlock(uint32_t var_id, BasicBlock* bb);
+
   // Processes the store operation |inst| in basic block |bb|. This extracts
   // the variable ID being stored into, determines whether the variable is an
   // SSA-target variable, and, if it is, it stores its value in the
@@ -287,10 +290,6 @@ class SSARewriter {
 
   // Memory pass requesting the SSA rewriter.
   MemPass* pass_;
-
-  // ID of the first Phi created by the SSA rewriter.  During rewriting, any
-  // ID bigger than this corresponds to a Phi candidate.
-  uint32_t first_phi_id_;
 };
 
 class SSARewritePass : public MemPass {

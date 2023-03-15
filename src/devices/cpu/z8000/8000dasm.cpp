@@ -79,7 +79,7 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0x1c18, 0x1cf8, 16, 1, "testl   @%rw2",                   0 },
 	{ 0x1c19, 0x1cf9, 16, 2, "ldm     @%rw2,%rw5,#%n",          0 },
 	{ 0x1d10, 0x1dff,  1, 1, "ldl     @%rw2,%rl3",              0 },
-	{ 0x1e10, 0x1eff,  1, 1, "jp      %c3,@%rl2",               0 },
+	{ 0x1e10, 0x1eff,  1, 1, "jp      %c3,@%rl2",               STEP_COND },
 	{ 0x1f10, 0x1ff0, 16, 1, "call    %rw2",                    STEP_OVER },
 	{ 0x2000, 0x200f,  1, 2, "ldb     %rb3,%#b3",               0 },
 	{ 0x2010, 0x20ff,  1, 1, "ldb     %rb3,@%rw2",              0 },
@@ -292,8 +292,8 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0x5c19, 0x5cf9, 16, 3, "ldm     %a2(%rw2),%rw5,#%n",      0 },
 	{ 0x5d00, 0x5d0f,  1, 2, "ldl     %a1,%rl3",                0 },
 	{ 0x5d10, 0x5dff,  1, 2, "ldl     %a1(%rw2),%rl3",          0 },
-	{ 0x5e00, 0x5e0f,  1, 2, "jp      %c3,%a1",                 0 },
-	{ 0x5e10, 0x5eff,  1, 2, "jp      %c3,%a1(%rw2)",           0 },
+	{ 0x5e00, 0x5e0f,  1, 2, "jp      %c3,%a1",                 STEP_COND },
+	{ 0x5e10, 0x5eff,  1, 2, "jp      %c3,%a1(%rw2)",           STEP_COND },
 	{ 0x5f00, 0x5f00,  1, 2, "call    %a1",                     STEP_OVER },
 	{ 0x5f10, 0x5ff0, 16, 2, "call    %a1(%rw2)",               STEP_OVER },
 	{ 0x6000, 0x600f,  1, 2, "ldb     %rb3,%a1",                0 },
@@ -410,7 +410,7 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0x9b00, 0x9bff,  1, 1, "div     %rl3,%rw2",               0 },
 	{ 0x9c00, 0x9cf8,  8, 1, "testl   %rl2",                    0 },
 	{ 0x9d00, 0x9dff,  1, 1, "rsvd9d",                          0 },
-	{ 0x9e00, 0x9e0f,  1, 1, "ret     %c3",                     STEP_OUT },
+	{ 0x9e00, 0x9e0f,  1, 1, "ret     %c3",                     STEP_OUT | STEP_COND },
 	{ 0x9f00, 0x9fff,  1, 1, "rsvd9f",                          0 },
 	{ 0xa000, 0xa0ff,  1, 1, "ldb     %rb3,%rb2",               0 },
 	{ 0xa100, 0xa1ff,  1, 1, "ld      %rw3,%rw2",               0 },
@@ -474,64 +474,64 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0xb81e, 0xb8fe, 16, 2, "trtdrb  @%rw2,@%rw6,%rb5",        0 },
 	{ 0xb900, 0xb9ff, 16, 1, "rsvdb9",                          0 },
 	{ 0xba10, 0xbaf0, 16, 2, "cpib    %rb6,@%rw2,%rw5,%c7",     0 },
-	{ 0xba11, 0xbaf1, 16, 2, "ldirb   @%rw6,@%rw2,%rw5",        STEP_OVER },
+	{ 0xba11, 0xbaf1, 16, 2, "ldirb   @%rw6,@%rw2,%rw5",        STEP_COND },
 	{ 0xba12, 0xbaf2, 16, 2, "cpsib   @%rw6,@%rw2,%rw5,%c7",    0 },
-	{ 0xba14, 0xbaf4, 16, 2, "cpirb   %rb6,@%rw2,%rw5,%c7",     STEP_OVER },
-	{ 0xba16, 0xbaf6, 16, 2, "cpsirb  @%rw6,@%rw2,%rw5,%c7",    STEP_OVER },
+	{ 0xba14, 0xbaf4, 16, 2, "cpirb   %rb6,@%rw2,%rw5,%c7",     STEP_COND },
+	{ 0xba16, 0xbaf6, 16, 2, "cpsirb  @%rw6,@%rw2,%rw5,%c7",    STEP_COND },
 	{ 0xba18, 0xbaf8, 16, 2, "cpdb    %rb6,@%rw2,%rw5,%c7",     0 },
-	{ 0xba19, 0xbaf9, 16, 2, "lddrb   @%rw2,@%rw6,%rw5",        STEP_OVER },
+	{ 0xba19, 0xbaf9, 16, 2, "lddrb   @%rw2,@%rw6,%rw5",        STEP_COND },
 	{ 0xba1a, 0xbafa, 16, 2, "cpsdb   @%rw6,@%rw2,%rw5,%c7",    0 },
-	{ 0xba1c, 0xbafc, 16, 2, "cpdrb   %rb6,@%rw2,%rw5,%c7",     STEP_OVER },
-	{ 0xba1e, 0xbafe, 16, 2, "cpsdrb  @%rw6,@%rw2,%rw5,%c7",    STEP_OVER },
+	{ 0xba1c, 0xbafc, 16, 2, "cpdrb   %rb6,@%rw2,%rw5,%c7",     STEP_COND },
+	{ 0xba1e, 0xbafe, 16, 2, "cpsdrb  @%rw6,@%rw2,%rw5,%c7",    STEP_COND },
 	{ 0xbb10, 0xbbf0, 16, 2, "cpi     %rw6,@%rw2,%rw5,%c7",     0 },
-	{ 0xbb11, 0xbbf1, 16, 2, "ldir    @%rw6,@%rw2,%rw5",        STEP_OVER },
+	{ 0xbb11, 0xbbf1, 16, 2, "ldir    @%rw6,@%rw2,%rw5",        STEP_COND },
 	{ 0xbb12, 0xbbf2, 16, 2, "cpsi    @%rw6,@%rw2,%rw5,%c7",    0 },
-	{ 0xbb14, 0xbbf4, 16, 2, "cpir    %rw6,@%rw2,%rw5,%c7",     STEP_OVER },
-	{ 0xbb16, 0xbbf6, 16, 2, "cpsir   @%rw6,@%rw2,%rw5,%c7",    STEP_OVER },
+	{ 0xbb14, 0xbbf4, 16, 2, "cpir    %rw6,@%rw2,%rw5,%c7",     STEP_COND },
+	{ 0xbb16, 0xbbf6, 16, 2, "cpsir   @%rw6,@%rw2,%rw5,%c7",    STEP_COND },
 	{ 0xbb18, 0xbbf8, 16, 2, "cpd     %rw6,@%rw2,%rw5,%c7",     0 },
-	{ 0xbb19, 0xbbf9, 16, 2, "lddr    @%rw2,@%rw6,%rw5",        STEP_OVER },
+	{ 0xbb19, 0xbbf9, 16, 2, "lddr    @%rw2,@%rw6,%rw5",        STEP_COND },
 	{ 0xbb1a, 0xbbfa, 16, 2, "cpsd    @%rw6,@%rw2,%rw5,%c7",    0 },
-	{ 0xbb1c, 0xbbfc, 16, 2, "cpdr    %rw6,@%rw2,%rw5,%c7",     STEP_OVER },
-	{ 0xbb1e, 0xbbfe, 16, 2, "cpsdr   @%rw6,@%rw2,%rw5,%c7",    STEP_OVER },
+	{ 0xbb1c, 0xbbfc, 16, 2, "cpdr    %rw6,@%rw2,%rw5,%c7",     STEP_COND },
+	{ 0xbb1e, 0xbbfe, 16, 2, "cpsdr   @%rw6,@%rw2,%rw5,%c7",    STEP_COND },
 	{ 0xbc00, 0xbcff,  1, 1, "rrdb    %rb3,%rb2",               0 },
 	{ 0xbd00, 0xbdff,  1, 1, "ldk     %rw2,%3",                 0 },
 	{ 0xbe00, 0xbeff,  1, 1, "rldb    %rb3,%rb2",               0 },
 	{ 0xbf00, 0xbfff,  1, 1, "rsvdbf",                          0 },
 	{ 0xc000, 0xcfff,  1, 1, "ldb     %rb1,%#b1",               0 },
 	{ 0xd000, 0xdfff,  1, 1, "calr    %d2",                     STEP_OVER },
-	{ 0xe000, 0xefff,  1, 1, "jr      %c1,%d1",                 0 },
-	{ 0xf000, 0xf07f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf100, 0xf17f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf200, 0xf27f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf300, 0xf37f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf400, 0xf47f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf500, 0xf57f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf600, 0xf67f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf700, 0xf77f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf800, 0xf87f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf900, 0xf97f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xfa00, 0xfa7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xfb00, 0xfb7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xfc00, 0xfc7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xfd00, 0xfd7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xfe00, 0xfe7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xff00, 0xff7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_OVER },
-	{ 0xf080, 0xf0ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf180, 0xf1ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf280, 0xf2ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf380, 0xf3ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf480, 0xf4ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf580, 0xf5ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf680, 0xf6ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf780, 0xf7ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf880, 0xf8ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xf980, 0xf9ff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xfa80, 0xfaff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xfb80, 0xfbff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xfc80, 0xfcff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xfd80, 0xfdff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xfe80, 0xfeff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
-	{ 0xff80, 0xffff,  1, 1, "djnz    %rw1,%d0",                STEP_OVER },
+	{ 0xe000, 0xefff,  1, 1, "jr      %c1,%d1",                 STEP_COND },
+	{ 0xf000, 0xf07f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf100, 0xf17f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf200, 0xf27f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf300, 0xf37f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf400, 0xf47f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf500, 0xf57f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf600, 0xf67f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf700, 0xf77f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf800, 0xf87f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf900, 0xf97f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xfa00, 0xfa7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xfb00, 0xfb7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xfc00, 0xfc7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xfd00, 0xfd7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xfe00, 0xfe7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xff00, 0xff7f,  1, 1, "dbjnz   %rb1,%d0",                STEP_COND },
+	{ 0xf080, 0xf0ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf180, 0xf1ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf280, 0xf2ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf380, 0xf3ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf480, 0xf4ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf580, 0xf5ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf680, 0xf6ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf780, 0xf7ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf880, 0xf8ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xf980, 0xf9ff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xfa80, 0xfaff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xfb80, 0xfbff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xfc80, 0xfcff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xfd80, 0xfdff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xfe80, 0xfeff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
+	{ 0xff80, 0xffff,  1, 1, "djnz    %rw1,%d0",                STEP_COND },
 	{ 0,      0,       0, 0, nullptr,                            0}
 };
 
@@ -667,14 +667,14 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 						tmp = ((n[1] & 0x01) << 8) + (n[3] << 4) + (n[7] & 0x08);
 						switch (tmp)
 						{
-							case 0x000: util::stream_format(stream, "inirb "); flags = STEP_OVER; break;
+							case 0x000: util::stream_format(stream, "inirb "); flags = STEP_COND; break;
 							case 0x008: util::stream_format(stream, "inib  "); break;
-							case 0x010: util::stream_format(stream, "sinirb"); flags = STEP_OVER; break;
+							case 0x010: util::stream_format(stream, "sinirb"); flags = STEP_COND; break;
 							case 0x018: util::stream_format(stream, "sinib "); break;
-							case 0x020: util::stream_format(stream, "otirb "); flags = STEP_OVER; break;
+							case 0x020: util::stream_format(stream, "otirb "); flags = STEP_COND; break;
 							case 0x028: util::stream_format(stream, "outib "); break;
 							case 0x030: util::stream_format(stream, "soutib"); break;
-							case 0x038: util::stream_format(stream, "sotirb"); flags = STEP_OVER; break;
+							case 0x038: util::stream_format(stream, "sotirb"); flags = STEP_COND; break;
 							case 0x040: util::stream_format(stream, "inb   "); break;
 							case 0x048: util::stream_format(stream, "inb   "); break;
 							case 0x050: util::stream_format(stream, "sinb  "); break;
@@ -683,22 +683,22 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x068: util::stream_format(stream, "outb  "); break;
 							case 0x070: util::stream_format(stream, "soutb "); break;
 							case 0x078: util::stream_format(stream, "soutb "); break;
-							case 0x080: util::stream_format(stream, "indrb "); flags = STEP_OVER; break;
+							case 0x080: util::stream_format(stream, "indrb "); flags = STEP_COND; break;
 							case 0x088: util::stream_format(stream, "indb  "); break;
-							case 0x090: util::stream_format(stream, "sindrb"); flags = STEP_OVER; break;
+							case 0x090: util::stream_format(stream, "sindrb"); flags = STEP_COND; break;
 							case 0x098: util::stream_format(stream, "sindb "); break;
-							case 0x0a0: util::stream_format(stream, "otdrb "); flags = STEP_OVER; break;
+							case 0x0a0: util::stream_format(stream, "otdrb "); flags = STEP_COND; break;
 							case 0x0a8: util::stream_format(stream, "outdb "); break;
 							case 0x0b0: util::stream_format(stream, "soutdb"); break;
-							case 0x0b8: util::stream_format(stream, "sotdrb"); flags = STEP_OVER; break;
-							case 0x100: util::stream_format(stream, "inir  "); flags = STEP_OVER; break;
+							case 0x0b8: util::stream_format(stream, "sotdrb"); flags = STEP_COND; break;
+							case 0x100: util::stream_format(stream, "inir  "); flags = STEP_COND; break;
 							case 0x108: util::stream_format(stream, "ini   "); break;
-							case 0x110: util::stream_format(stream, "sinir "); flags = STEP_OVER; break;
+							case 0x110: util::stream_format(stream, "sinir "); flags = STEP_COND; break;
 							case 0x118: util::stream_format(stream, "sini  "); break;
-							case 0x120: util::stream_format(stream, "otir  "); flags = STEP_OVER; break;
+							case 0x120: util::stream_format(stream, "otir  "); flags = STEP_COND; break;
 							case 0x128: util::stream_format(stream, "outi  "); break;
 							case 0x130: util::stream_format(stream, "souti "); break;
-							case 0x138: util::stream_format(stream, "sotir "); flags = STEP_OVER; break;
+							case 0x138: util::stream_format(stream, "sotir "); flags = STEP_COND; break;
 							case 0x140: util::stream_format(stream, "in    "); break;
 							case 0x148: util::stream_format(stream, "in    "); break;
 							case 0x150: util::stream_format(stream, "sin   "); break;
@@ -707,14 +707,14 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x168: util::stream_format(stream, "out   "); break;
 							case 0x170: util::stream_format(stream, "sout  "); break;
 							case 0x178: util::stream_format(stream, "sout  "); break;
-							case 0x180: util::stream_format(stream, "indr  "); flags = STEP_OVER; break;
+							case 0x180: util::stream_format(stream, "indr  "); flags = STEP_COND; break;
 							case 0x188: util::stream_format(stream, "ind   "); break;
-							case 0x190: util::stream_format(stream, "sindr "); flags = STEP_OVER; break;
+							case 0x190: util::stream_format(stream, "sindr "); flags = STEP_COND; break;
 							case 0x198: util::stream_format(stream, "sind  "); break;
-							case 0x1a0: util::stream_format(stream, "otdr  "); flags = STEP_OVER; break;
+							case 0x1a0: util::stream_format(stream, "otdr  "); flags = STEP_COND; break;
 							case 0x1a8: util::stream_format(stream, "outd  "); break;
 							case 0x1b0: util::stream_format(stream, "soutd "); break;
-							case 0x1b8: util::stream_format(stream, "sotdr "); flags = STEP_OVER; break;
+							case 0x1b8: util::stream_format(stream, "sotdr "); flags = STEP_COND; break;
 							default:
 								util::stream_format(stream, "unk(0x%x)", tmp);
 						}
@@ -747,8 +747,10 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							/* skip following comma */
 							if (*src == ',')
 								src++;
+							flags &= ~STEP_COND;
 						}
-						else util::stream_format(stream, "%s", cc[n[i]]);
+						else
+							util::stream_format(stream, "%s", cc[n[i]]);
 						break;
 					case 'd':
 						/* displacement */

@@ -4,6 +4,9 @@
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
 
+// Names
+// spell-checker: words Seidel
+
 ///
 /// \file nld_ms_sor.h
 ///
@@ -17,9 +20,7 @@
 
 #include <algorithm>
 
-namespace netlist
-{
-namespace solver
+namespace netlist::solver
 {
 
 	template <typename FT, int SIZE>
@@ -39,7 +40,7 @@ namespace solver
 			{
 			}
 
-		void vsolve_non_dynamic() override;
+		void upstream_solve_non_dynamic() override;
 
 	private:
 		state_var<float_type> m_lp_fact;
@@ -47,12 +48,12 @@ namespace solver
 		std::vector<float_type> one_m_w;
 	};
 
-	// ----------------------------------------------------------------------------------------
-	// matrix_solver - Gauss - Seidel
-	// ----------------------------------------------------------------------------------------
-
+	///
+	/// \brief Gauss - Seidel matrix_solver
+	///
+	///
 	template <typename FT, int SIZE>
-	void matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic()
+	void matrix_solver_SOR_t<FT, SIZE>::upstream_solve_non_dynamic()
 	{
 		const std::size_t iN = this->size();
 		bool resched = false;
@@ -91,7 +92,7 @@ namespace solver
 				RHS_t = RHS_t + Idr[i];
 			}
 
-			for (std::size_t i = this->m_terms[k].railstart(); i < term_count; i++)
+			for (std::size_t i = this->m_terms[k].rail_start(); i < term_count; i++)
 				RHS_t = RHS_t  - go[i] * *other_cur_analog[i];
 
 			this->m_RHS[k] = static_cast<float_type>(RHS_t);
@@ -128,11 +129,11 @@ namespace solver
 			for (std::size_t k = 0; k < iN; k++)
 			{
 				const int * net_other = this->m_terms[k].m_connected_net_idx.data();
-				const std::size_t railstart = this->m_terms[k].railstart();
+				const std::size_t rail_start = this->m_terms[k].rail_start();
 				const auto * go = this->m_gonn[k];
 
 				float_type Idrive = plib::constants<float_type>::zero();
-				for (std::size_t i = 0; i < railstart; i++)
+				for (std::size_t i = 0; i < rail_start; i++)
 					Idrive = Idrive - static_cast<float_type>(go[i]) * this->m_new_V[static_cast<std::size_t>(net_other[i])];
 
 				const float_type new_val = this->m_new_V[k] * one_m_w[k] + (Idrive + this->m_RHS[k]) * w[k];
@@ -153,12 +154,11 @@ namespace solver
 		{
 			// Fallback to direct solver ...
 			this->m_iterative_fail++;
-			matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic();
+			matrix_solver_direct_t<FT, SIZE>::upstream_solve_non_dynamic();
 		}
 
 	}
 
-} // namespace solver
-} // namespace netlist
+} // namespace netlist::solver
 
 #endif // NLD_MS_SOR_H_

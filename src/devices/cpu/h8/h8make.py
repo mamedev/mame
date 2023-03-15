@@ -18,6 +18,8 @@ def name_to_type(name):
         return 2
     if name == "s26":
         return 3
+    if name == "g":
+        return 4
     sys.stderr.write("Unknown chip type name %s\n" % name)
     sys.exit(1)
 
@@ -29,7 +31,9 @@ def type_to_device(dtype, mode):
             return "h8h_device"
         if dtype == 2:
             return "h8s2000_device"
-        return "h8s2600_device"
+        if dtype == 3:
+            return "h8s2600_device"
+        return "gt913_device"
     else:
         if dtype == 0:
             return "h8_disassembler"
@@ -37,7 +41,9 @@ def type_to_device(dtype, mode):
             return "h8h_disassembler"
         if dtype == 2:
             return "h8s2000_disassembler"
-        return "h8s2600_disassembler"
+        if dtype == 3:
+            return "h8s2600_disassembler"
+        return "gt913_disassembler"
 
 def hexsplit(str):
     res = []
@@ -139,7 +145,7 @@ class Opcode:
         if dtype == 0 and (am1 == "r16h" or am2 == "r16h"):
             self.mask[len(self.mask) - 1] |= 0x80
         extra_words = 0
-        if (am1 == "abs16" or am2 == "abs16" or am1 == "abs16e" or am1 == "abs24e") and self.skip == 0:
+        if (am1 == "abs16" or am2 == "abs16" or am1 == "abs16e" or am1 == "abs22e" or am1 == "abs24e") and self.skip == 0:
             extra_words += 1
         if (am1 == "abs32" or am2 == "abs32") and self.skip == 0:
             extra_words += 2
@@ -195,6 +201,8 @@ class Opcode:
             flags = "%d | STEP_OVER" % size
         elif self.name == "rts" or self.name == "rte":
             flags = "%d | STEP_OUT" % size
+        elif self.am1 == "rel8" and self.name != "bt" and self.name != "bf":
+            flags = "%d | STEP_COND" % size
         else:
             flags = "%d" % size
         
@@ -474,7 +482,7 @@ def main(argv):
     if mode == 's':
         opcodes.build_dispatch()
         opcodes.save_opcodes(f, dname)
-        if dtype == 0:
+        if dtype == 0 or dtype == 4:
             opcodes.save_dispatch(f, dname)
         opcodes.save_exec(f, dname, dtype, "full")
         opcodes.save_exec(f, dname, dtype, "partial")

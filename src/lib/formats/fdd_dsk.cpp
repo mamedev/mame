@@ -31,9 +31,14 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "fdd_dsk.h"
+
+#include "ioprocs.h"
+
+#include "osdcomm.h" // little_endianize_int32
+
+#include <cstring>
+
 
 fdd_format::fdd_format()
 {
@@ -54,18 +59,19 @@ const char *fdd_format::extensions() const
 	return "fdd";
 }
 
-int fdd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[7];
-	io_generic_read(io, h, 0, 7);
+	size_t actual;
+	io.read_at(0, h, 7, actual);
 
 	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
-		return 100;
+		return FIFID_SIGN;
 
 	return 0;
 }
 
-bool fdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
 	uint8_t hsec[0x0c];
 
@@ -82,11 +88,12 @@ bool fdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 	for (int track = 0; track < 160; track++)
 	{
-		int curr_num_sec = 0, curr_track_size = 0;
+		int curr_num_sec = 0; [[maybe_unused]] int curr_track_size = 0;
 		for (int sect = 0; sect < 26; sect++)
 		{
 			// read sector map for this sector
-			io_generic_read(io, hsec, pos, 0x0c);
+			size_t actual;
+			io.read_at(pos, hsec, 0x0c, actual);
 			pos += 0x0c;
 
 			if (hsec[0] == 0xff)    // unformatted/unused sector
@@ -118,10 +125,11 @@ bool fdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
 
+			size_t actual;
 			if (sec_offs[cur_sec_map] == 0xffffffff)
 				memset(sect_data + cur_pos, fill_vals[cur_sec_map], sector_size);
 			else
-				io_generic_read(io, sect_data + cur_pos, sec_offs[cur_sec_map], sector_size);
+				io.read_at(sec_offs[cur_sec_map], sect_data + cur_pos, sector_size, actual);
 
 			sects[i].track       = tracks[cur_sec_map];
 			sects[i].head        = heads[cur_sec_map];
@@ -145,4 +153,4 @@ bool fdd_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_FDD_FORMAT = &floppy_image_format_creator<fdd_format>;
+const fdd_format FLOPPY_FDD_FORMAT;

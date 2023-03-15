@@ -85,6 +85,8 @@
 #define WIM                 m_wim
 #define TBR                 m_tbr
 
+#define NWINDOWS            m_nwindows
+
 #define OP_NS   (op & 0xc0000000)
 
 #define OP      (op >> 30)
@@ -95,17 +97,17 @@
 #define OPFLOW  ((op >> 5) & 0x3f)
 
 #define DISP30  (int32_t(op << 2))
-#define DISP22  (int32_t(op << 10) >> 8)
-#define DISP19  (int32_t(op << 13) >> 11)
+#define DISP22  util::sext(op << 2, 24)
+#define DISP19  util::sext(op << 2, 21)
 #define DISP16  (int32_t(((op << 10) & 0xc0000000) | ((op << 16) & 0x3fff0000)) >> 14)
 #define IMM22   (op << 10)
 #define CONST22 (op & 0x3fffff)
-#define SIMM13  (int32_t(op << 19) >> 19)
-#define SIMM11  (int32_t(op << 21) >> 21)
-#define SIMM10  (int32_t(op << 22) >> 22)
-#define SIMM8   (int32_t(op << 24) >> 24)
+#define SIMM13  util::sext(op, 13)
+#define SIMM11  util::sext(op, 11)
+#define SIMM10  util::sext(op, 10)
+#define SIMM8   util::sext(op, 8)
 #define IMM7    (op & 0x7f)
-#define SIMM7   (int32_t(op << 25) >> 25)
+#define SIMM7   util::sext(op, 7)
 #define SHCNT32 (op & 31)
 #define SHCNT64 (op & 63)
 #define IAMODE  (op & 0x7)
@@ -142,7 +144,7 @@
 #define RDREG   *m_regs[RD]
 #define RS1REG  *m_regs[RS1]
 #define RS2REG  *m_regs[RS2]
-#define SET_RDREG(x)    do { if(RD) { RDREG = (x); } } while (0)
+#define SET_RDREG(x)    do { if(RDBITS) { RDREG = (x); } } while (0)
 #define ADDRESS (USEIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
 
 #define PC      m_pc
@@ -200,6 +202,7 @@
 #define OP3_UMULCC  26
 #define OP3_SMULCC  27
 #define OP3_SUBXCC  28
+#define OP3_DIVSCC  29
 #define OP3_UDIVCC  30
 #define OP3_SDIVCC  31
 #define OP3_TADDCC  32
@@ -214,6 +217,7 @@
 #define OP3_RDPSR   41
 #define OP3_RDWIM   42
 #define OP3_RDTBR   43
+#define OP3_SCAN    44
 #define OP3_WRASR   48
 #define OP3_WRPSR   49
 #define OP3_WRWIM   50

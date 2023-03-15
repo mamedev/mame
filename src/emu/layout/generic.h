@@ -21,6 +21,9 @@
 // no screens layouts
 extern const internal_layout layout_noscreens;   // for screenless systems
 
+// single screen layouts
+extern const internal_layout layout_monitors;    // common monitor aspect ratios
+
 // dual screen layouts
 extern const internal_layout layout_dualhsxs;    // dual 4:3 screens side-by-side
 extern const internal_layout layout_dualhovu;    // dual 4:3 screens above and below

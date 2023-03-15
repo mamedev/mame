@@ -16,7 +16,6 @@ TODO: Separate out i860XR and i860XP (make different types, etc).
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "i860.h"
 #include "i860dis.h"
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Steven G. Johnson, Jiahao Chen, Peter Colberg, Tony Kelman, Scott P. Jones, and other contributors.
+ * Copyright (c) 2014-2019 Steven G. Johnson, Jiahao Chen, Peter Colberg, Tony Kelman, Scott P. Jones, and other contributors.
  * Copyright (c) 2009 Public Software Group e. V., Berlin, Germany
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -27,8 +27,8 @@
  *
  * utf8proc is a free/open-source (MIT/expat licensed) C library
  * providing Unicode normalization, case-folding, and other operations
- * for strings in the UTF-8 encoding, supporting Unicode version
- * 8.0.0.  See the utf8proc home page (http://julialang.org/utf8proc/)
+ * for strings in the UTF-8 encoding, supporting up-to-date Unicode versions.
+ * See the utf8proc home page (http://julialang.org/utf8proc/)
  * for downloads and other information, or the source code on github
  * (https://github.com/JuliaLang/utf8proc).
  *
@@ -71,13 +71,13 @@
 /** The MAJOR version number (increased when backwards API compatibility is broken). */
 #define UTF8PROC_VERSION_MAJOR 2
 /** The MINOR version number (increased when new functionality is added in a backwards-compatible manner). */
-#define UTF8PROC_VERSION_MINOR 1
+#define UTF8PROC_VERSION_MINOR 6
 /** The PATCH version (increased for fixes that do not change the API). */
-#define UTF8PROC_VERSION_PATCH 0
+#define UTF8PROC_VERSION_PATCH 1
 /** @} */
 
 #include <stdlib.h>
-#include <sys/types.h>
+
 #if defined(_MSC_VER) && _MSC_VER < 1800
 // MSVC prior to 2013 lacked stdbool.h and inttypes.h
 typedef signed char utf8proc_int8_t;
@@ -120,36 +120,24 @@ typedef bool utf8proc_bool;
 #endif
 #include <limits.h>
 
-#ifdef _WIN32
-#  ifdef UTF8PROC_EXPORTS
-#    ifndef UTF8PROC_DLLEXPORT
-#    define UTF8PROC_DLLEXPORT __declspec(dllexport)
-#    endif
-#  else
-#    ifndef UTF8PROC_DLLEXPORT
-#    define UTF8PROC_DLLEXPORT __declspec(dllimport)
-#    endif
-#  endif
-#elif __GNUC__ >= 4
-#  ifndef UTF8PROC_DLLEXPORT
-#  define UTF8PROC_DLLEXPORT __attribute__ ((visibility("default")))
-#  endif
-#else
-#  ifndef UTF8PROC_DLLEXPORT
+#ifdef UTF8PROC_STATIC
 #  define UTF8PROC_DLLEXPORT
+#else
+#  ifdef _WIN32
+#    ifdef UTF8PROC_EXPORTS
+#      define UTF8PROC_DLLEXPORT __declspec(dllexport)
+#    else
+#      define UTF8PROC_DLLEXPORT __declspec(dllimport)
+#    endif
+#  elif __GNUC__ >= 4
+#    define UTF8PROC_DLLEXPORT __attribute__ ((visibility("default")))
+#  else
+#    define UTF8PROC_DLLEXPORT
 #  endif
 #endif
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef SSIZE_MAX
-#define SSIZE_MAX ((size_t)SIZE_MAX/2)
-#endif
-
-#ifndef UINT16_MAX
-#  define UINT16_MAX 65535U
 #endif
 
 /**
@@ -217,6 +205,10 @@ typedef enum {
    *       @ref UTF8PROC_DECOMPOSE
    */
   UTF8PROC_STRIPMARK = (1<<13),
+  /**
+   * Strip unassigned codepoints.
+   */
+  UTF8PROC_STRIPNA    = (1<<14),
 } utf8proc_option_t;
 
 /** @name Error codes
@@ -382,10 +374,18 @@ typedef enum {
   UTF8PROC_BOUNDCLASS_SPACINGMARK        = 12, /**< Spacingmark */
   UTF8PROC_BOUNDCLASS_PREPEND            = 13, /**< Prepend */
   UTF8PROC_BOUNDCLASS_ZWJ                = 14, /**< Zero Width Joiner */
+
+  /* the following are no longer used in Unicode 11, but we keep
+     the constants here for backward compatibility */
   UTF8PROC_BOUNDCLASS_E_BASE             = 15, /**< Emoji Base */
   UTF8PROC_BOUNDCLASS_E_MODIFIER         = 16, /**< Emoji Modifier */
   UTF8PROC_BOUNDCLASS_GLUE_AFTER_ZWJ     = 17, /**< Glue_After_ZWJ */
   UTF8PROC_BOUNDCLASS_E_BASE_GAZ         = 18, /**< E_BASE + GLUE_AFTER_ZJW */
+
+  /* the Extended_Pictographic property is used in the Unicode 11
+     grapheme-boundary rules, so we store it in the boundclass field */
+  UTF8PROC_BOUNDCLASS_EXTENDED_PICTOGRAPHIC = 19,
+  UTF8PROC_BOUNDCLASS_E_ZWG = 20, /* UTF8PROC_BOUNDCLASS_EXTENDED_PICTOGRAPHIC + ZWJ */
 } utf8proc_boundclass_t;
 
 /**
@@ -407,6 +407,11 @@ UTF8PROC_DLLEXPORT extern const utf8proc_int8_t utf8proc_utf8class[256];
  * development versions.
  */
 UTF8PROC_DLLEXPORT const char *utf8proc_version(void);
+
+/**
+ * Returns the utf8proc supported Unicode version as a string MAJOR.MINOR.PATCH.
+ */
+UTF8PROC_DLLEXPORT const char *utf8proc_unicode_version(void);
 
 /**
  * Returns an informative error string for the given utf8proc error code
@@ -473,6 +478,7 @@ UTF8PROC_DLLEXPORT const utf8proc_property_t *utf8proc_get_property(utf8proc_int
  * - @ref UTF8PROC_CHARBOUND - insert 0xFF bytes before each grapheme cluster
  * - @ref UTF8PROC_LUMP      - lump certain different codepoints together
  * - @ref UTF8PROC_STRIPMARK - remove all character marks
+ * - @ref UTF8PROC_STRIPNA   - remove unassigned codepoints
  * @param last_boundclass
  * Pointer to an integer variable containing
  * the previous codepoint's boundary class if the @ref UTF8PROC_CHARBOUND
@@ -496,7 +502,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(
  * string and orders the decomposed sequences correctly.
  *
  * If the @ref UTF8PROC_NULLTERM flag in `options` is set, processing
- * will be stopped, when a NULL byte is encounted, otherwise `strlen`
+ * will be stopped, when a NULL byte is encountered, otherwise `strlen`
  * bytes are processed.  The result (in the form of 32-bit unicode
  * codepoints) is written into the buffer being pointed to by
  * `buffer` (which must contain at least `bufsize` entries).  In case of
@@ -584,6 +590,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_reencode(utf8proc_int32_t *buffer, 
  * Given a pair of consecutive codepoints, return whether a grapheme break is
  * permitted between them (as defined by the extended grapheme clusters in UAX#29).
  *
+ * @param codepoint1 The first codepoint.
+ * @param codepoint2 The second codepoint, occurring consecutively after `codepoint1`.
  * @param state Beginning with Version 29 (Unicode 9.0.0), this algorithm requires
  *              state to break graphemes. This state can be passed in as a pointer
  *              in the `state` argument and should initially be set to 0. If the
@@ -592,7 +600,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_reencode(utf8proc_int32_t *buffer, 
  *              matching the rules in Unicode 8.0.0.
  *
  * @warning If the state parameter is used, `utf8proc_grapheme_break_stateful` must
- *          be called IN ORDER on ALL potential breaks in a string.
+ *          be called IN ORDER on ALL potential breaks in a string.  However, it
+ *          is safe to reset the state to zero after a grapheme break.
  */
 UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break_stateful(
     utf8proc_int32_t codepoint1, utf8proc_int32_t codepoint2, utf8proc_int32_t *state);
@@ -627,6 +636,18 @@ UTF8PROC_DLLEXPORT utf8proc_int32_t utf8proc_toupper(utf8proc_int32_t c);
 UTF8PROC_DLLEXPORT utf8proc_int32_t utf8proc_totitle(utf8proc_int32_t c);
 
 /**
+ * Given a codepoint `c`, return `1` if the codepoint corresponds to a lower-case character
+ * and `0` otherwise.
+ */
+UTF8PROC_DLLEXPORT int utf8proc_islower(utf8proc_int32_t c);
+
+/**
+ * Given a codepoint `c`, return `1` if the codepoint corresponds to an upper-case character
+ * and `0` otherwise.
+ */
+UTF8PROC_DLLEXPORT int utf8proc_isupper(utf8proc_int32_t c);
+
+/**
  * Given a codepoint, return a character width analogous to `wcwidth(codepoint)`,
  * except that a width of 0 is returned for non-printable codepoints
  * instead of -1 as in `wcwidth`.
@@ -659,7 +680,7 @@ UTF8PROC_DLLEXPORT const char *utf8proc_category_string(utf8proc_int32_t codepoi
  * contain NULL characters with the string if `str` contained NULL
  * characters). Other flags in the `options` field are passed to the
  * functions defined above, and regarded as described.  See also
- * @ref utfproc_map_custom to supply a custom codepoint transformation.
+ * @ref utf8proc_map_custom to supply a custom codepoint transformation.
  *
  * In case of success the length of the new string is returned,
  * otherwise a negative error code is returned.
@@ -684,8 +705,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_map_custom(
 
 /** @name Unicode normalization
  *
- * Returns a pointer to newly allocated memory of a NFD, NFC, NFKD or NFKC
- * normalized version of the null-terminated string `str`.  These
+ * Returns a pointer to newly allocated memory of a NFD, NFC, NFKD, NFKC or
+ * NFKC_Casefold normalized version of the null-terminated string `str`.  These
  * are shortcuts to calling @ref utf8proc_map with @ref UTF8PROC_NULLTERM
  * combined with @ref UTF8PROC_STABLE and flags indicating the normalization.
  */
@@ -698,6 +719,11 @@ UTF8PROC_DLLEXPORT utf8proc_uint8_t *utf8proc_NFC(const utf8proc_uint8_t *str);
 UTF8PROC_DLLEXPORT utf8proc_uint8_t *utf8proc_NFKD(const utf8proc_uint8_t *str);
 /** NFKC normalization (@ref UTF8PROC_COMPOSE and @ref UTF8PROC_COMPAT). */
 UTF8PROC_DLLEXPORT utf8proc_uint8_t *utf8proc_NFKC(const utf8proc_uint8_t *str);
+/**
+ * NFKC_Casefold normalization (@ref UTF8PROC_COMPOSE and @ref UTF8PROC_COMPAT
+ * and @ref UTF8PROC_CASEFOLD and @ref UTF8PROC_IGNORE).
+ **/
+UTF8PROC_DLLEXPORT utf8proc_uint8_t *utf8proc_NFKC_Casefold(const utf8proc_uint8_t *str);
 /** @} */
 
 #ifdef __cplusplus

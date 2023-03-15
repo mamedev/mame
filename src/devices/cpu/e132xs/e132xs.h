@@ -337,6 +337,10 @@ private:
 
 	uint32_t get_global_register(uint8_t code);
 
+	// words interpreted as pairs of signed half-words (HS)
+	static int get_lhs(uint32_t val) { return int16_t(val & 0xffff); }
+	static int get_rhs(uint32_t val) { return int16_t(val >> 16); }
+
 	uint32_t get_emu_code_addr(uint8_t num);
 	int32_t get_instruction_length(uint16_t op);
 
@@ -353,6 +357,9 @@ private:
 	void execute_int(uint32_t addr);
 	void execute_exception(uint32_t addr);
 	void execute_software();
+
+	template <reg_bank DST_GLOBAL> uint64_t get_double_word(uint8_t dst_code, uint8_t dstf_code) const;
+	template <reg_bank DST_GLOBAL> void set_double_word(uint8_t dst_code, uint8_t dstf_code, uint64_t val);
 
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_chk();
 	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void hyperstone_movd();

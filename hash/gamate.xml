@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Undumped carts, based on Wikipedia list
 C1010 - Bump N' Run (Unreleased?)
@@ -356,7 +356,7 @@ C1066 - ??
 
 <!-- This maybe comes from a cart with "Bomb Blaster" label? -->
 	<software name="bomblasta" cloneof="bomblast">
-		<description>Bomb Blaster (Alt)</description>
+		<description>Bomb Blaster (alt)</description>
 		<year>1990</year>
 		<publisher>Bit Corporation</publisher>
 		<info name="serial" value="C1031" />

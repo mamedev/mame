@@ -22,6 +22,7 @@
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/ram.h"
+#include "machine/tms9901.h"
 
 #define TI99_DATAMUX_TAG     "datamux_16_8"
 #define TI99_GROM0_TAG       "console_grom_0"
@@ -32,6 +33,7 @@
 #define TI99_CONSOLEROM      "console_rom"
 #define TI99_SOUNDCHIP_TAG   "soundchip"
 #define TI99_VDP_TAG         "vdp"
+#define TI99_TMS9901_TAG     "tms9901"
 
 namespace bus::ti99::internal {
 
@@ -90,6 +92,9 @@ private:
 	required_device<tmc0430_device> m_grom0;
 	required_device<tmc0430_device> m_grom1;
 	required_device<tmc0430_device> m_grom2;
+
+	// Link to 9901
+	required_device<tms9901_device> m_tms9901;
 
 	// Common read routine
 	void read_all(uint16_t addr, uint8_t *target);

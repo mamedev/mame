@@ -373,10 +373,10 @@ protected:
 	virtual void device_start() override;
 
 	// device_palette_interface overrides
-	virtual u32 palette_entries() const override { return m_entries; }
-	virtual u32 palette_indirect_entries() const override { return m_indirect_entries; }
-	virtual bool palette_shadows_enabled() const override { return m_enable_shadows; }
-	virtual bool palette_hilights_enabled() const override { return m_enable_hilights; }
+	virtual u32 palette_entries() const noexcept override { return m_entries; }
+	virtual u32 palette_indirect_entries() const noexcept override { return m_indirect_entries; }
+	virtual bool palette_shadows_enabled() const noexcept override { return m_enable_shadows; }
+	virtual bool palette_hilights_enabled() const noexcept override { return m_enable_hilights; }
 
 	// generic palette init routines
 	void palette_init_all_black(palette_device &palette);

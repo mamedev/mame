@@ -13,6 +13,8 @@
     - 12 hour clock
     - test register
     - timer reset
+    - convert I/O to address maps & views
+    - lh5045 doesn't really wrap time correctly
 
 */
 
@@ -23,6 +25,7 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(RP5C01, rp5c01_device, "rp5c01", "Ricoh RP5C01 RTC")
 DEFINE_DEVICE_TYPE(TC8521, tc8521_device, "tc8521", "Toshiba TC8521 RTC")
+DEFINE_DEVICE_TYPE(LH5045, lh5045_device, "lh5045", "Sharp LH5045 RTC")
 
 
 //**************************************************************************
@@ -201,10 +204,10 @@ void rp5c01_device::device_start()
 	// allocate timers
 	if (clock() > 0)
 	{
-		m_clock_timer = timer_alloc(TIMER_CLOCK);
+		m_clock_timer = timer_alloc(FUNC(rp5c01_device::advance_1hz_clock), this);
 		m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 
-		m_16hz_timer = timer_alloc(TIMER_16HZ);
+		m_16hz_timer = timer_alloc(FUNC(rp5c01_device::advance_16hz_clock), this);
 		m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 	}
 
@@ -227,28 +230,29 @@ void rp5c01_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  advance_1hz_clock -
 //-------------------------------------------------
 
-void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(rp5c01_device::advance_1hz_clock)
 {
-	switch (id)
+	if (m_1hz && (m_mode & MODE_TIMER_EN))
 	{
-	case TIMER_CLOCK:
-		if (m_1hz && (m_mode & MODE_TIMER_EN))
-		{
-			advance_seconds();
-		}
-
-		m_1hz = !m_1hz;
-		set_alarm_line();
-		break;
-
-	case TIMER_16HZ:
-		m_16hz = !m_16hz;
-		set_alarm_line();
-		break;
+		advance_seconds();
 	}
+
+	m_1hz = !m_1hz;
+	set_alarm_line();
+}
+
+
+//-------------------------------------------------
+//  advance_16hz_clock -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(rp5c01_device::advance_16hz_clock)
+{
+	m_16hz = !m_16hz;
+	set_alarm_line();
 }
 
 
@@ -287,10 +291,10 @@ void rp5c01_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rp5c01_device::nvram_read(emu_file &file)
+bool rp5c01_device::nvram_read(util::read_stream &file)
 {
-	if (m_battery_backed)
-		file.read(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.read(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
@@ -299,10 +303,10 @@ void rp5c01_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rp5c01_device::nvram_write(emu_file &file)
+bool rp5c01_device::nvram_write(util::write_stream &file)
 {
-	if (m_battery_backed)
-		file.write(m_ram, RAM_SIZE);
+	size_t actual;
+	return !file.write(m_ram, RAM_SIZE, actual) && actual == RAM_SIZE;
 }
 
 
@@ -430,4 +434,23 @@ void rp5c01_device::write(offs_t offset, uint8_t data)
 tc8521_device::tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: rp5c01_device(mconfig, TC8521, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  lh5045_device - constructor
+//-------------------------------------------------
+
+lh5045_device::lh5045_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: rp5c01_device(mconfig, LH5045, tag, owner, clock)
+{
+}
+
+TIMER_CALLBACK_MEMBER(lh5045_device::advance_1hz_clock)
+{
+	// inverted & different bit compared to rp5c01
+	if (m_1hz && (!BIT(m_mode, 2)))
+		advance_seconds();
+
+	m_1hz = !m_1hz;
+	set_alarm_line();
 }

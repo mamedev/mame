@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    hd6309.h
-
     Portable Hitachi 6309 emulator
 
 **********************************************************************/
@@ -48,7 +46,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual bool is_6809() override { return false; };
+	virtual bool is_6809() override { return false; }
+	virtual bool hd6309_native_mode() override { return m_md & 0x01; }
 
 private:
 	typedef m6809_base_device super;
@@ -77,11 +76,11 @@ private:
 	};
 
 	// CPU registers
-	PAIR16  m_v;
-	uint8_t   m_md;
+	PAIR16 m_v;
+	uint8_t m_md;
 
 	// other state
-	uint8_t   m_temp_im;
+	uint8_t m_temp_im;
 
 	// operand reading/writing
 	uint8_t read_operand();
@@ -90,8 +89,8 @@ private:
 	void write_operand(int ordinal, uint8_t data);
 
 	// interrupt registers
-	bool firq_saves_entire_state()      { return m_md & 0x02; }
-	uint16_t entire_state_registers()     { return hd6309_native_mode() ? 0x3FF : 0xFF; }
+	bool firq_saves_entire_state() { return m_md & 0x02; }
+	uint16_t entire_state_registers() { return hd6309_native_mode() ? 0x3FF : 0xFF; }
 
 	// bit tests
 	uint8_t &bittest_register();
@@ -105,16 +104,15 @@ private:
 	bool divd();
 
 	// miscellaneous
-	void set_e()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_E; }
-	void set_f()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_F; }
-	void set_w()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_W; }
-	exgtfr_register read_exgtfr_register(uint8_t reg);
-	void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	void set_e() { m_addressing_mode = ADDRESSING_MODE_REGISTER_E; }
+	void set_f() { m_addressing_mode = ADDRESSING_MODE_REGISTER_F; }
+	void set_w() { m_addressing_mode = ADDRESSING_MODE_REGISTER_W; }
+	uint16_t read_exgtfr_register(uint8_t reg);
+	void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool tfr_read(uint8_t opcode, uint8_t arg, uint8_t &data);
 	bool tfr_write(uint8_t opcode, uint8_t arg, uint8_t data);
-	bool add8_sets_h()                              { return (m_opcode & 0xFE) != 0x30; }
+	bool add8_sets_h() { return (m_opcode & 0xFE) != 0x30; }
 	void register_register_op();
-	bool hd6309_native_mode()           { return m_md & 0x01; }
 
 	void execute_one();
 };

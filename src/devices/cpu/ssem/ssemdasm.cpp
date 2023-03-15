@@ -66,5 +66,5 @@ offs_t ssem_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			break;
 	}
 
-	return 4 | SUPPORTED;
+	return 4 | (instr == 6 ? STEP_COND : 0) | SUPPORTED;
 }

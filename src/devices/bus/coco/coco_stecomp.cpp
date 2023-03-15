@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:tim lidnner
+// copyright-holders:tim lindner
 /***************************************************************************
 
     coco_stecomp.cpp

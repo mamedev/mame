@@ -171,7 +171,7 @@ double cem3394_device::filter(double input, double cutoff)
 double cem3394_device::filter(double input, double cutoff)
 {
 	// clamp cutoff to useful range, 50Hz-20kHz
-	cutoff = std::min(std::max(cutoff, 50.0), 20000.0);
+	cutoff = std::clamp(cutoff, 50.0, 20000.0);
 
 	// clamp resonance to below 1.0 to prevent runaway behavior; when clamping,
 	// also apply an (arbitrary) scale factor to the output since we're close
@@ -222,7 +222,7 @@ double cem3394_device::filter(double input, double cutoff)
 double cem3394_device::filter(double input, double cutoff)
 {
 	// clamp cutoff to useful range, 50Hz-20kHz
-	cutoff = std::min(std::max(cutoff, 50.0), 20000.0);
+	cutoff = std::clamp(cutoff, 50.0, 20000.0);
 
 	// clamp resonance to 0.95 to prevent infinite gain
 	double r = 4.0 * std::min(res, 0.95);

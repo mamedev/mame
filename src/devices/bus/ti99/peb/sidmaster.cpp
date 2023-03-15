@@ -31,7 +31,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_SIDMASTER, bus::ti99::peb, sidmaster_device, "ti99_sidmaster", "SID Master 99")
+DEFINE_DEVICE_TYPE(TI99_SIDMASTER, bus::ti99::peb::sidmaster_device, "ti99_sidmaster", "SID Master 99")
 
 namespace bus::ti99::peb {
 

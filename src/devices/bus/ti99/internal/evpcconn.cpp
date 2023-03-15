@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "evpcconn.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_EVPCCONN, bus::ti99::internal, evpc_clock_connector, "ti99_evpc_clock", "EVPC clock connector")
+DEFINE_DEVICE_TYPE(TI99_EVPCCONN, bus::ti99::internal::evpc_clock_connector, "ti99_evpc_clock", "EVPC clock connector")
 
 namespace bus::ti99::internal {
 

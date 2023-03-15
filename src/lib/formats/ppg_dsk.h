@@ -29,6 +29,6 @@ private:
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 };
 
-extern const floppy_format_type FLOPPY_PPG_FORMAT;
+extern const ppg_format FLOPPY_PPG_FORMAT;
 
 #endif // MAME_FORMATS_PPG_DSK_H

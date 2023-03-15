@@ -21,11 +21,13 @@
 */
 
 #include "csw_cas.h"
+#include "imageutl.h"
 #include "uef_cas.h"
+
+#include "osdcomm.h" // little_endianize_int*
 
 #include <zlib.h>
 
-#include <cassert>
 #include <cstring>
 
 

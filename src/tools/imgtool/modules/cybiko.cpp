@@ -10,6 +10,8 @@
 
 #include "imgtool.h"
 
+#include "opresolv.h"
+
 #include <zlib.h>
 
 struct cybiko_file_system

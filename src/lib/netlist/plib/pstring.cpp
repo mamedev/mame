@@ -83,7 +83,7 @@ typename pstring_t<F>::size_type pstring_t<F>::find(const pstring_t &search, siz
 	auto istart = std::next(begin(), static_cast<difference_type>(start));
 	for (; istart != end(); ++istart)
 	{
-		auto itc(istart);
+		auto itc = istart;
 		auto cmp = search.begin();
 		while (itc != end() && cmp != search.end() && *itc == *cmp)
 		{

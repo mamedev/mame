@@ -2,7 +2,7 @@
 // ssl/detail/impl/engine.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -55,17 +55,44 @@ engine::engine(SSL_CTX* context)
   ::SSL_set_bio(ssl_, int_bio, int_bio);
 }
 
+#if defined(ASIO_HAS_MOVE)
+engine::engine(engine&& other) ASIO_NOEXCEPT
+  : ssl_(other.ssl_),
+    ext_bio_(other.ext_bio_)
+{
+  other.ssl_ = 0;
+  other.ext_bio_ = 0;
+}
+#endif // defined(ASIO_HAS_MOVE)
+
 engine::~engine()
 {
-  if (SSL_get_app_data(ssl_))
+  if (ssl_ && SSL_get_app_data(ssl_))
   {
     delete static_cast<verify_callback_base*>(SSL_get_app_data(ssl_));
     SSL_set_app_data(ssl_, 0);
   }
 
-  ::BIO_free(ext_bio_);
-  ::SSL_free(ssl_);
+  if (ext_bio_)
+    ::BIO_free(ext_bio_);
+
+  if (ssl_)
+    ::SSL_free(ssl_);
 }
+
+#if defined(ASIO_HAS_MOVE)
+engine& engine::operator=(engine&& other) ASIO_NOEXCEPT
+{
+  if (this != &other)
+  {
+    ssl_ = other.ssl_;
+    ext_bio_ = other.ext_bio_;
+    other.ssl_ = 0;
+    other.ext_bio_ = 0;
+  }
+  return *this;
+}
+#endif // defined(ASIO_HAS_MOVE)
 
 SSL* engine::native_handle()
 {
@@ -204,7 +231,7 @@ const asio::error_code& engine::map_error_code(
   // SSL v2 doesn't provide a protocol-level shutdown, so an eof on the
   // underlying transport is passed through.
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L)
-  if (ssl_->version == SSL2_VERSION)
+  if (SSL_version(ssl_) == SSL2_VERSION)
     return ec;
 #endif // (OPENSSL_VERSION_NUMBER < 0x10100000L)
 
@@ -240,14 +267,23 @@ engine::want engine::perform(int (engine::* op)(void*, std::size_t),
   {
     ec = asio::error_code(sys_error,
         asio::error::get_ssl_category());
-    return want_nothing;
+    return pending_output_after > pending_output_before
+      ? want_output : want_nothing;
   }
 
   if (ssl_error == SSL_ERROR_SYSCALL)
   {
-    ec = asio::error_code(sys_error,
-        asio::error::get_system_category());
-    return want_nothing;
+    if (sys_error == 0)
+    {
+      ec = asio::ssl::error::unspecified_system_error;
+    }
+    else
+    {
+      ec = asio::error_code(sys_error,
+          asio::error::get_ssl_category());
+    }
+    return pending_output_after > pending_output_before
+      ? want_output : want_nothing;
   }
 
   if (result > 0 && bytes_transferred)
@@ -268,14 +304,19 @@ engine::want engine::perform(int (engine::* op)(void*, std::size_t),
     ec = asio::error_code();
     return want_input_and_retry;
   }
-  else if (::SSL_get_shutdown(ssl_) & SSL_RECEIVED_SHUTDOWN)
+  else if (ssl_error == SSL_ERROR_ZERO_RETURN)
   {
     ec = asio::error::eof;
     return want_nothing;
   }
-  else
+  else if (ssl_error == SSL_ERROR_NONE)
   {
     ec = asio::error_code();
+    return want_nothing;
+  }
+  else
+  {
+    ec = asio::ssl::error::unexpected_result;
     return want_nothing;
   }
 }

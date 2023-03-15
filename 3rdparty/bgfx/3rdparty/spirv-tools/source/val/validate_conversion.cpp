@@ -14,12 +14,12 @@
 
 // Validates correctness of conversion instructions.
 
-#include "source/val/validate.h"
-
 #include "source/diagnostic.h"
 #include "source/opcode.h"
 #include "source/spirv_constant.h"
+#include "source/spirv_target_env.h"
 #include "source/val/instruction.h"
+#include "source/val/validate.h"
 #include "source/val/validation_state.h"
 
 namespace spvtools {
@@ -263,16 +263,25 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Logical addressing not supported: "
                << spvOpcodeString(opcode);
 
-      if (_.addressing_model() ==
-          SpvAddressingModelPhysicalStorageBuffer64EXT) {
+      if (_.addressing_model() == SpvAddressingModelPhysicalStorageBuffer64) {
         uint32_t input_storage_class = 0;
         uint32_t input_data_type = 0;
         _.GetPointerTypeInfo(input_type, &input_data_type,
                              &input_storage_class);
-        if (input_storage_class != SpvStorageClassPhysicalStorageBufferEXT)
+        if (input_storage_class != SpvStorageClassPhysicalStorageBuffer)
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                 << "Pointer storage class must be PhysicalStorageBufferEXT: "
+                 << "Pointer storage class must be PhysicalStorageBuffer: "
                  << spvOpcodeString(opcode);
+
+        if (spvIsVulkanEnv(_.context()->target_env)) {
+          if (_.GetBitWidth(result_type) != 64) {
+            return _.diag(SPV_ERROR_INVALID_DATA, inst)
+                   << _.VkErrorID(4710)
+                   << "PhysicalStorageBuffer64 addressing mode requires the "
+                      "result integer type to have a 64-bit width for Vulkan "
+                      "environment.";
+          }
+        }
       }
       break;
     }
@@ -314,16 +323,25 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                << "Logical addressing not supported: "
                << spvOpcodeString(opcode);
 
-      if (_.addressing_model() ==
-          SpvAddressingModelPhysicalStorageBuffer64EXT) {
+      if (_.addressing_model() == SpvAddressingModelPhysicalStorageBuffer64) {
         uint32_t result_storage_class = 0;
         uint32_t result_data_type = 0;
         _.GetPointerTypeInfo(result_type, &result_data_type,
                              &result_storage_class);
-        if (result_storage_class != SpvStorageClassPhysicalStorageBufferEXT)
+        if (result_storage_class != SpvStorageClassPhysicalStorageBuffer)
           return _.diag(SPV_ERROR_INVALID_DATA, inst)
-                 << "Pointer storage class must be PhysicalStorageBufferEXT: "
+                 << "Pointer storage class must be PhysicalStorageBuffer: "
                  << spvOpcodeString(opcode);
+
+        if (spvIsVulkanEnv(_.context()->target_env)) {
+          if (_.GetBitWidth(input_type) != 64) {
+            return _.diag(SPV_ERROR_INVALID_DATA, inst)
+                   << _.VkErrorID(4710)
+                   << "PhysicalStorageBuffer64 addressing mode requires the "
+                      "input integer to have a 64-bit width for Vulkan "
+                      "environment.";
+          }
+        }
       }
       break;
     }
@@ -513,6 +531,24 @@ spv_result_t ConversionPass(ValidationState_t& _, const Instruction* inst) {
                  << "Expected input to have the same total bit width as "
                  << "Result Type: " << spvOpcodeString(opcode);
       }
+      break;
+    }
+
+    case SpvOpConvertUToAccelerationStructureKHR: {
+      if (!_.IsAccelerationStructureType(result_type)) {
+        return _.diag(SPV_ERROR_INVALID_DATA, inst)
+               << "Expected Result Type to be a Acceleration Structure: "
+               << spvOpcodeString(opcode);
+      }
+
+      const uint32_t input_type = _.GetOperandTypeId(inst, 2);
+      if (!input_type || !_.IsUnsigned64BitHandle(input_type)) {
+        return _.diag(SPV_ERROR_INVALID_DATA, inst)
+               << "Expected 64-bit uint scalar or 2-component 32-bit uint "
+                  "vector as input: "
+               << spvOpcodeString(opcode);
+      }
+
       break;
     }
 

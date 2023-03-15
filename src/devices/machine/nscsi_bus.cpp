@@ -233,7 +233,7 @@ const char *const nscsi_full_device::command_names[256] = {
 void nscsi_full_device::device_start()
 {
 	nscsi_device::device_start();
-	scsi_timer = timer_alloc(SCSI_TIMER);
+	scsi_timer = timer_alloc(FUNC(nscsi_full_device::update_tick), this);
 	save_item(NAME(scsi_cmdbuf));
 	save_item(NAME(scsi_sense_buffer));
 	save_item(NAME(scsi_cmdsize));
@@ -263,15 +263,12 @@ void nscsi_full_device::device_reset()
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	sense(false, SK_NO_SENSE);
 }
 
-void nscsi_full_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(nscsi_full_device::update_tick)
 {
-	if(id != SCSI_TIMER)
-		return;
-
-	step(true);
-
+	step(param);
 }
 
 void nscsi_full_device::scsi_ctrl_changed()
@@ -307,7 +304,7 @@ void nscsi_full_device::step(bool timeout)
 			if(scsi_initiator_id == 16)
 				scsi_initiator_id = -1;
 			scsi_state = TARGET_SELECT_WAIT_BUS_SETTLE;
-			scsi_timer->adjust(scsi_bus_settle_delay());
+			scsi_timer->adjust(scsi_bus_settle_delay(), true);
 		}
 		break;
 
@@ -339,7 +336,12 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			scsi_state &= STATE_MASK;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
-			step(false);
+			attotime delay = scsi_data_byte_period();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		}
 		break;
 
@@ -355,7 +357,12 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			scsi_state &= STATE_MASK;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
-			step(false);
+			attotime delay = scsi_data_byte_period();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		}
 		break;
 
@@ -463,7 +470,12 @@ void nscsi_full_device::step(bool timeout)
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
 			scsi_command();
 			scsi_state = TARGET_NEXT_CONTROL;
-			step(false);
+			attotime delay = scsi_data_command_delay();
+			if (delay == attotime::zero) {
+				step(false);
+			} else {
+				scsi_timer->adjust(delay, false);
+			}
 		} else
 			target_recv_byte();
 		break;
@@ -790,4 +802,16 @@ attotime nscsi_full_device::scsi_fast_hold_time()
 attotime nscsi_full_device::scsi_fast_negation_period()
 {
 	return attotime::from_nsec(30);
+}
+
+// Byte transfer rate (immediate)
+attotime nscsi_full_device::scsi_data_byte_period()
+{
+	return attotime::zero;
+}
+
+// Command execution delay (immediate)
+attotime nscsi_full_device::scsi_data_command_delay()
+{
+	return attotime::zero;
 }

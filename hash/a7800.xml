@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Atari 7800 Software List
 Prototype information obtained from http://www.atariprotos.com
@@ -165,7 +165,7 @@ Beef Drop (2006)
 Beef Drop VE (2007)               Missing
 B*nQ (2007)
 Combat 1990 (2005)                Missing
-FailSafe (NTSC only?) (2010)      Missing
+FailSafe (2010)
 Hangly-Man (2006)
 Jr Pac-Man (2009)
 Kessel Attack                     Missing
@@ -178,7 +178,7 @@ Santa Simon (2006)
 Space Duel (2007)
 Space Invaders (2008)
 Star Wars (2007)
-Super Pacman (2008)               Missing
+Super Pacman (2008)
 Wasp (2009)
 
 Notes:
@@ -215,6 +215,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+<!-- Doesn't work on standard 7800 due to missing encryption signature? -->
+	<software name="diagtestp" cloneof="diagtest" supported="no">
+		<description>7800 Pro System Diagnostic Test (prototype)</description>
+		<year>198?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="16384">
+				<rom name="testcart.bin" size="16384" crc="729dd769" sha1="ea4df28c6bedc09f7013013f257c984aed9b5319" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aceofaceu" cloneof="aceoface">
 		<description>Ace of Aces (NTSC)</description>
 		<year>1988</year>
@@ -243,7 +256,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="alienbrgu" cloneof="alienbrg">
+	<!-- Lacks lightgun emulation but playable with joystick -->
+	<software name="alienbrgu" cloneof="alienbrg" supported="partial">
 		<description>Alien Brigade (NTSC)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
@@ -251,14 +265,15 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="147456">
 				<rom name="alienbrg.bin" size="147456" crc="c8849d36" sha1="a8629fac962cc20b263a60bb2d2386d605713387"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="alienbrg">
+	<!-- Lacks lightgun emulation but playable with joystick -->
+	<software name="alienbrg" supported="partial">
 		<description>Alien Brigade (PAL)</description>
 		<year>1989</year>
 		<publisher>Atari</publisher>
@@ -266,8 +281,22 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="147456">
 				<rom name="alienbeu.bin" size="147456" crc="6a19f0fe" sha1="990711ae451d901a960af8ad9ae70813f16257b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armora2">
+		<description>Armor Attack II</description>
+		<year>2013</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="armor attack ii (20130416).bin" size="0x4000" crc="08eb2b5a" sha1="56f8bb2bc34ceba0c1107fcacab46dd0d4677075"/>
 			</dataarea>
 		</part>
 	</software>
@@ -289,7 +318,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdelux" cloneof="asteroid">
+	<software name="astdeluxu" cloneof="astdelux">
 		<description>Asteroids Deluxe (NTSC)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -303,7 +332,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="astdeluxp" cloneof="asteroid">
+	<software name="astdelux">
 		<description>Asteroids Deluxe (PAL)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -313,6 +342,34 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="asteroids deluxe (pal).bin" size="32768" crc="ab72ea89" sha1="341c7be2823e69e95a61567cb79042c140278c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrob">
+		<description>Astro Blaster (NTSC)</description>
+		<year>2014</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="astro blaster (20140201).bin" size="0xc000" crc="ff6dd806" sha1="51de38c2e1543d57f0b94edc58c2bb72dfb8b8d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrof">
+		<description>Astro Fighter (NTSC)</description>
+		<year>2015</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="astro fighter (20150726).bin" size="0x8000" crc="d18640f0" sha1="f76de283a1ac539157b9a97870e70addaedaa55d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +402,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="barnblstu" cloneof="barnblst">
+	<software name="barnblstu" cloneof="barnblst" supported="no">
 		<description>Barnyard Blaster (NTSC)</description>
 		<!-- Final Release Proto - C300051-059A (Matches NTSC)
 		             10/5/88 (#1/U3 27256 SUM16=9676)
@@ -358,14 +415,14 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="barnyard.bin" size="131072" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="barnblst">
+	<software name="barnblst" supported="no">
 		<description>Barnyard Blaster (PAL)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -373,6 +430,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="barnyaeu.bin" size="131072" crc="02764a86" sha1="a5797cf7e747bbd755c99fde6936caa15fbba6b1"/>
 			</dataarea>
@@ -395,7 +453,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="beefdrop">
-		<description>Beef Drop (NTSC, Added Pokey Chip)</description>
+		<description>Beef Drop (NTSC, added POKEY Chip)</description>
 		<year>2006</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Ken Siders" />
@@ -404,6 +462,20 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_pokey" />
 			<dataarea name="rom" size="32768">
 				<rom name="bd7800demo.bin" size="32768" crc="7873b949" sha1="a3eaff991cec95040aff53e0c26a862c3dfcc05e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bentley">
+		<description>Bentley Bear's Crystal Quest (NTSC)</description>
+		<year>2015</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_p450_ta" />
+			<dataarea name="rom" size="0x24000">
+				<rom name="bentley bear's crystal quest (20151220).bin" size="0x24000" crc="d44622b3" sha1="4a850d4b97bea621e9b6df142afeec8b398d6d6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -562,7 +634,36 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
-	<software name="crossbowu" cloneof="crossbow">
+	<software name="crazyottou" cloneof="crazyotto">
+		<description>Crazy Otto (NTSC, Ms. Pac-Man hack)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazyotto (ntsc) (20100612).bin" size="0x4000" crc="5049e4be" sha1="c4af478c38d524f0f5c418f0dd51af38ea62c3ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazyotto">
+		<description>Crazy Otto (PAL, Ms. Pac-Man hack)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="crazyotto (pal) (20100612).bin" size="0x4000" crc="5637c44a" sha1="5fc657219e4e513bc6ef84f093ac17846b11e2c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Lacks lightgun emulation but playable with joystick -->
+	<software name="crossbowu" cloneof="crossbow" supported="partial">
 		<description>Crossbow (NTSC)</description>
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
@@ -570,14 +671,15 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="147456">
 				<rom name="crossbow.bin" size="147456" crc="d2ea5686" sha1="d5e47da88e232cd9ea059e133e7c0f13d921a04c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="crossbow">
+	<!-- Lacks lightgun emulation but playable with joystick -->
+	<software name="crossbow" supported="partial">
 		<description>Crossbow (PAL)</description>
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
@@ -585,7 +687,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="147456">
 				<rom name="crossbeu.bin" size="147456" crc="e93d8894" sha1="f26d292210a91a714b4b87712ff53b8e49da611e"/>
 			</dataarea>
@@ -639,7 +741,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="dsrtflcna" cloneof="dsrtflcn">
-		<description>Desert Falcon (NTSC, Alternate)</description>
+		<description>Desert Falcon (NTSC, alternate)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7811"/>
@@ -761,8 +863,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="dbledrgn.bin" size="131072" crc="aa265865" sha1="c3fb140836a4ed84cda7a999832703e8b72c0d21"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="dbledrgn.bin" size="0x20000" crc="f20773d5" sha1="df67dad8bbf3813e7b96362c55ed4af40d831277"/>
 			</dataarea>
 		</part>
 	</software>
@@ -775,8 +877,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="dbledreu.bin" size="131072" crc="f29abdb2" sha1="210f3ac989549e89425e7677127715aee713af32"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="dbledreu.bin" size="0x20000" crc="4d634bf5" sha1="da7d495ac858c3b1f66aeb6e981c25bd08d44bd8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -789,8 +891,8 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_abs" />
-			<dataarea name="rom" size="65536">
-				<rom name="f18hornt.bin" size="65536" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="dei353am-hornt.u4" size="0x10000" crc="63d1c7c1" sha1="13a18a6b85db6222b01d37800e5e57db616a85a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -805,6 +907,34 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_abs" />
 			<dataarea name="rom" size="65536">
 				<rom name="f18horeu.bin" size="65536" crc="e5d714b0" sha1="673d912b2f9ab7a43f95e0e90bd80249b360fe0d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="failsafeu" cloneof="failsafe">
+		<description>FailSafe (NTSC)</description>
+		<year>2010</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="failsafe (ntsc) (20100227).bin" size="0xc000" crc="67ebf1ed" sha1="e3221e285adaee30f36b60e85a35b63cb4d63292"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="failsafe">
+		<description>FailSafe (PAL)</description>
+		<year>2010</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="failsafe (pal) (20100227).bin" size="0xc000" crc="56ac5864" sha1="2d810a0e521e06ce560fe42f9e1c15d759071d4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -879,6 +1009,21 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+	<software name="foodfup" cloneof="foodf">
+		<description>Food Fight (NTSC, prototype)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ff lo 8 8-16-84 029e.u2" size="0x4000" crc="47d02bb1" sha1="48539447a5a247c57faadd7236281844609e8fc0" offset="0x0000"/>
+				<rom name="ff hi e 8-16-84 845f.u1" size="0x2000" crc="ea1f5502" sha1="fa2fa3c5aa20ebd5f55d8182dadc822bdbba1ac5" offset="0x4000"/>
+				<rom size="0x2000" offset="0x6000" loadflag="reload"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="foodf">
 		<description>Food Fight (PAL)</description>
 		<year>1984</year>
@@ -889,6 +1034,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="foodfgeu.bin" size="49152" crc="c64549ec" sha1="40b8e5eeb9e9ad7239963ed79dc085092ccbec4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggie">
+		<description>Froggie</description>
+		<year>2018</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Matthias Luedtke" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_pokey" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="froggie (final release) (20180920).bin" size="0x8000" crc="224b93d4" sha1="586b43ca3acd35307bb58f32d08649c755944c5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -922,7 +1080,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop1">
-		<description>GATO (NTSC, Prototype, 198801xx)</description>
+		<description>GATO (NTSC, prototype, 198801xx)</description>
 		<year>1988</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -936,7 +1094,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop2" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 198712xx)</description>
+		<description>GATO (NTSC, prototype, 198712xx)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -950,7 +1108,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop3" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 198711xx)</description>
+		<description>GATO (NTSC, prototype, 198711xx)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -964,7 +1122,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop4" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870727)</description>
+		<description>GATO (NTSC, prototype, 19870727)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -978,7 +1136,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop5" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870623)</description>
+		<description>GATO (NTSC, prototype, 19870623)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -992,7 +1150,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop6" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870611)</description>
+		<description>GATO (NTSC, prototype, 19870611)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1006,7 +1164,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop7" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870523)</description>
+		<description>GATO (NTSC, prototype, 19870523)</description>
 		<!-- (27256 SUM16=1783) (27128 SUM16=A4D3) -->
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
@@ -1021,7 +1179,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 	<software name="gatop8" cloneof="gatop1">
-		<description>GATO (NTSC, Prototype, 19870424)</description>
+		<description>GATO (NTSC, prototype, 19870424)</description>
 		<year>1987</year>
 		<publisher>Atari / Spectrum Holobyte</publisher>
 		<info name="serial" value="CX7827"/>
@@ -1214,6 +1372,19 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 		</part>
 	</software>
 
+	<software name="kcmunch">
+		<description>K.C. Munchkin!</description>
+		<year>2014</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="kc munchkin (20140408).bin" size="0x4000" crc="3a935531" sha1="13a19fc0be062952a93359020778d04705b0b75d"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Karateka "Very close to final" Prototype
 12/23/86 (27128 LO SUM16=3B0E) (27256 HI SUM16=1271)
 NOTES:
@@ -1256,7 +1427,7 @@ game, you can keep pressed Button 1 during Atari logo (thanks to Mike
 Saarna for debugging the problem)
 -->
 	<software name="klax">
-		<description>Klax (NTSC, Prototype)</description>
+		<description>Klax (NTSC, prototype)</description>
 		<year>1992</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7888"/>
@@ -1382,7 +1553,7 @@ Saarna for debugging the problem)
 		</part>
 	</software>
 
-	<software name="meltdownu" cloneof="meltdown">
+	<software name="meltdownu" cloneof="meltdown" supported="no">
 		<description>Meltdown (NTSC)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
@@ -1390,14 +1561,14 @@ Saarna for debugging the problem)
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="meltdown.bin" size="131072" crc="4a8f2171" sha1="e601c45aaa1cc25f01493867664c8b9fefeca70e"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="meltdown">
+	<software name="meltdown" supported="no">
 		<description>Meltdown (PAL)</description>
 		<year>1990</year>
 		<publisher>Atari</publisher>
@@ -1405,15 +1576,43 @@ Saarna for debugging the problem)
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="meltdoeu.bin" size="131072" crc="177fc850" sha1="ac448f369c3c6334415095e4ff344fdd73b473be"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="meteorshu" cloneof="meteorsh">
+		<description>Meteor Shower (NTSC)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="meteor shower (ntsc) (20120218).bin" size="0x4000" crc="1a6b1e88" sha1="fe49cc7b92b3f1d44c91b4f645ee8348ebe7e017"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteorsh">
+		<description>Meteor Shower (PAL)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="meteor shower (pal) (20120218).bin" size="0x4000" crc="ea240bf3" sha1="5e06ce4a823407234e9c784ba51bbe6edd7ae7cf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mia" supported="partial">
-		<description>Missing In Action (Prototype)</description>
+		<description>Missing In Action (prototype)</description>
 		<!-- 5 Chips total 4 x 27256, 1 x 27128) -->
 		<year>1989</year>
 		<publisher>TNT Games</publisher>
@@ -1434,8 +1633,8 @@ Saarna for debugging the problem)
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="131072">
-				<rom name="midmutnt.bin" size="131072" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="c300051-089a.u1" size="0x20000" crc="187ec84e" sha1="db5ea4c1456f3b403f6b8978432ecbcdac89d432"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1450,6 +1649,34 @@ Saarna for debugging the problem)
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="131072">
 				<rom name="midmuteu.bin" size="131072" crc="7ca6d521" sha1="85f0e0556df65c0732f71ab3f2bbde3615355f72"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrstu" cloneof="mooncrst">
+		<description>Moon Cresta (NTSC)</description>
+		<year>2011</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="moon cresta (ntsc) (20111113).bin" size="0x8000" crc="1e85a87f" sha1="b94a015d2d77d5854bba6c3abfe6141f1af446c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mooncrst">
+		<description>Moon Cresta (PAL)</description>
+		<year>2011</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="moon cresta (pal) (20111113).bin" size="0x8000" crc="80ac3695" sha1="916ed56c5b4fe93f7371200a91b6f208894af445"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1688,7 +1915,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="pitfight">
-		<description>Pit Fighter (Prototype)</description>
+		<description>Pit Fighter (prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7891"/>
@@ -1729,7 +1956,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="plutos">
-		<description>Plutos (Prototype)</description>
+		<description>Plutos (prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1770,6 +1997,20 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!-- This allegedly is a 7800 BIOS that ended up on a cartridge. As a cartridge it doesn't run on real hardware? -->
+	<software name="polepos2p" cloneof="polepos2" supported="no">
+		<description>Pole Position II (prototype)</description>
+		<year>198?</year>
+		<publisher>Atari / Namco</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ppii lo.u2" size="0x4000" crc="ba6d7560" sha1="ae00f45eefd37d39ac26092b2a2c82d252714582" offset="0x0000"/>
+				<rom name="pole position ii hi.u1" size="0x4000" crc="547b7906" sha1="f7122f917a37d176960e81bdb0d68e8877cfa5e6" offset="0x4000"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rampage">
 		<description>Rampage (NTSC)</description>
 		<year>1989</year>
@@ -1778,14 +2019,14 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
-			<dataarea name="rom" size="131072">
-				<rom name="rampage.bin" size="131072" crc="39a316aa" sha1="13745b5eaaab7e2c992f3312285e112cdeb424f6"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="rampage.bin" size="0x20000" crc="d2876ee2" sha1="17401f85fe8b453a6b43b3d0035d993b90568efc"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="rampart" supported="no">
-		<description>Rampart (Prototype)</description>
+		<description>Rampart (prototype)</description>
 		<!-- (2 x 27512 - U1, U2) -->
 		<year>1991</year>
 		<publisher>Imagitec Design</publisher>
@@ -1799,7 +2040,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="fractal">
-		<description>Rescue on Fractalus (NTSC, Prototype)</description>
+		<description>Rescue on Fractalus (NTSC, prototype)</description>
 		<!-- 2 x 27128 - U2 (LO), U3 (HI) -->
 		<year>1984</year>
 		<publisher>Atari</publisher>
@@ -1811,6 +2052,34 @@ almost nothing like the prototype.
 				<rom name="rescuefr.bin" size="32768" crc="9a74fbf2" sha1="6653022f38e553d475896a918850158eaf8f77ff"/>
 			</dataarea>
 			<dataarea name="ram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ripoffu" cloneof="ripoff">
+		<description>Rip-Off (NTSC)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="rip-off (ntsc) (20120502).bin" size="0x4000" crc="ab65a41d" sha1="6c377ef750c8a7eebccde2c6cdaa3c0d0df65852"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ripoff">
+		<description>Rip-Off (PAL)</description>
+		<year>2012</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="rip-off (pal) (20120502).bin" size="0x4000" crc="b1c8d47d" sha1="52ddb5fdf55c5862dc435dfec37d0c59948dcb19"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1857,6 +2126,20 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<software name="scramble">
+		<description>Scramble (NTSC)</description>
+		<year>2016</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0xc000">
+				<rom name="scramble (ntsc) (20161202).bin" size="0xc000" crc="ea42ff6e" sha1="65d12610c14a44ab86c481dbb0fa9e562930a0e9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scrapdogu" cloneof="scrapdog">
 		<description>Scrapyard Dog (NTSC)</description>
 		<year>1990</year>
@@ -1885,22 +2168,22 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<software name="sentinelu" cloneof="sentinel">
-		<description>Sentinel (NTSC, Prototype)</description>
+	<software name="sentinelu" cloneof="sentinel" supported="no">
+		<description>Sentinel (NTSC, prototype)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="sentinel.bin" size="131072" crc="2fddad78" sha1="bd7de03a28b168c992bcaa96539c2310f3bfe30c"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sentinel">
+	<software name="sentinel" supported="no">
 		<description>Sentinel (PAL)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
@@ -1908,7 +2191,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<feature name="peripheral" value="lightgun" /> <!-- Works with Lightgun -->
+			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="131072">
 				<rom name="sentineu.bin" size="131072" crc="47340df9" sha1="6d85a73a56d2f02ff439736eace86691aa613444"/>
 			</dataarea>
@@ -1916,7 +2199,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="sirius">
-		<description>Sirius (Prototype)</description>
+		<description>Sirius (prototype)</description>
 		<year>1990</year>
 		<publisher>Tynesoft</publisher>
 		<part name="cart" interface="a7800_cart">
@@ -1985,7 +2268,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwarsu" cloneof="starwars">
-		<description>Star Wars 7800 (NTSC, Hack)</description>
+		<description>Star Wars 7800 (NTSC, hack)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Gambler172" />
@@ -1999,7 +2282,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars 7800 (PAL, Hack)</description>
+		<description>Star Wars 7800 (PAL, hack)</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Gambler172" />
@@ -2052,6 +2335,34 @@ almost nothing like the prototype.
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="49152">
 				<rom name="suprhueu.bin" size="49152" crc="6b27ea2c" sha1="469e03ee1e22ef0978c8095a38d662d34a413723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superpacu" cloneof="superpac">
+		<description>Super Pac-Man (NTSC)</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="super pac-man (ntsc) (20081010).bin" size="0x8000" crc="415a28ad" sha1="e1c51fa453b8dc600e5d7f46df1443b99a1507d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superpac">
+		<description>Super Pac-Man (PAL)</description>
+		<year>2008</year>
+		<publisher>AtariAge</publisher>
+		<info name="developer" value="Bob DeCrescenzo" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="super pac-man (pal) (20081010).bin" size="0x8000" crc="e920a2dc" sha1="58375542cb3c2ecf2e2800d280c2d56a58804e77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2199,16 +2510,16 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!-- An earlier development version, v1.05, with CRC AE1117DD does not run correctly on real hardware. On hardware and in MAME neither the player nor wasp sprites are displayed, though the game logic otherwise seems to run. -->
 	<software name="wasp">
-		<description>Wasp (NTSC)</description>
+		<description>Wasp!</description>
 		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Mark Ball" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="32768">
-				<rom name="wasp v1.05.bin" size="32768" crc="ae1117dd" sha1="be65bdc225aca4a8bb9a18653da7de78aaac3f80"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="wasp_standard_edition.bin" size="0x8000" crc="ccdc2dbf" sha1="4e259a2a01e86e970aa58acd94325f8a37eea1cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2247,9 +2558,9 @@ almost nothing like the prototype.
      e.g. no sound in bobsled ans ski jump games!
      Dump is confirmed from multiple carts, and it was probably used in
      some erlier production run, until they found out the mistake and
-     replaced it with the complete version  -->
+     replaced it with the complete version -->
 	<software name="wingameso" cloneof="wingames">
-		<description>Winter Games (NTSC, Older?)</description>
+		<description>Winter Games (NTSC, older?)</description>
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7831"/>
@@ -2260,6 +2571,19 @@ almost nothing like the prototype.
 				<rom name="wingameso.bin" size="131072" crc="cf648e88" sha1="361501982f4795c2d79fb6519e5c56452ebc5774"/>
 			</dataarea>
 			<dataarea name="ram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worm">
+		<description>Worm!</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Mark Ball" />
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="worm.07_03_10.1.16.bin" size="0x4000" crc="39296da2" sha1="d1b7cd5c27c2ec39cba55542eb1f90b027abd50b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2302,6 +2626,20 @@ almost nothing like the prototype.
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="32768">
 				<rom name="xevious.bin" size="32768" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xeviousup" cloneof="xevious">
+		<description>Xevious (NTSC, prototype)</description>
+		<year>1984</year>
+		<publisher>Atari / Namco</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="xevious 5-10 lo.u2" size="0x4000" crc="b154c59a" sha1="b94959e60e84c97dabc002f39f03c781376c35f7" offset="0x0000"/>
+				<rom name="xevious 5-10 hi.u1" size="0x4000" crc="9d3622b5" sha1="5cc9585f8c3f5dd0106990fde24883756868f437" offset="0x4000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2372,9 +2710,9 @@ almost nothing like the prototype.
 	<!-- XM board enhanced -->
 	<!-- from http://atariage.com/forums/topic/204250-donkey-kong-xm-pre-order-and-demo/ -->
 
-	<!-- these ones are listed as 'working in MESS' but are apparently the only images that work on real hardware too -->
+	<!-- these ones are listed as 'working in MAME' but are apparently the only images that work on real hardware too -->
 	<software name="dkongxm">
-		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2)</description>
+		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2388,7 +2726,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmu" cloneof="dkongxm">
-		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2401,11 +2739,11 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-	<!-- these are listed as 'with HSC emulation' and are designed for the prosystem emulator, they simulate some of the HSC features -->
+	<!-- these are listed as 'with HSC emulation' and are designed for the ProSystem Emulator, they simulate some of the HSC features -->
 	<!-- remove them? -->
 
-	<software name="dkongxmps"  cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+	<software name="dkongxmps" cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (PAL, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2419,7 +2757,7 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="dkongxmups" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (NTSC, Demo, XM enhanced, V1.2, for prosystem emulator)</description>
+		<description>Donkey Kong (NTSC, demo, XM enhanced, V1.2, for ProSystem Emulator)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />
@@ -2436,36 +2774,36 @@ almost nothing like the prototype.
 
 	<!-- an older version? sound is broken, did it work on the real hardware? -->
 	<software name="dkongxmo" cloneof="dkongxm" supported="no">
-			<description>Donkey Kong (PAL, Demo, XM enhanced, older)</description>
-			<year>2012</year>
-			<publisher>&lt;homebrew&gt;</publisher>
-			<info name="programmer" value="TEP392" />
-			<sharedfeat name="compatibility" value="PAL"/>
-			<part name="cart" interface="a7800_cart">
-				<feature name="slot" value="a78_sg9" />
-				<dataarea name="rom" size="147456">
-					<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00"/>
-				</dataarea>
-			</part>
-		</software>
+		<description>Donkey Kong (PAL, demo, XM enhanced, older)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_pal.bin" size="147456" crc="d362712e" sha1="118c462d6698bd23c378785f80062fdd7d65ca00"/>
+			</dataarea>
+		</part>
+	</software>
 
-		<software name="dkongxmou" cloneof="dkongxm" supported="no">
-			<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
-			<year>2012</year>
-			<publisher>&lt;homebrew&gt;</publisher>
-			<info name="programmer" value="TEP392" />
-			<sharedfeat name="compatibility" value="NTSC"/>
-			<part name="cart" interface="a7800_cart">
-				<feature name="slot" value="a78_sg9" />
-				<dataarea name="rom" size="147456">
-					<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455"/>
-				</dataarea>
-			</part>
-		</software>
+	<software name="dkongxmou" cloneof="dkongxm" supported="no">
+		<description>Donkey Kong (NTSC, demo, XM enhanced, older)</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="TEP392" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_sg9" />
+			<dataarea name="rom" size="147456">
+				<rom name="dkxm_final_demo_ntsc.bin" size="147456" crc="6e170055" sha1="f4da231312da06ff9e8af5681b5013b14886b455"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- this one is meant to detect PAL / NTSC and runs on an A7800 CC2 development board, without sound? based off older code? -->
 	<software name="dkongxmcc" cloneof="dkongxm" supported="no">
-		<description>Donkey Kong (PAL/NTSC, Demo, XM enhanced, older, for CC2 board)</description>
+		<description>Donkey Kong (PAL/NTSC, demo, XM enhanced, older, for CC2 board)</description>
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="TEP392" />

@@ -14,42 +14,10 @@
 
 
 namespace util {
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-static std::chrono::system_clock::duration calculate_system_clock_adjustment();
+namespace {
 
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-std::chrono::system_clock::duration system_clock_adjustment(calculate_system_clock_adjustment());
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-arbitrary_datetime arbitrary_datetime::now()
-{
-	time_t sec;
-	time(&sec);
-	auto t = *localtime(&sec);
-
-	arbitrary_datetime dt;
-	dt.year         = t.tm_year + 1900;
-	dt.month        = t.tm_mon + 1;
-	dt.day_of_month = t.tm_mday;
-	dt.hour         = t.tm_hour;
-	dt.minute       = t.tm_min;
-	dt.second       = t.tm_sec;
-
-	return dt;
-}
-
-static std::chrono::system_clock::duration calculate_system_clock_adjustment()
+std::chrono::system_clock::duration calculate_system_clock_adjustment()
 {
 	constexpr auto days_in_year(365);
 	constexpr auto days_in_four_years((days_in_year * 4) + 1);
@@ -82,6 +50,39 @@ static std::chrono::system_clock::duration calculate_system_clock_adjustment()
 	result += year * years;
 
 	return result - std::chrono::system_clock::from_time_t(0).time_since_epoch();
+}
+
+} // anonymous namespace
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+std::chrono::system_clock::duration system_clock_adjustment(calculate_system_clock_adjustment());
+
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+arbitrary_datetime arbitrary_datetime::now()
+{
+	time_t sec;
+	time(&sec);
+	auto t = *localtime(&sec);
+
+	arbitrary_datetime dt;
+	dt.year         = t.tm_year + 1900;
+	dt.month        = t.tm_mon + 1;
+	dt.day_of_month = t.tm_mday;
+	dt.hour         = t.tm_hour;
+	dt.minute       = t.tm_min;
+	dt.second       = t.tm_sec;
+
+	return dt;
 }
 
 

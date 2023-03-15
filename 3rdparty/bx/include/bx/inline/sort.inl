@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_SORT_H_HEADER_GUARD
@@ -9,21 +9,127 @@
 
 namespace bx
 {
-#define BX_RADIXSORT_BITS 11
-#define BX_RADIXSORT_HISTOGRAM_SIZE (1<<BX_RADIXSORT_BITS)
-#define BX_RADIXSORT_BIT_MASK (BX_RADIXSORT_HISTOGRAM_SIZE-1)
+	template<typename Ty>
+	inline int32_t compareAscending(const void* _lhs, const void* _rhs)
+	{
+		const Ty lhs = *static_cast<const Ty*>(_lhs);
+		const Ty rhs = *static_cast<const Ty*>(_rhs);
+		return (lhs > rhs) - (lhs < rhs);
+	}
+
+	template<typename Ty>
+	inline int32_t compareDescending(const void* _lhs, const void* _rhs)
+	{
+		return compareAscending<Ty>(_rhs, _lhs);
+	}
+
+	template<>
+	inline int32_t compareAscending<const char*>(const void* _lhs, const void* _rhs)
+	{
+		return strCmp(*(const char**)_lhs, *(const char**)_rhs);
+	}
+
+	template<>
+	inline int32_t compareAscending<StringView>(const void* _lhs, const void* _rhs)
+	{
+		return strCmp(*(const StringView*)_lhs, *(const StringView*)_rhs);
+	}
+
+	template<typename Ty>
+	inline void quickSort(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Element type must be trivially move assignable");
+		quickSort(_data, _num, _stride, _fn);
+	}
+
+	template<typename Ty>
+	inline void quickSort(Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Element type must be trivially move assignable");
+		quickSort( (void*)_data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t unique(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Element type must be trivially move assignable");
+		return unique(_data, _num, _stride, _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t unique(Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Element type must be trivially move assignable");
+		return unique( (void*)_data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t lowerBound(const Ty& _key, const Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		return lowerBound( (const void*)&_key, _data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t lowerBound(const Ty& _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		return lowerBound( (const void*)&_key, _data, _num, _stride, _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t upperBound(const Ty& _key, const Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		return upperBound( (const void*)&_key, _data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline uint32_t upperBound(const Ty& _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		return upperBound( (const void*)&_key, _data, _num, _stride, _fn);
+	}
+
+	template<typename Ty>
+	inline bool isSorted(const Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		return isSorted(_data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline bool isSorted(const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		return isSorted(_data, _num, _stride, _fn);
+	}
+
+	template<typename Ty>
+	inline int32_t binarySearch(const Ty& _key, const Ty* _data, uint32_t _num, const ComparisonFn _fn)
+	{
+		return binarySearch( (const void*)&_key, _data, _num, sizeof(Ty), _fn);
+	}
+
+	template<typename Ty>
+	inline int32_t binarySearch(const Ty& _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		return binarySearch( (const void*)&_key, _data, _num, _stride, _fn);
+	}
+
+	namespace radix_sort_detail
+	{
+		constexpr uint32_t kBits          = 11;
+		constexpr uint32_t kHistogramSize = 1<<kBits;
+		constexpr uint32_t kBitMask       = kHistogramSize-1;
+
+	} // namespace radix_sort_detail
 
 	inline void radixSort(uint32_t* _keys, uint32_t* _tempKeys, uint32_t _size)
 	{
 		uint32_t* keys = _keys;
 		uint32_t* tempKeys = _tempKeys;
 
-		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[radix_sort_detail::kHistogramSize];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
 
 			bool sorted = true;
 			{
@@ -32,7 +138,7 @@ namespace bx
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -44,7 +150,7 @@ namespace bx
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
+			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -54,7 +160,7 @@ namespace bx
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint32_t key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 			}
@@ -63,7 +169,7 @@ namespace bx
 			tempKeys = keys;
 			keys = swapKeys;
 
-			shift += BX_RADIXSORT_BITS;
+			shift += radix_sort_detail::kBits;
 		}
 
 done:
@@ -77,17 +183,19 @@ done:
 	template <typename Ty>
 	inline void radixSort(uint32_t* _keys, uint32_t* _tempKeys, Ty* _values, Ty* _tempValues, uint32_t _size)
 	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Sort element type must be trivially move assignable");
+
 		uint32_t* keys = _keys;
 		uint32_t* tempKeys = _tempKeys;
 		Ty* values = _values;
 		Ty* tempValues = _tempValues;
 
-		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[radix_sort_detail::kHistogramSize];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
 
 			bool sorted = true;
 			{
@@ -96,7 +204,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -108,7 +216,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
+			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -118,7 +226,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint32_t key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
@@ -132,7 +240,7 @@ done:
 			tempValues = values;
 			values = swapValues;
 
-			shift += BX_RADIXSORT_BITS;
+			shift += radix_sort_detail::kBits;
 		}
 
 done:
@@ -152,12 +260,12 @@ done:
 		uint64_t* keys = _keys;
 		uint64_t* tempKeys = _tempKeys;
 
-		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[radix_sort_detail::kHistogramSize];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
 
 			bool sorted = true;
 			{
@@ -166,7 +274,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -178,7 +286,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
+			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -188,7 +296,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint64_t key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 			}
@@ -197,7 +305,7 @@ done:
 			tempKeys = keys;
 			keys = swapKeys;
 
-			shift += BX_RADIXSORT_BITS;
+			shift += radix_sort_detail::kBits;
 		}
 
 done:
@@ -211,17 +319,19 @@ done:
 	template <typename Ty>
 	inline void radixSort(uint64_t* _keys, uint64_t* _tempKeys, Ty* _values, Ty* _tempValues, uint32_t _size)
 	{
+		BX_STATIC_ASSERT(isTriviallyMoveAssignable<Ty>(), "Sort element type must be trivially move assignable");
+
 		uint64_t* keys = _keys;
 		uint64_t* tempKeys = _tempKeys;
 		Ty* values = _values;
 		Ty* tempValues = _tempValues;
 
-		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[radix_sort_detail::kHistogramSize];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*radix_sort_detail::kHistogramSize);
 
 			bool sorted = true;
 			{
@@ -230,7 +340,7 @@ done:
 				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 				{
 					key = keys[ii];
-					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 					++histogram[index];
 					sorted &= prevKey <= key;
 				}
@@ -242,7 +352,7 @@ done:
 			}
 
 			uint32_t offset = 0;
-			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
+			for (uint32_t ii = 0; ii < radix_sort_detail::kHistogramSize; ++ii)
 			{
 				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
@@ -252,7 +362,7 @@ done:
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				uint64_t key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+				uint16_t index = (key>>shift)&radix_sort_detail::kBitMask;
 				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
@@ -266,7 +376,7 @@ done:
 			tempValues = values;
 			values = swapValues;
 
-			shift += BX_RADIXSORT_BITS;
+			shift += radix_sort_detail::kBits;
 		}
 
 done:
@@ -280,9 +390,5 @@ done:
 			}
 		}
 	}
-
-#undef BX_RADIXSORT_BITS
-#undef BX_RADIXSORT_HISTOGRAM_SIZE
-#undef BX_RADIXSORT_BIT_MASK
 
 } // namespace bx

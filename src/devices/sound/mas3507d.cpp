@@ -1,8 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-//
-// MAS 3507D MPEG audio decoder
-//
+/*
+    Micronas MAS 3507D MPEG audio decoder
+
+    Datasheet: https://www.mas-player.de/mp3/download/mas3507d.pdf
+
+    TODO:
+    - Datasheet says it has DSP and internal program ROM,
+    but these are not dumped and hooked up
+    - Support Broadcast mode, MPEG Layer 2
+*/
 
 #include "emu.h"
 #include "mas3507d.h"
@@ -10,7 +17,7 @@
 #define MINIMP3_ONLY_MP3
 #define MINIMP3_NO_STDIO
 #define MINIMP3_IMPLEMENTATION
-#define MAX_FRAME_SYNC_MATCHES 1
+#define MAX_FRAME_SYNC_MATCHES 3
 #include "minimp3/minimp3.h"
 #include "minimp3/minimp3_ex.h"
 
@@ -37,12 +44,12 @@ ALLOW_SAVE_TYPE(mas3507d_device::i2c_subdest_t)
 ALLOW_SAVE_TYPE(mas3507d_device::i2c_command_t)
 
 // device type definition
-DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
+DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "Micronas MAS 3507D MPEG decoder")
 
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, cb_sample(*this)
+	, cb_mpeg_frame_sync(*this), cb_demand(*this)
 	, i2c_bus_state(IDLE), i2c_bus_address(UNKNOWN), i2c_subdest(UNDEFINED), i2c_command(CMD_BAD)
 	, i2c_scli(false), i2c_sclo(false), i2c_sdai(false), i2c_sdao(false)
 	, i2c_bus_curbit(0), i2c_bus_curval(0), i2c_bytecount(0), i2c_io_bank(0), i2c_io_adr(0), i2c_io_count(0), i2c_io_val(0)
@@ -51,9 +58,10 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 
 void mas3507d_device::device_start()
 {
-	current_rate = 44100;
-	stream = stream_alloc(0, 2, current_rate);
-	cb_sample.resolve();
+	stream = stream_alloc(0, 2, 44100);
+
+	cb_mpeg_frame_sync.resolve();
+	cb_demand.resolve();
 
 	save_item(NAME(mp3data));
 	save_item(NAME(samples));
@@ -67,8 +75,8 @@ void mas3507d_device::device_start()
 	save_item(NAME(i2c_sdao));
 	save_item(NAME(i2c_bus_curbit));
 	save_item(NAME(i2c_bus_curval));
+
 	save_item(NAME(mp3data_count));
-	save_item(NAME(current_rate));
 	save_item(NAME(decoded_frame_count));
 	save_item(NAME(decoded_samples));
 	save_item(NAME(sample_count));
@@ -83,6 +91,7 @@ void mas3507d_device::device_start()
 	save_item(NAME(i2c_io_val));
 	save_item(NAME(i2c_sdao_data));
 	save_item(NAME(playback_status));
+	save_item(NAME(mp3_is_buffered));
 
 	// This should be removed in the future if/when native MP3 decoding is implemented in MAME
 	save_item(NAME(mp3_dec.mdct_overlap));
@@ -112,6 +121,8 @@ void mas3507d_device::device_reset()
 	is_muted = false;
 	gain_ll = gain_rr = 0;
 
+	stream->set_sample_rate(44100);
+
 	reset_playback();
 }
 
@@ -120,7 +131,8 @@ void mas3507d_device::i2c_scl_w(bool line)
 	if(line == i2c_scli)
 		return;
 	i2c_scli = line;
-
+	// FIXME: sda output should only change state when clock is low.
+	// On wrong device-id ensure sda is left high (Think it's OK but not certain)
 	if(i2c_scli) {
 		if(i2c_bus_state == STARTED) {
 			if(i2c_sdai)
@@ -348,11 +360,11 @@ void mas3507d_device::i2c_device_got_stop()
 	LOGOTHER("MAS I2C: got stop\n");
 }
 
-int gain_to_db(double val) {
+int mas3507d_device::gain_to_db(double val) {
 	return round(20 * log10((0x100000 - val) / 0x80000));
 }
 
-float gain_to_percentage(int val) {
+float mas3507d_device::gain_to_percentage(int val) {
 	if(val == 0)
 		return 0; // Special case for muting it seems
 
@@ -418,30 +430,53 @@ void mas3507d_device::run_program(uint32_t adr)
 	}
 }
 
-void mas3507d_device::fill_buffer()
+void mas3507d_device::sid_w(uint8_t byte)
 {
-	while(mp3data_count + 2 < mp3data.size()) {
-		uint16_t v = cb_sample();
-		mp3data[mp3data_count++] = v >> 8;
-		mp3data[mp3data_count++] = v;
+	if (mp3data_count >= mp3data.size()) {
+		std::copy(mp3data.begin() + 1, mp3data.end(), mp3data.begin());
+		mp3data_count--;
 	}
 
+	mp3data[mp3data_count++] = byte;
+
+	if (!mp3_is_buffered) {
+		// Only start the decoder when a full MP3 frame is found
+		int free_format_bytes = 0, frame_size = 0;
+		int frame_offset = mp3d_find_frame(static_cast<const uint8_t *>(&mp3data[0]), mp3data_count, &free_format_bytes, &frame_size);
+		mp3_is_buffered = frame_size && frame_offset + frame_size < mp3data_count;
+	}
+
+	cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
+}
+
+void mas3507d_device::fill_buffer()
+{
+	cb_mpeg_frame_sync(0);
+
+	if (!mp3_is_buffered) {
+		cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
+		return;
+	}
+
+	memset(&mp3_info, 0, sizeof(mp3dec_frame_info_t));
 	sample_count = mp3dec_decode_frame(&mp3_dec, static_cast<const uint8_t *>(&mp3data[0]), mp3data_count, static_cast<mp3d_sample_t *>(&samples[0]), &mp3_info);
 	samples_idx = 0;
-	playback_status = PLAYBACK_STATE_BUFFER_FULL;
 
-	if(sample_count == 0)
+	if (sample_count == 0) {
+		// Frame decode failed
+		reset_playback();
 		return;
+	}
 
 	std::copy(mp3data.begin() + mp3_info.frame_bytes, mp3data.end(), mp3data.begin());
 	mp3data_count -= mp3_info.frame_bytes;
 
-	if(mp3_info.hz != current_rate) {
-		current_rate = mp3_info.hz;
-		stream->set_sample_rate(current_rate);
-	}
+	stream->set_sample_rate(mp3_info.hz);
 
 	decoded_frame_count++;
+	cb_mpeg_frame_sync(1);
+
+	cb_demand(!mp3_is_buffered || mp3data_count < mp3data.size());
 }
 
 void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
@@ -451,8 +486,6 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 
 	if(s1 > sample_count)
 		s1 = sample_count;
-
-	playback_status = PLAYBACK_STATE_DEMAND_BUFFER;
 
 	for(int i = 0; i < s1; i++) {
 		outputs[0].put_int(pos, samples[samples_idx * bytes_per_sample], 32768);
@@ -471,22 +504,20 @@ void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int
 
 void mas3507d_device::reset_playback()
 {
+	if (mp3data_count != 0)
+		std::fill(mp3data.begin(), mp3data.end(), 0);
+
+	if (sample_count != 0 || decoded_samples != 0)
+		std::fill(samples.begin(), samples.end(), 0);
+
 	mp3dec_init(&mp3_dec);
 	mp3data_count = 0;
 	sample_count = 0;
 	decoded_frame_count = 0;
 	decoded_samples = 0;
-	playback_status = PLAYBACK_STATE_IDLE;
-	is_started = false;
 	samples_idx = 0;
-	std::fill(mp3data.begin(), mp3data.end(), 0);
-	std::fill(samples.begin(), samples.end(), 0);
-}
 
-void mas3507d_device::start_playback()
-{
-	reset_playback();
-	is_started = true;
+	mp3_is_buffered = false;
 }
 
 void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -495,13 +526,10 @@ void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read
 	int pos = 0;
 
 	while(pos < csamples) {
-		if(is_started && sample_count == 0)
+		if(sample_count == 0)
 			fill_buffer();
 
-		if(!is_started || sample_count <= 0) {
-			playback_status = PLAYBACK_STATE_IDLE;
-			decoded_frame_count = 0;
-			decoded_samples = 0;
+		if(sample_count <= 0) {
 			outputs[0].fill(0, pos);
 			outputs[1].fill(0, pos);
 			return;

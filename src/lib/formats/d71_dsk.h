@@ -27,6 +27,6 @@ protected:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_D71_FORMAT;
+extern const d71_format FLOPPY_D71_FORMAT;
 
 #endif // MAME_FORMATS_D71_DSK_H

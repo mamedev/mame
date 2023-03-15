@@ -41,7 +41,7 @@ public:
 	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
-	void remove_battery() { m_battery_backed = false; }
+	void remove_battery() { m_battery_backed = false; nvram_enable_backup(false); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -54,7 +54,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_leap_year() const override { return true; }
@@ -63,22 +62,22 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
-	virtual bool nvram_can_write() override { return m_battery_backed; }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
-private:
+	virtual TIMER_CALLBACK_MEMBER(advance_1hz_clock);
+	TIMER_CALLBACK_MEMBER(advance_16hz_clock);
+
 	inline void set_alarm_line();
+private:
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 	inline void check_alarm();
 
-	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_16HZ = 1;
-
 	devcb_write_line m_out_alarm_cb;
 	bool m_battery_backed;
 
+protected:
 	uint8_t m_reg[2][13];         // clock registers
 	uint8_t m_ram[13];            // RAM
 
@@ -89,6 +88,7 @@ private:
 	int m_1hz;                  // 1 Hz condition
 	int m_16hz;                 // 16 Hz condition
 
+private:
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_16hz_timer;
@@ -103,9 +103,19 @@ public:
 	tc8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class lh5045_device : public rp5c01_device
+{
+public:
+	// construction/destruction
+	lh5045_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	virtual TIMER_CALLBACK_MEMBER(advance_1hz_clock) override;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(RP5C01, rp5c01_device)
 DECLARE_DEVICE_TYPE(TC8521, tc8521_device)
+DECLARE_DEVICE_TYPE(LH5045, lh5045_device)
 
 #endif // MAME_MACHINE_RP5C01_H

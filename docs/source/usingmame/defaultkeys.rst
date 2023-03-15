@@ -30,14 +30,13 @@ and saving/loading save states.
 
 **Tab**
     Toggles the configuration menu.
-    Switches to the next UI panel.
-**~** (tilde key)
+**`**/**~** (backtick/tilde key)
     Toggles the On-Screen Display.
 
     If you are running with -debug, this key sends a ‘break’ in emulation.
 
-    When the on-screen display is visible, you can use the following
-    keys to control it:
+    When a slider control is visible, you can use the following keys to control
+    it:
 
     * **Up** - select previous parameter to modify.
     * **Down** - select next parameter to modify.
@@ -60,12 +59,12 @@ and saving/loading save states.
     Change current UI option setting when an arrow is present on it.
 **Right Arrow**
     Change current UI option setting when an arrow is present on it.
-**Home**
-    Highlight first UI menu option.
-**End**
-    Select last UI menu option.
-**Left Shift+Tab**
-    Select previous UI panel.
+**Home**/**End**
+    Highlight first or last UI menu option.
+**[** **]**
+    Move to previous or next group in UI menus that support it (e.g. move to the
+    inputs for the previous or next device in the **Input Assignments (this
+    System)** menu).
 **Enter**/**Joystick 1 Button 1**
     Select currently highlighted UI menu option.
 **Space**
@@ -73,10 +72,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**[**
-    UI Previous Group
-**]**
-    UI Next Group
 **P**
     Pauses the emulated machine.
 **Left Shift+P**
@@ -110,6 +105,7 @@ and saving/loading save states.
     * **Page Up**/**Page Down** - scroll up/down one page at a time.
     * **Home**/**End** - move to top/bottom of list.
     * **-**/**+** - increase/decrease the number of colors per row.
+    * **0** - restore the default number of colors per row.
     * **Enter** - switch to graphics viewer.
 
     Graphics mode:
@@ -120,7 +116,10 @@ and saving/loading save states.
     * **Home**/**End** - move to top/bottom of list.
     * **Left**/**Right** - change color displayed.
     * **R** - rotate tiles 90 degrees clockwise.
-    * **-**/**+** - increase/decrease the number of tiles per row.
+    * **-**/**+** - increase/decrease the number of tiles per row (hold Shift to
+      restrict to integer scale factors).
+    * **0** - restore the default number of tiles per row (hold Shift to
+      restrict to integer scale factors).
     * **Enter** - switch to tilemap viewer.
 
     Tilemap mode:
@@ -130,10 +129,11 @@ and saving/loading save states.
     * **Shift+Up**/**Down**/**Left**/**Right** - scroll 1 pixel at a time.
     * **Control+Up**/**Down**/**Left**/**Right** - scroll 64 pixels at a time.
     * **R** - rotate tilemap view 90 degrees clockwise.
-    * **-**/**+** - increase/decrease the zoom factor.
+    * **-**/**+** - decrease/increase the zoom factor.
+    * **0** - expand small tilemaps to fill the display.
     * **Enter** - switch to palette/colortable mode.
 
-    Note: Not all games have decoded graphics and/or tilemaps.
+    Note: Not all systems have decoded graphics and/or tilemaps.
 **Left Ctrl+F5**
     Toggle Filter.
     (*SDL MAME only*)
@@ -200,8 +200,31 @@ and saving/loading save states.
     keyboard as presented upon start by using
     :ref:`-uimodekey<mame-commandline-uimodekey>`
 **Escape**
-    Exits emulator.
-    Cancel current UI option.
+    Exit emulator, return to the previous menu, or cancel the current UI option.
+
+
+.. _default-selmenu-keys:
+
+System and software selection menus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The system and software selection menus use additional controls
+
+**Tab**
+    Moves keyboard/controller focus to the next UI panel.
+**Shift+Tab**
+    Moves keyboard/controller focus to the previous UI panel.
+**Left Alt+F**
+    Adds or removes the selected system or software list item from the favorites
+    list.
+**Left Alt+E**
+    Exports the currently displayed list of systems.
+**Left Alt+D**
+    Shows the full-size info viewer if info is available for the selected system
+    or software list item.  (Shows information loaded by the data plugin from
+    external files, including history.xml and mameinfo.dat.)
+**F1**
+    Audits system ROMs and disk images.
 
 
 .. _default-arcade-keys:
@@ -684,8 +707,8 @@ All the keys below are fully configurable in the user interface. This list shows
 the standard keyboard configuration.
 
 Note that controls can vary widely by computer type, so not all keys are shown
-here. See the “Input (this Machine)” section of MAME’s configuration menu for
-details for the machine you are currently using.
+here. See the **Input Assignments (this system)** section of MAME’s Input
+Settings menu for details for the machine you are currently using.
 
 
 **Tab**
@@ -720,5 +743,5 @@ All the keys are fully configurable in the user interface.
 
 Note that controls can vary widely by machine type, so default keys are not
 shown here and defaults will vary considerably based on the manufacturer and
-style. See the “Input (this Machine)” section of MAME’s configuration menu for
-details for the machine you are currently using.
+style. See the **Input Assignments (this system)** section of MAME’s Input
+Settings menu for details for the machine you are currently using.

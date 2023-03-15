@@ -221,8 +221,8 @@ void tms99xx_device::device_start()
 		// callexport = need to use the state_export method to read the state variable
 		state_add(i, s_statename[i], m_state_any).callimport().callexport().formatstr("%04X");
 	}
-	state_add(STATE_GENPC, "GENPC", PC).formatstr("%4s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", PC).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC).noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	build_command_lookup_table();
@@ -2222,7 +2222,7 @@ void tms99xx_device::alu_clr_swpb()
 		sign = 0x8000;
 		break;
 	case SWPB:
-		m_current_value = ((m_current_value << 8) | (m_current_value >> 8)) & 0xffff;
+		m_current_value = swapendian_int16(m_current_value);
 		setstatus = false;
 		break;
 	}

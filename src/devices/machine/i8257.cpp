@@ -428,7 +428,7 @@ void i8257_device::execute_run()
 			if (m_ready)
 			{
 				m_state = STATE_S4;
-				if (m_channel[m_current_channel].m_count == 0)
+				if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK != MODE_TRANSFER_READ))
 					set_tc(1);
 			}
 			else
@@ -439,7 +439,7 @@ void i8257_device::execute_run()
 			if (m_ready)
 			{
 				m_state = STATE_S4;
-				if (m_channel[m_current_channel].m_count == 0)
+				if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK != MODE_TRANSFER_READ))
 					set_tc(1);
 			}
 			break;
@@ -449,6 +449,8 @@ void i8257_device::execute_run()
 			{
 				dma_write();
 			}
+			if ((m_channel[m_current_channel].m_count == 0) && (MODE_TRANSFER_MASK == MODE_TRANSFER_READ))
+				set_tc(1);
 			advance();
 
 			if(m_hack && next_channel())

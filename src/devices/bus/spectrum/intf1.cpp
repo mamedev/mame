@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "intf1.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -53,6 +54,7 @@ void spectrum_intf1_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 
 	SOFTWARE_LIST(config, "microdrive_list").set_original("spectrum_microdrive");
 }

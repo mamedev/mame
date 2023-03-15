@@ -92,7 +92,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
 	u8 m_dsr;
-	u8 m_ring;
 
 	devcb_write_line m_rs232_conn_txd_handler;
 	devcb_write_line m_rs232_conn_dtr_handler;
@@ -117,7 +116,6 @@ private:
 	u8 pia_disp_pb_r();
 	void pia_disp_pa_w(u8 data);
 	void pia_disp_pb_w(u8 data);
-	DECLARE_READ_LINE_MEMBER(pia_disp_ca2_r);
 
 	u8 m_kbd_start_holdoff;
 
@@ -130,7 +128,6 @@ private:
 	void kbd_repeat_start(u8 row, u8 column);
 	void kbd_repeat_restart();
 	void kbd_repeat_stop();
-	void kbd_repeat();
 	void kbd_send_translated(u8 code);
 
 	TIMER_CALLBACK_MEMBER(kbd_scan_row);

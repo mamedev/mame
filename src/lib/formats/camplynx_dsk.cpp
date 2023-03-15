@@ -19,8 +19,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/camplynx_dsk.h"
 
 camplynx_format::camplynx_format() : wd177x_format(formats)
@@ -54,4 +52,4 @@ const camplynx_format::format camplynx_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_CAMPLYNX_FORMAT = &floppy_image_format_creator<camplynx_format>;
+const camplynx_format FLOPPY_CAMPLYNX_FORMAT;

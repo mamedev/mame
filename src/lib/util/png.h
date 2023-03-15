@@ -14,13 +14,14 @@
 #pragma once
 
 #include "bitmap.h"
-#include "corefile.h"
+#include "utilfwd.h"
 
 #include <cstdint>
 #include <list>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <utility>
 
 
@@ -31,12 +32,9 @@ namespace util {
 ***************************************************************************/
 
 /* Error types */
-enum class png_error
+enum class png_error : int
 {
-	NONE,
-	OUT_OF_MEMORY,
-	UNKNOWN_FILTER,
-	FILE_ERROR,
+	UNKNOWN_FILTER = 1,
 	BAD_SIGNATURE,
 	DECOMPRESS_ERROR,
 	FILE_TRUNCATED,
@@ -45,6 +43,9 @@ enum class png_error
 	COMPRESS_ERROR,
 	UNSUPPORTED_FORMAT
 };
+
+std::error_category const &png_category() noexcept;
+inline std::error_condition make_error_condition(png_error err) noexcept { return std::error_condition(int(err), png_category()); }
 
 
 
@@ -59,16 +60,16 @@ public:
 
 	~png_info() { free_data(); }
 
-	png_error read_file(core_file &fp);
-	png_error copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
-	png_error expand_buffer_8bit();
+	std::error_condition read_file(read_stream &fp);
+	std::error_condition copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
+	std::error_condition expand_buffer_8bit();
 
-	png_error add_text(std::string_view keyword, std::string_view text);
+	std::error_condition add_text(std::string_view keyword, std::string_view text);
 
 	void free_data();
 	void reset() { free_data(); operator=(png_info()); }
 
-	static png_error verify_header(core_file &fp);
+	static std::error_condition verify_header(read_stream &fp);
 
 	std::unique_ptr<std::uint8_t []>    image;
 	std::uint32_t                       width, height;
@@ -101,14 +102,21 @@ private:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-png_error png_read_bitmap(core_file &fp, bitmap_argb32 &bitmap);
+std::error_condition png_read_bitmap(read_stream &fp, bitmap_argb32 &bitmap);
 
-png_error png_write_bitmap(core_file &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
+std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
 
-png_error mng_capture_start(core_file &fp, bitmap_t &bitmap, unsigned rate);
-png_error mng_capture_frame(core_file &fp, png_info &info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
-png_error mng_capture_stop(core_file &fp);
+std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate);
+std::error_condition mng_capture_frame(random_write &fp, png_info &info, bitmap_t const &bitmap, int palette_length, rgb_t const *palette);
+std::error_condition mng_capture_stop(random_write &fp);
 
 } // namespace util
+
+
+namespace std {
+
+template <> struct is_error_condition_enum<util::png_error> : public std::true_type { };
+
+} // namespace std
 
 #endif // MAME_LIB_UTIL_PNG_H

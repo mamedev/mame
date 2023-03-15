@@ -1,22 +1,45 @@
 name: CI (macOS)
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+    - '.github/workflows/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+  pull_request:
+    paths:
+    - '.github/workflows/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+
+permissions:
+  contents: read
 
 jobs:
+
   build-macos:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Install dependencies
-        run: brew install sdl2
-      - name: Build
-        env:
-          USE_LIBSDL: 1
-          TOOLS: 1
-        run: make -j2
-      - name: Validate
-        run: ./mame -validate
-      - uses: actions/upload-artifact@master
-        with:
-          name: mame-macos-${{ github.sha }}
-          path: mame
+    - uses: actions/checkout@master
+    - name: Install dependencies
+      run: brew install python3 sdl2
+    - name: Build
+      env:
+        USE_LIBSDL: 1
+        TOOLS: 1
+      run: make -j2
+    - name: Validate
+      run: ./mame -validate
+    - uses: actions/upload-artifact@master
+      with:
+        name: mame-macos-${{ github.sha }}
+        path: |
+          mame
+          chdman
+          unidasm

@@ -13,7 +13,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98620, bus::hp_dio, dio16_98620_device, "hp98620", "HP98620 DMA Controller")
+DEFINE_DEVICE_TYPE(HPDIO_98620, bus::hp_dio::dio16_98620_device, "hp98620", "HP98620 DMA Controller")
 
 namespace bus::hp_dio {
 

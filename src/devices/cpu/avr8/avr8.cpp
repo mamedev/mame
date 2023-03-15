@@ -12,7 +12,7 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL, JMP, CALL
+      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL
 
     - Changelist -
       05 Jul. 2015 [Felipe Sanches]
@@ -60,7 +60,6 @@
 #include "emu.h"
 #include "avr8.h"
 #include "avr8dasm.h"
-#include "debugger.h"
 
 #define LOG_UNKNOWN         (1 << 1)
 #define LOG_BOOT            (1 << 2)
@@ -95,7 +94,9 @@
 							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
 
 #define VERBOSE             (0)
+//#define LOG_OUTPUT_FUNC     osd_printf_info
 #include "logmacro.h"
+
 
 //**************************************************************************
 //  ENUMS AND MACROS
@@ -588,6 +589,37 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 #define AVR8_EECR_EEPE          ((AVR8_EECR & AVR8_EECR_EEPE_MASK) >> 1)
 #define AVR8_EECR_EERE          ((AVR8_EECR & AVR8_EECR_EERE_MASK) >> 0)
 
+//---------------------------------------------------------------
+
+#define AVR8_ADMUX              (m_r[AVR8_REGIDX_ADMUX])
+#define AVR8_ADMUX_REFS_MASK    0xc0
+#define AVR8_ADMUX_ADLAR_MASK   0x20
+#define AVR8_ADMUX_MUX_MASK     0x0f
+#define AVR8_ADMUX_REFS         ((AVR8_ADMUX & AVR8_ADMUX_REFS_MASK) >> 6)
+#define AVR8_ADMUX_ADLAR        ((AVR8_ADMUX & AVR8_ADMUX_ADLAR_MASK) >> 5)
+#define AVR8_ADMUX_MUX          ((AVR8_ADMUX & AVR8_ADMUX_MUX_MASK) >> 0)
+
+#define AVR8_ADCSRB             (m_r[AVR8_REGIDX_ADCSRB])
+#define AVR8_ADCSRB_ACME_MASK   0x40
+#define AVR8_ADCSRB_ADTS_MASK   0x07
+#define AVR8_ADCSRB_ACME        ((AVR8_ADCSRB & AVR8_ADCSRB_ACME_MASK) >> 6)
+#define AVR8_ADCSRB_ADTS        ((AVR8_ADCSRB & AVR8_ADCSRB_ADTS_MASK) >> 0)
+
+#define AVR8_ADCSRA             (m_r[AVR8_REGIDX_ADCSRA])
+#define AVR8_ADCSRA_ADEN_MASK   0x80
+#define AVR8_ADCSRA_ADSC_MASK   0x40
+#define AVR8_ADCSRA_ADATE_MASK  0x20
+#define AVR8_ADCSRA_ADIF_MASK   0x10
+#define AVR8_ADCSRA_ADIE_MASK   0x08
+#define AVR8_ADCSRA_ADPS_MASK   0x07
+#define AVR8_ADCSRA_ADEN        ((AVR8_ADCSRA & AVR8_ADCSRA_ADEN_MASK) >> 7)
+#define AVR8_ADCSRA_ADSC        ((AVR8_ADCSRA & AVR8_ADCSRA_ADSC_MASK) >> 6)
+#define AVR8_ADCSRA_ADATE       ((AVR8_ADCSRA & AVR8_ADCSRA_ADATE_MASK) >> 5)
+#define AVR8_ADCSRA_ADIF        ((AVR8_ADCSRA & AVR8_ADCSRA_ADIF_MASK) >> 4)
+#define AVR8_ADCSRA_ADIE        ((AVR8_ADCSRA & AVR8_ADCSRA_ADIE_MASK) >> 3)
+#define AVR8_ADCSRA_ADPS        ((AVR8_ADCSRA & AVR8_ADCSRA_ADPS_MASK) >> 0)
+
+
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
@@ -720,6 +752,8 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_num_timers(num_timers)
 	, m_gpio_out_cb(*this)
 	, m_gpio_in_cb(*this)
+	, m_adc_in_cb(*this)
+	, m_adc_timer(nullptr)
 	, m_spi_active(false)
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
@@ -818,6 +852,9 @@ void avr8_device::device_start()
 	m_gpio_out_cb.resolve_all_safe();
 	m_gpio_in_cb.resolve_all_safe(0);
 
+	m_adc_in_cb.resolve_all_safe(0);
+	m_adc_timer = timer_alloc(FUNC(avr8_device::adc_conversion_complete), this);
+
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_shifted_pc).noshow();
@@ -878,6 +915,13 @@ void avr8_device::device_start()
 	save_item(NAME(m_timer1_compare_mode));
 	save_item(NAME(m_ocr1));
 	save_item(NAME(m_timer1_count));
+
+	// ADC
+	save_item(NAME(m_adc_sample));
+	save_item(NAME(m_adc_result));
+	save_item(NAME(m_adc_data));
+	save_item(NAME(m_adc_first));
+	save_item(NAME(m_adc_hold));
 
 	// SPI
 	save_item(NAME(m_spi_active));
@@ -960,6 +1004,12 @@ void avr8_device::device_reset()
 	{
 		m_r[i] = 0;
 	}
+
+	m_adc_sample = 0;
+	m_adc_result = 0;
+	m_adc_data = 0;
+	m_adc_first = true;
+	m_adc_hold = false;
 
 	m_spi_active = false;
 	m_spi_prescale = 0;
@@ -2236,6 +2286,103 @@ void avr8_device::changed_tccr5b(uint8_t data)
 
 
 /****************/
+/* ADC Handling */
+/****************/
+
+void avr8_device::adc_start_conversion()
+{
+	// set capture in progress flag
+	AVR8_ADCSRA |= AVR8_ADCSRA_ADSC_MASK;
+
+	// get a sample - the sample-and-hold circuit will hold this for the duration of the conversion
+	if (AVR8_ADMUX_MUX < 0x8)
+	{
+		m_adc_sample = m_adc_in_cb[AVR8_ADMUX_MUX]() & 0x3ff;
+	}
+	else if (AVR8_ADMUX_MUX == 0xe)
+	{
+		// 1.1V (Vbg)
+		// FIXME: the value this acquires depends on what the reference source is set to
+		logerror("%s: Using unimplemented 1.1V reference voltage as ADC input\n", machine().describe_context());
+		m_adc_sample = 0x3ff;
+	}
+	else if (AVR8_ADMUX_MUX == 0x0f)
+	{
+		// 0V (GND)
+		m_adc_sample = 0;
+	}
+	else
+	{
+		logerror("%s: Using reserved ADC input 0x%X\n", machine().describe_context(), AVR8_ADMUX_MUX);
+		m_adc_sample = 0;
+	}
+
+	// wait for conversion to complete
+	int const scale = 1 << std::max(AVR8_ADCSRA_ADPS, 1);
+	m_adc_timer->adjust(attotime::from_ticks((m_adc_first ? 25 : 13) * scale, clock()));
+}
+
+TIMER_CALLBACK_MEMBER(avr8_device::adc_conversion_complete)
+{
+	// set conversion result
+	m_adc_result = m_adc_sample;
+	if (!m_adc_hold)
+		m_adc_data = m_adc_result;
+
+	// clear conversion in progress flag, set conversion interrupt flag
+	AVR8_ADCSRA &= ~AVR8_ADCSRA_ADSC_MASK;
+	AVR8_ADCSRA |= AVR8_ADCSRA_ADIF_MASK;
+
+	// trigger another conversion if appropriate
+	if (AVR8_ADCSRA_ADATE && (AVR8_ADCSRB_ADTS == 0))
+		adc_start_conversion();
+}
+
+void avr8_device::change_adcsra(uint8_t data)
+{
+	// set auto trigger enable, interrupt enable, and prescaler directly
+	AVR8_ADCSRA = (AVR8_ADCSRA & ~(AVR8_ADCSRA_ADATE_MASK | AVR8_ADCSRA_ADIE_MASK | AVR8_ADCSRA_ADPS_MASK)) | (data & (AVR8_ADCSRA_ADATE_MASK | AVR8_ADCSRA_ADIE_MASK | AVR8_ADCSRA_ADPS_MASK));
+
+	// check enable bit
+	if (!(data & AVR8_ADCSRA_ADEN_MASK))
+	{
+		// disable ADC, terminate any conversion in progress
+		AVR8_ADCSRA &= ~(AVR8_ADCSRA_ADEN_MASK | AVR8_ADCSRA_ADSC_MASK);
+		m_adc_timer->reset();
+	}
+	else
+	{
+		// first conversion after initial enable takes longer
+		if (!AVR8_ADCSRA_ADEN)
+		{
+			m_adc_first = true;
+			AVR8_ADCSRA |= AVR8_ADCSRA_ADEN_MASK;
+		}
+
+		// trigger conversion if necessary
+		if (!AVR8_ADCSRA_ADSC && (data & AVR8_ADCSRA_ADSC_MASK))
+			adc_start_conversion();
+	}
+
+	// writing with ADIF set clears the interrupt flag manually
+	if (data & AVR8_ADCSRA_ADIF_MASK)
+		AVR8_ADCSRA &= ~AVR8_ADCSRA_ADIF_MASK;
+
+	if (AVR8_ADCSRA_ADIE)
+		logerror("%s: Unimplemented ADC interrupt enabled\n");
+}
+
+void avr8_device::change_adcsrb(uint8_t data)
+{
+	AVR8_ADCSRB = data & (AVR8_ADCSRB_ACME_MASK | AVR8_ADCSRB_ADTS_MASK);
+	if (AVR8_ADCSRB_ADTS != 0x00)
+		logerror("%s: Unimplemented ADC auto trigger source %X selected\n", machine().describe_context(), AVR8_ADCSRB_ADTS);
+}
+
+/************************************************************************************************/
+
+
+/****************/
 /* SPI Handling */
 /****************/
 
@@ -2691,23 +2838,26 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 		break;
 
 	case AVR8_REGIDX_ADCL:
-		LOGMASKED(LOG_ADC, "%s: (not yet implemented) ADCL = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ADC, "%s: ADCL = %02x\n", machine().describe_context(), data);
 		break;
 
 	case AVR8_REGIDX_ADCH:
-		LOGMASKED(LOG_ADC, "%s: (not yet implemented) ADCH = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ADC, "%s: ADCH = %02x\n", machine().describe_context(), data);
 		break;
 
 	case AVR8_REGIDX_ADCSRA:
-		LOGMASKED(LOG_ADC, "%s: (not yet implemented) ADCSRA = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ADC, "%s: ADCSRA = %02x\n", machine().describe_context(), data);
+		change_adcsra(data);
 		break;
 
 	case AVR8_REGIDX_ADCSRB:
-		LOGMASKED(LOG_ADC, "%s: (not yet implemented) ADCSRB = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ADC, "%s: ADCSRB = %02x\n", machine().describe_context(), data);
+		change_adcsrb(data);
 		break;
 
 	case AVR8_REGIDX_ADMUX:
-		LOGMASKED(LOG_ADC, "%s: (not yet implemented) ADMUX = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_ADC, "%s: ADMUX = %02x\n", machine().describe_context(), data);
+		AVR8_ADMUX = data & (AVR8_ADMUX_REFS_MASK | AVR8_ADMUX_ADLAR_MASK | AVR8_ADMUX_MUX_MASK);
 		break;
 
 	case AVR8_REGIDX_DIDR0:
@@ -3146,6 +3296,28 @@ uint8_t avr8_device::regs_r(offs_t offset)
 		return (uint8_t)(m_timer1_count >> 8);
 	case AVR8_REGIDX_TCNT2:
 	case AVR8_REGIDX_UCSR0A:
+		return m_r[offset];
+
+	case AVR8_REGIDX_ADCL:
+		if (!machine().side_effects_disabled())
+			m_adc_hold = true;
+		if (AVR8_ADMUX_ADLAR)
+			return (m_adc_data & 0x03) << 6;
+		else
+			return uint8_t(m_adc_data);
+	case AVR8_REGIDX_ADCH:
+		{
+			uint8_t const result = AVR8_ADMUX_ADLAR ? BIT(m_adc_data, 2, 8) : BIT(m_adc_data, 8, 2);
+			if (!machine().side_effects_disabled())
+			{
+				m_adc_data = m_adc_result;
+				m_adc_hold = false;
+			}
+			return result;
+		}
+	case AVR8_REGIDX_ADCSRA:
+	case AVR8_REGIDX_ADCSRB:
+	case AVR8_REGIDX_ADMUX:
 		return m_r[offset];
 
 	default:

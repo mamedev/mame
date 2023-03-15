@@ -24,11 +24,6 @@
 // MAMEOS headers
 #include "modules/lib/osdobj_common.h"
 #include "osx/debugosx.h"
-#ifdef OSD_MAC
-#include "osdmac.h"
-#else
-#include "osdsdl.h"
-#endif
 #include "debug_module.h"
 
 #import "osx/debugconsole.h"
@@ -61,17 +56,17 @@ public:
 			[m_console release];
 	}
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(osd_interface &osd, const osd_options &options) override;
+	virtual void exit() override;
 
-	virtual void init_debugger(running_machine &machine);
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine) override;
+	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual void debugger_update() override;
 
 private:
 	void create_console();
 	void build_menus();
-	void config_load(config_type cfgtype, util::xml::data_node const *parentnode);
+	void config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode);
 	void config_save(config_type cfgtype, util::xml::data_node *parentnode);
 
 	running_machine *m_machine;
@@ -91,7 +86,7 @@ std::atomic_bool debugger_osx::s_added_menus(false);
 //  initialise debugger module
 //============================================================
 
-int debugger_osx::init(const osd_options &options)
+int debugger_osx::init(osd_interface &osd, const osd_options &options)
 {
 	return 0;
 }
@@ -129,8 +124,8 @@ void debugger_osx::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	machine.configuration().config_register(
 			"debugger",
-			config_load_delegate(&debugger_osx::config_load, this),
-			config_save_delegate(&debugger_osx::config_save, this));
+			configuration_manager::load_delegate(&debugger_osx::config_load, this),
+			configuration_manager::save_delegate(&debugger_osx::config_save, this));
 }
 
 
@@ -305,9 +300,9 @@ void debugger_osx::build_menus()
 //  restore state based on configuration XML
 //============================================================
 
-void debugger_osx::config_load(config_type cfgtype, util::xml::data_node const *parentnode)
+void debugger_osx::config_load(config_type cfgtype, config_level cfglevel, util::xml::data_node const *parentnode)
 {
-	if ((config_type::GAME == cfgtype) && parentnode)
+	if ((config_type::SYSTEM == cfgtype) && parentnode)
 	{
 		if (m_console)
 		{
@@ -331,7 +326,7 @@ void debugger_osx::config_load(config_type cfgtype, util::xml::data_node const *
 
 void debugger_osx::config_save(config_type cfgtype, util::xml::data_node *parentnode)
 {
-	if ((config_type::GAME == cfgtype) && m_console)
+	if ((config_type::SYSTEM == cfgtype) && m_console)
 	{
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:m_machine],

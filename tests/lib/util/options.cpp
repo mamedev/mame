@@ -2,14 +2,8 @@
 
 #include "options.h"
 
-TEST_CASE("Empty options should return first as nullptr", "[util]")
+TEST_CASE("Empty options should return size of zero", "[util]")
 {
 	core_options options;
-	REQUIRE(options.first() == nullptr);
-}
-
-TEST_CASE("Empty options should have iterators same", "[util]")
-{
-	core_options options;
-	REQUIRE(options.begin() == options.end());
+	REQUIRE(options.entries().size() == 0);
 }

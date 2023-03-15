@@ -1,0 +1,285 @@
+<!-- Creator     : groff version 1.22.3 -->
+<!-- CreationDate: Sat May 14 18:10:42 2022 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>NLWAV</title>
+
+</head>
+<body>
+
+<h1 align="center">NLWAV</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#OPTIONS">OPTIONS</a><br>
+<a href="#EXAMPLES">EXAMPLES</a><br>
+<a href="#AUTHOR">AUTHOR</a><br>
+<a href="#COPYRIGHT">COPYRIGHT</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">nlwav &minus;
+manual page for nlwav (netlist) 0.1</p>
+
+<h2>SYNOPSIS
+<a name="SYNOPSIS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>nlwav</b>
+[<i>OPTION</i>] ... [<i>FILE</i>] ...</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Convert netlist
+log files into wav files.</p>
+
+<h2>OPTIONS
+<a name="OPTIONS"></a>
+</h2>
+
+
+
+<p style="margin-left:11%; margin-top: 1em"><b>&minus;f</b>,
+<b>&minus;&minus;format</b>=<i>wav16s</i>|wav32s|wav32f|vcda|vcdd|tab</p>
+
+<p style="margin-left:22%;">output format. Available
+options are wav16s|wav32s|wav32f|vcda|vcdd|tab.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p>wav16s</p></td>
+<td width="2%"></td>
+<td width="60%">
+
+
+<p>: multichannel wav output 16 bit signed</p></td>
+<td width="18%">
+</td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p>wav32s</p></td>
+<td width="2%"></td>
+<td width="60%">
+
+
+<p>: multichannel wav output 32 bit signed</p></td>
+<td width="18%">
+</td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="9%">
+
+
+<p>wav32f</p></td>
+<td width="2%"></td>
+<td width="60%">
+
+
+<p>: multichannel wav output 32 bit float</p></td>
+<td width="18%">
+</td></tr>
+</table>
+
+<p style="margin-left:11%;">vcda : analog VCD output</p>
+
+<p style="margin-left:22%;">vcdd : digital VCD output tab :
+sampled output Digital signals are created using the
+<b>&minus;&minus;high</b> and</p>
+
+
+<p style="margin-left:22%; margin-top: 1em"><b>&minus;&minus;low</b>
+options</p>
+
+<p style="margin-left:11%;"><b>&minus;o</b>,
+<b>&minus;&minus;output</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">output file</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>wav
+options:</b></p>
+
+<p style="margin-left:22%;">These options apply to wav
+output only</p>
+
+<p style="margin-left:11%;"><b>&minus;r</b>,
+<b>&minus;&minus;rate</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">sample rate of output file</p>
+
+<p style="margin-left:11%;"><b>&minus;a</b>,
+<b>&minus;&minus;amp</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">amplification after mean
+correction</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;lowpass</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">lowpass filter frequency.
+Default 20000 Hz.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;highpass</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">highpass filter frequency.
+Default is 20 Hz.</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;hpboost</b></p>
+
+<p style="margin-left:22%;">enable highpass boost to filter
+out initial click.</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>vcdd
+options:</b></p>
+
+<p style="margin-left:22%;">These options apply to vcdd
+output only</p>
+
+<p style="margin-left:11%;"><b>&minus;u</b>,
+<b>&minus;&minus;high</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">minimum input for high
+level</p>
+
+<p style="margin-left:11%;"><b>&minus;l</b>,
+<b>&minus;&minus;low</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">maximum input for low level</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>tab
+options:</b></p>
+
+<p style="margin-left:22%;">These options apply to sampled
+output only</p>
+
+<p style="margin-left:11%;"><b>&minus;s</b>,
+<b>&minus;&minus;start</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">time when sampling starts</p>
+
+<p style="margin-left:11%;"><b>&minus;i</b>,
+<b>&minus;&minus;increment</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">time between samples</p>
+
+<p style="margin-left:11%;"><b>&minus;n</b>,
+<b>&minus;&minus;samples</b>=<i>Value</i></p>
+
+<p style="margin-left:22%;">number of samples</p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>General
+options:</b></p>
+
+<p style="margin-left:22%;">These options always apply</p>
+
+<p style="margin-left:11%;"><b>&minus;v</b>,
+<b>&minus;&minus;verbose</b></p>
+
+<p style="margin-left:22%;">be verbose &minus; this
+produces lots of output</p>
+
+<p style="margin-left:11%;"><b>&minus;q</b>,
+<b>&minus;&minus;quiet</b></p>
+
+<p style="margin-left:22%;">be quiet &minus; no
+warnings</p>
+
+
+<p style="margin-left:11%;"><b>&minus;&minus;version</b></p>
+
+<p style="margin-left:22%;">display version and exit</p>
+
+<p style="margin-left:11%;"><b>&minus;h</b>,
+<b>&minus;&minus;help</b></p>
+
+<p style="margin-left:22%;">display help and exit</p>
+
+<h2>EXAMPLES
+<a name="EXAMPLES"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">./nlwav
+&minus;f vcdd &minus;o x.vcd log_V*</p>
+
+<p style="margin-left:22%; margin-top: 1em">convert all
+files starting with &quot;log_V&quot; into a digital vcd
+file</p>
+
+<p style="margin-left:11%; margin-top: 1em">./nlwav
+&minus;f wav16s &minus;o x.wav log_V*</p>
+
+<p style="margin-left:22%; margin-top: 1em">convert all
+files starting with &quot;log_V&quot; into a multichannel
+wav file (16bit, signed)</p>
+
+<p style="margin-left:11%; margin-top: 1em">./nlwav
+&minus;f tab &minus;o x.tab &minus;s 0.0000005 &minus;i
+0.000001 &minus;n 256 log_BLUE.log</p>
+
+<p style="margin-left:22%; margin-top: 1em">convert file
+log_BLUE.log to sampled output. First sample at 500ns
+followed by 255 samples every micro&minus;second.</p>
+
+<h2>AUTHOR
+<a name="AUTHOR"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Written by
+Couriersud.</p>
+
+<h2>COPYRIGHT
+<a name="COPYRIGHT"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Copyright
+&copy; 2021 Couriersud License BSD&minus;3&minus;Clause <br>
+This is free software: you are free to change and
+redistribute it. There is NO WARRANTY, to the extent
+permitted by law.</p>
+
+<h2>SEE ALSO
+<a name="SEE ALSO"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">More
+documentation for the <b>nlwav</b> program is available in
+doxygen format.</p>
+<hr>
+</body>
+</html>

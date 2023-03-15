@@ -5,7 +5,7 @@
 #include "upd78k3d.h"
 
 upd78k3_disassembler::upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const psw_bits[], bool has_macw, bool has_macsw)
-	: upd78k_family_disassembler(sfr_names, sfrp_names)
+	: upd78k_family_disassembler(sfr_names, sfrp_names, 0xfe00)
 	, m_ix_bases(s_ix_bases)
 	, m_psw_bits(psw_bits)
 	, m_has_macw(has_macw)
@@ -13,8 +13,8 @@ upd78k3_disassembler::upd78k3_disassembler(const char *const sfr_names[], const 
 {
 }
 
-upd78k3_disassembler::upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const ix_bases[])
-	: upd78k_family_disassembler(sfr_names, sfrp_names)
+upd78k3_disassembler::upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const ix_bases[], u16 saddr_ram_base)
+	: upd78k_family_disassembler(sfr_names, sfrp_names, saddr_ram_base)
 	, m_ix_bases(ix_bases)
 	, m_psw_bits(s_psw_bits)
 	, m_has_macw(true)
@@ -235,7 +235,7 @@ offs_t upd78k3_disassembler::dasm_02xx(std::ostream &stream, u8 op1, u8 op2, off
 		else
 			util::stream_format(stream, "%s,", m_psw_bits[op2 & 0x0f]);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 	else
 		return dasm_illegal2(stream, op1, op2);
@@ -332,7 +332,7 @@ offs_t upd78k3_disassembler::dasm_07xx(std::ostream &stream, u8 op2, offs_t pc, 
 	{
 		util::stream_format(stream, "%-8s", s_bcond_07f8[op2 & 0x07]);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 	else if ((op2 & 0xce) == 0xc8)
 	{
@@ -409,7 +409,7 @@ offs_t upd78k3_disassembler::dasm_08xx(std::ostream &stream, u8 op2, offs_t pc, 
 			format_saddr(stream, opcodes.r8(pc + 2));
 		util::stream_format(stream, ".%d,", op2 & 0x07);
 		format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-		return 4 | SUPPORTED;
+		return 4 | STEP_COND | SUPPORTED;
 	}
 	else
 		return dasm_illegal2(stream, 0x08, op2);
@@ -552,9 +552,9 @@ offs_t upd78k3_disassembler::dasm_16xx(std::ostream &stream, u8 op1, u8 op2)
 			stream << "A,";
 
 		stream << "[";
-		if (BIT(op1, 0) && BIT(op2, 6))
-			util::stream_format(stream, "%s+", m_ix_bases[4]);
-		if ((op2 & 0x60) == 0x60)
+		if (BIT(op1, 0) && (op2 & 0x60) == 0x40)
+			util::stream_format(stream, "%s+%s", m_ix_bases[4], BIT(op2, 4) ? "HL" : "DE");
+		else if ((op2 & 0x60) == 0x60)
 			stream << m_ix_bases[BIT(op2, 4) ? 3 : 4];
 		else
 		{
@@ -937,7 +937,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		{
 			util::stream_format(stream, "%-8s%c,", "DBNZ", BIT(op, 0) ? 'B' : 'C');
 			format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-			return 2 | SUPPORTED;
+			return 2 | STEP_COND | SUPPORTED;
 		}
 		else
 		{
@@ -960,10 +960,15 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			format_saddr(stream, opcodes.r8(pc + 1));
 			stream << ",";
 			if (BIT(op, 0))
+			{
 				format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
+				return 3 | STEP_COND | SUPPORTED;
+			}
 			else
+			{
 				format_imm8(stream, opcodes.r8(pc + 2));
-			return 3 | SUPPORTED;
+				return 3 | SUPPORTED;
+			}
 		}
 		else
 			return dasm_38(stream, op, pc, opcodes);
@@ -1019,7 +1024,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		format_saddr(stream, opcodes.r8(pc + 1));
 		util::stream_format(stream, ".%d,", op & 0x07);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x78:
 		return dasm_78(stream, op, pc, opcodes);
@@ -1027,7 +1032,7 @@ offs_t upd78k3_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x80:
 		util::stream_format(stream, "%-8s", s_bcond[op & 0x07]);
 		format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0x88:
 		return dasm_88xx(stream, op, opcodes.r8(pc + 1));

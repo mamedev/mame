@@ -50,7 +50,7 @@ void device_bbc_rom_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(BBC_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(BBC_ROM_REGION_TAG), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -84,7 +84,7 @@ void device_bbc_rom_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 bbc_romslot_device::bbc_romslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_rom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_bbc_rom_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -122,7 +122,7 @@ image_init_result bbc_romslot_device::call_load()
 
 		if (size % 0x2000)
 		{
-			seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid ROM size");
+			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
 			return image_init_result::FAIL;
 		}
 
@@ -213,6 +213,7 @@ void bbc_romslot_device::write(offs_t offset, uint8_t data)
 #include "datagem.h"
 #include "dfs.h"
 #include "genie.h"
+//#include "gommc.h"
 #include "pal.h"
 //#include "ramagic.h"
 #include "rtc.h"
@@ -234,8 +235,10 @@ void bbc_rom_devices(device_slot_interface &device)
 	device.option_add_internal("palmo2", BBC_PALMO2);
 	device.option_add_internal("datagem", BBC_DATAGEM);
 	device.option_add_internal("genie", BBC_PMSGENIE);
+	//device.option_add_internal("gommc", BBC_GOMMC);
 	device.option_add_internal("dfse00", BBC_DFSE00);
 	//device.option_add_internal("ramagic", BBC_RAMAGIC);
 	device.option_add_internal("stlrtc",  BBC_STLRTC);
 	device.option_add_internal("pmsrtc", BBC_PMSRTC);
+	device.option_add_internal("trilogy", BBC_TRILOGY);
 }

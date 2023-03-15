@@ -13,7 +13,7 @@
 #define MAME_BUS_BBC_TUBE_RC6502_H
 
 #include "tube.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02s.h"
 #include "cpu/g65816/g65816.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -62,6 +62,8 @@ protected:
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_ioport m_config;
+
+	DECLARE_WRITE_LINE_MEMBER(prst_w);
 
 private:
 	void tube_rc6502_mem(address_map &map);

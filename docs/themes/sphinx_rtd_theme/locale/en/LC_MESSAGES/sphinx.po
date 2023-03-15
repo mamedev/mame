@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sphinx_rtd_theme 0.4.3.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-05-06 13:38-0600\n"
+"POT-Creation-Date: 2021-08-17 10:02-0600\n"
 "PO-Revision-Date: 2019-07-16 15:43-0600\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -19,42 +19,64 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: sphinx_rtd_theme/breadcrumbs.html:43 sphinx_rtd_theme/breadcrumbs.html:45
+#. This is an ARIA section label for page links, including previous/next page
+#. link and links to GitHub/GitLab/etc.
+#: sphinx_rtd_theme/breadcrumbs.html:22
+msgid "Page navigation"
+msgstr ""
+
+#: sphinx_rtd_theme/breadcrumbs.html:37 sphinx_rtd_theme/breadcrumbs.html:39
 msgid "Edit on GitHub"
 msgstr ""
 
-#: sphinx_rtd_theme/breadcrumbs.html:50 sphinx_rtd_theme/breadcrumbs.html:52
+#: sphinx_rtd_theme/breadcrumbs.html:44 sphinx_rtd_theme/breadcrumbs.html:46
 msgid "Edit on Bitbucket"
 msgstr ""
 
-#: sphinx_rtd_theme/breadcrumbs.html:57 sphinx_rtd_theme/breadcrumbs.html:59
+#: sphinx_rtd_theme/breadcrumbs.html:51 sphinx_rtd_theme/breadcrumbs.html:53
 msgid "Edit on GitLab"
 msgstr ""
 
-#: sphinx_rtd_theme/breadcrumbs.html:62 sphinx_rtd_theme/breadcrumbs.html:64
+#: sphinx_rtd_theme/breadcrumbs.html:56 sphinx_rtd_theme/breadcrumbs.html:58
 msgid "View page source"
 msgstr ""
 
-#: sphinx_rtd_theme/breadcrumbs.html:74 sphinx_rtd_theme/footer.html:5
-msgid "Next"
+#. This is an ARIA section label for sequential page links, such as previous
+#. and next page links.
+#: sphinx_rtd_theme/breadcrumbs.html:67
+msgid "Sequential page navigation"
 msgstr ""
 
-#: sphinx_rtd_theme/breadcrumbs.html:77 sphinx_rtd_theme/footer.html:8
+#: sphinx_rtd_theme/breadcrumbs.html:69 sphinx_rtd_theme/footer.html:6
 msgid "Previous"
 msgstr ""
 
-#: sphinx_rtd_theme/footer.html:21 sphinx_rtd_theme/footer.html:24
-#: sphinx_rtd_theme/layout.html:96
-msgid "Copyright"
+#: sphinx_rtd_theme/breadcrumbs.html:72 sphinx_rtd_theme/footer.html:9
+msgid "Next"
+msgstr ""
+
+#. This is an ARIA section label for the footer section of the page.
+#: sphinx_rtd_theme/footer.html:4
+msgid "Footer"
+msgstr ""
+
+#: sphinx_rtd_theme/footer.html:21
+#, python-format
+msgid "&#169; <a href=\"%(path)s\">Copyright</a> %(copyright)s."
+msgstr ""
+
+#: sphinx_rtd_theme/footer.html:23
+#, python-format
+msgid "&#169; Copyright %(copyright)s."
 msgstr ""
 
 #. Build is a noun, not a verb
-#: sphinx_rtd_theme/footer.html:31
+#: sphinx_rtd_theme/footer.html:30
 msgid "Build"
 msgstr ""
 
 #. the phrase "revision" comes from Git, referring to a commit
-#: sphinx_rtd_theme/footer.html:37
+#: sphinx_rtd_theme/footer.html:36
 msgid "Revision"
 msgstr ""
 
@@ -65,59 +87,70 @@ msgstr ""
 
 #. the variable "sphinx_web" is a link to the Sphinx project documentation with
 #. the text "Sphinx"
-#: sphinx_rtd_theme/footer.html:52
+#: sphinx_rtd_theme/footer.html:53
 #, python-format
 msgid "Built with %(sphinx_web)s using a"
 msgstr ""
 
 #. "theme" refers to a theme for Sphinx, which alters the appearance of the
 #. generated documenation
-#: sphinx_rtd_theme/footer.html:54
+#: sphinx_rtd_theme/footer.html:55
 msgid "theme"
 msgstr ""
 
 #. this is always used as "provided by Read the Docs", and should not imply
 #. Read the Docs is an author of the generated documentation.
-#: sphinx_rtd_theme/footer.html:56
+#: sphinx_rtd_theme/footer.html:57
 #, python-format
 msgid "provided by %(readthedocs_web)s"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:79
+#: sphinx_rtd_theme/layout.html:97
 #, python-format
 msgid "Search within %(docstitle)s"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:87
+#: sphinx_rtd_theme/layout.html:105
 msgid "About these documents"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:90
+#: sphinx_rtd_theme/layout.html:108
 msgid "Index"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:93 sphinx_rtd_theme/search.html:11
+#: sphinx_rtd_theme/layout.html:111 sphinx_rtd_theme/search.html:11
 msgid "Search"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:121
-msgid "Documentation Home"
+#: sphinx_rtd_theme/layout.html:114
+msgid "Copyright"
 msgstr ""
 
-#: sphinx_rtd_theme/layout.html:128
+#: sphinx_rtd_theme/layout.html:147 sphinx_rtd_theme/layout.html:149
 msgid "Logo"
 msgstr ""
 
-#: sphinx_rtd_theme/search.html:29
+#. This is an ARIA section label for the main navigation menu
+#: sphinx_rtd_theme/layout.html:173
+msgid "Navigation menu"
+msgstr ""
+
+#. This is an ARIA section label for the navigation menu that is visible when
+#. viewing the page on mobile devices
+#: sphinx_rtd_theme/layout.html:195
+msgid "Mobile navigation menu"
+msgstr ""
+
+#: sphinx_rtd_theme/search.html:31
 msgid "Please activate JavaScript to enable the search functionality."
 msgstr ""
 
 #. Search is a noun, not a verb
-#: sphinx_rtd_theme/search.html:37
+#: sphinx_rtd_theme/search.html:39
 msgid "Search Results"
 msgstr ""
 
-#: sphinx_rtd_theme/search.html:39
+#: sphinx_rtd_theme/search.html:41
 msgid ""
 "Your search did not match any documents. Please make sure that all words "
 "are spelled correctly and that you've selected enough categories."
@@ -127,7 +160,7 @@ msgstr ""
 msgid "Search docs"
 msgstr ""
 
-#: sphinx_rtd_theme/versions.html:11
+#: sphinx_rtd_theme/versions.html:3 sphinx_rtd_theme/versions.html:11
 msgid "Versions"
 msgstr ""
 
@@ -152,5 +185,17 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Free document hosting provided by"
+#~ msgstr ""
+
+#~ msgid "Documentation Home"
+#~ msgstr ""
+
+#~ msgid "Breadcrumbs"
+#~ msgstr ""
+
+#~ msgid "Main"
+#~ msgstr ""
+
+#~ msgid "Top"
 #~ msgstr ""
 

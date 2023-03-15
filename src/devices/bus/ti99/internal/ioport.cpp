@@ -80,7 +80,7 @@
 #include "ioport.h"
 #include "bus/ti99/peb/peribox.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device, "ti99_ioport", "TI-99 I/O Port")
+DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
 namespace bus::ti99::internal {
 

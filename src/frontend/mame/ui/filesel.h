@@ -44,7 +44,9 @@ public:
 	virtual ~menu_file_selector() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_back() override { return !m_filename.empty(); }
 	virtual bool custom_mouse_down() override;
 
 private:
@@ -60,10 +62,11 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry() { }
+		file_selector_entry() = default;
 		file_selector_entry(file_selector_entry &&) = default;
 		file_selector_entry &operator=(file_selector_entry &&) = default;
-		file_selector_entry_type type;
+
+		file_selector_entry_type type = SELECTOR_ENTRY_TYPE_EMPTY;
 		std::string basename;
 		std::string fullpath;
 	};
@@ -80,17 +83,16 @@ private:
 	std::string                     m_hover_directory;
 	std::string                     m_filename;
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	// methods
-	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
 	file_selector_entry &append_entry(file_selector_entry_type entry_type, const std::string &entry_basename, const std::string &entry_fullpath);
 	file_selector_entry &append_entry(file_selector_entry_type entry_type, std::string &&entry_basename, std::string &&entry_fullpath);
 	file_selector_entry *append_dirent_entry(const osd::directory::entry *dirent);
 	void append_entry_menu_item(const file_selector_entry *entry);
 	void select_item(const file_selector_entry &entry);
-	void type_search_char(char32_t ch);
+	void update_search();
 };
 
 
@@ -118,8 +120,8 @@ public:
 	static result result_from_itemref(void *itemref);
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	// internal state
 	bool        m_can_in_place;

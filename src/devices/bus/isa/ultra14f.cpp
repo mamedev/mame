@@ -10,8 +10,8 @@
 #include "ultra14f.h"
 
 #include "bus/nscsi/devices.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/ncr5390.h"
+#include "cpu/m68000/m68008.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 
 DEFINE_DEVICE_TYPE(ULTRA14F, ultra14f_device, "ultra14f", "Ultra-14F SCSI Host Adapter")

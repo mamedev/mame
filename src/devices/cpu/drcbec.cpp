@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
+#include "debug/debugcpu.h"
 #include "drcbec.h"
 
 #include <cmath>
@@ -864,25 +864,21 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 4, 0):    // ROLAND  dst,src,count,mask[,f]
-				shift = PARAM2 & 31;
-				PARAM0 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
+				PARAM0 = rotl_32(PARAM1, PARAM2) & PARAM3;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 4, 1):
-				shift = PARAM2 & 31;
-				temp32 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
+				temp32 = rotl_32(PARAM1, PARAM2) & PARAM3;
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 4, 0):    // ROLINS  dst,src,count,mask[,f]
-				shift = PARAM2 & 31;
-				PARAM0 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				PARAM0 = (PARAM0 & ~PARAM3) | (rotl_32(PARAM1, PARAM2) & PARAM3);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 4, 1):
-				shift = PARAM2 & 31;
-				temp32 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				temp32 = (PARAM0 & ~PARAM3) | (rotl_32(PARAM1, PARAM2) & PARAM3);
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
@@ -1138,13 +1134,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 0):       // ROL     dst,src,count[,f]
-				shift = PARAM2 & 31;
-				PARAM0 = (PARAM1 << shift) | (PARAM1 >> ((32 - shift) & 31));
+				PARAM0 = rotl_32(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 4, 1):
 				shift = PARAM2 & 31;
-				temp32 = (PARAM1 << shift) | (PARAM1 >> ((32 - shift) & 31));
+				temp32 = rotl_32(PARAM1, shift);
 				if (shift != 0)
 				{
 					flags = FLAGS32_NZ(temp32);
@@ -1175,13 +1170,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 0):       // ROR     dst,src,count[,f]
-				shift = PARAM2 & 31;
-				PARAM0 = (PARAM1 >> shift) | (PARAM1 << ((32 - shift) & 31));
+				PARAM0 = rotr_32(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 4, 1):
 				shift = PARAM2 & 31;
-				temp32 = (PARAM1 >> shift) | (PARAM1 << ((32 - shift) & 31));
+				temp32 = rotr_32(PARAM1, shift);
 				flags = FLAGS32_NZ(temp32);
 				if (shift != 0) flags |= (PARAM1 >> (shift - 1)) & FLAG_C;
 				PARAM0 = temp32;
@@ -1507,25 +1501,21 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 8, 0):    // DROLAND dst,src,count,mask[,f]
-				shift = DPARAM2 & 63;
-				DPARAM0 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
+				DPARAM0 = rotl_64(DPARAM1, DPARAM2) & DPARAM3;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLAND, 8, 1):
-				shift = DPARAM2 & 63;
-				temp64 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
+				temp64 = rotl_64(DPARAM1, DPARAM2) & DPARAM3;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 8, 0):    // DROLINS dst,src,count,mask[,f]
-				shift = DPARAM2 & 63;
-				DPARAM0 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
+				DPARAM0 = (DPARAM0 & ~DPARAM3) | (rotl_64(DPARAM1, DPARAM2) & DPARAM3);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROLINS, 8, 1):
-				shift = DPARAM2 & 63;
-				temp64 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
+				temp64 = (DPARAM0 & ~DPARAM3) | (rotl_64(DPARAM1, DPARAM2) & DPARAM3);
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
@@ -1650,7 +1640,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_TEST, 8, 1):      // DTEST   src1,src2[,f]
-				temp64 = DPARAM1 & DPARAM2;
+				temp64 = DPARAM0 & DPARAM1;
 				flags = FLAGS64_NZ(temp64);
 				break;
 
@@ -1742,13 +1732,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 0):       // DROL    dst,src,count[,f]
-				shift = DPARAM2 & 63;
-				DPARAM0 = (DPARAM1 << shift) | (DPARAM1 >> ((64 - shift) & 63));
+				DPARAM0 = rotl_64(DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = (DPARAM1 << shift) | (DPARAM1 >> ((64 - shift) & 63));
+				temp64 = rotl_64(DPARAM1, shift);
 				flags = FLAGS64_NZ(temp64);
 				if (shift != 0) flags |= ((DPARAM1 << (shift - 1)) >> 63) & FLAG_C;
 				DPARAM0 = temp64;
@@ -1776,13 +1765,12 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 0):       // DROR    dst,src,count[,f]
-				shift = DPARAM2 & 63;
-				DPARAM0 = (DPARAM1 >> shift) | (DPARAM1 << ((64 - shift) & 63));
+				DPARAM0 = rotr_64(DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROR, 8, 1):
 				shift = DPARAM2 & 63;
-				temp64 = (DPARAM1 >> shift) | (DPARAM1 << ((64 - shift) & 63));
+				temp64 = rotr_64(DPARAM1, shift);
 				flags = FLAGS64_NZ(temp64);
 				if (shift != 0) flags |= (DPARAM1 >> (shift - 1)) & FLAG_C;
 				DPARAM0 = temp64;

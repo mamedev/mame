@@ -41,16 +41,13 @@ public:
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "img"; }
-	virtual const char *custom_instance_name() const noexcept override { return "disk"; }
-	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
+	virtual const char *image_type_name() const noexcept override { return "disk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -68,7 +65,7 @@ public:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE_NS(MESSIMG_DISK, nubus_image_device, messimg_disk_image_device, "messimg_disk_image", "Mac image")
+DEFINE_DEVICE_TYPE(MESSIMG_DISK, nubus_image_device::messimg_disk_image_device, "messimg_disk_image", "Mac image")
 
 nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MESSIMG_DISK, tag, owner, clock),
@@ -86,16 +83,16 @@ void nubus_image_device::messimg_disk_image_device::device_start()
 {
 	m_data = nullptr;
 
-	if (exists() && fseek(0, SEEK_END) == 0)
+	if (exists() && !fseek(0, SEEK_END))
 	{
-		m_size = (uint32_t)ftell();
+		m_size = uint32_t(ftell());
 	}
 }
 
 image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
-	m_size = (uint32_t)ftell();
+	m_size = uint32_t(ftell());
 	if (m_size > (256*1024*1024))
 	{
 		osd_printf_error("Mac image too large: must be 256MB or less!\n");
@@ -186,7 +183,7 @@ void nubus_image_device::device_start()
 	uint32_t slotspace;
 	uint32_t superslotspace;
 
-	install_declaration_rom(this, IMAGE_ROM_REGION);
+	install_declaration_rom(IMAGE_ROM_REGION);
 
 	slotspace = get_slotspace();
 	superslotspace = get_super_slotspace();
@@ -245,8 +242,8 @@ uint32_t nubus_image_device::image_r()
 void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
-	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
-	mem_mask = ((mem_mask & 0xff) << 24) | ((mem_mask & 0xff00) << 8) | ((mem_mask & 0xff0000) >> 8) | ((mem_mask & 0xff000000) >> 24);
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
 
 	COMBINE_DATA(&image[offset]);
 }
@@ -254,13 +251,12 @@ void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t me
 uint32_t nubus_image_device::image_super_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
-	uint32_t data = image[offset];
-	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+	return swapendian_int32(image[offset]);
 }
 
 void nubus_image_device::file_cmd_w(uint32_t data)
 {
-//  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
+//  data = swapendian_int32(data);
 	filectx.curcmd = data;
 	switch (data) {
 	case kFileCmdGetDir:
@@ -295,8 +291,9 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 			std::string fullpath(filectx.curdir);
 			fullpath += PATH_SEPARATOR;
 			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
-			if (osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_READ, filectx.fd, filectx.filelen);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;
@@ -306,8 +303,9 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 			fullpath += PATH_SEPARATOR;
 			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
 			uint64_t filesize; // unused, but it's an output from the open call
-			if (osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE)
-				osd_printf_error("Error opening %s\n", fullpath);
+			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize);
+			if (filerr)
+				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
 			filectx.bytecount = 0;
 		}
 		break;

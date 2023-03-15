@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "bus/nscsi/cdd2000.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 DEFINE_DEVICE_TYPE(CDD2000, cdd2000_device, "cdd2000", "Philips CDD2000 CD-R")
 
@@ -34,8 +34,9 @@ void cdd2000_device::mem_map(address_map &map)
 
 void cdd2000_device::device_add_mconfig(machine_config &config)
 {
-	MC68HC11F1(config, m_cdcpu, 8'000'000); // type and clock guessed
-	m_cdcpu->set_addrmap(AS_PROGRAM, &cdd2000_device::mem_map);
+	mc68hc11f1_device &cdcpu(MC68HC11F1(config, m_cdcpu, 8'000'000)); // type and clock guessed
+	cdcpu.set_addrmap(AS_PROGRAM, &cdd2000_device::mem_map);
+	cdcpu.set_default_config(0x0b);
 
 	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed
 }

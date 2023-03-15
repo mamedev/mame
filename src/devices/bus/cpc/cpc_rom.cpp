@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(CPC_ROMSLOT, cpc_rom_image_device, "cpc_rom_image", "CPC ROM 
 
 cpc_rom_image_device::cpc_rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CPC_ROMSLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_rom_image_interface(mconfig, *this)
 	, m_base(nullptr)
 {
 }

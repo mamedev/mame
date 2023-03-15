@@ -27,10 +27,6 @@ public:
 	isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~isbc202_device();
 
-	// device_multibus_interface overrides
-	virtual void install_io_rw(address_space& space) override;
-	virtual void install_mem_rw(address_space& space) override;
-
 	// Access to I/O space by CPU
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
@@ -43,16 +39,19 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual void execute_run() override;
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
@@ -101,7 +100,7 @@ private:
 	floppy_image_device *m_current_drive;
 	uint8_t m_px_s1s0;  // C-A16-11 & C-A16-13
 	uint8_t m_cmd;      // C-A8
-	cpu_device *m_cpu;  // When != nullptr: CPU is suspended in wait state
+	bool m_2nd_pass;
 	bool m_cpu_rd;
 	uint8_t m_ready_in;
 	uint8_t m_ready_ff; // I-A44 & I-A43
@@ -136,6 +135,10 @@ private:
 	emu_timer *m_timeout_timer;
 	emu_timer *m_byte_timer;
 	emu_timer *m_f_timer;
+
+	TIMER_CALLBACK_MEMBER(timeout_tick);
+	TIMER_CALLBACK_MEMBER(byte_tick);
+	TIMER_CALLBACK_MEMBER(f_tick);
 
 	void set_output();
 	unsigned selected_drive() const;

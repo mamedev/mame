@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
@@ -76,34 +76,13 @@ namespace entry
 #		if ENTRY_CONFIG_USE_WAYLAND
 		wl_egl_window *win_impl = (wl_egl_window*)glfwGetWindowUserPointer(_window);
 		if(win_impl)
-		{ 
+		{
 			glfwSetWindowUserPointer(_window, nullptr);
 			wl_egl_window_destroy(win_impl);
 		}
 #		endif
 #	endif
 		glfwDestroyWindow(_window);
-	}
-
-	static void glfwSetWindow(GLFWwindow* _window)
-	{
-		bgfx::PlatformData pd;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-# 		if ENTRY_CONFIG_USE_WAYLAND
-		pd.ndt      = glfwGetWaylandDisplay();
-#		else
-		pd.ndt      = glfwGetX11Display();
-		#endif
-#	elif BX_PLATFORM_OSX
-		pd.ndt      = NULL;
-#	elif BX_PLATFORM_WINDOWS
-		pd.ndt      = NULL;
-#	endif // BX_PLATFORM_WINDOWS
-		pd.nwh          = glfwNativeWindowHandle(_window);
-		pd.context      = NULL;
-		pd.backBuffer   = NULL;
-		pd.backBufferDS = NULL;
-		bgfx::setPlatformData(pd);
 	}
 
 	static uint8_t translateKeyModifiers(int _glfw)
@@ -453,29 +432,28 @@ namespace entry
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 			WindowHandle handle = { m_windowAlloc.alloc() };
-			m_windows[0] = glfwCreateWindow(ENTRY_DEFAULT_WIDTH
+			m_window[0] = glfwCreateWindow(ENTRY_DEFAULT_WIDTH
 				, ENTRY_DEFAULT_HEIGHT
 				, "bgfx"
 				, NULL
 				, NULL
 				);
 
-			if (!m_windows[0])
+			if (!m_window[0])
 			{
 				DBG("glfwCreateWindow failed!");
 				glfwTerminate();
 				return bx::kExitFailure;
 			}
 
-			glfwSetKeyCallback(m_windows[0], keyCb);
-			glfwSetCharCallback(m_windows[0], charCb);
-			glfwSetScrollCallback(m_windows[0], scrollCb);
-			glfwSetCursorPosCallback(m_windows[0], cursorPosCb);
-			glfwSetMouseButtonCallback(m_windows[0], mouseButtonCb);
-			glfwSetWindowSizeCallback(m_windows[0], windowSizeCb);
-			glfwSetDropCallback(m_windows[0], dropFileCb);
+			glfwSetKeyCallback(m_window[0], keyCb);
+			glfwSetCharCallback(m_window[0], charCb);
+			glfwSetScrollCallback(m_window[0], scrollCb);
+			glfwSetCursorPosCallback(m_window[0], cursorPosCb);
+			glfwSetMouseButtonCallback(m_window[0], mouseButtonCb);
+			glfwSetWindowSizeCallback(m_window[0], windowSizeCb);
+			glfwSetDropCallback(m_window[0], dropFileCb);
 
-			glfwSetWindow(m_windows[0]);
 			m_eventQueue.postSizeEvent(handle, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
 
 			for (uint32_t ii = 0; ii < ENTRY_CONFIG_MAX_GAMEPADS; ++ii)
@@ -492,10 +470,10 @@ namespace entry
 
 			m_thread.init(MainThreadEntry::threadFunc, &m_mte);
 
-			while (NULL != m_windows[0]
-			&&     !glfwWindowShouldClose(m_windows[0]))
+			while (NULL != m_window[0]
+			&&     !glfwWindowShouldClose(m_window[0]))
 			{
-				glfwWaitEvents();
+				glfwWaitEventsTimeout(0.016);
 
 				for (uint32_t ii = 0; ii < ENTRY_CONFIG_MAX_GAMEPADS; ++ii)
 				{
@@ -535,7 +513,7 @@ namespace entry
 							glfwSetWindowSizeCallback(window, windowSizeCb);
 							glfwSetDropCallback(window, dropFileCb);
 
-							m_windows[msg->m_handle.idx] = window;
+							m_window[msg->m_handle.idx] = window;
 							m_eventQueue.postSizeEvent(msg->m_handle, msg->m_width, msg->m_height);
 							m_eventQueue.postWindowEvent(msg->m_handle, glfwNativeWindowHandle(window));
 						}
@@ -545,31 +523,31 @@ namespace entry
 						{
 							if (isValid(msg->m_handle) )
 							{
-								GLFWwindow* window = m_windows[msg->m_handle.idx];
+								GLFWwindow* window = m_window[msg->m_handle.idx];
 								m_eventQueue.postWindowEvent(msg->m_handle);
 								glfwDestroyWindowImpl(window);
-								m_windows[msg->m_handle.idx] = NULL;
+								m_window[msg->m_handle.idx] = NULL;
 							}
 						}
 						break;
 
 					case GLFW_WINDOW_SET_TITLE:
 						{
-							GLFWwindow* window = m_windows[msg->m_handle.idx];
+							GLFWwindow* window = m_window[msg->m_handle.idx];
 							glfwSetWindowTitle(window, msg->m_title.c_str());
 						}
 						break;
 
 					case GLFW_WINDOW_SET_POS:
 						{
-							GLFWwindow* window = m_windows[msg->m_handle.idx];
+							GLFWwindow* window = m_window[msg->m_handle.idx];
 							glfwSetWindowPos(window, msg->m_x, msg->m_y);
 						}
 						break;
 
 					case GLFW_WINDOW_SET_SIZE:
 						{
-							GLFWwindow* window = m_windows[msg->m_handle.idx];
+							GLFWwindow* window = m_window[msg->m_handle.idx];
 							glfwSetWindowSize(window, msg->m_width, msg->m_height);
 						}
 						break;
@@ -582,7 +560,7 @@ namespace entry
 
 					case GLFW_WINDOW_TOGGLE_FULL_SCREEN:
 						{
-							GLFWwindow* window = m_windows[msg->m_handle.idx];
+							GLFWwindow* window = m_window[msg->m_handle.idx];
 							if (glfwGetWindowMonitor(window) )
 							{
 								glfwSetWindowMonitor(window
@@ -619,7 +597,7 @@ namespace entry
 
 					case GLFW_WINDOW_MOUSE_LOCK:
 						{
-							GLFWwindow* window = m_windows[msg->m_handle.idx];
+							GLFWwindow* window = m_window[msg->m_handle.idx];
 							if (msg->m_value)
 							{
 								glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -639,7 +617,7 @@ namespace entry
 			m_eventQueue.postExitEvent();
 			m_thread.shutdown();
 
-			glfwDestroyWindowImpl(m_windows[0]);
+			glfwDestroyWindowImpl(m_window[0]);
 			glfwTerminate();
 
 			return m_thread.getExitCode();
@@ -651,7 +629,7 @@ namespace entry
 			for (uint32_t ii = 0, num = m_windowAlloc.getNumHandles(); ii < num; ++ii)
 			{
 				uint16_t idx = m_windowAlloc.getHandleAt(ii);
-				if (_window == m_windows[idx])
+				if (_window == m_window[idx])
 				{
 					WindowHandle handle = { idx };
 					return handle;
@@ -676,7 +654,7 @@ namespace entry
 		EventQueue m_eventQueue;
 		bx::Mutex m_lock;
 
-		GLFWwindow* m_windows[ENTRY_CONFIG_MAX_WINDOWS];
+		GLFWwindow* m_window[ENTRY_CONFIG_MAX_WINDOWS];
 		bx::HandleAllocT<ENTRY_CONFIG_MAX_WINDOWS> m_windowAlloc;
 
 		GamepadGLFW m_gamepad[ENTRY_CONFIG_MAX_GAMEPADS];
@@ -799,13 +777,11 @@ namespace entry
 
 	const Event* poll()
 	{
-		glfwPostEmptyEvent();
 		return s_ctx.m_eventQueue.poll();
 	}
 
 	const Event* poll(WindowHandle _handle)
 	{
-		glfwPostEmptyEvent();
 		return s_ctx.m_eventQueue.poll(_handle);
 	}
 
@@ -825,7 +801,6 @@ namespace entry
 		msg->m_title = _title;
 		msg->m_handle.idx = s_ctx.m_windowAlloc.alloc();
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 		return msg->m_handle;
 	}
 
@@ -834,7 +809,6 @@ namespace entry
 		Msg* msg = new Msg(GLFW_WINDOW_DESTROY);
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 	}
 
 	void setWindowPos(WindowHandle _handle, int32_t _x, int32_t _y)
@@ -844,7 +818,6 @@ namespace entry
 		msg->m_y = _y;
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 	}
 
 	void setWindowSize(WindowHandle _handle, uint32_t _width, uint32_t _height)
@@ -854,7 +827,6 @@ namespace entry
 		msg->m_height = _height;
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 	}
 
 	void setWindowTitle(WindowHandle _handle, const char* _title)
@@ -863,7 +835,6 @@ namespace entry
 		msg->m_title = _title;
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 	}
 
 	void setWindowFlags(WindowHandle _handle, uint32_t _flags, bool _enabled)
@@ -876,7 +847,6 @@ namespace entry
 		Msg* msg = new Msg(GLFW_WINDOW_TOGGLE_FULL_SCREEN);
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 	}
 
 	void setMouseLock(WindowHandle _handle, bool _lock)
@@ -885,7 +855,24 @@ namespace entry
 		msg->m_value = _lock;
 		msg->m_handle = _handle;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
+	}
+
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		return glfwNativeWindowHandle(s_ctx.m_window[_handle.idx]);
+	}
+
+	void* getNativeDisplayHandle()
+	{
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#		if ENTRY_CONFIG_USE_WAYLAND
+		return glfwGetWaylandDisplay();
+#		else
+		return glfwGetX11Display();
+#		endif // ENTRY_CONFIG_USE_WAYLAND
+#	else
+		return NULL;
+#	endif // BX_PLATFORM_*
 	}
 
 	int32_t MainThreadEntry::threadFunc(bx::Thread* _thread, void* _userData)
@@ -899,7 +886,6 @@ namespace entry
 		Msg* msg = new Msg(GLFW_WINDOW_DESTROY);
 		msg->m_handle.idx = 0;
 		s_ctx.m_msgs.push(msg);
-		glfwPostEmptyEvent();
 
 		return result;
 	}

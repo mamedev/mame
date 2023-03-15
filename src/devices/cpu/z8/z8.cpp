@@ -25,7 +25,6 @@
 #include "emu.h"
 #include "z8.h"
 #include "z8dasm.h"
-#include "debugger.h"
 
 #define LOG_TIMER       (1 << 1U)
 #define LOG_RECEIVE     (1 << 2U)
@@ -1219,7 +1218,6 @@ void z8_device::device_start()
 		state_add(STATE_GENPC,   "GENPC",     m_pc).callimport().noshow();
 		state_add(STATE_GENPCBASE, "CURPC",   m_ppc).callimport().noshow();
 		state_add(Z8_SP,         "SP",        m_sp.w);
-		state_add(STATE_GENSP,   "GENSP",     m_sp.w).noshow();
 		state_add(Z8_RP,         "RP",        m_rp);
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%6s");
 		state_add(Z8_IMR,        "IMR",       m_imr);
@@ -1262,8 +1260,8 @@ void z8_device::device_start()
 	space(AS_IO).specific(m_regs);
 
 	/* allocate timers */
-	m_internal_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::timeout<0>), this));
-	m_internal_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z8_device::timeout<1>), this));
+	m_internal_timer[0] = timer_alloc(FUNC(z8_device::timeout<0>), this);
+	m_internal_timer[1] = timer_alloc(FUNC(z8_device::timeout<1>), this);
 
 	/* Clear state */
 	std::fill(std::begin(m_irq_line), std::end(m_irq_line), CLEAR_LINE);
@@ -1349,7 +1347,7 @@ void z8_device::take_interrupt(int irq)
 
 	// acknowledge the IRQ
 	m_irq &= ~(1 << irq);
-	standard_irq_callback(irq);
+	standard_irq_callback(irq, m_pc);
 
 	// get the interrupt vector address
 	uint16_t vector = irq * 2;

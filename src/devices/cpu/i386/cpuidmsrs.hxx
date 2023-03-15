@@ -36,7 +36,7 @@ uint64_t pentium_device::opcode_rdmsr(bool &valid_msr)
 		if (!(offset & ~0xf)) // 2-f are test registers
 		{
 			valid_msr = true;
-			logerror("RDMSR: Reading test MSR %x", offset);
+			logerror("RDMSR: Reading test MSR %x\n", offset);
 			return 0;
 		}
 		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n", offset, m_pc - 2);
@@ -84,7 +84,7 @@ void pentium_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		if (!(offset & ~0xf)) // 2-f are test registers
 		{
 			valid_msr = true;
-			logerror("WRMSR: Writing test MSR %x", offset);
+			logerror("WRMSR: Writing test MSR %x\n", offset);
 			break;
 		}
 		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n", offset, (uint32_t)(data >> 32), (uint32_t)data, m_pc - 2);

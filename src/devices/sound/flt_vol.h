@@ -27,8 +27,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	sound_stream*  m_stream;
-	stream_buffer::sample_t m_gain;
+	sound_stream* m_stream;
+	float m_gain;
 };
 
 DECLARE_DEVICE_TYPE(FILTER_VOLUME, filter_volume_device)

@@ -423,6 +423,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		break;
 	}
 
+	bool comma = false;
 	if( d->arguments )
 	{
 		util::stream_format(stream, "%-5s ", s_mnemonic[d->mnemonic]);
@@ -474,6 +475,9 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 			case 'I':
 				util::stream_format(stream, "%s", ixy);
 				break;
+			case ',':
+				comma = true;
+				[[fallthrough]];
 			default:
 				stream << *src;
 			}
@@ -485,12 +489,16 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
-	if (d->mnemonic == zCALL || d->mnemonic == zCPDR || d->mnemonic == zCPIR || d->mnemonic == zDJNZ ||
-		d->mnemonic == zHLT  || d->mnemonic == zINDR || d->mnemonic == zINIR || d->mnemonic == zLDDR ||
-		d->mnemonic == zLDIR || d->mnemonic == zOTDR || d->mnemonic == zOTIR || d->mnemonic == zRST)
+	if (d->mnemonic == zCALL || d->mnemonic == zHLT || d->mnemonic == zRST)
 		flags = STEP_OVER;
 	else if (d->mnemonic == zRETN || d->mnemonic == zRET || d->mnemonic == zRETI)
 		flags = STEP_OUT;
+	if (d->mnemonic == zCPDR  || d->mnemonic == zCPIR || d->mnemonic == zDJNZ  || d->mnemonic == zINDR ||
+		d->mnemonic == zINIR  || d->mnemonic == zLDDR || d->mnemonic == zLDIR  || d->mnemonic == zOTDR ||
+		d->mnemonic == zOTDMR || d->mnemonic == zOTIR || d->mnemonic == zOTIMR ||
+		((d->mnemonic == zCALL || d->mnemonic == zJP || d->mnemonic == zJR) && comma) ||
+		(d->mnemonic == zRET && d->arguments))
+		flags = STEP_COND;
 
 	return (pos - pc) | flags | SUPPORTED;
 }

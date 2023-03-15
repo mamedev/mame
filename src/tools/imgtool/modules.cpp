@@ -8,7 +8,6 @@
 
 ***************************************************************************/
 
-#include "imgtool.h"
 #include "modules.h"
 
 #ifndef MODULES_RECURSIVE
@@ -60,7 +59,7 @@ imgtoolerr_t imgtool_create_canonical_library(bool omit_untested, std::unique_pt
 			{
 				module->create = nullptr;
 				module->createimage_optguide = nullptr;
-				module->createimage_optspec = nullptr;
+				module->createimage_optspec.clear();
 			}
 		}
 	}
@@ -73,8 +72,6 @@ imgtoolerr_t imgtool_create_canonical_library(bool omit_untested, std::unique_pt
 
 MODULE(amiga_floppy)
 MODULE(concept)
-MODULE(mac_mfs)
-MODULE(mac_hfs)
 MODULE(hd)
 MODULE(rsdos)
 MODULE(dgndos)
@@ -88,8 +85,6 @@ MODULE(ti99_ti99hd)
 MODULE(ti990)
 MODULE(pc_floppy)
 MODULE(pc_chd)
-MODULE(prodos_525)
-MODULE(prodos_35)
 MODULE(thom_fd_basic)
 MODULE(thom_qd_basic)
 MODULE(thom_sap_basic)

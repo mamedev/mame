@@ -6,9 +6,6 @@
 //
 //============================================================
 
-#include <windows.h>
-#include "mamevers.rc"
-
 1                       24      MOVEABLE PURE   "mame.man"
 
 2                       ICON    DISCARDABLE     "mame.ico"

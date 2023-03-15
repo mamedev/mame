@@ -1,23 +1,39 @@
 // license: BSD-3-Clause
 // copyright-holders: Aaron Giles, Dirk Best
-/***************************************************************************
+/******************************************************************************
 
-    Commodore 8364 "Paula"
+    MOS Technology 8364 "Paula"
 
-***************************************************************************/
+    TODO:
+    - Inherit FDC, serial and irq controller to here;
+    - Move Agnus "location" logic from here;
+    - low-pass filter;
+    - convert volume values to non-linear dB scale (cfr. )
+    - Verify ADKCON modulation;
+    - Verify manual mode:
+      \- AGA roadkill during gameplay, which also has very long period setups,
+         extremely aliased;
+    - When a DMA stop occurs, is the correlated channel playback stopped
+      at the end of the current cycle or as soon as possible like current
+      implementation?
+
+******************************************************************************/
 
 #include "emu.h"
 #include "8364_paula.h"
 
+#define LIVE_AUDIO_VIEW 0
+
 //#define VERBOSE 1
 #include "logmacro.h"
+#include <cstring>
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "8364 Paula")
+DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paula\"")
 
 
 //*************************************************************************
@@ -29,11 +45,11 @@ DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "8364 Paula")
 //-------------------------------------------------
 
 paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PAULA_8364, tag, owner, clock),
-	device_sound_interface(mconfig, *this),
-	m_mem_r(*this), m_int_w(*this),
-	m_dmacon(0), m_adkcon(0),
-	m_stream(nullptr)
+	: device_t(mconfig, PAULA_8364, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_chipmem_r(*this)
+	, m_int_w(*this)
+	, m_stream(nullptr)
 {
 }
 
@@ -44,21 +60,37 @@ paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *
 void paula_8364_device::device_start()
 {
 	// resolve callbacks
-	m_mem_r.resolve_safe(0);
+	m_chipmem_r.resolve_safe(0);
 	m_int_w.resolve_safe();
 
 	// initialize channels
 	for (int i = 0; i < 4; i++)
 	{
 		m_channel[i].index = i;
-		m_channel[i].curticks = 0;
-		m_channel[i].manualmode = false;
-		m_channel[i].curlocation = 0;
-		m_channel[i].irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(paula_8364_device::signal_irq), this));
+		m_channel[i].irq_timer = timer_alloc(FUNC(paula_8364_device::signal_irq), this);
 	}
 
 	// create the stream
 	m_stream = stream_alloc(0, 4, clock() / CLOCK_DIVIDER);
+}
+
+void paula_8364_device::device_reset()
+{
+	m_dma_master_enable = false;
+	for (auto &chan : m_channel)
+	{
+		chan.loc = 0;
+		chan.len = 0;
+		chan.per = 0;
+		chan.vol = 0;
+		chan.curticks = 0;
+		chan.manualmode = false;
+		chan.curlocation = 0;
+		chan.curlength = 0;
+		chan.dma_enabled = false;
+		chan.atper = false;
+		chan.atvol = false;
+	}
 }
 
 //-------------------------------------------------
@@ -75,64 +107,91 @@ void paula_8364_device::update()
 //  IMPLEMENTATION
 //**************************************************************************
 
-uint16_t paula_8364_device::reg_r(offs_t offset)
+template <u8 ch> void paula_8364_device::audio_channel_map(address_map &map)
 {
-	switch (offset)
-	{
-	case REG_DMACONR:
-		return m_dmacon;
-
-	case REG_ADKCONR:
-		return m_adkcon;
-	}
-
-	return 0xffff;
+	// TODO: location addresses belongs to Agnus
+	map(0x00, 0x01).w(FUNC(paula_8364_device::audxlch_w<ch>));
+	map(0x02, 0x03).w(FUNC(paula_8364_device::audxlcl_w<ch>));
+	map(0x04, 0x05).w(FUNC(paula_8364_device::audxlen_w<ch>));
+	map(0x06, 0x07).w(FUNC(paula_8364_device::audxper_w<ch>));
+	map(0x08, 0x09).w(FUNC(paula_8364_device::audxvol_w<ch>));
+	map(0x0a, 0x0b).w(FUNC(paula_8364_device::audxdat_w<ch>));
 }
 
-void paula_8364_device::reg_w(offs_t offset, uint16_t data)
+// Instantiate channel maps
+template void paula_8364_device::audio_channel_map<0>(address_map &map);
+template void paula_8364_device::audio_channel_map<1>(address_map &map);
+template void paula_8364_device::audio_channel_map<2>(address_map &map);
+template void paula_8364_device::audio_channel_map<3>(address_map &map);
+
+template <u8 ch> void paula_8364_device::audxlch_w(u16 data)
 {
-	if (offset >= 0xa0 && offset <= 0xdf)
-		m_stream->update();
+	m_stream->update();
+	// TODO: chipmem mask
+	m_channel[ch].loc = (m_channel[ch].loc & 0x0000ffff) | ((data & 0x001f) << 16);
+}
 
-	switch (offset)
+template <u8 ch> void paula_8364_device::audxlcl_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].loc = (m_channel[ch].loc & 0xffff0000) | ((data & 0xfffe) <<  0);
+}
+
+template <u8 ch> void paula_8364_device::audxlen_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].len = data;
+}
+
+template <u8 ch> void paula_8364_device::audxper_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].per = data;
+}
+
+template <u8 ch> void paula_8364_device::audxvol_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].vol = data & 0x7f;
+}
+
+template <u8 ch> void paula_8364_device::audxdat_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].dat = data;
+	m_channel[ch].manualmode = true;
+}
+
+void paula_8364_device::dmacon_set(u16 data)
+{
+	m_stream->update();
+
+	m_dma_master_enable = bool(BIT(data, 9));
+
+	// update the DMA latches on each channel and reload if fresh
+	// This holds true particularly for Ocean games (bchvolly, lostpatr, pang) and waylildr:
+	// they sets a DMA length for a channel then enable DMA finally resets that length to 1
+	// after a short delay loop.
+	for (int channum = 0; channum < 4; channum++)
 	{
-	case REG_DMACON:
-		m_stream->update();
-		m_dmacon = (data & 0x8000) ? (m_dmacon | (data & 0x021f)) : (m_dmacon & ~(data & 0x021f));  // only bits 15, 9 and 5 to 0
-		break;
+		audio_channel *chan = &m_channel[channum];
+		if (!chan->dma_enabled && ((data >> channum) & 1))
+			dma_reload(chan, true);
 
-	case REG_ADKCON:
-		m_stream->update();
-		m_adkcon = (data & 0x8000) ? (m_adkcon | (data & 0x7fff)) : (m_adkcon & ~(data & 0x7fff));
-		break;
+		chan->dma_enabled = bool(BIT(data, channum));
+	}
+}
 
-	// to be moved
-	case REG_AUD0LCL: m_channel[CHAN_0].loc = (m_channel[CHAN_0].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD0LCH: m_channel[CHAN_0].loc = (m_channel[CHAN_0].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD1LCL: m_channel[CHAN_1].loc = (m_channel[CHAN_1].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD1LCH: m_channel[CHAN_1].loc = (m_channel[CHAN_1].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD2LCL: m_channel[CHAN_2].loc = (m_channel[CHAN_2].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD2LCH: m_channel[CHAN_2].loc = (m_channel[CHAN_2].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD3LCL: m_channel[CHAN_3].loc = (m_channel[CHAN_3].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD3LCH: m_channel[CHAN_3].loc = (m_channel[CHAN_3].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
+void paula_8364_device::adkcon_set(u16 data)
+{
+	m_stream->update();
 
-	// audio data
-	case REG_AUD0LEN: m_channel[CHAN_0].len = data; break;
-	case REG_AUD0PER: m_channel[CHAN_0].per = data; break;
-	case REG_AUD0VOL: m_channel[CHAN_0].vol = data; break;
-	case REG_AUD0DAT: m_channel[CHAN_0].dat = data; m_channel[CHAN_0].manualmode = true; break;
-	case REG_AUD1LEN: m_channel[CHAN_1].len = data; break;
-	case REG_AUD1PER: m_channel[CHAN_1].per = data; break;
-	case REG_AUD1VOL: m_channel[CHAN_1].vol = data; break;
-	case REG_AUD1DAT: m_channel[CHAN_1].dat = data; m_channel[CHAN_1].manualmode = true; break;
-	case REG_AUD2LEN: m_channel[CHAN_2].len = data; break;
-	case REG_AUD2PER: m_channel[CHAN_2].per = data; break;
-	case REG_AUD2VOL: m_channel[CHAN_2].vol = data; break;
-	case REG_AUD2DAT: m_channel[CHAN_2].dat = data; m_channel[CHAN_2].manualmode = true; break;
-	case REG_AUD3LEN: m_channel[CHAN_3].len = data; break;
-	case REG_AUD3PER: m_channel[CHAN_3].per = data; break;
-	case REG_AUD3VOL: m_channel[CHAN_3].vol = data; break;
-	case REG_AUD3DAT: m_channel[CHAN_3].dat = data; m_channel[CHAN_3].manualmode = true; break;
+	for (int channum = 0; channum < 4; channum++)
+	{
+		audio_channel *chan = &m_channel[channum];
+
+		chan->atper = bool(BIT(data, channum + 4));
+		chan->atvol = bool(BIT(data, channum));
 	}
 }
 
@@ -142,20 +201,51 @@ void paula_8364_device::reg_w(offs_t offset, uint16_t data)
 
 TIMER_CALLBACK_MEMBER( paula_8364_device::signal_irq )
 {
-	m_int_w(param);
+	m_int_w(param, 1);
 }
 
 //-------------------------------------------------
 //  dma_reload
 //-------------------------------------------------
 
-void paula_8364_device::dma_reload(audio_channel *chan)
+void paula_8364_device::dma_reload(audio_channel *chan, bool startup)
 {
 	chan->curlocation = chan->loc;
+	// TODO: how to treat length == 0?
 	chan->curlength = chan->len;
-	chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
+	// TODO: on startup=false irq should be delayed two cycles
+	if (startup)
+		chan->irq_timer->adjust(attotime::from_hz(15750), chan->index); // clock() / 227
+	else
+		signal_irq(chan->index);
 
-	LOG("dma_reload(%d): offs=%05X len=%04X\n", chan->index, chan->curlocation, chan->curlength);
+	LOG("dma_reload(%d): offs=%06X len=%04X\n", chan->index, chan->curlocation, chan->curlength);
+}
+
+std::string paula_8364_device::print_audio_state()
+{
+	std::ostringstream outbuffer;
+
+	util::stream_format(outbuffer, "DMA master %d\n", m_dma_master_enable);
+	for (auto &chan : m_channel)
+	{
+		util::stream_format(outbuffer, "%d DMA (%d) ADK (%d%d) REGS: %06x %04x %03x %02x %d LIVE: %06x %04x %d\n"
+			, chan.index
+			, chan.dma_enabled
+			, chan.atper
+			, chan.atvol
+			, chan.loc
+			, chan.len
+			, chan.per
+			, chan.vol
+			, chan.manualmode
+			, chan.curlocation
+			, chan.curlength
+			, chan.dma_enabled
+		);
+	}
+
+	return outbuffer.str();
 }
 
 //-------------------------------------------------
@@ -167,7 +257,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 	int channum, sampoffs = 0;
 
 	// if all DMA off, disable all channels
-	if (BIT(m_dmacon, 9) == 0)
+	if (m_dma_master_enable == false)
 	{
 		m_channel[0].dma_enabled =
 		m_channel[1].dma_enabled =
@@ -182,15 +272,8 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 	int samples = outputs[0].samples() * CLOCK_DIVIDER;
 
-	// update the DMA states on each channel and reload if fresh
-	for (channum = 0; channum < 4; channum++)
-	{
-		audio_channel *chan = &m_channel[channum];
-		if (!chan->dma_enabled && ((m_dmacon >> channum) & 1))
-			dma_reload(chan);
-
-		chan->dma_enabled = BIT(m_dmacon, channum);
-	}
+	if (LIVE_AUDIO_VIEW)
+		popmessage(print_audio_state());
 
 	// loop until done
 	while (samples > 0)
@@ -219,11 +302,12 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			int i;
 
 			// normalize the volume value
+			// FIXME: definitely not linear
 			volume = (volume & 0x40) ? 64 : (volume & 0x3f);
 			volume *= 4;
 
 			// are we modulating the period of the next channel?
-			if ((m_adkcon >> channum) & 0x10)
+			if (chan->atper)
 			{
 				nextper = chan->dat;
 				nextvol = -1;
@@ -231,7 +315,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			}
 
 			// are we modulating the volume of the next channel?
-			else if ((m_adkcon >> channum) & 0x01)
+			else if (chan->atvol)
 			{
 				nextper = -1;
 				nextvol = chan->dat;
@@ -263,14 +347,23 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 					chan->curlocation++;
 				if (chan->dma_enabled && !(chan->curlocation & 1))
 				{
-					chan->dat = m_mem_r(chan->curlocation);
+					chan->dat = m_chipmem_r(chan->curlocation);
 
 					if (chan->curlength != 0)
 						chan->curlength--;
 
-					// if we run out of data, reload the dma
+					// if we run out of data, reload the dma and signal an IRQ,
+					// gpmaster/asparmgp definitely expects this
+					// (uses channel 3 as a sequencer, changing the start address on the fly)
 					if (chan->curlength == 0)
-						dma_reload(chan);
+					{
+						dma_reload(chan, false);
+						// reload the data pointer, otherwise aliasing / buzzing outside the given buffer will be heard
+						// For example: Xenon 2 sets up location=0x63298 length=0x20
+						// for silencing channels on-the-fly without relying on irqs.
+						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
+						chan->dat = m_chipmem_r(chan->curlocation);
+					}
 				}
 
 				// latch the next byte of the sample
@@ -282,7 +375,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 				// if we're in manual mode, signal an interrupt once we latch the low byte
 				if (!chan->dma_enabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(nullptr, channum);
+					signal_irq(channum);
 					chan->manualmode = false;
 				}
 			}

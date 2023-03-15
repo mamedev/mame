@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     NEC PC-9801-26 sound card
 
@@ -8,8 +8,10 @@
 
     TODO:
     - verify sound irq;
+    - understand if dips can be read by SW;
+    - configurable irq level needs a binding flush in C-bus handling;
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "bus/cbus/pc9801_26.h"
@@ -23,11 +25,11 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "pc9801_26")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26")
 
 WRITE_LINE_MEMBER(pc9801_26_device::sound_irq)
 {
-	/* TODO: seems to die very often */
+	// TODO: sometimes misfired irq causes sound or even host hang
 	m_bus->int_w<5>(state);
 }
 
@@ -77,10 +79,27 @@ const tiny_rom_entry *pc9801_26_device::device_rom_region() const
 static INPUT_PORTS_START( pc9801_26 )
 	PORT_INCLUDE( pc9801_joy_port )
 
-	PORT_START("OPN_DSW")
+	// On-board jumpers
+	// TODO: any way to actually read these from HW?
+	PORT_START("OPN_JP6A1_JP6A3")
+	PORT_CONFNAME( 0x03, 0x02, "PC-9801-26: Interrupt level")
+	PORT_CONFSETTING(    0x00, "IRQ 0" ) // 2-3, 2-3
+	PORT_CONFSETTING(    0x01, "IRQ 4" ) // 2-3, 1-2
+	PORT_CONFSETTING(    0x02, "IRQ 5" ) // 1-2, 1-2
+	PORT_CONFSETTING(    0x03, "IRQ 6" ) // 1-2, 2-3
+
+	PORT_START("OPN_JP6A2")
+	PORT_CONFNAME( 0x07, 0x01, "PC-9801-26: Sound ROM address")
+	PORT_CONFSETTING(    0x00, "0xc8000" )    // 1-10
+	PORT_CONFSETTING(    0x01, "0xcc000" )    // 2-9
+	PORT_CONFSETTING(    0x02, "0xd0000" )    // 3-8
+	PORT_CONFSETTING(    0x03, "0xd4000" )    // 4-7
+	PORT_CONFSETTING(    0x04, "Disable ROM") // 5-6
+
+	PORT_START("OPN_JP6A4")
 	PORT_CONFNAME( 0x01, 0x01, "PC-9801-26: Port Base" )
-	PORT_CONFSETTING(    0x00, "0x088" )
-	PORT_CONFSETTING(    0x01, "0x188" )
+	PORT_CONFSETTING(    0x00, "0x088" ) // 1-4
+	PORT_CONFSETTING(    0x01, "0x188" ) // 2-3
 INPUT_PORTS_END
 
 ioport_constructor pc9801_26_device::device_input_ports() const
@@ -97,9 +116,9 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, PC9801_26, tag, owner, clock),
-		m_bus(*this, DEVICE_SELF_OWNER),
-		m_opn(*this, "opn")
+	: pc9801_snd_device(mconfig, PC9801_26, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opn(*this, "opn")
 {
 }
 
@@ -117,10 +136,15 @@ void pc9801_26_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+u16 pc9801_26_device::read_io_base()
+{
+	return ((ioport("OPN_JP6A4")->read() & 1) << 8) + 0x0088;
+}
 
 void pc9801_26_device::device_start()
 {
-	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
+	m_rom_base = 0;
+	m_io_base = 0;
 }
 
 
@@ -130,10 +154,48 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
-	uint16_t port_base = (ioport("OPN_DSW")->read() & 1) << 8;
+	// install the ROM to the physical program space
+	u8 rom_setting = ioport("OPN_JP6A2")->read() & 7;
+	static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
+	u32 current_rom = rom_addresses[rom_setting & 7];
+	memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
+	const u32 rom_size = rom_region->bytes() - 1;
 
-	m_bus->io_space().unmap_readwrite(0x0088, 0x008b, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008b, read8sm_delegate(*this, FUNC(pc9801_26_device::opn_r)), write8sm_delegate(*this, FUNC(pc9801_26_device::opn_w)));
+	if (m_rom_base == 0)
+		m_rom_base = current_rom;
+
+	if (m_rom_base != 0)
+	{
+		logerror("%s: uninstall ROM at %08x-%08x\n", machine().describe_context(), m_rom_base, m_rom_base + rom_size);
+		m_bus->program_space().unmap_readwrite(m_rom_base, m_rom_base + rom_size);
+	}
+	if (current_rom != 0)
+	{
+		logerror("%s: install ROM at %08x-%08x\n", machine().describe_context(), current_rom, current_rom + rom_size);
+		m_bus->program_space().unmap_readwrite(current_rom, current_rom + rom_size);
+		m_bus->program_space().install_rom(
+			current_rom,
+			current_rom + rom_size,
+			rom_region->base()
+		);
+	}
+	m_rom_base = current_rom;
+
+	// install I/O ports
+	u16 current_io = read_io_base();
+	m_bus->flush_install_io(
+		this->tag(),
+		m_io_base,
+		current_io,
+		3,
+		read8sm_delegate(*this, FUNC(pc9801_26_device::opn_r)),
+		write8sm_delegate(*this, FUNC(pc9801_26_device::opn_w))
+	);
+	m_io_base = current_io;
+
+	// install IRQ line
+//  static const u8 irq_levels[4] = {0, 4, 5, 6};
+//  m_irq_level = irq_levels[ioport("OPN_JP6A1_JP6A3")->read() & 3];
 }
 
 

@@ -17,7 +17,9 @@
 //**************************************************************************
 
 #define DEBUG_TICKET 0
-#define LOG(x) do { if (DEBUG_TICKET) logerror x; } while (0)
+
+#define VERBOSE (DEBUG_TICKET)
+#include "logmacro.h"
 
 
 
@@ -52,6 +54,7 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	, m_power(0)
 	, m_timer(nullptr)
 	, m_output(*this, tag) // TODO: change to "tag:status"
+	, m_dispense_handler(*this) // TODO: can we use m_output for this?
 {
 }
 
@@ -99,7 +102,7 @@ WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 	{
 		if (!m_power)
 		{
-			LOG(("%s: Ticket Power On\n", machine().describe_context()));
+			LOG("%s: Ticket Power On\n", machine().describe_context());
 			m_timer->adjust(m_period);
 			m_power = true;
 			m_status = m_ticketnotdispensed;
@@ -111,7 +114,7 @@ WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 		{
 			if (m_hopper_type == false || m_status == m_ticketnotdispensed)
 			{
-				LOG(("%s: Ticket Power Off\n", machine().describe_context()));
+				LOG("%s: Ticket Power Off\n", machine().describe_context());
 				m_timer->adjust(attotime::never);
 				m_output = 0;
 			}
@@ -135,9 +138,11 @@ void ticket_dispenser_device::device_start()
 	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH);
 	m_ticketnotdispensed = !m_ticketdispensed;
 
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);
 
 	m_output.resolve();
+
+	m_dispense_handler.resolve_safe();
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_power));
@@ -156,22 +161,22 @@ void ticket_dispenser_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handle timer callbacks
+//  update_output_state -
 //-------------------------------------------------
 
-void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(ticket_dispenser_device::update_output_state)
 {
 	// if we still have power, keep toggling ticket states
 	if (m_power)
 	{
 		m_status = !m_status;
-		LOG(("Ticket Status Changed to %02X\n", m_status));
+		LOG("Ticket Status Changed to %02X\n", m_status);
 		m_timer->adjust(m_period);
 	}
 	else if (m_hopper_type)
 	{
 		m_status = !m_status;
-		LOG(("%s: Ticket Power Off\n", machine().describe_context()));
+		LOG("%s: Ticket Power Off\n", machine().describe_context());
 		m_timer->adjust(attotime::never);
 		m_output = 0;
 	}
@@ -179,10 +184,14 @@ void ticket_dispenser_device::device_timer(emu_timer &timer, device_timer_id id,
 	// update output status
 	m_output = m_status == m_ticketdispensed;
 
+	if (m_hopper_type)
+	{
+		m_dispense_handler(m_status);
+	}
 	// if we just dispensed, increment global count
 	if (m_status == m_ticketdispensed)
 	{
 		machine().bookkeeping().increment_dispensed_tickets(1);
-		LOG(("Ticket Dispensed\n"));
+		LOG("Ticket Dispensed\n");
 	}
 }

@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "990_tap.h"
 
+#include "imagedev/magtape.h"
+
 enum
 {
 	w0_offline          = 0x8000,
@@ -887,21 +889,13 @@ void tap_990_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-class ti990_tape_image_device : public device_t,
-									public device_image_interface
+class ti990_tape_image_device : public magtape_image_device
 {
 public:
 	// construction/destruction
 	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual image_init_result call_load() override;
@@ -918,7 +912,7 @@ private:
 DEFINE_DEVICE_TYPE(TI990_TAPE, ti990_tape_image_device, "ti990_tape_image", "TI-990 Magnetic Tape")
 
 ti990_tape_image_device::ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_TAPE, tag, owner, clock), device_image_interface(mconfig, *this)
+	: magtape_image_device(mconfig, TI990_TAPE, tag, owner, clock)
 {
 }
 

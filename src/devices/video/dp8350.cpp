@@ -218,10 +218,10 @@ void dp835x_device::device_resolve_objects()
 void dp835x_device::device_start()
 {
 	// create timers
-	m_hblank_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hblank_start), this));
-	m_hblank_near_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hblank_near_end), this));
-	m_hsync_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hsync_update), this));
-	m_hsync_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dp835x_device::hsync_update), this));
+	m_hblank_start_timer = timer_alloc(FUNC(dp835x_device::hblank_start), this);
+	m_hblank_near_end_timer = timer_alloc(FUNC(dp835x_device::hblank_near_end), this);
+	m_hsync_on_timer = timer_alloc(FUNC(dp835x_device::hsync_update), this);
+	m_hsync_off_timer = timer_alloc(FUNC(dp835x_device::hsync_update), this);
 
 	// save state
 	save_item(NAME(m_60hz_refresh));

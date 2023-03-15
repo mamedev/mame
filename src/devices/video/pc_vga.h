@@ -39,6 +39,7 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
+	void set_vram_size(size_t vram_size) { vga.svga_intf.vram_size = vram_size; }
 
 protected:
 	enum
@@ -63,7 +64,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x100; }
+	virtual uint32_t palette_entries() const noexcept override { return 0x100; }
 
 	void vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect);
@@ -72,10 +73,11 @@ protected:
 	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode();
 	void recompute_params_clock(int divisor, int xtal);
-	uint8_t crtc_reg_read(uint8_t index);
+	virtual uint8_t crtc_reg_read(uint8_t index);
 	virtual void recompute_params();
-	void crtc_reg_write(uint8_t index, uint8_t data);
-	void seq_reg_write(uint8_t index, uint8_t data);
+	virtual void crtc_reg_write(uint8_t index, uint8_t data);
+	virtual uint8_t seq_reg_read(uint8_t index);
+	virtual void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();
 	uint8_t vga_crtc_r(offs_t offset);
 	void vga_crtc_w(offs_t offset, uint8_t data);
@@ -122,7 +124,7 @@ protected:
 			int crtc_regcount;
 		} svga_intf;
 
-		std::vector<uint8_t> memory;
+		std::unique_ptr<uint8_t []> memory;
 		uint32_t pens[16]; /* the current 16 pens */
 
 		uint8_t miscellaneous_output;
@@ -271,6 +273,7 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
+		bool ignore_chain4;
 	} svga;
 };
 
@@ -686,19 +689,108 @@ public:
 	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t port_03d0_r(offs_t offset) override;
 	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t mem_r(offs_t offset) override;
-	virtual void mem_w(offs_t offset, uint8_t data) override;
+//  virtual uint8_t mem_r(offs_t offset) override;
+//  virtual void mem_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_linear_r(offs_t offset) override;
+	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+
+protected:
+	virtual uint16_t offset() override;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
 
+class xga_copro_device : public device_t
+{
+public:
+	enum class TYPE {
+		XGA,
+		OTI111
+	};
+
+	xga_copro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	u8 xga_read(offs_t offset);
+	void xga_write(offs_t offset, u8 data);
+
+	auto mem_read_callback() { return m_mem_read_cb.bind(); }
+	auto mem_write_callback() { return m_mem_write_cb.bind(); }
+	auto set_type(TYPE var) { m_var = var; }
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+private:
+	void start_command();
+	void do_pxblt();
+	u32 read_map_pixel(int x, int y, int map);
+	void write_map_pixel(int x, int y, int map, u32 pixel);
+	u32 rop(u32 src, u32 dst, u8 rop);
+
+	u8 m_pelmap;
+	u32 m_pelmap_base[4];
+	u16 m_pelmap_width[4];
+	u16 m_pelmap_height[4];
+	u8 m_pelmap_format[4];
+	s16 m_bresh_err;
+	s16 m_bresh_k1;
+	s16 m_bresh_k2;
+	u32 m_dir;
+	u8 m_fmix;
+	u8 m_bmix;
+	u8 m_destccc;
+	u32 m_destccv;
+	u32 m_pelbmask;
+	u32 m_carrychain;
+	u32 m_fcolor;
+	u32 m_bcolor;
+	u16 m_opdim1;
+	u16 m_opdim2;
+	u16 m_maskorigx;
+	u16 m_maskorigy;
+	u16 m_srcxaddr;
+	u16 m_srcyaddr;
+	u16 m_patxaddr;
+	u16 m_patyaddr;
+	u16 m_dstxaddr;
+	u16 m_dstyaddr;
+	u32 m_pelop;
+	TYPE m_var;
+	devcb_read8 m_mem_read_cb;
+	devcb_write8 m_mem_write_cb;
+};
+
+DECLARE_DEVICE_TYPE(XGA_COPRO, xga_copro_device)
+
+class oak_oti111_vga_device : public svga_device
+{
+public:
+	oak_oti111_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	u8 xga_read(offs_t offset);
+	void xga_write(offs_t offset, u8 data);
+	u8 dac_read(offs_t offset);
+	void dac_write(offs_t offset, u8 data);
+	virtual u8 port_03d0_r(offs_t offset) override;
+	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual uint16_t offset() override;
+private:
+	u8 m_oak_regs[0x3b];
+	u8 m_oak_idx;
+	required_device<xga_copro_device> m_xga;
+};
+
+DECLARE_DEVICE_TYPE(OTI111, oak_oti111_vga_device)
+
 /*
   pega notes (paradise)
   build in amstrad pc1640
 
-  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae))
+  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
 
   4 additional dipswitches
   seems to have emulation modes at register level
@@ -731,7 +823,7 @@ DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
   oak vga (oti 037 chip)
   (below bios patch needed for running)
 
-  ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43))
+  ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
 */
 
 

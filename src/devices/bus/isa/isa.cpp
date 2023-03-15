@@ -107,10 +107,10 @@ isa8_device::isa8_device(const machine_config &mconfig, const char *tag, device_
 isa8_device::isa8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_mem_config("ISA 8-bit mem", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
-	m_io_config("ISA 8-bit I/O", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
-	m_mem16_config("ISA 16-bit mem", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
-	m_io16_config("ISA 16-bit I/O", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
+	m_mem_config("mem8", ENDIANNESS_LITTLE, 8, 24, 0, address_map_constructor()),
+	m_io_config("io8", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor()),
+	m_mem16_config("mem16", ENDIANNESS_LITTLE, 16, 24, 0, address_map_constructor()),
+	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor()),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
 	m_memwidth(0),
@@ -361,6 +361,11 @@ void isa8_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 	m_memspace->install_ram(start, end, data);
 }
 
+void isa8_device::install_bank(offs_t start, offs_t end, memory_bank *bank)
+{
+	m_memspace->install_readwrite_bank(start, end, bank);
+}
+
 void isa8_device::unmap_bank(offs_t start, offs_t end)
 {
 	m_memspace->unmap_readwrite(start, end);
@@ -460,7 +465,7 @@ void isa8_device::nmi()
 
 device_isa8_card_interface::device_isa8_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "isa"),
-		m_isa(nullptr), m_isa_dev(nullptr), m_next(nullptr)
+		m_isa(nullptr), m_isa_dev(nullptr)
 {
 }
 
@@ -591,35 +596,33 @@ void isa16_device::io16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t isa16_device::mem16_swap_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t rv;
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	mem_mask = swapendian_int16(mem_mask);
 
-	rv = m_memspace->read_word(offset<<1, mem_mask);
+	uint16_t rv = m_memspace->read_word(offset<<1, mem_mask);
 
-	return (rv<<8) | (rv>>8);
+	return swapendian_int16(rv);
 }
 
 void isa16_device::mem16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
-	data = (data<<8) | (data>>8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 	m_memspace->write_word(offset<<1, data, mem_mask);
 }
 
 uint16_t isa16_device::io16_swap_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t rv;
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
+	mem_mask = swapendian_int16(mem_mask);
 
-	rv = m_iospace->read_word(offset<<1, mem_mask);
+	uint16_t rv = m_iospace->read_word(offset<<1, mem_mask);
 
-	return (rv<<8) | (rv>>8);
+	return swapendian_int16(rv);
 }
 
 void isa16_device::io16_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	mem_mask = (mem_mask<<8) | (mem_mask>>8);
-	data = (data<<8) | (data>>8);
+	mem_mask = swapendian_int16(mem_mask);
+	data = swapendian_int16(data);
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 

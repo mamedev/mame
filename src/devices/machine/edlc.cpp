@@ -39,7 +39,7 @@ static const u8 ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 seeq8003_device::seeq8003_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, m_out_int(*this)
 	, m_out_rxrdy(*this)
 	, m_out_txrdy(*this)
@@ -67,8 +67,8 @@ void seeq8003_device::device_start()
 	//save_item(NAME(m_rx_fifo));
 	//save_item(NAME(m_tx_fifo));
 
-	m_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seeq8003_device::transmit), this));
-	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seeq8003_device::interrupt), this));
+	m_tx_timer = timer_alloc(FUNC(seeq8003_device::transmit), this);
+	m_int_timer = timer_alloc(FUNC(seeq8003_device::interrupt), this);
 
 	m_int_state = 0;
 	m_reset_state = 1;
@@ -258,7 +258,7 @@ void seeq8003_device::tx_command_w(u8 data)
 	m_tx_command = data;
 }
 
-void seeq8003_device::transmit(void *ptr, int param)
+void seeq8003_device::transmit(int param)
 {
 	if (m_tx_fifo.queue_length())
 	{
@@ -333,7 +333,7 @@ int seeq8003_device::receive(u8 *buf, int length)
 	return length;
 }
 
-void seeq8003_device::interrupt(void *ptr, int param)
+void seeq8003_device::interrupt(int param)
 {
 	int const state =
 		(!(m_tx_status & TXS_O) && (m_tx_status & m_tx_command & TXS_M)) ||

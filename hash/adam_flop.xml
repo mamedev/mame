@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="adam_flop" description="Coleco ADAM diskettes">
 
@@ -76,7 +76,7 @@ license:CC0
 	</software>
 
 	<software name="evesp1a" cloneof="evesp1">
-		<description>Eve SP-1 Serial-Parallel Drivers (Alt)</description>
+		<description>Eve SP-1 Serial-Parallel Drivers (alt)</description>
 		<year>1985</year>
 		<publisher>Eve Electronics</publisher>
 
@@ -88,7 +88,7 @@ license:CC0
 	</software>
 
 	<software name="evesp1b" cloneof="evesp1">
-		<description>Eve SP-1 Serial-Parallel Drivers (Alt 2)</description>
+		<description>Eve SP-1 Serial-Parallel Drivers (alt 2)</description>
 		<year>1985</year>
 		<publisher>Eve Electronics</publisher>
 
@@ -124,7 +124,7 @@ license:CC0
 	</software>
 
 	<software name="evesscca" cloneof="evesscc">
-		<description>Eve SS-CC Drivers &amp; Utilities (Alt)</description>
+		<description>Eve SS-CC Drivers &amp; Utilities (alt)</description>
 		<year>198?</year>
 		<publisher>Eve Electronics</publisher>
 
@@ -160,7 +160,7 @@ license:CC0
 	</software>
 
 	<software name="fpatch2a" cloneof="fpatch">
-		<description>Fast Patch (Rel. 2.0, Alt)</description>
+		<description>Fast Patch (Rel. 2.0, alt)</description>
 		<year>1987</year>
 		<publisher>Orphanware Business Systems</publisher>
 
@@ -232,7 +232,7 @@ license:CC0
 	</software>
 
 	<software name="midimitea" cloneof="midimite">
-		<description>MIDIBasic - Midi-Mite Drivers (Alt)</description>
+		<description>MIDIBasic - Midi-Mite Drivers (alt)</description>
 		<year>199?</year>
 		<publisher>Bonafide Systems</publisher>
 
@@ -282,7 +282,7 @@ license:CC0
 	</software>
 
 	<software name="ameriwara" cloneof="ameriwar">
-		<description>America at War (Alt)</description>
+		<description>America at War (alt)</description>
 		<year>1985</year>
 		<publisher>A-Ware Educational Software</publisher>
 
@@ -306,7 +306,7 @@ license:CC0
 	</software>
 
 	<software name="capstatea" cloneof="capstate">
-		<description>Capitals &amp; States (Alt)</description>
+		<description>Capitals &amp; States (alt)</description>
 		<year>198?</year>
 		<publisher>Data Backup</publisher>
 
@@ -330,7 +330,7 @@ license:CC0
 	</software>
 
 	<software name="chesstuta" cloneof="chesstut">
-		<description>Chess Tutor I (Alt)</description>
+		<description>Chess Tutor I (alt)</description>
 		<year>198?</year>
 		<publisher>Tutor-Ware</publisher>
 
@@ -354,7 +354,7 @@ license:CC0
 	</software>
 
 	<software name="chesstu2a" cloneof="chesstu2">
-		<description>Chess Tutor II (Alt)</description>
+		<description>Chess Tutor II (alt)</description>
 		<year>198?</year>
 		<publisher>Tutor-Ware</publisher>
 
@@ -378,7 +378,7 @@ license:CC0
 	</software>
 
 	<software name="biblefuna" cloneof="biblefun">
-		<description>The Complete Bible Fun Series (Alt)</description>
+		<description>The Complete Bible Fun Series (alt)</description>
 		<year>1987</year>
 		<publisher>J.P. Software</publisher>
 
@@ -421,7 +421,7 @@ license:CC0
 	</software>
 
 	<software name="edupack1a" cloneof="edupack1">
-		<description>Education Pack I (v2.3, Alt)</description>
+		<description>Education Pack I (v2.3, alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -457,7 +457,7 @@ license:CC0
 	</software>
 
 	<software name="flashcrda" cloneof="flashcrd">
-		<description>Electronic Flashcard Maker (Alt)</description>
+		<description>Electronic Flashcard Maker (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -493,7 +493,7 @@ license:CC0
 	</software>
 
 	<software name="expertypa" cloneof="expertyp">
-		<description>ExperType (Alt)</description>
+		<description>ExperType (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -529,7 +529,7 @@ license:CC0
 	</software>
 
 	<software name="ffmusica" cloneof="ffmusic">
-		<description>Flash Facts - Music Theory (Alt)</description>
+		<description>Flash Facts - Music Theory (alt)</description>
 		<year>198?</year>
 		<publisher>MusicAwareness</publisher>
 
@@ -589,7 +589,7 @@ license:CC0
 	</software>
 
 	<software name="greatinva" cloneof="greatinv">
-		<description>Great Inventions Game (Alt)</description>
+		<description>Great Inventions Game (alt)</description>
 		<year>1983</year>
 		<publisher>Parallel Systems</publisher>
 
@@ -668,7 +668,7 @@ license:CC0
 	</software>
 
 	<software name="scarrya" cloneof="scarry" supported="no">
-		<description>Richard Scarry's Best Electronic Wordbook Ever (320K Disk)</description>
+		<description>Richard Scarry's Best Electronic Wordbook Ever (320K disk)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -716,7 +716,7 @@ license:CC0
 	</software>
 
 	<software name="solarsysa" cloneof="solarsys">
-		<description>The Solar System (Alt)</description>
+		<description>The Solar System (alt)</description>
 		<year>1985</year>
 		<publisher>A-Ware Educational Software</publisher>
 
@@ -740,7 +740,7 @@ license:CC0
 	</software>
 
 	<software name="spavocaba" cloneof="spavocab">
-		<description>The Spanish Vocabularian (Alt)</description>
+		<description>The Spanish Vocabularian (alt)</description>
 		<year>1986</year>
 		<publisher>Marathon Computer Press</publisher>
 
@@ -764,7 +764,7 @@ license:CC0
 	</software>
 
 	<software name="statecapa" cloneof="statecap">
-		<description>States &amp; Capitals (Alt)</description>
+		<description>States &amp; Capitals (alt)</description>
 		<year>1982</year>
 		<publisher>Parallel Systems</publisher>
 
@@ -812,7 +812,7 @@ license:CC0
 	</software>
 
 	<software name="worldcapa" cloneof="worldcap">
-		<description>World Capitals (Alt)</description>
+		<description>World Capitals (alt)</description>
 		<year>1982</year>
 		<publisher>Parallel Systems</publisher>
 
@@ -836,7 +836,7 @@ license:CC0
 	</software>
 
 	<software name="worldgeoa" cloneof="worldgeo">
-		<description>World Geography (Alt)</description>
+		<description>World Geography (alt)</description>
 		<year>1985</year>
 		<publisher>A-Ware Educational Software</publisher>
 
@@ -862,7 +862,7 @@ license:CC0
 	</software>
 
 	<software name="2010a" cloneof="2010">
-		<description>2010 - The Text Adventure Game (Alt)</description>
+		<description>2010 - The Text Adventure Game (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -898,7 +898,7 @@ license:CC0
 	</software>
 
 	<software name="adambomba" cloneof="adambomb">
-		<description>ADAM Bomb (Level Select)</description>
+		<description>ADAM Bomb (level select)</description>
 		<year>1989</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -922,7 +922,7 @@ license:CC0
 	</software>
 
 	<software name="adambom2a" cloneof="adambom2">
-		<description>ADAM Bomb 2 - The Rescue (Alt)</description>
+		<description>ADAM Bomb 2 - The Rescue (alt)</description>
 		<year>1996</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -958,7 +958,7 @@ license:CC0
 	</software>
 
 	<software name="linkgolfa" cloneof="linkgolf">
-		<description>ADAM Links Golf (Alt)</description>
+		<description>ADAM Links Golf (alt)</description>
 		<year>1986</year>
 		<publisher>Superior Software</publisher>
 
@@ -994,7 +994,7 @@ license:CC0
 	</software>
 
 	<software name="addictusa" cloneof="addictus">
-		<description>Addictus (Alt)</description>
+		<description>Addictus (alt)</description>
 		<year>1989</year>
 		<publisher>Reedy Software</publisher>
 
@@ -1018,7 +1018,7 @@ license:CC0
 	</software>
 
 	<software name="advpack1a" cloneof="advpack1">
-		<description>Adventure Pack 1 (Alt)</description>
+		<description>Adventure Pack 1 (alt)</description>
 		<year>1986</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1042,7 +1042,7 @@ license:CC0
 	</software>
 
 	<software name="advpack2a" cloneof="advpack2">
-		<description>Adventure Pack 2 (Alt)</description>
+		<description>Adventure Pack 2 (alt)</description>
 		<year>1986</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1078,7 +1078,7 @@ license:CC0
 	</software>
 
 	<software name="advpak1va" cloneof="advpak1v">
-		<description>Adventure Pack I (Alt)</description>
+		<description>Adventure Pack I (alt)</description>
 		<year>1984</year>
 		<publisher>Victory Software</publisher>
 
@@ -1102,7 +1102,7 @@ license:CC0
 	</software>
 
 	<software name="advpak2va" cloneof="advpak2v">
-		<description>Adventure Pack II (Alt)</description>
+		<description>Adventure Pack II (alt)</description>
 		<year>1984</year>
 		<publisher>Victory Software</publisher>
 
@@ -1162,7 +1162,7 @@ license:CC0
 	</software>
 
 	<software name="arcadeaca" cloneof="arcadeac">
-		<description>Arcade Action (Alt)</description>
+		<description>Arcade Action (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1198,7 +1198,7 @@ license:CC0
 	</software>
 
 	<software name="beatbanda" cloneof="beatband">
-		<description>Beat the Bandit (Alt)</description>
+		<description>Beat the Bandit (alt)</description>
 		<year>1992</year>
 		<publisher>Maine ADAM Library</publisher>
 
@@ -1222,7 +1222,7 @@ license:CC0
 	</software>
 
 	<software name="bestbca" cloneof="bestbc">
-		<description>The Best of B.C. (Alt)</description>
+		<description>The Best of B.C. (alt)</description>
 		<year>1985</year>
 		<publisher>Sydney Development Co.</publisher>
 
@@ -1246,7 +1246,7 @@ license:CC0
 	</software>
 
 	<software name="bestea">
-		<description>The Best of Electronic Arts (Prototype)</description>
+		<description>The Best of Electronic Arts (prototype)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1258,7 +1258,7 @@ license:CC0
 	</software>
 
 	<software name="besteaa" cloneof="bestea">
-		<description>The Best of Electronic Arts (Prototype, Alt)</description>
+		<description>The Best of Electronic Arts (prototype, alt)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1270,7 +1270,7 @@ license:CC0
 	</software>
 
 	<software name="besteab" cloneof="bestea">
-		<description>The Best of Electronic Arts (Prototype, Alt 2)</description>
+		<description>The Best of Electronic Arts (prototype, alt 2)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1294,7 +1294,7 @@ license:CC0
 	</software>
 
 	<software name="beyondtra" cloneof="beyondtr">
-		<description>Beyond Trek (Alt)</description>
+		<description>Beyond Trek (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -1372,7 +1372,7 @@ license:CC0
 	</software>
 
 	<software name="midora" cloneof="midor">
-		<description>The Black Dungeon of Midor (Alt)</description>
+		<description>The Black Dungeon of Midor (alt)</description>
 		<year>1988</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1438,7 +1438,7 @@ license:CC0
 	</software>
 
 	<software name="braingama" cloneof="braingam">
-		<description>Brain Games (Alt)</description>
+		<description>Brain Games (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1462,7 +1462,7 @@ license:CC0
 	</software>
 
 	<software name="brainstma" cloneof="brainstm">
-		<description>BrainStorm (Alt)</description>
+		<description>BrainStorm (alt)</description>
 		<year>1990</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -1486,7 +1486,7 @@ license:CC0
 	</software>
 
 	<software name="buckroga" cloneof="buckrog">
-		<description>Buck Rogers - Planet of Zoom (Alt)</description>
+		<description>Buck Rogers - Planet of Zoom (alt)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -1498,7 +1498,7 @@ license:CC0
 	</software>
 
 	<software name="buckrogb" cloneof="buckrog">
-		<description>Buck Rogers - Planet of Zoom (Alt 2)</description>
+		<description>Buck Rogers - Planet of Zoom (alt 2)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -1510,7 +1510,7 @@ license:CC0
 	</software>
 
 	<software name="cabbage">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1522,7 +1522,7 @@ license:CC0
 	</software>
 
 	<software name="cabbagea" cloneof="cabbage">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype, Alt)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype, alt)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1534,7 +1534,7 @@ license:CC0
 	</software>
 
 	<software name="cabbageb" cloneof="cabbage">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype, Alt 2)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype, alt 2)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1546,7 +1546,7 @@ license:CC0
 	</software>
 
 	<software name="cabbagec" cloneof="cabbage">
-		<description>Cabbage Patch Kids - Adventures in the Park (Prototype, Alt 3, Hacked?)</description>
+		<description>Cabbage Patch Kids - Adventures in the Park (prototype, alt 3, hacked?)</description>
 		<year>1985</year>
 		<publisher>Coleco</publisher>
 
@@ -1582,7 +1582,7 @@ license:CC0
 	</software>
 
 	<software name="deathstna" cloneof="deathstn">
-		<description>Castle DeathStone (Alt)</description>
+		<description>Castle DeathStone (alt)</description>
 		<year>1986</year>
 		<publisher>Questech Computer Entertainment Software</publisher>
 
@@ -1618,7 +1618,7 @@ license:CC0
 	</software>
 
 	<software name="vampiraa" cloneof="vampira">
-		<description>Castle Vampira (Alt)</description>
+		<description>Castle Vampira (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -1642,7 +1642,7 @@ license:CC0
 	</software>
 
 	<software name="chesschma" cloneof="chesschm">
-		<description>Chess Champ (Alt)</description>
+		<description>Chess Champ (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -1678,7 +1678,7 @@ license:CC0
 	</software>
 
 	<software name="committda" cloneof="committd">
-		<description>Committed (Alt)</description>
+		<description>Committed (alt)</description>
 		<year>198?</year>
 		<publisher>Do Not Stamp Software</publisher>
 
@@ -1702,7 +1702,7 @@ license:CC0
 	</software>
 
 	<software name="cosfighta" cloneof="cosfight">
-		<description>Cosmo Fighter (Alt)</description>
+		<description>Cosmo Fighter (alt)</description>
 		<year>1997</year>
 		<publisher>Red Bullet Software</publisher>
 
@@ -1726,7 +1726,7 @@ license:CC0
 	</software>
 
 	<software name="dambustra" cloneof="dambustr">
-		<description>The Dam Busters (Alt)</description>
+		<description>The Dam Busters (alt)</description>
 		<year>1984</year>
 		<publisher>Sydney Development</publisher>
 
@@ -1750,7 +1750,7 @@ license:CC0
 	</software>
 
 	<software name="demondrga" cloneof="demondrg">
-		<description>Demons &amp; Dragons (Alt)</description>
+		<description>Demons &amp; Dragons (alt)</description>
 		<year>1986</year>
 		<publisher>Fast Ed's Software</publisher>
 
@@ -1786,7 +1786,7 @@ license:CC0
 	</software>
 
 	<software name="diabloa" cloneof="diablo">
-		<description>Diablo (Alt)</description>
+		<description>Diablo (alt)</description>
 		<year>1984</year>
 		<publisher>Image MicroCorp</publisher>
 
@@ -1798,7 +1798,7 @@ license:CC0
 	</software>
 
 	<software name="diablob" cloneof="diablo">
-		<description>Diablo (Alt 2)</description>
+		<description>Diablo (alt 2)</description>
 		<year>1984</year>
 		<publisher>Image MicroCorp</publisher>
 
@@ -1822,7 +1822,7 @@ license:CC0
 	</software>
 
 	<software name="dinodiga" cloneof="dinodig">
-		<description>Dinosaur Dig (Alt)</description>
+		<description>Dinosaur Dig (alt)</description>
 		<year>1989</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -1846,7 +1846,7 @@ license:CC0
 	</software>
 
 	<software name="dkonga" cloneof="dkong">
-		<description>Donkey Kong (Alt)</description>
+		<description>Donkey Kong (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -1870,7 +1870,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjra" cloneof="dkongjr">
-		<description>Donkey Kong Junior (Alt)</description>
+		<description>Donkey Kong Junior (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -1882,7 +1882,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjrp13" cloneof="dkongjr">
-		<description>Donkey Kong Junior (Prototype, Rev. 13, 5 Screen)</description>
+		<description>Donkey Kong Junior (prototype, rev. 13, 5 screen)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -1894,7 +1894,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjrp14" cloneof="dkongjr">
-		<description>Donkey Kong Junior (Prototype, Rev. 14, 5 Screen)</description>
+		<description>Donkey Kong Junior (prototype, rev. 14, 5 screen)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -1918,7 +1918,7 @@ license:CC0
 	</software>
 
 	<software name="dragona" cloneof="dragon">
-		<description>Dragon - The Chinese Challenge (Alt)</description>
+		<description>Dragon - The Chinese Challenge (alt)</description>
 		<year>1989</year>
 		<publisher>Reedy Software</publisher>
 
@@ -1954,7 +1954,7 @@ license:CC0
 	</software>
 
 	<software name="dlaira" cloneof="dlair">
-		<description>Dragon's Lair (Alt)</description>
+		<description>Dragon's Lair (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -1978,7 +1978,7 @@ license:CC0
 	</software>
 
 	<software name="espgamesa" cloneof="espgames">
-		<description>E.S.P. Games (Alt)</description>
+		<description>E.S.P. Games (alt)</description>
 		<year>1986</year>
 		<publisher>Enhanced Software Products</publisher>
 
@@ -2002,7 +2002,7 @@ license:CC0
 	</software>
 
 	<software name="elecgamea" cloneof="elecgame">
-		<description>Electronic Game Pack I (Alt)</description>
+		<description>Electronic Game Pack I (alt)</description>
 		<year>1985</year>
 		<publisher>Ape Software</publisher>
 
@@ -2050,7 +2050,7 @@ license:CC0
 	</software>
 
 	<software name="famfeuda" cloneof="famfeud">
-		<description>Family Feud (Alt)</description>
+		<description>Family Feud (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -2075,7 +2075,7 @@ license:CC0
 	</software>
 
 	<software name="famfeudqp2" cloneof="famfeud">
-		<description>Family Feud Question Pack (Alt)</description>
+		<description>Family Feud Question Pack (alt)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 		<info name="usage" value="Requires &quot;Family Feud&quot; to work" />
@@ -2088,7 +2088,7 @@ license:CC0
 	</software>
 
 	<software name="famfeudqp3" cloneof="famfeud">
-		<description>Family Feud Question Pack (Alt 2)</description>
+		<description>Family Feud Question Pack (alt 2)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 		<info name="usage" value="Requires &quot;Family Feud&quot; to work" />
@@ -2113,7 +2113,7 @@ license:CC0
 	</software>
 
 	<software name="famfwrita" cloneof="famfwrit">
-		<description>Family Feud Writer (Alt)</description>
+		<description>Family Feud Writer (alt)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 
@@ -2137,7 +2137,7 @@ license:CC0
 	</software>
 
 	<software name="fantasya" cloneof="fantasy">
-		<description>Fantasy Gamer (Alt)</description>
+		<description>Fantasy Gamer (alt)</description>
 		<year>1986</year>
 		<publisher>Martin Consulting</publisher>
 
@@ -2161,7 +2161,7 @@ license:CC0
 	</software>
 
 	<software name="foreplaya" cloneof="foreplay">
-		<description>Foreplay (Alt)</description>
+		<description>Foreplay (alt)</description>
 		<year>1988</year>
 		<publisher>ADAMzap Software</publisher>
 
@@ -2185,7 +2185,7 @@ license:CC0
 	</software>
 
 	<software name="fortfinda" cloneof="fortfind">
-		<description>Fortune Finder from the Future (Alt)</description>
+		<description>Fortune Finder from the Future (alt)</description>
 		<year>198?</year>
 		<publisher>Chris Hickman Software</publisher>
 
@@ -2209,7 +2209,7 @@ license:CC0
 	</software>
 
 	<software name="fortunewa" cloneof="fortunew">
-		<description>The Fortune Wheel (Alt)</description>
+		<description>The Fortune Wheel (alt)</description>
 		<year>1987</year>
 		<publisher>Ronald Bernetich</publisher>
 
@@ -2221,7 +2221,7 @@ license:CC0
 	</software>
 
 	<software name="frontlin">
-		<description>Front Line (Demo)</description>
+		<description>Front Line (demo)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -2233,7 +2233,7 @@ license:CC0
 	</software>
 
 	<software name="frontlina" cloneof="frontlin">
-		<description>Front Line (Demo, Alt)</description>
+		<description>Front Line (demo, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -2257,7 +2257,7 @@ license:CC0
 	</software>
 
 	<software name="gamepak1a" cloneof="gamepak1">
-		<description>Game Pack 1 (Alt)</description>
+		<description>Game Pack 1 (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -2281,7 +2281,7 @@ license:CC0
 	</software>
 
 	<software name="gamepak2a" cloneof="gamepak2">
-		<description>Game Pack 2 (Alt)</description>
+		<description>Game Pack 2 (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -2305,7 +2305,7 @@ license:CC0
 	</software>
 
 	<software name="gamepak3a" cloneof="gamepak3">
-		<description>Game Pack 3 (Alt)</description>
+		<description>Game Pack 3 (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -2329,7 +2329,7 @@ license:CC0
 	</software>
 
 	<software name="gamepakva" cloneof="gamepakv">
-		<description>Game Pack I (Victory Software, Alt)</description>
+		<description>Game Pack I (Victory Software, alt)</description>
 		<year>1985</year>
 		<publisher>Victory Software</publisher>
 
@@ -2353,7 +2353,7 @@ license:CC0
 	</software>
 
 	<software name="ghostzapa" cloneof="ghostzap">
-		<description>Ghost Zapper (Alt)</description>
+		<description>Ghost Zapper (alt)</description>
 		<year>1988</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -2445,7 +2445,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardya" cloneof="jeopardy">
-		<description>Jeopardy (Prototype, 2 Disks Version)</description>
+		<description>Jeopardy (prototype, 2 disks version)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -2477,7 +2477,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardyqp2" cloneof="jeopardy">
-		<description>Jeopardy Question Pack (Walters Software, Alt)</description>
+		<description>Jeopardy Question Pack (Walters Software, alt)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 		<info name="usage" value="Requires &quot;Jeopardy&quot; to work" />
@@ -2503,7 +2503,7 @@ license:CC0
 	</software>
 
 	<software name="jeopardyqp4" cloneof="jeopardy">
-		<description>Jeopardy Question Pack (M&amp;M Software, Alt)</description>
+		<description>Jeopardy Question Pack (M&amp;M Software, alt)</description>
 		<year>198?</year>
 		<publisher>M&amp;M Software</publisher>
 		<info name="usage" value="Requires &quot;Jeopardy&quot; to work" />
@@ -2528,7 +2528,7 @@ license:CC0
 	</software>
 
 	<software name="jeopwrita" cloneof="jeopwrit">
-		<description>Jeopardy Writer (Alt)</description>
+		<description>Jeopardy Writer (alt)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 
@@ -2552,7 +2552,7 @@ license:CC0
 	</software>
 
 	<software name="marauda" cloneof="maraud">
-		<description>Journey to Maraud Mountain (Alt)</description>
+		<description>Journey to Maraud Mountain (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2576,7 +2576,7 @@ license:CC0
 	</software>
 
 	<software name="kidstriva" cloneof="kidstriv">
-		<description>Kid's TriviaPak I (Alt)</description>
+		<description>Kid's TriviaPak I (alt)</description>
 		<year>1986</year>
 		<publisher>Mr. T Software</publisher>
 
@@ -2612,7 +2612,7 @@ license:CC0
 	</software>
 
 	<software name="labmousea" cloneof="labmouse">
-		<description>Lab Mouse (Alt)</description>
+		<description>Lab Mouse (alt)</description>
 		<year>1987</year>
 		<publisher>Reedy Software</publisher>
 
@@ -2679,7 +2679,7 @@ license:CC0
 	</software>
 
 	<software name="mageqsta" cloneof="mageqst">
-		<description>Mage Quest (v2.0, Alt Solo Adventure Packs)</description>
+		<description>Mage Quest (v2.0, alt Solo Adventure Packs)</description>
 		<year>1986</year>
 		<publisher>Reedy Software</publisher>
 
@@ -2746,7 +2746,7 @@ license:CC0
 	</software>
 
 	<software name="microchpa" cloneof="microchp">
-		<description>MicroChip (Alt)</description>
+		<description>MicroChip (alt)</description>
 		<year>1995</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -2782,7 +2782,7 @@ license:CC0
 	</software>
 
 	<software name="mindadama" cloneof="mindadam">
-		<description>Mind Over Adam (Alt)</description>
+		<description>Mind Over Adam (alt)</description>
 		<year>1988</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -2806,7 +2806,7 @@ license:CC0
 	</software>
 
 	<software name="modemchsa" cloneof="modemchs">
-		<description>Modem Chess (Alt)</description>
+		<description>Modem Chess (alt)</description>
 		<year>1993</year>
 		<publisher>Bonafide Systems</publisher>
 
@@ -2830,7 +2830,7 @@ license:CC0
 	</software>
 
 	<software name="modemtnka" cloneof="modemtnk">
-		<description>Modem Tank (Alt)</description>
+		<description>Modem Tank (alt)</description>
 		<year>1993</year>
 		<publisher>Bonafide Systems</publisher>
 
@@ -2914,7 +2914,7 @@ license:CC0
 	</software>
 
 	<software name="partytrva" cloneof="partytrv">
-		<description>Party Trivia Game (Alt)</description>
+		<description>Party Trivia Game (alt)</description>
 		<year>198?</year>
 		<publisher>Parallel Systems</publisher>
 
@@ -2950,7 +2950,7 @@ license:CC0
 	</software>
 
 	<software name="phrcrazea" cloneof="phrcraze">
-		<description>Phrase Craze (Alt)</description>
+		<description>Phrase Craze (alt)</description>
 		<year>1988</year>
 		<publisher>Reedy Software</publisher>
 
@@ -2962,7 +2962,7 @@ license:CC0
 	</software>
 
 	<software name="phrcrazeb" cloneof="phrcraze">
-		<description>Phrase Craze (Alt 2)</description>
+		<description>Phrase Craze (alt 2)</description>
 		<year>1988</year>
 		<publisher>Reedy Software</publisher>
 
@@ -3022,7 +3022,7 @@ license:CC0
 	</software>
 
 	<software name="pinaid2a" cloneof="pinaid2">
-		<description>Pinball Construction Aid II (Alt)</description>
+		<description>Pinball Construction Aid II (alt)</description>
 		<year>198?</year>
 		<publisher>D.L. Decker</publisher>
 
@@ -3082,7 +3082,7 @@ license:CC0
 	</software>
 
 	<software name="profoota" cloneof="profoot">
-		<description>Pro Football Strategy (Alt)</description>
+		<description>Pro Football Strategy (alt)</description>
 		<year>1986</year>
 		<publisher>Murdock Games</publisher>
 
@@ -3118,7 +3118,7 @@ license:CC0
 	</software>
 
 	<software name="qfaxqsta" cloneof="qfaxqst">
-		<description>QuikFax Quest I (Alt)</description>
+		<description>QuikFax Quest I (alt)</description>
 		<year>1985</year>
 		<publisher>Data Doctor</publisher>
 
@@ -3142,7 +3142,7 @@ license:CC0
 	</software>
 
 	<software name="reedyen1a" cloneof="reedyen1">
-		<description>The Reedy Entertainment Pack 1 (Alt)</description>
+		<description>The Reedy Entertainment Pack 1 (alt)</description>
 		<year>1986</year>
 		<publisher>Reedy Software</publisher>
 
@@ -3166,7 +3166,7 @@ license:CC0
 	</software>
 
 	<software name="reedyliba" cloneof="reedylib">
-		<description>Reedy Software Library (Alt)</description>
+		<description>Reedy Software Library (alt)</description>
 		<year>1985</year>
 		<publisher>Reedy Software</publisher>
 
@@ -3190,7 +3190,7 @@ license:CC0
 	</software>
 
 	<software name="robothfa" cloneof="robothf">
-		<description>RoboThief (Alt)</description>
+		<description>RoboThief (alt)</description>
 		<year>1991</year>
 		<publisher>Steve Pitman Software</publisher>
 
@@ -3262,7 +3262,7 @@ license:CC0
 	</software>
 
 	<software name="snackmana" cloneof="snackman">
-		<description>Snack-Man &amp; Bouncer (Alt)</description>
+		<description>Snack-Man &amp; Bouncer (alt)</description>
 		<year>1986</year>
 		<publisher>Orb1tware</publisher>
 
@@ -3286,7 +3286,7 @@ license:CC0
 	</software>
 
 	<software name="socializa" cloneof="socializ">
-		<description>The Socializer (Alt)</description>
+		<description>The Socializer (alt)</description>
 		<year>1988</year>
 		<publisher>Adultware</publisher>
 
@@ -3310,7 +3310,7 @@ license:CC0
 	</software>
 
 	<software name="stagefria" cloneof="stagefri">
-		<description>Stage Fright (Alt)</description>
+		<description>Stage Fright (alt)</description>
 		<year>1987</year>
 		<publisher>Reedy Software</publisher>
 
@@ -3358,7 +3358,7 @@ license:CC0
 	</software>
 
 	<software name="strpack1a" cloneof="strpack1">
-		<description>Strategy Pack I (Alt)</description>
+		<description>Strategy Pack I (alt)</description>
 		<year>1985</year>
 		<publisher>Victory Software</publisher>
 
@@ -3418,7 +3418,7 @@ license:CC0
 	</software>
 
 	<software name="subraida" cloneof="subraid">
-		<description>Sub Raiders (Alt)</description>
+		<description>Sub Raiders (alt)</description>
 		<year>1988</year>
 		<publisher>Strategic Software</publisher>
 
@@ -3430,7 +3430,7 @@ license:CC0
 	</software>
 
 	<software name="subroc">
-		<description>SubRoc (Prototype)</description>
+		<description>SubRoc (prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -3462,7 +3462,7 @@ license:CC0
   Falcon Federation Hack Group (or something like that) label.
 -->
 	<software name="apshai">
-		<description>Temple of Apshai (Prototype)</description>
+		<description>Temple of Apshai (prototype)</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 
@@ -3474,7 +3474,7 @@ license:CC0
 	</software>
 
 	<software name="apshai21" cloneof="apshai">
-		<description>Temple of Apshai (Prototype, Rev. 2.1 Patched)</description>
+		<description>Temple of Apshai (prototype, rev. 2.1 patched)</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 
@@ -3486,7 +3486,7 @@ license:CC0
 	</software>
 
 	<software name="apshai20" cloneof="apshai">
-		<description>Temple of Apshai (Prototype, Rev. 2.0 Patched)</description>
+		<description>Temple of Apshai (prototype, Rev. 2.0 patched)</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 
@@ -3517,7 +3517,7 @@ license:CC0
 	</software>
 
 	<software name="snowdraga" cloneof="snowdrag">
-		<description>Temple of the Snow Dragon (Alt)</description>
+		<description>Temple of the Snow Dragon (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Adventures</publisher>
 
@@ -3548,7 +3548,7 @@ license:CC0
 	</software>
 
 	<software name="timetrava" cloneof="timetrav">
-		<description>The Time Traveler (Alt)</description>
+		<description>The Time Traveler (alt)</description>
 		<year>198?</year>
 		<publisher>T.L. Fike</publisher>
 
@@ -3572,7 +3572,7 @@ license:CC0
 	</software>
 
 	<software name="tomba" cloneof="tomb">
-		<description>Tomb (Alt)</description>
+		<description>Tomb (alt)</description>
 		<year>1984</year>
 		<publisher>International Computing</publisher>
 
@@ -3596,7 +3596,7 @@ license:CC0
 	</software>
 
 	<software name="treka" cloneof="trek">
-		<description>Trek (Alt)</description>
+		<description>Trek (alt)</description>
 		<year>1984</year>
 		<publisher>Victory Software</publisher>
 
@@ -3620,7 +3620,7 @@ license:CC0
 	</software>
 
 	<software name="trivpak1a" cloneof="trivpak1">
-		<description>TriviaPak I (Alt)</description>
+		<description>TriviaPak I (alt)</description>
 		<year>1986</year>
 		<publisher>Mr. T Software</publisher>
 
@@ -3632,7 +3632,7 @@ license:CC0
 	</software>
 
 	<software name="troltale">
-		<description>Troll's Tale (Prototype)</description>
+		<description>Troll's Tale (prototype)</description>
 		<year>198?</year>
 		<publisher>Sierra On-Line</publisher>
 
@@ -3644,7 +3644,7 @@ license:CC0
 	</software>
 
 	<software name="troltalea" cloneof="troltale">
-		<description>Troll's Tale (Prototype, Alt)</description>
+		<description>Troll's Tale (prototype, alt)</description>
 		<year>198?</year>
 		<publisher>Sierra On-Line</publisher>
 
@@ -3656,7 +3656,7 @@ license:CC0
 	</software>
 
 	<software name="tunnels">
-		<description>Tunnels &amp; Trolls (Demo)</description>
+		<description>Tunnels &amp; Trolls (demo)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -3692,7 +3692,7 @@ license:CC0
 	</software>
 
 	<software name="wackywrda" cloneof="wackywrd" supported="no">
-		<description>Wacky Word Games (Alt)</description>
+		<description>Wacky Word Games (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -3759,7 +3759,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxona" cloneof="zaxxon">
-		<description>Zaxxon (Alt)</description>
+		<description>Zaxxon (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -3771,7 +3771,7 @@ license:CC0
 	</software>
 
 	<software name="zaxxonb" cloneof="zaxxon">
-		<description>Zaxxon (Alt 2)</description>
+		<description>Zaxxon (alt 2)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -3835,7 +3835,7 @@ license:CC0
 	</software>
 
 	<software name="cartc04a" cloneof="cartc04">
-		<description>Cartridge Compilation #04 - CopyCart+ v1.0 (Alt)</description>
+		<description>Cartridge Compilation #04 - CopyCart+ v1.0 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -3859,7 +3859,7 @@ license:CC0
 	</software>
 
 	<software name="cartc05a" cloneof="cartc05">
-		<description>Cartridge Compilation #05 - CopyCart+ v1.0 (Alt)</description>
+		<description>Cartridge Compilation #05 - CopyCart+ v1.0 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4017,7 +4017,7 @@ license:CC0
 	</software>
 
 	<software name="adamgfxa" cloneof="adamgfx">
-		<description>ADAM Graphics (Alt)</description>
+		<description>ADAM Graphics (alt)</description>
 		<year>199?</year>
 		<publisher>Maine ADAM Library</publisher>
 
@@ -4053,7 +4053,7 @@ license:CC0
 	</software>
 
 	<software name="bldglorya" cloneof="bldglory">
-		<description>Bold Glory (Alt)</description>
+		<description>Bold Glory (alt)</description>
 		<year>199?</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -4089,7 +4089,7 @@ license:CC0
 	</software>
 
 	<software name="brushpwra" cloneof="brushpwr">
-		<description>BrushPOWER (Alt)</description>
+		<description>BrushPOWER (alt)</description>
 		<year>198?</year>
 		<publisher>Guy Cousineau</publisher>
 
@@ -4113,7 +4113,7 @@ license:CC0
 	</software>
 
 	<software name="chromanta" cloneof="chromant">
-		<description>Chromantics (Alt)</description>
+		<description>Chromantics (alt)</description>
 		<year>199?</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -4161,7 +4161,7 @@ license:CC0
 	</software>
 
 	<software name="clippera" cloneof="clipper">
-		<description>Clipper (Alt)</description>
+		<description>Clipper (alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -4185,7 +4185,7 @@ license:CC0
 	</software>
 
 	<software name="clipslaba" cloneof="clipslab">
-		<description>Clips and Labels (Alt)</description>
+		<description>Clips and Labels (alt)</description>
 		<year>1992</year>
 		<publisher>Hexace Software</publisher>
 
@@ -4209,7 +4209,7 @@ license:CC0
 	</software>
 
 	<software name="colgfxa" cloneof="colgfx">
-		<description>Coleco Graphics Processor (Alt)</description>
+		<description>Coleco Graphics Processor (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -4245,7 +4245,7 @@ license:CC0
 	</software>
 
 	<software name="davincia" cloneof="davinci">
-		<description>da Vinci (Alt)</description>
+		<description>da Vinci (alt)</description>
 		<year>1986</year>
 		<publisher>Le Club National ADAM</publisher>
 
@@ -4281,7 +4281,7 @@ license:CC0
 	</software>
 
 	<software name="fontpwra" cloneof="fontpwr">
-		<description>Font POWER (Alt)</description>
+		<description>Font POWER (alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -4305,7 +4305,7 @@ license:CC0
 	</software>
 
 	<software name="fontas1aa" cloneof="fontas1a">
-		<description>Fontasy! Vol. 1A (Alt)</description>
+		<description>Fontasy! Vol. 1A (alt)</description>
 		<year>1992</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -4329,7 +4329,7 @@ license:CC0
 	</software>
 
 	<software name="fontas1ba" cloneof="fontas1b">
-		<description>Fontasy! Vol. 1B (Alt)</description>
+		<description>Fontasy! Vol. 1B (alt)</description>
 		<year>1992</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -4391,7 +4391,7 @@ license:CC0
 	</software>
 
 	<software name="gloryba" cloneof="gloryb">
-		<description>Glory B! (Alt Disk 1)</description>
+		<description>Glory B! (alt Disk 1)</description>
 		<year>1991</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -4434,7 +4434,7 @@ license:CC0
 	</software>
 
 	<software name="gfxexpa" cloneof="gfxexp">
-		<description>The Graphics Experimenter (Alt)</description>
+		<description>The Graphics Experimenter (alt)</description>
 		<year>198?</year>
 		<publisher>Nickelodeon Graphics</publisher>
 
@@ -4530,7 +4530,7 @@ license:CC0
 	</software>
 
 	<software name="gfxjinxa" cloneof="gfxjinx">
-		<description>Hi-Graphics Hi-Jinx (Alt)</description>
+		<description>Hi-Graphics Hi-Jinx (alt)</description>
 		<year>199?</year>
 		<publisher>EZ Developments</publisher>
 
@@ -4602,7 +4602,7 @@ license:CC0
 	</software>
 
 	<software name="paintaida" cloneof="paintaid">
-		<description>PaintAIDE / Swift Font Kit (Alt)</description>
+		<description>PaintAIDE / Swift Font Kit (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -4626,7 +4626,7 @@ license:CC0
 	</software>
 
 	<software name="paintmsta" cloneof="paintmst">
-		<description>PaintMASTER (Alt)</description>
+		<description>PaintMASTER (alt)</description>
 		<year>1987</year>
 		<publisher>Strategic Software</publisher>
 
@@ -4669,7 +4669,7 @@ license:CC0
 	</software>
 
 	<software name="perscala" cloneof="perscal">
-		<description>Personal Calendar Utility (Alt)</description>
+		<description>Personal Calendar Utility (alt)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -4688,7 +4688,7 @@ license:CC0
 	</software>
 
 	<software name="perscalb" cloneof="perscal" supported="no">
-		<description>Personal Calendar Utility (Disks 1+2)</description>
+		<description>Personal Calendar Utility (disks 1+2)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -4736,7 +4736,7 @@ license:CC0
 	</software>
 
 	<software name="powerpnta" cloneof="powerpnt">
-		<description>PowerPAINT (Alt)</description>
+		<description>PowerPAINT (alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -4748,7 +4748,7 @@ license:CC0
 	</software>
 
 	<software name="powerpntb" cloneof="powerpnt">
-		<description>PowerPAINT (Alt 2)</description>
+		<description>PowerPAINT (alt 2)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -4863,7 +4863,7 @@ license:CC0
 	</software>
 
 	<software name="rlemakera" cloneof="rlemaker">
-		<description>R.L.E. Maker (Alt)</description>
+		<description>R.L.E. Maker (alt)</description>
 		<year>1992</year>
 		<publisher>Maine ADAM Library</publisher>
 
@@ -4899,7 +4899,7 @@ license:CC0
 	</software>
 
 	<software name="rleviewa" cloneof="rleview">
-		<description>R.L.E. Viewer (Alt)</description>
+		<description>R.L.E. Viewer (alt)</description>
 		<year>198?</year>
 		<publisher>Compuserve Forum</publisher>
 
@@ -4923,7 +4923,7 @@ license:CC0
 	</software>
 
 	<software name="showoffa" cloneof="showoff">
-		<description>ShowOFF I - The Graphics Design Package (Alt)</description>
+		<description>ShowOFF I - The Graphics Design Package (alt)</description>
 		<year>1986</year>
 		<publisher>Digital Express</publisher>
 
@@ -4947,7 +4947,7 @@ license:CC0
 	</software>
 
 	<software name="signshopa" cloneof="signshop">
-		<description>SignSHOP (Alt)</description>
+		<description>SignSHOP (alt)</description>
 		<year>1986</year>
 		<publisher>Strategic Software</publisher>
 
@@ -4971,7 +4971,7 @@ license:CC0
 	</software>
 
 	<software name="signs01a" cloneof="signs01">
-		<description>SignSHOP Signs! Vol. #01 (Alt)</description>
+		<description>SignSHOP Signs! Vol. #01 (alt)</description>
 		<year>1987</year>
 		<publisher>ADAMzap Software</publisher>
 
@@ -5007,7 +5007,7 @@ license:CC0
 	</software>
 
 	<software name="simplea" cloneof="simple">
-		<description>SimplePAINTER &amp; Simple FX (Alt)</description>
+		<description>SimplePAINTER &amp; Simple FX (alt)</description>
 		<year>1990</year>
 		<publisher>The SoftWorks Factory</publisher>
 
@@ -5031,7 +5031,7 @@ license:CC0
 	</software>
 
 	<software name="smartprno" cloneof="smartprn">
-		<description>SmartPRINT Plus (Older?)</description>
+		<description>SmartPRINT Plus (older?)</description>
 		<year>1992</year>
 		<publisher>Maine ADAM Library</publisher>
 
@@ -5098,7 +5098,7 @@ license:CC0
 	</software>
 
 	<software name="spritpwra" cloneof="spritpwr">
-		<description>SpritePOWER (Alt)</description>
+		<description>SpritePOWER (alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -5129,7 +5129,7 @@ license:CC0
 	</software>
 
 	<software name="swiftlaba" cloneof="swiftlab">
-		<description>Swift's Label PrintShop (Alt)</description>
+		<description>Swift's Label PrintShop (alt)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -5160,7 +5160,7 @@ license:CC0
 	</software>
 
 	<software name="swiftprna" cloneof="swiftprn">
-		<description>SwiftPRINT (Alt)</description>
+		<description>SwiftPRINT (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -5184,7 +5184,7 @@ license:CC0
 	</software>
 
 	<software name="visisprta" cloneof="visisprt">
-		<description>VisiSprite (v6.5, Alt)</description>
+		<description>VisiSprite (v6.5, alt)</description>
 		<year>1990</year>
 		<publisher>Federation Software</publisher>
 
@@ -5245,7 +5245,7 @@ license:CC0
 	</software>
 
 	<software name="yuletoola" cloneof="yuletool">
-		<description>YuleTools I (Alt)</description>
+		<description>YuleTools I (alt)</description>
 		<year>199?</year>
 		<publisher>Eyezod Graphics</publisher>
 
@@ -5283,7 +5283,7 @@ license:CC0
 	</software>
 
 	<software name="adamhslca" cloneof="adamhslc">
-		<description>ADAM Home Software Library - Complete (Alt)</description>
+		<description>ADAM Home Software Library - Complete (alt)</description>
 		<year>1984</year>
 		<publisher>Dilithium Press</publisher>
 
@@ -5307,7 +5307,7 @@ license:CC0
 	</software>
 
 	<software name="adamhslma" cloneof="adamhslm">
-		<description>The ADAM Home Software Library - Mathematics &amp; Misc. (Alt)</description>
+		<description>The ADAM Home Software Library - Mathematics &amp; Misc. (alt)</description>
 		<year>1984</year>
 		<publisher>Dilithium Press - Coleco</publisher>
 
@@ -5438,7 +5438,7 @@ license:CC0
 	</software>
 
 	<software name="atgradeba" cloneof="atgradeb">
-		<description>A-Tech Gradebook (Alt)</description>
+		<description>A-Tech Gradebook (alt)</description>
 		<year>198?</year>
 		<publisher>ADAM Tech</publisher>
 
@@ -5462,7 +5462,7 @@ license:CC0
 	</software>
 
 	<software name="agendaa" cloneof="agenda">
-		<description>ADAM Agenda - The Personal Schedule Keeper (Alt)</description>
+		<description>ADAM Agenda - The Personal Schedule Keeper (alt)</description>
 		<year>198?</year>
 		<publisher>Jeff Harris</publisher>
 
@@ -5486,7 +5486,7 @@ license:CC0
 	</software>
 
 	<software name="fbanalyza" cloneof="fbanalyz">
-		<description>ADAM Football Analyzer (Alt)</description>
+		<description>ADAM Football Analyzer (alt)</description>
 		<year>198?</year>
 		<publisher>Hector Sanchez</publisher>
 
@@ -5666,7 +5666,7 @@ license:CC0
 	</software>
 
 	<software name="adamcalca" cloneof="adamcalc">
-		<description>ADAMCalc (Alt)</description>
+		<description>ADAMCalc (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -5690,7 +5690,7 @@ license:CC0
 	</software>
 
 	<software name="adamcalcdmp2" cloneof="adamcalc">
-		<description>ADAMCalc with Orphanware D.M.P. Patch (Alt?)</description>
+		<description>ADAMCalc with Orphanware D.M.P. Patch (alt?)</description>
 		<year>1987</year>
 		<publisher>Tom Clary Software</publisher>
 
@@ -5738,7 +5738,7 @@ license:CC0
 	</software>
 
 	<software name="addressa" cloneof="address">
-		<description>Address Book Filer with AutoDialer (Alt)</description>
+		<description>Address Book Filer with AutoDialer (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -5762,7 +5762,7 @@ license:CC0
 	</software>
 
 	<software name="addrmasta" cloneof="addrmast">
-		<description>Address Master (Alt)</description>
+		<description>Address Master (alt)</description>
 		<year>198?</year>
 		<publisher>ADAMagic Software</publisher>
 
@@ -5846,7 +5846,7 @@ license:CC0
 	</software>
 
 	<software name="basestata" cloneof="basestat">
-		<description>The Baseball Statistician (Alt)</description>
+		<description>The Baseball Statistician (alt)</description>
 		<year>1988</year>
 		<publisher>Wizard's Lair Software</publisher>
 
@@ -5882,7 +5882,7 @@ license:CC0
 	</software>
 
 	<software name="birthdaya" cloneof="birthday">
-		<description>Birthdays &amp; Anniversaries Book (Alt)</description>
+		<description>Birthdays &amp; Anniversaries Book (alt)</description>
 		<year>1991</year>
 		<publisher>Maine ADAM Library</publisher>
 
@@ -5906,7 +5906,7 @@ license:CC0
 	</software>
 
 	<software name="buispacka" cloneof="buispack">
-		<description>Business Pack I (Alt)</description>
+		<description>Business Pack I (alt)</description>
 		<year>1987</year>
 		<publisher>E&amp;T Software</publisher>
 
@@ -5954,7 +5954,7 @@ license:CC0
 	</software>
 
 	<software name="celestnva" cloneof="celestnv">
-		<description>Celestial and Great Circle Navigation (No Code, Hacked?)</description>
+		<description>Celestial and Great Circle Navigation (no code, hacked?)</description>
 		<year>1987</year>
 		<publisher>Gore Aviation</publisher>
 
@@ -5990,7 +5990,7 @@ license:CC0
 	</software>
 
 	<software name="chartasma" cloneof="chartasm">
-		<description>Chart &amp; Graph Assembler (Alt)</description>
+		<description>Chart &amp; Graph Assembler (alt)</description>
 		<year>1985</year>
 		<publisher>C+D Enterprises</publisher>
 
@@ -6026,7 +6026,7 @@ license:CC0
 	</software>
 
 	<software name="conduita" cloneof="conduit">
-		<description>Conduit Off-Set Calculator (Alt)</description>
+		<description>Conduit Off-Set Calculator (alt)</description>
 		<year>1996</year>
 		<publisher>L&amp;G Enterprises</publisher>
 
@@ -6074,7 +6074,7 @@ license:CC0
 	</software>
 
 	<software name="filidxssa" cloneof="filidxss">
-		<description>File Index (Strategic Software, Alt)</description>
+		<description>File Index (Strategic Software, alt)</description>
 		<year>1985</year>
 		<publisher>Strategic Software</publisher>
 
@@ -6134,7 +6134,7 @@ license:CC0
 	</software>
 
 	<software name="grandmaa" cloneof="grandma">
-		<description>Grandma's Recipes for Recipe Filer (Alt)</description>
+		<description>Grandma's Recipes for Recipe Filer (alt)</description>
 		<year>198?</year>
 		<publisher>Reedy Software</publisher>
 
@@ -6170,7 +6170,7 @@ license:CC0
 	</software>
 
 	<software name="homebudga" cloneof="homebudg">
-		<description>Home Budget Planning (Alt)</description>
+		<description>Home Budget Planning (alt)</description>
 		<year>1983</year>
 		<publisher>Parallel Systems,</publisher>
 
@@ -6290,7 +6290,7 @@ license:CC0
 	</software>
 
 	<software name="lablmenua" cloneof="lablmenu">
-		<description>Label &amp; Menu Maker (Alt)</description>
+		<description>Label &amp; Menu Maker (alt)</description>
 		<year>1988</year>
 		<publisher>Orb1tware</publisher>
 
@@ -6326,7 +6326,7 @@ license:CC0
 	</software>
 
 	<software name="librariaa" cloneof="libraria">
-		<description>Librarian (Alt)</description>
+		<description>Librarian (alt)</description>
 		<year>1987</year>
 		<publisher>Walters Software</publisher>
 
@@ -6350,7 +6350,7 @@ license:CC0
 	</software>
 
 	<software name="linkstaca" cloneof="linkstac">
-		<description>Linked Stack Development Kit (v1.5, Alt)</description>
+		<description>Linked Stack Development Kit (v1.5, alt)</description>
 		<year>1991</year>
 		<publisher>Jason Brown Software</publisher>
 
@@ -6398,7 +6398,7 @@ license:CC0
 	</software>
 
 	<software name="marktmona" cloneof="marktmon">
-		<description>Market Monitor (Alt)</description>
+		<description>Market Monitor (alt)</description>
 		<year>1986</year>
 		<publisher>Coleco Canada Limitee</publisher>
 
@@ -6434,7 +6434,7 @@ license:CC0
 	</software>
 
 	<software name="microwrka" cloneof="microwrk">
-		<description>MicroWORKS (Alt)</description>
+		<description>MicroWORKS (alt)</description>
 		<year>1987</year>
 		<publisher>Strategic Software</publisher>
 
@@ -6470,7 +6470,7 @@ license:CC0
 	</software>
 
 	<software name="minireca" cloneof="minirec">
-		<description>Mini Recorder (Alt)</description>
+		<description>Mini Recorder (alt)</description>
 		<year>199?</year>
 		<publisher>Bonafide Systems</publisher>
 
@@ -6518,7 +6518,7 @@ license:CC0
 	</software>
 
 	<software name="multiwria" cloneof="multiwri">
-		<description>MultiWRITE (Alt)</description>
+		<description>MultiWRITE (alt)</description>
 		<year>1987</year>
 		<publisher>Strategic Software</publisher>
 
@@ -6566,7 +6566,7 @@ license:CC0
 	</software>
 
 	<software name="paya" cloneof="pay">
-		<description>Pay (Alt)</description>
+		<description>Pay (alt)</description>
 		<year>1984</year>
 		<publisher>Steve Jacoby</publisher>
 
@@ -6590,7 +6590,7 @@ license:CC0
 	</software>
 
 	<software name="persaccta" cloneof="persacct">
-		<description>The Personal Accountant (Alt)</description>
+		<description>The Personal Accountant (alt)</description>
 		<year>1987</year>
 		<publisher>Softsync</publisher>
 
@@ -6626,7 +6626,7 @@ license:CC0
 	</software>
 
 	<software name="pictaida" cloneof="pictaid">
-		<description>Picture Aid (Alt)</description>
+		<description>Picture Aid (alt)</description>
 		<year>198?</year>
 		<publisher>Grant Software</publisher>
 
@@ -6650,7 +6650,7 @@ license:CC0
 	</software>
 
 	<software name="powerprna" cloneof="powerprn">
-		<description>PowerPRINT (Alt)</description>
+		<description>PowerPRINT (alt)</description>
 		<year>1985</year>
 		<publisher>Strategic Software</publisher>
 
@@ -6698,7 +6698,7 @@ license:CC0
 	</software>
 
 	<software name="recipefa" cloneof="recipef">
-		<description>Recipe Filer (Alt)</description>
+		<description>Recipe Filer (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -6758,7 +6758,7 @@ license:CC0
 	</software>
 
 	<software name="simplcala" cloneof="simplcal">
-		<description>SimpleCALC (Alt)</description>
+		<description>SimpleCALC (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -6782,7 +6782,7 @@ license:CC0
 	</software>
 
 	<software name="smartfila" cloneof="smartfil">
-		<description>Smart Filer (Alt)</description>
+		<description>Smart Filer (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -6818,7 +6818,7 @@ license:CC0
 	</software>
 
 	<software name="smarttaxa" cloneof="smarttax">
-		<description>SmartTAX 1040 (v1.0, Alt)</description>
+		<description>SmartTAX 1040 (v1.0, alt)</description>
 		<year>1989</year>
 		<publisher>JDK &amp; S Software</publisher>
 
@@ -6842,7 +6842,7 @@ license:CC0
 	</software>
 
 	<software name="smartypea" cloneof="smartype">
-		<description>Smart Type (v1.1, Alt)</description>
+		<description>Smart Type (v1.1, alt)</description>
 		<year>1985</year>
 		<publisher>Reedy Software</publisher>
 
@@ -6866,7 +6866,7 @@ license:CC0
 	</software>
 
 	<software name="swhelpa" cloneof="swhelp">
-		<description>SmartWRITER's Helper (Alt)</description>
+		<description>SmartWRITER's Helper (alt)</description>
 		<year>1992</year>
 		<publisher>Hexace Software</publisher>
 
@@ -6914,7 +6914,7 @@ license:CC0
 	</software>
 
 	<software name="softpacka" cloneof="softpack">
-		<description>SoftPack I (v2.0, Alt)</description>
+		<description>SoftPack I (v2.0, alt)</description>
 		<year>1987</year>
 		<publisher>E&amp;T Software</publisher>
 
@@ -6938,7 +6938,7 @@ license:CC0
 	</software>
 
 	<software name="speedwra" cloneof="speedwr">
-		<description>SpeedyWrite (v2.0, Alt)</description>
+		<description>SpeedyWrite (v2.0, alt)</description>
 		<year>198?</year>
 		<publisher>David White</publisher>
 
@@ -6998,7 +6998,7 @@ license:CC0
 	</software>
 
 	<software name="stellar5a" cloneof="stellar5">
-		<description>Stellar 5 (Alt)</description>
+		<description>Stellar 5 (alt)</description>
 		<year>1985</year>
 		<publisher>Hanania Enterprises</publisher>
 
@@ -7034,7 +7034,7 @@ license:CC0
 	</software>
 
 	<software name="tax1040a" cloneof="tax1040">
-		<description>Tax 1040-85 (Alt)</description>
+		<description>Tax 1040-85 (alt)</description>
 		<year>1985</year>
 		<publisher>Extended Software</publisher>
 
@@ -7070,7 +7070,7 @@ license:CC0
 	</software>
 
 	<software name="taxplana" cloneof="taxplan">
-		<description>Tax Planner (Alt)</description>
+		<description>Tax Planner (alt)</description>
 		<year>198?</year>
 		<publisher>Coleco Canada Limitee</publisher>
 
@@ -7130,7 +7130,7 @@ license:CC0
 	</software>
 
 	<software name="vtplayera" cloneof="vtplayer">
-		<description>V.T. Player (v1.1, Alt)</description>
+		<description>V.T. Player (v1.1, alt)</description>
 		<year>1991</year>
 		<publisher>Bonafide Systems</publisher>
 
@@ -7173,7 +7173,7 @@ license:CC0
 	</software>
 
 	<software name="videotuna" cloneof="videotun">
-		<description>VideoTunes (Alt)</description>
+		<description>VideoTunes (alt)</description>
 		<year>1984</year>
 		<publisher>FutureVision</publisher>
 
@@ -7209,7 +7209,7 @@ license:CC0
 	</software>
 
 	<software name="writemata" cloneof="writemat">
-		<description>WriterMATE (v1.1, Alt)</description>
+		<description>WriterMATE (v1.1, alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -7221,7 +7221,7 @@ license:CC0
 	</software>
 
 	<software name="writematb" cloneof="writemat">
-		<description>WriterMATE (v1.1, Alt 2)</description>
+		<description>WriterMATE (v1.1, alt 2)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -7248,7 +7248,7 @@ license:CC0
 	</software>
 
 	<software name="adambasa" cloneof="adambas">
-		<description>ADAM Basic (v1.6, Alt)</description>
+		<description>ADAM Basic (v1.6, alt)</description>
 		<year>198?</year>
 		<publisher>ADAMagic</publisher>
 
@@ -7272,7 +7272,7 @@ license:CC0
 	</software>
 
 	<software name="ausbasica" cloneof="ausbasic">
-		<description>Australian SmartBASIC (v1.1, Alt)</description>
+		<description>Australian SmartBASIC (v1.1, alt)</description>
 		<year>198?</year>
 		<publisher>Moonlight?</publisher>
 
@@ -7308,7 +7308,7 @@ license:CC0
 	</software>
 
 	<software name="autoaid1a" cloneof="autoaid">
-		<description>Auto-AID for SmartBASIC (v1.0, Alt)</description>
+		<description>Auto-AID for SmartBASIC (v1.0, alt)</description>
 		<year>1984</year>
 		<publisher>FutureVision</publisher>
 
@@ -7344,7 +7344,7 @@ license:CC0
 	</software>
 
 	<software name="basicaida" cloneof="basicaid">
-		<description>BasicAIDE (v2.0, Alt)</description>
+		<description>BasicAIDE (v2.0, alt)</description>
 		<year>198?</year>
 		<publisher>Mr. T Software</publisher>
 
@@ -7356,7 +7356,7 @@ license:CC0
 	</software>
 
 	<software name="basicaidb" cloneof="basicaid">
-		<description>BasicAIDE (v2.0, Alt 2)</description>
+		<description>BasicAIDE (v2.0, alt 2)</description>
 		<year>198?</year>
 		<publisher>Mr. T Software</publisher>
 
@@ -7416,7 +7416,7 @@ license:CC0
 	</software>
 
 	<software name="xbasutil1a" cloneof="xbasutil">
-		<description>Extended BASIC Utilities (v1.0, Alt)</description>
+		<description>Extended BASIC Utilities (v1.0, alt)</description>
 		<year>198?</year>
 		<publisher>Extended Software</publisher>
 
@@ -7428,7 +7428,7 @@ license:CC0
 	</software>
 
 	<software name="godosd">
-		<description>GoDOS (v1.2, Demo)</description>
+		<description>GoDOS (v1.2, demo)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -7447,7 +7447,7 @@ license:CC0
 	</software>
 
 	<software name="godosda" cloneof="godosd">
-		<description>GoDOS (v1.2, Demo Alt)</description>
+		<description>GoDOS (v1.2, demo alt)</description>
 		<year>1990</year>
 		<publisher>Phoenix 2000</publisher>
 
@@ -7516,7 +7516,7 @@ license:CC0
 	</software>
 
 	<software name="intelbsta" cloneof="intelbst">
-		<description>Intel-BEST (v3.3, Alt)</description>
+		<description>Intel-BEST (v3.3, alt)</description>
 		<year>1986</year>
 		<publisher>Digital Express</publisher>
 
@@ -7547,7 +7547,7 @@ license:CC0
 	</software>
 
 	<software name="macadam">
-		<description>MacADAM (Fra)</description>
+		<description>MacADAM (France)</description>
 		<year>1984</year>
 		<publisher>CBS Loisors - Coleco of France</publisher>
 
@@ -7559,7 +7559,7 @@ license:CC0
 	</software>
 
 	<software name="macadama" cloneof="macadam">
-		<description>MacADAM (Fra, Alt)</description>
+		<description>MacADAM (France, alt)</description>
 		<year>1984</year>
 		<publisher>CBS Loisors - Coleco of France</publisher>
 
@@ -7607,7 +7607,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas">
-		<description>SmartBASIC (v2.0, Prototype)</description>
+		<description>SmartBASIC (v2.0, prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -7619,7 +7619,7 @@ license:CC0
 	</software>
 
 	<software name="smartbasa" cloneof="smartbas">
-		<description>SmartBASIC (v2.0, Prototype, Alt)</description>
+		<description>SmartBASIC (v2.0, prototype, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -7643,7 +7643,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas40a" cloneof="smartbas">
-		<description>SmartBASIC (v2.0, 40 Column, Alt)</description>
+		<description>SmartBASIC (v2.0, 40 Column, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco - Gary Hoosier Software</publisher>
 
@@ -7691,7 +7691,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas1xa" cloneof="smartbas">
-		<description>SmartBASIC (v1.x Rev.20, Alt)</description>
+		<description>SmartBASIC (v1.x Rev.20, alt)</description>
 		<year>1991</year>
 		<publisher>Rich Drushel Software</publisher>
 
@@ -7715,7 +7715,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas10a" cloneof="smartbas">
-		<description>SmartBASIC (v1.0, Alt)</description>
+		<description>SmartBASIC (v1.0, alt)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -7727,7 +7727,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas10b" cloneof="smartbas">
-		<description>SmartBASIC (v1.0, Alt 2)</description>
+		<description>SmartBASIC (v1.0, alt 2)</description>
 		<year>1983</year>
 		<publisher>Coleco</publisher>
 
@@ -7775,7 +7775,7 @@ license:CC0
 	</software>
 
 	<software name="smartbas10ppa" cloneof="smartbas">
-		<description>SmartBASIC (v1.0, with Parallel Printer Driver, Alt)</description>
+		<description>SmartBASIC (v1.0, with Parallel Printer Driver, alt)</description>
 		<year>198?</year>
 		<publisher>Wayne Motel - N.I.A.D. Software</publisher>
 
@@ -7799,7 +7799,7 @@ license:CC0
 	</software>
 
 	<software name="smartbasp13a" cloneof="smartbas">
-		<description>SmartBASIC+ (v1.3, Alt)</description>
+		<description>SmartBASIC+ (v1.3, alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -7835,7 +7835,7 @@ license:CC0
 	</software>
 
 	<software name="smartbsta" cloneof="smartbst">
-		<description>SmartBEST (v1.0, Alt)</description>
+		<description>SmartBEST (v1.0, alt)</description>
 		<year>1985</year>
 		<publisher>Data Doctor</publisher>
 
@@ -7859,7 +7859,7 @@ license:CC0
 	</software>
 
 	<software name="smartloga" cloneof="smartlog">
-		<description>SmartLOGO (Alt)</description>
+		<description>SmartLOGO (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -7871,7 +7871,7 @@ license:CC0
 	</software>
 
 	<software name="smartlogb" cloneof="smartlog">
-		<description>SmartLOGO (Alt 2)</description>
+		<description>SmartLOGO (alt 2)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -7895,7 +7895,7 @@ license:CC0
 	</software>
 
 	<software name="smartlogmda" cloneof="smartlog">
-		<description>SmartLOGO with MemDsk (Alt)</description>
+		<description>SmartLOGO with MemDsk (alt)</description>
 		<year>199?</year>
 		<publisher>Hexace Software</publisher>
 
@@ -7932,7 +7932,7 @@ license:CC0
 	</software>
 
 	<software name="subworka" cloneof="subwork">
-		<description>SubWork (Alt)</description>
+		<description>SubWork (alt)</description>
 		<year>1988</year>
 		<publisher>Corleon Software</publisher>
 
@@ -7956,7 +7956,7 @@ license:CC0
 	</software>
 
 	<software name="superbasa" cloneof="superbas">
-		<description>SuperBasic Plus (Alt)</description>
+		<description>SuperBasic Plus (alt)</description>
 		<year>198?</year>
 		<publisher>TCR Software</publisher>
 
@@ -8116,7 +8116,7 @@ license:CC0
 	</software>
 
 	<software name="adambrda" cloneof="adambrd">
-		<description>The ADAM-Board (v1.2, Alt)</description>
+		<description>The ADAM-Board (v1.2, alt)</description>
 		<year>198?</year>
 		<publisher>ADAM-Link of Utah</publisher>
 
@@ -8140,7 +8140,7 @@ license:CC0
 	</software>
 
 	<software name="adamlnka" cloneof="adamlnk">
-		<description>ADAMLink (Alt)</description>
+		<description>ADAMLink (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -8164,7 +8164,7 @@ license:CC0
 	</software>
 
 	<software name="adamlnk2a" cloneof="adamlnk2">
-		<description>ADAMLink II (Alt)</description>
+		<description>ADAMLink II (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -8176,7 +8176,7 @@ license:CC0
 	</software>
 
 	<software name="adamlnk2dmp" cloneof="adamlnk2">
-		<description>ADAMLink II (Patched for D.M.P.)</description>
+		<description>ADAMLink II (patched for D.M.P.)</description>
 		<year>198?</year>
 		<publisher>Tom Clary Software</publisher>
 
@@ -8200,7 +8200,7 @@ license:CC0
 	</software>
 
 	<software name="adamlnk3a" cloneof="adamlnk3">
-		<description>ADAMLink III (Alt)</description>
+		<description>ADAMLink III (alt)</description>
 		<year>198?</year>
 		<publisher>Tom Clary Software</publisher>
 
@@ -8248,7 +8248,7 @@ license:CC0
 	</software>
 
 	<software name="adamlnk5a" cloneof="adamlnk5">
-		<description>ADAMLink V (Alt)</description>
+		<description>ADAMLink V (alt)</description>
 		<year>1992</year>
 		<publisher>Tom Clary Software - Rich Drushel Software</publisher>
 
@@ -8297,7 +8297,7 @@ license:CC0
 	</software>
 
 	<software name="smarterma" cloneof="smarterm">
-		<description>SmartTERM (v1.02, Alt)</description>
+		<description>SmartTERM (v1.02, alt)</description>
 		<year>1988</year>
 		<publisher>Kehoe Software</publisher>
 
@@ -8321,7 +8321,7 @@ license:CC0
 	</software>
 
 	<software name="swiftlnka" cloneof="swiftlnk">
-		<description>SwiftLINK (v1.3, Alt)</description>
+		<description>SwiftLINK (v1.3, alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -8359,7 +8359,7 @@ license:CC0
 	</software>
 
 	<software name="adamforma" cloneof="adamform" supported="no">
-		<description>ADAM Format Utility (AJM Software, v2.1, Alt)</description>
+		<description>ADAM Format Utility (AJM Software, v2.1, alt)</description>
 		<year>1990</year>
 		<publisher>AJM Software</publisher>
 
@@ -8539,7 +8539,7 @@ license:CC0
 	</software>
 
 	<software name="cartcopya" cloneof="cartcopy">
-		<description>Coleco Game Cartridge Copy (Alt)</description>
+		<description>Coleco Game Cartridge Copy (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco?</publisher>
 
@@ -8635,7 +8635,7 @@ license:CC0
 	</software>
 
 	<software name="converta" cloneof="convert">
-		<description>Convert (Alt)</description>
+		<description>Convert (alt)</description>
 		<year>1985</year>
 		<publisher>Sage Enterprises</publisher>
 
@@ -8695,7 +8695,7 @@ license:CC0
 	</software>
 
 	<software name="copycarta" cloneof="copycart">
-		<description>CopyCart+ (v2.0, Alt)</description>
+		<description>CopyCart+ (v2.0, alt)</description>
 		<year>1988</year>
 		<publisher>M.M.S.G.</publisher>
 
@@ -8743,7 +8743,7 @@ license:CC0
 	</software>
 
 	<software name="copywrita" cloneof="copywrit">
-		<description>CopyWriter &amp; DriveWriter (Alt)</description>
+		<description>CopyWriter &amp; DriveWriter (alt)</description>
 		<year>198?</year>
 		<publisher>Marathon Computer Press</publisher>
 
@@ -8803,7 +8803,7 @@ license:CC0
 	</software>
 
 	<software name="ddiskfora" cloneof="ddiskfor">
-		<description>Double Disk Formatter (Alt)</description>
+		<description>Double Disk Formatter (alt)</description>
 		<year>1987</year>
 		<publisher>Walters Software</publisher>
 
@@ -8839,7 +8839,7 @@ license:CC0
 	</software>
 
 	<software name="eosdiska" cloneof="eosdisk">
-		<description>E.O.S. Disk Manager (Alt)</description>
+		<description>E.O.S. Disk Manager (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -8875,7 +8875,7 @@ license:CC0
 	</software>
 
 	<software name="filemngra" cloneof="filemngr">
-		<description>File Manager (v3.0, Alt)</description>
+		<description>File Manager (v3.0, alt)</description>
 		<year>1992</year>
 		<publisher>AJM Software</publisher>
 
@@ -8971,7 +8971,7 @@ license:CC0
 	</software>
 
 	<software name="hackguida" cloneof="hackguid">
-		<description>Hacker's Guide to ADAM (Alt)</description>
+		<description>Hacker's Guide to ADAM (alt)</description>
 		<year>1985</year>
 		<publisher>Peter &amp; Ben Hinkle</publisher>
 
@@ -8995,7 +8995,7 @@ license:CC0
 	</software>
 
 	<software name="hurricana" cloneof="hurrican">
-		<description>Hurricane! (Alt)</description>
+		<description>Hurricane! (alt)</description>
 		<year>1988</year>
 		<publisher>Intergalactic Software</publisher>
 
@@ -9031,7 +9031,7 @@ license:CC0
 	</software>
 
 	<software name="inteload10a" cloneof="inteload">
-		<description>Intel-LOAD (v1.0, Alt)</description>
+		<description>Intel-LOAD (v1.0, alt)</description>
 		<year>1986</year>
 		<publisher>Digital Express</publisher>
 
@@ -9055,7 +9055,7 @@ license:CC0
 	</software>
 
 	<software name="jklutilsa" cloneof="jklutils">
-		<description>JKL Utilities (Alt)</description>
+		<description>JKL Utilities (alt)</description>
 		<year>198?</year>
 		<publisher>Overpriced Software</publisher>
 
@@ -9127,7 +9127,7 @@ license:CC0
 	</software>
 
 	<software name="mediaidpa" cloneof="mediaidp">
-		<description>Media-Aid Plus (Alt)</description>
+		<description>Media-Aid Plus (alt)</description>
 		<year>1987</year>
 		<publisher>Walters Software</publisher>
 
@@ -9163,7 +9163,7 @@ license:CC0
 	</software>
 
 	<software name="megadiska" cloneof="megadisk">
-		<description>MegaDISK (v1.0, Alt)</description>
+		<description>MegaDISK (v1.0, alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -9199,7 +9199,7 @@ license:CC0
 	</software>
 
 	<software name="multicrta" cloneof="multicrt">
-		<description>MultiCart Backup (v1.1b, Alt)</description>
+		<description>MultiCart Backup (v1.1b, alt)</description>
 		<year>1985</year>
 		<publisher>Practical Programs</publisher>
 
@@ -9211,7 +9211,7 @@ license:CC0
 	</software>
 
 	<software name="multcrtu">
-		<description>MultiCart Backup (Unknown)</description>
+		<description>MultiCart Backup (unknown)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -9223,7 +9223,7 @@ license:CC0
 	</software>
 
 	<software name="multcrtua" cloneof="multcrtu">
-		<description>MultiCart Backup (Unknown, Alt)</description>
+		<description>MultiCart Backup (unknown, alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -9259,7 +9259,7 @@ license:CC0
 	</software>
 
 	<software name="openfilea" cloneof="openfile">
-		<description>OpenFILER (v3.0, Alt)</description>
+		<description>OpenFILER (v3.0, alt)</description>
 		<year>1988</year>
 		<publisher>Acolyte Software</publisher>
 
@@ -9283,7 +9283,7 @@ license:CC0
 	</software>
 
 	<software name="packunpa" cloneof="packunp">
-		<description>Pack &amp; Unpack (Alt)</description>
+		<description>Pack &amp; Unpack (alt)</description>
 		<year>198?</year>
 		<publisher>Digital Express</publisher>
 
@@ -9307,7 +9307,7 @@ license:CC0
 	</software>
 
 	<software name="packcopya" cloneof="packcopy">
-		<description>PackCopy (v1.2, Alt)</description>
+		<description>PackCopy (v1.2, alt)</description>
 		<year>1985</year>
 		<publisher>Sage Enterprises</publisher>
 
@@ -9331,7 +9331,7 @@ license:CC0
 	</software>
 
 	<software name="packcopy11a" cloneof="packcopy">
-		<description>PackCopy (v1.1, Alt)</description>
+		<description>PackCopy (v1.1, alt)</description>
 		<year>1985</year>
 		<publisher>Sage Enterprises</publisher>
 
@@ -9367,7 +9367,7 @@ license:CC0
 	</software>
 
 	<software name="pdqcopya" cloneof="pdqcopy">
-		<description>PDQ Copy (Alt)</description>
+		<description>PDQ Copy (alt)</description>
 		<year>1987</year>
 		<publisher>Orb1tware</publisher>
 
@@ -9391,7 +9391,7 @@ license:CC0
 	</software>
 
 	<software name="pdqdira" cloneof="pdqdir">
-		<description>PDQ Directory Editor (Alt)</description>
+		<description>PDQ Directory Editor (alt)</description>
 		<year>1987</year>
 		<publisher>Orb1tware</publisher>
 
@@ -9415,7 +9415,7 @@ license:CC0
 	</software>
 
 	<software name="pdqedita" cloneof="pdqedit">
-		<description>PDQ Edit Utility (v1.0, Alt)</description>
+		<description>PDQ Edit Utility (v1.0, alt)</description>
 		<year>1988</year>
 		<publisher>Orb1tware</publisher>
 
@@ -9511,7 +9511,7 @@ license:CC0
 	</software>
 
 	<software name="quickopy11a" cloneof="quickopy">
-		<description>Quickopy (v1.1, Alt)</description>
+		<description>Quickopy (v1.1, alt)</description>
 		<year>1986</year>
 		<publisher>G.J.M.G. Enterprises</publisher>
 
@@ -9535,7 +9535,7 @@ license:CC0
 	</software>
 
 	<software name="quickopy10a" cloneof="quickopy">
-		<description>Quickopy (v1.0, Alt)</description>
+		<description>Quickopy (v1.0, alt)</description>
 		<year>1986</year>
 		<publisher>G.J.M.G. Enterprises</publisher>
 
@@ -9583,7 +9583,7 @@ license:CC0
 	</software>
 
 	<software name="ramdsk10a" cloneof="ramdsk">
-		<description>RAMDSK (v1.0, Alt)</description>
+		<description>RAMDSK (v1.0, alt)</description>
 		<year>1986</year>
 		<publisher>Walters Software</publisher>
 
@@ -9631,7 +9631,7 @@ license:CC0
 	</software>
 
 	<software name="smdsksba" cloneof="smdsksb">
-		<description>SmartDSK for SmartBASIC &amp; Utilities (Alt)</description>
+		<description>SmartDSK for SmartBASIC &amp; Utilities (alt)</description>
 		<year>1988</year>
 		<publisher>Walters Software</publisher>
 
@@ -9655,7 +9655,7 @@ license:CC0
 	</software>
 
 	<software name="softbacka" cloneof="softback">
-		<description>Software Backup (v1.0, Alt)</description>
+		<description>Software Backup (v1.0, alt)</description>
 		<year>1990</year>
 		<publisher>GL Programs</publisher>
 
@@ -9679,7 +9679,7 @@ license:CC0
 	</software>
 
 	<software name="speedchka" cloneof="speedchk">
-		<description>Speed Check (v2.0, Alt)</description>
+		<description>Speed Check (v2.0, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -9703,7 +9703,7 @@ license:CC0
 	</software>
 
 	<software name="speedchk10a" cloneof="speedchk">
-		<description>Speed Check (v1.0, Alt)</description>
+		<description>Speed Check (v1.0, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -9751,7 +9751,7 @@ license:CC0
 	</software>
 
 	<software name="slabfonta" cloneof="slabfont">
-		<description>Swift Label PrintShop Fonts Converter (Alt)</description>
+		<description>Swift Label PrintShop Fonts Converter (alt)</description>
 		<year>199?</year>
 		<publisher>Swift Enterprises</publisher>
 
@@ -9787,7 +9787,7 @@ license:CC0
 	</software>
 
 	<software name="swiftdska" cloneof="swiftdsk">
-		<description>SwiftDISK (Alt)</description>
+		<description>SwiftDISK (alt)</description>
 		<year>1988</year>
 		<publisher>Digital Express</publisher>
 
@@ -9811,7 +9811,7 @@ license:CC0
 	</software>
 
 	<software name="turbodska" cloneof="turbodsk">
-		<description>TurboDISK (v1.0, Alt)</description>
+		<description>TurboDISK (v1.0, alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -9835,7 +9835,7 @@ license:CC0
 	</software>
 
 	<software name="turbloada" cloneof="turbload">
-		<description>TurboLOAD (v1.0, Alt)</description>
+		<description>TurboLOAD (v1.0, alt)</description>
 		<year>1985</year>
 		<publisher>Strategic Software</publisher>
 
@@ -9859,7 +9859,7 @@ license:CC0
 	</software>
 
 	<software name="unclerna" cloneof="unclern">
-		<description>Uncle Ernie's Toolkit (Alt)</description>
+		<description>Uncle Ernie's Toolkit (alt)</description>
 		<year>1985</year>
 		<publisher>Uncle Ernie's Software</publisher>
 
@@ -9883,7 +9883,7 @@ license:CC0
 	</software>
 
 	<software name="unrealuta" cloneof="unrealut">
-		<description>Unreal Utilities (Alt)</description>
+		<description>Unreal Utilities (alt)</description>
 		<year>1986</year>
 		<publisher>Sage Enterprises</publisher>
 
@@ -9931,7 +9931,7 @@ license:CC0
 	</software>
 
 	<software name="xrboota" cloneof="xrboot">
-		<description>XRboot (Alt)</description>
+		<description>XRboot (alt)</description>
 		<year>1987</year>
 		<publisher>Digital Express</publisher>
 
@@ -9957,7 +9957,7 @@ license:CC0
 	</software>
 
 	<software name="alandba1">
-		<description>SmartBASIC Collection (Alt?)</description>
+		<description>SmartBASIC Collection (alt?)</description>
 		<year>198?</year>
 		<publisher>ADAMLand</publisher>
 
@@ -10123,7 +10123,7 @@ license:CC0
 	</software>
 
 	<software name="vegasarca" cloneof="vegasarc">
-		<description>Las Vegas ADAM Club Archives #1 (Alt)</description>
+		<description>Las Vegas ADAM Club Archives #1 (alt)</description>
 		<year>1986</year>
 		<publisher>Las Vegas A.U.G.</publisher>
 
@@ -13613,7 +13613,7 @@ license:CC0
 	</software>
 
 	<software name="cpma" cloneof="cpm">
-		<description>CP/M 2.2 (v1.50, Alt)</description>
+		<description>CP/M 2.2 (v1.50, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -13637,7 +13637,7 @@ license:CC0
 	</software>
 
 	<software name="cpmasma" cloneof="cpmasm">
-		<description>CP/M 2.2 &amp; Assembler (Alt)</description>
+		<description>CP/M 2.2 &amp; Assembler (alt)</description>
 		<year>1984</year>
 		<publisher>Coleco</publisher>
 
@@ -13687,7 +13687,7 @@ license:CC0
 	</software>
 
 	<software name="cpmprgsa" cloneof="cpmprgs">
-		<description>CP/M Programs (Alt)</description>
+		<description>CP/M Programs (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -13724,7 +13724,7 @@ license:CC0
 	</software>
 
 	<software name="tdos458a" cloneof="tdos">
-		<description>T-DOS (v4.58, Alt)</description>
+		<description>T-DOS (v4.58, alt)</description>
 		<year>198?</year>
 		<publisher>AJM Software</publisher>
 
@@ -13743,7 +13743,7 @@ license:CC0
 	</software>
 
 	<software name="tdos458b" cloneof="tdos">
-		<description>T-DOS (v4.58, Alt 2)</description>
+		<description>T-DOS (v4.58, alt 2)</description>
 		<year>198?</year>
 		<publisher>AJM Software</publisher>
 
@@ -13923,7 +13923,7 @@ license:CC0
 	</software>
 
 	<software name="deadlinea" cloneof="deadline">
-		<description>Deadline (Alt)</description>
+		<description>Deadline (alt)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 
@@ -13959,7 +13959,7 @@ license:CC0
 	</software>
 
 	<software name="hitchhika" cloneof="hitchhik">
-		<description>The HitchHiker's Guide to the Galaxy (Alt)</description>
+		<description>The HitchHiker's Guide to the Galaxy (alt)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 
@@ -14020,7 +14020,7 @@ license:CC0
 	</software>
 
 	<software name="plntfalla" cloneof="plntfall">
-		<description>Planetfall (Alt)</description>
+		<description>Planetfall (alt)</description>
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 
@@ -14056,7 +14056,7 @@ license:CC0
 	</software>
 
 	<software name="quatrisa" cloneof="quatris">
-		<description>Quatris (Alt)</description>
+		<description>Quatris (alt)</description>
 		<year>1989</year>
 		<publisher>Steve Perkins</publisher>
 
@@ -14080,7 +14080,7 @@ license:CC0
 	</software>
 
 	<software name="seastalka" cloneof="seastalk">
-		<description>Seastalker (Alt)</description>
+		<description>Seastalker (alt)</description>
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 
@@ -14128,7 +14128,7 @@ license:CC0
 	</software>
 
 	<software name="starxa" cloneof="starx">
-		<description>Starcross (Alt)</description>
+		<description>Starcross (alt)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 
@@ -14212,7 +14212,7 @@ license:CC0
 	</software>
 
 	<software name="zork1a" cloneof="zork1">
-		<description>Zork I: The Great Underground Empire (Alt)</description>
+		<description>Zork I: The Great Underground Empire (alt)</description>
 		<year>1981</year>
 		<publisher>Infocom</publisher>
 
@@ -14236,7 +14236,7 @@ license:CC0
 	</software>
 
 	<software name="zork2a" cloneof="zork2">
-		<description>Zork II: The Wizard of Frobozz (Alt)</description>
+		<description>Zork II: The Wizard of Frobozz (alt)</description>
 		<year>1981</year>
 		<publisher>Infocom</publisher>
 
@@ -14260,7 +14260,7 @@ license:CC0
 	</software>
 
 	<software name="zork3a" cloneof="zork3">
-		<description>Zork III: The Dungeon Master (Alt)</description>
+		<description>Zork III: The Dungeon Master (alt)</description>
 		<year>1982</year>
 		<publisher>Infocom</publisher>
 
@@ -15922,7 +15922,7 @@ license:CC0
 	</software>
 
 	<software name="pmastera" cloneof="pmaster">
-		<description>PrintMaster (CP/M, Alt)</description>
+		<description>PrintMaster (CP/M, alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -16025,7 +16025,7 @@ license:CC0
 	</software>
 
 	<software name="wordstara" cloneof="wordstar">
-		<description>WordStar (v3.3, Alt)</description>
+		<description>WordStar (v3.3, alt)</description>
 		<year>198?</year>
 		<publisher>MicroPro</publisher>
 
@@ -16161,7 +16161,7 @@ license:CC0
 	</software>
 
 	<software name="mexa" cloneof="mex">
-		<description>MEX (v1.2, Alt)</description>
+		<description>MEX (v1.2, alt)</description>
 		<year>1984</year>
 		<publisher>Ronald G. Fowler</publisher>
 

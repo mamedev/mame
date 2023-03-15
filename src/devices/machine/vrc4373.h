@@ -28,8 +28,8 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	void set_ram_size(int size) { m_ram_size = size; };
-	void set_simm0_size(int size) { m_simm0_size = size; };
+	void set_ram_size(int size) { m_ram_size = size; }
+	void set_simm0_size(int size) { m_simm0_size = size; }
 
 	virtual void config_map(address_map &map) override;
 

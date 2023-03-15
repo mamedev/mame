@@ -12,8 +12,9 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "coreutil.h"
 #include "machine/mc146818.h"
+
+#include "coreutil.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -51,17 +52,18 @@ ds1287_device::ds1287_device(const machine_config &mconfig, const char *tag, dev
 mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
+		device_rtc_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
-		m_clock_timer(nullptr), m_update_timer(nullptr), m_periodic_timer(nullptr),
+		m_clock_timer(nullptr),
+		m_update_timer(nullptr),
+		m_periodic_timer(nullptr),
 		m_write_irq(*this),
 		m_write_sqw(*this),
 		m_century_index(-1),
 		m_epoch(0),
-		m_use_utc(false),
 		m_binary(false),
 		m_hour(false),
-		m_binyear(false),
 		m_sqw_state(false),
 		m_tuc(0)
 {
@@ -74,9 +76,9 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 void mc146818_device::device_start()
 {
 	m_data = make_unique_clear<uint8_t[]>(data_size());
-	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_update_timer = timer_alloc(TIMER_UPDATE);
-	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
+	m_clock_timer = timer_alloc(FUNC(mc146818_device::clock_tick), this);
+	m_update_timer = timer_alloc(FUNC(mc146818_device::time_tick), this);
+	m_periodic_timer = timer_alloc(FUNC(mc146818_device::periodic_tick), this);
 
 	m_write_irq.resolve_safe();
 	m_write_sqw.resolve_safe();
@@ -104,140 +106,136 @@ void mc146818_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  timer events
 //-------------------------------------------------
 
-void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(mc146818_device::periodic_tick)
 {
-	switch (id)
+	m_sqw_state = !m_sqw_state;
+
+	if (m_data[REG_B] & REG_B_SQWE)
+		m_write_sqw(m_sqw_state);
+
+	// periodic flag/interrupt on rising edge of periodic timer
+	if (m_sqw_state)
 	{
-	case TIMER_PERIODIC:
-		m_sqw_state = !m_sqw_state;
-
-		if (m_data[REG_B] & REG_B_SQWE)
-			m_write_sqw(m_sqw_state);
-
-		// periodic flag/interrupt on rising edge of periodic timer
-		if (m_sqw_state)
-		{
-			m_data[REG_C] |= REG_C_PF;
-			update_irq();
-		}
-		break;
-
-	case TIMER_CLOCK:
-		if (!(m_data[REG_B] & REG_B_SET))
-		{
-			m_data[REG_A] |= REG_A_UIP;
-
-			m_update_timer->adjust(attotime::from_usec(244));
-		}
-		break;
-
-	case TIMER_UPDATE:
-		if (!param)
-		{
-			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
-			int seconds = get_seconds() + 1;
-			if (seconds < 60)
-			{
-				set_seconds(seconds);
-			}
-			else
-			{
-				set_seconds(0);
-
-				int minutes = get_minutes() + 1;
-				if (minutes < 60)
-				{
-					set_minutes(minutes);
-				}
-				else
-				{
-					set_minutes(0);
-
-					int hours = get_hours() + 1;
-					if (hours < 24)
-					{
-						set_hours(hours);
-					}
-					else
-					{
-						set_hours(0);
-
-						int dayofweek = get_dayofweek() + 1;
-						if (dayofweek <= 7)
-						{
-							set_dayofweek(dayofweek);
-						}
-						else
-						{
-							set_dayofweek(1);
-						}
-
-						int dayofmonth = get_dayofmonth() + 1;
-						if (dayofmonth <= gregorian_days_in_month(get_month(), get_year() + 2000))
-						{
-							set_dayofmonth(dayofmonth);
-						}
-						else
-						{
-							set_dayofmonth(1);
-
-							int month = get_month() + 1;
-							if (month <= 12)
-							{
-								set_month(month);
-							}
-							else
-							{
-								set_month(1);
-
-								int year = get_year() + 1;
-								if (year <= 99)
-								{
-									set_year(year);
-								}
-								else
-								{
-									set_year(0);
-
-									if (century_count_enabled())
-									{
-										set_century((get_century() + 1) % 100);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if ((m_data[REG_ALARM_SECONDS] == m_data[REG_SECONDS] || (m_data[REG_ALARM_SECONDS] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
-				(m_data[REG_ALARM_MINUTES] == m_data[REG_MINUTES] || (m_data[REG_ALARM_MINUTES] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
-				(m_data[REG_ALARM_HOURS] == m_data[REG_HOURS] || (m_data[REG_ALARM_HOURS] & ALARM_DONTCARE) == ALARM_DONTCARE))
-			{
-				// set the alarm interrupt flag AF
-				m_data[REG_C] |= REG_C_AF;
-			}
-
-			// defer the update end sequence if update cycle time is non-zero
-			if (m_tuc)
-			{
-				m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
-				break;
-			}
-		}
-
-		// clear update in progress and set update ended
-		m_data[REG_A] &= ~REG_A_UIP;
-		m_data[REG_C] |= REG_C_UF;
-
+		m_data[REG_C] |= REG_C_PF;
 		update_irq();
-		break;
 	}
 }
 
+TIMER_CALLBACK_MEMBER(mc146818_device::clock_tick)
+{
+	if (!(m_data[REG_B] & REG_B_SET))
+	{
+		m_data[REG_A] |= REG_A_UIP;
+
+		m_update_timer->adjust(attotime::from_usec(244));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mc146818_device::time_tick)
+{
+	if (!param)
+	{
+		/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
+		int seconds = get_seconds() + 1;
+		if (seconds < 60)
+		{
+			set_seconds(seconds);
+		}
+		else
+		{
+			set_seconds(0);
+
+			int minutes = get_minutes() + 1;
+			if (minutes < 60)
+			{
+				set_minutes(minutes);
+			}
+			else
+			{
+				set_minutes(0);
+
+				int hours = get_hours() + 1;
+				if (hours < 24)
+				{
+					set_hours(hours);
+				}
+				else
+				{
+					set_hours(0);
+
+					int dayofweek = get_dayofweek() + 1;
+					if (dayofweek <= 7)
+					{
+						set_dayofweek(dayofweek);
+					}
+					else
+					{
+						set_dayofweek(1);
+					}
+
+					int dayofmonth = get_dayofmonth() + 1;
+					if (dayofmonth <= gregorian_days_in_month(get_month(), get_year() + 2000))
+					{
+						set_dayofmonth(dayofmonth);
+					}
+					else
+					{
+						set_dayofmonth(1);
+
+						int month = get_month() + 1;
+						if (month <= 12)
+						{
+							set_month(month);
+						}
+						else
+						{
+							set_month(1);
+
+							int year = get_year() + 1;
+							if (year <= 99)
+							{
+								set_year(year);
+							}
+							else
+							{
+								set_year(0);
+
+								if (century_count_enabled())
+								{
+									set_century((get_century() + 1) % 100);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ((m_data[REG_ALARM_SECONDS] == m_data[REG_SECONDS] || (m_data[REG_ALARM_SECONDS] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+			(m_data[REG_ALARM_MINUTES] == m_data[REG_MINUTES] || (m_data[REG_ALARM_MINUTES] & ALARM_DONTCARE) == ALARM_DONTCARE) &&
+			(m_data[REG_ALARM_HOURS] == m_data[REG_HOURS] || (m_data[REG_ALARM_HOURS] & ALARM_DONTCARE) == ALARM_DONTCARE))
+		{
+			// set the alarm interrupt flag AF
+			m_data[REG_C] |= REG_C_AF;
+		}
+
+		// defer the update end sequence if update cycle time is non-zero
+		if (m_tuc)
+		{
+			m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
+			return;
+		}
+	}
+
+	// clear update in progress and set update ended
+	m_data[REG_A] &= ~REG_A_UIP;
+	m_data[REG_C] |= REG_C_UF;
+
+	update_irq();
+}
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
@@ -266,7 +264,6 @@ void mc146818_device::nvram_default()
 	if(m_hour)
 		m_data[REG_B] |= REG_B_24_12;
 
-	set_base_datetime();
 	update_timer();
 	update_irq();
 }
@@ -277,13 +274,17 @@ void mc146818_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_read(emu_file &file)
+bool mc146818_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	if (file.read(&m_data[0], size, actual) || actual != size)
+		return false;
 
-	set_base_datetime();
 	update_timer();
 	update_irq();
+
+	return true;
 }
 
 
@@ -292,9 +293,11 @@ void mc146818_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void mc146818_device::nvram_write(emu_file &file)
+bool mc146818_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], data_size());
+	size_t size = data_size();
+	size_t actual;
+	return !file.write(&m_data[0], size, actual) && actual == size;
 }
 
 
@@ -448,36 +451,29 @@ void mc146818_device::set_century(int century)
 
 
 //-------------------------------------------------
-//  set_base_datetime - update clock with real time
+//  rtc_clock_updated - update clock with real time
 //-------------------------------------------------
 
-void mc146818_device::set_base_datetime()
+void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	system_time systime;
-	system_time::full_time current_time;
-
-	machine().base_datetime(systime);
-
-	current_time = (m_use_utc) ? systime.utc_time: systime.local_time;
-
 //  logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
-//          current_time.year % 100, current_time.month + 1, current_time.mday,
-//          current_time.hour,current_time.minute, current_time.second);
+//          year, month, day,
+//          hour, minute, second);
 
-	set_seconds(current_time.second);
-	set_minutes(current_time.minute);
-	set_hours(current_time.hour);
-	set_dayofweek(current_time.weekday + 1);
-	set_dayofmonth(current_time.mday);
-	set_month(current_time.month + 1);
+	set_seconds(second);
+	set_minutes(minute);
+	set_hours(hour);
+	set_dayofweek(day_of_week);
+	set_dayofmonth(day);
+	set_month(month);
 
-	if(m_binyear)
-		set_year((current_time.year - m_epoch) % (m_data[REG_B] & REG_B_DM ? 0x100 : 100)); // pcd actually depends on this
+	if (m_epoch != 0)
+		set_year((year - m_epoch) % (m_data[REG_B] & REG_B_DM ? 0x100 : 100)); // pcd actually depends on this
 	else
-		set_year((current_time.year - m_epoch) % 100);
+		set_year(year % 100);
 
 	if (m_century_index >= 0)
-		set_century(current_time.year / 100);
+		set_century(year / 100);
 }
 
 

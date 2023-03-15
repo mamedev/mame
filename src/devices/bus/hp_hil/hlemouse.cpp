@@ -10,7 +10,7 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device, "hp_46060b", "HP 46060B Mouse")
+DEFINE_DEVICE_TYPE(HP_46060B_MOUSE, bus::hp_hil::hle_hp_46060b_device, "hp_46060b", "HP 46060B Mouse")
 
 namespace bus::hp_hil {
 

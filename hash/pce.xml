@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="pce" description="NEC PC-Engine cartridges">
+<softwarelist name="pce" description="NEC PC Engine HuCards">
 	<software name="1943kai">
 		<description>1943 Kai</description>
 		<year>1991</year>
@@ -67,6 +67,7 @@ license:CC0
 		<info name="serial" value="NAPH-1011"/>
 		<info name="release" value="19900928"/>
 		<info name="alt_title" value="アフターバーナーII"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="after burner ii (japan).pce" size="524288" crc="ca72a828" sha1="50b9d22fe5179aee5cb95022472714ef8483841f" />
@@ -281,6 +282,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Looks like a source code revision. Need to determine if this or parent is newer version. -->
 	<software name="benkei1" cloneof="benkei">
 		<description>Benkei Gaiden (alt)</description>
 		<year>1989</year>
@@ -929,7 +931,7 @@ license:CC0
 	<software name="dragnegg">
 		<description>Dragon Egg!</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91003"/>
 		<info name="release" value="19910927"/>
 		<info name="alt_title" value="どらごんEGG!"/>
@@ -1567,7 +1569,7 @@ license:CC0
 	<software name="xserd">
 		<description>Hisou Kihei - Xserd</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90002"/>
 		<info name="release" value="19900223"/>
 		<info name="alt_title" value="飛装騎兵カイザード"/>
@@ -1760,7 +1762,7 @@ license:CC0
 	<software name="shubibi2">
 		<description>Kaizou Choujin Shubibinman 2 - Aratanaru Teki</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91001"/>
 		<info name="release" value="19910427"/>
 		<info name="alt_title" value="改造町人 シュビビンマン2 ―新たなる敵―"/>
@@ -1802,7 +1804,7 @@ license:CC0
 	<software name="kickball">
 		<description>Kickball</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90004"/>
 		<info name="release" value="19901123"/>
 		<info name="alt_title" value="キックボール"/>
@@ -1870,7 +1872,7 @@ license:CC0
 	</software>
 
 	<software name="proyak89">
-		<description>Kore Ga Pro Yakyuu '89</description>
+		<description>Kore ga Pro Yakyuu '89</description>
 		<year>1989</year>
 		<publisher>Intec</publisher>
 		<info name="serial" value="IG89002"/>
@@ -1884,7 +1886,7 @@ license:CC0
 	</software>
 
 	<software name="proyak90">
-		<description>Kore Ga Pro Yakyuu '90</description>
+		<description>Kore ga Pro Yakyuu '90</description>
 		<year>1990</year>
 		<publisher>Intec</publisher>
 		<info name="serial" value="IG90001"/>
@@ -2124,7 +2126,7 @@ license:CC0
 	</software>
 
 	<software name="wataru">
-		<description>Majin Eiyuu Den Wataru</description>
+		<description>Mashin Eiyuuden Wataru</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63012"/>
@@ -2336,27 +2338,13 @@ license:CC0
 	<software name="motorod2">
 		<description>Moto Roader II</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91002"/>
 		<info name="release" value="19910329"/>
 		<info name="alt_title" value="モトローダーII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="moto roader ii (japan).pce" size="393216" crc="0b7f6e5f" sha1="101f6e3c90b314496b73ee9feab9a98f8d9b7821" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="motorod2a" cloneof="motorod2">
-		<description>Moto Roader II (alt)</description>
-		<year>1991</year>
-		<publisher>Masiya</publisher>
-		<info name="serial" value="NCS91002"/>
-		<info name="release" value="19910329"/>
-		<info name="alt_title" value="モトローダーII"/>
-		<part name="cart" interface="pce_cart">
-			<dataarea name="rom" size="393216">
-				<rom name="moto roader ii (japan) [a].pce" size="393216" crc="4ba525ba" sha1="e1288b2ba9875be14cd16ad7e590fc002a42290e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2434,7 +2422,7 @@ license:CC0
 	<software name="nazomasq">
 		<description>Nazo no Masquerade</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90003"/>
 		<info name="release" value="19900302"/>
 		<info name="alt_title" value="謎のマスカレード"/>
@@ -2645,6 +2633,7 @@ license:CC0
 		<info name="serial" value="NAPH-1010"/>
 		<info name="release" value="19900831"/>
 		<info name="alt_title" value="オペレーション ウルフ"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="operation wolf (japan).pce" size="524288" crc="ff898f87" sha1="da2a28e2961fa295c4b8f55bd5a6ce6f1c58beb7" />
@@ -2687,6 +2676,7 @@ license:CC0
 		<info name="serial" value="NAPH-1016"/>
 		<info name="release" value="19901221"/>
 		<info name="alt_title" value="アウトラン"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="out run (japan).pce" size="524288" crc="e203f223" sha1="4db6d354171a6e5f81d17d11e1aca7278a1fa95e" />
@@ -2778,7 +2768,7 @@ license:CC0
 	</software>
 
 	<software name="parodius">
-		<description>Parodius da! - Shinwa Kara Owarai He</description>
+		<description>Parodius Da! - Shinwa kara Owarai e</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KM92003"/>
@@ -2833,6 +2823,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Looks like a source code revision. Need to determine if this or parent is newer version. -->
 	<software name="pcgenja" cloneof="pcgenj">
 		<description>PC Genjin - Pithecanthropus Computerurus (alt)</description>
 		<year>1989</year>
@@ -3230,7 +3221,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rtypep2">
+	<software name="rtypep2a" cloneof="rtypep2">
 		<description>R-Type Part-2</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -3244,9 +3235,9 @@ license:CC0
 		</part>
 	</software>
 
-  <!-- later revision, password parser bugfix for passwords with 8 lives -->
-	<software name="rtypep21" cloneof="rtypep2">
-		<description>R-Type Part-2 (alt)</description>
+<!-- later revision, password parser bugfix for passwords with 8 lives -->
+	<software name="rtypep2">
+		<description>R-Type Part-2 (v1.1)</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63009"/>
@@ -3254,7 +3245,7 @@ license:CC0
 		<info name="alt_title" value="アールタイプ II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="r-type part-2 (japan) [a].pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" />
+				<rom name="r-type part-2 (japan) (v1.1).pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3805,7 +3796,7 @@ license:CC0
 		<publisher>Taito</publisher>
 		<info name="serial" value="TP02006"/>
 		<info name="release" value="19900126"/>
-		<info name="alt_title" value="タイトーチェイスH. Q. "/>
+		<info name="alt_title" value="タイトーチェイスH.Q."/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
 				<rom name="taito chase h.q. (japan).pce" size="393216" crc="6f4fd790" sha1="f4cd413a1f87027194b7cadfbaaa714c137e877f" />
@@ -3942,6 +3933,7 @@ license:CC0
 		<info name="serial" value="NAPH-1015"/>
 		<info name="release" value="19901207"/>
 		<info name="alt_title" value="サンダーブレード"/>
+		<info name="usage" value="Supports XE-1AJ or XE-1AP analog controller via XHE-3 adapter." />
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="thunder blade (japan).pce" size="524288" crc="ddc3e809" sha1="553f8026dd68e85cd17855adbf920b3971acfdc4" />
@@ -4260,7 +4252,7 @@ license:CC0
 	<software name="wallaby">
 		<description>Wallaby!! - Usagi no Kuni no Kangaroo Race</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90005"/>
 		<info name="release" value="19901214"/>
 		<info name="alt_title" value="ワラビー!! ウサギの国のカンガルーレース"/>
@@ -4427,7 +4419,7 @@ license:CC0
 
 
 	<software name="cdsysb" cloneof="cdsys">
-		<description>CD-Rom System Card (v1.0)</description>
+		<description>CD-ROM System Card (v1.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4438,7 +4430,7 @@ license:CC0
 	</software>
 
 	<software name="cdsysa" cloneof="cdsys">
-		<description>CD-Rom System Card (v2.0)</description>
+		<description>CD-ROM System Card (v2.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4449,7 +4441,7 @@ license:CC0
 	</software>
 
 	<software name="cdsys">
-		<description>CD-Rom System Card (v2.1)</description>
+		<description>CD-ROM System Card (v2.1)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
@@ -4471,7 +4463,7 @@ license:CC0
 	</software>
 
 	<software name="scdsys">
-		<description>Super CD-Rom System Card (v3.0)</description>
+		<description>CD-ROM² Super System Card (v3.0)</description>
 		<year>19??</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">

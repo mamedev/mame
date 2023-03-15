@@ -6,7 +6,7 @@ local exports = {}
 exports.name = "layout"
 exports.version = "0.0.1"
 exports.description = "Layout helper plugin"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local layout = exports
@@ -17,18 +17,22 @@ function layout.startplugin()
 		local env = {
 			machine = manager.machine,
 			emu = {
+				attotime = emu.attotime,
 				render_bounds = emu.render_bounds,
 				render_color = emu.render_color,
 				print_verbose = emu.print_verbose,
 				print_error = emu.print_error,
+				print_warning = emu.print_warning,
 				print_info = emu.print_info,
 				print_debug = emu.print_debug },
 			file = file,
 			print = print,
 			pairs = pairs,
 			ipairs = ipairs,
-			string = { format = string.format },
-			table = { insert = table.insert, remove = table.remove } }
+			string = string,
+			tonumber = tonumber,
+			tostring = tostring,
+			table = table }
 		local script, err = load(script, script, "t", env)
 		if not script then
 			emu.print_verbose("error loading layout script " .. err)

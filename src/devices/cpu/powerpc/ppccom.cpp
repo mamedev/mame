@@ -212,6 +212,7 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
+	, c_serial_clock(0)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -227,6 +228,7 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_dasm(powerpc_disassembler())
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;
@@ -717,6 +719,8 @@ void ppc_device::device_start()
 
 	m_debugger_temp = 0;
 
+	m_serial_clock = 0;
+
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
@@ -751,24 +755,28 @@ void ppc_device::device_start()
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
 
+	m_serial_clock = c_serial_clock != 0 ? c_serial_clock : 3'686'400; // TODO: get rid of this hard-coded magic number
+	if (m_serial_clock > m_system_clock / 2)
+		fatalerror("%s: PPC: serial clock (%d) must not be more than half of the system clock (%d)\n", tag(), m_serial_clock, m_system_clock);
+
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
-		m_decrementer_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::decrementer_int_callback), this));
+		m_decrementer_int_timer = timer_alloc(FUNC(ppc_device::decrementer_int_callback), this);
 
 	/* and for the 4XX interrupts if needed */
 	if (m_cap & PPCCAP_4XX)
 	{
-		m_fit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_fit_callback), this));
-		m_pit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_pit_callback), this));
-		m_spu.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_spu_callback), this));
+		m_fit_timer = timer_alloc(FUNC(ppc_device::ppc4xx_fit_callback), this);
+		m_pit_timer = timer_alloc(FUNC(ppc_device::ppc4xx_pit_callback), this);
+		m_spu.timer = timer_alloc(FUNC(ppc_device::ppc4xx_spu_callback), this);
 	}
 
 	if (m_cap & PPCCAP_4XX)
 	{
-		m_buffered_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
-		m_buffered_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this));
+		m_buffered_dma_timer[0] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[1] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[2] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
+		m_buffered_dma_timer[3] = timer_alloc(FUNC(ppc_device::ppc4xx_buffered_dma_callback), this);
 
 		m_buffered_dma_rate[0] = 10000;
 		m_buffered_dma_rate[1] = 10000;
@@ -842,7 +850,6 @@ void ppc_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
-	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
 	set_icountptr(m_core->icount);
@@ -1150,7 +1157,7 @@ void ppc_device::device_reset()
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor)
 		{
-			decrementer_int_callback(nullptr, 0);
+			decrementer_int_callback(0);
 		}
 	}
 
@@ -1834,9 +1841,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(nullptr, false);
+					ppc4xx_fit_callback(false);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(nullptr, false);
+					ppc4xx_pit_callback(false);
 				return;
 
 			/* timer status register */
@@ -1849,7 +1856,7 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(nullptr, false);
+				ppc4xx_pit_callback(false);
 				return;
 
 			/* timebase */
@@ -2684,7 +2691,7 @@ void ppc_device::ppc4xx_spu_timer_reset()
 	/* if we're enabled, reset at the current baud rate */
 	if (enabled)
 	{
-		attotime clockperiod = attotime::from_hz((m_dcr[DCR4XX_IOCR] & 0x02) ? 3686400 : 33333333);
+		attotime clockperiod = attotime::from_hz((m_dcr[DCR4XX_IOCR] & 0x02) ? m_serial_clock : m_system_clock);
 		int divisor = ((m_spu.regs[SPU4XX_BAUD_DIVISOR_H] * 256 + m_spu.regs[SPU4XX_BAUD_DIVISOR_L]) & 0xfff) + 1;
 		int bpc = 7 + ((m_spu.regs[SPU4XX_CONTROL] & 8) >> 3) + 1 + (m_spu.regs[SPU4XX_CONTROL] & 1);
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);

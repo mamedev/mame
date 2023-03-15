@@ -1,5 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
+
+template <hyperstone_device::reg_bank DST_GLOBAL>
+uint64_t hyperstone_device::get_double_word(uint8_t dst_code, uint8_t dstf_code) const
+{
+	if(DST_GLOBAL)
+		return (uint64_t)m_core->global_regs[dst_code] << 32 | m_core->global_regs[dstf_code];
+	else
+		return (uint64_t)m_core->local_regs[dst_code] << 32 | m_core->local_regs[dstf_code];
+}
+
+template <hyperstone_device::reg_bank DST_GLOBAL>
+void hyperstone_device::set_double_word(uint8_t dst_code, uint8_t dstf_code, uint64_t val)
+{
+	if(DST_GLOBAL)
+	{
+		m_core->global_regs[dst_code] = (uint32_t)(val >> 32);
+		m_core->global_regs[dstf_code] = (uint32_t)val;
+	}
+	else
+	{
+		m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
+		m_core->local_regs[dstf_code] = (uint32_t)val;
+	}
+}
+
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_chk()
 {
@@ -97,7 +122,7 @@ void hyperstone_device::hyperstone_movd()
 	else // Rd doesn't denote PC and Rs doesn't denote SR
 	{
 		SR &= ~(Z_MASK | N_MASK);
-		if (concat_64(sreg, sregf) == 0)
+		if (sreg == 0 && sregf == 0)
 			SR |= Z_MASK;
 		SR |= SIGN_TO_N(sreg);
 
@@ -134,9 +159,7 @@ void hyperstone_device::hyperstone_divsu()
 	}
 
 	const uint32_t sreg = (SRC_GLOBAL ? m_core->global_regs : m_core->local_regs)[src_code];
-	const uint32_t dreg = (DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dst_code];
-	const uint32_t dregf = (DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dstf_code];
-	const uint64_t dividend = concat_64(dreg, dregf);
+	const uint64_t dividend = get_double_word<DST_GLOBAL>(dst_code, dstf_code);
 
 	if (sreg == 0 || (SIGNED && (dividend & 0x8000000000000000U)))
 	{
@@ -1158,14 +1181,10 @@ void hyperstone_device::hyperstone_shrdi()
 {
 	check_delay_PC();
 
-	const uint32_t fp = GET_FP;
-	const uint32_t code = DST_CODE;
-	const uint32_t dst_code = (code + fp) & 0x3f;
-	const uint32_t dstf_code = (code + 1 + fp) & 0x3f;
-	uint32_t high_order = m_core->local_regs[dst_code];
-	const uint32_t low_order  = m_core->local_regs[dstf_code];
+	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
+	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 
-	uint64_t val = concat_64(high_order, low_order);
+	uint64_t val = get_double_word<LOCAL>(dst_code, dstf_code);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1177,14 +1196,11 @@ void hyperstone_device::hyperstone_shrdi()
 		val >>= n;
 	}
 
-	high_order = extract_64hi(val);
-
 	if (val == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
+	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = high_order;
-	m_core->local_regs[dstf_code] = extract_64lo(val);
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1196,9 +1212,8 @@ void hyperstone_device::hyperstone_shrd()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t src_code = (SRC_CODE + fp) & 0x3f;
-	const uint32_t d_code = DST_CODE;
-	const uint32_t dst_code = (d_code + fp) & 0x3f;
-	const uint32_t dstf_code = (d_code + 1 + fp) & 0x3f;
+	const uint32_t dst_code = (DST_CODE + fp) & 0x3f;
+	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 
 	if (src_code == dst_code || src_code == dstf_code)
 	{
@@ -1206,7 +1221,7 @@ void hyperstone_device::hyperstone_shrd()
 		return;
 	}
 
-	uint64_t val = concat_64(m_core->local_regs[dst_code], m_core->local_regs[dstf_code]);
+	uint64_t val = get_double_word<LOCAL>(dst_code, dstf_code);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1222,8 +1237,7 @@ void hyperstone_device::hyperstone_shrd()
 		SR |= Z_MASK;
 	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_core->local_regs[dstf_code] = (uint32_t)val;
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1261,7 +1275,7 @@ void hyperstone_device::hyperstone_sardi()
 	const uint32_t dst_code = (DST_CODE + GET_FP) & 0x3f;
 	const uint32_t dstf_code = (dst_code + 1) & 0x3f;
 
-	uint64_t val = concat_64(m_core->local_regs[dst_code], m_core->local_regs[dstf_code]);
+	uint64_t val = get_double_word<LOCAL>(dst_code, dstf_code);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1279,10 +1293,9 @@ void hyperstone_device::hyperstone_sardi()
 
 	if (val == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(m_core->local_regs[dst_code]);
+	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_core->local_regs[dstf_code] = (uint32_t)val;
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1303,7 +1316,7 @@ void hyperstone_device::hyperstone_sard()
 		return;
 	}
 
-	uint64_t val = concat_64(m_core->local_regs[dst_code], m_core->local_regs[dstf_code]);
+	uint64_t val = get_double_word<LOCAL>(dst_code, dstf_code);
 
 	SR &= ~(C_MASK | Z_MASK | N_MASK);
 
@@ -1313,22 +1326,18 @@ void hyperstone_device::hyperstone_sard()
 	{
 		SR |= (val >> (n - 1)) & 1;
 
-		uint32_t sign_bit = val >> 63;
-
+		const uint64_t sign_bit = val >> 63;
 		val >>= n;
 
 		if (sign_bit)
-		{
 			val |= 0xffffffff00000000L << (32 - n);
-		}
 	}
 
 	if (val == 0)
 		SR |= Z_MASK;
 	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = (uint32_t)(val >> 32);
-	m_core->local_regs[dstf_code] = (uint32_t)val;
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1375,10 +1384,10 @@ void hyperstone_device::hyperstone_shldi()
 	const uint32_t code = DST_CODE;
 	const uint32_t dst_code = (code + fp) & 0x3f;
 	const uint32_t dstf_code = (code + 1 + fp) & 0x3f;
-	uint32_t high_order = m_core->local_regs[dst_code];
-	uint32_t low_order  = m_core->local_regs[dstf_code];
+	const uint32_t high_order = m_core->local_regs[dst_code];
+	const uint32_t low_order  = m_core->local_regs[dstf_code];
 
-	uint64_t val = concat_64(high_order, low_order);
+	uint64_t val = (uint64_t)high_order << 32 | low_order;
 
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
@@ -1397,8 +1406,7 @@ void hyperstone_device::hyperstone_shldi()
 		SR |= Z_MASK;
 	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = extract_64hi(val);
-	m_core->local_regs[dstf_code] = extract_64lo(val);
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1421,10 +1429,10 @@ void hyperstone_device::hyperstone_shld()
 		return;
 	}
 
-	uint32_t high_order = m_core->local_regs[dst_code];
-	uint32_t low_order  = m_core->local_regs[dstf_code];
+	const uint32_t high_order = m_core->local_regs[dst_code];
+	const uint32_t low_order  = m_core->local_regs[dstf_code];
 
-	uint64_t val = concat_64(high_order, low_order);
+	uint64_t val = (uint64_t)high_order << 32 | low_order;
 
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
@@ -1443,8 +1451,7 @@ void hyperstone_device::hyperstone_shld()
 		SR |= Z_MASK;
 	SR |= SIGN64_TO_N(val);
 
-	m_core->local_regs[dst_code] = extract_64hi(val);
-	m_core->local_regs[dstf_code] = extract_64lo(val);
+	set_double_word<LOCAL>(dst_code, dstf_code, val);
 
 	m_core->icount -= m_core->clock_cycles_2;
 }
@@ -1459,7 +1466,7 @@ void hyperstone_device::hyperstone_shl()
 
 	uint32_t n    = m_core->local_regs[src_code & 0x3f] & 0x1f;
 	uint32_t base = m_core->local_regs[dst_code & 0x3f]; /* registers offset by frame pointer */
-	uint64_t mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
+	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
 
 	SR &= ~(C_MASK | V_MASK | Z_MASK | N_MASK);
 
@@ -1484,14 +1491,7 @@ void hyperstone_device::hyperstone_testlz()
 
 	const uint32_t fp = GET_FP;
 	const uint32_t sreg = m_core->local_regs[(SRC_CODE + fp) & 0x3f];
-	uint32_t zeros = 0;
-	for (uint32_t mask = 0x80000000; mask != 0; mask >>= 1 )
-	{
-		if (sreg & mask)
-			break;
-		else
-			zeros++;
-	}
+	const uint32_t zeros = count_leading_zeros_32(sreg);
 
 	m_core->local_regs[(DST_CODE + fp) & 0x3f] = zeros;
 
@@ -1513,8 +1513,7 @@ void hyperstone_device::hyperstone_rol()
 	const uint32_t mask = (uint32_t)(0xffffffff00000000ULL >> n);
 #endif
 
-	if (n)
-		val = (val << n) | (val >> (32 - n));
+	val = rotl_32(val, n);
 
 #ifdef MISSIONCRAFT_FLAGS
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
@@ -2069,7 +2068,7 @@ void hyperstone_device::hyperstone_shli()
 		SR |= (val & (0x80000000 >> (n - 1))) ? 1 : 0;
 	}
 
-	uint64_t mask = ((1U << (32 - n)) - 1) ^ 0xffffffff;
+	uint32_t mask = n ? 0xffffffff << (32 - n) : 0;
 	uint32_t val2 = val << n;
 
 	if (((val & mask) && (!(val2 & 0x80000000))) || (((val & mask) ^ mask) && (val2 & 0x80000000)))
@@ -2105,17 +2104,14 @@ void hyperstone_device::hyperstone_mulsu()
 
 	const uint32_t dreg = (DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dst_code];
 	const uint32_t sreg = (SRC_GLOBAL ? m_core->global_regs : m_core->local_regs)[src_code];
-	const uint64_t double_word = SIGNED ? (uint64_t)((int64_t)(int32_t)sreg * (int64_t)(int32_t)dreg) : ((uint64_t)sreg *(uint64_t)dreg);
-
-	const uint32_t high_order = (uint32_t)(double_word >> 32);
+	const uint64_t double_word = SIGNED ? (uint64_t)mul_32x32(sreg, dreg) : mulu_32x32(sreg, dreg);
 
 	SR &= ~(Z_MASK | N_MASK);
 	if (double_word == 0)
 		SR |= Z_MASK;
-	SR |= SIGN_TO_N(high_order);
+	SR |= SIGN64_TO_N(double_word);
 
-	(DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dst_code] = high_order;
-	(DST_GLOBAL ? m_core->global_regs : m_core->local_regs)[dstf_code] = (uint32_t)double_word;
+	set_double_word<DST_GLOBAL>(dst_code, dstf_code, double_word);
 
 	m_core->icount -= m_core->clock_cycles_6;
 	if(SIGNED == IS_SIGNED && ((int32_t) sreg >= -0x8000 && (int32_t) sreg <= 0x7fff) && ((int32_t) dreg >= -0x8000 && (int32_t) dreg <= 0x7fff))
@@ -2238,21 +2234,13 @@ void hyperstone_device::hyperstone_extend()
 
 		// unsigned multiplication, double word product
 		case EMULU:
-		{
-			const uint64_t result = (uint64_t)vals * (uint64_t)vald;
-			m_core->global_regs[14] = (uint32_t)(result >> 32);
-			m_core->global_regs[15] = (uint32_t)result;
+			set_double_word<GLOBAL>(14, 15, mulu_32x32(vals, vald));
 			break;
-		}
 
 		// signed multiplication, double word product
 		case EMULS:
-		{
-			const int64_t result = (int64_t)(int32_t)vals * (int64_t)(int32_t)vald;
-			m_core->global_regs[14] = (uint32_t)(result >> 32);
-			m_core->global_regs[15] = (uint32_t)result;
+			set_double_word<GLOBAL>(14, 15, mul_32x32(vals, vald));
 			break;
-		}
 
 		// signed multiply/add, single word product sum
 		case EMAC:
@@ -2261,54 +2249,45 @@ void hyperstone_device::hyperstone_extend()
 
 		// signed multiply/add, double word product sum
 		case EMACD:
-		{
-			int64_t result = (int64_t)concat_64(m_core->global_regs[14], m_core->global_regs[15]) + (int64_t)((int64_t)(int32_t)vals * (int64_t)(int32_t)vald);
-			m_core->global_regs[14] = (uint32_t)(result >> 32);
-			m_core->global_regs[15] = (uint32_t)result;
+			set_double_word<GLOBAL>(14, 15, get_double_word<GLOBAL>(14, 15) + mul_32x32(vals, vald));
 			break;
-		}
 
-		// signed multiply/substract, single word product difference
+		// signed multiply/subtract, single word product difference
 		case EMSUB:
-			m_core->global_regs[15] = (int32_t)m_core->global_regs[15] - ((int32_t)vals * (int32_t)vald);
+			m_core->global_regs[15] -= (int32_t)vals * (int32_t)vald;
 			break;
 
-		// signed multiply/substract, double word product difference
+		// signed multiply/subtract, double word product difference
 		case EMSUBD:
-		{
-			int64_t result = (int64_t)concat_64(m_core->global_regs[14], m_core->global_regs[15]) - (int64_t)((int64_t)(int32_t)vals * (int64_t)(int32_t)vald);
-			m_core->global_regs[14] = (uint32_t)(result >> 32);
-			m_core->global_regs[15] = (uint32_t)result;
+			set_double_word<GLOBAL>(14, 15, get_double_word<GLOBAL>(14, 15) - mul_32x32(vals, vald));
 			break;
-		}
 
 		// signed half-word multiply/add, single word product sum
 		case EHMAC:
-			m_core->global_regs[15] = (int32_t)m_core->global_regs[15] + ((int32_t)(vald >> 16) * (int32_t)(vals >> 16)) + ((int32_t)(vald & 0xffff) * (int32_t)(vals & 0xffff));
+			m_core->global_regs[15] = m_core->global_regs[15] + get_lhs(vald) * get_lhs(vals) + get_rhs(vald) * get_rhs(vals);
 			break;
 
 		// signed half-word multiply/add, double word product sum
 		case EHMACD:
 		{
-			int64_t result = (int64_t)concat_64(m_core->global_regs[14], m_core->global_regs[15]) + (int64_t)((int64_t)(int32_t)(vald >> 16) * (int64_t)(int32_t)(vals >> 16)) + ((int64_t)(int32_t)(vald & 0xffff) * (int64_t)(int32_t)(vals & 0xffff));
-			m_core->global_regs[14] = (uint32_t)(result >> 32);
-			m_core->global_regs[15] = (uint32_t)result;
+			int64_t result = get_double_word<GLOBAL>(14, 15) + int64_t(get_lhs(vald) * get_lhs(vals)) + int64_t(get_rhs(vald) * get_rhs(vals));
+			set_double_word<GLOBAL>(14, 15, result);
 			break;
 		}
 
 		// half-word complex multiply
 		case EHCMULD:
-			m_core->global_regs[14] = ((vald >> 16) * (vals >> 16    )) - ((vald & 0xffff) * (vals &  0xffff));
-			m_core->global_regs[15] = ((vald >> 16) * (vals &  0xffff)) + ((vald & 0xffff) * (vals >> 16    ));
+			m_core->global_regs[14] = get_lhs(vald) * get_lhs(vals) - get_rhs(vald) * get_rhs(vals);
+			m_core->global_regs[15] = get_lhs(vald) * get_rhs(vals) + get_rhs(vald) * get_lhs(vals);
 			break;
 
 		// half-word complex multiply/add
 		case EHCMACD:
-			m_core->global_regs[14] += ((vald >> 16) * (vals >> 16    )) - ((vald & 0xffff) * (vals &  0xffff));
-			m_core->global_regs[15] += ((vald >> 16) * (vals &  0xffff)) + ((vald & 0xffff) * (vals >> 16    ));
+			m_core->global_regs[14] += get_lhs(vald) * get_lhs(vals) - get_rhs(vald) * get_rhs(vals);
+			m_core->global_regs[15] += get_lhs(vald) * get_rhs(vals) + get_rhs(vald) * get_lhs(vals);
 			break;
 
-		// half-word (complex) add/substract
+		// half-word (complex) add/subtract
 		// Ls is not used and should denote the same register as Ld
 		case EHCSUMD:
 		{
@@ -2319,7 +2298,7 @@ void hyperstone_device::hyperstone_extend()
 			break;
 		}
 
-		// half-word (complex) add/substract with fixed point adjustment
+		// half-word (complex) add/subtract with fixed point adjustment
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTD:
 		{
@@ -2330,7 +2309,7 @@ void hyperstone_device::hyperstone_extend()
 			break;
 		}
 
-		// half-word (complex) add/substract with fixed point adjustment and shift
+		// half-word (complex) add/subtract with fixed point adjustment and shift
 		// Ls is not used and should denote the same register as Ld
 		case EHCFFTSD:
 		{

@@ -113,7 +113,7 @@ newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const ch
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_ctc(*this, Z80CTC_TAG),
 	m_acia(*this, MC6850_TAG),
-	m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
+	m_exp(*this, "exp"),
 	m_rom(*this, "eim"),
 	m_ram(*this, RAM_TAG)
 {

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
@@ -10,7 +10,7 @@
 #if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #	if ENTRY_CONFIG_USE_WAYLAND
 #		include <wayland-egl.h>
-#	endif 
+#	endif
 #elif BX_PLATFORM_WINDOWS
 #	define SDL_MAIN_HANDLED
 #endif
@@ -65,51 +65,18 @@ namespace entry
 #		else
 		return (void*)wmi.info.x11.window;
 #		endif
-#	elif BX_PLATFORM_OSX
+#	elif BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		return wmi.info.cocoa.window;
 #	elif BX_PLATFORM_WINDOWS
 		return wmi.info.win.window;
-#	elif BX_PLATFORM_STEAMLINK
-		return wmi.info.vivante.window;
+#   elif BX_PLATFORM_ANDROID
+		return wmi.info.android.window;
 #	endif // BX_PLATFORM_
-	}
-
-	inline bool sdlSetWindow(SDL_Window* _window)
-	{
-		SDL_SysWMinfo wmi;
-		SDL_VERSION(&wmi.version);
-		if (!SDL_GetWindowWMInfo(_window, &wmi) )
-		{
-			return false;
-		}
-
-		bgfx::PlatformData pd;
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
-#		if ENTRY_CONFIG_USE_WAYLAND
-		pd.ndt          = wmi.info.wl.display;
-#		else
-		pd.ndt          = wmi.info.x11.display;
-#		endif
-#	elif BX_PLATFORM_OSX
-		pd.ndt          = NULL;
-#	elif BX_PLATFORM_WINDOWS
-		pd.ndt          = NULL;
-#	elif BX_PLATFORM_STEAMLINK
-		pd.ndt          = wmi.info.vivante.display;
-#	endif // BX_PLATFORM_
-		pd.nwh          = sdlNativeWindowHandle(_window);
-
-		pd.context      = NULL;
-		pd.backBuffer   = NULL;
-		pd.backBufferDS = NULL;
-		bgfx::setPlatformData(pd);
-
-		return true;
 	}
 
 	static void sdlDestroyWindow(SDL_Window* _window)
 	{
-		if(!_window) 
+		if(!_window)
 			return;
 #	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #		if ENTRY_CONFIG_USE_WAYLAND
@@ -161,7 +128,7 @@ namespace entry
 
 	static void initTranslateKey(uint16_t _sdl, Key::Enum _key)
 	{
-		BX_CHECK(_sdl < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _sdl);
+		BX_ASSERT(_sdl < BX_COUNTOF(s_translateKey), "Out of bounds %d.", _sdl);
 		s_translateKey[_sdl&0xff] = (uint8_t)_key;
 	}
 
@@ -517,7 +484,6 @@ namespace entry
 
 			s_userEventStart = SDL_RegisterEvents(7);
 
-			sdlSetWindow(m_window[0]);
 			bgfx::renderFrame();
 
 			m_thread.init(MainThreadEntry::threadFunc, &m_mte);
@@ -540,7 +506,7 @@ namespace entry
 				bx::AllocatorI* allocator = getAllocator();
 				uint32_t size = (uint32_t)bx::getSize(reader);
 				void* data = BX_ALLOC(allocator, size + 1);
-				bx::read(reader, data, size);
+				bx::read(reader, data, size, bx::ErrorAssert{});
 				bx::close(reader);
 				((char*)data)[size] = '\0';
 
@@ -1164,6 +1130,31 @@ namespace entry
 	void setMouseLock(WindowHandle _handle, bool _lock)
 	{
 		sdlPostEvent(SDL_USER_WINDOW_MOUSE_LOCK, _handle, NULL, _lock);
+	}
+
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		return sdlNativeWindowHandle(s_ctx.m_window[_handle.idx]);
+	}
+
+	void* getNativeDisplayHandle()
+	{
+		SDL_SysWMinfo wmi;
+		SDL_VERSION(&wmi.version);
+		if (!SDL_GetWindowWMInfo(s_ctx.m_window[0], &wmi) )
+		{
+			return NULL;
+		}
+
+#	if BX_PLATFORM_LINUX || BX_PLATFORM_BSD
+#		if ENTRY_CONFIG_USE_WAYLAND
+		return wmi.info.wl.display;
+#		else
+		return wmi.info.x11.display;
+#		endif // ENTRY_CONFIG_USE_WAYLAND
+#	else
+		return NULL;
+#	endif // BX_PLATFORM_*
 	}
 
 	int32_t MainThreadEntry::threadFunc(bx::Thread* _thread, void* _userData)

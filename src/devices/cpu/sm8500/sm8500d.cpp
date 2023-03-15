@@ -30,9 +30,9 @@ const char *const sm8500_disassembler::s_mnemonic[] =
 };
 
 const uint32_t sm8500_disassembler::s_flags[] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, STEP_COND, STEP_COND,
 	0, 0, 0, 0, 0, 0, 0, 0, STEP_OVER, STEP_OVER, 0,
-	0, 0, 0, 0, 0, 0, STEP_OVER, 0,
+	0, 0, 0, 0, 0, 0, STEP_COND, 0,
 	0, 0, 0, 0, 0, STEP_OVER, 0, 0,
 	STEP_OUT, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, STEP_OUT, 0, 0,
@@ -576,5 +576,5 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		util::stream_format(stream, "%s", s_mnemonic[ instr->mnemonic ]);
 	}
 
-	return (pos - pc) | s_flags[instr->mnemonic] | SUPPORTED;
+	return (pos - pc) | (instr->arguments == AM_cjp && (op & 0x07) != 0 ? STEP_COND : s_flags[instr->mnemonic]) | SUPPORTED;
 }

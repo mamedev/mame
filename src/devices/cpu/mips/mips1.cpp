@@ -14,7 +14,6 @@
 #include "emu.h"
 #include "mips1.h"
 #include "mips1dsm.h"
-#include "debugger.h"
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_GENERAL (1U << 0)
@@ -257,6 +256,15 @@ void mips1core_device_base::execute_run()
 			// check for interrupts
 			if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
 			{
+				// enable debugger interrupt breakpoints
+				for (int irqline = 0; irqline < 6; irqline++)
+				{
+					if (CAUSE & SR & (CAUSE_IPEX0 << irqline))
+					{
+						standard_irq_callback(irqline, m_pc);
+						break;
+					}
+				}
 				generate_exception(EXCEPTION_INTERRUPT);
 				return;
 			}
@@ -620,13 +628,7 @@ void mips1core_device_base::execute_run()
 void mips1core_device_base::execute_set_input(int irqline, int state)
 {
 	if (state != CLEAR_LINE)
-	{
 		CAUSE |= CAUSE_IPEX0 << irqline;
-
-		// enable debugger interrupt breakpoints
-		if ((SR & SR_IEc) && (SR & (SR_IMEX0 << irqline)))
-			standard_irq_callback(irqline);
-	}
 	else
 		CAUSE &= ~(CAUSE_IPEX0 << irqline);
 }
@@ -1057,7 +1059,7 @@ void mips1core_device_base::lwl(u32 const op)
 	offs_t const offset = SIMMVAL + m_r[RSREG];
 	load<u32, false>(offset, [this, op, offset](u32 temp)
 	{
-		unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 3, 0)) << 3;
+		unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 3 : 0)) << 3;
 
 		m_r[RTREG] = (m_r[RTREG] & ~u32(0xffffffffU << shift)) | (temp << shift);
 	});
@@ -1068,7 +1070,7 @@ void mips1core_device_base::lwr(u32 const op)
 	offs_t const offset = SIMMVAL + m_r[RSREG];
 	load<u32, false>(offset, [this, op, offset](u32 temp)
 	{
-		unsigned const shift = ((offset & 0x3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 0, 3)) << 3;
+		unsigned const shift = ((offset & 0x3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
 
 		m_r[RTREG] = (m_r[RTREG] & ~u32(0xffffffffU >> shift)) | (temp >> shift);
 	});
@@ -1077,7 +1079,7 @@ void mips1core_device_base::lwr(u32 const op)
 void mips1core_device_base::swl(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 3, 0)) << 3;
+	unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 3 : 0)) << 3;
 
 	store<u32, false>(offset, m_r[RTREG] >> shift, 0xffffffffU >> shift);
 }
@@ -1085,7 +1087,7 @@ void mips1core_device_base::swl(u32 const op)
 void mips1core_device_base::swr(u32 const op)
 {
 	offs_t const offset = SIMMVAL + m_r[RSREG];
-	unsigned const shift = ((offset & 3) ^ ENDIAN_VALUE_LE_BE(m_endianness, 0, 3)) << 3;
+	unsigned const shift = ((offset & 3) ^ (m_endianness == ENDIANNESS_LITTLE ? 0 : 3)) << 3;
 
 	store<u32, false>(offset, m_r[RTREG] << shift, 0xffffffffU << shift);
 }

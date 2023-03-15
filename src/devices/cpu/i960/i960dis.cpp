@@ -216,7 +216,7 @@ offs_t i960_disassembler::dis_decode_ctrl(std::ostream &stream, u32 iCode, u32 i
 		util::stream_format(stream, "%s", mnemonic[op].mnem);
 		break;
 	case 1: // 1 operand
-		util::stream_format(stream, "%-8s%08lx", mnemonic[op].mnem, ((((s32)disp) << 8) >> 8) + (ip));
+		util::stream_format(stream, "%-8s%08lx", mnemonic[op].mnem, util::sext(disp, 24) + (ip));
 		break;
 	default:
 		return dis_decode_invalid(stream, iCode);
@@ -250,7 +250,7 @@ offs_t i960_disassembler::dis_decode_cobr(std::ostream &stream, u32 iCode, u32 i
 		else op1 = util::string_format("%s", regnames[src1]);
 		if (s2) op2 = util::string_format("sf%d", src2);
 		else op2 = util::string_format("%s", regnames[src2]);
-		op3 = util::string_format("0x%lx", ((((s32)disp) << 19) >> 19) + (ip));
+		op3 = util::string_format("0x%lx", util::sext(disp, 13) + (ip));
 
 		util::stream_format(stream, "%-8s%s,%s,%s", mnemonic[op].mnem, op1, op2, op3);
 		break;
@@ -537,6 +537,8 @@ offs_t i960_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		disflags = STEP_OVER;
 	else if (op == 0x0a)
 		disflags = STEP_OUT;
+	else if ((op & 0xd8) == 0x10 || (op > 0x38 && op < 0x3f))
+		disflags = STEP_COND;
 
 	switch(mnemonic[op].type)
 	{

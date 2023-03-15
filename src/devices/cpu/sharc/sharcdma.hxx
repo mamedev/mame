@@ -115,7 +115,7 @@ void adsp21062_device::dma_run_cycle(int channel)
 				break;
 			}
 			case DMA_PMODE_16_32:
-			{			
+			{
 				uint32_t data = ((dm_read32(src + 0) & 0xffff) << 16) | (dm_read32(src + 1) & 0xffff);
 
 				dm_write32(dst, data);
@@ -125,7 +125,7 @@ void adsp21062_device::dma_run_cycle(int channel)
 				break;
 			}
 			case DMA_PMODE_8_48:
-			{				
+			{
 				uint64_t data = ((uint64_t)(dm_read32(src + 0) & 0xff) << 0) |
 					((uint64_t)(dm_read32(src + 1) & 0xff) << 8) |
 					((uint64_t)(dm_read32(src + 2) & 0xff) << 16) |
@@ -136,7 +136,7 @@ void adsp21062_device::dma_run_cycle(int channel)
 				pm_write48(dst, data);
 				src += src_modifier * 6;
 				dst += dst_modifier;
-				src_count -= 6;				
+				src_count -= 6;
 				break;
 			}
 			default:
@@ -287,7 +287,7 @@ void adsp21062_device::sharc_dma_exec(int channel)
 	{
 		uint32_t dma_chain_ptr = m_core->dma[channel].chain_ptr & 0x1ffff;
 
-		schedule_chained_dma_op(channel, dma_chain_ptr, tran);		
+		schedule_chained_dma_op(channel, dma_chain_ptr, tran);
 	}
 	else
 	{
@@ -316,7 +316,7 @@ void adsp21062_device::sharc_dma_exec(int channel)
 			pmode = DMA_PMODE_8_48;
 		}
 
-		schedule_dma_op(channel, src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);	
+		schedule_dma_op(channel, src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);
 	}
 }
 

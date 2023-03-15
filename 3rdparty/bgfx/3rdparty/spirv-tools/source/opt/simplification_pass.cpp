@@ -45,6 +45,10 @@ void SimplificationPass::AddNewOperands(
 }
 
 bool SimplificationPass::SimplifyFunction(Function* function) {
+  if (function->IsDeclaration()) {
+    return false;
+  }
+
   bool modified = false;
   // Phase 1: Traverse all instructions in dominance order.
   // The second phase will only be on the instructions whose inputs have changed
@@ -90,7 +94,7 @@ bool SimplificationPass::SimplifyFunction(Function* function) {
             if (inst->opcode() == SpvOpCopyObject) {
               context()->ReplaceAllUsesWithPredicate(
                   inst->result_id(), inst->GetSingleWordInOperand(0),
-                  [](Instruction* user, uint32_t) {
+                  [](Instruction* user) {
                     const auto opcode = user->opcode();
                     if (!spvOpcodeIsDebug(opcode) &&
                         !spvOpcodeIsDecoration(opcode)) {
@@ -137,7 +141,7 @@ bool SimplificationPass::SimplifyFunction(Function* function) {
       if (inst->opcode() == SpvOpCopyObject) {
         context()->ReplaceAllUsesWithPredicate(
             inst->result_id(), inst->GetSingleWordInOperand(0),
-            [](Instruction* user, uint32_t) {
+            [](Instruction* user) {
               const auto opcode = user->opcode();
               if (!spvOpcodeIsDebug(opcode) && !spvOpcodeIsDecoration(opcode)) {
                 return true;

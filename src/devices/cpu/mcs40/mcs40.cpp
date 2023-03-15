@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "mcs40.h"
 #include "mcs40dasm.h"
-#include "debugger.h"
 
 
 /*

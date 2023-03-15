@@ -48,7 +48,7 @@ offs_t upd78k0_disassembler::dasm_31(std::ostream &stream, offs_t pc, const upd7
 				util::stream_format(stream, ".%d,", (op2 & 0x70) >> 4);
 			}
 			format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 		}
 		else switch (op2 & 0x0f)
 		{
@@ -57,36 +57,36 @@ offs_t upd78k0_disassembler::dasm_31(std::ostream &stream, offs_t pc, const upd7
 			format_sfr(stream, opcodes.r8(pc + 2));
 			util::stream_format(stream, ".%d,", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 
 		case 0x06:
 			util::stream_format(stream, "%-8s", "BT");
 			format_sfr(stream, opcodes.r8(pc + 2));
 			util::stream_format(stream, ".%d,", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 
 		case 0x07:
 			util::stream_format(stream, "%-8s", "BF");
 			format_sfr(stream, opcodes.r8(pc + 2));
 			util::stream_format(stream, ".%d,", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 4, opcodes.r8(pc + 3));
-			return 4 | SUPPORTED;
+			return 4 | STEP_COND | SUPPORTED;
 
 		case 0x0d:
 			util::stream_format(stream, "%-8sA.%d,", "BTCLR", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0x0e:
 			util::stream_format(stream, "%-8sA.%d,", "BT", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		case 0x0f:
 			util::stream_format(stream, "%-8sA.%d,", "BF", (op2 & 0x70) >> 4);
 			format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-			return 3 | SUPPORTED;
+			return 3 | STEP_COND | SUPPORTED;
 
 		default:
 			return dasm_illegal2(stream, 0x31, op2);
@@ -117,17 +117,17 @@ offs_t upd78k0_disassembler::dasm_31(std::ostream &stream, offs_t pc, const upd7
 	case 0x05:
 		util::stream_format(stream, "%-8s[HL].%d,", "BTCLR", (op2 & 0x70) >> 4);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x06:
 		util::stream_format(stream, "%-8s[HL].%d,", "BT", (op2 & 0x70) >> 4);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x07:
 		util::stream_format(stream, "%-8s[HL].%d,", "BF", (op2 & 0x70) >> 4);
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x0a: case 0x0b:
 		if (op2 < 0x90)
@@ -305,7 +305,7 @@ offs_t upd78k0_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		format_saddr(stream, opcodes.r8(pc + 1));
 		stream << ",";
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 
 	case 0x05: case 0x07:
 		util::stream_format(stream, "%-8sA,[%s]", "XCH", s_rp_names[(op & 0x06) >> 1]);
@@ -470,7 +470,7 @@ offs_t upd78k0_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x8a: case 0x8b:
 		util::stream_format(stream, "%-8s%s,", "DBNZ", s_r_names[op & 0x07]);
 		format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0x8c: case 0x9c: case 0xac: case 0xbc: case 0xcc: case 0xdc: case 0xec: case 0xfc:
 	{
@@ -484,13 +484,13 @@ offs_t upd78k0_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, ".%d,", (op & 0x70) >> 4);
 		}
 		format_jdisp8(stream, pc + 3, opcodes.r8(pc + 2));
-		return 3 | SUPPORTED;
+		return 3 | STEP_COND | SUPPORTED;
 	}
 
 	case 0x8d: case 0x9d:
 		util::stream_format(stream, "%-8s", BIT(op, 4) ? "BNC" : "BC");
 		format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0x8e:
 		util::stream_format(stream, "%-8sA,", "MOV");
@@ -550,7 +550,7 @@ offs_t upd78k0_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0xad: case 0xbd:
 		util::stream_format(stream, "%-8s", BIT(op, 4) ? "BNZ" : "BZ");
 		format_jdisp8(stream, pc + 2, opcodes.r8(pc + 1));
-		return 2 | SUPPORTED;
+		return 2 | STEP_COND | SUPPORTED;
 
 	case 0xae:
 		util::stream_format(stream, "%-8sA,", "MOV");

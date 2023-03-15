@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="electron_flop" description="Acorn Electron disks">
@@ -262,6 +262,42 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ebots">
+		<description>Electrobots</description>
+		<year>2021</year>
+		<publisher>0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="25344">
+				<rom name="electrobots.ssd" size="25344" crc="c033bcce" sha1="12308cd3e3acdb0c42c506b9ca470cbd7ffa6e7e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ebotsgu">
+		<description>Electrobots Going Underground</description>
+		<year>2022</year>
+		<publisher>0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="electrobots-going-underground.ssd" size="204800" crc="23b0686c" sha1="f3bd92e74f68aae7d3b53f7ddbe9af60a618ee77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elementum">
+		<description>Elementum</description>
+		<year>2020</year>
+		<publisher>0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="24576">
+				<rom name="elementum.ssd" size="24576" crc="5ce8a240" sha1="469513cac989d8cfd0231825176f98eec0f5b473"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elixir">
 		<description>Elixir</description>
 		<year>1987</year>
@@ -397,6 +433,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="loderun2021">
+		<description>Lode Runner 2021</description>
+		<year>2021</year>
+		<publisher>Software Projects/0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="loderunner2021-1.03.ssd" size="204800" crc="5f720f8b" sha1="f7512c9f45351e8b4b153c52b8094d47964ee877"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magsword">
 		<description>The Magic Sword (5.25")</description>
 		<year>1984</year>
@@ -417,6 +465,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="magicsword-adfs_e.adf" size="327680" crc="0b7f1517" sha1="49fe3ff8c50f635a1b20e3f9b66e6d6574430154"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manicm2021">
+		<description>Manic Miner 2021</description>
+		<year>2021</year>
+		<publisher>Software Projects/0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="manicminer2021-0.08b.ssd" size="204800" crc="4fb9bfd5" sha1="c9207b54d1f6253c778840678f4d7272997f33dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -601,6 +661,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="python">
+		<description>Python</description>
+		<year>2022</year>
+		<publisher>0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="python.ssd" size="204800" crc="96fe251b" sha1="a5efcb8db63e7cecfdc32e50ea894ef44c5dff69"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ravenwd">
 		<description>The Darkness of Raven Wood</description>
 		<year>2016</year>
@@ -722,6 +794,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tapper">
+		<description>Tapper</description>
+		<year>2022</year>
+		<publisher>U.S. Gold/0xC0DE</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="tapper.ssd" size="204800" crc="61382ee4" sha1="3e4b4ff05a3ac4781db978ae494d9162afbd36fc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="taroda">
 		<description>The Taroda Scheme</description>
 		<year>1988</year>
@@ -802,6 +886,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="welcomedisc-adfs_e.adf" size="327680" crc="a6733fa6" sha1="70b5d940c9c7da85e82e29b1b4e3ad29a44c51bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yap">
+		<description>You're Alan Partridge</description>
+		<year>2006</year>
+		<publisher>Organ Grinder's Monkey</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="yap-adfs_e.adf" size="327680" crc="694fa12b" sha1="de5c6fadaeb54cb82c684f6b4eca01a17842a891"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1572,7 +1668,7 @@ license:CC0
 		</part>
 	</software>
 
-		<software name="eug23">
+	<software name="eug23">
 		<description>Electron User Group #23 (3.5")</description>
 		<year>1995</year>
 		<publisher>E.U.G.</publisher>

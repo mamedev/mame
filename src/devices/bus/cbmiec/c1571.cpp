@@ -627,6 +627,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 	connector.set_default_option("525qd");
 	connector.set_fixed(true);
 	connector.set_formats(c1571_device::floppy_formats);
+	connector.enable_sound(true);
 }
 
 void c1571_device::add_cia_mconfig(machine_config &config)

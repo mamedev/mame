@@ -15,7 +15,7 @@
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
 #include "formats/imageutl.h"
-#include "coretmpl.h"
+#include "opresolv.h"
 #include <algorithm>
 
 /* -----------------------------------------------------------------------

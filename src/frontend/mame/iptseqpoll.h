@@ -27,22 +27,10 @@ public:
 protected:
 	input_code_poller(input_manager &manager) noexcept;
 
-	input_manager &m_manager;
-	std::vector<std::pair<input_device_item *, s32> > m_axis_memory;
-};
-
-
-class switch_code_poller_base : public input_code_poller
-{
-public:
-	virtual void reset() override;
-
-protected:
-	switch_code_poller_base(input_manager &manager) noexcept;
-
 	bool code_pressed_once(input_code code, bool moved);
 
-private:
+	input_manager &m_manager;
+	std::vector<std::pair<input_device_item *, s32> > m_axis_memory;
 	std::vector<input_code> m_switch_memory;
 };
 
@@ -52,11 +40,15 @@ class axis_code_poller : public input_code_poller
 public:
 	axis_code_poller(input_manager &manager) noexcept;
 
+	virtual void reset() override;
 	virtual input_code poll() override;
+
+private:
+	std::vector<bool> m_axis_active;
 };
 
 
-class switch_code_poller : public switch_code_poller_base
+class switch_code_poller : public input_code_poller
 {
 public:
 	switch_code_poller(input_manager &manager) noexcept;
@@ -65,7 +57,7 @@ public:
 };
 
 
-class keyboard_code_poller : public switch_code_poller_base
+class keyboard_code_poller : public input_code_poller
 {
 public:
 	keyboard_code_poller(input_manager &manager) noexcept;
@@ -89,6 +81,8 @@ public:
 
 protected:
 	input_sequence_poller() noexcept;
+
+	void set_modified() noexcept { m_modified = true; }
 
 	input_seq m_sequence;
 

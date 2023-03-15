@@ -172,10 +172,8 @@ vic3_device::vic3_device(const machine_config &mconfig, const char *tag, device_
 
 void vic3_device::device_start()
 {
-	int width, height;
-
-	width = screen().width();
-	height = screen().height();
+	int width = screen().width();
+	int height = screen().height();
 
 	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
 
@@ -1983,7 +1981,7 @@ void vic3_device::raster_interrupt_gen()
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer start */
-			machine().scheduler().timer_set(attotime(0, 0), timer_expired_delegate(FUNC(vic3_device::timer_timeout),this), 1);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(vic3_device::timer_timeout), this), 1);
 		}
 
 	}

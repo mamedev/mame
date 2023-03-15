@@ -277,7 +277,6 @@ protected:
 	typedef uint32_t (tms340x0_device::*raster_op_func)(uint32_t newpix, uint32_t oldpix);
 	typedef void (tms340x0_device::*wfield_func)(offs_t offset, uint32_t data);
 	typedef uint32_t (tms340x0_device::*rfield_func)(offs_t offset);
-	typedef void (tms340x0_device::*opcode_func)(uint16_t op);
 	typedef uint32_t (tms340x0_device::*pixel_op_func)(uint32_t, uint32_t, uint32_t);
 	typedef void (tms340x0_device::*pixblt_op_func)(int, int);
 	typedef void (tms340x0_device::*pixblt_b_op_func)(int);
@@ -286,7 +285,6 @@ protected:
 
 	static const wfield_func s_wfield_functions[32];
 	static const rfield_func s_rfield_functions[64];
-	static const opcode_func s_opcode_table[65536 >> 4];
 	static const pixel_op_func s_pixel_op_table[32];
 	static const uint8_t s_pixel_op_timing_table[33];
 	static const pixblt_op_func s_pixblt_op_table[];
@@ -360,7 +358,8 @@ protected:
 	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) = 0;
 	void SET_ST(uint32_t st);
 	void RESET_ST();
-	virtual uint32_t ROPCODE() = 0;
+	virtual uint16_t ROPCODE() = 0;
+	virtual void execute_op(uint16_t op) = 0;
 	virtual int16_t PARAM_WORD() = 0;
 	virtual int32_t PARAM_LONG() = 0;
 	virtual int16_t PARAM_WORD_NO_INC() = 0;
@@ -520,6 +519,7 @@ protected:
 	uint32_t rfield_s_30(offs_t offset);
 	uint32_t rfield_s_31(offs_t offset);
 	void unimpl(uint16_t op);
+	void illop(uint16_t op);
 	void pixblt_l_l(uint16_t op); /* 0f00 */
 	void pixblt_l_xy(uint16_t op); /* 0f20 */
 	void pixblt_xy_l(uint16_t op); /* 0f40 */
@@ -837,59 +837,6 @@ protected:
 	void rev_a(uint16_t op); /* 0020 */
 	void rev_b(uint16_t op); /* 0030 */
 	void trap(uint16_t op); /* 0900/10 */
-	void addxyi_a(uint16_t op);
-	void addxyi_b(uint16_t op);
-	void blmove(uint16_t op);
-	void cexec_l(uint16_t op);
-	void cexec_s(uint16_t op);
-	void clip(uint16_t op);
-	void cmovcg_a(uint16_t op);
-	void cmovcg_b(uint16_t op);
-	void cmovcm_f(uint16_t op);
-	void cmovcm_b(uint16_t op);
-	void cmovgc_a(uint16_t op);
-	void cmovgc_b(uint16_t op);
-	void cmovgc_a_s(uint16_t op);
-	void cmovgc_b_s(uint16_t op);
-	void cmovmc_f(uint16_t op);
-	void cmovmc_f_va(uint16_t op);
-	void cmovmc_f_vb(uint16_t op);
-	void cmovmc_b(uint16_t op);
-	void cmp_k_a(uint16_t op);
-	void cmp_k_b(uint16_t op);
-	void cvdxyl_a(uint16_t op);
-	void cvdxyl_b(uint16_t op);
-	void cvmxyl_a(uint16_t op);
-	void cvmxyl_b(uint16_t op);
-	void cvsxyl_a(uint16_t op);
-	void cvsxyl_b(uint16_t op);
-	void exgps_a(uint16_t op);
-	void exgps_b(uint16_t op);
-	void fline(uint16_t op);
-	void fpixeq(uint16_t op);
-	void fpixne(uint16_t op);
-	void getps_a(uint16_t op);
-	void getps_b(uint16_t op);
-	void idle(uint16_t op);
-	void linit(uint16_t op);
-	void mwait(uint16_t op);
-	void pfill_xy(uint16_t op);
-	void pixblt_l_m_l(uint16_t op);
-	void retm(uint16_t op);
-	void rmo_a(uint16_t op);
-	void rmo_b(uint16_t op);
-	void rpix_a(uint16_t op);
-	void rpix_b(uint16_t op);
-	void setcdp(uint16_t op);
-	void setcmp(uint16_t op);
-	void setcsp(uint16_t op);
-	void swapf_a(uint16_t op);
-	void swapf_b(uint16_t op);
-	void tfill_xy(uint16_t op);
-	void trapl(uint16_t op);
-	void vblt_b_l(uint16_t op);
-	void vfill_l(uint16_t op);
-	void vlcol(uint16_t op);
 	int apply_window(const char *inst_name,int srcbpp, uint32_t *srcaddr, XY *dst, int *dx, int *dy);
 	int compute_fill_cycles(int left_partials, int right_partials, int full_words, int op_timing);
 	int compute_pixblt_cycles(int left_partials, int right_partials, int full_words, int op_timing);
@@ -1026,7 +973,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
 
-	virtual uint32_t ROPCODE() override;
+	virtual uint16_t ROPCODE() override;
+	virtual void execute_op(uint16_t op) override;
 	virtual int16_t PARAM_WORD() override;
 	virtual int32_t PARAM_LONG() override;
 	virtual int16_t PARAM_WORD_NO_INC() override;
@@ -1036,7 +984,11 @@ protected:
 	virtual void TMS34010_WRMEM_WORD(offs_t A, uint32_t V) override;
 	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) override;
 
+	typedef void (tms34010_device::*opcode_func)(uint16_t op);
+
 private:
+	static const opcode_func s_opcode_table[65536 >> 4];
+
 	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 1, 3, ENDIANNESS_LITTLE>::specific m_program;
 };
@@ -1061,7 +1013,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void internal_regs_map(address_map &map);
 
-	virtual uint32_t ROPCODE() override;
+	virtual uint16_t ROPCODE() override;
+	virtual void execute_op(uint16_t op) override;
 	virtual int16_t PARAM_WORD() override;
 	virtual int32_t PARAM_LONG() override;
 	virtual int16_t PARAM_WORD_NO_INC() override;
@@ -1071,7 +1024,65 @@ protected:
 	virtual void TMS34010_WRMEM_WORD(offs_t A, uint32_t V) override;
 	virtual void TMS34010_WRMEM_DWORD(offs_t A, uint32_t V) override;
 
+	typedef void (tms34020_device::*opcode_func)(uint16_t op);
+
+	void addxyi_a(uint16_t op);
+	void addxyi_b(uint16_t op);
+	void blmove(uint16_t op);
+	void cexec_l(uint16_t op);
+	void cexec_s(uint16_t op);
+	void clip(uint16_t op);
+	void cmovcg_a(uint16_t op);
+	void cmovcg_b(uint16_t op);
+	void cmovcm_f(uint16_t op);
+	void cmovcm_b(uint16_t op);
+	void cmovgc_a(uint16_t op);
+	void cmovgc_b(uint16_t op);
+	void cmovgc_a_s(uint16_t op);
+	void cmovgc_b_s(uint16_t op);
+	void cmovmc_f(uint16_t op);
+	void cmovmc_f_va(uint16_t op);
+	void cmovmc_f_vb(uint16_t op);
+	void cmovmc_b(uint16_t op);
+	void cmp_k_a(uint16_t op);
+	void cmp_k_b(uint16_t op);
+	void cvdxyl_a(uint16_t op);
+	void cvdxyl_b(uint16_t op);
+	void cvmxyl_a(uint16_t op);
+	void cvmxyl_b(uint16_t op);
+	void cvsxyl_a(uint16_t op);
+	void cvsxyl_b(uint16_t op);
+	void exgps_a(uint16_t op);
+	void exgps_b(uint16_t op);
+	void fline(uint16_t op);
+	void fpixeq(uint16_t op);
+	void fpixne(uint16_t op);
+	void getps_a(uint16_t op);
+	void getps_b(uint16_t op);
+	void idle(uint16_t op);
+	void linit(uint16_t op);
+	void mwait(uint16_t op);
+	void pfill_xy(uint16_t op);
+	void pixblt_l_m_l(uint16_t op);
+	void retm(uint16_t op);
+	void rmo_a(uint16_t op);
+	void rmo_b(uint16_t op);
+	void rpix_a(uint16_t op);
+	void rpix_b(uint16_t op);
+	void setcdp(uint16_t op);
+	void setcmp(uint16_t op);
+	void setcsp(uint16_t op);
+	void swapf_a(uint16_t op);
+	void swapf_b(uint16_t op);
+	void tfill_xy(uint16_t op);
+	void trapl(uint16_t op);
+	void vblt_b_l(uint16_t op);
+	void vfill_l(uint16_t op);
+	void vlcol(uint16_t op);
+
 private:
+	static const opcode_func s_opcode_table[65536 >> 4];
+
 	memory_access<32, 2, 3, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 3, ENDIANNESS_LITTLE>::specific m_program;
 };

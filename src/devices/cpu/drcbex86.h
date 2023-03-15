@@ -99,7 +99,7 @@ private:
 		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
 
 		// helpers
-		asmjit::x86::Gp select_register(asmjit::x86::Gp const &defreg) const;
+		asmjit::x86::Gpd select_register(asmjit::x86::Gpd const &defreg) const;
 		asmjit::x86::Xmm select_register(asmjit::x86::Xmm defreg) const;
 		template <typename T> T select_register(T defreg, be_parameter const &checkparam) const;
 		template <typename T> T select_register(T defreg, be_parameter const &checkparam, be_parameter const &checkparam2) const;

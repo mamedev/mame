@@ -65,8 +65,6 @@ device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u
 	// override well-known symbols
 	if (index == STATE_GENPCBASE)
 		m_symbol.assign("CURPC");
-	else if (index == STATE_GENSP)
-		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)
 		m_symbol.assign("CURFLAGS");
 }
@@ -103,7 +101,7 @@ device_state_entry &device_state_entry::formatstr(const char *_format)
 
 	// set the DSF_CUSTOM_STRING flag by formatting with a nullptr string
 	m_flags &= ~DSF_CUSTOM_STRING;
-	format(nullptr);
+	format(nullptr, 0);
 
 	return *this;
 }
@@ -203,12 +201,10 @@ double device_state_entry::entry_dvalue() const
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-std::string device_state_entry::format(const char *string, bool maxout) const
+std::string device_state_entry::format(const char *string, u64 result, bool maxout) const
 {
-	std::string dest;
-	u64 result = entry_value() & m_datamask;
-
 	// parse the format
+	std::string dest;
 	bool leadzero = false;
 	bool percent = false;
 	bool explicitsign = false;
@@ -402,7 +398,7 @@ std::string device_state_entry::to_string() const
 		custom = string_format("%-12G", entry_dvalue());
 
 	// ask the entry to format itself
-	return format(custom.c_str());
+	return format(custom.c_str(), value());
 }
 
 
@@ -414,7 +410,7 @@ std::string device_state_entry::to_string() const
 int device_state_entry::max_length() const
 {
 	// ask the entry to format itself maximally
-	return format("", true).length();
+	return format("", 0, true).length();
 }
 
 
@@ -491,9 +487,6 @@ device_state_interface::device_state_interface(const machine_config &mconfig, de
 	: device_interface(device, "state")
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
-
-	// configure the fast accessor
-	device.interfaces().m_state = this;
 }
 
 

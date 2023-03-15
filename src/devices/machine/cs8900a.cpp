@@ -377,7 +377,7 @@ void cs8900a_device::device_start()
 
 cs8900a_device::cs8900a_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_network_interface(mconfig, *this, 10.0f)
+	, device_network_interface(mconfig, *this, 10)
 	, cs8900_ia_mac{0, 0, 0, 0, 0, 0}
 	, cs8900_packetpage_ptr(0)
 	, cs8900_recv_control(0)            /* copy of CC_RXCTL (contains all bits below) */

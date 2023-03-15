@@ -10,11 +10,15 @@
 
 #include "texture.h"
 
-bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t flags, void* data)
+bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t width_margin, uint16_t height, uint32_t flags, void* data)
 	: m_name(name)
 	, m_format(format)
 	, m_width(width)
+	, m_width_margin(width_margin)
 	, m_height(height)
+	, m_rowpixels(width)
+	, m_width_div_factor(1)
+	, m_width_mul_factor(1)
 {
 	bgfx::TextureInfo info;
 	bgfx::calcTextureSize(info, width, height, 1, false, false, 1, format);
@@ -32,17 +36,21 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 	}
 }
 
-bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, const bgfx::Memory* data, uint32_t flags, uint16_t pitch, uint16_t rowpixels)
+bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t width_margin, uint16_t height, const bgfx::Memory* data, uint32_t flags, uint16_t pitch, uint16_t rowpixels, int width_div_factor, int width_mul_factor)
 	: m_name(name)
 	, m_format(format)
 	, m_width(width)
+	, m_width_margin(width_margin)
 	, m_height(height)
 	, m_rowpixels(rowpixels ? rowpixels : width)
+	, m_width_div_factor(width_div_factor)
+	, m_width_mul_factor(width_mul_factor)
 {
+	int adjusted_width = (m_rowpixels * m_width_mul_factor) / m_width_div_factor;
 	bgfx::TextureInfo info;
-	bgfx::calcTextureSize(info, m_rowpixels, height, 1, false, false, 1, format);
-	m_texture = bgfx::createTexture2D(m_rowpixels, height, false, 1, format, flags, nullptr);
-	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, m_rowpixels, height, data, pitch);
+	bgfx::calcTextureSize(info, adjusted_width, height, 1, false, false, 1, format);
+	m_texture = bgfx::createTexture2D(adjusted_width, height, false, 1, format, flags, nullptr);
+	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, adjusted_width, height, data, pitch);
 }
 
 bgfx_texture::~bgfx_texture()
@@ -50,7 +58,8 @@ bgfx_texture::~bgfx_texture()
 	bgfx::destroy(m_texture);
 }
 
-void bgfx_texture::update(const bgfx::Memory *data, uint16_t pitch)
+void bgfx_texture::update(const bgfx::Memory *data, uint16_t pitch, uint16_t width_margin)
 {
-	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, m_width, m_height, data, pitch);
+	m_width_margin = width_margin;
+	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, (m_rowpixels * m_width_mul_factor) / m_width_div_factor, m_height, data, pitch);
 }

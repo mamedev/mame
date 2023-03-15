@@ -2207,7 +2207,7 @@ bool spu_device::update_envelope(const int v)
 				break;
 
 			case 4: // release
-				voice[v].env_level=(std::min)(1.0f,(std::max)(0.0f,voice[v].env_level));
+				voice[v].env_level=std::clamp(voice[v].env_level,0.0f,1.0f);
 				voice[v].env_delta=voice[v].env_rr;
 				if (voice[v].env_rr == -0.0f)   // 0.0 release means infinite time
 				{

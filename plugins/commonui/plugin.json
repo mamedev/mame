@@ -1,0 +1,9 @@
+{
+	"plugin": {
+		"name": "commonui",
+		"description": "Common plugin UI helpers",
+		"version": "0.0.1",
+		"author": "Vas Crabb",
+		"type": "library"
+	}
+}

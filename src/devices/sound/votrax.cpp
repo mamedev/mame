@@ -170,7 +170,7 @@ void votrax_sc01_device::device_start()
 	m_sclock = m_mainclock / 18.0;
 	m_cclock = m_mainclock / 36.0;
 	m_stream = stream_alloc(0, 1, m_sclock);
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(votrax_sc01_device::phone_tick), this);
 
 	// reset outputs
 	m_ar_cb.resolve_safe();
@@ -331,10 +331,10 @@ void votrax_sc01_device::device_clock_changed()
 
 
 //-------------------------------------------------
-//  device_timer - handle device timer
+//  phone_tick - process transitions
 //-------------------------------------------------
 
-void votrax_sc01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(votrax_sc01_device::phone_tick)
 {
 	m_stream->update();
 
@@ -633,7 +633,7 @@ stream_buffer::sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b);
 	shift_hist(vn, m_vn_6);
 
-	return vn*1.5;
+	return vn*0.35;
 }
 
 /*

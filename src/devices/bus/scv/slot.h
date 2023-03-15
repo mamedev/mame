@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -39,7 +39,7 @@ public:
 	virtual void write_cart(offs_t offset, uint8_t data) { }
 	virtual void write_bank(uint8_t data) { }
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return &m_ram[0]; }
@@ -61,7 +61,7 @@ protected:
 // ======================> scv_cart_slot_device
 
 class scv_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_scv_cart_interface>
 {
 public:
@@ -83,11 +83,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override { }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "scv_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
@@ -109,9 +104,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
 	int m_type;
 	device_scv_cart_interface*       m_cart;
 };
@@ -120,12 +112,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(SCV_CART_SLOT, scv_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define SCVSLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_SCV_SLOT_H

@@ -2,7 +2,13 @@
 // copyright-holders:Andrew Gardner
 #include "emu.h"
 #include "deviceswindow.h"
+
 #include "deviceinformationwindow.h"
+
+#include "util/xmlfile.h"
+
+
+namespace osd::debugger::qt {
 
 DevicesWindowModel::DevicesWindowModel(running_machine &machine, QObject *parent) :
 	m_machine(machine)
@@ -31,7 +37,7 @@ QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 Qt::ItemFlags DevicesWindowModel::flags(const QModelIndex &index) const
 {
 	if (!index.isValid())
-		return 0;
+		return Qt::NoItemFlags;
 
 	return QAbstractItemModel::flags(index);
 }
@@ -107,9 +113,9 @@ int DevicesWindowModel::columnCount(const QModelIndex &parent) const
 
 
 
-DevicesWindow::DevicesWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr),
-	m_devices_model(machine)
+DevicesWindow::DevicesWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
+	m_devices_model(debugger.machine())
 {
 	m_selected_device = nullptr;
 
@@ -148,35 +154,15 @@ void DevicesWindow::currentRowChanged(const QModelIndex &current, const QModelIn
 void DevicesWindow::activated(const QModelIndex &index)
 {
 	device_t *dev = static_cast<device_t *>(index.internalPointer());
-	(new DeviceInformationWindow(m_machine, dev, this))->show();
+	(new DeviceInformationWindow(m_debugger, dev, this))->show();
 }
 
 
-
-//=========================================================================
-//  DevicesWindowQtConfig
-//=========================================================================
-void DevicesWindowQtConfig::buildFromQWidget(QWidget *widget)
+void DevicesWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
-	WindowQtConfig::buildFromQWidget(widget);
-	//  DevicesWindow *window = dynamic_cast<DevicesWindow *>(widget);
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_DEVICES_VIEWER);
 }
 
-
-void DevicesWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	//  DevicesWindow *window = dynamic_cast<DevicesWindow *>(widget);
-}
-
-
-void DevicesWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-}
-
-
-void DevicesWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-}
+} // namespace osd::debugger::qt

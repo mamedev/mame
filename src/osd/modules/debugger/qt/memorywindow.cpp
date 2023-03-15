@@ -7,7 +7,10 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 #include <QtGui/QClipboard>
+#include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QApplication>
@@ -22,8 +25,12 @@
 #define horizontalAdvance width
 #endif
 
-MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr)
+
+namespace osd::debugger::qt {
+
+MemoryWindow::MemoryWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
+	m_inputHistory()
 {
 	setWindowTitle("Debug: Memory View");
 
@@ -44,6 +51,8 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	// The input edit
 	m_inputEdit = new QLineEdit(topSubFrame);
 	connect(m_inputEdit, &QLineEdit::returnPressed, this, &MemoryWindow::expressionSubmitted);
+	connect(m_inputEdit, &QLineEdit::textEdited, this, &MemoryWindow::expressionEdited);
+	m_inputEdit->installEventFilter(this);
 
 	// The memory space combo box
 	m_memoryComboBox = new QComboBox(topSubFrame);
@@ -76,24 +85,36 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	// Create a data format group
 	QActionGroup *dataFormat = new QActionGroup(this);
 	dataFormat->setObjectName("dataformat");
-	QAction *formatActOne  = new QAction("1-byte chunks", this);
-	QAction *formatActTwo  = new QAction("2-byte chunks", this);
-	QAction *formatActFour = new QAction("4-byte chunks", this);
-	QAction *formatActEight = new QAction("8-byte chunks", this);
-	QAction *formatAct32bitFloat = new QAction("32 bit floating point", this);
-	QAction *formatAct64bitFloat = new QAction("64 bit floating point", this);
-	QAction *formatAct80bitFloat = new QAction("80 bit floating point", this);
-	formatActOne->setObjectName("formatActOne");
-	formatActTwo->setObjectName("formatActTwo");
-	formatActFour->setObjectName("formatActFour");
-	formatActEight->setObjectName("formatActEight");
-	formatAct32bitFloat->setObjectName("formatAct32bitFloat");
-	formatAct64bitFloat->setObjectName("formatAct64bitFloat");
-	formatAct80bitFloat->setObjectName("formatAct80bitFloat");
+	QAction *formatActOne  = new QAction("1-byte Chunks (Hex)", this);
+	QAction *formatActTwo  = new QAction("2-byte Chunks (Hex)", this);
+	QAction *formatActFour = new QAction("4-byte Chunks (Hex)", this);
+	QAction *formatActEight = new QAction("8-byte Chunks (Hex)", this);
+	QAction *formatActOneOctal = new QAction("1-byte Chunks (Octal)", this);
+	QAction *formatActTwoOctal = new QAction("2-byte Chunks (Octal)", this);
+	QAction *formatActFourOctal = new QAction("4-byte Chunks (Octal)", this);
+	QAction *formatActEightOctal = new QAction("8-byte Chunks (Octal)", this);
+	QAction *formatAct32bitFloat = new QAction("32-bit Floating Point", this);
+	QAction *formatAct64bitFloat = new QAction("64-bit Floating Point", this);
+	QAction *formatAct80bitFloat = new QAction("80-bit Floating Point", this);
+	formatActOne->setData(int(debug_view_memory::data_format::HEX_8BIT));
+	formatActTwo->setData(int(debug_view_memory::data_format::HEX_16BIT));
+	formatActFour->setData(int(debug_view_memory::data_format::HEX_32BIT));
+	formatActEight->setData(int(debug_view_memory::data_format::HEX_64BIT));
+	formatActOneOctal->setData(int(debug_view_memory::data_format::OCTAL_8BIT));
+	formatActTwoOctal->setData(int(debug_view_memory::data_format::OCTAL_16BIT));
+	formatActFourOctal->setData(int(debug_view_memory::data_format::OCTAL_32BIT));
+	formatActEightOctal->setData(int(debug_view_memory::data_format::OCTAL_64BIT));
+	formatAct32bitFloat->setData(int(debug_view_memory::data_format::FLOAT_32BIT));
+	formatAct64bitFloat->setData(int(debug_view_memory::data_format::FLOAT_64BIT));
+	formatAct80bitFloat->setData(int(debug_view_memory::data_format::FLOAT_80BIT));
 	formatActOne->setCheckable(true);
 	formatActTwo->setCheckable(true);
 	formatActFour->setCheckable(true);
 	formatActEight->setCheckable(true);
+	formatActOneOctal->setCheckable(true);
+	formatActTwoOctal->setCheckable(true);
+	formatActFourOctal->setCheckable(true);
+	formatActEightOctal->setCheckable(true);
 	formatAct32bitFloat->setCheckable(true);
 	formatAct64bitFloat->setCheckable(true);
 	formatAct80bitFloat->setCheckable(true);
@@ -101,6 +122,10 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setActionGroup(dataFormat);
 	formatActFour->setActionGroup(dataFormat);
 	formatActEight->setActionGroup(dataFormat);
+	formatActOneOctal->setActionGroup(dataFormat);
+	formatActTwoOctal->setActionGroup(dataFormat);
+	formatActFourOctal->setActionGroup(dataFormat);
+	formatActEightOctal->setActionGroup(dataFormat);
 	formatAct32bitFloat->setActionGroup(dataFormat);
 	formatAct64bitFloat->setActionGroup(dataFormat);
 	formatAct80bitFloat->setActionGroup(dataFormat);
@@ -108,14 +133,23 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setShortcut(QKeySequence("Ctrl+2"));
 	formatActFour->setShortcut(QKeySequence("Ctrl+4"));
 	formatActEight->setShortcut(QKeySequence("Ctrl+8"));
-	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+9"));
+	formatActOneOctal->setShortcut(QKeySequence("Ctrl+3"));
+	formatActTwoOctal->setShortcut(QKeySequence("Ctrl+5"));
+	formatActFourOctal->setShortcut(QKeySequence("Ctrl+7"));
+	formatActEightOctal->setShortcut(QKeySequence("Ctrl+9"));
+	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+Shift+F"));
+	formatAct64bitFloat->setShortcut(QKeySequence("Ctrl+Shift+D"));
+	formatAct80bitFloat->setShortcut(QKeySequence("Ctrl+Shift+E"));
 	formatActOne->setChecked(true);
 	connect(dataFormat, &QActionGroup::triggered, this, &MemoryWindow::formatChanged);
-	// Create a address display group
+
+	// Create an address display group
 	QActionGroup *addressGroup = new QActionGroup(this);
 	addressGroup->setObjectName("addressgroup");
 	QAction *addressActLogical = new QAction("Logical Addresses", this);
 	QAction *addressActPhysical = new QAction("Physical Addresses", this);
+	addressActLogical->setData(false);
+	addressActPhysical->setData(true);
 	addressActLogical->setCheckable(true);
 	addressActPhysical->setCheckable(true);
 	addressActLogical->setActionGroup(addressGroup);
@@ -124,6 +158,26 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	addressActPhysical->setShortcut(QKeySequence("Ctrl+Y"));
 	addressActLogical->setChecked(true);
 	connect(addressGroup, &QActionGroup::triggered, this, &MemoryWindow::addressChanged);
+
+	// Create an address radix group
+	QActionGroup *radixGroup = new QActionGroup(this);
+	radixGroup->setObjectName("radixgroup");
+	QAction *radixActHexadecimal = new QAction("Hexadecimal Addresses", this);
+	QAction *radixActDecimal = new QAction("Decimal Addresses", this);
+	QAction *radixActOctal = new QAction("Octal Addresses", this);
+	radixActHexadecimal->setData(16);
+	radixActDecimal->setData(10);
+	radixActOctal->setData(8);
+	radixActHexadecimal->setCheckable(true);
+	radixActDecimal->setCheckable(true);
+	radixActOctal->setCheckable(true);
+	radixActHexadecimal->setActionGroup(radixGroup);
+	radixActDecimal->setActionGroup(radixGroup);
+	radixActOctal->setActionGroup(radixGroup);
+	radixActHexadecimal->setShortcut(QKeySequence("Ctrl+Shift+H"));
+	radixActOctal->setShortcut(QKeySequence("Ctrl+Shift+O"));
+	radixActHexadecimal->setChecked(true);
+	connect(radixGroup, &QActionGroup::triggered, this, &MemoryWindow::radixChanged);
 
 	// Create a reverse view radio
 	QAction *reverseAct = new QAction("Reverse View", this);
@@ -146,6 +200,8 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	optionsMenu->addSeparator();
 	optionsMenu->addActions(addressGroup->actions());
 	optionsMenu->addSeparator();
+	optionsMenu->addActions(radixGroup->actions());
+	optionsMenu->addSeparator();
 	optionsMenu->addAction(reverseAct);
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(increaseBplAct);
@@ -167,6 +223,91 @@ MemoryWindow::~MemoryWindow()
 }
 
 
+void MemoryWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	debug_view_memory &memView = *m_memTable->view<debug_view_memory>();
+
+	auto const region = node.get_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_memTable->sourceIndex());
+	if ((0 <= region) && (m_memoryComboBox->count() > region))
+		m_memoryComboBox->setCurrentIndex(region);
+
+	auto const reverse = node.get_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView.reverse() ? 1 : 0);
+	if (memView.reverse() != bool(reverse))
+	{
+		memView.set_reverse(bool(reverse));
+		findChild<QAction *>("reverse")->setChecked(bool(reverse));
+	}
+
+	auto const mode = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView.physical() ? 1 : 0);
+	QActionGroup *const addressGroup = findChild<QActionGroup *>("addressgroup");
+	for (QAction *action : addressGroup->actions())
+	{
+		if (action->data().toBool() == mode)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const radix = node.get_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView.address_radix());
+	QActionGroup *const radixGroup = findChild<QActionGroup *>("radixgroup");
+	for (QAction *action : radixGroup->actions())
+	{
+		if (action->data().toInt() == radix)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const format = node.get_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView.get_data_format()));
+	QActionGroup *const dataFormat = findChild<QActionGroup *>("dataformat");
+	for (QAction *action : dataFormat->actions())
+	{
+		if (action->data().toInt() == format)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	auto const chunks = node.get_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView.chunks_per_row());
+	memView.set_chunks_per_row(chunks);
+
+	util::xml::data_node const *const expression = node.get_child(NODE_WINDOW_EXPRESSION);
+	if (expression && expression->get_value())
+	{
+		m_inputEdit->setText(QString::fromUtf8(expression->get_value()));
+		expressionSubmitted();
+	}
+
+	m_memTable->restoreConfigurationFromNode(node);
+	m_inputHistory.restoreConfigurationFromNode(node);
+}
+
+
+void MemoryWindow::saveConfigurationToNode(util::xml::data_node &node)
+{
+	WindowQt::saveConfigurationToNode(node);
+
+	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_MEMORY_VIEWER);
+
+	debug_view_memory &memView = *m_memTable->view<debug_view_memory>();
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_REGION, m_memTable->sourceIndex());
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_REVERSE_COLUMNS, memView.reverse() ? 1 : 0);
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_MODE, memView.physical() ? 1 : 0);
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ADDRESS_RADIX, memView.address_radix());
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_DATA_FORMAT, int(memView.get_data_format()));
+	node.set_attribute_int(ATTR_WINDOW_MEMORY_ROW_CHUNKS, memView.chunks_per_row());
+	node.add_child(NODE_WINDOW_EXPRESSION, memView.expression());
+
+	m_memTable->saveConfigurationToNode(node);
+	m_inputHistory.saveConfigurationToNode(node);
+}
+
+
 void MemoryWindow::memoryRegionChanged(int index)
 {
 	if (index < m_memTable->view()->source_count())
@@ -175,18 +316,71 @@ void MemoryWindow::memoryRegionChanged(int index)
 		m_memTable->viewport()->update();
 
 		// Update the data format radio buttons to the memory region's default
-		debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
-		switch (memView->get_data_format())
+		debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
+
+		QActionGroup *const dataFormat = findChild<QActionGroup *>("dataformat");
+		for (QAction *action : dataFormat->actions())
 		{
-		case 1: dataFormatMenuItem("formatActOne")->setChecked(true); break;
-		case 2: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
-		case 4: dataFormatMenuItem("formatActFour")->setChecked(true); break;
-		case 8: dataFormatMenuItem("formatActEight")->setChecked(true); break;
-		case 9: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
-		case 10: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
-		case 11: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
-		default: break;
+			if (debug_view_memory::data_format(action->data().toInt()) == memView->get_data_format())
+			{
+				action->setChecked(true);
+				break;
+			}
 		}
+
+		QActionGroup *radixGroup = findChild<QActionGroup *>("radixgroup");
+		for (QAction *action : radixGroup->actions())
+		{
+			if (action->data().toInt() == memView->address_radix())
+			{
+				action->setChecked(true);
+				break;
+			}
+		}
+	}
+}
+
+
+// Used to intercept the user hitting the up arrow in the input widget
+bool MemoryWindow::eventFilter(QObject *obj, QEvent *event)
+{
+	// Only filter keypresses
+	if (event->type() != QEvent::KeyPress)
+		return QObject::eventFilter(obj, event);
+
+	QKeyEvent const &keyEvent = *static_cast<QKeyEvent *>(event);
+
+	// Catch up & down keys
+	if (keyEvent.key() == Qt::Key_Escape)
+	{
+		m_inputEdit->setText(QString::fromUtf8(m_memTable->view<debug_view_memory>()->expression()));
+		m_inputEdit->selectAll();
+		m_inputHistory.reset();
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Up)
+	{
+		QString const *const hist = m_inputHistory.previous(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Down)
+	{
+		QString const *const hist = m_inputHistory.next(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else
+	{
+		return QObject::eventFilter(obj, event);
 	}
 }
 
@@ -194,60 +388,48 @@ void MemoryWindow::memoryRegionChanged(int index)
 void MemoryWindow::expressionSubmitted()
 {
 	const QString expression = m_inputEdit->text();
-	downcast<debug_view_memory *>(m_memTable->view())->set_expression(expression.toLocal8Bit().data());
+	m_memTable->view<debug_view_memory>()->set_expression(expression.toUtf8().data());
+	m_inputEdit->selectAll();
 
-	// Make the cursor pop
-	m_memTable->view()->set_cursor_visible(true);
+	// Add history
+	if (!expression.isEmpty())
+		m_inputHistory.add(expression);
+}
 
-	// Check where the cursor is and adjust the scroll accordingly
-	debug_view_xy cursorPosition = m_memTable->view()->cursor_position();
-	// TODO: check if the region is already visible?
-	m_memTable->verticalScrollBar()->setValue(cursorPosition.y);
 
-	m_memTable->update();
-	m_memTable->viewport()->update();
+void MemoryWindow::expressionEdited(QString const &text)
+{
+	m_inputHistory.edit();
 }
 
 
 void MemoryWindow::formatChanged(QAction* changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
-
-	if (changedTo->text() == "1-byte chunks")
-		memView->set_data_format(1);
-	else if (changedTo->text() == "2-byte chunks")
-		memView->set_data_format(2);
-	else if (changedTo->text() == "4-byte chunks")
-		memView->set_data_format(4);
-	else if (changedTo->text() == "8-byte chunks")
-		memView->set_data_format(8);
-	else if (changedTo->text() == "32 bit floating point")
-		memView->set_data_format(9);
-	else if (changedTo->text() == "64 bit floating point")
-		memView->set_data_format(10);
-	else if (changedTo->text() == "80 bit floating point")
-		memView->set_data_format(11);
-
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
+	memView->set_data_format(debug_view_memory::data_format(changedTo->data().toInt()));
 	m_memTable->viewport()->update();
 }
 
 
 void MemoryWindow::addressChanged(QAction* changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
+	memView->set_physical(changedTo->data().toBool());
+	m_memTable->viewport()->update();
+}
 
-	if (changedTo->text() == "Logical Addresses")
-		memView->set_physical(false);
-	else if (changedTo->text() == "Physical Addresses")
-		memView->set_physical(true);
 
+void MemoryWindow::radixChanged(QAction* changedTo)
+{
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
+	memView->set_address_radix(changedTo->data().toInt());
 	m_memTable->viewport()->update();
 }
 
 
 void MemoryWindow::reverseChanged(bool changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_reverse(changedTo);
 	m_memTable->viewport()->update();
 }
@@ -255,7 +437,7 @@ void MemoryWindow::reverseChanged(bool changedTo)
 
 void MemoryWindow::increaseBytesPerLine(bool changedTo)
 {
-	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_chunks_per_row(memView->chunks_per_row() + 1);
 	m_memTable->viewport()->update();
 }
@@ -263,7 +445,7 @@ void MemoryWindow::increaseBytesPerLine(bool changedTo)
 
 void MemoryWindow::decreaseBytesPerLine(bool checked)
 {
-	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+	debug_view_memory *const memView = m_memTable->view<debug_view_memory>();
 	memView->set_chunks_per_row(memView->chunks_per_row() - 1);
 	m_memTable->viewport()->update();
 }
@@ -295,25 +477,6 @@ void MemoryWindow::setToCurrentCpu()
 }
 
 
-// I have a hard time storing QActions as class members.  This is a substitute.
-QAction *MemoryWindow::dataFormatMenuItem(const QString& itemName)
-{
-	QList<QMenu *> menus = menuBar()->findChildren<QMenu *>();
-	for (int i = 0; i < menus.length(); i++)
-	{
-		if (menus[i]->title() != "&Options")
-			continue;
-		QList<QAction *> actions = menus[i]->actions();
-		for (int j = 0; j < actions.length(); j++)
-		{
-			if (actions[j]->objectName() == itemName)
-				return actions[j];
-		}
-	}
-	return nullptr;
-}
-
-
 //=========================================================================
 //  DebuggerMemView
 //=========================================================================
@@ -323,14 +486,14 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 
 	if (view()->cursor_visible())
 	{
-		debug_view_memory &memView = downcast<debug_view_memory &>(*view());
+		debug_view_memory &memView = *view<debug_view_memory>();
 		debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memView.source());
 		address_space *const addressSpace = source.space();
 		if (addressSpace)
 		{
 			// get the last known PC to write to this memory location
 			debug_view_xy const pos = memView.cursor_position();
-			offs_t const address = memView.addressAtCursorPosition(pos);
+			offs_t const address = addressSpace->byte_to_address(memView.addressAtCursorPosition(pos));
 			offs_t a = address & addressSpace->logaddrmask();
 			bool good = false;
 			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), TRANSLATE_READ_DEBUG, a))
@@ -355,7 +518,10 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 						memValue);
 				if (pc != offs_t(-1))
 				{
-					m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
+					if (addressSpace->is_octal())
+						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 8).arg(pc, 2, 8);
+					else
+						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
 					good = true;
 				}
 				else
@@ -380,78 +546,4 @@ void DebuggerMemView::copyLastPc()
 	QApplication::clipboard()->setText(m_lastPc);
 }
 
-
-//=========================================================================
-//  MemoryWindowQtConfig
-//=========================================================================
-void MemoryWindowQtConfig::buildFromQWidget(QWidget *widget)
-{
-	WindowQtConfig::buildFromQWidget(widget);
-	MemoryWindow *window = dynamic_cast<MemoryWindow *>(widget);
-	QComboBox *memoryRegion = window->findChild<QComboBox*>("memoryregion");
-	m_memoryRegion = memoryRegion->currentIndex();
-
-	QAction *reverse = window->findChild<QAction *>("reverse");
-	m_reverse = reverse->isChecked();
-
-	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
-	if (addressGroup->checkedAction()->text() == "Logical Addresses")
-		m_addressMode = 0;
-	else if (addressGroup->checkedAction()->text() == "Physical Addresses")
-		m_addressMode = 1;
-
-	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	if (dataFormat->checkedAction()->text() == "1-byte chunks")
-		m_dataFormat = 0;
-	else if (dataFormat->checkedAction()->text() == "2-byte chunks")
-		m_dataFormat = 1;
-	else if (dataFormat->checkedAction()->text() == "4-byte chunks")
-		m_dataFormat = 2;
-	else if (dataFormat->checkedAction()->text() == "8-byte chunks")
-		m_dataFormat = 3;
-	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
-		m_dataFormat = 4;
-	else if (dataFormat->checkedAction()->text() == "64 bit floating point")
-		m_dataFormat = 5;
-	else if (dataFormat->checkedAction()->text() == "80 bit floating point")
-		m_dataFormat = 6;
-}
-
-
-void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	MemoryWindow *window = dynamic_cast<MemoryWindow *>(widget);
-	QComboBox *memoryRegion = window->findChild<QComboBox *>("memoryregion");
-	memoryRegion->setCurrentIndex(m_memoryRegion);
-
-	QAction *reverse = window->findChild<QAction *>("reverse");
-	if (m_reverse)
-		reverse->trigger();
-
-	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
-	addressGroup->actions()[m_addressMode]->trigger();
-
-	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	dataFormat->actions()[m_dataFormat]->trigger();
-}
-
-
-void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
-{
-	WindowQtConfig::addToXmlDataNode(node);
-	node.set_attribute_int("memoryregion", m_memoryRegion);
-	node.set_attribute_int("reverse", m_reverse);
-	node.set_attribute_int("addressmode", m_addressMode);
-	node.set_attribute_int("dataformat", m_dataFormat);
-}
-
-
-void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
-	m_reverse = node.get_attribute_int("reverse", m_reverse);
-	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
-	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
-}
+} // namespace osd::debugger::qt

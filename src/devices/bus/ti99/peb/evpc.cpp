@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "evpc.h"
+
 #include "speaker.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
@@ -52,7 +53,7 @@
 #include "logmacro.h"
 #define EVPC_SCREEN_TAG      "screen"
 
-DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
+DEFINE_DEVICE_TYPE(TI99_EVPC, bus::ti99::peb::snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
 namespace bus::ti99::peb {
 
@@ -130,9 +131,10 @@ void snug_enhanced_video_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void snug_enhanced_video_device::nvram_read(emu_file &file)
+bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_novram.get(), NOVRAM_SIZE);
+	size_t actual;
+	return !file.read(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
 }
 
 //-------------------------------------------------
@@ -140,9 +142,10 @@ void snug_enhanced_video_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void snug_enhanced_video_device::nvram_write(emu_file &file)
+bool snug_enhanced_video_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_novram.get(), NOVRAM_SIZE);
+	size_t actual;
+	return !file.write(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
 }
 
 /*

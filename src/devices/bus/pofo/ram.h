@@ -12,7 +12,6 @@
 #pragma once
 
 #include "ccm.h"
-#include "machine/nvram.h"
 
 
 
@@ -36,8 +35,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { if (m_nvram != nullptr) { file.read(m_nvram, m_nvram.bytes()); } }
-	virtual void nvram_write(emu_file &file) override { if (m_nvram != nullptr) { file.write(m_nvram, m_nvram.bytes()); } }
+	virtual bool nvram_read(util::read_stream &file) override { size_t actual; return !file.read(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
+	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(m_nvram, m_nvram.bytes(), actual) && actual == m_nvram.bytes(); }
 
 	// device_portfolio_memory_card_slot_interface overrides
 	virtual bool cdet() override { return 0; }

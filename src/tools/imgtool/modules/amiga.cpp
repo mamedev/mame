@@ -13,14 +13,17 @@
  Includes
 *****************************************************************************/
 
-
-#include <ctime>
-#include <cstring>
-#include <cctype>
-
 #include "imgtool.h"
+#include "charconv.h"
 #include "iflopimg.h"
+
 #include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cctype>
+#include <cstring>
+#include <ctime>
 
 
 
@@ -252,15 +255,22 @@ static int intl_toupper(int c)
 
 
 /* Amiga filename case insensitive string compare */
-static int intl_stricmp(const char *s1, const char *s2)
+static int intl_stricmp(std::string_view s1, std::string_view s2)
 {
-	for (;;)
+	auto s1_iter = s1.begin();
+	auto s2_iter = s2.begin();
+	while (true)
 	{
-		int c1 = intl_toupper(*s1++);
-		int c2 = intl_toupper(*s2++);
+		if (s1.end() == s1_iter)
+			return (s2.end() == s2_iter) ? 0 : -1;
+		else if (s2.end() == s2_iter)
+			return 1;
 
-		if (c1 == 0 || c1 != c2)
-			return c1 - c2;
+		const int c1 = intl_toupper(uint8_t(*s1_iter++));
+		const int c2 = intl_toupper(uint8_t(*s2_iter++));
+		const int diff = c1 - c2;
+		if (diff)
+			return diff;
 	}
 }
 
@@ -513,9 +523,8 @@ static imgtoolerr_t write_bitmap_block(imgtool::image &img, int block, const bit
 }
 
 
-#ifdef UNUSED_FUNCTION
 /* Read a bitmap extended block */
-static imgtoolerr_t read_bitmap_ext_block(imgtool::image *img, int block, bitmap_ext_block *bm)
+[[maybe_unused]] static imgtoolerr_t read_bitmap_ext_block(imgtool::image &img, int block, bitmap_ext_block *bm)
 {
 	imgtoolerr_t ret;
 	uint8_t buffer[BSIZE];
@@ -530,7 +539,6 @@ static imgtoolerr_t read_bitmap_ext_block(imgtool::image *img, int block, bitmap
 
 	return IMGTOOLERR_SUCCESS;
 }
-#endif
 
 
 /* Read the root block */
@@ -837,16 +845,14 @@ static int is_intl(imgtool::image &img)
 				t == DT_FFS_INTL_DIRC) ? true : false);
 }
 
-#ifdef UNUSED_FUNCTION
 /* Returns true if the disk uses the directory cache mode */
-static int is_dirc(imgtool::image *img)
+[[maybe_unused]] static int is_dirc(imgtool::image &img)
 {
 	disk_type t = get_disk_type(img);
 
 	return ((t == DT_OFS_INTL_DIRC ||
 				t == DT_FFS_INTL_DIRC) ? true : false);
 }
-#endif
 
 static imgtoolerr_t get_hash_table(imgtool::image &img, int block, uint32_t *ht)
 {
@@ -907,12 +913,10 @@ static imgtoolerr_t set_hash_table(imgtool::image &img, int block, const uint32_
 	return IMGTOOLERR_SUCCESS;
 }
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t get_root_hash_table(imgtool::image *img, uint32_t *ht)
+[[maybe_unused]] static imgtoolerr_t get_root_hash_table(imgtool::image &img, uint32_t *ht)
 {
 	return get_hash_table(img, get_total_blocks(img)/2, ht);
 }
-#endif
 
 static imgtoolerr_t get_blockname(imgtool::image &img, int block, char *dest)
 {
@@ -974,7 +978,7 @@ static imgtoolerr_t walk_hash_chain(imgtool::image &img, const char *path, int s
 	char name[31];
 
 	/* choose compare function depending on intl mode */
-	int (*cmp)(const char *, const char *) = is_intl(img) ? &intl_stricmp : &core_stricmp;
+	int (*cmp)(std::string_view, std::string_view) = is_intl(img) ? &intl_stricmp : &core_stricmp;
 
 	/* initialize filenames */
 	memset(name, 0, sizeof(name));
@@ -1367,8 +1371,7 @@ static int get_first_bit(uint32_t *array, int size)
 }
 
 
-#ifdef UNUSED_FUNCTION
-static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image *img, int start, int *block)
+[[maybe_unused]] static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image &img, int start, int *block)
 {
 	imgtoolerr_t ret;
 	bitmap_ext_block bm_ext;
@@ -1400,7 +1403,6 @@ static imgtoolerr_t walk_bitmap_ext_blocks(imgtool::image *img, int start, int *
 	/* else continue walking the list */
 	return walk_bitmap_ext_blocks(img, bm_ext.next, block);
 }
-#endif
 
 
 /* Searches for a block marked as free

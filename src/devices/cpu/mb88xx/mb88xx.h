@@ -192,7 +192,6 @@ private:
 	void update_pio_enable( uint8_t newpio );
 	void increment_timer();
 	void update_pio( int cycles );
-
 };
 
 

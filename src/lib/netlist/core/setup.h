@@ -13,7 +13,6 @@
 #include "../nl_setup.h"
 #include "../nltypes.h"
 
-//#include "../plib/ppreprocessor.h"
 #include "../plib/pstream.h"
 #include "../plib/pstring.h"
 
@@ -79,24 +78,47 @@ namespace netlist
 
 	namespace detail
 	{
-		// -----------------------------------------------------------------------------
-		// abstract_t
-		// -----------------------------------------------------------------------------
+		struct alias_t
+		{
+			alias_t(alias_type type, pstring alias, pstring references)
+			: m_type(type)
+			, m_alias(alias)
+			, m_references(references)
+			{}
 
+			alias_t(const alias_t &) = default;
+			alias_t &operator=(const alias_t &) = default;
+			alias_t(alias_t &&) noexcept = default;
+			alias_t &operator=(alias_t &&) noexcept = default;
+
+			pstring name() const { return m_alias; }
+			pstring references() const { return m_references; }
+			alias_type type() const { return m_type; }
+		private:
+			alias_type m_type;
+			pstring m_alias;
+			pstring m_references;
+		};
+
+		///
+		/// \brief class containing the abstract net list
+		///
+		/// After parsing a net list this class contains all raw
+		/// connections, parameter values and devices.
 		struct abstract_t
 		{
-			using link_t = std::pair<pstring, pstring>;
+			using connection_t = std::pair<pstring, pstring>;
 
 			abstract_t(log_type &log) : m_factory(log) { }
-			std::unordered_map<pstring, pstring>        m_alias;
-			std::vector<link_t>                         m_links;
+			std::unordered_map<pstring, alias_t>        m_aliases;
+			std::vector<connection_t>                   m_connections;
 			std::unordered_map<pstring, pstring>        m_param_values;
 			models_t::raw_map_t                         m_models;
 
 			// need to preserve order of device creation ...
 			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 			// lifetime control only - can be cleared before run
-			std::vector<std::pair<pstring, pstring>>    m_defparams;
+			std::vector<std::pair<pstring, pstring>>    m_default_params;
 			std::unordered_map<pstring, bool>           m_hints;
 			factory::list_t                             m_factory;
 		};
@@ -161,7 +183,7 @@ namespace netlist
 			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
 		}
 
-		// get family -> truthtable
+		// get family -> truth table
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		param_ref_t find_param(const pstring &param_in) const;
@@ -180,30 +202,27 @@ namespace netlist
 		models_t &models() noexcept { return m_models; }
 		const models_t &models() const noexcept { return m_models; }
 
-		netlist_state_t &nlstate() { return m_nlstate; }
-		const netlist_state_t &nlstate() const { return m_nlstate; }
+		netlist_state_t &nlstate() noexcept { return m_nlstate; }
+		const netlist_state_t &nlstate() const noexcept { return m_nlstate; }
 
-		nlparse_t &parser() { return m_parser; }
-		const nlparse_t &parser() const { return m_parser; }
+		nlparse_t &parser() noexcept { return m_parser; }
+		const nlparse_t &parser() const noexcept { return m_parser; }
 
 		log_type &log() noexcept;
 		const log_type &log() const noexcept;
-
-		// FIXME: needed from matrix_solver_t
-		void add_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
 
 	private:
 
 		void resolve_inputs();
 		pstring resolve_alias(const pstring &name) const;
 
-		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
+		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
 		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
-		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
-		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
-		bool connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect_input_output(detail::core_terminal_t &input, detail::core_terminal_t &output);
+		void connect_terminal_output(detail::core_terminal_t &terminal, detail::core_terminal_t &output);
+		void connect_terminal_input(detail::core_terminal_t &terminal, detail::core_terminal_t &input);
+		bool connect_input_input(detail::core_terminal_t &input1, detail::core_terminal_t &input2);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
@@ -216,7 +235,7 @@ namespace netlist
 
 		// net manipulations
 
-		void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
+		//void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
 		void move_connections(detail::net_t &net, detail::net_t &dest_net);
 		void delete_empty_nets();
 
@@ -233,7 +252,7 @@ namespace netlist
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 		// FIXME: Limited to 3 additional terminals
 		std::unordered_map<const terminal_t *,
-			std::array<terminal_t *, 4>>   m_connected_terminals;
+			std::array<terminal_t *, 4>>                       m_connected_terminals;
 		std::unordered_map<pstring, param_ref_t>               m_params;
 		std::unordered_map<const detail::core_terminal_t *,
 			devices::nld_base_proxy *>                         m_proxies;
@@ -243,7 +262,7 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// Specific netlist psource_t implementations
+	// Specific netlist `psource_t` implementations
 	// ----------------------------------------------------------------------------------------
 
 	class source_netlist_t : public plib::psource_t

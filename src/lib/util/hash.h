@@ -16,6 +16,10 @@
 #pragma once
 
 #include "hashing.h"
+#include "utilfwd.h"
+
+#include <memory>
+#include <system_error>
 
 
 //**************************************************************************
@@ -40,6 +44,9 @@ namespace util {
 // a collection of the various supported hashes and flags
 class hash_collection
 {
+	// forward declaration
+	class hash_creator;
+
 public:
 	// hash types are identified by non-hex alpha values (G-Z)
 	static constexpr char HASH_CRC = 'R';
@@ -56,9 +63,8 @@ public:
 
 	// construction/destruction
 	hash_collection();
-	hash_collection(std::string_view string);
-	hash_collection(const hash_collection &src);
-	~hash_collection();
+	hash_collection(std::string_view string) : hash_collection() { from_internal_string(string); }
+	hash_collection(const hash_collection &src) : hash_collection() { copyfrom(src); }
 
 	// operators
 	hash_collection &operator=(const hash_collection &src);
@@ -89,13 +95,12 @@ public:
 	bool from_internal_string(std::string_view string);
 
 	// creation
-	void begin(const char *types = nullptr);
-	void buffer(const uint8_t *data, uint32_t length);
-	void end();
-	void compute(const uint8_t *data, uint32_t length, const char *types = nullptr) { begin(types); buffer(data, length); end(); }
+	void compute(const uint8_t *data, uint32_t length, const char *types = nullptr);
+	std::error_condition compute(random_read &stream, uint64_t offset, size_t length, size_t &actual, const char *types = nullptr);
 
 private:
 	// internal helpers
+	std::unique_ptr<hash_creator> create(const char *types = nullptr);
 	void copyfrom(const hash_collection &src);
 
 	// internal state
@@ -104,16 +109,6 @@ private:
 	crc32_t                 m_crc32;
 	bool                    m_has_sha1;
 	sha1_t                  m_sha1;
-
-	// creators
-	struct hash_creator
-	{
-		bool                    m_doing_crc32;
-		crc32_creator           m_crc32_creator;
-		bool                    m_doing_sha1;
-		sha1_creator            m_sha1_creator;
-	};
-	hash_creator *          m_creator;
 };
 
 

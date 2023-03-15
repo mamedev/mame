@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="msx2p_flop" description="MSX2+ disk images">
@@ -27,7 +27,7 @@ Known undumped:
 
 
 	<software name="beppin">
-		<description>Beppin (Jpn)</description>
+		<description>Beppin (Japan)</description>
 		<year>1988</year>
 		<publisher>Wisdom</publisher>
 
@@ -40,7 +40,7 @@ Known undumped:
 
 <!-- Tagoo soft db reports this to be a 2 disks game in Japan... where does opening disk come from?!? -->
 	<software name="f1spirit">
-		<description>F-1 Spirit 3D Special (Jpn)</description>
+		<description>F-1 Spirit 3D Special (Japan)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
@@ -66,7 +66,7 @@ Known undumped:
 	</software>
 
 	<software name="f1spirita" cloneof="f1spirit">
-		<description>F-1 Spirit 3D Special (Jpn, Alt)</description>
+		<description>F-1 Spirit 3D Special (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
@@ -92,7 +92,7 @@ Known undumped:
 	</software>
 
 	<software name="f1spiritb" cloneof="f1spirit">
-		<description>F-1 Spirit 3D Special (Jpn, Alt Disk A)</description>
+		<description>F-1 Spirit 3D Special (Japan, alt Disk A)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="F1スピリット3Dスペシャル" />
@@ -118,7 +118,7 @@ Known undumped:
 	</software>
 
 	<software name="famistah">
-		<description>Pro Yakyuu Family Stadium - Homerun Contest (Jpn)</description>
+		<description>Pro Yakyuu Family Stadium - Homerun Contest (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト" />
@@ -131,7 +131,7 @@ Known undumped:
 	</software>
 
 	<software name="famistaha" cloneof="famistah">
-		<description>Pro Yakyuu Family Stadium - Homerun Contest (Jpn, Alt)</description>
+		<description>Pro Yakyuu Family Stadium - Homerun Contest (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="alt_title" value="プロ野球ファミリースタジアムホームランコンテスト" />
@@ -144,7 +144,7 @@ Known undumped:
 	</software>
 
 	<software name="dcconnec">
-		<description>J.B. Harold 3 - D.C. Connection (Jpn)</description>
+		<description>J.B. Harold 3 - D.C. Connection (Japan)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
@@ -170,7 +170,7 @@ Known undumped:
 	</software>
 
 	<software name="dcconneca" cloneof="dcconnec">
-		<description>J.B. Harold 3 - D.C. Connection (Jpn, Alt)</description>
+		<description>J.B. Harold 3 - D.C. Connection (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＪＢハロルド3～Ｄ．Ｃ．コネクション" />
@@ -198,7 +198,7 @@ Known undumped:
 
 <!-- Tagoo soft db reports this to be a 2 disks game in Japan... where does disk 3 come from? -->
 	<software name="kohakuir">
-		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Jpn)</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Japan)</description>
 		<year>1988</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="琥珀色の遺言" />
@@ -221,7 +221,7 @@ Known undumped:
 	</software>
 
 	<software name="kohakuira" cloneof="kohakuir">
-		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Jpn, Alt)</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="琥珀色の遺言" />
@@ -245,7 +245,7 @@ Known undumped:
 
 
 	<software name="laydock2">
-		<description>Laydock 2 - Last Attack (Jpn)</description>
+		<description>Laydock 2 - Last Attack (Japan)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="レイドック2ラストアタック" />
@@ -265,7 +265,7 @@ Known undumped:
 	</software>
 
 	<software name="laydock2a" cloneof="laydock2">
-		<description>Laydock 2 - Last Attack (Jpn, Alt)</description>
+		<description>Laydock 2 - Last Attack (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="レイドック2ラストアタック" />
@@ -286,7 +286,7 @@ Known undumped:
 
 	<!-- Has smooth horizontal scrolling, unlike the MSX2 release - this effect is not emulated correctly -->
 	<software name="midgarts" supported="no">
-		<description>Mid-Garts (MSX2+) (Jpn)</description>
+		<description>Mid-Garts (MSX2+) (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
 		<info name="alt_title" value="ミッドガルツ" />
@@ -330,7 +330,7 @@ Known undumped:
 	</software>
 
 	<software name="pacdisc">
-		<description>Pana Amusement Collection Disc (Jpn)</description>
+		<description>Pana Amusement Collection Disc (Japan)</description>
 		<year>1988</year>
 		<publisher>Panasoft</publisher>
 
@@ -349,7 +349,7 @@ Known undumped:
 	</software>
 
 	<software name="pacdisca" cloneof="pacdisc">
-		<description>Pana Amusement Collection Disc (Jpn, Alt)</description>
+		<description>Pana Amusement Collection Disc (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Panasoft</publisher>
 
@@ -368,7 +368,7 @@ Known undumped:
 	</software>
 
 	<software name="pacdiscb" cloneof="pacdisc">
-		<description>Pana Amusement Collection Disc (Jpn, Alt 2)</description>
+		<description>Pana Amusement Collection Disc (Japan, alt 2)</description>
 		<year>1988</year>
 		<publisher>Panasoft</publisher>
 
@@ -387,7 +387,7 @@ Known undumped:
 	</software>
 
 	<software name="hbf1xv">
-		<description>Sony HB-F1XV Story Disk (Jpn)</description>
+		<description>Sony HB-F1XV Story Disk (Japan)</description>
 		<year>1990</year>
 		<publisher>Sony</publisher>
 
@@ -403,7 +403,7 @@ Known undumped:
 <!-- Coverdisks? -->
 
 	<software name="twinkle">
-		<description>Twinkle Star - Hoshi no Mahou Tsukai (Jpn)</description>
+		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い" />
@@ -416,7 +416,7 @@ Known undumped:
 	</software>
 
 	<software name="twinklea" cloneof="twinkle">
-		<description>Twinkle Star - Hoshi no Mahou Tsukai (Jpn, Alt)</description>
+		<description>Twinkle Star - Hoshi no Mahou Tsukai (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="ＴＷＩＮＫＬＥ ＳＴＡＲ 星の魔法使い" />
@@ -429,7 +429,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidak">
-		<description>Yoshida Kensetsu (Jpn)</description>
+		<description>Yoshida Kensetsu (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -442,7 +442,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidaka" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Jpn, Alt)</description>
+		<description>Yoshida Kensetsu (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -455,7 +455,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidakb" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Jpn, Alt 2)</description>
+		<description>Yoshida Kensetsu (Japan, alt 2)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -468,7 +468,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidakc" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Jpn, Alt 3)</description>
+		<description>Yoshida Kensetsu (Japan, alt 3)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -481,7 +481,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidakd" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Jpn, Alt 4)</description>
+		<description>Yoshida Kensetsu (Japan, alt 4)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -494,7 +494,7 @@ Known undumped:
 	</software>
 
 	<software name="yoshidake" cloneof="yoshidak">
-		<description>Yoshida Kensetsu (Jpn, Alt 5)</description>
+		<description>Yoshida Kensetsu (Japan, alt 5)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 		<info name="alt_title" value="吉田建設" />
@@ -507,7 +507,7 @@ Known undumped:
 	</software>
 
 	<software name="lubeck">
-		<description>Lübeck (Jpn)</description>
+		<description>Lübeck (Japan)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -519,7 +519,7 @@ Known undumped:
 	</software>
 
 	<software name="lubecka" cloneof="lubeck">
-		<description>Lübeck (Jpn, Alt)</description>
+		<description>Lübeck (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -531,7 +531,7 @@ Known undumped:
 	</software>
 
 	<software name="seasard">
-		<description>Sea Sardine Side-2 (Jpn)</description>
+		<description>Sea Sardine Side-2 (Japan)</description>
 		<year>1991</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -543,7 +543,7 @@ Known undumped:
 	</software>
 
 	<software name="seasarda" cloneof="seasard">
-		<description>Sea Sardine Side-2 (Jpn, Alt)</description>
+		<description>Sea Sardine Side-2 (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -555,7 +555,7 @@ Known undumped:
 	</software>
 
 	<software name="wig">
-		<description>The Wig (Jpn)</description>
+		<description>The Wig (Japan)</description>
 		<year>1989</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -567,7 +567,7 @@ Known undumped:
 	</software>
 
 	<software name="wiga" cloneof="wig">
-		<description>The Wig (Jpn, Alt)</description>
+		<description>The Wig (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>MSX Magazine</publisher>
 
@@ -595,7 +595,7 @@ Known undumped:
 	</software>
 
 	<software name="gladius">
-		<description>Gladius (Ger)</description>
+		<description>Gladius (Germany)</description>
 		<year>1992</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="M. Pfeil / MP" />
@@ -608,7 +608,7 @@ Known undumped:
 	</software>
 
 	<software name="gradius3">
-		<description>Gradius III Legends (Spa, Demo)</description>
+		<description>Gradius III Legends (Spain, demo)</description>
 		<year>2001</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Imanok" />
@@ -634,7 +634,7 @@ Known undumped:
 	</software>
 
 	<software name="megadoom">
-		<description>Megadoom (Ned)</description>
+		<description>Megadoom (Netherlands)</description>
 		<year>1992</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="First Class Software" />
@@ -654,7 +654,7 @@ Known undumped:
 	</software>
 
 	<software name="megadoomd" cloneof="megadoom">
-		<description>Megadoom (Ned, Demo)</description>
+		<description>Megadoom (Netherlands, demo)</description>
 		<year>1992</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="First Class Software" />
@@ -674,7 +674,7 @@ Known undumped:
 	</software>
 
 	<software name="pbstrip">
-		<description>Playboy Strippoker (Ned)</description>
+		<description>Playboy Strippoker (Netherlands)</description>
 		<year>1992</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="First Class Software" />
@@ -687,7 +687,7 @@ Known undumped:
 	</software>
 
 	<software name="sonyc">
-		<description>Sonyc (Spa)</description>
+		<description>Sonyc (Spain)</description>
 		<year>1995</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Analogy" />
@@ -700,7 +700,7 @@ Known undumped:
 	</software>
 
 	<software name="trtmania">
-		<description>Turtle Mania (Ger, Demo)</description>
+		<description>Turtle Mania (Germany, demo)</description>
 		<year>1997</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="WR" />
@@ -713,7 +713,7 @@ Known undumped:
 	</software>
 
 	<software name="witchiz">
-		<description>The Witch 'Iz' (Jpn, Bad Dump?)</description>
+		<description>The Witch 'Iz' (Japan, bad dump?)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="Chihiro" />

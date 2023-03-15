@@ -43,7 +43,6 @@ protected:
 	required_memory_region m_chargen;
 
 	u16 m_video_addr;
-	u8 m_video_data;
 
 	std::unique_ptr<u8[]> m_video_ram;
 

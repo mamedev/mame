@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Sean Young
-#include <cassert>
 
-#include "formats/fmsx_cas.h"
+#include "fmsx_cas.h"
+
+#include <cstring>
 
 
 #define CAS_PERIOD        (16)

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -32,8 +32,22 @@ license:CC0
 	<element name="text_g"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="G"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 	<element name="text_h"> <rect><color red="0.56" green="0.33" blue="0.12" /></rect> <text string="H"><color red="0.87" green="0.87" blue="0.84" /></text> </element>
 
+
+<!-- sb board -->
+
+	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
+
+	<element name="hlbb" defstate="0">
+		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+	</element>
+
 	<element name="piece" defstate="0">
-		<rect><color alpha="0" /></rect> <!-- force unit square bounds -->
+		<rect><color alpha="0" /><bounds x="0" y="0" width="1" height="1" /></rect> <!-- force unit square bounds -->
 
 		<image file="chess/wp.svg" state="1"/>
 		<image file="chess/wn.svg" state="2"/>
@@ -87,20 +101,6 @@ license:CC0
 			<color red="0.7" green="0.7" blue="0.6" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
-	</element>
-
-
-<!-- sb board -->
-
-	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
-	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
-
-	<element name="hlbb" defstate="0">
-		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
-		<disk state="1">
-			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
-			<color red="0" green="0" blue="0" />
-		</disk>
 	</element>
 
 	<group name="sb_board">
@@ -343,15 +343,6 @@ license:CC0
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0400"><bounds x="5" y="39" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0800"><bounds x="5" y="43" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<!-- hand -->
-		<element ref="text_uih1"><bounds x="0" y="54" width="10" height="2" /></element>
-		<element ref="cblack"><bounds x="1" y="56.5" width="8" height="6" /></element>
-		<element name="piece_ui0" ref="piece"><bounds x="2" y="56.5" width="6" height="6" /></element>
-
-		<element ref="cwhite"><bounds x="1" y="63.5" width="8" height="2.5" /></element>
-		<element ref="text_uih2"><bounds x="1.5" y="63.75" width="7" height="2" /></element>
-		<element ref="hlub" inputtag="board:board:UI" inputmask="0x08"><bounds x="1" y="63.5" width="8" height="2.5" /><color alpha="0.25" /></element>
-
 		<element ref="cwhite"><bounds x="1" y="48" width="8" height="4" /></element>
 		<element name="piece_ui13" ref="piece"><bounds x="1" y="48" width="4" height="4" /></element>
 		<element name="piece_ui14" ref="piece"><bounds x="5" y="48" width="4" height="4" /></element>
@@ -360,6 +351,15 @@ license:CC0
 		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="1" y="48" width="4" height="4" /></element>
 		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="5" y="48" width="4" height="4" /></element>
 		<element ref="wmask2" blend="multiply"><bounds x="1" y="48" width="8" height="4" /></element>
+
+		<!-- hand -->
+		<element ref="text_uih1"><bounds x="0" y="54" width="10" height="2" /></element>
+		<element ref="cblack"><bounds x="1" y="56.5" width="8" height="6" /></element>
+		<element name="piece_ui0" ref="piece"><bounds x="2" y="56.5" width="6" height="6" /></element>
+
+		<element ref="cwhite"><bounds x="1" y="63.5" width="8" height="2.5" /></element>
+		<element ref="text_uih2"><bounds x="1.5" y="63.75" width="7" height="2" /></element>
+		<element ref="hlub" inputtag="board:board:UI" inputmask="0x08"><bounds x="1" y="63.5" width="8" height="2.5" /><color alpha="0.25" /></element>
 
 		<!-- undo -->
 		<element ref="text_uiu1"><bounds x="0" y="68" width="10" height="2" /></element>

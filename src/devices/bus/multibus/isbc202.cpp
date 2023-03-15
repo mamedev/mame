@@ -61,6 +61,7 @@
 #include "emu.h"
 #include "isbc202.h"
 #include "formats/img_dsk.h"
+#include "formats/fs_isis.h"
 
 // Debugging
 #include "logmacro.h"
@@ -99,13 +100,6 @@ constexpr unsigned TIMEOUT_MS = 10;     // "timeout" timer: 10 ms
 constexpr unsigned HALF_BIT_CELL_US = 1;// Half bit cell duration in µs
 constexpr unsigned BIT_FREQUENCY = 500000;  // Frequency of bit cells in Hz
 constexpr uint16_t CRC_POLY = 0x1021;   // CRC-CCITT
-
-// Timers
-enum {
-	  TIMEOUT_TMR_ID,
-	  BYTE_TMR_ID,
-	  F_TMR_ID
-};
 
 // device type definition
 DEFINE_DEVICE_TYPE(ISBC202, isbc202_device, "isbc202", "iSBC-202 floppy controller")
@@ -213,7 +207,7 @@ offs_t isbc202_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 // isbc202_device
 isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig , ISBC202 , tag , owner , multibus_slot_device::BUS_CLOCK / 4)
+	: cpu_device(mconfig , ISBC202 , tag , owner , DERIVED_CLOCK(1, 4))
 	, device_multibus_interface(mconfig , *this)
 	, m_mcu(*this , "mcu")
 	, m_cpes(*this , "cpe%u" , 0)
@@ -225,16 +219,6 @@ isbc202_device::isbc202_device(const machine_config &mconfig, const char *tag, d
 
 isbc202_device::~isbc202_device()
 {
-}
-
-void isbc202_device::install_io_rw(address_space& space)
-{
-	space.install_readwrite_handler(0x78 , 0x7f , read8m_delegate(*this , FUNC(isbc202_device::io_r)) , write8m_delegate(*this , FUNC(isbc202_device::io_w)));
-}
-
-void isbc202_device::install_mem_rw(address_space& space)
-{
-	m_mem_space = &space;
 }
 
 uint8_t isbc202_device::io_r(address_space &space, offs_t offset)
@@ -283,11 +267,10 @@ uint8_t isbc202_device::io_r(address_space &space, offs_t offset)
 
 	case 3:
 		// Read result byte (no auto XACK)
-		if (m_cpu == nullptr) {
-			m_cpu = dynamic_cast<cpu_device*>(&space.device());
+		if (!m_2nd_pass) {
 			set_start(3 , true);
 		} else {
-			m_cpu = nullptr;
+			m_2nd_pass = false;
 			res = m_data_low_out;
 		}
 		break;
@@ -314,12 +297,12 @@ void isbc202_device::io_w(address_space &space, offs_t offset, uint8_t data)
 	case 4:
 	case 5:
 	case 6:
-		if (m_cpu != nullptr) {
-			LOG("CPU != NULL!\n");
+		if (!m_2nd_pass) {
+			m_cpu_data = data;
+			set_start(offset , false);
+		} else {
+			m_2nd_pass = false;
 		}
-		m_cpu = dynamic_cast<cpu_device*>(&space.device());
-		m_cpu_data = data;
-		set_start(offset , false);
 		break;
 
 	case 7:
@@ -378,7 +361,7 @@ void isbc202_device::device_start()
 	save_item(NAME(m_op_us));
 	save_item(NAME(m_px_s1s0));
 	save_item(NAME(m_cmd));
-	save_item(NAME(m_cpu_rd));
+	save_item(NAME(m_2nd_pass));
 	save_item(NAME(m_ready_in));
 	save_item(NAME(m_ready_ff));
 	save_item(NAME(m_gate_lower));
@@ -414,9 +397,12 @@ void isbc202_device::device_start()
 		d->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&isbc202_device::floppy_index_cb , this));
 	}
 
-	m_timeout_timer = timer_alloc(TIMEOUT_TMR_ID);
-	m_byte_timer = timer_alloc(BYTE_TMR_ID);
-	m_f_timer = timer_alloc(F_TMR_ID);
+	m_timeout_timer = timer_alloc(FUNC(isbc202_device::timeout_tick), this);
+	m_byte_timer = timer_alloc(FUNC(isbc202_device::byte_tick), this);
+	m_f_timer = timer_alloc(FUNC(isbc202_device::f_tick), this);
+
+	m_mem_space = &m_bus->space(AS_PROGRAM);
+	m_bus->space(AS_IO).install_readwrite_handler(0x78, 0x7f, read8m_delegate(*this, FUNC(isbc202_device::io_r)), write8m_delegate(*this, FUNC(isbc202_device::io_w)));
 }
 
 void isbc202_device::device_reset()
@@ -433,7 +419,7 @@ void isbc202_device::device_reset()
 	m_inputs[ IN_SEL_TIMEOUT ] = true;
 	m_inputs[ IN_SEL_F ] = false;
 
-	m_cpu = nullptr;
+	m_2nd_pass = false;
 
 	m_irq = false;
 
@@ -445,37 +431,32 @@ void isbc202_device::device_reset()
 	m_f_timer->reset();
 }
 
-void isbc202_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(isbc202_device::timeout_tick)
 {
-	switch (id) {
-	case TIMEOUT_TMR_ID:
-		m_inputs[ IN_SEL_TIMEOUT ] = true;
-		break;
+	m_inputs[ IN_SEL_TIMEOUT ] = true;
+}
 
-	case BYTE_TMR_ID:
-		m_inputs[ IN_SEL_F ] = true;
-		m_f_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 2));
-		m_dlyd_amwrt = m_amwrt;
-		if (m_reading) {
-			m_last_f_time = machine().time();
-			rd_bits(8);
-			m_byte_timer->adjust(m_pll.ctime - machine().time());
-			// Updating of AZ flag actually happens when F goes low
-			m_inputs[ IN_SEL_AZ ] = m_crc == 0;
-		}
-		break;
+TIMER_CALLBACK_MEMBER(isbc202_device::byte_tick)
+{
+	m_inputs[ IN_SEL_F ] = true;
+	m_f_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 2));
+	m_dlyd_amwrt = m_amwrt;
+	if (m_reading) {
+		m_last_f_time = machine().time();
+		rd_bits(8);
+		m_byte_timer->adjust(m_pll.ctime - machine().time());
+		// Updating of AZ flag actually happens when F goes low
+		m_inputs[ IN_SEL_AZ ] = m_crc == 0;
+	}
+}
 
-	case F_TMR_ID:
-		m_inputs[ IN_SEL_F ] = false;
-		if (m_writing) {
-			write_byte();
-			m_data_sr = dbus_r();
-			m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));
-		}
-		break;
-
-	default:
-		break;
+TIMER_CALLBACK_MEMBER(isbc202_device::f_tick)
+{
+	m_inputs[ IN_SEL_F ] = false;
+	if (m_writing) {
+		write_byte();
+		m_data_sr = dbus_r();
+		m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));
 	}
 }
 
@@ -500,6 +481,7 @@ static void isbc202_floppies(device_slot_interface &device)
 static void isbc202_floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_IMG_FORMAT);
+	fr.add(fs::ISIS);
 };
 
 void isbc202_device::device_add_mconfig(machine_config &config)
@@ -516,34 +498,34 @@ void isbc202_device::device_add_mconfig(machine_config &config)
 	}
 
 	// Connect CO/CI signals
-	m_mcu->fo_w().set(m_cpes[ 0 ] , FUNC(i3002_device::ci_w));
-	m_cpes[ 0 ]->co_w().set(m_cpes[ 1 ] , FUNC(i3002_device::ci_w));
-	m_cpes[ 1 ]->co_w().set(m_cpes[ 2 ] , FUNC(i3002_device::ci_w));
-	m_cpes[ 2 ]->co_w().set(m_cpes[ 3 ] , FUNC(i3002_device::ci_w));
-	m_cpes[ 3 ]->co_w().set(FUNC(isbc202_device::co_w));
+	m_mcu->set_fo_w_cb(m_cpes[ 0 ] , FUNC(i3002_device::ci_w));
+	m_cpes[ 0 ]->set_co_w_cb(m_cpes[ 1 ] , FUNC(i3002_device::ci_w));
+	m_cpes[ 1 ]->set_co_w_cb(m_cpes[ 2 ] , FUNC(i3002_device::ci_w));
+	m_cpes[ 2 ]->set_co_w_cb(m_cpes[ 3 ] , FUNC(i3002_device::ci_w));
+	m_cpes[ 3 ]->set_co_w_cb(FUNC(isbc202_device::co_w));
 
 	// Connect RO/LI signals
-	m_cpes[ 0 ]->ro_w().set(FUNC(isbc202_device::co_w));
-	m_cpes[ 1 ]->ro_w().set(m_cpes[ 0 ] , FUNC(i3002_device::li_w));
-	m_cpes[ 2 ]->ro_w().set(m_cpes[ 1 ] , FUNC(i3002_device::li_w));
-	m_cpes[ 3 ]->ro_w().set(m_cpes[ 2 ] , FUNC(i3002_device::li_w));
+	m_cpes[ 0 ]->set_ro_w_cb(FUNC(isbc202_device::co_w));
+	m_cpes[ 1 ]->set_ro_w_cb(m_cpes[ 0 ] , FUNC(i3002_device::li_w));
+	m_cpes[ 2 ]->set_ro_w_cb(m_cpes[ 1 ] , FUNC(i3002_device::li_w));
+	m_cpes[ 3 ]->set_ro_w_cb(m_cpes[ 2 ] , FUNC(i3002_device::li_w));
 
 	// Connect M-bus
-	m_cpes[ 0 ]->mbus_r().set([this]() { return mbus_r(); });
-	m_cpes[ 1 ]->mbus_r().set([this]() { return mbus_r() >> 2; });
-	m_cpes[ 2 ]->mbus_r().set([this]() { return mbus_r() >> 4; });
-	m_cpes[ 3 ]->mbus_r().set([this]() { return mbus_r() >> 6; });
+	m_cpes[ 0 ]->set_mbus_r_cb(NAME([this]() { return mbus_r(); }));
+	m_cpes[ 1 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 2; }));
+	m_cpes[ 2 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 4; }));
+	m_cpes[ 3 ]->set_mbus_r_cb(NAME([this]() { return mbus_r() >> 6; }));
 
 	// Connect I-bus
-	m_cpes[ 0 ]->ibus_r().set([this]() { return ibus_r(); });
-	m_cpes[ 1 ]->ibus_r().set([this]() { return ibus_r() >> 2; });
-	m_cpes[ 2 ]->ibus_r().set([this]() { return ibus_r() >> 4; });
-	m_cpes[ 3 ]->ibus_r().set([this]() { return ibus_r() >> 6; });
+	m_cpes[ 0 ]->set_ibus_r_cb(NAME([this]() { return ibus_r(); }));
+	m_cpes[ 1 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 2; }));
+	m_cpes[ 2 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 4; }));
+	m_cpes[ 3 ]->set_ibus_r_cb(NAME([this]() { return ibus_r() >> 6; }));
 
 	// Connect SX input
-	m_mcu->sx_r().set([this]() { return m_microcode_addr & 0xf; });
+	m_mcu->set_sx_r_cb(NAME([this]() { return m_microcode_addr & 0xf; }));
 	// Connect PX input
-	m_mcu->px_r().set(FUNC(isbc202_device::px_r));
+	m_mcu->set_px_r_cb(FUNC(isbc202_device::px_r));
 
 	// Drives
 	for (auto& finder : m_drives) {
@@ -759,18 +741,11 @@ void isbc202_device::set_output()
 		// 1        Reset RDY latches (0)
 		// 0        -
 		if (BIT(m_mask , 5)) {
-			if (m_cpu != nullptr) {
-				// Release CPU from wait state
-				LOG_BUS("CPU out of wait state\n");
-				m_cpu->trigger(1);
-				if (!m_cpu_rd) {
-					m_cpu = nullptr;
-				}
-				// Ensure the MCU executes a few instruction before the CPU
-				machine().scheduler().boost_interleave(attotime::from_usec(1) , attotime::from_usec(5));
-			} else {
-				LOG("No CPU to wake up?\n");
-			}
+			// Release CPU from wait state
+			LOG_BUS("CPU out of wait state\n");
+			xack_w(0);
+			// Ensure the MCU executes a few instruction before the CPU
+			machine().scheduler().add_quantum(attotime::from_usec(1) , attotime::from_usec(5));
 			m_inputs[ IN_SEL_START ] = false;
 		}
 		if (BIT(m_mask , 4)) {
@@ -1026,14 +1001,10 @@ void isbc202_device::set_start(uint8_t off , bool read)
 	m_cmd = off;
 	m_inputs[ IN_SEL_START ] = true;
 	// Put CPU in wait state
-	m_cpu->spin_until_trigger(1);
+	xack_w(1);
 	m_cpu_rd = read;
+	m_2nd_pass = true;
 	LOG_BUS("CPU in wait state (rd=%d)\n" , read);
-	if (read) {
-		// If CPU is suspended when reading, rewind PC so that the
-		// "IN" instruction is repeated when CPU is released
-		m_cpu->set_pc(m_cpu->pc() - 2);
-	}
 }
 
 void isbc202_device::set_rd_wr(bool new_rd , bool new_wr)

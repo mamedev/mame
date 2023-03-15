@@ -4,7 +4,7 @@
 
     Slogger Plus 2
 
-    The Plus 2 interface from Slogger has been designed to compliment
+    The Plus 2 interface from Slogger has been designed to complement
     the Slogger Rombox Plus and Acorn Plus 1 by offering further
     expansion capabilities. This has been achieved by providing two
     extra cartridge slots, three ROM sockets and connections for a
@@ -231,7 +231,7 @@ image_init_result electron_plus2_device::load_rom(device_image_interface &image,
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
 		return image_init_result::FAIL;
 	}
 

@@ -35,6 +35,9 @@
 
 */
 
+DECLARE_DEVICE_TYPE(I8244, i8244_device)
+DECLARE_DEVICE_TYPE(I8245, i8245_device)
+
 
 class i8244_device :  public device_t
 					, public device_sound_interface
@@ -108,11 +111,13 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	TIMER_CALLBACK_MEMBER(hblank_start);
+	TIMER_CALLBACK_MEMBER(vblank_start);
 
 	virtual void set_default_params();
 	inline bool is_ntsc() { return m_vtotal == 263; }
@@ -125,10 +130,6 @@ protected:
 	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	/* timers */
-	static constexpr device_timer_id TIMER_VBLANK_START = 0;
-	static constexpr device_timer_id TIMER_HBLANK_START = 1;
 
 	// callbacks
 	devcb_write_line m_irq_func;
@@ -158,33 +159,31 @@ protected:
 	u8 m_collision_map[0x200];
 	u8 m_priority_map[0x200];
 
-	u8 m_x_beam_pos = 0;
-	u8 m_y_beam_pos = 0;
-	u8 m_control_status = 0;
-	u8 m_collision_status = 0;
+	u8 m_x_beam_pos;
+	u8 m_y_beam_pos;
+	u8 m_control_status;
+	u8 m_collision_status;
 
-	bool m_sh_written = false;
-	bool m_sh_pending = false;
-	u8 m_sh_prescaler = 0;
-	u8 m_sh_count = 0;
-	int m_sh_output = 0;
-	u8 m_sh_duty = 0;
+	bool m_sh_written;
+	bool m_sh_pending;
+	u8 m_sh_prescaler;
+	u8 m_sh_count;
+	int m_sh_output;
+	u8 m_sh_duty;
 };
 
 
-class i8245_device :  public i8244_device
+class i8245_device : public i8244_device
 {
 public:
 	// construction/destruction
 	i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static auto parent_rom_device_type() { return &I8244; }
+
 protected:
 	virtual void set_default_params() override;
 };
 
-
-// device type definition
-DECLARE_DEVICE_TYPE(I8244, i8244_device)
-DECLARE_DEVICE_TYPE(I8245, i8245_device)
 
 #endif // MAME_VIDEO_I8244_H

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="evio" description="Tomy evio Media cartridges">
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
@@ -11,29 +11,43 @@ license:CC0
 	evio Media cart listing
 
 	* = dumped
+	                                        Cartridge Colour
 
-	 eM1    - evio Selection 01
-	*eM2    - evio Selection 02 (translucent red)
-	*eM3    - Anime Mix 1 (yellow)
-	*eM4    - I Love Classic 1 (brown)
-	 eM5    - Healing Air 1
-	 eM6    - Drama Mix 1
-	*eM7    - Pure Kiss 1 (pink)
-	*eM8    - Hard Soul 1 (black)
-	*eM9    - evio Selection 03 (translucent red)
-	 eM10   - Anime Special - Pocket Monsters
+	*eM1    - evio Selection 01               (translucent red)
+	*eM2    - evio Selection 02               (translucent red)
+	*eM3    - Anime Mix 1                     (yellow)
+	*eM4    - I Love Classic 1                (brown)
+	*eM5    - Healing Air 1                   (translucent green)
+	*eM6    - Drama Mix 1                     (blue)
+	*eM7    - Pure Kiss 1                     (pink)
+	*eM8    - Hard Soul 1                     (black)
+	*eM9    - evio Selection 03               (translucent red)
+	*eM10   - Anime Special - Pocket Monsters (yellow)
 	 eM11   - Anime Mix 2
 	 eM12   - I Love Classic 2
 	 eM13   - Concerto Selection
 	 eM14   - Disney Special 1
-	 eM15   - evio Selection 04
-	*eM16   - Chisako Takashima Selection (cream/gold)
-	 eM17   - Minna no evio
-	*eM18   - Evio Challenge! (red/pink)
+	*eM15   - evio Selection 04               (translucent red)
+	*eM16   - Chisako Takashima Selection     (cream/gold)
+	*eM17   - Minna no evio                   (orange)
+	*eM18   - Evio Challenge!                 (red/pink)
 
 	(more?)
 
 	-->
+
+	<software name="em1" supported="no">
+		<description>evio Selection 01</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション01"/>
+		<info name="serial" value="eM1"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em01.bin" size="0x080000" crc="01cfd6aa" sha1="e91f947bc7601af08d7e7395b7d14f7c32a22c51"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="em2" supported="no">
 		<description>evio Selection 02</description>
@@ -70,6 +84,32 @@ license:CC0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="evio_em04.bin" size="0x080000" crc="22ad3e5b" sha1="e25269b1957e10cff6bb7590b912db9e62864c2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em5" supported="no">
+		<description>Healing Air 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ヒーリングエアー1"/>
+		<info name="serial" value="eM5"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em05.bin" size="0x080000" crc="7ac2d917" sha1="9ff3da60c5333a5d97791dfcdf8ffc20244fc553"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em6" supported="no">
+		<description>Drama Mix 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ドラマミックス1"/>
+		<info name="serial" value="eM6"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em06.bin" size="0x080000" crc="7f67ff20" sha1="e94685b112c03615d6b27c21460a69c2b69c3419"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,6 +153,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="em10" supported="no">
+		<description>Anime Special - Pocket Monsters</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメスペシャル ポケットモンスター"/>
+		<info name="serial" value="eM10"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em10.bin" size="0x080000" crc="573d49ef" sha1="e2d528a2aa149d8ccbadf0c75ed5f75ca0e6bf9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em15" supported="no">
+		<description>evio Selection 04</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション04"/>
+		<info name="serial" value="eM15"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em15.bin" size="0x080000" crc="d3a12cc2" sha1="29fff4c9c6aedd156c9c9b3f3773c05916c6d5d6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="em16" supported="no">
 		<description>Chisako Takashima Selection</description>
 		<year>2003</year>
@@ -126,14 +192,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="em17" supported="no">
+		<description>Minna no evio</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="みんなのエヴィオ"/>
+		<info name="serial" value="eM17"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em17.bin" size="0x080000" crc="5e41cde0" sha1="bee48cf8f41f715c5ba762c243cbfdd8bafeb3b5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- has eeprom -->
 	<software name="em18" supported="no">
 		<description>evio Challenge!</description>
-		<year>2003</year>
+		<year>2004</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="エヴィオチャレンジ!"/>
 		<info name="serial" value="eM18"/>
 		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc08_evio"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="evio_em18.bin" size="0x100000" crc="725a5720" sha1="062316f860cb6ca3c29d9c1e63ea4973b1eebcd8"/>
 			</dataarea>

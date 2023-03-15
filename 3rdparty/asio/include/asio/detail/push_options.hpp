@@ -2,7 +2,7 @@
 // detail/push_options.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,7 +24,9 @@
 // Intel C++
 
 # if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  pragma GCC visibility push (default)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
+#   pragma GCC visibility push (default)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
 
 #elif defined(__clang__)
@@ -44,8 +46,25 @@
 # endif
 
 # if !defined(_WIN32) && !defined(__WIN32__) && !defined(WIN32)
-#  pragma GCC visibility push (default)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
+#   pragma GCC visibility push (default)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // !defined(_WIN32) && !defined(__WIN32__) && !defined(WIN32)
+
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+# if (__clang_major__ >= 6)
+#  pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+# endif // (__clang_major__ >= 6)
+
+# pragma push_macro ("emit")
+# undef emit
+
+# pragma push_macro ("signal")
+# undef signal
+
+# pragma push_macro ("slot")
+# undef slot
 
 #elif defined(__GNUC__)
 
@@ -68,8 +87,28 @@
 # endif
 
 # if (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
-#  pragma GCC visibility push (default)
+#  if !defined(ASIO_DISABLE_VISIBILITY)
+#   pragma GCC visibility push (default)
+#  endif // !defined(ASIO_DISABLE_VISIBILITY)
 # endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
+
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
+# if (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || (__GNUC__ > 4)
+#  pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+# endif // (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || (__GNUC__ > 4)
+# if (__GNUC__ >= 7)
+#  pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+# endif // (__GNUC__ >= 7)
+
+# pragma push_macro ("emit")
+# undef emit
+
+# pragma push_macro ("signal")
+# undef signal
+
+# pragma push_macro ("slot")
+# undef slot
 
 #elif defined(__KCC)
 
@@ -87,7 +126,7 @@
 
 // Greenhills C++
 
-#elif defined(__BORLANDC__)
+#elif defined(__BORLANDC__) && !defined(__clang__)
 
 // Borland C++
 
@@ -166,5 +205,14 @@
 #   endif
 #  endif
 # endif
+
+# pragma push_macro ("emit")
+# undef emit
+
+# pragma push_macro ("signal")
+# undef signal
+
+# pragma push_macro ("slot")
+# undef slot
 
 #endif

@@ -70,7 +70,6 @@
 #include "mdec.h"
 #include "rcnt.h"
 #include "sound/spu.h"
-#include "debugger.h"
 
 #include "psxdefs.h"
 
@@ -1186,16 +1185,16 @@ void psxcpu_device::multiplier_update()
 	case MULTIPLIER_OPERATION_MULT:
 		{
 			int64_t result = mul_32x32( (int32_t)m_multiplier_operand1, (int32_t)m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
 			uint64_t result = mulu_32x32( m_multiplier_operand1, m_multiplier_operand2 );
-			m_lo = extract_64lo( result );
-			m_hi = extract_64hi( result );
+			m_lo = result;
+			m_hi = result >> 32;
 		}
 		break;
 
@@ -1794,7 +1793,8 @@ psxcpu_device::psxcpu_device( const machine_config &mconfig, device_type type, c
 	m_spu_write_handler( *this ),
 	m_cd_read_handler( *this ),
 	m_cd_write_handler( *this ),
-	m_ram( *this, "ram" )
+	m_ram( *this, "ram" ),
+	m_rom( *this, "rom" )
 {
 	m_disable_rom_berr = false;
 }
@@ -1836,7 +1836,7 @@ cxd8606cq_device::cxd8606cq_device( const machine_config &mconfig, const char *t
 void psxcpu_device::device_start()
 {
 	// get our address spaces
-	m_program = &space( AS_PROGRAM );
+	m_program = &space(AS_PROGRAM);
 	m_program->cache(m_instruction);
 	m_program->specific(m_data);
 
@@ -1983,6 +1983,9 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP2CR30, "zsf4", m_gte.m_cp2cr[ 30 ].d );
 	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
 
+	// initialize the registers once
+	std::fill(std::begin(m_r), std::end(m_r), 0);
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 
@@ -1992,8 +1995,6 @@ void psxcpu_device::device_start()
 	m_spu_write_handler.resolve_safe();
 	m_cd_read_handler.resolve_safe( 0 );
 	m_cd_write_handler.resolve_safe();
-
-	m_rom = memregion( "rom" );
 }
 
 

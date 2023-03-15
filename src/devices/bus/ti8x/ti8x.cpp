@@ -613,6 +613,12 @@ void device_ti8x_link_port_byte_interface::bit_received(bool data)
 #include "teeconn.h"
 #include "tispeaker.h"
 
+
+// must come after including the headers that declare these extern
+template class device_finder<device_ti8x_link_port_interface, false>;
+template class device_finder<device_ti8x_link_port_interface, true>;
+
+
 void default_ti8x_link_devices(device_slot_interface &device)
 {
 	device.option_add("bitsock",       TI8X_BIT_SOCKET);

@@ -354,6 +354,8 @@ offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 						flags = STEP_OUT;
 					util::stream_format(stream, "if (%s) goto %s", condtable[C], rH);
 				}
+				if (C > 1)
+					flags |= STEP_COND;
 			}
 			break;
 		}
@@ -440,10 +442,10 @@ offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const char *rS2 = regname[(op >> 0) & 0x1f];
 			const char *s = sizesuffix[(op >> 31) & 1];
 			uint8_t threeop = (op >> 11) & 1;
-			char condbuf[40] = { 0 };
 
+			std::string condbuf;
 			if ((op >> 10) & 1)
-				sprintf(condbuf, "if (%s) ", condtable[(op >> 12) & 15]);
+				condbuf = "if (" + std::string(condtable[(op >> 12) & 15]) + ") ";
 
 			switch ((op >> 21) & 15)
 			{

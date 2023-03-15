@@ -10,7 +10,6 @@
 \*********************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "arc.h"
 #include "arcdasm.h"
 
@@ -33,6 +32,13 @@ std::unique_ptr<util::disasm_interface> arc_cpu_device::create_disassembler()
 }
 
 /*****************************************************************************/
+
+device_memory_interface::space_config_vector arc_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 /*****************************************************************************/
 

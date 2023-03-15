@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "shaderc.h"
@@ -16,23 +16,15 @@ namespace bgfx { namespace glsl
 			: (ch == 'c' ? kGlslOptShaderCompute : kGlslOptShaderVertex);
 
 		glslopt_target target = kGlslTargetOpenGL;
-		switch (_version)
+		if(_version == BX_MAKEFOURCC('M', 'T', 'L', 0))
 		{
-		case BX_MAKEFOURCC('M', 'T', 'L', 0):
 			target = kGlslTargetMetal;
-			break;
-
-		case 2:
-			target = kGlslTargetOpenGLES20;
-			break;
-
-		case 3:
-			target = kGlslTargetOpenGLES30;
-			break;
-
-		default:
+		} else if(_version < 0x80000000) {
 			target = kGlslTargetOpenGL;
-			break;
+		}
+		else {
+			_version &= ~0x80000000;
+			target = (_version >= 300) ? kGlslTargetOpenGLES30 : kGlslTargetOpenGLES20;
 		}
 
 		glslopt_ctx* ctx = glslopt_initialize(target);
@@ -61,7 +53,7 @@ namespace bgfx { namespace glsl
 			}
 
 			printCode(_code.c_str(), line, start, end, column);
-			fprintf(stderr, "Error: %s\n", log);
+			bx::printf("Error: %s\n", log);
 			glslopt_shader_delete(shader);
 			glslopt_cleanup(ctx);
 			return false;
@@ -69,15 +61,22 @@ namespace bgfx { namespace glsl
 
 		const char* optimizedShader = glslopt_get_output(shader);
 
+		std::string out;
 		// Trim all directives.
 		while ('#' == *optimizedShader)
 		{
 			optimizedShader = bx::strFindNl(optimizedShader).getPtr();
 		}
 
+		out.append(optimizedShader, strlen(optimizedShader));
+		optimizedShader = out.c_str();
+
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
+
+			strReplace(code, "textureLodEXT", "texture2DLod");
+			strReplace(code, "textureGradEXT", "texture2DGrad");
 
 			strReplace(code, "texture2DLodARB", "texture2DLod");
 			strReplace(code, "texture2DLodEXT", "texture2DLod");
@@ -114,6 +113,13 @@ namespace bgfx { namespace glsl
 				{
 					bx::StringView qualifier = nextWord(parse);
 
+					if (0 == bx::strCmp(qualifier, "precision", 9) )
+					{
+						// skip precision
+						parse.set(eol.getPtr() + 1, parse.getTerm() );
+						continue;
+					}
+
 					if (0 == bx::strCmp(qualifier, "attribute", 9)
 					||  0 == bx::strCmp(qualifier, "varying",   7)
 					||  0 == bx::strCmp(qualifier, "in",        2)
@@ -121,6 +127,17 @@ namespace bgfx { namespace glsl
 					   )
 					{
 						// skip attributes and varyings.
+						parse.set(eol.getPtr() + 1, parse.getTerm() );
+						continue;
+					}
+
+					if (0 == bx::strCmp(qualifier, "flat", 4)
+					||  0 == bx::strCmp(qualifier, "smooth", 6)
+					||  0 == bx::strCmp(qualifier, "noperspective", 13)
+					||  0 == bx::strCmp(qualifier, "centroid", 8)
+					   )
+					{
+						// skip interpolation qualifiers
 						parse.set(eol.getPtr() + 1, parse.getTerm() );
 						continue;
 					}
@@ -154,7 +171,9 @@ namespace bgfx { namespace glsl
 
 					char uniformType[256];
 
-					if (0 == bx::strCmp(typen, "sampler", 7) )
+					if (0 == bx::strCmp(typen, "sampler", 7)
+					||  0 == bx::strCmp(typen, "isampler", 8)
+					||  0 == bx::strCmp(typen, "usampler", 8) )
 					{
 						bx::strCopy(uniformType, BX_COUNTOF(uniformType), "int");
 					}
@@ -188,6 +207,18 @@ namespace bgfx { namespace glsl
 						un.num = num;
 						un.regIndex = 0;
 						un.regCount = num;
+						switch (un.type)
+						{
+						case UniformType::Mat3:
+							un.regCount *= 3;
+							break;
+						case UniformType::Mat4:
+							un.regCount *= 4;
+							break;
+						default:
+							break;
+						}
+
 						uniforms.push_back(un);
 					}
 
@@ -291,7 +322,7 @@ namespace bgfx { namespace glsl
 						}
 					}
 					char uniformName[256];
-					bx::strCopy(uniformName, parse.getLength() + 1, parse);					
+					bx::strCopy(uniformName, parse.getLength() + 1, parse);
 					un.name = uniformName;
 					const char* regIndexBeg = textureName.getPtr() + textureNameMark.getLength();
 					bx::StringView regIndex = bx::strFind(regIndexBeg, ")");
@@ -314,20 +345,25 @@ namespace bgfx { namespace glsl
 			}
 		}
 
+		bx::ErrorAssert err;
+
 		uint16_t count = (uint16_t)uniforms.size();
-		bx::write(_writer, count);
+		bx::write(_writer, count, &err);
 
 		for (UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
 		{
 			const Uniform& un = *it;
 			uint8_t nameSize = (uint8_t)un.name.size();
-			bx::write(_writer, nameSize);
-			bx::write(_writer, un.name.c_str(), nameSize);
+			bx::write(_writer, nameSize, &err);
+			bx::write(_writer, un.name.c_str(), nameSize, &err);
 			uint8_t uniformType = uint8_t(un.type);
-			bx::write(_writer, uniformType);
-			bx::write(_writer, un.num);
-			bx::write(_writer, un.regIndex);
-			bx::write(_writer, un.regCount);
+			bx::write(_writer, uniformType, &err);
+			bx::write(_writer, un.num, &err);
+			bx::write(_writer, un.regIndex, &err);
+			bx::write(_writer, un.regCount, &err);
+			bx::write(_writer, un.texComponent, &err);
+			bx::write(_writer, un.texDimension, &err);
+			bx::write(_writer, un.texFormat, &err);
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()
@@ -339,10 +375,10 @@ namespace bgfx { namespace glsl
 		}
 
 		uint32_t shaderSize = (uint32_t)bx::strLen(optimizedShader);
-		bx::write(_writer, shaderSize);
-		bx::write(_writer, optimizedShader, shaderSize);
+		bx::write(_writer, shaderSize, &err);
+		bx::write(_writer, optimizedShader, shaderSize, &err);
 		uint8_t nul = 0;
-		bx::write(_writer, nul);
+		bx::write(_writer, nul, &err);
 
 		if (_options.disasm )
 		{

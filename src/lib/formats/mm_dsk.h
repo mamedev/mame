@@ -38,7 +38,7 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_MM1_FORMAT;
-extern const floppy_format_type FLOPPY_MM2_FORMAT;
+extern const mm1_format FLOPPY_MM1_FORMAT;
+extern const mm2_format FLOPPY_MM2_FORMAT;
 
 #endif // MAME_FORMATS_MM_DSK_H

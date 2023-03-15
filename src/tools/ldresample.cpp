@@ -8,16 +8,17 @@
 
 ****************************************************************************/
 
-#include <cstdio>
-#include <cctype>
-#include <cstdlib>
-#include <cmath>
-#include <new>
-#include <cassert>
+#include "avhuff.h"
 #include "bitmap.h"
 #include "chd.h"
-#include "avhuff.h"
 #include "vbiparse.h"
+
+#include <cassert>
+#include <cctype>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <new>
 
 
 
@@ -46,18 +47,18 @@ const uint32_t MINIMUM_SIGNAL_COUNT = 20;
 
 struct movie_info
 {
-	double          framerate;
-	int             iframerate;
-	int             numfields;
-	int             width;
-	int             height;
-	int             samplerate;
-	int             channels;
-	int             interlaced;
-	bitmap_yuy16    bitmap;
-	std::vector<int16_t>   lsound;
-	std::vector<int16_t>   rsound;
-	uint32_t          samples;
+	double                framerate;
+	int                   iframerate;
+	int                   numfields;
+	int                   width;
+	int                   height;
+	int                   samplerate;
+	int                   channels;
+	int                   interlaced;
+	bitmap_yuy16          bitmap;
+	std::vector<int16_t>  lsound;
+	std::vector<int16_t>  rsound;
+	uint32_t              samples;
 };
 
 
@@ -156,22 +157,22 @@ inline uint32_t sample_number_to_field(const movie_info &info, uint32_t samplenu
 //  information about it
 //-------------------------------------------------
 
-static chd_error open_chd(chd_file &file, const char *filename, movie_info &info)
+static std::error_condition open_chd(chd_file &file, const char *filename, movie_info &info)
 {
 	// open the file
-	chd_error chderr = file.open(filename);
-	if (chderr != CHDERR_NONE)
+	std::error_condition chderr = file.open(filename);
+	if (chderr)
 	{
-		fprintf(stderr, "Error opening CHD file: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error opening CHD file: %s\n", chderr.message().c_str());
 		return chderr;
 	}
 
 	// get the metadata
 	std::string metadata;
 	chderr = file.read_metadata(AV_METADATA_TAG, 0, metadata);
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error getting A/V metadata: %s\n", chderr.message().c_str());
 		return chderr;
 	}
 
@@ -180,7 +181,7 @@ static chd_error open_chd(chd_file &file, const char *filename, movie_info &info
 	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
-		return CHDERR_INVALID_DATA;
+		return chd_file::error::INVALID_METADATA;
 	}
 
 	// extract movie info
@@ -197,7 +198,7 @@ static chd_error open_chd(chd_file &file, const char *filename, movie_info &info
 	info.bitmap.resize(info.width, info.height);
 	info.lsound.resize(info.samplerate);
 	info.rsound.resize(info.samplerate);
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 
@@ -205,28 +206,28 @@ static chd_error open_chd(chd_file &file, const char *filename, movie_info &info
 //  create_chd - create a new CHD file
 //-------------------------------------------------
 
-static chd_error create_chd(chd_file_compressor &file, const char *filename, chd_file &source, const movie_info &info)
+static std::error_condition create_chd(chd_file_compressor &file, const char *filename, chd_file &source, const movie_info &info)
 {
 	// create the file
 	chd_codec_type compression[4] = { CHD_CODEC_AVHUFF };
-	chd_error chderr = file.create(filename, source.logical_bytes(), source.hunk_bytes(), source.unit_bytes(), compression);
-	if (chderr != CHDERR_NONE)
+	std::error_condition chderr = file.create(filename, source.logical_bytes(), source.hunk_bytes(), source.unit_bytes(), compression);
+	if (chderr)
 	{
-		fprintf(stderr, "Error creating new CHD file: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error creating new CHD file: %s\n", chderr.message().c_str());
 		return chderr;
 	}
 
 	// clone the metadata
 	chderr = file.clone_all_metadata(source);
-	if (chderr != CHDERR_NONE)
+	if (chderr)
 	{
-		fprintf(stderr, "Error cloning metadata: %s\n", chd_file::error_string(chderr));
+		fprintf(stderr, "Error cloning metadata: %s\n", chderr.message().c_str());
 		return chderr;
 	}
 
 	// begin compressing
 	file.compress_begin();
-	return CHDERR_NONE;
+	return std::error_condition();
 }
 
 
@@ -248,8 +249,8 @@ static bool read_chd(chd_file &file, uint32_t field, movie_info &info, uint32_t 
 	file.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 	// read the field
-	chd_error chderr = file.read_hunk(field, nullptr);
-	return (chderr == CHDERR_NONE);
+	std::error_condition chderr = file.read_hunk(field, nullptr);
+	return !chderr;
 }
 
 
@@ -507,6 +508,7 @@ int main(int argc, char *argv[])
 	// verify arguments
 	if (argc < 2)
 		return usage();
+
 	const char *srcfilename = argv[1];
 	const char *dstfilename = (argc < 3) ? nullptr : argv[2];
 	double offset = (argc < 4) ? 0.0 : atof(argv[3]);
@@ -524,8 +526,8 @@ int main(int argc, char *argv[])
 	// open the source file
 	chd_file srcfile;
 	movie_info info;
-	chd_error err = open_chd(srcfile, srcfilename, info);
-	if (err != CHDERR_NONE)
+	std::error_condition err = open_chd(srcfile, srcfilename, info);
+	if (err)
 	{
 		fprintf(stderr, "Unable to open file '%s'\n", srcfilename);
 		return 1;
@@ -537,9 +539,9 @@ int main(int argc, char *argv[])
 	printf("Sample rate: %dHz\n", info.samplerate);
 	printf("Total fields: %d\n", info.numfields);
 
-	// if we don't have a destination file, scan for edges
 	if (dstfilename == nullptr)
 	{
+		// if we don't have a destination file, scan for edges
 		for (uint32_t fieldnum = 60; fieldnum < info.numfields - 60; fieldnum += 30)
 		{
 			fprintf(stderr, "Field %5d\r", fieldnum);
@@ -547,14 +549,14 @@ int main(int argc, char *argv[])
 			find_edge_near_field(srcfile, fieldnum, info, true, delta);
 		}
 	}
-
-	// otherwise, resample the source to the destination
 	else
 	{
+		// otherwise, resample the source to the destination
+
 		// open the destination file
-		chd_resample_compressor dstfile(srcfile, info, int64_t(offset * 65536.0 * 256.0), int64_t(slope * 65536.0 * 256.0));
-		err = create_chd(dstfile, dstfilename, srcfile, info);
-		if (!dstfile.opened())
+		auto dstfile = std::make_unique<chd_resample_compressor>(srcfile, info, int64_t(offset * 65536.0 * 256.0), int64_t(slope * 65536.0 * 256.0));
+		err = create_chd(*dstfile, dstfilename, srcfile, info);
+		if (!dstfile->opened())
 		{
 			fprintf(stderr, "Unable to create file '%s'\n", dstfilename);
 			return 1;
@@ -563,7 +565,7 @@ int main(int argc, char *argv[])
 		// loop over all the fields in the source file
 		double progress, ratio;
 		osd_ticks_t last_update = 0;
-		while (dstfile.compress_continue(progress, ratio) == CHDERR_COMPRESSING)
+		while (dstfile->compress_continue(progress, ratio) == chd_file::error::COMPRESSING)
 			if (osd_ticks() - last_update > osd_ticks_per_second() / 4)
 			{
 				last_update = osd_ticks();

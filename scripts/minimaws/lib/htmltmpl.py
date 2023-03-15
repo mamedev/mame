@@ -50,7 +50,7 @@ MACHINE_PROLOGUE = string.Template(
         '    <tr><th>Source file:</th><td><a href="${sourcehref}">${sourcefile}</a></td></tr>\n')
 
 MACHINE_CLONES_PROLOGUE = string.Template(
-        '<h2>Clones</h2>\n' \
+        '<h2 id="heading-clones">Clones</h2>\n' \
         '<table id="tbl-clones">\n' \
         '    <thead>\n' \
         '        <tr>\n' \
@@ -104,6 +104,7 @@ MACHINE_SOFTWARELISTS_TABLE_EPILOGUE = string.Template(
         '</table>\n' \
         '<script>\n' \
         '    make_table_sortable(document.getElementById("tbl-softwarelists"));\n' \
+        '    make_collapsible(document.getElementById("heading-softwarelists"), document.getElementById("tbl-softwarelists"));\n' \
         '    if (!document.getElementById("tbl-softwarelists").tBodies[0].rows.length)\n' \
         '    {\n' \
         '        document.getElementById("heading-softwarelists").style.display = "none";\n' \
@@ -112,35 +113,40 @@ MACHINE_SOFTWARELISTS_TABLE_EPILOGUE = string.Template(
         '</script>\n')
 
 MACHINE_OPTIONS_HEADING = string.Template(
-        '<h2>Options</h2>\n' \
-        '<p>\n' \
-        '    Format: <select id="select-options-format" onchange="update_cmd_preview()"><option value="cmd">Command line</option><option value="ini">INI file</option></select>\n' \
-        '    <input type="checkbox" id="check-explicit-defaults" onchange="update_cmd_preview()"><label for="check-explicit-defaults">Explicit defaults</label>\n' \
-        '</p>\n' \
-        '<p id="para-cmd-preview"></p>\n')
+        '<h2 id="heading-options">Options</h2>\n' \
+        '<div id="div-options">\n' \
+        '    <p>\n' \
+        '        Format: <select id="select-options-format" onchange="update_cmd_preview()"><option value="cmd">Command line</option><option value="ini">INI file</option></select>\n' \
+        '        <input type="checkbox" id="check-explicit-defaults" onchange="update_cmd_preview()"><label for="check-explicit-defaults">Explicit defaults</label>\n' \
+        '    </p>\n' \
+        '    <p id="para-cmd-preview"></p>\n')
+
+MACHINE_OPTIONS_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-options"), document.getElementById("div-options"));</script>\n')
 
 MACHINE_BIOS_PROLOGUE = string.Template(
-        '<h3>System BIOS</h3>' \
-        '<select id="select-system-bios" onchange="update_cmd_preview()">')
+        '    <h3>System BIOS</h3>' \
+        '    <select id="select-system-bios" onchange="update_cmd_preview()">')
 
 MACHINE_BIOS_OPTION = string.Template(
-        '    <option value="${name}" data-isdefault="${isdefault}">${name} - ${description}</option>\n')
+        '        <option value="${name}" data-isdefault="${isdefault}">${name} - ${description}</option>\n')
 
 MACHINE_RAM_PROLOGUE = string.Template(
-        '<h3>RAM Size</h3>' \
-        '<select id="select-ram-option" onchange="update_cmd_preview()">')
+        '    <h3>RAM Size</h3>\n' \
+        '    <select id="select-ram-option" onchange="update_cmd_preview()">\n')
 
 MACHINE_RAM_OPTION = string.Template(
-        '    <option value="${name}" data-isdefault="${isdefault}">${name} (${size})</option>\n')
+        '        <option value="${name}" data-isdefault="${isdefault}">${name} (${size})</option>\n')
 
 MACHINE_SLOTS_PLACEHOLDER_PROLOGUE = string.Template(
-        '<h3>Slots</h3>\n' \
-        '<p id="para-slots-placeholder">Loading slot information&hellip;<p>\n' \
-        '<script>\n')
+        '    <h3>Slots</h3>\n' \
+        '    <p id="para-slots-placeholder">Loading slot information&hellip;<p>\n' \
+        '    <script>\n')
 
 MACHINE_SLOTS_PLACEHOLDER_EPILOGUE = string.Template(
-        '    populate_slots(${machine});\n'
-        '</script>\n')
+        '        populate_slots(${machine});\n'
+        '    </script>\n')
 
 MACHINE_ROW = string.Template(
         '        <tr>\n' \
@@ -253,7 +259,7 @@ SOFTWARE_PROLOGUE = string.Template(
         '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n');
 
 SOFTWARE_CLONES_PROLOGUE = string.Template(
-        '<h2>Clones</h2>\n' \
+        '<h2 id="heading-clones">Clones</h2>\n' \
         '<table id="tbl-clones">\n' \
         '    <thead>\n' \
         '        <tr>\n' \
@@ -275,11 +281,27 @@ SOFTWARE_CLONES_ROW = string.Template(
         '            <td>${supported}</td>\n' \
         '        </tr>\n')
 
+SOFTWARE_NOTES_PROLOGUE = string.Template(
+        '<h2 id="heading-notes">Notes</h2>\n' \
+        '<div id="div-notes">\n')
+
+SOFTWARE_NOTES_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-notes"), document.getElementById("div-notes"))();</script>\n\n')
+
+SOFTWARE_PARTS_PROLOGUE = string.Template(
+        '<h2 id="heading-parts">Parts</h2>\n' \
+        '<div id="div-parts">\n\n')
+
+SOFTWARE_PARTS_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-parts"), document.getElementById("div-parts"));</script>\n\n')
+
 SOFTWARE_PART_PROLOGUE = string.Template(
-        '<h3>${heading}</h3>\n' \
-        '<table class="sysinfo">\n' \
-        '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
-        '    <tr><th>Interface:</th><td>${interface}</td></tr>\n')
+        '    <h3>${heading}</h3>\n' \
+        '    <table class="sysinfo">\n' \
+        '        <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
+        '        <tr><th>Interface:</th><td>${interface}</td></tr>\n')
 
 
 SOFTWARELIST_PROLOGUE = string.Template(
@@ -322,8 +344,16 @@ SOFTWARELIST_PROLOGUE = string.Template(
         '    </tr>\n' \
         '</table>\n')
 
+SOFTWARELIST_NOTES_PROLOGUE = string.Template(
+        '<h2 id="heading-notes">Notes</h2>\n' \
+        '<div id="div-notes">\n')
+
+SOFTWARELIST_NOTES_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-notes"), document.getElementById("div-notes"))();</script>\n\n')
+
 SOFTWARELIST_MACHINE_TABLE_HEADER = string.Template(
-        '<h2>Machines</h2>\n' \
+        '<h2 id="heading-machines">Machines</h2>\n' \
         '<table id="tbl-machines">\n' \
         '    <thead>\n' \
         '        <tr>\n' \
@@ -346,7 +376,7 @@ SOFTWARELIST_MACHINE_TABLE_ROW = string.Template(
         '        </tr>\n')
 
 SOFTWARELIST_SOFTWARE_TABLE_HEADER = string.Template(
-        '<h2>Software</h2>\n' \
+        '<h2 id="heading-software">Software</h2>\n' \
         '<table id="tbl-software">\n' \
         '    <thead>\n' \
         '        <tr>\n' \

@@ -39,8 +39,8 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override { }
-	virtual void nvram_read(emu_file &file) override { file.read(m_nvram, 0x2000); }
-	virtual void nvram_write(emu_file &file) override { file.write(m_nvram, 0x2000); }
+	virtual bool nvram_read(util::read_stream &file) override { size_t actual; return !file.read(m_nvram, 0x2000, actual) && actual == 0x2000; }
+	virtual bool nvram_write(util::write_stream &file) override { size_t actual; return !file.write(m_nvram, 0x2000, actual) && actual == 0x2000; }
 
 	// device_vic20_expansion_card_interface overrides
 	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;

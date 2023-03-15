@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 
 /*
@@ -10,6 +10,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(ne555_astable)
+{
 
 	/*
 	 * Astable ne555
@@ -49,5 +50,5 @@ NETLIST_START(ne555_astable)
 	LOG(log2, C.1)
 	LOG(log3, 555.OUT)
 
-NETLIST_END()
+}
 //! [ne555_example]

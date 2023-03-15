@@ -9,13 +9,12 @@
 //
 //============================================================
 
-#include "emu.h"
+#include "chainmanager.h"
 
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 #include <cmath>
 
-#include "chainmanager.h"
 #include "chainentry.h"
 
 #include "effect.h"
@@ -27,10 +26,12 @@
 #include "vertex.h"
 #include "suppressor.h"
 
+#include "emucore.h"
 #include "render.h"
 
 
-bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs, std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output, bool apply_tint)
+bgfx_chain_entry::bgfx_chain_entry(std::string name, bgfx_effect* effect, clear_state* clear, std::vector<bgfx_suppressor*> suppressors, std::vector<bgfx_input_pair*> inputs,
+	std::vector<bgfx_entry_uniform*> uniforms, target_manager& targets, std::string output, bool apply_tint)
 	: m_name(name)
 	, m_effect(effect)
 	, m_clear(clear)
@@ -55,12 +56,18 @@ bgfx_chain_entry::~bgfx_chain_entry()
 		delete uniform;
 	}
 	m_uniforms.clear();
-	delete m_clear;
+	if (m_clear)
+	{
+		delete m_clear;
+	}
 }
 
-void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
+void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height,
+	float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
-	if (!setup_view(textures, view, screen_width, screen_height, screen))
+	uint16_t view_width = screen_width;
+	uint16_t view_height = screen_height;
+	if (!setup_view(textures, view, screen_width, screen_height, screen, view_width, view_height))
 	{
 		return;
 	}
@@ -73,18 +80,19 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 	uint32_t tint = 0xffffffff;
 	if (m_apply_tint)
 	{
-		const auto a = (uint8_t)std::round(prim.m_prim->color.a * 255);
-		const auto r = (uint8_t)std::round(prim.m_prim->color.r * 255);
-		const auto g = (uint8_t)std::round(prim.m_prim->color.g * 255);
-		const auto b = (uint8_t)std::round(prim.m_prim->color.b * 255);
+		const uint8_t a = (uint8_t)std::round(prim.m_prim->color.a * 255);
+		const uint8_t r = (uint8_t)std::round(prim.m_prim->color.r * 255);
+		const uint8_t g = (uint8_t)std::round(prim.m_prim->color.g * 255);
+		const uint8_t b = (uint8_t)std::round(prim.m_prim->color.b * 255);
 		tint = (a << 24) | (b << 16) | (g << 8) | r;
 	}
 
 	bgfx::TransientVertexBuffer buffer;
-	put_screen_buffer(prim.m_screen_width, prim.m_screen_height, tint, &buffer);
+	put_screen_buffer(view_width, view_height, tint, &buffer);
 	bgfx::setVertexBuffer(0, &buffer);
 
-	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
+	setup_auto_uniforms(prim, textures, screen_count, view_width, view_height, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y,
+		rotation_type, swap_xy, screen);
 
 	for (bgfx_entry_uniform* uniform : m_uniforms)
 	{
@@ -94,11 +102,48 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 		}
 	}
 
-	m_effect->submit(view, blend);
+	m_effect->submit(view);
 
 	if (m_targets.target(screen, m_output) != nullptr)
 	{
 		m_targets.target(screen, m_output)->page_flip();
+	}
+}
+
+void bgfx_chain_entry::setup_auto_uniforms(chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t view_width, uint16_t view_height,
+	uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y,
+	uint32_t rotation_type, bool swap_xy, int32_t screen)
+{
+	setup_viewsize_uniforms(view_width, view_height);
+	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
+	setup_screenscale_uniforms(screen_scale_x, screen_scale_y);
+	setup_screenoffset_uniforms(screen_offset_x, screen_offset_y);
+	setup_screencount_uniforms(screen_count);
+	setup_sourcesize_uniform(prim);
+	setup_targetsize_uniform(screen);
+	setup_targetscale_uniform(screen);
+	setup_rotationtype_uniform(rotation_type);
+	setup_swapxy_uniform(swap_xy);
+	setup_quaddims_uniform(prim);
+	setup_screenindex_uniform(screen);
+}
+
+void bgfx_chain_entry::setup_viewsize_uniforms(uint16_t view_width, uint16_t view_height)
+{
+	float width(view_width);
+	float height(view_height);
+	bgfx_uniform* view_dims = m_effect->uniform("u_view_dims");
+	if (view_dims != nullptr)
+	{
+		float values[2] = { width, height };
+		view_dims->set(values, sizeof(float) * 2);
+	}
+
+	bgfx_uniform* inv_view_dims = m_effect->uniform("u_inv_view_dims");
+	if (inv_view_dims != nullptr)
+	{
+		float values[2] = { -1.0f / width, 1.0f / height };
+		inv_view_dims->set(values, sizeof(float) * 2);
 	}
 }
 
@@ -235,22 +280,8 @@ void bgfx_chain_entry::setup_screenindex_uniform(int32_t screen) const
 	}
 }
 
-void bgfx_chain_entry::setup_auto_uniforms(chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
-{
-	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
-	setup_screenscale_uniforms(screen_scale_x, screen_scale_y);
-	setup_screenoffset_uniforms(screen_offset_x, screen_offset_y);
-	setup_screencount_uniforms(screen_count);
-	setup_sourcesize_uniform(prim);
-	setup_targetsize_uniform(screen);
-	setup_targetscale_uniform(screen);
-	setup_rotationtype_uniform(rotation_type);
-	setup_swapxy_uniform(swap_xy);
-	setup_quaddims_uniform(prim);
-	setup_screenindex_uniform(screen);
-}
-
-bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t screen_width, uint16_t screen_height, int32_t screen) const
+bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t screen_width, uint16_t screen_height, int32_t screen,
+	uint16_t &out_view_width, uint16_t &out_view_height) const
 {
 	bgfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	uint16_t width = screen_width;
@@ -269,11 +300,13 @@ bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t 
 
 	bgfx::setViewFrameBuffer(view, handle);
 	bgfx::setViewRect(view, 0, 0, width, height);
+	out_view_width = width;
+	out_view_height = height;
 
 	const bgfx::Caps* caps = bgfx::getCaps();
 
 	std::string name = m_inputs[0]->texture() + std::to_string(screen);
-	const float right_ratio = (float)textures.provider(name)->width() / textures.provider(name)->rowpixels();
+	const float right_ratio = float(textures.provider(name)->width()) / textures.provider(name)->rowpixels();
 
 	float projMat[16];
 	bx::mtxOrtho(projMat, 0.0f, right_ratio, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
@@ -306,14 +339,6 @@ void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_
 	{
 		v[0] = v[1] = 1;
 		v[2] = v[3] = 0;
-	}
-	else if (renderer_type == bgfx::RendererType::Direct3D9)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			u[i] += 0.5f / screen_width;
-			v[i] += 0.5f / screen_height;
-		}
 	}
 
 	vertex[0].m_x = x[0];

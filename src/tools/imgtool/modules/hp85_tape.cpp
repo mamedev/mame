@@ -7,11 +7,17 @@
     HP-85 tape format
 
 *********************************************************************/
-
 #include "imgtool.h"
-#include "formats/imageutl.h"
+
 #include "formats/hti_tape.h"
+#include "formats/imageutl.h"
+
+#include "ioprocs.h"
+#include "opresolv.h"
+
+#include <cstdio>
 #include <iostream>
+
 
 // Constants
 static constexpr unsigned CHARS_PER_FNAME = 6;  // Characters in a filename
@@ -109,9 +115,9 @@ private:
 	// Content
 	std::vector<sif_file_ptr_t> content;
 	// First file on track 1
-	file_no_t file_track_1;
+	file_no_t file_track_1{};
 	// No. of first record on track 1
-	uint16_t record_track_1;
+	uint16_t record_track_1 = 0;
 
 	bool dec_rec_header(const tape_word_t *hdr , file_no_t& file_no , uint16_t& rec_no , bool& has_body , unsigned& body_len);
 	bool load_whole_tape();
@@ -158,48 +164,13 @@ void tape_image_85::format_img(void)
 	finalize_allocation();
 }
 
-namespace {
-	int my_seekproc(void *file, int64_t offset, int whence)
-	{
-		reinterpret_cast<imgtool::stream *>(file)->seek(offset, whence);
-		return 0;
-	}
-
-	size_t my_readproc(void *file, void *buffer, size_t length)
-	{
-		return reinterpret_cast<imgtool::stream *>(file)->read(buffer, length);
-	}
-
-	size_t my_writeproc(void *file, const void *buffer, size_t length)
-	{
-		reinterpret_cast<imgtool::stream *>(file)->write(buffer, length);
-		return length;
-	}
-
-	uint64_t my_filesizeproc(void *file)
-	{
-		return reinterpret_cast<imgtool::stream *>(file)->size();
-	}
-
-	const struct io_procs my_stream_procs = {
-		nullptr,
-		my_seekproc,
-		my_readproc,
-		my_writeproc,
-		my_filesizeproc
-	};
-}
-
 imgtoolerr_t tape_image_85::load_from_file(imgtool::stream *stream)
 {
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	if (!image.load_tape(&io)) {
+	auto io = imgtool::stream_read(*stream, 0);
+	if (!io || !image.load_tape(*io)) {
 		return IMGTOOLERR_READERROR;
 	}
+	io.reset();
 
 	// Prevent track boundary crossing when reading directory
 	file_track_1 = 0;
@@ -422,12 +393,7 @@ imgtoolerr_t tape_image_85::save_to_file(imgtool::stream *stream)
 	file_0.clear();
 	save_sif_file(track , pos , dir.size() + 1 , file_0);
 
-	io_generic io;
-	io.file = (void *)stream;
-	io.procs = &my_stream_procs;
-	io.filler = 0;
-
-	image.save_tape(&io);
+	image.save_tape(*imgtool::stream_read_write(*stream, 0));
 
 	return IMGTOOLERR_SUCCESS;
 }

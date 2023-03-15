@@ -69,15 +69,11 @@ namespace emu::detail {
 class device_type_impl_base;
 
 
-template <typename T> struct is_device_implementation
-{
-	static constexpr bool value = std::is_base_of<device_t, T>::value;
-};
+template <typename T>
+using is_device_implementation = std::bool_constant<std::is_base_of_v<device_t, T> >;
 
-template <typename T> struct is_device_interface
-{
-	static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value;
-};
+template <typename T>
+using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
 
 struct device_feature
@@ -214,7 +210,7 @@ private:
 		assert(!owner);
 		assert(!clock);
 
-		return make_unique_clear<DriverClass>(mconfig, type, tag);
+		return std::make_unique<DriverClass>(mconfig, type, tag);
 	}
 
 	create_func const m_creator;
@@ -224,6 +220,7 @@ private:
 	char const *const m_source;
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
+	device_type_impl_base const *const m_parent_rom;
 
 	device_type_impl_base *m_next;
 
@@ -238,6 +235,7 @@ public:
 		, m_source(nullptr)
 		, m_unemulated_features(device_feature::NONE)
 		, m_imperfect_features(device_feature::NONE)
+		, m_parent_rom(nullptr)
 		, m_next(nullptr)
 	{
 	}
@@ -251,6 +249,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DeviceClass::unemulated_features())
 		, m_imperfect_features(DeviceClass::imperfect_features())
+		, m_parent_rom(DeviceClass::parent_rom_device_type())
 		, m_next(device_registrar::register_device(*this))
 	{
 	}
@@ -264,6 +263,7 @@ public:
 		, m_source(Source)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
 		, m_imperfect_features((DriverClass::imperfect_features() & ~Unemulated) | Imperfect)
+		, m_parent_rom(DriverClass::parent_rom_device_type())
 		, m_next(nullptr)
 	{
 	}
@@ -274,6 +274,7 @@ public:
 	char const *source() const { return m_source; }
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
+	device_type_impl_base const *parent_rom_device_type() const { return m_parent_rom; }
 
 	std::unique_ptr<device_t> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
 	{
@@ -334,54 +335,143 @@ template <
 		emu::detail::device_feature::type Imperfect>
 constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
 
+
+/// \addtogroup machinedef
+/// \{
+
+/// \brief Declare a device type
+///
+/// Declares a device type where the exposed device class is in the
+/// global namespace.  Must be used in the global namespace.
+///
+/// In addition to declaring the device type itself, a forward
+/// declaration for the exposed device class is generated, and automatic
+/// instantiation of device finder templates for the exposed device
+/// class is suppressed.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Class The exposed device class name.  Must be the device
+///   implementation class, or a public base of it, and must be derived
+///   from #device_t or #device_interface.
+/// \sa DECLARE_DEVICE_TYPE_NS DEFINE_DEVICE_TYPE
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DECLARE_DEVICE_TYPE(Type, Class) \
 		class Class; \
-		extern emu::detail::device_type_impl<Class> const &Type; \
+		extern emu::detail::device_type_impl<Class> const Type; \
 		extern template class device_finder<Class, false>; \
 		extern template class device_finder<Class, true>;
 
+
+/// \brief Declare a device type for a class in a namespace
+///
+/// Declares a device type where the exposed device class is not in the
+/// global namespace.  Must be used in the global namespace.
+///
+/// In addition to declaring the device type itself, a forward
+/// declaration for the exposed device class is generated, and automatic
+/// instantiation of device finder templates for the exposed device
+/// class is suppressed.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Namespace The fully qualified name of the namespace
+///   containing the exposed device class.
+/// \param Class The exposed device class name, without namespace
+///   qualifiers.  Must be the device implementation class, or a public
+///   base of it, and must be derived from #device_t or
+///   #device_interface.
+/// \sa DECLARE_DEVICE_TYPE DEFINE_DEVICE_TYPE
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DECLARE_DEVICE_TYPE_NS(Type, Namespace, Class) \
 		namespace Namespace { class Class; } \
-		extern emu::detail::device_type_impl<Namespace::Class> const &Type; \
+		extern emu::detail::device_type_impl<Namespace::Class> const Type; \
 		extern template class device_finder<Namespace::Class, false>; \
 		extern template class device_finder<Namespace::Class, true>;
 
+
+/// \brief Define a device type
+///
+/// Defines a device type where the exposed device class is the same as
+/// the device implementation class.  Must be used in the global
+/// namespace.
+///
+/// As well as defining the device type, device finder templates are
+/// instantiated for the device class.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Class The device implementation class name.  Must be the same
+///   as the exposed device class, and must be derived from #device_t.
+/// \param ShortName The short name of the device, used for
+///   identification, and in filesystem paths for assets and data.  Must
+///   be a string no longer than thirty-two characters, containing only
+///   ASCII lowercase letters, digits and underscores.  Must be globally
+///   unique across systems and devices.
+/// \param FullName Display name for the device.  Must be a string, and
+///   must be globally unique across systems and devices.
+/// \sa DECLARE_DEVICE_TYPE DECLARE_DEVICE_TYPE_NS
+///   DEFINE_DEVICE_TYPE_PRIVATE
 #define DEFINE_DEVICE_TYPE(Type, Class, ShortName, FullName) \
 		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Class> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
+		emu::detail::device_type_impl<Class> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
 
+
+/// \brief Define a device type with a private implementation class
+///
+/// Defines a device type where the exposed device class is a base of
+/// the device implementation class.  Must be used in the global
+/// namespace.
+///
+/// Device finder templates are not instantiated for the exposed device
+/// class.  This must be done explicitly in a single location for the
+/// project.
+/// \param Type The device type name (an identifier).  By convention,
+///   these start with an uppercase letter and consist only of uppercase
+///   letters and underscores.
+/// \param Base The fully-qualified exposed device class name.  Must be
+///   a public base of the device implementation class, and must be
+///   derived from #device_t or #device_interface.
+/// \param Class The fully-qualified device implementation class name.
+///   Must be derived from the exposed device class, and indirectly from
+///   #device_t.
+/// \param ShortName The short name of the device, used for
+///   identification, and in filesystem paths for assets and data.  Must
+///   be a string no longer than thirty-two characters, containing only
+///   ASCII lowercase letters, digits and underscores.  Must be globally
+///   unique across systems and devices.
+/// \param FullName Display name for the device.  Must be a string, and
+///   must be globally unique across systems and devices.
+/// \sa DECLARE_DEVICE_TYPE DECLARE_DEVICE_TYPE_NS DEFINE_DEVICE_TYPE
 #define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
 		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
+			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
+			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Base> const &Type = device_creator<Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>;
+		emu::detail::device_type_impl<Base> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>;
 
-#define DEFINE_DEVICE_TYPE_NS(Type, Namespace, Class, ShortName, FullName) \
-		namespace { \
-			struct Class##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
-			constexpr char const Class##_device_traits::shortname[], Class##_device_traits::fullname[], Class##_device_traits::source[]; \
-		} \
-		emu::detail::device_type_impl<Namespace::Class> const &Type = device_creator<Namespace::Class, (Class##_device_traits::shortname), (Class##_device_traits::fullname), (Class##_device_traits::source)>; \
-		template class device_finder<Namespace::Class, false>; \
-		template class device_finder<Namespace::Class, true>;
+/// \}
 
 
-// exception classes
+/// \brief Start order dependencies not satisfied exception
+///
+/// May be thrown from the start member functions of #device_t and
+/// #device_interface implementations if start order dependencies have
+/// not been satisfied.  MAME will start additional devices before
+/// reattempting to start the device that threw the exception.
+/// \sa device_t::device_start device_interface::interface_pre_start
 class device_missing_dependencies : public emu_exception { };
 
 
-// timer IDs for devices
-typedef u32 device_timer_id;
-
-// ======================> device_t
-
-// device_t represents a device
+/// \brief Base class for devices
+///
+/// The base class for all device implementations in MAME's modular
+/// architecture.
 class device_t : public delegate_late_bind
 {
 	DISABLE_COPYING(device_t);
@@ -434,7 +524,6 @@ class device_t : public delegate_late_bind
 		friend class device_t;
 		friend class device_interface;
 		friend class device_memory_interface;
-		friend class device_state_interface;
 		friend class device_execute_interface;
 
 	public:
@@ -464,7 +553,7 @@ class device_t : public delegate_late_bind
 		};
 
 		// construction/destruction
-		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr), m_state(nullptr) { }
+		interface_list() : m_head(nullptr), m_execute(nullptr), m_memory(nullptr) { }
 
 		// getters
 		device_interface *first() const { return m_head; }
@@ -477,7 +566,6 @@ class device_t : public delegate_late_bind
 		device_interface *m_head;               // head of interface list
 		device_execute_interface *m_execute;    // pre-cached pointer to execute interface
 		device_memory_interface *m_memory;      // pre-cached pointer to memory interface
-		device_state_interface *m_state;        // pre-cached pointer to state interface
 	};
 
 protected:
@@ -523,6 +611,15 @@ public:
 	/// \sa unemulated_features
 	static constexpr feature_type imperfect_features() { return feature::NONE; }
 
+	/// \brief Get parent device type for ROM search
+	///
+	/// Implement this member in a derived class to declare the parent
+	/// device type for the purpose of searching for ROMs.  Only one
+	/// level is allowed.  It is an error if the parent device type
+	/// itself declares a parent device type.
+	/// \return Pointer to parent device type, or nullptr.
+	static auto parent_rom_device_type() { return nullptr; }
+
 	virtual ~device_t();
 
 	// getters
@@ -558,11 +655,8 @@ public:
 	bool interface(device_execute_interface *&intf) const { intf = m_interfaces.m_execute; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) { intf = m_interfaces.m_memory; return (intf != nullptr); }
 	bool interface(device_memory_interface *&intf) const { intf = m_interfaces.m_memory; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) { intf = m_interfaces.m_state; return (intf != nullptr); }
-	bool interface(device_state_interface *&intf) const { intf = m_interfaces.m_state; return (intf != nullptr); }
 	device_execute_interface &execute() const { assert(m_interfaces.m_execute != nullptr); return *m_interfaces.m_execute; }
 	device_memory_interface &memory() const { assert(m_interfaces.m_memory != nullptr); return *m_interfaces.m_memory; }
-	device_state_interface &state() const { assert(m_interfaces.m_state != nullptr); return *m_interfaces.m_state; }
 
 	// owned object helpers
 	subdevice_list &subdevices() { return m_subdevices; }
@@ -598,39 +692,114 @@ public:
 	// clock/timing accessors
 	u32 clock() const { return m_clock; }
 	u32 unscaled_clock() const { return m_unscaled_clock; }
-	void set_unscaled_clock(u32 clock);
-	void set_unscaled_clock(const XTAL &xtal) { set_unscaled_clock(xtal.value()); }
-	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock); } // non-overloaded name because binding to overloads is ugly
+	void set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain = false);
+	void set_unscaled_clock(const XTAL &xtal, bool sync_on_new_clock_domain = false) { set_unscaled_clock(xtal.value(), sync_on_new_clock_domain); }
+	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock, false); } // non-overloaded name because binding to overloads is ugly
+	void set_unscaled_clock_int_sync(u32 clock) { set_unscaled_clock(clock, true); } // non-overloaded name because binding to overloads is ugly
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(u64 clocks) const noexcept;
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0, void *ptr = nullptr);
-	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, id, param, ptr); }
-	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
+	template <typename... T> emu_timer *timer_alloc(T &&... args);
 
-	// state saving interfaces
-	template<typename ItemType>
+	/// \brief Register data for save states
+	///
+	/// Registers data to be automatically saved/restored.  Can be used
+	/// with fixed-sized integer types, enumerated types marked safe for
+	/// saving (see #ALLOW_SAVE_TYPE and #ALLOW_SAVE_TYPE_AND_VECTOR).
+	/// Supports C arrays, \c std::array and \c std::vector.  Note that
+	/// \c std::vector instances must not be resized after being
+	/// registered to be saved/restored.
+	/// \param value Reference to the data to be saved/restored.  The
+	///   \c NAME macro can be used to simplify specifying the
+	///   \p valname argument at the same time.
+	/// \param [in] valname The name of the saved item.  The combination
+	///   of the \p valname and \p index arguments must be unique across
+	///   saved items for a device.
+	/// \param [in] index A numeric value to distinguish between saved
+	///   items with the same name.
+	template <typename ItemType>
 	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0)
 	{
 		assert(m_save);
 		m_save->save_item(this, name(), tag(), index, value, valname);
 	}
-	template<typename ItemType, typename StructType, typename ElementType>
+
+	/// \brief Register a member of a structure in an array for save
+	///   states
+	///
+	/// Registers data to be automatically saved/restored.  Can be used
+	/// with fixed-sized integer types, enumerated types marked safe for
+	/// saving (see #ALLOW_SAVE_TYPE and #ALLOW_SAVE_TYPE_AND_VECTOR).
+	/// Used to allow saving/restoring members of structures in C arrays
+	/// or \c std::array instances.
+	/// \param value Reference to the array of structures containing the
+	///   member to be saved/restored.  The #STRUCT_MEMBER macro can be
+	///   used to simplify specifying the \p element and \p valname
+	///   arguments at the same time.
+	/// \param [in] element Pointer to the member of the structure to
+	///   save/restore.
+	/// \param [in] valname The name of the saved item.  The combination
+	///   of the \p valname and \p index arguments must be unique across
+	///   saved items for a device.
+	/// \param [in] index A numeric value to distinguish between saved
+	///   items with the same name.
+	template <typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
 	{
 		assert(m_save);
 		m_save->save_item(this, name(), tag(), index, value, element, valname);
 	}
+
+	/// \brief Register an array of indeterminate for save states
+	///
+	/// Registers data to be automatically saved/restored when the
+	/// length of the outermost array cannot be automatically determined
+	/// at compile time.  Can be used with C arrays of indeterminate
+	/// length, pointers, and \c std::unique_ptr instances pointing to
+	/// arrays.  Use #save_item if length of the array can be determined
+	/// at compile time.
+	/// \param value Pointer to the array containing the data to be
+	///   saved/restored.  The \c NAME macro can be used to simplify
+	///   specifying the \p valname argument at the same time.
+	/// \param [in] valname The name of the saved item.  The combination
+	///   of the \p valname and \p index arguments must be unique across
+	///   saved items for a device.
+	/// \param [in] count The number of elements in the outermost array.
+	/// \param [in] index A numeric value to distinguish between saved
+	///   items with the same name.
+	/// \sa save_item
 	template<typename ItemType>
 	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
 		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
 	}
+
+	/// \brief Register a member of a structure in an array of
+	///   indeterminate for save states
+	///
+	/// Registers data to be automatically saved/restored when the
+	/// length of the outermost array cannot be automatically determined
+	/// at compile time.  Can be used with C arrays of indeterminate
+	/// length, pointers, and \c std::unique_ptr instances pointing to
+	/// arrays.  Use #save_item if length of the array can be determined
+	/// at compile time.
+	/// \param value Pointer to the array of structures containing the
+	///   member to be saved/restored.  The #STRUCT_MEMBER macro can be
+	///   used to simplify specifying the \p element and \p valname
+	///   arguments at the same time.
+	/// \param [in] element Pointer to the member of the structure to
+	///   save/restore.
+	/// \param [in] valname The name of the saved item.  The combination
+	///   of the \p valname and \p index arguments must be unique across
+	///   saved items for a device.
+	/// \param [in] count The number of elements in the outermost array.
+	/// \param [in] index A numeric value to distinguish between saved
+	///   items with the same name.
+	/// \sa save_item
 	template<typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
 	{
@@ -659,7 +828,7 @@ protected:
 	void debug_setup();
 	void pre_save();
 	void post_load();
-	void notify_clock_changed();
+	void notify_clock_changed(bool sync_on_new_clock_domain = false);
 	finder_base *register_auto_finder(finder_base &autodev);
 	void register_callback(devcb_base &callback);
 
@@ -674,8 +843,8 @@ protected:
 	///
 	/// Perform any final configuration tasks after all devices in the
 	/// system have added machine configuration.  This is called after
-	/// any #device_interface mix-in interface_config_complete members
-	/// have completed.
+	/// any #device_interface mix-in \c interface_config_complete
+	/// members have completed.
 	///
 	/// Note that automatic object finders will not have been resolved
 	/// at the time this member is called.
@@ -704,29 +873,29 @@ protected:
 	/// Implement this member to complete object resolution before any
 	/// devices are started.  For example it may be necessary to resolve
 	/// callbacks before any devices start so initial input conditions
-	/// can be set.  This is called after all registerd automatic object
-	/// finders are resolved.
+	/// can be set.  This is called after all registered automatic
+	/// object finders are resolved.
 	virtual void device_resolve_objects() ATTR_COLD;
 
 	/// \brief Device start handler
 	///
 	/// Implement this member to set up the initial state of the device
 	/// on start.  This will be called after all #device_interface
-	// /mix-in interface_pre_start members have completed successfully.
-	/// If the device can't start until another device has completed
-	/// starting, throw a #device_missing_dependencies exception.
-	/// Starting will be postponed until additional devices have been
-	/// started.
+	/// mix-in \c interface_pre_start members have completed
+	/// successfully.  If the device can't start until another device
+	/// has completed starting, throw a #device_missing_dependencies
+	/// exception.  Starting will be postponed until additional devices
+	/// have started.
 	///
-	/// If a device's base class is not device_t, it's good practice to
-	/// check start order dependencies (and throw
+	/// If a device's direct base class is not #device_t, it's good
+	/// practice to check start order dependencies (and throw
 	/// #device_missing_dependencies if necessary) before calling the
 	/// base implementation.  This will ensure that the base
 	/// implementation won't be called twice if starting needs to be
 	/// postponed.
 	///
 	/// This is the correct place to register for save states.
-	/// \sa device_reset device_stop
+	/// \sa device_reset device_stop save_item save_pointer
 	///   device_interface::interface_pre_start
 	///   device_interface::interface_post_start
 	virtual void device_start() ATTR_COLD = 0;
@@ -735,8 +904,8 @@ protected:
 	///
 	/// Implement this member to perform additional tasks on ending an
 	/// emulation session.  You may deallocate memory here.  This is
-	/// called after interface_pre_stop is called for all
-	/// #device_interface mix-ins, and before interface_post_stop is
+	/// called after \c interface_pre_stop is called for all
+	/// #device_interface mix-ins, and before \c interface_post_stop is
 	/// called for any #device_interface mix-ins.
 	/// \sa device_interface::interface_pre_stop
 	///   device_interface::interface_post_stop
@@ -745,7 +914,7 @@ protected:
 	/// \brief Device reset handler
 	///
 	/// Implement this member to provide reset behaviour.  This is
-	/// called after all #device_interface mix-in interface_pre_reset
+	/// called after all #device_interface mix-in \c interface_pre_reset
 	/// members have completed, and before any child devices are reset.
 	/// All devices are reset at the beginning of an emulation session
 	/// (after all devices have been started), and also when the user
@@ -770,7 +939,7 @@ protected:
 	/// after child devices are reset.  This is called when resetting a
 	/// device after #device_reset has been called and all child devices
 	/// have been reset, and before any #device_interface mix-in
-	/// interface_post_reset members are called.
+	/// \c interface_post_reset members are called.
 	/// \sa device_reset device_interface::interface_pre_reset
 	///   device_interface::interface_post_reset
 	virtual void device_reset_after_children() ATTR_COLD;
@@ -781,8 +950,10 @@ protected:
 	/// registered save state items are recorded.  For example it may be
 	/// necessary to flush caches, serialise self-referencing members or
 	/// pointers into data structures.  This is called after all
-	/// #device_interface mix-in interface_pre_save members are called.
-	/// \sa device_post_load device_interface::interface_pre_save
+	/// #device_interface mix-in \c interface_pre_save members are
+	/// called.
+	/// \sa device_post_load save_item save_pointer
+	///   device_interface::interface_pre_save
 	virtual void device_pre_save() ATTR_COLD;
 
 	/// \brief Complete save state loading
@@ -791,13 +962,14 @@ protected:
 	/// registered save state items are loaded.  For example it may be
 	/// necessary to update or invalidate caches, or de-serialise
 	/// pointers into data structures.  This is called after all
-	/// #device_interface mix-in interface_post_load members are called.
-	/// \sa device_pre_save device_interface::interface_post_load
+	/// #device_interface mix-in \c interface_post_load members are
+	/// called.
+	/// \sa device_pre_save save_item save_pointer
+	///   device_interface::interface_post_load
 	virtual void device_post_load() ATTR_COLD;
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	//------------------- end derived class overrides
 
@@ -879,7 +1051,7 @@ public:
 	///
 	/// Perform any final configuration tasks after all devices in the
 	/// system have added machine configuration.  This is called before
-	/// device_config_complete is called for the device.
+	/// \c device_config_complete is called for the device.
 	///
 	/// Note that automatic object finders will not have been resolved
 	/// at this time.
@@ -914,12 +1086,12 @@ public:
 	/// have been started.
 	///
 	/// Note that this member may be called multiple times if another
-	/// device_interface mix-in throws a #device_missing_dependencies
-	/// exception from its interface_pre_start member, or if the device
-	/// throws a #device_missing_dependencies exception from its
-	/// device_start member.  You must check to ensure that operations
-	/// like resource allocation are not performed multiple times, or
-	/// postpone them until #interface_post_start is called.
+	/// \c device_interface mix-in throws a #device_missing_dependencies
+	/// exception from its \c interface_pre_start member, or if the
+	/// device throws a #device_missing_dependencies exception from its
+	/// \c device_start member.  You must check to ensure that
+	/// operations like resource allocation are not performed multiple
+	/// times, or postpone them until #interface_post_start is called.
 	///
 	/// It's simpler to register for save states when
 	/// #interface_post_start is called.
@@ -930,22 +1102,23 @@ public:
 	///
 	/// Implement this member to complete mix-in start-up.  This is
 	/// called after #interface_pre_start is called for all
-	/// device_interface mix-ins, and after device_start is called for
-	/// the device.  This member will only be called once, it will not
-	/// be called multiple times if device starting is postponed.
+	/// device_interface mix-ins, and after \c device_start is called
+	/// for the device.  This member will only be called once, it will
+	/// not be called multiple times if device starting is postponed.
 	///
 	/// This member must not throw #device_missing_dependencies (start
 	/// order dependencies should be checked in #interface_pre_start).
 	/// This is the appropriate place to allocate resources like
 	/// timers and register for save states.
 	/// \sa interface_pre_start device_t::device_start
+	///   device_t::save_item device_t::save_pointer
 	virtual void interface_post_start() ATTR_COLD;
 
 	/// \brief Mix-in reset handler
 	///
 	/// Implement this member to provide reset behaviour.  This is
-	/// called before device_reset is called for the device, and before
-	/// any child devices are reset.  Only implement warm reset
+	/// called before \c device_reset is called for the device, and
+	/// before any child devices are reset.  Only implement warm reset
 	/// behaviour in this member.  Initial cold reset conditions should
 	/// be set up in #interface_pre_start and/or #interface_post_start.
 	/// If you need to provide additional behaviour after child devices
@@ -957,7 +1130,7 @@ public:
 	///
 	/// Implement this member to provide additional reset behaviour
 	/// after child devices are reset.  This is called after
-	/// device_reset_after_children has been called for the device.
+	/// \c device_reset_after_children has been called for the device.
 	/// \sa interface_pre_reset device_t::device_reset
 	///   device_t::device_reset_after_children
 	virtual void interface_post_reset() ATTR_COLD;
@@ -967,7 +1140,7 @@ public:
 	/// Implement this member to perform additional tasks on ending an
 	/// emulation session.  Do not deallocate anything that may need to
 	/// be referenced from another device_interface mix-in's
-	/// interface_pre_stop member or from the device's device_stop
+	/// \c interface_pre_stop member or from the device's \c device_stop
 	/// member.  This is called before device_stop is called for the
 	/// device.
 	/// \sa interface_post_stop device_t::device_stop
@@ -977,7 +1150,7 @@ public:
 	///
 	/// Implement this member to perform additional tasks on ending an
 	/// emulation session after the device is stopped.  You can
-	/// deallocate memory here.  This is called after device_stop is
+	/// deallocate memory here.  This is called after \c device_stop is
 	/// called for the device.
 	/// \sa interface_pre_stop device_t::device_stop
 	virtual void interface_post_stop() ATTR_COLD;
@@ -988,7 +1161,7 @@ public:
 	/// registered save state items are recorded.  For example it may be
 	/// necessary to flush caches, serialise self-referencing members or
 	/// pointers into data structures.  This is called before
-	/// device_pre_save is called for the device.
+	/// \c device_pre_save is called for the device.
 	/// \sa interface_post_load device_t::device_pre_save
 	virtual void interface_pre_save() ATTR_COLD;
 
@@ -998,11 +1171,11 @@ public:
 	/// registered save state items are loaded.  For example it may be
 	/// necessary to update or invalidate caches, or de-serialise
 	/// pointers into data structures.  This is called before
-	/// device_post_load is called for the device.
+	/// \c device_post_load is called for the device.
 	/// \sa interface_pre_save device_t::device_post_load
 	virtual void interface_post_load() ATTR_COLD;
 
-	virtual void interface_clock_changed();
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain);
 	virtual void interface_debug_setup();
 
 private:

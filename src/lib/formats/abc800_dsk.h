@@ -30,6 +30,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ABC800_FORMAT;
+extern const abc800_format FLOPPY_ABC800_FORMAT;
 
 #endif // MAME_FORMATS_ABC800_DSK_H

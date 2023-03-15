@@ -35,7 +35,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(update);
 
 private:
 	enum {
@@ -121,7 +122,7 @@ private:
 	inline bool iwm_is_sync() const;
 	void iwm_mode_w(u8 data);
 	void iwm_data_w(u8 data);
-	u8 iwm_control(int offset, u8 data);
+	void iwm_control(int offset, u8 data);
 	void iwm_sync();
 
 	void ism_fifo_clear();

@@ -107,8 +107,11 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 
 
 // slot devices
+#include "24bbc.h"
+#include "2ndserial.h"
 #include "autoprom.h"
 #include "cc500.h"
+#include "cisco.h"
 //#include "beebscan.h"
 //#include "teletext.h"
 #include "datacentre.h"
@@ -140,10 +143,13 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
 	device.option_add("autoprom",   BBC_AUTOPROM);        /* ATPL AutoPrommer */
+	device.option_add("24bbc",      BBC_24BBC);           /* Sprow 24bBC/RAM Disc */
+	device.option_add("2ndserial",  BBC_2NDSERIAL);       /* Sprow 2nd Serial Port */
 	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */
 	device.option_add("ide8",       BBC_IDE8);            /* RetroClinic BBC 8-bit IDE */
 	//device.option_add("beebscan",   BBC_BEEBSCAN);        /* Beeb HandScan */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */
+	device.option_add("cisco",      BBC_CISCO);           /* Cisco Terminal */
 	//device.option_add("videodig",   BBC_VIDEODIG);        /* Video Digitiser (RH Electronics) */
 	device.option_add("emrmidi",    BBC_EMRMIDI);         /* EMR Midi Interface */
 	//device.option_add("procyon",    BBC_PROCYON);         /* CST Procyon IEEE Interface */
@@ -172,6 +178,8 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
+	device.option_add("24bbc",      BBC_24BBC);           /* Sprow 24bBC/RAM Disc */
+	device.option_add("2ndserial",  BBC_2NDSERIAL);       /* Sprow 2nd Serial Port */
 	device.option_add("beebide",    BBC_BEEBIDE);         /* Sprow BeebIDE 16-bit */
 	device.option_add("ide8",       BBC_IDE8);            /* RetroClinic BBC 8-bit IDE */
 	device.option_add("b488",       BBC_B488);            /* Aries B488 */

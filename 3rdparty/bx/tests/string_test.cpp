@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -16,7 +16,7 @@ TEST_CASE("stringPrintfTy", "")
 {
 	std::string test;
 	bx::stringPrintf(test, "printf into std::string.");
-	REQUIRE(0 == bx::strCmp(bx::StringView(test), "printf into std::string.") );
+	REQUIRE(0 == bx::strCmp(bx::StringView(test.data(), int32_t(test.length() ) ), "printf into std::string.") );
 }
 
 TEST_CASE("prettify", "")
@@ -226,6 +226,18 @@ TEST_CASE("strFind", "")
 
 		REQUIRE(bx::strFind("vgd", 'a').isEmpty() );
 	}
+
+	{
+		bx::StringView test = bx::strFind("a", "a");
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", bx::StringView("a ", 1) );
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
 }
 
 TEST_CASE("strSkip", "")
@@ -321,6 +333,7 @@ TEST_CASE("toString double", "")
 	REQUIRE(testToString(-270.000000,             "-270.0") );
 	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
 	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testToString(-1.234567e-9,            "-1.234567e-9") );
 }
 
 template<typename Ty>
@@ -462,12 +475,26 @@ TEST_CASE("StringView", "")
 
 TEST_CASE("Trim", "")
 {
+	REQUIRE(bx::strLTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("aba", "a"), "ba") );
+
+	REQUIRE(bx::strRTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("aba", "a"), "ab") );
+
+	REQUIRE(bx::strTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("aba", "a"), "b") );
+
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "ab"), "vgd") );
-	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "abvgd") );
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd", "vagbd"), "abvgd") );
+
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vgd"), "abvgd") );
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("/555333/podmac/", "/"), "555333/podmac/") );
 
-	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd", "vagbd"), "abvgd") );
+
 	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "abv"), "abvgd") );
 	REQUIRE(0 == bx::strCmp(bx::strRTrim("/555333/podmac/", "/"), "/555333/podmac") );
 
@@ -480,6 +507,37 @@ TEST_CASE("Trim", "")
 
 	bx::FilePath uri("/555333/podmac/");
 	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
+}
+
+TEST_CASE("TrimSpace", "")
+{
+	REQUIRE(bx::strLTrimSpace("").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "").isEmpty() );
+
+	REQUIRE(bx::strLTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "\n").isEmpty() );
+
+	const bx::StringView t0("1389");
+	const bx::StringView t1("    1389");
+	const bx::StringView t2("1389    ");
+	const bx::StringView t3("  1389  ");
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t2), t2) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t3), "1389  ") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t1), t1) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t3), "  1389") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t3), t0) );
 }
 
 TEST_CASE("strWord", "")
@@ -495,4 +553,50 @@ TEST_CASE("strFindBlock", "")
 
 	bx::StringView result = bx::strFindBlock(test1, '{', '}');
 	REQUIRE(19 == result.getLength() );
+}
+
+TEST_CASE("prefix", "")
+{
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "abv") );
+	REQUIRE(!bx::hasPrefix("abvgd-1389.0", "bvg") );
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "abv"), "gd-1389.0") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
+}
+
+TEST_CASE("suffix", "")
+{
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "389.0") );
+	REQUIRE(!bx::hasSuffix("abvgd-1389.0", "1389") );
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "389.0"), "abvgd-1") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
+}
+
+TEST_CASE("0terminated", "")
+{
+	const bx::StringView t0("1389");
+	REQUIRE(t0.is0Terminated() );
+	const bx::StringView t1(strTrimPrefix(t0, "13") );
+	REQUIRE(!t1.is0Terminated() );
+	const bx::StringView t2(strTrimSuffix(t0, "89") );
+	REQUIRE(!t2.is0Terminated() );
+
+	bx::DefaultAllocator crt;
+	g_allocator = &crt;
+
+	typedef bx::StringT<&g_allocator> String;
+
+	String st;
+	REQUIRE(st.is0Terminated() );
+
+	st = strTrimPrefix(t0, "13");
+	REQUIRE(2 == st.getLength() );
+	REQUIRE(st.is0Terminated() );
+
+	st = strTrimSuffix(t0, "89");
+	REQUIRE(2 == st.getLength() );
+	REQUIRE(st.is0Terminated() );
 }

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="gamepock" description="Epoch Game Pocket Computer cartridges">
+
+<!-- Official -->
 
 	<software name="astrobom">
 		<description>Astro Bomber</description>
@@ -11,8 +13,8 @@ license:CC0
 		<publisher>Epoch</publisher>
 		<info name="serial" value="1" />
 		<part name="cart" interface="gamepock_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="astrobom.bin" size="8192" crc="b0fd260f" sha1="453a0f3c0952ebd8e691316c39960731f1996c09"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="astrobom.bin" size="0x2000" crc="b0fd260f" sha1="453a0f3c0952ebd8e691316c39960731f1996c09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23,20 +25,21 @@ license:CC0
 		<publisher>Epoch</publisher>
 		<info name="serial" value="2" />
 		<part name="cart" interface="gamepock_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="blockmaz.bin" size="8192" crc="cfb3291b" sha1="50dc5736200986b326b372c17c233c4180474471"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="blockmaz.bin" size="0x2000" crc="cfb3291b" sha1="50dc5736200986b326b372c17c233c4180474471"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pokemahj">
+		<!-- cartridge label literally has "MAHJONGG" with the extra g -->
 		<description>Pokekon Mahjongg</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="3" />
 		<part name="cart" interface="gamepock_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="pokemahj.bin" size="16384" crc="5c3eed48" sha1="918e1caa16cfae6b74da2026f3426d0a5818061c"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="pokemahj.bin" size="0x4000" crc="5c3eed48" sha1="918e1caa16cfae6b74da2026f3426d0a5818061c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47,20 +50,35 @@ license:CC0
 		<publisher>Epoch</publisher>
 		<info name="serial" value="4" />
 		<part name="cart" interface="gamepock_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="pokereve.bin" size="8192" crc="1c461f91" sha1="ead4a4efe5439e2ec1f6befb50c350f73919da8d"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="pokereve.bin" size="0x2000" crc="1c461f91" sha1="ead4a4efe5439e2ec1f6befb50c350f73919da8d"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sokoban">
-		<description>Soukoban - Store Keepers</description>
+		<description>Sokoban - Store Keepers</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<info name="serial" value="5" />
 		<part name="cart" interface="gamepock_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="soukoban.bin" size="8192" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="sokoban.bin" size="0x2000" crc="5d6f7819" sha1="61ef6483e8f9935dd8b6351fd2bdfda3af3899bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Homebrew -->
+
+	<software name="pokedemo">
+		<!-- ref: https://chrismcovell.com/GamePokekon/index.html -->
+		<description>1st Pokekon Demo</description>
+		<year>2010</year>
+		<publisher>Chris Covell</publisher>
+		<part name="cart" interface="gamepock_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="1st_pocket_computer_demo.bin" size="0x4000" crc="c008102c" sha1="8b204657dea60c9726b729a485378ac132f39d27"/>
 			</dataarea>
 		</part>
 	</software>

@@ -7,9 +7,9 @@
     Cassette code for Sega SC-3000 *.bit files
 
 *********************************************************************/
-#include "sc3000_bit.h"
 
-#include <cassert>
+#include "sc3000_bit.h"
+#include "tzx_cas.h"
 
 
 /***************************************************************************
@@ -99,4 +99,5 @@ const cassette_image::Format sc3000_bit_format =
 
 CASSETTE_FORMATLIST_START( sc3000_cassette_formats )
 	CASSETTE_FORMAT(sc3000_bit_format)
+	CASSETTE_FORMAT(tzx_cassette_format)
 CASSETTE_FORMATLIST_END

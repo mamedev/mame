@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_JUKU_FORMAT;
+extern const juku_format FLOPPY_JUKU_FORMAT;
 
 #endif // MAME_FORMATS_JUKU_DSK_H

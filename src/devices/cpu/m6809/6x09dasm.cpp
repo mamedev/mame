@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Sean Riddle,Tim Lindner
 /*****************************************************************************
 
-    6x09dasm.cpp - a 6809/6309/Konami opcode disassembler
+    a 6809/6309/Konami opcode disassembler
 
     Based on:
         6309dasm.c - a 6309 opcode disassembler
@@ -10,7 +10,6 @@
         Copyright Tim Lindner
 
     and
-
         6809dasm.c - a 6809 opcode disassembler
         Version 1.4 1-MAR-95
         Copyright Sean Riddle
@@ -124,6 +123,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	int numoperands = (p - pc == 1)
 		? op->length() - 1
 		: op->length() - 2;
+	offs_t flags = op->flags();
 
 	offs_t ppc = p;
 	p += numoperands;
@@ -154,8 +154,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0xf0)?",":"");
 		if (pb & 0x04)
-			util::stream_format(stream, "%sB",  (pb&0xf8)?",":"");
-		if (pb & 0x02)
+			util::stream_format(stream, "%s%s", (pb&0xf8)?",":"", (pb & 0x02) ? "D" : "B");
+		else if (pb & 0x02)
 			util::stream_format(stream, "%sA",  (pb&0xfc)?",":"");
 		if (pb & 0x01)
 			util::stream_format(stream, "%sCC", (pb&0xfe)?",":"");
@@ -167,8 +167,8 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
-			util::stream_format(stream, "%sA",  (pb&0x01)?",":"");
-		if (pb & 0x04)
+			util::stream_format(stream, "%s%s", (pb&0x01)?",":"", (pb & 0x04) ? "D" : "A");
+		else if (pb & 0x04)
 			util::stream_format(stream, "%sB",  (pb&0x03)?",":"");
 		if (pb & 0x08)
 			util::stream_format(stream, "%sDP", (pb&0x07)?",":"");
@@ -179,7 +179,10 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x40)
 			util::stream_format(stream, "%s%s", (pb&0x3f)?",":"", (op->mode() == PULS)?"U":"S");
 		if (pb & 0x80)
+		{
 			util::stream_format(stream, "%sPC", (pb&0x7f)?",":"");
+			flags |= STEP_OUT;
+		}
 		break;
 
 	case DIR:
@@ -279,7 +282,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		throw false;
 	}
 
-	return (p - pc) | op->flags() | SUPPORTED;
+	return (p - pc) | flags | SUPPORTED;
 }
 
 
@@ -323,20 +326,20 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 
 	{ 0x20, 2, "BRA",   REL,    M6x09_GENERAL },
 	{ 0x21, 2, "BRN",   REL,    M6x09_GENERAL },
-	{ 0x22, 2, "BHI",   REL,    M6x09_GENERAL },
-	{ 0x23, 2, "BLS",   REL,    M6x09_GENERAL },
-	{ 0x24, 2, "BCC",   REL,    M6x09_GENERAL },
-	{ 0x25, 2, "BCS",   REL,    M6x09_GENERAL },
-	{ 0x26, 2, "BNE",   REL,    M6x09_GENERAL },
-	{ 0x27, 2, "BEQ",   REL,    M6x09_GENERAL },
-	{ 0x28, 2, "BVC",   REL,    M6x09_GENERAL },
-	{ 0x29, 2, "BVS",   REL,    M6x09_GENERAL },
-	{ 0x2A, 2, "BPL",   REL,    M6x09_GENERAL },
-	{ 0x2B, 2, "BMI",   REL,    M6x09_GENERAL },
-	{ 0x2C, 2, "BGE",   REL,    M6x09_GENERAL },
-	{ 0x2D, 2, "BLT",   REL,    M6x09_GENERAL },
-	{ 0x2E, 2, "BGT",   REL,    M6x09_GENERAL },
-	{ 0x2F, 2, "BLE",   REL,    M6x09_GENERAL },
+	{ 0x22, 2, "BHI",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x23, 2, "BLS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x24, 2, "BCC",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x25, 2, "BCS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x26, 2, "BNE",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x27, 2, "BEQ",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x28, 2, "BVC",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x29, 2, "BVS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2A, 2, "BPL",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2B, 2, "BMI",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2C, 2, "BGE",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2D, 2, "BLT",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2E, 2, "BGT",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x2F, 2, "BLE",   REL,    M6x09_GENERAL, STEP_COND },
 
 	{ 0x30, 2, "LEAX",  IND,    M6x09_GENERAL },
 	{ 0x31, 2, "LEAY",  IND,    M6x09_GENERAL },
@@ -346,9 +349,9 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x35, 2, "PULS",  PULS,   M6x09_GENERAL },
 	{ 0x36, 2, "PSHU",  PSHU,   M6x09_GENERAL },
 	{ 0x37, 2, "PULU",  PULU,   M6x09_GENERAL },
-	{ 0x39, 1, "RTS",   INH ,   M6x09_GENERAL },
+	{ 0x39, 1, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
 	{ 0x3A, 1, "ABX",   INH,    M6x09_GENERAL },
-	{ 0x3B, 1, "RTI",   INH,    M6x09_GENERAL },
+	{ 0x3B, 1, "RTI",   INH,    M6x09_GENERAL, STEP_OUT },
 	{ 0x3C, 2, "CWAI",  IMM,    M6x09_GENERAL },
 	{ 0x3D, 1, "MUL",   INH,    M6x09_GENERAL },
 	{ 0x3F, 1, "SWI",   INH,    M6x09_GENERAL },
@@ -1114,38 +1117,38 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x5C, 2, "STS",   IND,    M6x09_GENERAL },
 
 	{ 0x60, 2, "BRA",   REL,    M6x09_GENERAL },
-	{ 0x61, 2, "BHI",   REL,    M6x09_GENERAL },
-	{ 0x62, 2, "BCC",   REL,    M6x09_GENERAL },
-	{ 0x63, 2, "BNE",   REL,    M6x09_GENERAL },
-	{ 0x64, 2, "BVC",   REL,    M6x09_GENERAL },
-	{ 0x65, 2, "BPL",   REL,    M6x09_GENERAL },
-	{ 0x66, 2, "BGE",   REL,    M6x09_GENERAL },
-	{ 0x67, 2, "BGT",   REL,    M6x09_GENERAL },
+	{ 0x61, 2, "BHI",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x62, 2, "BCC",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x63, 2, "BNE",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x64, 2, "BVC",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x65, 2, "BPL",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x66, 2, "BGE",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x67, 2, "BGT",   REL,    M6x09_GENERAL, STEP_COND },
 	{ 0x68, 3, "LBRA",  LREL,   M6x09_GENERAL },
-	{ 0x69, 3, "LBHI",  LREL,   M6x09_GENERAL },
-	{ 0x6A, 3, "LBCC",  LREL,   M6x09_GENERAL },
-	{ 0x6B, 3, "LBNE",  LREL,   M6x09_GENERAL },
-	{ 0x6C, 3, "LBVC",  LREL,   M6x09_GENERAL },
-	{ 0x6D, 3, "LBPL",  LREL,   M6x09_GENERAL },
-	{ 0x6E, 3, "LBGE",  LREL,   M6x09_GENERAL },
-	{ 0x6F, 3, "LBGT",  LREL,   M6x09_GENERAL },
+	{ 0x69, 3, "LBHI",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6A, 3, "LBCC",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6B, 3, "LBNE",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6C, 3, "LBVC",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6D, 3, "LBPL",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6E, 3, "LBGE",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x6F, 3, "LBGT",  LREL,   M6x09_GENERAL, STEP_COND },
 
 	{ 0x70, 2, "BRN",   REL,    M6x09_GENERAL },
-	{ 0x71, 2, "BLS",   REL,    M6x09_GENERAL },
-	{ 0x72, 2, "BCS",   REL,    M6x09_GENERAL },
-	{ 0x73, 2, "BEQ",   REL,    M6x09_GENERAL },
-	{ 0x74, 2, "BVS",   REL,    M6x09_GENERAL },
-	{ 0x75, 2, "BMI",   REL,    M6x09_GENERAL },
-	{ 0x76, 2, "BLT",   REL,    M6x09_GENERAL },
-	{ 0x77, 2, "BLE",   REL,    M6x09_GENERAL },
+	{ 0x71, 2, "BLS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x72, 2, "BCS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x73, 2, "BEQ",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x74, 2, "BVS",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x75, 2, "BMI",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x76, 2, "BLT",   REL,    M6x09_GENERAL, STEP_COND },
+	{ 0x77, 2, "BLE",   REL,    M6x09_GENERAL, STEP_COND },
 	{ 0x78, 3, "LBRN",  LREL,   M6x09_GENERAL },
-	{ 0x79, 3, "LBLS",  LREL,   M6x09_GENERAL },
-	{ 0x7A, 3, "LBCS",  LREL,   M6x09_GENERAL },
-	{ 0x7B, 3, "LBEQ",  LREL,   M6x09_GENERAL },
-	{ 0x7C, 3, "LBVS",  LREL,   M6x09_GENERAL },
-	{ 0x7D, 3, "LBMI",  LREL,   M6x09_GENERAL },
-	{ 0x7E, 3, "LBLT",  LREL,   M6x09_GENERAL },
-	{ 0x7F, 3, "LBLE",  LREL,   M6x09_GENERAL },
+	{ 0x79, 3, "LBLS",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7A, 3, "LBCS",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7B, 3, "LBEQ",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7C, 3, "LBVS",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7D, 3, "LBMI",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7E, 3, "LBLT",  LREL,   M6x09_GENERAL, STEP_COND },
+	{ 0x7F, 3, "LBLE",  LREL,   M6x09_GENERAL, STEP_COND },
 
 	{ 0x80, 1, "CLRA",  INH,    M6x09_GENERAL },
 	{ 0x81, 1, "CLRB",  INH,    M6x09_GENERAL },
@@ -1162,7 +1165,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x8C, 1, "DECA",  INH,    M6x09_GENERAL },
 	{ 0x8D, 1, "DECB",  INH,    M6x09_GENERAL },
 	{ 0x8E, 2, "DEC",   IND,    M6x09_GENERAL },
-	{ 0x8F, 1, "RTS",   INH ,   M6x09_GENERAL },
+	{ 0x8F, 1, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
 
 	{ 0x90, 1, "TSTA",  INH,    M6x09_GENERAL },
 	{ 0x91, 1, "TSTB",  INH,    M6x09_GENERAL },
@@ -1179,7 +1182,7 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x9C, 1, "ASLA",  INH,    M6x09_GENERAL },
 	{ 0x9D, 1, "ASLB",  INH,    M6x09_GENERAL },
 	{ 0x9E, 2, "ASL",   IND,    M6x09_GENERAL },
-	{ 0x9F, 1, "RTI",   INH ,   M6x09_GENERAL },
+	{ 0x9F, 1, "RTI",   INH ,   M6x09_GENERAL, STEP_OUT },
 
 	{ 0xA0, 1, "ROLA",  INH,    M6x09_GENERAL },
 	{ 0xA1, 1, "ROLB",  INH,    M6x09_GENERAL },

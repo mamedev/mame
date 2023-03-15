@@ -91,7 +91,7 @@ void hp9122c_device::device_start()
 	save_item(NAME(m_ds0));
 	save_item(NAME(m_ds1));
 
-	m_motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9122c_device::motor_timeout), this));
+	m_motor_timer = timer_alloc(FUNC(hp9122c_device::motor_timeout), this);
 }
 
 TIMER_CALLBACK_MEMBER(hp9122c_device::motor_timeout)
@@ -393,7 +393,7 @@ void hp9122c_device::device_add_mconfig(machine_config &config)
 	m_i8291a->int_write().set(FUNC(hp9122c_device::i8291a_int_w));
 	m_i8291a->dreq_write().set(FUNC(hp9122c_device::i8291a_dreq_w));
 
-	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , nullptr, true).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , nullptr, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , floppy_image_device::default_mfm_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , floppy_image_device::default_mfm_floppy_formats, true).enable_sound(true);
 	config.set_default_layout(layout_hp9122c);
 }

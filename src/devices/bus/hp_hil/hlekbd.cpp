@@ -11,8 +11,8 @@
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
+DEFINE_DEVICE_TYPE(HP_IPC_HLE_KEYBOARD, bus::hp_hil::hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(HP_ITF_HLE_KEYBOARD, bus::hp_hil::hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
 namespace bus::hp_hil {
 
@@ -454,7 +454,7 @@ void hle_hp_ipc_device::device_reset()
 
 void hle_hp_ipc_device::hil_idd()
 {
-	m_hp_hil_mlc->hil_write(0x0100 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(0x0100 | ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
 }
 
@@ -509,7 +509,7 @@ void hle_hp_ipc_device::will_scan_row(u8 row)
 
 attotime hle_hp_ipc_device::typematic_delay() const
 {
-	return attotime::from_msec(250); // XXX
+	return attotime::from_msec(250); // FIXME
 }
 
 attotime hle_hp_ipc_device::typematic_period() const
@@ -606,7 +606,7 @@ ioport_constructor hle_hp_itf_device::device_input_ports() const
 
 void hle_hp_itf_device::hil_idd()
 {
-	m_hp_hil_mlc->hil_write(m_device_id16 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | ioport("COL0")->read());
 	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
 }
 

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
 		  /* ICU's insane normalization API requires you to
 			 know the size of the destination buffer in advance,
-			 or alternatively to repeatly try normalizing and
+			 or alternatively to repeatedly try normalizing and
 			 double the buffer size until it succeeds.  Here, I just
 			 allocate a huge destination buffer to avoid the issue. */
 		  UChar *udest = (UChar*) malloc(10*ulen * sizeof(UChar));

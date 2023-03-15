@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="adam_cart" description="Coleco Adam cartridges">
 
-	<!--software name="adamdev" supported="no">
-	    <description>ADAM Dev (Prototype)</description>
+	<!--
+	<software name="adamdev" supported="no">
+	    <description>ADAM Dev (prototype)</description>
 	    <year>198?</year>
 	    <publisher>Coleco?</publisher>
 	    <part name="cart" interface="coleco_cart">
@@ -17,10 +18,11 @@ license:CC0
 	            <rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
 	        </dataarea>
 	    </part>
-	</software-->
+	</software>
+	-->
 
 	<software name="ard" supported="no">
-		<description>ADAM Resident Debugger (Prototype Rev20)</description>
+		<description>ADAM Resident Debugger (prototype revision 2.0)</description>
 		<year>198?</year>
 		<publisher>Coleco?</publisher>
 
@@ -56,7 +58,7 @@ license:CC0
 	</software>
 
 	<software name="adamdiaga" cloneof="adamdiag">
-		<description>ADAM Diagnostics (Alt)</description>
+		<description>ADAM Diagnostics (alt)</description>
 		<year>198?</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -78,7 +80,7 @@ license:CC0
 	</software>
 
 	<software name="adamtesta" cloneof="adamtest">
-		<description>ADAM Final Test (Alt)</description>
+		<description>ADAM Final Test (alt)</description>
 		<year>198?</year>
 		<publisher>Coleco</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -150,6 +152,17 @@ license:CC0
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x2000">
 				<rom name="adam tape util rev. 22 (1984) (coleco).rom" size="0x2000" crc="f235aba4" sha1="4db424c25c6ee010850e6783c844ad75bebf0359"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gfxproc">
+		<description>Coleco Graphics Processor</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x8000">
+				<rom name="Coleco Graphics Processor (1984) (Coleco).rom" size="0x8000" crc="5d09075d" sha1="ce2fec45a410408ed0789966e7ff8391b0374a19"/>
 			</dataarea>
 		</part>
 	</software>

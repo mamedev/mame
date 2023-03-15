@@ -20,6 +20,7 @@
 #include "riidasm.h"
 
 #define LOG_TBRD (1U << 1)
+#define LOG_PROD (1U << 2)
 #include "logmacro.h"
 
 // device type definitions
@@ -206,8 +207,8 @@ void riscii_series_device::device_start()
 
 	set_icountptr(m_icount);
 
-	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::timer0), this));
-	m_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::speech_timer), this));
+	m_timer0 = timer_alloc(FUNC(riscii_series_device::timer0), this);
+	m_speech_timer = timer_alloc(FUNC(riscii_series_device::speech_timer), this);
 
 	state_add<u32>(RII_PC, "PC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask);
 	state_add<u32>(STATE_GENPC, "GENPC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask).noshow();
@@ -614,7 +615,10 @@ u8 riscii_series_device::port_r(offs_t offset)
 
 void riscii_series_device::port_w(offs_t offset, u8 data)
 {
+	if (m_port_data[offset] == data)
+		return;
 	m_port_data[offset] = data;
+
 	if (offset < 2)
 	{
 		u8 dc = m_port_dcr[offset];
@@ -638,6 +642,29 @@ u8 riscii_series_device::stbcon_r()
 void riscii_series_device::stbcon_w(u8 data)
 {
 	m_stbcon = data;
+	if (BIT(data, 5))
+	{
+		if (BIT(data, 4))
+		{
+			// All key mode
+			port_w(8, 0x00);
+			port_w(9, 0x00);
+		}
+		else
+		{
+			// Key strobe output on ports J and K
+			if (BIT(data, 3))
+			{
+				port_w(9, 0xff);
+				port_w(8, (1 << (data & 7)) ^ 0xff);
+			}
+			else
+			{
+				port_w(8, 0xff);
+				port_w(9, (1 << (data & 7)) ^ 0xff);
+			}
+		}
+	}
 }
 
 u8 riscii_series_device::painten_r()
@@ -1302,7 +1329,7 @@ void riscii_series_device::execute_mul_imm(u8 data)
 	int mier = BIT(m_cpucon, 3) ? int(s8(m_acc)) : int(m_acc);
 	int mcand = BIT(m_cpucon, 4) ? int(s8(data)) : int(data);
 	m_prod = u16(mier * mcand);
-	logerror("%s: %d * %d = %04X\n", machine().describe_context(), mier, mcand, m_prod);
+	LOGMASKED(LOG_PROD, "%s: %d * %d = %04X\n", machine().describe_context(), mier, mcand, m_prod);
 }
 
 void riscii_series_device::execute_or(u8 reg, bool a)

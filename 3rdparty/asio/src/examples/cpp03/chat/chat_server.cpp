@@ -2,7 +2,7 @@
 // chat_server.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <list>
 #include <set>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "asio.hpp"
@@ -46,7 +46,8 @@ public:
   {
     participants_.insert(participant);
     std::for_each(recent_msgs_.begin(), recent_msgs_.end(),
-        boost::bind(&chat_participant::deliver, participant, _1));
+        boost::bind(&chat_participant::deliver,
+          participant, boost::placeholders::_1));
   }
 
   void leave(chat_participant_ptr participant)
@@ -61,7 +62,8 @@ public:
       recent_msgs_.pop_front();
 
     std::for_each(participants_.begin(), participants_.end(),
-        boost::bind(&chat_participant::deliver, _1, boost::ref(msg)));
+        boost::bind(&chat_participant::deliver,
+          boost::placeholders::_1, boost::ref(msg)));
   }
 
 private:

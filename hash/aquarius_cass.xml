@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="aquarius_cass" description="Mattel Aquarius cassettes">
@@ -290,6 +290,18 @@ license:CC0
 			<feature name="part_id" value="DISCO_A"/>
 			<dataarea name="cass" size="8054">
 				<rom name="DISCO_A.caq" size="8054" crc="1b072527" sha1="13959fd353f17ab767c28c117bb73910a9fafcd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doomsday">
+		<description>Doomsday Defender</description>
+		<year>2022</year>
+		<publisher>Cronosoft</publisher>
+		<info name="author" value="Roy Templeman"/>
+		<part name="cass1" interface="aquarius_cass">
+			<dataarea name="cass" size="16803">
+				<rom name="DDv50DR.caq" size="16803" crc="ef1fd7a8" sha1="d2685ad2d989f5f5ac0b526c9188606bfcc00333"/>
 			</dataarea>
 		</part>
 	</software>
@@ -617,7 +629,7 @@ license:CC0
 	<software name="modem">
 		<description>Modem Program</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<part name="cass1" interface="aquarius_cass">
 			<feature name="part_id" value="MODEM_BAS"/>
 			<dataarea name="cass" size="449">

@@ -45,8 +45,8 @@ class ppu2c0x_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (int scanline, int vblank, int blanked)> scanline_delegate;
-	typedef device_delegate<void (int scanline, int vblank, int blanked)> hblank_delegate;
+	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> scanline_delegate;
+	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> hblank_delegate;
 	typedef device_delegate<void (int *ppu_regs)> nmi_delegate;
 	typedef device_delegate<int (int address, int data)> vidaccess_delegate;
 	typedef device_delegate<void (offs_t offset)> latch_delegate;
@@ -127,8 +127,6 @@ public:
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
-	// some bootleg / clone hardware appears to ignore this
-	void use_sprite_write_limitation_disable() { m_use_sprite_write_limitation = false; }
 	uint16_t get_vram_dest();
 	void set_vram_dest(uint16_t dest);
 
@@ -177,11 +175,14 @@ protected:
 	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_config_complete() override;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
+	TIMER_CALLBACK_MEMBER(hblank_tick);
+	TIMER_CALLBACK_MEMBER(nmi_tick);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
 
 	// address space configurations
 	const address_space_config      m_space_config;
@@ -214,16 +215,13 @@ protected:
 	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
 
-
 	uint8_t readbyte(offs_t address);
 
 	uint32_t m_nespens[0x40*8];
-private:
-	static constexpr device_timer_id TIMER_HBLANK = 0;
-	static constexpr device_timer_id TIMER_NMI = 1;
-	static constexpr device_timer_id TIMER_SCANLINE = 2;
 
+private:
 	inline void writebyte(offs_t address, uint8_t data);
+	inline uint16_t apply_grayscale_and_emphasis(uint8_t color);
 
 
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
@@ -244,8 +242,6 @@ private:
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
 	emu_timer                   *m_nmi_timer;           /* NMI timer */
 	emu_timer                   *m_scanline_timer;      /* scanline timer */
-
-	bool m_use_sprite_write_limitation;
 };
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {
@@ -326,7 +322,6 @@ private:
 };
 
 // device type definition
-//extern const device_type PPU_2C0X;
 DECLARE_DEVICE_TYPE(PPU_2C02,    ppu2c02_device)       // NTSC NES
 DECLARE_DEVICE_TYPE(PPU_2C03B,   ppu2c03b_device)      // Playchoice 10
 DECLARE_DEVICE_TYPE(PPU_2C04,    ppu2c04_device)       // Vs. Unisystem

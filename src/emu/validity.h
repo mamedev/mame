@@ -60,7 +60,6 @@ private:
 	using string_set = std::unordered_set<std::string>;
 
 	// internal helpers
-	const char *ioport_string_from_index(u32 index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
 
 	// core helpers
@@ -69,14 +68,11 @@ private:
 	void validate_one(const game_driver &driver);
 
 	// internal sub-checks
-	void validate_core();
-	void validate_inlines();
-	void validate_rgb();
 	void validate_driver(device_t &root);
 	void validate_roms(device_t &root);
-	void validate_analog_input_field(ioport_field &field);
-	void validate_dip_settings(ioport_field &field);
-	void validate_condition(ioport_condition &condition, device_t &device);
+	void validate_analog_input_field(const ioport_field &field);
+	void validate_dip_settings(const ioport_field &field);
+	void validate_condition(const ioport_condition &condition, device_t &device);
 	void validate_inputs(device_t &root);
 	void validate_devices(machine_config &config);
 	void validate_device_types();
@@ -85,12 +81,6 @@ private:
 	void build_output_prefix(std::ostream &str) const;
 	template <typename Format, typename... Params> void output_via_delegate(osd_output_channel channel, Format &&fmt, Params &&...args);
 	void output_indented_errors(std::string &text, const char *header);
-
-	// random number generation
-	s32 random_i32();
-	u32 random_u32();
-	s64 random_i64();
-	u64 random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
@@ -119,6 +109,7 @@ private:
 	int_map                 m_region_map;
 	string_set              m_ioport_set;
 	string_set              m_already_checked;
+	string_set              m_slotcard_set;
 	bool                    m_checking_card;
 	bool const              m_quick;
 };

@@ -52,7 +52,7 @@ DEFINE_DEVICE_TYPE(NES_NTB_SLOT, nes_ntb_slot_device, "nes_ntb_slot", "NES NTB C
 
 nes_ntb_slot_device::nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_NTB_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<ntb_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
@@ -166,30 +166,19 @@ nes_sunsoft_dcs_device::nes_sunsoft_dcs_device(const machine_config &mconfig, co
 
 void nes_sunsoft_dcs_device::device_start()
 {
-	common_start();
-	ntb_enable_timer = timer_alloc(TIMER_PROTECT);
+	nes_sunsoft_4_device::device_start();
+
+	ntb_enable_timer = timer_alloc(FUNC(nes_sunsoft_dcs_device::protect_tick), this);
 	ntb_enable_timer->reset();
 	timer_freq = clocks_to_attotime(107520);
 
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_wram_enable));
 	save_item(NAME(m_exrom_enable));
 	save_item(NAME(m_timer_on));
 }
 
 void nes_sunsoft_dcs_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	m_reg = 0;
-	m_latch1 = 0;
-	m_latch2 = 0;
-	m_wram_enable = 0;
+	nes_sunsoft_4_device::pcb_reset();
 	m_exrom_enable = 0;
 	m_timer_on = 0;
 }
@@ -269,7 +258,7 @@ uint8_t nes_sunsoft_dcs_device::read_m(offs_t offset)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return get_open_bus();   // open bus
+	return get_open_bus();
 }
 
 
@@ -292,14 +281,11 @@ void nes_sunsoft_dcs_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  protect_tick - handler NTB-ROM timer elapsing
 //-------------------------------------------------
 
-void nes_sunsoft_dcs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(nes_sunsoft_dcs_device::protect_tick)
 {
-	if (id == TIMER_PROTECT)
-	{
-		m_timer_on = 0;
-		ntb_enable_timer->reset();
-	}
+	m_timer_on = 0;
+	ntb_enable_timer->reset();
 }

@@ -22,11 +22,13 @@ MAME Documentation
 
     usingmame/index
     commandline/index
+    plugins/index
     advanced/index
 
     debugger/index
     tools/index
 
+    contributing/index
     techspecs/index
 
     security

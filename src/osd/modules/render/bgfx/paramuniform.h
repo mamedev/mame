@@ -6,10 +6,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_PARAMUNIFORM_H
+#define MAME_RENDER_BGFX_PARAMUNIFORM_H
 
-#ifndef __DRAWBGFX_PARAM_UNIFORM__
-#define __DRAWBGFX_PARAM_UNIFORM__
+#pragma once
 
 #include "entryuniform.h"
 
@@ -26,4 +26,4 @@ private:
 	bgfx_parameter* m_param;
 };
 
-#endif // __DRAWBGFX_PARAM_UNIFORM__
+#endif // MAME_RENDER_BGFX_PARAMUNIFORM_H

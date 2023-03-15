@@ -2,7 +2,7 @@
 // ip/impl/network_v6.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2014 Oliver Kowalke (oliver dot kowalke at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -95,6 +95,7 @@ std::string network_v6::to_string() const
 
 std::string network_v6::to_string(asio::error_code& ec) const
 {
+  using namespace std; // For sprintf.
   ec = asio::error_code();
   char prefix_len[16];
 #if defined(ASIO_HAS_SECURE_RTL)
@@ -147,11 +148,21 @@ network_v6 make_network_v6(const std::string& str,
     return network_v6();
   }
 
-  return network_v6(make_address_v6(str.substr(0, pos)),
-      std::atoi(str.substr(pos + 1).c_str()));
+  const address_v6 addr = make_address_v6(str.substr(0, pos), ec);
+  if (ec)
+    return network_v6();
+
+  const int prefix_len = std::atoi(str.substr(pos + 1).c_str());
+  if (prefix_len < 0 || prefix_len > 128)
+  {
+    ec = asio::error::invalid_argument;
+    return network_v6();
+  }
+
+  return network_v6(addr, static_cast<unsigned short>(prefix_len));
 }
 
-#if defined(ASIO_HAS_STD_STRING_VIEW)
+#if defined(ASIO_HAS_STRING_VIEW)
 
 network_v6 make_network_v6(string_view str)
 {
@@ -164,7 +175,7 @@ network_v6 make_network_v6(string_view str,
   return make_network_v6(static_cast<std::string>(str), ec);
 }
 
-#endif // defined(ASIO_HAS_STD_STRING_VIEW)
+#endif // defined(ASIO_HAS_STRING_VIEW)
 
 } // namespace ip
 } // namespace asio

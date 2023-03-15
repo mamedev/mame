@@ -37,8 +37,25 @@ z88_1024k_flash_device::z88_1024k_flash_device(const machine_config &mconfig, co
 	: device_t(mconfig, Z88_1024K_FLASH, tag, owner, clock)
 	, device_z88cart_interface(mconfig, *this)
 	, m_flash(*this, FLASH_TAG)
+	, m_region(*this, FLASH_TAG)
 {
 }
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+ROM_START( z88_1024k_flash )
+	ROM_REGION( 0x100000, FLASH_TAG, ROMREGION_ERASEFF )
+	// this region is required to initialize the flash device with the data loaded from the cartridge interface
+ROM_END
+
+
+const tiny_rom_entry *z88_1024k_flash_device::device_rom_region() const
+{
+	return ROM_NAME( z88_1024k_flash );
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -64,7 +81,7 @@ void z88_1024k_flash_device::device_add_mconfig(machine_config &config)
 
 uint8_t* z88_1024k_flash_device::get_cart_base()
 {
-	return m_flash->base();
+	return m_region->base();
 }
 
 /*-------------------------------------------------

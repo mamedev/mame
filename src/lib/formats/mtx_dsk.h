@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_MTX_FORMAT;
+extern const mtx_format FLOPPY_MTX_FORMAT;
 
 #endif // MAME_FORMATS_MTX_DSK_H

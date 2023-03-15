@@ -30,19 +30,21 @@ public:
 	// construction/destruction
 	nes_miracle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t read_bit0() override;
+	virtual void write(uint8_t data) override;
+
 	required_device<midi_port_device> m_midiin, m_midiout;
 
 protected:
 	static constexpr int XMIT_RING_SIZE = 64;
 	static constexpr int RECV_RING_SIZE = 64;
-	static constexpr device_timer_id TIMER_STROBE_ON = 0;
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	TIMER_CALLBACK_MEMBER(strobe_tick);
 
 private:
 	// serial overrides
@@ -51,9 +53,6 @@ private:
 	virtual void tra_callback() override;    // Tx send bit
 
 	void xmit_char(uint8_t data);
-
-	virtual uint8_t read_bit0() override;
-	virtual void write(uint8_t data) override;
 
 	emu_timer *strobe_timer;
 

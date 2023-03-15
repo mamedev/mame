@@ -36,10 +36,6 @@ project("mametests")
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
-	configuration { "rpi" }
-		targetextension ""
-
-
 	configuration { }
 
 	links {

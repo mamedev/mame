@@ -60,6 +60,7 @@ protected:
 	attotime period() const;
 	void trigger(bool state);
 	TIMER_CALLBACK_MEMBER(timer_callback);
+	TIMER_CALLBACK_MEMBER(zc_to_callback);
 
 	required_device<z80ctc_device> m_device; // pointer back to our device
 	int             m_index;                // our channel index
@@ -69,6 +70,7 @@ protected:
 	bool            m_extclk;               // current signal from the external clock
 	emu_timer *     m_timer;                // array of active timers
 	u8              m_int_state;            // interrupt status (for daisy chain)
+	emu_timer *     m_zc_to_timer;          // zc to pulse timer
 };
 
 // ======================> z80ctc_device

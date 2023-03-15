@@ -164,9 +164,9 @@ void rtc65271_device::nvram_default()
 {
 	if (m_default_data.found())
 	{
-		emu_file file(OPEN_FLAG_READ);
-		file.open_ram(m_default_data, m_default_data.bytes());
-		nvram_read(file);
+		auto file = util::ram_read(m_default_data, m_default_data.bytes());
+		if (file != nullptr)
+			nvram_read(*file);
 	}
 	else
 	{
@@ -181,84 +181,87 @@ void rtc65271_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void rtc65271_device::nvram_read(emu_file &file)
+bool rtc65271_device::nvram_read(util::read_stream &file)
 {
 	uint8_t buf;
+	size_t actual;
 
 	/* version flag */
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	if (buf != 0)
-		return;
+		return false;
 
 	/* control registers */
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	m_regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
-	if (file.read(&buf, 1) != 1)
-		return;
+	if (file.read(&buf, 1, actual) || actual != 1)
+		return false;
 	m_regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 
 	/* alarm registers */
-	if (file.read(&m_regs[reg_alarm_second], 1) != 1)
-		return;
-	if (file.read(&m_regs[reg_alarm_minute], 1) != 1)
-		return;
-	if (file.read(&m_regs[reg_alarm_hour], 1) != 1)
-		return;
+	if (file.read(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+		return false;
+	if (file.read(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+		return false;
+	if (file.read(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+		return false;
 
 	/* user RAM */
-	if (file.read(m_regs+14, 50) != 50)
-		return;
+	if (file.read(m_regs+14, 50, actual) || actual != 50)
+		return false;
 
 	/* extended RAM */
-	if (file.read(m_xram, 4096) != 4096)
-		return;
+	if (file.read(m_xram, 4096, actual) || actual != 4096)
+		return false;
 
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
 	/*m_dirty = false;*/
 
-	{
-		system_time systime;
+	return true;
+}
 
-		/* get the current date/time from the core */
-		machine().current_datetime(systime);
+//-------------------------------------------------
+//  rtc_clock_updated - update clock with real time
+//-------------------------------------------------
 
-		/* set clock registers */
-		m_regs[reg_second] = systime.local_time.second;
-		m_regs[reg_minute] = systime.local_time.minute;
-		if (m_regs[reg_B] & reg_B_24h)
-			/* 24-hour mode */
-			m_regs[reg_hour] = systime.local_time.hour;
+void rtc65271_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	/* set clock registers */
+	m_regs[reg_second] = second;
+	m_regs[reg_minute] = minute;
+	if (m_regs[reg_B] & reg_B_24h)
+		/* 24-hour mode */
+		m_regs[reg_hour] = hour;
+	else
+	{   /* 12-hour mode */
+		if (hour >= 12)
+		{
+			m_regs[reg_hour] = 0x80;
+			hour -= 12;
+		}
 		else
-		{   /* 12-hour mode */
-			if (systime.local_time.hour >= 12)
-			{
-				m_regs[reg_hour] = 0x80;
-				systime.local_time.hour -= 12;
-			}
-			else
-			{
-				m_regs[reg_hour] = 0;
-			}
+		{
+			m_regs[reg_hour] = 0;
+		}
 
-			// Firebeat indicates non-BCD 12-hour mode has 0-based hour, so 12 AM is 0x00 and 12 PM is 0x80
-			m_regs[reg_hour] |= systime.local_time.hour; // ? systime.local_time.hour : 12;
-		}
-		m_regs[reg_weekday] = systime.local_time.weekday + 1;
-		m_regs[reg_monthday] = systime.local_time.mday;
-		m_regs[reg_month] = systime.local_time.month + 1;
-		m_regs[reg_year] = systime.local_time.year % 100;
-		if (! (m_regs[reg_B] & reg_B_DM))
-		{   /* BCD mode */
-			m_regs[reg_second] = binary_to_BCD(m_regs[reg_second]);
-			m_regs[reg_minute] = binary_to_BCD(m_regs[reg_minute]);
-			m_regs[reg_hour] = (m_regs[reg_hour] & 0x80) | binary_to_BCD(m_regs[reg_hour] & 0x7f);
-			/*m_regs[reg_weekday] = binary_to_BCD(m_regs[reg_weekday]);*/
-			m_regs[reg_monthday] = binary_to_BCD(m_regs[reg_monthday]);
-			m_regs[reg_month] = binary_to_BCD(m_regs[reg_month]);
-			m_regs[reg_year] = binary_to_BCD(m_regs[reg_year]);
-		}
+		// Firebeat indicates non-BCD 12-hour mode has 0-based hour, so 12 AM is 0x00 and 12 PM is 0x80
+		m_regs[reg_hour] |= hour; // ? hour : 12;
+	}
+	m_regs[reg_weekday] = day_of_week;
+	m_regs[reg_monthday] = day;
+	m_regs[reg_month] = month;
+	m_regs[reg_year] = year % 100;
+	if (! (m_regs[reg_B] & reg_B_DM))
+	{   /* BCD mode */
+		m_regs[reg_second] = binary_to_BCD(m_regs[reg_second]);
+		m_regs[reg_minute] = binary_to_BCD(m_regs[reg_minute]);
+		m_regs[reg_hour] = (m_regs[reg_hour] & 0x80) | binary_to_BCD(m_regs[reg_hour] & 0x7f);
+		/*m_regs[reg_weekday] = binary_to_BCD(m_regs[reg_weekday]);*/
+		m_regs[reg_monthday] = binary_to_BCD(m_regs[reg_monthday]);
+		m_regs[reg_month] = binary_to_BCD(m_regs[reg_month]);
+		m_regs[reg_year] = binary_to_BCD(m_regs[reg_year]);
 	}
 }
 
@@ -267,39 +270,41 @@ void rtc65271_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void rtc65271_device::nvram_write(emu_file &file)
+bool rtc65271_device::nvram_write(util::write_stream &file)
 {
 	uint8_t buf;
-
+	size_t actual;
 
 	/* version flag */
 	buf = 0;
-	if (file.write(& buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 
 	/* control registers */
 	buf = m_regs[reg_A] & (reg_A_DV | reg_A_RS);
-	if (file.write(&buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 	buf = m_regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
-	if (file.write(&buf, 1) != 1)
-		return;
+	if (file.write(&buf, 1, actual) || actual != 1)
+		return false;
 
 	/* alarm registers */
-	if (file.write(&m_regs[reg_alarm_second], 1) != 1)
-		return;
-	if (file.write(&m_regs[reg_alarm_minute], 1) != 1)
-		return;
-	if (file.write(&m_regs[reg_alarm_hour], 1) != 1)
-		return;
+	if (file.write(&m_regs[reg_alarm_second], 1, actual) || actual != 1)
+		return false;
+	if (file.write(&m_regs[reg_alarm_minute], 1, actual) || actual != 1)
+		return false;
+	if (file.write(&m_regs[reg_alarm_hour], 1, actual) || actual != 1)
+		return false;
 
 	/* user RAM */
-	if (file.write(m_regs+14, 50) != 50)
-		return;
+	if (file.write(m_regs+14, 50, actual) || actual != 50)
+		return false;
 
 	/* extended RAM */
-	if (file.write(m_xram, 4096) != 4096)
-		return;
+	if (file.write(m_xram, 4096, actual) || actual != 4096)
+		return false;
+
+	return true;
 }
 
 /*
@@ -400,7 +405,7 @@ void rtc65271_device::write(int xramsel, offs_t offset, uint8_t data)
 					{
 						attotime period = attotime::from_hz(SQW_freq_table[data & reg_A_RS]);
 						attotime half_period = period / 2;
-						attotime elapsed = m_update_timer->elapsed();
+						attotime elapsed = m_begin_update_timer->elapsed();
 
 						if (half_period > elapsed)
 							m_SQW_timer->adjust(half_period - elapsed);
@@ -505,7 +510,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_begin_update_cb)
 		m_regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		machine().scheduler().timer_set(UPDATE_CYCLE_TIME, timer_expired_delegate(FUNC(rtc65271_device::rtc_end_update_cb), this));
+		m_end_update_timer->adjust(UPDATE_CYCLE_TIME);
 	}
 }
 
@@ -667,6 +672,7 @@ DEFINE_DEVICE_TYPE(RTC65271, rtc65271_device, "rtc65271", "Epson RTC-65271 RTC")
 rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC65271, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_interrupt_cb(*this)
 	, m_default_data(*this, DEVICE_SELF)
 {
@@ -677,9 +683,11 @@ rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 void rtc65271_device::device_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_begin_update_cb), this));
-	m_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_SQW_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_SQW_cb), this));
+	m_begin_update_timer = timer_alloc(FUNC(rtc65271_device::rtc_begin_update_cb), this);
+	m_begin_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_end_update_timer = timer_alloc(FUNC(rtc65271_device::rtc_end_update_cb), this);
+	m_end_update_timer->adjust(attotime::never);
+	m_SQW_timer = timer_alloc(FUNC(rtc65271_device::rtc_SQW_cb), this);
 	m_interrupt_cb.resolve();
 
 	save_item(NAME(m_regs));

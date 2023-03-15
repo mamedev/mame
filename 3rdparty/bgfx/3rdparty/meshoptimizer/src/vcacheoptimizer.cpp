@@ -13,13 +13,23 @@ namespace meshopt
 const size_t kCacheSizeMax = 16;
 const size_t kValenceMax = 8;
 
-static const float kVertexScoreTableCache[1 + kCacheSizeMax] = {
-    0.f,
-    0.779f, 0.791f, 0.789f, 0.981f, 0.843f, 0.726f, 0.847f, 0.882f, 0.867f, 0.799f, 0.642f, 0.613f, 0.600f, 0.568f, 0.372f, 0.234f};
+struct VertexScoreTable
+{
+	float cache[1 + kCacheSizeMax];
+	float live[1 + kValenceMax];
+};
 
-static const float kVertexScoreTableLive[1 + kValenceMax] = {
-    0.f,
-    0.995f, 0.713f, 0.450f, 0.404f, 0.059f, 0.005f, 0.147f, 0.006f};
+// Tuned to minimize the ACMR of a GPU that has a cache profile similar to NVidia and AMD
+static const VertexScoreTable kVertexScoreTable = {
+    {0.f, 0.779f, 0.791f, 0.789f, 0.981f, 0.843f, 0.726f, 0.847f, 0.882f, 0.867f, 0.799f, 0.642f, 0.613f, 0.600f, 0.568f, 0.372f, 0.234f},
+    {0.f, 0.995f, 0.713f, 0.450f, 0.404f, 0.059f, 0.005f, 0.147f, 0.006f},
+};
+
+// Tuned to minimize the encoded index buffer size
+static const VertexScoreTable kVertexScoreTableStrip = {
+    {0.f, 1.000f, 1.000f, 1.000f, 0.453f, 0.561f, 0.490f, 0.459f, 0.179f, 0.526f, 0.000f, 0.227f, 0.184f, 0.490f, 0.112f, 0.050f, 0.131f},
+    {0.f, 0.956f, 0.786f, 0.577f, 0.558f, 0.618f, 0.549f, 0.499f, 0.489f},
+};
 
 struct TriangleAdjacency
 {
@@ -100,7 +110,7 @@ static unsigned int getNextVertexDeadEnd(const unsigned int* dead_end, unsigned 
 	return ~0u;
 }
 
-static unsigned int getNextVertexNeighbour(const unsigned int* next_candidates_begin, const unsigned int* next_candidates_end, const unsigned int* live_triangles, const unsigned int* cache_timestamps, unsigned int timestamp, unsigned int cache_size)
+static unsigned int getNextVertexNeighbor(const unsigned int* next_candidates_begin, const unsigned int* next_candidates_end, const unsigned int* live_triangles, const unsigned int* cache_timestamps, unsigned int timestamp, unsigned int cache_size)
 {
 	unsigned int best_candidate = ~0u;
 	int best_priority = -1;
@@ -131,13 +141,13 @@ static unsigned int getNextVertexNeighbour(const unsigned int* next_candidates_b
 	return best_candidate;
 }
 
-static float vertexScore(int cache_position, unsigned int live_triangles)
+static float vertexScore(const VertexScoreTable* table, int cache_position, unsigned int live_triangles)
 {
 	assert(cache_position >= -1 && cache_position < int(kCacheSizeMax));
 
 	unsigned int live_triangles_clamped = live_triangles < kValenceMax ? live_triangles : kValenceMax;
 
-	return kVertexScoreTableCache[1 + cache_position] + kVertexScoreTableLive[live_triangles_clamped];
+	return table->cache[1 + cache_position] + table->live[live_triangles_clamped];
 }
 
 static unsigned int getNextTriangleDeadEnd(unsigned int& input_cursor, const unsigned char* emitted_flags, size_t face_count)
@@ -156,7 +166,7 @@ static unsigned int getNextTriangleDeadEnd(unsigned int& input_cursor, const uns
 
 } // namespace meshopt
 
-void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count)
+void meshopt_optimizeVertexCacheTable(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count, const meshopt::VertexScoreTable* table)
 {
 	using namespace meshopt;
 
@@ -197,7 +207,7 @@ void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* 
 	float* vertex_scores = allocator.allocate<float>(vertex_count);
 
 	for (size_t i = 0; i < vertex_count; ++i)
-		vertex_scores[i] = vertexScore(-1, live_triangles[i]);
+		vertex_scores[i] = vertexScore(table, -1, live_triangles[i]);
 
 	// compute triangle scores
 	float* triangle_scores = allocator.allocate<float>(face_count);
@@ -271,16 +281,16 @@ void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* 
 		{
 			unsigned int index = indices[current_triangle * 3 + k];
 
-			unsigned int* neighbours = &adjacency.data[0] + adjacency.offsets[index];
-			size_t neighbours_size = adjacency.counts[index];
+			unsigned int* neighbors = &adjacency.data[0] + adjacency.offsets[index];
+			size_t neighbors_size = adjacency.counts[index];
 
-			for (size_t i = 0; i < neighbours_size; ++i)
+			for (size_t i = 0; i < neighbors_size; ++i)
 			{
-				unsigned int tri = neighbours[i];
+				unsigned int tri = neighbors[i];
 
 				if (tri == current_triangle)
 				{
-					neighbours[i] = neighbours[neighbours_size - 1];
+					neighbors[i] = neighbors[neighbors_size - 1];
 					adjacency.counts[index]--;
 					break;
 				}
@@ -298,16 +308,16 @@ void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* 
 			int cache_position = i >= cache_size ? -1 : int(i);
 
 			// update vertex score
-			float score = vertexScore(cache_position, live_triangles[index]);
+			float score = vertexScore(table, cache_position, live_triangles[index]);
 			float score_diff = score - vertex_scores[index];
 
 			vertex_scores[index] = score;
 
 			// update scores of vertex triangles
-			const unsigned int* neighbours_begin = &adjacency.data[0] + adjacency.offsets[index];
-			const unsigned int* neighbours_end = neighbours_begin + adjacency.counts[index];
+			const unsigned int* neighbors_begin = &adjacency.data[0] + adjacency.offsets[index];
+			const unsigned int* neighbors_end = neighbors_begin + adjacency.counts[index];
 
-			for (const unsigned int* it = neighbours_begin; it != neighbours_end; ++it)
+			for (const unsigned int* it = neighbors_begin; it != neighbors_end; ++it)
 			{
 				unsigned int tri = *it;
 				assert(!emitted_flags[tri]);
@@ -336,6 +346,16 @@ void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* 
 
 	assert(input_cursor == face_count);
 	assert(output_triangle == face_count);
+}
+
+void meshopt_optimizeVertexCache(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count)
+{
+	meshopt_optimizeVertexCacheTable(destination, indices, index_count, vertex_count, &meshopt::kVertexScoreTable);
+}
+
+void meshopt_optimizeVertexCacheStrip(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count)
+{
+	meshopt_optimizeVertexCacheTable(destination, indices, index_count, vertex_count, &meshopt::kVertexScoreTableStrip);
 }
 
 void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned int* indices, size_t index_count, size_t vertex_count, unsigned int cache_size)
@@ -392,11 +412,11 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 	{
 		const unsigned int* next_candidates_begin = &dead_end[0] + dead_end_top;
 
-		// emit all vertex neighbours
-		const unsigned int* neighbours_begin = &adjacency.data[0] + adjacency.offsets[current_vertex];
-		const unsigned int* neighbours_end = neighbours_begin + adjacency.counts[current_vertex];
+		// emit all vertex neighbors
+		const unsigned int* neighbors_begin = &adjacency.data[0] + adjacency.offsets[current_vertex];
+		const unsigned int* neighbors_end = neighbors_begin + adjacency.counts[current_vertex];
 
-		for (const unsigned int* it = neighbours_begin; it != neighbours_end; ++it)
+		for (const unsigned int* it = neighbors_begin; it != neighbors_end; ++it)
 		{
 			unsigned int triangle = *it;
 
@@ -441,7 +461,7 @@ void meshopt_optimizeVertexCacheFifo(unsigned int* destination, const unsigned i
 		const unsigned int* next_candidates_end = &dead_end[0] + dead_end_top;
 
 		// get next vertex
-		current_vertex = getNextVertexNeighbour(next_candidates_begin, next_candidates_end, &live_triangles[0], &cache_timestamps[0], timestamp, cache_size);
+		current_vertex = getNextVertexNeighbor(next_candidates_begin, next_candidates_end, &live_triangles[0], &cache_timestamps[0], timestamp, cache_size);
 
 		if (current_vertex == ~0u)
 		{

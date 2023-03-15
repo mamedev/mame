@@ -22,45 +22,23 @@ function maintargetosdoptions(_target,_subtarget)
 
 	configuration { }
 
-	if _OPTIONS["DIRECTINPUT"] == "8" then
-		links {
-			"dinput8",
-		}
-	else
-		links {
-			"dinput",
-		}
-	end
-
-
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
-			"SDL.dll",
+			"SDL2.dll",
 		}
 	end
 
 	links {
 		"comctl32",
 		"comdlg32",
-		"psapi",
+		"dinput8",
 		"ole32",
+		"psapi",
 		"shlwapi",
+		"uuid",
 	}
 end
 
-
-newoption {
-	trigger = "DIRECTINPUT",
-	description = "Minimum DirectInput version to support",
-	allowed = {
-		{ "7",  "Support DirectInput 7 or later"  },
-		{ "8",  "Support DirectInput 8 or later"  },
-	},
-}
-
-if not _OPTIONS["DIRECTINPUT"] then
-	_OPTIONS["DIRECTINPUT"] = "8"
-end
 
 newoption {
 	trigger = "USE_SDL",
@@ -124,17 +102,8 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	defines {
 		"DIRECT3D_VERSION=0x0900",
+		"DIRECTINPUT_VERSION=0x0800",
 	}
-
-	if _OPTIONS["DIRECTINPUT"] == "8" then
-		defines {
-			"DIRECTINPUT_VERSION=0x0800",
-		}
-	else
-		defines {
-			"DIRECTINPUT_VERSION=0x0700",
-		}
-	end
 
 	includedirs {
 		MAME_DIR .. "src/emu",
@@ -151,25 +120,28 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows",
 	}
 
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_cpp {
+			"-Wno-ignored-attributes",-- many instances in ImGui
+		}
+	end
+
 	files {
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.cpp",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dcomm.h",
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.h",
 		MAME_DIR .. "src/osd/modules/render/drawd3d.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawd3d.h",
-		MAME_DIR .. "src/osd/modules/render/drawgdi.cpp",
-		MAME_DIR .. "src/osd/modules/render/drawgdi.h",
-		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
-		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/windows/video.cpp",
 		MAME_DIR .. "src/osd/windows/video.h",
 		MAME_DIR .. "src/osd/windows/window.cpp",
 		MAME_DIR .. "src/osd/windows/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
-		MAME_DIR .. "src/osd/windows/winmenu.cpp",
 		MAME_DIR .. "src/osd/windows/winmain.cpp",
 		MAME_DIR .. "src/osd/windows/winmain.h",
+		MAME_DIR .. "src/osd/windows/winopts.cpp",
+		MAME_DIR .. "src/osd/windows/winopts.h",
 		MAME_DIR .. "src/osd/osdepend.h",
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.cpp",
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.h",
@@ -243,7 +215,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",
 		MAME_DIR .. "src/osd/osdsync.h",
-		MAME_DIR .. "src/osd/windows/main.cpp",
 		MAME_DIR .. "src/osd/windows/winutf8.cpp",
 		MAME_DIR .. "src/osd/windows/winutf8.h",
 		MAME_DIR .. "src/osd/windows/winutil.cpp",

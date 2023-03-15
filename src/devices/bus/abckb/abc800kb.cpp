@@ -71,6 +71,8 @@ XR22-050-3B Pinout
 #include "emu.h"
 #include "abc800kb.h"
 
+#include "utf8.h"
+
 
 
 //**************************************************************************
@@ -268,7 +270,7 @@ ioport_constructor abc800_keyboard_device::device_input_ports() const
 //  serial_output -
 //-------------------------------------------------
 
-inline void abc800_keyboard_device::serial_output(int state)
+void abc800_keyboard_device::serial_output(int state)
 {
 	if (m_txd != state)
 	{
@@ -283,7 +285,7 @@ inline void abc800_keyboard_device::serial_output(int state)
 //  serial_clock -
 //-------------------------------------------------
 
-inline void abc800_keyboard_device::serial_clock()
+TIMER_CALLBACK_MEMBER(abc800_keyboard_device::serial_clock)
 {
 	m_clk = !m_clk;
 
@@ -295,7 +297,7 @@ inline void abc800_keyboard_device::serial_clock()
 //  keydown -
 //-------------------------------------------------
 
-inline void abc800_keyboard_device::key_down(int state)
+void abc800_keyboard_device::key_down(int state)
 {
 	if (m_keydown != state)
 	{
@@ -337,7 +339,7 @@ abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, co
 void abc800_keyboard_device::device_start()
 {
 	// allocate timers
-	m_serial_timer = timer_alloc();
+	m_serial_timer = timer_alloc(FUNC(abc800_keyboard_device::serial_clock), this);
 	m_serial_timer->adjust(attotime::from_hz(XTAL(5'990'400)/(3*5)/20), 0, attotime::from_hz(XTAL(5'990'400)/(3*5)/20)); // ???
 
 	// state saving
@@ -357,15 +359,6 @@ void abc800_keyboard_device::device_reset()
 {
 }
 
-
-//-------------------------------------------------
-//  device_timer - handler timer events
-//-------------------------------------------------
-
-void abc800_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	serial_clock();
-}
 
 
 //-------------------------------------------------

@@ -13,7 +13,6 @@
 #include "esrip.h"
 #include "esripdsm.h"
 
-#include "debugger.h"
 #include "screen.h"
 
 

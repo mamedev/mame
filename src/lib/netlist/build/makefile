@@ -29,7 +29,7 @@ PSRC = $(SRC)/plib
 VSBUILD = $(SRC)/buildVS
 DOC = $(SRC)/documentation
 
-TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,
+TIDY_FLAGSX = -checks=*,-google*,-hicpp*,readability*,-fuchsia*,cert-*,-android-*,-altera*,
 TIDY_FLAGSX += -llvm-header-guard,
 # TIDY_FLAGSX += -cppcoreguidelines-pro-type-reinterpret-cast,
 TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-pointer-arithmetic,
@@ -44,11 +44,20 @@ TIDY_FLAGSX += -bugprone-macro-parentheses,
 #TIDY_FLAGSX += -misc-macro-parentheses,
 TIDY_FLAGSX += -bugprone-too-small-loop-variable,
 TIDY_FLAGSX += -modernize-use-trailing-return-type,
-#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
 TIDY_FLAGSX += -readability-magic-numbers,-readability-braces-around-statements,
 TIDY_FLAGSX += -readability-implicit-bool-conversion,
 TIDY_FLAGSX += -readability-named-parameter,-readability-function-size,
 TIDY_FLAGSX += -llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,
+TIDY_FLAGSX += -modernize-use-nodiscard,
+TIDY_FLAGSX += -modernize-use-auto,
+#TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+#TIDY_FLAGSX += -cppcoreguidelines-prefer-member-initializer,
+#TIDY_FLAGSX += -modernize-use-transparent-functors,
+TIDY_FLAGSX += -readability-function-cognitive-complexity,
+TIDY_FLAGSX += -readability-uppercase-literal-suffix
+TIDY_FLAGSX += -cert-err58-cpp
+
+
 #TIDY_FLAGSX += -cppcoreguidelines-avoid-non-const-global-variables
 
 space :=
@@ -96,6 +105,7 @@ MD = @mkdir
 RM = @rm
 endif
 
+CSPELL=cspell
 PYTHON=@python
 
 TIDY_DB = $(OBJ)/compile_commands.json
@@ -104,14 +114,14 @@ TIDY_DB = $(OBJ)/compile_commands.json
 #LTO decreases performance :-(
 #LTO = -flto=4  -fuse-linker-plugin -Wodr
 
-CCOREFLAGS = -g -O3 -std=c++14 -I$(SRC) 
+CCOREFLAGS = -g -O3 -std=c++17 -I$(SRC)
 
 CFLAGS =  $(LTO) $(CCOREFLAGS) $(CEXTRAFLAGS)
-LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
+LDFLAGS = $(LTO) -g -O3 -std=c++17 $(LDEXTRAFLAGS)
 
 CC = g++
 LD = g++
-CLANG_TIDY = clang-tidy-11
+CLANG_TIDY = clang-tidy-13
 DEPENDCC=$(CC)
 
 
@@ -150,6 +160,7 @@ DEVSOURCES += $(wildcard $(SRC)/devices/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/analog/*.cpp)
 DEVSOURCES += $(wildcard $(SRC)/macro/*.cpp)
 DEVSOURCES += $(MODULESOURCES)
+DEVSOURCES += $(SRC)/generated/nlm_modules_lib.cpp
 
 TESTSOURCES = $(wildcard $(SRC)/tests/*.cpp)
 
@@ -161,9 +172,18 @@ CORESOURCES := \
 	$(SRC)/nl_factory.cpp \
 	$(SRC)/tools/nl_convert.cpp \
 	$(SRC)/generated/static_solvers.cpp \
-	$(SRC)/generated/nlm_modules_lib.cpp \
 
 MAINSOURCES = $(SRC)/prg/nltool.cpp $(SRC)/prg/nlwav.cpp
+
+HEADERS = $(wildcard $(SRC)/analog/*.h)
+HEADERS += $(wildcard $(SRC)/core/*.h)
+HEADERS += $(wildcard $(SRC)/devices/*.h)
+HEADERS += $(wildcard $(SRC)/solver/*.h)
+HEADERS += $(wildcard $(SRC)/tools/*.h)
+HEADERS += $(wildcard $(SRC)/*.h)
+HEADERS += $(wildcard $(SRC)/generated/*.h)
+
+PHEADERS = $(wildcard $(SRC)/plib/*.h)
 
 PSOURCES := \
 	$(PSRC)/pstring.cpp \
@@ -173,6 +193,7 @@ PSOURCES := \
 	$(PSRC)/pfmtlog.cpp \
 	$(PSRC)/pmain.cpp \
 	$(PSRC)/poptions.cpp \
+	$(PSRC)/ppmf.cpp \
 	$(PSRC)/ppreprocessor.cpp \
 	$(PSRC)/ptokenizer.cpp \
 	$(PSRC)/putil.cpp \
@@ -183,15 +204,18 @@ TESTOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(TESTSOURCES:.cpp=.o))
 MAINOBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(MAINSOURCES:.cpp=.o))
 POBJS = 	$(patsubst $(SRC)%, $(OBJ)%, $(PSOURCES:.cpp=.o))
 
-OBJS = $(POBJS) $(NLOBJS) $(NLDEVOBJS) $(TESTOBJS)
+OBJS = $(TESTOBJS) $(POBJS) $(NLOBJS) $(NLDEVOBJS) $(TESTOBJS)
 
-VSBUILDS = \
-	$(VSBUILD/netlistlib.vcxproj) \
-	$(VSBUILD/netlistlib.vcxproj.user \
-	$(VSBUILD/nltool.vcxproj \
-	$(VSBUILD/netlistlib.vcxproj.filters  \
-	$(VSBUILD/nltool.vcxproj.filters \
-	$(VSBUILD/netlist.sln \
+VSFILES = \
+	$(VSBUILD)/netlistlib.vcxproj \
+	$(VSBUILD)/netlistlib.vcxproj.filters \
+	$(VSBUILD)/nltool.vcxproj \
+	$(VSBUILD)/nltool.vcxproj.filters \
+	$(VSBUILD)/nlwav.vcxproj \
+	$(VSBUILD)/nlwav.vcxproj.filters \
+	$(VSBUILD)/netlist.sln \
+
+OTHERFILES = makefile
 
 DOCS = \
 	doxygen.conf \
@@ -205,12 +229,13 @@ ALL_OBJS = $(OBJS) $(MAINOBJS)
 
 ALL_TIDY_FILES = $(ALL_OBJS:.o=.json)
 ALLSOURCES = $(DEVSOURCES) $(CORESOURCES) $(TESTSOURCES) $(MAINSOURCES) $(PSOURCES)
-ALLFILES = $(ALLSOURCES) $(VSBUILDS) $(DOCS)
+ALLHEADERS = $(HEADERS) $(PHEADERS)
+ALLFILES = $(ALLSOURCES) $(VSFILES) $(DOCS) $(OTHERFILES)
 
 MAKEFILE_TARGETS_WITHOUT_INCLUDE := \
 	clang clang-5 clang-libc gcc9 mingw native nvcc \
 	clean depend doc generated manpages maketree \
-	runtests tidy
+	runtests tidy fix_permissions precommit srcclean
 
 BUILD_DIRS = $(OBJDIRS) man html
 
@@ -262,28 +287,28 @@ maketree: $(sort $(BUILD_DIRS))
 #-------------------------------------------------
 
 native:
-	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
+	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra"
 
 gcc9:
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -pedantic -Wpedantic -fext-numeric-literals -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -Wall -Wextra -pedantic -Wpedantic -pedantic-errors -fext-numeric-literals -Wsign-compare" EXTRALIBS="-lquadmath" OBJ=obj/gcc9
 
 clang:
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Wall -pedantic -Wpedantic -Wunused-private-field -Wno-padded -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
-	$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native \
-		-mllvm -inline-threshold=2000 \
+	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang CEXTRAFLAGS="-march=native \
+		-mllvm  -inline-threshold=2000 \
 		-Wunknown-warning-option \
-		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
+		-Weverything -Wall -pedantic -Wpedantic \
 		-Werror -Wno-padded -Wno-weak-vtables -Wno-weak-template-vtables -Wunused-template \
-		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
-		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
-		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
-		-Wno-missing-prototypes"
+		-Wno-float-equal \
+		-Wno-c++98-compat -Wno-c++98-compat-pedantic \
+		-Wno-exit-time-destructors \
+		-Wno-undefined-reinterpret-cast -Wno-error=unused-macros \
+		-Wno-error=deprecated"
 
 clang-libc:
 	#clang-11 currently broken
 	#$(MAKE) CC=clang++-11 LD=clang++-11 OBJ=obj/clang CEXTRAFLAGS="-march=native
-	$(MAKE) CC=clang++-10 LD=clang++-10 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
+	$(MAKE) CC=clang++-13 LD=clang++-13 OBJ=obj/clang-libc CEXTRAFLAGS="-march=native \
 		-stdlib=libc++ -mllvm -inline-threshold=2000 \
 		-Wunknown-warning-option \
 		-Weverything -Wall -pedantic -Wpedantic -Wunused-private-field  \
@@ -291,25 +316,37 @@ clang-libc:
 		-Wmissing-variable-declarations -Wno-float-equal -Wconversion \
 		-Wno-c++98-compat -Wno-c++98-compat-pedantic -Wformat-nonliteral \
 		-Wno-exit-time-destructors -Winconsistent-missing-destructor-override \
-		-Wno-return-std-move-in-c++11 -Wno-unreachable-code \
-		-Wno-missing-prototypes" \
+		-Wno-undefined-reinterpret-cast \
+		-Wunreachable-code \
+		-Wmissing-prototypes" \
 		LDEXTRAFLAGS=-stdlib=libc++
 
-clang-5:
-	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
-
 nvcc:
-	$(MAKE) CC=/usr/local/cuda-10.2/bin/nvcc LD=/usr/local/cuda-10.2/bin/nvcc \
-		OBJ=obj/nvcc CEXTRAFLAGS="--std c++14 -x cu  -DNVCCBUILD=102 --expt-extended-lambda \
+	$(MAKE) CC=/usr/local/cuda-11.3/bin/nvcc LD=/usr/local/cuda-11.3/bin/nvcc \
+		OBJ=obj/nvcc CEXTRAFLAGS="--std c++17 -x cu --expt-extended-lambda \
 		--expt-relaxed-constexpr --default-stream per-thread --restrict \
 		--ftemplate-depth 1024  \
-		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-8 " \
+		-Xcompiler -O6 -Xcompiler -march=native -ccbin g++-9 " \
 		DEPENDCC=g++
 
 mingw:
 	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
 		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
 		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS)
+
+mingw-cross:
+	${MAKE}	CC="x86_64-w64-mingw32-g++-posix" LD="x86_64-w64-mingw32-g++-posix" \
+		CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN" \
+		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" OBJ=obj/mingw-cross \
+		EXESUFFIX=.exe LIBS=
+
+#
+# run with emrun  --browser chrome nltool.html -c run  -t 10 -n kidniki nl_kidniki.cpp
+#
+emsdk:
+	emmake $(MAKE) CC=emcc LD=emcc CEXTRAFLAGS="-fexceptions -msimd128" LDEXTRAFLAGS="-s ALLOW_MEMORY_GROWTH=0 -s TOTAL_MEMORY=268435456 -fexceptions -msimd128 --emrun --embed-file ../../../mame/machine/nl_pongf.cpp@nl_pongf.cpp --embed-file ../../../mame/audio/nl_kidniki.cpp@nl_kidniki.cpp" OBJ=obj/emsdk EXESUFFIX=.html
+	# LDFLAGS  -s ASSERTIONS=1
+
 
 #-------------------------------------------------
 # regression tests
@@ -331,6 +368,10 @@ manpages: maketree $(TARGETS) man/nltool.1 man/nlwav.1 html/nltool.html html/nlw
 doc:
 	./nltool$(EXESUFFIX) -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
+
+cspell:
+	#cd .. && cspell -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) ) | sed -e "s/ - Unknown/: error: Unknown/g"
+	cd .. && $(CSPELL) -c build/cspell.json --no-color --locale en-GB --relative $(patsubst $(SRC)/%, %, $(ALLHEADERS) $(ALLSOURCES)) | sed -e "s/ - Unknown/: error: Unknown/g"
 
 #-------------------------------------------------
 # depends
@@ -357,20 +398,34 @@ endif
 # generated
 #-------------------------------------------------
 
-$(SRC)/generated/lib_entries.hxx: $(DEVSOURCES)
+$(SRC)/generated/lib_entries.hxx: create_lib_entries.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_lib_entries.py $^ > $@
 
-$(SRC)/generated/nld_devinc.h: $(DEVSOURCES)
+$(SRC)/generated/nld_devinc.h: create_devinc.py $(DEVSOURCES)
 	@echo creating $@
 	$(PYTHON) create_devinc.py $^ > $@
 
-$(SRC)/generated/nlm_modules_lib.cpp: $(MODULESOURCES)
+$(SRC)/generated/nlm_modules_lib.cpp: create_modules.py $(MODULESOURCES)
 	@echo creating $@
 	$(PYTHON) create_modules.py $^ > $@
 
 .PHONY: generated
 generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)/generated/nlm_modules_lib.cpp
+
+#-------------------------------------------------
+# fix permissions, source management
+#-------------------------------------------------
+
+fix_permissions:
+	@find .. -executable -and -not -type d -print | grep -v /build | xargs -r chmod a-x
+	@chmod a-x $(ALLFILES)
+	@find .. -print | xargs setfacl -b
+
+srcclean: $(ALLSOURCES) $(ALLHEADERS)
+	@../../../../srcclean -u $(ALLSOURCES) $(ALLHEADERS)
+
+precommit: fix_permissions srcclean all runtests
 
 #-------------------------------------------------
 # clang tidy

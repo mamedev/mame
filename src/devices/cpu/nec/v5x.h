@@ -50,7 +50,7 @@ protected:
 	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
 	virtual void interface_post_load() override;
-	virtual void interface_clock_changed() override;
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain) override;
 
 	void v5x_set_input(int inputnum, int state);
 	void v5x_add_mconfig(machine_config &config);
@@ -105,7 +105,7 @@ protected:
 	void OPHA_w(u8 data);
 	u8 OPSEL_r();
 	void OPSEL_w(u8 data);
-	u8 get_pic_ack() { return 0; }
+	virtual u8 get_pic_ack(offs_t offset) { return 0; }
 	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
 
 	void tcu_clock_update();
@@ -148,6 +148,8 @@ public:
 	auto tout1_cb() { return m_tout1_callback.bind(); }
 	auto tout2_cb() { return subdevice<pit8253_device>("tcu")->out_handler<2>(); }
 
+	auto icu_slave_ack_cb() { return m_icu_slave_ack.bind(); }
+
 protected:
 	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type);
 
@@ -177,10 +179,20 @@ protected:
 	u8 OPCN_r();
 	void OPCN_w(u8 data);
 
+	// TODO: non-offset 7 configuration
+	// Currently used by pc88va only, which uses the canonical IRQ7 for cascading an external PIC to the internal one.
+	virtual u8 get_pic_ack(offs_t offset) override
+	{
+		if (offset == 7)
+			return m_icu_slave_ack(0);
+		return 0;
+	}
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(tout1_w);
 
 	devcb_write_line m_tout1_callback;
+	devcb_read8 m_icu_slave_ack;
 
 	u8 m_OPCN;
 	bool m_tout1;

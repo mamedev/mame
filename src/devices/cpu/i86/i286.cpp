@@ -2,7 +2,6 @@
 // copyright-holders:Carl
 #include "emu.h"
 #include "i286.h"
-#include "debugger.h"
 #include "i86inline.h"
 
 /*
@@ -879,7 +878,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 
 	if(number == -1)
 	{
-		number = standard_irq_callback(0);
+		number = standard_irq_callback(0, update_pc() & m_amask);
 
 		hwint = 1;
 	}

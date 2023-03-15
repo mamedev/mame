@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="megacdj" description="Sega Mega CD (Jpn) CD-ROMs">
+<softwarelist name="megacdj" description="Sega Mega CD (Japan) CD-ROMs">
 
 <!--- Images below are from the REDUMP set (unless otherwise noted) -->
 
@@ -23,7 +23,7 @@ license:CC0
 		<rom name="After Burner III (Japan) (Track 11).bin" size="56189280" crc="5e9e6657" />
 		<rom name="After Burner III (Japan) (Track 12).bin" size="59724336" crc="a4b53073" />
 		-->
-		<description>After Burner III (Jpn)</description>
+		<description>After Burner III (Japan)</description>
 		<year>1992</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68014"/>
@@ -43,7 +43,7 @@ license:CC0
 		<rom name="AX-101 (Japan) (Track 1).bin" size="615817104" crc="03cbf674" />
 		<rom name="AX-101 (Japan) (Track 2).bin" size="2352000" crc="3fd8d737" />
 		-->
-		<description>AX-101 (Jpn)</description>
+		<description>AX-101 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6031"/>
@@ -80,7 +80,7 @@ license:CC0
 		<rom name="Bari-Arm (Japan) (Track 18).bin" size="11802336" crc="46da7909" />
 		<rom name="Bari-Arm (Japan) (Track 19).bin" size="1505280" crc="f68eb74b" />
 		-->
-		<description>Bari-Arm (Jpn)</description>
+		<description>Bari-Arm (Japan)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="T-43024"/>
@@ -140,7 +140,7 @@ license:CC0
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 41).bin" size="13458144" crc="91e5797a" />
 		<rom name="Burai - Hachigyoku no Yuushi Densetsu (Japan) (Track 42).bin" size="12343296" crc="b4d2794c" />
 		-->
-		<description>Burai - Yatsudama no Yuushi Densetsu (Jpn)</description>
+		<description>Burai - Yatsudama no Yuushi Densetsu (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6004"/>
@@ -216,7 +216,7 @@ license:CC0
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 57).bin" size="9224544" crc="7f4ac50c" />
 		<rom name="Cosmic Fantasy Stories (Japan) (Track 58).bin" size="3130512" crc="f36f7b3c" />
 		-->
-		<description>Cosmic Fantasy Stories (Jpn)</description>
+		<description>Cosmic Fantasy Stories (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49014"/>
@@ -267,7 +267,7 @@ license:CC0
 		<rom name="Cyborg 009 (Japan) (Track 32).bin" size="44885568" crc="1cca8c90" />
 		<rom name="Cyborg 009 (Japan) (Track 33).bin" size="1952160" crc="cf515c02" />
 		-->
-		<description>Cyborg 009 (Jpn)</description>
+		<description>Cyborg 009 (Japan)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49054"/>
@@ -310,7 +310,7 @@ license:CC0
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 24).bin" size="9791376" crc="94656f55" />
 		<rom name="Dennin Aleste - Nobunaga and His Ninja Force (Japan) (Track 25).bin" size="68835984" crc="ec551c03" />
 		-->
-		<description>Dennin Aleste - Nobunaga and His Ninja Force (Jpn)</description>
+		<description>Dennin Aleste - Nobunaga and His Ninja Force (Japan)</description>
 		<year>1992</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66014"/>
@@ -339,7 +339,7 @@ license:CC0
 		<rom name="Detonator Orgun (Japan) (Track 10).bin" size="22092336" crc="121d8502" />
 		<rom name="Detonator Orgun (Japan) (Track 11).bin" size="1477056" crc="8773a91f" />
 		-->
-		<description>Detonator Orgun (Jpn)</description>
+		<description>Detonator Orgun (Japan)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
 		<info name="serial" value="T-28014"/>
@@ -368,7 +368,7 @@ license:CC0
 		<rom name="Devastator (Japan) (Track 10).bin" size="42049056" crc="b6a26f5b" />
 		<rom name="Devastator (Japan) (Track 11).bin" size="26928048" crc="c405b742" />
 		-->
-		<description>Devastator (Jpn)</description>
+		<description>Devastator (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32074"/>
@@ -388,7 +388,7 @@ license:CC0
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 1).bin" size="607935552" crc="280750dd" />
 		<rom name="Dragon's Lair (Japan) (En,Ja,Fr,De,It) (Track 2).bin" size="1521744" crc="60eade1a" />
 		-->
-		<description>Dragon's Lair (Jpn)</description>
+		<description>Dragon's Lair (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6035"/>
@@ -419,7 +419,7 @@ license:CC0
 		<rom name="Dynamic Country Club (Japan) (Track 12).bin" size="10315872" crc="22aacaf7" />
 		<rom name="Dynamic Country Club (Japan) (Track 13).bin" size="13425216" crc="3dc87886" />
 		-->
-		<description>Dynamic Country Club (Jpn)</description>
+		<description>Dynamic Country Club (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6017"/>
@@ -462,7 +462,7 @@ license:CC0
 		<rom name="Earnest Evans (Japan) (Track 24).bin" size="49601328" crc="bde9a2a9" />
 		<rom name="Earnest Evans (Japan) (Track 25).bin" size="46830672" crc="f3e9740d" />
 		-->
-		<description>Earnest Evans (Jpn)</description>
+		<description>Earnest Evans (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32014"/>
@@ -515,7 +515,7 @@ license:CC0
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 34).bin" size="3064656" crc="ff7429af" />
 		<rom name="Egawa Suguru no Super League CD (Japan) (Track 35).bin" size="1815744" crc="2c146ad4" />
 		-->
-		<description>Egawa Suguru no Super League CD (Jpn)</description>
+		<description>Egawa Suguru no Super League CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6019"/>
@@ -562,7 +562,7 @@ license:CC0
 		<rom name="F1 Circus CD (Japan) (Track 28).bin" size="11012064" crc="f1e3d543" />
 		<rom name="F1 Circus CD (Japan) (Track 29).bin" size="1387680" crc="6be88609" />
 		-->
-		<description>F1 Circus CD (Jpn)</description>
+		<description>F1 Circus CD (Japan)</description>
 		<year>1994</year>
 		<publisher>Nichibutsu</publisher>
 		<info name="serial" value="T-71014"/>
@@ -609,7 +609,7 @@ license:CC0
 		<rom name="Final Fight CD (Japan) (Track 28).bin" size="8897616" crc="385633f7" />
 		<rom name="Final Fight CD (Japan) (Track 29).bin" size="7178304" crc="f8cfa374" />
 		-->
-		<description>Final Fight CD (Jpn)</description>
+		<description>Final Fight CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6013"/>
@@ -677,7 +677,7 @@ license:CC0
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 49).bin" size="7225344" crc="3ca798cf" />
 		<rom name="Gambler Jiko Chuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan) (Track 50).bin" size="10548720" crc="09d601aa" />
 		-->
-		<description>Gambler Jikochuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Jpn)</description>
+		<description>Gambler Jikochuushinha 2 - Gekitou! Tokyo Mahjongland Hen (Japan)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45044"/>
@@ -726,7 +726,7 @@ license:CC0
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 30).bin" size="19121760" crc="aa75b323" />
 		<rom name="Game no Kandume Vol.1 (Japan) (Track 31).bin" size="1300656" crc="0db9cca1" />
 		-->
-		<description>Game no Kandume Vol.1 (Jpn)</description>
+		<description>Game no Kandume Vol.1 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6032"/>
@@ -768,7 +768,7 @@ license:CC0
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 23).bin" size="19121760" crc="aa75b323" />
 		<rom name="Game no Kandume Vol.2 (Japan) (Track 24).bin" size="1420608" crc="e76b47df" />
 		-->
-		<description>Game no Kandume Vol.2 (Jpn)</description>
+		<description>Game no Kandume Vol.2 (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6033"/>
@@ -824,7 +824,7 @@ license:CC0
 		<rom name="Garou Densetsu Special (Japan) (Track 37).bin" size="3720864" crc="455176b0" />
 		<rom name="Garou Densetsu Special (Japan) (Track 38).bin" size="2034480" crc="652d1e74" />
 		-->
-		<description>Garou Densetsu Special (Jpn)</description>
+		<description>Garou Densetsu Special (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60214"/>
@@ -879,7 +879,7 @@ license:CC0
 		<rom name="Heavenly Symphony (Japan) (Track 36).bin" size="14866992" crc="108f5a17" />
 		<rom name="Heavenly Symphony (Japan) (Track 37).bin" size="43267392" crc="e55cb55b" />
 		-->
-		<description>Heavenly Symphony (Jpn)</description>
+		<description>Heavenly Symphony (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6034"/>
@@ -913,7 +913,7 @@ license:CC0
 		<rom name="Heavy Nova (Japan) (Track 15).bin" size="27330240" crc="a1b0d2a5" />
 		<rom name="Heavy Nova (Japan) (Track 16).bin" size="13378176" crc="4b4f84d0" />
 		-->
-		<description>Heavy Nova (Jpn)</description>
+		<description>Heavy Nova (Japan)</description>
 		<year>1991</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22014"/>
@@ -955,7 +955,7 @@ license:CC0
 		<rom name="Heimdall (Japan) (Track 23).bin" size="2683632" crc="a6a2845f" />
 		<rom name="Heimdall (Japan) (Track 24).bin" size="2681280" crc="8e15cd69" />
 		-->
-		<description>Heimdall (Jpn)</description>
+		<description>Heimdall (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60154"/>
@@ -986,7 +986,7 @@ license:CC0
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 12).bin" size="39231360" crc="945df445" />
 		<rom name="Jaguar XJ220 (Japan) (En,Ja) (Track 13).bin" size="61763520" crc="c9bc9069" />
 		-->
-		<description>Jaguar XJ220 (Jpn)</description>
+		<description>Jaguar XJ220 (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60094"/>
@@ -1021,7 +1021,7 @@ license:CC0
 		<rom name="Jangou World Cup (Japan) (Track 16).bin" size="33810000" crc="8342332e" />
 		<rom name="Jangou World Cup (Japan) (Track 17).bin" size="26601120" crc="86bbc07d" />
 		-->
-		<description>Jangou World Cup (Jpn)</description>
+		<description>Jangou World Cup (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60124"/>
@@ -1044,7 +1044,7 @@ license:CC0
 		<rom name="Kamen Rider ZO (Japan) (Track 4).bin" size="11449536" crc="42c25462" />
 		<rom name="Kamen Rider ZO (Japan) (Track 5).bin" size="2631888" crc="f11cc7d0" />
 		-->
-		<description>Kamen Rider ZO (Jpn)</description>
+		<description>Kamen Rider ZO (Japan)</description>
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
 		<info name="serial" value="T-141013"/>
@@ -1087,7 +1087,7 @@ license:CC0
 		<rom name="Keiou Yuugekitai (Japan) (Track 24).bin" size="26556432" crc="5f24b29f" />
 		<rom name="Keiou Yuugekitai (Japan) (Track 25).bin" size="9972480" crc="b8ee9bfd" />
 		-->
-		<description>Keiou Yuugekitai (Jpn)</description>
+		<description>Keiou Yuugekitai (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60114"/>
@@ -1119,7 +1119,7 @@ license:CC0
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 13).bin" size="20638800" crc="5e49867e" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou (Japan) (Track 14).bin" size="15553776" crc="edbdbe07" />
 		-->
-		<description>Lodoss Tou Senki - Eiyuu Sensou (Jpn)</description>
+		<description>Lodoss Tou Senki - Eiyuu Sensou (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6024"/>
@@ -1141,7 +1141,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (Japan) (Track 3).bin" size="11769408" crc="ad7b04a0" />
 		<rom name="Lunar - Eternal Blue (Japan) (Track 4).bin" size="1608768" crc="cb94bee5" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 1)</description>
+		<description>Lunar - Eternal Blue (Japan, set 1)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -1211,7 +1211,7 @@ license:CC0
 		<rom name="Lunar - The Silver Star (Japan) (Track 51).bin" size="1611120" crc="5fce5cf1" />
 		<rom name="Lunar - The Silver Star (Japan) (Track 52).bin" size="15299760" crc="d22641d1" />
 		-->
-		<description>Lunar - The Silver Star (Jpn)</description>
+		<description>Lunar - The Silver Star (Japan)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
@@ -1238,7 +1238,7 @@ license:CC0
 		<rom name="Microcosm (Japan) (Track 8).bin" size="21873600" crc="bba6b7c9" />
 		<rom name="Microcosm (Japan) (Track 9).bin" size="23988048" crc="9956dc95" />
 		-->
-		<description>Microcosm (Jpn)</description>
+		<description>Microcosm (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60164"/>
@@ -1295,7 +1295,7 @@ license:CC0
 		<rom name="Night Striker (Japan, Korea) (Track 38).bin" size="18599616" crc="27ed2641" />
 		<rom name="Night Striker (Japan, Korea) (Track 39).bin" size="19331088" crc="05bf45d3" />
 		-->
-		<description>Night Striker (Jpn, Kor)</description>
+		<description>Night Striker (Japan, Korea)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11014"/>
@@ -1309,7 +1309,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ntrap">
+	<software name="ntrap" supported="no">
 		<!-- source redump.org
 		<rom name="Night Trap (Japan) (Disc 1).cue" size="224" crc="f3527896" />
 		<rom name="Night Trap (Japan) (Disc 1) (Track 1).bin" size="615875904" crc="17744c64" />
@@ -1319,9 +1319,12 @@ license:CC0
 		<rom name="Night Trap (Japan) (Disc 2) (Track 1).bin" size="514587024" crc="36d7aa8c" />
 		<rom name="Night Trap (Japan) (Disc 2) (Track 2).bin" size="2587200" crc="e575194e" />
 		-->
-		<description>Night Trap (Jpn)</description>
+		<description>Night Trap (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="G-6025"/>
 		<info name="disk_ring" value="G-6025P-00148 1 (Disc 1), G-6025P-00149 1 (Disc 2)"/>
 		<info name="release" value="19931119"/>
@@ -1346,7 +1349,7 @@ license:CC0
 		<rom name="Nostalgia 1907 (Japan) (Track 1).bin" size="192649968" crc="b1478a7e" />
 		<rom name="Nostalgia 1907 (Japan) (Track 2).bin" size="24710112" crc="747ca04b" />
 		-->
-		<description>Nostalgia 1907 (Jpn)</description>
+		<description>Nostalgia 1907 (Japan)</description>
 		<year>1991</year>
 		<publisher>Takeru</publisher>
 		<info name="serial" value="T-77014"/>
@@ -1367,7 +1370,7 @@ license:CC0
 		<rom name="Popful Mail (Japan) (Track 2).bin" size="25133472" crc="d044aac3" />
 		<rom name="Popful Mail (Japan) (Track 3).bin" size="42778176" crc="f64659a4" />
 		-->
-		<description>Popful Mail (Jpn)</description>
+		<description>Popful Mail (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6029"/>
@@ -1410,7 +1413,7 @@ license:CC0
 		<rom name="Prince of Persia (Japan) (Track 24).bin" size="1662864" crc="56f7c105" />
 		<rom name="Prince of Persia (Japan) (Track 25).bin" size="1660512" crc="227e49ca" />
 		-->
-		<description>Prince of Persia (Jpn)</description>
+		<description>Prince of Persia (Japan)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60014"/>
@@ -1451,7 +1454,7 @@ license:CC0
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 22).bin" size="1079568" crc="9563b01f" />
 		<rom name="Pro Yakyuu Super League CD (Japan) (Track 23).bin" size="1136016" crc="7024a847" />
 		-->
-		<description>Pro Yakyuu Super League CD (Jpn)</description>
+		<description>Pro Yakyuu Super League CD (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6010"/>
@@ -1510,7 +1513,7 @@ license:CC0
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 40).bin" size="1067808" crc="81bb73c2" />
 		<rom name="Quiz Scramble Special (Japan) (Rev B) (Track 41).bin" size="1176000" crc="36cf78ed" />
 		-->
-		<description>Quiz Scramble Special (Jpn, Rev. B)</description>
+		<description>Quiz Scramble Special (Japan, rev. B)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
@@ -1530,7 +1533,7 @@ license:CC0
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 1).bin" size="498555792" crc="ac72da73" />
 		<rom name="Capcom no Quiz - Tonosama no Yabou (Japan) (Track 2).bin" size="2050944" crc="07287a36" />
 		-->
-		<description>Quiz Tonosama no Yabou (Jpn)</description>
+		<description>Quiz Tonosama no Yabou (Japan)</description>
 		<year>1992</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44024"/>
@@ -1573,7 +1576,7 @@ license:CC0
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 24).bin" size="16226448" crc="effceb82" />
 		<rom name="Ranma 1-2 - Byakuranaika (Japan) (Track 25).bin" size="18051600" crc="cb75ab7c" />
 		-->
-		<description>Ranma ½ - Byakuranaika (Jpn)</description>
+		<description>Ranma ½ - Byakuranaika (Japan)</description>
 		<year>1993</year>
 		<publisher>NCS</publisher>
 		<info name="serial" value="T-25014"/>
@@ -1596,7 +1599,7 @@ license:CC0
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 4).bin" size="24124464" crc="0278c2fd" />
 		<rom name="Rise of the Dragon - A Blade Hunter Mystery (Japan) (Track 5).bin" size="29235360" crc="93ba211d" />
 		-->
-		<description>Rise of the Dragon - A Blade Hunter Mystery (Jpn)</description>
+		<description>Rise of the Dragon - A Blade Hunter Mystery (Japan)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6002"/>
@@ -1664,7 +1667,7 @@ license:CC0
 		<rom name="Sangokushi III (Japan) (Track 49).bin" size="15694896" crc="597a794d" />
 		<rom name="Sangokushi III (Japan) (Track 50).bin" size="15052800" crc="083cd29b" />
 		-->
-		<description>Sangokushi III (Jpn)</description>
+		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76014"/>
@@ -1694,7 +1697,7 @@ license:CC0
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 11).bin" size="3709104" crc="cac806ff" />
 		<rom name="Sega Classic Arcade Collection (Japan) (Track 12).bin" size="12169248" crc="46fd5492" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
@@ -1759,7 +1762,7 @@ license:CC0
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 46).bin" size="1495872" crc="cab5acd4" />
 		<rom name="Seima Densetsu 3x3 Eyes (Japan) (Track 47).bin" size="46023936" crc="b4ad07a8" />
 		-->
-		<description>Seima Densetsu 3x3 Eyes (Jpn)</description>
+		<description>Seima Densetsu 3x3 Eyes (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6007"/>
@@ -1862,7 +1865,7 @@ license:CC0
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 84).bin" size="23284800" crc="e0a79a6f" />
 		<rom name="Seirei Shinseiki - Fhey Area (Japan) (Track 85).bin" size="51076032" crc="6c6882b3" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
@@ -1894,7 +1897,7 @@ license:CC0
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 13).bin" size="6526800" crc="04008006" />
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 14).bin" size="9523248" crc="6c025c7e" />
 		-->
-		<description>Shadow of the Beast II - Juushin no Jubaku (Jpn)</description>
+		<description>Shadow of the Beast II - Juushin no Jubaku (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60034"/>
@@ -1941,7 +1944,7 @@ license:CC0
 		<rom name="Shin Megami Tensei (Japan) (Track 28).bin" size="16901472" crc="5f027327" />
 		<rom name="Shin Megami Tensei (Japan) (Track 29).bin" size="21358512" crc="c284eb28" />
 		-->
-		<description>Shin Megami Tensei (Jpn)</description>
+		<description>Shin Megami Tensei (Japan)</description>
 		<year>1994</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44044"/>
@@ -1994,7 +1997,7 @@ license:CC0
 		<rom name="Shining Force CD (Japan) (Track 34).bin" size="1822800" crc="95b82aea" />
 		<rom name="Shining Force CD (Japan) (Track 35).bin" size="19312272" crc="62fd60eb" />
 		-->
-		<description>Shining Force CD (Jpn)</description>
+		<description>Shining Force CD (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6036"/>
@@ -2020,7 +2023,7 @@ license:CC0
 		<rom name="Silpheed (Japan) (Track 7).bin" size="12888960" crc="f0eee386" />
 		<rom name="Silpheed (Japan) (Track 8).bin" size="34835472" crc="43febcf8" />
 		-->
-		<description>Silpheed (Jpn)</description>
+		<description>Silpheed (Japan)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45054"/>
@@ -2060,7 +2063,7 @@ license:CC0
 		<rom name="Sol-Feace (Japan) (Track 21).bin" size="16845024" crc="7faff230" />
 		<rom name="Sol-Feace (Japan) (Track 22).bin" size="20932800" crc="d14346cf" />
 		-->
-		<description>Sol-Feace (Jpn)</description>
+		<description>Sol-Feace (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32024"/>
@@ -2113,7 +2116,7 @@ license:CC0
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 34).bin" size="16214688" crc="ad32fc11" />
 		<rom name="Sonic the Hedgehog CD (Japan) (Track 35).bin" size="32104800" crc="e63f110d" />
 		-->
-		<description>Sonic The Hedgehog CD (Jpn)</description>
+		<description>Sonic The Hedgehog CD (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6021"/>
@@ -2133,7 +2136,7 @@ license:CC0
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 1).bin" size="395248896" crc="e49d72d3" />
 		<rom name="Star Wars - Rebel Assault (Japan) (Track 2).bin" size="57795696" crc="ea28d67f" />
 		-->
-		<description>Star Wars - Rebel Assault (Jpn)</description>
+		<description>Star Wars - Rebel Assault (Japan)</description>
 		<year>19??</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60174"/>
@@ -2153,7 +2156,7 @@ license:CC0
 		<rom name="Starblade (Japan) (Track 1).bin" size="466669728" crc="239f44d6" />
 		<rom name="Starblade (Japan) (Track 2).bin" size="1528800" crc="9265e140" />
 		-->
-		<description>Starblade (Jpn)</description>
+		<description>Starblade (Japan)</description>
 		<year>1994</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="T-14014"/>
@@ -2217,7 +2220,7 @@ license:CC0
 		<rom name="Switch (Japan) (Track 45).bin" size="34835472" crc="ba6b2357" />
 		<rom name="Switch (Japan) (Track 46).bin" size="11856432" crc="acc8f0a5" />
 		-->
-		<description>Switch (Jpn)</description>
+		<description>Switch (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6009"/>
@@ -2244,7 +2247,7 @@ license:CC0
 		<rom name="Tenbu Mega CD Special (Japan) (Track 8).bin" size="2940000" crc="e49038b7" />
 		<rom name="Tenbu Mega CD Special (Japan) (Track 9).bin" size="3231648" crc="bb700374" />
 		-->
-		<description>Tenbu Mega CD Special (Jpn)</description>
+		<description>Tenbu Mega CD Special (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>
@@ -2281,7 +2284,7 @@ license:CC0
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 18).bin" size="35757456" crc="16d2cedc" />
 		<rom name="Tenkafubu - Eiyuutachi no Houkou (Japan) (Track 19).bin" size="33828816" crc="5a99929d" />
 		-->
-		<description>Tenkafubu - Eiyuutachi no Houkou (Jpn)</description>
+		<description>Tenkafubu - Eiyuutachi no Houkou (Japan)</description>
 		<year>1991</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45024"/>
@@ -2301,7 +2304,7 @@ license:CC0
 		<rom name="Thunder Storm FX (Japan) (Track 1).bin" size="259446768" crc="5512fd9c" />
 		<rom name="Thunder Storm FX (Japan) (Track 2).bin" size="1653456" crc="bf577267" />
 		-->
-		<description>Thunder Storm FX (Jpn)</description>
+		<description>Thunder Storm FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
@@ -2330,7 +2333,7 @@ license:CC0
 		<rom name="Thunderhawk (Japan) (Track 10).bin" size="44243472" crc="a674e49f" />
 		<rom name="Thunderhawk (Japan) (Track 11).bin" size="52945872" crc="5229bdbf" />
 		-->
-		<description>Thunderhawk (Jpn)</description>
+		<description>Thunderhawk (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60134"/>
@@ -2344,15 +2347,18 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timegal">
+	<software name="timegal" supported="no">
 		<!-- source redump.org
 		<rom name="Time Gal (Japan).cue" size="202" crc="a50da29e" />
 		<rom name="Time Gal (Japan) (Track 1).bin" size="304652208" crc="1a756c12" />
 		<rom name="Time Gal (Japan) (Track 2).bin" size="1651104" crc="fd9c4ef7" />
 		-->
-		<description>Time Gal (Jpn)</description>
+		<description>Time Gal (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32114"/>
 		<info name="disk_ring" value="T-32114P-00031-R1M V"/>
 		<info name="release" value="19921113"/>
@@ -2371,7 +2377,7 @@ license:CC0
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 2).bin" size="21083328" crc="ef56f804" />
 		<rom name="Urusei Yatsura - Dear My Friends (Japan) (Track 3).bin" size="39774672" crc="5e2d74bf" />
 		-->
-		<description>Urusei Yatsura - Dear My Friends (Jpn)</description>
+		<description>Urusei Yatsura - Dear My Friends (Japan)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45064"/>
@@ -2406,7 +2412,7 @@ license:CC0
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 16).bin" size="19206432" crc="97d73c99" />
 		<rom name="Vay - Ryuusei no Yoroi (Japan) (Track 17).bin" size="22920240" crc="c5f8063d" />
 		-->
-		<description>Vay - Ryuusei no Yoroi (Jpn)</description>
+		<description>Vay - Ryuusei no Yoroi (Japan)</description>
 		<year>1993</year>
 		<publisher>SIMS</publisher>
 		<info name="serial" value="T-44014"/>
@@ -2429,7 +2435,7 @@ license:CC0
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 4).bin" size="33812352" crc="ba656829" />
 		<rom name="Wakusei Woodstock - Funky Horror Band (Japan) (Track 5).bin" size="49968240" crc="678ce0ca" />
 		-->
-		<description>Wakusei Woodstock - Funky Horror Band (Jpn)</description>
+		<description>Wakusei Woodstock - Funky Horror Band (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6001"/>
@@ -2453,7 +2459,7 @@ license:CC0
 		<rom name="Wing Commander (Japan) (Track 5).bin" size="7286496" crc="6e9f7d90" />
 		<rom name="Wing Commander (Japan) (Track 6).bin" size="30423120" crc="1890f041" />
 		-->
-		<description>Wing Commander (Jpn)</description>
+		<description>Wing Commander (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6011"/>
@@ -2490,7 +2496,7 @@ license:CC0
 		<rom name="Winning Post (Japan) (Track 18).bin" size="5433120" crc="11927a0d" />
 		<rom name="Winning Post (Japan) (Track 19).bin" size="33570096" crc="6bddf7c6" />
 		-->
-		<description>Winning Post (Jpn)</description>
+		<description>Winning Post (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76044"/>
@@ -2519,7 +2525,7 @@ license:CC0
 		<rom name="Wolfchild (Japan) (Track 10).bin" size="1740480" crc="219b4cb2" />
 		<rom name="Wolfchild (Japan) (Track 11).bin" size="19961424" crc="bcedc4fc" />
 		-->
-		<description>Wolfchild (Jpn)</description>
+		<description>Wolfchild (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60104"/>
@@ -2558,7 +2564,7 @@ license:CC0
 		<rom name="Wonder Dog (Japan) (Track 20).bin" size="6115200" crc="4636ac6d" />
 		<rom name="Wonder Dog (Japan) (Track 21).bin" size="59449152" crc="e813bb63" />
 		-->
-		<description>Wonder Dog (Jpn)</description>
+		<description>Wonder Dog (Japan)</description>
 		<year>1992</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60074"/>
@@ -2578,7 +2584,7 @@ license:CC0
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 1).bin" size="625389744" crc="e491e189" />
 		<rom name="Yumemi Yakata no Monogatari (Japan) (Track 2).bin" size="7190064" crc="1d6aa9a6" />
 		-->
-		<description>Yumemi Yakata no Monogatari (Jpn)</description>
+		<description>Yumemi Yakata no Monogatari (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6027"/>
@@ -2600,7 +2606,7 @@ license:CC0
 		<rom name="Yumimi Mix (Japan) (Track 3).bin" size="35872704" crc="43e9be38" />
 		<rom name="Yumimi Mix (Japan) (Track 4).bin" size="14307216" crc="579798ef" />
 		-->
-		<description>Yumimi Mix (Jpn)</description>
+		<description>Yumimi Mix (Japan)</description>
 		<year>1993</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45034"/>
@@ -2676,7 +2682,7 @@ license:CC0
 		<rom name="A-Rank Thunder Tanjouhen (1993)(Riot)(NTSC)(JP)(Track 54 of 55)[!].wav" size="27045692" crc="af8a4056" />
 		<rom name="A-Rank Thunder Tanjouhen (1993)(Riot)(NTSC)(JP)(Track 55 of 55)[!].wav" size="42124364" crc="aef65e71" />
 		-->
-		<description>A-Rank Thunder Tanjouhen (Jpn)</description>
+		<description>A-Rank Thunder Tanjouhen (Japan)</description>
 		<year>1993</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49064"/>
@@ -2732,7 +2738,7 @@ license:CC0
 		<rom name="After Armageddon Gaiden - Majuu Toushouden Eclipse (1994)(Sega)(NTSC)(JP)(Track 38 of 39)[!].wav" size="12752588" crc="3fac2053" />
 		<rom name="After Armageddon Gaiden - Majuu Toushouden Eclipse (1994)(Sega)(NTSC)(JP)(Track 39 of 39)[!].wav" size="12188108" crc="3ff8b389" />
 		-->
-		<description>After Armageddon Gaiden - Majuu Toushouden Eclipse (Jpn)</description>
+		<description>After Armageddon Gaiden - Majuu Toushouden Eclipse (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6026"/>
@@ -2766,7 +2772,7 @@ license:CC0
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)(Track 16 of 17)[!].wav" size="45640604" crc="1c985344" />
 		<rom name="Aisle Lord (1992)(Wolf Team)(NTSC)(Jp)(Track 17 of 17)[!].wav" size="3565676" crc="36134764" />
 		-->
-		<description>Aisle Lord (Jpn)</description>
+		<description>Aisle Lord (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32044"/>
@@ -2819,7 +2825,7 @@ license:CC0
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)(Track 35 of 36)[!].wav" size="23153132" crc="88953ed9" />
 		<rom name="Alshark (1993)(Polydor K.K.)(NTSC)(JP)(Track 36 of 36)[!].wav" size="6199916" crc="b2bb6c5a" />
 		-->
-		<description>Alshark (Jpn)</description>
+		<description>Alshark (Japan)</description>
 		<year>1993</year>
 		<publisher>Polydor K.K.</publisher>
 		<info name="serial" value="T-92014"/>
@@ -2832,7 +2838,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="anettfut">
+	<software name="anettfut" supported="no">
 		<!-- source toseciso
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)[!].cue" size="4562" crc="e29146cb" />
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 01 of 31)[!].iso" size="31488000" crc="ed405f82" />
@@ -2867,9 +2873,12 @@ license:CC0
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 30 of 31)[!].wav" size="11106188" crc="be77203b" />
 		<rom name="Anett Futatabi (1993)(Wolf Team)(NTSC)(JP)(en)(Track 31 of 31)[!].wav" size="29851628" crc="20d88302" />
 		-->
-		<description>Anett Futatabi (Jpn)</description>
+		<description>Anett Futatabi (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32104"/>
 		<info name="release" value="19930330"/>
 		<info name="alt_title" value="アネット再び"/>
@@ -2974,7 +2983,7 @@ license:CC0
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)(Track 89 of 90)[!].wav" size="66197084" crc="3bc1df1d" />
 		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (1993)(KOEI)(NTSC)(JP)(Track 90 of 90)[!].wav" size="55761260" crc="9a097866" />
 		-->
-		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76034"/>
@@ -3012,7 +3021,7 @@ license:CC0
 		<rom name="Arcus I-II-III (1993)(Wolf Team)(NTSC)(JP)(Track 20 of 21)[!].wav" size="20697644" crc="05d83490" />
 		<rom name="Arcus I-II-III (1993)(Wolf Team)(NTSC)(JP)(Track 21 of 21)[!].wav" size="34466252" crc="a3f5623a" />
 		-->
-		<description>Arcus I-II-III (Jpn)</description>
+		<description>Arcus I-II-III (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32094"/>
@@ -3088,7 +3097,7 @@ license:CC0
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)(Track 58 of 59)[!].wav" size="10066604" crc="5ecd20b6" />
 		<rom name="Arislan Senki - The Heroic Legend of Arslan (1993)(Sega)(NTSC)(JP)(Track 59 of 59)[!].wav" size="2396732" crc="8f3e097d" />
 		-->
-		<description>Arslan Senki - The Heroic Legend of Arslan (Jpn)</description>
+		<description>Arslan Senki - The Heroic Legend of Arslan (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6028"/>
@@ -3142,7 +3151,7 @@ license:CC0
 		<rom name="Baku-den - The Unbalanced Zone (1994)(Sony)(NTSC)(JP)(Track 36 of 37)[!].wav" size="10685180" crc="8a30a53f" />
 		<rom name="Baku-den - The Unbalanced Zone (1994)(Sony)(NTSC)(JP)(Track 37 of 37)[!].wav" size="2780108" crc="bc78ce37" />
 		-->
-		<description>Baku-den - The Unbalanced Zone (Jpn)</description>
+		<description>Baku-den - The Unbalanced Zone (Japan)</description>
 		<year>1994</year>
 		<publisher>Sony Music Entertainment</publisher>
 		<info name="serial" value="T-145014"/>
@@ -3204,7 +3213,7 @@ license:CC0
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)(Track 44 of 45)[!].wav" size="4595852" crc="223a7eed" />
 		<rom name="Battle Fantasy (1994)(Micronet)(NTSC)(JP)(Track 45 of 45)[!].wav" size="6954908" crc="95a4fc3e" />
 		-->
-		<description>Battle Fantasy (Jpn)</description>
+		<description>Battle Fantasy (Japan)</description>
 		<year>1994</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22044"/>
@@ -3271,7 +3280,7 @@ license:CC0
 		<rom name="Battlecorps - 3D Mechanical Battle Simulator (1994)(Victor)(NTSC)(JP)(Track 49 of 50)[!].wav" size="2269724" crc="dddff7ce" />
 		<rom name="Battlecorps - 3D Mechanical Battle Simulator (1994)(Victor)(NTSC)(JP)(Track 50 of 50)[!].wav" size="2577836" crc="7e1015ba" />
 		-->
-		<description>Battlecorps - 3D Mechanical Battle Simulator (Jpn)</description>
+		<description>Battlecorps - 3D Mechanical Battle Simulator (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60194"/>
@@ -3311,7 +3320,7 @@ license:CC0
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)(Track 22 of 23)[!].wav" size="35270636" crc="5f096446" />
 		<rom name="Black Hole Assault (1992)(Micronet)(NTSC)(JP)(Track 23 of 23)[!].wav" size="33944108" crc="2cf923dd" />
 		-->
-		<description>Black Hole Assault (Jpn)</description>
+		<description>Black Hole Assault (Japan)</description>
 		<year>1992</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22024"/>
@@ -3331,7 +3340,7 @@ license:CC0
 		<rom name="Captain Tsubasa (1994)(Tecmo)(NTSC)(JP)(Track 2 of 3)[!].wav" size="17943452" crc="9c1e5da1" />
 		<rom name="Captain Tsubasa (1994)(Tecmo)(NTSC)(JP)(Track 3 of 3)[!].wav" size="24726620" crc="8e904660" />
 		-->
-		<description>Captain Tsubasa (Jpn)</description>
+		<description>Captain Tsubasa (Japan)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="T-36014"/>
@@ -3354,7 +3363,7 @@ license:CC0
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)(Track 5 of 6)[!].wav" size="26507084" crc="87aba968" />
 		<rom name="Daihoushinden (1995)(Victor)(NTSC)(JP)(Track 6 of 6)[!].wav" size="1237196" crc="3644f956" />
 		-->
-		<description>Daihoushinden (Jpn)</description>
+		<description>Daihoushinden (Japan)</description>
 		<year>1995</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60024"/>
@@ -3383,7 +3392,7 @@ license:CC0
 		<rom name="Dark Wizard - Yomigaeri Shiyami no Madoushi (1993)(Sega)(NTSC)(JP)(Track 11 of 12)[!].wav" size="16972076" crc="5883fffb" />
 		<rom name="Dark Wizard - Yomigaeri Shiyami no Madoushi (1993)(Sega)(NTSC)(JP)(Track 12 of 12)[!].wav" size="46593164" crc="b505c38c" />
 		-->
-		<description>Dark Wizard - Yomigaeri Shiyami no Madoushi (Jpn)</description>
+		<description>Dark Wizard - Yomigaeri Shiyami no Madoushi (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6005"/>
@@ -3414,7 +3423,7 @@ license:CC0
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)(Track 13 of 14)[!].wav" size="1512380" crc="96431d34" />
 		<rom name="Death Bringer - Himerata Monshou - The Knight of Darkness (1992)(Riot)(NTSC)(JP)(Track 14 of 14)[!].wav" size="1361852" crc="71311dac" />
 		-->
-		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Jpn)</description>
+		<description>Death Bringer - Himerata Monshou - The Knight of Darkness (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49034"/>
@@ -3441,7 +3450,7 @@ license:CC0
 		<rom name="Denei Toshi - Illusion City (1993)(Micro Cabin)(NTSC)(JP)(Track 09 of 10)[!][T-51014P-00066-R2M].wav" size="45022028" crc="6a0765aa" />
 		<rom name="Denei Toshi - Illusion City (1993)(Micro Cabin)(NTSC)(JP)(Track 10 of 10)[!][T-51014P-00066-R2M].wav" size="56146988" crc="02d23f50" />
 		-->
-		<description>Illusion City - Genei Toshi (Jpn)</description>
+		<description>Illusion City - Genei Toshi (Japan)</description>
 		<year>1993</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="T-51014"/>
@@ -3461,7 +3470,7 @@ license:CC0
 		<rom name="Double Switch (1995)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="550866944" crc="165736de" />
 		<rom name="Double Switch (1995)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1528844" crc="409d75fa" />
 		-->
-		<description>Double Switch (Jpn)</description>
+		<description>Double Switch (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6040"/>
@@ -3485,7 +3494,7 @@ license:CC0
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 6 of 7)[!].wav" size="51689948" crc="a9380c6b" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(Victor)(NTSC)(JP)(Track 7 of 7)[!].wav" size="2940044" crc="aeadf2f5" />
 		-->
-		<description>Dungeon Master II - Skullkeep (Jpn, v1.0)</description>
+		<description>Dungeon Master II - Skullkeep (Japan, v1.0)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60144"/>
@@ -3519,7 +3528,7 @@ license:CC0
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 15 of 16)[!][Ecco the Dolphin].wav" size="59016428" crc="91778a50" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 16 of 16)[!][Ecco the Dolphin].wav" size="40350956" crc="4c9dcf9a" />
 		-->
-		<description>Ecco the Dolphin CD (Jpn, Disc 1 - Ecco the Dolphin)</description>
+		<description>Ecco the Dolphin CD (Japan, Disc 1 - Ecco the Dolphin)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
@@ -3553,7 +3562,7 @@ license:CC0
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 16 of 17)[!][Ecco the Dolphin II].wav" size="49128620" crc="1b3d0b81" />
 		<rom name="Ecco the Dolphin CD (1995)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 17 of 17)[!][Ecco the Dolphin II].wav" size="10816892" crc="3e9c92a6" />
 		-->
-		<description>Ecco the Dolphin CD (Jpn, Disc 2 - Ecco the Dolphin II)</description>
+		<description>Ecco the Dolphin CD (Japan, Disc 2 - Ecco the Dolphin II)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6041"/>
@@ -3626,7 +3635,7 @@ license:CC0
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 55 of 56)[!].wav" size="3069404" crc="b20c4c43" />
 		<rom name="Eye of the Beholder (1994)(Pony Canyon)(NTSC)(JP)(Track 56 of 56)[!].wav" size="3979628" crc="3193d019" />
 		-->
-		<description>Eye of the Beholder (Jpn)</description>
+		<description>Eye of the Beholder (Japan)</description>
 		<year>1994</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="T-75014"/>
@@ -3645,7 +3654,7 @@ license:CC0
 		<rom name="Fahrenheit (1995)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="516972544" crc="3e54d0fa" />
 		<rom name="Fahrenheit (1995)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1874588" crc="ad809074" />
 		-->
-		<description>Fahrenheit (Jpn)</description>
+		<description>Fahrenheit (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6043"/>
@@ -3708,7 +3717,7 @@ license:CC0
 		<rom name="Third World War, The (1993)(Micronet)(NTSC)(Jp)(Track 45 of 46)[!].wav" size="1844012" crc="919a20c3" />
 		<rom name="Third World War, The (1993)(Micronet)(NTSC)(Jp)(Track 46 of 46)[!].wav" size="1726412" crc="ccc08967" />
 		-->
-		<description>The IIIrd World War (Jpn)</description>
+		<description>The IIIrd World War (Japan)</description>
 		<year>1993</year>
 		<publisher>Micronet</publisher>
 		<info name="serial" value="T-22034"/>
@@ -3727,7 +3736,7 @@ license:CC0
 		<rom name="Ishii Hisaichi no Daisekai (1994)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="7733248" crc="e1f8624a" />
 		<rom name="Ishii Hisaichi no Daisekai (1994)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="769148" crc="bd7489e2" />
 		-->
-		<description>Ishii Hisaichi no Daisekai (Jpn)</description>
+		<description>Ishii Hisaichi no Daisekai (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6016"/>
@@ -3776,7 +3785,7 @@ license:CC0
 		<rom name="Jurassic Park (1992)(Sega)(NTSC)(JP)(Track 31 of 32)[!].wav" size="17444828" crc="380f8cca" />
 		<rom name="Jurassic Park (1992)(Sega)(NTSC)(JP)(Track 32 of 32)[!].wav" size="2394380" crc="960c51ad" />
 		-->
-		<description>Jurassic Park (Jpn)</description>
+		<description>Jurassic Park (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6038"/>
@@ -3816,7 +3825,7 @@ license:CC0
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)(Track 22 of 23)[!].wav" size="22666268" crc="935af7a1" />
 		<rom name="Lethal Enforcers (1993)(Konami)(NTSC)(JP)(en)(Track 23 of 23)[!].wav" size="37516796" crc="b15e6cdd" />
 		-->
-		<description>Lethal Enforcers (Jpn)</description>
+		<description>Lethal Enforcers (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95014"/>
@@ -3856,7 +3865,7 @@ license:CC0
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)(Track 22 of 23)[!].wav" size="5569580" crc="69ae91a0" />
 		<rom name="Lethal Enforcers II - The Western (1994)(Konami)(NTSC)(JP)(en)(Track 23 of 23)[!].wav" size="6508028" crc="f6cd9ab2" />
 		-->
-		<description>Lethal Enforcers II - The Western (Jpn)</description>
+		<description>Lethal Enforcers II - The Western (Japan)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95034"/>
@@ -3878,7 +3887,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271-R1M].wav" size="11769452" crc="022a2281" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271-R1M].wav" size="1608812" crc="794d7aa9" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 2)</description>
+		<description>Lunar - Eternal Blue (Japan, set 2)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -3900,7 +3909,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 3 of 4)[!][T-45074P-00271A-R1M].wav" size="11769452" crc="da19c77a" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(JP)(Track 4 of 4)[!][T-45074P-00271A-R1M].wav" size="1608812" crc="c980f230" />
 		-->
-		<description>Lunar - Eternal Blue (Jpn, Set 3)</description>
+		<description>Lunar - Eternal Blue (Japan, set 3)</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -3971,7 +3980,7 @@ license:CC0
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 51 of 52)[!][T-45014P-00017-R1M].wav" size="1611164" crc="d41a33c1" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 52 of 52)[!][T-45014P-00017-R1M].wav" size="15299804" crc="43115dd3" />
 		-->
-		<description>Lunar - The Silver Star (Jpn, R1M)</description>
+		<description>Lunar - The Silver Star (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
@@ -4041,7 +4050,7 @@ license:CC0
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 51 of 52)[!][T-45014P-00017-R2M].wav" size="1611164" crc="03534eda" />
 		<rom name="Lunar - The Silver Star (1992)(Game Arts)(NTSC)(JP)(Track 52 of 52)[!][T-45014P-00017-R2M].wav" size="15299804" crc="23d1fa5b" />
 		-->
-		<description>Lunar - The Silver Star (Jpn, R2)</description>
+		<description>Lunar - The Silver Star (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45014"/>
@@ -4094,7 +4103,7 @@ license:CC0
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 34 of 35)[!][T-49024P-00016-R2M].wav" size="1547660" crc="2e120947" />
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 35 of 35)[!][T-49024P-00016-R2M].wav" size="1573532" crc="a86f99bf" />
 		-->
-		<description>Mahou no Shoujo - Silky Lip (Jpn, R2M)</description>
+		<description>Mahou no Shoujo - Silky Lip (Japan, R2M)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
@@ -4147,7 +4156,7 @@ license:CC0
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 34 of 35)[!][T-49024P-00016-R1M].wav" size="1547660" crc="2e120947" />
 		<rom name="Mahou no Shoujo - Silky Lip (1992)(Riot)(NTSC)(JP)(Track 35 of 35)[!][T-49024P-00016-R1M].wav" size="1573532" crc="a86f99bf" />
 		-->
-		<description>Mahou no Shoujo - Silky Lip (Jpn, R1M)</description>
+		<description>Mahou no Shoujo - Silky Lip (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="serial" value="T-49024"/>
@@ -4182,7 +4191,7 @@ license:CC0
 		<rom name="Mega Schwarzschild (1993)(Sega)(NTSC)(JP)(Track 16 of 17)[!].wav" size="40115756" crc="aba41d28" />
 		<rom name="Mega Schwarzschild (1993)(Sega)(NTSC)(JP)(Track 17 of 17)[!].wav" size="35395292" crc="82a9c0a0" />
 		-->
-		<description>Mega Schwarzschild (Jpn)</description>
+		<description>Mega Schwarzschild (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6020"/>
@@ -4245,7 +4254,7 @@ license:CC0
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 45 of 46)[!].wav" size="11978780" crc="265ffd1b" />
 		<rom name="Might and Magic III - Isles of Terra (1993)(CRI)(NTSC)(JP)(Track 46 of 46)[!].wav" size="37799036" crc="0b0dd512" />
 		-->
-		<description>Might and Magic III - Isles of Terra (Jpn)</description>
+		<description>Might and Magic III - Isles of Terra (Japan)</description>
 		<year>1993</year>
 		<publisher>CRI</publisher>
 		<info name="serial" value="T-68024"/>
@@ -4283,7 +4292,7 @@ license:CC0
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)(Track 20 of 21)[!].wav" size="40273340" crc="8ba853c2" />
 		<rom name="Mortal Kombat (1994)(Acclaim)(NTSC)(JP)(en)(Track 21 of 21)[!].wav" size="51974540" crc="de937768" />
 		-->
-		<description>Mortal Kombat (Jpn)</description>
+		<description>Mortal Kombat (Japan)</description>
 		<year>1994</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-81014"/>
@@ -4309,7 +4318,7 @@ license:CC0
 		<rom name="NBA Jam (1993)(Acclaim)(NTSC)(Jp)(Track 8 of 9)[!].wav" size="59430380" crc="8c2ae27d" />
 		<rom name="NBA Jam (1993)(Acclaim)(NTSC)(Jp)(Track 9 of 9)[!].wav" size="1905164" crc="34a6ed57" />
 		-->
-		<description>NBA Jam (Jpn)</description>
+		<description>NBA Jam (Japan)</description>
 		<year>1993</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-81034"/>
@@ -4346,7 +4355,7 @@ license:CC0
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 19 of 20)[!].wav" size="1775804" crc="9bab569b" />
 		<rom name="Ninjawarriors, The (1993)(Taito)(NTSC)(JP)(en)(Track 20 of 20)[!].wav" size="1298348" crc="5981f196" />
 		-->
-		<description>The Ninjawarriors (Jpn)</description>
+		<description>The Ninjawarriors (Japan)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="T-11024"/>
@@ -4376,7 +4385,7 @@ license:CC0
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 12 of 13)[!].wav" size="38147132" crc="4a99b106" />
 		<rom name="Nobunaga no Yabou - Haouden (1994)(KOEI)(NTSC)(JP)(Track 13 of 13)[!].wav" size="20309564" crc="f05b24f0" />
 		-->
-		<description>Nobunaga no Yabou - Haouden (Jpn)</description>
+		<description>Nobunaga no Yabou - Haouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="T-76024"/>
@@ -4389,7 +4398,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="prizefig">
+	<software name="prizefig" supported="no">
 		<!-- source toseciso
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 1 of 2)[!].cue" size="301" crc="6caf1452" />
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 1 of 2)(Track 1 of 2)[!].iso" size="346562560" crc="3c4783bc" />
@@ -4399,9 +4408,12 @@ license:CC0
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="408199168" crc="3ecc7df9" />
 		<rom name="Prize Fighter (1993)(Sega)(NTSC)(JP)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="1528844" crc="409d75fa" />
 		-->
-		<description>Prize Fighter (Jpn)</description>
+		<description>Prize Fighter (Japan)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="G-6037"/>
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="プライズファイター"/>
@@ -4429,7 +4441,7 @@ license:CC0
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)(Track 6 of 7)[!].wav" size="34983692" crc="7a211cdc" />
 		<rom name="Psychic Detective Series vol.3 - AYA (1993)(Data West)(NTSC)(JP)(Track 7 of 7)[!].wav" size="58724780" crc="fff3e6a0" />
 		-->
-		<description>Psychic Detective Series vol.3 - AYA (Jpn)</description>
+		<description>Psychic Detective Series vol.3 - AYA (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-64024"/>
@@ -4453,7 +4465,7 @@ license:CC0
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)(Track 6 of 7)[!].wav" size="26570588" crc="31f96ca5" />
 		<rom name="Psychic Detective Series vol.4 - Orgel (1993)(Data West)(NTSC)(JP)(Track 7 of 7)[!].wav" size="28565084" crc="3d533b3d" />
 		-->
-		<description>Psychic Detective Series vol.4 - Orgel (Jpn)</description>
+		<description>Psychic Detective Series vol.4 - Orgel (Japan)</description>
 		<year>1993</year>
 		<publisher>Data West</publisher>
 		<info name="serial" value="T-64034"/>
@@ -4512,7 +4524,7 @@ license:CC0
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 40 of 41)[!][G-6003P-00014B-R1M].wav" size="1067852" crc="92e6a974" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 41 of 41)[!][G-6003P-00014B-R1M].wav" size="1176044" crc="5cf02565" />
 		-->
-		<description>Quiz Scramble Special (Jpn, R1M)</description>
+		<description>Quiz Scramble Special (Japan, R1M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
@@ -4571,7 +4583,7 @@ license:CC0
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 40 of 41)[!][G-6003P-00014B-R2M].wav" size="1067852" crc="d8ed2233" />
 		<rom name="Quiz Scramble Special (1992)(Sega)(NTSC)(JP)(Track 41 of 41)[!][G-6003P-00014B-R2M].wav" size="1176044" crc="d95aae43" />
 		-->
-		<description>Quiz Scramble Special (Jpn, R2M)</description>
+		<description>Quiz Scramble Special (Japan, R2M)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6003"/>
@@ -4585,7 +4597,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rbfx">
+	<software name="rbfx" supported="no">
 		<!-- source toseciso
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)[!].cue" size="589" crc="78b59c82" />
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 4)[!].iso" size="276729856" crc="0cd3a154" />
@@ -4593,9 +4605,12 @@ license:CC0
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 3 of 4)[!].wav" size="2065100" crc="8ea2a9f5" />
 		<rom name="Road Blaster FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 4 of 4)[!].wav" size="13702796" crc="f104ca19" />
 		-->
-		<description>Road Blaster FX (Jpn)</description>
+		<description>Road Blaster FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="T-32124"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="ロードブラスターFX"/>
@@ -4637,7 +4652,7 @@ license:CC0
 		<rom name="Secret of Monkey Island, The - Monkey Island Yurei - Kaizoku Oosoudou! (1993)(Victor)(NTSC)(JP)(Track 26 of 27)[!].wav" size="11176748" crc="c68d39eb" />
 		<rom name="Secret of Monkey Island, The - Monkey Island Yurei - Kaizoku Oosoudou! (1993)(Victor)(NTSC)(JP)(Track 27 of 27)[!].wav" size="10243004" crc="4f67b8c1" />
 		-->
-		<description>The Secret of Monkey Island - Monkey Island Yurei - Kaizoku Oosoudou! (Jpn)</description>
+		<description>The Secret of Monkey Island - Monkey Island Yurei - Kaizoku Oosoudou! (Japan)</description>
 		<year>1993</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60044"/>
@@ -4667,7 +4682,7 @@ license:CC0
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 11 of 12)[!][compilation][G-6012P-00024-2-R1M].wav" size="3709148" crc="99a3f4e7" />
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 12 of 12)[!][compilation][G-6012P-00024-2-R1M].wav" size="12169292" crc="4df03bd7" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R1M)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan, R1M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
@@ -4697,7 +4712,7 @@ license:CC0
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 11 of 12)[!][compilation][G-6012P-00024-2-R2M].wav" size="3711500" crc="684b3091" />
 		<rom name="Sega Classic Arcade Collection - Limited Edition (1992)(Sega)(NTSC)(JP)(Track 12 of 12)[!][compilation][G-6012P-00024-2-R2M].wav" size="12169292" crc="9406c05f" />
 		-->
-		<description>Sega Classic Arcade Collection - Limited Edition (Jpn, R2M)</description>
+		<description>Sega Classic Arcade Collection - Limited Edition (Japan, R2M)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6012"/>
@@ -4801,7 +4816,7 @@ license:CC0
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 84 of 85)[!][T-32034P-00009-R1K].wav" size="23284844" crc="299f46b1" />
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 85 of 85)[!][T-32034P-00009-R1K].wav" size="51076076" crc="967acd0b" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn, R1K)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan, R1K)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
@@ -4904,7 +4919,7 @@ license:CC0
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 84 of 85)[!][T-32034P-00009-R2K].wav" size="23284844" crc="507327a8" />
 		<rom name="Seirei Shinseiki - Fhey Area (1992)(Wolf Team)(NTSC)(JP)(Track 85 of 85)[!][T-32034P-00009-R2K].wav" size="51076076" crc="b7b3c759" />
 		-->
-		<description>Seirei Shinseiki - Fhey Area (Jpn, R2K)</description>
+		<description>Seirei Shinseiki - Fhey Area (Japan, R2K)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32034"/>
@@ -4953,7 +4968,7 @@ license:CC0
 		<rom name="Sengoku Denshou (1993)(Sammy)(NTSC)(JP)(Track 30 of 31)[!].wav" size="2093324" crc="01968d7e" />
 		<rom name="Sengoku Denshou (1993)(Sammy)(NTSC)(JP)(Track 31 of 31)[!].wav" size="1620572" crc="dec5de32" />
 		-->
-		<description>Sengoku Denshou (Jpn)</description>
+		<description>Sengoku Denshou (Japan)</description>
 		<year>1993</year>
 		<publisher>Sammy</publisher>
 		<info name="serial" value="T-24034"/>
@@ -4973,7 +4988,7 @@ license:CC0
 		<rom name="Shadowrun (1996)(Compile)(NTSC)(JP)(Track 2 of 3)[!].wav" size="15337436" crc="bb86bcc4" />
 		<rom name="Shadowrun (1996)(Compile)(NTSC)(JP)(Track 3 of 3)[!].wav" size="15690236" crc="27fa7931" />
 		-->
-		<description>Shadowrun (Jpn)</description>
+		<description>Shadowrun (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="T-66024"/>
@@ -5012,7 +5027,7 @@ license:CC0
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)(Track 21 of 22)[!].wav" size="36357260" crc="fcdb7789" />
 		<rom name="SimEarth (1993)(Sega)(NTSC)(JP)(Track 22 of 22)[!].wav" size="34967228" crc="712bd72b" />
 		-->
-		<description>SimEarth (Jpn)</description>
+		<description>SimEarth (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6008"/>
@@ -5046,7 +5061,7 @@ license:CC0
 		<rom name="SoulStar (1994)(Victor)(NTSC)(JP)(en)(Track 16 of 17)[!].wav" size="39080876" crc="70e33a16" />
 		<rom name="SoulStar (1994)(Victor)(NTSC)(JP)(en)(Track 17 of 17)[!].wav" size="2114492" crc="eb13e846" />
 		-->
-		<description>SoulStar (Jpn)</description>
+		<description>SoulStar (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 		<info name="serial" value="T-60184"/>
@@ -5066,7 +5081,7 @@ license:CC0
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R1M].iso" size="225912832" crc="70370315" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 2 of 2)[!][T32064P-00022-R1M].wav" size="1300700" crc="39b15913" />
 		-->
-		<description>Thunder Storm FX (Jpn, R1)</description>
+		<description>Thunder Storm FX (Japan, R1)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-32064"/>
@@ -5086,7 +5101,7 @@ license:CC0
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 1 of 2)[!][T32064P-00022-R2M].iso" size="225912832" crc="70370315" />
 		<rom name="Thunder Storm FX (1992)(Wolf Team)(NTSC)(JP)(en)(Track 2 of 2)[!][T32064P-00022-R2M].wav" size="1300700" crc="e511f436" />
 		-->
-		<description>Thunder Storm FX (Jpn, R2)</description>
+		<description>Thunder Storm FX (Japan, R2)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32064"/>
@@ -5106,7 +5121,7 @@ license:CC0
 		<rom name="Tomcat Alley (1994)(Sega)(NTSC)(JP)(Track 1 of 2)[!].iso" size="463513600" crc="18499535" />
 		<rom name="Tomcat Alley (1994)(Sega)(NTSC)(JP)(Track 2 of 2)[!].wav" size="1985132" crc="f5956250" />
 		-->
-		<description>Tomcat Alley (Jpn)</description>
+		<description>Tomcat Alley (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6039"/>
@@ -5126,7 +5141,7 @@ license:CC0
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)(Track 2 of 3)[!].wav" size="1178396" crc="90aba61c" />
 		<rom name="Warau Salesman (1993)(Sega)(NTSC)(JP)(Track 3 of 3)[!].wav" size="1526492" crc="2bee0332" />
 		-->
-		<description>Warau Salesman (Jpn)</description>
+		<description>Warau Salesman (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-6006"/>
@@ -5160,7 +5175,7 @@ license:CC0
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 13 of 14)[!].wav" size="1472396" crc="993eaa8f" />
 		<rom name="Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (demo) (1994)(Sega)(NTSC)(JP)(Track 14 of 14)[!].wav" size="20638844" crc="8a53ec78" />
 		-->
-		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Jpn, Demo)</description>
+		<description>Lodoss Tou Senki - Eiyuu Sensou - Record of Lodoss War (Japan, demo)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5179,7 +5194,7 @@ license:CC0
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(Jp)(Track 4 of 5)[!][Premium CD][audio cd].wav" size="64308428" crc="955cbf79" />
 		<rom name="Lunar - Eternal Blue (1994)(Game Arts)(NTSC)(Jp)(Track 5 of 5)[!][Premium CD][audio cd].wav" size="12642044" crc="59c495bf" />
 		-->
-		<description>Lunar - Eternal Blue - Premium CD (Jpn) [CD-Audio]</description>
+		<description>Lunar - Eternal Blue - Premium CD (Japan) [CD-Audio]</description>
 		<year>1994</year>
 		<publisher>Game Arts</publisher>
 		<info name="serial" value="T-45074"/>
@@ -5209,7 +5224,7 @@ license:CC0
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 14 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="20655308" crc="ee061041" />
 		<rom name="Nostalgia 1907 in North Atlantic Sea (1991)(Takeru)(NTSC)(Jp)(Track 15 of 15)[!][Original Sound Track Ver. 2][audio cd].wav" size="24021020" crc="b25d006c" />
 		-->
-		<description>Nostalgia 1907 in North Atlantic Sea - Original Sound Track Ver. 2 (Jpn) [CD-Audio]</description>
+		<description>Nostalgia 1907 in North Atlantic Sea - Original Sound Track Ver. 2 (Japan) [CD-Audio]</description>
 		<year>1992</year>
 		<publisher>Takeru</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -5225,7 +5240,7 @@ license:CC0
 		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 1 of 2)[!][audio cd].wav" size="39765308" crc="0a7b2e1e" />
 		<rom name="Tenbu Mega CD Special (1992)(Wolf Team)(NTSC)(Jp)(Track 2 of 2)[!][audio cd].wav" size="47239964" crc="d41f2e03" />
 		-->
-		<description>Tenbu Mega CD Special (Jpn) [CD-Audio]</description>
+		<description>Tenbu Mega CD Special (Japan) [CD-Audio]</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
 		<info name="serial" value="T-32084"/>

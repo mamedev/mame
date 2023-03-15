@@ -47,8 +47,8 @@
 #define WD1772_TAG "wd1772"
 #define PAL_TAG "pal"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
+DEFINE_DEVICE_TYPE(TI99_DDCC1, bus::ti99::peb::myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
+DEFINE_DEVICE_TYPE(DDCC1_PAL, bus::ti99::peb::ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
 
 namespace bus::ti99::peb {
 
@@ -84,7 +84,7 @@ bool myarc_fdc_device::card_selected()
 /*
     Provides the current address to the PAL.
 */
-uint16_t myarc_fdc_device::get_address()
+offs_t myarc_fdc_device::get_address()
 {
 	return m_address;
 }
@@ -94,20 +94,24 @@ uint16_t myarc_fdc_device::get_address()
 */
 void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	uint16_t addrcopy = m_address;
-	m_address = offset;
-	if (m_pal->ramsel())
-	{
-		*value = m_buffer_ram->pointer()[m_address & 0x07ff];
-	}
+	offs_t addrcopy = m_address;
 
-	if (m_pal->romen())
+	if (!m_dec_high || amabc_is_set(offset))
 	{
-		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
-		*value = m_dsrrom[base | (m_address & 0x0fff)];
+		m_address = offset;
+		if (m_pal->ramsel())
+		{
+			*value = m_buffer_ram->pointer()[m_address & 0x07ff];
+		}
+
+		if (m_pal->romen())
+		{
+			// EPROM selected
+			offs_t base = m_banksel? 0x1000 : 0;
+			*value = m_dsrrom[base | (m_address & 0x0fff)];
+		}
+		m_address = addrcopy;
 	}
-	m_address = addrcopy;
 }
 
 /*
@@ -115,13 +119,17 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 */
 void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
-	m_address = offset;
-	if (m_pal->ramsel())
+	offs_t addrcopy = m_address;
+
+	if (!m_dec_high || amabc_is_set(offset))
 	{
-		m_buffer_ram->pointer()[m_address & 0x07ff] = data;
+		m_address = offset;
+		if (m_pal->ramsel())
+		{
+			m_buffer_ram->pointer()[m_address & 0x07ff] = data;
+		}
+		m_address = addrcopy;
 	}
-	m_address = addrcopy;
 }
 
 /*
@@ -135,6 +143,9 @@ void myarc_fdc_device::readz(offs_t offset, uint8_t *value)
 		return;
 	}
 
+	// If we have an AMA/B/C decoder and it delivers false, exit here
+	if (m_dec_high && !amabc_is_set(offset)) return;
+
 	if (m_pal->ramsel())
 	{
 		// SRAM selected
@@ -145,7 +156,7 @@ void myarc_fdc_device::readz(offs_t offset, uint8_t *value)
 	if (m_pal->romen())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
+		offs_t base = m_banksel? 0x1000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x0fff)];
 		*value = *rom;
 
@@ -175,6 +186,9 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 		return;
 	}
 
+	// If we have an AMA/B/C decoder and it delivers false, exit here
+	if (m_dec_high && !amabc_is_set(offset)) return;
+
 	if (m_pal->ramsel())
 	{
 		// SRAM selected
@@ -196,7 +210,7 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	const uint8_t dipswitch[] = { 0x00, 0x01, 0x02, 0x04, 0x08 };
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs251())
 	{
@@ -229,7 +243,7 @@ void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 */
 void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs259())
 	{
@@ -260,7 +274,7 @@ WRITE_LINE_MEMBER( myarc_fdc_device::fdc_mon_w )
 	// Do not start the motors when no drive is selected. However, motors
 	// can always be stopped.
 	if (m_selected_drive != 0 || state==1)
-		for (int i=0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 			if (m_floppy[i] != nullptr) m_floppy[i]->mon_w(state);
 }
 
@@ -346,6 +360,8 @@ void myarc_fdc_device::device_reset()
 		m_wdc = m_wd1770;
 	else
 		m_wdc = m_wd1772;
+
+	m_dec_high = (ioport("AMADECODE")->read()!=0);
 }
 
 void myarc_fdc_device::device_config_complete()
@@ -366,7 +382,7 @@ void myarc_fdc_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_TI99_TDF_FORMAT);
 }
 
-static void ccfdc_floppies(device_slot_interface &device)
+static void myarc_ddcc_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);  // 40 tracks
 	device.option_add("525qd", FLOPPY_525_QD);  // 80 tracks
@@ -397,6 +413,11 @@ INPUT_PORTS_START(myarc_ddcc )
 	PORT_DIPNAME( 0x08, 0x00, "DSK4 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x08, "20ms/2ms")
+
+	PORT_START( "AMADECODE" )
+	PORT_CONFNAME( 0x01, 0x01, "Decode AMA/AMB/AMC lines" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
+		PORT_CONFSETTING( 0x01, DEF_STR( On ))
 INPUT_PORTS_END
 
 
@@ -438,10 +459,10 @@ void myarc_fdc_device::device_add_mconfig(machine_config& config)
 	DDCC1_PAL(config, PAL_TAG, 0);
 
 	// Floppy drives
-	FLOPPY_CONNECTOR(config, "0", ccfdc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", ccfdc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", ccfdc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "3", ccfdc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "0", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", myarc_ddcc_floppies, "525dd", myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "3", myarc_ddcc_floppies, nullptr, myarc_fdc_device::floppy_formats).enable_sound(true);
 }
 
 ioport_constructor myarc_fdc_device::device_input_ports() const

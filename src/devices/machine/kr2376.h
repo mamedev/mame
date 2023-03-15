@@ -71,8 +71,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual uint8_t key_codes(int mode, int x, int y) { return 0x00; }
+
+	TIMER_CALLBACK_MEMBER(perform_scan);
 
 private:
 	// internal state
@@ -92,11 +93,6 @@ private:
 	devcb_read_line m_read_shift, m_read_control;
 	devcb_write_line m_write_strobe;
 
-	enum
-	{
-		TIMER_SCAN_TICK
-	};
-
 	void change_output_lines();
 	void clock_scan_counters();
 	void detect_keypress();
@@ -110,16 +106,15 @@ protected:
 	virtual uint8_t key_codes(int mode, int x, int y) override;
 };
 
-//class kr2376_12_device : public kr2376_device
-//{
-//public:
-//  // construction/destruction
-//  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-//protected:
-//  virtual uint8_t key_codes(int mode, int x, int y) override;
-//};
+class kr2376_12_device : public kr2376_device
+{
+public:
+  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+  virtual uint8_t key_codes(int mode, int x, int y) override;
+};
 
 DECLARE_DEVICE_TYPE(KR2376_ST, kr2376_st_device)
-//DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
+DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)
 
 #endif // MAME_MACHINE_KR2376_H

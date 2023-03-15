@@ -2,7 +2,7 @@
 // third_party_lib.cpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 
 #include <asio.hpp>
 #include <boost/array.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <iostream>
@@ -83,9 +83,9 @@ class connection
 public:
   typedef boost::shared_ptr<connection> pointer;
 
-  static pointer create(asio::io_context& io_context)
+  static pointer create(const asio::any_io_executor& ex)
   {
-    return pointer(new connection(io_context));
+    return pointer(new connection(ex));
   }
 
   tcp::socket& socket()
@@ -102,8 +102,8 @@ public:
   }
 
 private:
-  connection(asio::io_context& io_context)
-    : socket_(io_context),
+  connection(const asio::any_io_executor& ex)
+    : socket_(ex),
       session_impl_(socket_),
       read_in_progress_(false),
       write_in_progress_(false)
@@ -193,7 +193,7 @@ private:
   void start_accept()
   {
     connection::pointer new_connection =
-      connection::create(acceptor_.get_executor().context());
+      connection::create(acceptor_.get_executor());
 
     acceptor_.async_accept(new_connection->socket(),
         boost::bind(&server::handle_accept, this, new_connection,

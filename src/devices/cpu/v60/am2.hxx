@@ -965,65 +965,51 @@ uint32_t v60_device::am2Error1()
 uint32_t v60_device::am2Error2()
 {
 	fatalerror("CPU - AM2 - 2 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t v60_device::am2Error3()
 {
 	fatalerror("CPU - AM2 - 3 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
-#endif
 
 uint32_t v60_device::am2Error4()
 {
 	fatalerror("CPU - AM2 - 4 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am2Error5()
 {
 	fatalerror("CPU - AM2 - 5 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam2Error1()
 {
 	fatalerror("CPU - BAM2 - 1 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam2Error2()
 {
 	fatalerror("CPU - BAM2 - 2 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t v60_device::bam2Error3()
 {
 	fatalerror("CPU - BAM2 - 3 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
-#endif
 
 uint32_t v60_device::bam2Error4()
 {
 	fatalerror("CPU - BAM2 - 4 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam2Error5()
 {
 	fatalerror("CPU - BAM2 - 5 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam2Error6()
 {
 	fatalerror("CPU - BAM2 - 6 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 

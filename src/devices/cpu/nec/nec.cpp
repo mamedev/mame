@@ -108,8 +108,6 @@
 #include "nec.h"
 #include "necdasm.h"
 
-#include "debugger.h"
-
 typedef uint8_t BOOLEAN;
 typedef uint8_t BYTE;
 typedef uint16_t WORD;
@@ -325,7 +323,7 @@ void nec_common_device::nec_interrupt(unsigned int_num, int/*INTSOURCES*/ source
 	m_MF = 1;
 
 	if (source == INT_IRQ)  /* get vector */
-		int_num = standard_irq_callback(0);
+		int_num = standard_irq_callback(0, PC());
 	debugger_exception_hook(int_num);
 
 	dest_off = read_mem_word(int_num*4);
@@ -544,7 +542,6 @@ void nec_common_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
-	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
 	set_icountptr(m_icount);
@@ -612,10 +609,6 @@ void nec_common_device::state_export(const device_state_entry &entry)
 
 		case STATE_GENPCBASE:
 			m_debugger_temp = (Sreg(PS)<<4) + m_prev_ip;
-			break;
-
-		case STATE_GENSP:
-			m_debugger_temp = (Sreg(SS)<<4) + Wreg(SP);
 			break;
 
 		case NEC_PSW:

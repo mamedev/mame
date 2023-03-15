@@ -18,12 +18,10 @@
 #include "ppc.h"
 #include "ppccom.h"
 #include "ppcfe.h"
-#include "ppc_dasm.h"
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
-#include "debugger.h"
 
 
 
@@ -3806,7 +3804,7 @@ void ppc_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32
 	if (m_drcuml->logging())
 	{
 		std::ostringstream stream;
-		powerpc_disassembler::dasm_one(stream, pc, op);
+		m_dasm.dasm_one(stream, pc, op);
 		block.append_comment("%08X: %s", pc, stream.str());                                  // comment
 	}
 }
@@ -3995,7 +3993,7 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 				buffer << "<virtual nop>";
 			else
-				powerpc_disassembler::dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
+				m_dasm.dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
 			buffer << "???";

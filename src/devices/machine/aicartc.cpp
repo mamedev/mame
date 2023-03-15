@@ -54,7 +54,7 @@ void aicartc_device::device_validity_check(validity_checker &valid) const
 
 void aicartc_device::device_start()
 {
-	m_clock_timer = timer_alloc();
+	m_clock_timer = timer_alloc(FUNC(aicartc_device::clock_tick), this);
 	m_clock_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
 
@@ -107,11 +107,10 @@ void aicartc_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_tick - advance the RTC counter
 //-------------------------------------------------
 
-
-void aicartc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(aicartc_device::clock_tick)
 {
 	m_rtc_tick++;
 	if(m_rtc_tick & 0x8000)
@@ -152,7 +151,7 @@ void aicartc_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 			if(m_we)
 			{
 				COMBINE_DATA(&m_rtc_reg_hi);
-				// clear write enable here?
+				m_we = 0;
 			}
 
 			break;

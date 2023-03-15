@@ -62,6 +62,8 @@ private:
 	void tube_z80_fetch(address_map &map);
 	void tube_z80_io(address_map &map);
 	void tube_z80_mem(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(prst_w);
 };
 
 

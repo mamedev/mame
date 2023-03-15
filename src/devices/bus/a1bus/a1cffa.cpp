@@ -11,23 +11,54 @@
 #include "emu.h"
 #include "a1cffa.h"
 
+#include "bus/ata/ataintf.h"
+
+
+namespace {
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 #define CFFA_ROM_REGION "cffa_rom"
 #define CFFA_ATA_TAG    "cffa_ata"
-
-DEFINE_DEVICE_TYPE(A1BUS_CFFA, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")
 
 ROM_START( cffa )
 	ROM_REGION(0x2000, CFFA_ROM_REGION, 0)
 	ROM_LOAD ("cffaromv1.1.bin", 0x0000, 0x1fe0, CRC(bf6b55ad) SHA1(6a290be18485a06f243a3561c4e01be5aafa4bfe) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a1bus_cffa_device:
+		public device_t,
+		public device_a1bus_card_interface
+{
+public:
+	// construction/destruction
+	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t cffa_r(offs_t offset);
+	void cffa_w(offs_t offset, uint8_t data);
+
+protected:
+	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	required_device<ata_interface_device> m_ata;
+
+private:
+	required_region_ptr<uint8_t> m_rom;
+	uint16_t m_lastdata;
+	bool m_writeprotect;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -147,3 +178,12 @@ void a1bus_cffa_device::cffa_w(offs_t offset, uint8_t data)
 
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A1BUS_CFFA, device_a1bus_card_interface, a1bus_cffa_device, "cffa1", "CFFA Compact Flash for Apple I")

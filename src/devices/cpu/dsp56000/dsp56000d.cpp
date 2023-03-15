@@ -369,9 +369,9 @@ offs_t dsp56000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_
 					switch (op & 0x010020U)
 					{
 					case 0x000000U: util::stream_format(stream, "jmp   %s", ea(MMMRRR, ew)); break;
-					case 0x000020U: util::stream_format(stream, "j%s   %s", CCCC[op & 15], ea(MMMRRR, ew)); break;
-					case 0x010000U: util::stream_format(stream, "jsr   %s", ea(MMMRRR, ew)); break;
-					case 0x010020U: util::stream_format(stream, "js%s  %s", CCCC[op & 15], ea(MMMRRR, ew)); break;
+					case 0x000020U: util::stream_format(stream, "j%s   %s", CCCC[op & 15], ea(MMMRRR, ew)); flags |= STEP_COND; break;
+					case 0x010000U: util::stream_format(stream, "jsr   %s", ea(MMMRRR, ew)); flags |= STEP_OVER; break;
+					case 0x010020U: util::stream_format(stream, "js%s  %s", CCCC[op & 15], ea(MMMRRR, ew)); flags |= STEP_OVER | STEP_COND; break;
 					}
 
 					// consume absolute
@@ -385,12 +385,12 @@ offs_t dsp56000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_
 
 					switch (op & 0x010060U)
 					{
-					case 0x000000U: util::stream_format(stream, "jclr  #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; break;
-					case 0x000020U: util::stream_format(stream, "jset  #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; break;
+					case 0x000000U: util::stream_format(stream, "jclr  #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; flags |= STEP_COND; break;
+					case 0x000020U: util::stream_format(stream, "jset  #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; flags |= STEP_COND; break;
 					case 0x000040U: util::stream_format(stream, "bclr  #%d,%s", op & 31, reg(dddddd)); break;
 					case 0x000060U: util::stream_format(stream, "bset  #%d,%s", op & 31, reg(dddddd)); break;
-					case 0x010000U: util::stream_format(stream, "jsclr #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; break;
-					case 0x010020U: util::stream_format(stream, "jsset #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; break;
+					case 0x010000U: util::stream_format(stream, "jsclr #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; flags |= STEP_OVER | STEP_COND; break;
+					case 0x010020U: util::stream_format(stream, "jsset #%d,%s,$%x", op & 31, reg(dddddd), u16(ew)); words++; flags |= STEP_OVER | STEP_COND; break;
 					case 0x010040U: util::stream_format(stream, "bchg  #%d,%s", op & 31, reg(dddddd)); break;
 					case 0x010060U: util::stream_format(stream, "btst  #%d,%s", op & 31, reg(dddddd)); break;
 					}
@@ -405,12 +405,12 @@ offs_t dsp56000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_
 				{
 				case 0x000000U: util::stream_format(stream, "bclr  #%d", op & 31); break;
 				case 0x000020U: util::stream_format(stream, "bset  #%d", op & 31); break;
-				case 0x000080U: util::stream_format(stream, "jclr  #%d", op & 31); break;
-				case 0x0000a0U: util::stream_format(stream, "jset  #%d", op & 31); break;
+				case 0x000080U: util::stream_format(stream, "jclr  #%d", op & 31); flags |= STEP_COND; break;
+				case 0x0000a0U: util::stream_format(stream, "jset  #%d", op & 31); flags |= STEP_COND; break;
 				case 0x010000U: util::stream_format(stream, "bchg  #%d", op & 31); break;
 				case 0x010020U: util::stream_format(stream, "btst  #%d", op & 31); break;
-				case 0x010080U: util::stream_format(stream, "jsclr #%d", op & 31); break;
-				case 0x0100a0U: util::stream_format(stream, "jsset #%d", op & 31); break;
+				case 0x010080U: util::stream_format(stream, "jsclr #%d", op & 31); flags |= STEP_OVER | STEP_COND; break;
+				case 0x0100a0U: util::stream_format(stream, "jsset #%d", op & 31); flags |= STEP_OVER | STEP_COND; break;
 				}
 
 				// second operand (address)
@@ -432,9 +432,9 @@ offs_t dsp56000_disassembler::disassemble(std::ostream &stream, offs_t pc, data_
 			}
 			break;
 		case 0xc: util::stream_format(stream, "jmp   <$%x", op & 0xfff); break;
-		case 0xd: util::stream_format(stream, "jsr   <$%x", op & 0xfff); break;
-		case 0xe: util::stream_format(stream, "j%s   <$%x", CCCC[(op >> 12) & 15], op & 0xfff); break;
-		case 0xf: util::stream_format(stream, "js%s  <$%x", CCCC[(op >> 12) & 15], op & 0xfff); break;
+		case 0xd: util::stream_format(stream, "jsr   <$%x", op & 0xfff); flags |= STEP_OVER; break;
+		case 0xe: util::stream_format(stream, "j%s   <$%x", CCCC[(op >> 12) & 15], op & 0xfff); flags |= STEP_COND; break;
+		case 0xf: util::stream_format(stream, "js%s  <$%x", CCCC[(op >> 12) & 15], op & 0xfff); flags |= STEP_OVER | STEP_COND; break;
 		}
 	}
 	else

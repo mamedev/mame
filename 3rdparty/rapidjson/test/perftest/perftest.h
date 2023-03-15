@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -24,10 +24,13 @@
 
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+// Likewise, __ARM_NEON is used to detect Neon.
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 
 #define RAPIDJSON_HAS_STDSTRING 1
@@ -127,7 +130,8 @@ public:
                 "integers.json",
                 "mixed.json",
                 "nulls.json",
-                "paragraphs.json"
+                "paragraphs.json",
+                "alotofkeys.json"
             };
 
             for (size_t j = 0; j < sizeof(typesfilenames) / sizeof(typesfilenames[0]); j++) {
@@ -155,7 +159,7 @@ public:
         free(whitespace_);
         json_ = 0;
         whitespace_ = 0;
-        for (size_t i = 0; i < 7; i++) {
+        for (size_t i = 0; i < 8; i++) {
             free(types_[i]);
             types_[i] = 0;
         }
@@ -171,8 +175,8 @@ protected:
     size_t length_;
     char *whitespace_;
     size_t whitespace_length_;
-    char *types_[7];
-    size_t typesLength_[7];
+    char *types_[8];
+    size_t typesLength_[8];
 
     static const size_t kTrialCount = 1000;
 };

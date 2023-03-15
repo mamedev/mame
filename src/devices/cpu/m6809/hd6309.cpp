@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods,Tim Lindner
 /*********************************************************************
 
-    hd6309.c
-
     Copyright John Butler
     Copyright Tim Lindner
 
@@ -115,7 +113,6 @@ March 2013 NPW:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "hd6309.h"
 #include "m6809inl.h"
 #include "6x09dasm.h"
@@ -134,9 +131,7 @@ DEFINE_DEVICE_TYPE(HD6309E, hd6309e_device, "hd6309e", "Hitachi HD6309E")
 //-------------------------------------------------
 
 hd6309_device::hd6309_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int divider) :
-	m6809_base_device(mconfig, tag, owner, clock, type, divider),
-	m_md(0),
-	m_temp_im(0)
+	m6809_base_device(mconfig, tag, owner, clock, type, divider)
 {
 }
 
@@ -447,35 +442,32 @@ inline void hd6309_device::bittest_set(bool result)
 //  read_exgtfr_register
 //-------------------------------------------------
 
-inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(uint8_t reg)
+inline uint16_t hd6309_device::read_exgtfr_register(uint8_t reg)
 {
-	uint16_t value;
+	uint16_t result;
 
 	switch(reg & 0x0F)
 	{
-		case  0: value = m_q.r.d;                           break;  // D
-		case  1: value = m_x.w;                             break;  // X
-		case  2: value = m_y.w;                             break;  // Y
-		case  3: value = m_u.w;                             break;  // U
-		case  4: value = m_s.w;                             break;  // S
-		case  5: value = m_pc.w;                            break;  // PC
-		case  6: value = m_q.r.w;                           break;  // W
-		case  7: value = m_v.w;                             break;  // V
-		case  8: value = ((uint16_t) m_q.r.a) << 8 | m_q.r.a; break;  // A
-		case  9: value = ((uint16_t) m_q.r.b) << 8 | m_q.r.b; break;  // B
-		case 10: value = ((uint16_t) m_cc) << 8 | m_cc;       break;  // CC
-		case 11: value = ((uint16_t) m_dp) << 8 | m_dp;       break;  // DP
-		case 12: value = 0;                                 break;  // 0
-		case 13: value = 0;                                 break;  // 0
-		case 14: value = ((uint16_t) m_q.r.e) << 8 | m_q.r.e; break;  // E
-		case 15: value = ((uint16_t) m_q.r.f) << 8 | m_q.r.f; break;  // F
+		case  0: result = m_q.r.d;                           break;  // D
+		case  1: result = m_x.w;                             break;  // X
+		case  2: result = m_y.w;                             break;  // Y
+		case  3: result = m_u.w;                             break;  // U
+		case  4: result = m_s.w;                             break;  // S
+		case  5: result = m_pc.w;                            break;  // PC
+		case  6: result = m_q.r.w;                           break;  // W
+		case  7: result = m_v.w;                             break;  // V
+		case  8: result = ((uint16_t) m_q.r.a) << 8 | m_q.r.a; break;  // A
+		case  9: result = ((uint16_t) m_q.r.b) << 8 | m_q.r.b; break;  // B
+		case 10: result = ((uint16_t) m_cc) << 8 | m_cc;       break;  // CC
+		case 11: result = ((uint16_t) m_dp) << 8 | m_dp;       break;  // DP
+		case 12: result = 0;                                   break;  // 0
+		case 13: result = 0;                                   break;  // 0
+		case 14: result = ((uint16_t) m_q.r.e) << 8 | m_q.r.e; break;  // E
+		case 15: result = ((uint16_t) m_q.r.f) << 8 | m_q.r.f; break;  // F
 		default:
 			fatalerror("Should not reach here");
 	}
 
-	exgtfr_register result;
-	result.byte_value = (uint8_t)value;
-	result.word_value = value;
 	return result;
 }
 
@@ -485,26 +477,26 @@ inline m6809_base_device::exgtfr_register hd6309_device::read_exgtfr_register(ui
 //  write_exgtfr_register
 //-------------------------------------------------
 
-inline void hd6309_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
+inline void hd6309_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 {
 	switch(reg & 0x0F)
 	{
-		case  0: m_q.r.d = value.word_value;                break;  // D
-		case  1: m_x.w   = value.word_value;                break;  // X
-		case  2: m_y.w   = value.word_value;                break;  // Y
-		case  3: m_u.w   = value.word_value;                break;  // U
-		case  4: m_s.w   = value.word_value;                break;  // S
-		case  5: m_pc.w  = value.word_value;                break;  // PC
-		case  6: m_q.r.w = value.word_value;                break;  // W
-		case  7: m_v.w   = value.word_value;                break;  // V
-		case  8: m_q.r.a = (uint8_t) (value.word_value >> 8); break;  // A
-		case  9: m_q.r.b = (uint8_t) (value.word_value >> 0); break;  // B
-		case 10: m_cc    = (uint8_t) (value.word_value >> 0); break;  // CC
-		case 11: m_dp    = (uint8_t) (value.word_value >> 8); break;  // DP
-		case 12:                                            break;  // 0
-		case 13:                                            break;  // 0
-		case 14: m_q.r.e = (uint8_t) (value.word_value >> 8); break;  // E
-		case 15: m_q.r.f = (uint8_t) (value.word_value >> 0); break;  // F
+		case  0: m_q.r.d = value;                break;  // D
+		case  1: m_x.w   = value;                break;  // X
+		case  2: m_y.w   = value;                break;  // Y
+		case  3: m_u.w   = value;                break;  // U
+		case  4: m_s.w   = value;                break;  // S
+		case  5: m_pc.w  = value;                break;  // PC
+		case  6: m_q.r.w = value;                break;  // W
+		case  7: m_v.w   = value;                break;  // V
+		case  8: m_q.r.a = (uint8_t) (value >> 8); break;  // A
+		case  9: m_q.r.b = (uint8_t) (value >> 0); break;  // B
+		case 10: m_cc    = (uint8_t) (value >> 0); break;  // CC
+		case 11: m_dp    = (uint8_t) (value >> 8); break;  // DP
+		case 12:                                   break;  // 0
+		case 13:                                   break;  // 0
+		case 14: m_q.r.e = (uint8_t) (value >> 8); break;  // E
+		case 15: m_q.r.f = (uint8_t) (value >> 0); break;  // F
 		default:
 			fatalerror("Should not reach here");
 	}

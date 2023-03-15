@@ -45,7 +45,6 @@ mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, 
 	, m_read_poty(*this)
 	, m_stream(nullptr)
 	, m_variant(variant)
-	, m_token(make_unique_clear<SID6581_t>())
 
 {
 }
@@ -202,6 +201,7 @@ void mos6581_device::device_start()
 	m_stream = stream_alloc(0, 1, machine().sample_rate());
 
 	// initialize SID engine
+	m_token = std::make_unique<SID6581_t>();
 	m_token->device = this;
 	m_token->mixer_channel = m_stream;
 	m_token->PCMfreq = machine().sample_rate();

@@ -45,6 +45,51 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x2a : ModRM = fetch(); tmp = GetRMByte(ModRM); tmp2 = (Breg(AL) & 0xf)<<4; Breg(AL) = (Breg(AL) & 0xf0) | (tmp&0xf); tmp = tmp2 | (tmp>>4);   PutbackRMByte(ModRM,tmp); CLKM(17,17,13,32,32,19); break;
 		case 0x31 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",PC()); break;
 		case 0x33 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC()); break;
+		case 0x39 : // INS reg,imm4
+			ModRM = fetch();
+			tmp = GetRMByte(ModRM) & 0x0f;
+			tmp2 = (fetch() & 0x0f) + 1;
+			PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~(((1 << tmp2) - 1) << tmp)) | ((Wreg(AW) & ((1 << tmp2) - 1)) << tmp));
+			if (tmp + tmp2 > 15) {
+				Wreg(IY) += 2;
+				PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~((1 << (tmp2 - (16 - tmp))) - 1)) | ((Wreg(AW) >> (16 - tmp)) & ((1 << (tmp2 - (16 - tmp))) - 1)));
+			}
+			PutRMByte(ModRM, (tmp + tmp2) & 0x0f);
+			// When and how many extra cycles are taken is not documented:
+			// V20: 75-103 cycles
+			// V30: 75-103 cycles, odd addresses
+			// V30: 67-87 cycles, even addresses
+			// V33: 39-77 cycles, odd addresses
+			// V33: 37-69 cycles, even addresses
+			if (Wreg(IY) & 1) {
+				CLKS(103, 103, 77);
+			} else {
+				CLKS(103, 87, 69);
+			}
+			break;
+		case 0x3b : // EXT reg,imm4
+			ModRM = fetch();
+			tmp = GetRMByte(ModRM) & 0x0f;
+			tmp2 = (fetch() & 0x0f) + 1;
+			Wreg(AW) = GetMemW(DS0, Wreg(IX)) >> tmp;
+			if (tmp + tmp2 > 15) {
+				Wreg(IX) += 2;
+				Wreg(AW) |= GetMemW(DS0, Wreg(IX)) << (16 - tmp);
+			}
+			Wreg(AW) &= ((1 << tmp2) - 1);
+			PutRMByte(ModRM, (tmp + tmp2) & 0x0f);
+			// When and how many extra cycles are taken is not documented:
+			// V20: 25-52 cycles
+			// V30: 25-52 cycles, odd addresses
+			// V30: 21-44 cycles, even addresses
+			// V33: 33-63 cycles, odd addresses
+			// V33: 29-61 cycles, even addresses
+			if (Wreg(IX) & 1) {
+				CLKS(52, 52, 63);
+			} else {
+				CLKS(52, 44, 62);
+			}
+			break;
 		case 0xe0 : BRKXA(true); CLK(12); break;
 		case 0xf0 : BRKXA(false); CLK(12); break;
 		case 0xff : BRKEM; CLK(50); break;
@@ -334,7 +379,7 @@ OP( 0x8c, i_mov_wsreg ) { GetModRM;
 		default:   logerror("%06x: MOV Sreg - Invalid register\n",PC());
 	}
 }
-OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO;  CLKS(4,4,2); }
+OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); if (ModRM >= 0xc0) logerror("LDEA invalid mode %Xh\n", ModRM); else { (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO; }  CLKS(4,4,2); }
 OP( 0x8e, i_mov_sregw ) { uint16_t src; GetModRM; src = GetRMWord(ModRM); CLKR(15,15,7,15,11,5,2,m_EA);
 	switch (ModRM & 0x38) {
 		case 0x00: Sreg(DS1) = src; break; /* mov es,ew */
@@ -610,7 +655,7 @@ OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	}
 	m_seg_prefix=false;
 }
-OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC()); m_halted=1; m_icount=0; }
+OP( 0xf4, i_hlt ) { m_halted=1; m_icount=0; }
 OP( 0xf5, i_cmc ) { m_CarryVal = !CF; CLK(2); }
 OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,result2;
 	GetModRM; tmp = GetRMByte(ModRM);

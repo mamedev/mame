@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "nubus.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -51,7 +53,7 @@ void nubus_slot_device::device_resolve_objects()
 	if (dev)
 	{
 		dev->set_nubus_tag(m_nubus.target(), m_nubus_slottag);
-		m_nubus->add_nubus_card(dev);
+		m_nubus->add_nubus_card(*dev);
 	}
 }
 
@@ -94,6 +96,10 @@ nubus_device::nubus_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
+nubus_device::~nubus_device()
+{
+}
+
 //-------------------------------------------------
 //  device_resolve_objects - resolve objects that
 //  may be needed for other devices to set
@@ -119,12 +125,13 @@ void nubus_device::device_start()
 {
 }
 
-void nubus_device::add_nubus_card(device_nubus_card_interface *card)
+void nubus_device::add_nubus_card(device_nubus_card_interface &card)
 {
-	m_device_list.append(*card);
+	m_device_list.emplace_back(card);
 }
 
-template<typename R, typename W> void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask)
+template <typename R, typename W>
+void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask)
 {
 	int buswidth = m_space->data_width();
 	switch(buswidth)
@@ -133,7 +140,7 @@ template<typename R, typename W> void nubus_device::install_device(offs_t start,
 			m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 			break;
 		case 64:
-			m_space->install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_readwrite_handler(start, end, rhandler, whandler, (uint64_t(mask) << 32) | mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
@@ -153,7 +160,8 @@ template void nubus_device::install_device<read32s_delegate,   write32s_delegate
 template void nubus_device::install_device<read32sm_delegate,  write32sm_delegate >(offs_t start, offs_t end, read32sm_delegate rhandler,  write32sm_delegate whandler, uint32_t mask);
 template void nubus_device::install_device<read32smo_delegate, write32smo_delegate>(offs_t start, offs_t end, read32smo_delegate rhandler, write32smo_delegate whandler, uint32_t mask);
 
-void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, uint32_t mask)
+template <typename R>
+void nubus_device::install_readonly_device(offs_t start, offs_t end, R rhandler, uint32_t mask)
 {
 	int buswidth = m_space->data_width();
 	switch(buswidth)
@@ -162,14 +170,28 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 			m_space->install_read_handler(start, end, rhandler, mask);
 			break;
 		case 64:
-			m_space->install_read_handler(start, end, rhandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_read_handler(start, end, rhandler, (uint64_t(mask) << 32) | mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 	}
 }
 
-void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, uint32_t mask)
+template void nubus_device::install_readonly_device<read8_delegate    >(offs_t start, offs_t end, read8_delegate rhandler,     uint32_t mask);
+template void nubus_device::install_readonly_device<read8s_delegate   >(offs_t start, offs_t end, read8s_delegate rhandler,    uint32_t mask);
+template void nubus_device::install_readonly_device<read8sm_delegate  >(offs_t start, offs_t end, read8sm_delegate rhandler,   uint32_t mask);
+template void nubus_device::install_readonly_device<read8smo_delegate >(offs_t start, offs_t end, read8smo_delegate rhandler,  uint32_t mask);
+template void nubus_device::install_readonly_device<read16_delegate   >(offs_t start, offs_t end, read16_delegate rhandler,    uint32_t mask);
+template void nubus_device::install_readonly_device<read16s_delegate  >(offs_t start, offs_t end, read16s_delegate rhandler,   uint32_t mask);
+template void nubus_device::install_readonly_device<read16sm_delegate >(offs_t start, offs_t end, read16sm_delegate rhandler,  uint32_t mask);
+template void nubus_device::install_readonly_device<read16smo_delegate>(offs_t start, offs_t end, read16smo_delegate rhandler, uint32_t mask);
+template void nubus_device::install_readonly_device<read32_delegate   >(offs_t start, offs_t end, read32_delegate rhandler,    uint32_t mask);
+template void nubus_device::install_readonly_device<read32s_delegate  >(offs_t start, offs_t end, read32s_delegate rhandler,   uint32_t mask);
+template void nubus_device::install_readonly_device<read32sm_delegate >(offs_t start, offs_t end, read32sm_delegate rhandler,  uint32_t mask);
+template void nubus_device::install_readonly_device<read32smo_delegate>(offs_t start, offs_t end, read32smo_delegate rhandler, uint32_t mask);
+
+template <typename W>
+void nubus_device::install_writeonly_device(offs_t start, offs_t end, W whandler, uint32_t mask)
 {
 	int buswidth = m_space->data_width();
 	switch(buswidth)
@@ -178,17 +200,36 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 			m_space->install_write_handler(start, end, whandler, mask);
 			break;
 		case 64:
-			m_space->install_write_handler(start, end, whandler, ((uint64_t)mask<<32)|mask);
+			m_space->install_write_handler(start, end, whandler, (uint64_t(mask) << 32) | mask);
 			break;
 		default:
 			fatalerror("NUBUS: Bus width %d not supported\n", buswidth);
 	}
 }
 
-void nubus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
+template void nubus_device::install_writeonly_device<write8_delegate    >(offs_t start, offs_t end, write8_delegate whandler,     uint32_t mask);
+template void nubus_device::install_writeonly_device<write8s_delegate   >(offs_t start, offs_t end, write8s_delegate whandler,    uint32_t mask);
+template void nubus_device::install_writeonly_device<write8sm_delegate  >(offs_t start, offs_t end, write8sm_delegate whandler,   uint32_t mask);
+template void nubus_device::install_writeonly_device<write8smo_delegate >(offs_t start, offs_t end, write8smo_delegate whandler,  uint32_t mask);
+template void nubus_device::install_writeonly_device<write16_delegate   >(offs_t start, offs_t end, write16_delegate whandler,    uint32_t mask);
+template void nubus_device::install_writeonly_device<write16s_delegate  >(offs_t start, offs_t end, write16s_delegate whandler,   uint32_t mask);
+template void nubus_device::install_writeonly_device<write16sm_delegate >(offs_t start, offs_t end, write16sm_delegate whandler,  uint32_t mask);
+template void nubus_device::install_writeonly_device<write16smo_delegate>(offs_t start, offs_t end, write16smo_delegate whandler, uint32_t mask);
+template void nubus_device::install_writeonly_device<write32_delegate   >(offs_t start, offs_t end, write32_delegate whandler,    uint32_t mask);
+template void nubus_device::install_writeonly_device<write32s_delegate  >(offs_t start, offs_t end, write32s_delegate whandler,   uint32_t mask);
+template void nubus_device::install_writeonly_device<write32sm_delegate >(offs_t start, offs_t end, write32sm_delegate whandler,  uint32_t mask);
+template void nubus_device::install_writeonly_device<write32smo_delegate>(offs_t start, offs_t end, write32smo_delegate whandler, uint32_t mask);
+
+void nubus_device::install_bank(offs_t start, offs_t end, void *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_space->install_ram(start, end, data);
+}
+
+void nubus_device::install_view(offs_t start, offs_t end, memory_view &view)
+{
+//  printf("install_view: %s @ %x->%x\n", tag, start, end);
+	m_space->install_view(start, end, view);
 }
 
 void nubus_device::set_irq_line(int slot, int state)
@@ -225,10 +266,11 @@ WRITE_LINE_MEMBER( nubus_device::irqe_w ) { m_out_irqe_cb(state); }
 //  device_nubus_card_interface - constructor
 //-------------------------------------------------
 
-device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "nubus"),
-		m_nubus(nullptr),
-		m_nubus_slottag(nullptr), m_slot(0), m_next(nullptr)
+device_nubus_card_interface::device_nubus_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "nubus"),
+	m_nubus(nullptr),
+	m_nubus_slottag(nullptr),
+	m_slot(0)
 {
 }
 
@@ -277,31 +319,31 @@ void device_nubus_card_interface::interface_pre_start()
 	}
 }
 
-void device_nubus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
+void device_nubus_card_interface::install_bank(offs_t start, offs_t end, void *data)
 {
 	nubus().install_bank(start, end, data);
 }
 
-void device_nubus_card_interface::install_declaration_rom(device_t *dev, const char *romregion, bool mirror_all_mb, bool reverse_rom)
+void device_nubus_card_interface::install_view(offs_t start, offs_t end, memory_view &view)
+{
+	nubus().install_view(start, end, view);
+}
+
+void device_nubus_card_interface::install_declaration_rom(const char *romregion, bool mirror_all_mb, bool reverse_rom)
 {
 	bool inverted = false;
 
-	uint8_t *rom = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->base();
-	uint32_t romlen = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->bytes();
+	uint8_t *rom = device().memregion(romregion)->base();
+	uint32_t romlen = device().memregion(romregion)->bytes();
 
 //  printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 
 	if (reverse_rom)
 	{
-		uint8_t temp;
-		uint32_t endptr = romlen-1;
-
-		for (uint32_t idx = 0; idx < romlen / 2; idx++)
+		for (uint32_t idx = 0, endptr = romlen-1; idx < endptr; idx++, endptr--)
 		{
-			temp = rom[idx];
-			rom[idx] = rom[endptr];
-			rom[endptr] = temp;
-			endptr--;
+			using std::swap;
+			swap(rom[idx], rom[endptr]);
 		}
 	}
 
@@ -313,12 +355,12 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 		inverted = true;
 	}
 
-	#if 0
+#if 0
 	FILE *f;
 	f = fopen("romout.bin", "wb");
 	fwrite(rom, romlen, 1, f);
 	fclose(f);
-	#endif
+#endif
 
 	switch (byteLanes)
 	{

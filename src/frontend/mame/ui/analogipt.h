@@ -27,7 +27,9 @@ public:
 	virtual ~menu_analog() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_activated() override;
 
 private:
 	enum
@@ -45,9 +47,9 @@ private:
 
 		std::reference_wrapper<ioport_field> field;
 		int type;
+		int defvalue;
 		int min, max;
 		int cur;
-		int defvalue;
 	};
 
 	struct field_data
@@ -65,14 +67,19 @@ private:
 	using item_data_vector = std::vector<item_data>;
 	using field_data_vector = std::vector<field_data>;
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	void find_fields();
 
+	static std::string item_text(int type, int value);
+
 	item_data_vector m_item_data;
 	field_data_vector m_field_data;
+	std::string m_prompt;
 	unsigned m_visible_fields;
+	int m_top_field;
+	bool m_hide_menu;
 };
 
 } // namespace ui

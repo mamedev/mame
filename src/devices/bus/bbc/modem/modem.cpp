@@ -91,11 +91,13 @@ void bbc_modem_slot_device::write(offs_t offset, uint8_t data)
 
 
 // slot devices
+#include "meup.h"
 #include "scsiaiv.h"
 
 
 void bbcm_modem_devices(device_slot_interface &device)
 {
+	device.option_add("meup",       BBC_MEUP);            /* Master Extra User Ports */
 	//device.option_add("modem",      BBC_MODEM);           /* Beebug Master Modem */
 	device.option_add("scsiaiv",    BBC_SCSIAIV);         /* Acorn AIV SCSI Host Adaptor */
 	//device.option_add("vp415",      BBC_VP415);           /* Philips VP415 */

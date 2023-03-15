@@ -896,9 +896,9 @@ avhuff_error avhuff_decoder::decode_audio(int channels, int samples, const uint8
 			{
 				// reset and decode
 				if (!m_flac_decoder.reset(48000, 1, samples, source, size))
-					throw CHDERR_DECOMPRESSION_ERROR;
+					throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 				if (!m_flac_decoder.decode_interleaved(reinterpret_cast<int16_t *>(curdest), samples, swap_endian))
-					throw CHDERR_DECOMPRESSION_ERROR;
+					throw std::error_condition(chd_file::error::DECOMPRESSION_ERROR);
 
 				// finish up
 				m_flac_decoder.finish();

@@ -2,11 +2,16 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    konami.c
-
     Portable Konami cpu emulator
+    Custom HD6309 in a gate array with ROM blocks for instruction decoding.
 
     Based on M6809 cpu core copyright John Butler
+
+    TODO:
+    - verify cycle timing
+    - verify status flag handling
+    - what happens with block/shift opcodes when count is 0? maybe a full loop?
+      parodius does an indexed LSRD and checks for A==0 to jump over the opcode
 
     References:
 
@@ -55,7 +60,6 @@ March 2013 NPW:
 *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "konami.h"
 #include "m6809inl.h"
 #include "6x09dasm.h"
@@ -85,9 +89,9 @@ DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 //  konami_cpu_device - constructor
 //-------------------------------------------------
 
-konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 1)
-	, m_set_lines(*this)
+konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	m6809_base_device(mconfig, tag, owner, clock, KONAMI, 4),
+	m_set_lines(*this)
 {
 }
 
@@ -102,6 +106,14 @@ void konami_cpu_device::device_start()
 
 	// resolve callbacks
 	m_set_lines.resolve();
+
+	// initialize variables
+	m_temp_im = 0;
+	m_bcount = 0;
+
+	// setup regtable
+	save_item(NAME(m_temp_im));
+	save_item(NAME(m_bcount));
 }
 
 
@@ -194,21 +206,20 @@ inline uint16_t &konami_cpu_device::ireg()
 //  read_exgtfr_register
 //-------------------------------------------------
 
-inline m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_register(uint8_t reg)
+inline uint16_t konami_cpu_device::read_exgtfr_register(uint8_t reg)
 {
-	exgtfr_register result;
-	result.word_value = 0x00FF;
+	uint16_t result = 0x00FF;
 
 	switch(reg & 0x07)
 	{
-		case  0: result.word_value = m_q.r.a;   break;  // A
-		case  1: result.word_value = m_q.r.b;   break;  // B
-		case  2: result.word_value = m_x.w;     break;  // X
-		case  3: result.word_value = m_y.w;     break;  // Y
-		case  4: result.word_value = m_s.w;     break;  // S
-		case  5: result.word_value = m_u.w;     break;  // U
+		case  0: result = m_q.r.a;   break;  // A
+		case  1: result = m_q.r.b;   break;  // B
+		case  2: result = m_x.w;     break;  // X
+		case  3: result = m_y.w;     break;  // Y
+		case  4: result = m_s.w;     break;  // S
+		case  5: result = m_u.w;     break;  // U
 	}
-	result.byte_value = (uint8_t) result.word_value;
+
 	return result;
 }
 
@@ -217,69 +228,17 @@ inline m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_registe
 //  write_exgtfr_register
 //-------------------------------------------------
 
-inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, m6809_base_device::exgtfr_register value)
+inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value)
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_q.r.a = value.byte_value;    break;  // A
-		case  1: m_q.r.b = value.byte_value;    break;  // B
-		case  2: m_x.w   = value.word_value;    break;  // X
-		case  3: m_y.w   = value.word_value;    break;  // Y
-		case  4: m_s.w   = value.word_value;    break;  // S
-		case  5: m_u.w   = value.word_value;    break;  // U
+		case  0: m_q.r.a = value;    break;  // A
+		case  1: m_q.r.b = value;    break;  // B
+		case  2: m_x.w   = value;    break;  // X
+		case  3: m_y.w   = value;    break;  // Y
+		case  4: m_s.w   = value;    break;  // S
+		case  5: m_u.w   = value;    break;  // U
 	}
-}
-
-
-//-------------------------------------------------
-//  safe_shift_right
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else if (value < 0)
-		result = (T) -1;
-	else
-		result = 0;
-
-	return result;
-}
-
-
-//-------------------------------------------------
-//  safe_shift_right_unsigned
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_right_unsigned(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value >> shift;
-	else
-		result = 0;
-
-	return result;
-}
-
-//-------------------------------------------------
-//  safe_shift_left
-//-------------------------------------------------
-
-template<class T> T konami_cpu_device::safe_shift_left(T value, uint32_t shift)
-{
-	T result;
-
-	if (shift < (sizeof(T) * 8))
-		result = value << shift;
-	else
-		result = 0;
-
-	return result;
 }
 
 

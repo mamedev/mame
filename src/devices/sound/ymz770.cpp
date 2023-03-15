@@ -266,16 +266,16 @@ retry:
 		switch (m_cpl)
 		{
 		case 3:
-			mixl = (mixl > ClipMax3) ? ClipMax3 : (mixl < -ClipMax3) ? -ClipMax3 : mixl;
-			mixr = (mixr > ClipMax3) ? ClipMax3 : (mixr < -ClipMax3) ? -ClipMax3 : mixr;
+			mixl = std::clamp(mixl, -ClipMax3, ClipMax3);
+			mixr = std::clamp(mixr, -ClipMax3, ClipMax3);
 			break;
 		case 2:
-			mixl = (mixl > ClipMax2) ? ClipMax2 : (mixl < -ClipMax2) ? -ClipMax2 : mixl;
-			mixr = (mixr > ClipMax2) ? ClipMax2 : (mixr < -ClipMax2) ? -ClipMax2 : mixr;
+			mixl = std::clamp(mixl, -ClipMax2, ClipMax2);
+			mixr = std::clamp(mixr, -ClipMax2, ClipMax2);
 			break;
 		case 1:
-			mixl = (mixl > 32767) ? 32767 : (mixl < -32768) ? -32768 : mixl;
-			mixr = (mixr > 32767) ? 32767 : (mixr < -32768) ? -32768 : mixr;
+			mixl = std::clamp(mixl, -32768, 32767);
+			mixr = std::clamp(mixr, -32768, 32767);
 			break;
 		}
 		if (m_mute)

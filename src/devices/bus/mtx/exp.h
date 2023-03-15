@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "imagedev/cartrom.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,7 +23,7 @@
 
 class device_mtx_exp_interface;
 
-class mtx_exp_slot_device : public device_t, public device_single_card_slot_interface<device_mtx_exp_interface>
+class mtx_exp_slot_device : public device_t, public device_single_card_slot_interface<device_mtx_exp_interface>, public device_cartrom_image_interface
 {
 	friend class device_mtx_exp_interface;
 public:
@@ -51,9 +53,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
+	virtual void bankswitch(uint8_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// image-level overrides
+	virtual image_init_result call_load() override;
+
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "mtx_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 private:
 	// address spaces we are attached to
@@ -63,6 +77,8 @@ private:
 	devcb_write_line m_busreq_handler;
 	devcb_write_line m_int_handler;
 	devcb_write_line m_nmi_handler;
+
+	device_mtx_exp_interface *m_card;
 };
 
 
@@ -70,6 +86,13 @@ private:
 
 class device_mtx_exp_interface : public device_interface
 {
+public:
+	virtual void bankswitch(uint8_t data) { }
+
+	void rom_alloc(uint32_t size, const char *tag);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint32_t get_rom_size() { return m_rom_size; }
+
 protected:
 	// construction/destruction
 	device_mtx_exp_interface(const machine_config &mconfig, device_t &device);
@@ -78,13 +101,19 @@ protected:
 	address_space &io_space() { return *m_slot->m_io; }
 
 	mtx_exp_slot_device *m_slot;
+
+private:
+	// internal state
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(MTX_EXP_SLOT, mtx_exp_slot_device)
 
-void mtx_expansion_devices(device_slot_interface &device);
+void mtx_int_expansion_devices(device_slot_interface &device);
+void mtx_ext_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_MTX_EXP_H

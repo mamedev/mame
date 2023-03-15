@@ -1,173 +1,137 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
-## copyright-holders:Aaron Giles, Andrew Gardner
+## copyright-holders:Vas Crabb
 
-from __future__ import with_statement
-
+import argparse
 import io
 import re
+import string
 import sys
 
 
 def parse_args():
-    def usage():
-        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] [-o <outfile>] <srcfile>\n')
-        sys.exit(1)
-
-    flags = True
-    target = 'mame'
-    format = 'rc'
-    input = None
-    output = None
-    i = 1
-    while i < len(sys.argv):
-        if flags and (sys.argv[i] == '-r'):
-            format = 'rc'
-        elif flags and (sys.argv[i] == '-p'):
-            format = 'plist'
-        elif flags and (sys.argv[i] == '-b'):
-            i += 1
-            if (i >= len(sys.argv)):
-                usage()
-            else:
-                target = sys.argv[i]
-        elif flags and (sys.argv[i] == '-o'):
-            i += 1
-            if (i >= len(sys.argv)) or (output is not None):
-                usage()
-            else:
-                output = sys.argv[i]
-        elif flags and (sys.argv[i] == '--'):
-            flags = False
-        elif flags and sys.argv[i].startswith('-'):
-            usage()
-        elif input is not None:
-            usage()
-        else:
-            input = sys.argv[i]
-        i += 1
-    if input is None:
-        usage()
-    return target, format, input, output
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--target', '-t', metavar='<target>', default='mame', help='target name')
+    parser.add_argument('--subtarget', '-s', metavar='<subtarget>', default='mame', help='subtarget name')
+    parser.add_argument('--executable', '-e', metavar='<executable>', default='mame', help='base executable name')
+    parser.add_argument('--format', '-f', choices=('rc', 'plist'), metavar='<format>', default='rc', help='output format')
+    parser.add_argument('--resources', '-r', metavar='<resfile>', help='resource file to include')
+    parser.add_argument('-o', metavar='<outfile>', help='output file name')
+    parser.add_argument('input', metavar='<srcfile>', help='version info source file')
+    return parser.parse_args()
 
 
-def extract_version(input):
+def extract_version(verinfo):
     pattern = re.compile('\s+BARE_BUILD_VERSION\s+"(([^."]+)\.([^."]+))"')
-    for line in input.readlines():
+    for line in verinfo:
         match = pattern.search(line)
         if match:
             return match.group(1), match.group(2), match.group(3)
     return None, None, None
 
 
-build, outfmt, srcfile, dstfile = parse_args()
+if __name__ == '__main__':
+    options = parse_args()
 
-try:
-    fp = io.open(srcfile, 'r')
-except IOError:
-    sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
-    sys.exit(1)
-
-version_string, version_major, version_minor = extract_version(fp)
-version_build = "0"
-version_subbuild = "0"
-if not version_string:
-    sys.stderr.write("Unable to extract version from source file '%s'\n" % srcfile)
-    sys.exit(1)
-fp.close()
-
-if dstfile is not None:
     try:
-        fp = open(dstfile, 'w')
-    except IOError:
-        sys.stderr.write("Unable to open output file '%s'\n" % dstfile)
+        with io.open(options.input, 'r') as verinfo:
+            verfull, vermajor, verminor = extract_version(verinfo)
+            verbuild = '0'
+    except IOError as e:
+        sys.stderr.write("Error reading source file '%s': %s\n" % (options.input, e))
         sys.exit(1)
-else:
-    fp = sys.stdout
 
-if build == "mess":
-    # MESS
-    author = "MESS Team"
-    comments = "Multi Emulation Super System"
-    company_name = "MESS Team"
-    file_description = "MESS"
-    internal_name = "MESS"
-    original_filename = "MESS"
-    product_name = "MESS"
-    bundle_identifier = "org.mamedev.mess"
-else:
-    # MAME
-    author = "Nicola Salmoria and the MAME Team"
-    comments = "Multi-purpose emulation framework"
-    company_name = "MAME Team"
-    file_description = "MAME"
-    internal_name = "MAME" if build == "mame" else build
-    original_filename = "MAME" if build == "mame" else build
-    product_name = "MAME" if build == "mame" else build
-    bundle_identifier = "org.mamedev." + build
+    if verfull is None:
+        sys.stderr.write("Unable to extract version from source file '%s'\n" % (options.input, ))
+        sys.exit(1)
 
-legal_copyright = "Copyright Nicola Salmoria and the MAME team"
-
-if outfmt == 'rc':
-    fp.write('VS_VERSION_INFO VERSIONINFO\n')
-    fp.write('\tFILEVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
-    fp.write('\tPRODUCTVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
-    fp.write('\tFILEFLAGSMASK 0x3fL\n')
-    if version_build == 0:
-        fp.write('\tFILEFLAGS 0x0L\n')
+    if options.format == 'plist':
+        template = string.Template(
+                '<?xml version="1.0" encoding="UTF-8"?>\n' \
+                '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' \
+                '<plist version="1.0">\n' \
+                '<dict>\n' \
+                '\t<key>CFBundleDisplayName</key>\n' \
+                '\t<string>${product}</string>\n' \
+                '\t<key>CFBundleIdentifier</key>\n' \
+                '\t<string>${rdns}</string>\n' \
+                '\t<key>CFBundleInfoDictionaryVersion</key>\n' \
+                '\t<string>6.0</string>\n' \
+                '\t<key>CFBundleName</key>\n' \
+                '\t<string>${product}</string>\n' \
+                '\t<key>CFBundleShortVersionString</key>\n' \
+                '\t<string>${major}.${minor}.${build}</string>\n' \
+                '\t<key>NSPrincipalClass</key>\n' \
+                '\t<string>NSApplication</string>\n' \
+                '</dict>\n' \
+                '</plist>\n')
     else:
-        fp.write('\tFILEFLAGS VS_FF_PRERELEASE\n')
-    fp.write('\tFILEOS VOS_NT_WINDOWS32\n')
-    fp.write('\tFILETYPE VFT_APP\n')
-    fp.write('\tFILESUBTYPE VFT2_UNKNOWN\n')
-    fp.write('BEGIN\n')
-    fp.write('\tBLOCK "StringFileInfo"\n')
-    fp.write('\tBEGIN\n')
-    fp.write('#ifdef UNICODE\n')
-    fp.write('\t\tBLOCK "040904b0"\n')
-    fp.write('#else\n')
-    fp.write('\t\tBLOCK "040904E4"\n')
-    fp.write('#endif\n')
-    fp.write('\t\tBEGIN\n')
-    fp.write('\t\t\tVALUE "Author", "%s\\0"\n' % author)
-    fp.write('\t\t\tVALUE "Comments", "%s\\0"\n' % comments)
-    fp.write('\t\t\tVALUE "CompanyName", "%s\\0"\n' % company_name)
-    fp.write('\t\t\tVALUE "FileDescription", "%s\\0"\n' % file_description)
-    fp.write('\t\t\tVALUE "FileVersion", "%s, %s, %s, %s\\0"\n' % (version_major, version_minor, version_build, version_subbuild))
-    fp.write('\t\t\tVALUE "InternalName", "%s\\0"\n' % internal_name)
-    fp.write('\t\t\tVALUE "LegalCopyright", "%s\\0"\n' % legal_copyright)
-    fp.write('\t\t\tVALUE "OriginalFilename", "%s\\0"\n' % original_filename)
-    fp.write('\t\t\tVALUE "ProductName", "%s\\0"\n' % product_name)
-    fp.write('\t\t\tVALUE "ProductVersion", "%s\\0"\n' % version_string)
-    fp.write('\t\tEND\n')
-    fp.write('\tEND\n')
-    fp.write('\tBLOCK "VarFileInfo"\n')
-    fp.write('\tBEGIN\n')
-    fp.write('#ifdef UNICODE\n')
-    fp.write('\t\tVALUE "Translation", 0x409, 1200\n')
-    fp.write('#else\n')
-    fp.write('\t\tVALUE "Translation", 0x409, 1252\n')
-    fp.write('#endif\n')
-    fp.write('\tEND\n')
-    fp.write('END\n')
-elif outfmt == 'plist':
-    fp.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    fp.write('<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n')
-    fp.write('<plist version="1.0">\n')
-    fp.write('<dict>\n')
-    fp.write('\t<key>CFBundleDisplayName</key>\n')
-    fp.write('\t<string>%s</string>\n' % product_name)
-    fp.write('\t<key>CFBundleIdentifier</key>\n')
-    fp.write('\t<string>%s</string>\n' % bundle_identifier)
-    fp.write('\t<key>CFBundleInfoDictionaryVersion</key>\n')
-    fp.write('\t<string>6.0</string>\n')
-    fp.write('\t<key>CFBundleName</key>\n')
-    fp.write('\t<string>%s</string>\n' % product_name)
-    fp.write('\t<key>CFBundleShortVersionString</key>\n')
-    fp.write('\t<string>%s.%s.%s</string>\n' % (version_major, version_minor, version_build))
-    fp.write('\t<key>NSPrincipalClass</key>\n')
-    fp.write('\t<string>NSApplication</string>\n')
-    fp.write('</dict>\n')
-    fp.write('</plist>\n')
-fp.flush()
+        template = string.Template(
+                '#include <windows.h>\n' \
+                '#pragma code_page(65001)\n' \
+                'VS_VERSION_INFO VERSIONINFO\n' \
+                '\tFILEVERSION ${major},${minor},${build},${subbuild}\n' \
+                '\tPRODUCTVERSION ${major},${minor},${build},${subbuild}\n' \
+                '\tFILEFLAGSMASK 0x3fL\n' \
+                '\tFILEFLAGS ${winfileflags}\n' \
+                '\tFILEOS VOS_NT_WINDOWS32\n' \
+                '\tFILETYPE VFT_APP\n' \
+                '\tFILESUBTYPE VFT2_UNKNOWN\n' \
+                'BEGIN\n' \
+                '\tBLOCK "StringFileInfo"\n' \
+                '\tBEGIN\n' \
+                '#ifdef UNICODE\n' \
+                '\t\tBLOCK "040904b0"\n' \
+                '#else\n' \
+                '\t\tBLOCK "040904E4"\n' \
+                '#endif\n' \
+                '\t\tBEGIN\n' \
+                '\t\t\tVALUE "Author", "${author}\\0"\n' \
+                '\t\t\tVALUE "Comments", "${comments}\\0"\n' \
+                '\t\t\tVALUE "CompanyName", "${company}\\0"\n' \
+                '\t\t\tVALUE "FileDescription", "${filedesc}\\0"\n' \
+                '\t\t\tVALUE "FileVersion", "${major}, ${minor}, ${build}, ${subbuild}\\0"\n' \
+                '\t\t\tVALUE "InternalName", "${internal}\\0"\n' \
+                '\t\t\tVALUE "LegalCopyright", "${copyright}\\0"\n' \
+                '\t\t\tVALUE "OriginalFilename", "${original}\\0"\n' \
+                '\t\t\tVALUE "ProductName", "${product}\\0"\n' \
+                '\t\t\tVALUE "ProductVersion", "${version}\\0"\n' \
+                '\t\tEND\n' \
+                '\tEND\n' \
+                '\tBLOCK "VarFileInfo"\n' \
+                '\tBEGIN\n' \
+                '#ifdef UNICODE\n' \
+                '\t\tVALUE "Translation", 0x409, 1200\n' \
+                '#else\n' \
+                '\t\tVALUE "Translation", 0x409, 1252\n' \
+                '#endif\n' \
+                '\tEND\n' \
+                'END\n' \
+                '#include "${resources}"\n')
+
+    internal = options.target + '_' + options.subtarget if options.target != options.subtarget else options.target
+    text = template.substitute(
+            version=verfull,
+            major=vermajor, minor=verminor, build='0', subbuild='0',
+            author='MAMEdev and contributors',
+            comments='Multi-purpose emulation framework',
+            company='MAMEdev',
+            filedesc='MAME',
+            internal=internal,
+            original=options.executable,
+            product=('MAME' if options.target == 'mame' else options.target),
+            rdns=('org.mamedev.' + internal),
+            copyright='\u00a9 1997-2023 MAMEdev and contributors',
+            winfileflags=('0x0L' if verbuild == '0' else 'VS_FF_PRERELEASE'),
+            resources=(options.resources or 'mame.rc'))
+
+    if options.o is not None:
+        try:
+            with io.open(options.o, 'w', encoding='utf-8') as out:
+                out.write(text)
+        except IOError as e:
+            sys.stderr.write("Error writing output file '%s': %s\n" % (options.o, e))
+            sys.exit(1)
+    else:
+        sys.stdout.write(text)

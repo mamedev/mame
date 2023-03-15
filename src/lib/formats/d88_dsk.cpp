@@ -29,12 +29,15 @@
  *
  */
 
-	#include <cassert>
-
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 #include "imageutl.h"
 
+#include "ioprocs.h"
+
+
 #define D88_HEADER_LEN 0x2b0
+
+#define SPOT_DUPLICATES 0
 
 struct d88_tag
 {
@@ -279,14 +282,15 @@ static void d88_get_header(floppy_image_legacy* floppy,uint32_t* size, uint8_t* 
 
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
-#ifdef SPOT_DUPLICATES
+	if(SPOT_DUPLICATES)
+	{
 		// there exist many .d88 files with same data and different headers and
 		// this allows to spot duplicates, making easier to debug softlists.
 		uint32_t temp_size = floppy_image_size(floppy);
-		uint8_t tmp_copy[temp_size - D88_HEADER_LEN];
-		floppy_image_read(floppy,tmp_copy,D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
-		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - D88_HEADER_LEN));
-#endif
+		auto tmp_copy = std::make_unique<uint8_t[]>(temp_size - D88_HEADER_LEN);
+		floppy_image_read(floppy,tmp_copy.get(),D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
+		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy.get(), temp_size - D88_HEADER_LEN));
+	}
 
 	if(prot)
 		*prot = header[0x1a];
@@ -414,24 +418,28 @@ const char *d88_format::extensions() const
 	return "d77,d88,1dd";
 }
 
-int d88_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int d88_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
-	uint8_t h[32];
+	uint64_t size;
+	if(io.length(size))
+		return 0;
 
-	io_generic_read(io, h, 0, 32);
+	uint8_t h[32];
+	size_t actual;
+	io.read_at(0, h, 32, actual);
 	if((little_endianize_int32(*(uint32_t *)(h+0x1c)) == size) &&
 		(h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
-		return 100;
+		return FIFID_SIZE|FIFID_STRUCT;
 
 	return 0;
 }
 
-bool d88_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
-	uint8_t h[32];
+	size_t actual;
 
-	io_generic_read(io, h, 0, 32);
+	uint8_t h[32];
+	io.read_at(0, h, 32, actual);
 
 	int cell_count = 0;
 	int track_count = 0;
@@ -477,9 +485,11 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		return false;
 
 	uint32_t track_pos[164];
-	io_generic_read(io, track_pos, 32, 164*4);
+	io.read_at(32, track_pos, 164*4, actual);
 
-	uint64_t file_size = io_generic_size(io);
+	uint64_t file_size;
+	if(io.length(file_size))
+		return false;
 
 	for(int track=0; track < track_count; track++)
 		for(int head=0; head < head_count; head++) {
@@ -496,7 +506,7 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 					return true;
 
 				uint8_t hs[16];
-				io_generic_read(io, hs, pos, 16);
+				io.read_at(pos, hs, 16, actual);
 				pos += 16;
 
 				uint16_t size = little_endianize_int16(*(uint16_t *)(hs+14));
@@ -521,7 +531,7 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;
-					io_generic_read(io, sects[i].data, pos, size);
+					io.read_at(pos, sects[i].data, size, actual);
 					pos += size;
 					sdatapos += size;
 
@@ -535,15 +545,9 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-
-bool d88_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
-{
-	return false;
-}
-
 bool d88_format::supports_save() const
 {
 	return false;
 }
 
-const floppy_format_type FLOPPY_D88_FORMAT = &floppy_image_format_creator<d88_format>;
+const d88_format FLOPPY_D88_FORMAT;

@@ -20,9 +20,10 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "dcp_dsk.h"
+
+#include "ioprocs.h"
+
 
 dcp_format::dcp_format()
 {
@@ -43,14 +44,18 @@ const char *dcp_format::extensions() const
 	return "dcp,dcu";
 }
 
-int dcp_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dcp_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return 0;
+
 	uint8_t h[0xa2];
 	int heads, tracks, spt, bps, count_tracks = 0;
 	bool is_hdb = false;
 
-	io_generic_read(io, h, 0, 0xa2);
+	size_t actual;
+	io.read_at(0, h, 0xa2, actual);
 
 	// First byte is the disk format (see below in load() for details)
 	switch (h[0])
@@ -103,22 +108,23 @@ int dcp_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 	// in theory track map should be enough (former check), but some images have it wrong!
 	// hence, if this check fails, we also allow for images with all tracks and wrong track map
 	if (size - 0xa2 == (heads * count_tracks * spt * bps) || size - 0xa2 == (heads * tracks * spt * bps))
-		return 100;
+		return FIFID_STRUCT|FIFID_SIZE;
 
 	// for disk type 0x11 the head 0 track 0 has 26 sectors of half width, so we need to compensate calculation
 	if (is_hdb && (size - 0xa2 + (0x80 * 26) == (heads * count_tracks * spt * bps) || size - 0xa2 + (0x80 * 26) == (heads * tracks * spt * bps)))
-		return 100;
+		return FIFID_STRUCT|FIFID_SIZE;
 
 	return 0;
 }
 
-bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
 {
+	size_t actual;
 	uint8_t h[0xa2];
 	int heads, tracks, spt, bps;
 	bool is_hdb = false;
 
-	io_generic_read(io, h, 0, 0xa2);
+	io.read_at(0, h, 0xa2, actual);
 
 	// First byte is the disk format:
 	switch (h[0])
@@ -215,7 +221,7 @@ bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		for (int track = 0; track < tracks; track++)
 			for (int head = 0; head < heads; head++)
 			{
-				io_generic_read(io, sect_data, 0xa2 + bps * spt * (track * heads + head), bps * spt);
+				io.read_at(0xa2 + bps * spt * (track * heads + head), sect_data, bps * spt, actual);
 
 				for (int i = 0; i < spt; i++)
 				{
@@ -235,7 +241,7 @@ bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	else    // FIXME: the code below is untested, because no image was found... there might be some silly mistake in the disk geometry!
 	{
 		// Read Head 0 Track 0 is FM with 26 sectors of 128bytes instead of 256
-		io_generic_read(io, sect_data, 0xa2, 128 * spt);
+		io.read_at(0xa2, sect_data, 128 * spt, actual);
 
 		for (int i = 0; i < spt; i++)
 		{
@@ -252,7 +258,7 @@ bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		build_pc_track_fm(0, 0, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, 128));
 
 		// Read Head 1 Track 0 is MFM with 26 sectors of 256bytes
-		io_generic_read(io, sect_data, 0xa2 + 128 * spt, bps * spt);
+		io.read_at(0xa2 + 128 * spt, sect_data, bps * spt, actual);
 
 		for (int i = 0; i < spt; i++)
 		{
@@ -273,7 +279,7 @@ bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 		for (int track = 1; track < tracks; track++)
 			for (int head = 0; head < heads; head++)
 			{
-				io_generic_read(io, sect_data, data_offs + bps * spt * ((track - 1) * heads + head), bps * spt);
+				io.read_at(data_offs + bps * spt * ((track - 1) * heads + head), sect_data, bps * spt, actual);
 
 				for (int i = 0; i < spt; i++)
 				{
@@ -299,4 +305,4 @@ bool dcp_format::supports_save() const
 	return false;
 }
 
-const floppy_format_type FLOPPY_DCP_FORMAT = &floppy_image_format_creator<dcp_format>;
+const dcp_format FLOPPY_DCP_FORMAT;

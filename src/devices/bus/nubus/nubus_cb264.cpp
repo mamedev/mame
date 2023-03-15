@@ -89,13 +89,13 @@ void nubus_cb264_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, CB264_ROM_REGION);
+	install_declaration_rom(CB264_ROM_REGION);
 
 	slotspace = get_slotspace();
 
 //  printf("[cb264 %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
 
 	nubus().install_device(slotspace+0xff6000, slotspace+0xff60ff, read32s_delegate(*this, FUNC(nubus_cb264_device::cb264_r)), write32s_delegate(*this, FUNC(nubus_cb264_device::cb264_w)));
@@ -113,7 +113,7 @@ void nubus_cb264_device::device_reset()
 	m_clutoffs = 0;
 	m_cb264_vbl_disable = 1;
 	m_cb264_mode = 0;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 	memset(m_palette, 0, sizeof(m_palette));
 }
 
@@ -130,6 +130,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		raise_slot_irq();
 	}
 
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
 	switch (m_cb264_mode)
 	{
 		case 0: // 1 bpp
@@ -138,7 +139,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/8; x++)
 				{
-					uint8_t const pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[pixels&0x80];
 					*scanline++ = m_palette[(pixels<<1)&0x80];
@@ -158,7 +159,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/4; x++)
 				{
-					uint8_t const pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[pixels&0xc0];
 					*scanline++ = m_palette[(pixels<<2)&0xc0];
@@ -174,7 +175,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/2; x++)
 				{
-					uint8_t const pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 
 					*scanline++ = m_palette[pixels&0xf0];
 					*scanline++ = m_palette[(pixels<<4)&0xf0];
@@ -188,7 +189,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				uint32_t *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640; x++)
 				{
-					uint8_t const pixels = m_vram[(y * 1024) + (BYTE4_XOR_BE(x))];
+					uint8_t const pixels = vram8[(y * 1024) + x];
 					*scanline++ = m_palette[pixels];
 				}
 			}
@@ -196,13 +197,9 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		case 4: // 24 bpp
 		case 7: // ???
+			for (int y = 0; y < 480; y++)
 			{
-				uint32_t const *const vram32 = (uint32_t *)&m_vram[0];
-
-				for (int y = 0; y < 480; y++)
-				{
-					std::copy_n(&vram32[y * 1024], 640, &bitmap.pix(y));
-				}
+				std::copy_n(&m_vram[y * 1024], 640, &bitmap.pix(y));
 			}
 			break;
 
@@ -218,7 +215,7 @@ void nubus_cb264_device::cb264_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	switch (offset)
 	{
 		case 0x4/4: // 0 = 1 bpp, 1 = 2bpp, 2 = 4bpp, 3 = 8bpp, 4 = 24bpp
-			m_cb264_mode = data;
+			m_cb264_mode = data & 0x7;
 			break;
 
 		case 0x14/4:    // VBL ack

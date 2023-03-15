@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// CD 90-015 - Floppy drive selectler built from a wd1770
+// CD 90-015 - Floppy disk interface built from a MC6843 single-density controller
 //
-// Handles up to two 5.25 dual-sided drives (DD 90-320)
+// Handles up to four 5.25 single-sided drives (UD 90-070). Formatted capacity is 80 KB.
+// The lack of a track zero sensor is confirmed from schematics.
 
 #include "emu.h"
 #include "cd90_015.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD90-015 floppy drive selectler")
+DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive controller")
 
 cd90_015_device::cd90_015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_015, tag, owner, clock),
@@ -32,8 +33,8 @@ void cd90_015_device::rom_map(address_map &map)
 
 void cd90_015_device::io_map(address_map &map)
 {
-	map(0, 7).m(m_fdc, FUNC(mc6843_device::map));
-	map(8, 9).rw(FUNC(cd90_015_device::motor_r), FUNC(cd90_015_device::select_w));
+	map(0x10, 0x17).m(m_fdc, FUNC(mc6843_device::map));
+	map(0x18, 0x19).rw(FUNC(cd90_015_device::motor_r), FUNC(cd90_015_device::select_w));
 }
 
 const tiny_rom_entry *cd90_015_device::device_rom_region() const
@@ -41,9 +42,37 @@ const tiny_rom_entry *cd90_015_device::device_rom_region() const
 	return ROM_NAME(cd90_015);
 }
 
+class ud90_070_device : public floppy_image_device {
+public:
+	ud90_070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual const char *image_interface() const noexcept override { return "floppy_5_25"; }
+
+protected:
+	virtual void setup_characteristics() override;
+};
+
+DEFINE_DEVICE_TYPE(UD90_070, ud90_070_device, "ud90_070", "Thomson UD 90-070 5.25\" single-sided disk drive")
+
+ud90_070_device::ud90_070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, UD90_070, tag, owner, clock)
+{
+}
+
+void ud90_070_device::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 1;
+	has_trk00_sensor = false;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+}
+
 void cd90_015_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("dd90_015", FLOPPY_525_SD);
+	device.option_add("ud90_070", UD90_070);
 }
 
 void cd90_015_device::floppy_formats(format_registration &fr)
@@ -53,23 +82,23 @@ void cd90_015_device::floppy_formats(format_registration &fr)
 
 void cd90_015_device::device_add_mconfig(machine_config &config)
 {
-	MC6843(config, m_fdc, 16_MHz_XTAL / 32); // Comes from the main board
+	MC6843(config, m_fdc, DERIVED_CLOCK(1, 2)); // Comes from the main board
 	m_fdc->force_ready();
-	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "dd90_015", floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "ud90_070", floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,    floppy_formats).enable_sound(true);
 }
 
-void cd90_015_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(cd90_015_device::motor_tick)
 {
-	m_floppy[id]->get_device()->mon_w(1);
+	m_floppy[param]->get_device()->mon_w(1);
 }
 
 void cd90_015_device::device_start()
 {
 	for(int i=0; i != 4; i++)
-		m_motor_timer[i] = timer_alloc(i);
+		m_motor_timer[i] = timer_alloc(FUNC(cd90_015_device::motor_tick), this);
 	save_item(NAME(m_select));
 }
 
@@ -101,7 +130,7 @@ void cd90_015_device::select_w(u8 data)
 		if(started & (1 << i)) {
 			if(m_floppy[i]->get_device()) {
 				m_floppy[i]->get_device()->mon_w(0);
-				m_motor_timer[i]->adjust(attotime::from_seconds(5));
+				m_motor_timer[i]->adjust(attotime::from_seconds(5), i);
 			}
 		}
 

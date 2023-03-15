@@ -2,8 +2,6 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    m6809.h
-
     Portable Motorola 6809 emulator
 
 **********************************************************************/
@@ -79,7 +77,7 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual bool is_6809() { return true; };
+	virtual bool is_6809() { return true; }
 
 	// addressing modes
 	enum
@@ -89,13 +87,6 @@ protected:
 		ADDRESSING_MODE_REGISTER_A  = 2,
 		ADDRESSING_MODE_REGISTER_B  = 3,
 		ADDRESSING_MODE_REGISTER_D = 4
-	};
-
-	// register transfer
-	struct exgtfr_register
-	{
-		uint8_t   byte_value;
-		uint16_t  word_value;
 	};
 
 	// flag bits in the cc register
@@ -164,13 +155,13 @@ protected:
 	M6809Q                      m_q;                // accumulator a and b (plus e and f on 6309)
 	PAIR16                      m_x, m_y;           // index registers
 	PAIR16                      m_u, m_s;           // stack pointers
-	uint8_t                       m_dp;               // direct page register
-	uint8_t                       m_cc;
+	uint8_t                     m_dp;               // direct page register
+	uint8_t                     m_cc;
 	PAIR16                      m_temp;
-	uint8_t                       m_opcode;
+	uint8_t                     m_opcode;
 
 	// other internal state
-	uint8_t *                     m_reg8;
+	uint8_t *                   m_reg8;
 	PAIR16 *                    m_reg16;
 	int                         m_reg;
 	bool                        m_nmi_line;
@@ -183,10 +174,10 @@ protected:
 	PAIR16                      m_ea;               // effective address
 
 	// Callbacks
-	devcb_write_line           m_lic_func;         // LIC pin on the 6809E
+	devcb_write_line            m_lic_func;         // LIC pin on the 6809E
 
 	// eat cycles
-	inline void eat(int cycles)                          { m_icount -= cycles; }
+	inline void eat(int cycles)                              { m_icount -= cycles; }
 	void eat_remaining();
 
 	// read a byte from given memory location
@@ -205,22 +196,22 @@ protected:
 	inline uint8_t read_opcode_arg(uint16_t address)         { eat(1); return m_mintf->read_opcode_arg(address); }
 
 	// read_opcode() and bump the program counter
-	inline uint8_t read_opcode()                           { return read_opcode(m_pc.w++); }
-	inline uint8_t read_opcode_arg()                       { return read_opcode_arg(m_pc.w++); }
-	inline void dummy_read_opcode_arg(uint16_t delta)      { read_opcode_arg(m_pc.w + delta); }
-	inline void dummy_vma(int count)                       { for(int i=0; i != count; i++) { read_opcode_arg(0xffff); } }
+	inline uint8_t read_opcode()                             { return read_opcode(m_pc.w++); }
+	inline uint8_t read_opcode_arg()                         { return read_opcode_arg(m_pc.w++); }
+	inline void dummy_read_opcode_arg(uint16_t delta)        { read_opcode_arg(m_pc.w + delta); }
+	inline void dummy_vma(int count)                         { for(int i=0; i != count; i++) { read_opcode_arg(0xffff); } }
 
 	// state stack - implemented as a uint32_t
-	void push_state(uint16_t state)                    { m_state = (m_state << 9) | state; }
-	uint16_t pop_state()                               { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
+	void push_state(uint16_t state)                 { m_state = (m_state << 9) | state; }
+	uint16_t pop_state()                            { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
 	void reset_state()                              { m_state = 0; }
 
 	// effective address reading/writing
-	uint8_t read_ea()                                 { return read_memory(m_ea.w); }
-	void write_ea(uint8_t data)                       { write_memory(m_ea.w, data); }
-	void set_ea(uint16_t ea)                          { m_ea.w = ea; m_addressing_mode = ADDRESSING_MODE_EA; }
-	void set_ea_h(uint8_t ea_h)                       { m_ea.b.h = ea_h; }
-	void set_ea_l(uint8_t ea_l)                       { m_ea.b.l = ea_l; m_addressing_mode = ADDRESSING_MODE_EA; }
+	uint8_t read_ea()                               { return read_memory(m_ea.w); }
+	void write_ea(uint8_t data)                     { write_memory(m_ea.w, data); }
+	void set_ea(uint16_t ea)                        { m_ea.w = ea; m_addressing_mode = ADDRESSING_MODE_EA; }
+	void set_ea_h(uint8_t ea_h)                     { m_ea.b.h = ea_h; }
+	void set_ea_l(uint8_t ea_l)                     { m_ea.b.l = ea_l; m_addressing_mode = ADDRESSING_MODE_EA; }
 
 	// operand reading/writing
 	uint8_t read_operand();
@@ -240,13 +231,13 @@ protected:
 	void set_b()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_B; }
 	void set_d()                                    { m_addressing_mode = ADDRESSING_MODE_REGISTER_D; }
 	void set_imm()                                  { m_addressing_mode = ADDRESSING_MODE_IMMEDIATE; }
-	void set_regop8(uint8_t &reg)                     { m_reg8 = &reg; m_reg16 = nullptr; }
+	void set_regop8(uint8_t &reg)                   { m_reg8 = &reg; m_reg16 = nullptr; }
 	void set_regop16(PAIR16 &reg)                   { m_reg16 = &reg; m_reg8 = nullptr; }
-	uint8_t &regop8()                                 { assert(m_reg8 != nullptr); return *m_reg8; }
+	uint8_t &regop8()                               { assert(m_reg8 != nullptr); return *m_reg8; }
 	PAIR16 &regop16()                               { assert(m_reg16 != nullptr); return *m_reg16; }
 	bool is_register_register_op_16_bit()           { return m_reg16 != nullptr; }
 	bool add8_sets_h()                              { return true; }
-	bool hd6309_native_mode()                       { return false; }
+	virtual bool hd6309_native_mode()               { return false; }
 
 	// index reg
 	uint16_t &ireg();
@@ -257,10 +248,10 @@ protected:
 
 	// branch conditions
 	inline bool cond_hi() { return !(m_cc & CC_ZC); }                                                // BHI/BLS
-	inline bool cond_cc() { return !(m_cc & CC_C);   }                                               // BCC/BCS
-	inline bool cond_ne() { return !(m_cc & CC_Z);   }                                               // BNE/BEQ
-	inline bool cond_vc() { return !(m_cc & CC_V);   }                                               // BVC/BVS
-	inline bool cond_pl() { return !(m_cc & CC_N);   }                                               // BPL/BMI
+	inline bool cond_cc() { return !(m_cc & CC_C); }                                                 // BCC/BCS
+	inline bool cond_ne() { return !(m_cc & CC_Z); }                                                 // BNE/BEQ
+	inline bool cond_vc() { return !(m_cc & CC_V); }                                                 // BVC/BVS
+	inline bool cond_pl() { return !(m_cc & CC_N); }                                                 // BPL/BMI
 	inline bool cond_ge() { return (m_cc & CC_N ? true : false) == (m_cc & CC_V ? true : false); }   // BGE/BLT
 	inline bool cond_gt() { return cond_ge() && !(m_cc & CC_Z); }                                    // BGT/BLE
 	inline void set_cond(bool cond)  { m_cond = cond; }
@@ -268,12 +259,13 @@ protected:
 
 	// interrupt registers
 	bool firq_saves_entire_state()      { return false; }
-	uint16_t partial_state_registers()    { return 0x81; }
-	uint16_t entire_state_registers()     { return 0xFF; }
+	uint16_t partial_state_registers()  { return 0x81; }
+	uint16_t entire_state_registers()   { return 0xFF; }
 
 	// miscellaneous
-	inline exgtfr_register read_exgtfr_register(uint8_t reg);
-	inline void write_exgtfr_register(uint8_t reg, exgtfr_register value);
+	inline uint16_t read_tfr_exg_816_register(uint8_t reg);
+	inline uint16_t read_exg_168_register(uint8_t reg);
+	inline void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
 	uint16_t get_pending_interrupt();

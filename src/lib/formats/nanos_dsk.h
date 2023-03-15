@@ -26,6 +26,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_NANOS_FORMAT;
+extern const nanos_format FLOPPY_NANOS_FORMAT;
 
 #endif // MAME_FORMATS_NANOS_DSK_H

@@ -52,12 +52,12 @@ void device_electron_cart_interface::rom_alloc(uint32_t size, const char *tag)
 	{
 		if (size <= 0x8000)
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), 0x8000, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), 0x8000, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = 0x8000;
 		}
 		else
 		{
-			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+			m_rom = device().machine().memory().region_alloc(std::string(tag).append(ELECTRON_CART_ROM_REGION_TAG), size, 1, ENDIANNESS_LITTLE)->base();
 			m_rom_size = size;
 		}
 	}
@@ -91,7 +91,7 @@ void device_electron_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 electron_cartslot_device::electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_electron_cart_interface>(mconfig, *this),
 	m_cart(nullptr),
 	m_irq_handler(*this),
@@ -132,7 +132,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if (size % 0x2000)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -152,7 +152,7 @@ image_init_result electron_cartslot_device::call_load()
 
 			if ((upsize % 0x2000 && upsize != 0) || (losize % 0x2000 && losize != 0) || (romsize % 0x2000 && romsize != 0))
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+				seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 				return image_init_result::FAIL;
 			}
 
@@ -261,6 +261,7 @@ void electron_cartslot_device::write(offs_t offset, uint8_t data, int infc, int 
 #include "aqr.h"
 #include "click.h"
 #include "cumana.h"
+#include "elksdp1.h"
 #include "mgc.h"
 #include "peg400.h"
 //#include "pmse2p.h"
@@ -283,6 +284,7 @@ void electron_cart(device_slot_interface &device)
 	device.option_add_internal("aqr", ELECTRON_AQR);
 	device.option_add_internal("click", ELECTRON_CLICK);
 	device.option_add_internal("cumana", ELECTRON_CUMANA);
+	device.option_add_internal("elksdp1", ELECTRON_ELKSDP1);
 	device.option_add_internal("mgc", ELECTRON_MGC);
 	device.option_add_internal("peg400", ELECTRON_PEG400);
 	//device.option_add_internal("pmse2p", ELECTRON_PMSE2P);

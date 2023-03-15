@@ -62,7 +62,7 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
-		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
+		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
 		m_write_irq(*this),
 		m_write_lh(*this),
 		m_write_rh(*this),
@@ -83,10 +83,10 @@ void dave_device::device_start()
 	m_write_rh.resolve_safe();
 
 	// allocate timers
-	m_timer_1hz = timer_alloc(TIMER_1HZ);
+	m_timer_1hz = timer_alloc(FUNC(dave_device::update_1hz_timer), this);
 	m_timer_1hz->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 
-	m_timer_50hz = timer_alloc(TIMER_50HZ);
+	m_timer_50hz = timer_alloc(FUNC(dave_device::update_50hz_timer), this);
 	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
 
 	// state saving
@@ -146,27 +146,30 @@ void dave_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  update_1hz_timer -
 //-------------------------------------------------
 
-void dave_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(dave_device::update_1hz_timer)
 {
-	switch (id)
-	{
-	case TIMER_1HZ:
-		m_irq_status ^= IRQ_1HZ_DIVIDER;
+	m_irq_status ^= IRQ_1HZ_DIVIDER;
 
-		if (m_irq_status & IRQ_1HZ_DIVIDER)
-			m_irq_status |= IRQ_1HZ_LATCH;
-		break;
+	if (m_irq_status & IRQ_1HZ_DIVIDER)
+		m_irq_status |= IRQ_1HZ_LATCH;
 
-	case TIMER_50HZ:
-		m_irq_status ^= IRQ_50HZ_DIVIDER;
+	update_interrupt();
+}
 
-		if (m_irq_status & IRQ_50HZ_DIVIDER)
-			m_irq_status |= IRQ_50HZ_LATCH;
-		break;
-	}
+
+//-------------------------------------------------
+//  update_50hz_timer -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(dave_device::update_50hz_timer)
+{
+	m_irq_status ^= IRQ_50HZ_DIVIDER;
+
+	if (m_irq_status & IRQ_50HZ_DIVIDER)
+		m_irq_status |= IRQ_50HZ_LATCH;
 
 	update_interrupt();
 }

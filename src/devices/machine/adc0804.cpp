@@ -118,7 +118,7 @@ void adc0804_device::device_start()
 		m_fclk_rc = attotime::from_double(m_res * m_cap / 1.1);
 
 	// create timer
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adc0804_device::conversion_done), this));
+	m_timer = timer_alloc(FUNC(adc0804_device::conversion_done), this);
 
 	// save state
 	if (m_rd_mode == RD_BITBANGED)

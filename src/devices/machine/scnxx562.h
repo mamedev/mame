@@ -152,13 +152,16 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
+
+	TIMER_CALLBACK_MEMBER(check_zero_detect);
+	TIMER_CALLBACK_MEMBER(rtxc_tick);
+	TIMER_CALLBACK_MEMBER(trxc_tick);
 
 	int m_rxc;
 	int m_txc;
@@ -435,13 +438,6 @@ protected:
 		REG_CTCR_TIM_OC         = 0x20,
 	};
 
-	enum
-	{
-		TIMER_ID,
-		TIMER_ID_RTXC,
-		TIMER_ID_TRXC
-	};
-
 	uint16_t m_brg_rx_rate;
 	uint16_t m_brg_tx_rate;
 	uint16_t m_brg_const;
@@ -602,7 +598,9 @@ protected:
 	void check_interrupts();
 	void reset_interrupts();
 	uint8_t modify_vector(uint8_t vect, int i, uint8_t src);
+	int interrupt_priority(int index, int state);
 	void trigger_interrupt(int index, int state);
+	void clear_interrupt(int index, int state);
 	int get_channel_index(duscc_channel *ch) const { return (ch == m_chanA) ? 0 : 1; }
 
 	// Variants in the DUSCC family

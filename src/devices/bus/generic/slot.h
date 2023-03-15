@@ -5,14 +5,25 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 #include <cassert>
 
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
+
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class device_generic_cart_interface : public device_interface
 {
@@ -50,6 +61,38 @@ public:
 			remain ^= chunk;
 			start ^= chunk;
 		}
+	}
+
+	// TODO: find a better home for this helper
+	template <typename T, typename U>
+	static T map_non_power_of_two(T count, U &&map)
+	{
+		if (T(0) >= count)
+			return T(0);
+
+		T const max(count - 1);
+		T mask(max);
+		for (unsigned i = 1; (sizeof(T) * 8) > i; i <<= 1)
+			mask = T(std::make_unsigned_t<T>(mask) | (std::make_unsigned_t<T>(mask) >> i));
+		int bits(0);
+		while (BIT(mask, bits))
+			++bits;
+
+		for (T entry = T(0); mask >= entry; ++entry)
+		{
+			T mapped(entry);
+			int b(bits - 1);
+			while (max < mapped)
+			{
+				while (BIT(max, b))
+					--b;
+				assert(0 <= b);
+				mapped = T(std::make_unsigned_t<T>(mapped) & ~(std::make_unsigned_t<T>(1) << b--));
+			}
+			map(entry, mapped);
+		}
+
+		return mask;
 	}
 
 	// construction/destruction
@@ -102,10 +145,13 @@ enum
 
 
 class generic_slot_device : public device_t,
-								public device_image_interface,
+								public device_rom_image_interface,
 								public device_single_card_slot_interface<device_generic_cart_interface>
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	virtual ~generic_slot_device();
 
 	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
@@ -114,18 +160,12 @@ public:
 	void set_interface(char const *interface) { m_interface = interface; }
 	void set_default_card(char const *def) { m_default_card = def; }
 	void set_extensions(char const *exts) { m_extensions = exts; }
-	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; } // default false
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
 
 	// device_image_interface implementation
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return m_interface; }
 	virtual char const *file_extensions() const noexcept override { return m_extensions; }
@@ -175,13 +215,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	// device_image_interface implementation
-	virtual software_list_loader const &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
 	char const *m_interface;
 	char const *m_default_card;
 	char const *m_extensions;
-	bool m_must_be_loaded;
 	int m_width;
 	endianness_t m_endianness;
 	device_generic_cart_interface *m_cart;
@@ -205,7 +241,8 @@ public:
 
 	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+	virtual const char *image_type_name() const noexcept override { return "romimage"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "rom"; }
 };
 
 class generic_cartslot_device : public generic_slot_device
@@ -224,7 +261,8 @@ public:
 
 	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual const char *image_type_name() const noexcept override { return "cartridge"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "cart"; }
 };
 
 

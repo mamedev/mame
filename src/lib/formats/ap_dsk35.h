@@ -14,24 +14,14 @@
 
 #include "flopimg.h"
 
-void sony_filltrack(uint8_t *buffer, size_t buffer_len, size_t *pos, uint8_t data);
-uint8_t sony_fetchtrack(const uint8_t *buffer, size_t buffer_len, size_t *pos);
-
-int apple35_sectors_per_track(floppy_image_legacy *image, int track);
-
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_mac);
-LEGACY_FLOPPY_OPTIONS_EXTERN(apple35_iigs);
-
 class dc42_format : public floppy_image_format_t
 {
 public:
 	dc42_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -39,19 +29,19 @@ public:
 	virtual bool supports_save() const override;
 
 private:
-	void update_chk(const uint8_t *data, int size, uint32_t &chk);
+	static void update_chk(const uint8_t *data, int size, uint32_t &chk);
 };
 
-extern const floppy_format_type FLOPPY_DC42_FORMAT;
+extern const dc42_format FLOPPY_DC42_FORMAT;
 
 class apple_gcr_format : public floppy_image_format_t
 {
 public:
 	apple_gcr_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -59,16 +49,16 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_APPLE_GCR_FORMAT;
+extern const apple_gcr_format FLOPPY_APPLE_GCR_FORMAT;
 
 class apple_2mg_format : public floppy_image_format_t
 {
 public:
 	apple_2mg_format();
 
-	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
-	virtual bool load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) override;
-	virtual bool save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image) override;
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	virtual const char *name() const override;
 	virtual const char *description() const override;
@@ -76,6 +66,6 @@ public:
 	virtual bool supports_save() const override;
 };
 
-extern const floppy_format_type FLOPPY_APPLE_2MG_FORMAT;
+extern const apple_2mg_format FLOPPY_APPLE_2MG_FORMAT;
 
 #endif // MAME_FORMATS_AP_DSK35_H

@@ -8,11 +8,12 @@
 
 *********************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cassert>
 #include "formats/vt_dsk_legacy.h"
 #include "formats/basicdsk.h"
+
+#include "opresolv.h"
+
+#include <cstring>
 
 static FLOPPY_IDENTIFY(vz_identify)
 {

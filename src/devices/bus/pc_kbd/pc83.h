@@ -41,8 +41,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { };
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { };
+	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { }
+	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { }
 
 private:
 	void bus_w(uint8_t data);

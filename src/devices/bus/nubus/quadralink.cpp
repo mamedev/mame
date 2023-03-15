@@ -106,7 +106,7 @@ void nubus_quadralink_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, QUADRALINK_ROM_REGION);
+	install_declaration_rom(QUADRALINK_ROM_REGION);
 
 	slotspace = get_slotspace();
 

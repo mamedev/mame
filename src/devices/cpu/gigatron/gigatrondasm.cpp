@@ -51,6 +51,8 @@ offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		util::stream_format(stream, "%-5s", s_jumps[(inst & 0x1c00) >> 10]);
 		if ((inst & 0x1c00) == 0)
 			stream << "y,";
+		else if (inst < 0xfc00)
+			flags = STEP_COND | step_over_extra(1);
 
 		switch (inst & 0x0300)
 		{
@@ -73,8 +75,6 @@ offs_t gigatron_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			stream << "in";
 			break;
 		}
-
-		flags = STEP_OVER | step_over_extra(1);
 	}
 	else if ((inst & 0xf300) == 0x0200)
 		stream << "nop";

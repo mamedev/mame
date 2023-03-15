@@ -49,6 +49,7 @@ DEFINE_DEVICE_TYPE(MM58274C, mm58274c_device, "mm58274c", "National Semiconducto
 
 mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MM58274C, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
 	, m_mode24(0)
 	, m_day1(0)
 {
@@ -61,9 +62,12 @@ mm58274c_device::mm58274c_device(const machine_config &mconfig, const char *tag,
 
 void mm58274c_device::device_start()
 {
-	m_increment_rtc = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58274c_device::rtc_increment_cb),this));
+	m_increment_rtc = timer_alloc(FUNC(mm58274c_device::rtc_increment_cb), this);
 	m_increment_rtc->adjust(attotime::zero, 0, attotime::from_msec(100));
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58274c_device::rtc_interrupt_cb),this));
+	m_interrupt_timer = timer_alloc(FUNC(mm58274c_device::rtc_interrupt_cb), this);
+
+	m_status = 0;
+	m_control = 0;
 
 	// register for state saving
 	save_item(NAME(m_mode24));
@@ -90,48 +94,41 @@ void mm58274c_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  rtc_clock_updated - update clock with real time
 //-------------------------------------------------
 
-void mm58274c_device::device_reset()
+void mm58274c_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	system_time systime;
-
-	/* get the current date/time from the core */
-	machine().current_datetime(systime);
-
-	m_clk_set = systime.local_time.year & 3 << 2;
+	m_clk_set = (year & 3) << 2;
 	if (m_mode24)
 		m_clk_set |= clk_set_24;
 
 	/* The clock count starts on 1st January 1900 */
-	m_wday = 1 + ((systime.local_time.weekday - m_day1) % 7);
-	m_years1 = (systime.local_time.year / 10) % 10;
-	m_years2 = systime.local_time.year % 10;
-	m_months1 = (systime.local_time.month + 1) / 10;
-	m_months2 = (systime.local_time.month + 1) % 10;
-	m_days1 = systime.local_time.mday / 10;
-	m_days2 = systime.local_time.mday % 10;
+	m_wday = 1 + ((day_of_week - 1 - m_day1 + 7) % 7);
+	m_years1 = (year / 10) % 10;
+	m_years2 = year % 10;
+	m_months1 = month / 10;
+	m_months2 = month % 10;
+	m_days1 = day / 10;
+	m_days2 = day % 10;
 	if (!m_mode24)
 	{
 		/* 12-hour mode */
-		if (systime.local_time.hour > 12)
+		if (hour > 12)
 		{
-			systime.local_time.hour -= 12;
+			hour -= 12;
 			m_clk_set |= clk_set_pm;
 		}
-		if (systime.local_time.hour == 0)
-			systime.local_time.hour = 12;
+		if (hour == 0)
+			hour = 12;
 	}
-	m_hours1 = systime.local_time.hour / 10;
-	m_hours2 = systime.local_time.hour % 10;
-	m_minutes1 = systime.local_time.minute / 10;
-	m_minutes2 = systime.local_time.minute % 10;
-	m_seconds1 = systime.local_time.second / 10;
-	m_seconds2 = systime.local_time.second % 10;
+	m_hours1 = hour / 10;
+	m_hours2 = hour % 10;
+	m_minutes1 = minute / 10;
+	m_minutes2 = minute % 10;
+	m_seconds1 = second / 10;
+	m_seconds2 = second % 10;
 	m_tenths = 0;
-	m_status = 0;
-	m_control = 0;
 }
 
 
@@ -162,7 +159,8 @@ uint8_t mm58274c_device::read(offs_t offset)
 	{
 		case 0x00:   /* Control Register */
 			reply = m_status;
-			m_status = 0;
+			if (!machine().side_effects_disabled())
+				m_status = 0;
 			break;
 
 		case 0x01:   /* Tenths of Seconds */

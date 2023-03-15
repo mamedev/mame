@@ -80,8 +80,6 @@
 #include "dsp16core.ipp"
 #include "dsp16rc.h"
 
-#include "debugger.h"
-
 #include <functional>
 #include <limits>
 
@@ -442,7 +440,7 @@ void dsp16_device_base::execute_set_input(int inputnum, int state)
 			m_ick_in = (ASSERT_LINE == state) ? 1U : 0U;
 		}
 		if (CLEAR_LINE != state)
-			standard_irq_callback(DSP16_ICK_LINE);
+			standard_irq_callback(DSP16_ICK_LINE, m_st_pcbase);
 		break;
 	case DSP16_ILD_LINE:
 		if (sio_ild_active())
@@ -464,7 +462,7 @@ void dsp16_device_base::execute_set_input(int inputnum, int state)
 			m_ock_in = (ASSERT_LINE == state) ? 1U : 0U;
 		}
 		if (CLEAR_LINE != state)
-			standard_irq_callback(DSP16_OCK_LINE);
+			standard_irq_callback(DSP16_OCK_LINE, m_st_pcbase);
 		break;
 	case DSP16_OLD_LINE:
 		if (sio_old_active())
@@ -720,7 +718,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 				{
 					LOGINT("DSP16: asserting IACK (PC = %04X)\n", m_st_pcbase);
 					m_iack_cb(m_iack_out = 0U);
-					standard_irq_callback(DSP16_INT_LINE);
+					standard_irq_callback(DSP16_INT_LINE, m_st_pcbase);
 				}
 				break;
 			case FLAGS_IACK_CLEAR:
@@ -1778,7 +1776,7 @@ s64 dsp16_device_base::dau_saturate(u16 a) const
 	if (m_core->dau_auc_sat(a))
 		return m_core->dau_a[a];
 	else
-		return std::min<s64>(std::max<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
+		return std::clamp<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min(), std::numeric_limits<s32>::max());
 }
 
 inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)

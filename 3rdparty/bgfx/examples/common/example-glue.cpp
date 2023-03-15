@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "imgui/imgui.h"
@@ -35,9 +35,9 @@ struct SampleData
 		m_values[m_offset] = value;
 		m_offset = (m_offset+1) % kNumSamples;
 
-		float min =  bx::kFloatMax;
-		float max = -bx::kFloatMax;
-		float avg =  0.0f;
+		float min = bx::max<float>();
+		float max = bx::min<float>();
+		float avg = 0.0f;
 
 		for (uint32_t ii = 0; ii < kNumSamples; ++ii)
 		{
@@ -81,11 +81,11 @@ static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _col
 
 	bool itemHovered = false;
 
-	ImGui::Button("", ImVec2(_width, _height) );
+	ImGui::Button("##", ImVec2(_width, _height) );
 	itemHovered |= ImGui::IsItemHovered();
 
 	ImGui::SameLine();
-	ImGui::InvisibleButton("", ImVec2(bx::max(1.0f, _maxWidth-_width), _height) );
+	ImGui::InvisibleButton("##", ImVec2(bx::max(1.0f, _maxWidth-_width), _height) );
 	itemHovered |= ImGui::IsItemHovered();
 
 	ImGui::PopStyleVar(2);
@@ -150,9 +150,7 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 		}
 		else if (ImGui::IsItemHovered() )
 		{
-			char tmp[1024];
-			bx::snprintf(tmp, BX_COUNTOF(tmp), "Documentation: %.*s", url.getLength(), url.getPtr() );
-			ImGui::SetTooltip(tmp);
+			ImGui::SetTooltip("Documentation: %.*s", url.getLength(), url.getPtr() );
 		}
 	}
 
@@ -393,9 +391,10 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 						const double toGpuMs = 1000.0/double(stats->gpuTimerFreq);
 						const float  scale   = 3.0f;
 
-						if (ImGui::ListBoxHeader("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
+						if (ImGui::BeginListBox("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper(stats->numEncoders, itemHeight);
+							ImGuiListClipper clipper;
+							clipper.Begin(stats->numEncoders, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -420,14 +419,15 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 								}
 							}
 
-							ImGui::ListBoxFooter();
+							ImGui::EndListBox();
 						}
 
 						ImGui::Separator();
 
-						if (ImGui::ListBoxHeader("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
+						if (ImGui::BeginListBox("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
 						{
-							ImGuiListClipper clipper(stats->numViews, itemHeight);
+							ImGuiListClipper clipper;
+							clipper.Begin(stats->numViews, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -466,7 +466,7 @@ void showExampleDialog(entry::AppI* _app, const char* _errorText)
 								}
 							}
 
-							ImGui::ListBoxFooter();
+							ImGui::EndListBox();
 						}
 
 						ImGui::PopFont();

@@ -20,17 +20,16 @@ DEFINE_DEVICE_TYPE(VCS_PADDLES, vcs_paddles_device, "vcs_paddles", "Atari / CBM 
 
 static INPUT_PORTS_START( vcs_paddles )
 	PORT_START("JOY")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // pin 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // pin 4
 	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("POTX")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 5
 
 	PORT_START("POTY")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(2) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(2) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255) PORT_REVERSE // pin 9
 INPUT_PORTS_END
-
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -56,7 +55,8 @@ vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
 	m_potx(*this, "POTX"),
-	m_poty(*this, "POTY")
+	m_poty(*this, "POTY"),
+	m_reverse_players(false)
 {
 }
 
@@ -76,7 +76,8 @@ void vcs_paddles_device::device_start()
 
 uint8_t vcs_paddles_device::vcs_joy_r()
 {
-	return m_joy->read();
+	uint8_t const data = m_joy->read();
+	return m_reverse_players ? bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0) : data;
 }
 
 
@@ -86,7 +87,7 @@ uint8_t vcs_paddles_device::vcs_joy_r()
 
 uint8_t vcs_paddles_device::vcs_pot_x_r()
 {
-	return m_potx->read();
+	return m_reverse_players ? m_poty->read() : m_potx->read();
 }
 
 
@@ -96,5 +97,5 @@ uint8_t vcs_paddles_device::vcs_pot_x_r()
 
 uint8_t vcs_paddles_device::vcs_pot_y_r()
 {
-	return m_poty->read();
+	return m_reverse_players ? m_potx->read() : m_poty->read();
 }

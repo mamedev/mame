@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #ifndef BGFX_RENDERER_H_HEADER_GUARD
@@ -100,8 +100,8 @@ namespace bgfx
 			for (uint32_t ii = 0, num = _program.m_numPredefined; ii < num; ++ii)
 			{
 				const PredefinedUniform& predefined = _program.m_predefined[ii];
-				uint8_t flags = predefined.m_type&BGFX_UNIFORM_FRAGMENTBIT;
-				switch (predefined.m_type&(~BGFX_UNIFORM_FRAGMENTBIT) )
+				uint8_t flags = predefined.m_type&kUniformFragmentBit;
+				switch (predefined.m_type&(~kUniformFragmentBit) )
 				{
 				case PredefinedUniform::ViewRect:
 					{
@@ -232,7 +232,7 @@ namespace bgfx
 					{
 						Matrix4 modelView;
 						const Matrix4& model = frameCache.m_matrixCache.m_cache[_draw.m_startMatrix];
-						bx::float4x4_mul(&modelView.un.f4x4
+						bx::model4x4_mul(&modelView.un.f4x4
 							, &model.un.f4x4
 							, &m_view[_view].un.f4x4
 							);
@@ -248,7 +248,7 @@ namespace bgfx
 					{
 						Matrix4 modelViewProj;
 						const Matrix4& model = frameCache.m_matrixCache.m_cache[_draw.m_startMatrix];
-						bx::float4x4_mul(&modelViewProj.un.f4x4
+						bx::model4x4_mul_viewproj4x4(&modelViewProj.un.f4x4
 							, &model.un.f4x4
 							, &m_viewProj[_view].un.f4x4
 							);
@@ -271,7 +271,7 @@ namespace bgfx
 					break;
 
 				default:
-					BX_CHECK(false, "predefined %d not handled", predefined.m_type);
+					BX_ASSERT(false, "predefined %d not handled", predefined.m_type);
 					break;
 				}
 			}
@@ -304,7 +304,7 @@ namespace bgfx
 				handle = m_alloc.alloc();
 			}
 
-			BX_CHECK(UINT16_MAX != handle, "Failed to find handle.");
+			BX_ASSERT(UINT16_MAX != handle, "Failed to find handle.");
 
 			Data& data = m_data[handle];
 			data.m_hash   = _key;
@@ -312,7 +312,7 @@ namespace bgfx
 			data.m_parent = _parent;
 			m_hashMap.insert(stl::make_pair(_key, handle) );
 
-			return &m_data[handle].m_value;
+			return bx::addressOf(m_data[handle].m_value);
 		}
 
 		Ty* find(uint64_t _key)
@@ -322,7 +322,7 @@ namespace bgfx
 			{
 				uint16_t handle = it->second;
 				m_alloc.touch(handle);
-				return &m_data[handle].m_value;
+				return bx::addressOf(m_data[handle].m_value);
 			}
 
 			return NULL;
@@ -501,7 +501,7 @@ namespace bgfx
 				ViewStats& viewStats = m_frame->m_perfStats.viewStats[m_numViews];
 				viewStats.cpuTimeBegin = bx::getHPCounter();
 
-				m_queryIdx = m_gpuTimer.begin(_view);
+				m_queryIdx = m_gpuTimer.begin(_view, m_frame->m_frameNum);
 
 				viewStats.view = ViewId(_view);
 				bx::strCopy(viewStats.name
@@ -524,6 +524,7 @@ namespace bgfx
 				viewStats.cpuTimeEnd = bx::getHPCounter();
 				viewStats.gpuTimeBegin = result.m_begin;
 				viewStats.gpuTimeEnd = result.m_end;
+				viewStats.gpuFrameNum = result.m_frameNum;
 
 				++m_numViews;
 				m_queryIdx = UINT32_MAX;

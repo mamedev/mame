@@ -78,9 +78,16 @@ class ComputeRegisterLiveness {
   //   - Second, walk loop forest to propagate registers crossing back-edges
   //   (add iterative values into the liveness set).
   void Compute() {
-    cfg_.ForEachBlockInPostOrder(&*function_->begin(), [this](BasicBlock* bb) {
-      ComputePartialLiveness(bb);
-    });
+    for (BasicBlock& start_bb : *function_) {
+      if (reg_pressure_->Get(start_bb.id()) != nullptr) {
+        continue;
+      }
+      cfg_.ForEachBlockInPostOrder(&start_bb, [this](BasicBlock* bb) {
+        if (reg_pressure_->Get(bb->id()) == nullptr) {
+          ComputePartialLiveness(bb);
+        }
+      });
+    }
     DoLoopLivenessUnification();
     EvaluateRegisterRequirements();
   }
@@ -156,7 +163,7 @@ class ComputeRegisterLiveness {
 
   // Propagates the register liveness information of each loop iterators.
   void DoLoopLivenessUnification() {
-    for (const Loop* loop : *loop_desc_.GetDummyRootLoop()) {
+    for (const Loop* loop : *loop_desc_.GetPlaceholderRootLoop()) {
       DoLoopLivenessUnification(*loop);
     }
   }
@@ -371,7 +378,7 @@ void RegisterLiveness::SimulateFusion(
   // The loop fusion is injecting the l1 before the l2, the latch of l1 will be
   // connected to the header of l2.
   // To compute the register usage, we inject the loop live-in (union of l1 and
-  // l2 live-in header blocks) into the the live in/out of each basic block of
+  // l2 live-in header blocks) into the live in/out of each basic block of
   // l1 to get the peak register usage. We then repeat the operation to for l2
   // basic blocks but in this case we inject the live-out of the latch of l1.
   auto live_loop = MakeFilterIteratorRange(

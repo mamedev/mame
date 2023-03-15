@@ -39,6 +39,14 @@ const thomson_525_format::format thomson_525_format::formats[] = {
 		1, {},
 		31, 22, 44
 	},
+	{
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
+		2000,
+		16, 40, 2,
+		256, {},
+		1, {},
+		31, 22, 44
+	},
 	{}
 };
 
@@ -82,5 +90,5 @@ const thomson_35_format::format thomson_35_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_THOMSON_525_FORMAT = &floppy_image_format_creator<thomson_525_format>;
-const floppy_format_type FLOPPY_THOMSON_35_FORMAT = &floppy_image_format_creator<thomson_35_format>;
+const thomson_525_format FLOPPY_THOMSON_525_FORMAT;
+const thomson_35_format FLOPPY_THOMSON_35_FORMAT;

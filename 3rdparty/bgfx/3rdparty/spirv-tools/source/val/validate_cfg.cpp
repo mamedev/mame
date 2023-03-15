@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "source/val/validate.h"
-
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -29,11 +27,13 @@
 
 #include "source/cfa.h"
 #include "source/opcode.h"
+#include "source/spirv_constant.h"
 #include "source/spirv_target_env.h"
 #include "source/spirv_validator_options.h"
 #include "source/val/basic_block.h"
 #include "source/val/construct.h"
 #include "source/val/function.h"
+#include "source/val/validate.h"
 #include "source/val/validation_state.h"
 
 namespace spvtools {
@@ -49,17 +49,30 @@ spv_result_t ValidatePhi(ValidationState_t& _, const Instruction* inst) {
               "basic blocks.";
   }
 
-  const Instruction* type_inst = _.FindDef(inst->type_id());
-  assert(type_inst);
-
-  const SpvOp type_opcode = type_inst->opcode();
-  if (type_opcode == SpvOpTypePointer &&
+  if (_.IsVoidType(inst->type_id())) {
+    return _.diag(SPV_ERROR_INVALID_DATA, inst)
+           << "OpPhi must not have void result type";
+  }
+  if (_.IsPointerType(inst->type_id()) &&
       _.addressing_model() == SpvAddressingModelLogical) {
-    if (!_.features().variable_pointers &&
-        !_.features().variable_pointers_storage_buffer) {
+    if (!_.features().variable_pointers) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << "Using pointers with OpPhi requires capability "
              << "VariablePointers or VariablePointersStorageBuffer";
+    }
+  }
+
+  const Instruction* type_inst = _.FindDef(inst->type_id());
+  assert(type_inst);
+  const SpvOp type_opcode = type_inst->opcode();
+
+  if (!_.options()->before_hlsl_legalization &&
+      !_.HasCapability(SpvCapabilityBindlessTextureNV)) {
+    if (type_opcode == SpvOpTypeSampledImage ||
+        (_.HasCapability(SpvCapabilityShader) &&
+         (type_opcode == SpvOpTypeImage || type_opcode == SpvOpTypeSampler))) {
+      return _.diag(SPV_ERROR_INVALID_ID, inst)
+             << "Result type cannot be Op" << spvOpcodeString(type_opcode);
     }
   }
 
@@ -80,6 +93,8 @@ spv_result_t ValidatePhi(ValidationState_t& _, const Instruction* inst) {
            << ") does not match block's predecessor count ("
            << block->predecessors()->size() << ").";
   }
+
+  std::unordered_set<uint32_t> observed_predecessors;
 
   for (size_t i = 3; i < inst->words().size(); ++i) {
     auto inc_id = inst->word(i);
@@ -107,6 +122,17 @@ spv_result_t ValidatePhi(ValidationState_t& _, const Instruction* inst) {
                << " is not a predecessor of <id> " << _.getIdName(block->id())
                << ".";
       }
+
+      // We must not have already seen this predecessor as one of the phi's
+      // operands.
+      if (observed_predecessors.count(inc_id) != 0) {
+        return _.diag(SPV_ERROR_INVALID_ID, inst)
+               << "OpPhi references incoming basic block <id> "
+               << _.getIdName(inc_id) << " multiple times.";
+      }
+
+      // Note the fact that we have now observed this predecessor.
+      observed_predecessors.insert(inc_id);
     }
   }
 
@@ -166,6 +192,12 @@ spv_result_t ValidateBranchConditional(ValidationState_t& _,
               "ID of an OpLabel instruction";
   }
 
+  if (_.version() >= SPV_SPIRV_VERSION_WORD(1, 6) && true_id == false_id) {
+    return _.diag(SPV_ERROR_INVALID_ID, inst)
+           << "In SPIR-V 1.6 or later, True Label and False Label must be "
+              "different labels";
+  }
+
   return SPV_SUCCESS;
 }
 
@@ -173,6 +205,18 @@ spv_result_t ValidateSwitch(ValidationState_t& _, const Instruction* inst) {
   const auto num_operands = inst->operands().size();
   // At least two operands (selector, default), any more than that are
   // literal/target.
+
+  const auto sel_type_id = _.GetOperandTypeId(inst, 0);
+  if (!_.IsIntScalarType(sel_type_id)) {
+    return _.diag(SPV_ERROR_INVALID_ID, inst)
+           << "Selector type must be OpTypeInt";
+  }
+
+  const auto default_label = _.FindDef(inst->GetOperandAs<uint32_t>(1));
+  if (default_label->opcode() != SpvOpLabel) {
+    return _.diag(SPV_ERROR_INVALID_ID, inst)
+           << "Default must be an OpLabel instruction";
+  }
 
   // target operands must be OpLabel
   for (size_t i = 2; i < num_operands; i += 2) {
@@ -195,27 +239,23 @@ spv_result_t ValidateReturnValue(ValidationState_t& _,
   const auto value = _.FindDef(value_id);
   if (!value || !value->type_id()) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
-           << "OpReturnValue Value <id> '" << _.getIdName(value_id)
-           << "' does not represent a value.";
+           << "OpReturnValue Value <id> " << _.getIdName(value_id)
+           << " does not represent a value.";
   }
   auto value_type = _.FindDef(value->type_id());
   if (!value_type || SpvOpTypeVoid == value_type->opcode()) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
-           << "OpReturnValue value's type <id> '"
-           << _.getIdName(value->type_id()) << "' is missing or void.";
+           << "OpReturnValue value's type <id> "
+           << _.getIdName(value->type_id()) << " is missing or void.";
   }
 
-  const bool uses_variable_pointer =
-      _.features().variable_pointers ||
-      _.features().variable_pointers_storage_buffer;
-
   if (_.addressing_model() == SpvAddressingModelLogical &&
-      SpvOpTypePointer == value_type->opcode() && !uses_variable_pointer &&
-      !_.options()->relax_logical_pointer) {
+      SpvOpTypePointer == value_type->opcode() &&
+      !_.features().variable_pointers && !_.options()->relax_logical_pointer) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
-           << "OpReturnValue value's type <id> '"
+           << "OpReturnValue value's type <id> "
            << _.getIdName(value->type_id())
-           << "' is a pointer, which is invalid in the Logical addressing "
+           << " is a pointer, which is invalid in the Logical addressing "
               "model.";
   }
 
@@ -223,8 +263,8 @@ spv_result_t ValidateReturnValue(ValidationState_t& _,
   const auto return_type = _.FindDef(function->GetResultTypeId());
   if (!return_type || return_type->id() != value_type->id()) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
-           << "OpReturnValue Value <id> '" << _.getIdName(value_id)
-           << "'s type does not match OpFunction's return type.";
+           << "OpReturnValue Value <id> " << _.getIdName(value_id)
+           << "s type does not match OpFunction's return type.";
   }
 
   return SPV_SUCCESS;
@@ -427,7 +467,7 @@ spv_result_t FindCaseFallThrough(
   std::vector<BasicBlock*> stack;
   stack.push_back(target_block);
   std::unordered_set<const BasicBlock*> visited;
-  bool target_reachable = target_block->reachable();
+  bool target_reachable = target_block->structurally_reachable();
   int target_depth = function->GetBlockDepth(target_block);
   while (!stack.empty()) {
     auto block = stack.back();
@@ -437,8 +477,8 @@ spv_result_t FindCaseFallThrough(
 
     if (!visited.insert(block).second) continue;
 
-    if (target_reachable && block->reachable() &&
-        target_block->dominates(*block)) {
+    if (target_reachable && block->structurally_reachable() &&
+        target_block->structurally_dominates(*block)) {
       // Still in the case construct.
       for (auto successor : *block->successors()) {
         stack.push_back(successor);
@@ -510,11 +550,12 @@ spv_result_t StructuredSwitchChecks(ValidationState_t& _, Function* function,
     if (seen_iter == seen_to_fall_through.end()) {
       const auto target_block = function->GetBlock(target).first;
       // OpSwitch must dominate all its case constructs.
-      if (header->reachable() && target_block->reachable() &&
-          !header->dominates(*target_block)) {
+      if (header->structurally_reachable() &&
+          target_block->structurally_reachable() &&
+          !header->structurally_dominates(*target_block)) {
         return _.diag(SPV_ERROR_INVALID_CFG, header->label())
                << "Selection header " << _.getIdName(header->id())
-               << " does not dominate its case construct "
+               << " does not structurally dominate its case construct "
                << _.getIdName(target);
       }
 
@@ -614,7 +655,7 @@ spv_result_t ValidateStructuredSelections(
     }
 
     // Skip unreachable blocks.
-    if (!block->reachable()) continue;
+    if (!block->structurally_reachable()) continue;
 
     if (terminator->opcode() == SpvOpBranchConditional) {
       const auto true_label = terminator->GetOperandAs<uint32_t>(1);
@@ -622,25 +663,22 @@ spv_result_t ValidateStructuredSelections(
       // Mark the upcoming blocks as seen now, but only error out if this block
       // was missing a merge instruction and both labels hadn't been seen
       // previously.
-      const bool both_unseen =
-          seen.insert(true_label).second && seen.insert(false_label).second;
-      if (!merge && both_unseen) {
+      const bool true_label_unseen = seen.insert(true_label).second;
+      const bool false_label_unseen = seen.insert(false_label).second;
+      if (!merge && true_label_unseen && false_label_unseen) {
         return _.diag(SPV_ERROR_INVALID_CFG, terminator)
                << "Selection must be structured";
       }
     } else if (terminator->opcode() == SpvOpSwitch) {
-      uint32_t count = 0;
-      // Mark the targets as seen now, but only error out if this block was
-      // missing a merge instruction and there were multiple unseen labels.
+      if (!merge) {
+        return _.diag(SPV_ERROR_INVALID_CFG, terminator)
+               << "OpSwitch must be preceded by an OpSelectionMerge "
+                  "instruction";
+      }
+      // Mark the targets as seen.
       for (uint32_t i = 1; i < terminator->operands().size(); i += 2) {
         const auto target = terminator->GetOperandAs<uint32_t>(i);
-        if (seen.insert(target).second) {
-          count++;
-        }
-      }
-      if (!merge && count > 1) {
-        return _.diag(SPV_ERROR_INVALID_CFG, terminator)
-               << "Selection must be structured";
+        seen.insert(target);
       }
     }
   }
@@ -672,7 +710,7 @@ spv_result_t StructuredControlFlowChecks(
 
   // Check the loop headers have exactly one back-edge branching to it
   for (BasicBlock* loop_header : function->ordered_blocks()) {
-    if (!loop_header->reachable()) continue;
+    if (!loop_header->structurally_reachable()) continue;
     if (!loop_header->is_type(kBlockTypeLoop)) continue;
     auto loop_header_id = loop_header->id();
     auto num_latch_blocks = loop_latch_blocks[loop_header_id].size();
@@ -687,9 +725,10 @@ spv_result_t StructuredControlFlowChecks(
   // Check construct rules
   for (const Construct& construct : function->constructs()) {
     auto header = construct.entry_block();
+    if (!header->structurally_reachable()) continue;
     auto merge = construct.exit_block();
 
-    if (header->reachable() && !merge) {
+    if (!merge) {
       std::string construct_name, header_name, exit_name;
       std::tie(construct_name, header_name, exit_name) =
           ConstructNames(construct.type());
@@ -699,43 +738,42 @@ spv_result_t StructuredControlFlowChecks(
                     exit_name + ". This may be a bug in the validator.";
     }
 
-    // If the exit block is reachable then it's dominated by the
-    // header.
-    if (merge && merge->reachable()) {
-      if (!header->dominates(*merge)) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(merge->id()))
-               << ConstructErrorString(construct, _.getIdName(header->id()),
-                                       _.getIdName(merge->id()),
-                                       "does not dominate");
-      }
-      // If it's really a merge block for a selection or loop, then it must be
-      // *strictly* dominated by the header.
-      if (construct.ExitBlockIsMergeBlock() && (header == merge)) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(merge->id()))
-               << ConstructErrorString(construct, _.getIdName(header->id()),
-                                       _.getIdName(merge->id()),
-                                       "does not strictly dominate");
-      }
+    // If the header is reachable, the merge is guaranteed to be structurally
+    // reachable.
+    if (!header->structurally_dominates(*merge)) {
+      return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(merge->id()))
+             << ConstructErrorString(construct, _.getIdName(header->id()),
+                                     _.getIdName(merge->id()),
+                                     "does not structurally dominate");
     }
+    // If it's really a merge block for a selection or loop, then it must be
+    // *strictly* structrually dominated by the header.
+    if (construct.ExitBlockIsMergeBlock() && (header == merge)) {
+      return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(merge->id()))
+             << ConstructErrorString(construct, _.getIdName(header->id()),
+                                     _.getIdName(merge->id()),
+                                     "does not strictly structurally dominate");
+    }
+
     // Check post-dominance for continue constructs.  But dominance and
     // post-dominance only make sense when the construct is reachable.
-    if (header->reachable() && construct.type() == ConstructType::kContinue) {
-      if (!merge->postdominates(*header)) {
+    if (construct.type() == ConstructType::kContinue) {
+      if (!merge->structurally_postdominates(*header)) {
         return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(merge->id()))
                << ConstructErrorString(construct, _.getIdName(header->id()),
                                        _.getIdName(merge->id()),
-                                       "is not post dominated by");
+                                       "is not structurally post dominated by");
       }
     }
 
     Construct::ConstructBlockSet construct_blocks = construct.blocks(function);
+    std::string construct_name, header_name, exit_name;
+    std::tie(construct_name, header_name, exit_name) =
+        ConstructNames(construct.type());
     for (auto block : construct_blocks) {
-      std::string construct_name, header_name, exit_name;
-      std::tie(construct_name, header_name, exit_name) =
-          ConstructNames(construct.type());
       // Check that all exits from the construct are via structured exits.
       for (auto succ : *block->successors()) {
-        if (block->reachable() && !construct_blocks.count(succ) &&
+        if (!construct_blocks.count(succ) &&
             !construct.IsStructuredExit(_, succ)) {
           return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
                  << "block <ID> " << _.getIdName(block->id()) << " exits the "
@@ -748,11 +786,68 @@ spv_result_t StructuredControlFlowChecks(
       // Check that for all non-header blocks, all predecessors are within this
       // construct.
       for (auto pred : *block->predecessors()) {
-        if (pred->reachable() && !construct_blocks.count(pred)) {
+        if (pred->structurally_reachable() && !construct_blocks.count(pred)) {
           return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(pred->id()))
                  << "block <ID> " << pred->id() << " branches to the "
                  << construct_name << " construct, but not to the "
                  << header_name << " <ID> " << header->id();
+        }
+      }
+
+      if (block->is_type(BlockType::kBlockTypeSelection) ||
+          block->is_type(BlockType::kBlockTypeLoop)) {
+        size_t index = (block->terminator() - &_.ordered_instructions()[0]) - 1;
+        const auto& merge_inst = _.ordered_instructions()[index];
+        if (merge_inst.opcode() == SpvOpSelectionMerge ||
+            merge_inst.opcode() == SpvOpLoopMerge) {
+          uint32_t merge_id = merge_inst.GetOperandAs<uint32_t>(0);
+          auto merge_block = function->GetBlock(merge_id).first;
+          if (merge_block->structurally_reachable() &&
+              !construct_blocks.count(merge_block)) {
+            return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
+                   << "Header block " << _.getIdName(block->id())
+                   << " is contained in the " << construct_name
+                   << " construct headed by " << _.getIdName(header->id())
+                   << ", but its merge block " << _.getIdName(merge_id)
+                   << " is not";
+          }
+        }
+      }
+    }
+
+    if (construct.type() == ConstructType::kLoop) {
+      // If the continue target differs from the loop header, then check that
+      // all edges into the continue construct come from within the loop.
+      const auto index = header->terminator() - &_.ordered_instructions()[0];
+      const auto& merge_inst = _.ordered_instructions()[index - 1];
+      const auto continue_id = merge_inst.GetOperandAs<uint32_t>(1);
+      const auto* continue_inst = _.FindDef(continue_id);
+      // OpLabel instructions aren't stored as part of the basic block for
+      // legacy reaasons. Grab the next instruction and use it's block pointer
+      // instead.
+      const auto next_index =
+          (continue_inst - &_.ordered_instructions()[0]) + 1;
+      const auto& next_inst = _.ordered_instructions()[next_index];
+      const auto* continue_target = next_inst.block();
+      if (header->id() != continue_id) {
+        for (auto pred : *continue_target->predecessors()) {
+          // Ignore back-edges from within the continue construct.
+          bool is_back_edge = false;
+          for (auto back_edge : back_edges) {
+            uint32_t back_edge_block;
+            uint32_t header_block;
+            std::tie(back_edge_block, header_block) = back_edge;
+            if (header_block == continue_id && back_edge_block == pred->id())
+              is_back_edge = true;
+          }
+          if (!construct_blocks.count(pred) && !is_back_edge) {
+            return _.diag(SPV_ERROR_INVALID_CFG, pred->terminator())
+                   << "Block " << _.getIdName(pred->id())
+                   << " branches to the loop continue target "
+                   << _.getIdName(continue_id)
+                   << ", but is not contained in the associated loop construct "
+                   << _.getIdName(header->id());
+          }
         }
       }
     }
@@ -775,120 +870,6 @@ spv_result_t StructuredControlFlowChecks(
   return SPV_SUCCESS;
 }
 
-spv_result_t PerformWebGPUCfgChecks(ValidationState_t& _, Function* function) {
-  for (auto& block : function->ordered_blocks()) {
-    if (block->reachable()) continue;
-    if (block->is_type(kBlockTypeMerge)) {
-      // 1. Find the referencing merge and confirm that it is reachable.
-      BasicBlock* merge_header = function->GetMergeHeader(block);
-      assert(merge_header != nullptr);
-      if (!merge_header->reachable()) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable merge-blocks must be referenced by "
-                  "a reachable merge instruction.";
-      }
-
-      // 2. Check that the only instructions are OpLabel and OpUnreachable.
-      auto* label_inst = block->label();
-      auto* terminator_inst = block->terminator();
-      assert(label_inst != nullptr);
-      assert(terminator_inst != nullptr);
-
-      if (terminator_inst->opcode() != SpvOpUnreachable) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable merge-blocks must terminate with "
-                  "OpUnreachable.";
-      }
-
-      auto label_idx = label_inst - &_.ordered_instructions()[0];
-      auto terminator_idx = terminator_inst - &_.ordered_instructions()[0];
-      if (label_idx + 1 != terminator_idx) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable merge-blocks must only contain an "
-                  "OpLabel and OpUnreachable instruction.";
-      }
-
-      // 3. Use label instruction to confirm there is no uses by branches.
-      for (auto use : label_inst->uses()) {
-        const auto* use_inst = use.first;
-        if (spvOpcodeIsBranch(use_inst->opcode())) {
-          return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-                 << "For WebGPU, unreachable merge-blocks cannot be the target "
-                    "of a branch.";
-        }
-      }
-    } else if (block->is_type(kBlockTypeContinue)) {
-      // 1. Find referencing loop and confirm that it is reachable.
-      std::vector<BasicBlock*> continue_headers =
-          function->GetContinueHeaders(block);
-      if (continue_headers.empty()) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable continue-target must be referenced "
-                  "by a loop instruction.";
-      }
-
-      std::vector<BasicBlock*> reachable_headers(continue_headers.size());
-      auto iter =
-          std::copy_if(continue_headers.begin(), continue_headers.end(),
-                       reachable_headers.begin(),
-                       [](BasicBlock* header) { return header->reachable(); });
-      reachable_headers.resize(std::distance(reachable_headers.begin(), iter));
-
-      if (reachable_headers.empty()) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable continue-target must be referenced "
-                  "by a reachable loop instruction.";
-      }
-
-      // 2. Check that the only instructions are OpLabel and OpBranch.
-      auto* label_inst = block->label();
-      auto* terminator_inst = block->terminator();
-      assert(label_inst != nullptr);
-      assert(terminator_inst != nullptr);
-
-      if (terminator_inst->opcode() != SpvOpBranch) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable continue-target must terminate with "
-                  "OpBranch.";
-      }
-
-      auto label_idx = label_inst - &_.ordered_instructions()[0];
-      auto terminator_idx = terminator_inst - &_.ordered_instructions()[0];
-      if (label_idx + 1 != terminator_idx) {
-        return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-               << "For WebGPU, unreachable continue-target must only contain "
-                  "an OpLabel and an OpBranch instruction.";
-      }
-
-      // 3. Use label instruction to confirm there is no uses by branches.
-      for (auto use : label_inst->uses()) {
-        const auto* use_inst = use.first;
-        if (spvOpcodeIsBranch(use_inst->opcode())) {
-          return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-                 << "For WebGPU, unreachable continue-target cannot be the "
-                    "target of a branch.";
-        }
-      }
-
-      // 4. Confirm that continue-target has a back edge to a reachable loop
-      //    header block.
-      auto branch_target = terminator_inst->GetOperandAs<uint32_t>(0);
-      for (auto* continue_header : reachable_headers) {
-        if (branch_target != continue_header->id()) {
-          return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-                 << "For WebGPU, unreachable continue-target must only have a "
-                    "back edge to a single reachable loop instruction.";
-        }
-      }
-    } else {
-      return _.diag(SPV_ERROR_INVALID_CFG, _.FindDef(block->id()))
-             << "For WebGPU, all blocks must be reachable, unless they are "
-             << "degenerate cases of merge-block or continue-target.";
-    }
-  }
-  return SPV_SUCCESS;
-}
-
 spv_result_t PerformCfgChecks(ValidationState_t& _) {
   for (auto& function : _.functions()) {
     // Check all referenced blocks are defined within a function
@@ -908,52 +889,27 @@ spv_result_t PerformCfgChecks(ValidationState_t& _) {
              << _.getIdName(function.id());
     }
 
-    // Set each block's immediate dominator and immediate postdominator,
-    // and find all back-edges.
+    // Set each block's immediate dominator.
     //
     // We want to analyze all the blocks in the function, even in degenerate
     // control flow cases including unreachable blocks.  So use the augmented
     // CFG to ensure we cover all the blocks.
     std::vector<const BasicBlock*> postorder;
-    std::vector<const BasicBlock*> postdom_postorder;
-    std::vector<std::pair<uint32_t, uint32_t>> back_edges;
     auto ignore_block = [](const BasicBlock*) {};
-    auto ignore_edge = [](const BasicBlock*, const BasicBlock*) {};
+    auto no_terminal_blocks = [](const BasicBlock*) { return false; };
     if (!function.ordered_blocks().empty()) {
       /// calculate dominators
       CFA<BasicBlock>::DepthFirstTraversal(
           function.first_block(), function.AugmentedCFGSuccessorsFunction(),
           ignore_block, [&](const BasicBlock* b) { postorder.push_back(b); },
-          ignore_edge);
+          no_terminal_blocks);
       auto edges = CFA<BasicBlock>::CalculateDominators(
           postorder, function.AugmentedCFGPredecessorsFunction());
       for (auto edge : edges) {
         if (edge.first != edge.second)
           edge.first->SetImmediateDominator(edge.second);
       }
-
-      /// calculate post dominators
-      CFA<BasicBlock>::DepthFirstTraversal(
-          function.pseudo_exit_block(),
-          function.AugmentedCFGPredecessorsFunction(), ignore_block,
-          [&](const BasicBlock* b) { postdom_postorder.push_back(b); },
-          ignore_edge);
-      auto postdom_edges = CFA<BasicBlock>::CalculateDominators(
-          postdom_postorder, function.AugmentedCFGSuccessorsFunction());
-      for (auto edge : postdom_edges) {
-        edge.first->SetImmediatePostDominator(edge.second);
-      }
-      /// calculate back edges.
-      CFA<BasicBlock>::DepthFirstTraversal(
-          function.pseudo_entry_block(),
-          function
-              .AugmentedCFGSuccessorsFunctionIncludingHeaderToContinueEdge(),
-          ignore_block, ignore_block,
-          [&](const BasicBlock* from, const BasicBlock* to) {
-            back_edges.emplace_back(from->id(), to->id());
-          });
     }
-    UpdateContinueConstructExitBlocks(function, back_edges);
 
     auto& blocks = function.ordered_blocks();
     if (!blocks.empty()) {
@@ -969,15 +925,8 @@ spv_result_t PerformCfgChecks(ValidationState_t& _) {
                    << _.getIdName(idom->id());
           }
         }
-
-        // For WebGPU check that all unreachable blocks are degenerate cases for
-        // merge-block or continue-target.
-        if (spvIsWebGPUEnv(_.context()->target_env)) {
-          spv_result_t result = PerformWebGPUCfgChecks(_, &function);
-          if (result != SPV_SUCCESS) return result;
-        }
       }
-      // If we have structed control flow, check that no block has a control
+      // If we have structured control flow, check that no block has a control
       // flow nesting depth larger than the limit.
       if (_.HasCapability(SpvCapabilityShader)) {
         const int control_flow_nesting_depth_limit =
@@ -994,6 +943,52 @@ spv_result_t PerformCfgChecks(ValidationState_t& _) {
 
     /// Structured control flow checks are only required for shader capabilities
     if (_.HasCapability(SpvCapabilityShader)) {
+      // Calculate structural dominance.
+      postorder.clear();
+      std::vector<const BasicBlock*> postdom_postorder;
+      std::vector<std::pair<uint32_t, uint32_t>> back_edges;
+      if (!function.ordered_blocks().empty()) {
+        /// calculate dominators
+        CFA<BasicBlock>::DepthFirstTraversal(
+            function.first_block(),
+            function.AugmentedStructuralCFGSuccessorsFunction(), ignore_block,
+            [&](const BasicBlock* b) { postorder.push_back(b); },
+            no_terminal_blocks);
+        auto edges = CFA<BasicBlock>::CalculateDominators(
+            postorder, function.AugmentedStructuralCFGPredecessorsFunction());
+        for (auto edge : edges) {
+          if (edge.first != edge.second)
+            edge.first->SetImmediateStructuralDominator(edge.second);
+        }
+
+        /// calculate post dominators
+        CFA<BasicBlock>::DepthFirstTraversal(
+            function.pseudo_exit_block(),
+            function.AugmentedStructuralCFGPredecessorsFunction(), ignore_block,
+            [&](const BasicBlock* b) { postdom_postorder.push_back(b); },
+            no_terminal_blocks);
+        auto postdom_edges = CFA<BasicBlock>::CalculateDominators(
+            postdom_postorder,
+            function.AugmentedStructuralCFGSuccessorsFunction());
+        for (auto edge : postdom_edges) {
+          edge.first->SetImmediateStructuralPostDominator(edge.second);
+        }
+        /// calculate back edges.
+        CFA<BasicBlock>::DepthFirstTraversal(
+            function.pseudo_entry_block(),
+            function.AugmentedStructuralCFGSuccessorsFunction(), ignore_block,
+            ignore_block,
+            [&](const BasicBlock* from, const BasicBlock* to) {
+              // A back edge must be a real edge. Since the augmented successors
+              // contain structural edges, filter those from consideration.
+              for (const auto* succ : *(from->successors())) {
+                if (succ == to) back_edges.emplace_back(from->id(), to->id());
+              }
+            },
+            no_terminal_blocks);
+      }
+      UpdateContinueConstructExitBlocks(function, back_edges);
+
       if (auto error =
               StructuredControlFlowChecks(_, &function, back_edges, postorder))
         return error;
@@ -1034,7 +1029,7 @@ spv_result_t CfgPass(ValidationState_t& _, const Instruction* inst) {
       uint32_t target = inst->GetOperandAs<uint32_t>(0);
       CFG_ASSERT(FirstBlockAssert, target);
 
-      _.current_function().RegisterBlockEnd({target}, opcode);
+      _.current_function().RegisterBlockEnd({target});
     } break;
     case SpvOpBranchConditional: {
       uint32_t tlabel = inst->GetOperandAs<uint32_t>(1);
@@ -1042,7 +1037,7 @@ spv_result_t CfgPass(ValidationState_t& _, const Instruction* inst) {
       CFG_ASSERT(FirstBlockAssert, tlabel);
       CFG_ASSERT(FirstBlockAssert, flabel);
 
-      _.current_function().RegisterBlockEnd({tlabel, flabel}, opcode);
+      _.current_function().RegisterBlockEnd({tlabel, flabel});
     } break;
 
     case SpvOpSwitch: {
@@ -1052,7 +1047,7 @@ spv_result_t CfgPass(ValidationState_t& _, const Instruction* inst) {
         CFG_ASSERT(FirstBlockAssert, target);
         cases.push_back(target);
       }
-      _.current_function().RegisterBlockEnd({cases}, opcode);
+      _.current_function().RegisterBlockEnd({cases});
     } break;
     case SpvOpReturn: {
       const uint32_t return_type = _.current_function().GetResultTypeId();
@@ -1062,22 +1057,85 @@ spv_result_t CfgPass(ValidationState_t& _, const Instruction* inst) {
         return _.diag(SPV_ERROR_INVALID_CFG, inst)
                << "OpReturn can only be called from a function with void "
                << "return type.";
+      _.current_function().RegisterBlockEnd(std::vector<uint32_t>());
+      break;
     }
-    // Fallthrough.
     case SpvOpKill:
     case SpvOpReturnValue:
     case SpvOpUnreachable:
-      _.current_function().RegisterBlockEnd(std::vector<uint32_t>(), opcode);
+    case SpvOpTerminateInvocation:
+    case SpvOpIgnoreIntersectionKHR:
+    case SpvOpTerminateRayKHR:
+    case SpvOpEmitMeshTasksEXT:
+      _.current_function().RegisterBlockEnd(std::vector<uint32_t>());
+      // Ops with dedicated passes check for the Execution Model there
       if (opcode == SpvOpKill) {
         _.current_function().RegisterExecutionModelLimitation(
             SpvExecutionModelFragment,
             "OpKill requires Fragment execution model");
       }
+      if (opcode == SpvOpTerminateInvocation) {
+        _.current_function().RegisterExecutionModelLimitation(
+            SpvExecutionModelFragment,
+            "OpTerminateInvocation requires Fragment execution model");
+      }
+      if (opcode == SpvOpIgnoreIntersectionKHR) {
+        _.current_function().RegisterExecutionModelLimitation(
+            SpvExecutionModelAnyHitKHR,
+            "OpIgnoreIntersectionKHR requires AnyHitKHR execution model");
+      }
+      if (opcode == SpvOpTerminateRayKHR) {
+        _.current_function().RegisterExecutionModelLimitation(
+            SpvExecutionModelAnyHitKHR,
+            "OpTerminateRayKHR requires AnyHitKHR execution model");
+      }
+
       break;
     default:
       break;
   }
   return SPV_SUCCESS;
+}
+
+void ReachabilityPass(ValidationState_t& _) {
+  for (auto& f : _.functions()) {
+    std::vector<BasicBlock*> stack;
+    auto entry = f.first_block();
+    // Skip function declarations.
+    if (entry) stack.push_back(entry);
+
+    while (!stack.empty()) {
+      auto block = stack.back();
+      stack.pop_back();
+
+      if (block->reachable()) continue;
+
+      block->set_reachable(true);
+      for (auto succ : *block->successors()) {
+        stack.push_back(succ);
+      }
+    }
+  }
+
+  // Repeat for structural reachability.
+  for (auto& f : _.functions()) {
+    std::vector<BasicBlock*> stack;
+    auto entry = f.first_block();
+    // Skip function declarations.
+    if (entry) stack.push_back(entry);
+
+    while (!stack.empty()) {
+      auto block = stack.back();
+      stack.pop_back();
+
+      if (block->structurally_reachable()) continue;
+
+      block->set_structurally_reachable(true);
+      for (auto succ : *block->structural_successors()) {
+        stack.push_back(succ);
+      }
+    }
+  }
 }
 
 spv_result_t ControlFlowPass(ValidationState_t& _, const Instruction* inst) {

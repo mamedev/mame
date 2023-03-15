@@ -9,8 +9,10 @@
 
 #pragma once
 
-#include "dirom.h"
 #include "scspdsp.h"
+
+#include "dirom.h"
+
 
 #define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
 				// driver code indicates should be 4, but sounds distorted then
@@ -42,7 +44,7 @@ protected:
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

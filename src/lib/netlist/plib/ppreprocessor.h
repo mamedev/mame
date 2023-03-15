@@ -52,8 +52,8 @@ namespace plib {
 		///
 		/// \param filename a filename or identifier identifying the stream.
 		///
-		/// FIXME: this is sub-optimal. Refactor input_context into pinput_context
-		/// and pass this to ppreprocessor.
+		/// FIXME: this is sub-optimal. Refactor input_context into `pinput`_context
+		/// and pass this to `ppreprocessor`.
 		///
 		template <typename T>
 		pstring process(T &&istrm, const pstring &filename)

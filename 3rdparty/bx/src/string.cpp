@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/allocator.h>
 #include <bx/file.h>
 #include <bx/hash.h>
@@ -135,7 +134,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			*_inOutStr = toLower(*_inOutStr);
+			_inOutStr[ii] = toLower(_inOutStr[ii]);
 		}
 	}
 
@@ -154,7 +153,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			*_inOutStr = toUpper(*_inOutStr);
+			_inOutStr[ii] = toUpper(_inOutStr[ii]);
 		}
 	}
 
@@ -310,9 +309,9 @@ namespace bx
 
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t len = strLen(_src, _num);
 		const int32_t max = _dstSize-1;
@@ -330,9 +329,9 @@ namespace bx
 
 	inline int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
-		BX_CHECK(NULL != _src, "_src can't be NULL!");
-		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
+		BX_ASSERT(NULL != _src, "_src can't be NULL!");
+		BX_ASSERT(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t max = _dstSize;
 		const int32_t len = strLen(_dst, max);
@@ -413,25 +412,16 @@ namespace bx
 				++ptr;
 				--stringLen;
 
-				// Search pattern lenght can't be longer than the string.
+				// Search pattern length can't be longer than the string.
 				if (findLen > stringLen)
 				{
 					return NULL;
 				}
 			}
 
-			// Set pointers.
-			const char* string = ptr;
-			const char* search = _find;
-
-			// Start comparing.
-			while (fn(*string++) == fn(*search++) )
+			if (0 == strCmp<fn>(ptr, _findMax, _find, _findMax) )
 			{
-				// If end of the 'search' string is reached, all characters match.
-				if ('\0' == *search)
-				{
-					return ptr;
-				}
+				return ptr;
 			}
 		}
 
@@ -490,7 +480,7 @@ namespace bx
 			}
 		}
 
-		return _str;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	StringView strLTrimSpace(const StringView& _str)
@@ -533,7 +523,29 @@ namespace bx
 				{
 					return StringView(ptr, ii + 1);
 				}
+		}
+
+			return StringView(_str.getPtr(), _str.getPtr());
+		}
+
+		return _str;
+	}
+
+	StringView strRTrimSpace(const StringView& _str)
+	{
+		if (!_str.isEmpty() )
+		{
+			const char* ptr = _str.getPtr();
+
+			for (int32_t len = _str.getLength(), ii = len - 1; 0 <= ii; --ii)
+			{
+				if (!isSpace(ptr[ii]) )
+				{
+					return StringView(ptr, ii + 1);
+				}
 			}
+			
+			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
@@ -544,29 +556,24 @@ namespace bx
 		return strLTrim(strRTrim(_str, _chars), _chars);
 	}
 
+	StringView strTrimSpace(const StringView& _str)
+	{
+		return strLTrimSpace(strRTrimSpace(_str) );
+	}
+
 	constexpr uint32_t kFindStep = 1024;
 
 	StringView strFindNl(const StringView& _str)
 	{
 		StringView str(_str);
 
-		for (; str.getPtr() != _str.getTerm()
-			; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
-			)
+		// This method returns the character past the \n, so
+		// there is no need to look for he \r which preceedes it.
+		StringView eol = strFind(str, "\n");
+		if (!eol.isEmpty() )
 		{
-			StringView eol = strFind(str, "\r\n");
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
-
-			eol = strFind(str, '\n');
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getTerm(), _str.getTerm() );
-			}
+			return StringView(eol.getTerm(), str.getTerm() );
 		}
-
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
@@ -674,7 +681,7 @@ namespace bx
 		StringView ptr = strFind(_str, _word);
 		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
-			char ch = *(ptr.getPtr() - 1);
+			char ch = ptr.getPtr() != _str.getPtr() ? *(ptr.getPtr() - 1) : ' ';
 			if (isAlphaNum(ch) || '_' == ch)
 			{
 				continue;
@@ -739,13 +746,40 @@ namespace bx
 		{
 			int32_t size = 0;
 			int32_t len = (int32_t)strLen(_str, _len);
-			int32_t padding = _param.width > len ? _param.width - len : 0;
-			bool sign = _param.sign && len > 1 && _str[0] != '-';
-			padding = padding > 0 ? padding - sign : 0;
+
+			if (_param.width > 0)
+			{
+				len = min(_param.width, len);
+			}
+
+			const bool hasMinus = (NULL != _str && '-' == _str[0]);
+			const bool hasSign = _param.sign || hasMinus;
+			char sign = hasSign ? hasMinus ? '-' : '+' : '\0';
+
+			const char* str = _str;
+			if (hasMinus)
+			{
+				str++;
+				len--;
+			}
+
+			int32_t padding = _param.width > len ? _param.width - len - hasSign: 0;
 
 			if (!_param.left)
 			{
-				size += writeRep(_writer, _param.fill, padding, _err);
+				if (' '  != _param.fill
+				&&  '\0' != sign)
+				{
+					size += write(_writer, sign, _err);
+					sign = '\0';
+				}
+
+				size += writeRep(_writer, _param.fill, max(0, padding), _err);
+			}
+
+			if ('\0' != sign)
+			{
+				size += write(_writer, sign, _err);
 			}
 
 			if (NULL == _str)
@@ -756,17 +790,12 @@ namespace bx
 			{
 				for (int32_t ii = 0; ii < len; ++ii)
 				{
-					size += write(_writer, toUpper(_str[ii]), _err);
+					size += write(_writer, toUpper(str[ii]), _err);
 				}
-			}
-			else if (sign)
-			{
-				size += write(_writer, '+', _err);
-				size += write(_writer, _str, len, _err);
 			}
 			else
 			{
-				size += write(_writer, _str, len, _err);
+				size += write(_writer, str, len, _err);
 			}
 
 			if (_param.left)
@@ -785,6 +814,11 @@ namespace bx
 		static int32_t write(WriterI* _writer, const char* _str, const Param& _param, Error* _err)
 		{
 			return write(_writer, _str, _param.prec, _param, _err);
+		}
+
+		static int32_t write(WriterI* _writer, const StringView& _str, const Param& _param, Error* _err)
+		{
+			return write(_writer, _str.getPtr(), min(_param.prec, _str.getLength() ), _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
@@ -849,30 +883,39 @@ namespace bx
 				return 0;
 			}
 
-			if (_param.upper)
-			{
-				toUpperUnsafe(str, len);
-			}
-
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
-				const int32_t precLen = int32_t(
-						dot
-						+ uint32_min(prec + _param.spec, 1)
-						+ prec
-						- str
-						);
-				if (precLen > len)
+				const int32_t prec   = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const char* strEnd   = str + len;
+				const char* exponent = strFind(str, INT32_MAX, 'e');
+				const char* fracEnd  = NULL != exponent ? exponent : strEnd;
+
+				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
+				const int32_t curPrec = int32_t(fracEnd - fracBegin);
+
+				// Move exponent to its final location after trimming or adding extra 0s.
+				if (fracEnd != strEnd)
 				{
-					for (int32_t ii = len; ii < precLen; ++ii)
-					{
-						str[ii] = '0';
-					}
-					str[precLen] = '\0';
+					const int32_t exponentLen = int32_t(strEnd - fracEnd);
+					char* finalExponentPtr = &fracBegin[prec];
+					memMove(finalExponentPtr, fracEnd, exponentLen);
+
+					finalExponentPtr[exponentLen] = '\0';
+					len = int32_t(&finalExponentPtr[exponentLen] - str);
 				}
-				len = precLen;
+				else
+				{
+					len = (int32_t)(fracBegin + prec - str);
+				}
+
+				if (curPrec < prec)
+				{
+					for (int32_t ii = curPrec; ii < prec; ++ii)
+					{
+						fracBegin[ii] = '0';
+					}
+				}
 			}
 
 			return write(_writer, str, len, _param, _err);
@@ -913,17 +956,22 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[flags][width][.precision][length sub-specifier]specifier
-				read(&reader, ch);
+				// %[Flags][Width][.Precision][Leegth]Type
+				read(&reader, ch, &err);
 
 				Param param;
 
-				// flags
-				while (' ' == ch
+				// Reference(s):
+				//  - Flags field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Flags_field
+				//
+				while (err.isOk()
+				&& (   ' ' == ch
 				||     '-' == ch
 				||     '+' == ch
 				||     '0' == ch
 				||     '#' == ch)
+				   )
 				{
 					switch (ch)
 					{
@@ -935,7 +983,7 @@ namespace bx
 						case '#': param.spec = true; break;
 					}
 
-					read(&reader, ch);
+					read(&reader, ch, &err);
 				}
 
 				if (param.left)
@@ -943,10 +991,13 @@ namespace bx
 					param.fill = ' ';
 				}
 
-				// width
+				// Reference(s):
+				//  - Width field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Width_field
+				//
 				if ('*' == ch)
 				{
-					read(&reader, ch);
+					read(&reader, ch, &err);
 					param.width = va_arg(_argList, int32_t);
 
 					if (0 > param.width)
@@ -958,49 +1009,57 @@ namespace bx
 				}
 				else
 				{
-					while (isNumeric(ch) )
+					while (err.isOk()
+					&&     isNumeric(ch) )
 					{
 						param.width = param.width * 10 + ch - '0';
-						read(&reader, ch);
+						read(&reader, ch, &err);
 					}
 				}
 
-				// .precision
+				// Reference(s):
+				//  - Precision field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Precision_field
 				if ('.' == ch)
 				{
-					read(&reader, ch);
+					read(&reader, ch, &err);
 
 					if ('*' == ch)
 					{
-						read(&reader, ch);
+						read(&reader, ch, &err);
 						param.prec = va_arg(_argList, int32_t);
 					}
 					else
 					{
 						param.prec = 0;
-						while (isNumeric(ch) )
+						while (err.isOk()
+						&&     isNumeric(ch) )
 						{
 							param.prec = param.prec * 10 + ch - '0';
-							read(&reader, ch);
+							read(&reader, ch, &err);
 						}
 					}
 				}
 
-				// length sub-specifier
-				while ('h' == ch
+				// Reference(s):
+				//  - Length field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Length_field
+				while (err.isOk()
+				&& (   'h' == ch
 				||     'I' == ch
 				||     'l' == ch
 				||     'j' == ch
 				||     't' == ch
 				||     'z' == ch)
+				   )
 				{
 					switch (ch)
 					{
 						default: break;
 
 						case 'j': param.bits = sizeof(intmax_t )*8; break;
-						case 't': param.bits = sizeof(size_t   )*8; break;
-						case 'z': param.bits = sizeof(ptrdiff_t)*8; break;
+						case 't': param.bits = sizeof(ptrdiff_t)*8; break;
+						case 'z': param.bits = sizeof(size_t   )*8; break;
 
 						case 'h': case 'I': case 'l':
 							switch (ch)
@@ -1010,14 +1069,14 @@ namespace bx
 								default: break;
 							}
 
-							read(&reader, ch);
+							read(&reader, ch, &err);
 							switch (ch)
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
 								case '3':
 								case '6':
-									read(&reader, ch);
+									read(&reader, ch, &err);
 									switch (ch)
 									{
 										case '2': param.bits = sizeof(int32_t)*8; break;
@@ -1031,11 +1090,18 @@ namespace bx
 							break;
 					}
 
-					read(&reader, ch);
+					read(&reader, ch, &err);
 				}
 
-				// specifier
-				switch (toLower(ch) )
+				if (!err.isOk() )
+				{
+					break;
+				}
+
+				// Reference(s):
+				//  - Type field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Type_field
+				switch (ch)
 				{
 					case 'c':
 						size += write(_writer, char(va_arg(_argList, int32_t) ), param, _err);
@@ -1043,6 +1109,10 @@ namespace bx
 
 					case 's':
 						size += write(_writer, va_arg(_argList, const char*), param, _err);
+						break;
+
+					case 'S':
+						size += write(_writer, *va_arg(_argList, const StringView*), param, _err);
 						break;
 
 					case 'o':
@@ -1065,8 +1135,11 @@ namespace bx
 						break;
 
 					case 'e':
+					case 'E':
 					case 'f':
+					case 'F':
 					case 'g':
+					case 'G':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
@@ -1076,6 +1149,7 @@ namespace bx
 						break;
 
 					case 'x':
+					case 'X':
 						param.base  = 16;
 						param.upper = isUpper(ch);
 						switch (param.bits)
@@ -1092,6 +1166,10 @@ namespace bx
 						default: size += write(_writer, va_arg(_argList, uint32_t), param, _err); break;
 						case 64: size += write(_writer, va_arg(_argList, uint64_t), param, _err); break;
 						}
+						break;
+
+					case 'n':
+						*va_arg(_argList, int32_t*) = size;
 						break;
 
 					default:

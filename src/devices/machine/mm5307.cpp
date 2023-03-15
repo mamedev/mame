@@ -140,7 +140,7 @@ void mm5307_device::device_resolve_objects()
 void mm5307_device::device_start()
 {
 	// Create timer
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm5307_device::periodic_update), this));
+	m_periodic_timer = timer_alloc(FUNC(mm5307_device::periodic_update), this);
 
 	// Register for saving
 	save_item(NAME(m_freq_control));

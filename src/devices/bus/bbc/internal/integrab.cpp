@@ -23,7 +23,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_INTEGRAB, bbc_integrab_device, "bbc_integrab", "Computech Integra-\xCE\xB2")
+DEFINE_DEVICE_TYPE(BBC_INTEGRAB, bbc_integrab_device, "bbc_integrab", u8"Computech Integra-β")
 
 
 //-------------------------------------------------
@@ -59,6 +59,8 @@ ROM_START(integrab)
 	ROMX_LOAD("ibos120p.rom", 0x0000, 0x4000, CRC(21e7a2c2) SHA1(d5ff79da2243aabd363ee26a1e7ad546657fdeb5), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "120", "IBOS 1.20")
 	ROMX_LOAD("ibos120.rom", 0x0000, 0x4000, CRC(52b1b8c4) SHA1(0f5b2a5bee23808b34eab2f027f7c1e77395c782), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "114", "IBOS 1.14")
+	ROMX_LOAD("ibos114.rom", 0x0000, 0x4000, CRC(d05ce376) SHA1(b2b7fc3258936296f83d720759caacba5378edec), ROM_BIOS(2))
 ROM_END
 
 //-------------------------------------------------
@@ -123,7 +125,7 @@ bbc_integrab_device::bbc_integrab_device(const machine_config &mconfig, const ch
 void bbc_integrab_device::device_start()
 {
 	m_shadow = false;
-	m_ram = std::make_unique<uint8_t[]>(0x8000);
+	m_ram = make_unique_clear<uint8_t[]>(0x8000);
 	m_nvram->set_base(m_ram.get(), 0x8000);
 
 	/* move internal roms to board */

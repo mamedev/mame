@@ -113,7 +113,6 @@
 #include "emu.h"
 #include "h6280.h"
 #include "6280dasm.h"
-#include "debugger.h"
 
 /* 6280 flags */
 enum
@@ -414,14 +413,14 @@ inline void h6280_device::check_and_take_irq_lines()
 		if ( m_irq_state[0] != CLEAR_LINE &&
 				!(m_irq_mask & 0x2) )
 		{
+			standard_irq_callback(0, PCW);
 			do_interrupt(H6280_IRQ1_VEC);
-			standard_irq_callback(0);
 		} else
 		if ( m_irq_state[1] != CLEAR_LINE &&
 				!(m_irq_mask & 0x1) )
 		{
+			standard_irq_callback(1, PCW);
 			do_interrupt(H6280_IRQ2_VEC);
-			standard_irq_callback(1);
 		}
 	}
 }

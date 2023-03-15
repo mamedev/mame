@@ -121,6 +121,10 @@ protected:
 		address_map_constructor delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
+	template <typename T> void add_map(uint64_t size, int flags, T &device, void (T::*map)(address_map &map), const char *name) {
+		address_map_constructor delegate(map, name, &device);
+		add_map(size, flags, delegate, &device);
+	}
 
 	void add_rom(const uint8_t *data, uint32_t size);
 	void add_rom_from_region();
@@ -189,7 +193,7 @@ public:
 	uint16_t iolimitu_r();
 	void iolimitu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t bridge_control_r();
-	void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
 	enum
@@ -201,6 +205,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void interface_post_reset() override;
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual device_t *bus_root();
@@ -247,6 +252,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void interface_post_reset() override;
 
 	virtual device_t *bus_root() override;
 

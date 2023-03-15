@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "utilfwd.h"
+
 #include <cstddef>
 #include <cstdint>
 
@@ -49,13 +51,13 @@ struct jed_data
 ***************************************************************************/
 
 /* parse a file (read into memory) into a jed_data structure */
-int jed_parse(const void *data, size_t length, jed_data *result);
+int jed_parse(util::random_read &src, jed_data *result);
 
 /* output a jed_data structure into a well-formatted JED file */
 size_t jed_output(const jed_data *data, void *result, size_t length);
 
 /* parse a binary JED file (read into memory) into a jed_data structure */
-int jedbin_parse(const void *data, size_t length, jed_data *result);
+int jedbin_parse(util::read_stream &src, jed_data *result);
 
 /* output a jed_data structure into a binary JED file */
 size_t jedbin_output(const jed_data *data, void *result, size_t length);

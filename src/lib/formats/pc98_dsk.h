@@ -31,6 +31,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_PC98_FORMAT;
+extern const pc98_format FLOPPY_PC98_FORMAT;
 
 #endif // MAME_FORMATS_PC98_DSK_H

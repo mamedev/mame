@@ -134,6 +134,8 @@ protected:
 
 	write32mo_delegate m_cmd_callback;
 
+	uint32_t m_pp_status;
+
 	void check_interrupts();
 	void processor_command(uint32_t command);
 	uint32_t fetch();
@@ -146,6 +148,7 @@ protected:
 	bool test_condition(int condition, uint32_t value);
 	uint32_t calculate_cmp(uint32_t src1, uint32_t src2);
 	void vector_loadstore();
+	void tc_command_execute(int channel, uint32_t entrypoint);
 };
 
 

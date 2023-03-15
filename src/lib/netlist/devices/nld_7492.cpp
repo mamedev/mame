@@ -54,7 +54,7 @@
 
 namespace netlist::devices {
 
-	static constexpr const std::array<netlist_time, 4> delay =
+	static constexpr const std::array<const netlist_time, 4> delay =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),

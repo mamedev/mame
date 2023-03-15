@@ -19,7 +19,7 @@ protected:
 	void dasm_memory_reference(std::ostream &stream, u16 inst, offs_t pc);
 	virtual offs_t dasm_iot(std::ostream &stream, u16 dev, offs_t pc);
 	void dasm_opr_group1(std::ostream &stream, u16 inst);
-	void dasm_opr_group2(std::ostream &stream, u16 inst);
+	offs_t dasm_opr_group2(std::ostream &stream, u16 inst);
 	virtual offs_t dasm_opr_group3(std::ostream &stream, u16 inst, offs_t pc, const data_buffer &opcodes);
 
 private:

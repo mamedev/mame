@@ -2,8 +2,8 @@
 // copyright-holders:Philip Bennett, Carl
 
 // SoftFloat 2 lacks an include guard
-#ifndef softfloat_h
-#define softfloat_h 1
+#ifndef softfloat2_h
+#define softfloat2_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #endif
@@ -26,7 +26,8 @@ protected:
 	i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(release_busy);
 
 private:
 	address_space &space() { return *m_space; }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="coleco" description="Coleco ColecoVision cartridges">
@@ -12,8 +12,6 @@ license:CC0
 
      - Moon Patrol (Atarisoft)
      - A.E. (Coleco)
-     - ADAM Demo Cartridge (Coleco)
-     - Coleco Graphics Processor (Coleco)
      - Super front Line Demo
      - Masters of the universe (Mattel)
      - Lord of the Dungeon (Probe 2000)
@@ -53,7 +51,7 @@ license:CC0
 	<software name="qberta" cloneof="qbert">
 		<!-- Q-Bert (1983)(Parker Brothers)[a].bin -->
 		<!-- 0x1fff : 0xea ('qbert') - 0x00 ('qberta') -->
-		<description>Q*bert (Alt)</description>
+		<description>Q*bert (alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9800" />
@@ -80,7 +78,7 @@ license:CC0
 	<software name="scobraa" cloneof="scobra">
 		<!-- Super Cobra (1983)(Parker Brothers)[a].bin -->
 		<!-- 0x1ffe : 0x00 0x0b ('scobra') - 0xff 0xfe ('scobraa') -->
-		<description>Super Cobra (Alt)</description>
+		<description>Super Cobra (alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9850" />
@@ -125,7 +123,7 @@ license:CC0
 		<description>Alphabet Zoo</description>
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="author" value="Dale Disharoon &amp; Bill Groetzinger " />
+		<info name="author" value="Dale Disharoon &amp; Bill Groetzinger" />
 		<info name="serial" value="ABC-CV" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
@@ -179,7 +177,7 @@ license:CC0
 		<!-- Aquattack (1984)(Interphase)[a].bin -->
 		<!-- 0x1a7b : 0x00 ('aquatack') - 0xff ('aquatacka') -->
 		<!-- 0x3fff : 0xff ('aquatack') - 0x7f ('aquatacka') -->
-		<description>Aquattack (Alt)</description>
+		<description>Aquattack (alt)</description>
 		<year>1984</year>
 		<publisher>Interphase</publisher>
 		<info name="serial" value="2-004" />
@@ -221,7 +219,7 @@ license:CC0
 	</software>
 
 	<software name="bcquestc" cloneof="bcquest">
-		<description>BC's Quest for Tires (Can)</description>
+		<description>BC's Quest for Tires (Canada)</description>
 		<year>1983</year>
 		<publisher>Coleco Canada</publisher>
 		<info name="developer" value="Sydney Development Corp." />
@@ -277,7 +275,7 @@ license:CC0
 	</software>
 
 	<software name="bdashp" cloneof="bdash">
-		<description>Boulder Dash (Prototype?)</description>
+		<description>Boulder Dash (prototype?)</description>
 		<year>1984</year>
 		<publisher>Micro Fun</publisher>
 		<info name="developer" value="First Star Software" />
@@ -396,7 +394,7 @@ license:CC0
 	<software name="cavengera" cloneof="cavenger">
 		<!-- Cosmic Avenger (1982)(Coleco)[a].bin -->
 		<!-- 0x3fff : 0xff ('cavenger') - 0x00 ('cavengera') -->
-		<description>Cosmic Avenger (Alt)</description>
+		<description>Cosmic Avenger (alt)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Universal" />
@@ -584,7 +582,7 @@ license:CC0
 
 <!-- This has been verified with real cart -->
 	<software name="evolutioc" cloneof="evolutio">
-		<description>Evolution (Can)</description>
+		<description>Evolution (Canada)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Sydney Developmeent Corp." />
@@ -626,7 +624,7 @@ license:CC0
 
 	<software name="flipslipa" cloneof="flipslip">
 		<!-- Flipper Slipper (1983)(Spectravideo).bin -->
-		<description>Flipper Slipper (Bad?)</description>
+		<description>Flipper Slipper (bad?)</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
 		<info name="serial" value="SE291" />
@@ -811,7 +809,7 @@ license:CC0
 	<software name="jmpmanjra" cloneof="jmpmanjr">
 		<!-- Jumpman Junior (1984)(Epyx)[a].bin -->
 		<!-- 0x3ffe : 0xff ('jmpmanjr') - 0x00 ('jmpmanjra') -->
-		<description>Jumpman Junior (Alt)</description>
+		<description>Jumpman Junior (alt)</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="590" />
@@ -983,7 +981,7 @@ license:CC0
 		<!-- Moonsweeper (1983)(Imagic)[a].bin -->
 		<!-- 0x36f9 : 0x1c 0x1a ('moonswpr') - 0x5c 0x5a ('moonswpra') -->
 		<!-- 0x3fff : 0xff ('moonswpr') - 0x00 ('moonswpra') -->
-		<description>Moonsweeper (Alt)</description>
+		<description>Moonsweeper (alt)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="serial" value="720061" />
@@ -1012,7 +1010,7 @@ license:CC0
 	<software name="mkinga" cloneof="mking">
 		<!-- Mountain King (1984)(Sunrise Software)[a].bin -->
 		<!-- 0x2bc8 : 0x01 ('mountkng') - 0x00 ('mountknga') -->
-		<description>Mountain King (Alt)</description>
+		<description>Mountain King (alt)</description>
 		<year>1984</year>
 		<publisher>Sunrise Software</publisher>
 		<info name="serial" value="1605" />
@@ -1042,7 +1040,7 @@ license:CC0
 		<!-- Motocross Racer (1984)(Xonox)[a].bin -->
 		<!-- 0x1fdb : 0x80 ('mtcracer') - 0xff ('mtcracera') -->
 		<!-- 0x1fdd : 0x80 ('mtcracer') - 0xff ('mtcracera') -->
-		<description>Motocross Racer (Alt)</description>
+		<description>Motocross Racer (alt)</description>
 		<year>1984</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="99026" />
@@ -1072,7 +1070,7 @@ license:CC0
 	<software name="mtrapa" cloneof="mtrap">
 		<!-- Mousetrap (1982)(Coleco)[a].bin -->
 		<!-- 0x3000-0x3fff : filled with 0xff in this set -->
-		<description>Mousetrap (Alt)</description>
+		<description>Mousetrap (alt)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Exidy" />
@@ -1117,7 +1115,7 @@ license:CC0
 	<software name="oilswella" cloneof="oilswell">
 		<!-- Oil's Well (1984)(Sierra On-Line)[a].bin -->
 		<!-- 0x3ffe : 0x07 0x10 ('oilswell') - 0x00 0xff ('oilswella') -->
-		<description>Oil's Well (Alt)</description>
+		<description>Oil's Well (alt)</description>
 		<year>1984</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="OWL-901" />
@@ -1208,7 +1206,7 @@ license:CC0
 		<description>Pitfall II: Lost Caverns</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="VS-008    " />
+		<info name="serial" value="VS-008" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pitfall2.1" size="8192" crc="08ad596e" sha1="d4961033a60b00fb9f99de49079a588b4a6518f0" offset="0x0000" />
@@ -1220,7 +1218,7 @@ license:CC0
 <!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
 	<software name="pitstop">
 		<!-- Pitstop (1983)(Epyx)[a].bin -->
-		<description>Pitstop (Euro, USA, Can)</description>
+		<description>Pitstop (Euro, USA, Canada)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
@@ -1237,7 +1235,7 @@ license:CC0
 	<software name="pitstopa" cloneof="pitstop">
 		<!-- Pitstop (1983)(Epyx).bin -->
 		<!-- 0x26a7 : 0x20 ('pitstop') - 0x10 ('pitstopa') -->
-		<description>Pitstop (USA, Alt)</description>
+		<description>Pitstop (USA, alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
@@ -1267,7 +1265,7 @@ license:CC0
 	<software name="popeyea" cloneof="popeye">
 		<!-- Popeye (1983)(Parker Brothers)[a].bin -->
 		<!-- 0x3fff : 0xf8 ('popeye') - 0xff ('popeyea') -->
-		<description>Popeye (Alt)</description>
+		<description>Popeye (alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9810" />
@@ -1295,7 +1293,7 @@ license:CC0
 
 	<software name="qbertquba" cloneof="qbertqub">
 		<!-- Q-Bert Qubes (1984)(Parker Brothers).bin -->
-		<description>Q*bert Qubes (Alt?)</description>
+		<description>Q*bert Qubes (alt?)</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9950" />
@@ -1324,7 +1322,7 @@ license:CC0
 	<software name="quintanaa" cloneof="quintana">
 		<!-- Quest for Quintana Roo (1983)(Sunrise Software)[a].bin -->
 		<!-- 0x3431 : 0x01 ('quintana') - 0x00 ('quintanaa') -->
-		<description>Quest for Quintana Roo (Alt)</description>
+		<description>Quest for Quintana Roo (alt)</description>
 		<year>1983</year>
 		<publisher>Sunrise Software</publisher>
 		<info name="serial" value="1603" />
@@ -1367,7 +1365,7 @@ license:CC0
 	<software name="robinha" cloneof="robinh">
 		<!-- Robin Hood (1984)(Xonox)[a].bin -->
 		<!-- 0x3fff : 0xff ('robinh') - 0x02 ('robinha') -->
-		<description>Robin Hood (Alt)</description>
+		<description>Robin Hood (alt)</description>
 		<year>1984</year>
 		<publisher>Xonox</publisher>
 		<info name="serial" value="99023" />
@@ -1397,7 +1395,7 @@ license:CC0
 	<software name="rockbolta" cloneof="rockbolt">
 		<!-- Rock 'n Bolt (1984)(Telegames)[a].bin -->
 		<!-- 0x3fff : 0x1a ('rockbolt') - 0x00 ('rockbolta') -->
-		<description>Rock 'n Bolt (Alt)</description>
+		<description>Rock 'n Bolt (alt)</description>
 		<year>1984</year>
 		<publisher>Telegames</publisher>
 		<info name="developer" value="Activision" />
@@ -1442,7 +1440,7 @@ license:CC0
 		<!-- Sammy Lightfoot (1983)(Sierra On-Line)[a].bin -->
 		<!-- 0x3ff1-0x3ffd : 0xbb * 13 ('sammylf') - 0xff * 13 ('sammylfa') -->
 		<!-- 0x3ffe : 0x00 ('sammylf') - 0xff ('sammylfa') -->
-		<description>Sammy Lightfoot (Alt)</description>
+		<description>Sammy Lightfoot (alt)</description>
 		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="serial" value="SLD902" />
@@ -1502,7 +1500,7 @@ license:CC0
 	<software name="smurfa" cloneof="smurf">
 		<!-- Smurf Rescue in Gargamel's Castle (1982)(Coleco)[a].bin -->
 		<!-- 0x3ffe : 0xff ('smurfrgc') - 0x00 ('smurfrgca') -->
-		<description>Smurf Rescue in Gargamel's Castle (Alt)</description>
+		<description>Smurf Rescue in Gargamel's Castle (alt)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2443" />
@@ -1532,7 +1530,7 @@ license:CC0
 	<software name="spacfurya" cloneof="spacfury"> <!-- GAME_NOT_WORKING -->
 		<!-- Space Fury (1983)(Sega)[a].bin -->
 		<!-- 0x0200-0x3fff : data is completely different in this set -->
-		<description>Space Fury (Alt)</description>
+		<description>Space Fury (alt)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Sega" />
@@ -1720,7 +1718,7 @@ license:CC0
 	<software name="tutankhma" cloneof="tutankhm">
 		<!-- Tutankham (1983)(Parker Brothers)[a].bin -->
 		<!-- 0x3000-0x3fff : filled with 0xff in this set -->
-		<description>Tutankham (Alt)</description>
+		<description>Tutankham (alt)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="serial" value="9840" />
@@ -1815,7 +1813,7 @@ license:CC0
 				<rom name="secalpha.1" size="8192" crc="9299539b" sha1="880beb9a4df332948052b40eef09b6c877de5f9e" offset="0x0000" /> <!-- 2364 -->
 				<rom name="secalpha.2" size="8192" crc="c8d6e83d" sha1="366877e0b68cdf2e4bfde38d9ce72eed97946f89" offset="0x2000" /> <!-- 2364 -->
 				<rom name="secalpha.3" size="4096" crc="354a3b2f" sha1="ff8966cec010248af60d2e2abee8a949c154ea25" offset="0x4000" /> <!-- 2332 -->
-				 <!-- NOTE: on this PCB, 2332 upper half is inaccessible and returns open bus, this misfeature is not yet emulated -->
+				<!-- NOTE: on this PCB, 2332 upper half is inaccessible and returns open bus, this misfeature is not yet emulated -->
 			</dataarea>
 		</part>
 	</software>
@@ -1856,7 +1854,7 @@ license:CC0
 
 <!-- This has been verified with a real cart -->
 	<software name="bcquest2c" cloneof="bcquest2">
-		<description>BC's Quest for Tires II: Grog's Revenge (Can)</description>
+		<description>BC's Quest for Tires II: Grog's Revenge (Canada)</description>
 		<year>1984</year>
 		<publisher>Coleco Canada</publisher>
 		<info name="developer" value="Sydney Development Corp." />
@@ -1872,7 +1870,7 @@ license:CC0
 
 	<software name="bcquest2ca" cloneof="bcquest2">
 		<!-- BC's Quest for Tires II - Grog's Revenge (1984)(Coleco).bin -->
-		<description>BC's Quest for Tires II: Grog's Revenge (Can, Bad?)</description>
+		<description>BC's Quest for Tires II: Grog's Revenge (Canada, bad?)</description>
 		<year>1984</year>
 		<publisher>Coleco Canada</publisher>
 		<info name="developer" value="Sydney Development Corp." />
@@ -1952,7 +1950,7 @@ license:CC0
 
 	<software name="dkonga" cloneof="dkong">
 		<!-- Donkey Kong (Earlier Version) (1982)(Coleco).bin -->
-		<description>Donkey Kong (Earlier)</description>
+		<description>Donkey Kong (earlier)</description>
 		<!-- This version contained a number of bugs which were fixed and the code size reduced to fit into 16k. -->
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
@@ -1988,7 +1986,7 @@ license:CC0
 		<!-- Frenzy (1983)(Coleco)[a].bin -->
 		<!-- 0x4000-0x4fff : Same as above -->
 		<!-- 0x5000-0x5fff : Copy of 0x4000-0x4fff -->
-		<description>Frenzy (Alt 1)</description>
+		<description>Frenzy (alt 1)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Stern Electronics" />
@@ -2006,7 +2004,7 @@ license:CC0
 		<!-- Frenzy (1983)(Coleco)[a2].bin -->
 		<!-- 0x4000-0x4fff : Same as above -->
 		<!-- 0x5000-0x5fff : Filled with 0xff -->
-		<description>Frenzy (Alt 2)</description>
+		<description>Frenzy (alt 2)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Stern Electronics" />
@@ -2049,7 +2047,7 @@ license:CC0
 		<!-- 0x5000 : 0x1a ('frontlin') - 0xda ('frontlina') -->
 		<!-- 0x5800 : 0x45 ('frontlin') - 0x8f ('frontlina') -->
 		<!-- 0x5ffe : 0x00 0x53 ('frontlin') - 0xff 0xff ('frontlina') -->
-		<description>Front Line (Alt)</description>
+		<description>Front Line (alt)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Taito" />
@@ -2081,7 +2079,7 @@ license:CC0
 
 	<software name="heista" cloneof="heist">
 		<!-- Heist, The (1983)(Micro Fun).bin -->
-		<description>The Heist (Trained?)</description>
+		<description>The Heist (trained?)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 		<info name="serial" value="MCL520" />
@@ -2097,7 +2095,7 @@ license:CC0
 	<software name="heistb" cloneof="heist">
 		<!-- Heist, The (1983)(Micro Fun)[a].bin -->
 		<!-- 0x5ffe : 0x00 0xff ('heist') - 0x70 0x66 ('heista') -->
-		<description>The Heist (Trained?, Alt)</description>
+		<description>The Heist (trained?, alt)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 		<info name="serial" value="MCL520" />
@@ -2145,7 +2143,7 @@ license:CC0
 		<!-- Miner 2049er (1983)(Micro Fun)[a].bin -->
 		<!-- use standard RAM range 0x6000-0x63ff ('min2049') - use mirrored RAM range 0x7000-0x73ff ('min2049a') -->
 		<!-- 0x5ffe : 0x00 0xff ('min2049') - 0x72 0xdd ('min2049a') -->
-		<description>Miner 2049er (Alt)</description>
+		<description>Miner 2049er (alt)</description>
 		<year>1983</year>
 		<publisher>Micro Fun</publisher>
 		<info name="serial" value="MCL521" />
@@ -2177,7 +2175,7 @@ license:CC0
 	<software name="mrdoa" cloneof="mrdo">
 		<!-- Mr. Do! (1983)(Coleco)[a].bin -->
 		<!-- 0x5ffe : 0xff ('mrdo') - 0x00 ('mrdoa') -->
-		<description>Mr. Do! (Alt)</description>
+		<description>Mr. Do! (alt)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Universal" />
@@ -2274,7 +2272,7 @@ license:CC0
 
 	<software name="subroca" cloneof="subroc">
 		<!-- Subroc (1983)(Coleco).bin -->
-		<description>Subroc (Alt?)</description>
+		<description>Subroc (alt?)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Sega" />
@@ -2426,7 +2424,7 @@ license:CC0
 
 	<software name="dambustrc" cloneof="dambustr">
 		<!-- Dam Busters, The (1984)(Coleco).bin -->
-		<description>The Dam Busters (Can)</description>
+		<description>The Dam Busters (Canada)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2686" />
@@ -2565,7 +2563,7 @@ license:CC0
 <!-- Prototypes & Demo's -->
 
 	<software name="2010p" cloneof="2010">
-		<description>2010: The Graphic Action Game (Prototype v54)</description>
+		<description>2010: The Graphic Action Game (prototype v54)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2618" />
@@ -2580,7 +2578,7 @@ license:CC0
 	</software>
 
 	<software name="2010p1" cloneof="2010">
-		<description>2010: The Graphic Action Game (Prototype v44)</description>
+		<description>2010: The Graphic Action Game (prototype v44)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2618" />
@@ -2596,7 +2594,7 @@ license:CC0
 
 	<software name="bbears">
 		<!-- Berenstain Bears, The (1984)(Coleco)(proto).bin -->
-		<description>The Berenstain Bears (Prototype)</description>
+		<description>The Berenstain Bears (prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2608,9 +2606,9 @@ license:CC0
 
 	<software name="btimem" cloneof="btime">
 		<!-- Burgertime (1983)(Mattel)(proto).bin -->
-		<description>Burgertime (Prototype)</description>
+		<description>Burgertime (prototype)</description>
 		<year>1983</year>
-		<publisher>Mattel</publisher>
+		<publisher>Mattel Electronics</publisher>
 		<info name="developer" value="Data East USA" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
@@ -2622,7 +2620,7 @@ license:CC0
 
 	<software name="cabbagep1" cloneof="cabbage">
 		<!-- Cabbage Patch Kids - Adventures in the Park (1984)(OAA)(proto).bin -->
-		<description>Cabbage Patch Kids: Adventure in the Park (Prototype)</description>
+		<description>Cabbage Patch Kids: Adventure in the Park (prototype)</description>
 		<year>1984</year>
 		<publisher>OAA / Konami</publisher>
 		<info name="developer" value="OAA" />
@@ -2635,7 +2633,7 @@ license:CC0
 	</software>
 
 	<software name="cabbagep2" cloneof="cabbage">
-		<description>Cabbage Patch Kids: Adventure in the Park (Prototype, Alt)</description>
+		<description>Cabbage Patch Kids: Adventure in the Park (prototype, alt)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="OAA" />
@@ -2649,7 +2647,7 @@ license:CC0
 
 	<software name="digdug">
 		<!-- Dig Dug (1984)(Atari)(proto).bin -->
-		<description>Dig Dug (Prototype)</description>
+		<description>Dig Dug (prototype)</description>
 		<year>1984</year>
 		<publisher>Atarisoft</publisher>
 		<info name="developer" value="Namco" />
@@ -2662,8 +2660,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drseussp" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle (prototype, rev r)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="jigsaw 10 6-7 1 5274 e052.1" size="0x2000" crc="e63951b3" sha1="528b441c516211c884925a7e11c30b6cb5f85ecb" offset="0x0000" />
+				<rom name="jigsaw 10 6-7 2 8dde e052.2" size="0x2000" crc="b0ecd4a4" sha1="c77cb81424d585acc41dd1120e81ca7adc0e555b" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The label says the checksum is 90B3 but the dump's checksum is 90A3. Possible bit rot or just an error on the label? -->
+	<software name="drseussp1" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle Graphics Demo</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="link seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" /> <!-- original label: LINK: Seuss 4/6 1 Puzzler 90B3 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dlair" supported="no">
-		<description>Dragon's Lair (Prototype, 0416)</description>
+		<description>Dragon's Lair (prototype, 0416)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2677,7 +2699,7 @@ license:CC0
 
 	<software name="mindmstr">
 		<!-- Escape from the Mind Master (1983)(Epyx)(proto).bin -->
-		<description>Escape from the Mindmaster (Prototype)</description>
+		<description>Escape from the Mindmaster (prototype)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2690,7 +2712,7 @@ license:CC0
 
 	<software name="fallguy">
 		<!-- Fall Guy (1983)(Fox Video Games)(proto).bin -->
-		<description>Fall Guy (Prototype)</description>
+		<description>Fall Guy (prototype)</description>
 		<year>1983</year>
 		<publisher>Fox Video Games</publisher>
 		<info name="usage" value="Supports driving controller" />
@@ -2702,9 +2724,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="frogger2p" cloneof="frogger2">
+		<description>Frogger II: Threedeep! (prototype, 19840615)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="frogger ii - threeedeep (jun 15, 1984 prototype).1" size="0x2000" crc="29ae3ab6" sha1="6e77709b74cae4c8d080ad4a8aa8eaef274e7a81" offset="0x0000" />
+				<rom name="frogger ii - threeedeep (jun 15, 1984 prototype).2" size="0x2000" crc="c63c4408" sha1="d2682cd8166882935179de590c4f26d90b96ff23" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joust">
 		<!-- Joust (1983)(Atari)(proto).bin -->
-		<description>Joust (Prototype)</description>
+		<description>Joust (prototype)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2718,7 +2752,7 @@ license:CC0
 
 	<software name="mash">
 		<!-- M.A.S.H. (1983)(Fox Video Games)(proto).bin -->
-		<description>M*A*S*H (Prototype)</description>
+		<description>M*A*S*H (prototype)</description>
 		<year>1983</year>
 		<publisher>Fox Video Games</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2731,7 +2765,7 @@ license:CC0
 
 	<software name="monkeyp" cloneof="monkey">
 		<!-- Monkey Academy (1984)(Konami)(proto).bin -->
-		<description>Monkey Academy (Prototype)</description>
+		<description>Monkey Academy (prototype)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2743,7 +2777,7 @@ license:CC0
 	</software>
 
 	<software name="monkeyp1" cloneof="monkey">
-		<description>Monkey Academy (Prototype, 0511)</description>
+		<description>Monkey Academy (prototype, 0511)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2757,7 +2791,7 @@ license:CC0
 
 	<software name="orbit">
 		<!-- Orbit (1983)(Parker Bros)(proto).bin -->
-		<description>Orbit (Prototype)</description>
+		<description>Orbit (prototype)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2769,7 +2803,7 @@ license:CC0
 
 	<software name="pacman">
 		<!-- Pac-Man (1983)(Atari)(proto).bin -->
-		<description>Pac-Man (Prototype)</description>
+		<description>Pac-Man (prototype)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2782,7 +2816,7 @@ license:CC0
 
 	<software name="porkys">
 		<!-- Porky's (1983)(Fox Video Games)(proto).bin -->
-		<description>Porky's (Prototype)</description>
+		<description>Porky's (prototype)</description>
 		<year>1983</year>
 		<publisher>Fox Video Games</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2795,7 +2829,7 @@ license:CC0
 
 	<software name="power">
 		<!-- Power Lords - Quest for Volcan (1983)(Probe 2000)(proto).bin -->
-		<description>Power Lords: Quest for Volcan (Prototype)</description>
+		<description>Power Lords: Quest for Volcan (prototype)</description>
 		<year>1984</year>
 		<publisher>Probe 2000</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2810,7 +2844,7 @@ license:CC0
 
 	<software name="smurfply">
 		<!-- Smurf Play and Learn (1982)(Coleco)(proto).bin -->
-		<description>Smurf Play and Learn (Prototype)</description>
+		<description>Smurf Play and Learn (prototype)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2822,7 +2856,7 @@ license:CC0
 	</software>
 
 	<software name="spyhuntp" cloneof="spyhunt">
-		<description>Spy Hunter (Prototype, v22)</description>
+		<description>Spy Hunter (prototype, v22)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2836,7 +2870,7 @@ license:CC0
 	</software>
 
 	<software name="spyhuntp1" cloneof="spyhunt">
-		<description>Spy Hunter (Prototype, v13)</description>
+		<description>Spy Hunter (prototype, v13)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2849,9 +2883,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="starwarsp" cloneof="starwars">
+		<description>Star Wars: The Arcade Game (prototype, 19840412)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="developer" value="Atari" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="star wars - the arcade game (apr 12, 1984 prototype).1" size="0x2000" crc="21174d6a" sha1="ea45736701e2cc55fec1f4f8c3839824be46be4b" offset="0x0000" />
+				<rom name="star wars - the arcade game (apr 12, 1984 prototype).2" size="0x2000" crc="93940cce" sha1="cef3d0f085a148ab5760afbe93384f8f12773770" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="steam">
 		<!-- Steamroller (1984)(Activision)(proto).bin -->
-		<description>Steamroller (Prototype)</description>
+		<description>Steamroller (prototype)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2864,7 +2911,7 @@ license:CC0
 
 	<software name="superdk">
 		<!-- Super DK! (1982)(Nintendo)(proto).bin -->
-		<description>Super DK! (Prototype)</description>
+		<description>Super DK! (prototype)</description>
 		<year>1982</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2878,7 +2925,7 @@ license:CC0
 	</software>
 
 	<software name="sword">
-		<description>Sword and Sorcerer (Prototype)</description>
+		<description>Sword and Sorcerer (prototype)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2891,7 +2938,7 @@ license:CC0
 
 	<software name="hustler">
 		<!-- Video Hustler (1984)(Coleco)(proto).bin -->
-		<description>Video Hustler (Prototype)</description>
+		<description>Video Hustler (prototype)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="developer" value="Konami" />
@@ -2903,7 +2950,7 @@ license:CC0
 	</software>
 
 	<software name="hustler1" cloneof="hustler">
-		<description>Video Hustler (Prototype, 19840727)</description>
+		<description>Video Hustler (prototype, 19840727)</description>
 		<year>1984</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2914,7 +2961,7 @@ license:CC0
 	</software>
 
 	<software name="wargamesp" cloneof="wargames">
-		<description>War Games (Prototype, 0417)</description>
+		<description>War Games (prototype, 0417)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2928,7 +2975,7 @@ license:CC0
 
 	<software name="yolk">
 		<!-- Yolks on You, The (1983)(Fox Video Games)(proto).bin.bin -->
-		<description>The Yolks on You (Prototype)</description>
+		<description>The Yolks on You (prototype)</description>
 		<year>1983</year>
 		<publisher>Fox Video Games</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2963,7 +3010,7 @@ license:CC0
 
 	<software name="finaltst">
 		<!-- Final Test Cartridge (1982)(Coleco).bin -->
-		<description>Final Test Cartridge (Prototype)</description>
+		<description>Final Test Cartridge (prototype)</description>
 		<year>1982</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -2987,7 +3034,7 @@ license:CC0
 
 	<software name="musicbox">
 		<!-- Music Box Demo (1987)(Coleco).bin -->
-		<description>Music Box (Demo)</description>
+		<description>Music Box (demo)</description>
 		<year>1987</year>
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -3087,7 +3134,7 @@ license:CC0
 
 	<software name="skiinga" cloneof="skiing">
 		<!-- Skiing (1986)(Telegames).bin -->
-		<description>Skiing (Bad?)</description>
+		<description>Skiing (bad?)</description>
 		<year>1986</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -3153,7 +3200,7 @@ license:CC0
 		<!-- Galaxian (1983)(Atari)[a].bin -->
 		<!-- 0x3ffe : 0x80 0xb0 ('galaxian') - 0x00 0xff ('galaxiana') -->
 		<!-- 0x4000 : 0x32 ('galaxian') - 0xff ('galaxiana') -->
-		<description>Galaxian (Alt)</description>
+		<description>Galaxian (alt)</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="70006" />
@@ -3218,7 +3265,7 @@ license:CC0
 
 	<software name="suprdkjr">
 		<!-- Super DK! Junior (1983)(Nintendo)(proto).bin -->
-		<description>Super DK! Junior (Prototype)</description>
+		<description>Super DK! Junior (prototype)</description>
 		<year>1983</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="coleco_cart">
@@ -3233,7 +3280,7 @@ license:CC0
 
 	<software name="tunnels">
 		<!-- Tunnels & Trolls (demo) (1983)(Coleco).bin -->
-		<description>Tunnels &amp; Trolls (Demo)</description>
+		<description>Tunnels &amp; Trolls (demo)</description>
 		<year>1983</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2441" />

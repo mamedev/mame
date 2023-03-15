@@ -14,7 +14,6 @@
 
 #include "video/ps2gif.h"
 #include "vudasm.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(SONYPS2_VU0, sonyvu0_device, "sonyvu0", "Sony PlayStation 2 VU0")
 DEFINE_DEVICE_TYPE(SONYPS2_VU1, sonyvu1_device, "sonyvu1", "Sony PlayStation 2 VU1")

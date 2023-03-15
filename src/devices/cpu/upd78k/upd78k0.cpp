@@ -26,9 +26,9 @@ DEFINE_DEVICE_TYPE(UPD78053, upd78053_device, "upd78053", "NEC uPD78053")
 upd78k0_device::upd78k0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 iram_size, address_map_constructor mem_map, address_map_constructor sfr_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, mem_map)
-	, m_iram_config("internal high-speed RAM", ENDIANNESS_LITTLE, 16, iram_size > 0x200 ? 10 : iram_size > 0x100 ? 9 : 8, 0,
+	, m_iram_config("iram", ENDIANNESS_LITTLE, 16, iram_size > 0x200 ? 10 : iram_size > 0x100 ? 9 : 8, 0,
 					address_map_constructor(FUNC(upd78k0_device::iram_map), this))
-	, m_sfr_config("SFR", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
+	, m_sfr_config("sfr", ENDIANNESS_LITTLE, 16, 8, 0, sfr_map)
 	, m_iram_size(iram_size)
 	, m_subclock(0)
 	, m_pc(0)
@@ -117,16 +117,16 @@ void upd78k0_device::device_start()
 		[this](u8 data) { m_psw = (m_psw & 0xd7) | (data & 2) << 4 | (data & 1) << 3; }
 	).mask(3).noshow();
 	state_add(UPD78K0_SP, "SP", m_sp);
-	void *iram = memshare("iram")->ptr();
+	u16 *iram = static_cast<u16 *>(memshare("iram")->ptr());
 	for (int n = 0; n < 4; n++)
 		state_add<u16>(UPD78K0_AX + n, std::array<const char *, 4>{{"AX", "BC", "DE", "HL"}}[n],
-			[this, iram, n]() { return static_cast<u16 *>(iram)[(debug_register_base() >> 1) | n]; },
-			[this, iram, n](u16 data) { static_cast<u16 *>(iram)[(debug_register_base() >> 1) | n] = data; }
+			[this, iram, n]() { return iram[(debug_register_base() >> 1) | n]; },
+			[this, iram, n](u16 data) { iram[(debug_register_base() >> 1) | n] = data; }
 		);
 	for (int n = 0; n < 8; n++)
 		state_add<u8>(UPD78K0_X + n, std::array<const char *, 8>{{"X", "A", "C", "B", "E", "D", "L", "H"}}[n],
-			[this, iram, n]() { return static_cast<u8 *>(iram)[BYTE_XOR_LE(debug_register_base() | n)]; },
-			[this, iram, n](u8 data) { static_cast<u8 *>(iram)[BYTE_XOR_LE(debug_register_base() | n)] = data; }
+			[this, iram, n]() { return util::little_endian_cast<const u8>(iram)[debug_register_base() | n]; },
+			[this, iram, n](u8 data) { util::little_endian_cast<u8>(iram)[debug_register_base() | n] = data; }
 		).noshow();
 
 	// save state

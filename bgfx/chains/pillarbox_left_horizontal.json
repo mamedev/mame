@@ -10,11 +10,11 @@
 {
 	"name": "Horizontal Pillarbox, Left",
 	"author": "Ryan Holtz",
-	
+
 	"sliders": [
 		{ "type": "float", "name": "saturation", "text": "Saturation", "default": 0.25, "max": 1.00, "min": 0.00, "step": 0.01, "format": "%1.2f", "screen": "raster" }
 	],
-	
+
 	"targets": [
 		{
 			"name": "guest",
@@ -29,16 +29,16 @@
 			"doublebuffer": true
 		}
 	],
-	
+
 	"passes": [
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Blit to scalable target",
 			"input": [
 				{ "sampler": "s_tex", "target": "screen" }
 			],
 			"output": "guest"
 		},
-		{	"effect": "pillarbox_left_horizontal/gaussian",
+		{   "effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 1, Horizontal",
 			"uniforms": [
 				{ "uniform": "u_dimension", "value": [ 1.0, 0.0 ] }
@@ -48,7 +48,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "pillarbox_left_horizontal/gaussian",
+		{   "effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 1, Vertical",
 			"uniforms": [
 				{ "uniform": "u_dimension", "value": [ 0.0, 1.0 ] }
@@ -58,7 +58,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "pillarbox_left_horizontal/gaussian",
+		{   "effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 2, Horizontal",
 			"uniforms": [
 				{ "uniform": "u_dimension", "value": [ 1.0, 0.0 ] }
@@ -68,7 +68,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "pillarbox_left_horizontal/gaussian",
+		{   "effect": "pillarbox_left_horizontal/gaussian",
 			"name": "Gaussian Blur 2, Vertical",
 			"uniforms": [
 				{ "uniform": "u_dimension", "value": [ 0.0, 1.0 ] }
@@ -92,7 +92,7 @@
 			],
 			"output": "internal"
 		},
-		{	"effect": "misc/blit",
+		{   "effect": "misc/blit",
 			"name": "Final Blit",
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" }

@@ -344,87 +344,120 @@ void m68340_cpu_device::m68340_internal_sim_ports_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint32_t m68340_cpu_device::m68340_internal_sim_cs_r(offs_t offset, uint32_t mem_mask)
+uint16_t m68340_cpu_device::m68340_internal_sim_cs_r(offs_t offset, uint16_t mem_mask)
 {
+	uint32_t data = 0;
 	LOGR("%s\n", FUNCNAME);
-	offset += m68340_sim::REG_AM_CS0>>2;
+	offset += m68340_sim::REG_AM_CS0>>1;
 
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
 
-	switch (offset<<2)
+	switch (offset << 1)
 	{
-		case m68340_sim::REG_AM_CS0:  return sim.m_am[0];
-		case m68340_sim::REG_BA_CS0:  return sim.m_ba[0];
-		case m68340_sim::REG_AM_CS1:  return sim.m_am[1];
-		case m68340_sim::REG_BA_CS1:  return sim.m_ba[1];
-		case m68340_sim::REG_AM_CS2:  return sim.m_am[2];
-		case m68340_sim::REG_BA_CS2:  return sim.m_ba[2];
-		case m68340_sim::REG_AM_CS3:  return sim.m_am[3];
-		case m68340_sim::REG_BA_CS3:  return sim.m_ba[3];
+		case m68340_sim::REG_AM_CS0:  data = sim.m_am[0];  break;
+		case m68340_sim::REG_BA_CS0:  data = sim.m_ba[0];  break;
+		case m68340_sim::REG_AM_CS1:  data = sim.m_am[1];  break;
+		case m68340_sim::REG_BA_CS1:  data = sim.m_ba[1];  break;
+		case m68340_sim::REG_AM_CS2:  data = sim.m_am[2];  break;
+		case m68340_sim::REG_BA_CS2:  data = sim.m_ba[2];  break;
+		case m68340_sim::REG_AM_CS3:  data = sim.m_am[3];  break;
+		case m68340_sim::REG_BA_CS3:  data = sim.m_ba[3];  break;
 
 		default:
-			logerror("%08x m68340_internal_sim_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
+			logerror("%08x m68340_internal_sim_r %08x, (%08x)\n", m_ppc, offset*2,mem_mask);
 	}
 
-	return 0x00000000;
+	return (BIT(offset,0) ? data : (data >> 16)) & 0xffff;
 }
 
-void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("%s\n", FUNCNAME);
-	offset += m68340_sim::REG_AM_CS0>>2;
 
-	if (offset & 1)
+	offset += m68340_sim::REG_AM_CS0>>1;
+
+	if (BIT(offset, 1))
 	{
-	  LOGCS("%08x Base address CS%d %08x, %08x (%08x) ", m_ppc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
-	  LOGCS("- Base: %08x BFC:%02x WP:%d FTE:%d NCS:%d Valid: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, data & 0x08 ? 1 : 0, data & 0x04 ? 1 : 0, data & 0x02 ? 1 : 0, data & 0x01 ? "Yes" : "No");
+		if (BIT(offset, 0))
+		{
+			LOGCS("%08x (LSWORD) Base address CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("- Base: %04x BFC:%02x WP:%d FTE:%d NCS:%d Valid: %s\n", data & 0xff00, (data & 0xf0) >> 4, data & 0x08 ? 1 : 0, data & 0x04 ? 1 : 0, data & 0x02 ? 1 : 0, data & 0x01 ? "Yes" : "No");
+		}
+		else
+		{
+			LOGCS("%08x (MSWORD) Base address CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("- Base: %04x\n", data);
+		}
 	}
 	else
 	{
-	  LOGCS("%08x Address mask CS%d %08x, %08x (%08x) ", m_ppc, (offset - 0x10) / 2, offset * 4, data, mem_mask);
-	  LOGCS("- Mask: %08x FCM:%02x DD:%d PS: %s\n", data & 0xffffff00, (data & 0xf0) >> 4, (data >> 2) & 0x03, std::array<char const *, 4>{{"Reserved", "16-Bit", "8-bit", "External DSACK response"}}[data & 0x03]);
+		if (BIT(offset, 0))
+		{
+			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("- FCM:%02x DD:%d PS: %s\n", (data & 0xf0) >> 4, (data >> 2) & 0x03, std::array<char const *, 4>{{"Reserved", "16-Bit", "8-bit", "External DSACK response"}}[data & 0x03]);
+		}
+		else
+		{
+			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("- Mask: %04x\n", data & 0xff00);
+		}
 	}
 
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
 
-	switch (offset << 2)
+	auto const combine_data32 =
+			[&offset, &data, &mem_mask] (uint32_t *varptr)
+			{
+				uint32_t data32 = data;
+				uint32_t mem_mask32 = mem_mask;
+
+				if (!BIT(offset,0))
+				{
+					data32 <<= 16;
+					mem_mask32 <<= 16;
+				}
+
+				*varptr = (*varptr & ~mem_mask32) | (data32 & mem_mask32);
+			};
+
+	switch ((offset << 1) & ~3)
 	{
 		case m68340_sim::REG_AM_CS0:
-			COMBINE_DATA(&sim.m_am[0]);
+			combine_data32(&sim.m_am[0]);
 			break;
 
 		case m68340_sim::REG_BA_CS0:
-			COMBINE_DATA(&sim.m_ba[0]);
+			combine_data32(&sim.m_ba[0]);
 			break;
 
 		case m68340_sim::REG_AM_CS1:
-			COMBINE_DATA(&sim.m_am[1]);
+			combine_data32(&sim.m_am[1]);
 			break;
 
 		case m68340_sim::REG_BA_CS1:
-			COMBINE_DATA(&sim.m_ba[1]);
+			combine_data32(&sim.m_ba[1]);
 			break;
 
 		case m68340_sim::REG_AM_CS2:
-			COMBINE_DATA(&sim.m_am[2]);
+			combine_data32(&sim.m_am[2]);
 			break;
 
 		case m68340_sim::REG_BA_CS2:
-			COMBINE_DATA(&sim.m_ba[2]);
+			combine_data32(&sim.m_ba[2]);
 			break;
 
 		case m68340_sim::REG_AM_CS3:
-			COMBINE_DATA(&sim.m_am[3]);
+			combine_data32(&sim.m_am[3]);
 			break;
 
 		case m68340_sim::REG_BA_CS3:
-			COMBINE_DATA(&sim.m_ba[3]);
+			combine_data32(&sim.m_ba[3]);
 			break;
 
 		default:
-			logerror("%08x m68340_internal_sim_cs_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
+			logerror("%08x m68340_internal_sim_cs_w %08x, %08x (%08x)\n", m_ppc, offset*2,data,mem_mask);
 			break;
 	}
 }
@@ -438,7 +471,7 @@ void m68340_cpu_device::start_68340_sim()
 {
 	LOG("%s\n", FUNCNAME);
 	LOGCLOCK( " - Clock: %d [0x%08x]\n", clock(), clock());
-	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback),this));
+	m_irq_timer = timer_alloc(FUNC(m68340_cpu_device::periodic_interrupt_timer_callback), this);
 
 	// resolve callbacks Port A
 	m_pa_out_cb.resolve_safe();

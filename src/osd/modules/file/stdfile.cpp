@@ -10,12 +10,14 @@
 #include "osdfile.h"
 
 #include <cassert>
+#include <cerrno>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <string>
 
-#include <cstdio>  // for fileno
+#include <stdio.h>  // for fileno
 #include <unistd.h> // for ftruncate
 
 
@@ -25,7 +27,10 @@ class std_osd_file : public osd_file
 {
 public:
 
-	std_osd_file(FILE *f) : m_file(f) { assert(m_file); }
+	std_osd_file(FILE *f) noexcept : m_file(f)
+	{
+		assert(m_file);
+	}
 
 	//============================================================
 	//  osd_close
@@ -34,59 +39,81 @@ public:
 	virtual ~std_osd_file() override
 	{
 		// close the file handle
-		if (m_file) std::fclose(m_file);
+		if (m_file)
+			std::fclose(m_file);
 	}
 
 	//============================================================
 	//  osd_read
 	//============================================================
 
-	virtual error read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
+	virtual std::error_condition read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
 	{
-		// seek to the new location; note that most fseek implementations are limited to 32 bits
+		// seek to the new location; note that most fseek implementations are limited to the range of long int
+		if (std::numeric_limits<long>::max() < offset)
+			return std::errc::invalid_argument;
 		if (std::fseek(m_file, offset, SEEK_SET) < 0)
-			return error::FAILURE;
+			return std::error_condition(errno, std::generic_category());
 
 		// perform the read
 		std::size_t const count = std::fread(buffer, 1, length, m_file);
+		if ((count < length) && std::ferror(m_file))
+		{
+			std::clearerr(m_file);
+			return std::error_condition(errno, std::generic_category());
+		}
 		actual = count;
 
-		return error::NONE;
+		return std::error_condition();
 	}
 
 	//============================================================
 	//  osd_write
 	//============================================================
 
-	virtual error write(const void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) override
+	virtual std::error_condition write(const void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
 	{
-		// seek to the new location; note that most fseek implementations are limited to 32 bits
+		// seek to the new location; note that most fseek implementations are limited to the range of long int
+		if (std::numeric_limits<long>::max() < offset)
+			return std::errc::invalid_argument;
 		if (std::fseek(m_file, offset, SEEK_SET) < 0)
-			return error::FAILURE;
+			return std::error_condition(errno, std::generic_category());
 
 		// perform the write
 		std::size_t const count = std::fwrite(buffer, 1, length, m_file);
+		if (count < length)
+		{
+			std::clearerr(m_file);
+			return std::error_condition(errno, std::generic_category());
+		}
 		actual = count;
 
-		return error::NONE;
+		return std::error_condition();
 	}
 
 	//============================================================
 	//  osd_truncate
 	//============================================================
 
-	error truncate(std::uint64_t offset) override
+	virtual std::error_condition truncate(std::uint64_t offset) noexcept override
 	{
-		return (ftruncate(fileno(m_file), offset) < 0) ? error::FAILURE : error::NONE;
+		// this is present in POSIX but not C/C++
+		if (::ftruncate(::fileno(m_file), offset) < 0)
+			return std::error_condition(errno, std::generic_category());
+		else
+			return std::error_condition();
 	}
 
 	//============================================================
 	//  osd_fflush
 	//============================================================
 
-	virtual error flush() override
+	virtual std::error_condition flush() noexcept override
 	{
-		return (std::fflush(m_file) == EOF) ? error::FAILURE : error::NONE;
+		if (!std::fflush(m_file))
+			return std::error_condition();
+		else
+			return std::error_condition(errno, std::generic_category());
 	}
 
 private:
@@ -100,7 +127,7 @@ private:
 //  osd_open
 //============================================================
 
-osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags, ptr &file, std::uint64_t &filesize)
+std::error_condition osd_file::open(std::string const &path, std::uint32_t openflags, ptr &file, std::uint64_t &filesize) noexcept
 {
 	// based on the flags, choose a mode
 	const char *mode;
@@ -114,12 +141,12 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 	else if (openflags & OPEN_FLAG_READ)
 		mode = "rb";
 	else
-		return error::INVALID_ACCESS;
+		return std::errc::invalid_argument;
 
 	// open the file
 	FILE *const fileptr = std::fopen(path.c_str(), mode);
 	if (!fileptr)
-		return error::NOT_FOUND;
+		return std::error_condition(errno, std::generic_category());
 
 	// get the size -- note that most fseek/ftell implementations are limited to 32 bits
 	long length;
@@ -127,21 +154,20 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 		((length = std::ftell(fileptr)) < 0) ||
 		(std::fseek(fileptr, 0, SEEK_SET) < 0))
 	{
+		std::error_condition err(errno, std::generic_category());
 		std::fclose(fileptr);
-		return error::FAILURE;
+		return err;
 	}
 
-	try
-	{
-		file = std::make_unique<std_osd_file>(fileptr);
-		filesize = std::int64_t(length);
-		return error::NONE;
-	}
-	catch (...)
+	osd_file::ptr result(new (std::nothrow) std_osd_file(fileptr));
+	if (!result)
 	{
 		std::fclose(fileptr);
-		return error::OUT_OF_MEMORY;
+		return std::errc::not_enough_memory;
 	}
+	file = std::move(result);
+	filesize = std::int64_t(length);
+	return std::error_condition();
 }
 
 
@@ -149,9 +175,9 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 //  osd_openpty
 //============================================================
 
-osd_file::error osd_file::openpty(ptr &file, std::string &name)
+std::error_condition osd_file::openpty(ptr &file, std::string &name) noexcept
 {
-	return error::FAILURE;
+	return std::errc::not_supported;
 }
 
 
@@ -159,9 +185,12 @@ osd_file::error osd_file::openpty(ptr &file, std::string &name)
 //  osd_rmfile
 //============================================================
 
-osd_file::error osd_file::remove(std::string const &filename)
+std::error_condition osd_file::remove(std::string const &filename) noexcept
 {
-	return (std::remove(filename.c_str()) < 0) ? error::FAILURE : error::NONE;
+	if (!std::remove(filename.c_str()))
+		return std::error_condition();
+	else
+		return std::error_condition(errno, std::generic_category());
 }
 
 
@@ -169,7 +198,7 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps) noexcept
 {
 	// there is no standard way of doing this, so we always return false, indicating
 	// that a given path is not a physical drive
@@ -181,7 +210,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 //  osd_uchar_from_osdchar
 //============================================================
 
-int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
+int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count) noexcept
 {
 	// we assume a standard 1:1 mapping of characters to the first 256 unicode characters
 	*uchar = (uint8_t)*osdchar;
@@ -221,13 +250,14 @@ osd_directory_entry *osd_stat(const std::string &path)
 //  osd_get_full_path
 //============================================================
 
-osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
+std::error_condition osd_get_full_path(std::string &dst, std::string const &path) noexcept
 {
 	// derive the full path of the file in an allocated string
 	// for now just fake it since we don't presume any underlying file system
-	dst = path;
+	try { dst = path; }
+	catch (...) { return std::errc::not_enough_memory; }
 
-	return osd_file::error::NONE;
+	return std::error_condition();
 }
 
 
@@ -235,7 +265,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 //  osd_is_absolute_path
 //============================================================
 
-bool osd_is_absolute_path(std::string const &path)
+bool osd_is_absolute_path(std::string const &path) noexcept
 {
 	// assume no for everything
 	return false;

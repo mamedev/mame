@@ -82,10 +82,10 @@ private:
 	// helpers
 	glyph &get_char(char32_t chnum);
 	void char_expand(char32_t chnum, glyph &ch);
-	bool load_cached_bdf(const char *filename);
+	bool load_cached_bdf(std::string_view filename);
 	bool load_bdf();
-	bool load_cached(emu_file &file, u64 length, u32 hash);
-	bool save_cached(const char *filename, u64 length, u32 hash);
+	bool load_cached(util::random_read &file, u64 length, u32 hash);
+	bool save_cached(util::random_write &file, u64 length, u32 hash);
 
 	void render_font_command_glyph();
 

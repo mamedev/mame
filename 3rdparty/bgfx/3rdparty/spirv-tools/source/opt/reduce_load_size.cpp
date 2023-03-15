@@ -27,7 +27,6 @@ namespace {
 const uint32_t kExtractCompositeIdInIdx = 0;
 const uint32_t kVariableStorageClassInIdx = 0;
 const uint32_t kLoadPointerInIdx = 0;
-const double kThreshold = 0.9;
 
 }  // namespace
 
@@ -112,10 +111,10 @@ bool ReduceLoadSize::ReplaceExtract(Instruction* inst) {
   Instruction* new_access_chain = ir_builder.AddAccessChain(
       pointer_to_result_type_id,
       composite_inst->GetSingleWordInOperand(kLoadPointerInIdx), ids);
-  Instruction* new_laod =
+  Instruction* new_load =
       ir_builder.AddLoad(inst->type_id(), new_access_chain->result_id());
 
-  context()->ReplaceAllUsesWith(inst->result_id(), new_laod->result_id());
+  context()->ReplaceAllUsesWith(inst->result_id(), new_load->result_id());
   context()->KillInst(inst);
   return true;
 }
@@ -139,6 +138,7 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
 
   all_elements_used =
       !def_use_mgr->WhileEachUser(op_inst, [&elements_used](Instruction* use) {
+        if (use->IsCommonDebugInstr()) return true;
         if (use->opcode() != SpvOpCompositeExtract ||
             use->NumInOperands() == 1) {
           return false;
@@ -150,6 +150,8 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
   bool should_replace = false;
   if (all_elements_used) {
     should_replace = false;
+  } else if (1.0 <= replacement_threshold_) {
+    should_replace = true;
   } else {
     analysis::ConstantManager* const_mgr = context()->get_constant_mgr();
     analysis::TypeManager* type_mgr = context()->get_type_mgr();
@@ -159,8 +161,15 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
       case analysis::Type::kArray: {
         const analysis::Constant* size_const =
             const_mgr->FindDeclaredConstant(load_type->AsArray()->LengthId());
-        assert(size_const->AsIntConstant());
-        total_size = size_const->GetU32();
+
+        if (size_const) {
+          assert(size_const->AsIntConstant());
+          total_size = size_const->GetU32();
+        } else {
+          // The size is spec constant, so it is unknown at this time.  Assume
+          // it is very large.
+          total_size = UINT32_MAX;
+        }
       } break;
       case analysis::Type::kStruct:
         total_size = static_cast<uint32_t>(
@@ -171,7 +180,7 @@ bool ReduceLoadSize::ShouldReplaceExtract(Instruction* inst) {
     }
     double percent_used = static_cast<double>(elements_used.size()) /
                           static_cast<double>(total_size);
-    should_replace = (percent_used < kThreshold);
+    should_replace = (percent_used < replacement_threshold_);
   }
 
   should_replace_cache_[op_inst->result_id()] = should_replace;

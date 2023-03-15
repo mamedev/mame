@@ -354,6 +354,8 @@ offs_t m7700_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		flags = STEP_OVER;
 	else if (opcode->is_return())
 		flags = STEP_OUT;
+	else if (opcode->is_bcond())
+		flags = STEP_COND;
 
 	stream << opcode->name();
 

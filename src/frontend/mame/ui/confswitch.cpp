@@ -51,6 +51,7 @@ menu_confswitch::switch_group_descriptor::switch_group_descriptor(ioport_field c
 	, mask(0U)
 	, state(0U)
 {
+	std::fill(std::begin(toggles), std::end(toggles), toggle{ nullptr, 0U });
 }
 
 
@@ -81,7 +82,14 @@ menu_confswitch::~menu_confswitch()
 }
 
 
-void menu_confswitch::populate(float &customtop, float &custombottom)
+void menu_confswitch::menu_activated()
+{
+	// switches can have input assignments, and scripts are a thing
+	reset(reset_options::REMEMBER_REF);
+}
+
+
+void menu_confswitch::populate()
 {
 	// locate relevant fields if necessary
 	if (m_fields.empty())
@@ -94,7 +102,6 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 
 	// loop over input ports and set up the current values
 	device_t *prev_owner(nullptr);
-	bool first_entry(true);
 	for (field_descriptor &desc : m_fields)
 	{
 		ioport_field &field(desc.field);
@@ -106,11 +113,10 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 				if (&field.device() != prev_owner)
 				{
 					prev_owner = &field.device();
-					if (first_entry)
-						first_entry = false;
+					if (prev_owner->owner())
+						item_append(string_format(_("%1$s [root%2$s]"), prev_owner->type().fullname(), prev_owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 					else
-						item_append(menu_item_type::SEPARATOR);
-					item_append(string_format("[root%s]", prev_owner->tag()), 0, nullptr);
+						item_append(string_format(_("[root%1$s]"), prev_owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 				}
 
 				// set the left/right flags appropriately
@@ -146,8 +152,10 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 						++m_active_switch_groups;
 
 					// apply the bits
-					group.mask |= uint32_t(1) << (loc.number() - 1);
 					ioport_value const mask(accummask & ~(accummask - 1));
+					group.toggles[loc.number() - 1].field = &field;
+					group.toggles[loc.number() - 1].mask = mask;
+					group.mask |= uint32_t(1) << (loc.number() - 1);
 					if (((settings.value & mask) && !loc.inverted()) || (!(settings.value & mask) && loc.inverted()))
 						group.state |= uint32_t(1) << (loc.number() - 1);
 
@@ -159,61 +167,110 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), 0, (void *)1);
+	item_append(_("Reset System"), 0, (void *)1);
 }
 
 
-void menu_confswitch::handle()
+bool menu_confswitch::handle(event const *ev)
 {
-	// process the menu
-	event const *const menu_event(process(0));
+	if (!ev || !ev->itemref)
+		return false;
 
-	// handle events
-	if (menu_event && menu_event->itemref)
+	if (uintptr_t(ev->itemref) == 1U)
 	{
-		if (uintptr_t(menu_event->itemref) == 1U)
-		{
-			// reset
-			if (menu_event->iptkey == IPT_UI_SELECT)
-				machine().schedule_hard_reset();
-		}
-		else
-		{
-			// actual settings
-			ioport_field &field(*reinterpret_cast<ioport_field *>(menu_event->itemref));
-			bool changed(false);
+		// reset
+		if (ev->iptkey == IPT_UI_SELECT)
+			machine().schedule_hard_reset();
+	}
+	else
+	{
+		// actual settings
+		ioport_field &field(*reinterpret_cast<ioport_field *>(ev->itemref));
+		bool changed(false);
 
-			switch (menu_event->iptkey)
+		switch (ev->iptkey)
+		{
+		// left goes to previous setting
+		case IPT_UI_LEFT:
+			field.select_previous_setting();
+			changed = true;
+			break;
+
+		// right goes to next setting
+		case IPT_UI_SELECT:
+		case IPT_UI_RIGHT:
+			field.select_next_setting();
+			changed = true;
+			break;
+
+		// if cleared, reset to default value
+		case IPT_UI_CLEAR:
 			{
-			// if selected, reset to default value
-			case IPT_UI_SELECT:
+				ioport_field::user_settings settings;
+				field.get_user_settings(settings);
+				if (field.defvalue() != settings.value)
 				{
-					ioport_field::user_settings settings;
-					field.get_user_settings(settings);
 					settings.value = field.defvalue();
 					field.set_user_settings(settings);
+					changed = true;
 				}
-				changed = true;
-				break;
-
-			// left goes to previous setting
-			case IPT_UI_LEFT:
-				field.select_previous_setting();
-				changed = true;
-				break;
-
-			// right goes to next setting
-			case IPT_UI_RIGHT:
-				field.select_next_setting();
-				changed = true;
-				break;
 			}
+			break;
 
-			// if anything changed, rebuild the menu, trying to stay on the same field
-			if (changed)
-				reset(reset_options::REMEMBER_REF);
+		// trick to get previous group - depend on headings having null reference
+		case IPT_UI_PREV_GROUP:
+			{
+				auto current = selected_index();
+				bool found_break = false;
+				while (0 < current)
+				{
+					if (!found_break)
+					{
+						if (!item(--current).ref())
+							found_break = true;
+					}
+					else if (!item(current - 1).ref())
+					{
+						set_selected_index(current);
+						set_top_line(current - 1);
+						return true;
+					}
+					else
+					{
+						--current;
+					}
+				}
+			}
+			break;
+
+		// trick to get next group - depend on special item references
+		case IPT_UI_NEXT_GROUP:
+			{
+				auto current = selected_index();
+				while (item_count() > ++current)
+				{
+					if (!item(current).ref())
+					{
+						if ((item_count() > (current + 1)) && (uintptr_t(item(current + 1).ref()) != 1))
+						{
+							set_selected_index(current + 1);
+							set_top_line(current);
+							return true;
+						}
+						break;
+					}
+				}
+			}
+			break;
 		}
+
+		// if anything changed, rebuild the menu, trying to stay on the same field
+		if (changed)
+			reset(reset_options::REMEMBER_REF);
 	}
+
+	// changing settings triggers an item rebuild because it can affect whether things are enabled
+	return false;
 }
 
 
@@ -254,8 +311,14 @@ void menu_confswitch::find_fields()
 
 menu_settings_dip_switches::menu_settings_dip_switches(mame_ui_manager &mui, render_container &container)
 	: menu_confswitch(mui, container, IPT_DIPSWITCH)
+	, m_switch_group_y()
 	, m_visible_switch_groups(0U)
+	, m_single_width(0.0f)
+	, m_nub_width(0.0f)
+	, m_first_nub(0.0f)
+	, m_clickable_height(0.0f)
 {
+	set_heading(_("DIP Switches"));
 }
 
 
@@ -264,17 +327,28 @@ menu_settings_dip_switches::~menu_settings_dip_switches()
 }
 
 
+void menu_settings_dip_switches::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_confswitch::recompute_metrics(width, height, aspect);
+
+	set_custom_space(
+			0.0f,
+			m_visible_switch_groups
+				? ((m_visible_switch_groups * (DIP_SWITCH_HEIGHT * line_height())) + ((m_visible_switch_groups - 1) * (DIP_SWITCH_SPACING * line_height())) + (tb_border() * 3.0f))
+				: 0.0f);
+}
+
+
 void menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
-	// catch if no diploc has to be drawn
+	// catch if no DIP locations have to be drawn
 	if (!m_visible_switch_groups)
 		return;
 
 	// calculate optimal width
 	float const aspect(machine().render().ui_aspect(&container()));
-	float const lineheight(ui().get_line_height());
-	float const singlewidth(lineheight * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * aspect);
-	float const maxwidth(1.0f - (ui().box_lr_border() * 2.0f * aspect));
+	float const maxwidth(1.0f - (lr_border() * 2.0f));
+	m_single_width = (line_height() * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * aspect);
 	float width(0.0f);
 	unsigned maxswitches(0U);
 	for (switch_group_descriptor const &group : switch_groups())
@@ -282,31 +356,34 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 		if (group.mask)
 		{
 			maxswitches = (std::max)(group.switch_count(), maxswitches);
-			float const namewidth(ui().get_string_width(group.name));
-			float const switchwidth(singlewidth * maxswitches);
-			width = (std::min)((std::max)(namewidth + switchwidth + (lineheight * aspect), width), maxwidth);
+			float const namewidth(get_string_width(group.name));
+			float const switchwidth(m_single_width * maxswitches);
+			width = (std::min)((std::max)(namewidth + switchwidth + (line_height() * aspect), width), maxwidth);
 		}
 	}
 
 	// draw extra menu area
-	float const boxwidth((std::max)(width + (ui().box_lr_border() * 2.0f * aspect), x2 - x1));
-	float const boxleft((1.0f - boxwidth) / 2.0f);
-	ui().draw_outlined_box(container(), boxleft, y2 + ui().box_tb_border(), boxleft + boxwidth, y2 + bottom, ui().colors().background_color());
+	float const boxwidth((std::max)(width + (lr_border() * 2.0f), x2 - x1));
+	float const boxleft((1.0f - boxwidth) * 0.5f);
+	ui().draw_outlined_box(container(), boxleft, y2 + tb_border(), boxleft + boxwidth, y2 + bottom, ui().colors().background_color());
 
 	// calculate centred layout
-	float const nameleft((1.0f - width) / 2.0f);
-	float const switchleft(nameleft + width - (singlewidth * maxswitches));
-	float const namewidth(width - (singlewidth * maxswitches) - (lineheight * aspect));
+	float const nameleft((1.0f - width) * 0.5f);
+	float const switchleft(nameleft + width - (m_single_width * maxswitches));
+	float const namewidth(width - (m_single_width * maxswitches) - (line_height() * aspect));
 
 	// iterate over switch groups
 	ioport_field *const field((uintptr_t(selectedref) != 1U) ? reinterpret_cast<ioport_field *>(selectedref) : nullptr);
-	float const nubheight(lineheight * SINGLE_TOGGLE_SWITCH_HEIGHT);
-	float const nubwidth(lineheight * SINGLE_TOGGLE_SWITCH_WIDTH * aspect);
-	float const ygap(lineheight * ((DIP_SWITCH_HEIGHT / 2) - SINGLE_TOGGLE_SWITCH_HEIGHT) / 2);
-	float const xgap((singlewidth + (UI_LINE_WIDTH / 2) - nubwidth) / 2);
+	float const nubheight(line_height() * SINGLE_TOGGLE_SWITCH_HEIGHT);
+	m_nub_width = line_height() * SINGLE_TOGGLE_SWITCH_WIDTH * aspect;
+	float const ygap(line_height() * ((DIP_SWITCH_HEIGHT * 0.5f) - SINGLE_TOGGLE_SWITCH_HEIGHT) * 0.5f);
+	float const xgap((m_single_width + (UI_LINE_WIDTH * 0.5f) - m_nub_width) * 0.5f);
+	m_first_nub = switchleft + xgap;
+	m_clickable_height = (line_height() * DIP_SWITCH_HEIGHT) - (ygap * 2.0f);
 	unsigned line(0U);
-	for (switch_group_descriptor const &group : switch_groups())
+	for (unsigned n = 0; switch_groups().size() > n; ++n)
 	{
+		switch_group_descriptor const &group(switch_groups()[n]);
 		if (group.mask)
 		{
 			// determine the mask of selected bits
@@ -319,47 +396,47 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 			}
 
 			// draw the name
-			float const liney(y2 + (ui().box_tb_border() * 2.0f) + (lineheight * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
-			ui().draw_text_full(
-					container(),
+			float const liney(y2 + (tb_border() * 2.0f) + (line_height() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
+			draw_text_normal(
 					group.name,
-					nameleft, liney + (lineheight * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,
-					ui::text_layout::RIGHT, ui::text_layout::NEVER,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					nameleft, liney + (line_height() * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,
+					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
+					ui().colors().text_color());
 
 			// draw the group outline
-			float const switchbottom(liney + (DIP_SWITCH_HEIGHT * lineheight));
+			float const switchbottom(liney + (DIP_SWITCH_HEIGHT * line_height()));
 			unsigned const cnt(group.switch_count());
 			ui().draw_outlined_box(
 					container(),
-					switchleft, liney, switchleft + (singlewidth * cnt), switchbottom,
+					switchleft, liney, switchleft + (m_single_width * cnt), switchbottom,
 					ui().colors().background_color());
 			for (unsigned i = 1; cnt > i; ++i)
 			{
 				container().add_line(
-						switchleft + (singlewidth * i), liney, switchleft + (singlewidth * i), switchbottom,
+						switchleft + (m_single_width * i), liney, switchleft + (m_single_width * i), switchbottom,
 						UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
 
 			// compute top and bottom for on and off positions
 			float const yoff(liney + UI_LINE_WIDTH + ygap);
 			float const yon(switchbottom - UI_LINE_WIDTH - ygap - nubheight);
+			m_switch_group_y[n] = yoff;
 
 			// draw the switch nubs
 			for (unsigned toggle = 0; cnt > toggle; ++toggle)
 			{
-				float const nubleft(switchleft + (singlewidth * toggle) + xgap);
+				float const nubleft(switchleft + (m_single_width * toggle) + xgap);
 				if (BIT(group.mask, toggle))
 				{
 					float const nubtop(BIT(group.state, toggle) ? yon : yoff);
 					container().add_rect(
-							nubleft, nubtop, nubleft + nubwidth, nubtop + nubheight,
+							nubleft, nubtop, nubleft + m_nub_width, nubtop + nubheight,
 							BIT(selectedmask, toggle) ? ui().colors().dipsw_color() : ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 				else
 				{
 					container().add_rect(
-							nubleft, yoff, nubleft + nubwidth, yon + nubheight,
+							nubleft, yoff, nubleft + m_nub_width, yon + nubheight,
 							ui().colors().unavailable_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				}
 			}
@@ -372,27 +449,67 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 }
 
 
-void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
+bool menu_settings_dip_switches::custom_mouse_down()
+{
+	if (!m_visible_switch_groups || (get_mouse_x() < m_first_nub))
+		return false;
+
+	float const x(get_mouse_x() - m_first_nub);
+	float const y(get_mouse_y());
+	for (unsigned n = 0U, line = 0U; (switch_groups().size() > n) && (m_visible_switch_groups > line); ++n)
+	{
+		switch_group_descriptor const &group(switch_groups()[n]);
+		if (group.mask)
+		{
+			++line;
+			if ((y >= m_switch_group_y[n]) && (y < (m_switch_group_y[n] + m_clickable_height)))
+			{
+				unsigned const cnt(group.switch_count());
+				for (unsigned i = 0U; cnt > i; ++i)
+				{
+					if (BIT(group.mask, i))
+					{
+						float const xstart(float(i) * m_single_width);
+						if ((x >= xstart) && (x < (xstart + m_nub_width)))
+						{
+							ioport_field::user_settings settings;
+							group.toggles[i].field->get_user_settings(settings);
+							settings.value ^= group.toggles[i].mask;
+							group.toggles[i].field->set_user_settings(settings);
+							reset(reset_options::REMEMBER_REF);
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+void menu_settings_dip_switches::populate()
 {
 	// let the base class add items
-	menu_confswitch::populate(customtop, custombottom);
+	menu_confswitch::populate();
 
 	// use up to about 70% of height for DIP switch display
 	if (active_switch_groups())
 	{
-		float const lineheight(ui().get_line_height());
-		float const groupheight(DIP_SWITCH_HEIGHT * lineheight);
-		float const groupspacing(DIP_SWITCH_SPACING * lineheight);
+		m_switch_group_y.resize(switch_groups().size());
+		float const groupheight(DIP_SWITCH_HEIGHT * line_height());
+		float const groupspacing(DIP_SWITCH_SPACING * line_height());
 		if ((active_switch_groups() * (groupheight + groupspacing)) > 0.7f)
 			m_visible_switch_groups = unsigned(0.7f / (groupheight + groupspacing));
 		else
 			m_visible_switch_groups = active_switch_groups();
-		custombottom = (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (ui().box_tb_border() * 3.0f);
+		set_custom_space(0.0f, (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (tb_border() * 3.0f));
 	}
 	else
 	{
 		m_visible_switch_groups = 0U;
-		custombottom = 0.0f;
+		set_custom_space(0.0f, 0.0f);
 	}
 }
 
@@ -404,11 +521,11 @@ void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
 
 menu_settings_machine_config::menu_settings_machine_config(mame_ui_manager &mui, render_container &container) : menu_confswitch(mui, container, IPT_CONFIG)
 {
+	set_heading(_("Machine Configuration"));
 }
 
 menu_settings_machine_config::~menu_settings_machine_config()
 {
 }
-
 
 } // namespace ui

@@ -94,8 +94,6 @@
 #include "scudsp.h"
 #include "scudspdasm.h"
 
-#include "debugger.h"
-
 
 DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
@@ -129,6 +127,8 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 #define scudsp_writeop(A, B) m_program->write_dword(A, B)
 #define scudsp_readmem(A,MD) m_data->read_dword(A | (MD << 6))
 #define scudsp_writemem(A,MD,B) m_data->write_dword(A | (MD << 6), B)
+
+constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | lo; }
 
 uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 {
@@ -498,7 +498,7 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			/* Unrecognized opcode */
 			break;
 		case 0xF:   /* RL8 */
-			i3 = ((m_acl.si << 8) & 0xffffff00) | ((m_acl.si >> 24) & 0xff);
+			i3 = rotl_32(m_acl.si, 8);
 			m_alu = i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
@@ -611,15 +611,13 @@ void scudsp_cpu_device::scudsp_move_immediate( uint32_t opcode )
 	{
 		if ( scudsp_compute_condition( (opcode & 0x3F80000 ) >> 19 ) )
 		{
-			value = opcode & 0x7ffff;
-			if ( value & 0x40000 ) value |= 0xfff80000;
+			value = util::sext( opcode, 19 );
 			scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 		}
 	}
 	else
 	{
-		value = opcode & 0x1ffffff;
-		if ( value & 0x1000000 ) value |= 0xfe000000;
+		value = util::sext( opcode, 25 );
 		scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 	}
 	m_icount -= 1;

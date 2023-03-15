@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="fmtowns_flop_cracked" description="Fujitsu FM Towns cracked floppy disk images">
 
-	<!-- Some graphics issues -->
-	<software name="asuka120" supported="partial">
+	<software name="asuka120">
 		<description>Asuka 120% Burning Fest. (cracked)</description>
 		<year>1994</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="あすか 120% BURNING Fest." />
 		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -39,6 +39,7 @@ license:CC0
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="キャメルトライ" />
 		<info name="release" value="199411xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="cameltry_fixed.bin" size="1261568" crc="8d98efc1" sha1="1537ea0addb4398b846a7582b54895533a984dd1"/>
@@ -53,35 +54,10 @@ license:CC0
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="コラムス" />
 		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="columns.hdm" size="1261568" crc="312d2c79" sha1="1c60aaa0028eb6570ecd2303e63e86598362226e" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dinosaur">
-		<description>Dinosaur (cracked)</description>
-		<year>1991</year>
-		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="ダイナソア" />
-		<info name="release" value="199110xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_program_disk.hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 1" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_scenario_disk_1_cracked.hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Scenario Disk 2" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dinosaur_scenario_disk_2_cracked.hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,6 +69,7 @@ license:CC0
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="スーパー大戦略" />
 		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">

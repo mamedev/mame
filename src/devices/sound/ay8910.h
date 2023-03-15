@@ -76,7 +76,12 @@ public:
 
 	// configuration helpers
 	void set_flags(int flags) { m_flags = flags; }
-	void set_psg_type(psg_type_t psg_type) { set_type(psg_type); }
+	void set_psg_type(psg_type_t psg_type)
+	{
+		// Ignore when AY8930 for now
+		if (!(m_feature & PSG_HAS_EXPANDED_MODE))
+			set_type(psg_type);
+	}
 	void set_resistors_load(int res_load0, int res_load1, int res_load2) { m_res_load[0] = res_load0; m_res_load[1] = res_load1; m_res_load[2] = res_load2; }
 	auto port_a_read_callback() { return m_port_a_read_cb.bind(); }
 	auto port_b_read_callback() { return m_port_b_read_cb.bind(); }
@@ -144,7 +149,7 @@ protected:
 private:
 	static constexpr unsigned NUM_CHANNELS = 3;
 
-	/* register id's */
+	// register id's
 	enum
 	{
 		AY_AFINE    = 0x00,
@@ -243,7 +248,7 @@ private:
 			attack = (shape & 0x04) ? mask : 0x00;
 			if ((shape & 0x08) == 0)
 			{
-				/* if Continue = 0, map the shape to the equivalent one which has Continue = 1 */
+				// if Continue = 0, map the shape to the equivalent one which has Continue = 1
 				hold = 1;
 				alternate = attack;
 			}
@@ -258,6 +263,18 @@ private:
 		}
 	};
 
+	inline void noise_rng_tick()
+	{
+		// The Random Number Generator of the 8910 is a 17-bit shift
+		// register. The input to the shift register is bit0 XOR bit3
+		// (bit0 is the output). This was verified on AY-3-8910 and YM2149 chips.
+
+		if (m_feature & PSG_HAS_EXPANDED_MODE) // AY8930 LFSR algorithm is slightly different, verified from manual
+			m_rng = (m_rng >> 1) | ((BIT(m_rng, 0) ^ BIT(m_rng, 2)) << 16);
+		else
+			m_rng = (m_rng >> 1) | ((BIT(m_rng, 0) ^ BIT(m_rng, 3)) << 16);
+	}
+
 	// inlines
 	inline bool tone_enable(int chan) { return BIT(m_regs[AY_ENABLE], chan); }
 	inline u8 tone_volume(tone_t *tone) { return tone->volume & (is_expanded_mode() ? 0x1f : 0x0f); }
@@ -267,10 +284,13 @@ private:
 
 	inline bool noise_enable(int chan) { return BIT(m_regs[AY_ENABLE], 3 + chan); }
 	inline u8 noise_period() { return is_expanded_mode() ? m_regs[AY_NOISEPER] & 0xff : m_regs[AY_NOISEPER] & 0x1f; }
-	inline u8 noise_output() { return m_rng & 1; }
+	inline u8 noise_output() { return is_expanded_mode() ? m_noise_out & 1 : m_rng & 1; }
 
 	inline bool is_expanded_mode() { return ((m_feature & PSG_HAS_EXPANDED_MODE) && ((m_mode & 0xe) == 0xa)); }
 	inline u8 get_register_bank() { return is_expanded_mode() ? (m_mode & 0x1) << 4 : 0; }
+
+	inline u8 noise_and() { return m_regs[AY_NOISEAND] & 0xff; }
+	inline u8 noise_or() { return m_regs[AY_NOISEOR] & 0xff; }
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
@@ -286,17 +306,19 @@ private:
 	int m_ready;
 	sound_stream *m_channel;
 	bool m_active;
-	s32 m_register_latch;
+	u8 m_register_latch;
 	u8 m_regs[16 * 2];
-	s32 m_last_enable;
+	s16 m_last_enable;
 	tone_t m_tone[NUM_CHANNELS];
 	envelope_t m_envelope[NUM_CHANNELS];
 	u8 m_prescale_noise;
-	s32 m_count_noise;
-	s32 m_rng;
+	s16 m_noise_value;
+	s16 m_count_noise;
+	u32 m_rng;
+	u8 m_noise_out;
 	u8 m_mode;
 	u8 m_env_step_mask;
-	/* init parameters ... */
+	// init parameters ...
 	int m_step;
 	int m_zero_is_off;
 	u8 m_vol_enabled[NUM_CHANNELS];
@@ -305,9 +327,9 @@ private:
 	stream_buffer::sample_t m_vol_table[NUM_CHANNELS][16];
 	stream_buffer::sample_t m_env_table[NUM_CHANNELS][32];
 	std::unique_ptr<stream_buffer::sample_t[]> m_vol3d_table;
-	int m_flags;          /* Flags */
-	int m_feature;        /* Chip specific features */
-	int m_res_load[3];    /* Load on channel in ohms */
+	int m_flags;          // Flags
+	int m_feature;        // Chip specific features
+	int m_res_load[3];    // Load on channel in ohms
 	devcb_read8 m_port_a_read_cb;
 	devcb_read8 m_port_b_read_cb;
 	devcb_write8 m_port_a_write_cb;
@@ -337,7 +359,7 @@ class ay8914_device : public ay8910_device
 public:
 	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	/* AY8914 handlers needed due to different register map */
+	// AY8914 handlers needed due to different register map
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 };

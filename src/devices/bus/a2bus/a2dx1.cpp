@@ -10,17 +10,40 @@
 
 #include "emu.h"
 #include "a2dx1.h"
+
+#include "sound/dac.h"
+
 #include "speaker.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+namespace {
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_DX1, a2bus_dx1_device, "a2dx1", "Decillonix DX-1")
+class a2bus_dx1_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_dx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_dx1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual bool take_c800() override { return false; }
+
+	required_device<dac_byte_interface> m_dac;
+	required_device<dac_byte_interface> m_dacvol;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -96,7 +119,11 @@ void a2bus_dx1_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-bool a2bus_dx1_device::take_c800()
-{
-	return false;
-}
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_DX1, device_a2bus_card_interface, a2bus_dx1_device, "a2dx1", "Decillonix DX-1")

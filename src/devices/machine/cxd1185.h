@@ -62,7 +62,7 @@ protected:
 	void ioport_w(u8 data);
 
 	// state machine
-	void state_timer(void *ptr, s32 param);
+	void state_timer(s32 param);
 	int state_step();
 
 	// other logic

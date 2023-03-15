@@ -2,7 +2,7 @@
 // detail/impl/scheduler.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,11 +23,30 @@
 #include "asio/detail/reactor.hpp"
 #include "asio/detail/scheduler.hpp"
 #include "asio/detail/scheduler_thread_info.hpp"
+#include "asio/detail/signal_blocker.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
 namespace detail {
+
+class scheduler::thread_function
+{
+public:
+  explicit thread_function(scheduler* s)
+    : this_(s)
+  {
+  }
+
+  void operator()()
+  {
+    asio::error_code ec;
+    this_->run(ec);
+  }
+
+private:
+  scheduler* this_;
+};
 
 struct scheduler::task_cleanup
 {
@@ -84,12 +103,14 @@ struct scheduler::work_cleanup
   thread_info* this_thread_;
 };
 
-scheduler::scheduler(
-    asio::execution_context& ctx, int concurrency_hint)
+scheduler::scheduler(asio::execution_context& ctx,
+    int concurrency_hint, bool own_thread)
   : asio::detail::execution_context_service_base<scheduler>(ctx),
     one_thread_(concurrency_hint == 1
         || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
-          SCHEDULER, concurrency_hint)),
+          SCHEDULER, concurrency_hint)
+        || !ASIO_CONCURRENCY_HINT_IS_LOCKING(
+          REACTOR_IO, concurrency_hint)),
     mutex_(ASIO_CONCURRENCY_HINT_IS_LOCKING(
           SCHEDULER, concurrency_hint)),
     task_(0),
@@ -97,16 +118,47 @@ scheduler::scheduler(
     outstanding_work_(0),
     stopped_(false),
     shutdown_(false),
-    concurrency_hint_(concurrency_hint)
+    concurrency_hint_(concurrency_hint),
+    thread_(0)
 {
   ASIO_HANDLER_TRACKING_INIT;
+
+  if (own_thread)
+  {
+    ++outstanding_work_;
+    asio::detail::signal_blocker sb;
+    thread_ = new asio::detail::thread(thread_function(this));
+  }
+}
+
+scheduler::~scheduler()
+{
+  if (thread_)
+  {
+    mutex::scoped_lock lock(mutex_);
+    shutdown_ = true;
+    stop_all_threads(lock);
+    lock.unlock();
+    thread_->join();
+    delete thread_;
+  }
 }
 
 void scheduler::shutdown()
 {
   mutex::scoped_lock lock(mutex_);
   shutdown_ = true;
+  if (thread_)
+    stop_all_threads(lock);
   lock.unlock();
+
+  // Join thread to ensure task operation is returned to queue.
+  if (thread_)
+  {
+    thread_->join();
+    delete thread_;
+    thread_ = 0;
+  }
 
   // Destroy handler objects.
   while (!op_queue_.empty())
@@ -272,6 +324,17 @@ void scheduler::compensating_work_started()
   ++static_cast<thread_info*>(this_thread)->private_outstanding_work;
 }
 
+bool scheduler::can_dispatch()
+{
+  return thread_call_stack::contains(this) != 0;
+}
+
+void scheduler::capture_current_exception()
+{
+  if (thread_info_base* this_thread = thread_call_stack::contains(this))
+    this_thread->capture_current_exception();
+}
+
 void scheduler::post_immediate_completion(
     scheduler::operation* op, bool is_continuation)
 {
@@ -292,6 +355,30 @@ void scheduler::post_immediate_completion(
   work_started();
   mutex::scoped_lock lock(mutex_);
   op_queue_.push(op);
+  wake_one_thread_and_unlock(lock);
+}
+
+void scheduler::post_immediate_completions(std::size_t n,
+    op_queue<scheduler::operation>& ops, bool is_continuation)
+{
+#if defined(ASIO_HAS_THREADS)
+  if (one_thread_ || is_continuation)
+  {
+    if (thread_info_base* this_thread = thread_call_stack::contains(this))
+    {
+      static_cast<thread_info*>(this_thread)->private_outstanding_work
+        += static_cast<long>(n);
+      static_cast<thread_info*>(this_thread)->private_op_queue.push(ops);
+      return;
+    }
+  }
+#else // defined(ASIO_HAS_THREADS)
+  (void)is_continuation;
+#endif // defined(ASIO_HAS_THREADS)
+
+  increment(outstanding_work_, static_cast<long>(n));
+  mutex::scoped_lock lock(mutex_);
+  op_queue_.push(ops);
   wake_one_thread_and_unlock(lock);
 }
 
@@ -396,6 +483,7 @@ std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
 
         // Complete the operation. May throw an exception. Deletes the object.
         o->complete(this, ec, task_result);
+        this_thread.rethrow_pending_exception();
 
         return 1;
       }
@@ -476,6 +564,7 @@ std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
 
   // Complete the operation. May throw an exception. Deletes the object.
   o->complete(this, ec, task_result);
+  this_thread.rethrow_pending_exception();
 
   return 1;
 }
@@ -530,6 +619,7 @@ std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock,
 
   // Complete the operation. May throw an exception. Deletes the object.
   o->complete(this, ec, task_result);
+  this_thread.rethrow_pending_exception();
 
   return 1;
 }

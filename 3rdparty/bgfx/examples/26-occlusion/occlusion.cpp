@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "common.h"
@@ -82,6 +82,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -203,8 +205,9 @@ public:
 				const float deltaTime = float(frameTime/freq);
 
 				// Update camera.
+				cameraUpdate(deltaTime, m_state.m_mouse, ImGui::MouseOverArea() );
+
 				float view[16];
-				cameraUpdate(deltaTime, m_state.m_mouse);
 				cameraGetViewMtx(view);
 
 				// Set view and projection matrix for view 0.

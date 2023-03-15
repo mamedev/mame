@@ -38,4 +38,4 @@ const rc759_format::format rc759_format::formats[] =
 	{}
 };
 
-const floppy_format_type FLOPPY_RC759_FORMAT = &floppy_image_format_creator<rc759_format>;
+const rc759_format FLOPPY_RC759_FORMAT;

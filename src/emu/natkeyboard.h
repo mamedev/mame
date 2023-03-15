@@ -16,6 +16,7 @@
 #include <functional>
 #include <iosfwd>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -63,9 +64,9 @@ public:
 	void post_char(char32_t ch, bool normalize_crlf = false);
 	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_utf8(const std::string &text, const attotime &rate = attotime::zero);
+	void post_utf8(std::string_view text, const attotime &rate = attotime::zero);
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_coded(const std::string &text, const attotime &rate = attotime::zero);
+	void post_coded(std::string_view text, const attotime &rate = attotime::zero);
 	void paste();
 
 	// debugging
@@ -109,7 +110,7 @@ private:
 	bool can_post_alternate(char32_t ch);
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
-	void timer(void *ptr, int param);
+	void timer(s32 param);
 	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 

@@ -3,7 +3,6 @@
 /* Handlers for SH3 internals */
 
 #include "emu.h"
-#include "debugger.h"
 #include "sh4.h"
 #include "sh4comn.h"
 #include "sh3comn.h"

@@ -18,9 +18,9 @@ NOTE: There exist multiples type of .cas files for Colour Genie
 We now support these three types below...
 
 ********************************************************************/
-#include "formats/cgen_cas.h"
+#include "cgen_cas.h"
 
-#include <cassert>
+#include <cstring>
 
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"

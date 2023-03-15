@@ -136,7 +136,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
+DEFINE_DEVICE_TYPE(TI99_HSGPL, bus::ti99::peb::snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
 
 namespace bus::ti99::peb {
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "common.h"
@@ -71,6 +71,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -86,6 +88,10 @@ public:
 						   , 1.0f
 						   , 0
 						   );
+
+		// Initialize Imgui
+		// This initializes the same allocator used by stb_truetype, so must do that before creating the font manager
+		imguiCreate();
 
 		// Init the text rendering system.
 		m_fontManager = new FontManager(512);
@@ -186,8 +192,6 @@ public:
 
 		// Create a transient buffer for real-time data.
 		m_transientText = m_textBufferManager->createTextBuffer(FONT_TYPE_ALPHA, BufferType::Transient);
-
-		imguiCreate();
 	}
 
 	virtual int shutdown() override
@@ -264,7 +268,10 @@ public:
 			float view[16];
 			bx::mtxLookAt(view, eye, at);
 
-			const float centering = 0.5f;
+			float centering = 0.0f;
+			if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9) {
+				centering = -0.5f;
+			}
 
 			// Setup a top-left ortho matrix for screen space drawing.
 			const bgfx::Caps* caps = bgfx::getCaps();

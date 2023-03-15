@@ -125,7 +125,7 @@ namespace plib {
 
 		/// \brief Compile an expression
 		///
-		/// \param expr infix or postfix expression. default is infix, postrix
+		/// \param expr infix or postfix expression. default is infix, postfix
 		///          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
 		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///

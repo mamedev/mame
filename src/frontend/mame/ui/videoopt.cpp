@@ -14,6 +14,8 @@
 #include "rendlay.h"
 #include "rendutil.h"
 
+#include "utf8.h"
+
 
 namespace ui {
 
@@ -37,13 +39,14 @@ constexpr uintptr_t ITEM_VIEW_FIRST     = 0x00000300;
 menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
+	set_heading(_("Video Options"));
 }
 
 menu_video_targets::~menu_video_targets()
 {
 }
 
-void menu_video_targets::populate(float &customtop, float &custombottom)
+void menu_video_targets::populate()
 {
 	// find the targets
 	for (unsigned targetnum = 0; ; targetnum++)
@@ -67,19 +70,20 @@ void menu_video_targets::populate(float &customtop, float &custombottom)
     menu
 -------------------------------------------------*/
 
-void menu_video_targets::handle()
+bool menu_video_targets::handle(event const *ev)
 {
-	event const *const menu_event = process(0);
-	if (menu_event && (menu_event->iptkey == IPT_UI_SELECT))
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
-		render_target *const target = reinterpret_cast<render_target *>(menu_event->itemref);
+		render_target *const target = reinterpret_cast<render_target *>(ev->itemref);
 		menu::stack_push<menu_video_options>(
 				ui(),
 				container(),
-				std::string(selected_item().text),
+				std::string(selected_item().text()),
 				*target,
 				&machine().video().snapshot_target() == target);
 	}
+
+	return false;
 }
 
 
@@ -91,36 +95,18 @@ void menu_video_targets::handle()
 menu_video_options::menu_video_options(
 		mame_ui_manager &mui,
 		render_container &container,
+		std::string_view title,
 		render_target &target,
 		bool snapshot)
 	: menu(mui, container)
 	, m_target(target)
-	, m_title()
-	, m_show_title(false)
 	, m_snapshot(snapshot)
 {
+	set_heading(util::string_format(_("Video Options: %1$s"), title));
+
 	if (!m_snapshot || !machine().video().snap_native())
 	{
 		set_selected_index(target.view());
-		reset(reset_options::REMEMBER_POSITION);
-	}
-}
-
-menu_video_options::menu_video_options(
-		mame_ui_manager &mui,
-		render_container &container,
-		std::string &&title,
-		render_target &target,
-		bool snapshot)
-	: menu(mui, container)
-	, m_target(target)
-	, m_title(std::move(title))
-	, m_show_title(true)
-	, m_snapshot(snapshot)
-{
-	if (!m_snapshot || !machine().video().snap_native())
-	{
-		set_selected_index(target.view() + 2);
 		reset(reset_options::REMEMBER_POSITION);
 	}
 }
@@ -129,16 +115,9 @@ menu_video_options::~menu_video_options()
 {
 }
 
-void menu_video_options::populate(float &customtop, float &custombottom)
+void menu_video_options::populate()
 {
 	uintptr_t ref;
-
-	// add title if requested
-	if (m_show_title)
-	{
-		item_append(m_title, FLAG_DISABLE, nullptr);
-		item_append(menu_item_type::SEPARATOR);
-	}
 
 	// add items for each view
 	if (!m_snapshot || !machine().video().snap_native())
@@ -223,25 +202,29 @@ void menu_video_options::populate(float &customtop, float &custombottom)
     menu
 -------------------------------------------------*/
 
-void menu_video_options::handle()
+bool menu_video_options::handle(event const *ev)
 {
-	auto const lockout_popup([this] () { machine().popmessage(_("Cannot change options while recording!")); });
+	auto const lockout_popup(
+			[this] ()
+			{
+				machine().popmessage(_("Cannot change options while recording!"));
+				return true;
+			});
 	bool const snap_lockout(m_snapshot && machine().video().is_recording());
 	bool changed(false);
 
 	// process the menu
-	event const *const menu_event(process(0));
-	if (menu_event && uintptr_t(menu_event->itemref))
+	if (ev && uintptr_t(ev->itemref))
 	{
-		switch (reinterpret_cast<uintptr_t>(menu_event->itemref))
+		switch (reinterpret_cast<uintptr_t>(ev->itemref))
 		{
 		// rotate adds rotation depending on the direction
 		case ITEM_ROTATE:
-			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				int const delta((menu_event->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90);
+				int const delta((ev->iptkey == IPT_UI_LEFT) ? ROT270 : ROT90);
 				m_target.set_orientation(orientation_add(delta, m_target.orientation()));
 				if (m_target.is_ui_target())
 				{
@@ -255,18 +238,18 @@ void menu_video_options::handle()
 
 		// layer config bitmasks handle left/right keys the same (toggle)
 		case ITEM_ZOOM:
-			if ((menu_event->iptkey == IPT_UI_LEFT) || (menu_event->iptkey == IPT_UI_RIGHT))
+			if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT))
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				m_target.set_zoom_to_screen(menu_event->iptkey == IPT_UI_RIGHT);
+				m_target.set_zoom_to_screen(ev->iptkey == IPT_UI_RIGHT);
 				changed = true;
 			}
 			break;
 
 		// non-integer scaling: rotate through options
 		case ITEM_UNEVENSTRETCH:
-			if (menu_event->iptkey == IPT_UI_LEFT)
+			if (ev->iptkey == IPT_UI_LEFT)
 			{
 				if (snap_lockout)
 					return lockout_popup();
@@ -294,7 +277,7 @@ void menu_video_options::handle()
 				}
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_RIGHT)
+			else if (ev->iptkey == IPT_UI_RIGHT)
 			{
 				if (snap_lockout)
 					return lockout_popup();
@@ -326,34 +309,34 @@ void menu_video_options::handle()
 
 		// keep aspect handles left/right keys the same (toggle)
 		case ITEM_KEEPASPECT:
-			if ((menu_event->iptkey == IPT_UI_LEFT) || (menu_event->iptkey == IPT_UI_RIGHT))
+			if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT))
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				m_target.set_keepaspect(menu_event->iptkey == IPT_UI_RIGHT);
+				m_target.set_keepaspect(ev->iptkey == IPT_UI_RIGHT);
 				changed = true;
 			}
 			break;
 
 		// anything else is a view item
 		default:
-			if (reinterpret_cast<uintptr_t>(menu_event->itemref) >= ITEM_VIEW_FIRST)
+			if (reinterpret_cast<uintptr_t>(ev->itemref) >= ITEM_VIEW_FIRST)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				if (menu_event->iptkey == IPT_UI_SELECT)
+				if (ev->iptkey == IPT_UI_SELECT)
 				{
-					m_target.set_view(reinterpret_cast<uintptr_t>(menu_event->itemref) - ITEM_VIEW_FIRST);
+					m_target.set_view(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_VIEW_FIRST);
 					changed = true;
 				}
 			}
-			else if (reinterpret_cast<uintptr_t>(menu_event->itemref) >= ITEM_TOGGLE_FIRST)
+			else if (reinterpret_cast<uintptr_t>(ev->itemref) >= ITEM_TOGGLE_FIRST)
 			{
 				if (snap_lockout)
 					return lockout_popup();
-				if ((menu_event->iptkey == IPT_UI_LEFT) || (menu_event->iptkey == IPT_UI_RIGHT))
+				if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT))
 				{
-					m_target.set_visibility_toggle(reinterpret_cast<uintptr_t>(menu_event->itemref) - ITEM_TOGGLE_FIRST, menu_event->iptkey == IPT_UI_RIGHT);
+					m_target.set_visibility_toggle(reinterpret_cast<uintptr_t>(ev->itemref) - ITEM_TOGGLE_FIRST, ev->iptkey == IPT_UI_RIGHT);
 					changed = true;
 				}
 			}
@@ -364,6 +347,7 @@ void menu_video_options::handle()
 	// if something changed, rebuild the menu
 	if (changed)
 		reset(reset_options::REMEMBER_REF);
+	return false;
 }
 
 } // namespace ui

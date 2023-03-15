@@ -31,11 +31,11 @@ static INPUT_PORTS_START( snes_mouse )
 	// due to the relative nature of movement detection in SNES mouse, when we wrap the system would
 	// detect a sudden jump in the wrong direction, making the usage unfriendly...
 	PORT_START("MOUSE_X")
-	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X ) PORT_NAME("Superscope X Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X ) PORT_NAME("Mouse X Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 //  PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 
 	PORT_START("MOUSE_Y")
-	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y) PORT_NAME("Superscope Y Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y) PORT_NAME("Mouse Y Axis") PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 //  PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(30) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 

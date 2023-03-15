@@ -21,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device, "zorro_a2232", "CBM A2232 Serial Card")
+DEFINE_DEVICE_TYPE(ZORRO_A2232, bus::amiga::zorro::a2232_device, "zorro_a2232", "CBM A2232 Serial Card")
 
 
 namespace bus::amiga::zorro {

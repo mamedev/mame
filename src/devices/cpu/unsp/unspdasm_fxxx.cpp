@@ -308,8 +308,6 @@ offs_t unsp_disassembler::disassemble_fxxx_101_group(std::ostream& stream, offs_
 		util::stream_format(stream, "<UNDEFINED>");
 		return UNSP_DASM_OK;
 	}
-
-	return UNSP_DASM_OK;
 }
 
 offs_t unsp_disassembler::disassemble_fxxx_110_group(std::ostream& stream, offs_t pc, uint16_t op, uint16_t ximm, const data_buffer &opcodes)

@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_RNG_H_HEADER_GUARD
@@ -137,7 +137,7 @@ namespace bx
 	template<typename Rng, typename Ty>
 	inline void shuffle(Rng* _rng, Ty* _array, uint32_t _num)
 	{
-		BX_CHECK(_num != 0, "Number of elements can't be 0!");
+		BX_ASSERT(_num != 0, "Number of elements can't be 0!");
 
 		for (uint32_t ii = 0, num = _num-1; ii < num; ++ii)
 		{

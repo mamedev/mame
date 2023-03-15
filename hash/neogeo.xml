@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
      The list contains both MVS and AES cartridges.
 
@@ -1123,7 +1123,7 @@ license:CC0
 				<rom loadflag="load16_word_swap" name="019-p1.p1" offset="0x000000" size="0x080000" crc="a2de8445" sha1="893d7ae72b4644123469de143fa35fac1cbcd61e" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.com", 0x0000, 0x1000, NO_DUMP /> -->  <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p.com" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="019-s1.s1" crc="5fcdc0ed" sha1="86415077e7adc3ba6153eeb4fb0c62cf36e903fa" />   <!-- TC531000 -->
@@ -1536,7 +1536,7 @@ license:CC0
 		<description>Eight Man (NGM-025 ~ NGH-025)</description>
 		<year>1991</year>
 		<publisher>SNK / Pallas</publisher>
-		<info name="serial" value="NGM-024 (MVS), NGH-024 (AES)"/>
+		<info name="serial" value="NGM-025 (MVS), NGH-025 (AES)"/>
 		<info name="release" value="1991xxxx (MVS), 19911120 (AES)"/>
 		<info name="alt_title" value="8マン"/>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -1628,7 +1628,7 @@ license:CC0
 	<software name="legendos">
 		<description>Legend of Success Joe / Ashita no Joe Densetsu</description>
 		<year>1991</year>
-		<publisher>SNK</publisher>
+		<publisher>SNK / Wave</publisher>
 		<info name="serial" value="NGM-029 (MVS), NGH-029 (AES)"/>
 		<info name="release" value="199107xx (MVS), 19910830 (AES)"/>
 		<info name="alt_title" value="あしたのジョー伝説"/>
@@ -2107,7 +2107,7 @@ license:CC0
 				<rom loadflag="load16_word_swap" name="038-p2.p2" offset="0x080000" size="0x080000" crc="a5193e2f" sha1="96803480439e90da23cdca70d59ff519ee85beeb" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP /> --> <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p.hd8301v1" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="038-s1.s1" crc="fff62ae3" sha1="6510a762ea41557a8938cbfc0557cd5921306061" />   <!-- TC531000 -->
@@ -3217,7 +3217,7 @@ license:CC0
 		<description>World Heroes 2 (ALH-006)</description>
 		<year>1993</year>
 		<publisher>ADK</publisher>
-		<info name="serial" value="ALH-006, ALH-006"/>
+		<info name="serial" value="ALH-006"/>
 		<info name="release" value="19930604"/>
 		<info name="alt_title" value="ワールドヒーローズ2"/>
 		<sharedfeat name="release" value="AES" />
@@ -4785,7 +4785,7 @@ license:CC0
 	</software>
 
 	<software name="stakwindev" cloneof="stakwin" supported="no">
-		<description>Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)</description>
+		<description>Stakes Winner / Stakes Winner - GI Kinzen Seiha e no Michi (early development board)</description>
 		<year>1995</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナー"/>
@@ -4806,7 +4806,7 @@ license:CC0
 				<rom name="v1.v1" offset="0x000000" size="0x080000" crc="ac590b85" sha1="47ff2ba9648b7145c29b534cd1f6839abb43bee2" />
 				<rom name="v2.v2" offset="0x080000" size="0x080000" crc="23ad8a91" sha1="da620c182fe9fc36421da73f2937e627d9a641bf" />
 				<rom name="v3.v3" offset="0x100000" size="0x080000" crc="e2d216b6" sha1="28b70e57a352ef6a08a5564f7756113a66e7dbb7" />
-				</dataarea>
+			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load32_byte" name="c1.c1"   offset="0x000000" size="0x080000" crc="fb2f29d3" sha1="1f4cf27d7da1262bae28a8dd88c56d8a9324e982" />
 				<rom loadflag="load32_byte" name="c2.c2"   offset="0x000002" size="0x080000" crc="6108e6db" sha1="f4cdb5df29698f1ba362a227b82d43c3baaa8948" />
@@ -5502,7 +5502,7 @@ license:CC0
 
 	<software name="moshougi">
 		<description>Shougi no Tatsujin - Master of Shougi</description>
-		<year>1990</year>
+		<year>1995</year>
 		<publisher>ADK / SNK</publisher>
 		<info name="serial" value="NGM-203 / ADM-010 (MVS), NGH-203 / ADH-010 (AES)"/>
 		<info name="release" value="19950928 (MVS), 19951013 (AES)"/>
@@ -6094,7 +6094,7 @@ license:CC0
 	-->
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger / Iron Clad (Prototype)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (prototype)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -6124,7 +6124,7 @@ license:CC0
 	</software>
 
 	<software name="ironclado" cloneof="ironclad">
-		<description>Choutetsu Brikin'ger / Iron Clad (Prototype, bootleg)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (prototype, bootleg)</description>
 		<year>1996</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -6624,7 +6624,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2320"/>
-		<info name="release" value="1990728"/>
+		<info name="release" value="19970728"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -6661,7 +6661,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2320"/>
-		<info name="release" value="19970321"/>
+		<info name="release" value="19970925"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -6780,7 +6780,7 @@ license:CC0
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-2340"/>
 		<info name="release" value="19971205"/>
-		<info name="alt_title" value=""/>
+		<info name="alt_title" value="幕末浪漫 月華の剣士"/>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
@@ -6817,7 +6817,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGH-2340"/>
-		<info name="release" value="19900129"/>
+		<info name="release" value="19980129"/>
 		<info name="alt_title" value="幕末浪漫 月華の剣士"/>
 		<sharedfeat name="release" value="AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
@@ -6890,7 +6890,7 @@ license:CC0
 	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
 	-->
 
-	<software name="puzzldpr" cloneof="puzzledp">
+	<software name="puzzldpr">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
 		<publisher>Visco</publisher>
@@ -6924,7 +6924,37 @@ license:CC0
 	. ??M-2360
 	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
 	-->
-	<!-- Irritating Maze requires a Custom BIOS and controller -->
+
+	<software name="irrmaze">
+		<description>The Irritating Maze / Ultra Denryu Iraira Bou</description>
+		<year>1997</year>
+		<publisher>SNK / Saurus</publisher>
+		<info name="serial" value="??M-2360"/>
+		<info name="alt_title" value="ウルトラ電流イライラ棒"/>
+		<info name="usage" value="Universe BIOS 2.2 and later support joystick play as a cheat." />
+		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
+		<sharedfeat name="compatibility" value="MVS" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="236-p1.p1" offset="0x100000" size="0x100000" crc="4c2ff660" sha1="4a0cbd09044648ff9ec67723729f16d422c34bda" /> <!-- TC5316200 -->
+				<rom loadflag="continue" offset="0x000000" size="0x100000" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="236-s1.s1" crc="5d1ca640" sha1="40a9668a1742a44597a07ce72273d17119815637" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="236-m1.m1" crc="880a1abd" sha1="905afa157aba700e798243b842792e50729b19a0" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x300000">
+				<rom offset="0x000000" size="0x200000" name="236-v1.v1" crc="5f89c3b4" sha1="dc8fd561cf8dfdd41696dcf14ea8d2d0ac4eec4b" />   <!-- TC5316200 -->
+				<rom offset="0x200000" size="0x100000" name="236-v2.v2" crc="72e3add7" sha1="dc49f05274693255416d2e41ecc088027b798eb9" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load16_byte" offset="0x000000" size="0x400000" name="236-c1.c1" crc="c1d47902" sha1="727001c34f979226fc8f581113ce2aaac4fc0d42" /> <!-- Plane 0,1 --> <!-- TC5332205 -->
+				<rom loadflag="load16_byte" offset="0x000001" size="0x400000" name="236-c2.c2" crc="e15f972e" sha1="6a329559c57a67be73a6733513b59e9e6c8d61cc" /> <!-- Plane 2,3 --> <!-- TC5332205 -->
+			</dataarea>
+		</part>
+	</software>
 
 
 	<!--
@@ -7640,7 +7670,7 @@ license:CC0
 
 	<software name="flipshot">
 		<description>Battle Flip Shot</description>
-		<year>1999</year>
+		<year>1998</year>
 		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2470"/>
 		<info name="release" value="19981208"/>
@@ -8229,7 +8259,7 @@ license:CC0
 		<description>Garou - Mark of the Wolves (NGH-2530)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<info name="serial" value="NGM-2530"/>
+		<info name="serial" value="NGH-2530"/>
 		<info name="release" value="19991126"/>
 		<info name="alt_title" value="餓狼"/>
 		<sharedfeat name="release" value="AES" />
@@ -8919,7 +8949,7 @@ license:CC0
 	<software name="mslug4">
 		<description>Metal Slug 4 (NGM-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGM-2630"/>
 		<info name="release" value="20020327"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -8960,7 +8990,7 @@ license:CC0
 	<software name="mslug4h" cloneof="mslug4">
 		<description>Metal Slug 4 (NGH-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGH-2630"/>
 		<info name="release" value="20020613"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -9103,7 +9133,7 @@ license:CC0
 		<description>The King of Fighters 2002 (NGM-2650 ~ NGH-2650)</description>
 		<year>2002</year>
 		<publisher>Eolith / Playmore</publisher>
-		<info name="serial" value="NGM-2650 (MVS), NGM-2650 (AES)"/>
+		<info name="serial" value="NGM-2650 (MVS), NGH-2650 (AES)"/>
 		<info name="release" value="20021010 (MVS), 20021219 (AES)"/>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ 2002"/>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -9152,9 +9182,9 @@ license:CC0
 
 	<software name="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)</description>
-		<year>2002</year>
+		<year>2003</year>
 		<publisher>Noise Factory / Atlus</publisher>
-		<info name="serial" value="NGM-2660 (MVS), NGM-2660 (AES)"/>
+		<info name="serial" value="NGM-2660 (MVS), NGH-2660 (AES)"/>
 		<info name="release" value="20030320 (MVS), 20030529 (AES)"/>
 		<info name="alt_title" value="新・豪血寺一族 闘婚"/>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -9819,11 +9849,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>
@@ -9849,11 +9879,11 @@ license:CC0
 				<rom offset="0x00000" size="0x80000" name="008-mg1.m1" crc="d163c690" sha1="1dfd04d20c5985037f07cd01000d0b04f3a8f4f4" />    <!-- M27C4001 -->
 			</dataarea>
 			<dataarea name="ymsnd:adpcma" size="0x0200000">
-				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!--  mask rom TC5316200 -->
+				<rom name="008-v1.v1" offset="0x000000" size="0x200000" crc="443eadba" sha1="3def3c22f0e276bc4c2fc7ff70ce473c08b0d2df" />   <!-- mask rom TC5316200 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x1000000">
-				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!--  mask rom TC5364205 -->
-				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!--  mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c1.c1" offset="0x000000" size="0x800000" crc="a9acbf18" sha1="d55122c70cbe78c2679598dc07863e1d1d1a31df" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="008-c2.c2" offset="0x000001" size="0x800000" crc="6289eef9" sha1="a2ede77bb2468a2e1486d74745a22a5451026039" />    <!-- mask rom TC5364205 -->
 			</dataarea>
 		</part>
 	</software>
@@ -10781,7 +10811,7 @@ license:CC0
 
 	<software name="matrimbl" cloneof="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)</description>
-		<year>2002</year>
+		<year>2003</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS" />
 		<sharedfeat name="compatibility" value="MVS,AES" />

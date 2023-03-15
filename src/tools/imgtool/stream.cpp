@@ -8,19 +8,179 @@
 
 ***************************************************************************/
 
+#include "stream.h"
+
+#include "imgtool.h"
+
+#include "corefile.h"
+#include "ioprocs.h"
+#include "path.h"
+#include "unzip.h"
+
+#include <cassert>
+#include <cstdarg>
 #include <cstdio>
 #include <cstring>
-#include <zlib.h>
 
-#include "unzip.h"
-#include "imgtool.h"
+
+
+namespace imgtool {
+
+namespace {
+
+class stream_read_wrapper : public virtual util::random_read
+{
+public:
+	stream_read_wrapper(stream::ptr &&stream, std::uint8_t filler) noexcept
+		: m_stream(stream.release())
+		, m_filler(filler)
+		, m_close(true)
+	{
+		assert(m_stream);
+	}
+
+	stream_read_wrapper(stream &stream, std::uint8_t filler) noexcept
+		: m_stream(&stream)
+		, m_filler(filler)
+		, m_close(false)
+	{
+	}
+
+	virtual ~stream_read_wrapper()
+	{
+		if (m_close)
+			delete m_stream;
+	}
+
+	virtual std::error_condition seek(std::int64_t offset, int whence) noexcept override
+	{
+		m_stream->seek(offset, whence);
+		return std::error_condition();
+	}
+
+	virtual std::error_condition tell(std::uint64_t &result) noexcept override
+	{
+		result = m_stream->tell();
+		return std::error_condition();
+	}
+
+	virtual std::error_condition length(std::uint64_t &result) noexcept override
+	{
+		result = m_stream->size();
+		return std::error_condition();
+	}
+
+	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		actual = m_stream->read(buffer, length);
+		if (actual < length)
+			std::memset(reinterpret_cast<std::uint8_t *>(buffer) + actual, m_filler, length - actual);
+		return std::error_condition();
+	}
+
+	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		std::uint64_t const pos = m_stream->tell();
+		m_stream->seek(offset, SEEK_SET);
+		actual = m_stream->read(buffer, length);
+		m_stream->seek(pos, SEEK_SET);
+		if (actual < length)
+			std::memset(reinterpret_cast<std::uint8_t *>(buffer) + actual, m_filler, length - actual);
+		return std::error_condition();
+	}
+
+protected:
+	stream *const m_stream;
+	std::uint8_t m_filler;
+	bool const m_close;
+};
+
+
+class stream_read_write_wrapper : public stream_read_wrapper, public util::random_read_write
+{
+public:
+	using stream_read_wrapper::stream_read_wrapper;
+
+	virtual std::error_condition finalize() noexcept override
+	{
+		return std::error_condition();
+	}
+
+	virtual std::error_condition flush() noexcept override
+	{
+		return std::error_condition();
+	}
+
+	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		std::uint64_t const pos = m_stream->tell();
+		std::uint64_t size = m_stream->size();
+		if (size < pos)
+		{
+			m_stream->seek(size, SEEK_SET);
+			size += m_stream->fill(m_filler, pos - size);
+		}
+		actual = (size >= pos) ? m_stream->write(buffer, length) : 0U;
+		return (actual == length) ? std::error_condition() : std::errc::io_error;
+	}
+
+	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	{
+		std::uint64_t const pos = m_stream->tell();
+		std::uint64_t size = m_stream->size();
+		if (offset > size)
+		{
+			m_stream->seek(size, SEEK_SET);
+			size += m_stream->fill(m_filler, offset - size);
+		}
+		else
+		{
+			m_stream->seek(offset, SEEK_SET);
+		}
+		actual = (size >= offset) ? m_stream->write(buffer, length) : 0U;
+		m_stream->seek(pos, SEEK_SET);
+		return (actual == length) ? std::error_condition() : std::errc::io_error;
+	}
+};
+
+} // anonymous namespace
+
+
+util::random_read::ptr stream_read(stream::ptr &&s, std::uint8_t filler) noexcept
+{
+	util::random_read::ptr result;
+	if (s)
+		result.reset(new (std::nothrow) stream_read_wrapper(std::move(s), filler));
+	return result;
+}
+
+util::random_read::ptr stream_read(stream &s, std::uint8_t filler) noexcept
+{
+	util::random_read::ptr result(new (std::nothrow) stream_read_wrapper(s, filler));
+	return result;
+}
+
+util::random_read_write::ptr stream_read_write(stream::ptr &&s, std::uint8_t filler) noexcept
+{
+	util::random_read_write::ptr result;
+	if (s)
+		result.reset(new (std::nothrow) stream_read_write_wrapper(std::move(s), filler));
+	return result;
+}
+
+util::random_read_write::ptr stream_read_write(stream &s, std::uint8_t filler) noexcept
+{
+	util::random_read_write::ptr result(new (std::nothrow) stream_read_write_wrapper(s, filler));
+	return result;
+}
+
 
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-imgtool::stream::stream(bool wp)
+stream::stream(bool wp)
 	: imgtype(IMG_FILE)
 	, write_protect(wp)
 	, position(0)
@@ -35,14 +195,15 @@ imgtool::stream::stream(bool wp)
 //  ctor
 //-------------------------------------------------
 
-imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
+stream::stream(bool wp, util::core_file::ptr &&f)
 	: imgtype(IMG_FILE)
 	, write_protect(wp)
 	, position(0)
-	, filesize(f->size())
+	, filesize(0)
 	, file(std::move(f))
 	, buffer(nullptr)
 {
+	file->length(filesize); // FIXME: check error return
 }
 
 
@@ -50,7 +211,7 @@ imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
 //  ctor
 //-------------------------------------------------
 
-imgtool::stream::stream(bool wp, std::size_t size)
+stream::stream(bool wp, std::size_t size)
 	: imgtype(IMG_MEM)
 	, write_protect(wp)
 	, position(0)
@@ -65,7 +226,7 @@ imgtool::stream::stream(bool wp, std::size_t size)
 //  ctor
 //-------------------------------------------------
 
-imgtool::stream::stream(bool wp, std::size_t size, void *buf)
+stream::stream(bool wp, std::size_t size, void *buf)
 	: imgtype(IMG_MEM)
 	, write_protect(wp)
 	, position(0)
@@ -80,7 +241,7 @@ imgtool::stream::stream(bool wp, std::size_t size, void *buf)
 //  dtor
 //-------------------------------------------------
 
-imgtool::stream::~stream()
+stream::~stream()
 {
 	if (buffer)
 		free(buffer);
@@ -91,39 +252,39 @@ imgtool::stream::~stream()
 //  open_zip
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open_zip(const std::string &zipname, const char *subname, int read_or_write)
+stream::ptr stream::open_zip(const std::string &zipname, const char *subname, int read_or_write)
 {
 	if (read_or_write)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 
 	/* check to see if the file exists */
 	FILE *f = fopen(zipname.c_str(), "r");
 	if (!f)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 	fclose(f);
 
-	imgtool::stream::ptr imgfile(new imgtool::stream(true));
+	stream::ptr imgfile(new stream(true));
 
 	imgfile->imgtype = IMG_MEM;
 
 	util::archive_file::ptr z;
 	util::archive_file::open_zip(zipname, z);
 	if (!z)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 
 	int zipent = z->first_file();
 	while ((zipent >= 0) && subname && strcmp(subname, z->current_name().c_str()))
 		zipent = z->next_file();
 	if (zipent < 0)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 
 	imgfile->filesize = z->current_uncompressed_length();
 	imgfile->buffer = reinterpret_cast<std::uint8_t *>(malloc(z->current_uncompressed_length()));
 	if (!imgfile->buffer)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 
-	if (z->decompress(imgfile->buffer, z->current_uncompressed_length()) != util::archive_file::error::NONE)
-		return imgtool::stream::ptr();
+	if (z->decompress(imgfile->buffer, z->current_uncompressed_length()))
+		return stream::ptr();
 
 	return imgfile;
 }
@@ -134,7 +295,7 @@ imgtool::stream::ptr imgtool::stream::open_zip(const std::string &zipname, const
 //  open
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read_or_write)
+stream::ptr stream::open(const std::string &filename, int read_or_write)
 {
 	static const uint32_t write_modes[] =
 	{
@@ -143,7 +304,7 @@ imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE,
 		OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE
 	};
-	imgtool::stream::ptr s;
+	stream::ptr s;
 	char c;
 
 	// maybe we are just a ZIP?
@@ -152,13 +313,13 @@ imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read
 
 	util::core_file::ptr f = nullptr;
 	auto const filerr = util::core_file::open(filename, write_modes[read_or_write], f);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 	{
 		if (!read_or_write)
 		{
 			int const len = filename.size();
 
-			/* can't open the file; try opening ZIP files with other names */
+			// can't open the file; try opening ZIP files with other names
 			std::vector<char> buf(len + 1);
 			strcpy(&buf[0], filename.c_str());
 
@@ -177,11 +338,11 @@ imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read
 				return s;
 		}
 
-		/* ah well, it was worth a shot */
-		return imgtool::stream::ptr();
+		// ah well, it was worth a shot
+		return stream::ptr();
 	}
 
-	imgtool::stream::ptr imgfile(new imgtool::stream(read_or_write ? false : true, std::move(f)));
+	stream::ptr imgfile(new stream(read_or_write ? false : true, std::move(f)));
 
 	// normal file
 	return imgfile;
@@ -192,11 +353,11 @@ imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read
 //  open_write_stream
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open_write_stream(int size)
+stream::ptr stream::open_write_stream(int size)
 {
-	imgtool::stream::ptr imgfile(new imgtool::stream(false, size));
+	stream::ptr imgfile(new stream(false, size));
 	if (!imgfile->buffer)
-		return imgtool::stream::ptr();
+		return stream::ptr();
 
 	return imgfile;
 }
@@ -206,9 +367,9 @@ imgtool::stream::ptr imgtool::stream::open_write_stream(int size)
 //  open_mem
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open_mem(void *buf, size_t sz)
+stream::ptr stream::open_mem(void *buf, size_t sz)
 {
-	imgtool::stream::ptr imgfile(new imgtool::stream(false, sz, buf));
+	stream::ptr imgfile(new stream(false, sz, buf));
 
 	return imgfile;
 }
@@ -218,7 +379,7 @@ imgtool::stream::ptr imgtool::stream::open_mem(void *buf, size_t sz)
 //  core_file
 //-------------------------------------------------
 
-util::core_file *imgtool::stream::core_file()
+util::core_file *stream::core_file()
 {
 	return (imgtype == IMG_FILE) ? file.get() : nullptr;
 }
@@ -228,22 +389,21 @@ util::core_file *imgtool::stream::core_file()
 //  read
 //-------------------------------------------------
 
-uint32_t imgtool::stream::read(void *buf, uint32_t sz)
+uint32_t stream::read(void *buf, uint32_t sz)
 {
-	uint32_t result = 0;
+	size_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_FILE:
-			assert(sz == (uint32_t) sz);
-			file->seek(position, SEEK_SET);
-			result = file->read(buf, (uint32_t) sz);
+			if (!file->seek(position, SEEK_SET))
+				file->read(buf, sz, result); // FIXME: check error return
 			break;
 
 		case IMG_MEM:
-			/* do we have to limit sz? */
+			// do we have to limit sz?
 			if (sz > (filesize - position))
-				sz = (uint32_t) (filesize - position);
+				sz = uint32_t(filesize - position);
 
 			memcpy(buf, buffer + position, sz);
 			result = sz;
@@ -262,31 +422,31 @@ uint32_t imgtool::stream::read(void *buf, uint32_t sz)
 //  write
 //-------------------------------------------------
 
-uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
+uint32_t stream::write(const void *buf, uint32_t sz)
 {
-	void *new_buffer;
-	uint32_t result = 0;
+	size_t result = 0;
 
 	switch(imgtype)
 	{
 		case IMG_MEM:
 			if (!write_protect)
 			{
-				/* do we have to expand the buffer? */
-				if (filesize < position + sz)
+				// do we have to expand the buffer?
+				const uint64_t end = position + sz;
+				if ((filesize < end) && (size_t(end) == end))
 				{
-					/* try to expand the buffer */
-					new_buffer = realloc(buffer , position + sz);
+					// try to expand the buffer
+					void *const new_buffer = realloc(buffer, size_t(end));
 					if (new_buffer)
 					{
-						buffer = (uint8_t*)new_buffer;
-						filesize = position + sz;
+						buffer = reinterpret_cast<uint8_t *>(new_buffer);
+						filesize = end;
 					}
 				}
 
-				/* do we have to limit sz? */
+				// do we have to limit sz?
 				if (sz > (filesize - position))
-					sz = (uint32_t) (filesize - position);
+					sz = uint32_t(filesize - position);
 
 				memcpy(buffer + position, buf, sz);
 				result = sz;
@@ -294,8 +454,8 @@ uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
 			break;
 
 		case IMG_FILE:
-			file->seek(position, SEEK_SET);
-			result = file->write(buf, sz);
+			if (!file->seek(position, SEEK_SET))
+				file->write(buf, sz, result); // FIXME: check error return
 			break;
 
 		default:
@@ -303,10 +463,10 @@ uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
 			break;
 	}
 
-	/* advance the file pointer */
+	// advance the file pointer
 	position += result;
 
-	/* did we grow the file */
+	// did we grow the file
 	if (position > filesize)
 		filesize = position;
 	return result;
@@ -317,31 +477,9 @@ uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
 //  size
 //-------------------------------------------------
 
-uint64_t imgtool::stream::size() const
+uint64_t stream::size() const
 {
 	return filesize;
-}
-
-
-//-------------------------------------------------
-//  getptr
-//-------------------------------------------------
-
-void *imgtool::stream::getptr()
-{
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			ptr = buffer;
-			break;
-
-		default:
-			ptr = nullptr;
-			break;
-	}
-	return ptr;
 }
 
 
@@ -349,7 +487,7 @@ void *imgtool::stream::getptr()
 //  seek
 //-------------------------------------------------
 
-int imgtool::stream::seek(int64_t pos, int where)
+int stream::seek(int64_t pos, int where)
 {
 	switch(where)
 	{
@@ -377,7 +515,7 @@ int imgtool::stream::seek(int64_t pos, int where)
 //  tell
 //-------------------------------------------------
 
-uint64_t imgtool::stream::tell()
+uint64_t stream::tell()
 {
 	return position;
 }
@@ -387,7 +525,7 @@ uint64_t imgtool::stream::tell()
 //  transfer
 //-------------------------------------------------
 
-uint64_t imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &source, uint64_t sz)
+uint64_t stream::transfer(stream &dest, stream &source, uint64_t sz)
 {
 	uint64_t result = 0;
 	uint64_t readsz;
@@ -407,61 +545,9 @@ uint64_t imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &sourc
 //  transfer_all
 //-------------------------------------------------
 
-uint64_t imgtool::stream::transfer_all(imgtool::stream &dest, imgtool::stream &source)
+uint64_t stream::transfer_all(stream &dest, stream &source)
 {
 	return transfer(dest, source, source.size());
-}
-
-
-//-------------------------------------------------
-//  crc
-//-------------------------------------------------
-
-int imgtool::stream::crc(unsigned long *result)
-{
-	size_t sz;
-	void *ptr;
-
-	switch(imgtype)
-	{
-		case IMG_MEM:
-			*result = crc32(0, (unsigned char *) buffer, (size_t) filesize);
-			break;
-
-		default:
-			sz = size();
-			ptr = malloc(sz);
-			if (!ptr)
-				return IMGTOOLERR_OUTOFMEMORY;
-			seek(0, SEEK_SET);
-			if (read(ptr, sz) != sz)
-			{
-				free(ptr);
-				return IMGTOOLERR_READERROR;
-			}
-			*result = crc32(0, (const Bytef*)ptr, sz);
-			free(ptr);
-			break;
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  file_crc
-//-------------------------------------------------
-
-int imgtool::stream::file_crc(const char *fname, unsigned long *result)
-{
-	int err;
-	imgtool::stream::ptr f;
-
-	f = imgtool::stream::open(fname, OSD_FOPEN_READ);
-	if (!f)
-		return IMGTOOLERR_FILENOTFOUND;
-
-	err = f->crc(result);
-	return err;
 }
 
 
@@ -469,7 +555,7 @@ int imgtool::stream::file_crc(const char *fname, unsigned long *result)
 //  fill
 //-------------------------------------------------
 
-uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
+uint64_t stream::fill(unsigned char b, uint64_t sz)
 {
 	uint64_t outsz;
 	char buf[1024];
@@ -490,7 +576,7 @@ uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
 //  is_read_only
 //-------------------------------------------------
 
-bool imgtool::stream::is_read_only()
+bool stream::is_read_only()
 {
 	return write_protect;
 }
@@ -500,7 +586,7 @@ bool imgtool::stream::is_read_only()
 //  putc
 //-------------------------------------------------
 
-uint32_t imgtool::stream::putc(char c)
+uint32_t stream::putc(char c)
 {
 	return write(&c, 1);
 }
@@ -510,7 +596,7 @@ uint32_t imgtool::stream::putc(char c)
 //  puts
 //-------------------------------------------------
 
-uint32_t imgtool::stream::puts(const char *s)
+uint32_t stream::puts(const char *s)
 {
 	return write(s, strlen(s));
 }
@@ -520,7 +606,7 @@ uint32_t imgtool::stream::puts(const char *s)
 //  printf
 //-------------------------------------------------
 
-uint32_t imgtool::stream::printf(const char *fmt, ...)
+uint32_t stream::printf(const char *fmt, ...)
 {
 	va_list va;
 	char buf[256];
@@ -531,3 +617,5 @@ uint32_t imgtool::stream::printf(const char *fmt, ...)
 
 	return puts(buf);
 }
+
+} // namespace imgtool

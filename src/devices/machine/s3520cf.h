@@ -11,6 +11,8 @@ Seiko/Epson S-3520CF
 
 #pragma once
 
+#include "dirtc.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -19,7 +21,8 @@ Seiko/Epson S-3520CF
 // ======================> s3520cf_device
 
 class s3520cf_device :  public device_t,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -48,8 +51,13 @@ protected:
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
-	virtual void nvram_read(emu_file &file) override;
-	virtual void nvram_write(emu_file &file) override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	optional_memory_region m_region;
 

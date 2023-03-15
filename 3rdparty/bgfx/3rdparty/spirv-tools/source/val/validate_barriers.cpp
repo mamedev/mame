@@ -50,7 +50,8 @@ spv_result_t BarriersPass(ValidationState_t& _, const Instruction* inst) {
                       *message =
                           "OpControlBarrier requires one of the following "
                           "Execution "
-                          "Models: TessellationControl, GLCompute or Kernel";
+                          "Models: TessellationControl, GLCompute, Kernel, "
+                          "MeshNV or TaskNV";
                     }
                     return false;
                   }
@@ -69,7 +70,7 @@ spv_result_t BarriersPass(ValidationState_t& _, const Instruction* inst) {
         return error;
       }
 
-      if (auto error = ValidateMemorySemantics(_, inst, 2)) {
+      if (auto error = ValidateMemorySemantics(_, inst, 2, memory_scope)) {
         return error;
       }
       break;
@@ -82,7 +83,7 @@ spv_result_t BarriersPass(ValidationState_t& _, const Instruction* inst) {
         return error;
       }
 
-      if (auto error = ValidateMemorySemantics(_, inst, 1)) {
+      if (auto error = ValidateMemorySemantics(_, inst, 1, memory_scope)) {
         return error;
       }
       break;
@@ -119,7 +120,7 @@ spv_result_t BarriersPass(ValidationState_t& _, const Instruction* inst) {
         return error;
       }
 
-      if (auto error = ValidateMemorySemantics(_, inst, 2)) {
+      if (auto error = ValidateMemorySemantics(_, inst, 2, memory_scope)) {
         return error;
       }
       break;

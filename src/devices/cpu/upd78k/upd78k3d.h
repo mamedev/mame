@@ -12,7 +12,7 @@ class upd78k3_disassembler : public upd78k_family_disassembler
 {
 protected:
 	upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const psw_bits[], bool has_macw, bool has_macsw);
-	upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const ix_bases[]);
+	upd78k3_disassembler(const char *const sfr_names[], const char *const sfrp_names[], const char *const ix_bases[], u16 saddr_ram_base);
 
 	// register and mnemonic tables
 	static const char *const s_r_names[16];

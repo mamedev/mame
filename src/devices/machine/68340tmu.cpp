@@ -156,7 +156,7 @@ void mc68340_timer_module_device::write(offs_t offset, uint16_t data, uint16_t m
 				   "Period Measurement - not implemented",
 				   "Event Count - not implemented",
 				   "Timer Bypass (Simple Test Method) - not implemented"
-			 }}[data & REG_CR_MODE_MASK]);
+			 }}[(data & REG_CR_MODE_MASK) >> 2]);
 
 		LOGTIMER("- OC: %s mode\n", std::array<char const *, 4>{{"Disabled", "Toggle", "Zero", "One"}}[data & REG_CR_OC_MASK]);
 
@@ -312,12 +312,14 @@ void mc68340_timer_module_device::device_start()
 
 	m_cpu = downcast<m68340_cpu_device *>(owner());
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68340_timer_module_device::timer_callback),this));
+	m_timer = timer_alloc(FUNC(mc68340_timer_module_device::timer_callback), this);
 
 	// Resolve Timer callbacks
 	m_tout_out_cb.resolve_safe();
 	m_tgate_in_cb.resolve_safe();
 	m_tin_in_cb.resolve_safe();
+
+	m_ir = 0x000f;
 }
 
 void mc68340_timer_module_device::device_reset()

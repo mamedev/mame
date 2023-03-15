@@ -17,7 +17,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "jaguar.h"
 #include "jagdasm.h"
 
@@ -1015,7 +1014,7 @@ void jaguar_cpu_device::ror_rn_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = m_r[(op >> 5) & 31] & 31;
 	const u32 r2 = m_r[dreg];
-	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
+	const u32 res = rotr_32(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }
@@ -1025,7 +1024,7 @@ void jaguar_cpu_device::rorq_n_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
-	const u32 res = (r2 >> r1) | (r2 << (32 - r1));
+	const u32 res = rotr_32(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }

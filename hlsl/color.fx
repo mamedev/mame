@@ -52,6 +52,7 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 SourceDims;
+uniform float3 PrimTint = float3(1.0f, 1.0f, 1.0f);
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -67,6 +68,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.TexCoord += 0.5f / SourceDims; // half texel offset correction (DX9)
 
 	Output.Color = Input.Color;
+	Output.Color.rgb *= PrimTint;
 
 	return Output;
 }
@@ -102,7 +104,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 OutChroma = OutTexel - OutLuma;
 	float3 Saturated = OutLuma + OutChroma * Saturation;
 
-	return float4(Saturated, BaseTexel.a);
+	return float4(Saturated * Input.Color.rgb, BaseTexel.a);
 }
 
 //-----------------------------------------------------------------------------

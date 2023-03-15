@@ -4,7 +4,7 @@
     psxcard.c - Sony PlayStation memory card device
 
     by pSXAuthor
-    MESS conversion by R. Belmont
+    MAME conversion by R. Belmont
 */
 
 #include "emu.h"
@@ -43,7 +43,7 @@ enum transfer_states
 
 psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSXCARD, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_memcard_image_interface(mconfig, *this),
 	pkt_ptr(0),
 	pkt_sz(0),
 	cmd(0),
@@ -67,7 +67,7 @@ psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, d
 void psxcard_device::device_start()
 {
 	m_owner = dynamic_cast<psx_controller_port_device *>(owner());
-	m_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxcard_device::ack_timer), this));
+	m_ack_timer = timer_alloc(FUNC(psxcard_device::ack_timer), this);
 
 	m_ack = true;
 	m_disabled = false;
@@ -360,7 +360,7 @@ void psxcard_device::do_card()
 	}
 }
 
-void psxcard_device::ack_timer(void *ptr, int param)
+void psxcard_device::ack_timer(int32_t param)
 {
 	m_ack = param;
 	m_owner->ack();

@@ -76,7 +76,6 @@ Package: 132-pin PGA, 200-pin QFP
 #include "emu.h"
 #include "v60.h"
 #include "v60d.h"
-#include "debugger.h"
 
 DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "NEC V60")
 DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
@@ -359,7 +358,6 @@ uint32_t v60_device::v60_update_psw_for_exception(int is_interrupt, int target_l
 uint32_t v60_device::opUNHANDLED()
 {
 	fatalerror("Unhandled OpCode found : %02x at %08x\n", OpRead16(PC), PC);
-	//return 0; /* never reached, fatalerror won't return */
 }
 
 // Opcode jump table
@@ -497,7 +495,6 @@ void v60_device::device_start()
 
 	state_add( STATE_GENPC, "GENPC", PC).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_PPC ).noshow();
-	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).callimport().formatstr("%7s").noshow();
 
 	set_icountptr(m_icount);
@@ -562,6 +559,7 @@ void v60_device::stall()
 
 void v60_device::v60_do_irq(int vector)
 {
+	debugger_exception_hook(vector);
 	uint32_t oldPSW = v60_update_psw_for_exception(1, 0);
 
 	// Push PC and PSW onto the stack
@@ -583,7 +581,7 @@ void v60_device::v60_try_irq()
 		if(m_irq_line != ASSERT_LINE)
 			m_irq_line = CLEAR_LINE;
 
-		vector = standard_irq_callback(0);
+		vector = standard_irq_callback(0, PC);
 
 		v60_do_irq(vector + 0x40);
 	}

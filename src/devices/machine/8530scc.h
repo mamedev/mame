@@ -46,7 +46,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(baud_expire);
 
 private:
 	struct Chan {
@@ -85,6 +86,7 @@ private:
 
 	devcb_write_line intrq_cb;
 
+	void updatebaudtimer(int ch);
 	void updateirqs();
 	void initchannel(int ch);
 	void resetchannel(int ch);

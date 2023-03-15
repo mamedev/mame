@@ -6,7 +6,7 @@
 
 #include "fm7_cas.h"
 
-#include <cassert>
+#include <cstring>
 
 #define WAVE_HIGH        0x5a9e
 #define WAVE_LOW        -0x5a9e

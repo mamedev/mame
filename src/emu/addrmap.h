@@ -72,7 +72,7 @@ class address_map_entry
 	friend class address_map;
 
 	template <typename T, typename Ret, typename... Params>
-	struct is_addrmap_method { static constexpr bool value = std::is_constructible<address_map_constructor, Ret (T::*)(Params...), const char *, T*>::value; };
+	using is_addrmap_method = std::bool_constant<std::is_constructible_v<address_map_constructor, Ret (T::*)(Params...), const char *, T *> >;
 
 	template <typename T, typename Ret, typename... Params>
 	static std::enable_if_t<is_addrmap_method<T, Ret, Params...>::value, address_map_constructor> make_delegate(Ret (T::*func)(Params...), const char *name, T *obj)
@@ -156,6 +156,9 @@ public:
 	// chip select width setting
 	address_map_entry &cswidth(int _cswidth) { m_cswidth = _cswidth; return *this; }
 
+	// flags setting
+	address_map_entry &flags(u16 _flags) { m_flags = _flags; return *this; }
+
 	// I/O port configuration
 	address_map_entry &portr(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
 	address_map_entry &portw(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
@@ -208,6 +211,60 @@ public:
 
 	// view initialization
 	void view(memory_view &mv);
+
+
+	// wait-states, implicit base -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(u64 (T::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(u32 (T::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(u32 (T::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	// wait-states, device tag -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(const char *tag, u64 (T::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(m_devbase, tag, ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(const char *tag, u32 (T::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(m_devbase, tag, ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(const char *tag, u32 (T::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(m_devbase, tag, ws, name); return *this; }
+
+	// wait-states, device reference -> delegate converter
+	template <typename T, typename U>
+	address_map_entry &before_time(T &obj, u64 (U::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(obj, ws, name); return *this; }
+
+	template <typename T, typename U>
+	address_map_entry &before_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(obj, ws, name); return *this; }
+
+	template <typename T, typename U>
+	address_map_entry &after_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(obj, ws, name); return *this; }
+
+	// wait-states, lambda -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(T &&ws, const char *name)
+	{ m_before_time = ws_time_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(T &&ws, const char *name)
+	{ m_before_delay = ws_delay_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(T &&ws, const char *name)
+	{ m_after_delay = ws_delay_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
 
 	// implicit base -> delegate converter
 	template <typename T, typename Ret, typename... Params>
@@ -365,11 +422,15 @@ public:
 	offs_t                  m_addrselect;           // select bits
 	u64                     m_mask;                 // mask for which lanes apply
 	int                     m_cswidth;              // chip select width override
+	u16                     m_flags;                // user flags
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	const char *            m_share;                // tag of a shared memory block
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
+	ws_time_delegate        m_before_time;          // before-time wait-state
+	ws_delay_delegate       m_before_delay;         // before-delay wait-state
+	ws_delay_delegate       m_after_delay;          // after-delay wait-state
 
 	// handlers
 	read8_delegate          m_rproto8;              // 8-bit read proto-delegate
@@ -504,7 +565,7 @@ public:
 	address_map(device_t &device, int spacenum);
 	address_map(memory_view &view);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, device_t &device, address_map_constructor submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, u64 unitmask, int cswidth, u16 flags, device_t &device, address_map_constructor submap_delegate);
 	~address_map();
 
 	// setters

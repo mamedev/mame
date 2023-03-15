@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
  */
 
 #include "bimg_p.h"
@@ -336,15 +336,17 @@ namespace bimg
 		if (_input.m_depth     != 1
 		&&  _input.m_numLayers != 1
 		&&  _input.m_format    != TextureFormat::RGBA32F
-		&&  _input.m_width/6   != _input.m_height)
+		&& ( (_input.m_width   != _input.m_height*6) || (_input.m_width*6 != _input.m_height) ) )
 		{
 			BX_ERROR_SET(_err, BIMG_ERROR, "Input image format is not strip projection.");
 			return NULL;
 		}
 
+		const bool   horizontal = _input.m_width == _input.m_height*6;
 		const uint32_t srcPitch = _input.m_width*16;
-		const uint32_t dstWidth = _input.m_height;
+		const uint32_t dstWidth = horizontal ? _input.m_height : _input.m_width;
 		const uint32_t dstPitch = dstWidth*16;
+		const uint32_t step     = horizontal ? dstPitch : dstPitch*dstWidth;
 
 		ImageContainer* output = imageAlloc(_allocator
 			, _input.m_format
@@ -358,7 +360,7 @@ namespace bimg
 
 		const uint8_t* srcData = (const uint8_t*)_input.m_data;
 
-		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += dstPitch)
+		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += step)
 		{
 			ImageMip dstMip;
 			imageGetRawData(*output, side, 0, output->m_data, output->m_size, dstMip);
@@ -428,10 +430,10 @@ namespace bimg
 	{
 		Aabb()
 		{
-			m_min[0] =  bx::kFloatMax;
-			m_min[1] =  bx::kFloatMax;
-			m_max[0] = -bx::kFloatMax;
-			m_max[1] = -bx::kFloatMax;
+			m_min[0] = bx::max<float>();
+			m_min[1] = bx::max<float>();
+			m_max[0] = bx::min<float>();
+			m_max[1] = bx::min<float>();
 		}
 
 		void add(float _x, float _y)
@@ -453,10 +455,10 @@ namespace bimg
 		bool isEmpty() const
 		{
 			// Has to have at least two points added so that no value is equal to initial state.
-			return ( (m_min[0] ==  bx::kFloatMax)
-				||   (m_min[1] ==  bx::kFloatMax)
-				||   (m_max[0] == -bx::kFloatMax)
-				||   (m_max[1] == -bx::kFloatMax)
+			return ( (m_min[0] == bx::max<float>() )
+				||   (m_min[1] == bx::max<float>() )
+				||   (m_max[0] == bx::min<float>() )
+				||   (m_max[1] == bx::min<float>() )
 				);
 		}
 
@@ -847,8 +849,8 @@ namespace bimg
 		const float kGoldenSection = 0.61803398875f;
 		float offset = kGoldenSection;
 
-		bx::Vec3 tangentX;
-		bx::Vec3 tangentY;
+		bx::Vec3 tangentX(bx::init::None);
+		bx::Vec3 tangentY(bx::init::None);
 		bx::calcTangentFrame(tangentX, tangentY, _dir);
 
 		for (uint32_t ii = 0; ii < kNumSamples; ++ii)
@@ -894,7 +896,7 @@ namespace bimg
 
 		if (0.0f < totalWeight)
 		{
-			// Optimized Reversible Tonemapper for Resovle
+			// Optimized Reversible Tonemapper for Resolve
 			// https://web.archive.org/web/20180717182019/https://gpuopen.com/optimized-reversible-tonemapper-for-resolve/
 			// Average, then reverse the tonemapper
 			//

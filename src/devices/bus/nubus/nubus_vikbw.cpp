@@ -82,13 +82,13 @@ void nubus_vikbw_device::device_start()
 {
 	uint32_t slotspace;
 
-	install_declaration_rom(this, VIKBW_ROM_REGION, true);
+	install_declaration_rom(VIKBW_ROM_REGION, true);
 
 	slotspace = get_slotspace();
 
 //  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE);
+	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, &m_vram[0]);
 	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, &m_vram[0]);
 
@@ -103,7 +103,7 @@ void nubus_vikbw_device::device_start()
 void nubus_vikbw_device::device_reset()
 {
 	m_vbl_disable = 1;
-	memset(&m_vram[0], 0, VRAM_SIZE);
+	std::fill(m_vram.begin(), m_vram.end(), 0);
 
 	m_palette[0] = rgb_t(255, 255, 255);
 	m_palette[1] = rgb_t(0, 0, 0);
@@ -122,12 +122,13 @@ uint32_t nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		raise_slot_irq();
 	}
 
+	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
 	for (int y = 0; y < 768; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 1024/8; x++)
 		{
-			uint8_t const pixels = m_vram[(y * 128) + (BYTE4_XOR_BE(x))];
+			uint8_t const pixels = vram8[(y * 128) + x];
 
 			*scanline++ = m_palette[BIT(pixels, 7)];
 			*scanline++ = m_palette[BIT(pixels, 6)];

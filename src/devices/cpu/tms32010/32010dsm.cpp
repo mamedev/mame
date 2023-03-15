@@ -153,9 +153,8 @@ tms32010_disassembler::tms32010_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = TMS32010Formats; i = 0;
+	ops = TMS32010Formats;
 	while (*ops)
 	{
 		p = *ops;
@@ -191,7 +190,6 @@ tms32010_disassembler::tms32010_disassembler()
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 
@@ -277,24 +275,26 @@ offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		if (*cp == '%')
 		{
-			char num[20];
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"%02Xh",a); break; // was $%02X
-				case 'B': sprintf(num,"%04Xh",b); break; // was $%04X
-				case 'D': sprintf(num,"%02Xh",d); break;
-				case 'K': sprintf(num,"%d",k); break;
-				case 'N': sprintf(num,"%s",nextar[n]); break;
-				case 'M': sprintf(num,"%s",arith[m]); break;
-				case 'P': sprintf(num,"PA%d",p); break;
-				case 'R': sprintf(num,"AR%d",r); break;
-				case 'S': sprintf(num,",%d",s); break;
-				case 'W': sprintf(num,"%04Xh",w); break;
+				case 'A': util::stream_format(stream,"%02Xh",a); break;
+				case 'B':
+					if (strncmp(cp, "b  ", 3) && strncmp(cp, "cal", 3))
+						flags = STEP_COND;
+					util::stream_format(stream,"%04Xh",b);
+					break;
+				case 'D': util::stream_format(stream,"%02Xh",d); break;
+				case 'K': util::stream_format(stream,"%d",k); break;
+				case 'N': stream << nextar[n]; break;
+				case 'M': stream << arith[m]; break;
+				case 'P': util::stream_format(stream,"PA%d",p); break;
+				case 'R': util::stream_format(stream,"AR%d",r); break;
+				case 'S': util::stream_format(stream,",%d",s); break;
+				case 'W': util::stream_format(stream,"%04Xh",w); break;
 				default:
 					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
-			stream << num;
 		}
 		else
 		{

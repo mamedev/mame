@@ -4,28 +4,29 @@
 
   TMS1000 family - TMS0270
 
+TMS0270 is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
+- RAM, ROM, and main instructions PLAs is the same as TMS0980
+- 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
+  plus optional separate lines for custom opcode handling
+- 48-term output PLA above the RAM (rotate opla 90 degrees)
+
+newer TMS0270 chips (eg. Speak & Math) have 42 pins
+
+TMS0260 is same or similar?
+
 */
 
 #include "emu.h"
 #include "tms0270.h"
-#include "debugger.h"
-
-// TMS0270 is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
-// - RAM, ROM, and main instructions PLAs is the same as TMS0980
-// - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
-//   plus optional separate lines for custom opcode handling
-// - 48-term output PLA above the RAM (rotate opla 90 degrees)
-DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "Texas Instruments TMS0270") // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
-// newer TMS0270 chips (eg. Speak & Math) have 42 pins
-
-// TMS0260 is same or similar?
 
 
 // device definitions
-tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, address_map_constructor(FUNC(tms0270_cpu_device::program_11bit_9), this), 8 /* data width */, address_map_constructor(FUNC(tms0270_cpu_device::data_144x4), this))
-{
-}
+DEFINE_DEVICE_TYPE(TMS0270, tms0270_cpu_device, "tms0270", "Texas Instruments TMS0270") // 40-pin DIP, 16 O pins, 8+ R pins (some R pins are internally hooked up to support more I/O)
+
+
+tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TMS0270, tag, owner, clock, 16 /* o pins */, 16 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0270_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0270_cpu_device::ram_144x4), this))
+{ }
 
 
 // machine configs
@@ -42,7 +43,7 @@ void tms0270_cpu_device::device_add_mconfig(machine_config &config)
 void tms0270_cpu_device::device_start()
 {
 	// common init
-	tms1k_base_device::device_start();
+	tms0980_cpu_device::device_start();
 
 	// zerofill
 	m_r_prev = 0;
@@ -81,25 +82,26 @@ void tms0270_cpu_device::device_reset()
 // i/o handling
 void tms0270_cpu_device::dynamic_output()
 {
-	// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
-	m_ctl_dir = m_r >> 11 & 1;
-
 	// R12: chip select (off=display via OPLA, on=TMS5100 via ACC/CKB)
-	m_chipsel = m_r >> 12 & 1;
+	m_chipsel = BIT(m_r, 12);
 
 	if (m_chipsel)
 	{
+		// R11: TMS5100 CTL port direction (0=read from TMS5100, 1=write to TMS5100)
+		m_ctl_dir = BIT(m_r, 11);
+
 		// ACC via SEG G,B,C,D: TMS5100 CTL pins
-		if (m_ctl_dir && m_a != m_ctl_out)
+		if (m_ctl_dir && m_ctl_out != m_a)
 		{
 			m_ctl_out = m_a;
-			m_write_ctl(0, m_ctl_out, 0xff);
+			m_write_ctl(m_ctl_out);
 		}
 
 		// R10 via SEG E: TMS5100 PDC pin
-		if (m_pdc != (m_r >> 10 & 1))
+		int pdc = BIT(m_r, 10);
+		if (m_pdc != pdc)
 		{
-			m_pdc = m_r >> 10 & 1;
+			m_pdc = pdc;
 			m_write_pdc(m_pdc);
 		}
 	}
@@ -108,7 +110,7 @@ void tms0270_cpu_device::dynamic_output()
 		// standard O-output
 		if (m_o_latch != m_o_latch_prev)
 		{
-			write_o_output(m_o_latch);
+			write_o_reg(m_o_latch);
 			m_o_latch_prev = m_o_latch;
 		}
 	}
@@ -116,7 +118,7 @@ void tms0270_cpu_device::dynamic_output()
 	// standard R-output
 	if (m_r != m_r_prev)
 	{
-		m_write_r(0, m_r & m_r_mask, 0xffff);
+		write_r_output(m_r);
 		m_r_prev = m_r;
 	}
 }
@@ -125,10 +127,10 @@ u8 tms0270_cpu_device::read_k_input()
 {
 	// external: TMS5100 CTL port via SEG G,B,C,D
 	if (m_chipsel)
-		return (m_ctl_dir) ? m_ctl_out : m_read_ctl(0, 0xff) & 0xf;
+		return (m_ctl_dir) ? m_ctl_out : m_read_ctl() & 0xf;
 
 	// standard K-input otherwise
-	u8 k = m_read_k(0, 0xff) & 0x1f;
+	u8 k = m_read_k() & 0x1f;
 	return (k & 0x10) ? 0xf : k; // the TMS0270 KF line asserts all K-inputs
 }
 

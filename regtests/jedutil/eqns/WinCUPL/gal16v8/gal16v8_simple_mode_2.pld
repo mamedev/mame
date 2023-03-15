@@ -1,0 +1,41 @@
+Name     GAL16V8 Simple Mode Test 2 ;
+PartNo   00 ;
+Date     2/16/2022 ;
+Revision 01 ;
+Designer MAME ;
+Company  MAME ;
+Assembly None ;
+Location  ;
+Device   G16V8A ;
+
+/* Simple Mode Test 2 */
+
+/* Input Pins */
+PIN 1   = [I1] ;
+PIN 2   = [I2] ;
+PIN 3   = [I3] ;
+PIN 4   = [I4] ;
+PIN 5   = [I5] ;
+PIN 6   = [I6] ;
+PIN 7   = [I7] ;
+PIN 8   = [I8] ;
+PIN 9   = [I9] ;
+PIN 11  = [I11] ;
+
+/* Output Pins */
+PINNODE 12  = [O12] ;
+PINNODE 13  = [O13] ;
+PINNODE 14  = [O14] ;
+PINNODE 15  = [O15] ;
+PINNODE 16  = [O16] ;
+PINNODE 17  = [O17] ;
+PINNODE 18  = [O18] ;
+PINNODE 19  = [O19] ;
+
+/* Logic Equations */
+
+!O12 = I1 #
+       I2 #
+       I3 #
+       !I4 #
+       !I5 ;

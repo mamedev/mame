@@ -15,7 +15,9 @@
 #include "source/print.h"
 
 #if defined(SPIRV_ANDROID) || defined(SPIRV_LINUX) || defined(SPIRV_MAC) || \
-    defined(SPIRV_IOS) || defined(SPIRV_FREEBSD) || defined(SPIRV_EMSCRIPTEN)
+    defined(SPIRV_IOS) || defined(SPIRV_TVOS) || defined(SPIRV_FREEBSD) ||  \
+    defined(SPIRV_OPENBSD) || defined(SPIRV_EMSCRIPTEN) ||                  \
+    defined(SPIRV_FUCHSIA) || defined(SPIRV_GNU)
 namespace spvtools {
 
 clr::reset::operator const char*() { return "\x1b[0m"; }

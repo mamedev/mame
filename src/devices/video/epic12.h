@@ -78,6 +78,21 @@ public:
 	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 protected:
+	// The firmware versions
+	enum {
+		// Used by ibara & mushisama
+		FW_A, // Byte checksum 03
+
+		// Used by espgal2
+		FW_B, // Byte checksum 3e
+
+		// Used by espgal2a, mushitama and mushisamb
+		FW_C, // Byte checksum f9
+
+		// Used by everything else
+		FW_D, // Byte checksum e1
+	};
+
 	struct clr_t
 	{
 		// clr_t to r5g5b5
@@ -820,6 +835,12 @@ protected:
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
+
+	// fpga firmware
+	std::vector<u8> m_firmware;
+	int m_firmware_pos;
+	u8 m_firmware_port;
+	int m_firmware_version;
 
 	// debug vram viewer
 #ifdef DEBUG_VRAM_VIEWER

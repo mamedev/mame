@@ -7,13 +7,12 @@
 
 #include "dirom.h"
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> gaelco_gae1_device
-
-#include "dirom.h"
 
 class gaelco_gae1_device : public device_t,
 							public device_sound_interface,
@@ -47,7 +46,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// device_rom_interface overrides
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 private:
 	static constexpr int NUM_CHANNELS   = 0x07;
@@ -61,13 +60,16 @@ private:
 	};
 
 	sound_stream *m_stream;                     /* our stream */
-	int m_banks[4];                             /* start of each ROM bank */
-	sound_channel m_channel[NUM_CHANNELS];      /* 7 stereo channels */
 
+	// live
+	sound_channel m_channel[NUM_CHANNELS];      /* 7 stereo channels */
 	uint16_t m_sndregs[0x38];
 
 	// Table for converting from 8 to 16 bits with volume control
 	int16_t m_volume_table[VOLUME_LEVELS][256];
+
+	// config
+	int m_banks[4];                             /* start of each ROM bank */
 };
 
 DECLARE_DEVICE_TYPE(GAELCO_GAE1, gaelco_gae1_device)

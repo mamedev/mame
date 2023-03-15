@@ -16,7 +16,6 @@
 // standard windows headers
 #include <windows.h>
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include <debugger.h>
 
 #include <psapi.h>
@@ -509,6 +508,9 @@ bool symbol_manager::parse_sym_line(const char *line, uintptr_t &address, std::s
 
 	// first look for a (ty) entry
 	const char *type = strstr(line, "(ty  20)");
+	if (type == nullptr)
+		type = strstr(line, "(ty   20)");
+
 	if (type == nullptr)
 		return false;
 
@@ -1097,7 +1099,5 @@ diagnostics_module * diagnostics_module::get_instance()
 	static diagnostics_win32 s_instance;
 	return &s_instance;
 }
-
-#endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #endif

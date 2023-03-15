@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/datmenu.h
@@ -14,13 +14,18 @@
 
 #pragma once
 
-#include "ui/menu.h"
+#include "ui/text.h"
+#include "ui/textbox.h"
 
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 
 struct ui_software_info;
+struct ui_system_info;
+
 
 namespace ui {
 
@@ -28,40 +33,46 @@ namespace ui {
 //  class dats menu
 //-------------------------------------------------
 
-class menu_dats_view : public menu
+class menu_dats_view : public menu_textbox
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver = nullptr);
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system = nullptr);
 	virtual ~menu_dats_view() override;
 
+	static void add_info_text(text_layout &layout, std::string_view text, rgb_t color, float size = 1.0f);
+
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_mouse_down() override;
+
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
-	// draw dats menu
-	virtual void draw(uint32_t flags) override;
-
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-
-	int m_actual;
-	const game_driver  *m_driver;
-	const ui_software_info *m_swinfo;
-	std::string m_list, m_short, m_long, m_parent;
-	void get_data();
-	void get_data_sw();
-	bool m_issoft;
 	struct list_items
 	{
-		list_items(std::string l, int i, std::string rev) { label = l; option = i; revision = rev; }
+		list_items(std::string &&l, int i, std::string &&rev) : label(std::move(l)), option(i), revision(std::move(rev)) { }
+
 		std::string label;
 		int option;
 		std::string revision;
 	};
+
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
+
+	void get_data(std::string &buffer);
+	void get_data_sw(std::string &buffer);
+
+	ui_system_info const *const m_system;
+	ui_software_info const *const m_swinfo;
+	bool const m_issoft;
+	int m_actual;
+	std::string m_list, m_short, m_long, m_parent;
 	std::vector<list_items> m_items_list;
 };
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_DATMENU_H */
+#endif // MAME_FRONTEND_UI_DATMENU_H

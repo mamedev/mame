@@ -42,15 +42,17 @@
  * an offset must be used to centralize the pixels.
  */
 #define CR_OFFSET    (-14)
-#define PAPER_WIDTH  1024
-#define PAPER_HEIGHT 576
+
+#define PAPER_WIDTH  1024    // 120 dpi * 8.5333 inches
+#define PAPER_HEIGHT (11*72) // 72 dpi * 11 inches
+
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device, "lx810l", "Espon LX-810L")
+DEFINE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device, "lx810l", "Epson LX-810L")
 DEFINE_DEVICE_TYPE(EPSON_AP2000, epson_ap2000_device, "ap2000", "Epson ActionPrinter 2000")
 
 
@@ -140,14 +142,6 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 
 //  config.set_default_layout(layout_lx800);
 
-	/* video hardware (simulates paper) */
-	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(PAPER_WIDTH, PAPER_HEIGHT);
-	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1);
-	screen.set_screen_update(FUNC(epson_lx810l_device::screen_update_lx810l));
-
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -163,21 +157,23 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	e05a30.centronics_perror().set(FUNC(epson_lx810l_device::e05a30_centronics_perror));
 	e05a30.centronics_fault().set(FUNC(epson_lx810l_device::e05a30_centronics_fault));
 	e05a30.centronics_select().set(FUNC(epson_lx810l_device::e05a30_centronics_select));
+	e05a30.cpu_reset().set(FUNC(epson_lx810l_device::e05a30_cpu_reset));
+	e05a30.ready_led().set(FUNC(epson_lx810l_device::e05a30_ready_led));
 
 	/* 256-bit eeprom */
 	EEPROM_93C06_16BIT(config, "eeprom");
 
-	STEPPER(config, m_pf_stepper, (uint8_t)4);
-	STEPPER(config, m_cr_stepper, (uint8_t)2);
+	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 72);  // do 72 dpi
+	m_bitmap_printer->set_pf_stepper_ratio(1,6);  // pf stepper moves at 216 dpi so at 72dpi half steps
+	m_bitmap_printer->set_cr_stepper_ratio(1,1);
 }
-
 
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( epson_lx810l )
 
+static INPUT_PORTS_START( epson_lx810 )
 	/* Buttons on printer */
 	PORT_START("ONLINE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
@@ -189,67 +185,69 @@ static INPUT_PORTS_START( epson_lx810l )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, reset_printer, 0)
 
-	/* DIPSW1 */
 	PORT_START("DIPSW1")
+	PORT_DIPNAME(0x01, 0x00, "Character spacing")             PORT_DIPLOCATION("SW 1:!1")
+	PORT_DIPSETTING(   0x00, "10 cpi")
+	PORT_DIPSETTING(   0x01, "12 cpi")
+	PORT_DIPNAME(0x02, 0x00, "Shape of zero")                 PORT_DIPLOCATION("SW 1:!2")
+	PORT_DIPSETTING(   0x00, "Not slashed")
+	PORT_DIPSETTING(   0x02, "Slashed")
+	PORT_DIPNAME(0x04, 0x00, "Character table")               PORT_DIPLOCATION("SW 1:!3")
+	PORT_DIPSETTING(   0x00, "Italics")
+	PORT_DIPSETTING(   0x04, "Graphics")
+	PORT_DIPNAME(0x08, 0x08, "Short tear-off")                PORT_DIPLOCATION("SW 1:!4")
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x00, "Draft printing speed")          PORT_DIPLOCATION("SW 1:!6")
+	PORT_DIPSETTING(   0x10, DEF_STR(Normal))
+	PORT_DIPSETTING(   0x00, "High speed")
+	PORT_DIPNAME(0xe0, 0xe0, "International character set")   PORT_DIPLOCATION("SW 1:!6,!7,!8")
+	PORT_DIPSETTING(   0xe0, "USA (PC 437)")
+	PORT_DIPSETTING(   0x60, "France (PC 850)")
+	PORT_DIPSETTING(   0xa0, "Germany (PC 860)")
+	PORT_DIPSETTING(   0x20, "UK (PC 863)")
+	PORT_DIPSETTING(   0xc0, "Denmark (PC 865)")
+	PORT_DIPSETTING(   0x40, "Sweden (PC 437)")
+	PORT_DIPSETTING(   0x80, "Italy (PC 437)")
+	PORT_DIPSETTING(   0x00, "Spain (PC 437)")
 
-	PORT_DIPNAME(0x01, 0x01, "Character spacing")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "12 cpi") /* default */
-	PORT_DIPSETTING(0x00, "10 cpi")
-
-	PORT_DIPNAME(0x02, 0x00, "Shape of zero")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "Slashed")
-	PORT_DIPSETTING(0x00, "Not slashed") /* default */
-
-	PORT_DIPNAME(0x0c, 0x08, "Page length")
-	PORT_DIPLOCATION("DIP:3,4")
-	PORT_DIPSETTING(0x00, "11 inches")
-	PORT_DIPSETTING(0x04, "12 inches")
-	PORT_DIPSETTING(0x08, "8.5 inches") /* default */
-	PORT_DIPSETTING(0x0c, "11.7 inches")
-
-	PORT_DIPNAME(0x10, 0x10, "Character table")
-	PORT_DIPLOCATION("DIP:5")
-	PORT_DIPSETTING(0x10, "Graphics") /* default */
-	PORT_DIPSETTING(0x00, "Italics")
-
-	PORT_DIPNAME(0xe0, 0xe0, "International characters and PC selection")
-	PORT_DIPLOCATION("DIP:6,7,8")
-	PORT_DIPSETTING(0xe0, "United States") /* default */
-	PORT_DIPSETTING(0x60, "France")
-	PORT_DIPSETTING(0xa0, "Germany")
-	PORT_DIPSETTING(0x20, "United Kingdom")
-	PORT_DIPSETTING(0xc0, "Denmark")
-	PORT_DIPSETTING(0x40, "Sweden")
-	PORT_DIPSETTING(0x80, "Italy")
-	PORT_DIPSETTING(0x00, "Spain")
-
-	/* DIPSW2 */
 	PORT_START("DIPSW2")
-
-	PORT_DIPNAME(0x01, 0x01, "Short tear-off")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "Invalid") /* default */
-	PORT_DIPSETTING(0x00, "Valid")
-
-	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
-	PORT_DIPNAME(0x04, 0x00, "Skip-over-perforation")
-	PORT_DIPLOCATION("DIP:3")
-	PORT_DIPSETTING(0x04, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
-	PORT_DIPNAME(0x08, 0x00, "Auto line feed")
-	PORT_DIPLOCATION("DIP:4")
-	PORT_DIPSETTING(0x08, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
+	PORT_DIPNAME(0x01, 0x00, "Page length")                   PORT_DIPLOCATION("SW 2:!1")
+	PORT_DIPSETTING(   0x00, "11\"")
+	PORT_DIPSETTING(   0x01, "12\"")
+	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")         PORT_DIPLOCATION("SW 2:!2")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, "Skip over perforation")         PORT_DIPLOCATION("SW 2:!3")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, "1\"")
+	PORT_DIPNAME(0x08, 0x00, "Auto line feed")                PORT_DIPLOCATION("SW 2:!4")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x08, DEF_STR(On))
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( epson_lx810l )
+	PORT_INCLUDE(epson_lx810)
+
+	PORT_MODIFY("DIPSW1")
+	PORT_DIPNAME(0x0c, 0x00, "Page length")                   PORT_DIPLOCATION("SW 1:!3,!4")
+	PORT_DIPSETTING(   0x08, "8.5\"")
+	PORT_DIPSETTING(   0x00, "11\"")
+	PORT_DIPSETTING(   0x0c, "11.7\" (A4)")
+	PORT_DIPSETTING(   0x04, "12\"")
+	PORT_DIPNAME(0x10, 0x00, "Character table")               PORT_DIPLOCATION("SW 1:!5")
+	PORT_DIPSETTING(   0x00, "Italics")
+	PORT_DIPSETTING(   0x10, "Graphics")
+
+	PORT_MODIFY("DIPSW2")
+	PORT_DIPNAME(0x01, 0x01, "Short tear-off")                PORT_DIPLOCATION("SW 2:!1")
+	PORT_DIPSETTING(   0x01, "Invalid")
+	PORT_DIPSETTING(   0x00, "Valid")
+INPUT_PORTS_END
+
 
 
 //-------------------------------------------------
@@ -258,13 +256,24 @@ INPUT_PORTS_END
 
 ioport_constructor epson_lx810l_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( epson_lx810l );
+	return INPUT_PORTS_NAME(epson_lx810l);
 }
 
 INPUT_CHANGED_MEMBER(epson_lx810l_device::online_sw)
 {
 	m_maincpu->set_input_line(UPD7810_INTF2, newval ? CLEAR_LINE : ASSERT_LINE);
 }
+
+INPUT_CHANGED_MEMBER(epson_lx810l_device::reset_printer)
+{
+	if (newval)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);  // reset cpu
+		m_e05a30->reset();  // this will generate an NMI interrupt when the e05a30 is ready (minimum 0.9 seconds after reset)
+	}
+}
+
+
 
 
 //**************************************************************************
@@ -284,20 +293,25 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_pf_stepper(*this, "pf_stepper"),
-	m_cr_stepper(*this, "cr_stepper"),
+	m_bitmap_printer(*this, "bitmap_printer"),
 	m_eeprom(*this, "eeprom"),
 	m_e05a30(*this, "e05a30"),
-	m_screen(*this, "screen"),
 	m_online_led(*this, "online_led"),
+	m_ready_led(*this, "ready_led"),
+	m_online_ioport(*this, "ONLINE"),
+	m_formfeed_ioport(*this, "FORMFEED"),
+	m_linefeed_ioport(*this, "LINEFEED"),
+	m_loadeject_ioport(*this, "LOADEJECT"),
+	m_paperend_ioport(*this, "PAPEREND"),
+	m_dipsw1_ioport(*this, "DIPSW1"),
+	m_dipsw2_ioport(*this, "DIPSW2"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
-	m_pf_pos_abs(1),
-	m_cr_pos_abs(1),
-	m_real_cr_pos(1),
 	m_real_cr_steps(0),
-	m_real_cr_dir(0), m_fakemem(0)
+	m_fakemem(0),
+	m_in_between_offset(0),
+	m_rightward_offset(-3)
 {
 }
 
@@ -313,11 +327,9 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 void epson_lx810l_device::device_start()
 {
 	m_online_led.resolve();
+	m_ready_led.resolve();
 
-	m_cr_timer = timer_alloc(TIMER_CR);
-
-	m_screen->register_screen_bitmap(m_bitmap);
-	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
+	m_cr_timer = timer_alloc(FUNC(epson_lx810l_device::cr_tick), this);
 }
 
 
@@ -327,29 +339,27 @@ void epson_lx810l_device::device_start()
 
 void epson_lx810l_device::device_reset()
 {
+	m_in_between_offset = 0;
 }
 
 
 //-------------------------------------------------
-//  device_timer - device-specific timer
+//  cr_tick - handle a carriage return
 //-------------------------------------------------
 
-void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(epson_lx810l_device::cr_tick)
 {
-	switch (id) {
-	case TIMER_CR:
-		/* The firmware issues two half-steps in sequence, one immediately
-		 * after the other. At full speed, the motor does two half-steps at
-		 * each 833 microseconds. A timer fires the printhead twice, with
-		 * the same period as each half-step (417 microseconds), but with
-		 * a 356 microseconds delay relative to the motor steps.
-		 */
-		m_real_cr_pos += param;
-		m_real_cr_steps--;
-		if (m_real_cr_steps)
-			m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
-		break;
-	}
+	/* The firmware issues two half-steps in sequence, one immediately
+	 * after the other. At full speed, the motor does two half-steps at
+	 * each 833 microseconds. A timer fires the printhead twice, with
+	 * the same period as each half-step (417 microseconds), but with
+	 * a 356 microseconds delay relative to the motor steps.
+	 */
+	m_in_between_offset += param;
+
+	m_real_cr_steps--;
+	if (m_real_cr_steps)
+		m_cr_timer->adjust(attotime::from_usec(400), m_bitmap_printer->m_cr_direction);
 }
 
 
@@ -385,16 +395,19 @@ void epson_lx810l_device::fakemem_w(uint8_t data)
 uint8_t epson_lx810l_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
-	uint8_t hp_sensor = m_cr_pos_abs <= 0 ? 0 : 1;
+	uint8_t hp_sensor = (m_bitmap_printer->m_xpos <= 0) ? 0 : 1;
+
 	//uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
 
 	result |= hp_sensor; /* home position */
 	//result |= pe_sensor << 1; /* paper end */
-	result |= ioport("PAPEREND")->read() << 1;  // simulate a paper out error
-	result |= ioport("LINEFEED")->read() << 6;
-	result |= ioport("FORMFEED")->read() << 7;
+	result |= m_paperend_ioport->read() << 1;  // simulate a paper out error
+	result |= m_linefeed_ioport->read() << 6;
+	result |= m_formfeed_ioport->read() << 7;
 
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
+
+	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ERROR, !m_paperend_ioport->read());
 
 	return result;
 }
@@ -416,7 +429,7 @@ void epson_lx810l_device::porta_w(offs_t offset, uint8_t data)
  */
 uint8_t epson_lx810l_device::portb_r(offs_t offset)
 {
-	uint8_t result = ~ioport("DIPSW1")->read();
+	uint8_t result = ~m_dipsw1_ioport->read();
 
 	/* if 93C06 is selected */
 	if (m_93c06_cs) {
@@ -456,7 +469,7 @@ uint8_t epson_lx810l_device::portc_r(offs_t offset)
 	uint8_t result = 0;
 
 	/* result |= ioport("serial")->read() << 1; */
-	result |= !ioport("ONLINE")->read() << 3;
+	result |= !m_online_ioport->read() << 3;
 	result |= m_93c06_clk << 4;
 	result |= m_93c06_cs  << 5;
 
@@ -478,6 +491,7 @@ void epson_lx810l_device::portc_w(offs_t offset, uint8_t data)
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
 	m_online_led = !BIT(data, 2);
+	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ONLINE, m_online_led);
 }
 
 
@@ -492,62 +506,26 @@ void epson_lx810l_device::printhead(uint16_t data)
 
 void epson_lx810l_device::pf_stepper(uint8_t data)
 {
-	int changed = m_pf_stepper->update(data);
-	m_pf_pos_abs = -m_pf_stepper->get_absolute_position();
-
-	/* clear last line of paper */
-	if (changed > 0) {
-		void *line = m_bitmap.raw_pixptr(bitmap_line(9), 0);
-		memset(line, 0xff, m_bitmap.width() * 4);
-	}
-
-	LOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
+	m_bitmap_printer->update_pf_stepper(data);
 }
 
 void epson_lx810l_device::cr_stepper(uint8_t data)
 {
-	int m_cr_pos_abs_prev = m_cr_pos_abs;
+	m_bitmap_printer->update_cr_stepper(bitswap<4>(data, 0, 1, 2, 3));  // reverse bits
 
-	m_cr_stepper->update(data);
-	m_cr_pos_abs = -m_cr_stepper->get_absolute_position();
-
-	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
-		/* going right */
-		m_real_cr_dir =  1;
-	} else {
-		/* going left */
-		m_real_cr_dir = -1;
-	}
+	m_in_between_offset = 0;
 
 	if (!m_real_cr_steps)
-		m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
-	m_real_cr_steps++;
-
-	LOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);
+	{
+		m_cr_timer->adjust(attotime::from_usec(400), m_bitmap_printer->m_cr_direction);
+		m_real_cr_steps++;
+	}
 }
 
 WRITE_LINE_MEMBER( epson_lx810l_device::e05a30_ready )
 {
 	// must be longer than attotime::zero - 0.09 is minimum to initialize properly
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_double(0.09));
-}
-
-
-/***************************************************************************
-    Video hardware (simulates paper)
-***************************************************************************/
-
-uint32_t epson_lx810l_device::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int scrolly = -bitmap_line(9);
-	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
-
-	/* draw "printhead" */
-	int bordersize = 1;
-	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10 - bordersize, PAPER_HEIGHT - 36 - bordersize, 20 + bordersize * 2, 36 + bordersize * 2, 0x000000 );
-	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10, PAPER_HEIGHT - 36, 20, 36, m_e05a30->ready_led() ? 0x55ff55 : 0x337733 );
-
-	return 0;
 }
 
 
@@ -570,12 +548,12 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 * lines which are being printed in different directions is
 		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
-		if (m_real_cr_pos < m_bitmap.width()) {
-			for (int i = 0; i < 9; i++) {
-				unsigned int const y = bitmap_line(i);
-				if ((m_printhead & (1<<(8-i))) != 0)
-					m_bitmap.pix(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
-			}
+		for (int i = 0; i < 9; i++)
+		{
+			if ((m_printhead & (1<<(8-i))) != 0)
+				m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, // * 1 for no interleave at 72 vdpi
+				m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset +
+				(m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;
 		}
 	}
 }
@@ -587,25 +565,25 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 
 uint8_t epson_lx810l_device::an0_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x01);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x01);
 	return res - 1; /* DIPSW2.1 */
 }
 
 uint8_t epson_lx810l_device::an1_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x02);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x02);
 	return res - 1; /* DIPSW2.2 */
 }
 
 uint8_t epson_lx810l_device::an2_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x04);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x04);
 	return res - 1; /* DIPSW2.3 */
 }
 
 uint8_t epson_lx810l_device::an3_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x08);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x08);
 	return res - 1; /* DIPSW2.4 */
 }
 
@@ -621,7 +599,7 @@ uint8_t epson_lx810l_device::an5_r()
 
 uint8_t epson_lx810l_device::an6_r()
 {
-	uint8_t res = !ioport("LOADEJECT")->read();
+	uint8_t res = !m_loadeject_ioport->read();
 	return res - 1;
 }
 

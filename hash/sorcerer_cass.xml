@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Compiled by Robbbert
 -->
@@ -416,7 +416,7 @@ Compiled by Robbbert
 	<software name="orb">
 		<description>Orb of Halucidon</description>
 		<year>1982</year>
-			<publisher>System Software</publisher>
+		<publisher>System Software</publisher>
 		<info name="serial" value="321ES" />
 		<info name="developer" value="Leo Blackman"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -1469,6 +1469,17 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0xa2b02c">
 				<rom name="defcm.wav" size="0xa2b02c" crc="24bd0b6f" sha1="5aaa0f01ed86d8db22871fb456c3c795a6495291" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="sword">
+		<description>S-Word Word Processor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0x8dec2c">
+				<rom name="s-word.wav" size="0x8dec2c" crc="1e7cac75" sha1="c1f8c51a419fee0f016edcd70a16ee07b97692b4" />
 			</dataarea>
 		</part>
 	</software>

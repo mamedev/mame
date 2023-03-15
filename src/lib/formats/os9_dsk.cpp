@@ -48,6 +48,7 @@
 #include "imageutl.h"
 
 #include "coretmpl.h" // BIT
+#include "ioprocs.h"
 
 
 os9_format::os9_format() : wd177x_format(formats)
@@ -66,24 +67,28 @@ const char *os9_format::description() const
 
 const char *os9_format::extensions() const
 {
-	return "dsk,os9";
+	return "os9,dsk";
 }
 
-int os9_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return 75;
+		return FIFID_SIZE;
+
 	return 0;
 }
 
-int os9_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int os9_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+		return -1;
 
 	uint8_t os9_header[0x60];
-	io_generic_read(io, os9_header, 0, sizeof(os9_header));
+	size_t actual;
+	io.read_at(0, os9_header, sizeof(os9_header), actual);
 
 	int os9_total_sectors = pick_integer_be(os9_header, 0x00, 3);
 	int os9_heads = util::BIT(os9_header[0x10], 0) ? 2 : 1;
@@ -213,13 +218,13 @@ int os9_format::find_size(io_generic *io, uint32_t form_factor, const std::vecto
 				continue;
 		}
 
-		LOG_FORMATS("OS9 matching format index %d\n", i);
+		LOG_FORMATS("os9_dsk: matching format index %d: tracks %d, sectors %d, sides: %d\n", i, f.track_count, f.sector_count, f.head_count);
 		return i;
 	}
 	return -1;
 }
 
-const wd177x_format::format &os9_format::get_track_format(const format &f, int head, int track)
+const wd177x_format::format &os9_format::get_track_format(const format &f, int head, int track) const
 {
 	int n = -1;
 
@@ -231,17 +236,17 @@ const wd177x_format::format &os9_format::get_track_format(const format &f, int h
 	}
 
 	if (n < 0) {
-		LOG_FORMATS("Error format not found\n");
+		LOG_FORMATS("os9_dsk: Error format not found\n");
 		return f;
 	}
 
 	if (head >= f.head_count) {
-		LOG_FORMATS("Error invalid head %d\n", head);
+		LOG_FORMATS("os9_dsk: Error invalid head %d\n", head);
 		return f;
 	}
 
 	if (track >= f.track_count) {
-		LOG_FORMATS("Error invalid track %d\n", track);
+		LOG_FORMATS("os9_dsk: Error invalid track %d\n", track);
 		return f;
 	}
 
@@ -578,4 +583,4 @@ const os9_format::format os9_format::formats_track0[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_OS9_FORMAT = &floppy_image_format_creator<os9_format>;
+const os9_format FLOPPY_OS9_FORMAT;

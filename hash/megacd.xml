@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="megacd" description="Sega Mega CD (Euro) CD-ROMs">
+<softwarelist name="megacd" description="Sega Mega CD (Europe) CD-ROMs">
 
 <!--- Images from the REDUMP set -->
 	<software name="spidking">
@@ -23,7 +23,7 @@ license:CC0
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 12).bin" size="28717920" crc="e6bf1188" />
 		<rom name="Amazing Spider-Man Vs. The Kingpin, The (Europe) (Track 13).bin" size="7949760" crc="43a5fee0" />
 		-->
-		<description>The Amazing Spider-Man Vs. The Kingpin (Euro)</description>
+		<description>The Amazing Spider-Man Vs. The Kingpin (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4412"/>
@@ -60,7 +60,7 @@ license:CC0
 		<rom name="Batman Returns (Europe) (Track 20).bin" size="35658672" crc="4178c70f" />
 		<rom name="Batman Returns (Europe) (Track 21).bin" size="31427424" crc="e659cab5" />
 		-->
-		<description>Batman Returns (Euro)</description>
+		<description>Batman Returns (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4401"/>
@@ -97,7 +97,7 @@ license:CC0
 		<rom name="Batman Returns (Europe) (Alt) (Track 20).bin" size="35658672" crc="728946aa" />
 		<rom name="Batman Returns (Europe) (Alt) (Track 21).bin" size="31427424" crc="a2fb531e" />
 		-->
-		<description>Batman Returns (Euro, Alt)</description>
+		<description>Batman Returns (Europe, alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4401"/>
@@ -163,7 +163,7 @@ license:CC0
 		<rom name="Battlecorps (Europe) (En,Fr,De,Es) (Track 49).bin" size="2269680" crc="805c92ac" />
 		<rom name="Battlecorps (Europe) (En,Fr,De,Es) (Track 50).bin" size="2580144" crc="7c29e9b3" />
 		-->
-		<description>Battlecorps (Euro)</description>
+		<description>Battlecorps (Europe)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115045-50"/>
@@ -193,7 +193,7 @@ license:CC0
 		<rom name="BC Racers (Europe) (En,Fr,De) (Track 14).bin" size="1888656" crc="f5c521ab" />
 		<rom name="BC Racers (Europe) (En,Fr,De) (Track 15).bin" size="1234800" crc="75ca5d6b" />
 		-->
-		<description>BC Racers (Euro)</description>
+		<description>BC Racers (Europe)</description>
 		<year>1994</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115075-50"/>
@@ -232,7 +232,7 @@ license:CC0
 		<rom name="Blackhole Assault (Europe) (Track 22).bin" size="35143584" crc="9a1ad459" />
 		<rom name="Blackhole Assault (Europe) (Track 23).bin" size="33944064" crc="21c676b8" />
 		-->
-		<description>Blackhole Assault (Euro)</description>
+		<description>Blackhole Assault (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4405"/>
@@ -250,7 +250,7 @@ license:CC0
 		<rom name="Cobra Command (Europe) (Track 1).bin" size="256344480" crc="4b176df2" />
 		<rom name="Cobra Command (Europe) (Track 2).bin" size="1651104" crc="fd9c4ef7" />
 		-->
-		<description>Cobra Command (Euro)</description>
+		<description>Cobra Command (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
@@ -268,7 +268,7 @@ license:CC0
 		<rom name="Corpse Killer (Europe) (Track 1).bin" size="626234112" crc="60cf5a65" />
 		<rom name="Corpse Killer (Europe) (Track 2).bin" size="1848672" crc="4b7fba78" />
 		-->
-		<description>Corpse Killer (Euro)</description>
+		<description>Corpse Killer (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162055-50"/>
@@ -290,7 +290,7 @@ license:CC0
 		<rom name="Dracula Unleashed (Europe) (Disc 2) (Track 1).bin" size="599428368" crc="7d69f0f5" />
 		<rom name="Dracula Unleashed (Europe) (Disc 2) (Track 2).bin" size="12171600" crc="0d2a5673" />
 		-->
-		<description>Dracula Unleashed (Euro)</description>
+		<description>Dracula Unleashed (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-4420-50"/>
@@ -313,7 +313,7 @@ license:CC0
 		<rom name="Dune (Europe) (En,Fr,De,Es,It,Ar) (Track 1).bin" size="541369248" crc="3bff9924" />
 		<rom name="Dune (Europe) (En,Fr,De,Es,It,Ar) (Track 2).bin" size="1735776" crc="7e6caa2b" />
 		-->
-		<description>Dune (Euro)</description>
+		<description>Dune (Europe)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70035-50"/>
@@ -357,7 +357,7 @@ license:CC0
 		<rom name="Earthworm Jim - Special Edition (Europe) (Track 27).bin" size="13789776" crc="2f17583a" />
 		<rom name="Earthworm Jim - Special Edition (Europe) (Track 28).bin" size="1528800" crc="9265e140" />
 		-->
-		<description>Earthworm Jim - Special Edition (Euro)</description>
+		<description>Earthworm Jim - Special Edition (Europe)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-125045-50"/>
@@ -389,7 +389,7 @@ license:CC0
 		<rom name="Ecco - The Tides of Time (Europe) (En,Fr,De,Es) (Track 16).bin" size="49128576" crc="31708458" />
 		<rom name="Ecco - The Tides of Time (Europe) (En,Fr,De,Es) (Track 17).bin" size="10816848" crc="ec8b50f3" />
 		-->
-		<description>Ecco - The Tides of Time (Euro)</description>
+		<description>Ecco - The Tides of Time (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4441"/>
@@ -421,7 +421,7 @@ license:CC0
 		<rom name="Ecco the Dolphin (Europe) (Track 15).bin" size="58670640" crc="ebc5c405" />
 		<rom name="Ecco the Dolphin (Europe) (Track 16).bin" size="40002816" crc="c1630466" />
 		-->
-		<description>Ecco the Dolphin (Euro)</description>
+		<description>Ecco the Dolphin (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
@@ -439,7 +439,7 @@ license:CC0
 		<rom name="ESPN Baseball Tonight (Europe) (Track 1).bin" size="205571856" crc="41289a30" />
 		<rom name="ESPN Baseball Tonight (Europe) (Track 2).bin" size="11952864" crc="9b867a9f" />
 		-->
-		<description>ESPN Baseball Tonight (Euro)</description>
+		<description>ESPN Baseball Tonight (Europe)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93115-50"/>
@@ -457,7 +457,7 @@ license:CC0
 		<rom name="Fahrenheit (Europe) (Track 1).bin" size="593710656" crc="ff7637da" />
 		<rom name="Fahrenheit (Europe) (Track 2).bin" size="2932944" crc="832e3da4" />
 		-->
-		<description>Fahrenheit (Euro)</description>
+		<description>Fahrenheit (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4438-50"/>
@@ -498,7 +498,7 @@ license:CC0
 		<rom name="Final Fight CD (Europe) (Track 25).bin" size="8897616" crc="385633f7" />
 		<rom name="Final Fight CD (Europe) (Track 26).bin" size="7178304" crc="f8cfa374" />
 		-->
-		<description>Final Fight CD (Euro)</description>
+		<description>Final Fight CD (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4410"/>
@@ -520,7 +520,7 @@ license:CC0
 		<rom name="Ground Zero Texas (Europe) (Disc 2) (Track 1).bin" size="600804288" crc="94938120" />
 		<rom name="Ground Zero Texas (Europe) (Disc 2) (Track 2).bin" size="2587200" crc="ef819709" />
 		-->
-		<description>Ground Zero Texas (Euro)</description>
+		<description>Ground Zero Texas (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93145-50"/>
@@ -554,7 +554,7 @@ license:CC0
 		<rom name="Jaguar XJ220 (Europe) (En,Ja) (Track 12).bin" size="39231360" crc="945df445" />
 		<rom name="Jaguar XJ220 (Europe) (En,Ja) (Track 13).bin" size="61763520" crc="c9bc9069" />
 		-->
-		<description>Jaguar XJ220 (Euro)</description>
+		<description>Jaguar XJ220 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4602"/>
@@ -602,7 +602,7 @@ license:CC0
 		<rom name="Jurassic Park (Europe) (Track 31).bin" size="17444784" crc="06bcc8e4" />
 		<rom name="Jurassic Park (Europe) (Track 32).bin" size="2394336" crc="e159b59c" />
 		-->
-		<description>Jurassic Park (Euro)</description>
+		<description>Jurassic Park (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4783"/>
@@ -641,7 +641,7 @@ license:CC0
 		<rom name="Lethal Enforcers II - Gun Fighters (Europe) (Track 22).bin" size="5569536" crc="231dae7f" />
 		<rom name="Lethal Enforcers II - Gun Fighters (Europe) (Track 23).bin" size="6507984" crc="3bf0c6dd" />
 		-->
-		<description>Lethal Enforcers II - Gun Fighters (Euro)</description>
+		<description>Lethal Enforcers II - Gun Fighters (Europe)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95025-50"/>
@@ -685,7 +685,7 @@ license:CC0
 		<rom name="Mickey Mania (Europe) (Track 27).bin" size="2514288" crc="0bf78fcf" />
 		<rom name="Mickey Mania (Europe) (Track 28).bin" size="1764000" crc="e7887563" />
 		-->
-		<description>Mickey Mania (Euro)</description>
+		<description>Mickey Mania (Europe)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93305-50"/>
@@ -722,7 +722,7 @@ license:CC0
 		<rom name="Mortal Kombat (Europe) (Track 20).bin" size="40273296" crc="c6190091" />
 		<rom name="Mortal Kombat (Europe) (Track 21).bin" size="51974496" crc="9600a7e1" />
 		-->
-		<description>Mortal Kombat (Euro)</description>
+		<description>Mortal Kombat (Europe)</description>
 		<year>1994</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81025-50"/>
@@ -747,7 +747,7 @@ license:CC0
 		<rom name="NBA Jam (Europe) (Track 8).bin" size="59430336" crc="b5cab536" />
 		<rom name="NBA Jam (Europe) (Track 9).bin" size="1905120" crc="dd9d2b17" />
 		-->
-		<description>NBA Jam (Euro)</description>
+		<description>NBA Jam (Europe)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81035-50"/>
@@ -769,7 +769,7 @@ license:CC0
 		<rom name="Night Trap (Europe) (Disc 2) (Track 1).bin" size="514650528" crc="f332c2a0" />
 		<rom name="Night Trap (Europe) (Disc 2) (Track 2).bin" size="2587200" crc="1cc25944" />
 		-->
-		<description>Night Trap (Euro)</description>
+		<description>Night Trap (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4903"/>
@@ -815,7 +815,7 @@ license:CC0
 		<rom name="Prince of Persia (Europe) (Track 24).bin" size="1662864" crc="9f2dc7d7" />
 		<rom name="Prince of Persia (Europe) (Track 25).bin" size="1660512" crc="7088a5d5" />
 		-->
-		<description>Prince of Persia (Euro)</description>
+		<description>Prince of Persia (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4652"/>
@@ -827,7 +827,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="roadaven">
+	<software name="roadaven" supported="no">
 		<!-- source redump.org
 		<rom name="Road Avenger (Europe).cue" size="442" crc="c852ae6d" />
 		<rom name="Road Avenger (Europe) (Track 1).bin" size="317816352" crc="c15fde6f" />
@@ -835,9 +835,12 @@ license:CC0
 		<rom name="Road Avenger (Europe) (Track 3).bin" size="2065056" crc="ad0d0969" />
 		<rom name="Road Avenger (Europe) (Track 4).bin" size="13702752" crc="311827f1" />
 		-->
-		<description>Road Avenger (Euro)</description>
+		<description>Road Avenger (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, requires sub CPU to be overclocked by 1.5x
+]]></notes>
 		<info name="serial" value="4603"/>
 		<info name="ring_code" value="MK-4603P-00053-R1M V"/>
 		<part name="cdrom" interface="scd_cdrom">
@@ -863,7 +866,7 @@ license:CC0
 		<rom name="Sega Classics Arcade Collection (Europe) (Track 11).bin" size="3709104" crc="0f1b8149" />
 		<rom name="Sega Classics Arcade Collection (Europe) (Track 12).bin" size="12169248" crc="b0224c0e" />
 		-->
-		<description>Sega Classics Arcade Collection - Limited Edition (Euro) [6105411P-00036A-R1M]</description>
+		<description>Sega Classics Arcade Collection - Limited Edition (Europe) [6105411P-00036A-R1M]</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4127"/>
@@ -881,7 +884,7 @@ license:CC0
 		<rom name="Sewer Shark (Europe) (Track 1).bin" size="487536672" crc="e995691c" />
 		<rom name="Sewer Shark (Europe) (Track 2).bin" size="2410800" crc="933d470a" />
 		-->
-		<description>Sewer Shark (Euro)</description>
+		<description>Sewer Shark (Europe)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93015-50"/>
@@ -912,7 +915,7 @@ license:CC0
 		<rom name="Shadow of the Beast II (Europe) (Track 14).bin" size="9069312" crc="b7acea96" />
 		<rom name="Shadow of the Beast II (Europe) (Track 15).bin" size="2116800" crc="7ecfd411" />
 		-->
-		<description>Shadow of the Beast II (Euro)</description>
+		<description>Shadow of the Beast II (Europe)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
 		<info name="ring_code" value="T-113045-50 21"/>
@@ -928,7 +931,7 @@ license:CC0
 		<rom name="Sherlock Holmes - Consulting Detective Vol. I (Europe).cue" size="120" crc="0e54ae48" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. I (Europe).bin" size="752581200" crc="49805f7a" />
 		-->
-		<description>Sherlock Holmes - Consulting Detective Vol. I (Euro)</description>
+		<description>Sherlock Holmes - Consulting Detective Vol. I (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4650"/>
@@ -952,7 +955,7 @@ license:CC0
 		<rom name="Silpheed (Europe) (Track 7).bin" size="12888960" crc="562af8f3" />
 		<rom name="Silpheed (Europe) (Track 8).bin" size="34837824" crc="09ffa41d" />
 		-->
-		<description>Silpheed (Euro)</description>
+		<description>Silpheed (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4423"/>
@@ -975,7 +978,7 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 2) (Track 1).bin" size="567038976" crc="16cdf26d" />
 		<rom name="Slam City with Scottie Pippen (Europe) (Disc 2) (Track 2).bin" size="17124912" crc="d9b4b665" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro, Alt)</description>
+		<description>Slam City with Scottie Pippen (Europe, alt)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162035-50"/>
@@ -1017,7 +1020,7 @@ license:CC0
 		<rom name="Smurfs, The (Europe) (En,Fr,De,Es,It) (Track 20).bin" size="2688336" crc="05946785" />
 		<rom name="Smurfs, The (Europe) (En,Fr,De,Es,It) (Track 21).bin" size="4083072" crc="b1a4cf52" />
 		-->
-		<description>The Smurfs (Euro)</description>
+		<description>The Smurfs (Europe)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-151015-50"/>
@@ -1051,7 +1054,7 @@ license:CC0
 		<rom name="Sol-Feace (Europe) (Track 17).bin" size="18173904" crc="74dffa17" />
 		<rom name="Sol-Feace (Europe) (Track 18).bin" size="23799888" crc="ce009bfc" />
 		-->
-		<description>Sol-Feace (Euro)</description>
+		<description>Sol-Feace (Europe)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
@@ -1102,7 +1105,7 @@ license:CC0
 		<rom name="Sonic CD (Europe) (Track 34).bin" size="16214688" crc="4cb441bf" />
 		<rom name="Sonic CD (Europe) (Track 35).bin" size="32107152" crc="b2b65110" />
 		-->
-		<description>Sonic CD (Euro)</description>
+		<description>Sonic CD (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4407"/>
@@ -1135,7 +1138,7 @@ license:CC0
 		<rom name="SoulStar (Europe) (En,Fr,De) (Track 16).bin" size="39080832" crc="203f7392" />
 		<rom name="SoulStar (Europe) (En,Fr,De) (Track 17).bin" size="2116800" crc="946c5266" />
 		-->
-		<description>SoulStar (Euro)</description>
+		<description>SoulStar (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-115035-50"/>
@@ -1156,7 +1159,7 @@ license:CC0
 		<rom name="Space Adventure, The - Cobra - The Legendary Bandit (Europe) (Track 4).bin" size="10939152" crc="a11de5ef" />
 		<rom name="Space Adventure, The - Cobra - The Legendary Bandit (Europe) (Track 5).bin" size="10939152" crc="e3a12d02" />
 		-->
-		<description>The Space Adventure - Cobra: The Legendary Bandit (Euro)</description>
+		<description>The Space Adventure - Cobra: The Legendary Bandit (Europe)</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="T-143015-50"/>
@@ -1174,7 +1177,7 @@ license:CC0
 		<rom name="Star Wars - Rebel Assault (Europe) (Track 1).bin" size="395255952" crc="2c8b3ea0" />
 		<rom name="Star Wars - Rebel Assault (Europe) (Track 2).bin" size="58148496" crc="51a31463" />
 		-->
-		<description>Star Wars - Rebel Assault (Euro)</description>
+		<description>Star Wars - Rebel Assault (Europe)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60075-50"/>
@@ -1202,7 +1205,7 @@ license:CC0
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es) (Track 11).bin" size="52941168" crc="366fd589" />
 		<rom name="Thunderhawk (Europe) (En,Fr,De,Es) (Track 12).bin" size="1907472" crc="b0b333b8" />
 		-->
-		<description>Thunderhawk (Euro)</description>
+		<description>Thunderhawk (Europe)</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
@@ -1220,7 +1223,7 @@ license:CC0
 		<rom name="Time Gal (Europe) (Track 1).bin" size="298936848" crc="d59965e8" />
 		<rom name="Time Gal (Europe) (Track 2).bin" size="1651104" crc="297595a7" />
 		-->
-		<description>Time Gal (Euro)</description>
+		<description>Time Gal (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4417"/>
@@ -1238,7 +1241,7 @@ license:CC0
 		<rom name="Tomcat Alley (Europe) (Track 1).bin" size="567756336" crc="5e41b3ba" />
 		<rom name="Tomcat Alley (Europe) (Track 2).bin" size="2669520" crc="ac3d778c" />
 		-->
-		<description>Tomcat Alley (Euro)</description>
+		<description>Tomcat Alley (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429"/>
@@ -1256,7 +1259,7 @@ license:CC0
 		<rom name="Tomcat Alley (Germany) (Track 1).bin" size="532775040" crc="64f930f1" />
 		<rom name="Tomcat Alley (Germany) (Track 2).bin" size="2690688" crc="c01db8b1" />
 		-->
-		<description>Tomcat Alley (Ger)</description>
+		<description>Tomcat Alley (Germany)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429-18"/>
@@ -1283,7 +1286,7 @@ license:CC0
 		<rom name="Wolfchild (Europe) (Track 10).bin" size="1740480" crc="219b4cb2" />
 		<rom name="Wolfchild (Europe) (Track 11).bin" size="19961424" crc="bcedc4fc" />
 		-->
-		<description>Wolfchild (Euro)</description>
+		<description>Wolfchild (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4404"/>
@@ -1308,7 +1311,7 @@ license:CC0
 		<rom name="Adventures of Batman & Robin, The (1995)(Sega)(PAL)(Track 6 of 7)[!].wav" size="28031180" crc="89a8e6e1" />
 		<rom name="Adventures of Batman & Robin, The (1995)(Sega)(PAL)(Track 7 of 7)[!].wav" size="10894508" crc="c25f0f64" />
 		-->
-		<description>The Adventures of Batman and Robin (Euro)</description>
+		<description>The Adventures of Batman and Robin (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4432"/>
@@ -1335,7 +1338,7 @@ license:CC0
 		<rom name="After Burner III (1993)(Sega)(PAL)(Track 11 of 12)[!].wav" size="52059212" crc="8e2b1499" />
 		<rom name="After Burner III (1993)(Sega)(PAL)(Track 12 of 12)[!].wav" size="34755548" crc="6d2f2b3d" />
 		-->
-		<description>After Burner III (Euro)</description>
+		<description>After Burner III (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4415"/>
@@ -1366,7 +1369,7 @@ license:CC0
 		<rom name="Bill Walsh College Football (1993)(EA Sports)(PAL)(Track 15 of 16)[!].wav" size="1592348" crc="7b10f00d" />
 		<rom name="Bill Walsh College Football (1993)(EA Sports)(PAL)(Track 16 of 16)[!].wav" size="1594700" crc="caa2edbd" />
 		-->
-		<description>Bill Walsh College Football (Euro)</description>
+		<description>Bill Walsh College Football (Europe)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50025-05"/>
@@ -1398,7 +1401,7 @@ license:CC0
 		<rom name="Bloodshot (1995)(Acclaim)(PAL)(M4)(Track 16 of 17)[!][aka Battle Frenzy].wav" size="60604028" crc="411b7ed6" />
 		<rom name="Bloodshot (1995)(Acclaim)(PAL)(M4)(Track 17 of 17)[!][aka Battle Frenzy].wav" size="65667884" crc="5a950b92" />
 		-->
-		<description>Bloodshot (Euro)</description>
+		<description>Bloodshot (Europe)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88045-50"/>
@@ -1428,7 +1431,7 @@ license:CC0
 		<rom name="Brutal - Paws of Fury (1994)(Gametek)(PAL)(M3)(Track 14 of 15)[!].wav" size="27036284" crc="9f18b997" />
 		<rom name="Brutal - Paws of Fury (1994)(Gametek)(PAL)(M3)(Track 15 of 15)[!].wav" size="18550268" crc="35c4d115" />
 		-->
-		<description>Brutal - Paws of Fury (Euro)</description>
+		<description>Brutal - Paws of Fury (Europe)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<info name="serial" value="T-83015-50"/>
@@ -1454,7 +1457,7 @@ license:CC0
 		<rom name="Chuck Rock (1993)(Sony Imagesoft)(PAL)(Track 10 of 11)[!].wav" size="1453580" crc="cd148dd1" />
 		<rom name="Chuck Rock (1993)(Sony Imagesoft)(PAL)(Track 11 of 11)[!].wav" size="20699996" crc="5aa9eb57" />
 		-->
-		<description>Chuck Rock (Euro)</description>
+		<description>Chuck Rock (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93045-50"/>
@@ -1482,7 +1485,7 @@ license:CC0
 		<rom name="Chuck Rock II - Son of Chuck (1993)(Core)(PAL)(Track 12 of 13)[!].wav" size="38300012" crc="ce0becf1" />
 		<rom name="Chuck Rock II - Son of Chuck (1993)(Core)(PAL)(Track 13 of 13)[!].wav" size="3031772" crc="95c3a7bd" />
 		-->
-		<description>Chuck Rock II - Son of Chuck (Euro)</description>
+		<description>Chuck Rock II - Son of Chuck (Europe)</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115025-50"/>
@@ -1500,7 +1503,7 @@ license:CC0
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 1 of 2)[!][MK-4402P-00032 2].iso" size="223211520" crc="e16f37d4" />
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 2 of 2)[!][MK-4402P-00032 2].wav" size="1298348" crc="9b33d164" />
 		-->
-		<description>Cobra Command (Euro) [MK-4402P-00032 2]</description>
+		<description>Cobra Command (Europe) [MK-4402P-00032 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
@@ -1518,7 +1521,7 @@ license:CC0
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 1 of 2)[!][MK-4402P-00032-R1M].iso" size="223211520" crc="e16f37d4" />
 		<rom name="Cobra Command (1993)(Sega)(PAL)(Track 2 of 2)[!][MK-4402P-00032-R1M].wav" size="1298348" crc="54a0693c" />
 		-->
-		<description>Cobra Command (Euro) [MK-4402P-00032-R1M]</description>
+		<description>Cobra Command (Europe) [MK-4402P-00032-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4402"/>
@@ -1536,7 +1539,7 @@ license:CC0
 		<rom name="Double Switch (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="551135232" crc="f85b2ade" />
 		<rom name="Double Switch (1994)(Sega)(PAL)(Track 2 of 2)[!].wav" size="1528844" crc="31f4f979" />
 		-->
-		<description>Double Switch (Euro)</description>
+		<description>Double Switch (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4419"/>
@@ -1553,7 +1556,7 @@ license:CC0
 		<rom name="Dragon's Lair (1994)(Sega)(PAL)(M4)(Track 1 of 2)[!].iso" size="529301504" crc="67a93382" />
 		<rom name="Dragon's Lair (1994)(Sega)(PAL)(M4)(Track 2 of 2)[!].wav" size="1168988" crc="d5840262" />
 		-->
-		<description>Dragon's Lair (Euro)</description>
+		<description>Dragon's Lair (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4436"/>
@@ -1581,7 +1584,7 @@ license:CC0
 		<rom name="Dungeon Explorer (1994)(Hudson)(PAL)(Track 12 of 13)[!].wav" size="16134764" crc="3b9225f3" />
 		<rom name="Dungeon Explorer (1994)(Hudson)(PAL)(Track 13 of 13)[!].wav" size="59571500" crc="79194579" />
 		-->
-		<description>Dungeon Explorer (Euro)</description>
+		<description>Dungeon Explorer (Europe)</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="T-143025-50"/>
@@ -1603,7 +1606,7 @@ license:CC0
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)(Track 6 of 7)[!].wav" size="51689948" crc="0883d15f" />
 		<rom name="Dungeon Master II - Skullkeep v1.0 (1994)(JVC)(PAL)(Track 7 of 7)[!].wav" size="2923580" crc="048d98fd" />
 		-->
-		<description>Dungeon Master II - Skullkeep v1.0 (Euro)</description>
+		<description>Dungeon Master II - Skullkeep v1.0 (Europe)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60085-50"/>
@@ -1634,7 +1637,7 @@ license:CC0
 		<rom name="Ecco the Dolphin (1993)(Sega)(PAL)(Track 15 of 16)[!][I-2647 A].wav" size="58670684" crc="2097d0ad" />
 		<rom name="Ecco the Dolphin (1993)(Sega)(PAL)(Track 16 of 16)[!][I-2647 A].wav" size="40002860" crc="4a786a3b" />
 		-->
-		<description>Ecco the Dolphin (Euro) [I-2647 A]</description>
+		<description>Ecco the Dolphin (Europe) [I-2647 A]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
@@ -1666,7 +1669,7 @@ license:CC0
 		<rom name="Ecco the Dolphin (1993)(Sega)(PAL)(Track 15 of 16)[!][MK-4408P-00135 1].wav" size="58670684" crc="4032d243" />
 		<rom name="Ecco the Dolphin (1993)(Sega)(PAL)(Track 16 of 16)[!][MK-4408P-00135 1].wav" size="40002860" crc="3c19d591" />
 		-->
-		<description>Ecco the Dolphin (Euro) [MK-4408P-00135 1]</description>
+		<description>Ecco the Dolphin (Europe) [MK-4408P-00135 1]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4408"/>
@@ -1701,7 +1704,7 @@ license:CC0
 		<rom name="Eternal Champions - Challenge From the Dark Side (1995)(Sega)(PAL)(Track 18 of 19)[!].wav" size="24159788" crc="365f0917" />
 		<rom name="Eternal Champions - Challenge From the Dark Side (1995)(Sega)(PAL)(Track 19 of 19)[!].wav" size="19436972" crc="34235e85" />
 		-->
-		<description>Eternal Champions - Challenge From the Dark Side (Euro)</description>
+		<description>Eternal Champions - Challenge From the Dark Side (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4427"/>
@@ -1772,7 +1775,7 @@ license:CC0
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)(Track 55 of 56)[!].wav" size="3069404" crc="c12da15d" />
 		<rom name="Eye of the Beholder (1994)(Sega)(PAL)(Track 56 of 56)[!].wav" size="3981980" crc="ccb7a029" />
 		-->
-		<description>Eye of the Beholder (Euro)</description>
+		<description>Eye of the Beholder (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4655"/>
@@ -1790,7 +1793,7 @@ license:CC0
 		<rom name="Fahrenheit (1995)(Sega)(PAL)(FR)(Track 1 of 2)[!].iso" size="516972544" crc="e5fd1a03" />
 		<rom name="Fahrenheit (1995)(Sega)(PAL)(FR)(Track 2 of 2)[!].wav" size="2227388" crc="5a8f7afc" />
 		-->
-		<description>Fahrenheit (Fra)</description>
+		<description>Fahrenheit (France)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4438-09"/>
@@ -1843,7 +1846,7 @@ license:CC0
 		<rom name="Fatal Fury Special (1995)(JVC)(PAL)(Track 37 of 38)[!].wav" size="3720908" crc="6e1580a6" />
 		<rom name="Fatal Fury Special (1995)(JVC)(PAL)(Track 38 of 38)[!].wav" size="2036876" crc="959e1f99" />
 		-->
-		<description>Fatal Fury Special (Euro)</description>
+		<description>Fatal Fury Special (Europe)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60165-50"/>
@@ -1904,7 +1907,7 @@ license:CC0
 		<rom name="FIFA International Soccer - Championship Edition (1994)(EA Sports)(PAL)(M4)(Track 45 of 46)[!].wav" size="4769900" crc="55bb0071" />
 		<rom name="FIFA International Soccer - Championship Edition (1994)(EA Sports)(PAL)(M4)(Track 46 of 46)[!].wav" size="2152124" crc="26f538b1" />
 		-->
-		<description>FIFA International Soccer - Championship Edition (Euro)</description>
+		<description>FIFA International Soccer - Championship Edition (Europe)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50055-50"/>
@@ -1937,7 +1940,7 @@ license:CC0
 		<rom name="Flink (1994)(Psygnosis - Sony Electronic Publishing)(PAL)(M5)(Track 17 of 18)[!].wav" size="18039884" crc="2418694b" />
 		<rom name="Flink (1994)(Psygnosis - Sony Electronic Publishing)(PAL)(M5)(Track 18 of 18)[!].wav" size="7540556" crc="ceba6fb6" />
 		-->
-		<description>Flink (Euro)</description>
+		<description>Flink (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
 		<info name="serial" value="T-113055-50"/>
@@ -1989,7 +1992,7 @@ license:CC0
 		<rom name="Formula One World Championship - Beyond the Limit (1994)(Sega)(PAL)(Track 36 of 37)[!].wav" size="15271580" crc="f452270f" />
 		<rom name="Formula One World Championship - Beyond the Limit (1994)(Sega)(PAL)(Track 37 of 37)[!].wav" size="43269788" crc="e4aa19ca" />
 		-->
-		<description>Formula One World Championship - Beyond the Limit (Euro)</description>
+		<description>Formula One World Championship - Beyond the Limit (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4608"/>
@@ -2026,7 +2029,7 @@ license:CC0
 		<rom name="Hook (1993)(Sony Imagesoft)(PAL)(Track 21 of 22)[!].wav" size="54658172" crc="e5f6336f" />
 		<rom name="Hook (1993)(Sony Imagesoft)(PAL)(Track 22 of 22)[!].wav" size="7705196" crc="0056215e" />
 		-->
-		<description>Hook (Euro)</description>
+		<description>Hook (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93055-50"/>
@@ -2073,7 +2076,7 @@ license:CC0
 		<rom name="Jurassic Park (1994)(Sega)(PAL)(DE)(Track 31 of 32)[!].wav" size="17444828" crc="d7f8fef1" />
 		<rom name="Jurassic Park (1994)(Sega)(PAL)(DE)(Track 32 of 32)[!].wav" size="2394380" crc="960c51ad" />
 		-->
-		<description>Jurassic Park (Ger)</description>
+		<description>Jurassic Park (Germany)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4411-18"/>
@@ -2114,7 +2117,7 @@ license:CC0
 		<rom name="Keio Flying Squadron (1994)(JVC)(PAL)(Track 25 of 26)[!].wav" size="26556476" crc="b66a7773" />
 		<rom name="Keio Flying Squadron (1994)(JVC)(PAL)(Track 26 of 26)[!].wav" size="9974876" crc="ccc63391" />
 		-->
-		<description>Keio Flying Squadron (Euro)</description>
+		<description>Keio Flying Squadron (Europe)</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60185-50"/>
@@ -2152,7 +2155,7 @@ license:CC0
 		<rom name="Lethal Enforcers (1993)(Konami)(PAL)(Track 22 of 23)[!].wav" size="22666268" crc="dc916db3" />
 		<rom name="Lethal Enforcers (1993)(Konami)(PAL)(Track 23 of 23)[!].wav" size="37516796" crc="1f2c4281" />
 		-->
-		<description>Lethal Enforcers (Euro)</description>
+		<description>Lethal Enforcers (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95015-50"/>
@@ -2188,7 +2191,7 @@ license:CC0
 		<rom name="Lords of Thunder (1995)(Virgin)(PAL)(Track 20 of 21)[!].wav" size="11049740" crc="e25099db" />
 		<rom name="Lords of Thunder (1995)(Virgin)(PAL)(Track 21 of 21)[!].wav" size="32514092" crc="5ac30817" />
 		-->
-		<description>Lords of Thunder (Euro)</description>
+		<description>Lords of Thunder (Europe)</description>
 		<year>1995</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="T-143035-50"/>
@@ -2220,7 +2223,7 @@ license:CC0
 		<rom name="Marko's Magic Football (1994)(Domark)(PAL)(M4)(Track 16 of 17)[!].wav" size="30740684" crc="ba8ea825" />
 		<rom name="Marko's Magic Football (1994)(Domark)(PAL)(M4)(Track 17 of 17)[!].wav" size="36644204" crc="45fcd569" />
 		-->
-		<description>Marko's Magic Football (Euro)</description>
+		<description>Marko's Magic Football (Europe)</description>
 		<year>1994</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88025-50"/>
@@ -2244,7 +2247,7 @@ license:CC0
 		<rom name="Microcosm (1993)(Psygnosis)(PAL)(Track 8 of 9)[!][T-113015-50 14].wav" size="21880700" crc="0c79229c" />
 		<rom name="Microcosm (1993)(Psygnosis)(PAL)(Track 9 of 9)[!][T-113015-50 14].wav" size="23983388" crc="08c8b1a2" />
 		-->
-		<description>Microcosm (Euro) [T-113015-50 14]</description>
+		<description>Microcosm (Europe) [T-113015-50 14]</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-113015-50"/>
@@ -2269,7 +2272,7 @@ license:CC0
 		<rom name="Microcosm (1993)(Psygnosis)(PAL)(Track 8 of 9)[!][T-113015-50 24].wav" size="21873644" crc="6050602b" />
 		<rom name="Microcosm (1993)(Psygnosis)(PAL)(Track 9 of 9)[!][T-113015-50 24].wav" size="23990444" crc="a3d976f8" />
 		-->
-		<description>Microcosm (Euro) [T-113015-50 24]</description>
+		<description>Microcosm (Europe) [T-113015-50 24]</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-113015-50"/>
@@ -2287,7 +2290,7 @@ license:CC0
 		<rom name="Midnight Raiders (1995)(Sega)(PAL)(Track 1 of 2)[!].iso" size="434898944" crc="03ffdb7b" />
 		<rom name="Midnight Raiders (1995)(Sega)(PAL)(Track 2 of 2)[!].wav" size="37074620" crc="480ed4bb" />
 		-->
-		<description>Midnight Raiders (Euro)</description>
+		<description>Midnight Raiders (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4439"/>
@@ -2304,7 +2307,7 @@ license:CC0
 		<rom name="Mighty Morphin Power Rangers (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="405338112" crc="d2724dd9" />
 		<rom name="Mighty Morphin Power Rangers (1994)(Sega)(PAL)(Track 2 of 2)[!].wav" size="7597004" crc="30bcb49f" />
 		-->
-		<description>Mighty Morphin Power Rangers (Euro)</description>
+		<description>Mighty Morphin Power Rangers (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -2397,7 +2400,7 @@ license:CC0
 		<rom name="NHL Hockey '94 (1994)(EA Sports)(PAL)(Track 78 of 79)[!].wav" size="4012556" crc="eb88b307" />
 		<rom name="NHL Hockey '94 (1994)(EA Sports)(PAL)(Track 79 of 79)[!].wav" size="1399484" crc="6ab04dfc" />
 		-->
-		<description>NHL Hockey '94 (Euro)</description>
+		<description>NHL Hockey '94 (Europe)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50015-50"/>
@@ -2418,7 +2421,7 @@ license:CC0
 		<rom name="Night Trap (1993)(Sega)(PAL)(Fr)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="447969280" crc="287db5f0" />
 		<rom name="Night Trap (1993)(Sega)(PAL)(Fr)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="2201516" crc="a567db5d" />
 		-->
-		<description>Night Trap (Fra)</description>
+		<description>Night Trap (France)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4903-09"/>
@@ -2434,7 +2437,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ntrap32" cloneof="ntrap">
+	<software name="ntrap32" cloneof="ntrap" supported="no">
 		<!-- source toseciso
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 1 of 2)[!][32X].cue" size="319" crc="57fec2f6" />
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 1 of 2)(Track 1 of 2)[!][32X].iso" size="537303040" crc="12027282" />
@@ -2444,9 +2447,14 @@ license:CC0
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 2 of 2)(Track 1 of 2)[!][32X].iso" size="448675840" crc="3b1ec3c9" />
 		<rom name="Night Trap (1995)(Digital Pictures)(PAL)(Disc 2 of 2)(Track 2 of 2)[!][32X].wav" size="2201516" crc="a47a1ce2" />
 		-->
-		<description>Night Trap (Euro, 32X)</description>
+		<description>Night Trap (Europe, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16202F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -2466,7 +2474,7 @@ license:CC0
 		<rom name="Novastorm (1994)(Psygnosis)(PAL)(Track 1 of 2)[!].iso" size="364460032" crc="62270769" />
 		<rom name="Novastorm (1994)(Psygnosis)(PAL)(Track 2 of 2)[!].wav" size="32462348" crc="930cfb1e" />
 		-->
-		<description>Novastorm (Euro)</description>
+		<description>Novastorm (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
 		<info name="serial" value="T-113065-50"/>
@@ -2504,7 +2512,7 @@ license:CC0
 		<rom name="Pitfall - The Mayan Adventure (1994)(Activision)(PAL)(Track 22 of 23)[!].wav" size="4275980" crc="3c58dbea" />
 		<rom name="Pitfall - The Mayan Adventure (1994)(Activision)(PAL)(Track 23 of 23)[!].wav" size="24032780" crc="39434d3e" />
 		-->
-		<description>Pitfall - The Mayan Adventure (Euro)</description>
+		<description>Pitfall - The Mayan Adventure (Europe)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="T-130025-50"/>
@@ -2529,7 +2537,7 @@ license:CC0
 		<rom name="PowerMonger (1994)(Electronic Arts)(PAL)(Track 09 of 10)[!].wav" size="4739324" crc="b4823d45" />
 		<rom name="PowerMonger (1994)(Electronic Arts)(PAL)(Track 10 of 10)[!].wav" size="3974924" crc="98734055" />
 		-->
-		<description>Power Monger (Euro)</description>
+		<description>Power Monger (Europe)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50035-50"/>
@@ -2550,7 +2558,7 @@ license:CC0
 		<rom name="Prize Fighter (1993)(Sega)(PAL)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="419006464" crc="5f667957" />
 		<rom name="Prize Fighter (1993)(Sega)(PAL)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="1528844" crc="ba3e90f3" />
 		-->
-		<description>Prize Fighter (Euro)</description>
+		<description>Prize Fighter (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4206"/>
@@ -2593,7 +2601,7 @@ license:CC0
 		<rom name="Puggsy (1993)(Psygnosis)(PAL)(Track 21 of 22)[!].wav" size="40684940" crc="a214bf8a" />
 		<rom name="Puggsy (1993)(Psygnosis)(PAL)(Track 22 of 22)[!].wav" size="2646044" crc="365645eb" />
 		-->
-		<description>Puggsy (Euro)</description>
+		<description>Puggsy (Europe)</description>
 		<year>1993</year>
 		<publisher>Psygnosis</publisher>
 		<info name="serial" value="T-113035-50"/>
@@ -2625,7 +2633,7 @@ license:CC0
 		<rom name="Robo Aleste (1993)(Sega)(PAL)(Track 16 of 17)[!].wav" size="9636188" crc="04c9f14d" />
 		<rom name="Robo Aleste (1993)(Sega)(PAL)(Track 17 of 17)[!].wav" size="62151644" crc="0643f7ab" />
 		-->
-		<description>Robo Aleste (Euro)</description>
+		<description>Robo Aleste (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4416"/>
@@ -2670,7 +2678,7 @@ license:CC0
 		<rom name="Samurai Shodown (1995)(JVC)(PAL)(Track 29 of 30)[!].wav" size="3015308" crc="36282cc0" />
 		<rom name="Samurai Shodown (1995)(JVC)(PAL)(Track 30 of 30)[!].wav" size="31754396" crc="2e1b243a" />
 		-->
-		<description>Samurai Shodown (Euro)</description>
+		<description>Samurai Shodown (Europe)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-60175-50"/>
@@ -2697,7 +2705,7 @@ license:CC0
 		<rom name="Sega Classics Arcade Collection - Limited Edition (1993)(Sega)(PAL)(Track 11 of 12)[!][compilation][610-5411P-00036A 2].wav" size="3709148" crc="5592f428" />
 		<rom name="Sega Classics Arcade Collection - Limited Edition (1993)(Sega)(PAL)(Track 12 of 12)[!][compilation][610-5411P-00036A 2].wav" size="12171644" crc="a95cb68e" />
 		-->
-		<description>Sega Classics Arcade Collection - Limited Edition (Euro) [610-5411P-00036A 2]</description>
+		<description>Sega Classics Arcade Collection - Limited Edition (Europe) [610-5411P-00036A 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4127"/>
@@ -2809,7 +2817,7 @@ license:CC0
 		<rom name="Sensible Soccer (1993)(Sony Imagesoft)(PAL)(M4)(Track 95 of 96)[!].wav" size="39687692" crc="5e3d2151" />
 		<rom name="Sensible Soccer (1993)(Sony Imagesoft)(PAL)(M4)(Track 96 of 96)[!].wav" size="1385372" crc="5be2bd1d" />
 		-->
-		<description>Sensible Soccer (Euro)</description>
+		<description>Sensible Soccer (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93185-50"/>
@@ -2830,7 +2838,7 @@ license:CC0
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 2 of 2)(Track 1 of 2)[!].iso" size="284045312" crc="a1947c65" />
 		<rom name="Sherlock Holmes - Consulting Detective Vol. II v1.0 (1993)(Sega)(PAL)(Disc 2 of 2)(Track 2 of 2)[!].wav" size="10584044" crc="1055b6a1" />
 		-->
-		<description>Sherlock Holmes - Consulting Detective Vol. II v1.0 (Euro)</description>
+		<description>Sherlock Holmes - Consulting Detective Vol. II v1.0 (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4653"/>
@@ -2885,7 +2893,7 @@ license:CC0
 		<rom name="Shining Force CD (1995)(Sega)(PAL)(Track 34 of 35)[!].wav" size="1822844" crc="c79d80cc" />
 		<rom name="Shining Force CD (1995)(Sega)(PAL)(Track 35 of 35)[!].wav" size="19314668" crc="2f3900ce" />
 		-->
-		<description>Shining Force CD (Euro)</description>
+		<description>Shining Force CD (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4656"/>
@@ -2914,7 +2922,7 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 4 of 4)(Track 1 of 2)[!][Smash].iso" size="471695360" crc="d57e5f45" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 4 of 4)(Track 2 of 2)[!][Smash].wav" size="16772156" crc="60fb6a14" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro)</description>
+		<description>Slam City with Scottie Pippen (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162035-50"/>
@@ -2940,7 +2948,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="slamcity32" cloneof="slamcity">
+	<software name="slamcity32" cloneof="slamcity" supported="no">
 		<!-- source toseciso
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)[!][Fingers][32X].cue" size="375" crc="d6b57cf0" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 1 of 4)(Track 1 of 2)[!][Fingers][32X].iso" size="529147904" crc="56a8ad9c" />
@@ -2958,9 +2966,14 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 4 of 4)(Track 1 of 2)[!][Smash][32X].iso" size="492021760" crc="d2956a70" />
 		<rom name="Slam City with Scottie Pippen (1994)(Digital Pictures)(PAL)(Disc 4 of 4)(Track 2 of 2)[!][Smash][32X].wav" size="16772156" crc="dd55912a" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro, 32X)</description>
+		<description>Slam City with Scottie Pippen (Europe, 32X)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16204F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -3009,7 +3022,7 @@ license:CC0
 		<rom name="Snatcher (1994)(Konami)(PAL)(Track 20 of 21)[!].wav" size="5844764" crc="d1c159b1" />
 		<rom name="Snatcher (1994)(Konami)(PAL)(Track 21 of 21)[!].wav" size="73805804" crc="33db9e54" />
 		-->
-		<description>Snatcher (Euro)</description>
+		<description>Snatcher (Europe)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="T-95035-05"/>
@@ -3026,7 +3039,7 @@ license:CC0
 		<rom name="Software Toolworks' Star Wars Chess, The (1994)(Mindscape)(PAL)(Track 1 of 2)[!].iso" size="227407872" crc="07d08ba5" />
 		<rom name="Software Toolworks' Star Wars Chess, The (1994)(Mindscape)(PAL)(Track 2 of 2)[!].wav" size="2227388" crc="0e5418f0" />
 		-->
-		<description>The Software Toolworks' Star Wars Chess (Euro)</description>
+		<description>The Software Toolworks' Star Wars Chess (Europe)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="T-158025-50"/>
@@ -3059,7 +3072,7 @@ license:CC0
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 17 of 18)[!][MK-4130P-00033 2].wav" size="18173948" crc="56d471e5" />
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 18 of 18)[!][MK-4130P-00033 2].wav" size="23802284" crc="39db3a1e" />
 		-->
-		<description>Sol-Feace (Euro) [MK-4130P-00033 2]</description>
+		<description>Sol-Feace (Europe) [MK-4130P-00033 2]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
@@ -3093,7 +3106,7 @@ license:CC0
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 17 of 18)[!][MK-4130P-00033-R1M].wav" size="18173948" crc="e81c2001" />
 		<rom name="Sol-Feace (1993)(Sega)(PAL)(Track 18 of 18)[!][MK-4130P-00033-R1M].wav" size="23799932" crc="7e3e4aee" />
 		-->
-		<description>Sol-Feace (Euro) [MK-4130P-00033-R1M]</description>
+		<description>Sol-Feace (Europe) [MK-4130P-00033-R1M]</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4130"/>
@@ -3111,7 +3124,7 @@ license:CC0
 		<rom name="StarBlade (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="406351872" crc="cd983063" />
 		<rom name="StarBlade (1994)(Sega)(PAL)(Track 2 of 2)[!].wav" size="1528844" crc="d1c13a6a" />
 		-->
-		<description>StarBlade (Euro)</description>
+		<description>StarBlade (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4284"/>
@@ -3132,7 +3145,7 @@ license:CC0
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(PAL)(Disc 2 of 2)(Track 1 of 2)[!][Wind & Fang Tu].iso" size="424419328" crc="c59ee246" />
 		<rom name="Supreme Warrior - Ying Heung (1994)(Digital Pictures)(PAL)(Disc 2 of 2)(Track 2 of 2)[!][Wind & Fang Tu].wav" size="1848716" crc="7edd9bb4" />
 		-->
-		<description>Supreme Warrior - Ying Heung (Euro)</description>
+		<description>Supreme Warrior - Ying Heung (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162045-50"/>
@@ -3148,7 +3161,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="supremew32" cloneof="supremew">
+	<software name="supremew32" cloneof="supremew" supported="no">
 		<!-- source toseciso
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 1 of 2)[!][Fire & Earth][32X].cue" size="397" crc="e1c77730" />
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 1 of 2)(Track 1 of 2)[!][Fire & Earth][32X].iso" size="459593728" crc="d8c88078" />
@@ -3158,9 +3171,14 @@ license:CC0
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 2 of 2)(Track 1 of 2)[!][Wind & Fang Tu][32X].iso" size="460056576" crc="dfe241ae" />
 		<rom name="Supreme Warrior - Ying Heung (1995)(Digital Pictures)(PAL)(en-zh)(Disc 2 of 2)(Track 2 of 2)[!][Wind & Fang Tu][32X].wav" size="1848716" crc="d7a563f5" />
 		-->
-		<description>Supreme Warrior - Ying Heung (Euro, 32X)</description>
+		<description>Supreme Warrior - Ying Heung (Europe, 32X)</description>
 		<year>1995</year>
 		<publisher>Digital Pictures</publisher>
+		<notes><![CDATA[
+Hangs on BIOS logo
+Requires [32X] add-on
+Requires [disc swap]
+]]></notes>
 		<info name="serial" value="T-16203F-50"/>
 		<part name="cdrom1" interface="scd_cdrom">
 			<diskarea name="cdrom">
@@ -3181,7 +3199,7 @@ license:CC0
 		<rom name="Surgical Strike (1995)(Sega)(PAL)(Track 2 of 3)[!].wav" size="43210988" crc="7be25ce0" />
 		<rom name="Surgical Strike (1995)(Sega)(PAL)(Track 3 of 3)[!].wav" size="1985132" crc="de684df7" />
 		-->
-		<description>Surgical Strike (Euro)</description>
+		<description>Surgical Strike (Europe)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4435"/>
@@ -3202,7 +3220,7 @@ license:CC0
 		<rom name="Syndicate (1995)(Domark)(PAL)(M3)(Track 5 of 6)[!].wav" size="69130028" crc="0fd6d2af" />
 		<rom name="Syndicate (1995)(Domark)(PAL)(M3)(Track 6 of 6)[!].wav" size="53665628" crc="88260a8c" />
 		-->
-		<description>Syndicate (Euro)</description>
+		<description>Syndicate (Europe)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88065-50"/>
@@ -3227,7 +3245,7 @@ license:CC0
 		<rom name="Terminator, The (1994)(Virgin)(PAL)(Track 09 of 10)[!].wav" size="17110844" crc="ff08ff42" />
 		<rom name="Terminator, The (1994)(Virgin)(PAL)(Track 10 of 10)[!].wav" size="39513644" crc="ab6ce9b9" />
 		-->
-		<description>The Terminator (Euro)</description>
+		<description>The Terminator (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70015-50"/>
@@ -3267,7 +3285,7 @@ license:CC0
 		<rom name="Theme Park (1995)(Domark)(PAL)(M4)(Track 24 of 25)[!].wav" size="4024316" crc="3db35980" />
 		<rom name="Theme Park (1995)(Domark)(PAL)(M4)(Track 25 of 25)[!].wav" size="4405340" crc="9e4b687c" />
 		-->
-		<description>Theme Park (Euro)</description>
+		<description>Theme Park (Europe)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="T-88055-50"/>
@@ -3294,7 +3312,7 @@ license:CC0
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 11 of 12)[!][SEGAT115015RE R4C].wav" size="52941212" crc="1cc54931" />
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 12 of 12)[!][SEGAT115015RE R4C].wav" size="1907516" crc="979232d1" />
 		-->
-		<description>Thunderhawk (Euro) [SEGAT115015RE R4C]</description>
+		<description>Thunderhawk (Europe) [SEGAT115015RE R4C]</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
@@ -3322,7 +3340,7 @@ license:CC0
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 11 of 12)[!][SEGAT115015RE R5C].wav" size="52941212" crc="fe96eb16" />
 		<rom name="Thunderhawk (1993)(Core)(PAL)(M4)(Track 12 of 12)[!][SEGAT115015RE R5C].wav" size="1907516" crc="3cb36fd2" />
 		-->
-		<description>Thunderhawk (Euro) [SEGAT115015RE R5C]</description>
+		<description>Thunderhawk (Europe) [SEGAT115015RE R5C]</description>
 		<year>1993</year>
 		<publisher>Core Design</publisher>
 		<info name="serial" value="T-115015-50"/>
@@ -3340,7 +3358,7 @@ license:CC0
 		<rom name="Tomcat Alley (1994)(Sega)(PAL)(ES)(Track 1 of 2)[!].iso" size="464031744" crc="6f9a205d" />
 		<rom name="Tomcat Alley (1994)(Sega)(PAL)(ES)(Track 2 of 2)[!].wav" size="2337932" crc="fb28a6a2" />
 		-->
-		<description>Tomcat Alley (Spa)</description>
+		<description>Tomcat Alley (Spain)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429-??"/>
@@ -3357,7 +3375,7 @@ license:CC0
 		<rom name="Tomcat Alley (1994)(Sega)(PAL)(FR)(Track 1 of 2)[!].iso" size="463912960" crc="ce61f41e" />
 		<rom name="Tomcat Alley (1994)(Sega)(PAL)(FR)(Track 2 of 2)[!].wav" size="2337932" crc="f2c815d6" />
 		-->
-		<description>Tomcat Alley (Fra)</description>
+		<description>Tomcat Alley (France)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4429-??"/>
@@ -3393,7 +3411,7 @@ license:CC0
 		<rom name="Wonder Dog (1993)(Sega)(PAL)(Track 20 of 21)[!].wav" size="6343388" crc="9393daa6" />
 		<rom name="Wonder Dog (1993)(Sega)(PAL)(Track 21 of 21)[!].wav" size="59253980" crc="3f94ad75" />
 		-->
-		<description>Wonder Dog (Euro)</description>
+		<description>Wonder Dog (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4428"/>
@@ -3426,7 +3444,7 @@ license:CC0
 		<rom name="World Cup USA 94 (1994)(U.S. Gold)(PAL)(M8)(Track 17 of 18)[!].wav" size="36670076" crc="c102bea4" />
 		<rom name="World Cup USA 94 (1994)(U.S. Gold)(PAL)(M8)(Track 18 of 18)[!].wav" size="29853980" crc="e2b161a9" />
 		-->
-		<description>World Cup USA 94 (Euro)</description>
+		<description>World Cup USA 94 (Europe)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79025-50"/>
@@ -3443,7 +3461,7 @@ license:CC0
 		<rom name="WWF Rage in the Cage (1993)(Arena)(PAL)(Track 1 of 2)[!].iso" size="212832256" crc="fb49c44c" />
 		<rom name="WWF Rage in the Cage (1993)(Arena)(PAL)(Track 2 of 2)[!].wav" size="3883196" crc="f68424f3" />
 		-->
-		<description>WWF Rage in the Cage (Euro)</description>
+		<description>WWF Rage in the Cage (Europe)</description>
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81015-50"/>
@@ -3460,7 +3478,7 @@ license:CC0
 		<rom name="Yumemi Mystery Mansion (1994)(Sega)(PAL)(Track 1 of 2)[!].iso" size="526925824" crc="e41c36b2" />
 		<rom name="Yumemi Mystery Mansion (1994)(Sega)(PAL)(Track 2 of 2)[!].wav" size="6837308" crc="f7d68b6f" />
 		-->
-		<description>Yumemi Mystery Mansion (Euro)</description>
+		<description>Yumemi Mystery Mansion (Europe)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4430"/>
@@ -3478,7 +3496,7 @@ license:CC0
 		<rom name="Time Cop (PAL, Beta, Complete).cue" size="606" crc="7677dfb6" />
 		<rom name="Time Cop (PAL, Beta, Complete).bin" size="201693408" crc="8b53e357" />
 		-->
-		<description>Time Cop (Euro, Prototype)</description>
+		<description>Time Cop (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3489,7 +3507,7 @@ license:CC0
 	</software>
 
 	<software name="timecope" cloneof="timecop">
-		<description>Time Cop (Euro, Early Prototype)</description>
+		<description>Time Cop (Europe, early prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3505,7 +3523,7 @@ license:CC0
 		<rom name="INXS (1993)(Sega)(PAL)(Track 1 of 2)[!].iso" size="443707392" crc="4e31245b" />
 		<rom name="INXS (1993)(Sega)(PAL)(Track 2 of 2)[!].wav" size="1528844" crc="3046994f" />
 		-->
-		<description>INXS (Euro)</description>
+		<description>INXS (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="4902"/>
@@ -3522,7 +3540,7 @@ license:CC0
 		<rom name="Kids on Site (1994)(Digital Pictures)(PAL)(Track 1 of 2)[!].iso" size="449314816" crc="af2f586d" />
 		<rom name="Kids on Site (1994)(Digital Pictures)(PAL)(Track 2 of 2)[!].wav" size="1766396" crc="9c8fad71" />
 		-->
-		<description>Kids on Site (Euro)</description>
+		<description>Kids on Site (Europe)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<info name="serial" value="T-162015-50"/>
@@ -3539,7 +3557,7 @@ license:CC0
 		<rom name="Kris Kross (1993)(Sony Imagesoft)(PAL)(Track 1 of 2)[!].iso" size="335079424" crc="18d22c95" />
 		<rom name="Kris Kross (1993)(Sony Imagesoft)(PAL)(Track 2 of 2)[!].wav" size="2058044" crc="b38beacf" />
 		-->
-		<description>Kris Kross (Euro)</description>
+		<description>Kris Kross (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="T-93025-50"/>
@@ -3582,7 +3600,7 @@ license:CC0
 		<rom name="Mickey Mania (demo) (1994)(Disney Software - Sony Imagesoft)(PAL)(Track 27 of 28)[!][MegaSEGA].wav" size="2530796" crc="ccc93e14" />
 		<rom name="Mickey Mania (demo) (1994)(Disney Software - Sony Imagesoft)(PAL)(Track 28 of 28)[!][MegaSEGA].wav" size="2116844" crc="e571664c" />
 		-->
-		<description>Mickey Mania (Euro, Demo) [MegaSEGA]</description>
+		<description>Mickey Mania (Europe, demo) [MegaSEGA]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3598,7 +3616,7 @@ license:CC0
 		<rom name="Power Factory featuring C+C Music Factory (1993)(Sony Imagesoft)(PAL)(Track 1 of 2)[!].iso" size="374403072" crc="08ae07ee" />
 		<rom name="Power Factory featuring C+C Music Factory (1993)(Sony Imagesoft)(PAL)(Track 2 of 2)[!].wav" size="2058044" crc="54b52fa6" />
 		-->
-		<description>Power Factory featuring C+C Music Factory (Euro)</description>
+		<description>Power Factory featuring C+C Music Factory (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3614,7 +3632,7 @@ license:CC0
 		<rom name="San Diego Zoo Presents The Animals!, The - A Multimedia Experience (1994)(Mindscape)(PAL)(Track 1 of 2)[!].iso" size="605925376" crc="896c97a1" />
 		<rom name="San Diego Zoo Presents The Animals!, The - A Multimedia Experience (1994)(Mindscape)(PAL)(Track 2 of 2)[!].wav" size="1526492" crc="e5b78ab7" />
 		-->
-		<description>The San Diego Zoo Presents The Animals! - A Multimedia Experience (Euro)</description>
+		<description>The San Diego Zoo Presents The Animals! - A Multimedia Experience (Europe)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="T-158015-50"/>
@@ -3631,7 +3649,7 @@ license:CC0
 		<rom name="Slam City with Scottie Pippen (demo) (1994)(Digital Pictures)(PAL)(Track 1 of 2)[!][Fingers].iso" size="406548480" crc="54137b81" />
 		<rom name="Slam City with Scottie Pippen (demo) (1994)(Digital Pictures)(PAL)(Track 2 of 2)[!][Fingers].wav" size="17124956" crc="5555431d" />
 		-->
-		<description>Slam City with Scottie Pippen (Euro, Demo)</description>
+		<description>Slam City with Scottie Pippen (Europe, demo)</description>
 		<year>1994</year>
 		<publisher>Digital Pictures</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3649,7 +3667,7 @@ license:CC0
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(Track 3 of 4)[!].wav" size="40717868" crc="ce15592d" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(Track 4 of 4)[!].wav" size="10094828" crc="1304e834" />
 		-->
-		<description>Thunderhawk (Euro, Demo)</description>
+		<description>Thunderhawk (Europe, demo)</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3671,7 +3689,7 @@ license:CC0
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)(Track 4 of 5)[!][Mega Power - Issue 04].wav" size="10094828" crc="a9219f33" />
 		<rom name="Thunderhawk (demo) (1993)(Core)(PAL)(M4)(Track 5 of 5)[!][Mega Power - Issue 04].wav" size="1900460" crc="5d53470e" />
 		-->
-		<description>Thunderhawk (Euro, Demo) [Mega Power - Issue 04]</description>
+		<description>Thunderhawk (Europe, demo) [Mega Power - issue 04]</description>
 		<year>1993</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3700,7 +3718,7 @@ license:CC0
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)(Track 14 of 15)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].wav" size="15633788" crc="8ebfd86d" />
 		<rom name="Mega Power - Issue 06 - Disc 02 (1994)(Paragon Publishing)(PAL)(GB)(Track 15 of 15)[!][demos - Microcosm, Puggsy, Wiz 'N' Liz].wav" size="2455532" crc="e3042b2d" />
 		-->
-		<description>Microcosm, Puggsy and Wiz 'N' Liz (Euro, Demo) [Mega Power - Issue 06]</description>
+		<description>Microcosm, Puggsy and Wiz 'N' Liz (Europe, demo) [Mega Power - issue 06]</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3718,7 +3736,7 @@ license:CC0
 		<rom name="Mega Power - Issue 10 - Disc 03 (1994)(Paragon Publishing)(PAL)(GB)(Track 3 of 4)[!][demo - SoulStar].wav" size="55302620" crc="35face1e" />
 		<rom name="Mega Power - Issue 10 - Disc 03 (1994)(Paragon Publishing)(PAL)(GB)(Track 4 of 4)[!][demo - SoulStar].wav" size="1234844" crc="c6ab7f6f" />
 		-->
-		<description>SoulStar (Euro, Demo) [Mega Power - Issue 10, Sega Pro CD - Issue 49]</description>
+		<description>SoulStar (Europe, demo) [Mega Power - Issue 10, Sega Pro CD - issue 49]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3735,7 +3753,7 @@ license:CC0
 		<rom name="Mega Power - Issue 11 - Disc 04 (1994-05-19)(Paragon Publishing)(PAL)(GB)(Track 2 of 3)[!][demo - Battlecorps].wav" size="66646316" crc="f49e880d" />
 		<rom name="Mega Power - Issue 11 - Disc 04 (1994-05-19)(Paragon Publishing)(PAL)(GB)(Track 3 of 3)[!][demo - Battlecorps].wav" size="1234844" crc="38b44c7b" />
 		-->
-		<description>Battlecorps (Euro, Demo) [Mega Power - Issue 11, Sega Pro CD - Issue 50]</description>
+		<description>Battlecorps (Europe, demo) [Mega Power - Issue 11, Sega Pro CD - issue 50]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3845,7 +3863,7 @@ license:CC0
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 95 of 96)[!][demo - Sensible Soccer v1.08].wav" size="40021676" crc="995261d2" />
 		<rom name="Mega Power - Issue 12 - Disc 05 (1994-06-23)(Paragon Publishing)(PAL)(GB)(M4)(Track 96 of 96)[!][demo - Sensible Soccer v1.08].wav" size="1230140" crc="e257eba0" />
 		-->
-		<description>Sensible Soccer v1.08 (Euro, Demo) [Mega Power - Issue 12, Sega Pro CD - Issue 44]</description>
+		<description>Sensible Soccer v1.08 (Europe, demo) [Mega Power - Issue 12, Sega Pro CD - issue 44]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3873,7 +3891,7 @@ license:CC0
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="4a61841d" />
 		<rom name="Mega Power - Issue 13 - Disc 06 (1994)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2152124" crc="6b57a164" />
 		-->
-		<description>FIFA International Soccer - CE (Euro, Demo) [Mega Power - Issue 13]</description>
+		<description>FIFA International Soccer - CE (Europe, demo) [Mega Power - issue 13]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3892,7 +3910,7 @@ license:CC0
 		<rom name="Mega Power - Issue 14 (1994)(Paragon Publishing)(PAL)(GB)(Track 4 of 5)[!][demos - Battlecorps, SoulStar].wav" size="55302620" crc="c86c66c3" />
 		<rom name="Mega Power - Issue 14 (1994)(Paragon Publishing)(PAL)(GB)(Track 5 of 5)[!][demos - Battlecorps, SoulStar].wav" size="1234844" crc="bdbc554c" />
 		-->
-		<description>Battlecorps and SoulStar (Euro, Demo) [Mega Power - Issue 14]</description>
+		<description>Battlecorps and SoulStar (Europe, demo) [Mega Power - issue 14]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3908,7 +3926,7 @@ license:CC0
 		<rom name="Mega Power - Issue 15 - Disc 07 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Star Wars - Rebel Assault].iso" size="27283456" crc="32cb8080" />
 		<rom name="Mega Power - Issue 15 - Disc 07 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Star Wars - Rebel Assault].wav" size="58324940" crc="4c111665" />
 		-->
-		<description>Star Wars - Rebel Assault (Euro, Demo) [Mega Power - Issue 15]</description>
+		<description>Star Wars - Rebel Assault (Europe, demo) [Mega Power - issue 15]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3924,7 +3942,7 @@ license:CC0
 		<rom name="Mega Power - Issue 16 - Disc 08-09 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Lawnmower Man, The].iso" size="63731712" crc="c494bfdd" />
 		<rom name="Mega Power - Issue 16 - Disc 08-09 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Lawnmower Man, The].wav" size="7949804" crc="d6ebdc33" />
 		-->
-		<description>The Lawnmower Man (Euro, Demo) [Mega Power - Issue 16]</description>
+		<description>The Lawnmower Man (Europe, demo) [Mega Power - issue 16]</description>
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3966,7 +3984,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 40 (1994)(Paragon Publishing)(PAL)(GB)(Track 27 of 28)[!][demo - Mickey Mania].wav" size="2530796" crc="4ea7df22" />
 		<rom name="Sega Pro CD - Issue 40 (1994)(Paragon Publishing)(PAL)(GB)(Track 28 of 28)[!][demo - Mickey Mania].wav" size="1745228" crc="0a8b990c" />
 		-->
-		<description>Mickey Mania (Euro, Demo) [Mega Power - Issue 17, Sega Pro CD - Issue 40]</description>
+		<description>Mickey Mania (Europe, demo) [Mega Power - issue 17, Sega Pro CD - issue 40]</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -3983,7 +4001,7 @@ license:CC0
 		<rom name="BC Racers (demo) (1994)(Core)(PAL)(Track 2 of 3)[!][Mega Power - Issue 18].wav" size="31189916" crc="96895176" />
 		<rom name="BC Racers (demo) (1994)(Core)(PAL)(Track 3 of 3)[!][Mega Power - Issue 18].wav" size="1234844" crc="9f3b627d" />
 		-->
-		<description>BC Racers (Euro, Demo) [Mega Power - Issue 18]</description>
+		<description>BC Racers (Europe, demo) [Mega Power - issue 18]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4012,7 +4030,7 @@ license:CC0
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)(Track 14 of 15)[!][Mega Power - Issue 19].wav" size="5569580" crc="75ec889e" />
 		<rom name="Lethal Enforcers II - Gun Fighters (demo) (1994)(Konami)(PAL)(Track 15 of 15)[!][Mega Power - Issue 19].wav" size="6508028" crc="3f59c835" />
 		-->
-		<description>Lethal Enforcers II - Gun Fighters (Euro, Demo) [Mega Power - Issue 19]</description>
+		<description>Lethal Enforcers II - Gun Fighters (Europe, demo) [Mega Power - issue 19]</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4028,7 +4046,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 01 (1994)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - Star Wars - Rebel Assault].iso" size="22941696" crc="5cf5b35f" />
 		<rom name="Sega Pro CD - Issue 01 (1994)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - Star Wars - Rebel Assault].wav" size="58324940" crc="374666eb" />
 		-->
-		<description>Star Wars - Rebel Assault (Euro, Demo) [Sega Pro CD - Issue 01]</description>
+		<description>Star Wars - Rebel Assault (Europe, demo) [Sega Pro CD - issue 01]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4043,7 +4061,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 02 (1994)(Paragon Publishing)(PAL)(GB)[!][demo - Novastorm].cue" size="168" crc="d2fb439b" />
 		<rom name="Sega Pro CD - Issue 02 (1994)(Paragon Publishing)(PAL)(GB)[!][demo - Novastorm].iso" size="369602560" crc="8711f408" />
 		-->
-		<description>Novastorm (Euro, Demo) [Sega Pro CD - Issue 02]</description>
+		<description>Novastorm (Europe, demo) [Sega Pro CD - issue 02]</description>
 		<year>1994</year>
 		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4083,7 +4101,7 @@ license:CC0
 		<rom name="Keio Flying Squadron (demo) (1994)(JVC)(PAL)(Track 25 of 26)[!][Sega Pro CD - Issue 03].wav" size="26556476" crc="45143565" />
 		<rom name="Keio Flying Squadron (demo) (1994)(JVC)(PAL)(Track 26 of 26)[!][Sega Pro CD - Issue 03].wav" size="9953708" crc="33aa35f9" />
 		-->
-		<description>Keio Flying Squadron (Euro, Demo) [Sega Pro CD - Issue 03]</description>
+		<description>Keio Flying Squadron (Europe, demo) [Sega Pro CD - issue 03]</description>
 		<year>1994</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4100,7 +4118,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 1 of 2)(Track 2 of 3)[!][demo - BC Racers].wav" size="43963628" crc="8ae2959e" />
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 1 of 2)(Track 3 of 3)[!][demo - BC Racers].wav" size="1234844" crc="128471a3" />
 		-->
-		<description>BC Racers (Euro, Demo) [Sega Pro CD - Issue 41]</description>
+		<description>BC Racers (Europe, demo) [Sega Pro CD - issue 41]</description>
 		<year>1994</year>
 		<publisher>Core</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4124,7 +4142,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 2 of 2)(Track 09 of 10)[!][demo - Pitfall - The Mayan Adventure].wav" size="6404540" crc="52e11c71" />
 		<rom name="Sega Pro CD - Issue 41 (1995)(Paragon Publishing)(PAL)(GB)(Disc 2 of 2)(Track 10 of 10)[!][demo - Pitfall - The Mayan Adventure].wav" size="24032780" crc="fb5f8907" />
 		-->
-		<description>Pitfall - The Mayan Adventure (Euro, Demo) [Sega Pro CD - Issue 41]</description>
+		<description>Pitfall - The Mayan Adventure (Europe, demo) [Sega Pro CD - issue 41]</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4141,7 +4159,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)(Track 2 of 3)[!][demo - Flashback - The Quest for Identity].wav" size="36023276" crc="3e85e65f" />
 		<rom name="Sega Pro CD - Issue 42 (1995)(Paragon Publishing)(PAL)(GB)(Track 3 of 3)[!][demo - Flashback - The Quest for Identity].wav" size="44161196" crc="3e5c56f2" />
 		-->
-		<description>Flashback - The Quest for Identity (Euro, Demo) [Sega Pro CD - Issue 42]</description>
+		<description>Flashback - The Quest for Identity (Europe, demo) [Sega Pro CD - issue 42]</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4169,7 +4187,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 13 of 14)[!][demo - FIFA International Soccer - CE].wav" size="4769900" crc="5b548696" />
 		<rom name="Sega Pro CD - Issue 43 (1995)(Paragon Publishing)(PAL)(GB)(M4)(Track 14 of 14)[!][demo - FIFA International Soccer - CE].wav" size="2504924" crc="70dcbb79" />
 		-->
-		<description>FIFA International Soccer - CE (Euro, Demo) [Sega Pro CD - Issue 43]</description>
+		<description>FIFA International Soccer - CE (Europe, demo) [Sega Pro CD - issue 43]</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4185,7 +4203,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 1 of 2)[!][demo - TimeCop].iso" size="4452352" crc="e20df99b" />
 		<rom name="Sega Pro CD - Issue 45 (1995)(Paragon Publishing)(PAL)(GB)(Track 2 of 2)[!][demo - TimeCop].wav" size="12740828" crc="c84ee4bc" />
 		-->
-		<description>TimeCop (Euro, Demo) [Sega Pro CD - Issue 45]</description>
+		<description>TimeCop (Europe, demo) [Sega Pro CD - issue 45]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4207,7 +4225,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 46 (1995)(Paragon Publishing)(PAL)(GB)(Track 7 of 8)[!][demo - Fatal Fury Special].wav" size="19933244" crc="e7984b27" />
 		<rom name="Sega Pro CD - Issue 46 (1995)(Paragon Publishing)(PAL)(GB)(Track 8 of 8)[!][demo - Fatal Fury Special].wav" size="22050044" crc="c389429f" />
 		-->
-		<description>Fatal Fury Special (Euro, Demo) [Sega Pro CD - Issue 46]</description>
+		<description>Fatal Fury Special (Europe, demo) [Sega Pro CD - issue 46]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">
@@ -4251,7 +4269,7 @@ license:CC0
 		<rom name="Sega Pro CD - Issue 47 (1995)(Paragon Publishing)(PAL)(GB)(Track 29 of 30)[!][demo - Samurai Shodown].wav" size="41367020" crc="792b66fb" />
 		<rom name="Sega Pro CD - Issue 47 (1995)(Paragon Publishing)(PAL)(GB)(Track 30 of 30)[!][demo - Samurai Shodown].wav" size="41719820" crc="8b4358ac" />
 		-->
-		<description>Samurai Shodown (Euro, Demo) [Sega Pro CD - Issue 47]</description>
+		<description>Samurai Shodown (Europe, demo) [Sega Pro CD - issue 47]</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cdrom" interface="scd_cdrom">

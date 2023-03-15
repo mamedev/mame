@@ -45,10 +45,10 @@ protected:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 	virtual DECLARE_READ_LINE_MEMBER(romcs) override;
 
-	virtual uint8_t fdc0_r(offs_t offset) { return 0xff; };
-	virtual uint8_t fdc1_r(offs_t offset) { return 0xff; };
-	virtual void fdc0_w(offs_t offset, uint8_t data) { };
-	virtual void fdc1_w(offs_t offset, uint8_t data) { };
+	virtual uint8_t fdc0_r(offs_t offset) { return 0xff; }
+	virtual uint8_t fdc1_r(offs_t offset) { return 0xff; }
+	virtual void fdc0_w(offs_t offset, uint8_t data) { }
+	virtual void fdc1_w(offs_t offset, uint8_t data) { }
 	virtual void nmi_check();
 
 	required_memory_region m_rom;

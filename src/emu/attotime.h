@@ -38,9 +38,10 @@
 #include "emucore.h"
 #include "xtal.h"
 
+#include "eminline.h"
+
 #include <cmath>
-#undef min
-#undef max
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -84,7 +85,7 @@ template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_NSEC(T &&x) 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
-//***************************************************************************/
+//**************************************************************************
 
 // the attotime structure itself
 class attotime
@@ -133,15 +134,15 @@ public:
 	static attotime from_double(double _time);
 	static attotime from_ticks(u64 ticks, u32 frequency);
 	static attotime from_ticks(u64 ticks, const XTAL &xtal) { return from_ticks(ticks, xtal.value()); }
-	/** Create an attotime from a integer count of seconds @seconds */
+	/** Create an attotime from an integer count of seconds @p seconds */
 	static constexpr attotime from_seconds(s32 seconds) { return attotime(seconds, 0); }
-	/** Create an attotime from a integer count of milliseconds @msec */
+	/** Create an attotime from an integer count of milliseconds @p msec */
 	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
-	/** Create an attotime from a integer count of microseconds @usec */
+	/** Create an attotime from an integer count of microseconds @p usec */
 	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
-	/** Create an attotime from a integer count of nanoseconds @nsec */
+	/** Create an attotime from an integer count of nanoseconds @p nsec */
 	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
-	/** Create an attotime from at the given frequency @frequency */
+	/** Create an attotime from at the given frequency @p frequency */
 	static attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, HZ_TO_ATTOSECONDS(frequency)) : (frequency == 1) ? attotime(1, 0) : attotime::never; }
 	static attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
 	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, HZ_TO_ATTOSECONDS(xtal)) : from_hz(xtal.dvalue()); }
@@ -180,7 +181,7 @@ public:
 //**************************************************************************
 
 /** handle addition between two attotimes */
-inline attotime operator+(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator+(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 
@@ -230,7 +231,7 @@ inline attotime &attotime::operator+=(const attotime &right) noexcept
 
 
 /** handle subtraction between two attotimes */
-inline attotime operator-(const attotime &left, const attotime &right) noexcept
+inline constexpr attotime operator-(const attotime &left, const attotime &right) noexcept
 {
 	attotime result;
 
@@ -346,7 +347,7 @@ inline u64 attotime::as_ticks(u32 frequency) const
 }
 
 
-/** Create an attotime from a tick count @ticks at the given frequency @frequency  */
+/** Create an attotime from a tick count @p ticks at the given frequency @p frequency  */
 inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 {
 	if (frequency > 0)

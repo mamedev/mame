@@ -43,9 +43,9 @@ private:
 	};
 
 	static const char *const em_name[];
-	static const uint8_t em_bits[];
-	static const uint32_t em_flags[];
-	static const uint8_t m58846_opmap[0xc0];
+	static const u8 em_bits[];
+	static const u32 em_flags[];
+	static const u8 m58846_opmap[0xc0];
 };
 
 #endif

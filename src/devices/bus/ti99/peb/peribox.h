@@ -179,7 +179,7 @@ public:
 	virtual void write(offs_t offset, uint8_t data) = 0;
 	virtual void crureadz(offs_t offset, uint8_t *value) = 0;
 	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
-	virtual void setaddress_dbin(offs_t offset, int state) { };
+	virtual void setaddress_dbin(offs_t offset, int state) { }
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
 	virtual DECLARE_WRITE_LINE_MEMBER(reset_in) { }
@@ -202,9 +202,9 @@ protected:
 	int     m_cru_base;
 
 	// Methods to decide whether we are acccessing the 4000-5fff region (DSR)
-	// or the cartridge region
-	static bool in_dsr_space(offs_t offset, bool amadec);
-	static bool in_cart_space(offs_t offset, bool amadec);
+	bool in_dsr_space(offs_t offset, bool amadec);
+
+	bool amabc_is_set(offs_t offset);
 };
 
 /*****************************************************************************

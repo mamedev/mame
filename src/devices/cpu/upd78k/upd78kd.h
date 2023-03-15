@@ -9,7 +9,7 @@
 class upd78k_family_disassembler : public util::disasm_interface
 {
 protected:
-	upd78k_family_disassembler(const char *const sfr_names[], const char *const sfrp_names[]);
+	upd78k_family_disassembler(const char *const sfr_names[], const char *const sfrp_names[], u16 saddr_ram_base);
 
 	// disasm_interface overrides
 	virtual u32 opcode_alignment() const override;
@@ -21,7 +21,7 @@ protected:
 	void format_ix_disp16(std::ostream &stream, const char *r, u16 d);
 	void format_ix_base16(std::ostream &stream, const char *r, u16 d);
 	void format_abs16(std::ostream &stream, u16 addr);
-	void format_jdisp8(std::ostream &stream, offs_t pc, u8 disp);
+	virtual void format_jdisp8(std::ostream &stream, offs_t pc, u8 disp);
 	void format_sfr(std::ostream &stream, u8 addr);
 	void format_saddr(std::ostream &stream, u8 addr);
 	void format_sfrp(std::ostream &stream, u8 addr);
@@ -36,6 +36,7 @@ protected:
 private:
 	const char *const *const m_sfr_names;
 	const char *const *const m_sfrp_names;
+	const u16 m_saddr_ram_base;
 };
 
 class upd78k_8reg_disassembler : public upd78k_family_disassembler

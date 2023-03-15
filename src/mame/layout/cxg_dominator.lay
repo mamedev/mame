@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -512,13 +512,12 @@ license:CC0
 <!-- buttons -->
 
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
-	<element name="red"><rect><color red="0.45" green="0.17" blue="0.22" /></rect></element>
-	<element name="rmask"><rect><color red="0.82" green="0.82" blue="0.83" /></rect></element>
+	<element name="red"><rect><color red="0.37" green="0.14" blue="0.18" /></rect></element>
+	<element name="rmask"><rect><color red="0.45" green="0.68" blue="0.65" /></rect></element>
 
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="whited"><disk><color red="1" green="1" blue="1" /></disk></element>
-	<element name="redd"><disk><color red="0.45" green="0.17" blue="0.22" /></disk></element>
-	<element name="rmaskd"><disk><color red="0.82" green="0.82" blue="0.83" /></disk></element>
+	<element name="redd"><disk><color red="0.37" green="0.14" blue="0.18" /></disk></element>
 
 	<element name="butb" defstate="0">
 		<rect state="0"><color red="0.07" green="0.07" blue="0.07" /></rect>
@@ -529,9 +528,24 @@ license:CC0
 		<disk state="0"><color red="0.41" green="0.43" blue="0.4" /></disk>
 		<disk state="1"><color red="0.31" green="0.32" blue="0.3" /></disk>
 	</element>
+
 	<element name="butgr" defstate="0">
-		<rect state="0"><color red="0.41" green="0.43" blue="0.4" /></rect>
-		<rect state="1"><color red="0.31" green="0.32" blue="0.3" /></rect>
+		<rect state="0">
+			<bounds x="0" y="0" width="1" height="2" />
+			<color red="0.41" green="0.43" blue="0.4" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="1" height="2" />
+			<color red="0.31" green="0.32" blue="0.3" />
+		</rect>
+		<disk state="0">
+			<bounds x="0" y="0" width="2" height="2" />
+			<color red="0.41" green="0.43" blue="0.4" />
+		</disk>
+		<disk state="1">
+			<bounds x="0" y="0" width="2" height="2" />
+			<color red="0.31" green="0.32" blue="0.3" />
+		</disk>
 	</element>
 
 	<element name="text_l1a"><text string="NEW" align="2"><color red="1" green="1" blue="1" /></text></element>
@@ -583,18 +597,19 @@ license:CC0
 		<element ref="text_r3"><bounds x="95.5" y="69.0" width="17" height="1.6" /></element>
 		<element ref="text_r4"><bounds x="95.5" y="73.5" width="17" height="1.6" /></element>
 
-		<element ref="text_r5"><bounds x="95.5" y="82.1" width="13.4" height="1.6" /></element>
+		<element ref="text_r5"><bounds x="95.5" y="82.1" width="13" height="1.6" /></element>
 		<element ref="text_r6"><bounds x="109.7" y="82.1" width="5" height="1.6" /></element>
 
 		<element ref="text_r7"><bounds x="95.5" y="86.85" width="9.4" height="1.6" /></element>
 		<element ref="text_r8"><bounds x="95.5" y="90.85" width="9.4" height="1.6" /></element>
 		<element ref="text_r9"><bounds x="95.5" y="94.85" width="9.4" height="1.6" /></element>
 
-		<element ref="red" blend="add"><bounds x="95" y="2.5" width="22.5" height="95" /></element>
 		<element ref="white"><bounds x="98.5" y="64.35" width="2.1" height="2.1" /></element>
-		<element ref="red"><bounds x="98.8" y="64.65" width="1.5" height="1.5" /></element>
+		<element ref="black"><bounds x="98.8" y="64.65" width="1.5" height="1.5" /></element>
 		<element ref="white"><bounds x="98.5" y="68.85" width="2.1" height="2.1" /></element>
+
 		<element ref="rmask" blend="multiply"><bounds x="95" y="2.5" width="22.5" height="95" /></element>
+		<element ref="red" blend="add"><bounds x="95" y="2.5" width="22.5" height="95" /></element>
 
 		<group ref="lcd1"><bounds x="100.5" y="11.8" width="11.5" height="5.4" /></group>
 		<group ref="lcd2"><bounds x="100.5" y="21.8" width="11.5" height="5.4" /></group>
@@ -624,14 +639,10 @@ license:CC0
 		<element ref="butgd" inputtag="IN.1" inputmask="0x20"><bounds x="113" y="64.0" width="3" height="3" /></element>
 		<element ref="butgd" inputtag="IN.1" inputmask="0x10"><bounds x="113" y="68.5" width="3" height="3" /></element>
 
-		<element ref="butgd" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="30.5" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="32.0" width="3" height="1.5" /></element>
-		<element ref="butgd" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="1.5" height="3" /></element>
-		<element ref="butgd" inputtag="IN.0" inputmask="0x02"><bounds x="105.3" y="79" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.0" inputmask="0x02"><bounds x="106.8" y="79" width="1.5" height="3" /></element>
-		<element ref="butgd" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="3" height="3" /></element>
-		<element ref="butgr" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="1.5" height="3" /></element>
+		<element ref="butgr" inputtag="IN.1" inputmask="0x80"><bounds x="107.5" y="30.5" width="3" height="3" /><orientation rotate="270" /></element>
+		<element ref="butgr" inputtag="IN.1" inputmask="0x01"><bounds x="113" y="73.0" width="3" height="3" /></element>
+		<element ref="butgr" inputtag="IN.0" inputmask="0x02"><bounds x="105.3" y="79" width="3" height="3" /><orientation rotate="180" /></element>
+		<element ref="butgr" inputtag="IN.0" inputmask="0x01"><bounds x="109.7" y="79" width="3" height="3" /></element>
 
 		<element ref="white"><bounds x="95" y="2.5" width="22.5" height="32.25" /><color alpha="0.08" /></element>
 	</group>
@@ -649,8 +660,6 @@ license:CC0
 		<!-- panel notches -->
 		<element ref="redd"><bounds x="95.5" y="77.5" width="5" height="5" /></element>
 		<element ref="redd"><bounds x="95.5" y="17.5" width="5" height="5" /></element>
-		<element ref="rmaskd" blend="multiply"><bounds x="95.5" y="77.5" width="5" height="5" /></element>
-		<element ref="rmaskd" blend="multiply"><bounds x="95.5" y="17.5" width="5" height="5" /></element>
 		<element ref="whited"><bounds x="95.5" y="17.5" width="5" height="5" /><color alpha="0.08" /></element>
 
 		<element ref="black"><bounds x="97.5" y="2.5" width="22.5" height="95" /></element>

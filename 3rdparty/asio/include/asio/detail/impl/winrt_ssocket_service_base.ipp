@@ -2,7 +2,7 @@
 // detail/impl/winrt_ssocket_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,9 +30,9 @@ namespace asio {
 namespace detail {
 
 winrt_ssocket_service_base::winrt_ssocket_service_base(
-    asio::io_context& io_context)
-  : io_context_(use_service<io_context_impl>(io_context)),
-    async_manager_(use_service<winrt_async_manager>(io_context)),
+    execution_context& context)
+  : scheduler_(use_service<scheduler_impl>(context)),
+    async_manager_(use_service<winrt_async_manager>(context)),
     mutex_(),
     impl_list_(0)
 {
@@ -66,6 +66,7 @@ void winrt_ssocket_service_base::construct(
 void winrt_ssocket_service_base::base_move_construct(
     winrt_ssocket_service_base::base_implementation_type& impl,
     winrt_ssocket_service_base::base_implementation_type& other_impl)
+  ASIO_NOEXCEPT
 {
   impl.socket_ = other_impl.socket_;
   other_impl.socket_ = nullptr;
@@ -138,14 +139,27 @@ asio::error_code winrt_ssocket_service_base::close(
     winrt_ssocket_service_base::base_implementation_type& impl,
     asio::error_code& ec)
 {
-  if (impl.socket_)
-  {
-    delete impl.socket_;
-    impl.socket_ = nullptr;
-  }
-
+  delete impl.socket_;
+  impl.socket_ = nullptr;
   ec = asio::error_code();
   return ec;
+}
+
+winrt_ssocket_service_base::native_handle_type
+winrt_ssocket_service_base::release(
+    winrt_ssocket_service_base::base_implementation_type& impl,
+    asio::error_code& ec)
+{
+  if (!is_open(impl))
+    return nullptr;
+
+  cancel(impl, ec);
+  if (ec)
+    return nullptr;
+
+  native_handle_type tmp = impl.socket_;
+  impl.socket_ = nullptr;
+  return tmp;
 }
 
 std::size_t winrt_ssocket_service_base::do_get_endpoint(
@@ -381,7 +395,7 @@ void winrt_ssocket_service_base::start_connect_op(
   if (!is_open(impl))
   {
     op->ec_ = asio::error::bad_descriptor;
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
@@ -410,7 +424,7 @@ void winrt_ssocket_service_base::start_connect_op(
 
   if (op->ec_)
   {
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
@@ -425,7 +439,7 @@ void winrt_ssocket_service_base::start_connect_op(
   {
     op->ec_ = asio::error_code(
         e->HResult, asio::system_category());
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
   }
 }
 
@@ -476,14 +490,14 @@ void winrt_ssocket_service_base::start_send_op(
   if (flags)
   {
     op->ec_ = asio::error::operation_not_supported;
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
   if (!is_open(impl))
   {
     op->ec_ = asio::error::bad_descriptor;
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
@@ -494,7 +508,7 @@ void winrt_ssocket_service_base::start_send_op(
 
     if (bufs.all_empty())
     {
-      io_context_.post_immediate_completion(op, is_continuation);
+      scheduler_.post_immediate_completion(op, is_continuation);
       return;
     }
 
@@ -505,7 +519,7 @@ void winrt_ssocket_service_base::start_send_op(
   {
     op->ec_ = asio::error_code(e->HResult,
         asio::system_category());
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
   }
 }
 
@@ -567,14 +581,14 @@ void winrt_ssocket_service_base::start_receive_op(
   if (flags)
   {
     op->ec_ = asio::error::operation_not_supported;
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
   if (!is_open(impl))
   {
     op->ec_ = asio::error::bad_descriptor;
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
     return;
   }
 
@@ -585,7 +599,7 @@ void winrt_ssocket_service_base::start_receive_op(
 
     if (bufs.all_empty())
     {
-      io_context_.post_immediate_completion(op, is_continuation);
+      scheduler_.post_immediate_completion(op, is_continuation);
       return;
     }
 
@@ -598,7 +612,7 @@ void winrt_ssocket_service_base::start_receive_op(
   {
     op->ec_ = asio::error_code(e->HResult,
         asio::system_category());
-    io_context_.post_immediate_completion(op, is_continuation);
+    scheduler_.post_immediate_completion(op, is_continuation);
   }
 }
 

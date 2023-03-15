@@ -47,17 +47,21 @@
 #define HP_IOADDR_IC_SHIFT      0
 
 // Compose an I/O address from PA & IC
-inline constexpr unsigned HP_MAKE_IOADDR(unsigned pa , unsigned ic) { return ((pa << HP_IOADDR_PA_SHIFT) | (ic << HP_IOADDR_IC_SHIFT)); }
+constexpr unsigned HP_MAKE_IOADDR(unsigned pa , unsigned ic) { return ((pa << HP_IOADDR_PA_SHIFT) | (ic << HP_IOADDR_IC_SHIFT)); }
 
 class hp_hybrid_cpu_device : public cpu_device
 {
 public:
+	using stm_delegate = device_delegate<void (uint8_t)>;
+	using opcode_delegate = device_delegate<void (uint16_t)>;
+	using int_delegate = device_delegate<uint8_t (offs_t)>;
+
 	DECLARE_WRITE_LINE_MEMBER(dmar_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_w);
 	DECLARE_WRITE_LINE_MEMBER(status_w);
 	DECLARE_WRITE_LINE_MEMBER(flag_w);
 
-	uint8_t pa_r() const;
+	uint8_t pa_r() const { return m_reg_PA[0]; }
 
 	auto pa_changed_cb() { return m_pa_changed_func.bind(); }
 
@@ -82,13 +86,13 @@ public:
 	};
 
 	// Called at start of each memory access
-	auto stm_cb() { return m_stm_func.bind(); }
+	template <typename... T> void set_stm_cb(T &&... args) { m_stm_func.set(std::forward<T>(args)...); }
 
 	// Tap into fetched opcodes
-	auto opcode_cb() { return m_opcode_func.bind(); }
+	template <typename... T> void set_opcode_cb(T &&... args) { m_opcode_func.set(std::forward<T>(args)...); }
 
 	// Acknowledge interrupts
-	auto int_cb() { return m_int_func.bind(); }
+	template <typename... T> void set_int_cb(T &&... args) { m_int_func.set(std::forward<T>(args)...); }
 
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
@@ -160,9 +164,9 @@ protected:
 
 	devcb_write8 m_pa_changed_func;
 	uint8_t m_last_pa;
-	devcb_write16 m_opcode_func;
-	devcb_write8 m_stm_func;
-	devcb_read8 m_int_func;
+	opcode_delegate m_opcode_func;
+	stm_delegate m_stm_func;
+	int_delegate m_int_func;
 
 	int m_icount;
 	uint32_t m_addr_mask;

@@ -6,16 +6,15 @@
 //
 //==================================================================
 
-#include "emu.h"
 #include "slideruniformreader.h"
+
+#include "entryuniform.h"
+#include "slider.h"
+#include "slideruniform.h"
 
 #include <vector>
 
-#include "slideruniform.h"
-#include "entryuniform.h"
-#include "slider.h"
-
-bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, std::string prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders)
+bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, const std::string &prefix, bgfx_uniform* uniform, std::map<std::string, bgfx_slider*>& sliders)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -36,12 +35,12 @@ bgfx_entry_uniform* slider_uniform_reader::read_from_value(const Value& value, s
 		slider_list.push_back(sliders[name + "2"]);
 	}
 
-	return new bgfx_slider_uniform(uniform, slider_list);
+	return new bgfx_slider_uniform(uniform, std::move(slider_list));
 }
 
-bool slider_uniform_reader::validate_parameters(const Value& value, std::string prefix)
+bool slider_uniform_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value.HasMember("slider"), (prefix + "Must have string value 'slider' (what slider are we getting the value of?)\n").c_str())) return false;
-	if (!READER_CHECK(value["slider"].IsString(), (prefix + "Value 'slider' must be a string\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("slider"), "%sMust have string value 'slider' (what slider are we getting the value of?)\n", prefix)) return false;
+	if (!READER_CHECK(value["slider"].IsString(), "%sValue 'slider' must be a string\n", prefix)) return false;
 	return true;
 }

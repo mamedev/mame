@@ -7,6 +7,7 @@
 **************************************************************************/
 #include "emu.h"
 #include "zeus2.h"
+#include "screen.h"
 
 #include <algorithm>
 
@@ -19,7 +20,7 @@
 *  Constructor
 *************************************/
 zeus2_renderer::zeus2_renderer(zeus2_device *state)
-	: poly_manager<float, zeus2_poly_extra_data, 4, 10000>(state->machine())
+	: poly_manager<float, zeus2_poly_extra_data, 4>(state->machine())
 	, m_state(state)
 {
 }
@@ -48,16 +49,13 @@ TIMER_CALLBACK_MEMBER(zeus2_device::display_irq_off)
 	//  vblank_period = screen().frame_period();
 	//vblank_timer->adjust(vblank_period);
 	vblank_timer->adjust(screen().time_until_vblank_start());
-	//machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
 }
 
 TIMER_CALLBACK_MEMBER(zeus2_device::display_irq)
 {
 	m_vblank(ASSERT_LINE);
 	/* set a timer for the next off state */
-	//machine().scheduler().timer_set(screen().time_until_pos(0), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this), 0, this);
-	machine().scheduler().timer_set(screen().time_until_vblank_end(), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this), 0, this);
-	//machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this));
+	vblank_off_timer->adjust(screen().time_until_vblank_end());
 }
 
 TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
@@ -87,9 +85,9 @@ void zeus2_device::device_start()
 	/* we need to cleanup on exit */
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
-	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
-
-	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
+	int_timer = timer_alloc(FUNC(zeus2_device::int_timer_callback), this);
+	vblank_timer = timer_alloc(FUNC(zeus2_device::display_irq), this);
+	vblank_off_timer = timer_alloc(FUNC(zeus2_device::display_irq_off), this);
 
 	//printf("%s\n", machine().system().name);
 	// Set system type
@@ -1776,7 +1774,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			return;
 	}
 
-	zeus2_poly_extra_data& extra = this->object_data_alloc();
+	zeus2_poly_extra_data& extra = this->object_data().next();
 
 	extra.ucode_src = m_state->m_curUCodeSrc;
 	extra.tex_src = m_state->zeus_texbase;
@@ -1786,8 +1784,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_min_enable = true;// (m_state->m_renderRegs[0x14] & 0x008000);
-	extra.zbuf_min = int32_t((m_state->m_renderRegs[0x15]) << 8) >> 8;
-	//extra.zbuf_min = m_state->m_renderRegs[0x15];
+	extra.zbuf_min = util::sext(m_state->m_renderRegs[0x15], 24);
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
 	extra.depth_write_enable = !(m_state->m_renderRegs[0x14] & 0x001000);
@@ -1827,8 +1824,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	}
 
 	//if (numverts == 3)
-	//  render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert[0], vert[1], vert[2]);
-	render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert);
+	//  render_triangle<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert[0], vert[1], vert[2]);
+	render_polygon<4, 4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert);
 }
 
 

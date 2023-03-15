@@ -13,10 +13,10 @@
 #include "emu.h"
 #include "tx0.h"
 #include "tx0dasm.h"
-#include "debugger.h"
 
-#define LOG 0
-#define LOG_EXTRA 0
+#define LOG_RIM (1 << 1U)
+//#define VERBOSE (LOG_RIM)
+#include "logmacro.h"
 
 
 #define READ_TX0_18BIT(A) ((signed)m_program->read_dword(A))
@@ -41,8 +41,9 @@
 #define INCREMENT_PC_8KW    (PC = (PC+1) & ADDRESS_MASK_8KW)
 
 
-DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "MIT Lincoln Laboratory TX-0 8KW")
-DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "MIT Lincoln Laboratory TX-0 64KW")
+DEFINE_DEVICE_TYPE(TX0_8KW,     tx0_8kw_device,  "tx0_8kw_cpu",  "MIT Lincoln Laboratory TX-0 8KW (new)")
+DEFINE_DEVICE_TYPE(TX0_8KW_OLD, tx0_8kwo_device, "tx0_8kwo_cpu", "MIT Lincoln Laboratory TX-0 8KW (old)")
+DEFINE_DEVICE_TYPE(TX0_64KW,    tx0_64kw_device, "tx0_64kw_cpu", "MIT Lincoln Laboratory TX-0 64KW")
 
 
 tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask)
@@ -65,8 +66,18 @@ tx0_device::tx0_device(const machine_config &mconfig, device_type type, const ch
 	m_program_config.m_is_octal = true;
 }
 
+tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tx0_device(mconfig, type, tag, owner, clock, 13, ADDRESS_MASK_8KW, 037)
+{
+}
+
 tx0_8kw_device::tx0_8kw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx0_device(mconfig, TX0_8KW, tag, owner, clock, 13, ADDRESS_MASK_8KW, 037)
+	: tx0_8kw_device(mconfig, TX0_8KW, tag, owner, clock)
+{
+}
+
+tx0_8kwo_device::tx0_8kwo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tx0_8kw_device(mconfig, TX0_8KW_OLD, tag, owner, clock)
 {
 }
 
@@ -255,9 +266,6 @@ void tx0_64kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(PC);
-
-
 		if (m_ioh && m_ios)
 		{
 			m_ioh = 0;
@@ -265,7 +273,10 @@ void tx0_64kw_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
@@ -295,6 +306,7 @@ void tx0_64kw_device::execute_run()
 						m_rim = 0;  /* exit read-in mode */
 						m_run = (IR == 2) ? 1 : 0;  /* stop if add instruction */
 						m_rim_step = 0;
+						LOGMASKED(LOG_RIM, "RIM %s: PC <- %06o\n", (IR == 2) ? "start" : "stop", PC);
 					}
 					else if ((IR == 0) || (IR == 3))    /* sto or opr instruction? */
 					{
@@ -321,6 +333,7 @@ void tx0_64kw_device::execute_run()
 				{   /* data transfer complete */
 					m_ios = 0;
 
+					LOGMASKED(LOG_RIM, "RIM transfer: %06o <- %06o\n", MAR, AC);
 					tx0_write(MAR, MBR = AC);
 
 					m_rim_step = 0;
@@ -332,6 +345,7 @@ void tx0_64kw_device::execute_run()
 		{
 			if (m_cycle == 0)
 			{   /* fetch new instruction */
+				debugger_instruction_hook(PC);
 				MBR = tx0_read(MAR = PC);
 				INCREMENT_PC_64KW;
 				IR = MBR >> 16;     /* basic opcode */
@@ -358,9 +372,6 @@ void tx0_8kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(PC);
-
-
 		if (m_ioh && m_ios)
 		{
 			m_ioh = 0;
@@ -368,7 +379,10 @@ void tx0_8kw_device::execute_run()
 
 
 		if ((! m_run) && (! m_rim))
+		{
+			debugger_instruction_hook(PC);
 			m_icount = 0;   /* if processor is stopped, just burn cycles */
+		}
 		else if (m_rim)
 		{
 			switch (m_rim_step)
@@ -398,6 +412,7 @@ void tx0_8kw_device::execute_run()
 						m_rim = 0;  /* exit read-in mode */
 						m_run = (IR == 16) ? 1 : 0; /* stop if add instruction */
 						m_rim_step = 0;
+						LOGMASKED(LOG_RIM, "RIM %s: PC <- %05o\n", (IR == 16) ? "start" : "stop", PC);
 					}
 					else if ((IR == 0) || (IR == 24))   /* sto or opr instruction? */
 					{
@@ -424,6 +439,7 @@ void tx0_8kw_device::execute_run()
 				{   /* data transfer complete */
 					m_ios = 0;
 
+					LOGMASKED(LOG_RIM, "RIM transfer: %05o <- %06o\n", MAR, AC);
 					tx0_write(MAR, MBR = AC);
 
 					m_rim_step = 0;
@@ -435,6 +451,7 @@ void tx0_8kw_device::execute_run()
 		{
 			if (m_cycle == 0)
 			{   /* fetch new instruction */
+				debugger_instruction_hook(PC);
 				MBR = tx0_read(MAR = PC);
 				INCREMENT_PC_8KW;
 				IR = MBR >> 13;     /* basic opcode */
@@ -487,10 +504,10 @@ void tx0_64kw_device::execute_instruction_64kw()
 				/* (0.8) CLR = Clear the right nine digital positions of the AC */
 				AC &= 0777000;
 
-			if (((MAR & 0030000) >> 12) == 1)
+			if (((MAR & 0030000) >> 12) == 2)
 				/* (0.8) IOS In-Out Stop = Stop machine so that an In-Out command
 				    (specified by digits 6 7 8 of MAR) may be executed */
-				m_ioh = 1;
+				m_ios = 0;
 
 			if (((MAR & 0007000) >> 9) != 0)
 			{
@@ -545,14 +562,14 @@ void tx0_64kw_device::execute_instruction_64kw()
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
-			if (AC == 0777777)      /* check for -0 */
-				AC = 0;
 			break;
 
 		case 2:     /* TRansfer on Negative */
 			break;
 
 		case 3:     /* OPeRate */
+			MBR = 0;
+
 			if ((MAR & 0000104) == 0000100)
 				/* (1.1) PEN = Read the light pen flip-flops 1 and 2 into AC(0) and
 				    AC(1). */
@@ -562,26 +579,27 @@ void tx0_64kw_device::execute_instruction_64kw()
 				/* (1.1) TAC = Insert a one in each digital position of the AC
 				    wherever there is a one in the corresponding digital position
 				    of the TAC. */
-				/*...*/ { }
-
-			if (MAR & 0000040)
-				/* (1.2) COM = Complement every digit in the accumulator */
-				AC ^= 0777777;
+				AC |= m_tac;
 
 			if ((MAR & 0000003) == 1)
 				/* (1.2) AMB = Store the contents of the AC in the MBR. */
 				MBR = AC;
 
+			if (MAR & 0000040)
+				/* (1.2) COM = Complement every digit in the accumulator */
+				AC ^= 0777777;
+
 			if ((MAR & 0000003) == 3)
 				/* (1.2) TBR = Store the contents of the TBR in the MBR. */
-				/*...*/ { }
+				MBR |= m_tbr;
 
-			if ((MAR & 0000003) == 2)
+			if ((MAR & 0000003) == 2 && ((MAR & 0000600) >> 7) == 1)
+				/* LMB and MBL used simultaneously interchange LR and MBR */
+				std::swap(LR, MBR);
+			else if ((MAR & 0000003) == 2)
 				/* (1.3) LMB = Store the contents of the LR in the MBR. */
 				MBR = LR;
-			break;
-
-			if (((MAR & 0000600) >> 7) == 1)
+			else if (((MAR & 0000600) >> 7) == 1)
 				/* (1.3) MLR = Store the contents of the MBR (memory buffer
 				    register) in the live reg. */
 				LR = MBR;
@@ -621,12 +639,230 @@ void tx0_64kw_device::execute_instruction_64kw()
 
 				AC = AC + MBR;
 				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-
-				if (AC == 0777777)      /* check for -0 */
-					AC = 0;
 			}
 
 			if (((MAR & 0030000) >> 12) == 3)
+				/* (1.8) Hlt = Halt the computer */
+				m_run = 0;
+
+			break;
+		}
+	}
+}
+
+/* execute one instruction */
+void tx0_8kwo_device::execute_instruction_8kw()
+{
+	if (! m_cycle)
+	{
+		m_cycle = 1;    /* most frequent case */
+		switch (IR)
+		{
+		case 0:     /* STOre */
+		case 4:     /* Store LR */
+		case 8:     /* ADD */
+		case 12:    /* Load LR */
+			break;
+
+		case 16:    /* TRansfer on Negative */
+			if (AC & 0400000)
+			{
+				PC = MAR & 0017777;
+				m_cycle = 0;    /* instruction only takes one cycle if branch
+				                    is taken */
+			}
+			break;
+
+		case 20:    /* TRAnsfer */
+			PC = MAR & 0017777;
+			m_cycle = 0;    /* instruction only takes one cycle if branch
+			                    is taken */
+			break;
+
+		case 24:    /* OPeRate */
+		case 25:
+		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+			if (IR & 004)
+				/* (0.8) CLL = Clear the left nine digital positions of the AC */
+				AC &= 0000777;
+
+			if (IR & 002)
+				/* (0.8) CLR = Clear the right nine digital positions of the AC */
+				AC &= 0777000;
+
+			if (((IR & 001) == 01) && ((MAR & 010000) == 000000))
+			{
+				/* (0.8) IOS In-Out Stop = Stop machine so that an In-Out command
+				    (specified by digits 6 7 8 of MAR) may be executed */
+				/* ((MAR & 0007000) >> 9) is device ID */
+				/* 7: */
+				/* (0.8) P7H = Punch holes 1-6 in flexo tape specified by AC
+				    digital positions 2, 5, 8, 11, 14, and 17.  Also punches a 7th
+				    hole on tape. */
+				/* 6: */
+				/* (0.8) P6H = Same as P7H but no seventh hole */
+				/* 4: */
+				/* (0.8) PNT = Print one flexowriter character specified by AC
+				    digits 2, 5, 8, 11, 14, and 17. */
+				/* 1: */
+				/* (0.8) R1C = Read one line of flexo tape so that tape positions
+				    1, 2, 3, 4, 5, and 6 will be put in the AC digital positions 0,
+				    3, 6, 9, 12 and 15. */
+				/* 3: */
+				/* (0.8) R3C = Read one line of flexo tape into AC digits 0, 3, 6,
+				    9, 12 and 15.  Then cycle the AC one digital position; read the
+				    next line on tape into AC digits 0, 3, 6, 9, 12 and 15, cycle
+				    the AC right one digital position and read the third and last
+				    line into AC digits 0, 3, 6, 9, 12 and 15.  (This command is
+				    equal to a triple CYR-R1C.) */
+				/* 2: */
+				/* (0.8) DIS = Intensify a point on the scope with x and y
+				    coordinates where x is specified by AC digits 0-8 with digit 0
+				    being used as the sign and y is specified by AC digits 9-17
+				    with digit 9 being used as the sign for y.  The complement
+				    system is in effect when the signs are negative. */
+				/* (5 is undefined) */
+				int index = (MAR & 0007000) >> 9;
+
+				m_ios = 0;
+				call_io_handler(index);
+				m_ioh = 1;
+			}
+
+			if (((IR & 001) == 00) && ((MAR & 010000) == 010000))
+			{   /* (IOS) EX0 through EX7 = operate user's EXternal equipment. */
+				switch ((MAR & 0007000) >> 9)
+				{
+				/* ... */
+				}
+			}
+			break;
+		}
+	}
+	else
+	{
+		m_cycle = 0;    /* always true */
+		switch (IR)
+		{
+		case 0:     /* STOre */
+			tx0_write(MAR, (MBR = AC));
+			break;
+
+		case 4:     /* Store LR */
+			tx0_write(MAR, (MBR = LR));
+			break;
+
+		case 8:     /* ADD */
+			MBR = tx0_read(MAR);
+
+			AC = AC + MBR;
+			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+
+			break;
+
+		case 12:    /* Load LR */
+			LR = MBR = tx0_read(MAR);
+			break;
+
+		case 16:    /* TRansfer on Negative */
+		case 20:    /* TRAnsfer */
+			break;
+
+		case 24:    /* OPeRate */
+		case 25:
+		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+			MBR = 0;
+
+			if ((MAR & 0000104) == 0000100)
+				/* (1.1) PEN = Read the light pen flip-flops 1 and 2 into AC(0) and
+				    AC(1). */
+				/*...*/{ }
+
+			if ((MAR & 0000104) == 0000004)
+				/* (1.1) TAC = Insert a one in each digital position of the AC
+				    wherever there is a one in the corresponding digital position
+				    of the TAC. */
+				AC |= m_tac;
+
+			if ((MAR & 0000003) == 1)
+				/* (1.2) AMB = Store the contents of the AC in the MBR. */
+				MBR = AC;
+
+			if (MAR & 0000040)
+				/* (1.2) COM = Complement every digit in the accumulator */
+				AC ^= 0777777;
+
+			if ((MAR & 0000003) == 3)
+				/* (1.2) TBR = Store the contents of the TBR in the MBR. */
+				MBR |= m_tbr;
+
+			uint32_t tmp = MBR;
+
+			if ((MAR & 0000003) == 2)
+				/* (1.3) LMB = Store the contents of the LR in the MBR. */
+				MBR = LR;
+
+			if (((MAR & 0000600) >> 7) == 1)
+				/* (1.3) MLR = Store the contents of the MBR (memory buffer
+				    register) in the live reg. */
+				LR = tmp;
+
+			if ((MAR & 0000704) == 0000104)
+				/* (1.3) ORL = Inclusive or MBR into LR. */
+				LR |= tmp;
+
+			if ((MAR & 0000704) == 0000304)
+				/* (1.3) ANL = And MBR into LR. */
+				LR &= tmp;
+
+			if (((MAR & 0000600) >> 7) == 2)
+				/* (1.4) SHR = Shift the AC right one place, i.e. multiply the AC
+				    by 2^-1 */
+				AC >>= 1;
+
+			if (((MAR & 0000600) >> 7) == 3)
+				/* (1.4) CYR = Cycle the AC right one digital position (AC(17) will
+				    become AC(0)) */
+				AC = (AC >> 1) | ((AC & 1) << 17);
+
+			if (MAR & 0000020)
+				/* (1.4) PAD = Partial add AC to MBR, that is, for every digital
+				    position of the MBR that contains a one, complement the digit
+				    in the corresponding digital position of the AC.  This is also
+				    called a half add. */
+				AC ^= MBR;
+
+			if (MAR & 0000010)
+			{   /* (1.7) CRY = Partial add the 18 digits of the AC to the
+			        corresponding 18 digits of the carry.
+
+			        To determine what the 18 digits of the carry are, use the
+			        following rule:
+
+			        "Grouping the AC and MBR digits into pairs and proceeding from
+			        right to left, assign the carry digit of the next pair to a one
+			        if in the present pair MBR = 1 and AC = 0 or if in the present
+			        pair AC = 1 and carry 1.
+
+			        (Note: the 0th digit pair determines the 17th pair's carry
+			        digit)" */
+				AC ^= MBR;
+
+				AC = AC + MBR;
+				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
+			}
+
+			if (((IR & 001) == 01) && ((MAR & 017000) == 010000))
 				/* (1.8) Hlt = Halt the computer */
 				m_run = 0;
 
@@ -639,10 +875,6 @@ void tx0_device::indexed_address_eval()
 {
 	MAR = MAR + XR;
 	MAR = (MAR + (MAR >> 14)) & 0037777;    /* propagate carry around */
-	//if (MAR == 0037777)       /* check for -0 */
-	//  MAR = 0;
-	if (MAR & 0020000)          /* fix negative (right???) */
-		MAR = (MAR + 1) & 0017777;
 }
 
 /* execute one instruction */
@@ -791,6 +1023,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 					/* (5 is undefined) */
 					int index = (MAR & 0007000) >> 9;
 
+					m_ios = 0;
 					call_io_handler(index);
 					m_ioh = 1;
 				}
@@ -837,15 +1070,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 			if (m_cycle)
 			{   /* cycle 1 */
 				AC = tx0_read(MAR) + 1;
-
-				#if 0
-					AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-					if (AC == 0777777)      /* check for -0 (right???) */
-						AC = 0;
-				#else
-					if (AC >= 0777777)
-						AC = (AC + 1) & 0777777;
-				#endif
+				AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 			}
 			else
 			{   /* cycle 2 */
@@ -873,8 +1098,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
 
-			if (AC == 0777777)      /* check for -0 */
-				AC = 0;
 			break;
 
 		case 10:    /* LoaD indeX */
@@ -888,8 +1111,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 			XR = XR + ((MBR & 0017777) | ((MBR >> 4) & 0020000));
 			XR = (XR + (XR >> 14)) & 0037777;   /* propagate carry around */
 
-			//if (XR == 0037777)        /* check for -0 */
-			//  XR = 0;
 			break;
 
 		case 13:    /* Load Lr indeXed */
@@ -940,6 +1161,9 @@ void tx0_8kw_device::execute_instruction_8kw()
 					/* (1.1) TAC = transfer TAC into ac (inclusive or) */
 					AC |= m_tac;
 
+				if ((IR & 002) == 00)
+					MBR = 0; // MBR cleared at 1.1
+
 				if (((IR & 001) == 00) && ((MAR & 017000) == 002000))
 					/* (1.2) TBR = transfer TBR into mbr (inclusive or) */
 					MBR |= m_tbr;
@@ -972,18 +1196,14 @@ void tx0_8kw_device::execute_instruction_8kw()
 						break;
 
 					default:
-						if (LOG)
-							logerror("unrecognized instruction");
+						LOG("unrecognized instruction\n");
 						break;
 					}
 				}
 
 				if (((! (MAR & 0000400)) && (MAR & 0000200)) && ((! (MAR & 0000004)) && (MAR & 0000002)))
-				{   /* LMB and MBL used simultaneously interchange LR and MBR */
-					int tmp = MBR;
-					MBR = LR;
-					LR = tmp;
-				}
+					/* LMB and MBL used simultaneously interchange LR and MBR */
+					std::swap(LR, MBR);
 				else if ((! (MAR & 0000400)) && (MAR & 0000200))
 					/* (1.4) MBL = Transfer MBR contents to LR */
 					LR = MBR;
@@ -999,19 +1219,18 @@ void tx0_8kw_device::execute_instruction_8kw()
 				{
 					switch (MAR & 0000300)
 					{
-					case 0000000:   /* (1.6) CYR = CYcle ac contents Right one binary
+					case 0000200:   /* (1.6) CYR = CYcle ac contents Right one binary
 					                    position (AC(17) -> AC(0)) */
 						AC = (AC >> 1) | ((AC & 1) << 17);
 						break;
 
-					case 0000200:   /* (1.6) CYcle ac contents Right one binary
+					case 0000000:   /* (1.6) SHR = SHift ac contents Right one binary
 					                    position (AC(0) unchanged) */
 						AC = (AC >> 1) | (AC & 0400000);
 						break;
 
 					default:
-						if (LOG)
-							logerror("unrecognized instruction");
+						LOG("unrecognized instruction\n");
 						break;
 					}
 				}
@@ -1027,9 +1246,6 @@ void tx0_8kw_device::execute_instruction_8kw()
 
 					AC = AC + MBR;
 					AC = (AC + (AC >> 18)) & 0777777;   /* propagate carry around */
-
-					if (AC == 0777777)      /* check for -0 */
-						AC = 0;
 				}
 
 				if ((! (MAR & 0000004)) && (MAR & 0000001))
@@ -1085,6 +1301,11 @@ void tx0_device::io_complete()
 std::unique_ptr<util::disasm_interface> tx0_8kw_device::create_disassembler()
 {
 	return std::make_unique<tx0_8kw_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tx0_8kwo_device::create_disassembler()
+{
+	return std::make_unique<tx0_8kwo_disassembler>();
 }
 
 std::unique_ptr<util::disasm_interface> tx0_64kw_device::create_disassembler()

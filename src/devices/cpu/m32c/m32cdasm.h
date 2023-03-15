@@ -51,7 +51,7 @@ private:
 	void dasm_00000001(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, bool indirect_src, bool indirect_dest) const;
 	void dasm_general(std::ostream &stream, offs_t &pc, offs_t &flags, const data_buffer &opcodes, u8 op1, bool indirect_src, bool indirect_dest) const;
 	void dasm_1101(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 op1, bool indirect_src, bool indirect_dest) const;
-	void dasm_111x(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 op1, bool indirect_dest) const;
+	void dasm_111x(std::ostream &stream, offs_t &pc, offs_t &flags, const data_buffer &opcodes, u8 op1, bool indirect_dest) const;
 };
 
 #endif // MAME_CPU_M32C_M32CDASM_H

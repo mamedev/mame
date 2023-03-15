@@ -1,4 +1,5 @@
-MAME is a registered trademark of Gregory Ember.
+MAME is a registered trademark of Gregory Ember.  Other trademarks are
+property of their respective owners.
 
 MAME as a whole is made available under the terms of the GNU General
 Public License.  Individual source files may be made available under
@@ -10,7 +11,7 @@ distributions.
 
 
 MAME
-Copyright (c) 1997-2021 MAMEdev and contributors
+Copyright (c) 1997-2023 MAMEdev and contributors
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 2, as provided
@@ -238,7 +239,7 @@ can include it to GNU GPL or GNU LGPL code.
 
 
 AsmJit - a lightweight library for machine code generation.
-Copyright (c) 2008-2020 The AsmJit Authors
+Copyright (c) 2008-2021 The AsmJit Authors
 
 Nano SVG - Simple stupid SVG parser
 Copyright (c) 2013-14 Mikko Mononen memon@inside.org
@@ -251,7 +252,7 @@ Copyright (c) 2006 and later Cockos Incorporated
 Copyright (c) 1999 D. J. Bernstein
 
 zlib data compression library
-Copyright (c) 1995-2017 Jean-loup Gailly and Mark Adler
+Copyright (C) 1995-2022 Jean-loup Gailly and Mark Adler
 
 This software is provided 'as-is', without any express or implied
 warranty.  In no event will the authors be held liable for any damages

@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "keyboards.h"
+#include "cherry_mx1500.h"
 #include "ec1841.h"
 #include "iskr1030.h"
 #include "keytro.h"
@@ -30,6 +31,7 @@ void pc_at_keyboards(device_slot_interface &device)
 	device.option_add(STR_KBD_IBM_PC_AT_84, PC_KBD_IBM_PC_AT_84);
 	device.option_add(STR_KBD_IBM_3270PC_122, PC_KBD_IBM_3270PC_122);
 	device.option_add(STR_KBD_IBM_PC_AT_101, PC_KBD_IBM_PC_AT_101);
+	device.option_add(STR_KBD_CHERRY_G80_1500, CHERRY_G80_1500);
 }
 
 void ps2_mice(device_slot_interface &device)

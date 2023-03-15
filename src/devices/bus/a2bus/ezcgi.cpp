@@ -13,6 +13,11 @@
 #include "emu.h"
 #include "ezcgi.h"
 
+#include "video/tms9928a.h"
+#include "video/v9938.h"
+
+
+namespace {
 
 /***************************************************************************
     PARAMETERS
@@ -22,12 +27,83 @@
 #define SCREEN_TAG "screen"
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_EZCGI,      a2bus_ezcgi_device,      "a2ezcgi",  "E-Z Color Graphics Interface")
-DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9938, a2bus_ezcgi_9938_device, "a2ezcgi3", "E-Z Color Graphics Interface (TMS9938)")
-DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z Color Graphics Interface (TMS9958)")
+class a2bus_ezcgi_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+	required_device<tms9918a_device> m_tms;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+};
+
+class a2bus_ezcgi_9938_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+	required_device<v9938_device> m_tms;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+};
+
+class a2bus_ezcgi_9958_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+	required_device<v9958_device> m_tms;
+
+private:
+	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+};
 
 #define MSX2_XBORDER_PIXELS     16
 #define MSX2_YBORDER_PIXELS     28
@@ -287,3 +363,14 @@ WRITE_LINE_MEMBER( a2bus_ezcgi_9958_device::tms_irq_w )
 		lower_slot_irq();
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_EZCGI,      device_a2bus_card_interface, a2bus_ezcgi_device,      "a2ezcgi",  "E-Z Color Graphics Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_EZCGI_9938, device_a2bus_card_interface, a2bus_ezcgi_9938_device, "a2ezcgi3", "E-Z Color Graphics Interface (TMS9938)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_EZCGI_9958, device_a2bus_card_interface, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z Color Graphics Interface (TMS9958)")

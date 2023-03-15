@@ -107,7 +107,8 @@ private:
 	void set_output();
 	attotime compute_duration();
 
-	emu_timer *m_timer;
+	emu_timer *m_clear_timer;
+	emu_timer *m_output_timer;
 	int m_connection_type;  /* the hook up type - one of the constants above */
 	double m_res;           /* resistor connected to RCext */
 	double m_cap;           /* capacitor connected to Cext and RCext */

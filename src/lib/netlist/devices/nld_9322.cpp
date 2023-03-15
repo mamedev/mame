@@ -64,18 +64,18 @@ namespace netlist::devices {
 		, m_3(*this, "C")
 		, m_4(*this, "D")
 		{
-			register_subalias("A1", "A.A");
-			register_subalias("B1", "A.B");
-			register_subalias("Y1", "A.Y");
-			register_subalias("A2", "B.A");
-			register_subalias("B2", "B.B");
-			register_subalias("Y2", "B.Y");
-			register_subalias("A3", "C.A");
-			register_subalias("B3", "C.B");
-			register_subalias("Y3", "C.Y");
-			register_subalias("A4", "D.A");
-			register_subalias("B4", "D.B");
-			register_subalias("Y4", "D.Y");
+			register_sub_alias("A1", "A.A");
+			register_sub_alias("B1", "A.B");
+			register_sub_alias("Y1", "A.Y");
+			register_sub_alias("A2", "B.A");
+			register_sub_alias("B2", "B.B");
+			register_sub_alias("Y2", "B.Y");
+			register_sub_alias("A3", "C.A");
+			register_sub_alias("B3", "C.B");
+			register_sub_alias("Y3", "C.Y");
+			register_sub_alias("A4", "D.A");
+			register_sub_alias("B4", "D.B");
+			register_sub_alias("Y4", "D.Y");
 
 			connect("A.VCC", "B.VCC");
 			connect("A.VCC", "C.VCC");
@@ -90,10 +90,10 @@ namespace netlist::devices {
 			connect("A.STROBE", "C.STROBE");
 			connect("A.STROBE", "D.STROBE");
 
-			register_subalias("SELECT", "A.SELECT");
-			register_subalias("STROBE", "A.STROBE");
-			register_subalias("GND", "A.GND");
-			register_subalias("VCC", "B.VCC");
+			register_sub_alias("SELECT", "A.SELECT");
+			register_sub_alias("STROBE", "A.STROBE");
+			register_sub_alias("GND", "A.GND");
+			register_sub_alias("VCC", "B.VCC");
 		}
 
 	private:

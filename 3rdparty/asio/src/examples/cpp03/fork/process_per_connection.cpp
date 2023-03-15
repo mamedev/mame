@@ -2,7 +2,7 @@
 // process_per_connection.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +13,7 @@
 #include <asio/signal_set.hpp>
 #include <asio/write.hpp>
 #include <boost/array.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <sys/types.h>
@@ -58,7 +58,7 @@ private:
   void start_accept()
   {
     acceptor_.async_accept(socket_,
-        boost::bind(&server::handle_accept, this, _1));
+        boost::bind(&server::handle_accept, this, boost::placeholders::_1));
   }
 
   void handle_accept(const asio::error_code& ec)
@@ -108,7 +108,8 @@ private:
   void start_read()
   {
     socket_.async_read_some(asio::buffer(data_),
-        boost::bind(&server::handle_read, this, _1, _2));
+        boost::bind(&server::handle_read, this,
+          boost::placeholders::_1, boost::placeholders::_2));
   }
 
   void handle_read(const asio::error_code& ec, std::size_t length)
@@ -120,7 +121,7 @@ private:
   void start_write(std::size_t length)
   {
     asio::async_write(socket_, asio::buffer(data_, length),
-        boost::bind(&server::handle_write, this, _1));
+        boost::bind(&server::handle_write, this, boost::placeholders::_1));
   }
 
   void handle_write(const asio::error_code& ec)

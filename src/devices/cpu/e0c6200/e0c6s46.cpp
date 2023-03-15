@@ -83,11 +83,11 @@ void e0c6s46_device::device_start()
 	m_pixel_update_cb.resolve();
 
 	// create timers
-	m_core_256_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::core_256_cb), this));
+	m_core_256_handle = timer_alloc(FUNC(e0c6s46_device::core_256_cb), this);
 	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
-	m_prgtimer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::prgtimer_cb), this));
+	m_prgtimer_handle = timer_alloc(FUNC(e0c6s46_device::prgtimer_cb), this);
 	m_prgtimer_handle->adjust(attotime::never);
-	m_buzzer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::buzzer_cb), this));
+	m_buzzer_handle = timer_alloc(FUNC(e0c6s46_device::buzzer_cb), this);
 	m_buzzer_handle->adjust(attotime::never);
 
 	// zerofill

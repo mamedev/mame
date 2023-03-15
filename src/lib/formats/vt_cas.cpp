@@ -2,8 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 #include "formats/vt_cas.h"
 
-#include <cassert>
-
 /*********************************************************************
     vtech 1/2 agnostic
 *********************************************************************/

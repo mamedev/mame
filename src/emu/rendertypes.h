@@ -20,6 +20,16 @@
 //**************************************************************************
 
 
+// texture formats
+enum texture_format
+{
+	TEXFORMAT_UNDEFINED = 0,                            // require a format to be specified
+	TEXFORMAT_PALETTE16,                                // 16bpp palettized, no alpha
+	TEXFORMAT_RGB32,                                    // 32bpp 8-8-8 RGB
+	TEXFORMAT_ARGB32,                                   // 32bpp 8-8-8-8 ARGB
+	TEXFORMAT_YUY16                                     // 16bpp 8-8 Y/Cb, Y/Cr in sequence
+};
+
 // blending modes
 enum
 {

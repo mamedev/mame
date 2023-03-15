@@ -19,8 +19,8 @@
 
 #include "imagedev/floppy.h"
 
-#include "corestr.h"
-#include "zippath.h"
+#include "util/corestr.h"
+#include "util/zippath.h"
 
 #include <cstring>
 #include <locale>
@@ -59,6 +59,7 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &c
 	, m_result(result)
 {
 	(void)m_image;
+	set_process_flags(PROCESS_IGNOREPAUSE);
 }
 
 
@@ -72,13 +73,26 @@ menu_file_selector::~menu_file_selector()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// set up custom render proc
+	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
 void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// lay out extra text
-	auto layout = ui().create_layout(container());
+	auto layout = create_layout();
 	layout.add_text(m_current_directory);
 
 	// position this extra text
@@ -89,8 +103,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += ui().box_lr_border() * machine().render().ui_aspect(&container());
-	y1 += ui().box_tb_border();
+	x1 += lr_border();
+	y1 += tb_border();
 
 	size_t hit_start = 0, hit_span = 0;
 	if (is_mouse_hit()
@@ -132,45 +146,6 @@ bool menu_file_selector::custom_mouse_down()
 	}
 
 	return false;
-}
-
-
-//-------------------------------------------------
-//  compare_file_selector_entries - sorting proc
-//  for file selector entries
-//-------------------------------------------------
-
-int menu_file_selector::compare_entries(const file_selector_entry *e1, const file_selector_entry *e2)
-{
-	int result;
-	const char *e1_basename = e1->basename.c_str();
-	const char *e2_basename = e2->basename.c_str();
-
-	if (e1->type < e2->type)
-	{
-		result = -1;
-	}
-	else if (e1->type > e2->type)
-	{
-		result = 1;
-	}
-	else
-	{
-		result = core_stricmp(e1_basename, e2_basename);
-		if (result == 0)
-		{
-			result = strcmp(e1_basename, e2_basename);
-			if (result == 0)
-			{
-				if (e1 < e2)
-					result = -1;
-				else if (e1 > e2)
-					result = 1;
-			}
-		}
-	}
-
-	return result;
 }
 
 
@@ -316,8 +291,8 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 		{
 			// drive/directory - first check the path
 			util::zippath_directory::ptr dir;
-			osd_file::error const err = util::zippath_directory::open(entry.fullpath, dir);
-			if (err != osd_file::error::NONE)
+			std::error_condition const err = util::zippath_directory::open(entry.fullpath, dir);
+			if (err)
 			{
 				// this path is problematic; present the user with an error and bail
 				ui().popup_time(1, _("Error accessing %s"), entry.fullpath);
@@ -342,44 +317,40 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 //  type_search_char
 //-------------------------------------------------
 
-void menu_file_selector::type_search_char(char32_t ch)
+void menu_file_selector::update_search()
 {
-	std::string const current(m_filename);
-	if (input_character(m_filename, ch, uchar_is_printable))
+	ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+
+	file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
+
+	// if it's a perfect match for the current selection, don't move it
+	if (!cur_selected || core_strnicmp(cur_selected->basename.c_str(), m_filename.c_str(), m_filename.size()))
 	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
-
-		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
-
-		// if it's a perfect match for the current selection, don't move it
-		if (!cur_selected || core_strnicmp(cur_selected->basename.c_str(), m_filename.c_str(), m_filename.size()))
+		std::string::size_type bestmatch(0);
+		file_selector_entry const *selected_entry(cur_selected);
+		for (auto &entry : m_entrylist)
 		{
-			std::string::size_type bestmatch(0);
-			file_selector_entry const *selected_entry(cur_selected);
-			for (auto &entry : m_entrylist)
+			// TODO: more efficient "common prefix" code
+			std::string::size_type match(0);
+			for (std::string::size_type i = 1; m_filename.size() >= i; ++i)
 			{
-				// TODO: more efficient "common prefix" code
-				std::string::size_type match(0);
-				for (std::string::size_type i = 1; m_filename.size() >= i; ++i)
-				{
-					if (!core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i))
-						match = i;
-					else
-						break;
-				}
-
-				if (match > bestmatch)
-				{
-					bestmatch = match;
-					selected_entry = &entry;
-				}
+				if (!core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i))
+					match = i;
+				else
+					break;
 			}
 
-			if (selected_entry && (selected_entry != cur_selected))
+			if (match > bestmatch)
 			{
-				set_selection((void *)selected_entry);
-				centre_selection();
+				bestmatch = match;
+				selected_entry = &entry;
 			}
+		}
+
+		if (selected_entry && (selected_entry != cur_selected))
+		{
+			set_selection((void *)selected_entry);
+			centre_selection();
 		}
 	}
 }
@@ -389,24 +360,23 @@ void menu_file_selector::type_search_char(char32_t ch)
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate(float &customtop, float &custombottom)
+void menu_file_selector::populate()
 {
 	const file_selector_entry *selected_entry = nullptr;
-
 
 	// clear out the menu entries
 	m_entrylist.clear();
 
 	// open the directory
 	util::zippath_directory::ptr directory;
-	osd_file::error const err = util::zippath_directory::open(m_current_directory, directory);
+	std::error_condition const err = util::zippath_directory::open(m_current_directory, directory);
 
 	// add the "[empty slot]" entry if available
 	if (m_has_empty)
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 
 	// add the "[create]" entry
-	if (m_has_create && !directory->is_archive())
+	if (m_has_create && directory && !directory->is_archive())
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 
 	// add and select the "[software list]" entry if available
@@ -421,9 +391,11 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	std::size_t const first = m_entrylist.size() + 1;
 
 	// build the menu for each item
-	if (osd_file::error::NONE != err)
+	if (err)
 	{
-		osd_printf_verbose("menu_file_selector::populate: error opening directory '%s' (%d)\n", m_current_directory, int(err));
+		osd_printf_verbose(
+				"menu_file_selector::populate: error opening directory '%s' (%s:%d %s)\n",
+				m_current_directory, err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -438,24 +410,27 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 					selected_entry = entry;
 
 				// do we have to select this file?
-				if (!core_stricmp(m_current_file.c_str(), dirent->name))
+				if (!core_stricmp(m_current_file, dirent->name))
 					selected_entry = entry;
 			}
 		}
 	}
 	directory.reset();
 
-	// sort the menu entries
-	const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
-	std::sort(
-			m_entrylist.begin() + first,
-			m_entrylist.end(),
-			[&coll] (file_selector_entry const &x, file_selector_entry const &y)
-			{
-				std::wstring const xstr = wstring_from_utf8(x.basename);
-				std::wstring const ystr = wstring_from_utf8(y.basename);
-				return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
-			});
+	if (m_entrylist.size() > first)
+	{
+		// sort the menu entries
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+		std::sort(
+				m_entrylist.begin() + first,
+				m_entrylist.end(),
+				[&coll] (file_selector_entry const &x, file_selector_entry const &y)
+				{
+					std::wstring const xstr = wstring_from_utf8(x.basename);
+					std::wstring const ystr = wstring_from_utf8(y.basename);
+					return coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size()) < 0;
+				});
+	}
 
 	// append all of the menu entries
 	for (file_selector_entry const &entry : m_entrylist)
@@ -464,9 +439,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	// set the selection (if we have one)
 	if (selected_entry)
 		set_selection((void *)selected_entry);
-
-	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -474,31 +446,49 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_selector::handle()
+bool menu_file_selector::handle(event const *ev)
 {
-	// process the menu
-	event const *const event = process(0);
-	if (event && event->itemref)
-	{
-		// handle selections
-		if (event->iptkey == IPT_UI_SELECT)
-		{
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
+	if (!ev)
+		return false;
 
-			// reset the char buffer when pressing IPT_UI_SELECT
-			m_filename.clear();
-		}
-		else if (event->iptkey == IPT_SPECIAL)
+	if (ev->iptkey == IPT_SPECIAL)
+	{
+		// if it's any other key and we're not maxed out, update
+		if (input_character(m_filename, ev->unichar, uchar_is_printable))
 		{
-			// if it's any other key and we're not maxed out, update
-			type_search_char(event->unichar);
-		}
-		else if (event->iptkey == IPT_UI_CANCEL)
-		{
-			// reset the char buffer also in this case
-			m_filename.clear();
+			update_search();
+			return true;
 		}
 	}
+	else if (ev->iptkey == IPT_UI_PASTE)
+	{
+		if (paste_text(m_filename, uchar_is_printable))
+		{
+			update_search();
+			return true;
+		}
+	}
+	else if (ev->iptkey == IPT_UI_CANCEL)
+	{
+		// reset the char buffer also in this case
+		if (!m_filename.empty())
+		{
+			m_filename.clear();
+			ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+			return true;
+		}
+	}
+	else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
+	{
+		// handle selections
+		select_item(*reinterpret_cast<file_selector_entry const *>(ev->itemref));
+
+		// reset the char buffer when pressing IPT_UI_SELECT
+		m_filename.clear();
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -533,7 +523,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate(float &customtop, float &custombottom)
+void menu_select_rw::populate()
 {
 	item_append(_("Select access mode"), FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), 0, itemref_from_result(result::READONLY));
@@ -548,15 +538,15 @@ void menu_select_rw::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_rw::handle()
+bool menu_select_rw::handle(event const *ev)
 {
-	// process the menu
-	const event *event = process(0);
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (ev && ev->iptkey == IPT_UI_SELECT)
 	{
-		m_result = result_from_itemref(event->itemref);
+		m_result = result_from_itemref(ev->itemref);
 		stack_pop();
 	}
+
+	return false;
 }
 
 

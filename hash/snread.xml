@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="snread" description="Speak &amp; Read modules">
-
 
 	<software name="dogonlog">
 		<description>A Dog on a Log</description>
@@ -102,6 +101,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

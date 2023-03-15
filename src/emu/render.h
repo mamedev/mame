@@ -47,18 +47,11 @@
 #define MAME_EMU_RENDER_H
 
 #include "rendertypes.h"
-#include "screen.h"
 
-#include <array>
 #include <cmath>
-#include <functional>
-#include <map>
+#include <list>
 #include <memory>
 #include <mutex>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -164,6 +157,7 @@ struct render_texinfo
 	void *              base;               // base of the data
 	u32                 rowpixels;          // pixels per row
 	u32                 width;              // width of the image
+	u32                 width_margin;       // left margin of the scaled bounds, if applicable
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
 	u64                 unique_id;          // unique identifier to pass to osd
@@ -312,7 +306,6 @@ private:
 // a render_texture is used to track transformations when building an object list
 class render_texture
 {
-	friend resource_pool_object<render_texture>::~resource_pool_object();
 	friend class simple_list<render_texture>;
 	friend class fixed_allocator<render_texture>;
 	friend class render_manager;
@@ -347,7 +340,7 @@ private:
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
-	static constexpr int MAX_TEXTURE_SCALES = 20;
+	static constexpr int MAX_TEXTURE_SCALES = 100;
 
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
@@ -378,16 +371,14 @@ private:
 // a render_container holds a list of items and an orientation for the entire collection
 class render_container
 {
-	friend resource_pool_object<render_container>::~resource_pool_object();
-	friend class simple_list<render_container>;
 	friend class render_manager;
 	friend class render_target;
 
+public:
 	// construction/destruction
 	render_container(render_manager &manager, screen_device *screen = nullptr);
 	~render_container();
 
-public:
 	// user settings describes the collected user-controllable settings
 	struct user_settings
 	{
@@ -406,7 +397,6 @@ public:
 	};
 
 	// getters
-	render_container *next() const { return m_next; }
 	screen_device *screen() const { return m_screen; }
 	render_manager &manager() const { return m_manager; }
 	render_texture *overlay() const { return m_overlaytexture; }
@@ -480,7 +470,6 @@ private:
 	void update_palette();
 
 	// internal state
-	render_container *      m_next;                 // the next container in the list
 	render_manager &        m_manager;              // reference back to the owning manager
 	simple_list<item>       m_itemlist;             // head of the item list
 	fixed_allocator<item>   m_item_allocator;       // free container items
@@ -499,7 +488,6 @@ private:
 // a render_target describes a surface that is being rendered to
 class render_target
 {
-	friend resource_pool_object<render_target>::~resource_pool_object();
 	friend class simple_list<render_target>;
 	friend class render_manager;
 
@@ -567,11 +555,6 @@ public:
 	// reference tracking
 	void invalidate_all(void *refptr);
 
-	// debug containers
-	render_container *debug_alloc();
-	void debug_free(render_container &container);
-	void debug_append(render_container &container);
-
 	// resolve tag lookups
 	void resolve_tags();
 
@@ -593,11 +576,11 @@ private:
 	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
 	bool load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
-	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
+	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_view_item &item);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
 
 	// config callbacks
-	void config_load(util::xml::data_node const &targetnode);
+	void config_load(util::xml::data_node const *targetnode);
 	bool config_save(util::xml::data_node &targetnode);
 
 	// view lookups
@@ -617,7 +600,7 @@ private:
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
-	std::unique_ptr<std::list<layout_file>> m_filelist; // list of layout files
+	std::list<layout_file>  m_filelist;                 // list of layout files
 	view_mask_vector        m_views;                    // views we consider
 	unsigned                m_curview;                  // current view index
 	u32                     m_flags;                    // creation flags
@@ -641,7 +624,6 @@ private:
 	render_layer_config     m_base_layerconfig;         // the layer configuration at the time of first frame
 	int                     m_maxtexwidth;              // maximum width of a texture
 	int                     m_maxtexheight;             // maximum height of a texture
-	simple_list<render_container> m_debug_containers;   // list of debug containers
 	s32                     m_clear_extent_count;       // number of clear extents
 	s32                     m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
@@ -674,7 +656,7 @@ public:
 	render_target *target_alloc(util::xml::data_node const &layout, u32 flags = 0);
 	void target_free(render_target *target);
 	const simple_list<render_target> &targets() const { return m_targetlist; }
-	render_target *first_target() const { return m_targetlist.first(); }
+	render_target *first_target() { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;
 
 	// UI targets
@@ -699,12 +681,8 @@ public:
 	void resolve_tags();
 
 private:
-	// containers
-	render_container *container_alloc(screen_device *screen = nullptr);
-	void container_free(render_container *container);
-
 	// config callbacks
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// internal state
@@ -720,8 +698,8 @@ private:
 	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens
-	render_container *              m_ui_container;     // UI container
-	simple_list<render_container>   m_screen_container_list; // list of containers for the screen
+	std::unique_ptr<render_container> m_ui_container;   // UI container
+	std::list<render_container>     m_screen_container_list; // list of containers for the screen
 };
 
 #endif  // MAME_EMU_RENDER_H

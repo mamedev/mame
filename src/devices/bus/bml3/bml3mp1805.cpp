@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "bml3mp1805.h"
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
     PARAMETERS

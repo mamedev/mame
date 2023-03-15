@@ -991,7 +991,7 @@ offs_t v850_disassembler::disassemble(std::ostream &stream, offs_t pc, const v85
 	{
 		s16 disp9 = s8((opcode & 0xf800) >> 8 | (opcode & 0x0070) >> 4) * 2;
 		util::stream_format(stream, "%-8s0x%08X", s_bconds[BIT(opcode, 0, 4)], pc + disp9);
-		return 2 | SUPPORTED;
+		return 2 | (BIT(opcode, 0, 4) != 0b0101 ? STEP_COND : 0) | SUPPORTED;
 	}
 
 	case 0b1100:

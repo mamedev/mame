@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(nes_only);
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="neocd" description="SNK NeoGeo CD CD-ROMs">
 
@@ -10,7 +10,7 @@ license:CC0
 
 
 	<software name="pbobble">
-		<description>Bust-A-Move (USA) ~ Puzzle Bobble (Jpn)</description>
+		<description>Bust-A-Move (USA) ~ Puzzle Bobble (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="パズルボブル" />
@@ -24,7 +24,7 @@ license:CC0
 	</software>
 
 	<software name="lbowling">
-		<description>League Bowling (Jpn, USA)</description>
+		<description>League Bowling (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リーグボウリング" />
@@ -38,7 +38,7 @@ license:CC0
 	</software>
 
 	<software name="crsword2">
-		<description>Crossed Swords II (Jpn)</description>
+		<description>Crossed Swords II (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="クロススウォードII" />
@@ -52,7 +52,7 @@ license:CC0
 	</software>
 
 	<software name="zintrick">
-		<description>Oshidashi Zintrick (Jpn)</description>
+		<description>Oshidashi Zintrick (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="押し出しジントリック" />
@@ -66,7 +66,7 @@ license:CC0
 	</software>
 
 	<software name="fromanc2">
-		<description>Idol Mahjong Final Romance 2 (Jpn)</description>
+		<description>Idol Mahjong Final Romance 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<info name="alt_title" value="アイドル麻雀 ファイナルロマンス2" />
@@ -80,7 +80,7 @@ license:CC0
 	</software>
 
 	<software name="lasthope">
-		<description>Last Hope (Euro)</description>
+		<description>Last Hope (Europe)</description>
 		<year>2007</year>
 		<publisher>NG:DEV.TEAM</publisher>
 		<part name="cdrom" interface="neocd_cdrom">
@@ -91,7 +91,7 @@ license:CC0
 	</software>
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger (Jpn)</description>
+		<description>Choutetsu Brikin'ger (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="超鉄ブリキンガー" />
@@ -105,7 +105,7 @@ license:CC0
 	</software>
 
 	<software name="ngcdspec">
-		<description>Neo Geo CD Special (Jpn)</description>
+		<description>Neo Geo CD Special (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGCD-205" />
@@ -119,7 +119,7 @@ license:CC0
 
 
 	<software name="kof96col">
-		<description>The King of Fighters '96 NEOGEO Collection (Jpn)</description>
+		<description>The King of Fighters '96 NEOGEO Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96 ネオジオコレクション" />
@@ -133,7 +133,7 @@ license:CC0
 	</software>
 
 	<software name="trally">
-		<description>Rally Chase (Jpn)</description>
+		<description>Rally Chase (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ラリーチェイス" />
@@ -147,7 +147,7 @@ license:CC0
 	</software>
 
 	<software name="adkworld">
-		<description>ADK World (Jpn)</description>
+		<description>ADK World (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="エーディーケイワールド" />
@@ -161,7 +161,7 @@ license:CC0
 	</software>
 
 	<software name="samsprpg">
-		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Jpn)</description>
+		<description>Shinsetsu Samurai Spirits - Bushidou Retsuden (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="真説サムライスピリッツ 武士道烈伝" />
@@ -175,7 +175,7 @@ license:CC0
 	</software>
 
 	<software name="2020bb">
-		<description>2020 Super Baseball (Jpn, USA)</description>
+		<description>2020 Super Baseball (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="2020年スーパーベースボール" />
@@ -189,7 +189,7 @@ license:CC0
 	</software>
 
 	<software name="3countb">
-		<description>3 Count Bout (USA) ~ Fire Suplex (Jpn)</description>
+		<description>3 Count Bout (USA) ~ Fire Suplex (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ファイヤー・スープレックス" />
@@ -203,7 +203,7 @@ license:CC0
 	</software>
 
 	<software name="sonicwi2">
-		<description>Aero Fighters 2 (USA) ~ Sonic Wings 2 (Jpn)</description>
+		<description>Aero Fighters 2 (USA) ~ Sonic Wings 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ソニックウイングス2" />
@@ -217,7 +217,7 @@ license:CC0
 	</software>
 
 	<software name="sonicwi3">
-		<description>Aero Fighters 3 (USA) ~ Sonic Wings 3 (Jpn)</description>
+		<description>Aero Fighters 3 (USA) ~ Sonic Wings 3 (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ソニックウイングス3" />
@@ -231,7 +231,7 @@ license:CC0
 	</software>
 
 	<software name="aodk">
-		<description>Aggressors of Dark Kombat (USA) ~ Tsuukai GanGan Koushinkyoku (Jpn)</description>
+		<description>Aggressors of Dark Kombat (USA) ~ Tsuukai GanGan Koushinkyoku (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="痛快ガンガン行進曲" />
@@ -245,7 +245,7 @@ license:CC0
 	</software>
 
 	<software name="alpham2">
-		<description>Alpha Mission II (USA) ~ ASO II - Last Guardian (Jpn)</description>
+		<description>Alpha Mission II (USA) ~ ASO II - Last Guardian (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ASO II - ラストガーディアン" />
@@ -259,7 +259,7 @@ license:CC0
 	</software>
 
 	<software name="aof">
-		<description>Ryuuko no Ken (Jpn)</description>
+		<description>Ryuuko no Ken (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="龍虎の拳" />
@@ -273,7 +273,7 @@ license:CC0
 	</software>
 
 	<software name="aof2">
-		<description>Art of Fighting 2 (USA) ~ Ryuuko no Ken 2 (Jpn)</description>
+		<description>Art of Fighting 2 (USA) ~ Ryuuko no Ken 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="龍虎の拳2" />
@@ -287,7 +287,7 @@ license:CC0
 	</software>
 
 	<software name="aof3">
-		<description>Art of Fighting - Ryuuko no Ken Gaiden (Jpn)</description>
+		<description>Art of Fighting - Ryuuko no Ken Gaiden (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
@@ -301,7 +301,7 @@ license:CC0
 	</software>
 
 	<software name="aof3a" cloneof="aof3">
-		<description>Art of Fighting 3 - Path of the Warrior (USA) ~ Art of Fighting - Ryuuko no Ken Gaiden (Jpn)</description>
+		<description>Art of Fighting 3 - Path of the Warrior (USA) ~ Art of Fighting - Ryuuko no Ken Gaiden (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
@@ -316,7 +316,7 @@ license:CC0
 
 	<!-- Resets after loading? -->
 	<software name="lastbld2" supported="no">
-		<description>Bakumatsu Roman Daini Maku - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Jpn)</description>
+		<description>Bakumatsu Roman Daini Maku - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="幕末浪漫第二幕 月華の剣士 月に咲く華、散りゆく花" />
@@ -330,7 +330,7 @@ license:CC0
 	</software>
 
 	<software name="bstars2">
-		<description>Baseball Stars 2 (Jpn, USA)</description>
+		<description>Baseball Stars 2 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ベースボールスターズ2" />
@@ -344,7 +344,7 @@ license:CC0
 	</software>
 
 	<software name="bstars">
-		<description>Baseball Stars Professional (Jpn, USA)</description>
+		<description>Baseball Stars Professional (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ベースボールスターズ プロフェッショナル" />
@@ -358,7 +358,7 @@ license:CC0
 	</software>
 
 	<software name="breakers">
-		<description>Breakers (Jpn)</description>
+		<description>Breakers (Japan)</description>
 		<year>1997</year>
 		<publisher>Visco</publisher>
 		<info name="alt_title" value="ブレイカーズ" />
@@ -372,7 +372,7 @@ license:CC0
 	</software>
 
 	<software name="burningf">
-		<description>Burning Fight (Jpn, USA)</description>
+		<description>Burning Fight (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="バーニングファイト" />
@@ -386,7 +386,7 @@ license:CC0
 	</software>
 
 	<software name="totc">
-		<description>Treasure of the Caribbean (Fra)</description>
+		<description>Treasure of the Caribbean (France)</description>
 		<year>2011?</year>
 		<publisher>Neo Conception International</publisher>
 		<part name="cdrom" interface="neocd_cdrom">
@@ -399,7 +399,7 @@ license:CC0
 
 
 	<software name="crsword">
-		<description>Crossed Swords (Jpn)</description>
+		<description>Crossed Swords (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="クロスソード" />
@@ -415,7 +415,7 @@ license:CC0
 
 
 	<software name="cyberlip">
-		<description>Cyber-Lip (Jpn, USA)</description>
+		<description>Cyber-Lip (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サイバーリップ" />
@@ -431,7 +431,7 @@ license:CC0
 	<!-- Hangs during loading due to erasing vectors -->
 	<!-- TODO: user reports indicate this is a bad dump (also hangs in FBA) and CHDs made from other sources play fine in MAME -->
 	<software name="doubledr" supported="no">
-		<description>Double Dragon (Jpn, USA)</description>
+		<description>Double Dragon (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ダブルドラゴン" />
@@ -445,7 +445,7 @@ license:CC0
 	</software>
 
 	<software name="fatfury1">
-		<description>Fatal Fury - The Battle of Fury (USA) ~ Garou Densetsu - Shukumei no Tatakai (Jpn)</description>
+		<description>Fatal Fury - The Battle of Fury (USA) ~ Garou Densetsu - Shukumei no Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説 宿命の闘い" />
@@ -459,7 +459,7 @@ license:CC0
 	</software>
 
 	<software name="fatfury2">
-		<description>Fatal Fury 2 (USA) ~ Garou Densetsu 2 - Aratanaru Tatakai (Jpn)</description>
+		<description>Fatal Fury 2 (USA) ~ Garou Densetsu 2 - Aratanaru Tatakai (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説2 ―新たなる闘い―" />
@@ -474,7 +474,7 @@ license:CC0
 
 	<!-- Copy protection failure, select demo mode and leave it for a few cycles to see -->
 	<software name="fatfury3" supported="no">
-		<description>Fatal Fury 3 - Road to the Final Victory (USA) ~ Garou Densetsu 3 - Harukanaru Tatakai (Jpn)</description>
+		<description>Fatal Fury 3 - Road to the Final Victory (USA) ~ Garou Densetsu 3 - Harukanaru Tatakai (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説3―遥かなる闘い―" />
@@ -500,7 +500,7 @@ license:CC0
 	</software>
 
 	<software name="fatfursp">
-		<description>Fatal Fury Special (USA) ~ Garou Densetsu Special (Jpn)</description>
+		<description>Fatal Fury Special (USA) ~ Garou Densetsu Special (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="餓狼伝説 スペシャル" />
@@ -514,7 +514,7 @@ license:CC0
 	</software>
 
 	<software name="fbfrenzy">
-		<description>Football Frenzy (Jpn, USA)</description>
+		<description>Football Frenzy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="フットボールフレンジー" />
@@ -528,7 +528,7 @@ license:CC0
 	</software>
 
 	<software name="pgoal">
-		<description>Futsal - 5 on 5 Mini Soccer (Jpn)</description>
+		<description>Futsal - 5 on 5 Mini Soccer (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="フットサル" />
@@ -542,7 +542,7 @@ license:CC0
 	</software>
 
 	<software name="galaxyfg">
-		<description>Galaxy Fight - Universal Warriors (Jpn, USA)</description>
+		<description>Galaxy Fight - Universal Warriors (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="alt_title" value="ギャラクシーファイト ユニバーサル ウォリアーズ" />
@@ -556,7 +556,7 @@ license:CC0
 	</software>
 
 	<software name="gpilots">
-		<description>Ghost Pilots (Jpn)</description>
+		<description>Ghost Pilots (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ゴーストパイロット" />
@@ -571,7 +571,7 @@ license:CC0
 
 
 	<software name="janshin">
-		<description>Janshin Densetsu - Quest of the Jongmaster (Jpn)</description>
+		<description>Janshin Densetsu - Quest of the Jongmaster (Japan)</description>
 		<year>1995</year>
 		<publisher>Aicom</publisher>
 		<info name="alt_title" value="雀神伝説" />
@@ -585,7 +585,7 @@ license:CC0
 	</software>
 
 	<software name="karnovr">
-		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Jpn)</description>
+		<description>Karnov's Revenge (USA) ~ Fighter's History Dynamite (Japan)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト" />
@@ -599,7 +599,7 @@ license:CC0
 	</software>
 
 	<software name="kof94">
-		<description>The King of Fighters '94 (Jpn, USA)</description>
+		<description>The King of Fighters '94 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
@@ -613,7 +613,7 @@ license:CC0
 	</software>
 
 	<software name="kof94a" cloneof="kof94">
-		<description>The King of Fighters '94 (Jpn, USA, Alt)</description>
+		<description>The King of Fighters '94 (Japan, USA, alt)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
@@ -627,7 +627,7 @@ license:CC0
 	</software>
 
 	<software name="kof95">
-		<description>The King of Fighters '95 (Jpn, USA)</description>
+		<description>The King of Fighters '95 (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
@@ -641,7 +641,7 @@ license:CC0
 	</software>
 
 	<software name="kof95a" cloneof="kof95">
-		<description>The King of Fighters '95 (Jpn, USA, Alt)</description>
+		<description>The King of Fighters '95 (Japan, USA, alt)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
@@ -655,7 +655,7 @@ license:CC0
 	</software>
 
 	<software name="kof96">
-		<description>The King of Fighters '96 (Jpn)</description>
+		<description>The King of Fighters '96 (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
@@ -669,7 +669,7 @@ license:CC0
 	</software>
 
 	<software name="kof96a" cloneof="kof96">
-		<description>The King of Fighters '96 (Jpn, USA)</description>
+		<description>The King of Fighters '96 (Japan, USA)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
@@ -683,7 +683,7 @@ license:CC0
 	</software>
 
 	<software name="kof97">
-		<description>The King of Fighters '97 (Jpn)</description>
+		<description>The King of Fighters '97 (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97" />
@@ -697,7 +697,7 @@ license:CC0
 	</software>
 
 	<software name="kof98">
-		<description>The King of Fighters '98 - Dream Match Never Ends (Jpn)</description>
+		<description>The King of Fighters '98 - Dream Match Never Ends (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '98" />
@@ -711,7 +711,7 @@ license:CC0
 	</software>
 
 	<software name="kof99">
-		<description>The King of Fighters '99 - Millennium Battle (Jpn)</description>
+		<description>The King of Fighters '99 - Millennium Battle (Japan)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '99" />
@@ -725,7 +725,7 @@ license:CC0
 	</software>
 
 	<software name="kotm2">
-		<description>King of the Monsters 2 (Jpn, USA)</description>
+		<description>King of the Monsters 2 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="キング・オブ・ザ・モンスターズ2 ―ネクストシング―" />
@@ -739,7 +739,7 @@ license:CC0
 	</software>
 
 	<software name="lastblad">
-		<description>Bakumatsu Roman - Gekka no Kenshi (Jpn)</description>
+		<description>Bakumatsu Roman - Gekka no Kenshi (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="幕末浪漫 月華の剣士" />
@@ -753,7 +753,7 @@ license:CC0
 	</software>
 
 	<software name="lresort">
-		<description>Last Resort (Jpn, USA)</description>
+		<description>Last Resort (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ラストリゾート" />
@@ -767,7 +767,7 @@ license:CC0
 	</software>
 
 	<software name="magdrop2">
-		<description>Magical Drop 2 (Jpn)</description>
+		<description>Magical Drop 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="マジカルドロップ2" />
@@ -781,7 +781,7 @@ license:CC0
 	</software>
 
 	<software name="maglord">
-		<description>Magician Lord (Jpn)</description>
+		<description>Magician Lord (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="マジシャンロード" />
@@ -795,7 +795,7 @@ license:CC0
 	</software>
 
 	<software name="mahretsu">
-		<description>Mahjong Kyo Retsuden - Nishi Nihon Hen (Jpn)</description>
+		<description>Mahjong Kyo Retsuden - Nishi Nihon Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="麻雀狂列伝 ―西日本編―" />
@@ -809,7 +809,7 @@ license:CC0
 	</software>
 
 	<software name="mslug">
-		<description>Metal Slug (Jpn, USA)</description>
+		<description>Metal Slug (Japan, USA)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="メタルスラッグ" />
@@ -823,7 +823,7 @@ license:CC0
 	</software>
 
 	<software name="mslug2">
-		<description>Metal Slug 2 (Jpn)</description>
+		<description>Metal Slug 2 (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="メタルスラッグ2" />
@@ -837,7 +837,7 @@ license:CC0
 	</software>
 
 	<software name="mutnat">
-		<description>Mutation Nation (Jpn, USA)</description>
+		<description>Mutation Nation (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ミューテイション ネイション" />
@@ -851,7 +851,7 @@ license:CC0
 	</software>
 
 	<software name="nam1975">
-		<description>NAM-1975 (Jpn, USA)</description>
+		<description>NAM-1975 (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ナム-1975" />
@@ -865,7 +865,7 @@ license:CC0
 	</software>
 
 	<software name="neodrift">
-		<description>Neo DriftOut (Jpn)</description>
+		<description>Neo DriftOut (Japan)</description>
 		<year>1996</year>
 		<publisher>Visco</publisher>
 		<info name="alt_title" value="NEOドリフトアウト" />
@@ -881,7 +881,7 @@ license:CC0
 
 
 	<software name="turfmast">
-		<description>Big Tournament Golf (Jpn)</description>
+		<description>Big Tournament Golf (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ビッグトーナメントゴルフ" />
@@ -895,7 +895,7 @@ license:CC0
 	</software>
 
 	<software name="ncombat">
-		<description>Ninja Combat (Jpn)</description>
+		<description>Ninja Combat (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャコンバット" />
@@ -909,7 +909,7 @@ license:CC0
 	</software>
 
 	<software name="ncommand">
-		<description>Ninja Commando (Jpn)</description>
+		<description>Ninja Commando (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャコマンドー" />
@@ -923,7 +923,7 @@ license:CC0
 	</software>
 
 	<software name="ninjamas">
-		<description>Ninja Master's - Haou Ninpou-Chou (Jpn)</description>
+		<description>Ninja Master's - Haou Ninpou-Chou (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ニンジャマスターズ 覇王忍法帖" />
@@ -938,7 +938,7 @@ license:CC0
 
 
 	<software name="overtop">
-		<description>OverTop (Jpn)</description>
+		<description>OverTop (Japan)</description>
 		<year>1996</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="オーバートップ" />
@@ -952,7 +952,7 @@ license:CC0
 	</software>
 
 	<software name="pspikes2">
-		<description>Power Spikes II (Jpn)</description>
+		<description>Power Spikes II (Japan)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<info name="alt_title" value="パワースパイクスII" />
@@ -966,7 +966,7 @@ license:CC0
 	</software>
 
 	<software name="pulstar">
-		<description>Pulstar (Jpn, USA)</description>
+		<description>Pulstar (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="パルスター" />
@@ -980,7 +980,7 @@ license:CC0
 	</software>
 
 	<software name="joyjoy">
-		<description>Puzzled (USA) ~ Joy Joy Kid (Jpn)</description>
+		<description>Puzzled (USA) ~ Joy Joy Kid (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ジョイジョイキッド" />
@@ -994,7 +994,7 @@ license:CC0
 	</software>
 
 	<software name="quizkof">
-		<description>Quiz King of Fighters (Jpn)</description>
+		<description>Quiz King of Fighters (Japan)</description>
 		<year>1995</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="クイズ キングオブファイターズ" />
@@ -1008,7 +1008,7 @@ license:CC0
 	</software>
 
 	<software name="bjourney">
-		<description>Raguy (Jpn)</description>
+		<description>Raguy (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ラギ" />
@@ -1022,7 +1022,7 @@ license:CC0
 	</software>
 
 	<software name="rbff1">
-		<description>Real Bout Fatal Fury (USA) ~ Real Bout Garou Densetsu (Jpn)</description>
+		<description>Real Bout Fatal Fury (USA) ~ Real Bout Garou Densetsu (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説" />
@@ -1036,7 +1036,7 @@ license:CC0
 	</software>
 
 	<software name="rbff2">
-		<description>Real Bout Fatal Fury 2 - The Newcomers (USA) ~ Real Bout Garou Densetsu 2 - The Newcomers (Jpn)</description>
+		<description>Real Bout Fatal Fury 2 - The Newcomers (USA) ~ Real Bout Garou Densetsu 2 - The Newcomers (Japan)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説2" />
@@ -1050,7 +1050,7 @@ license:CC0
 	</software>
 
 	<software name="rbffspec">
-		<description>Real Bout Special (Jpn)</description>
+		<description>Real Bout Special (Japan)</description>
 		<year>1997</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル" />
@@ -1064,7 +1064,7 @@ license:CC0
 	</software>
 
 	<software name="ridhero">
-		<description>Riding Hero (Jpn, USA)</description>
+		<description>Riding Hero (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ライディングヒーロー" />
@@ -1078,7 +1078,7 @@ license:CC0
 	</software>
 
 	<software name="roboarmy">
-		<description>Robo Army (Jpn, USA)</description>
+		<description>Robo Army (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ロボアーミー" />
@@ -1092,7 +1092,7 @@ license:CC0
 	</software>
 
 	<software name="samsho">
-		<description>Samurai Shodown (USA) ~ Samurai Spirits (Jpn)</description>
+		<description>Samurai Shodown (USA) ~ Samurai Spirits (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ" />
@@ -1106,7 +1106,7 @@ license:CC0
 	</software>
 
 	<software name="samsho2">
-		<description>Samurai Shodown II (USA) ~ Shin Samurai Spirits - Haoumaru Jigoku Hen (Jpn)</description>
+		<description>Samurai Shodown II (USA) ~ Shin Samurai Spirits - Haoumaru Jigoku Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="真 サムライスピリッツ 覇王丸地獄変" />
@@ -1120,7 +1120,7 @@ license:CC0
 	</software>
 
 	<software name="samsho3">
-		<description>Samurai Spirits - Zankurou Musouken (Jpn)</description>
+		<description>Samurai Spirits - Zankurou Musouken (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ 斬紅郎無双剣" />
@@ -1134,7 +1134,7 @@ license:CC0
 	</software>
 
 	<software name="samsho4">
-		<description>Samurai Shodown IV - Amakusa's Revenge (USA) ~ Samurai Spirits - Amakusa Kourin (Jpn)</description>
+		<description>Samurai Shodown IV - Amakusa's Revenge (USA) ~ Samurai Spirits - Amakusa Kourin (Japan)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サムライスピリッツ 天草降臨" />
@@ -1148,7 +1148,7 @@ license:CC0
 	</software>
 
 	<software name="savagere">
-		<description>Savage Reign (USA) ~ Fu'un Mokujiroku - Kakutou Sousei (Jpn)</description>
+		<description>Savage Reign (USA) ~ Fu'un Mokujiroku - Kakutou Sousei (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="風雲黙示録 格闘創世" />
@@ -1162,7 +1162,7 @@ license:CC0
 	</software>
 
 	<software name="sengoku">
-		<description>Sengoku (USA) ~  Sengoku Denshou (Jpn)</description>
+		<description>Sengoku (USA) ~ Sengoku Denshou (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="戦国伝承" />
@@ -1176,7 +1176,7 @@ license:CC0
 	</software>
 
 	<software name="sengoku2">
-		<description>Sengoku 2 (USA) ~ Sengoku Denshou 2 (Jpn)</description>
+		<description>Sengoku 2 (USA) ~ Sengoku Denshou 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="戦国伝承2" />
@@ -1190,7 +1190,7 @@ license:CC0
 	</software>
 
 	<software name="ragnagrd">
-		<description>Shin-Oh-Ken (Jpn)</description>
+		<description>Shin-Oh-Ken (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="神凰拳" />
@@ -1204,7 +1204,7 @@ license:CC0
 	</software>
 
 	<software name="mosyougi">
-		<description>Shougi no Tatsujin - Master of Syougi (Jpn)</description>
+		<description>Shougi no Tatsujin - Master of Syougi (Japan)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="将棋の達人" />
@@ -1218,7 +1218,7 @@ license:CC0
 	</software>
 
 	<software name="socbrawl">
-		<description>Soccer Brawl (Jpn, USA)</description>
+		<description>Soccer Brawl (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="サッカーブロール" />
@@ -1232,7 +1232,7 @@ license:CC0
 	</software>
 
 	<software name="stakwin">
-		<description>Stakes Winner - GI Kanzen Seiha e no Machi (Jpn)</description>
+		<description>Stakes Winner - GI Kanzen Seiha e no Machi (Japan)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<info name="alt_title" value="ステークスウィナーGI完全制覇への道" />
@@ -1246,7 +1246,7 @@ license:CC0
 	</software>
 
 	<software name="strhoop">
-		<description>Street Hoop (USA) ~ Dunk Dream (Jpn)</description>
+		<description>Street Hoop (USA) ~ Dunk Dream (Japan)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="ダンク・ドリーム" />
@@ -1260,7 +1260,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki">
-		<description>Super Sidekicks (USA) ~ Tokuten Ou (Jpn)</description>
+		<description>Super Sidekicks (USA) ~ Tokuten Ou (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王" />
@@ -1274,7 +1274,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki2">
-		<description>Super Sidekicks 2 (USA) ~ Tokuten Ou 2 (Jpn)</description>
+		<description>Super Sidekicks 2 (USA) ~ Tokuten Ou 2 (Japan)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王2" />
@@ -1288,7 +1288,7 @@ license:CC0
 	</software>
 
 	<software name="ssideki3">
-		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Ou 3 - Eikou e no Chousen (Jpn)</description>
+		<description>Super Sidekicks 3 - The Next Glory (USA) ~ Tokuten Ou 3 - Eikou e no Chousen (Japan)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="得点王3 栄光への挑戦" />
@@ -1302,7 +1302,7 @@ license:CC0
 	</software>
 
 	<software name="superspy">
-		<description>The Super Spy (Jpn, USA)</description>
+		<description>The Super Spy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="ザ・スーパースパイ" />
@@ -1316,7 +1316,7 @@ license:CC0
 	</software>
 
 	<software name="kabukikl">
-		<description>Tengai Makyou Shinden - Far East of Eden (Jpn)</description>
+		<description>Tengai Makyou Shinden - Far East of Eden (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="alt_title" value="天外魔境 真伝" />
@@ -1330,7 +1330,7 @@ license:CC0
 	</software>
 
 	<software name="tophuntr">
-		<description>Top Hunter - Roddy &amp; Cathy (Jpn, USA)</description>
+		<description>Top Hunter - Roddy &amp; Cathy (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="トップハンター" />
@@ -1344,7 +1344,7 @@ license:CC0
 	</software>
 
 	<software name="tpgolf">
-		<description>Top Player's Golf (Jpn, USA)</description>
+		<description>Top Player's Golf (Japan, USA)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="トッププレイヤーズ・ゴルフ" />
@@ -1358,7 +1358,7 @@ license:CC0
 	</software>
 
 	<software name="twinspri">
-		<description>Twinkle Star Sprites (Jpn)</description>
+		<description>Twinkle Star Sprites (Japan)</description>
 		<year>1997</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ティンクルスター スプライツ" />
@@ -1372,7 +1372,7 @@ license:CC0
 	</software>
 
 	<software name="viewpoin">
-		<description>Viewpoint (Jpn, USA)</description>
+		<description>Viewpoint (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Aicom</publisher>
 		<info name="alt_title" value="ビューポイント" />
@@ -1386,7 +1386,7 @@ license:CC0
 	</software>
 
 	<software name="gowcaizr">
-		<description>Choujin Gakuen Gowcaizer (Jpn)</description>
+		<description>Choujin Gakuen Gowcaizer (Japan)</description>
 		<year>1995</year>
 		<publisher>Technos</publisher>
 		<info name="alt_title" value="超人学園ゴウカイザー" />
@@ -1400,7 +1400,7 @@ license:CC0
 	</software>
 
 	<software name="wjammers">
-		<description>Windjammers (USA) ~ Flying Power Disc (Jpn)</description>
+		<description>Windjammers (USA) ~ Flying Power Disc (Japan)</description>
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<info name="alt_title" value="フライングパワーディスク" />
@@ -1414,7 +1414,7 @@ license:CC0
 	</software>
 
 	<software name="wh1">
-		<description>World Heroes (Jpn, USA)</description>
+		<description>World Heroes (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ" />
@@ -1428,7 +1428,7 @@ license:CC0
 	</software>
 
 	<software name="wh2">
-		<description>World Heroes 2 (Jpn, USA)</description>
+		<description>World Heroes 2 (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2" />
@@ -1442,7 +1442,7 @@ license:CC0
 	</software>
 
 	<software name="wh2j">
-		<description>World Heroes 2 Jet (Jpn)</description>
+		<description>World Heroes 2 Jet (Japan)</description>
 		<year>1994</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ2ジェット" />
@@ -1456,7 +1456,7 @@ license:CC0
 	</software>
 
 	<software name="whp">
-		<description>World Heroes Perfect (Jpn, USA)</description>
+		<description>World Heroes Perfect (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>ADK</publisher>
 		<info name="alt_title" value="ワールドヒーローズ パーフェクト" />

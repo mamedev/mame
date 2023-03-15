@@ -129,6 +129,8 @@ class OpcodeList:
                     flags = "STEP_OVER"
                 elif opc.name == "rts":
                     flags = "STEP_OUT"
+                elif opc.amode == "rel8" or opc.amode == "rrel8" or opc.amode == "brrel8" or opc.amode == "wrrel8":
+                    flags = "STEP_COND"
                 else:
                     flags = "0"
                 print("\t{ \"%s\", %s, DASM_%s, %s }," % (opc.name, alt, opc.amode, flags), file=f)

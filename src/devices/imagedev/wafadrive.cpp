@@ -24,8 +24,7 @@ DEFINE_DEVICE_TYPE(WAFADRIVE_IMAGE, wafadrive_image_device, "wafadrive_image", "
 //-------------------------------------------------
 
 wafadrive_image_device::wafadrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, WAFADRIVE_IMAGE, tag, owner, clock),
-	device_image_interface(mconfig, *this)
+	microtape_image_device(mconfig, WAFADRIVE_IMAGE, tag, owner, clock)
 {
 }
 

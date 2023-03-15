@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Hitachi HD44780 LCD controller
+    Hitachi HD44780 LCD controller
 
 ***************************************************************************/
 
@@ -33,6 +33,7 @@ public:
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 	void set_busy_factor(float f) { m_busy_factor = f; } // it's a workaround for inaccurate busy flag emulation
+	void set_function_set_at_any_time(bool v = true) { m_function_set_at_any_time = v; }
 
 	// device interface
 	void write(offs_t offset, u8 data);
@@ -57,10 +58,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
+	TIMER_CALLBACK_MEMBER(blink_tick);
 
 	// charset
 	enum
@@ -95,9 +98,6 @@ private:
 	void pixel_update(bitmap_ind16 &bitmap, u8 line, u8 pos, u8 y, u8 x, int state);
 
 	// internal state
-	static constexpr device_timer_id TIMER_BUSY = 0;
-	static constexpr device_timer_id TIMER_BLINKING = 1;
-
 	emu_timer * m_blink_timer;
 	emu_timer * m_busy_timer;
 
@@ -135,6 +135,7 @@ private:
 	bool        m_nibble;
 	int         m_charset_type;
 	u8          m_render_buf[80 * 16];
+	bool        m_function_set_at_any_time;
 
 	enum        { DDRAM, CGRAM };
 };

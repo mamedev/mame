@@ -25,7 +25,6 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
@@ -56,7 +55,6 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0, 32, 12)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
-	, m_dr_breakpoints{nullptr, nullptr, nullptr, nullptr}
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
 {
@@ -1531,7 +1529,7 @@ void i386_device::i386_check_irq_line()
 	if ( (m_irq_state) && m_IF )
 	{
 		m_cycles -= 2;
-		i386_trap(standard_irq_callback(0), 1, 0);
+		i386_trap(standard_irq_callback(0, m_pc), 1, 0);
 	}
 }
 
@@ -1557,10 +1555,13 @@ void i386_device::report_invalid_opcode()
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
-	logerror("i386: Invalid opcode");
+	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 }
 
@@ -1569,10 +1570,13 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
-	logerror("i386: Invalid %s modrm %01X", opcode, modrm);
+	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 	i386_trap(6, 0, 0);
 }
@@ -2013,6 +2017,16 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
+
+	save_item(NAME(m_x87_cw));
+	save_item(NAME(m_x87_tw));
+	save_item(NAME(m_x87_sw));
+	save_item(NAME(m_x87_cs));
+	save_item(NAME(m_x87_ds));
+	save_item(NAME(m_x87_inst_ptr));
+	save_item(NAME(m_x87_data_ptr));
+	save_item(NAME(m_x87_opcode));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
@@ -2020,10 +2034,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler(0);
 
 	set_icountptr(m_cycles);
-	m_notifier = m_program->add_change_notifier([this](read_or_write mode)
-	{
-		dri_changed();
-	});
+	m_notifier = m_program->add_change_notifier([this] (read_or_write mode) { dri_changed(); });
 }
 
 void i386_device::device_start()
@@ -2123,7 +2134,6 @@ void i386_device::register_state_i386()
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%32s").noshow();
-	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
 
 void i386_device::register_state_i386_x87()
@@ -2133,14 +2143,14 @@ void i386_device::register_state_i386_x87()
 	state_add( X87_CTRL,   "x87_CW", m_x87_cw).formatstr("%04X");
 	state_add( X87_STATUS, "x87_SW", m_x87_sw).formatstr("%04X");
 	state_add( X87_TAG,    "x87_TAG", m_x87_tw).formatstr("%04X");
-	state_add( X87_ST0,    "ST0", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST1,    "ST1", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST2,    "ST2", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST3,    "ST3", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST4,    "ST4", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST5,    "ST5", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST6,    "ST6", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST7,    "ST7", m_debugger_temp ).formatstr("%15s");
+	state_add( X87_ST0,    "ST0", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST1,    "ST1", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST2,    "ST2", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST3,    "ST3", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST4,    "ST4", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST5,    "ST5", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST6,    "ST6", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST7,    "ST7", m_debugger_temp ).callexport().formatstr("%15s");
 }
 
 void i386_device::register_state_i386_x87_xmm()
@@ -2196,6 +2206,30 @@ void i386_device::state_export(const device_state_entry &entry)
 	{
 		case I386_IP:
 			m_debugger_temp = m_eip & 0xffff;
+			break;
+		case X87_ST0:
+			m_debugger_temp = floatx80_to_float64(ST(0));
+			break;
+		case X87_ST1:
+			m_debugger_temp = floatx80_to_float64(ST(1));
+			break;
+		case X87_ST2:
+			m_debugger_temp = floatx80_to_float64(ST(2));
+			break;
+		case X87_ST3:
+			m_debugger_temp = floatx80_to_float64(ST(3));
+			break;
+		case X87_ST4:
+			m_debugger_temp = floatx80_to_float64(ST(4));
+			break;
+		case X87_ST5:
+			m_debugger_temp = floatx80_to_float64(ST(5));
+			break;
+		case X87_ST6:
+			m_debugger_temp = floatx80_to_float64(ST(6));
+			break;
+		case X87_ST7:
+			m_debugger_temp = floatx80_to_float64(ST(7));
 			break;
 	}
 }
@@ -2442,6 +2476,9 @@ void i386_device::zero_state()
 	memset( m_opcode_bytes, 0, sizeof(m_opcode_bytes) );
 	m_opcode_pc = 0;
 	m_opcode_bytes_length = 0;
+	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
+	m_opcode_addrs_index = 0;
+	m_dri_changed_active = false;
 }
 
 void i386_device::device_reset()
@@ -2791,6 +2828,8 @@ void i386_device::execute_run()
 #ifdef DEBUG_MISSING_OPCODE
 		m_opcode_bytes_length = 0;
 		m_opcode_pc = m_pc;
+		m_opcode_addrs[m_opcode_addrs_index] = m_opcode_pc;
+		m_opcode_addrs_index = (m_opcode_addrs_index + 1) & 15;
 #endif
 		try
 		{
@@ -3328,10 +3367,36 @@ void pentium3_device::device_reset()
 
 	// [ 0:0] FPU on chip
 	// [ 4:4] Time Stamp Counter
+	// [ 8:8] CMPXCHG8B instruction
 	// [ D:D] PTE Global Bit
-	m_feature_flags = 0x00002011;       // TODO: enable relevant flags here
+	// [15:15] CMOV and FCMOV
+	// [18:18] PSN (Processor Serial Number, P3 only)
+	m_feature_flags = 0x0004a111;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
+}
+
+void pentium3_device::opcode_cpuid()
+{
+	switch (REG32(EAX))
+	{
+		case 0x00000003:
+		{
+			// TODO: lower part of 96 bits s/n for Pentium III processors only (ditched in 4)
+			// (upper 32-bits part is in EAX=1 EAX return)
+			// NB: if this is triggered from an Arcade system then there's a very good chance
+			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
+			logerror("CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
+			REG32(EAX) = 0x00000000;
+			REG32(EBX) = 0x00000000;
+			REG32(ECX) = 0x01234567;
+			REG32(EDX) = 0x89abcdef;
+			CYCLES(CYCLES_CPUID);
+			break;
+		}
+		default:
+			pentium_pro_device::opcode_cpuid();
+	}
 }
 
 /*****************************************************************************/
@@ -3397,7 +3462,9 @@ void pentium4_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	m_feature_flags = 0x00000001;       // TODO: enable relevant flags here
+	// [ 8:8] CMPXCHG8B instruction
+	// [15:15] CMOV and FCMOV
+	m_feature_flags = 0x00008101;       // TODO: enable relevant flags here
 
 	CHANGE_PC(m_eip);
 }

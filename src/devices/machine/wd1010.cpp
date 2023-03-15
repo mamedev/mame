@@ -96,9 +96,9 @@ void wd1010_device::device_start()
 	m_out_data_cb.resolve_safe();
 
 	// allocate timer
-	m_seek_timer = timer_alloc(TIMER_SEEK);
-	m_read_timer = timer_alloc(TIMER_READ);
-	m_write_timer = timer_alloc(TIMER_WRITE);
+	m_seek_timer = timer_alloc(FUNC(wd1010_device::update_seek), this);
+	m_read_timer = timer_alloc(FUNC(wd1010_device::delayed_read), this);
+	m_write_timer = timer_alloc(FUNC(wd1010_device::delayed_write), this);
 
 	// register for save states
 	save_item(NAME(m_intrq));
@@ -124,56 +124,59 @@ void wd1010_device::device_reset()
 }
 
 //-------------------------------------------------
-//  device_timer - device-specific timer
+//  update_seek -
 //-------------------------------------------------
 
-void wd1010_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(wd1010_device::update_seek)
 {
-	switch (tid)
+	if ((m_command >> 4) != CMD_SCAN_ID)
 	{
-	case TIMER_SEEK:
+		LOGSEEK("Seek complete\n");
+		m_drives[drive()].cylinder = param;
+		m_status |= STATUS_SC;
+	}
 
-		if ((m_command >> 4) != CMD_SCAN_ID)
-		{
-			LOGSEEK("Seek complete\n");
-			m_drives[drive()].cylinder = param;
-			m_status |= STATUS_SC;
-		}
-
-		switch (m_command >> 4)
-		{
-		case CMD_RESTORE:
-			cmd_restore();
-			break;
-
-		case CMD_SEEK:
-			cmd_seek();
-			break;
-
-		case CMD_READ_SECTOR:
-			cmd_read_sector();
-			break;
-
-		case CMD_WRITE_SECTOR:
-		case CMD_WRITE_FORMAT:
-			cmd_write_sector();
-			break;
-
-		case CMD_SCAN_ID:
-			cmd_scan_id();
-			break;
-		}
-
+	switch (m_command >> 4)
+	{
+	case CMD_RESTORE:
+		cmd_restore();
 		break;
 
-	case TIMER_READ:
+	case CMD_SEEK:
+		cmd_seek();
+		break;
+
+	case CMD_READ_SECTOR:
 		cmd_read_sector();
 		break;
 
-	case TIMER_WRITE:
+	case CMD_WRITE_SECTOR:
+	case CMD_WRITE_FORMAT:
 		cmd_write_sector();
 		break;
+
+	case CMD_SCAN_ID:
+		cmd_scan_id();
+		break;
 	}
+}
+
+//-------------------------------------------------
+//  delayed_read -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(wd1010_device::delayed_read)
+{
+	cmd_read_sector();
+}
+
+//-------------------------------------------------
+//  delayed_write -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(wd1010_device::delayed_write)
+{
+	cmd_write_sector();
 }
 
 //-------------------------------------------------
@@ -303,13 +306,13 @@ void wd1010_device::end_command()
 int wd1010_device::get_lbasector()
 {
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 	int lbasector;
 
 	lbasector = m_cylinder;
-	lbasector *= info->heads;
+	lbasector *= info.heads;
 	lbasector += head();
-	lbasector *= info->sectors;
+	lbasector *= info.sectors;
 	lbasector += m_sector_number;
 
 	return lbasector;
@@ -535,10 +538,10 @@ void wd1010_device::cmd_read_sector()
 	}
 
 	hard_disk_file *file = m_drives[drive()].drive->get_hard_disk_file();
-	hard_disk_info *info = hard_disk_get_info(file);
+	const auto &info = file->get_info();
 
 	// verify that we can read
-	if (head() > info->heads)
+	if (head() > info.heads)
 	{
 		// out of range
 		LOG("--> Head out of range, aborting\n");
@@ -557,7 +560,7 @@ void wd1010_device::cmd_read_sector()
 
 	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector());
 
-	hard_disk_read(file, get_lbasector(), buffer);
+	file->read(get_lbasector(), buffer);
 
 	for (int i = 0; i < 512; i++)
 		m_out_data_cb(buffer[i]);
@@ -626,7 +629,7 @@ void wd1010_device::cmd_write_sector()
 			buffer[i] = m_in_data_cb();
 	}
 
-	hard_disk_write(file, get_lbasector(), buffer);
+	file->write(get_lbasector(), buffer);
 
 	// save last read head and sector number
 	m_drives[drive()].head = head();

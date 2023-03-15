@@ -16,9 +16,6 @@
 #include "z8000.h"
 #include "z8000cpu.h"
 
-#include "debugger.h"
-#include "debug/debugcon.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -36,10 +33,10 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_io_config("I/O", ENDIANNESS_BIG, 16, 16, 0)
-	, m_opcodes_config("first word", ENDIANNESS_BIG, 16, addrbits, 0)
+	, m_io_config("io_std", ENDIANNESS_BIG, 16, 16, 0)
+	, m_opcodes_config("first_word", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_stack_config("stack", ENDIANNESS_BIG, 16, addrbits, 0)
-	, m_sio_config("special I/O", ENDIANNESS_BIG, 16, 16, 0)
+	, m_sio_config("io_spc", ENDIANNESS_BIG, 16, 16, 0)
 	, m_iack_in(*this)
 	, m_mo_out(*this)
 	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_halt(false), m_icount(0)
@@ -255,7 +252,7 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
+		return swapendian_int16(space.read_word(addr & ~1, 0xffff));
 	else
 		return space.read_word(addr);
 }
@@ -271,7 +268,7 @@ void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
+		space.write_word(addr & ~1, swapendian_int16(value), 0xffff);
 	else
 		space.write_word(addr, value, 0xffff);
 }
@@ -396,7 +393,7 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
 	{
-		//standard_irq_callback(SEGT_LINE);
+		//standard_irq_callback(SEGT_LINE, m_pc);
 		m_irq_vec = m_iack_in[0](m_pc);
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
@@ -411,7 +408,7 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_NMI)
 	{
-		standard_irq_callback(NMI_LINE);
+		standard_irq_callback(NMI_LINE, m_pc);
 		m_irq_vec = m_iack_in[1](m_pc);
 		m_halt = false;
 
@@ -428,7 +425,7 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
 	{
-		standard_irq_callback(NVI_LINE);
+		standard_irq_callback(NVI_LINE, m_pc);
 		m_irq_vec = m_iack_in[2](m_pc);
 		m_halt = false;
 
@@ -444,7 +441,7 @@ void z8002_device::Interrupt()
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
 	{
-		standard_irq_callback(VI_LINE);
+		standard_irq_callback(VI_LINE, m_pc);
 		m_irq_vec = m_iack_in[3](m_pc);
 		m_halt = false;
 
@@ -520,7 +517,6 @@ void z8002_device::register_debug_state()
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_fcw ).formatstr("%16s").noshow();
-	state_add( STATE_GENSP, "GENSP", m_nspoff ).noshow();
 }
 
 void z8002_device::state_string_export(const device_state_entry &entry, std::string &str) const

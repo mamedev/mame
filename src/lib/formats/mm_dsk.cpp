@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/mm_dsk.h"
 
 mm1_format::mm1_format() : upd765_format(formats)
@@ -86,5 +84,5 @@ const mm2_format::format mm2_format::formats[] = {
 	{}
 };
 
-const floppy_format_type FLOPPY_MM1_FORMAT = &floppy_image_format_creator<mm1_format>;
-const floppy_format_type FLOPPY_MM2_FORMAT = &floppy_image_format_creator<mm2_format>;
+const mm1_format FLOPPY_MM1_FORMAT;
+const mm2_format FLOPPY_MM2_FORMAT;

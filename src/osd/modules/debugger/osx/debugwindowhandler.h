@@ -23,19 +23,6 @@ extern NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification;
 extern NSString *const MAMESaveDebuggerConfigurationNotification;
 
 
-// for compatibility with the Qt debugger
-enum
-{
-	MAME_DEBUGGER_WINDOW_TYPE_CONSOLE = 1,
-	MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER,
-	MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER,
-	MAME_DEBUGGER_WINDOW_TYPE_ERROR_LOG_VIEWER,
-	MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER,
-	MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER,
-	MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER
-};
-
-
 @interface MAMEDebugWindowHandler : NSObject <NSWindowDelegate>
 {
 	NSWindow        *window;

@@ -237,7 +237,8 @@
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node {
 	[super saveConfigurationToNode:node];
-	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER);
+	node->set_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER);
+	node->set_attribute(osd::debugger::ATTR_WINDOW_DEVICE_TAG, device->tag());
 }
 
 @end

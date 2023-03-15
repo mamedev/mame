@@ -3,8 +3,7 @@
 /* .PTP Microkey Primo tape images */
 
 #include "primoptp.h"
-
-#include <cassert>
+#include "imageutl.h"
 
 
 #define PRIMO_WAVEENTRY_LOW     -32768

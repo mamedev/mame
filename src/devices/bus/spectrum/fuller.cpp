@@ -55,6 +55,7 @@ void spectrum_fuller_device::device_add_mconfig(machine_config &config)
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+	m_exp->fb_r_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::fb_r));
 }
 
 //**************************************************************************
@@ -95,10 +96,10 @@ uint8_t spectrum_fuller_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0x5f:
-		data &= m_psg->data_r();
+		data = m_psg->data_r();
 		break;
 	case 0x7f:
-		data &= m_joy->read() | (0xff ^ 0x8f);
+		data = m_joy->read() | (0xff ^ 0x8f);
 		break;
 	}
 	return data;

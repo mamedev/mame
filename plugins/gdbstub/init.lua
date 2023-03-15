@@ -4,7 +4,7 @@ local exports = {}
 exports.name = "gdbstub"
 exports.version = "0.0.1"
 exports.description = "GDB stub plugin"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local gdbstub = exports

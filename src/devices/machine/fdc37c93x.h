@@ -79,6 +79,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
 	DECLARE_WRITE_LINE_MEMBER(irq_keyboard_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mouse_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp21_gp25_gatea20_w);
 	DECLARE_WRITE_LINE_MEMBER(kbdp20_gp20_reset_w);
 
@@ -149,8 +150,8 @@ private:
 	devcb_write_line m_nrts2_callback;
 	required_device<smc37c78_device> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
-	required_device<ns16450_device> pc_serial1_comdev;
-	required_device<ns16450_device> pc_serial2_comdev;
+	required_device<ns16550_device> pc_serial1_comdev;
+	required_device<ns16550_device> pc_serial2_comdev;
 	required_device<ds12885_device> ds12885_rtcdev;
 	required_device<kbdc8042_device> m_kbdc;
 	int sysopt_pin;
@@ -185,12 +186,12 @@ private:
 	void write_auxio_configuration_register(int index, int data);
 	uint16_t read_global_configuration_register(int index);
 	uint16_t read_logical_configuration_register(int index);
-	uint16_t read_fdd_configuration_register(int index) { return 0; }
-	uint16_t read_ide1_configuration_register(int index) { return 0; }
-	uint16_t read_ide2_configuration_register(int index) { return 0; }
-	uint16_t read_parallel_configuration_register(int index) { return 0; }
-	uint16_t read_serial1_configuration_register(int index) { return 0; }
-	uint16_t read_serial2_configuration_register(int index) { return 0; }
+	uint16_t read_fdd_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_ide2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_parallel_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[logical_device][index]; }
+	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[logical_device][index]; }
 	uint16_t read_rtc_configuration_register(int index);
 	uint16_t read_keyboard_configuration_register(int index);
 	uint16_t read_auxio_configuration_register(int index);

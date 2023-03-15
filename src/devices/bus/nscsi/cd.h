@@ -37,6 +37,9 @@ protected:
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
+	void return_no_cd();
+	static int to_msf(int frame);
+
 	cdrom_file *cdrom;
 
 private:
@@ -53,9 +56,6 @@ private:
 	char revision[4];
 	uint8_t inquiry_data;
 	uint8_t compliance;
-
-	void return_no_cd();
-	static int to_msf(int frame);
 };
 
 class nscsi_cdrom_sgi_device : public nscsi_cdrom_device
@@ -66,6 +66,12 @@ public:
 protected:
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
+};
+
+class nscsi_cdrom_news_device : public nscsi_cdrom_device
+{
+public:
+	nscsi_cdrom_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class nscsi_dec_rrd45_device : public nscsi_cdrom_device
@@ -111,10 +117,12 @@ public:
 
 protected:
 	virtual void scsi_command() override;
+	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device)
+DECLARE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device)
 DECLARE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device)

@@ -82,11 +82,11 @@ device_md_cart_interface::~device_md_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
+void device_md_cart_interface::rom_alloc(size_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = (uint16_t *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_BIG)->base();
+		m_rom = (uint16_t *)device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 2, ENDIANNESS_BIG)->base();
 		m_rom_size = size;
 	}
 }
@@ -161,10 +161,9 @@ uint32_t device_md_cart_interface::get_padded_size(uint32_t size)
 //-------------------------------------------------
 base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_md_cart_interface>(mconfig, *this),
-	m_type(SEGA_STD), m_cart(nullptr),
-	m_must_be_loaded(1)
+	m_type(SEGA_STD), m_cart(nullptr)
 {
 }
 
@@ -361,7 +360,7 @@ image_init_result base_md_cart_slot_device::load_list()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	length = m_cart->get_padded_size(length);
 
-	m_cart->rom_alloc(length, tag());
+	m_cart->rom_alloc(length);
 	ROM = m_cart->get_rom_base();
 	memcpy((uint8_t *)ROM, get_software_region("rom"), get_software_region_length("rom"));
 
@@ -473,8 +472,8 @@ image_init_result base_md_cart_slot_device::load_nonlist()
 	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 	len = m_cart->get_padded_size(tmplen - offset);
 
-	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
-	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len, tag());
+	// this contains an hack for SSF2: its current bankswitch code needs larger ROM space to work
+	m_cart->rom_alloc((len == 0x500000) ? 0x900000 : len);
 
 	// STEP 3: copy the game data in the appropriate way
 	ROM = (unsigned char *)m_cart->get_rom_base();
@@ -906,18 +905,17 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size(), offset = 0;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		if (genesis_is_SMD(&rom[0x200], len - 0x200))
-				offset = 0x200;
+		uint32_t const offset = genesis_is_SMD(&rom[0x200], len - 0x200) ? 0x200 : 0;
 
-		type = get_cart_type(&rom[offset], len - offset);
-		slot_string = md_get_slot(type);
+		int const type = get_cart_type(&rom[offset], len - offset);
+		char const *const slot_string = md_get_slot(type);
 
 		return std::string(slot_string);
 	}
@@ -1082,10 +1080,10 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	}
 	logerror("Checksum: %X\n", checksum);
 	logerror(" - Calculated Checksum: %X\n", csum);
-	logerror("Supported I/O Devices: %.16s\n%s", io, ctrl.c_str());
+	logerror("Supported I/O Devices: %.16s\n%s", io, ctrl);
 	logerror("Modem: %.12s\n", modem);
 	logerror("Memo: %.40s\n", memo);
-	logerror("Country: %.16s\n%s", country, reg.c_str());
+	logerror("Country: %.16s\n%s", country, reg);
 	logerror("ROM Start:  0x%.8X\n", rom_start);
 	logerror("ROM End:    0x%.8X\n", rom_end);
 	logerror("RAM Start:  0x%.8X\n", ram_start);

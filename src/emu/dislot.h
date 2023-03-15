@@ -46,10 +46,10 @@ public:
 	class slot_option
 	{
 	public:
-		slot_option(char const *name, device_type const &devtype, bool selectable);
+		slot_option(char const *name, device_type devtype, bool selectable);
 
 		char const *name() const { return m_name; }
-		device_type const &devtype() const { return m_devtype; }
+		device_type devtype() const { return m_devtype; }
 		bool selectable() const { return m_selectable; }
 		char const *default_bios() const { return m_default_bios; }
 		std::function<void (device_t *)> const &machine_config() const { return m_machine_config; }
@@ -116,7 +116,7 @@ public:
 	///   description is used in the user interface.
 	/// \return A reference to the added option for additional
 	///   configuration.
-	slot_option &option_add(char const *option, const device_type &devtype);
+	slot_option &option_add(char const *option, device_type devtype);
 
 	/// \brief Add an internal option
 	///
@@ -130,7 +130,11 @@ public:
 	///   description is used in the user interface.
 	/// \return A reference to the added option for additional
 	///   configuration.
-	slot_option &option_add_internal(const char *option, const device_type &devtype);
+	slot_option &option_add_internal(const char *option, device_type devtype);
+
+	slot_option &option_replace(const char *option, device_type devtype);
+	slot_option &option_replace_internal(const char *option, device_type devtype);
+	void option_remove(const char *option);
 
 	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
 	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
@@ -162,7 +166,7 @@ public:
 	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	const char *slot_name() const { return device().tag() + 1; }
-	slot_option &option_set(const char *tag, const device_type &devtype) { m_default_option = tag; m_fixed = true; return option_add_internal(tag, devtype); }
+	slot_option &option_set(const char *tag, device_type devtype) { m_default_option = tag; m_fixed = true; return option_add_internal(tag, devtype); }
 
 protected:
 	device_slot_interface(machine_config const &mconfig, device_t &device);

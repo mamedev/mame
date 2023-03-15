@@ -23,7 +23,7 @@ private:
 	std::string GET_ADDRESS(int addr_mode, int address);
 	std::string GET_SHIFT(int shift);
 	void print_condition_codes(bool pp, int zl, int cv, int tp);
-	void dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes);
+	uint32_t dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes);
 	void dasm_group_bf(uint16_t opcode, offs_t &npc, const data_buffer &opcodes);
 
 	std::ostream *output;

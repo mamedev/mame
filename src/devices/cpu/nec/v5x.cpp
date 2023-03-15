@@ -132,7 +132,7 @@ void device_v5x_interface::TCKS_w(u8 data)
 	tcu_clock_update();
 }
 
-void device_v5x_interface::interface_clock_changed()
+void device_v5x_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	tcu_clock_update();
 }
@@ -347,6 +347,7 @@ void v50_base_device::device_start()
 	m_internal_io = &space(AS_INTERNAL_IO);
 
 	m_tout1_callback.resolve_safe();
+	m_icu_slave_ack.resolve_safe(0);
 
 	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
@@ -520,6 +521,7 @@ v50_base_device::v50_base_device(const machine_config &mconfig, device_type type
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, is_16bit)
 	, m_tout1_callback(*this)
+	, m_icu_slave_ack(*this)
 	, m_OPCN(0)
 	, m_tout1(false)
 	, m_intp1(false)

@@ -86,15 +86,16 @@ public:
 
 	void set_poll_int_lines(bool poll) { m_poll_lines = poll; }
 
+	void update_clock();
+
 private:
-	static constexpr device_timer_id DECREMENTER = 0;
+	virtual void device_start() override;
+	virtual void device_stop() override;
+	virtual void device_reset() override;
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	TIMER_CALLBACK_MEMBER(decrement_tick);
+
 	void soft_reset();
-
-	void device_start() override;
-	void device_stop() override;
-	void device_reset() override;
 
 	// Common method for device_reset and rst1_line
 	void do_reset();

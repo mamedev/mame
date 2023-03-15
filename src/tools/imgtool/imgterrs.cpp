@@ -8,8 +8,9 @@
 
 ***************************************************************************/
 
-#include "imgtool.h"
 #include "imgterrs.h"
+
+#include <cassert>
 #include <iterator>
 
 static const char *const msgs[] =

@@ -19,6 +19,7 @@
 #include "source/cfa.h"
 #include "source/latest_version_glsl_std_450_header.h"
 #include "source/opt/iterator.h"
+#include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
@@ -46,12 +47,23 @@ bool LocalSingleStoreElimPass::LocalSingleStoreElim(Function* func) {
 }
 
 bool LocalSingleStoreElimPass::AllExtensionsSupported() const {
-  // If any extension not in whitelist, return false
+  // If any extension not in allowlist, return false
   for (auto& ei : get_module()->extensions()) {
-    const char* extName =
-        reinterpret_cast<const char*>(&ei.GetInOperand(0).words[0]);
-    if (extensions_whitelist_.find(extName) == extensions_whitelist_.end())
+    const std::string extName = ei.GetInOperand(0).AsString();
+    if (extensions_allowlist_.find(extName) == extensions_allowlist_.end())
       return false;
+  }
+  // only allow NonSemantic.Shader.DebugInfo.100, we cannot safely optimise
+  // around unknown extended
+  // instruction sets even if they are non-semantic
+  for (auto& inst : context()->module()->ext_inst_imports()) {
+    assert(inst.opcode() == SpvOpExtInstImport &&
+           "Expecting an import of an extension's instruction set.");
+    const std::string extension_name = inst.GetInOperand(0).AsString();
+    if (spvtools::utils::starts_with(extension_name, "NonSemantic.") &&
+        extension_name != "NonSemantic.Shader.DebugInfo.100") {
+      return false;
+    }
   }
   return true;
 }
@@ -67,19 +79,19 @@ Pass::Status LocalSingleStoreElimPass::ProcessImpl() {
   ProcessFunction pfn = [this](Function* fp) {
     return LocalSingleStoreElim(fp);
   };
-  bool modified = context()->ProcessEntryPointCallTree(pfn);
+  bool modified = context()->ProcessReachableCallTree(pfn);
   return modified ? Status::SuccessWithChange : Status::SuccessWithoutChange;
 }
 
 LocalSingleStoreElimPass::LocalSingleStoreElimPass() = default;
 
 Pass::Status LocalSingleStoreElimPass::Process() {
-  InitExtensionWhiteList();
+  InitExtensionAllowList();
   return ProcessImpl();
 }
 
-void LocalSingleStoreElimPass::InitExtensionWhiteList() {
-  extensions_whitelist_.insert({
+void LocalSingleStoreElimPass::InitExtensionAllowList() {
+  extensions_allowlist_.insert({
       "SPV_AMD_shader_explicit_vertex_parameter",
       "SPV_AMD_shader_trinary_minmax",
       "SPV_AMD_gcn_shader",
@@ -88,6 +100,7 @@ void LocalSingleStoreElimPass::InitExtensionWhiteList() {
       "SPV_AMD_gpu_shader_half_float",
       "SPV_KHR_shader_draw_parameters",
       "SPV_KHR_subgroup_vote",
+      "SPV_KHR_8bit_storage",
       "SPV_KHR_16bit_storage",
       "SPV_KHR_device_group",
       "SPV_KHR_multiview",
@@ -118,8 +131,16 @@ void LocalSingleStoreElimPass::InitExtensionWhiteList() {
       "SPV_NV_shading_rate",
       "SPV_NV_mesh_shader",
       "SPV_NV_ray_tracing",
+      "SPV_KHR_ray_query",
       "SPV_EXT_fragment_invocation_density",
       "SPV_EXT_physical_storage_buffer",
+      "SPV_KHR_terminate_invocation",
+      "SPV_KHR_subgroup_uniform_control_flow",
+      "SPV_KHR_integer_dot_product",
+      "SPV_EXT_shader_image_int64",
+      "SPV_KHR_non_semantic_info",
+      "SPV_KHR_uniform_group_instructions",
+      "SPV_KHR_fragment_shader_barycentric",
   });
 }
 bool LocalSingleStoreElimPass::ProcessVariable(Instruction* var_inst) {
@@ -132,7 +153,33 @@ bool LocalSingleStoreElimPass::ProcessVariable(Instruction* var_inst) {
     return false;
   }
 
-  return RewriteLoads(store_inst, users);
+  bool all_rewritten;
+  bool modified = RewriteLoads(store_inst, users, &all_rewritten);
+
+  // If all uses are rewritten and the variable has a DebugDeclare and the
+  // variable is not an aggregate, add a DebugValue after the store and remove
+  // the DebugDeclare.
+  uint32_t var_id = var_inst->result_id();
+  if (all_rewritten &&
+      context()->get_debug_info_mgr()->IsVariableDebugDeclared(var_id)) {
+    const analysis::Type* var_type =
+        context()->get_type_mgr()->GetType(var_inst->type_id());
+    const analysis::Type* store_type = var_type->AsPointer()->pointee_type();
+    if (!(store_type->AsStruct() || store_type->AsArray())) {
+      modified |= RewriteDebugDeclares(store_inst, var_id);
+    }
+  }
+
+  return modified;
+}
+
+bool LocalSingleStoreElimPass::RewriteDebugDeclares(Instruction* store_inst,
+                                                    uint32_t var_id) {
+  uint32_t value_id = store_inst->GetSingleWordInOperand(1);
+  bool modified = context()->get_debug_info_mgr()->AddDebugValueForVariable(
+      store_inst, var_id, value_id, store_inst);
+  modified |= context()->get_debug_info_mgr()->KillDebugDeclares(var_id);
+  return modified;
 }
 
 Instruction* LocalSingleStoreElimPass::FindSingleStoreAndCheckUses(
@@ -171,6 +218,14 @@ Instruction* LocalSingleStoreElimPass::FindSingleStoreAndCheckUses(
       case SpvOpName:
       case SpvOpCopyObject:
         break;
+      case SpvOpExtInst: {
+        auto dbg_op = user->GetCommonDebugOpcode();
+        if (dbg_op == CommonDebugInfoDebugDeclare ||
+            dbg_op == CommonDebugInfoDebugValue) {
+          break;
+        }
+        return nullptr;
+      }
       default:
         if (!user->IsDecoration()) {
           // Don't know if this instruction modifies the variable.
@@ -217,7 +272,8 @@ bool LocalSingleStoreElimPass::FeedsAStore(Instruction* inst) const {
 }
 
 bool LocalSingleStoreElimPass::RewriteLoads(
-    Instruction* store_inst, const std::vector<Instruction*>& uses) {
+    Instruction* store_inst, const std::vector<Instruction*>& uses,
+    bool* all_rewritten) {
   BasicBlock* store_block = context()->get_instr_block(store_inst);
   DominatorAnalysis* dominator_analysis =
       context()->GetDominatorAnalysis(store_block->GetParent());
@@ -228,16 +284,22 @@ bool LocalSingleStoreElimPass::RewriteLoads(
   else
     stored_id = store_inst->GetSingleWordInOperand(kVariableInitIdInIdx);
 
-  std::vector<Instruction*> uses_in_store_block;
+  *all_rewritten = true;
   bool modified = false;
   for (Instruction* use : uses) {
-    if (use->opcode() == SpvOpLoad) {
-      if (dominator_analysis->Dominates(store_inst, use)) {
-        modified = true;
-        context()->KillNamesAndDecorates(use->result_id());
-        context()->ReplaceAllUsesWith(use->result_id(), stored_id);
-        context()->KillInst(use);
-      }
+    if (use->opcode() == SpvOpStore) continue;
+    auto dbg_op = use->GetCommonDebugOpcode();
+    if (dbg_op == CommonDebugInfoDebugDeclare ||
+        dbg_op == CommonDebugInfoDebugValue)
+      continue;
+    if (use->opcode() == SpvOpLoad &&
+        dominator_analysis->Dominates(store_inst, use)) {
+      modified = true;
+      context()->KillNamesAndDecorates(use->result_id());
+      context()->ReplaceAllUsesWith(use->result_id(), stored_id);
+      context()->KillInst(use);
+    } else {
+      *all_rewritten = false;
     }
   }
 

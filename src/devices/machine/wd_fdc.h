@@ -92,7 +92,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mr_w);
 
 	void index_callback(floppy_image_device *floppy, int state);
-
 protected:
 	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -112,13 +111,13 @@ protected:
 	int delay_register_commit;
 	int delay_command_commit;
 	bool spinup_on_interrupt;
+	bool extended_ddam;
 
 	static constexpr int fd179x_step_times[4] = {  6000, 12000, 20000, 30000 };
 	static constexpr int fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual int calc_sector_size(uint8_t size, uint8_t command) const;
 	virtual int settle_time() const;
@@ -132,9 +131,12 @@ protected:
 	virtual void pll_save_checkpoint() = 0;
 	virtual void pll_retrieve_checkpoint() = 0;
 
-private:
-	enum { TM_GEN, TM_CMD, TM_TRACK, TM_SECTOR };
+	TIMER_CALLBACK_MEMBER(generic_tick);
+	TIMER_CALLBACK_MEMBER(cmd_w_tick);
+	TIMER_CALLBACK_MEMBER(track_w_tick);
+	TIMER_CALLBACK_MEMBER(sector_w_tick);
 
+private:
 	//  State machine general behaviour:
 	//
 	//  There are three levels of state.
@@ -198,6 +200,9 @@ private:
 		SETTLE_WAIT,
 		SETTLE_DONE,
 
+		WRITE_PROTECT_WAIT,
+		WRITE_PROTECT_DONE,
+
 		DATA_LOAD_WAIT,
 		DATA_LOAD_WAIT_DONE,
 
@@ -241,6 +246,8 @@ private:
 		WRITE_SECTOR_PRE,
 		WRITE_SECTOR_PRE_BYTE
 	};
+
+
 
 	struct live_info {
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
@@ -304,6 +311,8 @@ private:
 	int format_last_byte_count;
 	std::string format_description_string;
 
+	bool delay_int;
+
 	void delay_cycles(emu_timer *tm, int cycles);
 
 	// Device timer subfunctions
@@ -351,7 +360,7 @@ private:
 	void live_run(attotime limit = attotime::never);
 	bool read_one_bit(const attotime &limit);
 	bool write_one_bit(const attotime &limit);
-
+	void reset_data_sync();
 	void live_write_raw(uint16_t raw);
 	void live_write_mfm(uint8_t mfm);
 	void live_write_fm(uint8_t fm);

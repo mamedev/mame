@@ -1,11 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Known Undumped protos: -
 
-  - Behind Jaggi Lines          Atari                CX5254  (Released as "Rescue on Fractalus")
   - Fail Safe                   Atari                CX5210  (Released as "Countermeasure")
   - Jungle River Cruise         Atari                        (Created to work with the unreleased "Puffer" Exercise Bicycle)
   - Muppets Go-Round            Atari                CX5234  (Released on the Atari 8bit as "Sesame Street Letter Go Round")
@@ -16,7 +15,6 @@ Possible Undumped protos: -
   - Adventure                   Atari
   - Arabian                     Atari
   - Asteroids Deluxe            Atari
-  - Astro Grover                Atari                 CX5233
   - Big Bird Hide 'N Seek       Atari                 CX5235
   - Black Widow                 Atari
   - Bristles                    First Star Soft.
@@ -100,7 +98,7 @@ Possible Undumped protos: -
 -->
 <softwarelist name="a5200" description="Atari 5200 cartridges">
 	<software name="5200menu">
-		<description>5200 Menu (Prototype)</description>
+		<description>5200 Menu (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -112,7 +110,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="aep">
-		<description>A.E. (Prototype)</description>
+		<description>A.E. (prototype)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software Inc</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -137,7 +135,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="asteroid">
-		<description>Asteroids (Prototype)</description>
+		<description>Asteroids (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5201" />
@@ -162,9 +160,23 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
+	<software name="astrgrvr" supported="no">
+		<description>Astro Grover (prototype)</description>
+		<year>1983</year>
+		<publisher>Children's Computer Workshop</publisher>
+		<info name="release" value="19830803" />
+		<info name="serial" value="CX5233" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="astrogrover.bin" size="0x8000" crc="18417ada" sha1="f3bad1c66743c8051d7c9c36eb367bdf908bc6fb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ballblaz">
 		<description>Ballblazer</description>
-		<year>1986</year>
+		<year>1985</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5255" />
 		<part name="cart" interface="a8bit_cart">
@@ -175,8 +187,8 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-<!--  Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
-        Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
+<!-- Barroom Baseball.  This prototype is for an standup arcade environment involving coins/timer and is based on Real Sports
+     Baseball.  While this functions in an Atari 5200 as a cartridge image, it is not a home cartridge.  Therefore, it is commented. -->
 
 <!--
     <software name="barbball">
@@ -193,7 +205,7 @@ Possible Undumped protos: -
 -->
 
 	<software name="bzone">
-		<description>Battlezone (Prototype)</description>
+		<description>Battlezone (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5239" />
@@ -201,6 +213,22 @@ Possible Undumped protos: -
 			<feature name="slot" value="a5200_2chips" />
 			<dataarea name="rom" size="16384">
 				<rom name="bzone.bin" size="16384" crc="b3b8e314" sha1="a339cddfc28477c21c58783d2d3b0cf0f4626ddf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzonea" cloneof="bzone">
+		<description>Battlezone (prototype, alt)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX5239" />
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
+			<dataarea name="rom" size="0x8000"> <!-- same data as the other set but repeated -->
+				<rom name="battle zone lo.a" size="0x2000" crc="45247338" sha1="1b27681fb53ab80bd39e4e7ad0a35625c79e7677" offset="0x0000"/>
+				<rom name="battle zone mlo.b" size="0x2000" crc="45247338" sha1="1b27681fb53ab80bd39e4e7ad0a35625c79e7677" offset="0x2000"/>
+				<rom name="battle zone mhi.c" size="0x2000" crc="465a7b80" sha1="78d653e521a2b0fe4d05cdbfe187beb11f4df19c" offset="0x4000"/>
+				<rom name="battle zone hi.d" size="0x2000" crc="465a7b80" sha1="78d653e521a2b0fe4d05cdbfe187beb11f4df19c" offset="0x6000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -214,6 +242,21 @@ Possible Undumped protos: -
 			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="16384">
 				<rom name="beamrid.bin" size="16384" crc="9bae58dc" sha1="b75d555d059ad61992f9f5a234129ecbf9504c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jaggi" cloneof="fractal">
+		<description>Behind Jaggi Lines (prototype)</description>
+		<year>1984</year>
+		<publisher>Atari / Lucasfilm</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="behind jaggi lo 1-18-84 101a.a" size="0x2000" crc="c244bde8" sha1="a08b1764ab3b8f3c30fd90faa3ac62fcf447dbb0" offset="0x0000"/>
+				<rom name="behind jaggi mlo 1-18-84 c3c1.b" size="0x2000" crc="5ea68db3" sha1="499ec2f48314943f1f3d4cb39f484a21f4d0009a" offset="0x2000"/>
+				<rom name="behind jaggi mhi 1-18-84 14bf.c" size="0x2000" crc="791a2267" sha1="ff92b86e8e9054337991ae83f47381d754ff33fc" offset="0x4000"/>
+				<rom name="behind jaggi hi 1-18-84 f358.d" size="0x2000" crc="b8ca1753" sha1="14acb8f2a2e9787c14c724f0e04d41d4f24a394c" offset="0x6000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +275,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="blckbelt">
-		<description>Black Belt (Prototype)</description>
+		<description>Black Belt (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5231" />
@@ -245,7 +288,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="blaster">
-		<description>Blaster (Prototype)</description>
+		<description>Blaster (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -269,10 +312,13 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
-	<software name="bbsb">
+	<software name="bbsb" supported="partial">
 		<description>Bounty Bob Strikes Back!</description>
 		<year>1984</year>
 		<publisher>Big Five Software</publisher>
+		<notes><![CDATA[
+Sometimes it throws [GTIA] glitchy frames (noticeable on player deaths)
+]]></notes>
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200_bbsb" />
 			<dataarea name="rom" size="40960">
@@ -401,7 +447,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="flegacy">
-		<description>Final Legacy (Prototype)</description>
+		<description>Final Legacy (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5256" />
@@ -414,7 +460,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="friskyt">
-		<description>Frisky Tom (Prototype)</description>
+		<description>Frisky Tom (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -544,7 +590,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="jrpacman">
-		<description>Jr Pacman (Prototype)</description>
+		<description>Jr Pacman (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5251" />
@@ -623,7 +669,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="laststar">
-		<description>The Last Starfighter (Prototype)</description>
+		<description>The Last Starfighter (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5260" />
@@ -636,7 +682,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="looneyh">
-		<description>Looney Tunes Hotel (Prototype)</description>
+		<description>Looney Tunes Hotel (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -661,7 +707,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="meebzork">
-		<description>Meebzork (Prototype)</description>
+		<description>Meebzork (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -698,7 +744,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="microgam">
-		<description>Microgammon SB (Prototype)</description>
+		<description>Microgammon SB (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -710,7 +756,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="milliped">
-		<description>Millipede (Prototype)</description>
+		<description>Millipede (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5248" />
@@ -737,7 +783,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="minigolf">
-		<description>Miniature Golf (Prototype)</description>
+		<description>Miniature Golf (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5230" />
@@ -881,6 +927,19 @@ Possible Undumped protos: -
 		</part>
 	</software>
 
+	<software name="poleposp" cloneof="polepos">
+		<description>Pole Position (prototype 133-05)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a8bit_cart">
+			<feature name="slot" value="a5200" />
+			<feature name="peripheral" value="trackball" /> <!-- Works with Trackball controller -->
+			<dataarea name="rom" size="0x8000">
+				<rom name="poleposition_133-05.bin" size="0x8000" crc="15b7b5ef" sha1="c22e5ea7cc892f515e4967f6ff0844b5a8d34b62"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popeye">
 		<description>Popeye</description>
 		<year>1983</year>
@@ -961,7 +1020,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="rsbasket1" cloneof="rsbasket">
-		<description>RealSports Basketball (Prototype, 19831031)</description>
+		<description>RealSports Basketball (prototype, 19831031)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
@@ -974,7 +1033,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="rsbasket2" cloneof="rsbasket">
-		<description>RealSports Basketball (Prototype, 19821105)</description>
+		<description>RealSports Basketball (prototype, 19821105)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5219" />
@@ -1032,7 +1091,7 @@ Possible Undumped protos: -
 	<software name="fractal">
 		<description>Rescue on Fractalus!</description>
 		<!-- Prototype called "Behind Jaggi Lines" -->
-		<year>1986</year>
+		<year>1985</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<info name="serial" value="CX5254" />
 		<part name="cart" interface="a8bit_cart">
@@ -1057,7 +1116,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="roadrun">
-		<description>Road Runner (Prototype)</description>
+		<description>Road Runner (prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5242" />
@@ -1123,7 +1182,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="spitfire">
-		<description>Spitfire (Prototype)</description>
+		<description>Spitfire (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1135,7 +1194,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="sprtgoof">
-		<description>Sport Goofy (Prototype)</description>
+		<description>Sport Goofy (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5237" />
@@ -1200,7 +1259,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="stargate">
-		<description>Stargate (Prototype)</description>
+		<description>Stargate (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5252" />
@@ -1240,7 +1299,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="spacman">
-		<description>Super Pac-Man (Prototype)</description>
+		<description>Super Pac-Man (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1252,9 +1311,10 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="tempest">
-		<description>Tempest (Prototype)</description>
+		<description>Tempest (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
+		<info name="developer" value="Keithen Hayenga" />
 		<info name="serial" value="CX5220" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
@@ -1265,7 +1325,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="trackfld">
-		<description>Track and Field (Prototype)</description>
+		<description>Track and Field (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5258" />
@@ -1304,7 +1364,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="xari">
-		<description>Xari Arena (Prototype)</description>
+		<description>Xari Arena (prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1316,7 +1376,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="xevious">
-		<description>Xevious (Prototype)</description>
+		<description>Xevious (prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX5246" />
@@ -1404,7 +1464,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="pamdg23">
-		<description>Atari PAM Diagnostics (Rev 2.3)</description>
+		<description>Atari PAM Diagnostics (rev 2.3)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1416,7 +1476,7 @@ Possible Undumped protos: -
 	</software>
 
 	<software name="finaltst">
-		<description>Atari PAM Final System Test (Rev 1.0)</description>
+		<description>Atari PAM Final System Test (rev 1.0)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a8bit_cart">
@@ -1481,8 +1541,8 @@ Possible Undumped protos: -
 	<software name="5200temp">
 		<description>5200 Tempest</description>
 		<year>2012</year>
-		<publisher>Atariage</publisher> <!-- unlicensed? -->
-		<info name="developer" value="Keithen" />
+		<publisher>AtariAge</publisher> <!-- unlicensed? -->
+		<info name="developer" value="Keithen Hayenga" />
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a5200" />
 			<dataarea name="rom" size="32768">

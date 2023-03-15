@@ -115,7 +115,6 @@ void nes_oekakids_device::pcb_reset()
 	prg32(0);
 	chr4_0(0, CHRRAM);
 	chr4_4(3, CHRRAM);
-	set_nt_mirroring(PPU_MIRROR_LOW);
 	m_latch = 0;
 	m_reg = 0;
 }
@@ -123,7 +122,7 @@ void nes_oekakids_device::pcb_reset()
 void nes_fcg_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_fcg_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -132,7 +131,6 @@ void nes_fcg_device::device_start()
 
 void nes_fcg_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -144,7 +142,7 @@ void nes_fcg_device::pcb_reset()
 void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_lz93d50_24c01_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
@@ -154,7 +152,6 @@ void nes_lz93d50_24c01_device::device_start()
 
 void nes_lz93d50_24c01_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
@@ -167,7 +164,7 @@ void nes_lz93d50_24c01_device::pcb_reset()
 void nes_fjump2_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer = timer_alloc(FUNC(nes_fjump2_device::irq_timer_tick), this);
 	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_reg));
@@ -207,32 +204,28 @@ void nes_fjump2_device::pcb_reset()
 
 void nes_oekakids_device::nt_w(offs_t offset, uint8_t data)
 {
-	int page = ((offset & 0xc00) >> 10);
-
 #if 0
 	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
-	m_nt_access[page][offset & 0x3ff] = data;
+	device_nes_cart_interface::nt_w(offset, data);
 }
 
 uint8_t nes_oekakids_device::nt_r(offs_t offset)
 {
-	int page = ((offset & 0xc00) >> 10);
-
 #if 0
 	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		chr4_0(m_reg | m_latch, CHRRAM);
 	}
 #endif
 
-	return m_nt_access[page][offset & 0x3ff];
+	return device_nes_cart_interface::nt_r(offset);
 }
 
 void nes_oekakids_device::update_chr()
@@ -247,7 +240,7 @@ void nes_oekakids_device::ppu_latch(offs_t offset)
 #if 0
 	if ((offset & 0x3000) == 0x2000)
 	{
-		m_latch = (offset & 0x300) >> 8;
+		m_latch = BIT(offset, 8, 2);
 		update_chr();
 	}
 #endif
@@ -285,25 +278,22 @@ void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(nes_fcg_device::irq_timer_tick)
 {
-	if (id == TIMER_IRQ)
+	if (m_irq_enable)
 	{
-		if (m_irq_enable)
-		{
-			// 16bit counter, IRQ fired when the counter goes from 1 to 0
-			// after firing, the counter is *not* reloaded, but next clock
-			// counter wraps around from 0 to 0xffff
-			if (!m_irq_count)
-				m_irq_count = 0xffff;
-			else
-				m_irq_count--;
+		// 16bit counter, IRQ fired when the counter goes from 1 to 0
+		// after firing, the counter is *not* reloaded, but next clock
+		// counter wraps around from 0 to 0xffff
+		if (!m_irq_count)
+			m_irq_count = 0xffff;
+		else
+			m_irq_count--;
 
-			if (!m_irq_count)
-			{
-				set_irq_line(ASSERT_LINE);
-				m_irq_enable = 0;
-			}
+		if (!m_irq_count)
+		{
+			set_irq_line(ASSERT_LINE);
+			m_irq_enable = 0;
 		}
 	}
 }
@@ -393,7 +383,7 @@ uint8_t nes_lz93d50_24c01_device::read_m(offs_t offset)
 
 void nes_lz93d50_24c01_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C01(config, m_i2cmem);
+	I2C_X24C01(config, m_i2cmem);
 }
 
 void nes_lz93d50_24c02_device::device_add_mconfig(machine_config &config)

@@ -22,8 +22,8 @@
 
 // Calculates the dominator or postdominator tree for a given function.
 // 1 - Compute the successors and predecessors for each BasicBlock. We add a
-// dummy node for the start node or for postdominators the exit. This node will
-// point to all entry or all exit nodes.
+// placeholder node for the start node or for postdominators the exit. This node
+// will point to all entry or all exit nodes.
 // 2 - Using the CFA::DepthFirstTraversal get a depth first postordered list of
 // all BasicBlocks. Using the successors (or for postdominator, predecessors)
 // calculated in step 1 to traverse the tree.
@@ -48,7 +48,7 @@ namespace {
 // BBType - BasicBlock type. Will either be BasicBlock or DominatorTreeNode
 // SuccessorLambda - Lamdba matching the signature of 'const
 // std::vector<BBType>*(const BBType *A)'. Will return a vector of the nodes
-// succeding BasicBlock A.
+// succeeding BasicBlock A.
 // PostLambda - Lamdba matching the signature of 'void (const BBType*)' will be
 // called on each node traversed AFTER their children.
 // PreLambda - Lamdba matching the signature of 'void (const BBType*)' will be
@@ -57,9 +57,9 @@ template <typename BBType, typename SuccessorLambda, typename PreLambda,
           typename PostLambda>
 static void DepthFirstSearch(const BBType* bb, SuccessorLambda successors,
                              PreLambda pre, PostLambda post) {
-  // Ignore backedge operation.
-  auto nop_backedge = [](const BBType*, const BBType*) {};
-  CFA<BBType>::DepthFirstTraversal(bb, successors, pre, post, nop_backedge);
+  auto no_terminal_blocks = [](const BBType*) { return false; };
+  CFA<BBType>::DepthFirstTraversal(bb, successors, pre, post,
+                                   no_terminal_blocks);
 }
 
 // Wrapper around CFA::DepthFirstTraversal to provide an interface to perform
@@ -69,7 +69,7 @@ static void DepthFirstSearch(const BBType* bb, SuccessorLambda successors,
 // BBType - BasicBlock type. Will either be BasicBlock or DominatorTreeNode
 // SuccessorLambda - Lamdba matching the signature of 'const
 // std::vector<BBType>*(const BBType *A)'. Will return a vector of the nodes
-// succeding BasicBlock A.
+// succeeding BasicBlock A.
 // PostLambda - Lamdba matching the signature of 'void (const BBType*)' will be
 // called on each node traversed after their children.
 template <typename BBType, typename SuccessorLambda, typename PostLambda>
@@ -103,12 +103,14 @@ class BasicBlockSuccessorHelper {
   using Function = typename GetFunctionClass<BBType>::FunctionType;
 
   using BasicBlockListTy = std::vector<BasicBlock*>;
-  using BasicBlockMapTy = std::map<const BasicBlock*, BasicBlockListTy>;
+  using BasicBlockMapTy =
+      std::unordered_map<const BasicBlock*, BasicBlockListTy>;
 
  public:
   // For compliance with the dominance tree computation, entry nodes are
-  // connected to a single dummy node.
-  BasicBlockSuccessorHelper(Function& func, const BasicBlock* dummy_start_node,
+  // connected to a single placeholder node.
+  BasicBlockSuccessorHelper(Function& func,
+                            const BasicBlock* placeholder_start_node,
                             bool post);
 
   // CFA::CalculateDominators requires std::vector<BasicBlock*>.
@@ -139,72 +141,61 @@ class BasicBlockSuccessorHelper {
   // Build the successors and predecessors map for each basic blocks |f|.
   // If |invert_graph_| is true, all edges are reversed (successors becomes
   // predecessors and vice versa).
-  // For convenience, the start of the graph is |dummy_start_node|.
+  // For convenience, the start of the graph is |placeholder_start_node|.
   // The dominator tree construction requires a unique entry node, which cannot
-  // be guaranteed for the postdominator graph. The |dummy_start_node| BB is
-  // here to gather all entry nodes.
-  void CreateSuccessorMap(Function& f, const BasicBlock* dummy_start_node);
+  // be guaranteed for the postdominator graph. The |placeholder_start_node| BB
+  // is here to gather all entry nodes.
+  void CreateSuccessorMap(Function& f,
+                          const BasicBlock* placeholder_start_node);
 };
 
 template <typename BBType>
 BasicBlockSuccessorHelper<BBType>::BasicBlockSuccessorHelper(
-    Function& func, const BasicBlock* dummy_start_node, bool invert)
+    Function& func, const BasicBlock* placeholder_start_node, bool invert)
     : invert_graph_(invert) {
-  CreateSuccessorMap(func, dummy_start_node);
+  CreateSuccessorMap(func, placeholder_start_node);
 }
 
 template <typename BBType>
 void BasicBlockSuccessorHelper<BBType>::CreateSuccessorMap(
-    Function& f, const BasicBlock* dummy_start_node) {
-  std::map<uint32_t, BasicBlock*> id_to_BB_map;
-  auto GetSuccessorBasicBlock = [&f, &id_to_BB_map](uint32_t successor_id) {
-    BasicBlock*& Succ = id_to_BB_map[successor_id];
-    if (!Succ) {
-      for (BasicBlock& BBIt : f) {
-        if (successor_id == BBIt.id()) {
-          Succ = &BBIt;
-          break;
-        }
-      }
-    }
-    return Succ;
-  };
+    Function& f, const BasicBlock* placeholder_start_node) {
+  IRContext* context = f.DefInst().context();
 
   if (invert_graph_) {
     // For the post dominator tree, we see the inverted graph.
     // successors_ in the inverted graph are the predecessors in the CFG.
-    // The tree construction requires 1 entry point, so we add a dummy node
-    // that is connected to all function exiting basic blocks.
-    // An exiting basic block is a block with an OpKill, OpUnreachable,
-    // OpReturn or OpReturnValue as terminator instruction.
+    // The tree construction requires 1 entry point, so we add a placeholder
+    // node that is connected to all function exiting basic blocks. An exiting
+    // basic block is a block with an OpKill, OpUnreachable, OpReturn,
+    // OpReturnValue, or OpTerminateInvocation  as terminator instruction.
     for (BasicBlock& bb : f) {
       if (bb.hasSuccessor()) {
         BasicBlockListTy& pred_list = predecessors_[&bb];
         const auto& const_bb = bb;
         const_bb.ForEachSuccessorLabel(
-            [this, &pred_list, &bb,
-             &GetSuccessorBasicBlock](const uint32_t successor_id) {
-              BasicBlock* succ = GetSuccessorBasicBlock(successor_id);
+            [this, &pred_list, &bb, context](const uint32_t successor_id) {
+              BasicBlock* succ = context->get_instr_block(successor_id);
               // Inverted graph: our successors in the CFG
               // are our predecessors in the inverted graph.
               this->successors_[succ].push_back(&bb);
               pred_list.push_back(succ);
             });
       } else {
-        successors_[dummy_start_node].push_back(&bb);
-        predecessors_[&bb].push_back(const_cast<BasicBlock*>(dummy_start_node));
+        successors_[placeholder_start_node].push_back(&bb);
+        predecessors_[&bb].push_back(
+            const_cast<BasicBlock*>(placeholder_start_node));
       }
     }
   } else {
-    successors_[dummy_start_node].push_back(f.entry().get());
+    successors_[placeholder_start_node].push_back(f.entry().get());
     predecessors_[f.entry().get()].push_back(
-        const_cast<BasicBlock*>(dummy_start_node));
+        const_cast<BasicBlock*>(placeholder_start_node));
     for (BasicBlock& bb : f) {
       BasicBlockListTy& succ_list = successors_[&bb];
 
       const auto& const_bb = bb;
       const_bb.ForEachSuccessorLabel([&](const uint32_t successor_id) {
-        BasicBlock* succ = GetSuccessorBasicBlock(successor_id);
+        BasicBlock* succ = context->get_instr_block(successor_id);
         succ_list.push_back(succ);
         predecessors_[succ].push_back(&bb);
       });
@@ -241,6 +232,7 @@ bool DominatorTree::Dominates(uint32_t a, uint32_t b) const {
 
 bool DominatorTree::Dominates(const DominatorTreeNode* a,
                               const DominatorTreeNode* b) const {
+  if (!a || !b) return false;
   // Node A dominates node B if they are the same.
   if (a == b) return true;
 
@@ -286,7 +278,7 @@ DominatorTreeNode* DominatorTree::GetOrInsertNode(BasicBlock* bb) {
 }
 
 void DominatorTree::GetDominatorEdges(
-    const Function* f, const BasicBlock* dummy_start_node,
+    const Function* f, const BasicBlock* placeholder_start_node,
     std::vector<std::pair<BasicBlock*, BasicBlock*>>* edges) {
   // Each time the depth first traversal calls the postorder callback
   // std::function we push that node into the postorder vector to create our
@@ -300,7 +292,7 @@ void DominatorTree::GetDominatorEdges(
   // BB are derived from F, so we need to const cast it at some point
   // no modification is made on F.
   BasicBlockSuccessorHelper<BasicBlock> helper{
-      *const_cast<Function*>(f), dummy_start_node, postdominator_};
+      *const_cast<Function*>(f), placeholder_start_node, postdominator_};
 
   // The successor function tells DepthFirstTraversal how to move to successive
   // nodes by providing an interface to get a list of successor nodes from any
@@ -314,7 +306,7 @@ void DominatorTree::GetDominatorEdges(
   // If we're building a post dominator tree we traverse the tree in reverse
   // using the predecessor function in place of the successor function and vice
   // versa.
-  DepthFirstSearchPostOrder(dummy_start_node, successor_functor,
+  DepthFirstSearchPostOrder(placeholder_start_node, successor_functor,
                             postorder_function);
   *edges = CFA<BasicBlock>::CalculateDominators(postorder, predecessor_functor);
 }
@@ -327,12 +319,12 @@ void DominatorTree::InitializeTree(const CFG& cfg, const Function* f) {
     return;
   }
 
-  const BasicBlock* dummy_start_node =
+  const BasicBlock* placeholder_start_node =
       postdominator_ ? cfg.pseudo_exit_block() : cfg.pseudo_entry_block();
 
   // Get the immediate dominator for each node.
   std::vector<std::pair<BasicBlock*, BasicBlock*>> edges;
-  GetDominatorEdges(f, dummy_start_node, &edges);
+  GetDominatorEdges(f, placeholder_start_node, &edges);
 
   // Transform the vector<pair> into the tree structure which we can use to
   // efficiently query dominance.
@@ -378,7 +370,7 @@ void DominatorTree::DumpTreeAsDot(std::ostream& out_stream) const {
     }
 
     // Print the arrow from the parent to this node. Entry nodes will not have
-    // parents so draw them as children from the dummy node.
+    // parents so draw them as children from the placeholder node.
     if (node->parent_) {
       out_stream << node->parent_->bb_->id() << " -> " << node->bb_->id()
                  << ";\n";

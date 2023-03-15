@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "shaderc.h"
@@ -115,7 +115,7 @@ namespace bgfx { namespace hlsl
 			return compiler;
 		}
 
-		fprintf(stderr, "Error: Unable to open D3DCompiler_*.dll shader compiler.\n");
+		bx::printf("Error: Unable to open D3DCompiler_*.dll shader compiler.\n");
 		return NULL;
 	}
 
@@ -311,7 +311,7 @@ namespace bgfx { namespace hlsl
 				uint32_t tableSize = (commentSize - 1) * 4;
 				if (tableSize < sizeof(CTHeader) || header->Size != sizeof(CTHeader) )
 				{
-					fprintf(stderr, "Error: Invalid constant table data\n");
+					bx::printf("Error: Invalid constant table data\n");
 					return false;
 				}
 				break;
@@ -323,12 +323,13 @@ namespace bgfx { namespace hlsl
 
 		if (!header)
 		{
-			fprintf(stderr, "Error: Could not find constant table data\n");
+			bx::printf("Error: Could not find constant table data\n");
 			return false;
 		}
 
 		const uint8_t* headerBytePtr = (const uint8_t*)header;
 		const char* creator = (const char*)(headerBytePtr + header->Creator);
+		BX_UNUSED(creator);
 
 		BX_TRACE("Creator: %s 0x%08x", creator, header->Version);
 		BX_TRACE("Num constants: %d", header->Constants);
@@ -366,7 +367,7 @@ namespace bgfx { namespace hlsl
 				Uniform un;
 				un.name = '$' == name[0] ? name + 1 : name;
 				un.type = isSampler(desc.Type)
-					? UniformType::Enum(BGFX_UNIFORM_SAMPLERBIT | type)
+					? UniformType::Enum(kUniformSamplerBit | type)
 					: type
 					;
 				un.num = (uint8_t)ctType.Elements;
@@ -390,7 +391,7 @@ namespace bgfx { namespace hlsl
 			);
 		if (FAILED(hr) )
 		{
-			fprintf(stderr, "Error: D3DReflect failed 0x%08x\n", (uint32_t)hr);
+			bx::printf("Error: D3DReflect failed 0x%08x\n", (uint32_t)hr);
 			return false;
 		}
 
@@ -398,7 +399,7 @@ namespace bgfx { namespace hlsl
 		hr = reflect->GetDesc(&desc);
 		if (FAILED(hr) )
 		{
-			fprintf(stderr, "Error: ID3D11ShaderReflection::GetDesc failed 0x%08x\n", (uint32_t)hr);
+			bx::printf("Error: ID3D11ShaderReflection::GetDesc failed 0x%08x\n", (uint32_t)hr);
 			return false;
 		}
 
@@ -479,7 +480,7 @@ namespace bgfx { namespace hlsl
 								un.type = uniformType;
 								un.num = uint8_t(constDesc.Elements);
 								un.regIndex = uint16_t(varDesc.StartOffset);
-								un.regCount = BX_ALIGN_16(varDesc.Size) / 16;
+								un.regCount = uint16_t(bx::alignUp(varDesc.Size, 16) / 16);
 								_uniforms.push_back(un);
 
 								BX_TRACE("\t%s, %d, size %d, flags 0x%08x, %d (used)"
@@ -513,7 +514,7 @@ namespace bgfx { namespace hlsl
 			hr = reflect->GetResourceBindingDesc(ii, &bindDesc);
 			if (SUCCEEDED(hr) )
 			{
-				if (D3D_SIT_SAMPLER == bindDesc.Type)
+				if (D3D_SIT_SAMPLER == bindDesc.Type || D3D_SIT_TEXTURE == bindDesc.Type)
 				{
 					BX_TRACE("\t%s, %d, %d, %d"
 						, bindDesc.Name
@@ -523,16 +524,23 @@ namespace bgfx { namespace hlsl
 						);
 
 					bx::StringView end = bx::strFind(bindDesc.Name, "Sampler");
-					if (!end.isEmpty() )
+					if (end.isEmpty())
+						end = bx::strFind(bindDesc.Name, "Texture");
+
+					if (!end.isEmpty())
 					{
 						Uniform un;
 						un.name.assign(bindDesc.Name, (end.getPtr() - bindDesc.Name) );
-						un.type = UniformType::Enum(BGFX_UNIFORM_SAMPLERBIT | UniformType::Sampler);
+						un.type = UniformType::Enum(kUniformSamplerBit | UniformType::Sampler);
 						un.num = 1;
 						un.regIndex = uint16_t(bindDesc.BindPoint);
 						un.regCount = uint16_t(bindDesc.BindCount);
 						_uniforms.push_back(un);
 					}
+				}
+				else
+				{
+					BX_TRACE("\t%s, unknown bind data", bindDesc.Name);
 				}
 			}
 		}
@@ -551,7 +559,7 @@ namespace bgfx { namespace hlsl
 
 		if (profile[0] == '\0')
 		{
-			fprintf(stderr, "Error: Shader profile must be specified.\n");
+			bx::printf("Error: Shader profile must be specified.\n");
 			return false;
 		}
 
@@ -602,6 +610,8 @@ namespace bgfx { namespace hlsl
 			writeFile(hlslfp.c_str(), _code.c_str(), (int32_t)_code.size() );
 		}
 
+		bx::ErrorAssert err;
+
 		HRESULT hr = D3DCompile(_code.c_str()
 			, _code.size()
 			, hlslfp.c_str()
@@ -646,7 +656,7 @@ namespace bgfx { namespace hlsl
 			}
 
 			printCode(_code.c_str(), line, start, end, column);
-			fprintf(stderr, "Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
+			bx::printf("Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
 			errorMsg->Release();
 			return false;
 		}
@@ -656,11 +666,11 @@ namespace bgfx { namespace hlsl
 		uint16_t attrs[bgfx::Attrib::Count];
 		uint16_t size = 0;
 
-		if (_version == 9)
+		if (_version < 400)
 		{
 			if (!getReflectionDataD3D9(code, uniforms) )
 			{
-				fprintf(stderr, "Error: Unable to get D3D9 reflection data.\n");
+				bx::printf("Error: Unable to get D3D9 reflection data.\n");
 				goto error;
 			}
 		}
@@ -669,49 +679,51 @@ namespace bgfx { namespace hlsl
 			UniformNameList unusedUniforms;
 			if (!getReflectionDataD3D11(code, profile[0] == 'v', uniforms, numAttrs, attrs, size, unusedUniforms) )
 			{
-				fprintf(stderr, "Error: Unable to get D3D11 reflection data.\n");
+				bx::printf("Error: Unable to get D3D11 reflection data.\n");
 				goto error;
 			}
 
 			if (_firstPass
 			&&  unusedUniforms.size() > 0)
 			{
-				const size_t strLength = bx::strLen("uniform");
-
 				// first time through, we just find unused uniforms and get rid of them
 				std::string output;
-				bx::Error err;
-				LineReader reader(_code.c_str() );
-				while (err.isOk() )
+				bx::LineReader reader(_code.c_str() );
+				while (!reader.isDone() )
 				{
-					char str[4096];
-					int32_t len = bx::read(&reader, str, BX_COUNTOF(str), &err);
-					if (err.isOk() )
+					bx::StringView strLine = reader.next();
+					bool found = false;
+
+					for (UniformNameList::iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
 					{
-						std::string strLine(str, len);
-
-						for (UniformNameList::iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
+						bx::StringView str = strFind(strLine, "uniform ");
+						if (str.isEmpty() )
 						{
-							size_t index = strLine.find("uniform ");
-							if (index == std::string::npos)
-							{
-								continue;
-							}
-
-							// matching lines like:  uniform u_name;
-							// we want to replace "uniform" with "static" so that it's no longer
-							// included in the uniform blob that the application must upload
-							// we can't just remove them, because unused functions might still reference
-							// them and cause a compile error when they're gone
-							if (!bx::findIdentifierMatch(strLine.c_str(), it->c_str() ).isEmpty() )
-							{
-								strLine = strLine.replace(index, strLength, "static");
-								unusedUniforms.erase(it);
-								break;
-							}
+							continue;
 						}
 
-						output += strLine;
+						// matching lines like:  uniform u_name;
+						// we want to replace "uniform" with "static" so that it's no longer
+						// included in the uniform blob that the application must upload
+						// we can't just remove them, because unused functions might still reference
+						// them and cause a compile error when they're gone
+						if (!bx::findIdentifierMatch(strLine, it->c_str() ).isEmpty() )
+						{
+							output.append(strLine.getPtr(), str.getPtr() );
+							output += "static ";
+							output.append(str.getTerm(), strLine.getTerm() );
+							output += "\n";
+							found = true;
+
+							unusedUniforms.erase(it);
+							break;
+						}
+					}
+
+					if (!found)
+					{
+						output.append(strLine.getPtr(), strLine.getTerm() );
+						output += "\n";
 					}
 				}
 
@@ -722,24 +734,27 @@ namespace bgfx { namespace hlsl
 
 		{
 			uint16_t count = (uint16_t)uniforms.size();
-			bx::write(_writer, count);
+			bx::write(_writer, count, &err);
 
-			uint32_t fragmentBit = profile[0] == 'p' ? BGFX_UNIFORM_FRAGMENTBIT : 0;
+			uint32_t fragmentBit = profile[0] == 'p' ? kUniformFragmentBit : 0;
 			for (UniformArray::const_iterator it = uniforms.begin(); it != uniforms.end(); ++it)
 			{
 				const Uniform& un = *it;
 				uint8_t nameSize = (uint8_t)un.name.size();
-				bx::write(_writer, nameSize);
-				bx::write(_writer, un.name.c_str(), nameSize);
+				bx::write(_writer, nameSize, &err);
+				bx::write(_writer, un.name.c_str(), nameSize, &err);
 				uint8_t type = uint8_t(un.type | fragmentBit);
-				bx::write(_writer, type);
-				bx::write(_writer, un.num);
-				bx::write(_writer, un.regIndex);
-				bx::write(_writer, un.regCount);
+				bx::write(_writer, type, &err);
+				bx::write(_writer, un.num, &err);
+				bx::write(_writer, un.regIndex, &err);
+				bx::write(_writer, un.regCount, &err);
+				bx::write(_writer, un.texComponent, &err);
+				bx::write(_writer, un.texDimension, &err);
+				bx::write(_writer, un.texFormat, &err);
 
 				BX_TRACE("%s, %s, %d, %d, %d"
 					, un.name.c_str()
-					, getUniformTypeName(un.type)
+					, getUniformTypeName(UniformType::Enum(un.type & ~kUniformMask))
 					, un.num
 					, un.regIndex
 					, un.regCount
@@ -765,18 +780,18 @@ namespace bgfx { namespace hlsl
 
 		{
 			uint32_t shaderSize = uint32_t(code->GetBufferSize() );
-			bx::write(_writer, shaderSize);
-			bx::write(_writer, code->GetBufferPointer(), shaderSize);
+			bx::write(_writer, shaderSize, &err);
+			bx::write(_writer, code->GetBufferPointer(), shaderSize, &err);
 			uint8_t nul = 0;
-			bx::write(_writer, nul);
+			bx::write(_writer, nul, &err);
 		}
 
-		if (_version > 9)
+		if (_version >= 400)
 		{
-			bx::write(_writer, numAttrs);
-			bx::write(_writer, attrs, numAttrs*sizeof(uint16_t) );
+			bx::write(_writer, numAttrs, &err);
+			bx::write(_writer, attrs, numAttrs*sizeof(uint16_t), &err);
 
-			bx::write(_writer, size);
+			bx::write(_writer, size, &err);
 		}
 
 		if (_options.disasm )
@@ -827,7 +842,7 @@ namespace bgfx
 	bool compileHLSLShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
 		BX_UNUSED(_options, _version, _code, _writer);
-		fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
+		bx::printf("HLSL compiler is not supported on this platform.\n");
 		return false;
 	}
 

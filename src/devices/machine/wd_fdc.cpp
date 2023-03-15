@@ -22,8 +22,10 @@
 #define LOG_STATE   (1U << 12) // Show state machine
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
+#define LOG_CRC     (1U << 15) // CRC errors
 
 #define VERBOSE (LOG_DESC)
+//#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -42,6 +44,7 @@
 #define LOGSTATE(...) LOGMASKED(LOG_STATE, __VA_ARGS__)
 #define LOGLIVE(...) LOGMASKED(LOG_LIVE, __VA_ARGS__)
 #define LOGFUNC(...) LOGMASKED(LOG_FUNC, __VA_ARGS__)
+#define LOGCRC(...) LOGMASKED(LOG_CRC, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -79,6 +82,60 @@ DEFINE_DEVICE_TYPE(WD1770,     wd1770_device,     "wd1770",     "Western Digital
 DEFINE_DEVICE_TYPE(WD1772,     wd1772_device,     "wd1772",     "Western Digital WD1772 FDC")
 DEFINE_DEVICE_TYPE(WD1773,     wd1773_device,     "wd1773",     "Western Digital WD1773 FDC")
 
+static const char *const states[] =
+{
+	"IDLE",
+	"RESTORE",
+	"SEEK",
+	"STEP",
+	"READ_SECTOR",
+	"READ_TRACK",
+	"READ_ID",
+	"WRITE_TRACK",
+	"WRITE_SECTOR",
+	"SPINUP",
+	"SPINUP_WAIT",
+	"SPINUP_DONE",
+	"SETTLE_WAIT",
+	"SETTLE_DONE",
+	"WRITE_PROTECT_WAIT",
+	"WRITE_PROTECT_DONE",
+	"DATA_LOAD_WAIT",
+	"DATA_LOAD_WAIT_DONE",
+	"SEEK_MOVE",
+	"SEEK_WAIT_STEP_TIME",
+	"SEEK_WAIT_STEP_TIME_DONE",
+	"SEEK_WAIT_STABILIZATION_TIME",
+	"SEEK_WAIT_STABILIZATION_TIME_DONE",
+	"SEEK_DONE",
+	"WAIT_INDEX",
+	"WAIT_INDEX_DONE",
+	"SCAN_ID",
+	"SCAN_ID_FAILED",
+	"SECTOR_READ",
+	"SECTOR_WRITE",
+	"TRACK_DONE",
+	"INITIAL_RESTORE",
+	"DUMMY",
+	"SEARCH_ADDRESS_MARK_HEADER",
+	"READ_HEADER_BLOCK_HEADER",
+	"READ_DATA_BLOCK_HEADER",
+	"READ_ID_BLOCK_TO_LOCAL",
+	"READ_ID_BLOCK_TO_DMA",
+	"READ_ID_BLOCK_TO_DMA_BYTE",
+	"SEARCH_ADDRESS_MARK_DATA",
+	"SEARCH_ADDRESS_MARK_DATA_FAILED",
+	"READ_SECTOR_DATA",
+	"READ_SECTOR_DATA_BYTE",
+	"READ_TRACK_DATA",
+	"READ_TRACK_DATA_BYTE",
+	"WRITE_TRACK_DATA",
+	"WRITE_BYTE",
+	"WRITE_BYTE_DONE",
+	"WRITE_SECTOR_PRE",
+	"WRITE_SECTOR_PRE_BYTE"
+};
+
 wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
@@ -93,6 +150,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	force_ready = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
+	extended_ddam = false;
 	hlt = true; // assume tied to VCC
 }
 
@@ -120,10 +178,10 @@ void wd_fdc_device_base::device_start()
 	if (!has_enmf && !enmf_cb.isnull())
 		logerror("Warning, this chip doesn't have an ENMF line.\n");
 
-	t_gen = timer_alloc(TM_GEN);
-	t_cmd = timer_alloc(TM_CMD);
-	t_track = timer_alloc(TM_TRACK);
-	t_sector = timer_alloc(TM_SECTOR);
+	t_gen = timer_alloc(FUNC(wd_fdc_device_base::generic_tick), this);
+	t_cmd = timer_alloc(FUNC(wd_fdc_device_base::cmd_w_tick), this);
+	t_track = timer_alloc(FUNC(wd_fdc_device_base::track_w_tick), this);
+	t_sector = timer_alloc(FUNC(wd_fdc_device_base::sector_w_tick), this);
 	dden = disable_mfm;
 	enmf = false;
 	floppy = nullptr;
@@ -131,6 +189,8 @@ void wd_fdc_device_base::device_start()
 	data = 0x00;
 	track = 0x00;
 	mr = true;
+
+	delay_int = false;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
@@ -258,18 +318,35 @@ WRITE_LINE_MEMBER(wd_fdc_device_base::dden_w)
 	}
 }
 
-void wd_fdc_device_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::generic_tick)
 {
-	LOGEVENT("Event fired for timer %s\n", (id==TM_GEN)? "TM_GEN" : (id==TM_CMD)? "TM_CMD" : (id==TM_TRACK)? "TM_TRACK" : "TM_SECTOR");
+	LOGEVENT("Event fired for TM_GEN\n");
 	live_sync();
+	do_generic();
+	general_continue();
+}
 
-	switch(id) {
-	case TM_GEN: do_generic(); break;
-	case TM_CMD: do_cmd_w(); break;
-	case TM_TRACK: do_track_w(); break;
-	case TM_SECTOR: do_sector_w(); break;
-	}
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::cmd_w_tick)
+{
+	LOGEVENT("Event fired for TM_CMD\n");
+	live_sync();
+	do_cmd_w();
+	general_continue();
+}
 
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::track_w_tick)
+{
+	LOGEVENT("Event fired for TM_TRACK\n");
+	live_sync();
+	do_track_w();
+	general_continue();
+}
+
+TIMER_CALLBACK_MEMBER(wd_fdc_device_base::sector_w_tick)
+{
+	LOGEVENT("Event fired for TM_SECTOR\n");
+	live_sync();
+	do_sector_w();
 	general_continue();
 }
 
@@ -280,7 +357,9 @@ void wd_fdc_device_base::command_end()
 	motor_timeout = 0;
 
 	if(!drq && (status & S_BUSY)) {
-		status &= ~S_BUSY;
+		if (!t_cmd->enabled()) {
+			status &= ~S_BUSY;
+		}
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -435,6 +514,7 @@ void wd_fdc_device_base::seek_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in seek\n");
 				return;
 			}
 			command_end();
@@ -540,6 +620,7 @@ void wd_fdc_device_base::read_sector_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in readsector\n");
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3], command);
@@ -555,8 +636,10 @@ void wd_fdc_device_base::read_sector_continue()
 
 		case SECTOR_READ:
 			LOGSTATE("SECTOR_READ\n");
-			if(cur_live.crc)
+			if(cur_live.crc) {
 				status |= S_CRC;
+				LOGCRC("CRC error in readsector %04X\n",cur_live.crc);
+			}
 
 			if(command & 0x10 && !(status & S_RNF)) {
 				sector++;
@@ -790,13 +873,23 @@ void wd_fdc_device_base::write_track_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
 			delay_cycles(t_gen, 192);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case DATA_LOAD_WAIT:
@@ -902,13 +995,23 @@ void wd_fdc_device_base::write_sector_continue()
 			LOGSTATE("SETTLE_DONE\n");
 			if (floppy && floppy->wpt_r()) {
 				LOGSTATE("WRITE_PROT\n");
-				status |= S_WP;
-				command_end();
+				sub_state = WRITE_PROTECT_WAIT;
+				delay_cycles(t_gen, 145);
 				return;
 			}
 			sub_state = SCAN_ID;
 			counter = 0;
 			live_start(SEARCH_ADDRESS_MARK_HEADER);
+			return;
+
+		case WRITE_PROTECT_WAIT:
+			LOGSTATE("WRITE_PROTECT_WAIT\n");
+			return;
+
+		case WRITE_PROTECT_DONE:
+			LOGSTATE("WRITE_PROTECT_DONE\n");
+			status |= S_WP;
+			command_end();
 			return;
 
 		case SCAN_ID:
@@ -920,6 +1023,7 @@ void wd_fdc_device_base::write_sector_continue()
 			if(cur_live.crc) {
 				status |= S_CRC;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
+				LOGCRC("CRC error in writesector\n");
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3], command);
@@ -957,15 +1061,27 @@ void wd_fdc_device_base::interrupt_start()
 
 	LOGCOMMAND("cmd: forced interrupt (c=%02x)\n", command);
 
+	// If writing a byte to a sector, then wait until it's written before terminating
+	// This behavior is required by the RM nimbus driver, otherwise the forced interrupt
+	// at the end of a multiple sector write occasionally prevents the CRC byte being
+	// written, causing the disk to be corrupted.
+	if(/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
+		((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE))) {
+		delay_int = true;
+		return;
+	} else {
+		delay_int = false;
+	}
+
+	//logerror("main_state=%s, cur_live.state=%s\n",states[main_state],states[cur_live.state]);
+
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
 		cur_live.tm = attotime::never;
 		status &= ~S_BUSY;
 		drop_drq();
 		motor_timeout = 0;
-	}
-	else
-	{
+	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
@@ -979,14 +1095,13 @@ void wd_fdc_device_base::interrupt_start()
 			intrq_cb(intrq);
 	}
 
-	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
-	{
+	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
 		motor_timeout = 0;
 
 		if (head_control)
 			set_hld();
 
-		if (motor_control) {
+		if(motor_control) {
 			status |= S_MON | S_SPIN;
 
 			mon_cb(0);
@@ -1048,6 +1163,10 @@ void wd_fdc_device_base::do_generic()
 		sub_state = SETTLE_DONE;
 		break;
 
+	case WRITE_PROTECT_WAIT:
+		sub_state = WRITE_PROTECT_DONE;
+		break;
+
 	case SEEK_WAIT_STEP_TIME:
 		sub_state = SEEK_WAIT_STEP_TIME_DONE;
 		break;
@@ -1075,7 +1194,8 @@ void wd_fdc_device_base::do_generic()
 void wd_fdc_device_base::do_cmd_w()
 {
 	// it is actually possible to send another command even while in busy state.
-	// currently we simply accept any commands, but chip logic probably more complex (presumable it is possible change command of the same type only).
+	// currently we simply accept any commands, but chip logic is probably more complex
+	// (presumably it is only possible change to a command of the same type).
 #if 0
 	// Only available command when busy is interrupt
 	if(main_state != IDLE && (cmd_buffer & 0xf0) != 0xd0) {
@@ -1227,6 +1347,8 @@ uint8_t wd_fdc_device_base::status_r()
 
 	uint8_t val = status;
 	if (inverted_bus) val ^= 0xff;
+
+	LOGCOMP("Status value: %02X\n",val);
 
 	return val;
 }
@@ -1422,6 +1544,8 @@ void wd_fdc_device_base::index_callback(floppy_image_device *floppy, int state)
 	case SPINUP_DONE:
 	case SETTLE_WAIT:
 	case SETTLE_DONE:
+	case WRITE_PROTECT_WAIT:
+	case WRITE_PROTECT_DONE:
 	case DATA_LOAD_WAIT:
 	case DATA_LOAD_WAIT_DONE:
 	case SEEK_MOVE:
@@ -1589,6 +1713,14 @@ bool wd_fdc_device_base::read_one_bit(const attotime &limit)
 	return false;
 }
 
+void wd_fdc_device_base::reset_data_sync()
+{
+	cur_live.data_separator_phase = false;
+	cur_live.bit_counter = 0;
+
+	cur_live.data_reg = bitswap<8>(cur_live.shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+}
+
 bool wd_fdc_device_base::write_one_bit(const attotime &limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
@@ -1685,15 +1817,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			if(!dden && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
 			if(dden && cur_live.shift_reg == 0xf57e) {
 				cur_live.crc = 0xef21;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
+				reset_data_sync();
 				if(main_state == READ_ID)
 					cur_live.state = READ_ID_BLOCK_TO_DMA;
 				else
@@ -1777,6 +1907,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(cur_live.bit_counter == 16*6) {
 				if(cur_live.crc) {
 					status |= S_CRC;
+					LOGCRC("CRC error in live_run\n");
 				}
 
 				// Already synchronous
@@ -1812,8 +1943,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
 					cur_live.crc = 0x443b;
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
+					reset_data_sync();
 					cur_live.state = READ_DATA_BLOCK_HEADER;
 				}
 			} else {
@@ -1830,11 +1960,16 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.shift_reg == 0xf56e ? 0xafa5 :
 						0xbf84;
 
-					if((cur_live.data_reg & 0xfe) == 0xf8)
+					reset_data_sync();
+
+					if(extended_ddam) {
+						if(!(cur_live.data_reg & 1))
+							status |= S_DDM;
+						if(!(cur_live.data_reg & 2))
+							status |= S_DDM << 1;
+					} else if((cur_live.data_reg & 0xfe) == 0xf8)
 						status |= S_DDM;
 
-					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 0;
 					cur_live.state = READ_SECTOR_DATA;
 				}
 			}
@@ -1901,7 +2036,12 @@ void wd_fdc_device_base::live_run(attotime limit)
 			} else if(slot < sector_size+2) {
 				// CRC
 				if(slot == sector_size+1) {
-					live_delay(IDLE);
+					// act on delayed interrupt if active
+/*                  if(delay_int) {
+                        interrupt_start();
+                        return;
+                    }
+*/                  live_delay(IDLE);
 					return;
 				}
 			}
@@ -1928,7 +2068,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 				// FM resyncs
 				&& !(dden && (cur_live.shift_reg == 0xf57e      // FM IDAM
 							|| cur_live.shift_reg == 0xf56f     // FM DAM
-							|| cur_live.shift_reg == 0xf56a))   // FM DDAM
+							|| cur_live.shift_reg == 0xf56a     // FM DDAM
+							|| cur_live.shift_reg == 0xf56b     // FM DDAM
+							|| cur_live.shift_reg == 0xf56e     // FM DDAM
+							|| cur_live.shift_reg == 0xf56f))   // FM DDAM
 				)
 				break;
 
@@ -1945,8 +2088,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// MZ: TI99 "DISkASSEMBLER" copy protection requires a threshold of 8
 			bool output_byte = cur_live.bit_counter > 8;
 
-			cur_live.data_separator_phase = false;
-			cur_live.bit_counter = 0;
+			reset_data_sync();
 
 			if(output_byte) {
 				live_delay(READ_TRACK_DATA_BYTE);
@@ -2095,7 +2237,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_fm(0x00);
 					else if(cur_live.byte_counter < 7) {
 						cur_live.crc = 0xffff;
-						live_write_raw(command & 1 ? 0xf56a : 0xf56f);
+						if(extended_ddam) {
+							static const uint16_t dam[4] = { 0xf56f, 0xf56e, 0xf56b, 0xf56a };
+							live_write_raw(dam[command & 3]);
+						} else
+							live_write_raw(command & 1 ? 0xf56a : 0xf56f);
 					} else if(cur_live.byte_counter < sector_size + 7-1) {
 						if(drq) {
 							status |= S_LOST;
@@ -2116,6 +2262,11 @@ void wd_fdc_device_base::live_run(attotime limit)
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// Act on delayed interrupt if set.
+						if(delay_int)
+							interrupt_start();
+
 						return;
 					}
 
@@ -2145,9 +2296,15 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_mfm(cur_live.crc >> 8);
 					else if(cur_live.byte_counter < sector_size + 16+3)
 						live_write_mfm(0xff);
+//                      live_write_mfm(0x4e);
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// Act on delayed interrupt if set.
+						if(delay_int)
+							interrupt_start();
+
 						return;
 					}
 				}
@@ -2591,6 +2748,7 @@ fd1771_device::fd1771_device(const machine_config &mconfig, const char *tag, dev
 	motor_control = false;
 	ready_hooked = true;
 	spinup_on_interrupt = true; // ZX-Spectrum Beta-disk V2 require this, or ReadSector command should set HLD before RDY check
+	extended_ddam = true;
 }
 
 int fd1771_device::calc_sector_size(uint8_t size, uint8_t command) const
@@ -2904,6 +3062,7 @@ wd2791_device::wd2791_device(const machine_config &mconfig, const char *tag, dev
 wd2793_device::wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : wd_fdc_analog_device_base(mconfig, WD2793, tag, owner, clock)
 {
 	step_times = fd179x_step_times;
+
 	delay_register_commit = 16;
 	delay_command_commit = 12;
 	disable_mfm = false;

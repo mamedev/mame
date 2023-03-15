@@ -29,6 +29,7 @@
 #include "source/assembly_grammar.h"
 #include "source/opt/cfg.h"
 #include "source/opt/constants.h"
+#include "source/opt/debug_info_manager.h"
 #include "source/opt/decoration_manager.h"
 #include "source/opt/def_use_manager.h"
 #include "source/opt/dominator_analysis.h"
@@ -42,6 +43,7 @@
 #include "source/opt/type_manager.h"
 #include "source/opt/value_number_table.h"
 #include "source/util/make_unique.h"
+#include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
@@ -78,7 +80,8 @@ class IRContext {
     kAnalysisIdToFuncMapping = 1 << 13,
     kAnalysisConstants = 1 << 14,
     kAnalysisTypes = 1 << 15,
-    kAnalysisEnd = 1 << 16
+    kAnalysisDebugInfo = 1 << 16,
+    kAnalysisEnd = 1 << 17
   };
 
   using ProcessFunction = std::function<bool(Function*)>;
@@ -96,6 +99,7 @@ class IRContext {
         module_(new Module()),
         consumer_(std::move(c)),
         def_use_mgr_(nullptr),
+        feature_mgr_(nullptr),
         valid_analyses_(kAnalysisNone),
         constant_mgr_(nullptr),
         type_mgr_(nullptr),
@@ -114,6 +118,7 @@ class IRContext {
         module_(std::move(m)),
         consumer_(std::move(c)),
         def_use_mgr_(nullptr),
+        feature_mgr_(nullptr),
         valid_analyses_(kAnalysisNone),
         type_mgr_(nullptr),
         id_to_name_(nullptr),
@@ -187,6 +192,14 @@ class IRContext {
   inline IteratorRange<Module::inst_iterator> debugs3();
   inline IteratorRange<Module::const_inst_iterator> debugs3() const;
 
+  // Iterators for debug info instructions (excluding OpLine & OpNoLine)
+  // contained in this module.  These are OpExtInst for DebugInfo extension
+  // placed between section 9 and 10.
+  inline Module::inst_iterator ext_inst_debuginfo_begin();
+  inline Module::inst_iterator ext_inst_debuginfo_end();
+  inline IteratorRange<Module::inst_iterator> ext_inst_debuginfo();
+  inline IteratorRange<Module::const_inst_iterator> ext_inst_debuginfo() const;
+
   // Add |capability| to the module, if it is not already enabled.
   inline void AddCapability(SpvCapability capability);
 
@@ -215,6 +228,8 @@ class IRContext {
   // Appends a debug 3 instruction (OpModuleProcessed) to this module.
   // This is due to decision by the SPIR Working Group, pending publication.
   inline void AddDebug3Inst(std::unique_ptr<Instruction>&& d);
+  // Appends a OpExtInst for DebugInfo to this module.
+  inline void AddExtInstDebugInfo(std::unique_ptr<Instruction>&& d);
   // Appends an annotation instruction to this module.
   inline void AddAnnotationInst(std::unique_ptr<Instruction>&& a);
   // Appends a type-declaration instruction to this module.
@@ -287,7 +302,7 @@ class IRContext {
     }
   }
 
-  // Returns a pointer the decoration manager.  If the decoration manger is
+  // Returns a pointer the decoration manager.  If the decoration manager is
   // invalid, it is rebuilt first.
   analysis::DecorationManager* get_decoration_mgr() {
     if (!AreAnalysesValid(kAnalysisDecorations)) {
@@ -316,6 +331,17 @@ class IRContext {
     return type_mgr_.get();
   }
 
+  // Returns a pointer to the debug information manager.  If no debug
+  // information manager has been created yet, it creates one.
+  // NOTE: Once created, the debug information manager remains active
+  // it is never re-built.
+  analysis::DebugInfoManager* get_debug_info_mgr() {
+    if (!AreAnalysesValid(kAnalysisDebugInfo)) {
+      BuildDebugInfoManager();
+    }
+    return debug_info_mgr_.get();
+  }
+
   // Returns a pointer to the scalar evolution analysis. If it is invalid it
   // will be rebuilt first.
   ScalarEvolutionAnalysis* GetScalarEvolutionAnalysis() {
@@ -333,6 +359,13 @@ class IRContext {
   // OpMemberNames associated with the given id.
   inline IteratorRange<std::multimap<uint32_t, Instruction*>::iterator>
   GetNames(uint32_t id);
+
+  // Returns an OpMemberName instruction that targets |struct_type_id| at
+  // index |index|. Returns nullptr if no such instruction exists.
+  // While the SPIR-V spec does not prohibit having multiple OpMemberName
+  // instructions for the same structure member, it is hard to imagine a member
+  // having more than one name. This method returns the first one it finds.
+  inline Instruction* GetMemberName(uint32_t struct_type_id, uint32_t index);
 
   // Sets the message consumer to the given |consumer|. |consumer| which will be
   // invoked every time there is a message to be communicated to the outside.
@@ -352,7 +385,7 @@ class IRContext {
 
   // Deletes the instruction defining the given |id|. Returns true on
   // success, false if the given |id| is not defined at all. This method also
-  // erases the name, decorations, and defintion of |id|.
+  // erases the name, decorations, and definition of |id|.
   //
   // Pointers and iterators pointing to the deleted instructions become invalid.
   // However other pointers and iterators are still valid.
@@ -373,6 +406,15 @@ class IRContext {
   // instruction exists.
   Instruction* KillInst(Instruction* inst);
 
+  // Collects the non-semantic instruction tree that uses |inst|'s result id
+  // to be killed later.
+  void CollectNonSemanticTree(Instruction* inst,
+                              std::unordered_set<Instruction*>* to_kill);
+
+  // Collect function reachable from |entryId|, returns |funcs|
+  void CollectCallTreeFromRoots(unsigned entryId,
+                                std::unordered_set<uint32_t>* funcs);
+
   // Returns true if all of the given analyses are valid.
   bool AreAnalysesValid(Analysis set) { return (set & valid_analyses_) == set; }
 
@@ -385,13 +427,13 @@ class IRContext {
   bool ReplaceAllUsesWith(uint32_t before, uint32_t after);
 
   // Replace all uses of |before| id with |after| id if those uses
-  // (instruction, operand pair) return true for |predicate|. Returns true if
+  // (instruction) return true for |predicate|. Returns true if
   // any replacement happens. This method does not kill the definition of the
   // |before| id. If |after| is the same as |before|, does nothing and return
   // false.
   bool ReplaceAllUsesWithPredicate(
       uint32_t before, uint32_t after,
-      const std::function<bool(Instruction*, uint32_t)>& predicate);
+      const std::function<bool(Instruction*)>& predicate);
 
   // Returns true if all of the analyses that are suppose to be valid are
   // actually valid.
@@ -415,6 +457,9 @@ class IRContext {
 
   // Kill all name and decorate ops targeting the result id of |inst|.
   void KillNamesAndDecorates(Instruction* inst);
+
+  // Change operands of debug instruction to DebugInfoNone.
+  void KillOperandFromDebugInstructions(Instruction* inst);
 
   // Returns the next unique id for use by an instruction.
   inline uint32_t TakeNextUniqueId() {
@@ -478,6 +523,18 @@ class IRContext {
         std::string message = "ID overflow. Try running compact-ids.";
         consumer()(SPV_MSG_ERROR, "", {0, 0, 0}, message.c_str());
       }
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+      // If TakeNextId returns 0, it is very likely that execution will
+      // subsequently fail. Such failures are false alarms from a fuzzing point
+      // of view: they are due to the fact that too many ids were used, rather
+      // than being due to an actual bug. Thus, during a fuzzing build, it is
+      // preferable to bail out when ID overflow occurs.
+      //
+      // A zero exit code is returned here because a non-zero code would cause
+      // ClusterFuzz/OSS-Fuzz to regard the termination as a crash, and spurious
+      // crash reports is what this guard aims to avoid.
+      exit(0);
+#endif
     }
     return next_id;
   }
@@ -560,9 +617,13 @@ class IRContext {
   bool ProcessCallTreeFromRoots(ProcessFunction& pfn,
                                 std::queue<uint32_t>* roots);
 
-  // Emmits a error message to the message consumer indicating the error
+  // Emits a error message to the message consumer indicating the error
   // described by |message| occurred in |inst|.
   void EmitErrorMessage(std::string message, Instruction* inst);
+
+  // Returns true if and only if there is a path to |bb| from the entry block of
+  // the function that contains |bb|.
+  bool IsReachable(const opt::BasicBlock& bb);
 
  private:
   // Builds the def-use manager from scratch, even if it was already valid.
@@ -640,6 +701,13 @@ class IRContext {
   void BuildTypeManager() {
     type_mgr_ = MakeUnique<analysis::TypeManager>(consumer(), this);
     valid_analyses_ = valid_analyses_ | kAnalysisTypes;
+  }
+
+  // Builds the debug information manager from scratch, even if it was
+  // already valid.
+  void BuildDebugInfoManager() {
+    debug_info_mgr_ = MakeUnique<analysis::DebugInfoManager>(this);
+    valid_analyses_ = valid_analyses_ | kAnalysisDebugInfo;
   }
 
   // Removes all computed dominator and post-dominator trees. This will force
@@ -720,6 +788,8 @@ class IRContext {
 
   // The instruction decoration manager for |module_|.
   std::unique_ptr<analysis::DecorationManager> decoration_mgr_;
+
+  // The feature manager for |module_|.
   std::unique_ptr<FeatureManager> feature_mgr_;
 
   // A map from instructions to the basic block they belong to. This mapping is
@@ -736,7 +806,7 @@ class IRContext {
   // iterators to traverse instructions.
   std::unordered_map<uint32_t, Function*> id_to_func_;
 
-  // A bitset indicating which analyes are currently valid.
+  // A bitset indicating which analyzes are currently valid.
   Analysis valid_analyses_;
 
   // Opcodes of shader capability core executable instructions
@@ -763,6 +833,9 @@ class IRContext {
 
   // Type manager for |module_|.
   std::unique_ptr<analysis::TypeManager> type_mgr_;
+
+  // Debug information manager for |module_|.
+  std::unique_ptr<analysis::DebugInfoManager> debug_info_mgr_;
 
   // A map from an id to its corresponding OpName and OpMemberName instructions.
   std::unique_ptr<std::multimap<uint32_t, Instruction*>> id_to_name_;
@@ -798,8 +871,7 @@ inline IRContext::Analysis operator|(IRContext::Analysis lhs,
 
 inline IRContext::Analysis& operator|=(IRContext::Analysis& lhs,
                                        IRContext::Analysis rhs) {
-  lhs = static_cast<IRContext::Analysis>(static_cast<int>(lhs) |
-                                         static_cast<int>(rhs));
+  lhs = lhs | rhs;
   return lhs;
 }
 
@@ -925,6 +997,23 @@ IteratorRange<Module::const_inst_iterator> IRContext::debugs3() const {
   return ((const Module*)module_.get())->debugs3();
 }
 
+Module::inst_iterator IRContext::ext_inst_debuginfo_begin() {
+  return module()->ext_inst_debuginfo_begin();
+}
+
+Module::inst_iterator IRContext::ext_inst_debuginfo_end() {
+  return module()->ext_inst_debuginfo_end();
+}
+
+IteratorRange<Module::inst_iterator> IRContext::ext_inst_debuginfo() {
+  return module()->ext_inst_debuginfo();
+}
+
+IteratorRange<Module::const_inst_iterator> IRContext::ext_inst_debuginfo()
+    const {
+  return ((const Module*)module_.get())->ext_inst_debuginfo();
+}
+
 void IRContext::AddCapability(SpvCapability capability) {
   if (!get_feature_mgr()->HasCapability(capability)) {
     std::unique_ptr<Instruction> capability_inst(new Instruction(
@@ -947,11 +1036,7 @@ void IRContext::AddCapability(std::unique_ptr<Instruction>&& c) {
 }
 
 void IRContext::AddExtension(const std::string& ext_name) {
-  const auto num_chars = ext_name.size();
-  // Compute num words, accommodate the terminating null character.
-  const auto num_words = (num_chars + 1 + 3) / 4;
-  std::vector<uint32_t> ext_words(num_words, 0u);
-  std::memcpy(ext_words.data(), ext_name.data(), num_chars);
+  std::vector<uint32_t> ext_words = spvtools::utils::MakeVector(ext_name);
   AddExtension(std::unique_ptr<Instruction>(
       new Instruction(this, SpvOpExtension, 0u, 0u,
                       {{SPV_OPERAND_TYPE_LITERAL_STRING, ext_words}})));
@@ -968,11 +1053,7 @@ void IRContext::AddExtension(std::unique_ptr<Instruction>&& e) {
 }
 
 void IRContext::AddExtInstImport(const std::string& name) {
-  const auto num_chars = name.size();
-  // Compute num words, accommodate the terminating null character.
-  const auto num_words = (num_chars + 1 + 3) / 4;
-  std::vector<uint32_t> ext_words(num_words, 0u);
-  std::memcpy(ext_words.data(), name.data(), num_chars);
+  std::vector<uint32_t> ext_words = spvtools::utils::MakeVector(name);
   AddExtInstImport(std::unique_ptr<Instruction>(
       new Instruction(this, SpvOpExtInstImport, 0u, TakeNextId(),
                       {{SPV_OPERAND_TYPE_LITERAL_STRING, ext_words}})));
@@ -1008,14 +1089,23 @@ void IRContext::AddDebug1Inst(std::unique_ptr<Instruction>&& d) {
 void IRContext::AddDebug2Inst(std::unique_ptr<Instruction>&& d) {
   if (AreAnalysesValid(kAnalysisNameMap)) {
     if (d->opcode() == SpvOpName || d->opcode() == SpvOpMemberName) {
-      id_to_name_->insert({d->result_id(), d.get()});
+      // OpName and OpMemberName do not have result-ids. The target of the
+      // instruction is at InOperand index 0.
+      id_to_name_->insert({d->GetSingleWordInOperand(0), d.get()});
     }
+  }
+  if (AreAnalysesValid(kAnalysisDefUse)) {
+    get_def_use_mgr()->AnalyzeInstDefUse(d.get());
   }
   module()->AddDebug2Inst(std::move(d));
 }
 
 void IRContext::AddDebug3Inst(std::unique_ptr<Instruction>&& d) {
   module()->AddDebug3Inst(std::move(d));
+}
+
+void IRContext::AddExtInstDebugInfo(std::unique_ptr<Instruction>&& d) {
+  module()->AddExtInstDebugInfo(std::move(d));
 }
 
 void IRContext::AddAnnotationInst(std::unique_ptr<Instruction>&& a) {
@@ -1076,6 +1166,21 @@ IRContext::GetNames(uint32_t id) {
   }
   auto result = id_to_name_->equal_range(id);
   return make_range(std::move(result.first), std::move(result.second));
+}
+
+Instruction* IRContext::GetMemberName(uint32_t struct_type_id, uint32_t index) {
+  if (!AreAnalysesValid(kAnalysisNameMap)) {
+    BuildIdToNameMap();
+  }
+  auto result = id_to_name_->equal_range(struct_type_id);
+  for (auto i = result.first; i != result.second; ++i) {
+    auto* name_instr = i->second;
+    if (name_instr->opcode() == SpvOpMemberName &&
+        name_instr->GetSingleWordInOperand(1) == index) {
+      return name_instr;
+    }
+  }
+  return nullptr;
 }
 
 }  // namespace opt

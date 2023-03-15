@@ -19,6 +19,7 @@
 #include "ptypes.h"
 
 #include <exception>
+#include <optional>
 #include <type_traits>
 #include <utility>
 
@@ -29,7 +30,8 @@
 		#define gsl_Expects(e) ((e) ? static_cast<void>(0) : static_cast<void>(0))
 	#endif
 #elif defined(__GNUC__) && !(defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ))
-	#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	//#define gsl_Expects(e) ((e) ? static_cast<void>(0) : __builtin_unreachable())
+	#define gsl_Expects(e) (__builtin_expect(!!(e), 1) ? static_cast<void>(0) : __builtin_unreachable())
 #elif defined(_MSC_VER)
 	#define gsl_Expects(e) __assume(e)
 #else
@@ -100,6 +102,54 @@ namespace plib {
 
 	} // namespace pgsl
 
+	/// \brief dynamic downcast from base type pointer to derived type pointer
+	///
+	/// This is a `noexcept` dynamic_cast implementation. It will return the cast
+	/// wrapped into a std::optional type forcing the caller to
+	/// examine if the conversion was successful.
+	///
+	/// \tparam D Derived type
+	/// \tparam B Base type
+	/// \param  base pointer to type B
+	/// \returns return_success_t
+	///
+	template <typename D, typename B>
+	std::enable_if_t<std::is_pointer_v<D> && std::is_pointer_v<std::remove_reference_t<B>>,
+		std::optional<D>>
+	dynamic_downcast(B base) noexcept
+	{
+		D ret = dynamic_cast<D>(base);
+		if (ret != nullptr)
+			return ret;
+		return std::nullopt;
+	}
+
+	/// \brief dynamic downcast from base type reference to derived type pointer
+	///
+	/// This is a `noexcept` dynamic_cast implementation. It will return the
+	/// pointer cast wrapped into a std::optional type forcing the caller to
+	/// examine if the conversion was successful.
+	///
+	/// The return value is a pointer cast since there is no std::optional for
+	/// references. Such a construct is considered ill-formed according to
+	/// the std::optional specification (Section 5.2, p1).
+	///
+	/// \tparam D Derived type
+	/// \tparam B Base type
+	/// \param  base reference of type B
+	/// \returns return_success_t
+	///
+	template <typename D, typename B>
+	std::enable_if_t<std::is_pointer_v<D> &&!std::is_pointer_v<std::remove_reference_t<B>> ,
+		std::optional<D>>
+	dynamic_downcast(B &base) noexcept
+	{
+		D ret = dynamic_cast<D>(&base);
+		if (ret != nullptr)
+			return ret;
+		return std::nullopt;
+	}
+
 	/// \brief downcast from base type to derived type
 	///
 	/// The cpp core guidelines require a very careful use of static cast
@@ -109,8 +159,8 @@ namespace plib {
 	template <typename D, typename B>
 	constexpr D downcast(B && b) noexcept
 	{
-		static_assert(std::is_pointer<D>::value || std::is_reference<D>::value, "downcast only supports pointers or reference for derived");
-		static_assert(std::is_pointer<B>::value || std::is_reference<B>::value, "downcast only supports pointers or reference for base");
+		static_assert((std::is_pointer<D>::value && std::is_pointer<B>::value)
+			|| (std::is_reference<D>::value && std::is_reference<B>::value), "downcast only supports pointers or reference for derived");
 		return static_cast<D>(std::forward<B>(b));
 	}
 
@@ -118,9 +168,8 @@ namespace plib {
 
 	/// \brief cast to void *
 	///
-	/// The purpose here is to help identifiy casts to void in the code.
-	/// These case usuallyindicate some wizard assumptioms which should be easily
-	/// be easy to identify.
+	/// The purpose of void_ptr_cast is to help identify casts to void in the code.
+	///
 	template <typename T>
 	constexpr void * void_ptr_cast(T *ptr) noexcept { return static_cast<void *>(ptr); }
 

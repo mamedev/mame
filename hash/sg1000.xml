@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Othello Multivision carts are marked with OMV.
 
@@ -118,7 +118,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 <softwarelist name="sg1000" description="Sega SG-1000 and SG-1000 MarkII cartridges">
 
 	<software name="3ninmj">
-		<description>San-nin Mahjong (Jpn, OMV)</description>
+		<description>San-nin Mahjong (Japan, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G004"/>
@@ -131,7 +131,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="3ninmjt" cloneof="3ninmj">
-		<description>San-nin Mahjong (Tw)</description>
+		<description>San-nin Mahjong (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-013"/>
@@ -144,7 +144,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="3ninmja" cloneof="3ninmj">
-		<description>San-nin Mahjong (Jpn, alt)</description>
+		<description>San-nin Mahjong (Japan, alt)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="alt_title" value="三人麻雀"/>
@@ -156,7 +156,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bankp">
-		<description>Bank Panic (Jpn)</description>
+		<description>Bank Panic (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Sanritsu</publisher>
 		<info name="serial" value="C-53"/>
@@ -169,7 +169,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bilidada" cloneof="bankp">
-		<description>Bi Li Da Dao (Tw)</description>
+		<description>Bi Li Da Dao (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-053"/>
@@ -182,7 +182,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="blckonyx">
-		<description>The Black Onyx (Jpn)</description>
+		<description>The Black Onyx (Japan)</description>
 		<year>1987</year>
 		<publisher>Sega / BPS</publisher>
 		<info name="serial" value="C-72"/>
@@ -195,7 +195,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjack">
-		<description>Bomb Jack (Jpn)</description>
+		<description>Bomb Jack (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Tehkan</publisher>
 		<info name="serial" value="C-61"/>
@@ -208,7 +208,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackk1" cloneof="bombjack">
-		<description>Bomb Jack (Kor)</description>
+		<description>Bomb Jack (Korea)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="범짹 ~ Beom Jjaek"/>
@@ -220,7 +220,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackk2" cloneof="bombjack">
-		<description>Beom Jjaek (Kor)</description>
+		<description>Beom Jjaek (Korea)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="범짹 ~ Beom Jjaek"/>
@@ -232,7 +232,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackt1" cloneof="bombjack">
-		<description>Bomb Jack (Tw)</description>
+		<description>Bomb Jack (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-059"/>
@@ -245,7 +245,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombmnsp">
-		<description>Bomber Man Special (Tw)</description>
+		<description>Bomber Man Special (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="alt_title" value="爆破隊 ~ Bàopò duì"/>
@@ -260,7 +260,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hongdui" cloneof="bombmnsp">
-		<description>Hongzha Dui (Tw)</description>
+		<description>Hongzha Dui (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="GR-009"/>
@@ -276,7 +276,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bombjackt2" cloneof="bombjack">
-		<description>Chaoren (Tw)</description>
+		<description>Chaoren (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-059"/>
@@ -289,7 +289,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="bordrlin">
-		<description>Borderline (Euro, Jpn)</description>
+		<description>Borderline (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1001"/>
@@ -302,7 +302,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="cabkids">
-		<description>Cabbage Patch Kids (Tw)</description>
+		<description>Cabbage Patch Kids (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-104"/>
@@ -315,7 +315,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="castle">
-		<description>The Castle (Jpn)</description>
+		<description>The Castle (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega / ASCII</publisher>
 		<info name="serial" value="G-1046"/>
@@ -337,7 +337,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 <!-- This is a port of the MSX version -->
 	<software name="castlet" cloneof="castle">
-		<description>Mowang migong ~ The Castle (Tw)</description>
+		<description>Mowang migong ~ The Castle (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="Y-116"/>
@@ -353,7 +353,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chackn">
-		<description>Chack'n Pop (Jpn)</description>
+		<description>Chack'n Pop (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
 		<info name="serial" value="C-52"/>
@@ -366,7 +366,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="dayu" cloneof="chackn">
-		<description>Da Yu (Tw)</description>
+		<description>Da Yu (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-060"/>
@@ -379,7 +379,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chaldrby">
-		<description>Challenge Derby (Jpn, OMV)</description>
+		<description>Challenge Derby (Japan, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G005"/>
@@ -392,7 +392,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chaldrbya" cloneof="chaldrby">
-		<description>Challenge Derby (Jpn, OMV, Alt)</description>
+		<description>Challenge Derby (Japan, OMV, alt)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G005"/>
@@ -407,7 +407,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 <!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
   of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
 	<software name="chaldrbyb" cloneof="chaldrby">
-		<description>Challenge Derby (Jpn, OMV, Hacked)</description>
+		<description>Challenge Derby (Japan, OMV, hacked)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G005"/>
@@ -420,7 +420,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbas">
-		<description>Champion Baseball (Jpn)</description>
+		<description>Champion Baseball (Japan)</description>
 		<!-- according to Bock this comes from Small Boxed cart -->
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
@@ -437,7 +437,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbasa" cloneof="champbas">
-		<description>Champion Baseball (Jpn, Older)</description>
+		<description>Champion Baseball (Japan, older)</description>
 		<!-- only 16k out of 40k are the game data, according to Bock this comes from Big Boxed cart (older than the Small Boxed cart above) -->
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
@@ -453,7 +453,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbast" cloneof="champbas">
-		<description>Champion Baseball (Tw)</description>
+		<description>Champion Baseball (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-011"/>
@@ -466,7 +466,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbil">
-		<description>Champion Billiards (Jpn)</description>
+		<description>Champion Billiards (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-71"/>
@@ -479,7 +479,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbilt" cloneof="champbil">
-		<description>Hua Shi Zhuangqiu (Tw)</description>
+		<description>Hua Shi Zhuangqiu (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-069"/>
@@ -492,7 +492,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbox">
-		<description>Champion Boxing (Jpn)</description>
+		<description>Champion Boxing (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1033"/>
@@ -508,7 +508,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champboxt" cloneof="champbox">
-		<description>Champion Boxing (Tw)</description>
+		<description>Champion Boxing (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-033"/>
@@ -521,7 +521,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champglf">
-		<description>Champion Golf (Jpn)</description>
+		<description>Champion Golf (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Logitec</publisher>
 		<info name="serial" value="G-1005"/>
@@ -538,7 +538,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champglfk" cloneof="champglf">
-		<description>Champion Golf (Kor)</description>
+		<description>Champion Golf (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="G-35"/>
@@ -551,7 +551,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champice">
-		<description>Champion Ice Hockey (Jpn)</description>
+		<description>Champion Ice Hockey (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-59"/>
@@ -564,7 +564,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champicek" cloneof="champice">
-		<description>Champion Ice Hockey (Kor)</description>
+		<description>Champion Ice Hockey (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="아이스 하키"/>
@@ -576,7 +576,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champicet" cloneof="champice">
-		<description>Qugunqiu (Tw)</description>
+		<description>Qugunqiu (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-061"/>
@@ -589,7 +589,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champken">
-		<description>Champion Kendou (Jpn)</description>
+		<description>Champion Kendou (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-67"/>
@@ -602,7 +602,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champkent" cloneof="champken">
-		<description>Jiandao (Tw)</description>
+		<description>Jiandao (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-067"/>
@@ -615,7 +615,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champpwr">
-		<description>Champion Pro Wrestling (Jpn)</description>
+		<description>Champion Pro Wrestling (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1039"/>
@@ -628,7 +628,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champscr">
-		<description>Champion Soccer (Jpn)</description>
+		<description>Champion Soccer (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1034"/>
@@ -641,7 +641,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champscrt" cloneof="champscr">
-		<description>Champion Soccer (Tw)</description>
+		<description>Champion Soccer (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-034"/>
@@ -654,7 +654,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champtns">
-		<description>Champion Tennis (Jpn)</description>
+		<description>Champion Tennis (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1009"/>
@@ -671,7 +671,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="choplift">
-		<description>Choplifter (Jpn)</description>
+		<description>Choplifter (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-48"/>
@@ -684,7 +684,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chopliftp" cloneof="choplift">
-		<description>Choplifter (Jpn, Prototype)</description>
+		<description>Choplifter (Japan, prototype)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -695,7 +695,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chopliftk" cloneof="choplift">
-		<description>Choplifter (Kor)</description>
+		<description>Choplifter (Korea)</description>
 		<year>1985?</year>
 		<publisher>Sega?</publisher>
 		<info name="alt_title" value="쵸프리프터"/>
@@ -707,7 +707,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="feilang" cloneof="choplift">
-		<description>Fei Lang (Tw)</description>
+		<description>Fei Lang (Taiwan)</description>
 		<!-- This version has the Chinese title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -721,7 +721,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="feilanga" cloneof="choplift">
-		<description>Fei Lang ~ Choplifter (Tw, Alt)</description>
+		<description>Fei Lang ~ Choplifter (Taiwan, alt)</description>
 		<!-- This version has the English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -735,7 +735,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="chopliftt" cloneof="choplift">
-		<description>Choplifter (Tw)</description>
+		<description>Choplifter (Taiwan)</description>
 		<!-- This version has the no Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -749,7 +749,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="cloderun">
-		<description>Championship Lode Runner (Jpn)</description>
+		<description>Championship Lode Runner (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Brøderbund Software</publisher>
 		<info name="serial" value="C-57"/>
@@ -762,7 +762,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="cloderunt" cloneof="cloderun">
-		<description>Xun Bao Er Dai (Tw)</description>
+		<description>Xun Bao Er Dai (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-057"/>
@@ -775,7 +775,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="circusc">
-		<description>Maxi Tuan ~ Circus Charlie (Tw)</description>
+		<description>Maxi Tuan ~ Circus Charlie (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-112"/>
@@ -788,7 +788,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="circusck" cloneof="circusc">
-		<description>Circus Charlie (Kor)</description>
+		<description>Circus Charlie (Korea)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -800,7 +800,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 <!-- MPR-5437 according to SC-3000.com pics, but not clear which version these correspond to -->
 	<software name="congo">
-		<description>Congo Bongo (Euro, Jpn, v1)</description>
+		<description>Congo Bongo (Europe, Japan, v1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1007"/>
@@ -813,7 +813,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="congoa" cloneof="congo">
-		<description>Congo Bongo (Euro, Jpn, v1 Alt)</description>
+		<description>Congo Bongo (Europe, Japan, v1 alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -824,7 +824,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="congob" cloneof="congo">
-		<description>Congo Bongo (Jpn, v0)</description>
+		<description>Congo Bongo (Japan, v0)</description>
 		<!-- other 32k dumps floating around are overdumps, as verified by Bock! -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -836,7 +836,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="congot" cloneof="congo"> <!-- based on Jpn v1 release -->
-		<description>Congo Bongo (Tw)</description>
+		<description>Congo Bongo (Taiwan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="A103"/>
@@ -849,7 +849,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="cso">
-		<description>C_So! (Jpn)</description>
+		<description>C_So! (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Pony Canyon</publisher>
 		<info name="serial" value="C-64"/>
@@ -862,7 +862,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="csot" cloneof="cso">
-		<description>Wanpi Gui (Tw)</description>
+		<description>Wanpi Gui (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-068"/>
@@ -875,7 +875,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="dacike">
-		<description>Da Cike (Tw)</description>
+		<description>Da Cike (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="GA-008"/>
@@ -891,7 +891,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="dokidoki">
-		<description>Dokidoki Penguin Land (Jpn)</description>
+		<description>Dokidoki Penguin Land (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-50"/>
@@ -904,7 +904,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="qie" cloneof="dokidoki">
-		<description>Qi E (Tw)</description>
+		<description>Qi E (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-050"/>
@@ -917,7 +917,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="dragwang">
-		<description>Dragon Wang (Jpn, v1)</description>
+		<description>Dragon Wang (Japan, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-46"/>
@@ -930,7 +930,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jingwumn" cloneof="dragwang"> <!-- based on Jpn v0 release -->
-		<description>Jing Wu Men (Tw)</description>
+		<description>Jing Wu Men (Taiwan)</description>
 		<!-- This version has Chinese title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -944,7 +944,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jingwumna" cloneof="dragwang"> <!-- based on Jpn v0 release -->
-		<description>Jing Wu Men (Tw, Alt)</description>
+		<description>Jing Wu Men (Taiwan, alt)</description>
 		<!-- This version has English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -958,7 +958,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="dragwang1" cloneof="dragwang">
-		<description>Dragon Wang (Jpn, v0)</description>
+		<description>Dragon Wang (Japan, v0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -969,7 +969,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="drol">
-		<description>Drol (Jpn)</description>
+		<description>Drol (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Aik Beng / Brøderbund Software</publisher>
 		<info name="serial" value="C-51"/>
@@ -982,7 +982,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="drolt" cloneof="drol">
-		<description>Drol (Tw)</description>
+		<description>Drol (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-051"/>
@@ -995,7 +995,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="drolk" cloneof="drol">
-		<description>Drol (Kor)</description>
+		<description>Drol (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="드롤"/>
@@ -1007,7 +1007,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="elevator">
-		<description>Elevator Action (Jpn)</description>
+		<description>Elevator Action (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
 		<info name="serial" value="C-55"/>
@@ -1020,7 +1020,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="elevatort" cloneof="elevator">
-		<description>Die Dui Die (Tw)</description>
+		<description>Die Dui Die (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-055"/>
@@ -1033,7 +1033,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="exerion">
-		<description>Exerion (Euro, Jpn)</description>
+		<description>Exerion (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
 		<info name="serial" value="G-1028"/>
@@ -1050,7 +1050,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="exeriont" cloneof="exerion">
-		<description>Exerion (Tw)</description>
+		<description>Exerion (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-028"/>
@@ -1063,7 +1063,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="exerionk" cloneof="exerion">
-		<description>Exerion (Kor)</description>
+		<description>Exerion (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="엑스리온"/>
@@ -1076,7 +1076,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 <!-- MPR-6145.IC1 according to SC-3000.com pics, PCB 171-5177, but not clear which version these correspond to -->
 	<software name="flicky">
-		<description>Flicky (Jpn, v1)</description>
+		<description>Flicky (Japan, v1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1036"/>
@@ -1089,7 +1089,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="flickya" cloneof="flicky">
-		<description>Flicky (Jpn, v0)</description>
+		<description>Flicky (Japan, v0)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1036"/>
@@ -1102,7 +1102,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="flickyt" cloneof="flicky"> <!-- Based on Jpn v1 release -->
-		<description>Flicky (Tw)</description>
+		<description>Flicky (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-036"/>
@@ -1115,7 +1115,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="girlgard">
-		<description>Girl's Garden (Jpn)</description>
+		<description>Girl's Garden (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1037"/>
@@ -1128,7 +1128,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="girlgardt" cloneof="girlgard">
-		<description>Girl's Garden (Tw)</description>
+		<description>Girl's Garden (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-037"/>
@@ -1141,7 +1141,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="golgo13">
-		<description>Golgo 13 (Jpn)</description>
+		<description>Golgo 13 (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1014"/>
@@ -1154,7 +1154,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="gpworld">
-		<description>GP World (Jpn, v1)</description>
+		<description>GP World (Japan, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1040"/>
@@ -1167,7 +1167,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="gpworlda" cloneof="gpworld">
-		<description>GP World (Jpn, v0)</description>
+		<description>GP World (Japan, v0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1040"/>
@@ -1183,7 +1183,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="gpworldt" cloneof="gpworld"> <!-- based on Jpn v0 release -->
-		<description>GP World (Tw)</description>
+		<description>GP World (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-040"/>
@@ -1196,7 +1196,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="gulkave">
-		<description>Gulkave (Jpn)</description>
+		<description>Gulkave (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-63"/>
@@ -1209,7 +1209,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="gulkavek" cloneof="gulkave">
-		<description>Gulkave (Kor)</description>
+		<description>Gulkave (Korea)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1220,7 +1220,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="guzzler">
-		<description>Guzzler (Jpn, OMV)</description>
+		<description>Guzzler (Japan, OMV)</description>
 		<year>1983</year>
 		<publisher>Tsukuda Original / Tehkan</publisher>
 		<info name="serial" value="OM-G002"/>
@@ -1233,7 +1233,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="guzzlert" cloneof="guzzler">
-		<description>Guzzler (Tw)</description>
+		<description>Guzzler (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-006"/>
@@ -1246,7 +1246,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hangon2">
-		<description>Hang-On II (Jpn)</description>
+		<description>Hang-On II (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-60"/>
@@ -1259,7 +1259,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hangon2t1" cloneof="hangon2">
-		<description>Hang-On II (Tw)</description>
+		<description>Hang-On II (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="摩托飛車 ~ Mótuō Fēichē"/>
@@ -1271,7 +1271,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hangon2t2" cloneof="hangon2">
-		<description>Motuo Feiche (Tw)</description>
+		<description>Motuo Feiche (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="摩托飛車 ~ Mótuō Fēichē"/>
@@ -1283,7 +1283,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hero">
-		<description>H.E.R.O. (Jpn)</description>
+		<description>H.E.R.O. (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Activision</publisher>
 		<info name="serial" value="C-58"/>
@@ -1296,7 +1296,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="herot" cloneof="hero"> <!-- Taiwanese logo version -->
-		<description>Qing Feng Xia (Tw)</description>
+		<description>Qing Feng Xia (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-058"/>
@@ -1309,7 +1309,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="herotw" cloneof="hero"> <!-- English logo version -->
-		<description>H.E.R.O. (Tw)</description>
+		<description>H.E.R.O. (Taiwan)</description>
 		<year>1985</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1320,7 +1320,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="homemj">
-		<description>Home Mahjong (Jpn, v1)</description>
+		<description>Home Mahjong (Japan, v1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1030"/>
@@ -1333,7 +1333,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="homemj1" cloneof="homemj">
-		<description>Home Mahjong (Jpn, v0)</description>
+		<description>Home Mahjong (Japan, v0)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1344,7 +1344,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="homemjt" cloneof="homemj"> <!-- based on Jpn v1 release -->
-		<description>Yon-nin Mahjong (Tw)</description>
+		<description>Yon-nin Mahjong (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-030"/>
@@ -1358,7 +1358,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<!-- only game not touched by Sega in any way? -->
 	<software name="hustle">
-		<description>Hustle Chumy (Jpn)</description>
+		<description>Hustle Chumy (Japan)</description>
 		<year>1984</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="G-1035"/>
@@ -1371,7 +1371,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hustletw" cloneof="hustle">
-		<description>Hustle Chumy / Wanpi shu (Tw)</description>
+		<description>Hustle Chumy / Wanpi shu (Taiwan)</description>
 		<year>1984</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1382,7 +1382,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hyperspt">
-		<description>Hyper Sports (Jpn)</description>
+		<description>Hyper Sports (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
 		<info name="serial" value="G-1042"/>
@@ -1398,7 +1398,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hypersptt" cloneof="hyperspt">
-		<description>Hyper Sports (Tw)</description>
+		<description>Hyper Sports (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-042"/>
@@ -1411,7 +1411,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hypersptk" cloneof="hyperspt">
-		<description>Hyper Sports (Kor)</description>
+		<description>Hyper Sports (Korea)</description>
 		<year>198?</year>
 		<publisher>Samsung</publisher>
 		<info name="alt_title" value="하이퍼스포츠"/>
@@ -1423,7 +1423,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="hypersp2">
-		<description>Hyper Sports 2 (Tw)</description>
+		<description>Hyper Sports 2 (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-101"/>
@@ -1436,7 +1436,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jb007">
-		<description>007 James Bond (Jpn, v2.7, OMV)</description>
+		<description>007 James Bond (Japan, v2.7, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G008"/>
@@ -1449,7 +1449,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jb007a" cloneof="jb007">
-		<description>007 James Bond (Jpn, v2.6, OMV)</description>
+		<description>007 James Bond (Japan, v2.6, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1460,7 +1460,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jb007t" cloneof="jb007">
-		<description>007 James Bond (Tw)</description>
+		<description>007 James Bond (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-009"/>
@@ -1473,7 +1473,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="jinzita">
-		<description>Jinzita (Tw)</description>
+		<description>Jinzita (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="Y-106"/>
@@ -1489,7 +1489,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="ldrun">
-		<description>Lode Runner (Euro, Jpn)</description>
+		<description>Lode Runner (Europe, Japan)</description>
 		<year>1984</year>
 		<publisher>Sega / Brøderbund Software</publisher>
 		<info name="serial" value="G-1031"/>
@@ -1506,7 +1506,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="ldrunk" cloneof="ldrun">
 		<!-- Alt Title: Lode Runner I (cart label) -->
-		<description>Lode Runner (Kor)</description>
+		<description>Lode Runner (Korea)</description>
 		<year>1984?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1517,7 +1517,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="ldrunt" cloneof="ldrun">
-		<description>Lode Runner (Tw)</description>
+		<description>Lode Runner (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-031"/>
@@ -1542,7 +1542,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="magtree">
-		<description>Magical Tree (Tw)</description>
+		<description>Magical Tree (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-102"/>
@@ -1555,7 +1555,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="mkidwiz">
-		<description>Magical Kid Wiz (Tw)</description>
+		<description>Magical Kid Wiz (Taiwan)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="Y-115"/>
@@ -1571,7 +1571,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="mahjong">
-		<description>Mahjong (Jpn)</description>
+		<description>Mahjong (Japan)</description>
 		<!-- This version has smaller 1983 and Japanese instructions in the title screen -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1585,7 +1585,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="mahjonga" cloneof="mahjong">
-		<description>Mahjong (Jpn, Alt)</description>
+		<description>Mahjong (Japan, alt)</description>
 		<!-- This version has bigger 1983 and English instructions in the title screen -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1597,7 +1597,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="mahjongt" cloneof="mahjong">
-		<description>Mahjong (Tw)</description>
+		<description>Mahjong (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-004"/>
@@ -1610,7 +1610,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="monacogp">
-		<description>Monaco GP (Jpn, v2)</description>
+		<description>Monaco GP (Japan, v2)</description>
 		<!-- This is a later version with bug fixes -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1624,7 +1624,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="monacogpa" cloneof="monacogp">
-		<description>Monaco GP (Jpn, v1)</description>
+		<description>Monaco GP (Japan, v1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1635,7 +1635,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="monacogpb" cloneof="monacogp">
-		<description>Monaco GP (Jpn, v0)</description>
+		<description>Monaco GP (Japan, v0)</description>
 		<!-- 16kb of data + 16kb of trash + 8kb of data, Bock verified that this only came in the earlier Big Boxed carts
 		(afterwards only the 32k was used, even in carts with "24k" advertise on the box) -->
 		<year>1983</year>
@@ -1648,7 +1648,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="monacogpt" cloneof="monacogp"> <!-- based on v1 Jpn release -->
-		<description>Monaco GP (Tw)</description>
+		<description>Monaco GP (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-017"/>
@@ -1661,7 +1661,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="moyuchua">
-		<description>Moyu Chuanqi (Tw)</description>
+		<description>Moyu Chuanqi (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Jumbo</publisher>
 		<info name="serial" value="GB-001"/>
@@ -1677,7 +1677,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="ninjapri">
-		<description>Ninja Princess (Jpn)</description>
+		<description>Ninja Princess (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-65"/>
@@ -1690,7 +1690,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="ninjaprit" cloneof="ninjapri">
-		<description>Renzhe Gongzhu (Tw)</description>
+		<description>Renzhe Gongzhu (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-065"/>
@@ -1703,7 +1703,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="nsub">
-		<description>N-Sub (Euro?)</description>
+		<description>N-Sub (Europe?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1714,7 +1714,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="nsuba" cloneof="nsub">
-		<description>N-Sub (Jpn)</description>
+		<description>N-Sub (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1003"/>
@@ -1727,7 +1727,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="nsubb" cloneof="nsub">
-		<description>N-Sub (Jpn, Alt)</description>
+		<description>N-Sub (Japan, alt)</description>
 		<!-- only 16k out of 40k are the game data, also one between nsuba and nsubb has a gameover glitch (bg color is not reset properly in certain cases), the other is fixed -->
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -1741,7 +1741,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="nsubt" cloneof="nsub">
-		<description>N-Sub (Tw)</description>
+		<description>N-Sub (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-003"/>
@@ -1754,7 +1754,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="matchpg">
-		<description>Okamoto Ayako no Match Play Golf (Jpn, OMV)</description>
+		<description>Okamoto Ayako no Match Play Golf (Japan, OMV)</description>
 		<year>1984?</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G006"/>
@@ -1767,7 +1767,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="matchpga" cloneof="matchpg">
-		<description>Okamoto Ayako no Match Play Golf (Jpn, OMV, Alt)</description>
+		<description>Okamoto Ayako no Match Play Golf (Japan, OMV, alt)</description>
 		<year>1984?</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1778,7 +1778,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="matchpgt" cloneof="matchpg"> <!-- based on Jpn Rev. B? -->
-		<description>Okamoto Ayako no Match Play Golf (Tw)</description>
+		<description>Okamoto Ayako no Match Play Golf (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-021"/>
@@ -1791,7 +1791,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="orguss">
-		<description>Orguss (Euro, Jpn)</description>
+		<description>Orguss (Europe, Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1015"/>
@@ -1808,7 +1808,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="othello">
-		<description>Othello (Jpn)</description>
+		<description>Othello (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Tsukuda Original</publisher>
 		<info name="serial" value="G-1044"/>
@@ -1824,7 +1824,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="heibaiqi" cloneof="othello">
-		<description>Hei Bai Qi (Tw)</description>
+		<description>Hei Bai Qi (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-044"/>
@@ -1840,7 +1840,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pacar">
-		<description>Pacar (Euro, Jpn)</description>
+		<description>Pacar (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1020"/>
@@ -1857,7 +1857,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pacara" cloneof="pacar">
-		<description>Pacar (Jpn, Alt)</description>
+		<description>Pacar (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1020"/>
@@ -1870,7 +1870,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pacart" cloneof="pacar">
-		<description>Pacar (Tw)</description>
+		<description>Pacar (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-020"/>
@@ -1883,7 +1883,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pachink2">
-		<description>Pachinko II (Jpn)</description>
+		<description>Pachinko II (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1029"/>
@@ -1896,7 +1896,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pachink2t" cloneof="pachink2">
-		<description>Pachinko II (Tw)</description>
+		<description>Pachinko II (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-029"/>
@@ -1909,7 +1909,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pachinko">
-		<description>Pachinko (Jpn)</description>
+		<description>Pachinko (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1027"/>
@@ -1922,7 +1922,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pingpong">
-		<description>Ping Pong (Tw)</description>
+		<description>Ping Pong (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-108"/>
@@ -1935,7 +1935,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pippols">
-		<description>Shénqí huāyuán (Tw)</description>
+		<description>Shénqí huāyuán (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Jumbo</publisher>
 		<info name="alt_title" value="Pippols / Shénqí huāyuán (神奇花園)"/>
@@ -1950,7 +1950,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pitfall2a" cloneof="pitfall2">
-		<description>Pitfall II - The Lost Caverns (Jpn, v0)</description>
+		<description>Pitfall II - The Lost Caverns (Japan, v0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-49"/>
@@ -1963,7 +1963,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="pitfall2">
-		<description>Pitfall II - The Lost Caverns (Jpn, v1)</description>
+		<description>Pitfall II - The Lost Caverns (Japan, v1)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -1974,7 +1974,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="faguiqib" cloneof="pitfall2">
-		<description>Fa Gui Qibing (Tw)</description>
+		<description>Fa Gui Qibing (Taiwan)</description>
 		<!-- This version has the Chinese title screen -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -1988,7 +1988,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="faguiqiba" cloneof="pitfall2">
-		<description>Fa Gui Qibing (Tw, Alt)</description>
+		<description>Fa Gui Qibing (Taiwan, alt)</description>
 		<!-- This version has the English title screen -->
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -2002,7 +2002,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="popflame">
-		<description>Pop Flamer (Euro, Jpn)</description>
+		<description>Pop Flamer (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
 		<info name="serial" value="G-1019"/>
@@ -2015,7 +2015,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="popflamet" cloneof="popflame">
-		<description>Pop Flamer (Tw)</description>
+		<description>Pop Flamer (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-019"/>
@@ -2028,7 +2028,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="qbert">
-		<description>Q*bert (Jpn, OMV)</description>
+		<description>Q*bert (Japan, OMV)</description>
 		<year>1983</year>
 		<publisher>Tsukuda Original / Parker Brothers</publisher>
 		<info name="serial" value="OM-G001"/>
@@ -2041,7 +2041,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="rallyx">
-		<description>Rally-X (Tw)</description>
+		<description>Rally-X (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="alt_title" value="烏賊車 ~ Wūzéi chē"/>
@@ -2056,7 +2056,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="duduche" cloneof="rallyx">
-		<description>Du Du Che (Tw)</description>
+		<description>Du Du Che (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="GR-010"/>
@@ -2072,7 +2072,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="roadfght">
-		<description>Road Fighter (Tw)</description>
+		<description>Road Fighter (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Jumbo?</publisher>
 		<info name="alt_title" value="火鳳凰 ~ Huǒ fènghuáng"/>
@@ -2087,7 +2087,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="huojiche" cloneof="roadfght">
-		<description>Huojian Che (Tw)</description>
+		<description>Huojian Che (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Jumbo</publisher>
 		<info name="serial" value="GB-004"/>
@@ -2103,7 +2103,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="rocknbol">
-		<description>Rock n' Bolt (Jpn)</description>
+		<description>Rock n' Bolt (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Activision</publisher>
 		<info name="serial" value="C-54"/>
@@ -2116,7 +2116,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="motianda" cloneof="rocknbol"> <!-- Taiwanese logo version -->
-		<description>Mo Tian Da Lou (Tw)</description>
+		<description>Mo Tian Da Lou (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-054"/>
@@ -2129,7 +2129,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="rocknboltw" cloneof="rocknbol"> <!-- English logo version -->
-		<description>Rock n' Bolt (Tw)</description>
+		<description>Rock n' Bolt (Taiwan)</description>
 		<year>1985</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2140,7 +2140,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarihu" supported="no">
-		<description>Safari Hunting (Jpn)</description>
+		<description>Safari Hunting (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1002"/>
@@ -2153,7 +2153,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarihut" cloneof="safarihu" supported="no">
-		<description>Safari Hunting (Tw)</description>
+		<description>Safari Hunting (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-002"/>
@@ -2166,7 +2166,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarirc">
-		<description>Safari Race (Euro?)</description>
+		<description>Safari Race (Europe?)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2177,7 +2177,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarircj" cloneof="safarirc">
-		<description>Safari Race (Jpn)</description>
+		<description>Safari Race (Japan)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1032"/>
@@ -2193,7 +2193,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="safarirct" cloneof="safarirc">
-		<description>Safari Race (Tw)</description>
+		<description>Safari Race (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-032"/>
@@ -2206,7 +2206,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="segaflip">
-		<description>Sega Flipper (Euro, Jpn)</description>
+		<description>Sega Flipper (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1018"/>
@@ -2219,7 +2219,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="segaflipa" cloneof="segaflip">
-		<description>Sega Flipper (Jpn, Alt)</description>
+		<description>Sega Flipper (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2230,7 +2230,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="segaflipt" cloneof="segaflip">
-		<description>Flipper (Tw)</description>
+		<description>Flipper (Taiwan)</description>
 		<year>1984?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-018"/>
@@ -2243,7 +2243,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="segagala">
-		<description>Sega-Galaga (Jpn)</description>
+		<description>Sega-Galaga (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Namco</publisher>
 		<info name="serial" value="G-1022"/>
@@ -2256,7 +2256,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="segagala1" cloneof="segagala">
-		<description>Sega-Galaga (Jpn, Alt)</description>
+		<description>Sega-Galaga (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega / Namco</publisher>
 		<info name="serial" value="G-1022"/>
@@ -2269,7 +2269,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="galaga" cloneof="segagala">
-		<description>Galaga (Tw)</description>
+		<description>Galaga (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-022"/>
@@ -2282,7 +2282,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="serizawa">
-		<description>Serizawa Hachidan no Tsumeshogi (Jpn)</description>
+		<description>Serizawa Hachidan no Tsumeshogi (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1006"/>
@@ -2295,7 +2295,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="shinnyus">
-		<description>Shinnyushain Tooru Kun (Jpn)</description>
+		<description>Shinnyushain Tooru Kun (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
 		<info name="serial" value="G-1041"/>
@@ -2308,7 +2308,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="shinnyust" cloneof="shinnyus">
-		<description>Shinnyushain Tooru Kun (Tw)</description>
+		<description>Shinnyushain Tooru Kun (Taiwan)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="A121"/>
@@ -2321,7 +2321,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sxpao">
-		<description>Shuangxiang Pao (Tw)</description>
+		<description>Shuangxiang Pao (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>Jumbo</publisher>
 		<info name="serial" value="GB-003"/>
@@ -2337,7 +2337,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sindbadm">
-		<description>Sindbad Mystery (Euro, Jpn)</description>
+		<description>Sindbad Mystery (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1012"/>
@@ -2354,7 +2354,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sindbadmt" cloneof="sindbadm">
-		<description>Sindbad Mystery (Tw)</description>
+		<description>Sindbad Mystery (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-012"/>
@@ -2367,7 +2367,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sokoban">
-		<description>Soukoban (Jpn)</description>
+		<description>Soukoban (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Thinking Rabbit</publisher>
 		<info name="serial" value="C-56"/>
@@ -2380,7 +2380,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sokobant" cloneof="sokoban">
-		<description>Soukoban (Tw)</description>
+		<description>Soukoban (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-056"/>
@@ -2393,7 +2393,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="sokobank" cloneof="sokoban">
-		<description>Soukoban (Kor)</description>
+		<description>Soukoban (Korea)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="창고지기 ~ Changgo Jigi"/>
@@ -2405,7 +2405,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="iq" cloneof="sokoban">
-		<description>I.Q. (Kor)</description>
+		<description>I.Q. (Korea)</description>
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="G-36"/>
@@ -2418,7 +2418,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacearm">
-		<description>Space Armor (Jpn, v20, OMV)</description>
+		<description>Space Armor (Japan, v20, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G007"/>
@@ -2431,7 +2431,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacearma" cloneof="spacearm">
-		<description>Space Armor (Jpn, v20, OMV, Alt)</description>
+		<description>Space Armor (Japan, v20, OMV, alt)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G007, also W-016 (Tw, by Aaronix)"/>
@@ -2444,7 +2444,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacearmb" cloneof="spacearm">
-		<description>Space Armor (Jpn, v10, OMV)</description>
+		<description>Space Armor (Japan, v10, OMV)</description>
 		<year>1984</year>
 		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2455,7 +2455,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invaders (Jpn)</description>
+		<description>Space Invaders (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
 		<info name="serial" value="G-1045"/>
@@ -2468,7 +2468,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spaceinvt" cloneof="spaceinv">
-		<description>Space Invaders (Tw)</description>
+		<description>Space Invaders (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-045"/>
@@ -2481,7 +2481,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacemnt">
-		<description>Space Mountain (Jpn, OMV)</description>
+		<description>Space Mountain (Japan, OMV)</description>
 		<year>1983</year>
 		<publisher>Tsukuda Original</publisher>
 		<info name="serial" value="OM-G003"/>
@@ -2494,7 +2494,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="spacesla">
-		<description>Space Slalom (Jpn)</description>
+		<description>Space Slalom (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Orca</publisher>
 		<info name="serial" value="G-1023"/>
@@ -2507,7 +2507,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starfrce">
-		<description>Star Force (Jpn)</description>
+		<description>Star Force (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega / Tehkan</publisher>
 		<info name="serial" value="G-1043, C-43"/>
@@ -2520,7 +2520,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starfrcet" cloneof="starfrce">
-			<description>Star Force (Tw)</description>
+		<description>Star Force (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-043"/>
@@ -2533,7 +2533,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starfrceta" cloneof="starfrce">
-		<description>Star Force (Tw, Alt)</description>
+		<description>Star Force (Taiwan, alt)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-043"/>
@@ -2547,7 +2547,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 <!-- MPR-5440 according to SC-3000.com pics, but not clear which version these correspond to -->
 	<software name="starjack">
-		<description>Star Jacker (Euro, Jpn, v1.2)</description>
+		<description>Star Jacker (Europe, Japan, v1.2)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1010"/>
@@ -2560,7 +2560,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starjack1" cloneof="starjack">
-		<description>Star Jacker (Euro, Jpn, v1.1)</description>
+		<description>Star Jacker (Europe, Japan, v1.1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2571,7 +2571,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starjack2" cloneof="starjack">
-		<description>Star Jacker (Jpn, v1.0)</description>
+		<description>Star Jacker (Japan, v1.0)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2582,7 +2582,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starjackt" cloneof="starjack">
-		<description>Star Jacker (Tw)</description>
+		<description>Star Jacker (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-010"/>
@@ -2595,7 +2595,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="supertnk">
-		<description>Super Tank (Jpn)</description>
+		<description>Super Tank (Japan)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-66"/>
@@ -2608,7 +2608,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="supertnkk" cloneof="supertnk">
-		<description>Super Tank (Kor)</description>
+		<description>Super Tank (Korea)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2619,7 +2619,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="supertnkt" cloneof="supertnk">
-		<description>Chaoji Tanke (Tw)</description>
+		<description>Chaoji Tanke (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-066"/>
@@ -2632,7 +2632,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="tankdazh">
-		<description>Tanke Dazhan (Tw)</description>
+		<description>Tanke Dazhan (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="GR-014"/>
@@ -2649,7 +2649,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="terebioe">
 		<!-- Notes: This game used a tablet as controller, directly connected to the cart itself -->
-		<description>Terebi Oekaki (Jpn)</description>
+		<description>Terebi Oekaki (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GB-800"/>
@@ -2664,7 +2664,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="wboy">
-		<description>Wonder Boy (Jpn, v1)</description>
+		<description>Wonder Boy (Japan, v1)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-69"/>
@@ -2677,7 +2677,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="wboya" cloneof="wboy">
-		<description>Wonder Boy (Jpn, v0)</description>
+		<description>Wonder Boy (Japan, v0)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-69"/>
@@ -2690,7 +2690,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="wboyt" cloneof="wboy">
-		<description>Taotailang (Tw)</description>
+		<description>Taotailang (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-070"/>
@@ -2703,7 +2703,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="yamato">
-		<description>Yamato (Euro, Jpn)</description>
+		<description>Yamato (Europe, Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1008"/>
@@ -2716,7 +2716,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="yamatoa" cloneof="yamato">
-		<description>Yamato (Euro, Jpn, Alt)</description>
+		<description>Yamato (Europe, Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2727,7 +2727,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="yamatot" cloneof="yamato">
-		<description>Yamato (Tw)</description>
+		<description>Yamato (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="W-008"/>
@@ -2740,7 +2740,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="yiear">
-		<description>Yie Ar Kung-Fu (Tw)</description>
+		<description>Yie Ar Kung-Fu (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-103"/>
@@ -2753,7 +2753,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="yingchua">
-		<description>Yingzi Chuanshuo (Tw)</description>
+		<description>Yingzi Chuanshuo (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="serial" value="GR-012"/>
@@ -2769,7 +2769,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="starsold">
-		<description>Yǔzhòu zhànshì (Tw)</description>
+		<description>Yǔzhòu zhànshì (Taiwan)</description>
 		<year>1986?</year>
 		<publisher>DahJee</publisher>
 		<info name="alt_title" value="Star Soldier / Yǔzhòu zhànshì (宇宙戰士)"/>
@@ -2784,7 +2784,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="zaxxon">
-		<description>Zaxxon (Jpn)</description>
+		<description>Zaxxon (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-1038"/>
@@ -2797,7 +2797,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="zaxxont" cloneof="zaxxon">
-		<description>Zaxxon (Tw)</description>
+		<description>Zaxxon (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-038"/>
@@ -2810,7 +2810,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="zippyrac">
-		<description>Zippy Race (Jpn)</description>
+		<description>Zippy Race (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega / Irem</publisher>
 		<info name="serial" value="G-1026, C-26"/>
@@ -2823,7 +2823,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="zippyract" cloneof="zippyrac">
-		<description>Zippy Race (Tw)</description>
+		<description>Zippy Race (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="B-026"/>
@@ -2836,7 +2836,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="zoom909">
-		<description>Zoom 909 (Jpn)</description>
+		<description>Zoom 909 (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-47"/>
@@ -2849,7 +2849,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="huohuli" cloneof="zoom909">
-		<description>Huo Hu Li (Tw)</description>
+		<description>Huo Hu Li (Taiwan)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<info name="serial" value="R-47"/>
@@ -2863,7 +2863,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 <!-- SC-3000 carts -->
 	<software name="uranaiac">
-		<description>Uranai Angel Cutie (Jpn)</description>
+		<description>Uranai Angel Cutie (Japan)</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2874,7 +2874,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="linkwrld">
-		<description>Link World (Prototype?)</description>
+		<description>Link World (prototype?)</description>
 		<year>1987</year>
 		<publisher>Abstract Software</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2888,7 +2888,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="homebas">
-		<description>Home BASIC (Jpn)</description>
+		<description>Home BASIC (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2904,7 +2904,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 <!-- MyCard -->
 
 	<software name="cardctch">
-		<description>Sega Card Catcher (Jpn)</description>
+		<description>Sega Card Catcher (Japan)</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -2916,7 +2916,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champbox1" cloneof="champbox">
-		<description>Champion Boxing (Jpn, MyCard)</description>
+		<description>Champion Boxing (Japan, MyCard)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="C-33"/>
@@ -2929,7 +2929,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 	<software name="champglf1" cloneof="champglf">
-		<description>Champion Golf (Jpn, MyCard)</description>
+		<description>Champion Golf (Japan, MyCard)</description>
 		<year>1983</year>
 		<publisher>Sega / Logitec</publisher>
 		<info name="serial" value="C-05"/>

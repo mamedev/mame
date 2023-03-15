@@ -113,7 +113,7 @@ void f3853_device::device_start()
 		reg = reg << 1 | (BIT(reg,7) ^ BIT(reg,5) ^ BIT(reg,4) ^ BIT(reg,3) ^ 1);
 	}
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(f3853_device::timer_callback),this));
+	m_timer = timer_alloc(FUNC(f3853_device::timer_callback), this);
 
 	// zerofill (what's not in constructor)
 	m_external_int_enable = false;

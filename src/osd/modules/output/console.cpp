@@ -9,18 +9,23 @@
 *******************************************************************c********/
 
 #include "output_module.h"
+
 #include "modules/osdmodule.h"
+#include "osdcore.h"
+
+namespace osd {
+
+namespace {
 
 class output_console : public osd_module, public output_module
 {
 public:
-	output_console()
-	: osd_module(OSD_OUTPUT_PROVIDER, "console"), output_module()
+	output_console() : osd_module(OSD_OUTPUT_PROVIDER, "console")
 	{
 	}
 	virtual ~output_console() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	virtual void exit() override { }
 
 	// output_module
@@ -29,4 +34,9 @@ public:
 
 };
 
-MODULE_DEFINITION(OUTPUT_CONSOLE, output_console)
+} // anonymous namespace
+
+} // namespace osd
+
+
+MODULE_DEFINITION(OUTPUT_CONSOLE, osd::output_console)

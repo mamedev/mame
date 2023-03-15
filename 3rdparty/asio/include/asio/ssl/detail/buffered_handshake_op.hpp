@@ -2,7 +2,7 @@
 // ssl/detail/buffered_handshake_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,11 @@ template <typename ConstBufferSequence>
 class buffered_handshake_op
 {
 public:
+  static ASIO_CONSTEXPR const char* tracking_name()
+  {
+    return "ssl::stream<>::async_buffered_handshake";
+  }
+
   buffered_handshake_op(stream_base::handshake_type type,
       const ConstBufferSequence& buffers)
     : type_(type),
@@ -51,7 +56,7 @@ public:
       const asio::error_code& ec,
       const std::size_t& bytes_transferred) const
   {
-    handler(ec, bytes_transferred);
+    ASIO_MOVE_OR_LVALUE(Handler)(handler)(ec, bytes_transferred);
   }
 
 private:

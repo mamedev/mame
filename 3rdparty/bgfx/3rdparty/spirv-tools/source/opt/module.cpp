@@ -90,14 +90,20 @@ void Module::ForEachInst(const std::function<void(Instruction*)>& f,
   DELEGATE(extensions_);
   DELEGATE(ext_inst_imports_);
   if (memory_model_) memory_model_->ForEachInst(f, run_on_debug_line_insts);
+  if (sampled_image_address_mode_)
+    sampled_image_address_mode_->ForEachInst(f, run_on_debug_line_insts);
   DELEGATE(entry_points_);
   DELEGATE(execution_modes_);
   DELEGATE(debugs1_);
   DELEGATE(debugs2_);
   DELEGATE(debugs3_);
+  DELEGATE(ext_inst_debuginfo_);
   DELEGATE(annotations_);
   DELEGATE(types_values_);
-  for (auto& i : functions_) i->ForEachInst(f, run_on_debug_line_insts);
+  for (auto& i : functions_) {
+    i->ForEachInst(f, run_on_debug_line_insts,
+                   /* run_on_non_semantic_insts = */ true);
+  }
 #undef DELEGATE
 }
 
@@ -110,6 +116,9 @@ void Module::ForEachInst(const std::function<void(const Instruction*)>& f,
   if (memory_model_)
     static_cast<const Instruction*>(memory_model_.get())
         ->ForEachInst(f, run_on_debug_line_insts);
+  if (sampled_image_address_mode_)
+    static_cast<const Instruction*>(sampled_image_address_mode_.get())
+        ->ForEachInst(f, run_on_debug_line_insts);
   for (auto& i : entry_points_) DELEGATE(i);
   for (auto& i : execution_modes_) DELEGATE(i);
   for (auto& i : debugs1_) DELEGATE(i);
@@ -117,9 +126,11 @@ void Module::ForEachInst(const std::function<void(const Instruction*)>& f,
   for (auto& i : debugs3_) DELEGATE(i);
   for (auto& i : annotations_) DELEGATE(i);
   for (auto& i : types_values_) DELEGATE(i);
+  for (auto& i : ext_inst_debuginfo_) DELEGATE(i);
   for (auto& i : functions_) {
-    static_cast<const Function*>(i.get())->ForEachInst(f,
-                                                       run_on_debug_line_insts);
+    static_cast<const Function*>(i.get())->ForEachInst(
+        f, run_on_debug_line_insts,
+        /* run_on_non_semantic_insts = */ true);
   }
   if (run_on_debug_line_insts) {
     for (auto& i : trailing_dbg_line_info_) DELEGATE(i);
@@ -133,12 +144,97 @@ void Module::ToBinary(std::vector<uint32_t>* binary, bool skip_nop) const {
   // TODO(antiagainst): should we change the generator number?
   binary->push_back(header_.generator);
   binary->push_back(header_.bound);
-  binary->push_back(header_.reserved);
+  binary->push_back(header_.schema);
 
-  auto write_inst = [binary, skip_nop](const Instruction* i) {
-    if (!(skip_nop && i->IsNop())) i->ToBinaryWithoutAttachedDebugInsts(binary);
+  size_t bound_idx = binary->size() - 2;
+  DebugScope last_scope(kNoDebugScope, kNoInlinedAt);
+  const Instruction* last_line_inst = nullptr;
+  bool between_merge_and_branch = false;
+  bool between_label_and_phi_var = false;
+  auto write_inst = [binary, skip_nop, &last_scope, &last_line_inst,
+                     &between_merge_and_branch, &between_label_and_phi_var,
+                     this](const Instruction* i) {
+    // Skip emitting line instructions between merge and branch instructions.
+    auto opcode = i->opcode();
+    if (between_merge_and_branch && i->IsLineInst()) {
+      return;
+    }
+    between_merge_and_branch = false;
+    if (last_line_inst != nullptr) {
+      // If the current instruction is OpLine or DebugLine and it is the same
+      // as the last line instruction that is still effective (can be applied
+      // to the next instruction), we skip writing the current instruction.
+      if (i->IsLine()) {
+        uint32_t operand_index = 0;
+        if (last_line_inst->WhileEachInOperand(
+                [&operand_index, i](const uint32_t* word) {
+                  assert(i->NumInOperandWords() > operand_index);
+                  return *word == i->GetSingleWordInOperand(operand_index++);
+                })) {
+          return;
+        }
+      } else if (!i->IsNoLine() && i->dbg_line_insts().empty()) {
+        // If the current instruction does not have the line information,
+        // the last line information is not effective any more. Emit OpNoLine
+        // or DebugNoLine to specify it.
+        uint32_t shader_set_id = context()
+                                     ->get_feature_mgr()
+                                     ->GetExtInstImportId_Shader100DebugInfo();
+        if (shader_set_id != 0) {
+          binary->push_back((5 << 16) | static_cast<uint16_t>(SpvOpExtInst));
+          binary->push_back(context()->get_type_mgr()->GetVoidTypeId());
+          binary->push_back(context()->TakeNextId());
+          binary->push_back(shader_set_id);
+          binary->push_back(NonSemanticShaderDebugInfo100DebugNoLine);
+        } else {
+          binary->push_back((1 << 16) | static_cast<uint16_t>(SpvOpNoLine));
+        }
+        last_line_inst = nullptr;
+      }
+    }
+
+    if (opcode == SpvOpLabel) {
+      between_label_and_phi_var = true;
+    } else if (opcode != SpvOpVariable && opcode != SpvOpPhi &&
+               !spvtools::opt::IsOpLineInst(opcode)) {
+      between_label_and_phi_var = false;
+    }
+
+    if (!(skip_nop && i->IsNop())) {
+      const auto& scope = i->GetDebugScope();
+      if (scope != last_scope) {
+        // Can only emit nonsemantic instructions after all phi instructions
+        // in a block so don't emit scope instructions before phi instructions
+        // for NonSemantic.Shader.DebugInfo.100.
+        if (!between_label_and_phi_var ||
+            context()
+                ->get_feature_mgr()
+                ->GetExtInstImportId_OpenCL100DebugInfo()) {
+          // Emit DebugScope |scope| to |binary|.
+          auto dbg_inst = ext_inst_debuginfo_.begin();
+          scope.ToBinary(dbg_inst->type_id(), context()->TakeNextId(),
+                         dbg_inst->GetSingleWordOperand(2), binary);
+        }
+        last_scope = scope;
+      }
+
+      i->ToBinaryWithoutAttachedDebugInsts(binary);
+    }
+    // Update the last line instruction.
+    if (spvOpcodeIsBlockTerminator(opcode) || i->IsNoLine()) {
+      last_line_inst = nullptr;
+    } else if (opcode == SpvOpLoopMerge || opcode == SpvOpSelectionMerge) {
+      between_merge_and_branch = true;
+      last_line_inst = nullptr;
+    } else if (i->IsLine()) {
+      last_line_inst = i;
+    }
   };
   ForEachInst(write_inst, true);
+
+  // We create new instructions for DebugScope and DebugNoLine. The bound must
+  // be updated.
+  binary->data()[bound_idx] = header_.bound;
 }
 
 uint32_t Module::ComputeIdBound() const {
@@ -169,9 +265,7 @@ bool Module::HasExplicitCapability(uint32_t cap) {
 
 uint32_t Module::GetExtInstImportId(const char* extstr) {
   for (auto& ei : ext_inst_imports_)
-    if (!strcmp(extstr,
-                reinterpret_cast<const char*>(&(ei.GetInOperand(0).words[0]))))
-      return ei.result_id();
+    if (!ei.GetInOperand(0).AsString().compare(extstr)) return ei.result_id();
   return 0;
 }
 

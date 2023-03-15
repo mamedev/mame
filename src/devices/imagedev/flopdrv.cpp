@@ -14,8 +14,14 @@
 */
 
 #include "emu.h"
-#include "formats/imageutl.h"
 #include "flopdrv.h"
+#include "softlist_dev.h"
+
+#include "formats/imageutl.h"
+
+#include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
+
 
 #define VERBOSE     0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -33,7 +39,7 @@
 struct floppy_error_map
 {
 	floperr_t ferr;
-	image_error_t ierr;
+	std::error_condition ierr;
 	const char *message;
 };
 
@@ -45,11 +51,11 @@ struct floppy_error_map
 
 static const floppy_error_map errmap[] =
 {
-	{ FLOPPY_ERROR_SUCCESS,         IMAGE_ERROR_SUCCESS },
-	{ FLOPPY_ERROR_INTERNAL,        IMAGE_ERROR_INTERNAL },
-	{ FLOPPY_ERROR_UNSUPPORTED,     IMAGE_ERROR_UNSUPPORTED },
-	{ FLOPPY_ERROR_OUTOFMEMORY,     IMAGE_ERROR_OUTOFMEMORY },
-	{ FLOPPY_ERROR_INVALIDIMAGE,    IMAGE_ERROR_INVALIDIMAGE }
+	{ FLOPPY_ERROR_SUCCESS,         { } },
+	{ FLOPPY_ERROR_INTERNAL,        { image_error::INTERNAL } },
+	{ FLOPPY_ERROR_UNSUPPORTED,     { image_error::UNSUPPORTED } },
+	{ FLOPPY_ERROR_OUTOFMEMORY,     { std::errc::not_enough_memory } },
+	{ FLOPPY_ERROR_INVALIDIMAGE,    { image_error::INVALIDIMAGE } }
 };
 
 /***************************************************************************
@@ -123,7 +129,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* initialise flags */
 	m_flags = 0;
 	m_index_pulse_callback = nullptr;
-	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
+	m_index_timer = timer_alloc(FUNC(legacy_floppy_image_device::floppy_drive_index_callback), this);
 	m_idx = 0;
 
 	floppy_drive_set_geometry(m_config->floppy_type);
@@ -418,50 +424,52 @@ void legacy_floppy_image_device::floppy_drive_set_controller(device_t *controlle
 
 image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args)
 {
+	const struct FloppyFormat *floppy_options = m_config->formats;
+
 	floperr_t err;
-	const struct FloppyFormat *floppy_options;
-	int floppy_flags, i;
-
-	device_image_interface *image = nullptr;
-	interface(image);   /* figure out the floppy options */
-	floppy_options = m_config->formats;
-
-	if (is_create)
+	check_for_file();
+	auto io = util::random_read_write_fill(image_core_file(), 0xff);
+	if (!io)
+	{
+		err = FLOPPY_ERROR_OUTOFMEMORY;
+	}
+	else if (is_create)
 	{
 		/* creating an image */
 		assert(create_format >= 0);
-		err = floppy_create((void *) image, &image_ioprocs, &floppy_options[create_format], create_args, &m_floppy);
-		if (err)
-			goto error;
+		err = floppy_create(std::move(io), &floppy_options[create_format], create_args, &m_floppy);
 	}
 	else
 	{
 		/* opening an image */
-		floppy_flags = !is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
-		err = floppy_open_choices((void *) image, &image_ioprocs, filetype(), floppy_options, floppy_flags, &m_floppy);
-		if (err)
-			goto error;
+		int const floppy_flags = !is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
+		err = floppy_open_choices(std::move(io), filetype(), floppy_options, floppy_flags, &m_floppy);
 	}
-	if (floppy_callbacks(m_floppy)->get_heads_per_disk && floppy_callbacks(m_floppy)->get_tracks_per_disk)
+
+	if (!err)
 	{
-		floppy_drive_set_geometry_absolute(floppy_get_tracks_per_disk(m_floppy),floppy_get_heads_per_disk(m_floppy));
+		if (floppy_callbacks(m_floppy)->get_heads_per_disk && floppy_callbacks(m_floppy)->get_tracks_per_disk)
+		{
+			floppy_drive_set_geometry_absolute(floppy_get_tracks_per_disk(m_floppy),floppy_get_heads_per_disk(m_floppy));
+		}
+		/* disk changed */
+		m_dskchg = CLEAR_LINE;
+
+		// If we have one of our hacky load procs, call it
+		if (m_load_proc)
+			m_load_proc(*this, is_create);
+
+		return image_init_result::PASS;
 	}
-	/* disk changed */
-	m_dskchg = CLEAR_LINE;
-
-	// If we have one of our hacky load procs, call it
-	if (m_load_proc)
-		m_load_proc(*this, is_create);
-
-	return image_init_result::PASS;
-
-error:
-	for (i = 0; i < std::size(errmap); i++)
+	else
 	{
-		if (err == errmap[i].ferr)
-			seterror(errmap[i].ierr, errmap[i].message);
+		for (int i = 0; i < std::size(errmap); i++)
+		{
+			if (err == errmap[i].ferr)
+				seterror(errmap[i].ierr, errmap[i].message);
+		}
+		return image_init_result::FAIL;
 	}
-	return image_init_result::FAIL;
 }
 
 TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
@@ -684,6 +692,9 @@ void legacy_floppy_image_device::device_start()
 	/* disk changed */
 	m_dskchg = CLEAR_LINE;
 //  m_out_dskchg_func(m_dskchg);
+
+	/* write-protect callback */
+	m_wpt_timer = timer_alloc(FUNC(legacy_floppy_image_device::set_wpt), this);
 }
 
 
@@ -712,6 +723,11 @@ void legacy_floppy_image_device::device_config_complete()
 	}
 }
 
+const software_list_loader &legacy_floppy_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
+}
+
 image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return internal_floppy_device_load(true, format_type, format_options);
@@ -733,7 +749,7 @@ image_init_result legacy_floppy_image_device::call_load()
 	else
 		next_wpt = 0;
 
-	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), next_wpt);
+	m_wpt_timer->adjust(attotime::from_msec(250), next_wpt);
 
 	return retVal;
 }
@@ -755,7 +771,7 @@ void legacy_floppy_image_device::call_unload()
 	//m_out_wpt_func(m_wpt);
 
 	/* set timer for disk eject */
-	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), 1);
+	m_wpt_timer->adjust(attotime::from_msec(250), 1);
 }
 
 bool legacy_floppy_image_device::is_creatable() const noexcept

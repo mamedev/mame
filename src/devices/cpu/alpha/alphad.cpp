@@ -1225,21 +1225,21 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			else
 				BRANCH_R("br", Ra(instruction), Disp_B(instruction)); // BR
 			break;
-		case 0x31: BRANCH_F("fbeq", Ra(instruction), Disp_B(instruction)); break; // FBEQ
-		case 0x32: BRANCH_F("fblt", Ra(instruction), Disp_B(instruction)); break; // FBLT
-		case 0x33: BRANCH_F("fble", Ra(instruction), Disp_B(instruction)); break; // FBLE
-		case 0x34: BRANCH_R("bsr",  Ra(instruction), Disp_B(instruction)); break; // BSR
-		case 0x35: BRANCH_F("fbne", Ra(instruction), Disp_B(instruction)); break; // FBNE
-		case 0x36: BRANCH_F("fbge", Ra(instruction), Disp_B(instruction)); break; // FBGE
-		case 0x37: BRANCH_F("fbgt", Ra(instruction), Disp_B(instruction)); break; // FBGT
-		case 0x38: BRANCH_R("blbc", Ra(instruction), Disp_B(instruction)); break; // BLBC
-		case 0x39: BRANCH_R("beq",  Ra(instruction), Disp_B(instruction)); break; // BEQ
-		case 0x3a: BRANCH_R("blt",  Ra(instruction), Disp_B(instruction)); break; // BLT
-		case 0x3b: BRANCH_R("ble",  Ra(instruction), Disp_B(instruction)); break; // BLE
-		case 0x3c: BRANCH_R("blbs", Ra(instruction), Disp_B(instruction)); break; // BLBS
-		case 0x3d: BRANCH_R("bne",  Ra(instruction), Disp_B(instruction)); break; // BNE
-		case 0x3e: BRANCH_R("bge",  Ra(instruction), Disp_B(instruction)); break; // BGE
-		case 0x3f: BRANCH_R("bgt",  Ra(instruction), Disp_B(instruction)); break; // BGT
+		case 0x31: BRANCH_F("fbeq", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBEQ
+		case 0x32: BRANCH_F("fblt", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBLT
+		case 0x33: BRANCH_F("fble", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBLE
+		case 0x34: BRANCH_R("bsr",  Ra(instruction), Disp_B(instruction)); flags |= STEP_OVER; break; // BSR
+		case 0x35: BRANCH_F("fbne", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBNE
+		case 0x36: BRANCH_F("fbge", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBGE
+		case 0x37: BRANCH_F("fbgt", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // FBGT
+		case 0x38: BRANCH_R("blbc", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BLBC
+		case 0x39: BRANCH_R("beq",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BEQ
+		case 0x3a: BRANCH_R("blt",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BLT
+		case 0x3b: BRANCH_R("ble",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BLE
+		case 0x3c: BRANCH_R("blbs", Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BLBS
+		case 0x3d: BRANCH_R("bne",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BNE
+		case 0x3e: BRANCH_R("bge",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BGE
+		case 0x3f: BRANCH_R("bgt",  Ra(instruction), Disp_B(instruction)); flags |= STEP_COND; break; // BGT
 	}
 
 	return bytes | flags;

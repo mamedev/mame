@@ -69,6 +69,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set(m_fiqs, FUNC(input_merger_device::in_w<0>));
 	m_ula->pirq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+	m_ula->prst_handler().set(FUNC(bbc_tube_a500_device::prst_w));
 
 	ACORN_MEMC(config, m_memc, 24_MHz_XTAL / 3, m_vidc);
 	m_memc->set_addrmap(0, &bbc_tube_a500_device::a500_map);
@@ -88,7 +89,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
-	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
+	ACORN_VIDC1(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
@@ -138,6 +139,11 @@ void bbc_tube_a500_device::device_start()
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+WRITE_LINE_MEMBER(bbc_tube_a500_device::prst_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
 
 uint8_t bbc_tube_a500_device::host_r(offs_t offset)
 {

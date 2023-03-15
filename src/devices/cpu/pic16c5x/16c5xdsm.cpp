@@ -1,27 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                      Microchip PIC16C5x Emulator                         *
-	*                                                                          *
-	*                    Copyright Tony La Porta                               *
-	*                 Originally written for the MAME project.                 *
-	*                                                                          *
-	*                                                                          *
-	*      Addressing architecture is based on the Harvard addressing scheme.  *
-	*                                                                          *
-	*         Many thanks to those involved in the i8039 Disassembler          *
-	*                        as this was based on it.                          *
-	*                                                                          *
-	*                                                                          *
-	*                                                                          *
-	* A Address to jump to.                                                    *
-	* B Bit address within an 8-bit file register.                             *
-	* D Destination select (0 = store result in W (accumulator))               *
-	*                      (1 = store result in file register)                 *
-	* F Register file address (00-1F).                                         *
-	* K Literal field, constant data.                                          *
-	*                                                                          *
-	\**************************************************************************/
+/************************************************************************
+
+  Microchip PIC16C5x Emulator
+
+  Copyright Tony La Porta
+  Originally written for the MAME project.
+
+
+Many thanks to those involved in the i8039 Disassembler as this was based on it.
+
+A Address to jump to.
+B Bit address within an 8-bit file register.
+D Destination select (0 = store result in W (accumulator))
+                     (1 = store result in file register)
+F Register file address (00-1F).
+K Literal field, constant data.
+
+************************************************************************/
 
 #include "emu.h"
 #include "16c5xdsm.h"
@@ -30,10 +26,12 @@
 #include <stdexcept>
 
 
-const char *const pic16c5x_disassembler::regfile[32] = { "Reg$00 (IND)",    "Reg$01 (TMR)",    "Reg$02 (PCL)",  "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
-									"Reg$08", "Reg$09", "Reg$0A", "Reg$0B", "Reg$0C", "Reg$0D", "Reg$0E", "Reg$0F",
-									"Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
-									"Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F" };
+const char *const pic16c5x_disassembler::regfile[32] = {
+	"Reg$00 (IND)", "Reg$01 (TMR)", "Reg$02 (PCL)", "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
+	"Reg$08", "Reg$09", "Reg$0A", "Reg$0B", "Reg$0C", "Reg$0D", "Reg$0E", "Reg$0F",
+	"Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
+	"Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F"
+};
 
 const char *const pic16c5x_disassembler::dest[2] = { "W", "Reg" };
 
@@ -82,9 +80,8 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
-	int i;
 
-	ops = PIC16C5xFormats; i = 0;
+	ops = PIC16C5xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -107,33 +104,31 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", ops[0],ops[1]));
 			}
 		}
-		if (bit != -1 )
+		if (bit != -1)
 		{
 			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", ops[0],ops[1],bit));
 		}
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace((u8)*p)) p++;
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
-		i++;
 	}
 }
 
 offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	int a, b, d, f, k;  /* these can all be filled in by parsing an instruction */
+	int a, b, d, f, k; // these can all be filled in by parsing an instruction
 	int i;
 	int op;
 	int cnt = 1;
 	int code;
 	int bit;
-	//char *buffertmp;
-	const char *cp;             /* character pointer in OpFormats */
-	uint32_t flags = 0;
+	const char *cp; // character pointer in OpFormats
+	u32 flags = 0;
 
-	op = -1;                /* no matching opcode */
+	op = -1; // no matching opcode
 	code = opcodes.r16(pc);
-	for ( i = 0; i < int(Op.size()); i++)
+	for (i = 0; i < int(Op.size()); i++)
 	{
 		if ((code & Op[i].mask) == Op[i].bits)
 		{
@@ -145,13 +140,14 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			op = i;
 		}
 	}
+
 	if (op == -1)
 	{
 		util::stream_format(stream, "???? dw %04Xh",code);
 		return cnt | SUPPORTED;
 	}
-	//buffertmp = buffer;
-	if (Op[op].extcode)     /* Actually, theres no double length opcodes */
+
+	if (Op[op].extcode) // Actually, theres no double length opcodes
 	{
 		bit = 27;
 		code <<= 16;
@@ -163,33 +159,35 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		bit = 11;
 	}
 
-	/* shift out operands */
+	// shift out operands
 	cp = Op[op].parse;
 	a = b = d = f = k = 0;
 
 	while (bit >= 0)
 	{
-		/* osd_printf_debug("{%c/%d}",*cp,bit); */
+		// osd_printf_debug("{%c/%d}",*cp,bit);
 		switch (*cp)
 		{
-		case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'b': b <<=1; b |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'd': d <<=1; d |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'f': f <<=1; f |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'k': k <<=1; k |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case ' ': break;
-		case '1': case '0':  bit--; break;
-		case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
+			case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'b': b <<=1; b |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'd': d <<=1; d |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'f': f <<=1; f |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'k': k <<=1; k |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case ' ': break;
+			case '1': case '0':  bit--; break;
+			case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
 		}
 		cp++;
 	}
 
-	/* now traverse format string */
+	// now traverse format string
 	cp = Op[op].fmt;
 	if (!strncmp(cp, "call", 4))
 		flags = STEP_OVER;
 	else if (!strncmp(cp, "ret", 3))
 		flags = STEP_OUT;
+	else if (!strncmp(cp, "btfs", 4) || !strncmp(cp + 2, "cfsz", 4))
+		flags = STEP_COND;
 
 	while (*cp)
 	{
@@ -215,7 +213,7 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	return cnt | flags | SUPPORTED;
 }
 
-uint32_t pic16c5x_disassembler::opcode_alignment() const
+u32 pic16c5x_disassembler::opcode_alignment() const
 {
 	return 1;
 }

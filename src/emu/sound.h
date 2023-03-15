@@ -373,6 +373,7 @@ public:
 	// safely write a sample to the buffer
 	void put(s32 start, sample_t sample)
 	{
+		sound_assert(u32(start) < samples());
 		m_buffer->put(index_to_buffer_index(start), sample);
 	}
 
@@ -399,6 +400,7 @@ public:
 	// safely add a sample to the buffer
 	void add(s32 start, sample_t sample)
 	{
+		sound_assert(u32(start) < samples());
 		u32 index = index_to_buffer_index(start);
 		m_buffer->put(index, m_buffer->get(index) + sample);
 	}
@@ -458,7 +460,6 @@ private:
 	// given a stream starting offset, return the buffer index
 	u32 index_to_buffer_index(s32 start) const
 	{
-		sound_assert(u32(start) < samples());
 		u32 index = start + m_start;
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
@@ -669,11 +670,14 @@ private:
 	// handle updates after a save state load
 	void postload();
 
+	// handle updates before a save state load
+	void presave();
+
 	// re-print the synchronization timer
 	void reprime_sync_timer();
 
 	// timer callback for synchronous streams
-	void sync_update(void *, s32);
+	void sync_update(s32);
 
 	// return a view of 0 data covering the given time period
 	read_stream_view empty_view(attotime start, attotime end);
@@ -691,6 +695,8 @@ private:
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
 	bool m_resampling_disabled;                    // is resampling of input streams disabled?
 	emu_timer *m_sync_timer;                       // update timer for synchronous streams
+
+	attotime m_last_update_end_time;               // last end_time() in update
 
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
@@ -762,6 +768,7 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
+	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
@@ -808,14 +815,14 @@ private:
 	void resume();
 
 	// handle configuration load/save
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// helper to adjust scale factor toward a goal
 	stream_buffer::sample_t adjust_toward_compressor_scale(stream_buffer::sample_t curscale, stream_buffer::sample_t prevsample, stream_buffer::sample_t rawsample);
 
 	// periodic sound update, called STREAMS_UPDATE_FREQUENCY per second
-	void update(void *ptr = nullptr, s32 param = 0);
+	void update(s32 param = 0);
 
 	// internal state
 	running_machine &m_machine;           // reference to the running machine
@@ -832,6 +839,7 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode

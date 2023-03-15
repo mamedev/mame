@@ -94,9 +94,8 @@ Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
 
-#include <cassert>
-
 #include "cbm_tap.h"
+#include "imageutl.h"
 
 
 #define CBM_WAV_FREQUENCY   44100
@@ -137,7 +136,7 @@ static int      len;
 /* This in fact gives the number of samples for half of the pulse */
 static inline int tap_data_to_samplecount(int data, int frequency)
 {
-//  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MESS TZX formula
+//  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MAME TZX formula
 	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));    // tap2wav formula
 }
 

@@ -104,7 +104,9 @@ public:
 		BOOLEAN,         // boolean option
 		INTEGER,         // integer option
 		FLOAT,           // floating-point option
-		STRING           // string option
+		STRING,          // string option
+		PATH,            // single path option
+		MULTIPATH        // semicolon-delimited paths option
 	};
 
 	// information about a single entry in the options
@@ -128,6 +130,7 @@ public:
 		const std::vector<std::string> &names() const noexcept { return m_names; }
 		const std::string &name() const noexcept { return m_names[0]; }
 		virtual const char *value() const noexcept;
+		virtual const char *value_unsubstituted() const noexcept;
 		int priority() const noexcept { return m_priority; }
 		void set_priority(int priority) noexcept { m_priority = priority; }
 		option_type type() const noexcept { return m_type; }
@@ -138,18 +141,20 @@ public:
 		bool has_range() const noexcept;
 
 		// mutators
-		void set_value(std::string &&newvalue, int priority, bool always_override = false);
+		void copy_from(const entry &that, bool always_override);
+		void set_value(std::string &&newvalue, int priority, bool always_override = false, bool perform_substitutions = false);
 		virtual void set_default_value(std::string &&newvalue);
 		void set_description(const char *description) { m_description = description; }
 		void set_value_changed_handler(std::function<void(const char *)> &&handler) { m_value_changed_handler = std::move(handler); }
 		virtual void revert(int priority_hi, int priority_lo) { }
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) = 0;
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) = 0;
+		virtual bool internal_copy_value(const entry &that);
 
-	private:
 		void validate(const std::string &value);
 
+	private:
 		const std::vector<std::string>              m_names;
 		int                                         m_priority;
 		core_options::option_type                   m_type;
@@ -231,6 +236,7 @@ private:
 
 		// getters
 		virtual const char *value() const noexcept override;
+		virtual const char *value_unsubstituted() const noexcept override;
 		virtual const char *minimum() const noexcept override;
 		virtual const char *maximum() const noexcept override;
 		virtual const std::string &default_value() const noexcept override;
@@ -239,14 +245,19 @@ private:
 		virtual void set_default_value(std::string &&newvalue) override;
 
 	protected:
-		virtual void internal_set_value(std::string &&newvalue) override;
+		virtual void internal_set_value(std::string &&newvalue, bool perform_substitutions) override;
+		virtual bool internal_copy_value(const entry &that) override;
 
 	private:
 		// internal state
 		std::string             m_data;             // data for this item
+		std::string             m_data_unsubst;     // data for this item, prior to any substitution
 		std::string             m_defdata;          // default data for this item
+		std::string             m_defdata_unsubst;  // default data for this item, prior to any substitution
 		std::string             m_minimum;          // minimum value
 		std::string             m_maximum;          // maximum value
+
+		std::string type_specific_substitutions(std::string_view s) const noexcept;
 	};
 
 	// used internally in core_options
@@ -259,7 +270,7 @@ private:
 
 	// internal helpers
 	void add_to_entry_map(const std::string &name, entry::shared_ptr &entry);
-	void do_set_value(entry &curentry, std::string_view data, int priority, std::ostream &error_stream, condition_type &condition);
+	void do_set_value(entry &curentry, std::string_view data, int priority, std::ostream &error_stream, condition_type &condition, bool perform_substitutions);
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
@@ -279,15 +290,5 @@ struct options_entry
 	core_options::option_type   type;               // type of option
 	const char *                description;        // description for -showusage
 };
-
-// legacy option types
-const core_options::option_type OPTION_INVALID = core_options::option_type::INVALID;
-const core_options::option_type OPTION_HEADER = core_options::option_type::HEADER;
-const core_options::option_type OPTION_COMMAND = core_options::option_type::COMMAND;
-const core_options::option_type OPTION_BOOLEAN = core_options::option_type::BOOLEAN;
-const core_options::option_type OPTION_INTEGER = core_options::option_type::INTEGER;
-const core_options::option_type OPTION_FLOAT = core_options::option_type::FLOAT;
-const core_options::option_type OPTION_STRING = core_options::option_type::STRING;
-
 
 #endif // MAME_LIB_UTIL_OPTIONS_H

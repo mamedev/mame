@@ -35,7 +35,7 @@ private:
 	void format_ea(std::ostream &stream, u8 ea, u16 disp);
 
 	// disassembly helpers
-	offs_t dasm_illegal(std::ostream &stream, std::initializer_list<u8> ops);
+	offs_t dasm_illegal(std::ostream &stream, u8 op);
 	offs_t dasm_general(std::ostream &stream, offs_t pc, u8 ea, const data_buffer &opcodes);
 	offs_t dasm_misc(std::ostream &stream, offs_t pc, u8 ea, const data_buffer &opcodes);
 	offs_t dasm_immop(std::ostream &stream, offs_t pc, bool w, const data_buffer &opcodes);

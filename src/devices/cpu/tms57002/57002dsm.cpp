@@ -51,7 +51,7 @@ offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		{
 
 #define DASM3
-#include "cpu/tms57002/tms57002.hxx"
+#include "cpu/tms57002/tms57002d.hxx"
 #undef  DASM3
 
 		default:
@@ -67,7 +67,7 @@ offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			break;
 
 #define DASM1
-#include "cpu/tms57002/tms57002.hxx"
+#include "cpu/tms57002/tms57002d.hxx"
 #undef  DASM1
 
 		default:
@@ -87,7 +87,7 @@ offs_t tms57002_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			break;
 
 #define DASM2
-#include "cpu/tms57002/tms57002.hxx"
+#include "cpu/tms57002/tms57002d.hxx"
 #undef  DASM2
 
 		default:

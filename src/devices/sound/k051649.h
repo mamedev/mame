@@ -68,12 +68,6 @@ private:
 
 	/* global sound parameters */
 	sound_stream *m_stream;
-	int m_rate;
-
-	/* mixer tables and internal buffers */
-	std::vector<stream_buffer::sample_t> m_mixer_table;
-	stream_buffer::sample_t *m_mixer_lookup;
-	std::vector<s16> m_mixer_buffer;
 
 	/* chip registers */
 	u8 m_test;

@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "output.h"
 
-#include "coreutil.h"
-
 #include <algorithm>
 
 

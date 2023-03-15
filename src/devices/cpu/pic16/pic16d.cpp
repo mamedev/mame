@@ -106,14 +106,14 @@ const pic16_disassembler::instruction pic16_disassembler::instructions[] {
 	{ 0x0e00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "swapf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
 	{ 0x0600, 0x3f00, [](P) -> u32 { util::stream_format(stream, "xorwf %s, %c",  d->freg(opcode), fw(opcode)); return 1; } },
 
-	{ 0x0b00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "decfsz %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
-	{ 0x0f00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "incfsz %s, %c", d->freg(opcode), fw(opcode)); return 1; } },
+	{ 0x0b00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "decfsz %s, %c", d->freg(opcode), fw(opcode)); return 1 | STEP_COND; } },
+	{ 0x0f00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "incfsz %s, %c", d->freg(opcode), fw(opcode)); return 1 | STEP_COND; } },
 
 	{ 0x1000, 0x3c00, [](P) -> u32 { util::stream_format(stream, "bcf %d, %s",   (opcode >> 7) & 7, d->freg(opcode)); return 1; } },
 	{ 0x1400, 0x3c00, [](P) -> u32 { util::stream_format(stream, "bsf %d, %s",   (opcode >> 7) & 7, d->freg(opcode)); return 1; } },
 
-	{ 0x1800, 0x3c00, [](P) -> u32 { util::stream_format(stream, "btfsc %d, %s", (opcode >> 7) & 7, d->freg(opcode)); return 1; } },
-	{ 0x1c00, 0x3c00, [](P) -> u32 { util::stream_format(stream, "btfss %d, %s", (opcode >> 7) & 7, d->freg(opcode)); return 1; } },
+	{ 0x1800, 0x3c00, [](P) -> u32 { util::stream_format(stream, "btfsc %d, %s", (opcode >> 7) & 7, d->freg(opcode)); return 1 | STEP_COND; } },
+	{ 0x1c00, 0x3c00, [](P) -> u32 { util::stream_format(stream, "btfss %d, %s", (opcode >> 7) & 7, d->freg(opcode)); return 1 | STEP_COND; } },
 
 	{ 0x3e00, 0x3f00, [](P) -> u32 { util::stream_format(stream, "addlw %s", imm8(opcode)); return 1; } },
 	{ 0x3900, 0x3f00, [](P) -> u32 { util::stream_format(stream, "andlw %s", imm8(opcode)); return 1; } },

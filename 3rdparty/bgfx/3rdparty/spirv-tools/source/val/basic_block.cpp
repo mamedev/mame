@@ -24,11 +24,13 @@ namespace val {
 BasicBlock::BasicBlock(uint32_t label_id)
     : id_(label_id),
       immediate_dominator_(nullptr),
-      immediate_post_dominator_(nullptr),
+      immediate_structural_dominator_(nullptr),
+      immediate_structural_post_dominator_(nullptr),
       predecessors_(),
       successors_(),
       type_(0),
       reachable_(false),
+      structurally_reachable_(false),
       label_(nullptr),
       terminator_(nullptr) {}
 
@@ -36,21 +38,32 @@ void BasicBlock::SetImmediateDominator(BasicBlock* dom_block) {
   immediate_dominator_ = dom_block;
 }
 
-void BasicBlock::SetImmediatePostDominator(BasicBlock* pdom_block) {
-  immediate_post_dominator_ = pdom_block;
+void BasicBlock::SetImmediateStructuralDominator(BasicBlock* dom_block) {
+  immediate_structural_dominator_ = dom_block;
+}
+
+void BasicBlock::SetImmediateStructuralPostDominator(BasicBlock* pdom_block) {
+  immediate_structural_post_dominator_ = pdom_block;
 }
 
 const BasicBlock* BasicBlock::immediate_dominator() const {
   return immediate_dominator_;
 }
 
-const BasicBlock* BasicBlock::immediate_post_dominator() const {
-  return immediate_post_dominator_;
+const BasicBlock* BasicBlock::immediate_structural_dominator() const {
+  return immediate_structural_dominator_;
+}
+
+const BasicBlock* BasicBlock::immediate_structural_post_dominator() const {
+  return immediate_structural_post_dominator_;
 }
 
 BasicBlock* BasicBlock::immediate_dominator() { return immediate_dominator_; }
-BasicBlock* BasicBlock::immediate_post_dominator() {
-  return immediate_post_dominator_;
+BasicBlock* BasicBlock::immediate_structural_dominator() {
+  return immediate_structural_dominator_;
+}
+BasicBlock* BasicBlock::immediate_structural_post_dominator() {
+  return immediate_structural_post_dominator_;
 }
 
 void BasicBlock::RegisterSuccessors(
@@ -58,13 +71,11 @@ void BasicBlock::RegisterSuccessors(
   for (auto& block : next_blocks) {
     block->predecessors_.push_back(this);
     successors_.push_back(block);
-    if (block->reachable_ == false) block->set_reachable(reachable_);
-  }
-}
 
-void BasicBlock::RegisterBranchInstruction(SpvOp branch_instruction) {
-  if (branch_instruction == SpvOpUnreachable) reachable_ = false;
-  return;
+    // Register structural successors/predecessors too.
+    block->structural_predecessors_.push_back(this);
+    structural_successors_.push_back(block);
+  }
 }
 
 bool BasicBlock::dominates(const BasicBlock& other) const {
@@ -73,10 +84,16 @@ bool BasicBlock::dominates(const BasicBlock& other) const {
            std::find(other.dom_begin(), other.dom_end(), this));
 }
 
-bool BasicBlock::postdominates(const BasicBlock& other) const {
-  return (this == &other) ||
-         !(other.pdom_end() ==
-           std::find(other.pdom_begin(), other.pdom_end(), this));
+bool BasicBlock::structurally_dominates(const BasicBlock& other) const {
+  return (this == &other) || !(other.structural_dom_end() ==
+                               std::find(other.structural_dom_begin(),
+                                         other.structural_dom_end(), this));
+}
+
+bool BasicBlock::structurally_postdominates(const BasicBlock& other) const {
+  return (this == &other) || !(other.structural_pdom_end() ==
+                               std::find(other.structural_pdom_begin(),
+                                         other.structural_pdom_end(), this));
 }
 
 BasicBlock::DominatorIterator::DominatorIterator() : current_(nullptr) {}
@@ -113,21 +130,43 @@ BasicBlock::DominatorIterator BasicBlock::dom_end() {
   return DominatorIterator();
 }
 
-const BasicBlock::DominatorIterator BasicBlock::pdom_begin() const {
-  return DominatorIterator(
-      this, [](const BasicBlock* b) { return b->immediate_post_dominator(); });
+const BasicBlock::DominatorIterator BasicBlock::structural_dom_begin() const {
+  return DominatorIterator(this, [](const BasicBlock* b) {
+    return b->immediate_structural_dominator();
+  });
 }
 
-BasicBlock::DominatorIterator BasicBlock::pdom_begin() {
-  return DominatorIterator(
-      this, [](const BasicBlock* b) { return b->immediate_post_dominator(); });
+BasicBlock::DominatorIterator BasicBlock::structural_dom_begin() {
+  return DominatorIterator(this, [](const BasicBlock* b) {
+    return b->immediate_structural_dominator();
+  });
 }
 
-const BasicBlock::DominatorIterator BasicBlock::pdom_end() const {
+const BasicBlock::DominatorIterator BasicBlock::structural_dom_end() const {
   return DominatorIterator();
 }
 
-BasicBlock::DominatorIterator BasicBlock::pdom_end() {
+BasicBlock::DominatorIterator BasicBlock::structural_dom_end() {
+  return DominatorIterator();
+}
+
+const BasicBlock::DominatorIterator BasicBlock::structural_pdom_begin() const {
+  return DominatorIterator(this, [](const BasicBlock* b) {
+    return b->immediate_structural_post_dominator();
+  });
+}
+
+BasicBlock::DominatorIterator BasicBlock::structural_pdom_begin() {
+  return DominatorIterator(this, [](const BasicBlock* b) {
+    return b->immediate_structural_post_dominator();
+  });
+}
+
+const BasicBlock::DominatorIterator BasicBlock::structural_pdom_end() const {
+  return DominatorIterator();
+}
+
+BasicBlock::DominatorIterator BasicBlock::structural_pdom_end() {
   return DominatorIterator();
 }
 

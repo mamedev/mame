@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="disk">
+		<disk />
+	</element>
+
+	<element name="rect">
+		<rect />
+	</element>
+
+	<view name="Full">
+		<element name="padding" ref="rect">
+			<bounds x="0" y="0" width="832" height="560" />
+			<color red="0" green="0" blue="0" />
+		</element>
+
+		<screen index="0">
+			<bounds x="96" y="0" width="640" height="480" />
+		</screen>
+
+		<element name="left top pad" ref="rect">
+			<bounds x="16" y="209" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="left top lamp" ref="rect">
+			<bounds x="16" y="209" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="left middle pad" ref="rect">
+			<bounds x="16" y="289" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="left middle lamp" ref="rect">
+			<bounds x="16" y="289" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="left bottom pad" ref="rect">
+			<bounds x="16" y="369" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="left bottom lamp" ref="rect">
+			<bounds x="16" y="369" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="right top pad" ref="rect">
+			<bounds x="752" y="209" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="right top lamp" ref="rect">
+			<bounds x="752" y="209" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="right middle pad" ref="rect">
+			<bounds x="752" y="289" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="right middle lamp" ref="rect">
+			<bounds x="752" y="289" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="right bottom pad" ref="rect">
+			<bounds x="752" y="369" width="64" height="64" />
+			<color state="50" alpha="0" />
+			<color state="150" alpha="1" />
+		</element>
+		<element name="right bottom lamp" ref="rect">
+			<bounds x="752" y="369" width="64" height="64" />
+			<color state="0" red="1" green="0" blue="0" alpha="0" />
+			<color state="1" red="1" green="0" blue="0" alpha="1" />
+		</element>
+
+		<element name="select left right" ref="rect">
+			<bounds x="312" y="508" width="48" height="24" />
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="1" green="0" blue="0" />
+		</element>
+		<element name="start lamp" ref="disk">
+			<bounds x="376" y="496" width="48" height="48" />
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="1" green="0" blue="0" />
+		</element>
+		<element name="select left right" ref="rect">
+			<bounds x="440" y="508" width="48" height="24" />
+			<color state="0" red="1" green="1" blue="1" />
+			<color state="1" red="1" green="0" blue="0" />
+		</element>
+	</view>
+</mamelayout>

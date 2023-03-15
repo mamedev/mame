@@ -5,18 +5,23 @@
  *
  */
 
-#include "emu.h"
 #include "modules/osdmodule.h"
 #include "monitor_module.h"
 
 #if defined(OSD_SDL)
 
-#include <algorithm>
+#include "monitor_common.h"
+
+#include "modules/lib/osdobj_common.h"
+#include "modules/osdwindow.h"
+
+#include "osdcore.h"
+#include "window.h"
+
 #include <SDL2/SDL.h>
 
-#include "modules/osdwindow.h"
-#include "monitor_common.h"
-#include "window.h"
+#include <algorithm>
+
 
 inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
 {

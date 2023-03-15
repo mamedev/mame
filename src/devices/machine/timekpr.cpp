@@ -91,6 +91,7 @@ inline int counter_from_ram(u8 const *data, s32 offset, u8 unmap = 0)
 timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_reset_cb(*this)
 	, m_irq_cb(*this)
 	, m_default_data(*this, DEVICE_SELF)
@@ -200,19 +201,7 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 
 void timekeeper_device::device_start()
 {
-	system_time systime;
-
-	machine().base_datetime(systime);
-
 	m_control = 0;
-	m_seconds = time_helper::make_bcd(systime.local_time.second);
-	m_minutes = time_helper::make_bcd(systime.local_time.minute);
-	m_hours = time_helper::make_bcd(systime.local_time.hour);
-	m_day = time_helper::make_bcd(systime.local_time.weekday + 1);
-	m_date = time_helper::make_bcd(systime.local_time.mday);
-	m_month = time_helper::make_bcd(systime.local_time.month + 1);
-	m_year = time_helper::make_bcd(systime.local_time.year % 100);
-	m_century = time_helper::make_bcd(systime.local_time.year / 100);
 	m_data.resize(m_size);
 
 	save_item(NAME(m_control));
@@ -227,10 +216,10 @@ void timekeeper_device::device_start()
 	save_item(NAME(m_data));
 	save_item(NAME(m_watchdog_delay));
 
-	emu_timer *timer = timer_alloc();
+	emu_timer *timer = timer_alloc(FUNC(timekeeper_device::timer_tick), this);
 	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timekeeper_device::watchdog_callback), this));
+	m_watchdog_timer = timer_alloc(FUNC(timekeeper_device::watchdog_callback), this);
 	m_watchdog_timer->adjust(attotime::never);
 	m_reset_cb.resolve_safe();
 	m_irq_cb.resolve_safe();
@@ -240,7 +229,21 @@ void timekeeper_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void timekeeper_device::device_reset() { }
+void timekeeper_device::device_reset()
+{
+}
+
+void timekeeper_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_seconds = time_helper::make_bcd(second);
+	m_minutes = time_helper::make_bcd(minute);
+	m_hours = time_helper::make_bcd(hour);
+	m_day = time_helper::make_bcd(day_of_week);
+	m_date = time_helper::make_bcd(day);
+	m_month = time_helper::make_bcd(month);
+	m_year = time_helper::make_bcd(year % 100);
+	m_century = time_helper::make_bcd(year / 100);
+}
 
 void timekeeper_device::counters_to_ram()
 {
@@ -268,7 +271,7 @@ void timekeeper_device::counters_from_ram()
 	m_century = counter_from_ram(&m_data[0], m_offset_century);
 }
 
-void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(timekeeper_device::timer_tick)
 {
 	LOGMASKED(LOG_TICKS, "Tick\n");
 	if ((m_seconds & SECONDS_ST) != 0 ||
@@ -457,11 +460,14 @@ void timekeeper_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_read(emu_file &file)
+bool timekeeper_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], m_size);
+	size_t actual;
+	if (file.read(&m_data[0], m_size, actual) || actual != m_size)
+		return false;
 
 	counters_to_ram();
+	return true;
 }
 
 
@@ -470,7 +476,8 @@ void timekeeper_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void timekeeper_device::nvram_write(emu_file &file)
+bool timekeeper_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], m_size);
+	size_t actual;
+	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
 }

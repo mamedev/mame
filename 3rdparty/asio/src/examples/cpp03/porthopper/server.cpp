@@ -2,14 +2,14 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #include <asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <cmath>
 #include <cstdlib>
@@ -22,7 +22,7 @@ using asio::ip::tcp;
 using asio::ip::udp;
 
 typedef boost::shared_ptr<tcp::socket> tcp_socket_ptr;
-typedef boost::shared_ptr<asio::deadline_timer> timer_ptr;
+typedef boost::shared_ptr<asio::steady_timer> timer_ptr;
 typedef boost::shared_ptr<control_request> control_request_ptr;
 
 class server
@@ -36,14 +36,13 @@ public:
       next_frame_number_(1)
   {
     // Start waiting for a new control connection.
-    tcp_socket_ptr new_socket(
-        new tcp::socket(acceptor_.get_executor().context()));
+    tcp_socket_ptr new_socket(new tcp::socket(acceptor_.get_executor()));
     acceptor_.async_accept(*new_socket,
         boost::bind(&server::handle_accept, this,
           asio::placeholders::error, new_socket));
 
     // Start the timer used to generate outgoing frames.
-    timer_.expires_from_now(boost::posix_time::milliseconds(100));
+    timer_.expires_after(asio::chrono::milliseconds(100));
     timer_.async_wait(boost::bind(&server::handle_timer, this));
   }
 
@@ -60,8 +59,7 @@ public:
     }
 
     // Start waiting for a new control connection.
-    tcp_socket_ptr new_socket(
-        new tcp::socket(acceptor_.get_executor().context()));
+    tcp_socket_ptr new_socket(new tcp::socket(acceptor_.get_executor()));
     acceptor_.async_accept(*new_socket,
         boost::bind(&server::handle_accept, this,
           asio::placeholders::error, new_socket));
@@ -75,8 +73,8 @@ public:
     {
       // Delay handling of the control request to simulate network latency.
       timer_ptr delay_timer(
-          new asio::deadline_timer(acceptor_.get_executor().context()));
-      delay_timer->expires_from_now(boost::posix_time::seconds(2));
+          new asio::steady_timer(acceptor_.get_executor()));
+      delay_timer->expires_after(asio::chrono::seconds(2));
       delay_timer->async_wait(
           boost::bind(&server::handle_control_request_timer, this,
             socket, request, delay_timer));
@@ -142,7 +140,7 @@ public:
     }
 
     // Wait for next timeout.
-    timer_.expires_from_now(boost::posix_time::milliseconds(100));
+    timer_.expires_after(asio::chrono::milliseconds(100));
     timer_.async_wait(boost::bind(&server::handle_timer, this));
   }
 
@@ -151,7 +149,7 @@ private:
   tcp::acceptor acceptor_;
 
   // The timer used for generating data.
-  asio::deadline_timer timer_;
+  asio::steady_timer timer_;
 
   // The socket used to send data to subscribers.
   udp::socket udp_socket_;

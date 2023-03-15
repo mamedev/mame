@@ -1,4 +1,4 @@
-/* comparitive benchmark of GNU libunistring */
+/* comparative benchmark of GNU libunistring */
 
 #include <stdio.h>
 #include <stdlib.h>

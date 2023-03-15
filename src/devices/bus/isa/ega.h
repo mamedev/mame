@@ -32,8 +32,8 @@ public:
 	uint8_t pc_ega8_3d0_r(offs_t offset);
 	void pc_ega8_3d0_w(offs_t offset, uint8_t data);
 
-	CRTC_EGA_ROW_UPDATE(pc_ega_graphics);
-	CRTC_EGA_ROW_UPDATE(pc_ega_text);
+	CRTC_EGA_PIXEL_UPDATE(pc_ega_graphics);
+	CRTC_EGA_PIXEL_UPDATE(pc_ega_text);
 
 protected:
 	isa8_ega_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -55,7 +55,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vblank_changed);
 
-	CRTC_EGA_ROW_UPDATE(ega_update_row);
+	CRTC_EGA_PIXEL_UPDATE(ega_update_row);
 
 public:
 	required_device<crtc_ega_device> m_crtc_ega;
@@ -104,6 +104,7 @@ public:
 	uint8_t   m_vsync;
 	uint8_t   m_vblank;
 	uint8_t   m_display_enable;
+	uint8_t   m_irq;
 	int     m_video_mode;
 	required_device<palette_device> m_palette;
 };

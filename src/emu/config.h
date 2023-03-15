@@ -13,62 +13,70 @@
 
 #pragma once
 
-#include "xmlfile.h"
+#include <map>
+#include <memory>
+#include <string>
+#include <string_view>
 
-/*************************************
- *
- *  Constants
- *
- *************************************/
 
-#define CONFIG_VERSION          10
-
-enum class config_type
+enum class config_type : int
 {
-	INIT = 0,       // opportunity to initialize things first
+	INIT,           // opportunity to initialize things first
 	CONTROLLER,     // loading from controller file
 	DEFAULT,        // loading from default.cfg
-	GAME,           // loading from game.cfg
+	SYSTEM,         // loading from system.cfg
 	FINAL           // opportunity to finish initialization
 };
 
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
+enum class config_level : int
+{
+	DEFAULT,
+	SOURCE,
+	BIOS,
+	PARENT,
+	SYSTEM
+};
 
-typedef delegate<void (config_type, util::xml::data_node const *)> config_load_delegate;
-typedef delegate<void (config_type, util::xml::data_node *)> config_save_delegate;
-
-// ======================> configuration_manager
 
 class configuration_manager
 {
-	struct config_element
-	{
-		std::string          name;              // node name
-		config_load_delegate load;              // load callback
-		config_save_delegate save;              // save callback
-	};
-
 public:
+	typedef delegate<void (config_type, config_level, util::xml::data_node const *)> load_delegate;
+	typedef delegate<void (config_type, util::xml::data_node *)> save_delegate;
+
+	static inline constexpr int CONFIG_VERSION = 10;
+
 	// construction/destruction
 	configuration_manager(running_machine &machine);
+	~configuration_manager();
 
-	void config_register(const char* nodename, config_load_delegate load, config_save_delegate save);
-	int load_settings();
+	void config_register(std::string_view name, load_delegate &&load, save_delegate &&save);
+
+	bool load_settings();
 	void save_settings();
 
-	// getters
-	running_machine &machine() const { return m_machine; }
 private:
-	int load_xml(emu_file &file, config_type which_type);
-	int save_xml(emu_file &file, config_type which_type);
+	struct config_handler
+	{
+		load_delegate load;
+		save_delegate save;
+	};
+
+	running_machine &machine() const { return m_machine; }
+
+	bool attempt_load(game_driver const &system, emu_file &file, std::string_view name, config_type which_type);
+
+	bool load_xml(game_driver const &system, emu_file &file, config_type which_type);
+	bool save_xml(emu_file &file, config_type which_type);
+
+	void save_unhandled(std::unique_ptr<util::xml::file> &unhandled, util::xml::data_node const &systemnode);
+	void restore_unhandled(util::xml::file const &unhandled, util::xml::data_node &systemnode);
 
 	// internal state
-	running_machine &   m_machine;                  // reference to our machine
-	std::vector<config_element> m_typelist;
+	running_machine &m_machine;
+	std::multimap<std::string, config_handler> m_typelist;
+	std::unique_ptr<util::xml::file> m_unhandled_default;
+	std::unique_ptr<util::xml::file> m_unhandled_system;
 };
 
-#endif  /* MAME_EMU_CONFIG_H */
+#endif // MAME_EMU_CONFIG_H

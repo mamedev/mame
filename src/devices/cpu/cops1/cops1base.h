@@ -92,6 +92,7 @@ protected:
 	address_space *m_data;
 
 	int m_icount;
+	int m_state_count;
 
 	// fixed settings or mask options
 	int m_prgwidth; // ROM/RAM address size

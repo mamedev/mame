@@ -52,7 +52,7 @@ device_o2_cart_interface::~device_o2_cart_interface()
 
 o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
 	, m_type(O2_STD)
 	, m_cart(nullptr)
@@ -182,10 +182,10 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		u32 size = hook.image_file()->size();
-		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
-		slot_string = o2_get_slot(type);
+		uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error return
+		int const type = (size == 0x4000) ? O2_RALLY : O2_STD;
+		char const *const slot_string = o2_get_slot(type);
 
 		return std::string(slot_string);
 	}

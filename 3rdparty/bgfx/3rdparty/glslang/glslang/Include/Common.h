@@ -38,6 +38,22 @@
 #define _COMMON_INCLUDED_
 
 #include <sstream>
+#include <algorithm>
+#include <cassert>
+#ifdef _MSC_VER
+#include <cfloat>
+#else
+#include <cmath>
+#endif
+#include <cstdio>
+#include <cstdlib>
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #if defined(__ANDROID__) || (defined(_MSC_VER) && _MSC_VER < 1700)
 
@@ -51,7 +67,7 @@ std::string to_string(const T& val) {
 }
 #endif
 
-#if (defined(_MSC_VER) && _MSC_VER < 1900 /*vs2015*/) || defined MINGW_HAS_SECURE_API
+#if (defined(_MSC_VER) && _MSC_VER < 1900 /*vs2015*/) || (defined(MINGW_HAS_SECURE_API) && MINGW_HAS_SECURE_API)
     #include <basetsd.h>
     #ifndef snprintf
     #define snprintf sprintf_s
@@ -93,18 +109,6 @@ std::string to_string(const T& val) {
     #pragma warning(disable : 4514) // unused inline method
     #pragma warning(disable : 4201) // nameless union
 #endif
-
-#include <set>
-#include <unordered_set>
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <list>
-#include <algorithm>
-#include <string>
-#include <cstdio>
-#include <cstdlib>
-#include <cassert>
 
 #include "PoolAlloc.h"
 
@@ -196,6 +200,10 @@ template <class K, class D, class HASH = std::hash<K>, class PRED = std::equal_t
 class TUnorderedMap : public std::unordered_map<K, D, HASH, PRED, pool_allocator<std::pair<K const, D> > > {
 };
 
+template <class K, class CMP = std::less<K> >
+class TSet : public std::set<K, CMP, pool_allocator<K> > {
+};
+
 //
 // Persistent string memory.  Should only be used for strings that survive
 // across compiles/links.
@@ -211,7 +219,7 @@ template <class T> T Max(const T a, const T b) { return a > b ? a : b; }
 //
 // Create a TString object from an integer.
 //
-#if defined _MSC_VER || defined MINGW_HAS_SECURE_API
+#if defined(_MSC_VER) || (defined(MINGW_HAS_SECURE_API) && MINGW_HAS_SECURE_API)
 inline const TString String(const int i, const int base = 10)
 {
     char text[16];     // 32 bit ints are at most 10 digits in base 10
@@ -286,6 +294,46 @@ template <class T> bool IsMultipleOfPow2(T number, int powerOf2)
 {
     assert(IsPow2(powerOf2));
     return ! (number & (powerOf2 - 1));
+}
+
+// Returns log2 of an integer power of 2.
+// T should be integral.
+template <class T> int IntLog2(T n)
+{
+    assert(IsPow2(n));
+    int result = 0;
+    while ((T(1) << result) != n) {
+      result++;
+    }
+    return result;
+}
+
+inline bool IsInfinity(double x) {
+#ifdef _MSC_VER
+    switch (_fpclass(x)) {
+    case _FPCLASS_NINF:
+    case _FPCLASS_PINF:
+        return true;
+    default:
+        return false;
+    }
+#else
+    return std::isinf(x);
+#endif
+}
+
+inline bool IsNan(double x) {
+#ifdef _MSC_VER
+    switch (_fpclass(x)) {
+    case _FPCLASS_SNAN:
+    case _FPCLASS_QNAN:
+        return true;
+    default:
+        return false;
+    }
+#else
+  return std::isnan(x);
+#endif
 }
 
 } // end namespace glslang

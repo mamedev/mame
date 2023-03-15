@@ -11,29 +11,35 @@
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-// standard windows headers
-#include <windows.h>
-#include <mmsystem.h>
-
-// undef WINNT for dsound.h to prevent duplicate definition
-#undef WINNT
-#include <dsound.h>
-#undef interface
-
 // MAME headers
-#include "emu.h"
-#include "osdepend.h"
 #include "emuopts.h"
 
+// osd headers
+#include "modules/lib/osdobj_common.h"
+#include "osdepend.h"
+#include "osdcore.h"
+
 #ifdef SDLMAME_WIN32
-#include "../../sdl/osdsdl.h"
+#include "sdl/window.h"
 #include <SDL2/SDL_syswm.h>
-#include "../../sdl/window.h"
 #else
 #include "winmain.h"
 #include "window.h"
 #endif
+
 #include <utility>
+
+// standard windows headers
+
+#include <windows.h>
+
+#include <mmreg.h>
+#include <mmsystem.h>
+
+#include <dsound.h>
+
+#include <wrl/client.h>
+
 
 //============================================================
 //  DEBUGGING
@@ -41,17 +47,171 @@
 
 #define LOG_SOUND   0
 
-#define LOG(x)      do { if (LOG_SOUND) osd_printf_verbose x; } while(0)
+#define LOG(...)      do { if (LOG_SOUND) osd_printf_verbose(__VA_ARGS__); } while(0)
+
+
+namespace osd {
+
+namespace {
+
+class buffer_base
+{
+public:
+	explicit operator bool() const { return bool(m_buffer); }
+
+	unsigned long release() { return m_buffer.Reset(); }
+
+protected:
+	Microsoft::WRL::ComPtr<IDirectSoundBuffer> m_buffer;
+};
+
+
+class primary_buffer : public buffer_base
+{
+public:
+	HRESULT create(LPDIRECTSOUND dsound)
+	{
+		assert(!m_buffer);
+		DSBUFFERDESC desc;
+		memset(&desc, 0, sizeof(desc));
+		desc.dwSize = sizeof(desc);
+		desc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_GETCURRENTPOSITION2;
+		desc.lpwfxFormat = nullptr;
+		return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
+	}
+
+	HRESULT get_format(WAVEFORMATEX &format) const
+	{
+		assert(m_buffer);
+		return m_buffer->GetFormat(&format, sizeof(format), nullptr);
+	}
+
+	HRESULT set_format(WAVEFORMATEX const &format) const
+	{
+		assert(m_buffer);
+		return m_buffer->SetFormat(&format);
+	}
+};
+
+
+class stream_buffer : public buffer_base
+{
+public:
+	HRESULT create(LPDIRECTSOUND dsound, DWORD size, WAVEFORMATEX &format)
+	{
+		assert(!m_buffer);
+		DSBUFFERDESC desc;
+		memset(&desc, 0, sizeof(desc));
+		desc.dwSize = sizeof(desc);
+		desc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS | DSBCAPS_GETCURRENTPOSITION2;
+		desc.dwBufferBytes = size;
+		desc.lpwfxFormat = &format;
+		m_size = size;
+		return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
+	}
+
+	HRESULT play_looping() const
+	{
+		assert(m_buffer);
+		return m_buffer->Play(0, 0, DSBPLAY_LOOPING);
+	}
+	HRESULT stop() const
+	{
+		assert(m_buffer);
+		return m_buffer->Stop();
+	}
+	HRESULT set_volume(LONG volume) const
+	{
+		assert(m_buffer);
+		return m_buffer->SetVolume(volume);
+	}
+	HRESULT set_min_volume() { return set_volume(DSBVOLUME_MIN); }
+
+	HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos) const
+	{
+		assert(m_buffer);
+		return m_buffer->GetCurrentPosition(&play_pos, &write_pos);
+	}
+	HRESULT copy_data(DWORD cursor, DWORD bytes, void const *data)
+	{
+		HRESULT result = lock(cursor, bytes);
+		if (DS_OK != result)
+			return result;
+
+		assert(m_bytes1);
+		assert((m_locked1 + m_locked2) >= bytes);
+		memcpy(m_bytes1, data, std::min(m_locked1, bytes));
+		if (m_locked1 < bytes)
+		{
+			assert(m_bytes2);
+			memcpy(m_bytes2, (uint8_t const *)data + m_locked1, bytes - m_locked1);
+		}
+
+		unlock();
+		return DS_OK;
+	}
+	HRESULT clear()
+	{
+		HRESULT result = lock_all();
+		if (DS_OK != result)
+			return result;
+
+		assert(m_bytes1);
+		assert(!m_bytes2);
+		assert(m_size == m_locked1);
+		assert(0U == m_locked2);
+		memset(m_bytes1, 0, m_locked1);
+
+		unlock();
+		return DS_OK;
+	}
+
+	DWORD size() const { return m_size; }
+
+private:
+	HRESULT lock(DWORD cursor, DWORD bytes)
+	{
+		assert(cursor < m_size);
+		assert(bytes <= m_size);
+		assert(m_buffer);
+		assert(!m_bytes1);
+		return m_buffer->Lock(
+				cursor, bytes,
+				&m_bytes1,
+				&m_locked1,
+				&m_bytes2,
+				&m_locked2,
+				0);
+	}
+	HRESULT lock_all() { return lock(0, m_size); }
+	HRESULT unlock()
+	{
+		assert(m_buffer);
+		assert(m_bytes1);
+		HRESULT const result = m_buffer->Unlock(
+				m_bytes1,
+				m_locked1,
+				m_bytes2,
+				m_locked2);
+		m_bytes1 = m_bytes2 = nullptr;
+		m_locked1 = m_locked2 = 0;
+		return result;
+	}
+
+	DWORD m_size = 0;
+	void *m_bytes1 = nullptr, *m_bytes2 = nullptr;
+	DWORD m_locked1 = 0, m_locked2 = 0;
+};
 
 
 class sound_direct_sound : public osd_module, public sound_module
 {
 public:
-
 	sound_direct_sound() :
 		osd_module(OSD_SOUND_PROVIDER, "dsound"),
 		sound_module(),
-		m_dsound(nullptr),
+		m_sample_rate(0),
+		m_audio_latency(0),
 		m_bytes_per_sample(0),
 		m_primary_buffer(),
 		m_stream_buffer(),
@@ -60,9 +220,8 @@ public:
 		m_buffer_overflows(0)
 	{
 	}
-	virtual ~sound_direct_sound() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -70,177 +229,25 @@ public:
 	virtual void set_mastervolume(int attenuation) override;
 
 private:
-	class buffer
-	{
-	public:
-		buffer() : m_buffer(nullptr) { }
-		~buffer() { release(); }
-
-		ULONG release()
-		{
-			ULONG const result = m_buffer ? m_buffer->Release() : 0;
-			m_buffer = nullptr;
-			return result;
-		}
-
-		operator bool() const { return m_buffer; }
-
-	protected:
-		LPDIRECTSOUNDBUFFER m_buffer;
-	};
-
-	class primary_buffer : public buffer
-	{
-	public:
-		HRESULT create(LPDIRECTSOUND dsound)
-		{
-			assert(!m_buffer);
-			DSBUFFERDESC desc;
-			memset(&desc, 0, sizeof(desc));
-			desc.dwSize = sizeof(desc);
-			desc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_GETCURRENTPOSITION2;
-			desc.lpwfxFormat = nullptr;
-			return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
-		}
-
-		HRESULT get_format(WAVEFORMATEX &format) const
-		{
-			assert(m_buffer);
-			return m_buffer->GetFormat(&format, sizeof(format), nullptr);
-		}
-		HRESULT set_format(WAVEFORMATEX const &format) const
-		{
-			assert(m_buffer);
-			return m_buffer->SetFormat(&format);
-		}
-	};
-
-	class stream_buffer : public buffer
-	{
-	public:
-		stream_buffer() : m_size(0), m_bytes1(nullptr), m_bytes2(nullptr), m_locked1(0), m_locked2(0) { }
-
-		HRESULT create(LPDIRECTSOUND dsound, DWORD size, WAVEFORMATEX &format)
-		{
-			assert(!m_buffer);
-			DSBUFFERDESC desc;
-			memset(&desc, 0, sizeof(desc));
-			desc.dwSize = sizeof(desc);
-			desc.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_GLOBALFOCUS | DSBCAPS_GETCURRENTPOSITION2;
-			desc.dwBufferBytes = size;
-			desc.lpwfxFormat = &format;
-			m_size = size;
-			return dsound->CreateSoundBuffer(&desc, &m_buffer, nullptr);
-		}
-
-		HRESULT play_looping() const
-		{
-			assert(m_buffer);
-			return m_buffer->Play(0, 0, DSBPLAY_LOOPING);
-		}
-		HRESULT stop() const
-		{
-			assert(m_buffer);
-			return m_buffer->Stop();
-		}
-		HRESULT set_volume(LONG volume) const
-		{
-			assert(m_buffer);
-			return m_buffer->SetVolume(volume);
-		}
-		HRESULT set_min_volume() { return set_volume(DSBVOLUME_MIN); }
-
-		HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos) const
-		{
-			assert(m_buffer);
-			return m_buffer->GetCurrentPosition(&play_pos, &write_pos);
-		}
-		HRESULT copy_data(DWORD cursor, DWORD bytes, void const *data)
-		{
-			HRESULT result = lock(cursor, bytes);
-			if (DS_OK != result)
-				return result;
-
-			assert(m_bytes1);
-			assert((m_locked1 + m_locked2) >= bytes);
-			memcpy(m_bytes1, data, std::min(m_locked1, bytes));
-			if (m_locked1 < bytes)
-			{
-				assert(m_bytes2);
-				memcpy(m_bytes2, (uint8_t const *)data + m_locked1, bytes - m_locked1);
-			}
-
-			unlock();
-			return DS_OK;
-		}
-		HRESULT clear()
-		{
-			HRESULT result = lock_all();
-			if (DS_OK != result)
-				return result;
-
-			assert(m_bytes1);
-			assert(!m_bytes2);
-			assert(m_size == m_locked1);
-			assert(0U == m_locked2);
-			memset(m_bytes1, 0, m_locked1);
-
-			unlock();
-			return DS_OK;
-		}
-
-		DWORD size() const { return m_size; }
-
-	protected:
-		HRESULT lock(DWORD cursor, DWORD bytes)
-		{
-			assert(cursor < m_size);
-			assert(bytes <= m_size);
-			assert(m_buffer);
-			assert(!m_bytes1);
-			return m_buffer->Lock(
-					cursor, bytes,
-					&m_bytes1,
-					&m_locked1,
-					&m_bytes2,
-					&m_locked2,
-					0);
-		}
-		HRESULT lock_all() { return lock(0, m_size); }
-		HRESULT unlock()
-		{
-			assert(m_buffer);
-			assert(m_bytes1);
-			HRESULT const result = m_buffer->Unlock(
-					m_bytes1,
-					m_locked1,
-					m_bytes2,
-					m_locked2);
-			m_bytes1 = m_bytes2 = nullptr;
-			m_locked1 = m_locked2 = 0;
-			return result;
-		}
-
-		DWORD m_size;
-		void *m_bytes1, *m_bytes2;
-		DWORD m_locked1, m_locked2;
-	};
-
 	HRESULT         dsound_init();
 	void            dsound_kill();
 	HRESULT         create_buffers(DWORD size, WAVEFORMATEX &format);
 	void            destroy_buffers();
 
 	// DirectSound objects
-	LPDIRECTSOUND   m_dsound;
+	Microsoft::WRL::ComPtr<IDirectSound> m_dsound;
+
+	// configuration
+	int             m_sample_rate;
+	int             m_audio_latency;
 
 	// descriptors and formats
-	uint32_t          m_bytes_per_sample;
+	uint32_t        m_bytes_per_sample;
 
 	// sound buffers
 	primary_buffer  m_primary_buffer;
 	stream_buffer   m_stream_buffer;
-	uint32_t          m_stream_buffer_in;
+	uint32_t        m_stream_buffer_in;
 
 	// buffer over/underflow counts
 	unsigned        m_buffer_underflows;
@@ -252,12 +259,16 @@ private:
 //  init
 //============================================================
 
-int sound_direct_sound::init(osd_options const &options)
+int sound_direct_sound::init(osd_interface &osd, osd_options const &options)
 {
-	// attempt to initialize directsound
-	// don't make it fatal if we can't -- we'll just run without sound
-	dsound_init();
+	m_sample_rate = options.sample_rate();
+	m_audio_latency = options.audio_latency();
 	m_buffer_underflows = m_buffer_overflows = 0;
+
+	// attempt to initialize DirectSound
+	if (dsound_init() != DS_OK)
+		return -1;
+
 	return 0;
 }
 
@@ -281,7 +292,7 @@ void sound_direct_sound::exit()
 				m_buffer_underflows);
 	}
 
-	LOG(("Sound buffer: overflows=%u underflows=%u\n", m_buffer_overflows, m_buffer_underflows));
+	LOG("Sound buffer: overflows=%u underflows=%u\n", m_buffer_overflows, m_buffer_underflows);
 }
 
 
@@ -359,7 +370,7 @@ void sound_direct_sound::update_audio_stream(
 void sound_direct_sound::set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	attenuation = std::max(std::min(attenuation, 0), -32);
+	attenuation = std::clamp(attenuation, -32, 0);
 
 	// set the master volume
 	if (m_stream_buffer)
@@ -385,7 +396,7 @@ HRESULT sound_direct_sound::dsound_init()
 	result = DirectSoundCreate(nullptr, &m_dsound, nullptr);
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error creating DirectSound: %08x\n", (unsigned)result);
+		osd_printf_error("Error creating DirectSound: %08x\n", result);
 		goto error;
 	}
 
@@ -395,7 +406,7 @@ HRESULT sound_direct_sound::dsound_init()
 	result = m_dsound->GetCaps(&dsound_caps);
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error getting DirectSound capabilities: %08x\n", (unsigned)result);
+		osd_printf_error("Error getting DirectSound capabilities: %08x\n", result);
 		goto error;
 	}
 
@@ -404,35 +415,40 @@ HRESULT sound_direct_sound::dsound_init()
 #ifdef SDLMAME_WIN32
 		SDL_SysWMinfo wminfo;
 		SDL_VERSION(&wminfo.version);
-		SDL_GetWindowWMInfo(std::dynamic_pointer_cast<sdl_window_info>(osd_common_t::s_window_list.front())->platform_window(), &wminfo);
+		if (!SDL_GetWindowWMInfo(dynamic_cast<sdl_window_info &>(*osd_common_t::window_list().front()).platform_window(), &wminfo))
+		{
+			result = DSERR_UNSUPPORTED; // just so it has something to return
+			goto error;
+		}
 		HWND const window = wminfo.info.win.window;
 #else // SDLMAME_WIN32
-		HWND const window = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+		HWND const window = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 #endif // SDLMAME_WIN32
 		result = m_dsound->SetCooperativeLevel(window, DSSCL_PRIORITY);
 	}
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (unsigned)result);
+		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", result);
 		goto error;
 	}
 
 	{
 		// make a format description for what we want
 		WAVEFORMATEX stream_format;
-		stream_format.wBitsPerSample    = 16;
 		stream_format.wFormatTag        = WAVE_FORMAT_PCM;
 		stream_format.nChannels         = 2;
-		stream_format.nSamplesPerSec    = sample_rate();
+		stream_format.nSamplesPerSec    = m_sample_rate;
+		stream_format.wBitsPerSample    = 16;
 		stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 		stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
+		stream_format.cbSize            = 0;
 
 		// compute the buffer size based on the output sample rate
 		int audio_latency = std::max(m_audio_latency, 1);
 		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
 		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
-		LOG(("stream_buffer_size = %u\n", (unsigned)stream_buffer_size));
+		LOG("stream_buffer_size = %u\n", stream_buffer_size);
 
 		// create the buffers
 		m_bytes_per_sample = stream_format.nBlockAlign;
@@ -446,7 +462,7 @@ HRESULT sound_direct_sound::dsound_init()
 	result = m_stream_buffer.play_looping();
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error playing: %08x\n", (uint32_t)result);
+		osd_printf_error("Error playing: %08x\n", result);
 		goto error;
 	}
 	return DS_OK;
@@ -466,9 +482,7 @@ error:
 void sound_direct_sound::dsound_kill()
 {
 	// release the object
-	if (m_dsound)
-		m_dsound->Release();
-	m_dsound = nullptr;
+	m_dsound.Reset();
 }
 
 
@@ -484,10 +498,10 @@ HRESULT sound_direct_sound::create_buffers(DWORD size, WAVEFORMATEX &format)
 	HRESULT result;
 
 	// create the primary buffer
-	result = m_primary_buffer.create(m_dsound);
+	result = m_primary_buffer.create(m_dsound.Get());
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error creating primary DirectSound buffer: %08x\n", (unsigned)result);
+		osd_printf_error("Error creating primary DirectSound buffer: %08x\n", result);
 		goto error;
 	}
 
@@ -495,7 +509,7 @@ HRESULT sound_direct_sound::create_buffers(DWORD size, WAVEFORMATEX &format)
 	result = m_primary_buffer.set_format(format);
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error setting primary DirectSound buffer format: %08x\n", (unsigned)result);
+		osd_printf_error("Error setting primary DirectSound buffer format: %08x\n", result);
 		goto error;
 	}
 
@@ -504,20 +518,20 @@ HRESULT sound_direct_sound::create_buffers(DWORD size, WAVEFORMATEX &format)
 	result = m_primary_buffer.get_format(primary_format);
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error getting primary DirectSound buffer format: %08x\n", (unsigned)result);
+		osd_printf_error("Error getting primary DirectSound buffer format: %08x\n", result);
 		goto error;
 	}
 	osd_printf_verbose(
 			"DirectSound: Primary buffer: %d Hz, %d bits, %d channels\n",
-			(int)primary_format.nSamplesPerSec,
-			(int)primary_format.wBitsPerSample,
-			(int)primary_format.nChannels);
+			primary_format.nSamplesPerSec,
+			primary_format.wBitsPerSample,
+			primary_format.nChannels);
 
 	// create the stream buffer
-	result = m_stream_buffer.create(m_dsound, size, format);
+	result = m_stream_buffer.create(m_dsound.Get(), size, format);
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error creating DirectSound stream buffer: %08x\n", (unsigned)result);
+		osd_printf_error("Error creating DirectSound stream buffer: %08x\n", result);
 		goto error;
 	}
 
@@ -525,7 +539,7 @@ HRESULT sound_direct_sound::create_buffers(DWORD size, WAVEFORMATEX &format)
 	result = m_stream_buffer.clear();
 	if (result != DS_OK)
 	{
-		osd_printf_error("Error locking DirectSound stream buffer: %08x\n", (unsigned)result);
+		osd_printf_error("Error locking DirectSound stream buffer: %08x\n", result);
 		goto error;
 	}
 
@@ -555,8 +569,16 @@ void sound_direct_sound::destroy_buffers()
 	m_primary_buffer.release();
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
+
 #else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
-	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound") } }
+
 #endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)
+
+MODULE_DEFINITION(SOUND_DSOUND, osd::sound_direct_sound)

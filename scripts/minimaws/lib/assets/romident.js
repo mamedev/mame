@@ -132,6 +132,7 @@ function add_unmatched(names, crc, sha1)
 		heading.textContent = 'Unmatched';
 		table = div.appendChild(document.createElement('table'));
 		table.setAttribute('id', 'table-unmatched');
+		make_collapsible(heading, table);
 	}
 	var content;
 	if (crc === null)
@@ -160,8 +161,10 @@ function add_issues(name)
 	var list;
 	if (!div.hasChildNodes())
 	{
-		div.appendChild(document.createElement('h2')).textContent = 'Potential Issues';
+		var heading = div.appendChild(document.createElement('h2'));
+		heading.textContent = 'Potential Issues';
 		list = div.appendChild(document.createElement('dl'));
+		make_collapsible(heading, list);
 	}
 	else
 	{
@@ -229,6 +232,7 @@ function get_machine_table(shortname, description)
 		var table = div.appendChild(document.createElement('table'));
 		machine_info[shortname] = table;
 		add_matches(table, matched_names, null);
+		make_collapsible(heading, table);
 		return table;
 	}
 }

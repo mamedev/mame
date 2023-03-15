@@ -1,4 +1,4 @@
-// license:CC0
+// license:CC0-1.0
 // copyright-holders:Couriersud
 /*
  * Script to analyze opamp amplification as a function of frequency.
@@ -19,6 +19,7 @@
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(main)
+{
 
 	/* Standard stuff */
 
@@ -100,4 +101,4 @@ NETLIST_START(main)
 	LOG(log_Y, R1.1)
 	LOG(log_Z, f)
 #endif
-NETLIST_END()
+}

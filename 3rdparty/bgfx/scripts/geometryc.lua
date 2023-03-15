@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2019 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+-- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 --
 
 project "geometryc"
@@ -17,15 +17,13 @@ project "geometryc"
 	files {
 		path.join(BGFX_DIR, "3rdparty/meshoptimizer/src/**.cpp"),
 		path.join(BGFX_DIR, "3rdparty/meshoptimizer/src/**.h"),
-		path.join(BGFX_DIR, "src/vertexdecl.**"),
+		path.join(BGFX_DIR, "src/vertexlayout.**"),
 		path.join(BGFX_DIR, "tools/geometryc/**.cpp"),
 		path.join(BGFX_DIR, "tools/geometryc/**.h"),
 		path.join(BGFX_DIR, "examples/common/bounds.**"),
 	}
 
-	links {
-		"bx",
-	}
+	using_bx();
 
 	configuration { "mingw-*" }
 		targetextension ".exe"
@@ -33,7 +31,7 @@ project "geometryc"
 			"psapi",
 		}
 
-	configuration { "osx" }
+	configuration { "osx*" }
 		links {
 			"Cocoa.framework",
 		}

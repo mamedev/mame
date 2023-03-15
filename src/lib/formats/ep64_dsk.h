@@ -27,6 +27,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_EP64_FORMAT;
+extern const ep64_format FLOPPY_EP64_FORMAT;
 
 #endif // MAME_FORMATS_EP64_DSK_H

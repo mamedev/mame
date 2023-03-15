@@ -13,7 +13,6 @@
  *************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "s2650.h"
 #include "s2650cpu.h"
 
@@ -214,7 +213,7 @@ inline int s2650_device::check_irq_line()
 				m_halt = 0;
 				m_iar = (m_iar + 1) & PMSK;
 			}
-			standard_irq_callback(0);
+			standard_irq_callback(0, m_page + m_iar);
 
 			/* Say hi */
 			int vector = m_intack_handler();

@@ -736,9 +736,10 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 		case 6: CYCLES(CYCLES_MOV_DR6_7_REG); m_dr[dr] = LOAD_RM32(modrm); break;
 		case 7:
 		{
-			dr7_changed(m_dr[7], rm32);
-			CYCLES(CYCLES_MOV_DR6_7_REG);
+			uint32_t old_dr7 = m_dr[7];
 			m_dr[dr] = rm32;
+			dr7_changed(old_dr7, m_dr[7]);
+			CYCLES(CYCLES_MOV_DR6_7_REG);
 			break;
 		}
 		default:
@@ -2490,6 +2491,11 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
+	if ((m_cr[0] & 0xa) == 0xa)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	// TODO
 }
 

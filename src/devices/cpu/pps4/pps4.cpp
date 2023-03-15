@@ -78,7 +78,6 @@
 #include "emu.h"
 #include "pps4.h"
 #include "pps4dasm.h"
-#include "debugger.h"
 
 
 #define VERBOSE 0       //!< set to 1 to log certain instruction conditions
@@ -95,6 +94,8 @@ pps4_device::pps4_device(const machine_config &mconfig, device_type type, const 
 	, m_dia_cb(*this)
 	, m_dib_cb(*this)
 	, m_do_cb(*this)
+	, m_wasldi(0)
+	, m_waslbl(0)
 {
 }
 
@@ -125,7 +126,7 @@ u8 pps4_device::M()
 {
 	u8 ret = m_data.read_byte(m_B & ~m_SAG);
 	m_SAG = 0;
-	return ret;
+	return ret & 15;
 }
 
 
@@ -154,7 +155,6 @@ std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
 inline u8 pps4_device::ROP()
 {
 	const u8 op = m_cache.read_byte(m_P & 0xFFF);
-	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return op;
@@ -211,9 +211,9 @@ inline u8 pps4_device::ARG()
  */
 void pps4_device::iAD()
 {
-	m_A = m_A + M();
-	m_C = (m_A >> 4) & 1;
-	m_A = m_A & 15;
+	m_A += M();
+	m_C = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -232,8 +232,8 @@ void pps4_device::iAD()
 void pps4_device::iADC()
 {
 	m_A = m_A + M() + m_C;
-	m_C = m_A >> 4;
-	m_A = m_A & 15;
+	m_C = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -252,10 +252,11 @@ void pps4_device::iADC()
  */
 void pps4_device::iADSK()
 {
-	m_A = m_A + M();
-	m_C = m_A >> 4;
+	m_A = m_A + M() + m_C;   // This fixes the diagnostic test button, same as pinmame. It means ADSK and ADCSK are the same.
+	//m_A += M();
+	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
-	m_A = m_A & 15;
+	m_A &= 15;
 }
 
 /**
@@ -275,9 +276,9 @@ void pps4_device::iADSK()
 void pps4_device::iADCSK()
 {
 	m_A = m_A + M() + m_C;
-	m_C = m_A >> 4;
+	m_C = (m_A > 15) ? 1 : 0;
 	m_Skip = m_C;
-	m_A = m_A & 15;
+	m_A &= 15;
 }
 
 /**
@@ -304,9 +305,9 @@ void pps4_device::iADCSK()
 void pps4_device::iADI()
 {
 	const u8 imm = ~m_I1 & 15;
-	m_A = m_A + imm;
-	m_Skip = (m_A >> 4) & 1;
-	m_A = m_A & 15;
+	m_A += imm;
+	m_Skip = (m_A > 15) ? 1 : 0;
+	m_A &= 15;
 }
 
 /**
@@ -326,7 +327,7 @@ void pps4_device::iADI()
  */
 void pps4_device::iDC()
 {
-	m_A = m_A + 10;
+	m_A = (m_A + 10) & 15;
 }
 
 /**
@@ -345,7 +346,7 @@ void pps4_device::iDC()
  */
 void pps4_device::iAND()
 {
-	m_A = m_A & M();
+	m_A &= M();
 }
 
 /**
@@ -364,7 +365,7 @@ void pps4_device::iAND()
  */
 void pps4_device::iOR()
 {
-	m_A = m_A | M();
+	m_A |= M();
 }
 
 /**
@@ -384,7 +385,7 @@ void pps4_device::iOR()
  */
 void pps4_device::iEOR()
 {
-	m_A = m_A ^ M();
+	m_A ^= M();
 }
 
 /**
@@ -402,7 +403,7 @@ void pps4_device::iEOR()
  */
 void pps4_device::iCOMP()
 {
-	m_A = m_A ^ 15;
+	m_A ^= 15;
 }
 
 /**
@@ -522,7 +523,7 @@ void pps4_device::iRF2()
  * by B register are placed in the accumulator.
  * The RAM address in the B register is then
  * modified by the result of an exclusive-OR of
- * the 3-b it immediate field I(3:1) and B(7:5)
+ * the 3-b immediate field I(3:1) and B(7:5)
  *
  * See %Note3
  */
@@ -530,7 +531,7 @@ void pps4_device::iLD()
 {
 	const u16 i3c = ~m_I1 & 7;
 	m_A = M();
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 }
 
 /**
@@ -555,7 +556,7 @@ void pps4_device::iEX()
 	const u8 mem = M();
 	W(m_A);
 	m_A = mem;
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 }
 
 /**
@@ -585,14 +586,10 @@ void pps4_device::iEXD()
 	u8 bl = m_B & 15;
 	W(m_A);
 	m_A = mem;
-	m_B = m_B ^ (i3c << 4);
+	m_B ^= (i3c << 4);
 	// if decrement BL wraps to 1111b
-	if (0 == bl) {
-		bl = 15;
-		m_Skip = 1;
-	} else {
-		bl = bl - 1;
-	}
+	bl = (bl - 1) & 15;
+	m_Skip = (bl == 15);
 	m_B = (m_B & ~15) | bl;
 }
 
@@ -617,12 +614,10 @@ void pps4_device::iEXD()
  */
 void pps4_device::iLDI()
 {
-	// previous LDI instruction?
-	if (0x70 == (m_Ip & 0xf0)) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
-	}
-	m_A = ~m_I1 & 15;
+	if (!m_wasldi)
+		m_A = ~m_I1 & 15;
+
+	m_wasldi = 2;
 }
 
 /**
@@ -640,7 +635,7 @@ void pps4_device::iLDI()
  */
 void pps4_device::iLAX()
 {
-	m_A = m_X;
+	m_A = m_X & 15;
 }
 
 /**
@@ -654,11 +649,11 @@ void pps4_device::iLAX()
  * X <- A
  *
  * The contents of the accumulator are
- * tansferred to the X register.
+ * transferred to the X register.
  */
 void pps4_device::iLXA()
 {
-	m_X = m_A;
+	m_X = m_A & 15;
 }
 
 /**
@@ -672,7 +667,7 @@ void pps4_device::iLXA()
  * A <- BL
  *
  * The contents of BL register are
- * tansferred to the accumulator.
+ * transferred to the accumulator.
  */
 void pps4_device::iLABL()
 {
@@ -690,7 +685,7 @@ void pps4_device::iLABL()
  * BM <- X
  *
  * The contents of X register are
- * tansferred to BM register.
+ * transferred to the BM register.
  */
 void pps4_device::iLBMX()
 {
@@ -708,7 +703,7 @@ void pps4_device::iLBMX()
  * BU <- A
  * A <- M
  *
- * The contents of accumulator are tansferred to
+ * The contents of accumulator are transferred to
  * BU register. Also, the contents of the currently
  * addressed RAM are transferred to accumulator.
  */
@@ -776,9 +771,7 @@ void pps4_device::iXBMX()
 void pps4_device::iXAX()
 {
 	// swap A and X
-	m_A ^= m_X;
-	m_X ^= m_A;
-	m_A ^= m_X;
+	std::swap(m_A, m_X);
 }
 
 /**
@@ -797,9 +790,7 @@ void pps4_device::iXAX()
 void pps4_device::iXS()
 {
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 }
 
 /**
@@ -824,8 +815,8 @@ void pps4_device::iXS()
  */
 void pps4_device::iCYS()
 {
-	const u16 sa = (m_SA >> 4) | (m_A << 8);
-	m_A = m_SA & 15;
+	const u16 sa = (m_SA >> 4) | ((m_A^15) << 8);
+	m_A = ~m_SA & 15;
 	m_SA = sa;
 }
 
@@ -864,20 +855,17 @@ void pps4_device::iCYS()
  */
 void pps4_device::iLB()
 {
-	// previous LB or LBL instruction?
-	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
+	if (!m_waslbl)
+	{
+		m_SB = m_SA;
+		m_SA = (m_P + 1) & 0xFFF;
+		m_P = (3 << 6) | (m_I1 & 15);
+		m_B = ~ARG() & 255;
+		m_P = m_SA;
+		// swap SA and SB
+		std::swap(m_SA, m_SB);
 	}
-	m_SB = m_SA;
-	m_SA = (m_P + 1) & 0xFFF;
-	m_P = (3 << 6) | (m_I1 & 15);
-	m_B = ~ARG() & 255;
-	m_P = m_SA;
-	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	m_waslbl = 2;
 }
 
 /**
@@ -906,12 +894,10 @@ void pps4_device::iLB()
 void pps4_device::iLBL()
 {
 	m_I2 = ARG();
-	// previous LB or LBL instruction?
-	if (0xc0 == (m_Ip & 0xf0) || 0x00 == m_Ip) {
-		LOG("%s: skip prev:%02x op:%02x\n", __FUNCTION__, m_Ip, m_I1);
-		return;
-	}
-	m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
+	if (!m_waslbl)
+		m_B = ~m_I2 & 255;  // Note: immediate is 1's complement
+
+	m_waslbl = 2;
 }
 
 /**
@@ -1103,7 +1089,7 @@ void pps4_device::iSKC()
  */
 void pps4_device::iSKZ()
 {
-	m_Skip = (0 == m_A) ? 1 : 0;
+	m_Skip = m_A ? 0 : 1;
 }
 
 /**
@@ -1175,9 +1161,7 @@ void pps4_device::iRTN()
 {
 	m_P = m_SA & 0xFFF;
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 }
 
 /**
@@ -1198,9 +1182,7 @@ void pps4_device::iRTNSK()
 {
 	m_P = m_SA & 0xFFF;
 	// swap SA and SB
-	m_SA ^= m_SB;
-	m_SB ^= m_SA;
-	m_SA ^= m_SB;
+	std::swap(m_SA, m_SB);
 	m_Skip = 1; // next opcode is ignored
 }
 
@@ -1235,7 +1217,7 @@ void pps4_device::iRTNSK()
  */
 void pps4_device::iIOL()
 {
-	u8 ac = (~m_A & 15);
+	u8 ac = ~m_A & 15;
 	m_I2 = ARG();
 	m_io.write_byte(m_I2, ac);
 	LOG("%s: port:%02x <- %x\n", __FUNCTION__, m_I2, ac);
@@ -1283,7 +1265,7 @@ void pps4_device::iDIB()
 void pps4_2_device::iDIB()
 {
 	// PPS-4/2 can write zeros onto bidirectional DIO pins to mask open-drain inputs
-	m_A = m_dib_cb() & m_DIO;
+	m_A = m_dib_cb() & m_DIO & 15;
 }
 
 /**
@@ -1307,7 +1289,7 @@ void pps4_device::iDOA()
 void pps4_2_device::iDOA()
 {
 	// DOA also transfers contents of X to DIO on PPS-4/2
-	m_DIO = m_X;
+	m_DIO = m_X & 15;
 	m_do_cb(m_A | (m_X << 4));
 }
 
@@ -1340,6 +1322,10 @@ void pps4_device::iSAG()
 void pps4_device::execute_one()
 {
 	m_I1 = ROP();
+	if (m_wasldi)
+		m_wasldi--;
+	if (m_waslbl)
+		m_waslbl--;
 	if (m_Skip) {
 		m_Skip = 0;
 		LOG("%s: skip op:%02x\n", __FUNCTION__, m_I1);
@@ -1586,7 +1572,8 @@ void pps4_device::device_start()
 	save_item(NAME(m_FF2));
 	save_item(NAME(m_I1));
 	save_item(NAME(m_I2));
-	save_item(NAME(m_Ip));
+	save_item(NAME(m_wasldi));
+	save_item(NAME(m_waslbl));
 
 	state_add( PPS4_PC, "PC", m_P ).mask(0xFFF).formatstr("%03X");
 	state_add( PPS4_A, "A",  m_A ).formatstr("%01X");
@@ -1598,7 +1585,6 @@ void pps4_device::device_start()
 	state_add( PPS4_B, "B",  m_B ).formatstr("%03X");
 	state_add( PPS4_I1, "I1",  m_I1 ).formatstr("%02X").noshow();
 	state_add( PPS4_I2, "I2",  m_I2 ).formatstr("%02X").noshow();
-	state_add( PPS4_Ip, "Ip",  m_Ip ).formatstr("%02X").noshow();
 	state_add( STATE_GENPC,    "GENPC", m_P ).noshow();
 	state_add( STATE_GENPCBASE,"CURPC", m_P ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
@@ -1647,7 +1633,8 @@ void pps4_device::device_reset()
 	m_FF2 = 0;      // Flip-flop 2
 	m_I1 = 0;        // Most recent instruction I(8:1)
 	m_I2 = 0;       // Most recent parameter I2(8:1)
-	m_Ip = 0;       // Previous instruction I(8:1)
+	m_wasldi = 0;   // was last instruction LDI?
+	m_waslbl = 0;   // was last instruction LB/LBL?
 }
 
 void pps4_2_device::device_reset()

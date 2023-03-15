@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "utilfwd.h"
+
 #include <FLAC/all.h>
 
 #include <cstdint>
@@ -22,8 +24,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-namespace util { class core_file; }
-
 // ======================> flac_encoder
 
 class flac_encoder
@@ -32,7 +32,7 @@ public:
 	// construction/destruction
 	flac_encoder();
 	flac_encoder(void *buffer, uint32_t buflength);
-	flac_encoder(util::core_file &file);
+	flac_encoder(util::random_write &file);
 	~flac_encoder();
 
 	// configuration
@@ -48,7 +48,7 @@ public:
 	// reset
 	bool reset();
 	bool reset(void *buffer, uint32_t buflength);
-	bool reset(util::core_file &file);
+	bool reset(util::random_write &file);
 
 	// encode a buffer
 	bool encode_interleaved(const int16_t *samples, uint32_t samples_per_channel, bool swap_endian = false);
@@ -65,7 +65,7 @@ private:
 
 	// internal state
 	FLAC__StreamEncoder *   m_encoder;              // actual encoder
-	util::core_file *       m_file;                 // output file
+	util::random_write *    m_file;                 // output file
 	uint32_t                m_compressed_offset;    // current offset with the compressed stream
 	FLAC__byte *            m_compressed_start;     // start of compressed data
 	uint32_t                m_compressed_length;    // length of the compressed stream
@@ -90,7 +90,7 @@ public:
 	// construction/destruction
 	flac_decoder();
 	flac_decoder(const void *buffer, uint32_t length, const void *buffer2 = nullptr, uint32_t length2 = 0);
-	flac_decoder(util::core_file &file);
+	flac_decoder(util::read_stream &file);
 	~flac_decoder();
 
 	// getters (valid after reset)
@@ -105,7 +105,7 @@ public:
 	bool reset();
 	bool reset(const void *buffer, uint32_t length, const void *buffer2 = nullptr, uint32_t length2 = 0);
 	bool reset(uint32_t sample_rate, uint8_t num_channels, uint32_t block_size, const void *buffer, uint32_t length);
-	bool reset(util::core_file &file);
+	bool reset(util::read_stream &file);
 
 	// decode to a buffer; num_samples must be a multiple of the block size
 	bool decode_interleaved(int16_t *samples, uint32_t num_samples, bool swap_endian = false);
@@ -125,8 +125,8 @@ private:
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
 
 	// output state
-	FLAC__StreamDecoder *   m_decoder;              // actual encoder
-	util::core_file *       m_file;                 // output file
+	FLAC__StreamDecoder *   m_decoder;              // actual decoder
+	util::read_stream *     m_file;                 // input file
 	uint32_t                m_sample_rate;          // decoded sample rate
 	uint8_t                 m_channels;             // decoded number of channels
 	uint8_t                 m_bits_per_sample;      // decoded bits per sample

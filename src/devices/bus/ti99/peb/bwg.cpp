@@ -63,7 +63,7 @@
 #define VERBOSE ( LOG_CONFIG | LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
+DEFINE_DEVICE_TYPE(TI99_BWG, bus::ti99::peb::snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
 
 namespace bus::ti99::peb {
 

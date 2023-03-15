@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -31,7 +31,7 @@ class device_cococart_interface;
 
 class cococart_slot_device final : public device_t,
 								public device_single_card_slot_interface<device_cococart_interface>,
-								public device_image_interface
+								public device_cartrom_image_interface
 {
 public:
 	// output lines on the CoCo cartridge slot
@@ -69,18 +69,10 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "coco_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
@@ -128,10 +120,12 @@ private:
 	coco_cartridge_line         m_cart_line;
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
+
 public:
-	devcb_write_line        m_cart_callback;
+	devcb_write_line            m_cart_callback;
 	devcb_write_line            m_nmi_callback;
 	devcb_write_line            m_halt_callback;
+
 private:
 	// cartridge
 	device_cococart_interface   *m_cart;
@@ -140,6 +134,11 @@ private:
 	void set_line(line ln, coco_cartridge_line &line, line_value value);
 	void set_line_timer(coco_cartridge_line &line, line_value value);
 	void twiddle_line_if_q(coco_cartridge_line &line);
+
+	TIMER_CALLBACK_MEMBER(cart_line_timer_tick);
+	TIMER_CALLBACK_MEMBER(nmi_line_timer_tick);
+	TIMER_CALLBACK_MEMBER(halt_line_timer_tick);
+
 public:
 	static const char *line_value_string(line_value value);
 };
@@ -222,7 +221,7 @@ protected:
 
 private:
 	cococart_base_update_delegate    m_update;
-	cococart_slot_device *           m_owning_slot;
+	cococart_slot_device * const     m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
 

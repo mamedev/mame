@@ -1,0 +1,20 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
+# w65c02s - WDC variant, with different dummy fetch patterns for indexed modes
+brk_s_imp   ora_s_idx   nop_imm     nop_c_imp   tsb_s_zpg   ora_zpg     asl_s_zpg   rmb_bzp     php_imp     ora_imm     asl_acc     nop_c_imp   tsb_aba     ora_aba     asl_c_aba   bbr_zpb
+bpl_rel     ora_s_idy   ora_zpi     nop_c_imp   trb_s_zpg   ora_s_zpx   asl_s_zpx   rmb_bzp     clc_imp     ora_s_aby   inc_acc     nop_c_imp   trb_aba     ora_s_abx   asl_s_abx   bbr_zpb
+jsr_adr     and_s_idx   nop_imm     nop_c_imp   bit_zpg     and_zpg     rol_s_zpg   rmb_bzp     plp_s_imp   and_imm     rol_acc     nop_c_imp   bit_aba     and_aba     rol_c_aba   bbr_zpb
+bmi_rel     and_s_idy   and_zpi     nop_c_imp   bit_s_zpx   and_s_zpx   rol_s_zpx   rmb_bzp     sec_imp     and_s_aby   dec_acc     nop_c_imp   bit_s_abx   and_s_abx   rol_s_abx   bbr_zpb
+rti_s_imp   eor_s_idx   nop_imm     nop_c_imp   nop_zpg     eor_zpg     lsr_s_zpg   rmb_bzp     pha_imp     eor_imm     lsr_acc     nop_c_imp   jmp_adr     eor_aba     lsr_c_aba   bbr_zpb
+bvc_rel     eor_s_idy   eor_zpi     nop_c_imp   nop_s_zpx   eor_s_zpx   lsr_s_zpx   rmb_bzp     cli_imp     eor_s_aby   phy_imp     nop_c_imp   nop_c_aba   eor_s_abx   lsr_s_abx   bbr_zpb
+rts_s_imp   adc_s_idx   nop_imm     nop_c_imp   stz_zpg     adc_c_zpg   ror_s_zpg   rmb_bzp     pla_s_imp   adc_c_imm   ror_acc     nop_c_imp   jmp_s_ind   adc_c_aba   ror_c_aba   bbr_zpb
+bvs_rel     adc_s_idy   adc_c_zpi   nop_c_imp   stz_s_zpx   adc_s_zpx   ror_s_zpx   rmb_bzp     sei_imp     adc_s_aby   ply_s_imp   nop_c_imp   jmp_s_iax   adc_s_abx   ror_s_abx   bbr_zpb
+bra_rel     sta_s_idx   nop_imm     nop_c_imp   sty_zpg     sta_zpg     stx_zpg     smb_bzp     dey_imp     bit_imm     txa_imp     nop_c_imp   sty_aba     sta_aba     stx_aba     bbs_zpb
+bcc_rel     sta_s_idy   sta_zpi     nop_c_imp   sty_s_zpx   sta_s_zpx   stx_s_zpy   smb_bzp     tya_imp     sta_s_aby   txs_imp     nop_c_imp   stz_aba     sta_s_abx   stz_s_abx   bbs_zpb
+ldy_imm     lda_s_idx   ldx_imm     nop_c_imp   ldy_zpg     lda_zpg     ldx_zpg     smb_bzp     tay_imp     lda_imm     tax_imp     nop_c_imp   ldy_aba     lda_aba     ldx_aba     bbs_zpb
+bcs_rel     lda_s_idy   lda_zpi     nop_c_imp   ldy_s_zpx   lda_s_zpx   ldx_s_zpy   smb_bzp     clv_imp     lda_s_aby   tsx_imp     nop_c_imp   ldy_s_abx   lda_s_abx   ldx_s_aby   bbs_zpb
+cpy_imm     cmp_s_idx   nop_imm     nop_c_imp   cpy_zpg     cmp_zpg     dec_s_zpg   smb_bzp     iny_imp     cmp_imm     dex_imp     wai_imp     cpy_aba     cmp_aba     dec_c_aba   bbs_zpb
+bne_rel     cmp_s_idy   cmp_zpi     nop_c_imp   nop_s_zpx   cmp_s_zpx   dec_s_zpx   smb_bzp     cld_imp     cmp_s_aby   phx_imp     stp_imp     nop_s_abx   cmp_s_abx   dec_s_abx   bbs_zpb
+cpx_imm     sbc_s_idx   nop_imm     nop_c_imp   cpx_zpg     sbc_c_zpg   inc_s_zpg   smb_bzp     inx_imp     sbc_c_imm   nop_imp     nop_c_imp   cpx_aba     sbc_c_aba   inc_c_aba   bbs_zpb
+beq_rel     sbc_s_idy   sbc_c_zpi   nop_c_imp   nop_s_zpx   sbc_s_zpx   inc_s_zpx   smb_bzp     sed_imp     sbc_s_aby   plx_s_imp   nop_c_imp   nop_s_abx   sbc_s_abx   inc_s_abx   bbs_zpb
+reset_s

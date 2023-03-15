@@ -13,7 +13,10 @@
 
 #pragma once
 
-#include "ui/menu.h"
+#include "ui/textbox.h"
+
+#include <string>
+
 
 namespace ui {
 
@@ -86,27 +89,34 @@ private:
 };
 
 
-class menu_game_info : public menu
+class menu_game_info : public menu_textbox
 {
 public:
 	menu_game_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_game_info() override;
 
+protected:
+	virtual void menu_activated() override;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 
-class menu_warn_info : public menu
+class menu_warn_info : public menu_textbox
 {
 public:
 	menu_warn_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_warn_info() override;
 
+protected:
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -116,9 +126,12 @@ public:
 	menu_image_info(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_image_info() override;
 
+protected:
+	virtual void menu_activated() override;
+
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 	void image_info(device_image_interface *image);
 };
 

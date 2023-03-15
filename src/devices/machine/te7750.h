@@ -73,6 +73,14 @@ private:
 	u8                  m_data_dir[9];
 };
 
+// ======================> te7751_device
+
+class te7751_device : public te7750_device
+{
+public:
+	te7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
 // ======================> te7752_device
 
 class te7752_device : public te7750_device
@@ -83,6 +91,7 @@ public:
 
 // device type definitions
 DECLARE_DEVICE_TYPE(TE7750, te7750_device)
+DECLARE_DEVICE_TYPE(TE7751, te7751_device)
 DECLARE_DEVICE_TYPE(TE7752, te7752_device)
 
 #endif // MAME_MACHINE_TE7750_H

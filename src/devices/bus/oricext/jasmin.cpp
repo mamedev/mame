@@ -18,7 +18,7 @@ void oric_jasmin_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ORIC_DSK_FORMAT);
 	fr.add(FLOPPY_ORIC_JASMIN_FORMAT);
 
-	fr.add(FS_ORIC_JASMIN);
+	fr.add(fs::ORIC_JASMIN);
 }
 
 static void jasmin_floppies(device_slot_interface &device)

@@ -150,19 +150,19 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 		CDP1801_OPCODE("DEC R%d", implied(opcode)); break;
 	case 0x30: CDP1801_OPCODE("BR %04X", short_branch(base_pc, pc, params)); break;
-	case 0x32: CDP1801_OPCODE("BZ %04X", short_branch(base_pc, pc, params)); break;
-	case 0x33: CDP1801_OPCODE("BDF %04X", short_branch(base_pc, pc, params)); break;
-	case 0x34: CDP1801_OPCODE("B1 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x35: CDP1801_OPCODE("B2 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x36: CDP1801_OPCODE("B3 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x37: CDP1801_OPCODE("B4 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x32: CDP1801_OPCODE("BZ %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x33: CDP1801_OPCODE("BDF %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x34: CDP1801_OPCODE("B1 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x35: CDP1801_OPCODE("B2 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x36: CDP1801_OPCODE("B3 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x37: CDP1801_OPCODE("B4 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
 	case 0x38: CDP1801_OPCODE("SKP %04X", short_skip(pc)); break;
-	case 0x3a: CDP1801_OPCODE("BNZ %04X", short_branch(base_pc, pc, params)); break;
-	case 0x3b: CDP1801_OPCODE("BNF %04X", short_branch(base_pc, pc, params)); break;
-	case 0x3c: CDP1801_OPCODE("BN1 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x3d: CDP1801_OPCODE("BN2 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x3e: CDP1801_OPCODE("BN3 %04X", short_branch(base_pc, pc, params)); break;
-	case 0x3f: CDP1801_OPCODE("BN4 %04X", short_branch(base_pc, pc, params)); break;
+	case 0x3a: CDP1801_OPCODE("BNZ %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x3b: CDP1801_OPCODE("BNF %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x3c: CDP1801_OPCODE("BN1 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x3d: CDP1801_OPCODE("BN2 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x3e: CDP1801_OPCODE("BN3 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x3f: CDP1801_OPCODE("BN4 %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
 	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 	case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 		CDP1801_OPCODE("LDA R%d", implied(opcode)); break;
@@ -213,8 +213,8 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0xfd: CDP1801_OPCODE("SDI #%02X", immediate(pc, params)); break;
 	case 0xff: CDP1801_OPCODE("SMI #%02X", immediate(pc, params)); break;
 	// CDP1802
-	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); break;
-	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); break;
+	case 0x31: CDP1802_OPCODE("BQ %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
+	case 0x39: CDP1802_OPCODE("BNQ %04X", short_branch(base_pc, pc, params)); flags = STEP_COND; break;
 	case 0x60:
 		util::stream_format(stream, m_variant < TYPE_1802 ? "OUT 0" : "IRX");
 		if (m_config && m_config->get_p() == m_config->get_x())
@@ -235,21 +235,21 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0x7e: CDP1802_OPCODE("SHLC"); break;
 	case 0x7f: CDP1802_OPCODE("SMBI #%02X", immediate(pc, params)); break;
 	case 0xc0: CDP1802_OPCODE("LBR %04X", long_branch(pc, params)); break;
-	case 0xc1: CDP1802_OPCODE("LBQ %04X", long_branch(pc, params)); break;
-	case 0xc2: CDP1802_OPCODE("LBZ %04X", long_branch(pc, params)); break;
-	case 0xc3: CDP1802_OPCODE("LBDF %04X", long_branch(pc, params)); break;
+	case 0xc1: CDP1802_OPCODE("LBQ %04X", long_branch(pc, params)); flags = STEP_COND; break;
+	case 0xc2: CDP1802_OPCODE("LBZ %04X", long_branch(pc, params)); flags = STEP_COND; break;
+	case 0xc3: CDP1802_OPCODE("LBDF %04X", long_branch(pc, params)); flags = STEP_COND; break;
 	case 0xc4: CDP1802_OPCODE("NOP"); break;
-	case 0xc5: CDP1802_OPCODE("LSNQ %04X", long_skip(pc)); break;
-	case 0xc6: CDP1802_OPCODE("LSNZ %04X", long_skip(pc)); break;
-	case 0xc7: CDP1802_OPCODE("LSNF %04X", long_skip(pc)); break;
+	case 0xc5: CDP1802_OPCODE("LSNQ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xc6: CDP1802_OPCODE("LSNZ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xc7: CDP1802_OPCODE("LSNF %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xc8: CDP1802_OPCODE("LSKP %04X", long_skip(pc)); break;
-	case 0xc9: CDP1802_OPCODE("LBNQ %04X", long_skip(pc)); break;
-	case 0xca: CDP1802_OPCODE("LBNZ %04X", long_skip(pc)); break;
-	case 0xcb: CDP1802_OPCODE("LBNF %04X", long_skip(pc)); break;
-	case 0xcc: CDP1802_OPCODE("LSIE %04X", long_skip(pc)); break;
-	case 0xcd: CDP1802_OPCODE("LSQ %04X", long_skip(pc)); break;
-	case 0xce: CDP1802_OPCODE("LSZ %04X", long_skip(pc)); break;
-	case 0xcf: CDP1802_OPCODE("LSDF %04X", long_skip(pc)); break;
+	case 0xc9: CDP1802_OPCODE("LBNQ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xca: CDP1802_OPCODE("LBNZ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xcb: CDP1802_OPCODE("LBNF %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xcc: CDP1802_OPCODE("LSIE %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xcd: CDP1802_OPCODE("LSQ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xce: CDP1802_OPCODE("LSZ %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xcf: CDP1802_OPCODE("LSDF %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xfe: CDP1802_OPCODE("SHL"); break;
 	//
 	default:   CDP1801_OPCODE("illegal"); break;

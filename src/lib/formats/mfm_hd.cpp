@@ -294,9 +294,9 @@ int mfmhd_generic_format::chs_to_lba(int cylinder, int head, int sector)
 	else return -1;
 }
 
-chd_error mfmhd_generic_format::load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head)
+std::error_condition mfmhd_generic_format::load(chd_file* chdfile, uint16_t* trackimage, int tracksize, int cylinder, int head)
 {
-	chd_error state = CHDERR_NONE;
+	std::error_condition state;
 	uint8_t sector_content[16384];
 
 	int sectorcount = m_param.sectors_per_track;
@@ -382,8 +382,9 @@ chd_error mfmhd_generic_format::load(chd_file* chdfile, uint16_t* trackimage, in
 		int lbaposition = chs_to_lba(cylinder, head, sec_number);
 		if (lbaposition>=0)
 		{
-			chd_error state = chdfile->read_units(lbaposition, sector_content);
-			if (state != CHDERR_NONE) break;
+			state = chdfile->read_units(lbaposition, sector_content);
+			if (state)
+				break;
 		}
 		else
 		{
@@ -413,7 +414,7 @@ chd_error mfmhd_generic_format::load(chd_file* chdfile, uint16_t* trackimage, in
 	if (TRACE_LAYOUT) osd_printf_verbose("\n");
 
 	// Gap 4
-	if (state == CHDERR_NONE)
+	if (!state)
 	{
 		// Fill the rest with 0x4e
 		mfm_encode(trackimage, position, 0x4e, tracksize-position);
@@ -433,7 +434,7 @@ enum
 	CHECK_CRC
 };
 
-chd_error mfmhd_generic_format::save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int current_cylinder, int current_head)
+std::error_condition mfmhd_generic_format::save(chd_file* chdfile, uint16_t* trackimage, int tracksize, int current_cylinder, int current_head)
 {
 	if (TRACE_RWTRACK) osd_printf_verbose("%s: write back (c=%d,h=%d) to CHD\n", tag(), current_cylinder, current_head);
 
@@ -490,7 +491,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, uint16_t* trackimage, in
 	bool countgap3 = false;
 	bool countsync = false;
 
-	chd_error chdstate = CHDERR_NONE;
+	std::error_condition chdstate;
 
 	if (TRACE_IMAGE)
 	{
@@ -643,7 +644,7 @@ chd_error mfmhd_generic_format::save(chd_file* chdfile, uint16_t* trackimage, in
 							if (TRACE_DETAIL) osd_printf_verbose("%s: Writing sector chs=(%d,%d,%d) to CHD\n", tag(), current_cylinder, current_head, sector);
 							chdstate = chdfile->write_units(chs_to_lba(current_cylinder, current_head, sector), buffer);
 
-							if (chdstate != CHDERR_NONE)
+							if (chdstate)
 							{
 								osd_printf_verbose("%s: Write error while writing sector chs=(%d,%d,%d)\n", tag(), cylinder, head, sector);
 							}

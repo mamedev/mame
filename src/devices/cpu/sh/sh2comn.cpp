@@ -12,8 +12,6 @@
 #include "sh2.h"
 #include "sh2comn.h"
 
-#include "debugger.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 

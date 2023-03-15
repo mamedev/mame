@@ -9,17 +9,32 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
+#include "main.h"
 
-machine_manager::machine_manager(emu_options& options, osd_interface& osd)
-  : m_osd(osd),
+#include "emuopts.h"
+#include "http.h"
+
+
+machine_manager::machine_manager(emu_options& options, osd_interface& osd) :
+	m_osd(osd),
 	m_options(options),
 	m_machine(nullptr)
 {
 }
+
+
+machine_manager::~machine_manager()
+{
+}
+
 
 void machine_manager::start_http_server()
 {
 	m_http = std::make_unique<http_manager>(options().http(), options().http_port(), options().http_root());
 }
 
+
+http_manager *machine_manager::http()
+{
+  return m_http.get();
+}

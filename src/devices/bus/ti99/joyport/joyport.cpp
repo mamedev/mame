@@ -40,7 +40,7 @@
 #include "handset.h"
 #include "mecmouse.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device, "ti99_joyport", "TI-99 Joystick port")
+DEFINE_DEVICE_TYPE(TI99_JOYPORT, bus::ti99::joyport::joyport_device, "ti99_joyport", "TI-99 Joystick port")
 
 namespace bus::ti99::joyport {
 

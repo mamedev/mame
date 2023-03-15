@@ -17,58 +17,18 @@
 #include "machine/pla.h"
 
 
-// pinout reference
-
-/*
-            ____   ____                         ____   ____
-     R8  1 |*   \_/    | 28 R7           R0  1 |*   \_/    | 28 Vss
-     R9  2 |           | 27 R6           R1  2 |           | 27 OSC2
-    R10  3 |           | 26 R5           R2  3 |           | 26 OSC1
-    Vdd  4 |           | 25 R4           R3  4 |           | 25 O0
-     K1  5 |           | 24 R3           R4  5 |           | 24 O1
-     K2  6 |  TMS1000  | 23 R2           R5  6 |           | 23 O2
-     K4  7 |  TMS1070  | 22 R1           R6  7 |  TMS1400  | 22 O3
-     K8  8 |  TMS1100  | 21 R0           R7  8 |           | 21 O4
-   INIT  9 |  TMS1170  | 20 Vss          R8  9 |           | 20 O5
-     O7 10 |           | 19 OSC2         R9 10 |           | 19 O6
-     O6 11 |           | 18 OSC1        R10 11 |           | 18 O7
-     O5 12 |           | 17 O0          Vdd 12 |           | 17 K8
-     O4 13 |           | 16 O1         INIT 13 |           | 16 K4
-     O3 14 |___________| 15 O2           K1 14 |___________| 15 K2
-
-
-            ____   ____
-     R2  1 |*   \_/    | 28 R3
-     R1  2 |           | 27 R4
-     R0  3 |           | 26 R5
-      ?  4 |           | 25 R6
-    Vdd  5 |           | 24 R7
-     K3  6 |           | 23 R8
-     K8  7 |  TMS0980  | 22 ?
-     K4  8 |           | 21 ?
-     K2  9 |           | 20 Vss
-     K1 10 |           | 19 ?
-     O7 11 |           | 18 O0
-     O6 12 |           | 17 O1
-     O5 13 |           | 16 O2
-     O4 14 |___________| 15 O3
-
-  note: TMS0980 official pin names for R0-R8 is D9-D1, O0-O7 is S(A-G,DP)
-
-*/
-
-
 class tms1k_base_device : public cpu_device
 {
 public:
-	// K input pins
-	auto k() { return m_read_k.bind(); }
+	// common handlers
+	auto read_k() { return m_read_k.bind(); } // K input pins
+	auto write_o() { return m_write_o.bind(); } // O/Segment output pins
+	auto write_r() { return m_write_r.bind(); } // R output pins (also called D on some chips)
 
-	// O/Segment output pins
-	auto o() { return m_write_o.bind(); }
-
-	// R output pins (also called D on some chips)
-	auto r() { return m_write_r.bind(); }
+	// TMS2100 handlers
+	auto read_j() { return m_read_j.bind(); } // J input pins
+	auto read_r() { return m_read_r.bind(); } // R0-R3 input pins
+	auto &set_option_dec_div(u8 div) { m_option_dec_div = div; return *this; }
 
 	// OFF request on TMS0980 and up
 	auto power_off() { return m_power_off.bind(); }
@@ -92,7 +52,7 @@ public:
 
 protected:
 	// construction/destruction
-	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	tms1k_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -160,18 +120,35 @@ protected:
 		F_TDO   = (1<<13),
 		F_TPC   = (1<<14),
 
-		F_OFF   = (1<<15),
-		F_REAC  = (1<<16),
-		F_SAL   = (1<<17),
-		F_SBL   = (1<<18),
-		F_SEAC  = (1<<19),
-		F_XDA   = (1<<20)
+		F_TAX   = (1<<15),
+		F_TXA   = (1<<16),
+		F_TRA   = (1<<17),
+		F_TAC   = (1<<18),
+		F_TCA   = (1<<19),
+		F_TADM  = (1<<20),
+		F_TMA   = (1<<21),
+
+		F_OFF   = (1<<22),
+		F_REAC  = (1<<23),
+		F_SAL   = (1<<24),
+		F_SBL   = (1<<25),
+		F_SEAC  = (1<<26),
+		F_XDA   = (1<<27)
 	};
+
+	void rom_10bit(address_map &map);
+	void rom_11bit(address_map &map);
+	void rom_12bit(address_map &map);
+	void ram_6bit(address_map &map);
+	void ram_7bit(address_map &map);
+	void ram_8bit(address_map &map);
 
 	void next_pc();
 
-	virtual void write_o_output(u8 index);
-	virtual u8 read_k_input();
+	virtual void write_o_reg(u8 index);
+	virtual void write_o_output(u16 data) { m_write_o(data & m_o_mask); }
+	virtual void write_r_output(u32 data) { m_write_r(data & m_r_mask); }
+	virtual u8 read_k_input() { return m_read_k() & 0xf; }
 	virtual void set_cki_bus();
 	virtual void dynamic_output() { ; } // not used by default
 	virtual void read_opcode();
@@ -179,9 +156,6 @@ protected:
 	virtual void op_br();
 	virtual void op_call();
 	virtual void op_retn();
-	virtual void op_br3();
-	virtual void op_call3();
-	virtual void op_retn3();
 
 	virtual void op_sbit();
 	virtual void op_rbit();
@@ -196,15 +170,26 @@ protected:
 
 	virtual void op_comc();
 	virtual void op_tpc();
-	virtual void op_xda();
-	virtual void op_off();
-	virtual void op_seac();
-	virtual void op_reac();
-	virtual void op_sal();
-	virtual void op_sbl();
+
+	virtual void op_tax() { ; }
+	virtual void op_txa() { ; }
+	virtual void op_tra() { ; }
+	virtual void op_tac() { ; }
+	virtual void op_tca() { ; }
+	virtual void op_tadm() { ; }
+	virtual void op_tma() { ; }
+
+	virtual void op_xda() { ; }
+	virtual void op_off() { ; }
+	virtual void op_seac() { ; }
+	virtual void op_reac() { ; }
+	virtual void op_sal() { ; }
+	virtual void op_sbl() { ; }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
+	address_space *m_program;
+	address_space *m_data;
 
 	optional_device<pla_device> m_mpla;
 	optional_device<pla_device> m_ipla;
@@ -212,69 +197,79 @@ protected:
 	optional_memory_region m_opla_b; // binary dump of output PLA, in place of PLA file
 	optional_device<pla_device> m_spla;
 
-	u8 m_pc;        // 6 or 7-bit program counter
-	u32 m_sr;       // 6 or 7-bit subroutine return register(s)
-	u8 m_pa;        // 4-bit page address register
-	u8 m_pb;        // 4-bit page buffer register
-	u16 m_ps;       // 4-bit page subroutine register(s)
-	u8 m_a;         // 4-bit accumulator
-	u8 m_x;         // 2,3,or 4-bit RAM X register
-	u8 m_y;         // 4-bit RAM Y register
-	u8 m_ca;        // chapter address register
-	u8 m_cb;        // chapter buffer register
-	u16 m_cs;       // chapter subroutine register(s)
-	u16 m_r;
+	// internal state
+	u8 m_pc;            // 6 or 7-bit program counter
+	u32 m_sr;           // 6 or 7-bit subroutine return register(s)
+	u8 m_pa;            // 4-bit page address register
+	u8 m_pb;            // 4-bit page buffer register
+	u16 m_ps;           // 4-bit page subroutine register(s)
+	u8 m_a;             // 4-bit accumulator
+	u8 m_x;             // 2,3,or 4-bit RAM X register
+	u8 m_y;             // 4-bit RAM Y register
+	u8 m_ca;            // chapter address register
+	u8 m_cb;            // chapter buffer register
+	u16 m_cs;           // chapter subroutine register(s)
+	u32 m_r;
 	u16 m_o;
 	u8 m_cki_bus;
 	u8 m_c4;
-	u8 m_p;         // 4-bit adder p(lus)-input
-	u8 m_n;         // 4-bit adder n(egative)-input
-	u8 m_adder_out; // adder result
-	u8 m_carry_in;  // adder carry-in bit
-	u8 m_carry_out; // adder carry-out bit
+	u8 m_p;             // 4-bit adder p(lus)-input
+	u8 m_n;             // 4-bit adder n(egative)-input
+	u8 m_adder_out;     // adder result
+	u8 m_carry_in;      // adder carry-in bit
+	u8 m_carry_out;     // adder carry-out bit
 	u8 m_status;
 	u8 m_status_latch;
-	u8 m_eac;       // end around carry bit
-	u8 m_clatch;    // call latch bit(s)
-	u8 m_add;       // add latch bit
-	u8 m_bl;        // branch latch bit
+	u8 m_eac;           // end around carry bit
+	u8 m_clatch;        // call latch bit(s)
+	u8 m_add;           // add latch bit
+	u8 m_bl;            // branch latch bit
 
 	u8 m_ram_in;
 	u8 m_dam_in;
-	int m_ram_out;  // signed!
+	int m_ram_out;      // signed!
 	u8 m_ram_address;
 	u16 m_rom_address;
 	u16 m_opcode;
 	u32 m_fixed;
 	u32 m_micro;
 	int m_subcycle;
-	int m_icount;
 	u8 m_o_index;
 
-	u8 m_o_pins;    // how many O pins
-	u8 m_r_pins;    // how many R pins
-	u8 m_pc_bits;   // how many program counter bits
-	u8 m_byte_bits; // how many bits per 'byte'
-	u8 m_x_bits;    // how many X register bits
-
-	address_space *m_program;
-	address_space *m_data;
-
-	const u16 *m_output_pla_table;
-	devcb_read8 m_read_k;
-	devcb_write16 m_write_o;
-	devcb_write16 m_write_r;
-	devcb_write_line m_power_off;
-	devcb_read8 m_read_ctl;
-	devcb_write8 m_write_ctl;
-	devcb_write_line m_write_pdc;
-	devcb_read32 m_decode_micro;
+	// fixed settings or mask options
+	u8 m_o_pins;        // how many O pins
+	u8 m_r_pins;        // how many R pins
+	u8 m_pc_bits;       // how many program counter bits
+	u8 m_byte_bits;     // how many bits per 'byte'
+	u8 m_x_bits;        // how many X register bits
+	u8 m_stack_levels;  // number of stack levels (max 4)
 
 	u32 m_o_mask;
 	u32 m_r_mask;
-	u32 m_k_mask;
 	u32 m_pc_mask;
 	u32 m_x_mask;
+
+	u8 m_option_dec_div;
+
+	// i/o handlers
+	devcb_read8 m_read_k;
+	devcb_write16 m_write_o;
+	devcb_write32 m_write_r;
+
+	devcb_read8 m_read_j;
+	devcb_read8 m_read_r;
+
+	devcb_write_line m_power_off;
+
+	devcb_read8 m_read_ctl;
+	devcb_write8 m_write_ctl;
+	devcb_write_line m_write_pdc;
+
+	const u16 *m_output_pla_table;
+	devcb_read32 m_decode_micro;
+
+	int m_icount;
+	int m_state_count;
 
 	// lookup tables
 	std::vector<u32> m_fixed_decode;

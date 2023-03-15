@@ -644,6 +644,8 @@ protected:
 
 class ym2610
 {
+	static constexpr uint8_t EOS_FLAGS_MASK = 0xbf;
+
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
@@ -761,7 +763,7 @@ public:
 
 protected:
 	// simulate the DAC discontinuity
-	constexpr int32_t dac_discontinuity(int32_t value) const { return (value < 0) ? (value - 2) : (value + 3); }
+	constexpr int32_t dac_discontinuity(int32_t value) const { return (value < 0) ? (value - 3) : (value + 4); }
 
 	// internal state
 	uint16_t m_address;              // address register

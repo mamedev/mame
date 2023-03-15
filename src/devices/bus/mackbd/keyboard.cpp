@@ -278,8 +278,8 @@ protected:
 
 	virtual void device_start() override
 	{
-		m_watchdog_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peripheral_base::watchdog_timeout), this));
-		m_watchdog_output = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(peripheral_base::watchdog_output), this));
+		m_watchdog_timeout = timer_alloc(FUNC(peripheral_base::watchdog_timeout), this);
+		m_watchdog_output = timer_alloc(FUNC(peripheral_base::watchdog_output), this);
 
 		m_row_drive = make_bitmask<u16>(Rows);
 		m_host_clock_out = 1U;
@@ -742,6 +742,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -757,6 +759,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -771,6 +775,8 @@ public:
 		: keyboard_base(mconfig, MACKBD_M0110T, tag, owner, clock)
 	{
 	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override
@@ -839,6 +845,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -853,6 +861,8 @@ public:
 		: keypad_base(mconfig, MACKBD_M0120P, tag, owner, clock)
 	{
 	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override

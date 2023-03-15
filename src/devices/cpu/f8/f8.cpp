@@ -46,7 +46,6 @@
 #include "emu.h"
 #include "f8.h"
 #include "f8dasm.h"
-#include "debugger.h"
 
 
 /* status flags */
@@ -68,7 +67,8 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	cpu_device(mconfig, F8, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 	m_regs_config("register", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(f8_cpu_device::regs_map), this)),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
+	m_romc08_callback(*this)
 { }
 
 void f8_cpu_device::regs_map(address_map &map)
@@ -104,6 +104,11 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 					m_w & 0x01 ? 'S':'.');
 			break;
 	}
+}
+
+void f8_cpu_device::device_resolve_objects()
+{
+	m_romc08_callback.resolve_safe(0);
 }
 
 void f8_cpu_device::device_start()
@@ -280,7 +285,6 @@ void f8_cpu_device::ROMC_00(int insttim)
 	 * code addressed by PC0; then all devices increment the contents
 	 * of PC0.
 	 */
-
 	m_dbus = m_program.read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
@@ -370,7 +374,7 @@ void f8_cpu_device::ROMC_08()
 	 */
 	m_pc1 = m_pc0;
 	m_dbus = 0;
-	m_pc0 = 0;
+	m_pc0 = m_romc08_callback() * 0x0101;
 	m_icount -= cL;
 }
 
@@ -449,7 +453,7 @@ void f8_cpu_device::ROMC_0F()
 	 * must move the contents of the data bus into the low order
 	 * byte of PC0.
 	 */
-	m_irq_vector = standard_irq_callback(F8_INPUT_LINE_INT_REQ);
+	m_irq_vector = standard_irq_callback(F8_INPUT_LINE_INT_REQ, m_pc0);
 	m_dbus = m_irq_vector & 0x00ff;
 	m_pc1 = m_pc0;
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;

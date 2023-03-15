@@ -216,13 +216,12 @@ protected:
 	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
 	virtual void interface_post_reset() override;
-	virtual void interface_clock_changed() override;
+	virtual void interface_clock_changed(bool sync_on_new_clock_domain) override;
 
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
-	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
-	int standard_irq_callback(int irqline);
+	int standard_irq_callback(int irqline, offs_t pc);
 
 	// debugger hooks
 	bool debugger_enabled() const { return bool(device().machine().debug_flags & DEBUG_FLAG_ENABLED); }
@@ -304,7 +303,9 @@ private:
 
 	// cycle counting and executing
 	profile_type            m_profiler;                 // profiler tag
+protected:  // TODO: decide whether to bring up the wait-state methods
 	int *                   m_icountptr;                // pointer to the icount
+private:
 	int                     m_cycles_running;           // number of cycles we are executing
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
 
@@ -323,6 +324,9 @@ private:
 	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
+
+	emu_timer *             m_spin_end_timer;           // timer for triggering the end of spin_until_time
+	emu_timer *             m_pulse_end_timers[MAX_INPUT_LINES]; // timer for ending input-line pulses
 
 	// callbacks
 	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }

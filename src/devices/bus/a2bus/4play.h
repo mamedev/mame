@@ -14,32 +14,7 @@
 
 #include "a2bus.h"
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class a2bus_4play_device:
-	public device_t,
-	public device_a2bus_card_interface
-{
-public:
-	// construction/destruction
-	a2bus_4play_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	a2bus_4play_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	virtual uint8_t read_c0nx(uint8_t offset) override;
-
-	required_ioport m_p1, m_p2, m_p3, m_p4;
-
-private:
-};
-
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_4PLAY, a2bus_4play_device)
+DECLARE_DEVICE_TYPE(A2BUS_4PLAY, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_4PLAY_H

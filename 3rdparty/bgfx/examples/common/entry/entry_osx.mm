@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
@@ -45,18 +45,6 @@
 
 namespace entry
 {
-	///
-	inline void osxSetNSWindow(void* _window, void* _nsgl = NULL)
-	{
-		bgfx::PlatformData pd;
-		pd.ndt          = NULL;
-		pd.nwh          = _window;
-		pd.context      = _nsgl;
-		pd.backBuffer   = NULL;
-		pd.backBufferDS = NULL;
-		bgfx::setPlatformData(pd);
-	}
-
 	static uint8_t s_translateKey[256];
 
 	struct MainThreadEntry
@@ -100,6 +88,7 @@ namespace entry
 			, m_scroll(0)
 			, m_style(0)
 			, m_exit(false)
+			, m_mouseLock(NULL)
 		{
 			s_translateKey[27]             = Key::Esc;
 			s_translateKey[uint8_t('\r')]  = Key::Return;
@@ -194,17 +183,54 @@ namespace entry
 			*outY = bx::clamp(y, 0, int32_t(adjustFrame.size.height) );
 		}
 
+		void setMousePos(NSWindow* _window, int _x, int _y)
+		{
+			NSRect  originalFrame = [_window frame];
+			NSRect  adjustFrame   = [_window contentRectForFrameRect: originalFrame];
+
+			adjustFrame.origin.y = NSMaxY(NSScreen.screens[0].frame) - NSMaxY(adjustFrame);
+
+			CGWarpMouseCursorPosition(CGPointMake(_x + adjustFrame.origin.x, _y + adjustFrame.origin.y));
+			CGAssociateMouseAndMouseCursorPosition(YES);
+		}
+
+		void setMouseLock(NSWindow* _window, bool _lock)
+		{
+			NSWindow* newMouseLock = _lock ? _window : NULL;
+
+			if ( m_mouseLock != newMouseLock )
+			{
+				if ( _lock )
+				{
+					NSRect  originalFrame = [_window frame];
+					NSRect  adjustFrame   = [_window contentRectForFrameRect: originalFrame];
+
+					m_cmx = (int)adjustFrame.size.width / 2;
+					m_cmy = (int)adjustFrame.size.height / 2;
+
+					setMousePos(_window, m_cmx, m_cmy);
+					[NSCursor hide];
+				}
+				else
+				{
+					[NSCursor unhide];
+				}
+				m_mouseLock = newMouseLock;
+			}
+		}
+
+
 		uint8_t translateModifiers(int flags)
 		{
 			return 0
-				| (0 != (flags & NX_DEVICELSHIFTKEYMASK ) ) ? Modifier::LeftShift  : 0
-				| (0 != (flags & NX_DEVICERSHIFTKEYMASK ) ) ? Modifier::RightShift : 0
-				| (0 != (flags & NX_DEVICELALTKEYMASK ) )   ? Modifier::LeftAlt    : 0
-				| (0 != (flags & NX_DEVICERALTKEYMASK ) )   ? Modifier::RightAlt   : 0
-				| (0 != (flags & NX_DEVICELCTLKEYMASK ) )   ? Modifier::LeftCtrl   : 0
-				| (0 != (flags & NX_DEVICERCTLKEYMASK ) )   ? Modifier::RightCtrl  : 0
-				| (0 != (flags & NX_DEVICELCMDKEYMASK) )    ? Modifier::LeftMeta   : 0
-				| (0 != (flags & NX_DEVICERCMDKEYMASK) )    ? Modifier::RightMeta  : 0
+				| ( (0 != (flags & NX_DEVICELSHIFTKEYMASK) ) ? Modifier::LeftShift  : 0)
+				| ( (0 != (flags & NX_DEVICERSHIFTKEYMASK) ) ? Modifier::RightShift : 0)
+				| ( (0 != (flags & NX_DEVICELALTKEYMASK) )   ? Modifier::LeftAlt    : 0)
+				| ( (0 != (flags & NX_DEVICERALTKEYMASK) )   ? Modifier::RightAlt   : 0)
+				| ( (0 != (flags & NX_DEVICELCTLKEYMASK) )   ? Modifier::LeftCtrl   : 0)
+				| ( (0 != (flags & NX_DEVICERCTLKEYMASK) )   ? Modifier::RightCtrl  : 0)
+				| ( (0 != (flags & NX_DEVICELCMDKEYMASK) )   ? Modifier::LeftMeta   : 0)
+				| ( (0 != (flags & NX_DEVICERCMDKEYMASK) )   ? Modifier::RightMeta  : 0)
 				;
 		}
 
@@ -286,6 +312,15 @@ namespace entry
 				case NSEventTypeRightMouseDragged:
 				case NSEventTypeOtherMouseDragged:
 					getMousePos(window, &m_mx, &m_my);
+
+					if (window == m_mouseLock)
+					{
+						m_mx -= m_cmx;
+						m_my -= m_cmy;
+
+						setMousePos(window, m_cmx, m_cmy);
+					}
+
 					m_eventQueue.postMouseEvent(handle, m_mx, m_my, m_scroll);
 					break;
 
@@ -460,8 +495,6 @@ namespace entry
 
 			m_windowFrame = [m_window[0] frame];
 
-			osxSetNSWindow(m_window[0]);
-
 			MainThreadEntry mte;
 			mte.m_argc = _argc;
 			mte.m_argv = _argv;
@@ -525,6 +558,10 @@ namespace entry
 		int32_t m_scroll;
 		int32_t m_style;
 		bool    m_exit;
+
+		NSWindow* m_mouseLock;
+		int32_t m_cmx;
+		int32_t m_cmy;
 	};
 
 	static Context s_ctx;
@@ -671,7 +708,21 @@ namespace entry
 
 	void setMouseLock(WindowHandle _handle, bool _lock)
 	{
-		BX_UNUSED(_handle, _lock);
+		dispatch_async(dispatch_get_main_queue()
+			, ^{
+				NSWindow* window = s_ctx.m_window[_handle.idx];
+				s_ctx.setMouseLock(window, _lock);
+			});
+	}
+
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		return s_ctx.m_window[_handle.idx];
+	}
+
+	void* getNativeDisplayHandle()
+	{
+		return NULL;
 	}
 
 } // namespace entry

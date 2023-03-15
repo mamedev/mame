@@ -39,18 +39,24 @@ namespace plib {
 
 			static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
-			token_id_t() : m_id(npos) {}
+			token_id_t()
+			: m_id(npos)
+			{}
+
 			explicit token_id_t(std::size_t id, const pstring &name)
 			: m_id(id)
 			, m_name(name)
 			{}
 
-			PCOPYASSIGNMOVE(token_id_t, default)
+			token_id_t(const token_id_t &) = default;
+			token_id_t &operator=(const token_id_t &) = default;
+			token_id_t(token_id_t &&) noexcept = default;
+			token_id_t &operator=(token_id_t &&) noexcept = default;
 
 			~token_id_t() = default;
 
-			std::size_t id() const { return m_id; }
-			const pstring & name() const { return m_name; }
+			constexpr std::size_t id() const { return m_id; }
+			constexpr const pstring & name() const { return m_name; }
 		private:
 			std::size_t m_id;
 			pstring     m_name;
@@ -75,18 +81,18 @@ namespace plib {
 			{
 			}
 
-			PCOPYASSIGNMOVE(token_t, default)
+			token_t(const token_t &) = default;
+			token_t &operator=(const token_t &) = default;
+			token_t(token_t &&) noexcept = default;
+			token_t &operator=(token_t &&) noexcept = default;
 
 			~token_t() = default;
 
-			bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
-			bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
-
-			bool is_type(const token_type type) const noexcept { return m_type == type; }
-
-			token_type type() const noexcept { return m_type; }
-
-			const pstring &str() const noexcept { return m_token; }
+			constexpr bool is(const token_id_t &tok_id) const noexcept { return m_id == tok_id.id(); }
+			constexpr bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
+			constexpr bool is_type(const token_type type) const noexcept { return m_type == type; }
+			constexpr token_type type() const noexcept { return m_type; }
+			constexpr const pstring &str() const noexcept { return m_token; }
 
 		private:
 			token_type m_type;
@@ -94,17 +100,22 @@ namespace plib {
 			pstring m_token;
 		};
 
-		class token_store : public std::vector<token_t>
+		class token_store_t : public std::vector<token_t>
 		{
 			using std::vector<token_t>::vector;
 		};
 
 	} // namespace detail
 
-	class ptokenizer
+	class tokenizer_t
 	{
 	public:
-		explicit ptokenizer() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+		using token_type = detail::token_type;
+		using token_id_t = detail::token_id_t;
+		using token_t = detail::token_t;
+		using token_store_t = detail::token_store_t;
+
+		explicit tokenizer_t() // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
 		: m_strm(nullptr)
 		, m_unget(0)
 		, m_string('"')
@@ -114,14 +125,12 @@ namespace plib {
 			clear();
 		}
 
-		PCOPYASSIGNMOVE(ptokenizer, delete)
+		tokenizer_t(const tokenizer_t &) = delete;
+		tokenizer_t &operator=(const tokenizer_t &) = delete;
+		tokenizer_t(tokenizer_t &&) noexcept = delete;
+		tokenizer_t &operator=(tokenizer_t &&) noexcept = delete;
 
-		virtual ~ptokenizer() = default;
-
-		using token_type = detail::token_type;
-		using token_id_t = detail::token_id_t;
-		using token_t = detail::token_t;
-		using token_store = detail::token_store;
+		virtual ~tokenizer_t() = default;
 
 		// tokenizer stuff follows ...
 
@@ -132,11 +141,11 @@ namespace plib {
 			return ret;
 		}
 
-		ptokenizer & identifier_chars(const pstring &s) { m_identifier_chars = s; return *this; }
-		ptokenizer & number_chars(const pstring &st, const pstring & rem) { m_number_chars_start = st; m_number_chars = rem; return *this; }
-		ptokenizer & string_char(pstring::value_type c) { m_string = c; return *this; }
-		ptokenizer & whitespace(const pstring & s) { m_whitespace = s; return *this; }
-		ptokenizer & comment(const pstring &start, const pstring &end, const pstring &line)
+		tokenizer_t & identifier_chars(const pstring &s) { m_identifier_chars = s; return *this; }
+		tokenizer_t & number_chars(const pstring &st, const pstring & rem) { m_number_chars_start = st; m_number_chars = rem; return *this; }
+		tokenizer_t & string_char(pstring::value_type c) { m_string = c; return *this; }
+		tokenizer_t & whitespace(const pstring & s) { m_whitespace = s; return *this; }
+		tokenizer_t & comment(const pstring &start, const pstring &end, const pstring &line)
 		{
 			m_tok_comment_start = register_token(start);
 			m_tok_comment_end = register_token(end);
@@ -144,19 +153,7 @@ namespace plib {
 			return *this;
 		}
 
-		void append_to_store(putf8_reader *reader, token_store &tokstor)
-		{
-			clear();
-			m_strm = reader;
-			// Process tokens into queue
-			token_t ret(token_type::UNKNOWN);
-			m_token_queue = &tokstor;
-			do {
-				ret = get_token_comment();
-				tokstor.push_back(ret);
-			} while (!ret.is_type(token_type::token_type::ENDOFFILE));
-			m_token_queue = nullptr;
-		}
+		void append_to_store(putf8_reader *reader, token_store_t &store);
 
 	private:
 
@@ -172,7 +169,7 @@ namespace plib {
 		// get internal token with comment processing
 		token_t get_token_comment();
 
-		void skipeol();
+		void skip_eol();
 
 		pstring::value_type getc();
 		void ungetc(pstring::value_type c);
@@ -200,19 +197,19 @@ namespace plib {
 
 	protected:
 		bool m_support_line_markers;
-		token_store *m_token_queue;
+		token_store_t *m_token_queue;
 	};
 
-	class ptoken_reader
+	class token_reader_t
 	{
 	public:
 
-		using token_t = ptokenizer::token_t;
-		using token_type = ptokenizer::token_type;
-		using token_id_t = ptokenizer::token_id_t;
-		using token_store = ptokenizer::token_store;
+		using token_t = tokenizer_t::token_t;
+		using token_type = tokenizer_t::token_type;
+		using token_id_t = tokenizer_t::token_id_t;
+		using token_store = tokenizer_t::token_store_t;
 
-		explicit ptoken_reader()
+		explicit token_reader_t()
 		: m_idx(0)
 		, m_token_store(nullptr)
 		{
@@ -220,16 +217,19 @@ namespace plib {
 			m_source_location.emplace_back(plib::source_location("Unknown", 0));
 		}
 
-		PCOPYASSIGNMOVE(ptoken_reader, delete)
+		token_reader_t(const token_reader_t &) = delete;
+		token_reader_t &operator=(const token_reader_t &) = delete;
+		token_reader_t(token_reader_t &&) noexcept = delete;
+		token_reader_t &operator=(token_reader_t &&) noexcept = delete;
 
-		virtual ~ptoken_reader() = default;
+		virtual ~token_reader_t() = default;
 
-		void set_token_source(const token_store *tokstor)
+		void set_token_source(const token_store *store)
 		{
-			m_token_store = tokstor;
+			m_token_store = store;
 		}
 
-		pstring currentline_str() const;
+		pstring current_line_str() const;
 
 		// tokenizer stuff follows ...
 
@@ -247,9 +247,10 @@ namespace plib {
 
 		void error(const perrmsg &errs);
 
-		plib::source_location sourceloc() { return m_source_location.back(); }
+		plib::source_location location() { return m_source_location.back(); }
 
 		pstring current_line() const { return m_line; }
+
 	protected:
 		virtual void verror(const pstring &msg) = 0;
 

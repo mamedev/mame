@@ -5,7 +5,6 @@
 
 #include "coretmpl.h" // BIT
 
-#include <cassert>
 #include <ostream>
 
 

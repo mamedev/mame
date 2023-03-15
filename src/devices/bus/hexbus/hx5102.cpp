@@ -107,7 +107,7 @@
 #define MOTOR_TIMER 1
 #define UNDEF -1
 
-DEFINE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device, "ti_hx5102", "TI Hexbus Floppy Drive")
+DEFINE_DEVICE_TYPE(HX5102, bus::hexbus::hx5102_device, "ti_hx5102", "TI Hexbus Floppy Drive")
 
 namespace bus::hexbus {
 

@@ -26,6 +26,6 @@ private:
 	static const format formats[];
 };
 
-extern const floppy_format_type FLOPPY_ASST128_FORMAT;
+extern const asst128_format FLOPPY_ASST128_FORMAT;
 
 #endif // MAME_FORMATS_ASST128_DSK_H

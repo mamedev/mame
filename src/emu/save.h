@@ -51,18 +51,36 @@ enum save_error
 typedef named_delegate<void ()> save_prepost_delegate;
 
 
-// use this to declare a given type is a simple, non-pointer type that can be
-// saved; in general, this is intended only to be used for specific enum types
-// defined by your device
+/// \brief Declare a type as safe to automatically save/restore
+///
+/// Use this to declare that a given type is a simple, non-pointer type
+/// that can be saved and restored.  In general, this should only be
+/// be used for specific enum types that have fixed width integer types
+/// as their storage classes.
+/// \param TYPE The name of the type to declare safe to save.
+/// \sa ALLOW_SAVE_TYPE_AND_VECTOR
 #define ALLOW_SAVE_TYPE(TYPE) \
-	template <> struct save_manager::is_atom<TYPE> { static constexpr bool value = true; };
+	template <> struct save_manager::is_atom<TYPE> : public std::true_type { };
 
-// use this as above, but also to declare that std::vector<TYPE> is safe as well
+/// \brief Declare a type as safe to automatically save/restore,
+///   including in \c std::vector instances
+///
+/// Used the same way as #ALLOW_SAVE_TYPE, but also declares that
+/// \c std::vector instances containing the type are safe to save.
+/// that can be saved and restored.  This must not be used if
+/// \c std::vector is specialised in an incompatible way.
+/// \param TYPE The name of the type to declare safe to save.
+/// \sa ALLOW_SAVE_TYPE
 #define ALLOW_SAVE_TYPE_AND_VECTOR(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE) \
-	template <> struct save_manager::is_vector_safe<TYPE> { static constexpr bool value = true; };
+	template <> struct save_manager::is_vector_safe<TYPE> : public std::true_type { };
 
-// use this for saving members of structures in arrays
+/// \brief Helper for referring to members of structures in arrays
+///
+/// Expands to the necessary reference, pointer to member and name to
+/// refer to a structure member.
+/// \param s Reference to a C array or \c std::array of structures.
+/// \param m Name of the structure member to refer to.
 #define STRUCT_MEMBER(s, m) s, &save_manager::pointer_unwrap<decltype(s)>::underlying_type::m, #s "." #m
 
 
@@ -99,8 +117,8 @@ class save_manager
 	};
 
 	// set of templates to identify valid save types
-	template <typename ItemType> struct is_atom { static constexpr bool value = false; };
-	template <typename ItemType> struct is_vector_safe { static constexpr bool value = false; };
+	template <typename ItemType> struct is_atom : public std::false_type { };
+	template <typename ItemType> struct is_vector_safe : public std::false_type { };
 
 	class state_entry
 	{
@@ -282,9 +300,9 @@ public:
 	{ save_pointer(nullptr, "global", nullptr, index, std::forward<ItemType>(value), element, valname, count); }
 
 	// file processing
-	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
-	save_error write_file(emu_file &file);
-	save_error read_file(emu_file &file);
+	static save_error check_file(running_machine &machine, util::core_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	save_error write_file(util::core_file &file);
+	save_error read_file(util::core_file &file);
 
 	save_error write_stream(std::ostream &str);
 	save_error read_stream(std::istream &str);

@@ -16,16 +16,14 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "lc8670.h"
 #include "lc8670dsm.h"
 
-//***************************************************************************
-//    DEBUGGING
-//***************************************************************************
+#define LOG_TIMERS      (1U << 1)
+#define LOG_IRQ         (1U << 2)
 
-#define LOG_TIMERS          0
-#define LOG_IRQ             0
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -207,9 +205,9 @@ void lc8670_cpu_device::device_start()
 	m_lcd_update_func.resolve();
 
 	// setup timers
-	m_basetimer = timer_alloc(BASE_TIMER);
+	m_basetimer = timer_alloc(FUNC(lc8670_cpu_device::base_timer_update), this);
 	m_basetimer->adjust(attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]), 0, attotime::from_hz(m_clocks[unsigned(clock_source::SUB)]));
-	m_clocktimer = timer_alloc(CLOCK_TIMER);
+	m_clocktimer = timer_alloc(FUNC(lc8670_cpu_device::clock_timer_update), this);
 
 	// register state for debugger
 	state_add(LC8670_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%04X");
@@ -329,26 +327,27 @@ void lc8670_cpu_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  base_timer_update
 //-------------------------------------------------
 
-void lc8670_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(lc8670_cpu_device::base_timer_update)
 {
-	switch(id)
-	{
-		case BASE_TIMER:
-			if (!(REG_ISL & 0x10))
-				base_timer_tick();
-			break;
+	if (!(REG_ISL & 0x10))
+		base_timer_tick();
+}
 
-		case CLOCK_TIMER:
-			timer0_prescaler_tick();
-			timer1_tick();
 
-			if ((REG_ISL & 0x30) == 0x10)
-				base_timer_tick();
-			break;
-	}
+//-------------------------------------------------
+//  clock_timer_update
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(lc8670_cpu_device::clock_timer_update)
+{
+	timer0_prescaler_tick();
+	timer1_tick();
+
+	if ((REG_ISL & 0x30) == 0x10)
+		base_timer_tick();
 }
 
 
@@ -455,7 +454,7 @@ void lc8670_cpu_device::execute_run()
 
 void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 {
-	switch(inputnum)
+	switch (inputnum)
 	{
 		case LC8670_EXT_INT0:
 			if ((REG_I01CR & 0x0c) == 0x00 && m_input_lines[inputnum] && !state)        // falling edge
@@ -596,13 +595,15 @@ void lc8670_cpu_device::check_irqs()
 		// high priority IRQ
 		else if ((REG_IE & 0x80) && ((REG_IP<<3) & m_irq_flag))
 		{
-			for(int i=3; i<=10; i++)
-				if ((m_irq_flag & (REG_IP<<3)) & (1<<i))
+			for(int i = 3; i <= 10; i++)
+			{
+				if (BIT(m_irq_flag & (REG_IP << 3), i))
 				{
 					irq = i;
 					priority = 1;
 					break;
 				}
+			}
 		}
 
 		// low priority IRQ
@@ -618,39 +619,40 @@ void lc8670_cpu_device::check_irqs()
 		}
 		else if (REG_IE & 0x80)
 		{
-			for(int i=3; i<=10; i++)
-				if (m_irq_flag & (1<<i))
+			for(int i = 3; i <= 10; i++)
+			{
+				if (BIT(m_irq_flag, i))
 				{
 					irq = i;
 					priority = 0;
 					break;
 				}
+			}
 		}
 
 		// IRQ with less priority of current interrupt are not executed until the end of the current interrupt routine
 		if (irq != 0 && ((m_irq_lev & (1<<priority)) || (priority == 0 && (m_irq_lev & 0x06)) || (priority == 1 && (m_irq_lev & 0x04))))
 		{
-			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag(), irq, priority, m_irq_lev);
+			LOGMASKED(LOG_IRQ, "%s: interrupt %d (Priority=%d, Level=%d) delayed\n", tag(), irq, priority, m_irq_lev);
 			irq = 0;
 		}
 
 		if (irq != 0)
 		{
-			if (LOG_IRQ)    logerror("%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			LOGMASKED(LOG_IRQ, "%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			standard_irq_callback(irq, m_pc);
 
-			m_irq_lev |= (1<<priority);
+			m_irq_lev |= (1 << priority);
 
-			push((m_pc>>0) & 0xff);
-			push((m_pc>>8) & 0xff);
+			push((uint8_t)m_pc);
+			push((uint8_t)(m_pc >> 8));
 
 			set_pc(s_irq_vectors[irq]);
 
 			REG_PCON &= ~HALT_MODE;     // interrupts resume from HALT state
 
 			// clear the IRQ flag
-			m_irq_flag &= ~(1<<irq);
-
-			standard_irq_callback(irq);
+			m_irq_flag &= ~(1 << irq);
 		}
 	}
 
@@ -677,14 +679,14 @@ void lc8670_cpu_device::base_timer_tick()
 
 		if (base_counter_h & 0x40)
 		{
-			if (LOG_TIMERS) logerror("%s: base timer 0 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,0));
+			LOGMASKED(LOG_TIMERS, "%s: base timer 0 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR, 0));
 			REG_BTCR |= 0x02;
 			if (REG_BTCR & 0x01)
 				set_irq_flag(4);
 		}
 
 		bool bt1_req = false;
-		switch(REG_BTCR & 0x30)
+		switch (REG_BTCR & 0x30)
 		{
 			case 0x00:
 				if (base_counter_l & 0x20)
@@ -706,7 +708,7 @@ void lc8670_cpu_device::base_timer_tick()
 
 		if (bt1_req)
 		{
-			if (LOG_TIMERS) logerror("%s: base timer 1 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR,3));
+			LOGMASKED(LOG_TIMERS, "%s: base timer 1 overflow, IRQ: %d\n", tag(), BIT(REG_BTCR, 3));
 			REG_BTCR |= 0x08;
 			if (REG_BTCR & 0x04)
 				set_irq_flag(4);
@@ -717,7 +719,7 @@ void lc8670_cpu_device::base_timer_tick()
 		else
 			update_port1(m_p1_data & 0xbf);
 
-		m_base_timer[0] = base_counter_l & 0xff;
+		m_base_timer[0] = (uint8_t)base_counter_l;
 		m_base_timer[1] = base_counter_h & 0x3f;
 	}
 }
@@ -731,7 +733,7 @@ void lc8670_cpu_device::timer0_prescaler_tick()
 	uint16_t prescaler = m_timer0_prescaler + 1;
 	if (prescaler & 0x100)
 	{
-		if (LOG_TIMERS) logerror("%s: timer0 prescaler overflow\n", tag());
+		LOGMASKED(LOG_TIMERS, "%s: timer0 prescaler overflow\n", tag());
 
 		if ((REG_ISL & 0x30) == 0x30)
 			base_timer_tick();
@@ -742,7 +744,7 @@ void lc8670_cpu_device::timer0_prescaler_tick()
 	}
 	else
 	{
-		m_timer0_prescaler = prescaler & 0xff;
+		m_timer0_prescaler = (uint8_t)prescaler;
 	}
 }
 
@@ -763,7 +765,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0 & 0x10000)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 long overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					LOGMASKED(LOG_TIMERS, "%s: timer0 long overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT, 3));
 					m_timer0[0] = REG_T0LR;
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x0a;
@@ -772,8 +774,8 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 				}
 				else
 				{
-					m_timer0[0] = (timer0>>0) & 0xff;
-					m_timer0[1] = (timer0>>8) & 0xff;
+					m_timer0[0] = (uint8_t)timer0;
+					m_timer0[1] = (uint8_t)(timer0 >> 8);
 				}
 			}
 		}
@@ -786,7 +788,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 
 				if (timer0l & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 low overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,0));
+					LOGMASKED(LOG_TIMERS, "%s: timer0 low overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT, 0));
 					m_timer0[0] = REG_T0LR;
 					REG_T0CNT |= 0x02;
 					if (REG_T0CNT & 0x01)
@@ -794,15 +796,15 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 				}
 				else
 				{
-					m_timer0[0]  = timer0l & 0xff;
+					m_timer0[0] = (uint8_t)timer0l;
 				}
 			}
-			if ((REG_T0CNT & 0x80)  && !ext_line)
+			if ((REG_T0CNT & 0x80) && !ext_line)
 			{
 				uint16_t timer0h = m_timer0[1] + 1;
 				if (timer0h & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
+					LOGMASKED(LOG_TIMERS, "%s: timer0 high overflow, IRQ: %d\n", tag(), BIT(REG_T0CNT,3));
 					m_timer0[1] = REG_T0HR;
 					REG_T0CNT |= 0x08;
 					if (REG_T0CNT & 0x04)
@@ -810,7 +812,7 @@ void lc8670_cpu_device::timer0_tick(bool ext_line)
 				}
 				else
 				{
-					m_timer0[1]  = timer0h & 0xff;
+					m_timer0[1] = (uint8_t)timer0h;
 				}
 			}
 		}
@@ -839,7 +841,7 @@ void lc8670_cpu_device::timer1_tick()
 
 					if (timer1h & 0x100)
 					{
-						if (LOG_TIMERS) logerror("%s: timer1 long overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+						LOGMASKED(LOG_TIMERS, "%s: timer1 long overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT, 3));
 						m_timer1[1] = REG_T1HR;
 						REG_T1CNT |= 0x08;
 						if (REG_T1CNT & 0x05)
@@ -847,12 +849,12 @@ void lc8670_cpu_device::timer1_tick()
 					}
 					else
 					{
-						m_timer1[1] = timer1h & 0xff;
+						m_timer1[1] = (uint8_t)timer1h;
 					}
 				}
 				else
 				{
-					m_timer1[0]  = timer1l & 0xff;
+					m_timer1[0]  = (uint8_t)timer1l;
 				}
 			}
 		}
@@ -868,7 +870,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1l & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer1 low overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,0));
+					LOGMASKED(LOG_TIMERS, "%s: timer1 low overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT, 0));
 					m_timer1[0] = REG_T1LR;
 					update_port1(m_p1_data & 0x7f);
 					REG_T1CNT |= 0x02;
@@ -877,7 +879,7 @@ void lc8670_cpu_device::timer1_tick()
 				}
 				else
 				{
-					m_timer1[0] = timer1l & 0xff;
+					m_timer1[0] = (uint8_t)timer1l;
 				}
 			}
 			if (REG_T1CNT & 0x80)
@@ -886,7 +888,7 @@ void lc8670_cpu_device::timer1_tick()
 
 				if (timer1h & 0x100)
 				{
-					if (LOG_TIMERS) logerror("%s: timer1 high overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT,3));
+					LOGMASKED(LOG_TIMERS, "%s: timer1 high overflow, IRQ: %d\n", tag(), BIT(REG_T1CNT, 3));
 					m_timer1[1] = REG_T1HR;
 					REG_T1CNT |= 0x08;
 					if (REG_T1CNT & 0x04)
@@ -894,7 +896,7 @@ void lc8670_cpu_device::timer1_tick()
 				}
 				else
 				{
-					m_timer1[1] = timer1h & 0xff;
+					m_timer1[1] = (uint8_t)timer1h;
 				}
 			}
 		}
@@ -908,26 +910,26 @@ void lc8670_cpu_device::timer1_tick()
 
 uint8_t lc8670_cpu_device::mram_r(offs_t offset)
 {
-	return m_mram[BIT(REG_PSW,1)*0x100 + offset];
+	return m_mram[(BIT(REG_PSW, 1) << 8) + offset];
 }
 
 void lc8670_cpu_device::mram_w(offs_t offset, uint8_t data)
 {
-	m_mram[BIT(REG_PSW,1)*0x100 + offset] = data;
+	m_mram[(BIT(REG_PSW, 1) << 8) + offset] = data;
 }
 
 uint8_t lc8670_cpu_device::xram_r(offs_t offset)
 {
 	if (!(REG_VCCR & 0x40) || machine().side_effects_disabled())  // XRAM access enabled
 	{
-		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
+		uint8_t *xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
-		switch(REG_XBNK & 0x03)
+		switch (REG_XBNK & 0x03)
 		{
 			case 0:
 			case 1:
 				if ((offset & 0x0f) < 0x0c)
-					return xram_bank[(offset>>4) * 0x0c + (offset & 0x0f)];
+					return xram_bank[(offset >> 4) * 0x0c + (offset & 0x0f)];
 				break;
 			case 2:
 				if (offset < 0x06)
@@ -943,14 +945,14 @@ void lc8670_cpu_device::xram_w(offs_t offset, uint8_t data)
 {
 	if (!(REG_VCCR & 0x40) || machine().side_effects_disabled())  // XRAM access enabled
 	{
-		uint8_t * xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
+		uint8_t *xram_bank = m_xram + (REG_XBNK & 0x03) * 0x60;
 
 		switch(REG_XBNK & 0x03)
 		{
 			case 0:
 			case 1:
 				if ((offset & 0x0f) < 0x0c)
-					xram_bank[(offset>>4) * 0x0c + (offset & 0x0f)] = data;
+					xram_bank[(offset >> 4) * 0x0c + (offset & 0x0f)] = data;
 				break;
 			case 2:
 				if (offset < 0x06)
@@ -980,12 +982,12 @@ uint8_t lc8670_cpu_device::regs_r(offs_t offset)
 			return m_io.read_byte(LC8670_PORT7) | 0xf0;    // 4-bit read-only port
 		case 0x66:
 		{
-			uint8_t data = m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff];
+			uint8_t data = m_vtrbf[((REG_VRMAD2 << 8) | REG_VRMAD1) & 0x1ff];
 			if (!machine().side_effects_disabled() && (REG_VSEL & 0x10))
 			{
-				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
-				REG_VRMAD1 = vrmad & 0xff;
-				REG_VRMAD2 = (vrmad >> 8) & 0x01;
+				uint16_t vrmad = ((REG_VRMAD1 | (REG_VRMAD2 << 8)) + 1) & 0x1ff;
+				REG_VRMAD1 = (uint8_t)vrmad;
+				REG_VRMAD2 = (uint8_t)(vrmad >> 8);
 			}
 			return data;
 		}
@@ -1050,9 +1052,9 @@ void lc8670_cpu_device::regs_w(offs_t offset, uint8_t data)
 			m_vtrbf[((REG_VRMAD2<<8) | REG_VRMAD1) & 0x1ff] = data;
 			if (!machine().side_effects_disabled() && (REG_VSEL & 0x10))
 			{
-				uint16_t vrmad = (REG_VRMAD1 | (REG_VRMAD2<<8)) + 1;
-				REG_VRMAD1 = vrmad & 0xff;
-				REG_VRMAD2 = (vrmad >> 8) & 0x01;
+				uint16_t vrmad = ((REG_VRMAD1 | (REG_VRMAD2 << 8)) + 1) & 0x1ff;
+				REG_VRMAD1 = (uint8_t)vrmad;
+				REG_VRMAD2 = (uint8_t)(vrmad >> 8);
 			}
 			break;
 		case 0x7f:
@@ -1145,7 +1147,7 @@ inline uint16_t lc8670_cpu_device::get_addr()
 	if (mode > 0x01 && mode <= 0x03)
 		addr = GET_D9;
 	else if (mode > 0x03 && mode <= 0x07)
-		addr = read_data(GET_RI | ((REG_PSW>>1) & 0x0c)) | ((GET_RI & 0x02) ? 0x100 : 0x00);
+		addr = read_data(GET_RI | ((REG_PSW >> 1) & 0x0c)) | ((GET_RI & 0x02) ? 0x100 : 0x00);
 	else
 		fatalerror("%s: invalid get_addr in mode %x\n", machine().describe_context().c_str(), mode);
 
@@ -1192,7 +1194,7 @@ inline void lc8670_cpu_device::change_clock_source()
 inline void lc8670_cpu_device::check_p_flag()
 {
 	uint8_t p_plag = 0;
-	for(int i=0; i<8; i++)
+	for(int i = 0; i < 8; i++)
 		p_plag ^= BIT(REG_A, i);
 
 	if (p_plag)
@@ -1216,8 +1218,8 @@ inline void lc8670_cpu_device::check_p3int()
 
 inline void lc8670_cpu_device::set_irq_flag(int source)
 {
-	if (LOG_IRQ)    logerror("%s: set interrupt flag: %d\n", tag(), source);
-	m_irq_flag |= 1<<source;
+	LOGMASKED(LOG_IRQ, "%s: set interrupt flag: %d\n", tag(), source);
+	m_irq_flag |= 1 << source;
 }
 
 int lc8670_cpu_device::decode_op(uint8_t op)
@@ -1239,7 +1241,7 @@ int lc8670_cpu_device::decode_op(uint8_t op)
 			break;
 	}
 
-	return ((op>>4) & 0x0f) * 5 + idx;
+	return (op >> 4) * 5 + idx;
 }
 
 //**************************************************************************
@@ -1271,8 +1273,8 @@ int lc8670_cpu_device::op_call()
 {
 	uint16_t new_pc = GET_A12;
 
-	push((m_pc>>0) & 0xff);
-	push((m_pc>>8) & 0xff);
+	push((uint8_t)m_pc);
+	push((uint8_t)(m_pc >> 8));
 
 	set_pc((m_pc & 0xf000) | new_pc);
 
@@ -1283,10 +1285,10 @@ int lc8670_cpu_device::op_call()
 int lc8670_cpu_device::op_callr()
 {
 	uint16_t r16 = fetch();
-	r16 |= fetch()<<8;
+	r16 |= fetch() << 8;
 
-	push((m_pc>>0) & 0xff);
-	push((m_pc>>8) & 0xff);
+	push((uint8_t)m_pc);
+	push((uint8_t)(m_pc >> 8));
 	set_pc(m_pc - 1 + r16);
 
 	return 4;
@@ -1295,7 +1297,7 @@ int lc8670_cpu_device::op_callr()
 int lc8670_cpu_device::op_brf()
 {
 	uint16_t r16 = fetch();
-	r16 |= fetch()<<8;
+	r16 |= fetch() << 8;
 	set_pc(m_pc - 1 + r16);
 
 	return 4;
@@ -1310,11 +1312,11 @@ int lc8670_cpu_device::op_st()
 
 int lc8670_cpu_device::op_callf()
 {
-	uint16_t a16 = fetch()<<8;
+	uint16_t a16 = fetch() << 8;
 	a16 |= fetch();
 
-	push((m_pc>>0) & 0xff);
-	push((m_pc>>8) & 0xff);
+	push((uint8_t)m_pc);
+	push((uint8_t)(m_pc >> 8));
 	set_pc(a16);
 
 	return 2;
@@ -1322,7 +1324,7 @@ int lc8670_cpu_device::op_callf()
 
 int lc8670_cpu_device::op_jmpf()
 {
-	uint16_t a16 = fetch()<<8;
+	uint16_t a16 = fetch() << 8;
 	a16 |= fetch();
 	set_pc(a16);
 
@@ -1350,11 +1352,11 @@ int lc8670_cpu_device::op_jmp()
 
 int lc8670_cpu_device::op_mul()
 {
-	uint32_t res = REG_B * ((REG_A<<8) | REG_C);
+	uint32_t res = REG_B * ((REG_A << 8) | REG_C);
 
-	REG_A = (res>>8) & 0xff;
-	REG_B = (res>>16) & 0xff;
-	REG_C = (res>>0) & 0xff;
+	REG_A = (uint8_t)(res >> 8);
+	REG_B = (uint8_t)(res >> 16);
+	REG_C = (uint8_t)res;
 
 	SET_OV(REG_B != 0 ? 1 : 0);
 	SET_CY(0);
@@ -1397,13 +1399,13 @@ int lc8670_cpu_device::op_div()
 
 	if (REG_B != 0)
 	{
-		uint16_t v = ((REG_A<<8) | REG_C);
+		uint16_t v = ((REG_A << 8) | REG_C);
 		res = v / REG_B;
 		mod = v % REG_B;
 
-		REG_A = (res>>8) & 0xff;
-		REG_C = (res>>0) & 0xff;
-		REG_B = mod & 0xff;
+		REG_A = (uint8_t)(res >> 8);
+		REG_C = (uint8_t)res;
+		REG_B = (uint8_t)mod;
 		SET_OV(0);
 	}
 	else
@@ -1447,7 +1449,7 @@ int lc8670_cpu_device::op_bne_ri()
 
 int lc8670_cpu_device::op_ldf()
 {
-	uint16_t addr = REG_TRL | (REG_TRH<<8);
+	uint16_t addr = REG_TRL | (REG_TRH << 8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
 	REG_A = m_program.read_byte(addr);
@@ -1459,7 +1461,7 @@ int lc8670_cpu_device::op_ldf()
 
 int lc8670_cpu_device::op_stf()
 {
-	uint16_t addr = REG_TRL | (REG_TRH<<8);
+	uint16_t addr = REG_TRL | (REG_TRH << 8);
 
 	m_bankswitch_func(REG_FPR & 0x01 ? 2 : 1);
 	m_program.write_byte(addr, REG_A);
@@ -1489,9 +1491,9 @@ int lc8670_cpu_device::op_bpc()
 	uint8_t r8 = GET_R8;
 	uint8_t data = read_data_latch(d9);
 
-	if (data & (1<<b3))
+	if (BIT(data, b3))
 	{
-		write_data_latch(d9, data & ~(1<<b3));
+		write_data_latch(d9, data & ~(1 << b3));
 		set_pc(m_pc + SIGNED(r8));
 	}
 
@@ -1522,7 +1524,7 @@ int lc8670_cpu_device::op_bp()
 	uint16_t d9 = GET_D9B3;
 	uint8_t r8 = GET_R8;
 
-	if (read_data(d9) & (1<<b3))
+	if (BIT(read_data(d9), b3))
 		set_pc(m_pc + SIGNED(r8));
 
 	return 2;
@@ -1565,7 +1567,7 @@ int lc8670_cpu_device::op_add()
 	SET_AC(((REG_A & 0x0f) + (data & 0x0f)) > 0x0f ? 1 : 0);
 	SET_OV((REG_A & data) & (data ^ res) & 0x80 ? 1 : 0);
 
-	REG_A = res & 0xff;
+	REG_A = (uint8_t)res;
 	CHECK_P();
 
 	return 1;
@@ -1577,7 +1579,7 @@ int lc8670_cpu_device::op_bn()
 	uint16_t d9 = GET_D9B3;
 	uint8_t r8 = GET_R8;
 
-	if (!(read_data(d9) & (1<<b3)))
+	if (!BIT(read_data(d9), b3))
 		set_pc(m_pc + SIGNED(r8));
 
 	return 2;
@@ -1600,7 +1602,7 @@ int lc8670_cpu_device::op_addc()
 
 	SET_CY(res > 0xff ? 1 : 0);
 	SET_AC(((REG_A & 0x0f) + (data & 0x0f) + GET_CY) > 0x0f ? 1 : 0);
-	SET_OV(((REG_A+GET_CY) & data) & (data ^ res) & 0x80 ? 1 : 0);
+	SET_OV(((REG_A + GET_CY) & data) & (data ^ res) & 0x80 ? 1 : 0);
 
 	REG_A = res & 0xff;
 	CHECK_P();
@@ -1610,7 +1612,7 @@ int lc8670_cpu_device::op_addc()
 
 int lc8670_cpu_device::op_ret()
 {
-	uint16_t new_pc = pop()<<8;
+	uint16_t new_pc = pop() << 8;
 	new_pc |= pop();
 	set_pc(new_pc);
 
@@ -1626,7 +1628,7 @@ int lc8670_cpu_device::op_sub()
 	SET_AC(((REG_A & 0x0f) - (data & 0x0f)) < 0x00 ? 1 : 0);
 	SET_OV((REG_A ^ data) & (data & res) & 0x80 ? 1 : 0);
 
-	REG_A = res & 0xff;
+	REG_A = (uint8_t)res;
 	CHECK_P();
 
 	return 1;
@@ -1637,7 +1639,7 @@ int lc8670_cpu_device::op_not1()
 	uint16_t d9 = GET_D9B3;
 	uint8_t data = read_data_latch(d9);
 
-	data ^= (1<<GET_B3);
+	data ^= (1 << GET_B3);
 	write_data_latch(d9, data);
 
 	return 1;
@@ -1645,17 +1647,19 @@ int lc8670_cpu_device::op_not1()
 
 int lc8670_cpu_device::op_reti()
 {
-	uint16_t new_pc = pop()<<8;
+	uint16_t new_pc = pop() << 8;
 	new_pc |= pop();
 	set_pc(new_pc);
 
-	if (LOG_IRQ)    logerror("%s: RETI from level %d\n", machine().describe_context(), m_irq_lev);
-	for(int i=2; i>=0; i--)
-		if (m_irq_lev & (1<<i))
+	LOGMASKED(LOG_IRQ, "%s: RETI from level %d\n", machine().describe_context(), m_irq_lev);
+	for(int i = 2; i >= 0; i--)
+	{
+		if (BIT(m_irq_lev, i))
 		{
-			m_irq_lev &= ~(1<<i);
+			m_irq_lev &= ~(1 << i);
 			break;
 		}
+	}
 
 	m_after_reti = true;
 
@@ -1671,7 +1675,7 @@ int lc8670_cpu_device::op_subc()
 	SET_AC(((REG_A & 0x0f) - (data & 0x0f) - GET_CY) < 0x00 ? 1 : 0);
 	SET_OV((REG_A ^ (data + GET_CY)) & (data & res) & 0x80 ? 1 : 0);
 
-	REG_A = res & 0xff;
+	REG_A = (uint8_t)res;
 	CHECK_P();
 
 	return 1;
@@ -1679,7 +1683,7 @@ int lc8670_cpu_device::op_subc()
 
 int lc8670_cpu_device::op_ror()
 {
-	REG_A = ((REG_A & 0x01) << 7) | (REG_A>>1);
+	REG_A = ((REG_A & 0x01) << 7) | (REG_A >> 1);
 	CHECK_P();
 
 	return 1;
@@ -1687,7 +1691,7 @@ int lc8670_cpu_device::op_ror()
 
 int lc8670_cpu_device::op_ldc()
 {
-	REG_A = m_program.read_byte(((REG_TRH<<8) | REG_TRL) + REG_A);
+	REG_A = m_program.read_byte(((REG_TRH << 8) | REG_TRL) + REG_A);
 	CHECK_P();
 
 	return 2;
@@ -1710,7 +1714,7 @@ int lc8670_cpu_device::op_clr1()
 	uint16_t d9 = GET_D9B3;
 	uint8_t data = read_data_latch(d9);
 
-	data &= ~(1<<GET_B3);
+	data &= ~(1 << GET_B3);
 	write_data_latch(d9, data);
 
 	return 1;
@@ -1718,9 +1722,9 @@ int lc8670_cpu_device::op_clr1()
 
 int lc8670_cpu_device::op_rorc()
 {
-	uint8_t a = (REG_A>>1) | (GET_CY ? 0x80 : 0x00);
+	uint8_t a = (REG_A >> 1) | (GET_CY ? 0x80 : 0x00);
 
-	SET_CY(BIT(REG_A,0));
+	SET_CY(BIT(REG_A, 0));
 	REG_A = a;
 	CHECK_P();
 
@@ -1737,7 +1741,7 @@ int lc8670_cpu_device::op_or()
 
 int lc8670_cpu_device::op_rol()
 {
-	REG_A = ((REG_A & 0x80) >> 7) | (REG_A<<1);
+	REG_A = ((REG_A & 0x80) >> 7) | (REG_A << 1);
 	CHECK_P();
 
 	return 1;
@@ -1756,7 +1760,7 @@ int lc8670_cpu_device::op_set1()
 	uint16_t d9 = GET_D9B3;
 	uint8_t data = read_data_latch(d9);
 
-	data |= (1<<GET_B3);
+	data |= (1 << GET_B3);
 	write_data_latch(d9, data);
 
 	return 1;
@@ -1764,9 +1768,9 @@ int lc8670_cpu_device::op_set1()
 
 int lc8670_cpu_device::op_rolc()
 {
-	uint8_t a = (REG_A<<1) | (GET_CY ? 0x01 : 0x00);
+	uint8_t a = (REG_A << 1) | (GET_CY ? 0x01 : 0x00);
 
-	SET_CY(BIT(REG_A,7));
+	SET_CY(BIT(REG_A, 7));
 	REG_A = a;
 	CHECK_P();
 

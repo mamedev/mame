@@ -18,7 +18,7 @@ mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, dev
 void mc6843_device::device_start()
 {
 	m_irq.resolve_safe();
-	m_timer = timer_alloc(0);
+	m_timer = timer_alloc(FUNC(mc6843_device::update_tick), this);
 	m_floppy = nullptr;
 
 	m_dir  = 0x00;
@@ -126,6 +126,10 @@ void mc6843_device::dor_w(u8 data)
 	m_dor = data;
 	m_dor_loaded = true;
 	logerror("dor_w %02x\n", m_dor);
+
+	m_strb &= ~SB_DTERR;
+	if(m_strb == 0)
+		m_isr &= 0x7;
 }
 
 u8 mc6843_device::ctar_r()
@@ -238,18 +242,22 @@ void mc6843_device::sur_w(u8 data)
 
 u8 mc6843_device::strb_r()
 {
+	u8 strb = m_strb;
 	if(!machine().side_effects_disabled()) {
-		logerror("strb_r %02x -%s%s%s%s%s%s%s%s\n", m_strb,
-				 m_strb & SB_HERR  ? " herr" : "",
-				 m_strb & SB_WERR  ? " werr" : "",
-				 m_strb & SB_FI    ? " fi" : "",
-				 m_strb & SB_SERR  ? " serr" : "",
-				 m_strb & SB_SAERR ? " saerr" : "",
-				 m_strb & SB_DMERR ? " dmerr" : "",
-				 m_strb & SB_CRC   ? " crc" : "",
-				 m_strb & SB_DTERR ? " dterr" : "");
+		logerror("strb_r %02x -%s%s%s%s%s%s%s%s\n", strb,
+				 strb & SB_HERR  ? " herr" : "",
+				 strb & SB_WERR  ? " werr" : "",
+				 strb & SB_FI    ? " fi" : "",
+				 strb & SB_SERR  ? " serr" : "",
+				 strb & SB_SAERR ? " saerr" : "",
+				 strb & SB_DMERR ? " dmerr" : "",
+				 strb & SB_CRC   ? " crc" : "",
+				 strb & SB_DTERR ? " dterr" : "");
+		m_strb &= ~(SB_HERR|SB_WERR|SB_SERR|SB_SAERR|SB_DMERR|SB_CRC|SB_DTERR);
+		if(m_strb == 0)
+			m_isr &= 0x7;
 	}
-	return m_strb;
+	return strb;
 }
 
 void mc6843_device::sar_w(u8 data)
@@ -300,7 +308,7 @@ void mc6843_device::ready_callback(floppy_image_device *floppy, int state)
 	}
 }
 
-void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(mc6843_device::update_tick)
 {
 	live_sync();
 	run(true, false, false);
@@ -342,6 +350,9 @@ void mc6843_device::command_start()
 	case C_SSR: case C_RCR: case C_SSW: case C_SWD: case C_MSR: case C_MSW:
 		m_stra |= SA_BUSY;
 		m_stra &= ~(SA_DDM|SA_TNEQ);
+		m_strb &= ~SB_DMERR;
+		if(m_strb == 0)
+			m_isr &= 0x7;
 		m_state = S_SRW_WAIT_READY;
 		break;
 

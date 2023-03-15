@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    NEC PC-9801-118
+    System Sacom AMD-98 (AmuseMent boarD)
 
 ***************************************************************************/
 
@@ -14,12 +14,11 @@
 #include "bus/cbus/pc9801_cbus.h"
 #include "sound/ay8910.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_118_device
+// ======================> pc9801_amd98_device
 
 class pc9801_amd98_device : public device_t
 {
@@ -54,12 +53,7 @@ private:
 
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device)
 
-
-
-
-
-#endif // MAME_BUS_CBUS_PC9801_118_H
+#endif // MAME_BUS_CBUS_PC9801_AMD98_H

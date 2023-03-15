@@ -73,7 +73,7 @@ void ds2404_device::device_start()
 	for (auto & elem : m_state)
 		elem = STATE_IDLE;
 
-	m_tick_timer = timer_alloc(0);
+	m_tick_timer = timer_alloc(FUNC(ds2404_device::timer_tick), this);
 	m_tick_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 
@@ -317,22 +317,13 @@ void ds2404_device::clk_w(uint8_t data)
 	}
 }
 
-void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(ds2404_device::timer_tick)
 {
-	switch(id)
+	for(uint8_t &elem : m_rtc)
 	{
-		case 0:
-			// tick
-			for(auto &elem : m_rtc)
-			{
-				elem++;
-				if(elem != 0)
-					break;
-			}
+		elem++;
+		if(elem != 0)
 			break;
-
-		default:
-			throw emu_fatalerror("Unknown id in ds2404_device::device_timer");
 	}
 }
 
@@ -353,9 +344,10 @@ void ds2404_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_read(emu_file &file)
+bool ds2404_device::nvram_read(util::read_stream &file)
 {
-	file.read(m_sram, sizeof(m_sram));
+	size_t actual;
+	return !file.read(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
 }
 
 
@@ -364,7 +356,8 @@ void ds2404_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void ds2404_device::nvram_write(emu_file &file)
+bool ds2404_device::nvram_write(util::write_stream &file)
 {
-	file.write(m_sram, sizeof(m_sram));
+	size_t actual;
+	return !file.write(m_sram, sizeof(m_sram), actual) && actual == sizeof(m_sram);
 }

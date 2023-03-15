@@ -11,6 +11,10 @@ Used by Saitek(SciSys) chess computers Leonardo, Galileo, Renaissance.
 #include "emu.h"
 #include "expansion.h"
 
+#include "maestro.h"
+#include "maestroa.h"
+#include "sparc.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -71,7 +75,7 @@ void saitekosa_expansion_device::device_add_mconfig(machine_config &config)
 	// optional embedded screen
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_size(99, 16);
+	screen.set_size(6 * 16 + 3, 16);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(saitekosa_expansion_device::screen_update));
 }
@@ -128,7 +132,7 @@ void saitekosa_expansion_device::pw_w(int state)
 
 u32 saitekosa_expansion_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : UPDATE_HAS_NOT_CHANGED;
+	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : 0;
 }
 
 
@@ -152,4 +156,16 @@ device_saitekosa_expansion_interface::device_saitekosa_expansion_interface(const
 
 device_saitekosa_expansion_interface::~device_saitekosa_expansion_interface()
 {
+}
+
+//-------------------------------------------------
+//  module list
+//-------------------------------------------------
+
+void saitekosa_expansion_modules(device_slot_interface &device)
+{
+	device.option_add("analyst", OSA_ANALYST);
+	device.option_add("maestro", OSA_MAESTRO);
+	device.option_add("maestroa", OSA_MAESTROA);
+	device.option_add("sparc", OSA_SPARC);
 }

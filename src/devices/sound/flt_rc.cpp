@@ -22,7 +22,7 @@ filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *ta
 		m_stream(nullptr),
 		m_k(0),
 		m_memory(0),
-		m_type(LOWPASS),
+		m_type(LOWPASS_3R),
 		m_last_sample_rate(0),
 		m_R1(1),
 		m_R2(1),
@@ -69,8 +69,8 @@ void filter_rc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 
 	switch (m_type)
 	{
+		case LOWPASS_3R:
 		case LOWPASS:
-		case LOWPASS_2C:
 			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
 			{
 				memory += (src.get(sampindex) - memory) * m_k;
@@ -96,7 +96,7 @@ void filter_rc_device::recalc()
 
 	switch (m_type)
 	{
-		case LOWPASS:
+		case LOWPASS_3R:
 			if (m_C == 0.0)
 			{
 				/* filter disabled */
@@ -106,7 +106,7 @@ void filter_rc_device::recalc()
 			}
 			Req = (m_R1 * (m_R2 + m_R3)) / (m_R1 + m_R2 + m_R3);
 			break;
-		case LOWPASS_2C:
+		case LOWPASS:
 			if (m_C == 0.0)
 			{
 				/* filter disabled */

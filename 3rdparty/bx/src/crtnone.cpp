@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/debug.h>
 #include <bx/file.h>
 #include <bx/math.h>
@@ -100,7 +99,7 @@ extern "C" const char* strstr(const char* _str, const char* _find)
 
 extern "C" void qsort(void* _base, size_t _num, size_t _size, bx::ComparisonFn _fn)
 {
-	BX_CHECK(_num <= UINT32_MAX && _size <= UINT32_MAX, "");
+	BX_ASSERT(_num <= UINT32_MAX && _size <= UINT32_MAX, "");
 	return bx::quickSort(_base, _num, _size, _fn);
 }
 
@@ -333,6 +332,12 @@ extern "C" int sscanf(const char* _str, const char* _format, ...)
 }
 
 extern "C" int fscanf(FILE* _stream, const char* _format, ...)
+{
+	BX_UNUSED(_stream, _format);
+	return -1;
+}
+
+extern "C" int __isoc99_fscanf(FILE* _stream, const char* _format, ...)
 {
 	BX_UNUSED(_stream, _format);
 	return -1;
@@ -601,6 +606,11 @@ extern "C" void free(void* _ptr)
 	crt0::realloc(_ptr, 0);
 }
 
+extern "C" void exit(int _exitCode)
+{
+	crt0::exit(_exitCode);
+}
+
 #endif // BX_PLATFORM_*
 
 extern "C" void abort(void)
@@ -618,6 +628,10 @@ extern "C" void __assert_fail(const char* _assertion, const char* _file, uint32_
 void* __dso_handle = (void*)&__dso_handle;
 
 void operator delete(void*)
+{
+}
+
+void operator delete(void*, size_t)
 {
 }
 

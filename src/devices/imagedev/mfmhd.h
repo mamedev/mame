@@ -17,7 +17,11 @@
 #pragma once
 
 #include "imagedev/harddriv.h"
+
 #include "formats/mfm_hd.h"
+
+#include <system_error>
+
 
 class mfm_harddisk_device;
 
@@ -48,7 +52,7 @@ private:
 	running_machine &           m_machine;
 };
 
-class mfm_harddisk_device : public harddisk_image_device
+class mfm_harddisk_device : public device_t, public device_image_interface
 {
 public:
 	~mfm_harddisk_device();
@@ -56,6 +60,14 @@ public:
 	typedef delegate<void (mfm_harddisk_device*, int)> index_pulse_cb;
 	typedef delegate<void (mfm_harddisk_device*, int)> ready_cb;
 	typedef delegate<void (mfm_harddisk_device*, int)> seek_complete_cb;
+
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_type_name() const noexcept override { return "harddisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "hard"; }
+	virtual const char *file_extensions() const noexcept override { return "chd"; }
 
 	void setup_index_pulse_cb(index_pulse_cb cb);
 	void setup_ready_cb(ready_cb cb);
@@ -71,7 +83,7 @@ public:
 
 	// Active low lines. We're using ASSERT=0 / CLEAR=1
 	line_state      ready_r() { return m_ready? ASSERT_LINE : CLEAR_LINE; }
-	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
+	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; }
 	line_state      trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; }
 
 	// Data output towards controller
@@ -94,7 +106,7 @@ public:
 	attotime        track_end_time();
 
 	// Access the tracks on the image. Used as a callback from the cache.
-	chd_error       load_track(uint16_t* data, int cylinder, int head);
+	std::error_condition load_track(uint16_t* data, int cylinder, int head);
 	void            write_track(uint16_t* data, int cylinder, int head);
 
 	// Delivers the number of heads according to the loaded image
@@ -103,12 +115,14 @@ public:
 protected:
 	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void                device_start() override;
-	void                device_stop() override;
-	void                device_reset() override;
-	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void        device_start() override;
+	virtual void        device_stop() override;
+	virtual void        device_reset() override;
 
-	std::string         tts(const attotime &t);
+	TIMER_CALLBACK_MEMBER(index_timer);
+	TIMER_CALLBACK_MEMBER(recalibrate);
+	TIMER_CALLBACK_MEMBER(seek_update);
+	TIMER_CALLBACK_MEMBER(cache_update);
 
 	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer, *m_cache_timer;
 	index_pulse_cb      m_index_pulse_cb;
@@ -154,9 +168,8 @@ private:
 
 	std::unique_ptr<mfmhd_trackimage_cache> m_cache;
 	mfmhd_image_format_t*   m_format;
-
+	chd_file   *m_chd;
 	void        head_move();
-	void        recalibrate();
 
 	// Common routine for read/write
 	bool            find_position(attotime &from_when, const attotime &limit, int &bytepos, int &bitpos);

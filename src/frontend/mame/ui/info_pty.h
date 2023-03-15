@@ -16,6 +16,7 @@
 #include "ui/menu.h"
 
 namespace ui {
+
 class menu_pty_info : public menu
 {
 public:
@@ -23,8 +24,8 @@ public:
 	virtual ~menu_pty_info() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 } // namespace ui

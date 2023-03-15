@@ -35,7 +35,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(busy_tick);
+	TIMER_CALLBACK_MEMBER(empty_tick);
 
 	void set_irq(int state);
 	void set_dmarq(int state);
@@ -118,7 +120,9 @@ protected:
 		IDE_COMMAND_SET_BLOCK_COUNT = 0xc6,
 		IDE_COMMAND_READ_DMA = 0xc8,
 		IDE_COMMAND_WRITE_DMA = 0xca,
+		IDE_COMMAND_STANDBY_IMMEDIATE = 0xe0,
 		IDE_COMMAND_IDLE_IMMEDIATE = 0xe1,
+		IDE_COMMAND_STANDBY = 0xe2,
 		IDE_COMMAND_IDLE = 0xe3,
 		IDE_COMMAND_CHECK_POWER_MODE = 0xe5,
 		IDE_COMMAND_CACHE_FLUSH = 0xe7,

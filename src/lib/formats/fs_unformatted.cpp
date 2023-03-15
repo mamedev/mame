@@ -3,23 +3,27 @@
 
 // Creation of unformatted floppy images
 
-#include "emu.h"
 #include "fs_unformatted.h"
 
-const fs_unformatted FS_UNFORMATTED;
+namespace fs {
 
-const char *fs_unformatted::name() const
+const unformatted_image UNFORMATTED;
+
+const char *unformatted_image::name() const
 {
 	return "unformatted";
 }
 
-const char *fs_unformatted::description() const
+const char *unformatted_image::description() const
 {
 	return "Unformatted floppy image";
 }
 
-void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void unformatted_image::enumerate_f(floppy_enumerator &fe) const
 {
+	u32 form_factor = fe.form_factor();
+	const std::vector<u32> &variants = fe.variants();
+
 	bool all = form_factor == floppy_image::FF_UNKNOWN;
 	u32 best_8 =
 		form_factor == floppy_image::FF_8 ?
@@ -83,7 +87,7 @@ void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, co
 		fe.add_raw("u3ssdd", FSI_35_SSDD, "Unformatted 3\" single-sided double-density");
 }
 
-void fs_unformatted::format(u32 key, floppy_image *image)
+void unformatted_image::format(u32 key, floppy_image *image)
 {
 	switch(key) {
 	case FSI_8_DSDD: image->set_form_variant(floppy_image::FF_8, floppy_image::DSDD); break;
@@ -108,27 +112,29 @@ void fs_unformatted::format(u32 key, floppy_image *image)
 	}
 }
 
-std::unique_ptr<filesystem_t> fs_unformatted::mount(fsblk_t &blockdev) const
+std::unique_ptr<filesystem_t> unformatted_image::mount(fsblk_t &blockdev) const
 {
 	return nullptr;
 }
 
-bool fs_unformatted::can_format() const
+bool unformatted_image::can_format() const
 {
 	return false;
 }
 
-bool fs_unformatted::can_read() const
+bool unformatted_image::can_read() const
 {
 	return false;
 }
 
-bool fs_unformatted::can_write() const
+bool unformatted_image::can_write() const
 {
 	return false;
 }
 
-bool fs_unformatted::has_rsrc() const
+bool unformatted_image::has_rsrc() const
 {
 	return false;
 }
+
+} // namespace fs

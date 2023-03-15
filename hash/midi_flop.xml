@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="midi_flop" description="Standard MIDI floppy disks">
 
@@ -12,6 +12,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="329738">
 				<rom name="dansbandshits nr 3.imd" size="329738" crc="5a8ec4b1" sha1="b9894ef4d15457c7f77234fb383afa55603a0dd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hikari_fl90">
+		<description>Hikari Navigation (FL-90) (Japan)</description>
+		<year>1999</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="FL-90" /> <!-- at least one other edition (FL-91) also exists -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="hikari navigation fl-90.img" size="1474560" crc="f7172a29" sha1="8060339739e899f247e09386d99c129152074776"/>
 			</dataarea>
 		</part>
 	</software>

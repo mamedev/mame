@@ -304,8 +304,9 @@ public:
     size_type max_size() const { return static_cast<size_type>(-1) / sizeof(T); }
     size_type max_size(int size) const { return static_cast<size_type>(-1) / size; }
 
-    void setAllocator(TPoolAllocator* a) { allocator = *a; }
     TPoolAllocator& getAllocator() const { return allocator; }
+
+    pool_allocator select_on_container_copy_construction() const { return pool_allocator{}; }
 
 protected:
     pool_allocator& operator=(const pool_allocator&) { return *this; }

@@ -67,6 +67,7 @@ enum
 	MFG_SYNCMOS = 0x40,
 	MFG_TI = 0x97,
 	MFG_TI_OLD = 0x01,
+	MFG_TOSHIBA = 0x98,
 	MFG_WINBOND_NEX = 0xef,
 	MFG_WINBOND = 0xda
 };
@@ -95,6 +96,7 @@ DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,     fujitsu_29dl164bd_device,     "mbm29dl
 DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,     fujitsu_29lv002tc_device,     "mbm29lv002tc",          "Fujitsu MBM29LV002TC Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV800B,      fujitsu_29lv800b_device,      "mbm29lv800b",           "Fujitsu MBM29LV800B Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F400B,        intel_e28f400b_device,        "intel_e28f400b",        "Intel E28F400B Flash")
+DEFINE_DEVICE_TYPE(MACRONIX_29F008TC,     macronix_29f008tc_device,     "macronix_29f008tc",     "Macronix 29F008TC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29L001MC,     macronix_29l001mc_device,     "macronix_29l001mc",     "Macronix 29L001MC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29LV160TMC,   macronix_29lv160tmc_device,   "macronix_29lv160tmc",   "Macronix 29LV160TMC Flash")
 DEFINE_DEVICE_TYPE(TMS_29F040,            tms_29f040_device,            "tms_29f040",            "Texas Instruments 29F040 Flash")
@@ -113,7 +115,7 @@ DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device,      "sharp_l
 DEFINE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device,        "intel_te28f320",        "Intel TE28F320 Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_lh28f320bf",      "Sharp LH28F320BFHE-PBTL Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
-DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash" )
+DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
 
 DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
@@ -121,6 +123,8 @@ DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39v
 DEFINE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device,         "atmel_49f4096",         "Atmel AT49F4096 Flash")
 
 DEFINE_DEVICE_TYPE(CAT28F020,             cat28f020_device,             "cat28f020",             "CSI CAT28F020 Flash")
+
+DEFINE_DEVICE_TYPE(TC58FVT800,            tc58fvt800_device,            "tc58fvt800",            "Toshiba TC58FVT800 Flash")
 
 
 
@@ -132,16 +136,15 @@ DEFINE_DEVICE_TYPE(CAT28F020,             cat28f020_device,             "cat28f0
 //  intelfsh_device - constructor
 //-------------------------------------------------
 
-intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bits, uint32_t size, uint8_t maker_id, uint16_t device_id)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
-		m_type(variant),
-		m_size(0),
-		m_bits(8),
+		m_size(size),
+		m_bits(bits),
 		m_addrmask(0),
-		m_device_id(0),
-		m_maker_id(0),
+		m_device_id(device_id),
+		m_maker_id(maker_id),
 		m_sector_is_4k(false),
 		m_sector_is_16k(false),
 		m_top_boot_sector(false),
@@ -153,375 +156,146 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_timer(nullptr),
 		m_bank(0)
 {
-	switch( variant )
-	{
-	case FLASH_INTEL_28F016S5:
-	case FLASH_SHARP_LH28F016S:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0xaa;
-		break;
-	case FLASH_SHARP_LH28F016S_16BIT:
-		m_bits = 16;
-		m_size = 0x200000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0xaa;
-		break;
-	case FLASH_ATMEL_29C010:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_page_size = 0x80;
-		m_maker_id = MFG_ATMEL;
-		m_device_id = 0xd5;
-		break;
-	case FLASH_ATMEL_49F4096:
-		m_bits = 16;
-		m_size = 0x80000;
-		m_maker_id = MFG_ATMEL;
-		m_device_id = 0x92;
-		m_sector_is_16k = true;
-		break;
-	case FLASH_AMD_29F010:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0x20;
-		break;
-	case FLASH_AMD_29F040:
-		m_bits = 8;
-		m_size = 0x80000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0xa4;
-		break;
-	case FLASH_AMD_29F080:
-		m_bits = 8;
-		m_size = 0x100000;
-		m_addrmask = 0x7ff;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0xd5;
-		break;
-	case FLASH_AMD_29F400T:
-		m_bits = 8;
-		m_size = 0x80000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0x23;
-		m_top_boot_sector = true;
-		break;
-	case FLASH_AMD_29F800T:
-		m_bits = 8;
-		m_size = 0x100000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0xda;
-		m_top_boot_sector = true;
-		break;
-	case FLASH_AMD_29F800B_16BIT:
-		m_bits = 16;
-		m_size = 0x100000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0x2258;
-		m_top_boot_sector = false;
-		break;
-	case FLASH_AMD_29LV200T:
-		m_bits = 8;
-		m_size = 0x40000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0x3b;
-		break;
-	case FLASH_CAT28F020:
-		m_bits = 8;
-		m_size = 0x40000;
-		m_maker_id = MFG_CATALYST;
-		m_device_id = 0xbd;
-		break;
-	case FLASH_INTEL_28F320J3D:
-		m_bits = 16;
-		m_size = 0x400000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0x16;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SPANSION_S29GL064S: // senbbs
-		m_bits = 16;
-		m_size = 0x800000;
-		m_maker_id = MFG_SPANSION;
-		m_device_id = 0x227e;
-		m_sector_is_4k = false;
-		break;
-	case FLASH_INTEL_28F320J5: // funkball
-		m_bits = 16;
-		m_size = 0x400000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0x14;
-//      m_sector_is_4k = true; 128kb?
-		break;
-	case FLASH_SST_39SF040:
-		m_bits = 8;
-		m_size = 0x80000;
-		m_maker_id = MFG_SST;
-		m_device_id = 0xb7;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SST_39VF020:
-		m_bits = 8;
-		m_size = 0x40000;
-		m_maker_id = MFG_SST;
-		m_device_id = 0xd6;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SST_49LF020:
-		m_bits = 8;
-		m_size = 0x40000;
-		m_maker_id = MFG_SST;
-		m_device_id = 0x61;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SST_39VF400A:
-		m_bits = 16;
-		m_size = 0x80000;
-		m_maker_id = MFG_SST;
-		m_device_id = 0xd6;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SHARP_LH28F400:
-		m_bits = 16;
-		m_size = 0x80000;
-		m_maker_id = MFG_SHARP;
-		m_device_id = 0xed;
-		break;
-	case FLASH_INTEL_E28F400B:
-		m_bits = 16;
-		m_size = 0x80000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0x4471;
-		break;
-	case FLASH_FUJITSU_29F160TE:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = MFG_FUJITSU;
-		m_device_id = 0xd2;
-		m_top_boot_sector = true;
-		break;
-	case FLASH_FUJITSU_29F016A:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = MFG_FUJITSU;
-		m_device_id = 0xad;
-		break;
-	case FLASH_FUJITSU_29DL164BD:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = MFG_FUJITSU;
-		m_device_id = 0x35;
-		break;
-	case FLASH_FUJITSU_29LV002TC:
-		m_bits = 8;
-		m_size = 0x40000;
-		m_maker_id = MFG_FUJITSU;
-		m_device_id = 0x40;
-		break;
-	case FLASH_FUJITSU_29LV800B:
-		m_bits = 16;
-		m_size = 0x100000;
-		m_maker_id = MFG_FUJITSU;
-		m_device_id = 0x225b;
-		m_bot_boot_sector = true;
-		break;
-	case FLASH_INTEL_E28F008SA:
-		m_bits = 8;
-		m_size = 0x100000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0xa2;
-		break;
-	case FLASH_INTEL_TE28F160:
-	case FLASH_SHARP_LH28F160S3:
-		m_bits = 16;
-		m_size = 0x200000;
-		m_maker_id = MFG_SHARP;
-		m_device_id = 0xd0;
-		break;
-	case FLASH_INTEL_TE28F320:
-		m_bits = 16;
-		m_size = 0x400000;
-		m_maker_id = MFG_INTEL;
-		m_device_id = 0x8896;
-		break;
-	case FLASH_SHARP_LH28F320BF:
-		m_bits = 16;
-		m_size = 0x400000;
-		m_maker_id = MFG_SHARP;
-		m_device_id = 0xb5;
-		break;
-	case FLASH_MACRONIX_29L001MC:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = MFG_MACRONIX;
-		m_device_id = 0x51;
-		break;
-	case FLASH_MACRONIX_29LV160TMC:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = MFG_MACRONIX;
-		m_device_id = 0x49;
-		m_sector_is_16k = true;
-		break;
-	case FLASH_PANASONIC_MN63F805MNP:
-		m_bits = 8;
-		m_size = 0x10000;
-		m_maker_id = MFG_PANASONIC;
-		m_device_id = 0x1b;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SANYO_LE26FV10N1TS:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = MFG_SANYO;
-		m_device_id = 0x13;
-		m_sector_is_4k = true;
-		break;
-	case FLASH_SST_28SF040:
-		m_bits = 8;
-		m_size = 0x80000;
-		m_maker_id = MFG_SST;
-		m_device_id = 0x04;
-		break;
-	case FLASH_TMS_29F040:
-		m_bits = 8;
-		m_addrmask = 0x7fff;
-		m_size = 0x80000;
-		m_maker_id = MFG_AMD;
-		m_device_id = 0xa4;
-		break;
-	}
-
-	int addrbits;
-	for (addrbits = 24; addrbits > 0; addrbits--)
-		if ((m_size & (1 << addrbits)) != 0)
-			break;
+	assert(bits == 8 || bits == 16);
+	assert(size != 0);
 }
 
-intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: intelfsh_device(mconfig, type, tag, owner, clock, variant) { }
+intelfsh8_device::intelfsh8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size, uint8_t maker_id, uint16_t device_id)
+	: intelfsh_device(mconfig, type, tag, owner, clock, 8, size, maker_id, device_id) { }
 
-intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: intelfsh_device(mconfig, type, tag, owner, clock, variant) { }
+intelfsh16_device::intelfsh16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t size, uint8_t maker_id, uint16_t device_id)
+	: intelfsh_device(mconfig, type, tag, owner, clock, 16, size, maker_id, device_id) { }
 
 
 intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, INTEL_28F016S5, tag, owner, clock, FLASH_INTEL_28F016S5) { }
+	: intelfsh8_device(mconfig, INTEL_28F016S5, tag, owner, clock, 0x200000, MFG_INTEL, 0xaa) { }
 
 fujitsu_29f160te_device::fujitsu_29f160te_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, FUJITSU_29F160TE, tag, owner, clock, FLASH_FUJITSU_29F160TE) { }
+	: intelfsh8_device(mconfig, FUJITSU_29F160TE, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; }
 
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, FUJITSU_29F016A, tag, owner, clock, FLASH_FUJITSU_29F016A) { }
+	: intelfsh8_device(mconfig, FUJITSU_29F016A, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xad) { }
 
 fujitsu_29dl164bd_device::fujitsu_29dl164bd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, FUJITSU_29DL164BD, tag, owner, clock, FLASH_FUJITSU_29DL164BD) { }
+	: intelfsh8_device(mconfig, FUJITSU_29DL164BD, tag, owner, clock, 0x200000, MFG_FUJITSU, 0x35) { }
 
 fujitsu_29lv002tc_device::fujitsu_29lv002tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, FUJITSU_29LV002TC, tag, owner, clock, FLASH_FUJITSU_29LV002TC) { }
+	: intelfsh8_device(mconfig, FUJITSU_29LV002TC, tag, owner, clock, 0x40000, MFG_FUJITSU, 0x40) { }
 
 fujitsu_29lv800b_device::fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, FUJITSU_29LV800B, tag, owner, clock, FLASH_FUJITSU_29LV800B) { }
+	: intelfsh16_device(mconfig, FUJITSU_29LV800B, tag, owner, clock, 0x100000, MFG_FUJITSU, 0x225b) { m_bot_boot_sector = true; }
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SHARP_LH28F016S, tag, owner, clock, FLASH_SHARP_LH28F016S) { }
+	: intelfsh8_device(mconfig, SHARP_LH28F016S, tag, owner, clock, 0x200000, MFG_INTEL, 0xaa) { }
 
 sharp_lh28f016s_16bit_device::sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SHARP_LH28F016S_16BIT, tag, owner, clock, FLASH_SHARP_LH28F016S_16BIT) { }
+	: intelfsh16_device(mconfig, SHARP_LH28F016S_16BIT, tag, owner, clock, 0x200000, MFG_INTEL, 0xaa) { }
 
 atmel_29c010_device::atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, ATMEL_29C010, tag, owner, clock, FLASH_ATMEL_29C010) { }
+	: intelfsh8_device(mconfig, ATMEL_29C010, tag, owner, clock, 0x20000, MFG_ATMEL, 0xd5) { m_page_size = 0x80; }
 
 atmel_49f4096_device::atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, ATMEL_49F4096, tag, owner, clock, FLASH_ATMEL_49F4096) { }
+	: intelfsh16_device(mconfig, ATMEL_49F4096, tag, owner, clock, 0x80000, MFG_ATMEL, 0x92) { m_sector_is_16k = true; }
 
 amd_29f010_device::amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F010, tag, owner, clock, FLASH_AMD_29F010) { }
+	: intelfsh8_device(mconfig, AMD_29F010, tag, owner, clock, 0x20000, MFG_AMD, 0x20) { }
 
 amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F040, tag, owner, clock, FLASH_AMD_29F040) { }
+	: intelfsh8_device(mconfig, AMD_29F040, tag, owner, clock, 0x80000, MFG_AMD, 0xa4) { }
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F080, tag, owner, clock, FLASH_AMD_29F080) { }
+	: intelfsh8_device(mconfig, AMD_29F080, tag, owner, clock, 0x100000, MFG_AMD, 0xd5) { m_addrmask = 0x7ff; }
 
 amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F400T, tag, owner, clock, FLASH_AMD_29F400T) { }
+	: intelfsh8_device(mconfig, AMD_29F400T, tag, owner, clock, 0x80000, MFG_AMD, 0x23) { m_top_boot_sector = true; }
 
 amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, FLASH_AMD_29F800T) { }
+	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, 0x100000, MFG_AMD, 0xda) { m_top_boot_sector = true; }
 
 amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, FLASH_AMD_29F800B_16BIT) { }
+	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_top_boot_sector = false; }
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, FLASH_AMD_29LV200T) { }
+	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, 0x40000, MFG_AMD, 0x3b) { }
 
 cat28f020_device::cat28f020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, CAT28F020, tag, owner, clock, FLASH_CAT28F020) { }
+	: intelfsh8_device(mconfig, CAT28F020, tag, owner, clock, 0x40000, MFG_CATALYST, 0xbd) { }
 
 intel_e28f008sa_device::intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, INTEL_E28F008SA, tag, owner, clock, FLASH_INTEL_E28F008SA) { }
+	: intelfsh8_device(mconfig, INTEL_E28F008SA, tag, owner, clock, 0x100000, MFG_INTEL, 0xa2) { }
+
+macronix_29f008tc_device::macronix_29f008tc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, MACRONIX_29F008TC, tag, owner, clock, 0x100000, MFG_MACRONIX, 0x81) { m_sector_is_4k = true; }
 
 macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, MACRONIX_29L001MC, tag, owner, clock, FLASH_MACRONIX_29L001MC) { }
+	: intelfsh8_device(mconfig, MACRONIX_29L001MC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x51) { }
 
 macronix_29lv160tmc_device::macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, tag, owner, clock, FLASH_MACRONIX_29LV160TMC) { }
+	: intelfsh8_device(mconfig, MACRONIX_29LV160TMC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x49) { m_sector_is_16k = true; }
 
 panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, tag, owner, clock, FLASH_PANASONIC_MN63F805MNP) { }
+	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, tag, owner, clock, 0x10000, MFG_PANASONIC, 0x1b) { m_sector_is_4k = true; }
 
 sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SANYO_LE26FV10N1TS, tag, owner, clock, FLASH_SANYO_LE26FV10N1TS) { }
+	: intelfsh8_device(mconfig, SANYO_LE26FV10N1TS, tag, owner, clock, 0x20000, MFG_SANYO, 0x13) { m_sector_is_4k = true; }
 
 sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_28SF040, tag, owner, clock, FLASH_SST_28SF040) { }
+	: intelfsh8_device(mconfig, SST_28SF040, tag, owner, clock, 0x80000, MFG_SST, 0x04) { }
 
 sst_39sf040_device::sst_39sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, FLASH_SST_39SF040) { }
+	: intelfsh8_device(mconfig, SST_39SF040, tag, owner, clock, 0x80000, MFG_SST, 0xb7) { m_addrmask = 0x7fff; }
 
 sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, FLASH_SST_39VF020) { }
+	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, 0x40000, MFG_SST, 0xd6) { m_sector_is_4k = true; }
 
 sst_49lf020_device::sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, SST_49LF020, tag, owner, clock, FLASH_SST_49LF020) { }
+	: intelfsh8_device(mconfig, SST_49LF020, tag, owner, clock, 0x40000, MFG_SST, 0x61) { m_sector_is_4k = true; }
 
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SHARP_LH28F400, tag, owner, clock, FLASH_SHARP_LH28F400) { }
+	: intelfsh16_device(mconfig, SHARP_LH28F400, tag, owner, clock, 0x80000, MFG_SHARP, 0xed) { }
 
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, INTEL_TE28F160, tag, owner, clock, FLASH_INTEL_TE28F160) { }
+	: intelfsh16_device(mconfig, INTEL_TE28F160, tag, owner, clock, 0x200000, MFG_SHARP, 0xd0) { }
 
 sharp_lh28f160s3_device::sharp_lh28f160s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SHARP_LH28F160S3, tag, owner, clock, FLASH_SHARP_LH28F160S3) { }
+	: intelfsh16_device(mconfig, SHARP_LH28F160S3, tag, owner, clock, 0x200000, MFG_SHARP, 0xd0) { }
 
 intel_te28f320_device::intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, INTEL_TE28F320, tag, owner, clock, FLASH_INTEL_TE28F320) { }
+	: intelfsh16_device(mconfig, INTEL_TE28F320, tag, owner, clock, 0x400000, MFG_INTEL, 0x8896) { }
 
 spansion_s29gl064s_device::spansion_s29gl064s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SPANSION_S29GL064S, tag, owner, clock, FLASH_SPANSION_S29GL064S) { }
+	: intelfsh16_device(mconfig, SPANSION_S29GL064S, tag, owner, clock, 0x800000, MFG_SPANSION, 0x227e)
+{
+	// senbbs
+	m_sector_is_4k = false;
+}
 
 intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, INTEL_E28F400B, tag, owner, clock, FLASH_INTEL_E28F400B) { }
+	: intelfsh16_device(mconfig, INTEL_E28F400B, tag, owner, clock, 0x80000, MFG_INTEL, 0x4471) { }
 
 sharp_lh28f320bf_device::sharp_lh28f320bf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SHARP_LH28F320BF, tag, owner, clock, FLASH_SHARP_LH28F320BF) { }
+	: intelfsh16_device(mconfig, SHARP_LH28F320BF, tag, owner, clock, 0x400000, MFG_SHARP, 0xb5) { }
 
 intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, INTEL_28F320J3D, tag, owner, clock, FLASH_INTEL_28F320J3D) { }
+	: intelfsh16_device(mconfig, INTEL_28F320J3D, tag, owner, clock, 0x400000, MFG_INTEL, 0x16) { m_sector_is_4k = true; }
 
 intel_28f320j5_device::intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, INTEL_28F320J5, tag, owner, clock, FLASH_INTEL_28F320J5) { }
+	: intelfsh16_device(mconfig, INTEL_28F320J5, tag, owner, clock, 0x400000, MFG_INTEL, 0x14)
+{
+	// funkball
+//  m_sector_is_4k = true; 128kb?
+}
 
 
 sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SST_39VF400A, tag, owner, clock, FLASH_SST_39VF400A) { }
+	: intelfsh16_device(mconfig, SST_39VF400A, tag, owner, clock, 0x80000, MFG_SST, 0xd6) { m_sector_is_4k = true; }
 
 
 tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, TMS_29F040, tag, owner, clock, FLASH_TMS_29F040) { }
+	: intelfsh8_device(mconfig, TMS_29F040, tag, owner, clock, 0x80000, MFG_AMD, 0xa4) { m_addrmask = 0x7fff; }
+
+tc58fvt800_device::tc58fvt800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, TC58FVT800, tag, owner, clock, 0x100000, MFG_TOSHIBA, 0x4f) { m_top_boot_sector = true; }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -530,7 +304,7 @@ tms_29f040_device::tms_29f040_device(const machine_config &mconfig, const char *
 void intelfsh_device::device_start()
 {
 	m_data = std::make_unique<uint8_t []>(m_size);
-	m_timer = timer_alloc();
+	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_flash_mode) );
@@ -540,10 +314,10 @@ void intelfsh_device::device_start()
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  delay_tick - handle delayed commands/events
 //-------------------------------------------------
 
-void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 {
 	switch( m_flash_mode )
 	{
@@ -598,9 +372,10 @@ void intelfsh_device::nvram_default()
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_read(emu_file &file)
+bool intelfsh_device::nvram_read(util::read_stream &file)
 {
-	file.read(&m_data[0], m_size);
+	size_t actual;
+	return !file.read(&m_data[0], m_size, actual) && actual == m_size;
 }
 
 
@@ -609,9 +384,10 @@ void intelfsh_device::nvram_read(emu_file &file)
 //  .nv file
 //-------------------------------------------------
 
-void intelfsh_device::nvram_write(emu_file &file)
+bool intelfsh_device::nvram_write(util::write_stream &file)
 {
-	file.write(&m_data[0], m_size);
+	size_t actual;
+	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
 }
 
 
@@ -761,7 +537,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_WRITEPART1;
 			break;
 		case 0x50:  // clear status reg
-			if ((m_type == FLASH_SST_49LF020) && (m_flash_mode == FM_NORMAL))
+			if ((m_maker_id == MFG_SST && m_device_id == 0x61) && (m_flash_mode == FM_NORMAL))
 				logerror("Invalid flash mode byte %x\n", data & 0xff);
 			else
 			{
@@ -770,7 +546,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			}
 			break;
 		case 0x20:  // block erase
-			if (m_type == FLASH_SST_49LF020)
+			if (m_maker_id == MFG_SST && m_device_id == 0x61)
 				logerror("Unknown flash mode byte %x\n", data & 0xff);
 			else
 				m_flash_mode = FM_CLEARPART1;
@@ -851,7 +627,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xa0 )
 		{
-			if (m_type == FLASH_ATMEL_29C010)
+			if (m_maker_id == MFG_ATMEL && m_device_id == 0xd5)
 			{
 				m_flash_mode = FM_WRITEPAGEATMEL;
 				m_byte_count = 0;
@@ -1095,7 +871,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			break;
 		}
 		m_status = 0x80;
-		if (m_type == FLASH_SST_28SF040)
+		if (m_maker_id == MFG_SST && m_device_id == 0x04)
 			m_flash_mode = FM_NORMAL;
 		else
 			m_flash_mode = FM_READSTATUS;
@@ -1125,7 +901,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 	case FM_CLEARPART1:
 		if( ( data & 0xff ) == 0xd0 )
 		{
-			if (m_type == FLASH_SST_28SF040)
+			if (m_maker_id == MFG_SST && m_device_id == 0x04)
 			{
 				// clear the 256 bytes block containing the current address to all 0xffs
 				uint32_t base = address * ((m_bits == 16) ? 2 : 1);
@@ -1133,7 +909,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 
 				m_timer->adjust( attotime::from_msec( 4 ) );
 			}
-			else if (m_type == FLASH_INTEL_E28F400B)
+			else if (m_maker_id == MFG_INTEL && m_device_id == 0x4471)
 			{
 				// 00000-03fff -  16KB boot block (may be write protected via external pins)
 				// 04000-05fff -   8KB parameter block

@@ -443,8 +443,8 @@ bit_imm
 
 asr_xav_zpg
 	TMP = read_pc(); // TODO: verify this, should it write back or set A?
-	TMP = read_zeropage(TMP);
-	do_asr(TMP);
+	TMP2 = read_zeropage(TMP);
+	do_asr(TMP2);
 	prefetch();
 
 asr_aba

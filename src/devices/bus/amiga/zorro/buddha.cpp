@@ -33,7 +33,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device, "zorro_buddha", "Buddha IDE controller")
+DEFINE_DEVICE_TYPE(ZORRO_BUDDHA, bus::amiga::zorro::buddha_device, "zorro_buddha", "Buddha IDE controller")
 
 
 namespace bus::amiga::zorro {

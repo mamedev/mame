@@ -1,12 +1,12 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
+#! /usr/bin/env python3
 # Written by Martin v. Löwis <loewis@informatik.hu-berlin.de>
 
 """Generate binary message catalog from textual translation description.
 
 This program converts a textual Uniforum-style message catalog (.po file) into
 a binary GNU catalog (.mo file).  This is essentially the same function as the
-GNU msgfmt program, however, it is a simpler implementation.
+GNU msgfmt program, however, it is a simpler implementation.  Currently it
+does not handle plural forms but it does handle message contexts.
 
 Usage: msgfmt.py [OPTIONS] filename.po
 
@@ -25,20 +25,17 @@ Options:
         Display version information and exit.
 """
 
-from __future__ import print_function
 import os
 import sys
+import ast
 import getopt
 import struct
 import array
-import re
-import codecs
 from email.parser import HeaderParser
 
 __version__ = "1.2"
 
 MESSAGES = {}
-
 
 
 def usage(code, msg=''):
@@ -48,33 +45,14 @@ def usage(code, msg=''):
     sys.exit(code)
 
 
-
-def add(id, str, fuzzy):
+def add(ctxt, id, str, fuzzy):
     "Add a non-fuzzy translation to the dictionary."
     global MESSAGES
     if not fuzzy and str:
-        MESSAGES[id] = str
-
-def dequote(s):
-    if (s[0] == s[-1]) and s.startswith(("'", '"')):
-        return s[1:-1]
-    return s
-
-# decode_escapes from http://stackoverflow.com/a/24519338
-ESCAPE_SEQUENCE_RE = re.compile(r'''
-    ( \\U........      # 8-digit hex escapes
-    | \\u....          # 4-digit hex escapes
-    | \\x..            # 2-digit hex escapes
-    | \\[0-7]{1,3}     # Octal escapes
-    | \\N\{[^}]+\}     # Unicode characters by name
-    | \\[\\'"abfnrtv]  # Single-character escapes
-    )''', re.UNICODE | re.VERBOSE)
-
-def decode_escapes(s):
-    def decode_match(match):
-        return codecs.decode(match.group(0), 'unicode-escape')
-
-    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
+        if ctxt is None:
+            MESSAGES[id] = str
+        else:
+            MESSAGES[b"%b\x04%b" % (ctxt, id)] = str
 
 
 def generate():
@@ -112,17 +90,16 @@ def generate():
                          7*4,               # start of key index
                          7*4+len(keys)*8,   # start of value index
                          0, 0)              # size and offset of hash table
-    offsdata = array.array("i", offsets)
-    output += offsdata.tobytes() if hasattr(offsdata, "tobytes") else offsdata.tostring()
+    output += array.array("i", offsets).tobytes()
     output += ids
     output += strs
     return output
 
 
-
 def make(filename, outfile):
     ID = 1
     STR = 2
+    CTXT = 3
 
     # Compute .mo name from .po name and arguments
     if filename.endswith('.po'):
@@ -133,31 +110,28 @@ def make(filename, outfile):
         outfile = os.path.splitext(infile)[0] + '.mo'
 
     try:
-        lines = open(infile, 'rb').readlines()
+        with open(infile, 'rb') as f:
+            lines = f.readlines()
     except IOError as msg:
         print(msg, file=sys.stderr)
         sys.exit(1)
 
-    section = None
+    section = msgctxt = None
     fuzzy = 0
-    empty = 0
-    header_attempted = False
-
-    # Start off assuming Latin-1, so everything decodes without failure,
-    # until we know the exact encoding
-    encoding = 'latin-1'
 
     # Start off assuming Latin-1, so everything decodes without failure,
     # until we know the exact encoding
     encoding = 'latin-1'
 
     # Parse the catalog
-    for lno, l in enumerate(lines):
+    lno = 0
+    for l in lines:
         l = l.decode(encoding)
+        lno += 1
         # If we get a comment line after a msgstr, this is a new entry
         if l[0] == '#' and section == STR:
-            add(msgid, msgstr, fuzzy)
-            section = None
+            add(msgctxt, msgid, msgstr, fuzzy)
+            section = msgctxt = None
             fuzzy = 0
         # Record a fuzzy mark
         if l[:2] == '#,' and 'fuzzy' in l:
@@ -165,10 +139,16 @@ def make(filename, outfile):
         # Skip comments
         if l[0] == '#':
             continue
-        # Now we are in a msgid section, output previous section
-        if l.startswith('msgid') and not l.startswith('msgid_plural'):
+        # Now we are in a msgid or msgctxt section, output previous section
+        if l.startswith('msgctxt'):
             if section == STR:
-                add(msgid, msgstr, fuzzy)
+                add(msgctxt, msgid, msgstr, fuzzy)
+            section = CTXT
+            l = l[7:]
+            msgctxt = b''
+        elif l.startswith('msgid') and not l.startswith('msgid_plural'):
+            if section == STR:
+                add(msgctxt, msgid, msgstr, fuzzy)
                 if not msgid:
                     # See whether there is an encoding declaration
                     p = HeaderParser()
@@ -179,14 +159,6 @@ def make(filename, outfile):
             l = l[5:]
             msgid = msgstr = b''
             is_plural = False
-            if l.strip() == '""':
-                # Check if next line is msgstr. If so, this is a multiline msgid.
-                if lines[lno+1].decode(encoding).startswith('msgstr'):
-                    # If this is the first empty msgid and is followed by msgstr, this is the header, which may contain the encoding declaration.
-                    # Otherwise this file is not valid
-                    if empty > 1:
-                        print("Found multiple empty msgids on line " + str(lno) + ", not valid!")
-                    empty += 1
         # This is a message with plural forms
         elif l.startswith('msgid_plural'):
             if section != ID:
@@ -208,26 +180,6 @@ def make(filename, outfile):
                 if msgstr:
                     msgstr += b'\0' # Separator of the various plural forms
             else:
-                if (l[6:].strip() == '""') and (empty == 1) and (not header_attempted):
-                    header = ""
-                    # parse up until next empty line = end of header
-                    hdrno = lno
-                    while(hdrno < len(lines)-1):
-                        # This is a roundabout way to strip non-ASCII unicode characters from the header.
-                        # As we are only parsing out the encoding, we don't need any unicode chars in it.
-                        l = lines[hdrno+1].decode('unicode_escape').encode('ascii','ignore').decode(encoding)
-                        if l.strip():
-                            header += decode_escapes(dequote(l.strip()))
-                        else:
-                            break
-                        hdrno += 1
-                    # See whether there is an encoding declaration
-                    if(hdrno > lno):
-                        p = HeaderParser()
-                        charset = p.parsestr(str(header)).get_content_charset()
-                        header_attempted = True
-                        if charset:
-                            encoding = charset
                 if is_plural:
                     print('indexed msgstr required for plural on  %s:%d' % (infile, lno),
                           file=sys.stderr)
@@ -237,8 +189,10 @@ def make(filename, outfile):
         l = l.strip()
         if not l:
             continue
-        l = decode_escapes(dequote(l)) # strip quotes and replace newlines if present
-        if section == ID:
+        l = ast.literal_eval(l)
+        if section == CTXT:
+            msgctxt += l.encode(encoding)
+        elif section == ID:
             msgid += l.encode(encoding)
         elif section == STR:
             msgstr += l.encode(encoding)
@@ -249,16 +203,16 @@ def make(filename, outfile):
             sys.exit(1)
     # Add last entry
     if section == STR:
-        add(msgid, msgstr, fuzzy)
+        add(msgctxt, msgid, msgstr, fuzzy)
 
     # Compute output
     output = generate()
 
     try:
-        open(outfile,"wb").write(output)
+        with open(outfile,"wb") as f:
+            f.write(output)
     except IOError as msg:
         print(msg, file=sys.stderr)
-
 
 
 def main():

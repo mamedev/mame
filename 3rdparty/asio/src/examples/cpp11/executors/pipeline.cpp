@@ -11,6 +11,7 @@
 #include <queue>
 #include <thread>
 #include <vector>
+#include <cctype>
 
 using asio::execution_context;
 using asio::executor_binder;
@@ -19,9 +20,10 @@ using asio::post;
 using asio::system_executor;
 using asio::use_future;
 using asio::use_service;
+namespace execution = asio::execution;
 
 // An executor that launches a new thread for each function submitted to it.
-// This class satisfies the Executor requirements.
+// This class satisfies the executor requirements.
 class thread_executor
 {
 private:
@@ -54,38 +56,26 @@ private:
   };
 
 public:
-  execution_context& context() const noexcept
+  execution_context& query(execution::context_t) const
   {
-    return system_executor().context();
+    return asio::query(system_executor(), execution::context);
   }
 
-  void on_work_started() const noexcept
+  execution::blocking_t query(execution::blocking_t) const
   {
-    // This executor doesn't count work.
+    return execution::blocking.never;
   }
 
-  void on_work_finished() const noexcept
+  thread_executor require(execution::blocking_t::never_t) const
   {
-    // This executor doesn't count work.
+    return *this;
   }
 
-  template <class Func, class Alloc>
-  void dispatch(Func&& f, const Alloc& a) const
+  template <class Func>
+  void execute(Func f) const
   {
-    post(std::forward<Func>(f), a);
-  }
-
-  template <class Func, class Alloc>
-  void post(Func f, const Alloc&) const
-  {
-    thread_bag& bag = use_service<thread_bag>(context());
+    thread_bag& bag = use_service<thread_bag>(query(execution::context));
     bag.add_thread(std::thread(std::move(f)));
-  }
-
-  template <class Func, class Alloc>
-  void defer(Func&& f, const Alloc& a) const
-  {
-    post(std::forward<Func>(f), a);
   }
 
   friend bool operator==(const thread_executor&,
@@ -291,7 +281,7 @@ void writer(queue_back<std::string> in)
 
 int main()
 {
-  thread_pool pool;
+  thread_pool pool(1);
 
   auto f = pipeline(reader, filter, bind_executor(pool, upper), writer);
   f.wait();
