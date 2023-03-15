@@ -441,6 +441,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x10, "Odd")
+	PORT_DIPSETTING(    0x20, "None")
 	PORT_DIPSETTING(    0x30, "Even")
 	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
@@ -580,9 +581,9 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
-	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
-	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
-	uart.out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
+	INS8250(config, m_ace, INS8250_CLOCK);
+	m_ace->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	m_ace->out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
 
 	MM5740(config, m_mm5740, MM5740_CLOCK);
 	m_mm5740->x_cb<1>().set_ioport("X1");
