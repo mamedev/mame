@@ -185,9 +185,6 @@ protected:
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 
-	// PIO callback
-	void pio_portb_w(uint8_t data) override;
-
 	// sound
 	virtual void speaker_update();
 };
@@ -225,11 +222,11 @@ protected:
 	void video_control_w(int data);
 
 	// PIO callback
-	void pio_portb_w(uint8_t data) override;
+	virtual void pio_portb_w(uint8_t data) override;
 
 	// sound
-	void dac_update() override;
-	void speaker_update() override;
+	virtual void dac_update() override;
+	virtual void speaker_update() override;
 
 	void kc85_4_mem(address_map &map) ATTR_COLD;
 	void kc85_4_io(address_map &map) ATTR_COLD;
