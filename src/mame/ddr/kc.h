@@ -185,9 +185,6 @@ protected:
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 
-	// PIO callback
-	void pio_portb_w(uint8_t data) override;
-
 	// sound
 	virtual void speaker_update();
 };

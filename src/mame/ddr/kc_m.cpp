@@ -595,17 +595,6 @@ void kc_state::pio_portb_w(uint8_t data)
 	update_0x08000();
 
 	// KC 85/2..3: 5-bit DAC
-	m_dac_level = (~data & 0x1f)>>1;
-	dac_update();
-}
-
-void kc85_3_state::pio_portb_w(uint8_t data)
-{
-	m_pio_data[1] = data;
-
-	update_0x08000();
-
-	// KC 85/2..3: 5-bit DAC
 	m_dac_level = (~data & 0x1f);
 	dac_update();
 }
