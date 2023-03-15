@@ -37,6 +37,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "softlist_dev.h"
 
 #include "utf8.h"
 
@@ -847,6 +848,8 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_cassette->set_formats(oric_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("oric1_cass");
+	SOFTWARE_LIST(config, "oric1_cass").set_original("oric1_cass");
 
 	/* via */
 	MOS6522(config, m_via, 12_MHz_XTAL / 12);
