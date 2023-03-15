@@ -29,40 +29,6 @@ Notes:
 
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
-  * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
-
-ToDo:
-  * Sprite garbage in Beast Busters: Second Nightmare, another irq issue?
-  * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
-    seem to be just an input port but controls program flow too.
-  * Work out the purpose of the interrupts and how many are needed.
-  * Correct game speed (seems too fast).
-
-  2d:
-  * Scroll (base registers?)
-  * ROZ (4th tilemap in fatal fury should be floor [in progress], background should zoom)
-  * Find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
-  * Fix zooming sprites (zoom registers not understood, center versus edge pivot)
-  * Priorities
-  * Is all the bitmap decoding right?
-  * Upgrade to modern video timing.
-
-  3d:
-  * Find where the remainder of the 3d display list information is 'hiding'
-    -- should the 3d 'ram' be treated like a fifo, instead of like RAM (see Dreamcast etc.)
-  * Remaining 3d bits - glowing, etc.
-  * Populate the display buffers
-  * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
-
-  Other:
-  * Translate KL5C80 docs and finish up the implementation
-  * Figure out what IO $54 & $72 are on the communications CPU
-  * Fix sound
-  * Backup ram etc.
-  * Correct cpu speed
-  * How to use the FPGA data ('ROM1')
-
-
 ------------------------------------------------------------------------------
 Hyper NeoGeo 64, SNK 1997-1999
 Hardware info by Guru
@@ -1777,8 +1743,12 @@ static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...
 	return s_values;
 }
 
-static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
-
+template <uint32_t... Values>
+static auto const &texlayout_yoffset_4(std::integer_sequence<uint32_t, Values...>)
+{
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { (Values * 4096)... };
+	return s_values;
+}
 
 static const gfx_layout hng64_1024x1024x8_texlayout =
 {
@@ -1793,17 +1763,18 @@ static const gfx_layout hng64_1024x1024x8_texlayout =
 	texlayout_yoffset
 };
 
+// it appears that 4bpp tiles can only be in the top 1024 part of this as indexing is the same as 8bpp?
 static const gfx_layout hng64_1024x1024x4_texlayout =
 {
-	1024, 1024,
+	1024, 2048,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
-	1024*1024*4,
+	1024*2048*4,
 	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
-	texlayout_yoffset_4
+	texlayout_yoffset_4(std::make_integer_sequence<uint32_t, 2048>())
 };
 
 

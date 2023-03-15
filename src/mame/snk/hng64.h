@@ -48,10 +48,7 @@ struct polygon
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
 	uint8_t tex4bpp = 0;              // How to index into the texture
-	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
-	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
-	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
-
+	uint16_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
 	uint16_t colorIndex = 0;
 
@@ -85,9 +82,7 @@ struct hng64_poly_data
 {
 	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
-	uint8_t texPageSmall = 0;
-	uint8_t texPageHorizOffset = 0;
-	uint8_t texPageVertOffset = 0;
+	uint16_t texPageSmall = 0;
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
 	bool blend = false;
