@@ -511,11 +511,11 @@ void segas1x_bootleg_state::sound_7759_map(address_map &map)
 }
 
 
-void segas1x_bootleg_state::upd7759_bank_w(uint8_t data)//*
+void segas1x_bootleg_state::upd7759_bank_w(uint8_t data)
 {
 	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
-	m_upd7759->start_w(BIT(data, 7));
+	m_upd7759->md_w(BIT(~data, 7));
 	m_upd7759->reset_w(BIT(data, 6));
 	offs = 0x10000 + (data * 0x4000) % size;
 	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
@@ -2103,7 +2103,6 @@ void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
 	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
 	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
@@ -3152,7 +3151,7 @@ ROM_START( tturfbl )
 	ROM_LOAD16_BYTE( "12276.4b", 0x60001, 0x10000, CRC(838bd71f) SHA1(82d9d127438f5e1906b1cf40bf3b4727f2ee5685) )
 	ROM_LOAD16_BYTE( "12280.8b", 0x60000, 0x10000, CRC(639a57cb) SHA1(84fd8b96758d38f9e1ba1a3c2cf8099ec0452784) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) //* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "tt014d68.rom", 0x10000, 0x10000, CRC(d4aab1d9) SHA1(94885896d59da1ecabe2377a194fcf61eaae3765) )
 	ROM_LOAD( "tt0246ff.rom", 0x20000, 0x10000, CRC(bb4bba8f) SHA1(b182a7e1d0425e93c2c1b93472aafd30a6af6907) )
 ROM_END

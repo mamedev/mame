@@ -220,7 +220,7 @@ uint8_t z180asci_channel_base::cntla_r()
 
 uint8_t z180asci_channel_base::cntlb_r()
 {
-	uint8_t data = (m_asci_cntlb & 0x0d) | (m_cts << 5);
+	uint8_t data = (m_asci_cntlb & 0xdf) | (m_cts << 5);
 	LOG("Z180 CNTLB%d rd $%02x\n", m_id, data);
 	return data;
 }

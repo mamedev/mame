@@ -894,21 +894,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 		{
 			if (m_nmi_line)
 			{
-				// service interrupt
-				interrupt(NMI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_NMI);
+					debug()->interrupt_hook(INPUT_LINE_NMI, m_pc);
+
+				// service interrupt
+				interrupt(NMI, m_pc);
 			}
 			else if (m_int_line && (m_psr & PSR_I))
 			{
-				// service interrupt
-				interrupt(NVI, m_pc);
-
 				// notify the debugger
 				if (machine().debug_enabled())
-					debug()->interrupt_hook(INPUT_LINE_IRQ0);
+					debug()->interrupt_hook(INPUT_LINE_IRQ0, m_pc);
+
+				// service interrupt
+				interrupt(NVI, m_pc);
 			}
 
 			// update trace pending

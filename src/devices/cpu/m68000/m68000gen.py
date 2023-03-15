@@ -1471,7 +1471,13 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
 
     if drop_critical:
         code.append(["drop_critical"])
-        
+
+    if tvn_to_ftu:
+        if tvn != None:
+            code.append(["trap", tvn])
+        else:
+            code.append(["trap", macro_tvn])
+
     dbl_to_pcl = dbl_to_reg and pcl_dbl
     dbh_to_pch = dbh_to_reg and pch_dbh
     abl_to_pcl = abl_to_reg and pcl_abl
@@ -1602,16 +1608,14 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             code_to_sort.append(["=sri"])
         else:
             code_to_sort.append(["=sri7"])
-        
+
     if tvn_to_ftu:
         if tvn != None:
-            code_to_sort.append(["trap", tvn])
             if type(tvn) == str:
                 code_to_sort.append(["=", R.ftu, tvn])
             else:
                 code_to_sort.append(["=", R.ftu, "c", tvn << 2])
         else:
-            code_to_sort.append(["trap", macro_tvn])
             if type(macro_tvn) == str:
                 code_to_sort.append(["=", R.ftu, macro_tvn])
             else:

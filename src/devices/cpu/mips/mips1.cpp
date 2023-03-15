@@ -256,6 +256,15 @@ void mips1core_device_base::execute_run()
 			// check for interrupts
 			if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
 			{
+				// enable debugger interrupt breakpoints
+				for (int irqline = 0; irqline < 6; irqline++)
+				{
+					if (CAUSE & SR & (CAUSE_IPEX0 << irqline))
+					{
+						standard_irq_callback(irqline, m_pc);
+						break;
+					}
+				}
 				generate_exception(EXCEPTION_INTERRUPT);
 				return;
 			}
@@ -619,13 +628,7 @@ void mips1core_device_base::execute_run()
 void mips1core_device_base::execute_set_input(int irqline, int state)
 {
 	if (state != CLEAR_LINE)
-	{
 		CAUSE |= CAUSE_IPEX0 << irqline;
-
-		// enable debugger interrupt breakpoints
-		if ((SR & SR_IEc) && (SR & (SR_IMEX0 << irqline)))
-			standard_irq_callback(irqline);
-	}
 	else
 		CAUSE &= ~(CAUSE_IPEX0 << irqline);
 }

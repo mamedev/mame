@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <system_error>
+#include <type_traits>
 
 
 
@@ -460,7 +461,10 @@ protected:
 			result = sol::stack::push(L, i.ix + 1);
 		else
 			result = T::push_key(L, i.it, i.ix);
-		result += sol::stack::push_reference(L, T::unwrap(i.it));
+		if constexpr (std::is_reference_v<decltype(T::unwrap(i.it))>)
+			result += sol::stack::push_reference(L, std::ref(T::unwrap(i.it)));
+		else
+			result += sol::stack::push_reference(L, T::unwrap(i.it));
 		++i;
 		return result;
 	}
@@ -481,9 +485,16 @@ public:
 		T &self(immutable_sequence_helper::get_self(L));
 		std::ptrdiff_t const index(sol::stack::unqualified_get<std::ptrdiff_t>(L, 2));
 		if ((0 >= index) || (self.items().size() < index))
+		{
 			return sol::stack::push(L, sol::lua_nil);
+		}
 		else
-			return sol::stack::push_reference(L, T::unwrap(std::next(self.items().begin(), index - 1)));
+		{
+			if constexpr (std::is_reference_v<decltype(T::unwrap(std::next(self.items().begin(), index - 1)))>)
+				return sol::stack::push_reference(L, std::ref(T::unwrap(std::next(self.items().begin(), index - 1))));
+			else
+				return sol::stack::push_reference(L, T::unwrap(std::next(self.items().begin(), index - 1)));
+		}
 	}
 
 	static int index_of(lua_State *L)

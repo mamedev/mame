@@ -29,40 +29,6 @@ Notes:
 
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
-  * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
-
-ToDo:
-  * Sprite garbage in Beast Busters: Second Nightmare, another irq issue?
-  * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
-    seem to be just an input port but controls program flow too.
-  * Work out the purpose of the interrupts and how many are needed.
-  * Correct game speed (seems too fast).
-
-  2d:
-  * Scroll (base registers?)
-  * ROZ (4th tilemap in fatal fury should be floor [in progress], background should zoom)
-  * Find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
-  * Fix zooming sprites (zoom registers not understood, center versus edge pivot)
-  * Priorities
-  * Is all the bitmap decoding right?
-  * Upgrade to modern video timing.
-
-  3d:
-  * Find where the remainder of the 3d display list information is 'hiding'
-    -- should the 3d 'ram' be treated like a fifo, instead of like RAM (see Dreamcast etc.)
-  * Remaining 3d bits - glowing, etc.
-  * Populate the display buffers
-  * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
-
-  Other:
-  * Translate KL5C80 docs and finish up the implementation
-  * Figure out what IO $54 & $72 are on the communications CPU
-  * Fix sound
-  * Backup ram etc.
-  * Correct cpu speed
-  * How to use the FPGA data ('ROM1')
-
-
 ------------------------------------------------------------------------------
 Hyper NeoGeo 64, SNK 1997-1999
 Hardware info by Guru
@@ -984,6 +950,13 @@ uint32_t hng64_state::hng64_sysregs_r(offs_t offset, uint32_t mem_mask)
 	return m_sysregs[offset];
 }
 
+void hng64_state::raster_irq_pos_w(uint32_t data)
+{
+	m_raster_irq_pos[m_irq_pos_half] = data;
+
+	m_irq_pos_half ^= 1;
+}
+
 void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
@@ -992,15 +965,40 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	if(((offset*4) & 0xff00) == 0x1100)
 		logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
+	int scanline = m_screen->vpos();
 
 	switch(offset*4)
 	{
+		/*
+		case 0x0014:
+		    break;
+		case 0x001c:
+		    break;
+		*/
+		case 0x100c:
+			raster_irq_pos_w(data);
+			break;
+
+		/*
+		case 0x1014:
+		    break;
+		case 0x101c:
+		    break;
+		case 0x106c: // also reads from this one when writing 100c regs
+		    break;
+		case 0x1074:
+		    break;
+		*/
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
+		/*
+		case 0x108c:
+		    break;
+		*/
 		default:
-			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
 	}
 }
 
@@ -1113,8 +1111,20 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
-	COMBINE_DATA(&m_videoregs[offset]);
+	LOGMASKED(LOG_VREGS, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+
+	uint32_t newval = m_videoregs[offset];
+	COMBINE_DATA(&newval);
+
+	if (newval != m_videoregs[offset])
+	{
+		int vpos = m_screen->vpos();
+
+		if (vpos > 0)
+			m_screen->update_partial(vpos - 1);
+
+		m_videoregs[offset] = newval;
+	}
 }
 
 uint16_t hng64_state::main_sound_comms_r(offs_t offset)
@@ -1733,8 +1743,12 @@ static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...
 	return s_values;
 }
 
-static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
-
+template <uint32_t... Values>
+static auto const &texlayout_yoffset_4(std::integer_sequence<uint32_t, Values...>)
+{
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { (Values * 4096)... };
+	return s_values;
+}
 
 static const gfx_layout hng64_1024x1024x8_texlayout =
 {
@@ -1749,17 +1763,18 @@ static const gfx_layout hng64_1024x1024x8_texlayout =
 	texlayout_yoffset
 };
 
+// it appears that 4bpp tiles can only be in the top 1024 part of this as indexing is the same as 8bpp?
 static const gfx_layout hng64_1024x1024x4_texlayout =
 {
-	1024, 1024,
+	1024, 2048,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
-	1024*1024*4,
+	1024*2048*4,
 	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
-	texlayout_yoffset_4
+	texlayout_yoffset_4(std::make_integer_sequence<uint32_t, 2048>())
 };
 
 
@@ -2098,14 +2113,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 {
 	int scanline = param;
 
-	switch(scanline)
+	if (!(scanline & 1)) // in reality there are half as many scanlines, as we're running in interlace mode
 	{
-		case 224*2: set_irq(0x0001);  break; // lv 0 vblank irq
-//      case 0*2:   set_irq(0x0002);  break; // lv 1
-//      case 32*2:  set_irq(0x0008);  break; // lv 2
-//      case 64*2:  set_irq(0x0008);  break; // lv 2
-		case 128*2: set_irq(0x0800);  break; // lv 11 network irq?
+		const int scanline_shifted = scanline >> 1;
+
+		switch (scanline_shifted)
+		{
+		case 224: set_irq(0x0001);  break; // lv 0 vblank irq
+//      case 32:  set_irq(0x0008);  break; // lv 2
+//      case 64:  set_irq(0x0008);  break; // lv 2
+		case 240: set_irq(0x0800);  break; // lv 11 network irq?
+
+		default:
+		{
+			// raster / timer irq, used to split tilemaps for fatfurwa floor
+			if (scanline_shifted == m_raster_irq_pos[0]+8)
+				if (scanline_shifted <224)
+					set_irq(0x0002);
+			break;
+		}
+
+		}
 	}
+
 }
 
 void hng64_state::machine_start()
@@ -2175,6 +2205,9 @@ void hng64_state::machine_start()
 
 	save_item(NAME(main_latch));
 	save_item(NAME(sound_latch));
+
+	save_item(NAME(m_irq_pos_half));
+	save_item(NAME(m_raster_irq_pos));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2211,6 +2244,10 @@ void hng64_state::machine_reset()
 	m_fbcontrol[1] = 0x00;
 	m_fbcontrol[2] = 0x00;
 	m_fbcontrol[3] = 0x00;
+
+	m_irq_pos_half = 0;
+	m_raster_irq_pos[0] = 0xffffffff;
+	m_raster_irq_pos[1] = 0xffffffff;
 
 	clear3d();
 }
@@ -2516,6 +2553,8 @@ void hng64_state::hng64(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade0).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade1).set_format(palette_device::xRGB_888, 0x1000);
 	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
 	hng64_audio(config);

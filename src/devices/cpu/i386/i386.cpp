@@ -1529,7 +1529,7 @@ void i386_device::i386_check_irq_line()
 	if ( (m_irq_state) && m_IF )
 	{
 		m_cycles -= 2;
-		i386_trap(standard_irq_callback(0), 1, 0);
+		i386_trap(standard_irq_callback(0, m_pc), 1, 0);
 	}
 }
 

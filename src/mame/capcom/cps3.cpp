@@ -858,18 +858,18 @@ void cps3_state::decrypt_bios()
 		u32 xormask = cps3_mask(i, m_key1, m_key2);
 		coderegion[i/4] = dword ^ xormask;
 	}
-#if 0
-	/* Dump to file */
+
+	// Dump to file
+	if (0)
 	{
-		auto filename = std::string{ machine().system().name } + "_bios.dump";
+		auto filename = std::string(machine().system().name) + "_bios.dump";
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
-			fwrite(m_decrypted_bios, 0x080000, 1, fp);
+			fwrite(coderegion, codelength, 1, fp);
 			fclose(fp);
 		}
 	}
-#endif
 }
 
 

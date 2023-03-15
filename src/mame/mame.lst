@@ -822,10 +822,8 @@ lwriter2nt                      // Apple LaserWriter II NT
 @source:apple/mac.cpp
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 macii                           // 1987 Apple Macintosh II
-maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
-maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
 macse30                         // 1989 Apple Macintosh SE/30
 
@@ -839,6 +837,10 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/maciici.cpp
+maciici                         // 1989 Apple Macintosh IIci
+maciisi                         // 1990 Apple Macintosh IIsi
 
 @source:apple/maciifx.cpp
 maciifx                         // 1990 Apple Macintosh IIfx
@@ -1564,10 +1566,11 @@ spacduel0                       // 136006           (c) 1980
 spacduel1                       // 136006           (c) 1980
 
 @source:atari/bzone.cpp
-bradley                         // ??           (c) 1980
+bradley                         // ??               (c) 1980
 bzone                           // 0364xx           (c) 1980
 bzonea                          // 0364xx           (c) 1980
 bzonec                          // 0364xx           (c) 1980
+dsrtwars                        // bootleg          (c) 1981
 redbaron                        // 036995-037007    (c) 1980
 redbarona                       // 036995-037007    (c) 1980
 
@@ -18890,6 +18893,7 @@ phpball                         // Tomy
 playmaker                       // Tiger Electronics
 qfire                           // Electroplay
 quizwizc                        // Coleco
+racetime                        // Bandai
 raisedvl                        // Entex
 scruiser                        // US Games
 simon                           // Milton Bradley
@@ -27952,6 +27956,7 @@ am_mg33i                        // (c) Amatic
 am_mg34i                        // (c) Amatic
 am_mg35i                        // (c) Amatic
 am_mg3a                         // (c) 2000 Amatic
+am_mg4sk                        // (c) 2003 Amatic
 am_mg4v                         // (c) 2000 Amatic
 am_mg5hu                        // (c) Amatic
 suprstar                        // (c) 1996 Amatic
@@ -43424,6 +43429,7 @@ spellba                         //
 
 @source:ti/ti74.cpp
 ti74                            // 1985 TI-74
+ti74a                           // 1985 TI-74
 ti95                            // 1986 TI-95
 
 @source:ti/ti85.cpp
@@ -43504,6 +43510,9 @@ k28
 
 @source:tiger/k28m2.cpp
 k28m2
+
+@source:tiger/pylo.cpp
+pylo
 
 @source:tigertel/gizmondo.cpp
 gizmondo                        //
@@ -43839,6 +43848,15 @@ cp500                           // Prologica CP500
 
 @source:trs/vis.cpp
 vis
+
+@source:tryom/chess.cpp
+tchess
+
+@source:tryom/gammonm.cpp
+gammonm2
+
+@source:tryom/omar.cpp
+omar
 
 @source:tvgames/actions_atj2279b.cpp
 rbitgen

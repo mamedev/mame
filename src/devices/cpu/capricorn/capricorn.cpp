@@ -1535,7 +1535,7 @@ void capricorn_cpu_device::take_interrupt()
 	// Int. ack sequence takes 9 cycles
 	// Microcode FSM runs through this state sequence (see patent):
 	// 31-15-26-13-23-22-30-16-20
-	standard_irq_callback(0);
+	standard_irq_callback(0, m_genpc);
 	m_icount -= 9;
 	push_pc();
 	uint8_t vector = m_intack_in();

@@ -602,10 +602,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
 			else                         currentPoly.tex4bpp = 0x0;
 
-			currentPoly.texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
-			currentPoly.texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
-			currentPoly.texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
-
+			currentPoly.texPageSmall = chunkOffset[2];
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
 
 			// Flat shaded polygon, no texture, no lighting
@@ -1311,6 +1308,9 @@ void hng64_state::normalize(float* x)
 
 void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
@@ -1325,15 +1325,15 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
+	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
@@ -1349,37 +1349,47 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
-				textureS += (renderData.texscrolly & 0x3fff)>>4;
-				textureT += (renderData.texscrollx & 0x3fff)>>4;
+				textureS += (renderData.texscrolly & 0x3fff)>>5;
+				textureT += (renderData.texscrollx & 0x3fff)>>5;
 
 
 #if 1
+
+				int textPageSub = (renderData.texPageSmall & 0xc000) >> 14;
+				int texPageHorizOffset = (renderData.texPageSmall & 0x3800) >> 11;
+				int texPageVertOffset = (renderData.texPageSmall & 0x0070) >> 4;
+
 				// Small-Page textures
-				if (renderData.texPageSmall == 2)
+				if (textPageSub == 2)
 				{
 					textureT = fmod(textureT, 256.0f);
 					textureS = fmod(textureS, 256.0f);
 
-					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
-					textureS += (256.0f * (renderData.texPageVertOffset>>1));
+					textureT += (256.0f * (texPageHorizOffset>>1));
+					textureS += (256.0f * (texPageVertOffset>>1));
 				}
-				else if (renderData.texPageSmall == 3)
+				else if (textPageSub == 3)
 				{
 					// this can't be 128x128 textures, it is needed for the road etc. in xrally which is 256 wide,
 					// but also overhead objects which are 128 (eg lamps, near top left hand side on 8bpp texture page 8)
 					textureT = fmod(textureT, 128.0f);
 					textureS = fmod(textureS, 128.0f);
 
-					textureT += (128.0f * (renderData.texPageHorizOffset >> 0));
-					textureS += (128.0f * (renderData.texPageVertOffset >> 0));
+					textureT += (128.0f * (texPageHorizOffset >> 0));
+					textureS += (128.0f * (texPageVertOffset >> 0));
 				}
 #endif
 
 				uint8_t paletteEntry;
 				int t = (int)textureT;
+				int s = (int)textureS;
+
+				t &= 1023;
+				s &= 1023; // 4bpp pages seem to be limited to 1024 pixels, with page numbering being the same, the bottom 1024 pixels of 4bpp pages are unsed?
+
 				if (renderData.tex4bpp)
 				{
-					paletteEntry = textureOffset[((int)textureS) * 512 + (t >> 1)];
+					paletteEntry = textureOffset[s * 512 + (t >> 1)];
 
 					if (t & 1)
 						paletteEntry = (paletteEntry >> 4) & 0x0f;
@@ -1388,10 +1398,10 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				}
 				else
 				{
-					paletteEntry = textureOffset[((int)textureS) * 1024 + t];
+					paletteEntry = textureOffset[s * 1024 + t];
 				}
 
-				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
+				// pen 0 in textures is always transparent
 				if (paletteEntry != 0)
 				{
 					float rIntensity = rCorrect / 16.0f;
@@ -1400,8 +1410,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					if (renderData.blend)
 						color |= 0x800;
 
-					*colorBuffer = color;
-					*depthBuffer = z;
+					colorBuffer[x & 511] = color;
+					depthBuffer[x & 511] = z;
 				}
 			}
 		}
@@ -1411,35 +1421,32 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 		light += dlight;
 		s += ds;
 		t += dt;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
 void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	const float dz = extent.param[0].dpdx;
 
 	// Pointers to the pixel buffers
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
-	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512)];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
-			*colorBuffer = renderData.palOffset + renderData.colorIndex;
-			*depthBuffer = z;
+			colorBuffer[x & 511] = renderData.palOffset + renderData.colorIndex;
+			depthBuffer[x & 511] = z;
 		}
 
 		z += dz;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
@@ -1451,8 +1458,6 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
 	rOptions.texPageSmall = p->texPageSmall;
-	rOptions.texPageHorizOffset = p->texPageHorizOffset;
-	rOptions.texPageVertOffset = p->texPageVertOffset;
 	rOptions.colorIndex = p->colorIndex;
 	rOptions.blend = p->blend;
 	rOptions.texscrollx = p->texscrollx;

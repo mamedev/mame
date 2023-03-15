@@ -1276,7 +1276,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	image_handler_ingame();
 
 	if (ui_disabled)
-		return ui_disabled;
+		return 0;
 
 	if (machine().ui_input().pressed(IPT_UI_CANCEL))
 	{

@@ -1347,7 +1347,7 @@ void z8_device::take_interrupt(int irq)
 
 	// acknowledge the IRQ
 	m_irq &= ~(1 << irq);
-	standard_irq_callback(irq);
+	standard_irq_callback(irq, m_pc);
 
 	// get the interrupt vector address
 	uint16_t vector = irq * 2;

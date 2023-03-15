@@ -37,6 +37,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 - gpoker: Entex Electronic Poker
 - matchnum: LJN Electronic Concentration
 - palmf31: Toshiba BC-8018B
+- racetime: Bandai FL Grand Prix Champion
 - ti1250: Texas Instruments TI-1200
 - ti25503: Texas Instruments TI-1265
 - ti5100: loose 1979 TMS1073NL chip
@@ -121,8 +122,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2787   TMS1040?  1980, Bandai Race Time (? note: VFD-capable)
- *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ @MP2787   TMS1070   1980, Bandai Race Time
+ *MP2788   TMS1070   1980, Bandai Flight Time
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
@@ -1000,6 +1001,121 @@ ROM_END
 
 /***************************************************************************
 
+  Bandai Race Time (model 8007 / 16162)
+  * PCB label: SM-007
+  * TMS1070 MP2787 (die label: 1070B, MP2787)
+  * cyan/red VFD Futaba DM-8Z, 1-bit sound
+
+  known releases:
+  - World: Race Time, published by Bandai
+  - Japan: FL Grand Prix Champion, published by Bandai
+
+***************************************************************************/
+
+class racetime_state : public hh_tms1k_state
+{
+public:
+	racetime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void racetime(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void racetime_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void racetime_state::write_r(u32 data)
+{
+	// R7: input mux
+	m_inp_mux = BIT(data, 7);
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+
+	// R0-R8: VFD grid
+	// R9: VFD plate
+	m_grid = data & 0x1ff;
+	m_plate = (m_plate & 0xff) | (data >> 1 & 0x100);
+	update_display();
+}
+
+void racetime_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	update_display();
+}
+
+u8 racetime_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( racetime )
+	PORT_START("IN.0") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+INPUT_PORTS_END
+
+void racetime_state::racetime(machine_config &config)
+{
+	// basic machine hardware
+	TMS1070(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(racetime_state::read_k));
+	m_maincpu->write_r().set(FUNC(racetime_state::write_r));
+	m_maincpu->write_o().set(FUNC(racetime_state::write_o));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(229, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( racetime )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp2787", 0x0000, 0x0400, CRC(38c668b9) SHA1(2181647d4f2385a81355eaf99a40ad82f57ecdc6) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_racetime_output.pla", 0, 365, CRC(192c6a44) SHA1(db0b441252d1e6bf3885e528756cfecc0468c664) )
+
+	ROM_REGION( 221716, "screen", 0)
+	ROM_LOAD( "racetime.svg", 0, 221716, CRC(d3934aed) SHA1(40b1fde191506c884b16b2ee3daaee2c6a4f4f08) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai TC7: Air Traffic Control
   * TMS1100 MCU, label MP1311 (die label: 1100E, MP1311)
   * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
@@ -1297,7 +1413,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * cyan VFD Futaba 20-ST-22, 2-line 9-digit 7seg + 1 custom
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -15107,6 +15223,7 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1980, racetime,   0,         0, racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -852,6 +852,11 @@ device.debug (read-only)
     The :ref:`debugger interface <luareference-debug-devdebug>` to the device if
     it is a CPU device, or ``nil`` if it is not a CPU device or the debugger is
     not enabled.
+device.state[] (read-only)
+    The :ref:`state entries <luareference-dev-stateentry>` for devices that
+    expose the register state interface, indexed by symbol, or ``nil`` for other
+    devices.  The index operator and ``index_of`` methods have O(n) complexity;
+    all other supported operations have O(1) complexity.
 device.spaces[] (read-only)
     A table of the device’s :ref:`address spaces <luareference-mem-space>`,
     indexed by name.  Only valid for devices that implement the memory
@@ -1310,6 +1315,46 @@ slot.options[] (read-only)
     operations have O(1) complexity.
 slot.device (read-only)
     The underlying :ref:`device <luareference-dev-device>`.
+
+.. _luareference-dev-stateentry:
+
+Device state entry
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_state_entry`` class, which allows access to named
+registers exposed by a :ref:`device <luareference-dev-device>`.  Supports
+conversion to string for display.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].state[symbol]
+    Gets a state entry for a given device by symbol.
+
+Properties
+^^^^^^^^^^
+
+entry.value (read/write)
+    The numeric value of the state entry, as either an integer or floating-point
+    number.  Attempting to set the value of a read-only state entry raises an
+    error.
+entry.symbol (read-only)
+    The state entry’s symbolic name.
+entry.visible (read-only)
+    A Boolean indicating whether the state entry should be displayed in the
+    debugger register view.
+entry.writeable (read-only)
+    A Boolean indicating whether it is possible to modify the state entry’s
+    value.
+entry.is_float (read-only)
+    A Boolean indicating whether the state entry’s value is a floating-point
+    number.
+entry.datamask (read-only)
+    A bit mask of the valid bits of the value for integer state entries.
+entry.datasize (read-only)
+    The size of the underlying value in bytes for integer state entries.
+entry.max_length (read-only)
+    The maximum display string length for the state entry.
 
 .. _luareference-dev-imagefmt:
 

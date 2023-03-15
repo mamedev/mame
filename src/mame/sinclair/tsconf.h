@@ -46,10 +46,12 @@ public:
 	static constexpr u16 with_vblank(u16 pixclocks) { return 32 + pixclocks; }
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void video_start() override;
+	void machine_start() override;
+	void machine_reset() override;
 
+	TIMER_CALLBACK_MEMBER(irq_on) override;
+	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
 
@@ -132,9 +134,11 @@ private:
 
 	void update_frame_timer();
 	emu_timer *m_frame_irq_timer = nullptr;
-	emu_timer *m_line_irq_timer = nullptr;
+	emu_timer *m_scanline_irq_timer = nullptr;
 
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
+	IRQ_CALLBACK_MEMBER(irq_vector);
+	u8 m_int_mask;
 
 	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);

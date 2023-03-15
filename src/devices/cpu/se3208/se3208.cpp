@@ -1726,7 +1726,7 @@ void se3208_device::device_reset()
 
 void se3208_device::SE3208_NMI()
 {
-	standard_irq_callback(INPUT_LINE_NMI);
+	standard_irq_callback(INPUT_LINE_NMI, m_PC);
 	m_machinex_cb(0x00);
 
 	PushVal(m_PC);
@@ -1742,7 +1742,7 @@ void se3208_device::SE3208_Interrupt()
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
-	standard_irq_callback(0);
+	standard_irq_callback(0, m_PC);
 	m_machinex_cb(0x01);
 
 	PushVal(m_PC);
