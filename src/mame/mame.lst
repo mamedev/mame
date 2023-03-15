@@ -14785,6 +14785,10 @@ bw2                             //
 @source:booth/apexc.cpp
 apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray Computer
 
+@source:brother/lw350.cpp
+lw350                           // Brother LW-350 (c) 1995 Brother Industries, Ltd.
+lw450                           // Brother LW-450 (c) 1992 Brother Industries, Ltd.
+
 @source:camputers/camplynx.cpp
 lynx128k                        //
 lynx48k                         //
