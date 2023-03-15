@@ -2684,10 +2684,15 @@ All tested stages don't draw playfield properly, timing?
 		</part>
 	</software>
 
-	<software name="xanadu">
+	<software name="xanadu" supported="no">
 		<description>Kaze no Densetsu Xanadu (Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Crashes by selecting anything
+Crashes if left idle on attract mode
+Doesn't survive a soft reset
+]]></notes>
 		<info name="serial" value="HECD4006"/>
 		<info name="release" value="19940218"/>
 		<info name="alt_title" value="風の伝説ザナドゥ"/>
@@ -2852,12 +2857,12 @@ Sets high transfer length (0xfc), stalls, [SCSI] timing sensitive
 		</part>
 	</software>
 
-	<software name="ladyphan" supported="no">
+	<software name="ladyphan">
 		<description>Lady Phantom (Japan)</description>
 		<year>1991</year>
 		<publisher>Laser Soft</publisher>
 	    <notes><![CDATA[
-Hangs after first attack turn (shoot to the foe behind the tree)
+Hangs after first attack turn (shoot to the foe behind the tree) (fixed)
 ]]></notes>
 		<info name="serial" value="TJCD1019"/>
 		<info name="release" value="19911129"/>
@@ -4277,7 +4282,7 @@ Unsupported [セーブくん] joypad slot peripheral
 	<software name="psycdet3">
 		<description>Psychic Detective Series Vol. III - Aya (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD2003"/>
 		<info name="release" value="19921120"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.3 AYA"/>
@@ -4290,10 +4295,13 @@ Unsupported [セーブくん] joypad slot peripheral
 		</part>
 	</software>
 
-	<software name="psycdet3d" cloneof="psycdet3">
+	<software name="psycdet3d" cloneof="psycdet3" supported="no">
 		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
+	    <notes><![CDATA[
+Hangs at 3 minutes mark (verify, [ADPCM] or [SCSI])
+]]></notes>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
@@ -4306,7 +4314,7 @@ Unsupported [セーブくん] joypad slot peripheral
 	<software name="psycdet4">
 		<description>Psychic Detective Series Vol. IV - Orgel (Japan)</description>
 		<year>1993</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD3004"/>
 		<info name="release" value="19930806"/>
 		<info name="alt_title" value="サイキック・ディテクティブ・シリーズ Vol.4 オルゴール"/>
@@ -4594,7 +4602,7 @@ Unsupported [セーブくん] joypad slot peripheral
 	<software name="rayxan2">
 		<description>Rayxanber II (Japan)</description>
 		<year>1991</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD1001"/>
 		<info name="release" value="19910607"/>
 		<info name="alt_title" value="ライザンバーII"/>
@@ -4610,7 +4618,7 @@ Unsupported [セーブくん] joypad slot peripheral
 	<software name="rayxan3">
 		<description>Rayxanber III (Japan)</description>
 		<year>1992</year>
-		<publisher>DataWest</publisher>
+		<publisher>Data West</publisher>
 		<info name="serial" value="DWCD2002"/>
 		<info name="release" value="19920626"/>
 		<info name="alt_title" value="ライザンバーII"/>
@@ -4639,10 +4647,14 @@ Unsupported [セーブくん] joypad slot peripheral
 		</part>
 	</software>
 
-	<software name="rennybla">
+	<software name="rennybla" supported="no">
 		<description>Renny Blaster (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
+	    <notes><![CDATA[
+Hangs on technique screen after level select (assuming you pick them up in stages) [pce_ctrl] reads at vpos = 10
+[ADPCM] streaming cuts off on gameplay dialogues
+]]></notes>
 		<info name="serial" value="NAPR-1044"/>
 		<info name="release" value="19950623"/>
 		<info name="alt_title" value="レニーブラスター"/>
@@ -5131,10 +5143,13 @@ Unsupported [セーブくん] joypad slot peripheral
 		</part>
 	</software>
 
-	<software name="shangh3">
+	<software name="shangh3" supported="partial">
 		<description>Shanghai III - Dragon's Eye (Japan)</description>
 		<year>1992</year>
 		<publisher>ASK Kodansha</publisher>
+		<notes><![CDATA[
+Plays static sound on Dragon's Eye mode result video
+]]></notes>
 		<info name="serial" value="AKCD2002"/>
 		<info name="release" value="19921218"/>
 		<info name="alt_title" value="上海III ドラゴンズアイ"/>
@@ -5550,10 +5565,13 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-	<software name="spaceinv">
+	<software name="spaceinv" supported="no">
 		<description>Space Invaders - The Original Game (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
+	    <notes><![CDATA[
+Crashes with [redbook] static if attract mode opening isn't skipped
+]]></notes>
 		<info name="serial" value="NAPR-1050"/>
 		<info name="release" value="19950728"/>
 		<info name="alt_title" value="スペースインベーダー・ジ・オリジナルゲーム"/>
@@ -5678,10 +5696,15 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-	<software name="steamhea">
+	<software name="steamhea" supported="no">
 		<description>Steam Heart's (Japan)</description>
 		<year>1996</year>
 		<publisher>TGL</publisher>
+	    <notes><![CDATA[
+Enables [ADPCM] half irqs, stops voice playback in the middle
+[redbook] doesn't playback during gameplay
+Eventually hangs requiring a transfer ready irq [SCSI] (untested)
+]]></notes>
 		<info name="serial" value="GLCD6002"/>
 		<info name="release" value="19960322"/>
 		<info name="alt_title" value="スチーム・ハーツ"/>
@@ -6314,10 +6337,13 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-	<software name="proyakyu">
+	<software name="proyakyu" supported="partial">
 		<description>The Pro Yakyuu (Japan)</description>
 		<year>1990</year>
 		<publisher>Intec</publisher>
+	    <notes><![CDATA[
+Verify sound mixing, [PSG] covers [ADPCM]
+]]></notes>
 		<info name="serial" value="IGCD0001"/>
 		<info name="release" value="19901005"/>
 		<info name="alt_title" value="ザ・プロ野球"/>
@@ -6512,10 +6538,13 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-	<software name="traveler">
+	<software name="traveler" supported="partial">
 		<description>Travelers! Densetsu wo ButtobaSe (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
+	    <notes><![CDATA[
+Cuts off [ADPCM] playback, enables half irq
+]]></notes>
 		<info name="serial" value="JCCD4015"/>
 		<info name="release" value="19941229"/>
 		<info name="alt_title" value="とらべらーず! 伝説をぶっとばせ"/>
@@ -6760,7 +6789,7 @@ Offset [CRTC] screen
 		</part>
 	</software>
 
-	<software name="carmnwld" supported="no">
+	<software name="carmnwld">
 		<description>Where in the World is Carmen Sandiego? (Japan)</description>
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
@@ -7018,10 +7047,13 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		</part>
 	</software>
 
-	<software name="ys4">
+	<software name="ys4" supported="partial">
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-4-1108-R1F)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+	    <notes><![CDATA[
+Cuts off [ADPCM] playbacks, uses half irq
+]]></notes>
 		<info name="serial" value="HCD3051"/>
 		<info name="release" value="19931222"/>
 		<info name="alt_title" value="イースIV"/>
@@ -7034,10 +7066,13 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		</part>
 	</software>
 
-	<software name="ys4a" cloneof="ys4">
+	<software name="ys4a" cloneof="ys4" supported="partial">
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-5-1116-R1P)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
+	    <notes><![CDATA[
+Cuts off [ADPCM] playbacks, uses half irq
+]]></notes>
 		<info name="serial" value="HCD3051"/>
 		<info name="release" value="19931222"/>
 		<info name="alt_title" value="イースIV"/>

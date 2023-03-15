@@ -38,17 +38,19 @@ TODO:
 #define LOG_CDDA           (1U <<  2)
 #define LOG_SCSI           (1U <<  3)
 #define LOG_FADER          (1U <<  4)
-#define LOG_SCSIXFER       (1U <<  5) // single byte transfers, verbose
+#define LOG_IRQ            (1U <<  5)
+#define LOG_SCSIXFER       (1U <<  6) // single byte transfers, verbose
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER | LOG_IRQ)
 #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
 #define LOGSCSI(...)        LOGMASKED(LOG_SCSI, __VA_ARGS__)
-#define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
 #define LOGFADER(...)       LOGMASKED(LOG_FADER, __VA_ARGS__)
+#define LOGIRQ(...)         LOGMASKED(LOG_IRQ, __VA_ARGS__)
+#define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
 
 // 0xdd subchannel read is special and very verbose when it happens, treat differently
 #define LIVE_SUBQ_VIEW    0
@@ -1078,7 +1080,11 @@ void pce_cd_device::set_irq_line(int num, int state)
 
 	if (m_irq_mask & m_irq_status & 0x7c)
 	{
-		//printf("IRQ PEND = %02x MASK = %02x IRQ ENABLE %02X\n",m_irq_mask & m_irq_status & 0x7c,m_irq_mask & 0x7c,m_irq_status & 0x7c);
+		LOGIRQ("IRQ: PEND = %02x MASK = %02x STATUS %02x\n"
+			, m_irq_mask & m_irq_status & 0x7c
+			, m_irq_mask & 0x7c
+			, m_irq_status & 0x7c
+		);
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
 	else
@@ -1254,6 +1260,7 @@ void pce_cd_device::cdc_status_w(uint8_t data)
 	m_scsi_SEL = 0;
 	m_adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 	/* any write here clears CD transfer irqs */
+	LOGIRQ("IRQ: CD clear & ~0x70\n");
 	set_irq_line(0x70, CLEAR_LINE);
 	m_cdc_status = data;
 }
@@ -1290,6 +1297,8 @@ uint8_t pce_cd_device::irq_mask_r()
 void pce_cd_device::irq_mask_w(uint8_t data)
 {
 	m_scsi_ACK = data & 0x80;
+	if (data & 0x7c)
+		LOGIRQ("IRQ: mask %02x (%02x)\n", m_irq_mask & 0x7c, m_irq_status);
 	m_irq_mask = data;
 	set_irq_line(0, 0);
 }
@@ -1297,9 +1306,9 @@ void pce_cd_device::irq_mask_w(uint8_t data)
 /*
  * CD Interface Register 0x03 - BRAM lock / CD status (read only)
  *
- * -x-- ---- acknowledge signal
- * --x- ---- done signal
- * ---x ---- bram signal
+ * -x-- ---- CD acknowledge signal
+ * --x- ---- CD done signal
+ * ---x ---- bram signal (?)
  * ---- x--- ADPCM 2
  * ---- -x-- ADPCM 1
  * ---- --x- CDDA left/right speaker select
@@ -1431,8 +1440,8 @@ uint8_t pce_cd_device::adpcm_status_r()
  * CD Interface Register 0x0d - ADPCM address control
  *
  * x--- ---- ADPCM reset
- * -x-- ---- ADPCM play
- * --x- ---- ADPCM repeat
+ * -x-- ---- ADPCM play   - may be reversed
+ * --x- ---- ADPCM repeat /
  * ---x ---- ADPCM set length
  * ---- x--- ADPCM set read address
  * ---- --xx ADPCM set write address
