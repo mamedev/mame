@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "machine/pic8259.h"
 #include "video/poly.h"
 
 class vertex_program_disassembler {

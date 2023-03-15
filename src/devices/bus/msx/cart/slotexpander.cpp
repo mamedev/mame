@@ -2,6 +2,7 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "slotexpander.h"
+#include "bus/msx/cart/cartridge.h"
 #include "machine/input_merger.h"
 
 /*

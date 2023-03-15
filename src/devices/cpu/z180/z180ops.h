@@ -14,8 +14,15 @@
 #define LEAVE_HALT() {                                          \
 	if( m_HALT )                                                  \
 	{                                                           \
+		if( m_HALT == 2 )                                        \
+		{                                                       \
+			_PC += 2;                                           \
+		}                                                       \
+		else                                                    \
+		{                                                       \
+			_PC++;                                              \
+		}                                                       \
 		m_HALT = 0;                                               \
-		_PC++;                                                  \
 	}                                                           \
 }
 
@@ -952,6 +959,7 @@ uint8_t z180_device::SET(uint8_t bit, uint8_t value)
  * OTDMR
  ***************************************************************/
 #define SLP {                                                   \
+	_PC -= 2;                                                      \
 	m_icount = 0;                                           \
 	m_HALT = 2;                                                 \
 }
