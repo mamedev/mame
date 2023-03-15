@@ -14785,6 +14785,9 @@ bw2                             //
 @source:booth/apexc.cpp
 apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray Computer
 
+@source:brother/lw30.cpp
+lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
+
 @source:camputers/camplynx.cpp
 lynx128k                        //
 lynx48k                         //
