@@ -23,10 +23,6 @@ TODO:
 - Audio CD player rewind/fast forward don't work properly
   \- never go past 1 minute mark, underflows;
 - Fader feature is sketchy and unchecked against real HW;
-(old note, to move out there)
-- Steam Heart's: needs transfer ready irq to get past the
-                 gameplay hang, don't know exactly when it should fire
-- Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
 
 **************************************************************************************************/
 
@@ -41,8 +37,8 @@ TODO:
 #define LOG_IRQ            (1U <<  5)
 #define LOG_SCSIXFER       (1U <<  6) // single byte transfers, verbose
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER | LOG_IRQ)
-#define LOG_OUTPUT_FUNC osd_printf_info
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
@@ -423,7 +419,8 @@ void pce_cd_device::read_6()
 
 	if (frame_count == 0)
 	{
-		/* Star Breaker uses this */
+		// starbrkr uses this (cannot reproduce)
+		// Should supposedly bump to max size (frame_count = 256)
 		popmessage("Read Sector frame count == 0");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
@@ -572,6 +569,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 	switch (mode)
 	{
 		case 0x00:
+			// tadaima
 			popmessage("CD-DA set end mode 0x00");
 			frame = (m_command_buffer[3] << 16) | (m_command_buffer[4] << 8) | m_command_buffer[5];
 			break;
