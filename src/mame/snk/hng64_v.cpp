@@ -1546,7 +1546,7 @@ void hng64_state::video_start()
 	m_dl = std::make_unique<uint16_t[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
-	m_texturerom = memregion("textures")->base();
+	m_texturerom = memregion("textures0")->base();
 	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 
