@@ -40,7 +40,7 @@ protected:
 
 public:
 	// General, undocumented, or 6309 only?
-	enum m6x09_instruction_level
+	enum m6x09_instruction_level : uint8_t
 	{
 		M6x09_GENERAL = 1,
 		M6809_UNDOCUMENTED = 2,
@@ -53,7 +53,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
-	enum m6x09_addressing_mode
+	enum m6x09_addressing_mode : uint8_t
 	{
 		INH,                // Inherent
 		PSHS, PSHU,         // Push
@@ -99,8 +99,8 @@ protected:
 	private:
 		uint16_t                m_opcode;         // 8-bit opcode value
 		uint8_t                 m_operand_length; // Opcode length in bytes
-		m6x09_addressing_mode   m_mode : 6;       // Addressing mode
-		uint32_t                m_level;          // General, or 6309 only?
+		m6x09_addressing_mode   m_mode;           // Addressing mode
+		uint8_t                 m_level;          // General, or 6309 only?
 		unsigned                m_flags;          // Disassembly flags
 		const char *            m_name;           // Opcode name
 	};
