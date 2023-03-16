@@ -55,8 +55,8 @@ struct polygon
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
 
-	uint16_t tex_mask_x = 1023;
-	uint16_t tex_mask_y = 1023;
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 
@@ -92,8 +92,8 @@ struct hng64_poly_data
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
 
-	uint16_t tex_mask_x = 1023;
-	uint16_t tex_mask_y = 1023;
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 class hng64_state;
