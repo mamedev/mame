@@ -584,9 +584,9 @@ void shaders::begin_frame(render_primitive_list *primlist)
 	{
 		if (PRIMFLAG_GET_SCREENTEX(prim.flags))
 		{
-			containers[num_targets] = prim.container;
 			int screen_index = 0;
 			for (; screen_index < num_screens && containers[screen_index] != prim.container; screen_index++);
+			containers[screen_index] = prim.container;
 			target_to_screen[num_targets] = screen_index;
 			targets_per_screen[screen_index]++;
 			if (screen_index >= num_screens)
