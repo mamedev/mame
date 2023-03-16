@@ -604,22 +604,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			currentPoly.texPageSmall = chunkOffset[2];
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
 
-
-			switch (m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 0])
-			{
-			case 0x07: currentPoly.tex_mask_x = 128; break;
-			case 0x08: currentPoly.tex_mask_x = 256; break;
-			case 0x09: currentPoly.tex_mask_x = 512; break;
-			default: currentPoly.tex_mask_x = 1024; break;
-			}
-
-			switch (m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 1])
-			{
-			case 0x07: currentPoly.tex_mask_y = 128; break;
-			case 0x08: currentPoly.tex_mask_y = 256; break;
-			case 0x09: currentPoly.tex_mask_y = 512; break;
-			default: currentPoly.tex_mask_y = 1024; break;
-			}
+			// only values 07/08/09 have been observed.  Textures are only 1024 wide, so values above 09 (512) make little sense anyway
+			currentPoly.tex_mask_x = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 0];
+			currentPoly.tex_mask_y = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 1];
 
 			// Flat shaded polygon, no texture, no lighting
 			if (chunkOffset[1] & 0x8000)
