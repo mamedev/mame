@@ -194,6 +194,7 @@ void mb89352_device::device_reset()
 	m_transfer_count = 0;
 	m_spc_status = 0x05;  // presumably the data reg is empty to start with
 	m_busfree_int_enable = 0;
+	m_reset_and_disable = 1;
 }
 
 void mb89352_device::device_stop()
@@ -287,6 +288,10 @@ uint8_t mb89352_device::mb89352_r(offs_t offset)
 		return (1 << m_bdid);
 	case 0x01:  // SCTL - SPC Control
 		ret = 0x00;
+		if(m_reset_and_disable)
+			ret |= 0x80;
+		if(m_control_reset)
+			ret |= 0x40;
 		if(m_arbit_enable)
 			ret |= 0x10;
 		if(m_parity_enable)
@@ -372,6 +377,15 @@ void mb89352_device::mb89352_w(offs_t offset, uint8_t data)
 			device_reset();
 			logerror("mb89352: SCTL: Reset and disable.\n");
 		}
+		else
+			m_reset_and_disable = 0;
+		if(data & 0x40)
+		{
+			m_control_reset = 1;
+			logerror("mb89352: SCTL: Control reset.\n");
+		}
+		else
+			m_control_reset = 0;
 		if(data & 0x10)
 		{
 			m_arbit_enable = 1;
@@ -458,14 +472,18 @@ void mb89352_device::mb89352_w(offs_t offset, uint8_t data)
 			{
 				//m_ints |= INTS_SELECTION;
 			}
-			select(m_target);
-			set_phase(SCSI_PHASE_COMMAND); // straight to command phase, may need a delay between selection and command phases
-			m_line_status |= MB89352_LINE_SEL;
-			m_line_status |= MB89352_LINE_BSY;
-			m_spc_status &= ~SSTS_TARG_CONNECTED;
-			m_spc_status |= SSTS_INIT_CONNECTED;
-			m_spc_status |= SSTS_SPC_BSY;
-			m_ints |= INTS_COMMAND_COMPLETE;
+			if(select(m_target))
+			{
+				set_phase(SCSI_PHASE_COMMAND); // straight to command phase, may need a delay between selection and command phases
+				m_line_status |= MB89352_LINE_SEL;
+				m_line_status |= MB89352_LINE_BSY;
+				m_spc_status &= ~SSTS_TARG_CONNECTED;
+				m_spc_status |= SSTS_INIT_CONNECTED;
+				m_spc_status |= SSTS_SPC_BSY;
+				m_ints |= INTS_COMMAND_COMPLETE;
+			}
+			else
+				m_ints |= INTS_TIMEOUT;
 			if(m_int_enable != 0)
 				m_irq_cb(1);
 			logerror("mb89352: SCMD: Selection (SCSI ID%i)\n",m_target);
