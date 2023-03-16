@@ -706,7 +706,7 @@ XCLR8:
 	return;
 
 XST8:
-	// ToDo: Flag setting is much more complex see:
+	// TODO: Flag setting is much more complex, see:
 	// https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours#store-immediate
 
 	@read_operand();
@@ -714,7 +714,7 @@ XST8:
 	return;
 
 XST16:
-	// ToDo: Flag setting is much more complex see:
+	// TODO: Flag setting is much more complex, see:
 	// https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours#store-immediate
 
 	m_temp.b.h = read_operand(0);
