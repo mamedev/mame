@@ -88,11 +88,6 @@ protected:
 		unsigned flags() const { return m_flags; }
 		const char *name() const { return m_name; }
 
-		bool operator < (const opcodeinfo & rhs) const
-		{
-			return (opcode() < rhs.opcode());
-		}
-
 		struct compare
 		{
 			using is_transparent = void;
