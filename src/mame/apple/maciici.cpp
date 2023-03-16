@@ -8,10 +8,10 @@
 
     By R. Belmont
 
-	These are the RBV/MDU (RAM Based Video/Memory Decode Unit) near-twins.
-	IIci cost-reduced the IIcx and added on-board video.
-	IIsi cost-reduced the IIci with a slower CPU and Egret ADB instead of
-	the PIC ADB modem and Apple RTC/PRAM chip.
+    These are the RBV/MDU (RAM Based Video/Memory Decode Unit) near-twins.
+    IIci cost-reduced the IIcx and added on-board video.
+    IIsi cost-reduced the IIci with a slower CPU and Egret ADB instead of
+    the PIC ADB modem and Apple RTC/PRAM chip.
 
 ****************************************************************************/
 
@@ -22,6 +22,7 @@
 #include "macrtc.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
+#include "rbv.h"
 
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -38,9 +39,6 @@
 #include "machine/z80scc.h"
 #include "sound/asc.h"
 
-#include "emupal.h"
-#include "render.h"
-#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -56,6 +54,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via1"),
+		m_rbv(*this, "rbv"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_asc(*this, "asc"),
@@ -65,9 +64,6 @@ public:
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scc(*this, "scc"),
-		m_montype(*this, "MONTYPE"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_rtc(*this, "rtc"),
 		m_egret(*this, "egret")
 	{
@@ -83,6 +79,7 @@ protected:
 private:
 	required_device<m68030_device> m_maincpu;
 	required_device<via6522_device> m_via1;
+	required_device<rbv_device> m_rbv;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<asc_device> m_asc;
@@ -92,30 +89,9 @@ private:
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<z80scc_device> m_scc;
-	required_ioport m_montype;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
 
-	emu_timer *m_6015_timer = nullptr;
-	emu_timer *m_scanline_timer = nullptr;
-
-	u8 m_rbv_regs[256]{}, m_rbv_ier = 0, m_rbv_ifr = 0, m_rbv_montype = 0, m_rbv_vbltime = 0;
-	u32 m_rbv_colors[3]{}, m_rbv_count = 0, m_rbv_clutoffs = 0, m_rbv_immed10wr = 0;
-	u32 m_rbv_palette[256]{};
-
-	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void rbv_reset();
-	void rbv_recalc_irqs();
-	void rbv_ramdac_w(offs_t offset, uint32_t data);
-	uint8_t rbv_r(offs_t offset);
-	void rbv_w(offs_t offset, uint8_t data);
-	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-
-	WRITE_LINE_MEMBER(mac_asc_irq);
-	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
 	void set_via2_interrupt(int value);
 	void field_interrupts();
 
@@ -124,16 +100,6 @@ private:
 	u32 m_rom_size = 0;
 	int m_scc_interrupt = false, m_via_interrupt = false, m_via2_interrupt = false, m_last_taken_interrupt = false;
 	int m_adb_irq_pending = 0;
-	uint8_t m_nubus_irq_state = 0;
-
-	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
-	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
 	uint16_t via_r(offs_t offset);
 	void via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -148,6 +114,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_irq);
 	WRITE_LINE_MEMBER(via_out_cb2);
 	WRITE_LINE_MEMBER(via_out_cb2_iisi);
+	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
+	DECLARE_WRITE_LINE_MEMBER(scc_irq_w);
 
 	uint32_t rom_switch_r(offs_t offset);
 
@@ -202,63 +170,28 @@ private:
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
 	}
-};
 
-TIMER_CALLBACK_MEMBER(maciici_state::mac_6015_tick)
-{
-	m_via1->write_ca1(0);
-	m_via1->write_ca1(1);
-
-	m_macadb->adb_vblank();
-}
-
-TIMER_CALLBACK_MEMBER(maciici_state::mac_scanline_tick)
-{
-	int scanline = m_screen->vpos();
-
-	if (m_rbv_vbltime > 0)
+	WRITE_LINE_MEMBER(write_6015)
 	{
-		m_rbv_vbltime--;
-
-		if (m_rbv_vbltime == 0)
+		if (state)
 		{
-			m_rbv_regs[2] |= 0x40;
-			rbv_recalc_irqs();
+			m_macadb->adb_vblank();
 		}
 	}
-
-	int next_scanline = (scanline + 1) % 370;	// TODO: fix
-	m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
-}
+};
 
 void maciici_state::machine_start()
 {
-	m_6015_timer = timer_alloc(FUNC(maciici_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
-
-	m_scanline_timer = timer_alloc(FUNC(maciici_state::mac_scanline_tick), this);
-	m_scanline_timer->adjust(m_screen->time_until_pos(0, 0));
+	m_rbv->set_ram_info((u32 *)m_ram->pointer(), m_ram->size());
 
 	m_rom_ptr = (u32 *)memregion("bootrom")->base();
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;
-
-	save_item(NAME(m_rbv_regs));
-	save_item(NAME(m_rbv_ier));
-	save_item(NAME(m_rbv_ifr));
-	save_item(NAME(m_rbv_colors));
-	save_item(NAME(m_rbv_count));
-	save_item(NAME(m_rbv_clutoffs));
-	save_item(NAME(m_rbv_palette));
 }
 
 void maciici_state::machine_reset()
 {
-	m_rbv_vbltime = 0;
-	rbv_reset();
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
-
 	// main cpu shouldn't start until Egret wakes it up
 	if (m_egret)
 	{
@@ -325,20 +258,6 @@ void maciici_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(maciici_state::mac_asc_irq)
-{
-	if (state == ASSERT_LINE)
-	{
-		m_rbv_regs[3] |= 0x10; // any VIA 2 interrupt | sound interrupt
-		rbv_recalc_irqs();
-	}
-	else
-	{
-		m_rbv_regs[3] &= ~0x10;
-		rbv_recalc_irqs();
-	}
-}
-
 WRITE_LINE_MEMBER(maciici_state::via_irq)
 {
 	m_via_interrupt = state;
@@ -355,281 +274,6 @@ void maciici_state::set_via2_interrupt(int value)
 {
 	m_via2_interrupt = value;
 	field_interrupts();
-}
-
-WRITE_LINE_MEMBER(maciici_state::nubus_irq_c_w)
-{
-	nubus_slot_interrupt(0xc, state);
-}
-
-WRITE_LINE_MEMBER(maciici_state::nubus_irq_d_w)
-{
-	nubus_slot_interrupt(0xd, state);
-}
-
-WRITE_LINE_MEMBER(maciici_state::nubus_irq_e_w)
-{
-	nubus_slot_interrupt(0xe, state);
-}
-
-void maciici_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
-{
-	static const uint8_t masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
-
-	slot -= 9;
-
-	if (state)
-	{
-		m_nubus_irq_state &= ~masks[slot];
-	}
-	else
-	{
-		m_nubus_irq_state |= masks[slot];
-	}
-
-	m_rbv_regs[2] &= ~0x38;
-	m_rbv_regs[2] |= (m_nubus_irq_state & 0x38);
-	rbv_recalc_irqs();
-}
-
-// do this here - screen_update is called each scanline when stepping in the
-// debugger, which means you can't escape the VIA2 IRQ handler
-//
-// RBV/MDU bits in IER/IFR:
-//
-// CA1: any slot interrupt = 0x02
-// CA2: SCSI interrupt     = 0x01
-// CB1: ASC interrupt      = 0x10
-
-WRITE_LINE_MEMBER(maciici_state::mac_rbv_vbl)
-{
-	if (!state)
-		return;
-
-	m_rbv_regs[2] &= ~0x40; // set vblank signal
-	m_rbv_vbltime = 10;
-
-	//  printf("RBV: raising VBL!\n");
-
-	if (m_rbv_regs[0x12] & 0x40)
-	{
-		rbv_recalc_irqs();
-	}
-}
-
-void maciici_state::rbv_ramdac_w(offs_t offset, uint32_t data)
-{
-	if (!offset)
-	{
-		m_rbv_clutoffs = data >> 24;
-		m_rbv_count = 0;
-	}
-	else
-	{
-		m_rbv_colors[m_rbv_count++] = data >> 24;
-
-		if (m_rbv_count == 3)
-		{
-			// for portrait display, force monochrome by using the blue channel
-			if (m_montype->read() == 1)
-			{
-				m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]));
-				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[2], m_rbv_colors[2], m_rbv_colors[2]);
-				m_rbv_clutoffs++;
-				m_rbv_count = 0;
-			}
-			else
-			{
-				m_palette->set_pen_color(m_rbv_clutoffs, rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]));
-				m_rbv_palette[m_rbv_clutoffs] = rgb_t(m_rbv_colors[0], m_rbv_colors[1], m_rbv_colors[2]);
-				m_rbv_clutoffs++;
-				m_rbv_count = 0;
-			}
-		}
-	}
-}
-
-void maciici_state::rbv_recalc_irqs()
-{
-	// check slot interrupts and bubble them down to IFR
-	uint8_t slot_irqs = (~m_rbv_regs[2]) & 0x78;
-	slot_irqs &= (m_rbv_regs[0x12] & 0x78);
-
-	if (slot_irqs)
-	{
-		m_rbv_regs[3] |= 2; // any slot
-	}
-	else // no slot irqs, clear the pending bit
-	{
-		m_rbv_regs[3] &= ~2; // any slot
-	}
-
-	uint8_t ifr = (m_rbv_regs[3] & m_rbv_ier) & 0x1b; // m_rbv_regs[0x13]);
-
-	//  printf("ifr = %02x (reg3 %02x reg13 %02x)\n", ifr, m_rbv_regs[3], m_rbv_regs[0x13]);
-	if (ifr != 0)
-	{
-		m_rbv_regs[3] = ifr | 0x80;
-		m_rbv_ifr = ifr | 0x80;
-
-		//      printf("VIA2 raise\n");
-		set_via2_interrupt(1);
-	}
-	else
-	{
-		//      printf("VIA2 lower\n");
-		set_via2_interrupt(0);
-	}
-}
-
-uint8_t maciici_state::rbv_r(offs_t offset)
-{
-	int data = 0;
-
-	if (offset < 0x100)
-	{
-		data = m_rbv_regs[offset];
-
-		if (offset == 0x10)
-		{
-			data &= ~0x38;
-			data |= (m_montype->read() << 3);
-			//            printf("%s rbv_r montype: %02x\n", machine().describe_context().c_str(), data);
-		}
-
-		// bit 7 of these registers always reads as 0 on RBV
-		if ((offset == 0x12) || (offset == 0x13))
-		{
-			data &= ~0x80;
-		}
-	}
-	else
-	{
-		offset >>= 9;
-
-		switch (offset)
-		{
-		case 13: // IFR
-				 //              printf("Read IER = %02x (PC=%x) 2=%02x\n", m_rbv_ier, m_maincpu->pc(), m_rbv_regs[2]);
-			data = m_rbv_ifr;
-			break;
-
-		case 14: // IER
-				 //              printf("Read IFR = %02x (PC=%x) 2=%02x\n", m_rbv_ifr, m_maincpu->pc(), m_rbv_regs[2]);
-			data = m_rbv_ier;
-			break;
-
-		default:
-			logerror("rbv_r: Unknown extended RBV VIA register %d access\n", offset);
-			break;
-		}
-	}
-
-	//  printf("rbv_r: %x = %02x (PC=%x)\n", offset, data, m_maincpu->pc());
-
-	return data;
-}
-
-void maciici_state::rbv_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x100)
-	{
-		//      if (offset == 0x10)
-		//      printf("rbv_w: %02x to offset %x (PC=%x)\n", data, offset, m_maincpu->pc());
-		switch (offset)
-		{
-		case 0x02:
-			data &= 0x40;
-			m_rbv_regs[offset] &= ~data;
-			rbv_recalc_irqs();
-			break;
-
-		case 0x03:			 // write here to ack
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_rbv_regs[offset] |= data & 0x7f;
-				m_rbv_ifr |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_rbv_regs[offset] &= ~(data & 0x7f);
-				m_rbv_ifr &= ~(data & 0x7f);
-			}
-			rbv_recalc_irqs();
-			break;
-
-		case 0x10:
-			if (data != 0)
-			{
-				m_rbv_immed10wr = 1;
-			}
-			m_rbv_regs[offset] = data;
-			break;
-
-		case 0x12:
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_rbv_regs[offset] |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_rbv_regs[offset] &= ~(data & 0x7f);
-			}
-			rbv_recalc_irqs();
-			break;
-
-		case 0x13:
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_rbv_regs[offset] |= data & 0x7f;
-
-				if (data == 0xff)
-					m_rbv_regs[offset] = 0x1f; // I don't know why this is special, but the IIci ROM's POST demands it
-			}
-			else // 1 bits write 0s
-			{
-				m_rbv_regs[offset] &= ~(data & 0x7f);
-			}
-			break;
-
-		default:
-			m_rbv_regs[offset] = data;
-			break;
-		}
-	}
-	else
-	{
-		offset >>= 9;
-
-		switch (offset)
-		{
-		case 13: // IFR
-				 //              printf("%02x to IFR (PC=%x)\n", data, m_maincpu->pc());
-			if (data & 0x80)
-			{
-				data = 0x7f;
-			}
-			rbv_recalc_irqs();
-			break;
-
-		case 14:			 // IER
-							 //              printf("%02x to IER (PC=%x)\n", data, m_maincpu->pc());
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_rbv_ier |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_rbv_ier &= ~(data & 0x7f);
-			}
-			rbv_recalc_irqs();
-			break;
-
-		default:
-			logerror("rbv_w: Unknown extended RBV VIA register %d access\n", offset);
-			break;
-		}
-	}
 }
 
 void maciici_state::via_sync()
@@ -766,8 +410,7 @@ void maciici_state::maciici_map(address_map &map)
 	map(0x50012000, 0x50013fff).rw(FUNC(maciici_state::scsi_drq_r), FUNC(maciici_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(maciici_state::iwm_r), FUNC(maciici_state::iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50024007).w(FUNC(maciici_state::rbv_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(FUNC(maciici_state::rbv_r), FUNC(maciici_state::rbv_w)).mirror(0x00f00000);
+	map(0x50024000, 0x50027fff).m(m_rbv, FUNC(rbv_device::map)).mirror(0x00f00000);
 	map(0x50040000, 0x50041fff).rw(FUNC(maciici_state::via_r), FUNC(maciici_state::via_w)).mirror(0x00f00000);
 }
 
@@ -853,168 +496,11 @@ void maciici_state::devsel_w(uint8_t devsel)
 		m_cur_floppy->ss_w(m_hdsel);
 }
 
-// IIci/IIsi RAM-Based Video (RBV)
-
-void maciici_state::rbv_reset()
-{
-	int htotal, vtotal;
-	double framerate;
-
-	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
-
-	m_rbv_count = 0;
-	m_rbv_clutoffs = 0;
-	m_rbv_immed10wr = 0;
-
-	m_rbv_regs[2] = 0x7f;
-	m_rbv_regs[3] = 0;
-
-	m_rbv_montype = m_montype->read();
-	rectangle visarea;
-	switch (m_rbv_montype)
-	{
-	case 1: // 15" portrait display
-		visarea.set(0, 640 - 1, 0, 870 - 1);
-		htotal = 832;
-		vtotal = 918;
-		framerate = 75.0;
-		break;
-
-	case 2: // 12" RGB
-		visarea.set(0, 512 - 1, 0, 384 - 1);
-		htotal = 640;
-		vtotal = 407;
-		framerate = 60.15;
-		break;
-
-	case 6: // 13" RGB
-	default:
-		visarea.set(0, 640 - 1, 0, 480 - 1);
-		htotal = 800;
-		vtotal = 525;
-		framerate = 59.94;
-		break;
-	}
-
-	//    logerror("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.width(), visarea.height(), framerate);
-	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
-}
-
-uint32_t maciici_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t const *vram8 = (uint8_t *)m_ram->pointer();
-	int hres, vres;
-
-	switch (m_rbv_montype)
-	{
-	case 1: // 15" portrait display
-		hres = 640;
-		vres = 870;
-		break;
-
-	case 2: // 12" RGB
-		hres = 512;
-		vres = 384;
-		break;
-
-	case 6: // 13" RGB
-	default:
-		hres = 640;
-		vres = 480;
-		break;
-	}
-
-	switch (m_rbv_regs[0x10] & 7)
-	{
-	case 0: // 1bpp
-	{
-		for (int y = 0; y < vres; y++)
-		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres; x += 8)
-			{
-				uint8_t const pixels = vram8[(y * (hres / 8)) + ((x / 8) ^ 3)];
-
-				*scanline++ = m_rbv_palette[0xfe | (pixels >> 7)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 6) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 5) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 4) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 3) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 2) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | ((pixels >> 1) & 1)];
-				*scanline++ = m_rbv_palette[0xfe | (pixels & 1)];
-			}
-		}
-	}
-	break;
-
-	case 1: // 2bpp
-	{
-		for (int y = 0; y < vres; y++)
-		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres / 4; x++)
-			{
-				uint8_t const pixels = vram8[(y * (hres / 4)) + (BYTE4_XOR_BE(x))];
-
-				*scanline++ = m_rbv_palette[0xfc | ((pixels >> 6) & 3)];
-				*scanline++ = m_rbv_palette[0xfc | ((pixels >> 4) & 3)];
-				*scanline++ = m_rbv_palette[0xfc | ((pixels >> 2) & 3)];
-				*scanline++ = m_rbv_palette[0xfc | (pixels & 3)];
-			}
-		}
-	}
-	break;
-
-	case 2: // 4bpp
-	{
-		for (int y = 0; y < vres; y++)
-		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres / 2; x++)
-			{
-				uint8_t const pixels = vram8[(y * (hres / 2)) + (BYTE4_XOR_BE(x))];
-
-				*scanline++ = m_rbv_palette[0xf0 | (pixels >> 4)];
-				*scanline++ = m_rbv_palette[0xf0 | (pixels & 0xf)];
-			}
-		}
-	}
-	break;
-
-	case 3: // 8bpp
-	{
-		for (int y = 0; y < vres; y++)
-		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres; x++)
-			{
-				uint8_t const pixels = vram8[(y * hres) + (BYTE4_XOR_BE(x))];
-				*scanline++ = m_rbv_palette[pixels];
-			}
-		}
-	}
-	}
-
-	return 0;
-}
-
-/***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-
-INPUT_PORTS_START( maciici )
-	PORT_START("MONTYPE")
-	PORT_CONFNAME(0x0f, 0x06, "Connected monitor")
-	PORT_CONFSETTING( 0x01, "15\" Portrait Display (640x870)")
-	PORT_CONFSETTING( 0x02, "12\" RGB (512x384)")
-	PORT_CONFSETTING( 0x06, "13\" RGB (640x480)")
+static INPUT_PORTS_START(maciici)
 INPUT_PORTS_END
 
 /***************************************************************************
-	MACHINE DRIVERS
+    MACHINE DRIVERS
 ***************************************************************************/
 void maciici_state::maciici(machine_config &config)
 {
@@ -1053,7 +539,7 @@ void maciici_state::maciici(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
-	m_asc->irqf_callback().set(FUNC(maciici_state::mac_asc_irq));
+	m_asc->irqf_callback().set(m_rbv, FUNC(rbv_device::asc_irq_w));
 	m_asc->add_route(0, "lspeaker", 1.0);
 	m_asc->add_route(1, "rspeaker", 1.0);
 
@@ -1094,14 +580,10 @@ void maciici_state::maciici(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
-	PALETTE(config, m_palette).set_entries(256);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_size(640, 870);
-	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
-	m_screen->set_screen_update(FUNC(maciici_state::screen_update_macrbv));
-	m_screen->screen_vblank().set(FUNC(maciici_state::mac_rbv_vbl));
+	RBV(config, m_rbv, C15M);
+	m_rbv->via6015_callback().set(m_via1, FUNC(via6522_device::write_ca1));
+	m_rbv->via6015_callback().append(FUNC(maciici_state::write_6015));
+	m_rbv->irq_callback().set(FUNC(maciici_state::set_via2_interrupt));
 
 	/* internal ram */
 	m_ram->set_default_size("2M");
@@ -1109,9 +591,9 @@ void maciici_state::maciici(machine_config &config)
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
-	nubus.out_irqc_callback().set(FUNC(maciici_state::nubus_irq_c_w));
-	nubus.out_irqd_callback().set(FUNC(maciici_state::nubus_irq_d_w));
-	nubus.out_irqe_callback().set(FUNC(maciici_state::nubus_irq_e_w));
+	nubus.out_irqc_callback().set(m_rbv, FUNC(rbv_device::slot0_irq_w));
+	nubus.out_irqd_callback().set(m_rbv, FUNC(rbv_device::slot1_irq_w));
+	nubus.out_irqe_callback().set(m_rbv, FUNC(rbv_device::slot2_irq_w));
 
 	NUBUS_SLOT(config, "nbc", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
