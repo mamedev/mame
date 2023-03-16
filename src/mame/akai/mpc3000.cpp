@@ -63,6 +63,7 @@ MPCs on other hardware:
 #include "emu.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/upd7810/upd7810.h"
+#include "imagedev/floppy.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/hd61830.h"
 #include "bus/midi/midi.h"
@@ -85,6 +86,7 @@ public:
 		, m_dsp(*this, "dsp")
 		, m_mdout(*this, "mdout")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 	{ }
 
 	void mpc3000(machine_config &config);
@@ -98,6 +100,10 @@ private:
 	required_device<l7a1045_sound_device> m_dsp;
 	required_device<midi_port_device> m_mdout;
 	required_device<upd72069_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+
+	static void floppies(device_slot_interface &device);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -183,6 +189,11 @@ void mpc3000_state::mpc3000_palette(palette_device &palette) const
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
+void mpc3000_state::floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
+
 void mpc3000_state::mpc3000(machine_config &config)
 {
 	V53A(config, m_maincpu, 16_MHz_XTAL);
@@ -230,6 +241,8 @@ void mpc3000_state::mpc3000(machine_config &config)
 	UPD72069(config, m_fdc, 16_MHz_XTAL); // clocked by V53 CLKOUT (TODO: upd72069 supports motor control)
 	//m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::ir?_w));
 	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::drq?_w));
+
+	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", floppy_image_device::default_mfm_floppy_formats);
 
 	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
 	pit.set_clk<0>(16_MHz_XTAL / 4);
