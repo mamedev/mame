@@ -54,6 +54,9 @@ struct polygon
 
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1023;
+	uint16_t tex_mask_y = 1023;
 };
 
 
@@ -88,6 +91,9 @@ struct hng64_poly_data
 	bool blend = false;
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1023;
+	uint16_t tex_mask_y = 1023;
 };
 
 class hng64_state;
@@ -161,7 +167,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_fbtable(*this, "fbtable"),
 		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
@@ -232,7 +237,6 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_fbtable;
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_fbram1;
 	required_shared_ptr<uint32_t> m_fbram2;
@@ -262,6 +266,7 @@ private:
 	int m_roadedge_3d_hack;
 
 	uint8_t m_fbcontrol[4]{};
+	uint8_t m_texture_wrapsize_table[0x20];
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -349,8 +354,8 @@ private:
 
 	void hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
-	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t hng64_texture_wrapsize_table_r(offs_t offset);
+	void hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data);
 
 	uint32_t hng64_fbram1_r(offs_t offset);
 	void hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
