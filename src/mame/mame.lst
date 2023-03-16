@@ -819,14 +819,6 @@ lwriter                         // Apple LaserWriter
 lwriterplus                     // Apple LaserWriter Plus
 lwriter2nt                      // Apple LaserWriter II NT
 
-@source:apple/mac.cpp
-mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-macii                           // 1987 Apple Macintosh II
-maciicx                         // 1989 Apple Macintosh IIcx
-maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
-maciix                          // 1988 Apple Macintosh IIx
-macse30                         // 1989 Apple Macintosh SE/30
-
 @source:apple/mac128.cpp
 mac128k                         // 1984 Apple Macintosh
 mac512k                         // 1985 Apple Macintosh 512k
@@ -837,6 +829,14 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/macii.cpp
+mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
+macii                           // 1987 Apple Macintosh II
+maciicx                         // 1989 Apple Macintosh IIcx
+maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
+maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
 
 @source:apple/maciici.cpp
 maciici                         // 1989 Apple Macintosh IIci
