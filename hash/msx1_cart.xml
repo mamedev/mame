@@ -12608,7 +12608,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Bandai</publisher>
 		<info name="serial" value="0201253 / BMX-004" />
 		<info name="alt_title" value="銀河漂流バイファム (Ginga Hyoryuu Vifam)" />
-		<info name="usage" value="Requires a MSX1 system."/>
+		<info name="usage" value="Requires an MSX1 system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
