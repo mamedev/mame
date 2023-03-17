@@ -33,9 +33,9 @@ namespace {
 class h19_state : public driver_device
 {
 public:
-	h19_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		 	m_tlb(*this, "tlb")
+	h19_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_tlb(*this, "tlb")
 	{
 	}
 
@@ -57,17 +57,36 @@ void h19_state::h19(machine_config &config)
 
 void h19_state::h19_superh19(machine_config &config)
 {
+#if USE_ALT_BIOS
+	h19(config);
+
+	m_tlb->set_default_bios_tag("040");
+#else
 	HEATH_SUPER19(config, m_tlb, H19_CLOCK);
+#endif
 }
 
 void h19_state::h19_watzh19(machine_config &config)
 {
+#if USE_ALT_BIOS
+	h19(config);
+
+	m_tlb->set_default_bios_tag("050");
+#else
+
 	HEATH_WATZ(config, m_tlb, H19_CLOCK);
+#endif
 }
 
 void h19_state::h19_ultrah19(machine_config &config)
 {
+#if USE_ALT_BIOS
+	h19(config);
+
+	m_tlb->set_default_bios_tag("060");
+#else
 	HEATH_ULTRA(config, m_tlb, H19_CLOCK);
+#endif
 }
 
 /* ROM definition */
@@ -92,4 +111,3 @@ COMP( 1982, super19, h19,    0,      h19_superh19,    0,   h19_state, empty_init
 COMP( 1982, watz19,  h19,    0,      h19_watzh19,     0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ Watzman ROM",  MACHINE_SUPPORTS_SAVE )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
 COMP( 1983, ultra19, h19,    0,      h19_ultrah19,    0,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ ULTRA ROM",    MACHINE_SUPPORTS_SAVE )
-

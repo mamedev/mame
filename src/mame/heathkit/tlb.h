@@ -13,7 +13,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
-#include "bus/rs232/rs232.h"
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -85,6 +84,8 @@ private:
 
 };
 
+#define USE_ALT_BIOS 0
+#if !USE_ALT_BIOS
 class heath_super19_tlb_device : public heath_tlb_device
 {
 public:
@@ -112,10 +113,12 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
+#endif
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
+#if !USE_ALT_BIOS
 DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
 DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
-
+#endif
 #endif // MAME_HEATHKIT_TLB_H
