@@ -146,7 +146,8 @@ public:
 		m_hyperbas(*this, "hyperbas"),
 		m_telmon24(*this, "telmon24"),
 		m_joy1(*this, "JOY1"),
-		m_joy2(*this, "JOY2")
+		m_joy2(*this, "JOY2"),
+		m_floppies(*this, "fdc:%d", 0U)
 	{ }
 
 	void via2_a_w(uint8_t data);
@@ -186,7 +187,7 @@ protected:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 
-	floppy_image_device *m_floppies[4];
+	required_device_array<floppy_connector, 4> m_floppies;
 	uint8_t m_port_314;
 	uint8_t m_via2_a, m_via2_b;
 	bool m_via2_ca2, m_via2_cb2, m_via2_irq;
@@ -435,12 +436,6 @@ void oric_state::machine_reset()
 void telestrat_state::machine_start()
 {
 	machine_start_common();
-	for(u8 i=0; i<4; i++)
-	{
-		char name[32];
-		sprintf(name, "fdc:%d", i);
-		m_floppies[i] = subdevice<floppy_connector>(name)->get_device();
-	}
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = false;
 	m_acia_irq = false;
 
@@ -514,7 +509,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
-	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
+	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3]->get_device();
 	m_fdc->set_floppy(floppy);
 	m_fdc->dden_w(m_port_314 & P_DDEN);
 	if(floppy) {
