@@ -171,13 +171,12 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 
 uint16_t mpc3000_state::dma_memr_cb(offs_t offset)
 {
-	//logerror("dma_memr_cb: offset %x\n", offset);
-	return m_maincpu->space(AS_PROGRAM).read_word(offset);
+	return m_maincpu->space(AS_PROGRAM).read_word(offset << 1);
 }
 
 void mpc3000_state::dma_memw_cb(offs_t offset, uint16_t data)
 {
-	m_maincpu->space(AS_PROGRAM).write_word(offset, data);
+	m_maincpu->space(AS_PROGRAM).write_word(offset << 1, data);
 }
 
 void mpc3000_state::mpc3000_sub_map(address_map &map)
