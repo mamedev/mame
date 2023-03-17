@@ -768,7 +768,6 @@ void mos6530_device_base::live_run(const attotime &limit)
 
 			live_delay(RUNNING_AFTER_INTERRUPT);
 			return;
-			break;
 		}
 		}
 	}
