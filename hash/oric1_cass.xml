@@ -5,13 +5,13 @@ license:CC0-1.0
 -->
 <softwarelist name="oric1_cass" description="Oric 1 cassettes">
 
-	<software name="aigledor" supported="e8b5d417d482809a5145e1d160d01064721fe4e7">
+	<software name="aigledor">
 		<description>Le Aigle D'Or</description>
 		<year>1984</year>
 		<publisher>???</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="54630">
-				<rom name="Aigle D'Or" size="54630" crc=" Le (F) (1984).tap" sha1="76de857c"/>
+				<rom name="Aigle D'Or, Le (F) (1984).tap" size="54630" crc="76de857c" sha1="e8b5d417d482809a5145e1d160d01064721fe4e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="centipedea1" cloneof="centipede">
+	<software name="centipede1" cloneof="centipede">
 		<description>Centipede (Alt)</description>
 		<year>1983</year>
 		<publisher>???</publisher>
@@ -49,7 +49,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="digdoga1" cloneof="digdog">
+	<software name="digdog1" cloneof="digdog">
 		<description>Dig Dog (Atmos)</description>
 		<year>1983</year>
 		<publisher>???</publisher>
@@ -82,7 +82,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="draculaa1" cloneof="dracula">
+	<software name="dracula1" cloneof="dracula">
 		<description>Dracula's Revenge (Alt)</description>
 		<year>1983</year>
 		<publisher>???</publisher>
@@ -93,13 +93,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="galaxians" supported="bdda1a9d5fd2da9f62a37bef0142a6e26d3db95b">
+	<software name="galaxians" supported="no">
 		<description>Galaxians</description>
 		<year>19??</year>
 		<publisher>???</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10784">
-				<rom name="Galaxians (UK" size="10784" crc="F) (19xx).tap" sha1="6c38e071"/>
+				<rom name="Galaxians (UK,F) (19xx).tap" size="10784" crc="6c38e071" sha1="bdda1a9d5fd2da9f62a37bef0142a6e26d3db95b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,13 +115,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hobbit" supported="c164a97c">
-		<description>Hobbit</description>
-		<year> The</year>
-		<publisher>1982</publisher>
+	<software name="hobbit">
+		<description>The Hobbit</description>
+		<year>1982</year>
+		<publisher>???</publisher>
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="">
-				<rom name="36212" size="" crc="Hobbit" sha1=" The (UK) (1982).tap"/>
+			<dataarea name="cass" size="36212">
+				<rom name="The Hobbit (UK) (1982).tap" size="36212" crc="c164a97c" sha1="77a5439e347123c83638b585bfecd21960bdcfc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -247,7 +247,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zorgona1" cloneof="zorgon">
+	<software name="zorgon1" cloneof="zorgon">
 		<description>Zorgon's Revenge (Alt 1)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
@@ -258,7 +258,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="zorgona2" cloneof="zorgon">
+	<software name="zorgon2" cloneof="zorgon">
 		<description>Zorgon's Revenge (Alt 2)</description>
 		<year>1984</year>
 		<publisher>IJK Software</publisher>
