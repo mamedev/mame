@@ -70,7 +70,7 @@
 **   - pause button
 **   - speed controller slider
 **   - rensha turbo slider
-** - victhc90, victhc95, victhc95a: Turbo/2nd cpu not supported. Firmware not working.
+** - victhc90, victhc90a, victhc95, victhc95a: Turbo/2nd cpu not supported. Firmware not working.
 ** - fsa1fx, fsa1wsx, fsa1wx
 **   - rensha turbo slider
 **   - pause button

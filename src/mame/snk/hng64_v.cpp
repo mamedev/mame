@@ -837,6 +837,9 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (m_screen_dis)
 		return 0;
 
+	// Draw sprites to buffer for later mixing
+	draw_sprites_buffer(screen, cliprect);
+
 	// set during transitions, could be 'disable all palette output'?
 	if ((m_tcram[0x24 / 4] >> 16) & 0x0002)
 		return 0;
@@ -989,12 +992,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				mixsprites_test(screen, bitmap, cliprect, (i/4)<<12, y);
 		}
 	}
-
-	// Draw the sprites on top of everything
-	draw_sprites_buffer(screen, cliprect);
-
-
-
 
 #if HNG64_VIDEO_DEBUG
 	if (0)
@@ -1549,7 +1546,7 @@ void hng64_state::video_start()
 	m_dl = std::make_unique<uint16_t[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
-	m_texturerom = memregion("textures")->base();
+	m_texturerom = memregion("textures0")->base();
 	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 

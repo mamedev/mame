@@ -66,7 +66,7 @@ do \
 	uint32_t srcdata = (SOURCE); \
 	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
-		if (zval > (DESTZ)) \
+		if (zval >= (DESTZ)) \
 		{ \
 			if (srcdata != trans_pen) \
 			{ \
@@ -277,6 +277,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	{
 		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
+
 		int16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
 		int16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
 
@@ -321,6 +322,18 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			currentsprite = nextsprite;
 			continue;
 		};
+
+		// skip the lowest sprite priority depending on the zsort mode
+		// it was previously assumed the default buffer fill would take care of this
+		// but unless there's a sign bit, the roadedge name entry screen disagrees as it
+		// requires a >= check on the sprite draw, not >
+		//
+		// for the non-zsort/zrev case, fatfurywa char selectappears requires <, not <=
+		if (zsort && (zval == 0))
+		{
+			currentsprite = nextsprite;
+			continue;
+		}
 
 		int32_t dx, dy;
 

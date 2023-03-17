@@ -48,15 +48,15 @@ struct polygon
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
 	uint8_t tex4bpp = 0;              // How to index into the texture
-	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
-	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
-	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
-
+	uint16_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
 	uint16_t colorIndex = 0;
 
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 
@@ -85,14 +85,15 @@ struct hng64_poly_data
 {
 	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
-	uint8_t texPageSmall = 0;
-	uint8_t texPageHorizOffset = 0;
-	uint8_t texPageVertOffset = 0;
+	uint16_t texPageSmall = 0;
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
 	bool blend = false;
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 class hng64_state;
@@ -166,7 +167,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_fbtable(*this, "fbtable"),
 		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
@@ -237,7 +237,6 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_fbtable;
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_fbram1;
 	required_shared_ptr<uint32_t> m_fbram2;
@@ -267,6 +266,7 @@ private:
 	int m_roadedge_3d_hack;
 
 	uint8_t m_fbcontrol[4]{};
+	uint8_t m_texture_wrapsize_table[0x20];
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -354,8 +354,8 @@ private:
 
 	void hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
-	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t hng64_texture_wrapsize_table_r(offs_t offset);
+	void hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data);
 
 	uint32_t hng64_fbram1_r(offs_t offset);
 	void hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

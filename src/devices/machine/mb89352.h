@@ -55,6 +55,8 @@ private:
 	uint8_t m_parity_enable;
 	uint8_t m_arbit_enable;
 	uint8_t m_busfree_int_enable;
+	uint8_t m_control_reset;
+	uint8_t m_reset_and_disable;
 	uint8_t m_line_status;
 	uint8_t m_spc_status;
 	uint8_t m_error_status;
