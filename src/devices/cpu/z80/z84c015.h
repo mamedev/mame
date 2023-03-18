@@ -23,8 +23,8 @@ class z84c015_device : public tmpz84c015_device
 public:
 	z84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-    DECLARE_READ_LINE_MEMBER(cs0_r) { return BIT(~m_mcr, 0); }
-    DECLARE_READ_LINE_MEMBER(cs1_r) { return BIT(~m_mcr, 1); }
+	DECLARE_READ_LINE_MEMBER(cs0_r) { return BIT(~m_mcr, 0); }
+	DECLARE_READ_LINE_MEMBER(cs1_r) { return BIT(~m_mcr, 1); }
 	u8 csbr_r() { return m_csbr; }
 
 protected:
