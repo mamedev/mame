@@ -57,36 +57,17 @@ void h19_state::h19(machine_config &config)
 
 void h19_state::h19_superh19(machine_config &config)
 {
-#if USE_ALT_BIOS
-	h19(config);
-
-	m_tlb->set_default_bios_tag("Super19");
-#else
 	HEATH_SUPER19(config, m_tlb, H19_CLOCK);
-#endif
 }
 
 void h19_state::h19_watzh19(machine_config &config)
 {
-#if USE_ALT_BIOS
-	h19(config);
-
-	m_tlb->set_default_bios_tag("Watz19");
-#else
-
 	HEATH_WATZ(config, m_tlb, H19_CLOCK);
-#endif
 }
 
 void h19_state::h19_ultrah19(machine_config &config)
 {
-#if USE_ALT_BIOS
-	h19(config);
-
-	m_tlb->set_default_bios_tag("Ultra19");
-#else
 	HEATH_ULTRA(config, m_tlb, H19_CLOCK);
-#endif
 }
 
 /* ROM definition */
