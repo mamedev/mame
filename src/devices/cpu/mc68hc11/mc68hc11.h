@@ -8,8 +8,7 @@
 
 enum {
 	MC68HC11_IRQ_LINE           = 0,
-	MC68HC11_TOC1_LINE          = 1,
-	MC68HC11_RTI_LINE           = 2
+	MC68HC11_XIRQ_LINE          = 1
 };
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)

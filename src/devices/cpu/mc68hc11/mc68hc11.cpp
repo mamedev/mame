@@ -1013,8 +1013,7 @@ void mc68hc11_cpu_device::device_reset()
 		}
 	}
 
-	m_pc = READ16(0xfffe); // TODO: vectors differ in bootstrap and special test modes
-	m_wait_state = 0;
+	m_wait_state = 1;
 	m_stop_state = 0;
 	m_ccr = CC_X | CC_I | CC_S;
 	init_w(m_init_value);
@@ -1028,7 +1027,7 @@ void mc68hc11_cpu_device::device_reset()
 	m_tflg2 = 0;
 	m_tmsk2 = 3; // timer prescale
 	m_pactl = 0;
-	m_irq_state = 0;
+	m_irq_state = 0x80000000 | (m_irq_state & 0x04000000);
 	if (m_irq_asserted)
 		set_irq_state(0x06, true);
 	m_frc_base = m_reset_time = total_cycles();
@@ -1155,9 +1154,12 @@ void mc68hc11_cpu_device::check_irq_lines()
 		}
 	}
 
-	if (m_irq_state != 0 && (!(m_ccr & CC_I)))
+	uint32_t irq_state = m_irq_state;
+	if (m_ccr & CC_X)
+		irq_state &= ~0x04000000; // mask XIRQ out
+	if (irq_state != 0 && (!(m_ccr & CC_I) || (irq_state >= 0x04000000)))
 	{
-		int level = count_leading_zeros_32(m_irq_state); // TODO: respect HPRIO setting
+		int level = count_leading_zeros_32(irq_state); // TODO: respect HPRIO setting
 		standard_irq_callback(level, m_pc);
 
 		if(m_wait_state == 0)
@@ -1169,13 +1171,16 @@ void mc68hc11_cpu_device::check_irq_lines()
 			PUSH8(REG_B);
 			PUSH8(m_ccr);
 		}
+		// TODO: vectors differ in bootstrap and special test modes
 		uint16_t pc_vector = READ16(0xfffe - level * 2);
 		SET_PC(pc_vector);
 		m_ccr |= CC_I; //irq taken, mask the flag
-		if(m_wait_state == 1) { m_wait_state = 2; }
+		if (level < 0x06)
+			m_ccr |= CC_X;
+		if(m_wait_state == 1) { m_wait_state = level == 0 ? 0 : 2; }
 		if(m_stop_state == 1) { m_stop_state = 2; }
-		if (level == 0x06 && BIT(m_option, 5))
-			set_irq_state(0x06, false); // auto-ack edge-triggered IRQ
+		if (level < 0x05 || (level == 0x06 && BIT(m_option, 5)))
+			set_irq_state(level, false); // auto-ack edge-triggered IRQ
 	}
 }
 
@@ -1198,6 +1203,10 @@ void mc68hc11_cpu_device::execute_set_input(int inputnum, int state)
 		else if (m_irq_asserted && state == CLEAR_LINE && !BIT(m_option, 5))
 			set_irq_state(0x06, false);
 		m_irq_asserted = state != CLEAR_LINE;
+		break;
+
+	case MC68HC11_XIRQ_LINE:
+		set_irq_state(0x05, state != CLEAR_LINE);
 		break;
 
 	default:
