@@ -482,23 +482,25 @@ u64 symbol_table::read_memory(address_space &space, offs_t address, int size, bo
 {
 	u64 result = ~u64(0) >> (64 - 8*size);
 
+	address_space *tspace = &space;
+
 	if (apply_translation)
 	{
 		// mask against the logical byte mask
 		address &= space.logaddrmask();
 
 		// translate if necessary; if not mapped, return 0xffffffffffffffff
-		if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+		if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, address, tspace))
 			return result;
 	}
 
 	// otherwise, call the reading function for the translated address
 	switch (size)
 	{
-	case 1:     result = space.read_byte(address);              break;
-	case 2:     result = space.read_word_unaligned(address);    break;
-	case 4:     result = space.read_dword_unaligned(address);   break;
-	case 8:     result = space.read_qword_unaligned(address);   break;
+	case 1:     result = tspace->read_byte(address);              break;
+	case 2:     result = tspace->read_word_unaligned(address);    break;
+	case 4:     result = tspace->read_dword_unaligned(address);   break;
+	case 8:     result = tspace->read_qword_unaligned(address);   break;
 	}
 	return result;
 }
@@ -511,23 +513,25 @@ u64 symbol_table::read_memory(address_space &space, offs_t address, int size, bo
 
 void symbol_table::write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation)
 {
+	address_space *tspace = &space;
+
 	if (apply_translation)
 	{
 		// mask against the logical byte mask
 		address &= space.logaddrmask();
 
 		// translate if necessary; if not mapped, we're done
-		if (!space.device().memory().translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_WRITE, address, tspace))
 			return;
 	}
 
 	// otherwise, call the writing function for the translated address
 	switch (size)
 	{
-	case 1:     space.write_byte(address, data);            break;
-	case 2:     space.write_word_unaligned(address, data);  break;
-	case 4:     space.write_dword_unaligned(address, data); break;
-	case 8:     space.write_qword_unaligned(address, data); break;
+	case 1:     tspace->write_byte(address, data);            break;
+	case 2:     tspace->write_word_unaligned(address, data);  break;
+	case 4:     tspace->write_dword_unaligned(address, data); break;
+	case 8:     tspace->write_qword_unaligned(address, data); break;
 	}
 
 	notify_memory_modified();

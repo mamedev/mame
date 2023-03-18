@@ -2606,8 +2606,9 @@ void h6280_device::psg_w(offs_t offset, uint8_t data)
 	m_psg->c6280_w(offset, data);
 }
 
-bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);
 
