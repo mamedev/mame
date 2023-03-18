@@ -113,7 +113,7 @@ public:
 	/////////////////////////////////////////////////////////
 
 protected:
-	tmpz84c015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t, address_map_constructor io_map);
+	tmpz84c015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
