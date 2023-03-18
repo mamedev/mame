@@ -152,14 +152,17 @@ Indicates whether a given space actually exists.
 
 .. code-block:: C++
 
-    bool translate(int spacenum, int intention, offs_t &address);
+    bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space);
 
 Does a logical to physical address translation through the device's
 MMU.  spacenum gives the space number, intention for the type of the
-future access (``TRANSLATE_(READ\|WRITE\|FETCH)(\|_USER\|_DEBUG)``)
-and address is an in/out parameter holding the address to translate on
-entry and the translated version on return.  Should return ``true`` if
-the translation went correctly, or ``false`` if the address is unmapped.
+future access (``TR_(READ\|WRITE\|FETCH)``), address is an in/out
+parameter holding the address to translate on entry and the translated
+version on return, and finally target_space is the actual space the
+access would end up in, which may be in a different device.  Should
+return ``true`` if the translation went correctly, or ``false`` if the
+address is unmapped.  The call must not change the state of the
+device.
 
 Note that for some historical reason, the device itself must override
 the virtual method ``memory_translate`` with the same signature.

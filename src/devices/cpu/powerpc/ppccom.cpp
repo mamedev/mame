@@ -334,9 +334,9 @@ device_memory_interface::space_config_vector ppc_device::memory_space_config() c
 static inline bool page_access_allowed(int transtype, uint8_t key, uint8_t protbits)
 {
 	if (key == 0)
-		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : true;
+		return (transtype == device_memory_interface::TR_WRITE) ? (protbits != 3) : true;
 	else
-		return (transtype == TRANSLATE_WRITE) ? (protbits == 2) : (protbits != 0);
+		return (transtype == device_memory_interface::TR_WRITE) ? (protbits == 2) : (protbits != 0);
 }
 
 
@@ -1237,10 +1237,10 @@ void ppc_device::ppccom_dcstore_callback()
     filling
 -------------------------------------------------*/
 
-uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &address)
+uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug, offs_t &address)
 {
-	int transpriv = ((intention & TRANSLATE_USER_MASK) == 0);   // 1 for supervisor, 0 for user
-	int transtype = intention & TRANSLATE_TYPE_MASK;
+	int transpriv = ((intention & TR_USER) == 0);   // 1 for supervisor, 0 for user
+	int transtype = intention & TR_TYPE;
 	offs_t hash, hashbase, hashmask;
 	int batbase, batnum, hashnum;
 	uint32_t segreg;
@@ -1253,7 +1253,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 			fatalerror("MMU enabled but not supported!\n");
 
 		/* only check if PE is enabled */
-		if (transtype == TRANSLATE_WRITE && (m_core->msr & MSR4XX_PE))
+		if (transtype == TR_WRITE && (m_core->msr & MSR4XX_PE))
 		{
 			/* are we within one of the protection ranges? */
 			int inrange1 = ((address >> 12) >= (m_core->spr[SPR4XX_PBL1] >> 12) && (address >> 12) < (m_core->spr[SPR4XX_PBU1] >> 12));
@@ -1272,7 +1272,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 		return 0x001;
 
 	/* also no translation necessary if translation is disabled */
-	if ((transtype == TRANSLATE_FETCH && (m_core->msr & MSROEA_IR) == 0) || (transtype != TRANSLATE_FETCH && (m_core->msr & MSROEA_DR) == 0))
+	if ((transtype == TR_FETCH && (m_core->msr & MSROEA_IR) == 0) || (transtype != TR_FETCH && (m_core->msr & MSROEA_DR) == 0))
 		return 0x001;
 
 	/* first scan the appropriate BAT */
@@ -1282,7 +1282,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 		{
 			uint32_t upper = m_core->spr[SPROEA_IBAT0U + 2*batnum + 0];
 			uint32_t lower = m_core->spr[SPROEA_IBAT0U + 2*batnum + 1];
-			int privbit = ((intention & TRANSLATE_USER_MASK) == 0) ? 3 : 2;
+			int privbit = ((intention & TR_USER) == 0) ? 3 : 2;
 
 //            printf("bat %d upper = %08x privbit %d\n", batnum, upper, privbit);
 
@@ -1299,7 +1299,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 					/* verify protection; if we fail, return false and indicate a protection violation */
 					if (!page_access_allowed(transtype, key, upper & 3))
 					{
-						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+						return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 					}
 
 					/* otherwise we're good */
@@ -1312,7 +1312,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 	}
 	else
 	{
-		batbase = (transtype == TRANSLATE_FETCH) ? SPROEA_IBAT0U : SPROEA_DBAT0U;
+		batbase = (transtype == TR_FETCH) ? SPROEA_IBAT0U : SPROEA_DBAT0U;
 
 		for (batnum = 0; batnum < 4; batnum++)
 		{
@@ -1331,7 +1331,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 					/* verify protection; if we fail, return false and indicate a protection violation */
 					if (!page_access_allowed(transtype, 1, lower & 3))
 					{
-						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+						return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 					}
 
 					/* otherwise we're good */
@@ -1353,13 +1353,13 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 
 	/* look up the segment register */
 	segreg = m_core->sr[address >> 28];
-	if (transtype == TRANSLATE_FETCH && (segreg & 0x10000000))
-		return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+	if (transtype == TR_FETCH && (segreg & 0x10000000))
+		return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 
 	/* check for memory-forced I/O */
 	if (m_cap & PPCCAP_MFIOC)
 	{
-		if ((transtype != TRANSLATE_FETCH) && ((segreg & 0x87f00000) == 0x87f00000))
+		if ((transtype != TR_FETCH) && ((segreg & 0x87f00000) == 0x87f00000))
 		{
 			address = ((segreg & 0xf)<<28) | (address & 0x0fffffff);
 			return 1;
@@ -1382,12 +1382,12 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 		m_core->mmu603_cmp = 0x80000000 | ((segreg & 0xffffff) << 7) | (0 << 6) | ((address >> 22) & 0x3f);
 		m_core->mmu603_hash[0] = hashbase | ((hash << 6) & hashmask);
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
-		if ((entry & (VTLB_FLAG_FIXED | VTLB_FLAG_VALID)) == (VTLB_FLAG_FIXED | VTLB_FLAG_VALID))
+		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
 			address = (entry & 0xfffff000) | (address & 0x00000fff);
 			return 0x001;
 		}
-		return DSISR_NOT_FOUND | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+		return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 	}
 
 	/* loop twice over hashes */
@@ -1410,13 +1410,13 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 
 					/* verify protection; if we fail, return false and indicate a protection violation */
 					if (!page_access_allowed(transtype, (segreg >> (29 + transpriv)) & 1, pteglower & 3))
-						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+						return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 
 					/* update page table bits */
-					if (!(intention & TRANSLATE_DEBUG_MASK))
+					if (!debug)
 					{
 						pteglower |= 0x100;
-						if (transtype == TRANSLATE_WRITE)
+						if (transtype == TR_WRITE)
 							pteglower |= 0x080;
 						ptegptr[BYTE_XOR_BE(ptenum * 2 + 1)] = pteglower;
 					}
@@ -1432,7 +1432,7 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 	}
 
 	/* we failed to find any match: not found */
-	return DSISR_NOT_FOUND | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
+	return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 }
 
 
@@ -1441,14 +1441,16 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
     from logical to physical
 -------------------------------------------------*/
 
-bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
+
 	/* only applies to the program address space */
 	if (spacenum != AS_PROGRAM)
 		return true;
 
 	/* translation is successful if the internal routine returns 0 or 1 */
-	return (ppccom_translate_address_internal(intention, address) <= 1);
+	return (ppccom_translate_address_internal(intention, true, address) <= 1);
 }
 
 
@@ -1458,7 +1460,10 @@ bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address)
 
 void ppc_device::ppccom_tlb_fill()
 {
-	vtlb_fill(m_core->param0, m_core->param1);
+	offs_t address = m_core->param0;
+	if(ppccom_translate_address_internal(m_core->param1, false, address) > 1)
+		return;
+	vtlb_fill(m_core->param0, address, m_core->param1);
 }
 
 
@@ -1489,14 +1494,14 @@ void ppc_device::ppccom_get_dsisr()
 
 	if (m_core->param1 & 1)
 	{
-		intent = TRANSLATE_WRITE;
+		intent = TR_WRITE;
 	}
 	else
 	{
-		intent = TRANSLATE_READ;
+		intent = TR_READ;
 	}
 
-	m_core->param1 = ppccom_translate_address_internal(intent, m_core->param0);
+	m_core->param1 = ppccom_translate_address_internal(intent, false, m_core->param0);
 }
 
 /*-------------------------------------------------
@@ -1540,11 +1545,11 @@ void ppc_device::ppccom_execute_tlbl()
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
 	/* determine the flags */
-	flags = VTLB_FLAG_VALID | VTLB_READ_ALLOWED | VTLB_FETCH_ALLOWED;
+	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED;
 	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= VTLB_WRITE_ALLOWED;
+		flags |= WRITE_ALLOWED;
 	if (isitlb)
-		flags |= VTLB_FETCH_ALLOWED;
+		flags |= FETCH_ALLOWED;
 
 	/* load the entry */
 	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
