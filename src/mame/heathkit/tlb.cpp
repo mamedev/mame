@@ -95,20 +95,26 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type ty
 {
 }
 
+void heath_tlb_device::checkBeepState()
+{
+	if (!m_keyclickactive && !m_bellactive)
+	{
+		m_beep->set_state(0);
+	}
+}
+
 TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
 {
 	m_keyclickactive = false;
 
-	if (!m_keyclickactive && !m_bellactive)
-		m_beep->set_state(0);
+	checkBeepState();
 }
 
 TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
 {
 	m_bellactive = false;
 
-	if (!m_keyclickactive && !m_bellactive)
-		m_beep->set_state(0);
+	checkBeepState();
 }
 
 void heath_tlb_device::mem_map(address_map &map)
@@ -170,8 +176,7 @@ void heath_tlb_device::device_start()
 
 void heath_tlb_device::key_click_w(uint8_t data)
 {
-/* Keyclick - 6 mSec */
-
+	// Keyclick - 6 mSec
 	m_beep->set_state(1);
 	m_keyclickactive = true;
 	m_key_click_timer->adjust(attotime::from_msec(6));
@@ -179,8 +184,7 @@ void heath_tlb_device::key_click_w(uint8_t data)
 
 void heath_tlb_device::bell_w(uint8_t data)
 {
-/* Bell (^G) - 200 mSec */
-
+	// Bell (^G) - 200 mSec
 	m_beep->set_state(1);
 	m_bellactive = true;
 	m_bell_timer->adjust(attotime::from_msec(200));
@@ -261,7 +265,9 @@ WRITE_LINE_MEMBER(heath_tlb_device::mm5740_data_ready_w)
 MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 {
 	if (!de)
+	{
 		return;
+	}
 
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
@@ -278,10 +284,10 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 			chr &= 0x7f;
 		}
 
-		/* get pattern of pixels for that character scanline */
+		// get pattern of pixels for that character scanline
 		uint8_t const gfx = m_p_chargen[(chr<<4) | ra] ^ inv;
 
-		/* Display a scanline of a character (8 pixels) */
+		// Display a scanline of a character (8 pixels)
 		*p++ = palette[BIT(gfx, 7)];
 		*p++ = palette[BIT(gfx, 6)];
 		*p++ = palette[BIT(gfx, 5)];
@@ -294,18 +300,18 @@ MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 }
 
 
-/* F4 Character Displayer */
+// F4 Character Displayer
 static const gfx_layout h19_charlayout =
 {
-	8, 10,                  /* 8 x 10 characters */
-	128,                    /* 128 characters */
-	1,                      /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 10,                  // 8 x 10 characters
+	128,                    // 128 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16                    /* every char takes 16 bytes */
+	8*16                    // every char takes 16 bytes
 };
 
 static GFXDECODE_START(gfx_h19)
@@ -493,18 +499,18 @@ INPUT_PORTS_END
 ROM_START( h19 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 #if USE_ALT_BIOS
-	ROM_DEFAULT_BIOS("030")
+	ROM_DEFAULT_BIOS("H19")
 
-	ROM_SYSTEM_BIOS( 0, "030", "H19" )
+	ROM_SYSTEM_BIOS( 0, "H19", "H19" )
 	ROMX_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b), ROM_BIOS(0) )
 
-	ROM_SYSTEM_BIOS( 1, "040", "Super19" )
+	ROM_SYSTEM_BIOS( 1, "Super19", "Super19" )
 	ROMX_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 2, "050", "Watz19" )
+	ROM_SYSTEM_BIOS( 2, "Watz19", "Watz19" )
 	ROMX_LOAD(  "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(2) )
 
-	ROM_SYSTEM_BIOS( 3, "060", "Ultra19" )
+	ROM_SYSTEM_BIOS( 3, "Ultra19", "Ultra19" )
 	ROMX_LOAD(  "2532_h19_ultra_firmware.bin", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3), ROM_BIOS(3) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
@@ -600,14 +606,12 @@ WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
 
 void heath_tlb_device::device_add_mconfig(machine_config &config)
 {
-
-
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
-	/* video hardware */
+	// video hardware
 	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);                         // TODO- this is adjustable by dipswitch.
@@ -626,10 +630,12 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
+	// serial port
 	INS8250(config, m_ace, INS8250_CLOCK);
 	m_ace->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 	m_ace->out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
 
+	// keyboard
 	MM5740(config, m_mm5740, MM5740_CLOCK);
 	m_mm5740->x_cb<1>().set_ioport("X1");
 	m_mm5740->x_cb<2>().set_ioport("X2");
@@ -644,7 +650,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_mm5740->control_cb().set(FUNC(heath_tlb_device::mm5740_control_r));
 	m_mm5740->data_ready_cb().set(FUNC(heath_tlb_device::mm5740_data_ready_w));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
 }

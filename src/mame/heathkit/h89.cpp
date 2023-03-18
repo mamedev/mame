@@ -2,20 +2,18 @@
 // copyright-holders:Sandro Ronco, Mark Garlanger
 /***************************************************************************
 
-        Heathkit H89
+  Heathkit H89
 
-        12/05/2009 Skeleton driver.
-
-    Monitor Commands:
-    B Boot
-    C Convert (number)
-    G Go (address)
-    I In (address)
-    O Out (address,data)
-    R Radix (H/O)
-    S Substitute (address)
-    T Test Memory
-    V View
+    Monitor Commands (for MTR-90):
+      B Boot
+      C Convert (number)
+      G Go (address)
+      I In (address)
+      O Out (address,data)
+      R Radix (H/O)
+      S Substitute (address)
+      T Test Memory
+      V View
 
 ****************************************************************************/
 
@@ -23,7 +21,6 @@
 
 #include "tlb.h"
 
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/timer.h"
@@ -174,7 +171,9 @@ void h89_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_port_f2 & 0x02)
+	{
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
+	}
 }
 
 void h89_state::port_f2_w(uint8_t data)
@@ -186,7 +185,7 @@ void h89_state::port_f2_w(uint8_t data)
 
 void h89_state::h89(machine_config & config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
@@ -194,10 +193,12 @@ void h89_state::h89(machine_config & config)
 	INS8250(config, m_console, INS8250_CLOCK);
 	HEATH_TLB(config, m_tlb, H19_CLOCK);
 
+	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
-
 	m_tlb->serial_data_callback().set(m_console, FUNC(ins8250_uart_device::rx_w));
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
+
+	// H89 interrupt interval is 2mSec
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_msec(2));
 }
 
 /* ROM definition */

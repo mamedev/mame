@@ -50,6 +50,8 @@ private:
 	uint8_t kbd_flags_r();
 	uint16_t translate_mm5740_b(uint16_t b);
 
+	void checkBeepState();
+
 	void serial_out_b(uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
