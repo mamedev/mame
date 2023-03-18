@@ -7,6 +7,11 @@ license:CC0-1.0
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
 
+    TODO:
+    - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
+    - Substitute dumps listed here with redump.org versions (below doesn't happen anymore as per 2023),
+      use redump URL entry to denote them under the notes field.
+
     Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
     perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
     are considered replaceable.
@@ -30,10 +35,6 @@ license:CC0-1.0
     'read error' in MAME.  Is this some kind of protection on the original discs, or just errors in the way
     various PC software and/or emulators handle them?  There are multiple second audio offset issues with
     several games in MAME which could be related.
-
-    TODO:
-    - Fix sharedfeat for Arcade Card (ACD) games, once that we split implementation from scdsys;
-    - What [Imperfect] means in some sets? Is it an alias for baddump?
 
 -->
 
@@ -3757,7 +3758,7 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 	</software>
 
 	<software name="neklegbb">
-		<description>Nekketsu Legend Baseball (Japan)</description>
+		<description>Nekketsu Legend Baseballer (Japan)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PVCD-5013"/>
