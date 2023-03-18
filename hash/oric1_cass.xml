@@ -8,7 +8,7 @@ license:CC0-1.0
 	<software name="aigledor">
 		<description>Le Aigle D'Or</description>
 		<year>1984</year>
-		<publisher>???</publisher>
+		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="54630">
 				<rom name="Aigle D'Or, Le (F) (1984).tap" size="54630" crc="76de857c" sha1="e8b5d417d482809a5145e1d160d01064721fe4e7"/>
@@ -19,7 +19,7 @@ license:CC0-1.0
 	<software name="centipede" supported="no">
 		<description>Centipede</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>PSS</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="5675">
 				<rom name="Centipede (UK) (1983).tap" size="5675" crc="6d6edff5" sha1="bcf466655221df157a3cad521b072860380dde4d"/>
@@ -30,7 +30,7 @@ license:CC0-1.0
 	<software name="centipede1" cloneof="centipede">
 		<description>Centipede (Alt)</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>PSS</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="5685">
 				<rom name="Centipede (UK) (1983) [a1].tap" size="5685" crc="eb17855a" sha1="eed7ef97d7e17d1977ffe0710f1a3521b754afc3"/>
@@ -41,7 +41,7 @@ license:CC0-1.0
 	<software name="deltaforce">
 		<description>Delta Force 4 - Space Invaders</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Emerald Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="23571">
 				<rom name="Delta Force 4 - Space Invaders (UK) (1983).tap" size="23571" crc="c50d525a" sha1="18f7603003070f87b6b951fd305e01dfc222499d"/>
@@ -52,7 +52,7 @@ license:CC0-1.0
 	<software name="digdog1" cloneof="digdog">
 		<description>Dig Dog (Atmos)</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Taskset</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="35017">
 				<rom name="Dig Dog (Atmos) (UK) (1983).tap" size="35017" crc="32f05730" sha1="78a3a7aad169521fc705d621700dfe4a71c0cdf6"/>
@@ -63,7 +63,7 @@ license:CC0-1.0
 	<software name="digdog">
 		<description>Dig Dog (Oric-1)</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Taskset</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25167">
 				<rom name="Dig Dog (Oric-1) (UK) (1983).tap" size="25167" crc="f018300c" sha1="132836c8ef46239aa6bf02cb74e7d2a8d977f13b"/>
@@ -71,10 +71,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dracula">
+	<software name="dracula" supported="no">
 		<description>Dracula's Revenge</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Softek Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="44303">
 				<rom name="Dracula's Revenge (UK) (1983).tap" size="44303" crc="7cb74ad0" sha1="ab048e26c6d13fa2bd58329727e11f383289c272"/>
@@ -82,10 +82,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dracula1" cloneof="dracula">
+	<software name="dracula1" cloneof="dracula" supported="no">
 		<description>Dracula's Revenge (Alt)</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Softek Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="42521">
 				<rom name="Dracula's Revenge (UK) (1983) [a1].tap" size="42521" crc="2935818a" sha1="7ca0b104af18338345e927029a0964367e3e3beb"/>
@@ -96,7 +96,7 @@ license:CC0-1.0
 	<software name="galaxians" supported="no">
 		<description>Galaxians</description>
 		<year>19??</year>
-		<publisher>???</publisher>
+		<publisher>Softek Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10784">
 				<rom name="Galaxians (UK,F) (19xx).tap" size="10784" crc="6c38e071" sha1="bdda1a9d5fd2da9f62a37bef0142a6e26d3db95b"/>
@@ -118,7 +118,7 @@ license:CC0-1.0
 	<software name="hobbit">
 		<description>The Hobbit</description>
 		<year>1982</year>
-		<publisher>???</publisher>
+		<publisher>Melbourne House - Tansoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="36212">
 				<rom name="The Hobbit (UK) (1982).tap" size="36212" crc="c164a97c" sha1="77a5439e347123c83638b585bfecd21960bdcfc4"/>
@@ -137,10 +137,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hunchback1" cloneof="hunchback">
+		<description>Hunchback (Alt 1)</description>
+		<year>1983</year>
+		<publisher>Ocean</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="37237">
+				<rom name="Hunchback (UK) (19xx) [a1].tap" size="37237" crc="51ddcbd0" sha1="b96d939dd6eba0be77c84fb7f36f620850a852d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hunchback2" cloneof="hunchback">
+		<description>Hunchback (Alt 2)</description>
+		<year>1983</year>
+		<publisher>Ocean</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="24026">
+				<rom name="Hunchback (UK) (19xx) [a2].tap " size="24026" crc="33327eef" sha1="0a8df6827b979be41686d903eedf773644a7ceea"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="loki">
 		<description>Loki</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Joe the Lion</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="24555">
 				<rom name="Loki (UK) (1983).tap" size="24555" crc="f10ed1f0" sha1="3d68d63da7a548d76aca6dd10faf614aecfa90c2"/>
@@ -148,10 +170,54 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lunar">
+		<description>Lunar Lander</description>
+		<year>1983</year>
+		<publisher>Durrell Software</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="6238">
+				<rom name="Lunar Lander (UK) (1983).tap" size="6238" crc="9bd55824" sha1="0371c0edd78bfb9f86ccfb81fb14e734b6d89c5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunar1">
+		<description>Lunar Lander (Basic)</description>
+		<year>1983</year>
+		<publisher>basic</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="1130">
+				<rom name="Lunar Lander (UK) (1983) [a1].tap" size="1130" crc="62d9ffdd" sha1="392c994233f85e054073cd51e724a4375b3f97cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrwimpy">
+		<description>Mr. Wimpy</description>
+		<year>1984</year>
+		<publisher>Ocean</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="31164">
+				<rom name="Mr. Wimpy (UK) (1984).tap" size="31164" crc="59901634" sha1="a3ebb48ae8681ee928643b75ac9ee885569d3626"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrwimpy1" cloneof="mrwimpy">
+		<description>Mr Wimpy</description>
+		<year>1984</year>
+		<publisher>Ocean</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="23000">
+				<rom name="Wimpy (UK) (1984).tap" size="23000" crc="bfbf7e41" sha1="20bb3668c37ad91de2d10e6cac9d3b1a88e34353"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mushroom">
 		<description>Mushroom Mania</description>
 		<year>1983</year>
-		<publisher>???</publisher>
+		<publisher>Arcadia Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8419">
 				<rom name="Mushroom Mania (UK) (1983).tap" size="8419" crc="e0bc3694" sha1="0045c220abdb42a41c5088462fd61e5328d8e490"/>
@@ -181,24 +247,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="welcome">
+	<software name="sjeep">
+		<description>Super Jeep</description>
+		<year>1984</year>
+		<publisher>Loriciels</publisher>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="33866">
+				<rom name="Super Jeep (F) (1984).tap" size="33866" crc="e395b81d" sha1="9bdad43afe2f134eca54f4990dda95f1ac985ce2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="welcome" supported="no">
 		<description>Welcome to Oric Demo</description>
 		<year>1983</year>
 		<publisher>???</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25088">
 				<rom name="Welcome to Oric Demo (UK) (1983).tap" size="25088" crc="bcd6603d" sha1="85d34a357321c65c06af43a41fb72b827c2e16ce"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wimpy">
-		<description>Mr. Wimpy</description>
-		<year>1984</year>
-		<publisher>Ocean</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="31164">
-				<rom name="Mr. Wimpy (UK) (1984).tap" size="31164" crc="59901634" sha1="a3ebb48ae8681ee928643b75ac9ee885569d3626"/>
 			</dataarea>
 		</part>
 	</software>
