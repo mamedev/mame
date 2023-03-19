@@ -2,16 +2,16 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+#include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+#include "debug/debugcpu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/timer.h"
-#include "cpu/z180/z180.h"
-#include "debug/debugcpu.h"
-#include "sound/beep.h"
-#include "video/mc6845.h"
 #include "util/utf8.h"
-#include "imagedev/floppy.h"
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw350 -resolution 960x256 -flop roms\lw350\Brother_LW-200-300_GW-24-45_Ver1.0_SpreadsheetProgramAndDataStorageDisk.img
@@ -165,9 +165,9 @@ void lw350_floppy_image_device::call_unload()
 // FDC high-level emulation (not timing accurate) based on "Hitachi 8-Bit Microcomputer HD63265 FDC Floppy Disk Controller User's Manual"
 // https://archive.org/details/bitsavers_hitachidatDiskControllerUsersManual2edMar89_3858532
 
-class hd63266f_t : public device_t {
+class hd63266f_device_t : public device_t {
 public:
-	hd63266f_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd63266f_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_wr_cb() { return irq_cb.bind(); }
 	auto dreq_wr_cb() { return dreq_cb.bind(); }
@@ -236,7 +236,7 @@ protected:
 	lw350_floppy_image_device *floppy;
 };
 
-DEFINE_DEVICE_TYPE(HD63266F, hd63266f_t, "hd63266f", "HD63266F")
+DEFINE_DEVICE_TYPE(HD63266F, hd63266f_device_t, "hd63266f", "HD63266F")
 
 enum FDC_STATUS_MASK : uint8_t
 {
@@ -358,7 +358,7 @@ enum FDC_SSB1_MASK : uint8_t
 	FDC_SSB1M_NDE = 0x80,
 };
 
-hd63266f_t::hd63266f_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hd63266f_device_t::hd63266f_device_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HD63266F, tag, owner, clock),
 	irq_cb(*this),
 	dreq_cb(*this),
@@ -366,7 +366,7 @@ hd63266f_t::hd63266f_t(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-void hd63266f_t::device_start()
+void hd63266f_device_t::device_start()
 {
 	irq_cb.resolve();
 	dreq_cb.resolve();
@@ -375,7 +375,7 @@ void hd63266f_t::device_start()
 	assert(!dend_cb.isnull() && "only DMA mode supported; supply a DEND_R callback!");
 }
 
-void hd63266f_t::reset()
+void hd63266f_device_t::reset()
 {
 	str = FDC_STATUSM_TXR;
 	cmd = 0x00;
@@ -391,7 +391,7 @@ void hd63266f_t::reset()
 	pcn = 0;
 }
 
-void hd63266f_t::write(uint8_t data)
+void hd63266f_device_t::write(uint8_t data)
 {
 	bool input_done = false;
 	auto oldSTR = str;
@@ -548,7 +548,7 @@ void hd63266f_t::write(uint8_t data)
 	}
 }
 
-uint8_t hd63266f_t::read()
+uint8_t hd63266f_device_t::read()
 {
 	bool output_done = false;
 
@@ -660,7 +660,7 @@ uint8_t hd63266f_t::read()
 	return dtr;
 }
 
-void hd63266f_t::execute()
+void hd63266f_device_t::execute()
 {
 	ssb0 = ssb1 = ssb2 = ssb3 = 0;
 
@@ -820,7 +820,7 @@ void hd63266f_t::execute()
 	logerror("fdc:execute STR=%02x => %02x %s\n", oldSTR, str, machine().describe_context());
 }
 
-void hd63266f_t::abort()
+void hd63266f_device_t::abort()
 {
 	auto oldSTR = str;
 	reset();
@@ -833,9 +833,9 @@ void hd63266f_t::abort()
 #include "machine/upd765.h"
 
 
-class hd63266f_t : public upd765_family_device {
+class hd63266f_device_t : public upd765_family_device {
 public:
-	hd63266f_t(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	hd63266f_device_t(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 	void map(address_map& map) override {
 		map(0x0, 0x0).r(FUNC(upd765a_device::msr_r));
 		map(0x1, 0x1).rw(FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
@@ -846,9 +846,9 @@ public:
 	//auto dend_rd_cb() { return dend_cb.bind(); }
 };
 
-DEFINE_DEVICE_TYPE(HD63266F, hd63266f_t, "hd63266f", "Hitachi HD63266F FDC")
+DEFINE_DEVICE_TYPE(HD63266F, hd63266f_device_t, "hd63266f", "Hitachi HD63266F FDC")
 
-hd63266f_t::hd63266f_t(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+hd63266f_device_t::hd63266f_device_t(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 : upd765_family_device(mconfig, HD63266F, tag, owner, clock) {
 	set_ready_line_connected(false);
 	set_select_lines_connected(false);
@@ -873,19 +873,27 @@ public:
 		floppy(*this, "floppy"),
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		io_kbrow(*this, "kbrow.%u", 0),
+		rombank(*this, "rom")
 	{ }
 
 	void lw350(machine_config& config);
+
+protected:
+	// driver_device overrides
+	void machine_start() override;
+	void machine_reset() override;
+	void video_start() override;
 
 private:
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<screen_device> screen;
 	required_device<lw350_floppy_connector> floppy;
-	required_device<hd63266f_t> fdc;
+	required_device<hd63266f_device_t> fdc;
 	required_device<beep_device> beeper;
-	optional_ioport_array<9> io_kbrow;
+	required_ioport_array<9> io_kbrow;
+	required_memory_bank rombank;
 
 	uint8_t vram[80 * 128];
 	uint8_t io_70, io_7a, io_b8, io_90;
@@ -919,7 +927,7 @@ private:
 	uint8_t io_b8_r() {
 		// keyboard matrix
  		if(io_b8 <= 8)
-			return io_kbrow[io_b8].read_safe(0);
+			return io_kbrow[io_b8]->read();
 
 		switch(io_b8) {
 		// get language
@@ -938,7 +946,7 @@ private:
 		io_b8 = data;
 	}
 	void rombank_w(uint8_t data) { // E0
-		membank("rom")->set_entry(data & 0x03);
+		rombank->set_entry(data & 0x03);
 	}
 	void beeper_w(uint8_t data) { // F0
 		beeper->set_state(data == 0);
@@ -982,11 +990,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
-
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
 		map(0x02000, 0x05fff).ram();
@@ -1007,10 +1010,10 @@ private:
 
 		// floppy
 		#ifndef UPD765
-			map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-			map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
+			map(0x78, 0x78).rw("fdc", FUNC(hd63266f_device_t::status_r), FUNC(hd63266f_device_t::abort_w));
+			map(0x79, 0x79).r("fdc", FUNC(hd63266f_device_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
 		#else
-			map(0x78, 0x79).m(fdc, FUNC(hd63266f_t::map));
+			map(0x78, 0x79).m(fdc, FUNC(hd63266f_device_t::map));
 		#endif
 		map(0x7a, 0x7a).r(FUNC(lw350_state::io_7a_r));
 		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
@@ -1066,70 +1069,70 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 
 static INPUT_PORTS_START(lw350)
 	PORT_START("kbrow.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)      PORT_CHAR('4')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)      PORT_CHAR('3')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_W)      PORT_CHAR('w')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)      PORT_CHAR('e')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)      PORT_CHAR('d')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)      PORT_CHAR('x')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CHAR('%')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CHAR(U'§')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_W)      PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)      PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)      PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TAB)    PORT_CHAR(UCHAR_MAMEKEY(TAB))
 
 	PORT_START("kbrow.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)      PORT_CHAR('5')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)      PORT_CHAR('6')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)      PORT_CHAR('r')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)      PORT_CHAR('t')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)      PORT_CHAR('c')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)      PORT_CHAR('f')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)      PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)      PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)                 PORT_CODE(KEYCODE_UP)     PORT_CHAR(UCHAR_MAMEKEY(UP))
 
 	PORT_START("kbrow.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)      PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)      PORT_CHAR('7')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)      PORT_CHAR('z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_H)      PORT_CHAR('h')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_G)      PORT_CHAR('g')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)      PORT_CHAR('v')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)      PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_H)      PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_G)      PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)      PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G.S.END")               PORT_CODE(KEYCODE_END)    PORT_CHAR(UCHAR_MAMEKEY(END))
 
 	PORT_START("kbrow.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_S)          PORT_CHAR('s')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
 	PORT_START("kbrow.4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_J)          PORT_CHAR('j')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_I)          PORT_CHAR('i')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_B)          PORT_CHAR('b')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_N)          PORT_CHAR('n')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ß
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR('m')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(U'ß') PORT_CHAR('?')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')  PORT_CHAR('O')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MENU)       PORT_CHAR(UCHAR_MAMEKEY(MENU))
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // ö Ö
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // ü Ü
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+')  PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -1143,16 +1146,16 @@ static INPUT_PORTS_START(lw350)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    //PORT_CODE(KEYCODE_)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Horz/Vert")             //PORT_CODE(KEYCODE_)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(UCHAR_MAMEKEY(SPACE))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // ´ `
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // ä Ä
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'´')  PORT_CHAR(U'`')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')   PORT_CHAR('L')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')  PORT_CHAR(U'°')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')   PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')   PORT_CHAR(':')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-')   PORT_CHAR('_')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ä')  PORT_CHAR(U'Ä')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1174,8 +1177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::io_90_timer_callback)
 void lw350_state::machine_start()
 {
 	auto rom = memregion("maincpu")->base();
-
-	membank("rom")->configure_entries(0, 4, rom, 0x20000);
+	rombank->configure_entries(0, 4, rom, 0x20000);
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
 
 	fdc->set_floppy(floppy->get_device());
@@ -1381,7 +1383,7 @@ constexpr int MDA_CLOCK = 16'257'000;
 class lw450_state : public driver_device
 {
 public:
-	lw450_state(const machine_config &mconfig, device_type type, const char *tag)
+	lw450_state(const machine_config& mconfig, device_type type, const char* tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		screen(*this, "screen"),
@@ -1392,10 +1394,17 @@ public:
 		vram(*this, "vram"),
 		speaker(*this, "beeper"),
 		io_kbrow(*this, "kbrow.%u", 0),
-		rom(*this, "maincpu")
+		rom(*this, "maincpu"),
+		rombank(*this, "rom")
 	{ }
 
 	void lw450(machine_config& config);
+
+protected:
+	// driver_device overrides
+	void machine_start() override;
+	void machine_reset() override;
+	void video_start() override;
 
 private:
 	// devices
@@ -1403,27 +1412,30 @@ private:
 	required_device<screen_device> screen;
 	required_device<palette_device> palette;
 	required_device<lw350_floppy_connector> floppy;
-	required_device<hd63266f_t> fdc;
+	required_device<hd63266f_device_t> fdc;
 	required_device<hd6345_device> m_crtc;
 	required_shared_ptr<uint8_t> vram;
 	required_device<beep_device> speaker;
-	optional_ioport_array<9> io_kbrow;
+	required_ioport_array<9> io_kbrow;
 	required_region_ptr<uint8_t> rom;
+	required_memory_bank rombank;
 
 	uint8_t io_72, io_73, io_74, io_75; // gfx
 	uint8_t io_7a, io_b8;
 	uint32_t framecnt;
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
+	uint8_t illegal_r(offs_t offset) {
+		if(!machine().side_effects_disabled())
+			logerror("%s: unmapped memory read from %0*X\n", machine().describe_context(), 6, offset);
 		return 0;
 	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
+	void illegal_w(offs_t offset, uint8_t data) {
+		if(!machine().side_effects_disabled())
+			logerror("%s: unmapped memory write to %0*X = %0*X\n", machine().describe_context(), 6, offset, 2, data);
 	}
 
-	uint8_t rom72000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
+	uint8_t rom72000_r(offs_t offset) {
+		return rom[0x02000 + offset];
 	}
 
 	// IO
@@ -1431,7 +1443,7 @@ private:
 	uint8_t io_b8_r() {
 		// keyboard matrix
 		if(io_b8 <= 8)
-			return io_kbrow[io_b8].read_safe(0);
+			return io_kbrow[io_b8]->read();
 		return 0x00;
 	}
 	void io_b8_w(uint8_t data) {
@@ -1439,7 +1451,7 @@ private:
 	}
 	void rombank_w(uint8_t data) { // E0
 		if(data >= 4 && data < 8)
-			membank("dictionary")->set_entry(data - 4);
+			rombank->set_entry(data - 4);
 	}
 	void beeper_w(uint8_t data) { // F0
 		speaker->set_state(data == 0);
@@ -1471,11 +1483,6 @@ private:
 	void io_75_w(uint8_t data) { io_75 = data; }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
-
-	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
 
 	void map_program(address_map& map);
 	void map_io(address_map& map);
@@ -1513,10 +1520,10 @@ void lw450_state::map_io(address_map& map)
 
 	// floppy
 	#ifndef UPD765
-		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-		map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw450_state::fdc_dtr_w));
+		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_device_t::status_r), FUNC(hd63266f_device_t::abort_w));
+		map(0x79, 0x79).r("fdc", FUNC(hd63266f_device_t::data_r)).w(FUNC(lw450_state::fdc_dtr_w));
 	#else
-		map(0x78, 0x79).m(fdc, FUNC(hd63266f_t::map));
+		map(0x78, 0x79).m(fdc, FUNC(hd63266f_device_t::map));
 	#endif
 	map(0x7a, 0x7a).r(FUNC(lw450_state::io_7a_r));
 
@@ -1657,7 +1664,7 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 
 void lw450_state::machine_start()
 {
-	membank("dictionary")->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
+	rombank->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
 
 	palette->set_pen_color(0, rgb_t(0, 0, 0));
 	palette->set_pen_color(1, rgb_t(0xaa, 0xaa, 0xaa));
@@ -1744,6 +1751,6 @@ ROM_START( lw450 )
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME          FLAGS
 COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
 COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
