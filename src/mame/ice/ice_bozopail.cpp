@@ -47,8 +47,8 @@ private:
 	void bank_w(u8 data);
 	void sndl_w(u8 data);
 	void sndh_w(u8 data);
-	[[maybe_unused]] void clk_w(u8 data);
-	[[maybe_unused]] void load_w(u8 data);
+	void clk_w(u8 data);
+	void load_w(u8 data);
 	u8 pa_r();
 
 	void ice_bozo_map(address_map &map);
@@ -101,8 +101,8 @@ void ice_bozopail_state::ice_bozo_map(address_map &map)
 	map(0x9800, 0x9800).nopw();
 	map(0xa000, 0xa000).w(FUNC(ice_bozopail_state::sndl_w));
 	map(0xa800, 0xa800).w(FUNC(ice_bozopail_state::sndh_w));
-	map(0xb000, 0xb000).nopw();
-	map(0xb800, 0xb800).nopw();
+	map(0xb000, 0xb000).w(FUNC(ice_bozopail_state::clk_w));
+	map(0xb800, 0xb800).w(FUNC(ice_bozopail_state::load_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x3fc000);
 }
 
