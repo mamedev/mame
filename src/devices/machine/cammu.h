@@ -193,7 +193,7 @@ public:
 	}
 
 	// address translation for debugger
-	bool memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address);
+	bool memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address, address_space *&target_space);
 
 protected:
 	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

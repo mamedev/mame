@@ -12,7 +12,6 @@ Control Data Corporation CDC 721 Terminal (Viking)
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
@@ -32,7 +31,10 @@ public:
 	cdc721_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_bank_16k(*this, {"block0", "block4", "block8", "blockc"})
+		, m_block0(*this, "block0")
+		, m_block4(*this, "block4")
+		, m_block8(*this, "block8")
+		, m_blockc(*this, "blockc")
 		, m_crtc(*this, "crtc")
 		, m_rom_chargen(*this, "chargen")
 		, m_ram_chargen(*this, "chargen")
@@ -62,10 +64,6 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void block0_map(address_map &map);
-	void block4_map(address_map &map);
-	void block8_map(address_map &map);
-	void blockc_map(address_map &map);
 
 	u8 m_flashcnt = 0;
 	u8 m_foreign_char_bank = 0;
@@ -75,7 +73,7 @@ private:
 	u8 m_interrupt_mask = 0;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<address_map_bank_device, 4> m_bank_16k;
+	memory_view m_block0, m_block4, m_block8, m_blockc;
 	required_device<crt5037_device> m_crtc;
 	required_region_ptr<u8> m_rom_chargen;
 	required_shared_ptr<u8> m_ram_chargen;
@@ -140,11 +138,10 @@ void cdc721_state::misc_w(u8 data)
 void cdc721_state::block_select_w(u8 data)
 {
 	logerror("%s: Bank select = %02X\n", machine().describe_context(), data);
-	for (int b = 0; b < 4; b++)
-	{
-		m_bank_16k[b]->set_bank(data & 3);
-		data >>= 2;
-	}
+	m_block0.select(BIT(data, 0, 2));
+	m_block4.select(BIT(data, 2, 2));
+	m_block8.select(BIT(data, 4, 2));
+	m_blockc.select(BIT(data, 6, 2));
 }
 
 void cdc721_state::nvram_w(offs_t offset, u8 data)
@@ -163,38 +160,29 @@ WRITE_LINE_MEMBER(cdc721_state::foreign_char_bank_w)
 
 void cdc721_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw("block0", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x7fff).rw("block4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0xbfff).rw("block8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xffff).rw("blockc", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-}
-
-void cdc721_state::block0_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom().region("resident", 0);
-	map(0x8000, 0xbfff).ram();
-}
-
-void cdc721_state::block4_map(address_map &map)
-{
-	map(0x0000, 0x00ff).mirror(0x2700).ram().share("nvram").w(FUNC(cdc721_state::nvram_w));
-	map(0x0800, 0x0bff).mirror(0x2400).ram().share("chargen"); // 2x P2114AL-2
-	map(0x8000, 0xbfff).rom().region("16krom", 0);
-	map(0xc000, 0xffff).ram();
-}
-
-void cdc721_state::block8_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom().region("rompack", 0);
-	map(0x4000, 0x7fff).ram();
-}
-
-void cdc721_state::blockc_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().share("videoram");
-	map(0x4000, 0x40ff).mirror(0x2700).ram().share("nvram").w(FUNC(cdc721_state::nvram_w));
-	map(0x4800, 0x4bff).mirror(0x2400).ram().share("chargen");
+	map(0x0000, 0x3fff).view(m_block0);
+	m_block0[0](0x0000, 0x3fff).rom().region("resident", 0);
+	m_block0[1](0x0000, 0x3fff).unmaprw();
+	m_block0[2](0x0000, 0x3fff).ram();
+	m_block0[3](0x0000, 0x3fff).unmaprw();
+	map(0x4000, 0x7fff).view(m_block4);
+	m_block4[0](0x4000, 0x40ff).mirror(0x2700).ram().share("nvram").w(FUNC(cdc721_state::nvram_w));
+	m_block4[0](0x4800, 0x4bff).mirror(0x2400).ram().share("chargen"); // 2x P2114AL-2
+	m_block4[1](0x4000, 0x7fff).unmaprw();
+	m_block4[2](0x4000, 0x7fff).rom().region("16krom", 0);
+	m_block4[3](0x4000, 0x7fff).ram();
+	map(0x8000, 0xbfff).view(m_block8);
+	m_block8[0](0x8000, 0xbfff).rom().region("rompack", 0);
+	m_block8[1](0x8000, 0xbfff).ram();
+	m_block8[2](0x8000, 0xbfff).unmaprw();
+	m_block8[3](0x8000, 0xbfff).unmaprw();
+	map(0xc000, 0xffff).view(m_blockc);
+	m_blockc[0](0xc000, 0xdfff).ram();
+	m_blockc[0](0xe000, 0xffff).ram().share("videoram");
+	m_blockc[1](0xc000, 0xc0ff).mirror(0x2700).ram().share("nvram").w(FUNC(cdc721_state::nvram_w));
+	m_blockc[1](0xc800, 0xcbff).mirror(0x2400).ram().share("chargen");
+	m_blockc[2](0xc000, 0xffff).unmaprw();
+	m_blockc[3](0xc000, 0xffff).unmaprw();
 }
 
 void cdc721_state::io_map(address_map &map)
@@ -216,8 +204,10 @@ INPUT_PORTS_END
 
 void cdc721_state::machine_reset()
 {
-	for (auto &bank : m_bank_16k)
-		bank->set_bank(0);
+	m_block0.select(0);
+	m_block4.select(0);
+	m_block8.select(0);
+	m_blockc.select(0);
 }
 
 void cdc721_state::machine_start()
@@ -311,11 +301,6 @@ void cdc721_state::cdc721(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdc721_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &cdc721_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(cdc721_state::restart_cb));
-
-	ADDRESS_MAP_BANK(config, "block0").set_map(&cdc721_state::block0_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "block4").set_map(&cdc721_state::block4_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "block8").set_map(&cdc721_state::block8_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "blockc").set_map(&cdc721_state::blockc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 

@@ -91,7 +91,7 @@ void i386_device::i386_set_descriptor_accessed(uint16_t selector)
 		base = m_gdtr.base;
 
 	addr = base + (selector & ~7) + 5;
-	i386_translate_address(TRANSLATE_READ, &addr, nullptr);
+	i386_translate_address(TR_READ, false, &addr, nullptr);
 	rights = m_program->read_byte(addr);
 	// Should a fault be thrown if the table is read only?
 	m_program->write_byte(addr, rights | 1);
@@ -2494,7 +2494,7 @@ inline void i386_device::dri_changed()
 			int breakpoint_length = (m_dr[7] >> ((dr << 2) + 16 + 2)) & 3;
 			uint32_t phys_addr = m_dr[dr];
 			uint32_t error;
-			if(translate_address(m_CPL, TRANSLATE_READ, &phys_addr, &error))
+			if(translate_address(m_CPL, TR_READ, &phys_addr, &error))
 			{
 				phys_addr &= ~3; // According to CUP386, data breakpoints are only reliable on dword-aligned addresses, so align this to a dword.
 				uint32_t true_mask = 0;

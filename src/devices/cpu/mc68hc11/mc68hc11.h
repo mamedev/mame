@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Angelo Salese
+// copyright-holders:Ville Linde, Angelo Salese, AJR
 #ifndef MAME_CPU_MC68HC11_MC68HC11_H
 #define MAME_CPU_MC68HC11_MC68HC11_H
 
@@ -8,8 +8,7 @@
 
 enum {
 	MC68HC11_IRQ_LINE           = 0,
-	MC68HC11_TOC1_LINE          = 1,
-	MC68HC11_RTI_LINE           = 2
+	MC68HC11_XIRQ_LINE          = 1
 };
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
@@ -83,6 +82,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void set_irq_state(uint8_t irqn, bool state);
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) = 0;
 
@@ -166,7 +167,9 @@ private:
 	uint8_t m_adctl;
 	int m_ad_channel;
 
-	uint8_t m_irq_state[3];
+	uint32_t m_irq_state;
+	bool m_irq_asserted;
+
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
 	devcb_read8::array<8> m_port_input_cb;

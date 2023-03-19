@@ -339,8 +339,9 @@ void mn1880_device::device_reset()
 	m_mmu_enable = 0;
 }
 
-bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	switch (spacenum)
 	{
 	case AS_PROGRAM:
