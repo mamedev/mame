@@ -688,10 +688,14 @@ gx4000                          // Amstrad GX4000 - 1990
 kccomp                          // VEB KC compact
 
 @source:amstrad/nc.cpp
-dw225                           //
-nc100                           // 1992 NC100
-nc150                           // 1992 NC150
-nc200                           // 1993 NC200
+nc100                           // 1992 Amstrad
+nc100de                         // 1992 Amstrad
+nc100dk                         // 1992 Amstrad
+nc100sv                         // 1992 Amstrad
+dw225                           // 1992 NTS
+nc150fr                         // 1992 Amstrad
+nc150it                         // 1992 Amstrad
+nc200                           // 1993 Amstrad
 
 @source:amstrad/pc1512.cpp
 pc1512                          //
@@ -819,14 +823,6 @@ lwriter                         // Apple LaserWriter
 lwriterplus                     // Apple LaserWriter Plus
 lwriter2nt                      // Apple LaserWriter II NT
 
-@source:apple/mac.cpp
-mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-macii                           // 1987 Apple Macintosh II
-maciicx                         // 1989 Apple Macintosh IIcx
-maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
-maciix                          // 1988 Apple Macintosh IIx
-macse30                         // 1989 Apple Macintosh SE/30
-
 @source:apple/mac128.cpp
 mac128k                         // 1984 Apple Macintosh
 mac512k                         // 1985 Apple Macintosh 512k
@@ -837,6 +833,14 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/macii.cpp
+mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
+macii                           // 1987 Apple Macintosh II
+maciicx                         // 1989 Apple Macintosh IIcx
+maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
+maciix                          // 1988 Apple Macintosh IIx
+macse30                         // 1989 Apple Macintosh SE/30
 
 @source:apple/maciici.cpp
 maciici                         // 1989 Apple Macintosh IIci
@@ -14785,8 +14789,14 @@ bw2                             //
 @source:booth/apexc.cpp
 apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray Computer
 
+@source:brother/ax145.cpp
+ax145                           // Brother AX-145 (c) 198? Brother Industries, Ltd.
+
 @source:brother/lw30.cpp
 lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
+
+@source:brother/lw840.cpp
+lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
 
 @source:camputers/camplynx.cpp
 lynx128k                        //
@@ -32020,6 +32030,7 @@ vg8235f                         // 1986 MSX2
 vg8240                          // 1986 MSX2
 victhc80                        //
 victhc90                        //
+victhc90a                       //
 victhc95                        //
 victhc95a                       //
 y503iiir                        //
@@ -42163,7 +42174,7 @@ fgoala                          // MF  (c) 1979 Taito Corporation
 
 @source:taito/flstory.cpp
 flstory                         // A45 (c) 1985 Taito Corporation
-flstoryj                        // A45 (c) 1985 Taito Corporation (Japan)
+flstoryo                        // A45 (c) 1985 Taito Corporation (Japan)
 onna34ro                        // A52 (c) 1985 Taito Corporation (Japan)
 onna34roa                       // A52 (c) 1985 Taito Corporation (Japan)
 rumba                           // A23 (c) 1985 Taito Corporation (Japan)

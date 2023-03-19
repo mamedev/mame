@@ -584,9 +584,9 @@ void shaders::begin_frame(render_primitive_list *primlist)
 	{
 		if (PRIMFLAG_GET_SCREENTEX(prim.flags))
 		{
-			containers[num_targets] = prim.container;
 			int screen_index = 0;
 			for (; screen_index < num_screens && containers[screen_index] != prim.container; screen_index++);
+			containers[screen_index] = prim.container;
 			target_to_screen[num_targets] = screen_index;
 			targets_per_screen[screen_index]++;
 			if (screen_index >= num_screens)
@@ -958,7 +958,6 @@ void shaders::begin_draw()
 		return;
 
 	curr_target = 0;
-	curr_effect = default_effect.get();
 
 	// Update for delta_time
 	const double t = machine->time().as_double();
@@ -990,6 +989,8 @@ void shaders::begin_draw()
 	{
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 	}
+
+	set_curr_effect(default_effect.get());
 }
 
 
@@ -1003,7 +1004,7 @@ void shaders::set_curr_effect(effect *curr_effect)
 	{
 		return;
 	}
-	if (this->curr_effect->is_active())
+	if (this->curr_effect && this->curr_effect->is_active())
 	{
 		this->curr_effect->end();
 	}
@@ -1350,10 +1351,10 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 	}
 
 	set_curr_effect(downsample_effect.get());
-	curr_effect->update_uniforms();
 
 	for (int bloom_index = 0; bloom_index < rt->bloom_count; bloom_index++)
 	{
+		curr_effect->update_uniforms();
 		curr_effect->set_vector("TargetDims", 2, rt->bloom_dims[bloom_index]);
 		curr_effect->set_texture("DiffuseTexture",
 				bloom_index == 0
@@ -1361,6 +1362,7 @@ int shaders::downsample_pass(d3d_render_target *rt, int source_index, poly_info 
 					: rt->bloom_texture[bloom_index - 1].Get());
 
 		blit(rt->bloom_surface[bloom_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
+		downsample_effect->end();
 	}
 
 	return next_index;

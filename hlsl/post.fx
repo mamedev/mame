@@ -211,7 +211,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (BaseCoord.x < 0.0 || BaseCoord.y < 0.0 ||
 		BaseCoord.x > 1.0 || BaseCoord.y > 1.0)
 	{
-		discard;
+		return float4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	// Color Compression (may not affect bloom)

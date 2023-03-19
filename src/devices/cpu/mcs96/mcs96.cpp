@@ -241,6 +241,15 @@ u16 mcs96_device::any_r16(u16 adr)
 		return program->read_word(adr);
 }
 
+bool mcs96_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	if (spacenum == AS_PROGRAM && intention != TR_FETCH && address < 0x100)
+		target_space = regs;
+	else
+		target_space = &space(spacenum);
+	return true;
+}
+
 uint8_t mcs96_device::do_addb(uint8_t v1, uint8_t v2)
 {
 	uint16_t sum = v1+v2;

@@ -71,11 +71,12 @@ void m68020pmmu_device::device_start()
 	init_cpu_m68020pmmu();
 }
 
-bool m68020hmmu_device::memory_translate(int space, int intention, offs_t &address)
+bool m68020hmmu_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	{
-		if ((space == AS_PROGRAM) && (m_hmmu_enabled))
+		if ((spacenum == AS_PROGRAM) && (m_hmmu_enabled))
 		{
 			address = hmmu_translate_addr(address);
 		}

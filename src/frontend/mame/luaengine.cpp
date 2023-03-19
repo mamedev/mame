@@ -41,7 +41,7 @@
 //  LUA ENGINE
 //**************************************************************************
 
-int luaopen_zlib(lua_State *L);
+int luaopen_zlib(lua_State *const L);
 extern "C" int luaopen_lfs(lua_State *L);
 int luaopen_linenoise(lua_State *L);
 int luaopen_lsqlite3(lua_State *L);
