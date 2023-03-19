@@ -95,12 +95,12 @@ void cchance_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 
-	map(0xa000, 0xafff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
-	map(0xb000, 0xbfff).ram().rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
+	map(0xa000, 0xafff).rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
+	map(0xb000, 0xbfff).rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 
 	map(0xc000, 0xdfff).ram();
 
-	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
+	map(0xe000, 0xe2ff).rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
 	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  // control registers (0x80 mirror used by Arkanoid 2)
 	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   // enable / disable background transparency
 
@@ -184,12 +184,6 @@ static INPUT_PORTS_START( cchance )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	// These ports are required in tnzs_state
-	PORT_START("IN1")
-	PORT_START("IN2")
-	PORT_START("DSWA")
-	PORT_START("DSWB")
 INPUT_PORTS_END
 
 static const gfx_layout cchance_layout =
