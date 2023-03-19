@@ -4472,10 +4472,10 @@ ROM_END
 
 ROM_START( kengo )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ken_d-h0-.ic55", 0x00001, 0x20000, CRC(f4ddeea5) SHA1(bcf016e40886e11c171f2f50de39ac0d8cabcdd1) )
-	ROM_RELOAD(                        0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ken_d-l0-.ic61", 0x00000, 0x20000, CRC(04dc0f81) SHA1(b296529f0bc26d53b344449dfa5a08eca70f30d8) )
-	ROM_RELOAD(                        0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "ken_d-h0-c.ic55", 0x00001, 0x20000, CRC(f4ddeea5) SHA1(bcf016e40886e11c171f2f50de39ac0d8cabcdd1) ) // no regional 'For use in ...' message
+	ROM_RELOAD(                         0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ken_d-l0-c.ic61", 0x00000, 0x20000, CRC(04dc0f81) SHA1(b296529f0bc26d53b344449dfa5a08eca70f30d8) )
+	ROM_RELOAD(                         0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ken_d-sp-.ic17", 0x00000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
@@ -4506,11 +4506,11 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_b-3a-.ic9",  0x0600, 0x0117, CRC(ad1a7942) SHA1(72c699de17e3d65081a5951581af90aadb4ba65b) ) // TIBPAL-16L8-25 - bruteforced - located on M84-B-B top board
 ROM_END
 
-ROM_START( kengoa )
+ROM_START( kengoj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) ) // shows 'for use in Japan' message, kengo set above doesn't
+	ROM_LOAD16_BYTE( "ken_d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) ) // shows 'For use in Japan' message
 	ROM_RELOAD(                        0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c) )
+	ROM_LOAD16_BYTE( "ken_d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c) )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -4725,9 +4725,9 @@ GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state, empty_
 GAME( 1991, cosmccop,    0,        cosmccop,     gallop,       m72_state, empty_init,      ROT0,   "Irem", "Cosmic Cop (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gallop,      cosmccop, cosmccop,     gallop,       m72_state, empty_init,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M84 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Lightning Swords", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, kengoa,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
+GAME( 1991, ltswords,    0,        kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Lightning Swords (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, kengoj,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
 GAME( 1990, poundfor,    0,        poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
