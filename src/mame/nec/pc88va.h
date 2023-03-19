@@ -269,6 +269,7 @@ private:
 	void rtc_w(offs_t offset, u8 data);
 	u8 opn_porta_r();
 	u8 opn_portb_r();
+	void opn_portb_w(u8 data);
 
 	u8 m_device_ctrl_data = 0;
 	u8 m_misc_ctrl = 0x80;

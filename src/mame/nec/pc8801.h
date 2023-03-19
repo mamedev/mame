@@ -232,6 +232,7 @@ protected:
 
 	uint8_t opn_porta_r();
 	uint8_t opn_portb_r();
+	void opn_portb_w(uint8_t data);
 
 private:
 	optional_device<ym2203_device> m_opn;
