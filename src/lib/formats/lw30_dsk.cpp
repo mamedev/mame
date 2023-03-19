@@ -9,6 +9,7 @@
 #include "lw30_dsk.h"
 
 #include <array>
+#include <cstring>
 #include "ioprocs.h"
 
 namespace {
