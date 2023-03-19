@@ -47,8 +47,8 @@ private:
 	void bank_w(u8 data);
 	void sndl_w(u8 data);
 	void sndh_w(u8 data);
-	void clk_w(u8 data);
-	void load_w(u8 data);
+	[[maybe_unused]] void clk_w(u8 data);
+	[[maybe_unused]] void load_w(u8 data);
 	u8 pa_r();
 
 	void ice_bozo_map(address_map &map);
