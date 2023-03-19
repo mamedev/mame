@@ -40,30 +40,31 @@ cha3    $10d8
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "screen.h"
+
 #include "speaker.h"
 
 
 namespace {
 
-class cchance_state : public tnzs_base_state
+class cchance_state : public tnzs_video_state_base
 {
 public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_base_state(mconfig, type, tag)
+		: tnzs_video_state_base(mconfig, type, tag)
 	{ }
 
-	void cchance(machine_config &config);
+	void cchance(machine_config &config) ATTR_COLD;
 
 protected:
-	void machine_reset() override;
-	void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void output_0_w(uint8_t data);
 	uint8_t input_1_r();
 	void output_1_w(uint8_t data);
-	void main_map(address_map &map);
+
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_hop_io = 0;
 	uint8_t m_bell_io = 0;
@@ -81,13 +82,13 @@ void cchance_state::output_0_w(uint8_t data)
 
 uint8_t cchance_state::input_1_r()
 {
-	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
+	return m_hop_io | m_bell_io | (ioport("SP")->read() & 0xff);
 }
 
 void cchance_state::output_1_w(uint8_t data)
 {
-	m_hop_io = (data & 0x40)>>4;
-	m_bell_io = (data & 0x80)>>4;
+	m_hop_io = (data & 0x40) >>4;
+	m_bell_io = (data & 0x80) >>4;
 }
 
 void cchance_state::main_map(address_map &map)
@@ -100,8 +101,8 @@ void cchance_state::main_map(address_map &map)
 	map(0xc000, 0xdfff).ram();
 
 	map(0xe000, 0xe2ff).ram().rw(m_spritegen, FUNC(x1_001_device::spriteylow_r8), FUNC(x1_001_device::spriteylow_w8));
-	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  /* control registers (0x80 mirror used by Arkanoid 2) */
-	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   /* enable / disable background transparency */
+	map(0xe300, 0xe303).ram().mirror(0xfc).w(m_spritegen, FUNC(x1_001_device::spritectrl_w8));  // control registers (0x80 mirror used by Arkanoid 2)
+	map(0xe800, 0xe800).w(m_spritegen, FUNC(x1_001_device::spritebgflag_w8));   // enable / disable background transparency
 
 	map(0xf000, 0xf000).nopr().nopw(); //???
 	map(0xf001, 0xf001).r(FUNC(cchance_state::input_1_r)).w(FUNC(cchance_state::output_0_w));
@@ -121,6 +122,7 @@ static INPUT_PORTS_START( cchance )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout SW")  PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("SP")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opt 1") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opt 2") PORT_CODE(KEYCODE_S)
@@ -130,6 +132,7 @@ static INPUT_PORTS_START( cchance )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop SW") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Key") PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Last Key") PORT_CODE(KEYCODE_K)
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -155,6 +158,7 @@ static INPUT_PORTS_START( cchance )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("DSW2") //likely to be unused
 	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -209,13 +213,16 @@ GFXDECODE_END
 
 void cchance_state::machine_start()
 {
+	tnzs_video_state_base::machine_start();
+
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));
 }
 
 void cchance_state::machine_reset()
 {
-	tnzs_base_state::machine_reset();
+	tnzs_video_state_base::machine_reset();
+
 	m_hop_io = 0;
 	m_bell_io = 0;
 }
@@ -230,7 +237,7 @@ void cchance_state::cchance(machine_config &config)
 	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
 	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));

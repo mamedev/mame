@@ -519,7 +519,7 @@ private:
 	{
 		// keyboard matrix
 		if(io_b8 <= 8)
-			return m_io_kbrow[io_b8].read();
+			return m_io_kbrow[io_b8]->read();
 		return 0x00;
 	}
 	void io_b8_w(uint8_t data)
@@ -604,13 +604,13 @@ uint32_t lw30_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 {
 	// based on LW-350 ROM draw_char routine @ 6B14
 	enum attrs : uint8_t {
-		UNDERLINE			= 0b00000001,
-		OVERLINE			= 0b00000010,
-		BOLD				= 0b00000100,
-		VERTICAL_LINE		= 0b00001000,
-		INVERT_FULL			= 0b00010000,
-		INVERT_UPPER_HALF	= 0b00100000,
-		INVERT_LOWER_HALF	= 0b01000000
+		UNDERLINE           = 0b00000001,
+		OVERLINE            = 0b00000010,
+		BOLD                = 0b00000100,
+		VERTICAL_LINE       = 0b00001000,
+		INVERT_FULL         = 0b00010000,
+		INVERT_UPPER_HALF   = 0b00100000,
+		INVERT_LOWER_HALF   = 0b01000000
 	};
 
 	const rgb_t palette[]{
@@ -778,8 +778,8 @@ void lw30_state::machine_start()
 
 	// floppy debugging
 	//if(machine().debug_enabled()) {
-	//	machine().debugger().console().execute_command(R"(bp 6a2c,1,{logerror "expect AB; A=%02X\n",a; g})", false);
-	//	machine().debugger().console().execute_command(R"(bp 6617,1,{logerror "expect DE; A=%02X\n",a; g})", false);
+	//  machine().debugger().console().execute_command(R"(bp 6a2c,1,{logerror "expect AB; A=%02X\n",a; g})", false);
+	//  machine().debugger().console().execute_command(R"(bp 6617,1,{logerror "expect DE; A=%02X\n",a; g})", false);
 	//}
 }
 
@@ -877,7 +877,7 @@ static INPUT_PORTS_START(lw30)
 
 	PORT_START("kbrow.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'´') PORT_CHAR(U'`')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')	 PORT_CHAR('K')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('K')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    //PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(':')
@@ -931,5 +931,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME          FLAGS
-COMP( 1991, lw30, 0,     0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME  FLAGS
+COMP( 1991, lw30, 0,     0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "LW-30",  MACHINE_NODEVICE_PRINTER )

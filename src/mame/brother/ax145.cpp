@@ -290,5 +290,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME          FLAGS
-COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "Brother AX-145", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME  FLAGS
+COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "AX-145", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
