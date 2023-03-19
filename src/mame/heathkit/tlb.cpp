@@ -495,6 +495,34 @@ static INPUT_PORTS_START( tlb )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( super19 )
+  PORT_INCLUDE( tlb )
+
+  PORT_MODIFY("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPSETTING(    0x0e, "38400")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x10, "Odd")
+	PORT_DIPSETTING(    0x20, "None")
+	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x40, "Stick")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
+
+	PORT_MODIFY("SW402")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")            PORT_DIPLOCATION("SW402:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(No))
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
+	PORT_DIPSETTING(    0x00, "Off")
+	PORT_DIPSETTING(    0x80, "On")
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ultra19 )
 	PORT_INCLUDE( tlb )
 
@@ -536,34 +564,6 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPSETTING(    0x40, "Fast Blink")
 	PORT_DIPSETTING(    0x60, "Slow Blink")
 	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode")  PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "Off")
-	PORT_DIPSETTING(    0x80, "On")
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( super19 )
-  PORT_INCLUDE( tlb )
-
-  PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")           PORT_DIPLOCATION("SW401:1,2,3,4")
-	PORT_DIPSETTING(    0x0e, "38400")
-	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR(None))
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x20, "None")
-	PORT_DIPSETTING(    0x30, "Even")
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
-	PORT_DIPSETTING(    0x40, "Stick")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
-	PORT_DIPSETTING(    0x00, "Half")
-	PORT_DIPSETTING(    0x80, "Full")
-
-	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x02, 0x00, "Keyclick")            PORT_DIPLOCATION("SW402:2")
-	PORT_DIPSETTING(    0x02, DEF_STR(No))
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
-	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")    PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "Off")
 	PORT_DIPSETTING(    0x80, "On")
 
@@ -726,6 +726,11 @@ heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, cons
 const tiny_rom_entry *heath_watz_tlb_device::device_rom_region() const
 {
 	return ROM_NAME(watz19);
+}
+
+ioport_constructor heath_watz_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(watz19);
 }
 
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
