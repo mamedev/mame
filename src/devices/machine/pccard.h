@@ -51,15 +51,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( battery_voltage_2_w ) { m_battery_voltage_2_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( write_protect_w ) { m_write_protect_cb(state); }
 
+	// 16-bit access
 	uint16_t read_memory(offs_t offset, uint16_t mem_mask = ~0);
 	uint16_t read_reg(offs_t offset, uint16_t mem_mask = ~0);
 	void write_memory(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void write_reg(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	// 16-bit access, even/odd swapped
 	uint16_t read_memory_swap(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(read_memory(offset, swapendian_int16(mem_mask))); }
 	uint16_t read_reg_swap(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(read_reg(offset, swapendian_int16(mem_mask))); }
 	void write_memory_swap(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { write_memory(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
 	void write_reg_swap(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { write_reg(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
+
+	// 8-bit access
+	uint8_t read_memory_byte(offs_t offset);
+	uint8_t read_reg_byte(offs_t offset);
+	void write_memory_byte(offs_t offset, uint8_t data);
+	void write_reg_byte(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override;

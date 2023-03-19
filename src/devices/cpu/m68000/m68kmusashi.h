@@ -321,7 +321,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(int space, int intention, offs_t &address) override;
+	virtual bool memory_translate(int space, int intention, offs_t &address, address_space *&target_space) override;
 
 #include "m68kcpu.h"
 #include "m68kops.h"
