@@ -2,13 +2,16 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+
+#include "cpu/z180/z180.h"
+#include "machine/timer.h"
+#include "video/hd44780.h"
+
+#include "debug/debugcpu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/timer.h"
-#include "cpu/z180/z180.h"
-#include "debug/debugcpu.h"
-#include "video/hd44780.h"
+
 
 // 240x18x4 = 960x72
 // -log -debug -window -intscalex 4 -intscaley 4 -resolution 960x72 ax145
@@ -93,11 +96,13 @@ see https://github.com/BartmanAbyss/brother-hardware/tree/master/0G%20-%20Brothe
 //    16, 17       => francais/deutsch
 //    8, 9, 14, 21 => espanol
 
+namespace {
+
 class ax145_state : public driver_device
 {
 public:
-	ax145_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ax145_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		lcdc(*this, "hd44780"),
 		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
@@ -105,24 +110,24 @@ public:
 		dictionary_bank(*this, "dictionary")
 	{ }
 
-	void ax145(machine_config& config);
+	void ax145(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
+	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
+	static constexpr uint8_t ID = 1;
+
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
 	memory_share_creator<uint8_t> ram;
 	required_region_ptr<uint8_t> rom;
 	required_memory_bank dictionary_bank;
-
-	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
-	static constexpr uint8_t ID = 1;
 
 	// config switch
 	uint8_t io_3000{};
@@ -132,14 +137,16 @@ private:
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
 
-	void map_program(address_map& map) {
+	void map_program(address_map &map) ATTR_COLD
+	{
 		map(0x00000, 0x01fff).rom();
 		map(0x04000, 0x1ffff).rom();
-		map(0x40000, 0x5ffff).bankr("dictionary");
+		map(0x40000, 0x5ffff).bankr(dictionary_bank);
 		// RAM is installed in machine_start()
 	}
 
-	void map_io(address_map& map) {
+	void map_io(address_map &map) ATTR_COLD
+	{
 		map.global_mask(0xffff);
 		map(0x0000, 0x003f).noprw(); // Z180 internal registers
 		//map(0x0040, 0x00ff).rw(FUNC(ax145_state::illegal_io_r), FUNC(ax145_state::illegal_io_w));
@@ -161,7 +168,8 @@ private:
 		//map(0xb800, 0xb800).rw(TODO, TODO);
 	}
 
-	void palette(palette_device &palette) const {
+	void palette(palette_device &palette) const ATTR_COLD
+	{
 		palette.set_pen_color(0, rgb_t(138, 146, 148));
 		palette.set_pen_color(1, rgb_t(92, 83, 88));
 	}
@@ -171,27 +179,32 @@ private:
 
 	// should probably return something different depending on io_3000
 	// 0x0014a9 also reads but io_3000=0xfe,0xff...
-	uint8_t io_3800_r() {
+	uint8_t io_3800_r()
+	{
 		// config lower 4 bits
 		return (~ID) & 0x0f;
 	}
 
-	uint8_t io_4000_r() {
+	uint8_t io_4000_r()
+	{
 		// config upper 4 bits
 		return (~ID) >> 4;
 	}
 
-	void lcd_signal_w(uint8_t data) {
+	void lcd_signal_w(uint8_t data)
+	{
 		lcd_signal = data;
 	}
 
-	uint8_t lcd_data_r() {
+	uint8_t lcd_data_r()
+	{
 		if(BIT(lcd_signal, 1)) // RS
 			return lcdc->data_r();
 		else
 			return lcdc->control_r();
 	}
-	void lcd_data_w(uint8_t data) {
+	void lcd_data_w(uint8_t data)
+	{
 		if(BIT(lcd_signal, 0)) { // E
 			if(BIT(lcd_signal, 1)) // RS
 				lcdc->data_w(data << 4);
@@ -200,16 +213,19 @@ private:
 		}
 	}
 
-	void dictionary_bank_w(uint8_t data) {
+	void dictionary_bank_w(uint8_t data)
+	{
 		dictionary_bank->set_entry(data & 0x03);
 	}
 
 	// int2
-	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
+	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback)
+	{
 		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
 
-	uint8_t irq_ack_r() {
+	uint8_t irq_ack_r()
+	{
 		if(!machine().side_effects_disabled())
 			maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
@@ -233,15 +249,16 @@ void ax145_state::machine_reset()
 {
 }
 
-void ax145_state::ax145(machine_config& config) {
+void ax145_state::ax145(machine_config &config) {
 	// basic machine hardware
 	HD64180RP(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &ax145_state::map_program);
 	maincpu->set_addrmap(AS_IO, &ax145_state::map_io);
+
 	TIMER(config, "1khz").configure_periodic(FUNC(ax145_state::int2_timer_callback), attotime::from_hz(1000)); // just guessing frequency, based on LW-30, 350, 450
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_color(rgb_t(6, 245, 206));
 	screen.set_physical_aspect(480, 128);
 	screen.set_refresh_hz(78.1);
@@ -271,5 +288,7 @@ ROM_START( ax145 )
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe)) // german dictionary
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME           FLAGS
-COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "Brother AX-145", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+} // anonymous namespace
+
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME          FLAGS
+COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "Brother AX-145", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
