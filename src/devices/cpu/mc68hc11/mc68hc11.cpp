@@ -1177,8 +1177,8 @@ void mc68hc11_cpu_device::check_irq_lines()
 		m_ccr |= CC_I; //irq taken, mask the flag
 		if (level < 0x06)
 			m_ccr |= CC_X;
-		if(m_wait_state == 1) { m_wait_state = level == 0 ? 0 : 2; }
-		if(m_stop_state == 1) { m_stop_state = 2; }
+		if(m_wait_state == 1) { m_wait_state = 0; }
+		if(m_stop_state == 1) { m_stop_state = 0; }
 		if (level < 0x05 || (level == 0x06 && BIT(m_option, 5)))
 			set_irq_state(level, false); // auto-ack edge-triggered IRQ
 	}
