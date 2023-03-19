@@ -688,10 +688,14 @@ gx4000                          // Amstrad GX4000 - 1990
 kccomp                          // VEB KC compact
 
 @source:amstrad/nc.cpp
-dw225                           //
-nc100                           // 1992 NC100
-nc150                           // 1992 NC150
-nc200                           // 1993 NC200
+nc100                           // 1992 Amstrad
+nc100de                         // 1992 Amstrad
+nc100dk                         // 1992 Amstrad
+nc100sv                         // 1992 Amstrad
+dw225                           // 1992 NTS
+nc150fr                         // 1992 Amstrad
+nc150it                         // 1992 Amstrad
+nc200                           // 1993 Amstrad
 
 @source:amstrad/pc1512.cpp
 pc1512                          //
