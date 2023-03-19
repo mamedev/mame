@@ -285,7 +285,7 @@ void lw700i_state::lw700i(machine_config &config)
 	m_screen->set_visarea(0, 480, 0, 128);
 }
 
-ROM_START(blw700i)
+ROM_START(lw700i)
 	ROM_REGION(0x200000, "maincpu", 0)      /* H8/3003 program ROM */
 	ROM_LOAD16_WORD_SWAP( "mx24969b.bin", 0x000000, 0x200000, CRC(78d88d04) SHA1(3cda632c7190257abd20e121575767e8e9a18b1c) )
 ROM_END
@@ -293,4 +293,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1995, blw700i,    0, 0, lw700i, lw700i, lw700i_state, empty_init, "Brother", "LW-700i", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+COMP( 1995, lw700i,    0, 0, lw700i, lw700i, lw700i_state, empty_init, "Brother", "LW-700i", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

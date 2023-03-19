@@ -328,7 +328,9 @@ INTERRUPT_GEN_MEMBER(arknoid2_state::mcu_interrupt)
 
 void arknoid2_state::machine_reset()
 {
-	/* initialize the mcu simulation */
+	extrmatn_state::machine_reset();
+
+	// initialize the MCU simulation
 	mcu_reset();
 
 	m_mcu_readcredits = 0;
@@ -338,25 +340,25 @@ void arknoid2_state::machine_reset()
 void kageki_state::machine_reset()
 {
 	tnzs_base_state::machine_reset();
+
 	m_csport_sel = 0;
 }
 
 void tnzs_base_state::machine_start()
 {
+	tnzs_video_state_base::machine_start();
+
 	uint8_t *sub = memregion("sub")->base();
 
-	m_bank2 = 0;
 	m_mainbank->set_bank(2);
 
 	m_subbank->configure_entries(0, 4, &sub[0x08000], 0x2000);
-	m_subbank->set_entry(m_bank2);
-
-	save_item(NAME(m_bank2));
+	m_subbank->set_entry(0);
 }
 
 void arknoid2_state::machine_start()
 {
-	tnzs_base_state::machine_start();
+	extrmatn_state::machine_start();
 
 	save_item(NAME(m_mcu_readcredits));
 	save_item(NAME(m_insertcoin));
@@ -377,12 +379,14 @@ void arknoid2_state::machine_start()
 void kageki_state::machine_start()
 {
 	tnzs_base_state::machine_start();
+
 	save_item(NAME(m_csport_sel));
 }
 
 void kabukiz_state::machine_start()
 {
-	tnzs_base_state::machine_start();
+	tnzsb_state::machine_start();
+
 	uint8_t *sound = memregion("audiocpu")->base();
 	m_audiobank->configure_entries(0, 8, &sound[0x00000], 0x4000);
 }
@@ -459,13 +463,7 @@ void tnzs_base_state::bankswitch1_w(uint8_t data)
 //  logerror("%s: writing %02x to bankswitch 1\n", m_maincpu->pc(),data);
 
 	// bits 0-1 select ROM bank
-	m_bank2 = data & 0x03;
-	m_subbank->set_entry(m_bank2);
-}
-
-void jpopnics_state::machine_reset()
-{
-	tnzs_base_state::machine_reset();
+	m_subbank->set_entry(data & 0x03);
 }
 
 void jpopnics_state::subbankswitch_w(uint8_t data)

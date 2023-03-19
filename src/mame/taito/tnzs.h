@@ -17,16 +17,35 @@
 #include "screen.h"
 
 
-class tnzs_base_state : public driver_device
+class tnzs_video_state_base : public driver_device
 {
-public:
-	tnzs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	tnzs_video_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "sub")
 		, m_spritegen(*this, "spritegen")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+	{
+	}
+
+	void prompalette(palette_device &palette) const;
+	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<x1_001_device> m_spritegen;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+};
+
+
+class tnzs_base_state : public tnzs_video_state_base
+{
+protected:
+	tnzs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_video_state_base(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_mainbank(*this, "mainbank")
 		, m_subbank(*this, "subbank")
 	{ }
@@ -34,33 +53,22 @@ public:
 	void tnzs_base(machine_config &config);
 	void tnzs_mainbank(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 
 	virtual void bankswitch1_w(uint8_t data);
 
 	void ramrom_bankswitch_w(uint8_t data);
 
-	void prompalette(palette_device &palette) const;
-	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
-
 	void base_sub_map(address_map &map);
 	void main_map(address_map &map);
 	void mainbank_map(address_map &map);
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
-	required_device<x1_001_device> m_spritegen;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */
-	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */
-
-	/* misc / mcu */
-	int      m_bank2 = 0;
+	// devices
+	required_device<cpu_device> m_subcpu;
+	required_device<address_map_bank_device> m_mainbank;
+	required_memory_bank m_subbank;
 };
+
 
 class tnzs_mcu_state : public tnzs_base_state
 {
@@ -115,6 +123,7 @@ public:
 	extrmatn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_mcu_state(mconfig, type, tag, false)
 	{ }
+
 	void extrmatn(machine_config &config);
 	void plumppop(machine_config &config);
 
@@ -162,10 +171,10 @@ private:
 	int      m_mcu_readcredits = 0;
 	int      m_mcu_reportcoin = 0;
 	int      m_insertcoin = 0;
-	uint8_t    m_mcu_coinage[4]{};
-	uint8_t    m_mcu_coins_a = 0;
-	uint8_t    m_mcu_coins_b = 0;
-	uint8_t    m_mcu_credits = 0;
+	uint8_t  m_mcu_coinage[4]{};
+	uint8_t  m_mcu_coins_a = 0;
+	uint8_t  m_mcu_coins_b = 0;
+	uint8_t  m_mcu_credits = 0;
 
 	void mcu_handle_coins(int coin);
 };
@@ -224,9 +233,6 @@ public:
 	{ }
 
 	void jpopnics(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 
 private:
 	void subbankswitch_w(uint8_t data);
