@@ -2,17 +2,23 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
-#include "debug/debugcpu.h"
+
 #include "cpu/h8/h83003.h"
 #include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/beep.h"
+
+#include "debug/debugcpu.h"
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/pc_dsk.h"
+
+#include "util/endianness.h"
 #include "util/utf8.h"
+
 
 // command line parameters:
 // -window -debug -log lw840 -flop "c:\schreibmaschine\Brother LW-840ic\LW840-ic_V1.0_Disk1_Graphic_Art_Print_Program, etc..img"
@@ -76,11 +82,13 @@ Emulation Status:
 
 ***************************************************************************/
 
-class gm82c765b_device : public upd765_family_device {
+class gm82c765b_device : public upd765_family_device
+{
 public:
 	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map& map) override {
+	virtual void map(address_map& map) override ATTR_COLD
+	{
 		map(0x0, 0x0).r(FUNC(gm82c765b_device::msr_r));
 		map(0x1, 0x1).rw(FUNC(gm82c765b_device::fifo_r), FUNC(gm82c765b_device::fifo_w));
 		map(0x2, 0x2).w(FUNC(gm82c765b_device::dor_w));
@@ -88,7 +96,7 @@ public:
 	}
 };
 
-DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GM82C765B")
+DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GoldStar GM82C765B FDC") // also sold with Hynix branding
 
 gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
 	upd765_family_device(mconfig, GM82C765B, tag, owner, clock)
@@ -98,11 +106,13 @@ gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *ta
 	select_connected = true;
 }
 
+namespace {
+
 class lw840_state : public driver_device
 {
 public:
-	lw840_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lw840_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		screen(*this, "screen"),
 		fdc(*this, "fdc"),
@@ -112,13 +122,12 @@ public:
 		sram(*this, "sram")
 	{ }
 
-	void lw840(machine_config& config);
+	void lw840(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -134,50 +143,59 @@ private:
 	uint8_t irq_toggle{};
 
 	// screen updates
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint16_t port7_r(offs_t, uint16_t mem_mask = ~0) {
+	uint16_t port7_r()
+	{
 		auto row = keyboard & 0x0f;
 		if(row <= 8)
 			return io_kbrow[row]->read();
 
 		// seems to be able to control power-on self test if not 0xff
-		return 0xffff & mem_mask;
+		return 0xffff;
 	}
-	uint16_t keyboard_r(offs_t, uint16_t mem_mask = ~0) {
-		return (keyboard << 8) & mem_mask; 
+	uint16_t keyboard_r()
+	{
+		return keyboard << 8;
 	}
-	void keyboard_w(uint16_t data) { 
-		keyboard = data >> 8; 
+	void keyboard_w(uint16_t data)
+	{
+		keyboard = data >> 8;
 	}
-	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
+	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback)
+	{
 		irq_toggle = ~irq_toggle;
 		maincpu->set_input_line(INPUT_LINE_IRQ2, irq_toggle ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	static void floppy_formats(format_registration& fr) {
+	static void floppy_formats(format_registration &fr) ATTR_COLD
+	{
 		fr.add(FLOPPY_PC_FORMAT);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt) {
+	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt)
+	{
 		maincpu->set_input_line(INPUT_LINE_IRQ4, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq) {
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq)
+	{
 		maincpu->set_input_line(H8_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	uint16_t disk_inserted_r(offs_t, uint16_t mem_mask = ~0) {
+	uint16_t disk_inserted_r()
+	{
 		// bit#6: disk inserted
 		// bit#7: ??1.44mb
 		// bit#1: ???
 		// bit#0: ???
 
-		// hack: always disk inserted, HD-disk
-		return (0b01000000 << 8) & mem_mask;
+		// FIXME: hack: always disk inserted, HD-disk
+		return 0b01000000 << 8;
 	}
 
-	void map_program(address_map& map) {
+	void map_program(address_map &map) ATTR_COLD
+	{
 		map(0x000000, 0x3fffff).rom();
-		map(0x5f8000, 0x5fffff).ram().share("sram"); // SRAM
+		map(0x5f8000, 0x5fffff).ram().share(sram); // SRAM
 		map(0x600000, 0x67ffff).ram(); // DRAM
 		map(0xe00000, 0xe00007).m(fdc, FUNC(gm82c765b_device::map));
 		map(0xe00030, 0xe00041).noprw(); // just to shut up the error.log
@@ -185,26 +203,23 @@ private:
 		map(0xec0004, 0xec0005).r(FUNC(lw840_state::disk_inserted_r));
 	}
 
-	void map_io(address_map& map) {
+	void map_io(address_map &map) ATTR_COLD
+	{
 		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
 	}
 };
 
-void lw840_state::video_start()
-{
-}
-
-uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t lw840_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t palette[]{
 		0xffffffff,
 		0xff000000,
 	};
 
-	auto vram = reinterpret_cast<uint16_t*>(&sram[0x300 / sizeof(uint16_t)]);
+	uint16_t const *const vram = &sram[0x300 / sizeof(uint16_t)];
 
-	for(auto y = 0; y < 400; y++) {
-		uint32_t* p = &bitmap.pix(y);
+	for(auto y = std::max<int32_t>(cliprect.top(), 0); y <= std::min<int32_t>(cliprect.bottom(), 400 - 1); y++) {
+		uint32_t *p = &bitmap.pix(y);
 		for(auto x = 0; x < 640; x += 16) {
 			auto gfx = vram[(y * 640 + x) / 16];
 			for(int i = 15; i >= 0; i--)
@@ -217,11 +232,11 @@ uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 void lw840_state::machine_start()
 {
 	screen->set_visible_area(0, 640 - 1, 0, 400 - 1);
-	fdc->set_rate(500000);
+	fdc->set_rate(500'000);
 
-	// patches here; byte-swapped!!
-	auto rom8 = reinterpret_cast<uint8_t*>(rom.target());
-	//rom8[0x34a+1] = 0x47; // always branch to mem_test_error
+	// patches here
+	auto rom8 = util::big_endian_cast<uint8_t>(rom.target());
+	//rom8[0x34a] = 0x47; // always branch to mem_test_error
 	rom8[0x102] = rom8[0x102 + 1] = 0xff; // skip printer check
 	//rom8[0xa380] = rom8[0xa380 + 1] = 0; // skip FDC init
 }
@@ -322,16 +337,19 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static void lw840_floppies(device_slot_interface& device) {
+static void lw840_floppies(device_slot_interface &device)
+{
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-void lw840_state::lw840(machine_config& config) {
+void lw840_state::lw840(machine_config &config)
+{
 	// basic machine hardware
 	H83003(config, maincpu, 14'745'600);
 	maincpu->set_addrmap(AS_PROGRAM, &lw840_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw840_state::map_io);
 	maincpu->tend0().set("fdc", FUNC(gm82c765b_device::tc_line_w));
+
 	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
 
 	// video hardware
@@ -357,6 +375,8 @@ ROM_START( lw840 )
 	ROM_REGION(0x400000, "maincpu", 0)
 	ROM_LOAD("us3122-a", 0x00000, 0x400000, CRC(70A3A4A6) SHA1(11e32c7da58800d69af29089f7e7deeab513b1ae))
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS         INIT        COMPANY         FULLNAME            FLAGS
 COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,  empty_init, "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
