@@ -1598,7 +1598,7 @@ Loading is way too fast once you start a race
 	</software>
 
 	<software name="faussete" supported="no">
-		<description>Faussete Amour (Japan)</description>
+		<description>Fausseté Amour (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
 		<notes><![CDATA[
@@ -4265,6 +4265,7 @@ Unsupported [セーブくん] joypad slot peripheral
 	</software>
 
 	<software name="priveyed">
+		<!-- Stylized "eye dol" in lowercase on box art and title screen -->
 		<description>Private eye dol (ACD, SCD)(Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -6540,7 +6541,7 @@ Verify sound mixing, [PSG] covers [ADPCM]
 	</software>
 
 	<software name="traveler" supported="partial">
-		<description>Travelers! Densetsu wo ButtobaSe (Japan)</description>
+		<description>Travelers! Densetsu wo Buttobase (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
 	    <notes><![CDATA[
