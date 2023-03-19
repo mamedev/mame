@@ -817,7 +817,7 @@ void st_state::st_super_map(address_map &map)
 
 	// no blitter on original ST
 
-	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffa00, 0xfffa3f).after_delay(NAME([](offs_t) { return 4; })).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 

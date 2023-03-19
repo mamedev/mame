@@ -41,7 +41,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	//virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	u32 dma_r(offs_t offset, u32 mem_mask);
 	void dma_w(offs_t offset, u32 data, u32 mem_mask);

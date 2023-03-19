@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-/***************************************************************************
+/**************************************************************************************************
 
   pcfx.cpp
 
   Driver file to handle emulation of the NEC PC-FX.
 
-***************************************************************************/
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -22,6 +22,8 @@
 
 namespace {
 
+// TODO: should really inherit from a common pcfx_motherboard_device
+// - pcfxga needs to be exposed as a ISA16 and C-Bus boards, it's not a real stand-alone driver.
 class pcfx_state : public driver_device
 {
 public:
@@ -98,16 +100,6 @@ void pcfx_state::extio_w(offs_t offset, uint8_t data)
 	io_space.write_byte(offset, data);
 }
 
-void pcfx_state::pcfx_mem(address_map &map)
-{
-	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
-//  map(0x80000000, 0x807FFFFF).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
-	map(0xE0000000, 0xE7FFFFFF).noprw();   /* BackUp RAM */
-	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
-	map(0xF8000000, 0xF8000007).noprw();   /* PIO */
-	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
-}
-
 uint16_t pcfx_state::pad_r(offs_t offset)
 {
 	uint16_t res;
@@ -126,7 +118,6 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	else
 	{
 		// received data
-		//printf("RX %d\n",port_type);
 		res = m_pad.latch[port_type] >> (((offset<<1) & 2) ? 16 : 0);
 
 		if(((offset<<1) & 0x02) == 0)
@@ -163,7 +154,7 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 		*/
 		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
-			m_pad_timers[port_type]->adjust(attotime::from_usec(1000)); // TODO: time
+			m_pad_timers[port_type]->adjust(attotime::from_usec(100)); // TODO: time
 		}
 
 		m_pad.ctrl[port_type] = data & 7;
@@ -176,6 +167,16 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 	}
 }
 
+void pcfx_state::pcfx_mem(address_map &map)
+{
+	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
+//  map(0x80000000, 0x80FFFFFF).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
+//  map(0x80700000, 0x807FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
+	map(0xE0000000, 0xE7FFFFFF).noprw();   /* BackUp RAM */
+	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
+//  map(0xF8000000, 0xF8000007).noprw();   /* PIO, needed by pcfxga for reading backup "RAM" from DOS/V host */
+	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
+}
 
 void pcfx_state::pcfx_io(address_map &map)
 {
@@ -186,12 +187,12 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x000006FF).rw("huc6272", FUNC(huc6272_device::read), FUNC(huc6272_device::write));    /* HuC6272 */
-	map(0x00000C80, 0x00000C83).noprw();
+//  map(0x00000C80, 0x00000C83).noprw(); // backup RAM control
 	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
-	map(0x00000F00, 0x00000FFF).noprw();
-//  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r));
-	map(0x00780000, 0x007FFFFF).rom().region("scsi_rom", 0);
-	map(0x80500000, 0x805000FF).noprw();   /* HuC6273 */
+//  map(0x00000F00, 0x00000FFF).noprw(); // Timer
+//  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
+//  map(0x00700000, 0x007FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
+	map(0x80500000, 0x805000FF).noprw(); // pcfxga Kubota/Hudson HuC6273 "Aurora" 3d controller
 }
 
 
@@ -201,25 +202,26 @@ static INPUT_PORTS_START( pcfx )
 	*/
 	PORT_START("P1")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID pad
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Button I")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button II")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button III")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Button IV")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Button V")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Button VI")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("P1 Select Button")
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("P1 RUN Button")
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Up")
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Right")
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("P1 Down")
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Left")
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 1")
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 2")
-	PORT_BIT( 0x0fffa000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// pcfxga expects latches to go active high on main menu
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Button I")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button II")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button III")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Button IV")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Button V")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Button VI")
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("P1 Select Button")
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("P1 RUN Button")
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Up")
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Right")
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("P1 Down")
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Left")
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 1")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 2")
+	PORT_BIT( 0x0fffa000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ID unconnect
-	PORT_BIT( 0x0fffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fffffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -470,8 +472,12 @@ ROM_START( pcfx )
 	ROM_SYSTEM_BIOS( 1, "v101", "BIOS v1.01 - 5 Dec 1994" )
 	ROMX_LOAD( "pcfxv101.bin", 0x000000, 0x100000, CRC(236102c9) SHA1(8b662f7548078be52a871565e19511ccca28c5c8), ROM_BIOS(1) )
 
-	ROM_REGION32_LE( 0x80000, "scsi_rom", 0 )
+	ROM_REGION32_LE( 0x100000, "scsi_rom", ROMREGION_ERASEFF )
+	// TODO: "PC-FX EXTIO Boot", really belongs to FX-SCSI PC-FX expansion board
+	// r/w to I/O $600000 SCSI if ROM enabled in both memory and I/O areas,
+	// allows PC-FX to act as a CD drive for a PC-98 host ...
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
+	ROM_RELOAD( 0x80000, 0x80000 )
 ROM_END
 
 
@@ -479,7 +485,7 @@ ROM_START( pcfxga )
 	ROM_REGION32_LE( 0x100000, "ipl", 0 )
 	ROM_LOAD( "pcfxga.rom", 0x000000, 0x100000, CRC(41c3776b) SHA1(a9372202a5db302064c994fcda9b24d29bb1b41c) )
 
-	ROM_REGION32_LE( 0x80000, "scsi_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x100000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
 
 } // Anonymous namespace

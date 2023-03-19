@@ -369,8 +369,9 @@ void i80286_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-bool i80286_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool i80286_cpu_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	if(spacenum == AS_PROGRAM)
 		address &= m_amask;
 

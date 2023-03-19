@@ -687,7 +687,8 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 {
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
-	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
+	address_space *tspace;
+	if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, addr, tspace))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -696,11 +697,11 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = space.read_byte(addr);
+		uint32_t opcode = tspace->read_byte(addr);
 		addr++;
-		uint32_t op1 = space.read_dword_unaligned(addr);
+		uint32_t op1 = tspace->read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = space.read_dword_unaligned(addr);
+		uint32_t op2 = tspace->read_dword_unaligned(addr);
 		addr += 4;
 
 		std::string sop1;
