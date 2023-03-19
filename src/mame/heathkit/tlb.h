@@ -93,7 +93,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 class heath_watz_tlb_device : public heath_tlb_device
@@ -112,6 +112,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
