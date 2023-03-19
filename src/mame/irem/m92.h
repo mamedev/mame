@@ -64,6 +64,7 @@ public:
 	void majtitl2(machine_config &config);
 	void majtitl2a(machine_config &config);
 	void mysticri(machine_config &config);
+	void leaguemna(machine_config &config);
 
 	void init_bank();
 
