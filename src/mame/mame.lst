@@ -14792,6 +14792,9 @@ apexc                           // 1955(?) APEXC: All-Purpose Electronic X-ray C
 @source:brother/ax145.cpp
 ax145                           // Brother AX-145 (c) 198? Brother Industries, Ltd.
 
+@source:brother/lw840.cpp
+lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
+
 @source:camputers/camplynx.cpp
 lynx128k                        //
 lynx48k                         //
