@@ -18,12 +18,14 @@ public:
 	void start_audio(uint32_t startlba, uint32_t numblocks);
 	void stop_audio();
 	void pause_audio(int pause);
-	int16_t get_channel_volume(int channel);
+	int16_t get_channel_sample(int channel);
 
 	uint32_t get_audio_lba();
 	int audio_active();
 	int audio_paused();
 	int audio_ended();
+
+	auto audio_end_cb() { return m_audio_end_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -46,7 +48,9 @@ private:
 	std::unique_ptr<uint8_t[]>   m_audio_cache;
 	uint32_t              m_audio_samples;
 	uint32_t              m_audio_bptr;
-	int16_t               m_audio_volume[2];
+	int16_t               m_audio_data[2];
+
+	devcb_write_line m_audio_end_cb;
 };
 
 DECLARE_DEVICE_TYPE(CDDA, cdda_device)
