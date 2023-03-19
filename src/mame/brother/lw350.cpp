@@ -13,10 +13,6 @@
 #include "util/utf8.h"
 #include "imagedev/floppy.h"
 
-// if updating project, c:\msys64\win32env.bat
-// cd \schreibmaschine\mame_src
-// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
-
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw350 -resolution 960x256 -flop roms\lw350\Brother_LW-200-300_GW-24-45_Ver1.0_SpreadsheetProgramAndDataStorageDisk.img
 
@@ -75,6 +71,8 @@ Hidden Keys during "SCHREIBMASCHINE" ("Typewriter")
 
 Emulation Status:
 - Printer not working
+
+see https://github.com/BartmanAbyss/brother-hardware/tree/master/2G%20-%20Brother%20LW-350 for datasheets, photos
 
 ***************************************************************************/
 
@@ -1368,6 +1366,8 @@ VSYNC 50 Hz
 PC MDA standard
   DB9 connector 1+2 GND, 3+4+5 nc, 6 Intensity, 7 Brightness, 8 HSync, 9 VSync
   HSync positive, VSync negative active
+
+see https://github.com/BartmanAbyss/brother-hardware/tree/master/1G%20-%20Brother%20LW-450 for datasheets, photos
 
 Emulation Status:
 Printer not working
