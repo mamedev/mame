@@ -2,31 +2,26 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+#include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/timer.h"
-#include "cpu/z180/z180.h"
-#include "imagedev/floppy.h"
+#include "formats/lw30_dsk.h"
 #include "util/utf8.h"
 
-#include "sound/beep.h"
-#include "video/mc6845.h"
-
 #define LOG_FLOPPY (1U << 1)
-#define LOGFLOPPY(...) LOGMASKED(LOG_FLOPPY, __VA_ARGS__)
+#define LOGFLOPPY(...) if(!machine().side_effects_disabled()) LOGMASKED(LOG_FLOPPY, __VA_ARGS__)
 
 //#define VERBOSE (LOG_GENERAL | LOG_FLOPPY)
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-// if updating project, c:\users\chuck\downloads\msys64\win32env.bat
-// cd \schreibmaschine\mame_src
-// make SUBTARGET=brother NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
-
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
-// -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img
 
 // floppy: see src\devices\bus\vtech\memexp\floppy.cpp
 
@@ -109,207 +104,20 @@ ROHM
 BA6580DK
 Read/Write Amplifier for FDD
 
+see https://github.com/BartmanAbyss/brother-hardware/tree/master/1G%20-%20Brother%20LW-30 for datasheets, photos
+
 Emulation Status:
 Printer not working
 Floppy Disk writing not working
 Floppy Disk Sync not implemented (reading works)
 Dictionary ROM not working
 Cursor shapes not implemented except block cursor
+Keyboard not 100% (mostly copied from LW-350)
 
 TODO: find self-test; verify RAM address map
 // 8kb SRAM, 64kb DRAM <- where?
 
 ***************************************************************************/
-
-namespace {
-	constexpr uint16_t sync_table[]{
-		0xDAEF, 0xB7AD, 0xFBBE, 0xEADF, 0xBFFA, 0xAEB6, 0xF5D7, 0xDBEE, 0xBAAB, 0xFDBD, 
-		0xEBDE, 0xD5F7, 0xAFB5, 0xF6D6, 0xDDED, 0xBBAA, 0xEDBB, 0xD6DD, 0xB5F6, 0xF7AF, 
-		0xDED5, 0xBDEB, 0xABFD, 0xEEBA, 0xD7DB, 0xB6F5, 0xFAAE, 0xDFBF, 0xBEEA, 0xADFB, 
-		0xEFB7, 0xDADA, 0xB7EF, 0xFBAD, 0xEABE, 0xBFDF, 0xAEFA, 0xF5B6, 0xDBD7, 0xBAEE, 
-		0xFDAB, 0xEBBD, 0xD5DE, 0xAFF7, 0xF6B5, 0xDDD6, 0xBBED, 0xAADD, 0xEDF6, 0xD6AF, 
-		0xB5D5, 0xF7EB, 0xDEFD, 0xBDBA, 0xABDB, 0xEEF5, 0xD7AE, 0xB6BF, 0xFAEA, 0xDFFB, 
-		0xBEB7, 0xADDA, 0xEFEF, 0xDAAD, 0xB7BE, 0xFBDF, 0xEAFA, 0xBFB6, 0xAED7, 0xF5EE, 
-		0xDBAB, 0xBABD, 0xFDDE, 0xEBF7, 0xD5B5, 0xAFD6, 0xF6ED, 0xDDAA, 0xD6BB, 0xB5DD
-	};
-
-	constexpr uint8_t gcr_table[]{
-		0xAA, 0xAB, 0xAD, 0xAE, 0xAF, 0xB5, 0xB6, 0xB7,
-		0xBA, 0xBB, 0xBD, 0xBE, 0xBF, 0xD5, 0xD6, 0xD7,
-		0xDA, 0xDB, 0xDD, 0xDE, 0xDF, 0xEA, 0xEB, 0xED,
-		0xEE, 0xEF, 0xF5, 0xF6, 0xF7, 0xFA, 0xFB, 0xFD,
-		0xFE, 0xFF // FE, FF are reserved
-	};
-
-	// format
-	constexpr uint8_t sector_prefix[]{
-		0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xAB
-	};
-
-	// write
-	constexpr uint8_t sector_header[]{
-		0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
-		0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xED
-	};
-
-	// write
-	constexpr uint8_t sector_footer[]{
-		0xF5, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD
-	};
-
-	constexpr uint8_t sector_interleave1[]{ // 1-based
-		1, 6, 11, 4, 9, 2, 7, 12, 5, 10, 3, 8
-	};
-
-	constexpr uint8_t sector_interleave2[]{ // 1-based
-		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-	};
-
-	constexpr uint8_t sector_interleave3[]{ // 1-based
-		1, 4, 7, 10, 6, 9, 12, 3, 11, 2, 5, 8
-	};
-
-	void gcr_encode_5_to_8(const uint8_t* input, uint8_t* output) {
-		// input:
-		// 76543210
-		// --------
-		// 00000111 0
-		// 11222223 1
-		// 33334444 2
-		// 45555566 3
-		// 66677777 4
-
-		output[0] = gcr_table[ (input[0] >> 3) & 0x1f                                  ];
-		output[1] = gcr_table[((input[0] << 2) & 0x1f) | ((input[1] >> 6) & 0b00000011)];
-		output[2] = gcr_table[ (input[1] >> 1) & 0x1f                                  ];
-		output[3] = gcr_table[((input[1] << 4) & 0x1f) | ((input[2] >> 4) & 0b00001111)];
-		output[4] = gcr_table[((input[2] << 1) & 0x1f) | ((input[3] >> 7) & 0b00000001)];
-		output[5] = gcr_table[ (input[3] >> 2) & 0x1f                                  ];
-		output[6] = gcr_table[((input[3] << 3) & 0x1f) | ((input[4] >> 5) & 0b00000111)];
-		output[7] = gcr_table[  input[4]       & 0x1f                                  ];
-	}
-
-	std::array<uint8_t, 3> checksum_256_bytes(const uint8_t* input) {
-		size_t i = 0;
-		uint8_t a = 0;
-		uint8_t c = input[i++];
-		uint8_t d = input[i++];
-		uint8_t e = input[i++];
-		for(size_t b = 0; b < 253; b++) {
-			a = d;
-			if(c & 0b10000000)
-				a ^= 1;
-			d = c;
-			c = a;
-			a = (d << 1) ^ e;
-			e = d;
-			d = a;
-			e ^= input[i++];
-		}
-
-		return { c, d, e };
-	}
-
-	std::array<uint8_t, 416> gcr_encode_and_checksum(const uint8_t* input /* 256 bytes */) {
-		std::array<uint8_t, 416> output;
-		for(int i = 0; i < 51; i++)
-			gcr_encode_5_to_8(&input[i * 5], &output[i * 8]);
-
-		auto checksum = checksum_256_bytes(input);
-		std::array<uint8_t, 5> end_and_checksum{ input[255], checksum[0], checksum[1], checksum[2], 0x58 };
-		gcr_encode_5_to_8(&end_and_checksum[0], &output[408]);
-
-		return output;
-	}
-}
-
-class lw30_format : public floppy_image_format_t {
-public:
-	static constexpr int tracks_per_disk = 78;
-	static constexpr int sectors_per_track = 12;
-	static constexpr int sector_size = 256;
-
-	static constexpr int rpm = 300;
-	static constexpr int cells_per_rev = 250'000 / (rpm / 60);
-
-	// format track: 0xaa (2), 0xaa (48), 12*sector
-	// format sector: sector_prefix (8), track_sync (2), sector_sync (2), predata (19), payload=0xaa (414), postdata (13), 0xaa (42), should come out to ~4,000 bits
-	// write sector: (after sector_sync, 0xdd) sector_header (2+14), payload (416), sector_footer (11)
-
-	// from write_format, write_sector_data_header_data_footer
-	static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/ + 42/*0xaa*/;
-	static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + sectors_per_track * raw_sector_size;
-
-	int identify(util::random_read& io, uint32_t form_factor, const std::vector<uint32_t>& variants) const override {
-		uint64_t size{};
-		io.length(size);
-		if(size == tracks_per_disk * sectors_per_track * sector_size)
-			return 50; // identified by size
-
-		return 0;
-	}
-
-	bool load(util::random_read& io, uint32_t form_factor, const std::vector<uint32_t>& variants, floppy_image* image) const override {
-		uint8_t trackdata[sectors_per_track * sector_size], rawdata[cells_per_rev / 8];
-		memset(rawdata, 0xaa, sizeof(rawdata));
-		for(int track = 0; track < tracks_per_disk; track++) {
-			size_t actual{};
-			io.read_at(track * sectors_per_track * sector_size, trackdata, sectors_per_track * sector_size, actual);
-			if(actual != sectors_per_track * sector_size)
-				return false;
-			size_t i = 0;
-			for(int x = 0; x < 2 + 48; x++)
-				rawdata[i++] = 0xaa;
-			auto interleave_offset = (track % 4) * 4;
-			for(size_t s = interleave_offset; s < interleave_offset + sectors_per_track; s++) {
-				auto sector = sector_interleave1[s % sectors_per_track] - 1;
-				// according to check_track_and_sector
-				for(const auto& d : sector_prefix) // 8 bytes
-					rawdata[i++] = d;
-				rawdata[i++] = sync_table[track] & 0xff;
-				rawdata[i++] = sync_table[track] >> 8;
-				rawdata[i++] = sync_table[sector] & 0xff;
-				rawdata[i++] = sync_table[sector] >> 8;
-				rawdata[i++] = 0xdd;
-				for(const auto& d : sector_header) // 16 bytes
-					rawdata[i++] = d;
-				auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 256 -> 416 bytes
-				for(const auto& d : payload)
-					rawdata[i++] = d;
-				for(const auto& d : sector_footer) // 11 bytes
-					rawdata[i++] = d;
-				for(int x = 0; x < 42; x++)
-					rawdata[i++] = 0xaa;
-			}
-			assert(i == raw_track_size);
-			assert(i <= cells_per_rev / 8);
-			generate_track_from_bitstream(track, 0, rawdata, cells_per_rev, image);
-		}
-
-		image->set_variant(floppy_image::SSDD);
-
-		return true;
-	}
-
-	const char* name() const override {
-		return "lw30";
-	}
-
-	const char* description() const override {
-		return "Brother LW-30 floppy disk image";
-	}
-
-	const char* extensions() const override {
-		return "img";
-	}
-
-	bool supports_save() const override {
-		// TODO
-		return false;
-	}
-};
-
-const lw30_format FLOPPY_LW30_FORMAT;
 
 class brother_beep_device : public device_t, public device_sound_interface
 {
@@ -474,17 +282,19 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		LOG("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
+	uint8_t illegal_r(offs_t offset) {
+		if(!machine().side_effects_disabled())
+			LOG("%s: unmapped memory read from %0*X\n", machine().describe_context(), 6, offset);
 		return 0;
 	}
-	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		LOG("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
+	void illegal_w(offs_t offset, uint8_t data) {
+		if(!machine().side_effects_disabled())
+			LOG("%s: unmapped memory write to %0*X = %0*X\n", machine().describe_context(), 6, offset, 2, data);
 	}
 
 	// ROM
-	uint8_t rom42000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
+	uint8_t rom42000_r(offs_t offset) {
+		return rom[0x02000 + offset];
 	}
 
 	// IO
@@ -504,8 +314,10 @@ private:
 		uint8_t data = 0x00;
 		if(video_pos_y < 0x20)
 			data = videoram[video_pos_y * 256 + video_pos_x];
-		else
-			LOG("%s: video_data_r out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+		else {
+			if(!machine().side_effects_disabled())
+				LOG("%s: video_data_r out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+		}
 
 		return data;
 	}
@@ -513,8 +325,10 @@ private:
 	void video_data_w(uint8_t data) { // 74
 		if(video_pos_y < 0x20)
 			videoram[video_pos_y * 256 + video_pos_x] = data;
-		else
-			LOG("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+		else {
+			if(!machine().side_effects_disabled())
+				LOG("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+		}
 
 		video_pos_x++;
 		if(video_pos_x == 0)
@@ -602,9 +416,9 @@ private:
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
 		// a rotation to the right means increase quarter-track
-		auto rol4 = [](uint8_t d) { return ((d << 1) & 0b1111) | ((d >> 3) & 0b0001); };
-		auto ror4 = [](uint8_t d) { return ((d >> 1) & 0b0111) | ((d << 3) & 0b1000); };
-		auto old_track = floppy_steps / 4;
+		const auto rol4 = [](uint8_t d) { return ((d << 1) & 0b1111) | ((d >> 3) & 0b0001); };
+		const auto ror4 = [](uint8_t d) { return ((d >> 1) & 0b0111) | ((d << 3) & 0b1000); };
+		const auto old_track = floppy_steps / 4;
 		switch(data & 0xf) {
 		case 0b0011:
 		case 0b0110:
@@ -621,7 +435,7 @@ private:
 			LOGFLOPPY("%s: initial step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		}
-		auto new_track = floppy_steps / 4;
+		const auto new_track = floppy_steps / 4;
 		auto floppy_device = floppy->get_device();
 		if(new_track != old_track) {
 			floppy_device->dir_w(new_track < old_track);
@@ -674,31 +488,7 @@ private:
 		io_b8 = data;
 	}
 
-	// Tetris Game Over Melody:
-	// according to oscilloscope:
-	// - total length 2.630s, wavosaur shows 2.043s
-	// - last note: 600µs on, 600µs off, on-to-on: 1260µs, wavosaur shows 1083µs
-	// according to MAME
-	// - 11µs between writes to beeper
-	// - 476µs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
-	// - 713µs
-	// - 724µs
-	// - last note: 543µs (value=0x2ba=698) => 0.7779x
-
 	void beeper_w(uint8_t data) { // F0
-		#if 0
-			static uint8_t lastData{};
-			static attotime last{};
-			static attotime lastDifferent{};
-			attotime cur{ maincpu->local_time() };
-
-			LOG("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
-			if(data != lastData)
-				lastDifferent = cur;
-			last = cur;
-			lastData = data;
-		#endif
-
 		beeper->set_state(data);
 	}
 
@@ -969,93 +759,93 @@ void lw30_state::machine_reset()
 
 static INPUT_PORTS_START(lw30)
 	PORT_START("kbrow.0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)      PORT_CHAR('4')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)      PORT_CHAR('3')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_W)      PORT_CHAR('w')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)      PORT_CHAR('e')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)      PORT_CHAR('d')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)      PORT_CHAR('x')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CHAR(U'§')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_W)      PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)      PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)      PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TAB)    PORT_CHAR(UCHAR_MAMEKEY(TAB))
 
 	PORT_START("kbrow.1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)      PORT_CHAR('5')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)      PORT_CHAR('6')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)      PORT_CHAR('r')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)      PORT_CHAR('t')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)      PORT_CHAR('c')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)      PORT_CHAR('f')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)      PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)      PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)                 PORT_CODE(KEYCODE_UP)     PORT_CHAR(UCHAR_MAMEKEY(UP))
 
 	PORT_START("kbrow.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)      PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)      PORT_CHAR('7')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)      PORT_CHAR('z')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_H)      PORT_CHAR('h')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_G)      PORT_CHAR('g')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)      PORT_CHAR('v')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)      PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_H)      PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_G)      PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_V)      PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G.S.END")               PORT_CODE(KEYCODE_END)    PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_END)    PORT_CHAR(UCHAR_MAMEKEY(END))
 
 	PORT_START("kbrow.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_S)          PORT_CHAR('s')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 
 	PORT_START("kbrow.4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_J)          PORT_CHAR('j')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_I)          PORT_CHAR('i')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_B)          PORT_CHAR('b')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_N)          PORT_CHAR('n')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ß
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR('m')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(U'ß') PORT_CHAR('?')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR('=')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')  PORT_CHAR('O')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR(';')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MENU)       PORT_CHAR(UCHAR_MAMEKEY(MENU))
 
 	PORT_START("kbrow.6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // ö Ö
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FILE/SPELL")            PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // ü Ü
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SM/Layout")             PORT_CODE(KEYCODE_PRTSCR)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STORNO")                PORT_CODE(KEYCODE_PAUSE)      PORT_CHAR(UCHAR_MAMEKEY(CANCEL))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TW/WP/LAYOUT")          PORT_CODE(KEYCODE_PRTSCR)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CANCEL")                PORT_CODE(KEYCODE_PAUSE)      PORT_CHAR(UCHAR_MAMEKEY(CANCEL))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(UCHAR_MAMEKEY(ENTER))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    //PORT_CODE(KEYCODE_)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Horz/Vert")             //PORT_CODE(KEYCODE_)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("WORD OUT/LINE OUT")     //PORT_CODE(KEYCODE_)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(UCHAR_MAMEKEY(SPACE))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // ´ `
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // ä Ä
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'´') PORT_CHAR(U'`')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')	 PORT_CHAR('K')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    //PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(':')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-')  PORT_CHAR('_')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1101,5 +891,5 @@ ROM_START( lw30 )
 	ROM_LOAD("font-bold", 0x00000, 0x800, CRC(D81B79C4) SHA1(fa6be6f9dd0d7ae6d001802778272ecce8f425bc))
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT     COMPANY         FULLNAME          FLAGS
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME          FLAGS
 COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
