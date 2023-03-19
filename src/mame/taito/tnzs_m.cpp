@@ -348,18 +348,11 @@ void tnzs_base_state::machine_start()
 {
 	tnzs_video_state_base::machine_start();
 
-	uint8_t *const main = memregion("maincpu")->base();
-	m_mainrombank->configure_entries(0, 8, &main[0], 0x4000);
-	m_mainrombank->set_entry(2);
-
-	m_mainrambank->configure_entries(0, 2, &m_bankedram[0], 0x4000);
-	m_mainrambank->set_entry(0);
-
-	m_ramromview.disable();
-
 	uint8_t *const sub = memregion("sub")->base();
 	m_subbank->configure_entries(0, 4, &sub[0x08000], 0x2000);
 	m_subbank->set_entry(0);
+
+	m_ramromview.select(2);
 }
 
 void arknoid2_state::machine_start()
@@ -405,14 +398,7 @@ void tnzs_base_state::ramrom_bankswitch_w(uint8_t data)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	// bits 0-2 select RAM/ROM bank
-	m_mainrombank->set_entry(data & 0x07);
-	m_mainrambank->set_entry(data & 0x01);
-
-	// instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
-	if (data & 0x06)
-		m_ramromview.disable();
-	else
-		m_ramromview.select(0);
+	m_ramromview.select(data & 0x07);
 }
 
 void arknoid2_state::bankswitch1_w(uint8_t data)
