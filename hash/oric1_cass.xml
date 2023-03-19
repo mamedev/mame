@@ -51,7 +51,7 @@ license:CC0-1.0
 
 	<software name="3dmaze">
 		<description>3D Maze</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4601">
@@ -304,7 +304,7 @@ license:CC0-1.0
 
 	<software name="bananas">
 		<description>Bananas</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9446">
@@ -348,7 +348,7 @@ license:CC0-1.0
 
 	<software name="blitz">
 		<description>Blitz</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1135">
@@ -370,7 +370,7 @@ license:CC0-1.0
 
 	<software name="bombyx">
 		<description>Bombyx</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Dialog Informatique</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10703">
@@ -381,7 +381,7 @@ license:CC0-1.0
 
 	<software name="bossthe">
 		<description>Boss, The</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Peaksoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="33971">
@@ -403,7 +403,7 @@ license:CC0-1.0
 
 	<software name="breakoutmach">
 		<description>Breakout Machine</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9743">
@@ -425,7 +425,7 @@ license:CC0-1.0
 
 	<software name="bunker">
 		<description>Bunker</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13561">
@@ -436,7 +436,7 @@ license:CC0-1.0
 
 	<software name="business">
 		<description>Business, The</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Arnold, Peter - Goodrum, David</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12056">
@@ -458,7 +458,7 @@ license:CC0-1.0
 
 	<software name="canonnade">
 		<description>Canonnade - Oric Pot</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Micro Programmes 5</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10239">
@@ -469,7 +469,7 @@ license:CC0-1.0
 
 	<software name="cassebrique">
 		<description>Casse Brique</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3553">
@@ -480,7 +480,7 @@ license:CC0-1.0
 
 	<software name="cassebrique1" cloneof="cassebrique">
 		<description>Casse Brique (alt)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1458">
@@ -500,7 +500,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="centipede">
+	<software name="centipede" supported="no">
 		<description>Centipede</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>
@@ -535,7 +535,7 @@ license:CC0-1.0
 
 	<software name="cheesesnake">
 		<description>Cheese-Snake</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>JGB</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4287">
@@ -612,7 +612,7 @@ license:CC0-1.0
 
 	<software name="ciroou">
 		<description>Ciro Ou Les Envahisseurs Fous</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Ch.Magrin</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6851">
@@ -645,7 +645,7 @@ license:CC0-1.0
 
 	<software name="citeinterdite">
 		<description>Cite Interdite, La</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11511">
@@ -766,7 +766,7 @@ license:CC0-1.0
 
 	<software name="corsaires">
 		<description>Corsaires</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="23407">
@@ -788,7 +788,7 @@ license:CC0-1.0
 
 	<software name="crabes">
 		<description>Crabes</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1810">
@@ -953,7 +953,7 @@ license:CC0-1.0
 
 	<software name="deathdriver">
 		<description>Death Driver</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>GPD-Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3246">
@@ -1062,7 +1062,7 @@ license:CC0-1.0
 
 	<software name="domino">
 		<description>Domino</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="7270">
@@ -1126,7 +1126,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="draculas">
+	<software name="draculas" supported="no">
 		<description>Dracula's Revenge</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
@@ -1137,7 +1137,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="draculas1" cloneof="draculas">
+	<software name="draculas1" cloneof="draculas" supported="no">
 		<description>Dracula's Revenge (alt)</description>
 		<year>1983</year>
 		<publisher>Softek</publisher>
@@ -1183,7 +1183,7 @@ license:CC0-1.0
 
 	<software name="electric">
 		<description>Electric Eel</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Poeschel, Knut</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3232">
@@ -1216,7 +1216,7 @@ license:CC0-1.0
 
 	<software name="esquive">
 		<description>Esquive</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Oric France</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10836">
@@ -1326,7 +1326,7 @@ license:CC0-1.0
 
 	<software name="flightsim">
 		<description>Flight Simulator (club euro)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Club Europe Oric</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="37773">
@@ -1337,7 +1337,7 @@ license:CC0-1.0
 
 	<software name="flightsimq">
 		<description>Flight Simulator (quark)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Quark Data</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11739">
@@ -1348,7 +1348,7 @@ license:CC0-1.0
 
 	<software name="flightsimq1" cloneof="flightsimq">
 		<description>Flight Simulator (quark alt)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Quark Data</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="7288">
@@ -1423,9 +1423,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="galaxians">
+	<software name="galaxians" supported="no">
 		<description>Galaxians</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Softek Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10784">
@@ -1458,7 +1458,7 @@ license:CC0-1.0
 
 	<software name="ghosts">
 		<description>Ghosts and Ghouls</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Overy, Simon</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4438">
@@ -1555,7 +1555,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="harrier">
+	<software name="harrier" supported="yes">
 		<description>Harrier Attack</description>
 		<year>1983</year>
 		<publisher>Durell Software</publisher>
@@ -1612,7 +1612,7 @@ license:CC0-1.0
 
 	<software name="honeykong">
 		<description>Honey-Kong</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Sprites</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="26588">
@@ -1623,7 +1623,7 @@ license:CC0-1.0
 
 	<software name="hopper">
 		<description>Hopper</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Personal Software Services</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11235">
@@ -1733,7 +1733,7 @@ license:CC0-1.0
 
 	<software name="incrust">
 		<description>Incrust</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Magique Software - Merlin</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1271">
@@ -1744,7 +1744,7 @@ license:CC0-1.0
 
 	<software name="indiana">
 		<description>Indiana John's</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="17868">
@@ -1788,7 +1788,7 @@ license:CC0-1.0
 
 	<software name="invasion">
 		<description>Invasion</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>de Guerra, Alain</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6072">
@@ -1799,7 +1799,7 @@ license:CC0-1.0
 
 	<software name="invasionav">
 		<description>Invasion Avant L'Aube</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18088">
@@ -1843,7 +1843,7 @@ license:CC0-1.0
 
 	<software name="jetattack">
 		<description>Jet Attack</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="32705">
@@ -1920,7 +1920,7 @@ license:CC0-1.0
 
 	<software name="jump">
 		<description>Jump</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Kartmann, A &amp; E</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10684">
@@ -1931,7 +1931,7 @@ license:CC0-1.0
 
 	<software name="jumpfox">
 		<description>JumpFox</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="25129">
@@ -1953,7 +1953,7 @@ license:CC0-1.0
 
 	<software name="keysof">
 		<description>Keys of Kraal, The</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Marshall, John</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="23739">
@@ -1997,7 +1997,7 @@ license:CC0-1.0
 
 	<software name="laby5">
 		<description>Laby 5</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10265">
@@ -2052,7 +2052,7 @@ license:CC0-1.0
 
 	<software name="leopard">
 		<description>Leopard Kongen</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Bjoha Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="14908">
@@ -2063,7 +2063,7 @@ license:CC0-1.0
 
 	<software name="lightbikes">
 		<description>Light Bikes</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Your Computer</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2195">
@@ -2195,7 +2195,7 @@ license:CC0-1.0
 
 	<software name="maze">
 		<description>Maze</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="43298">
@@ -2239,7 +2239,7 @@ license:CC0-1.0
 
 	<software name="miner">
 		<description>Miner</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Computasolve</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="17936">
@@ -2349,7 +2349,7 @@ license:CC0-1.0
 
 	<software name="morpionh">
 		<description>Morpion (hebdogiciel)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6851">
@@ -2402,7 +2402,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mushroom">
+	<software name="mushroom" supported="no">
 		<description>Mushroom Mania</description>
 		<year>1983</year>
 		<publisher>Arcadia Software</publisher>
@@ -2459,7 +2459,7 @@ license:CC0-1.0
 
 	<software name="nightrider">
 		<description>Night Rider</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Ciro Soft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12247">
@@ -2470,7 +2470,7 @@ license:CC0-1.0
 
 	<software name="normal">
 		<description>Normal Lotto</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3210">
@@ -2492,7 +2492,7 @@ license:CC0-1.0
 
 	<software name="nuclear">
 		<description>Nuclear War</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="32642">
@@ -2514,7 +2514,7 @@ license:CC0-1.0
 
 	<software name="oilleak">
 		<description>Oil Leak</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4809">
@@ -2525,7 +2525,7 @@ license:CC0-1.0
 
 	<software name="oldtimer">
 		<description>Old-Timer</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2991">
@@ -2580,7 +2580,7 @@ license:CC0-1.0
 
 	<software name="oricsquash">
 		<description>Oric Squash</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2650">
@@ -2624,7 +2624,7 @@ license:CC0-1.0
 
 	<software name="oricbingo">
 		<description>Oric-Bingo</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>GPD Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10302">
@@ -2701,7 +2701,7 @@ license:CC0-1.0
 
 	<software name="othello1">
 		<description>Othello (alt)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Edgar, Jacob - Portelli, Joseph</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="14280">
@@ -2723,7 +2723,7 @@ license:CC0-1.0
 
 	<software name="parachute">
 		<description>Parachute</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1386">
@@ -2756,7 +2756,7 @@ license:CC0-1.0
 
 	<software name="parcours">
 		<description>Parcours Du Combattant, Le</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4722">
@@ -2778,7 +2778,7 @@ license:CC0-1.0
 
 	<software name="patience">
 		<description>Patience</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>A &amp; F Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="5349">
@@ -2800,7 +2800,7 @@ license:CC0-1.0
 
 	<software name="perseus">
 		<description>Perseus &amp; Andromeda</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Channel 8 Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="35091">
@@ -2811,7 +2811,7 @@ license:CC0-1.0
 
 	<software name="pilote">
 		<description>Pilote</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>C.C.O.I</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18121">
@@ -2822,7 +2822,7 @@ license:CC0-1.0
 
 	<software name="planeten">
 		<description>Planeten</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>J.R. Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="20965">
@@ -2855,7 +2855,7 @@ license:CC0-1.0
 
 	<software name="plouf">
 		<description>Plouf (en)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Larcher, Dominique</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8697">
@@ -2866,7 +2866,7 @@ license:CC0-1.0
 
 	<software name="plouf1" cloneof="plouf">
 		<description>Plouf (fr)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Larcher, Dominique</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8769">
@@ -2877,7 +2877,7 @@ license:CC0-1.0
 
 	<software name="pontoon">
 		<description>Pontoon</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="5195">
@@ -3031,7 +3031,7 @@ license:CC0-1.0
 
 	<software name="ramassemiettes">
 		<description>Ramasse-Miettes</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Atmos</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1176">
@@ -3108,7 +3108,7 @@ license:CC0-1.0
 
 	<software name="reversi1">
 		<description>Reversi (???)</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18193">
@@ -3163,7 +3163,7 @@ license:CC0-1.0
 
 	<software name="rushhour">
 		<description>Rush Hour</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>F., Frances</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18084">
@@ -3262,7 +3262,7 @@ license:CC0-1.0
 
 	<software name="serpent">
 		<description>Serpent</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="988">
@@ -3339,7 +3339,7 @@ license:CC0-1.0
 
 	<software name="slalom">
 		<description>Slalom</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1016">
@@ -3350,7 +3350,7 @@ license:CC0-1.0
 
 	<software name="snakevenom">
 		<description>Snake Venom</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Financial &amp; General Computing</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9499">
@@ -3405,7 +3405,7 @@ license:CC0-1.0
 
 	<software name="spieskiller">
 		<description>Spies Killer</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Surian, S.</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="15090">
@@ -3460,7 +3460,7 @@ license:CC0-1.0
 
 	<software name="starprobe">
 		<description>Star Probe</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Chymesoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="40584">
@@ -3471,7 +3471,7 @@ license:CC0-1.0
 
 	<software name="startrek">
 		<description>Star Trek</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13839">
@@ -3757,7 +3757,7 @@ license:CC0-1.0
 
 	<software name="tommy">
 		<description>Tommy</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9399">
@@ -3790,7 +3790,7 @@ license:CC0-1.0
 
 	<software name="toutou">
 		<description>Toutou</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Micr'Oric</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="5832">
@@ -3801,7 +3801,7 @@ license:CC0-1.0
 
 	<software name="trace">
 		<description>Trace</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="1462">
@@ -4085,7 +4085,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="xenon1a1" cloneof="xenon1">
+	<software name="xenon1a1" cloneof="xenon1" supported="no">
 		<description>Xenon 1 (alt 1)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
@@ -4142,7 +4142,7 @@ license:CC0-1.0
 
 	<software name="zagorsk">
 		<description>Zagorsk</description>
-		<year>19xx</year>
+		<year>19??</year>
 		<publisher>Lundgren, Lars</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9224">
