@@ -765,9 +765,11 @@ void kageki_state::csport_w(uint8_t data)
 void tnzs_base_state::prompal_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_mainrombank);
 	map(0x8000, 0xbfff).view(m_ramromview);
-	m_ramromview[0](0x8000, 0xbfff).bankrw(m_mainrambank);
+	for (int i = 0; 2 > i; ++i)
+		m_ramromview[i](0x8000, 0xbfff).ram(); // instead of the first two banks of ROM being repeated redundantly the hardware maps RAM here
+	for (int i = 2; 8 > i; ++i)
+		m_ramromview[i](0x8000, 0xbfff).rom().region("maincpu", 0x4000 * i);
 	map(0xc000, 0xcfff).rw(m_spritegen, FUNC(x1_001_device::spritecodelow_r8), FUNC(x1_001_device::spritecodelow_w8));
 	map(0xd000, 0xdfff).rw(m_spritegen, FUNC(x1_001_device::spritecodehigh_r8), FUNC(x1_001_device::spritecodehigh_w8));
 	map(0xe000, 0xefff).ram().share("share1"); // WORK RAM (shared by the 2 Z80's)
