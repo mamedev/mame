@@ -46,9 +46,6 @@ protected:
 		: tnzs_video_state_base(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
 		, m_subbank(*this, "subbank")
-		, m_mainrombank(*this, "rombank")
-		, m_mainrambank(*this, "rambank")
-		, m_bankedram(*this, "bankedram", 0x8000, ENDIANNESS_LITTLE)
 		, m_ramromview(*this, "ramrom")
 	{ }
 
@@ -70,9 +67,6 @@ protected:
 	required_memory_bank m_subbank;
 
 private:
-	required_memory_bank m_mainrombank;
-	required_memory_bank m_mainrambank;
-	memory_share_creator<uint8_t> m_bankedram;
 	memory_view m_ramromview;
 };
 
