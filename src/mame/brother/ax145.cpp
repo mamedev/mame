@@ -8,7 +8,6 @@
 #include "machine/timer.h"
 #include "cpu/z180/z180.h"
 #include "debug/debugcpu.h"
-#include "sound/beep.h"
 #include "video/hd44780.h"
 
 // 240x18x4 = 960x72
@@ -78,9 +77,11 @@ LCD Driver with 80-Channel Outputs
 
 LCD: 40 characters x 2 lines
 
+see https://github.com/BartmanAbyss/brother-hardware/tree/master/0G%20-%20Brother%20AX-145 for datasheets, photos
+
 // Status:
 // doesn't go further than "SCHREIBWERK ÜBERPRÜFEN" (check printer)
-// needs european font for HD44780
+// TODO: needs european font for HD44780
 
 ***************************************************************************/
 
@@ -100,10 +101,17 @@ public:
 		maincpu(*this, "maincpu"),
 		lcdc(*this, "hd44780"),
 		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
-		rom(*this, "maincpu")
+		rom(*this, "maincpu"),
+		dictionary_bank(*this, "dictionary")
 	{ }
 
 	void ax145(machine_config& config);
+
+protected:
+	// driver_device overrides
+	void machine_start() override;
+	void machine_reset() override;
+	void video_start() override;
 
 private:
 	// devices
@@ -111,9 +119,10 @@ private:
 	required_device<hd44780_device> lcdc;
 	memory_share_creator<uint8_t> ram;
 	required_region_ptr<uint8_t> rom;
+	required_memory_bank dictionary_bank;
 
 	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
-	static constexpr uint8_t id = 1;
+	static constexpr uint8_t ID = 1;
 
 	// config switch
 	uint8_t io_3000{};
@@ -122,11 +131,6 @@ private:
 	// bit 1: RS (Register Select)
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
-
-	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
 
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
@@ -168,17 +172,13 @@ private:
 	// should probably return something different depending on io_3000
 	// 0x0014a9 also reads but io_3000=0xfe,0xff...
 	uint8_t io_3800_r() {
-		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
-
 		// config lower 4 bits
-		return (~id) & 0x0f;
+		return (~ID) & 0x0f;
 	}
 
 	uint8_t io_4000_r() {
-		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
-
 		// config upper 4 bits
-		return (~id) >> 4;
+		return (~ID) >> 4;
 	}
 
 	void lcd_signal_w(uint8_t data) {
@@ -201,7 +201,7 @@ private:
 	}
 
 	void dictionary_bank_w(uint8_t data) {
-		membank("dictionary")->set_entry(data & 0x03);
+		dictionary_bank->set_entry(data & 0x03);
 	}
 
 	// int2
@@ -210,7 +210,8 @@ private:
 	}
 
 	uint8_t irq_ack_r() {
-		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+		if(!machine().side_effects_disabled())
+			maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
 	}
 };
@@ -223,9 +224,9 @@ void ax145_state::machine_start()
 {
 	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
 	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
-	membank("dictionary")->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
+	dictionary_bank->configure_entries(0, 4, memregion("dictionary")->base(), 0x20000);
 
-	// ROM patch
+	// TODO: ROM patch
 }
 
 void ax145_state::machine_reset()
@@ -271,4 +272,4 @@ ROM_START( ax145 )
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME           FLAGS
-COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "Brother AX-145", MACHINE_NOT_WORKING )
+COMP( 198?, ax145,   0,   0,      ax145,  ax145,  ax145_state,     empty_init,       "Brother",      "Brother AX-145", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
