@@ -1189,6 +1189,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/lw30_dsk.h,FORMATS["LW30_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "LW30_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/lw30_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/lw30_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/os9_dsk.h,FORMATS["OS9_DSK"] = true
 --------------------------------------------------
 
