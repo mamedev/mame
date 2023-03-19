@@ -119,10 +119,9 @@ void msx_cart_skw01_device::device_start()
 	page(1)->install_readwrite_handler(0x7fc5, 0x7fc5, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<2>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<2>)));
 	page(1)->install_readwrite_handler(0x7fc6, 0x7fc6, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<3>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<3>)));
 	page(1)->install_readwrite_handler(0x7fc7, 0x7fc7, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<3>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<3>)));
-	page(1)->install_readwrite_handler(0x7fc8, 0x7fc8, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_r)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<4>)));
+	page(1)->install_write_handler(0x7fc8, 0x7fc8, write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<4>)));
 	page(1)->install_write_handler(0x7fc9, 0x7fc9, write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<4>)));
-	page(1)->install_write_handler(0x7fca, 0x7fca, write8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_w)));
-	page(1)->install_readwrite_handler(0x7fcb, 0x7fcb, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_r)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_w)));
+	page(1)->install_readwrite_handler(0x7fca, 0x7fcb, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_r)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_w)));
 	page(1)->install_readwrite_handler(0x7fcc, 0x7fcc, read8smo_delegate(*m_cent_status_in, FUNC(input_buffer_device::read)), write8smo_delegate(*m_cent_ctrl_out, FUNC(output_latch_device::write)));
 	page(1)->install_write_handler(0x7fce, 0x7fce, write8smo_delegate(*m_cent_data_out, FUNC(output_latch_device::write)));
 }
