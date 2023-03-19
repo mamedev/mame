@@ -49,8 +49,8 @@ apple/imacg3.cpp
 apple/iphone2g.cpp
 apple/lisa.cpp
 apple/lwriter.cpp
-apple/mac.cpp
 apple/mac128.cpp
+apple/macii.cpp
 apple/maciici.cpp
 apple/maciifx.cpp
 apple/maciivx.cpp
@@ -113,6 +113,10 @@ bitcorp/gamate.cpp
 bondwell/bw12.cpp
 bondwell/bw2.cpp
 booth/apexc.cpp
+brother/ax145.cpp
+brother/lw30.cpp
+brother/lw700i.cpp
+brother/lw840.cpp
 camputers/camplynx.cpp
 canon/canon_s80.cpp
 canon/cat.cpp
@@ -807,7 +811,6 @@ skeleton/basf7100.cpp
 skeleton/bert.cpp
 skeleton/bitgraph.cpp
 skeleton/blit.cpp
-skeleton/blw700i.cpp
 skeleton/bpmmicro.cpp
 skeleton/br8641.cpp
 skeleton/busicom.cpp
