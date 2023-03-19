@@ -91,7 +91,7 @@ void bml3bus_mp1802_device::bml3_mp1802_w(uint8_t data)
 	floppy_image_device *floppy = m_floppy[data & 0x03]->get_device();
 
 	m_fdc->set_floppy(floppy);
-	//m_fdc->dden_w(!BIT(data, 5)); // TODO: support FM tracks in d88_format
+	m_fdc->dden_w(!BIT(data, 5));
 
 	if (floppy)
 	{
