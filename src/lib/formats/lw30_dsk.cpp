@@ -8,9 +8,12 @@
 ***************************************************************************/
 #include "lw30_dsk.h"
 
-#include <array>
-#include <cstring>
 #include "ioprocs.h"
+
+#include <array>
+#include <cassert>
+#include <cstring>
+
 
 namespace {
 	constexpr uint16_t sync_table[]{
@@ -60,7 +63,8 @@ namespace {
 		1, 4, 7, 10, 6, 9, 12, 3, 11, 2, 5, 8
 	};
 
-	void gcr_encode_5_to_8(const uint8_t* input, uint8_t* output) {
+	void gcr_encode_5_to_8(const uint8_t *input, uint8_t *output)
+	{
 		// input:
 		// 76543210
 		// --------
@@ -80,7 +84,8 @@ namespace {
 		output[7] = gcr_table[input[4] & 0x1f];
 	}
 
-	std::array<uint8_t, 3> checksum_256_bytes(const uint8_t* input) {
+	std::array<uint8_t, 3> checksum_256_bytes(const uint8_t *input)
+	{
 		size_t i = 0;
 		uint8_t a = 0;
 		uint8_t c = input[i++];
@@ -101,7 +106,7 @@ namespace {
 		return { c, d, e };
 	}
 
-	std::array<uint8_t, 416> gcr_encode_and_checksum(const uint8_t* input /* 256 bytes */) {
+	std::array<uint8_t, 416> gcr_encode_and_checksum(const uint8_t *input /* 256 bytes */) {
 		std::array<uint8_t, 416> output;
 		for(int i = 0; i < 51; i++)
 			gcr_encode_5_to_8(&input[i * 5], &output[i * 8]);
@@ -114,12 +119,12 @@ namespace {
 	}
 }
 
-static constexpr int tracks_per_disk = 78;
-static constexpr int sectors_per_track = 12;
-static constexpr int sector_size = 256;
+static constexpr int TRACKS_PER_DISK = 78;
+static constexpr int SECTORS_PER_TRACK = 12;
+static constexpr int SECTOR_SIZE = 256;
 
-static constexpr int rpm = 300;
-static constexpr int cells_per_rev = 250'000 / (rpm / 60);
+static constexpr int RPM = 300;
+static constexpr int CELLS_PER_REV = 250'000 / (RPM / 60);
 
 // format track: 0xaa (2), 0xaa (48), 12*sector
 // format sector: sector_prefix (8), track_sync (2), sector_sync (2), predata (19), payload=0xaa (414), postdata (13), 0xaa (42), should come out to ~4,000 bits
@@ -127,31 +132,33 @@ static constexpr int cells_per_rev = 250'000 / (rpm / 60);
 
 // from write_format, write_sector_data_header_data_footer
 static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/ + 42/*0xaa*/;
-static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + sectors_per_track * raw_sector_size;
+static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + SECTORS_PER_TRACK * raw_sector_size;
 
-int lw30_format::identify(util::random_read& io, uint32_t form_factor, const std::vector<uint32_t>& variants) const {
-	uint64_t size{};
+int lw30_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	uint64_t size = 0;
 	io.length(size);
-	if(size == tracks_per_disk * sectors_per_track * sector_size)
+	if(size == TRACKS_PER_DISK * SECTORS_PER_TRACK * SECTOR_SIZE)
 		return 50; // identified by size
 
 	return 0;
 }
 
-bool lw30_format::load(util::random_read& io, uint32_t form_factor, const std::vector<uint32_t>& variants, floppy_image* image) const {
-	uint8_t trackdata[sectors_per_track * sector_size], rawdata[cells_per_rev / 8];
+bool lw30_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
+{
+	uint8_t trackdata[SECTORS_PER_TRACK * SECTOR_SIZE], rawdata[CELLS_PER_REV / 8];
 	memset(rawdata, 0xaa, sizeof(rawdata));
-	for(int track = 0; track < tracks_per_disk; track++) {
+	for(int track = 0; track < TRACKS_PER_DISK; track++) {
 		size_t actual{};
-		io.read_at(track * sectors_per_track * sector_size, trackdata, sectors_per_track * sector_size, actual);
-		if(actual != sectors_per_track * sector_size)
+		io.read_at(track * SECTORS_PER_TRACK * SECTOR_SIZE, trackdata, SECTORS_PER_TRACK * SECTOR_SIZE, actual);
+		if(actual != SECTORS_PER_TRACK * SECTOR_SIZE)
 			return false;
 		size_t i = 0;
 		for(int x = 0; x < 2 + 48; x++)
 			rawdata[i++] = 0xaa;
 		auto interleave_offset = (track % 4) * 4;
-		for(size_t s = interleave_offset; s < interleave_offset + sectors_per_track; s++) {
-			auto sector = sector_interleave1[s % sectors_per_track] - 1;
+		for(size_t s = interleave_offset; s < interleave_offset + SECTORS_PER_TRACK; s++) {
+			auto sector = sector_interleave1[s % SECTORS_PER_TRACK] - 1;
 			// according to check_track_and_sector
 			for(const auto& d : sector_prefix) // 8 bytes
 				rawdata[i++] = d;
@@ -162,17 +169,17 @@ bool lw30_format::load(util::random_read& io, uint32_t form_factor, const std::v
 			rawdata[i++] = 0xdd;
 			for(const auto& d : sector_header) // 16 bytes
 				rawdata[i++] = d;
-			auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 256 -> 416 bytes
-			for(const auto& d : payload)
+			auto payload = gcr_encode_and_checksum(trackdata + sector * SECTOR_SIZE); // 256 -> 416 bytes
+			for(const auto &d : payload)
 				rawdata[i++] = d;
-			for(const auto& d : sector_footer) // 11 bytes
+			for(const auto &d : sector_footer) // 11 bytes
 				rawdata[i++] = d;
 			for(int x = 0; x < 42; x++)
 				rawdata[i++] = 0xaa;
 		}
 		assert(i == raw_track_size);
-		assert(i <= cells_per_rev / 8);
-		generate_track_from_bitstream(track, 0, rawdata, cells_per_rev, image);
+		assert(i <= CELLS_PER_REV / 8);
+		generate_track_from_bitstream(track, 0, rawdata, CELLS_PER_REV, image);
 	}
 
 	image->set_variant(floppy_image::SSDD);
@@ -180,19 +187,23 @@ bool lw30_format::load(util::random_read& io, uint32_t form_factor, const std::v
 	return true;
 }
 
-const char* lw30_format::name() const {
+const char *lw30_format::name() const
+{
 	return "lw30";
 }
 
-const char* lw30_format::description() const {
+const char *lw30_format::description() const
+{
 	return "Brother LW-30 floppy disk image";
 }
 
-const char* lw30_format::extensions() const {
+const char *lw30_format::extensions() const
+{
 	return "img";
 }
 
-bool lw30_format::supports_save() const {
+bool lw30_format::supports_save() const
+{
 	// TODO
 	return false;
 }

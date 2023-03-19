@@ -2,23 +2,30 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 #include "formats/lw30_dsk.h"
+
 #include "util/utf8.h"
 
+
 #define LOG_FLOPPY (1U << 1)
-#define LOGFLOPPY(...) if(!machine().side_effects_disabled()) LOGMASKED(LOG_FLOPPY, __VA_ARGS__)
 
 //#define VERBOSE (LOG_GENERAL | LOG_FLOPPY)
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
+#define LOGFLOPPY(...) LOGMASKED(LOG_FLOPPY, __VA_ARGS__)
+
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
@@ -38,7 +45,7 @@ Brother LW-30
 
 Hardware:
 
-#7 
+#7
 Hitachi
 HD64180RP6
 8-bit CMOS Micro Processing Unit
@@ -46,12 +53,12 @@ fully compatible with Zilog Z80180 (Z180)
 6 MHz, DP-64S, Address Space 512 K Byte
 MuRata CST12MTW 12.00 MHz Ceramic Resonator
 
-#8 
+#8
 Mitsubishi
 M65122ASP
 UA5445-B LC-1
 
-#6 
+#6
 NEC
 D23C4001EC-172
 UA2849-A
@@ -62,7 +69,7 @@ LH532H07
 UA5362-A
 2MBit Mask ROM
 
-#11 
+#11
 Hitachi
 HM6264ALP-15
 High Speed CMOS Static RAM (8kbit x 8) 150ns
@@ -119,14 +126,14 @@ TODO: find self-test; verify RAM address map
 
 ***************************************************************************/
 
-class brother_beep_device : public device_t, public device_sound_interface
+class lw30_beep_device : public device_t, public device_sound_interface
 {
 public:
-	brother_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lw30_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
 	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -143,11 +150,11 @@ private:
 	int8_t m_signal;         /* current signal */
 };
 
-DEFINE_DEVICE_TYPE(BROTHER_BEEP, brother_beep_device, "brother_beep", "Brother Beep")
+DEFINE_DEVICE_TYPE(BROTHER_BEEP, lw30_beep_device, "lw30_beep", "Brother LW-30 Beeper")
 
 static constexpr auto BROTHER_BEEP_RATE = 48000;
 
-brother_beep_device::brother_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+lw30_beep_device::lw30_beep_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BROTHER_BEEP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
@@ -156,7 +163,7 @@ brother_beep_device::brother_beep_device(const machine_config &mconfig, const ch
 {
 }
 
-void brother_beep_device::device_start()
+void lw30_beep_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, BROTHER_BEEP_RATE);
 	m_state = 0xff;
@@ -169,9 +176,9 @@ void brother_beep_device::device_start()
 	save_item(NAME(m_signal));
 }
 
-void brother_beep_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
+void lw30_beep_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	auto& buffer = outputs[0];
+	auto &buffer = outputs[0];
 	auto signal = m_signal;
 	int clock = 0, rate = BROTHER_BEEP_RATE / 2;
 
@@ -209,7 +216,7 @@ void brother_beep_device::sound_stream_update(sound_stream& stream, std::vector<
 	m_signal = signal;
 }
 
-WRITE_LINE_MEMBER(brother_beep_device::set_state)
+WRITE_LINE_MEMBER(lw30_beep_device::set_state)
 {
 	// only update if new state is not the same as old state
 	if(m_state == state)
@@ -225,7 +232,7 @@ WRITE_LINE_MEMBER(brother_beep_device::set_state)
 	m_state = state;
 }
 
-void brother_beep_device::set_clock(uint32_t frequency)
+void lw30_beep_device::set_clock(uint32_t frequency)
 {
 	if(m_frequency == frequency)
 		return;
@@ -236,11 +243,14 @@ void brother_beep_device::set_clock(uint32_t frequency)
 	m_incr = 0;
 }
 
+
+namespace {
+
 class lw30_state : public driver_device
 {
 public:
-	lw30_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lw30_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		screen(*this, "screen"),
 		floppy(*this, "floppy"),
@@ -249,11 +259,16 @@ public:
 		rom(*this, "maincpu"),
 		font_normal(*this, "font_normal"),
 		font_bold(*this, "font_bold")
-	{ 
+	{
 		//video_control = 0b00000010; // TEST LW-10 screen height
 	}
 
 	void lw30(machine_config& config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -261,18 +276,18 @@ private:
 	required_device<screen_device> screen;
 
 	required_device<floppy_connector> floppy;
-	required_device<brother_beep_device> beeper;
-	optional_ioport_array<9> m_io_kbrow;
+	required_device<lw30_beep_device> beeper;
+	required_ioport_array<9> m_io_kbrow;
 	required_region_ptr<uint8_t> rom, font_normal, font_bold;
 
 	// floppy
-	uint8_t floppy_data{};
-	uint8_t io_88{};
-	uint8_t io_98{};
-	uint8_t floppy_control{}; // stepper motor control
-	uint8_t floppy_steps{}; // quarter track
-	uint8_t floppy_shifter{}, floppy_latch{};
-	bool floppy_read_until_zerobit{};
+	uint8_t floppy_data = 0;
+	uint8_t io_88 = 0;
+	uint8_t io_98 = 0;
+	uint8_t floppy_control = 0; // stepper motor control
+	uint8_t floppy_steps = 0; // quarter track
+	uint8_t floppy_shifter = 0, floppy_latch = 0;
+	bool floppy_read_until_zerobit = false;
 
 	// video
 	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
@@ -280,37 +295,38 @@ private:
 	uint8_t cursor_state;
 
 	// screen updates
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t illegal_r(offs_t offset) {
+	uint8_t illegal_r(offs_t offset)
+	{
 		if(!machine().side_effects_disabled())
 			LOG("%s: unmapped memory read from %0*X\n", machine().describe_context(), 6, offset);
 		return 0;
 	}
-	void illegal_w(offs_t offset, uint8_t data) {
-		if(!machine().side_effects_disabled())
-			LOG("%s: unmapped memory write to %0*X = %0*X\n", machine().describe_context(), 6, offset, 2, data);
-	}
-
-	// ROM
-	uint8_t rom42000_r(offs_t offset) {
-		return rom[0x02000 + offset];
+	void illegal_w(offs_t offset, uint8_t data)
+	{
+		LOG("%s: unmapped memory write to %0*X = %0*X\n", machine().describe_context(), 6, offset, 2, data);
 	}
 
 	// IO
-	void video_cursor_x_w(uint8_t data) { // 70
+	void video_cursor_x_w(uint8_t data) // 70
+	{
 		video_cursor_x = data;
 	}
-	void video_cursor_y_w(uint8_t data) { // 71
+	void video_cursor_y_w(uint8_t data) // 71
+	{
 		video_cursor_y = data;
 	}
-	void video_pos_x_w(uint8_t data) { // 72
+	void video_pos_x_w(uint8_t data) // 72
+	{
 		video_pos_x = data;
 	}
-	void video_pos_y_w(uint8_t data) { // 73
+	void video_pos_y_w(uint8_t data) // 73
+	{
 		video_pos_y = data;
 	}
-	uint8_t video_data_r() { // 74
+	uint8_t video_data_r() // 74
+	{
 		uint8_t data = 0x00;
 		if(video_pos_y < 0x20)
 			data = videoram[video_pos_y * 256 + video_pos_x];
@@ -322,27 +338,29 @@ private:
 		return data;
 	}
 
-	void video_data_w(uint8_t data) { // 74
+	void video_data_w(uint8_t data) // 74
+	{
 		if(video_pos_y < 0x20)
 			videoram[video_pos_y * 256 + video_pos_x] = data;
-		else {
-			if(!machine().side_effects_disabled())
-				LOG("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
-		}
+		else
+			LOG("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
 
 		video_pos_x++;
 		if(video_pos_x == 0)
 			video_pos_y++;
 	}
 
-	uint8_t video_control_r() { // 75 
-		return video_control; 
+	uint8_t video_control_r() // 75
+	{
+		return video_control;
 	}
-	void video_control_w(uint8_t data) { 
+	void video_control_w(uint8_t data)
+	{
 		video_control = data; // | 0b00000010; // TEST LW-10 screen height
-	} 
+	}
 	// 76
-	uint8_t io_77_r() { // config
+	uint8_t io_77_r() // config
+	{
 		// TODO: use PORT_CONFNAME, etc
 		uint8_t out = 0x20; // 14 lines
 		out |= 0x00; // german
@@ -352,7 +370,8 @@ private:
 	}
 
 	// Floppy
-	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer_callback) {
+	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer_callback)
+	{
 		auto floppy_device = floppy->get_device();
 		if(floppy_device->ready_r() != false)
 			return;
@@ -377,41 +396,51 @@ private:
 		//LOGFLOPPY("%s: read_io_80 track=%d,offset=%4x => %02x\n", callstack(), floppy_steps / 4, floppy_track_offset, ret);
 	}
 
-	uint8_t floppy_data_r() { // 80
-		floppy_control &= ~0x80; // floppy_data_available = false;
-		LOGFLOPPY("%s: read %02X from IO 80\n", machine().describe_context(), floppy_data);
+	uint8_t floppy_data_r() // 80
+	{
+		if(!machine().side_effects_disabled()) {
+			floppy_control &= ~0x80; // floppy_data_available = false;
+			LOGFLOPPY("%s: read %02X from IO 80\n", machine().describe_context(), floppy_data);
+		}
 		return floppy_data;
 	}
-	void floppy_data_w(uint8_t data) {
+	void floppy_data_w(uint8_t data)
+	{
 		LOGFLOPPY("%s: write %02X to IO 80\n", machine().describe_context(), data);
 		floppy_data = data;
 	}
 
-	uint8_t io_88_r() {
+	uint8_t io_88_r()
+	{
 		// bit 0: set in start_write; cleared in end_write
 		// bit 1: pulsed after 3*0xFF sync (read next floppydata until zero-bit)
 		// bit 2: cleared in stepper routines, rst28_06
 		// bit 3: set in start_write; cleared in end_write
 		// bit 5: cleared in rst28_06; motor-on?
-		LOGFLOPPY("%s: read %02X from IO 88\n", machine().describe_context(), io_88);
+		if(!machine().side_effects_disabled())
+			LOGFLOPPY("%s: read %02X from IO 88\n", machine().describe_context(), io_88);
 		return io_88;
 	}
-	void io_88_w(uint8_t data) {
+	void io_88_w(uint8_t data)
+	{
 		LOGFLOPPY("%s: write %02X to IO 88\n", machine().describe_context(), data);
 		io_88 = data;
 		floppy->get_device()->mon_w((io_88 & (1 << 5)) == 0);
 	}
 
-	uint8_t floppy_status_r() { // 90
+	uint8_t floppy_status_r() // 90
+	{
 		// bit 7 set; data ready from floppy
 		// bit 6 clear; unknown meaning
 		// bit 5 clear; unknown meaning
 		// bit 4 clear; unknown meaning
 		// bit 3-0: stepper motor
-		LOGFLOPPY("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
+		if(!machine().side_effects_disabled())
+			LOGFLOPPY("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
 		return floppy_control;
 	}
-	void floppy_stepper_w(uint8_t data) {
+	void floppy_stepper_w(uint8_t data)
+	{
 		LOGFLOPPY("%s: write %02X to IO 90\n", machine().describe_context(), data);
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
@@ -447,88 +476,100 @@ private:
 		floppy_control = (floppy_control & 0xf0) | (data & 0x0f);
 	}
 
-	uint8_t io_98_r() {
+	uint8_t io_98_r()
+	{
 		// mirrored in RAM
 		// bit 0: cleared in rst28_06 in mirror
 		// bit 2: cleared before formatting in mirror; set after formatting
 		// bit 3: cleared before formatting in mirror
 		// bit 4: cleared before writing in mirror; set after writing
-		if(io_88 & 0b10)
-			floppy_read_until_zerobit = true;
-		else
-			floppy_read_until_zerobit = false;
+		if(!machine().side_effects_disabled()) {
+			if(io_88 & 0b10)
+				floppy_read_until_zerobit = true;
+			else
+				floppy_read_until_zerobit = false;
 
-		LOGFLOPPY("%s: read %02X from IO 98\n", machine().describe_context(), io_98);
+			LOGFLOPPY("%s: read %02X from IO 98\n", machine().describe_context(), io_98);
+		}
 		return io_98;
 	}
-	void io_98_w(uint8_t data) {
+	void io_98_w(uint8_t data)
+	{
 		LOGFLOPPY("%s: write %02X to IO 98\n", machine().describe_context(), data);
 		io_98 = data;
 	}
 
-	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
-		LOGFLOPPY("%s: unmapped IO read from %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, mem_mask);
+	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0)
+	{
+		if(!machine().side_effects_disabled())
+			LOGFLOPPY("%s: unmapped IO read from %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, mem_mask);
 		return 0;
 	}
-	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
+	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0)
+	{
 		LOGFLOPPY("%s: unmapped IO write to %0*X = %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, data, 2, mem_mask);
 	}
 
-	uint8_t io_b0_r() {
+	uint8_t io_b0_r()
+	{
 		// Tetris reads bit 3, needed for correct keyboard layout
 		return 0b1000;
 	}
-	uint8_t io_b8_r() { // B8 (keyboard)
+	uint8_t io_b8_r() // B8 (keyboard)
+	{
 		// keyboard matrix
 		if(io_b8 <= 8)
-			return m_io_kbrow[io_b8].read_safe(0);
+			return m_io_kbrow[io_b8].read();
 		return 0x00;
 	}
-	void io_b8_w(uint8_t data) {
+	void io_b8_w(uint8_t data)
+	{
 		io_b8 = data;
 	}
 
-	void beeper_w(uint8_t data) { // F0
+	void beeper_w(uint8_t data) // F0
+	{
 		beeper->set_state(data);
 	}
 
-	void irqack_w(uint8_t) { // F8
+	void irqack_w(uint8_t) // F8
+	{
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 
-	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback) {
+	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback)
+	{
 		maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 
-	TIMER_DEVICE_CALLBACK_MEMBER(cursor_timer_callback) {
+	TIMER_DEVICE_CALLBACK_MEMBER(cursor_timer_callback)
+	{
 		cursor_state = !cursor_state;
 	}
 
-	static void floppy_formats(format_registration& fr) {
+	static void floppy_formats(format_registration &fr)
+	{
 		fr.add(FLOPPY_LW30_FORMAT);
 	}
 
-	static void lw30_floppies(device_slot_interface& device) {
+	static void lw30_floppies(device_slot_interface &device) ATTR_COLD
+	{
 		device.option_add("35ssdd", FLOPPY_35_SSDD);
 	}
 
-	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-
-	void video_start() override;
-
-	void map_program(address_map& map) {
+	void map_program(address_map &map) ATTR_COLD
+	{
 		map(0x00000, 0x01fff).rom();
 		map(0x02000, 0x05fff).ram();
 		map(0x06000, 0x3ffff).rom();
 		map(0x50000, 0x51fff).ram(); // ???
 		map(0x61000, 0x61fff).ram();
-		map(0x42000, 0x45fff).rw(FUNC(lw30_state::rom42000_r), FUNC(lw30_state::illegal_w)); // => ROM 0x02000-0x05fff
+		map(0x42000, 0x45fff).rom().region("maincpu", 0x02000).w(FUNC(lw30_state::illegal_w)); // => ROM 0x02000-0x05fff
 		map(0x65000, 0x70fff).ram();
 	}
 
-	void map_io(address_map& map) {
+	void map_io(address_map &map) ATTR_COLD
+	{
 		map.global_mask(0xff);
 		map(0x00, 0x3f).noprw(); // Z180 internal registers
 
@@ -559,21 +600,17 @@ private:
 	}
 };
 
-void lw30_state::video_start()
-{
-}
-
-uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t lw30_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// based on LW-350 ROM draw_char routine @ 6B14
 	enum attrs : uint8_t {
-		underline			= 0b00000001,
-		overline			= 0b00000010,
-		bold				= 0b00000100,
-		vertical_line		= 0b00001000,
-		invert_full			= 0b00010000,
-		invert_upper_half	= 0b00100000,
-		invert_lower_half	= 0b01000000
+		UNDERLINE			= 0b00000001,
+		OVERLINE			= 0b00000010,
+		BOLD				= 0b00000100,
+		VERTICAL_LINE		= 0b00001000,
+		INVERT_FULL			= 0b00010000,
+		INVERT_UPPER_HALF	= 0b00100000,
+		INVERT_LOWER_HALF	= 0b01000000
 	};
 
 	const rgb_t palette[]{
@@ -582,28 +619,28 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	};
 
 	enum control : uint8_t {
-		display_on          = 0b00000001,
-		half_height         = 0b00000010, // 64px height (LW-10/20) instead of 128px height (LW-30)
-		bitmap_mode         = 0b00001000,
-		tile_mode           = 0b00100000, // 8x8 tiles at videoram[0x1000]
+		DISPLAY_ON          = 0b00000001,
+		HALF_HEIGHT         = 0b00000010, // 64px height (LW-10/20) instead of 128px height (LW-30)
+		BITMAP_MODE         = 0b00001000,
+		TILE_MODE           = 0b00100000, // 8x8 tiles at videoram[0x1000]
 	};
 
-	if(video_control & display_on) {
-		if(video_control & tile_mode) {
+	if(video_control & DISPLAY_ON) {
+		if(video_control & TILE_MODE) {
 			uint8_t pixmap[60 * 128]; // pixel data
 			for(auto y = 0; y < 16; y++) {
 				for(auto x = 0; x < 60; x++) {
-					auto atr = videoram[y * 256 + x * 2 + 0];
-					auto chr = videoram[y * 256 + x * 2 + 1];
-					auto fnt = &videoram[0x1000 + chr * 8 + ((atr & bold) ? 0x800 : 0)];
+					const auto atr = videoram[y * 256 + x * 2 + 0];
+					const auto chr = videoram[y * 256 + x * 2 + 1];
+					const auto fnt = &videoram[0x1000 + chr * 8 + ((atr & BOLD) ? 0x800 : 0)];
 					uint8_t charbuf[8];
 					for(int i = 0; i < 8; i++) {
 						charbuf[i] = fnt[i];
 					}
-					if(atr & underline) {
+					if(atr & UNDERLINE) {
 						charbuf[7] = 0xff;
 					}
-					if(atr & vertical_line) {
+					if(atr & VERTICAL_LINE) {
 						for(int i = 0; i < 8; i++) {
 							charbuf[i] |= 0b1;
 						}
@@ -615,9 +652,9 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t *p = &bitmap.pix(y);
 				for(auto x = 0; x < 480; x += 8) {
-					auto gfx = pixmap[y * 60 + x / 8];
+					const auto gfx = pixmap[y * 60 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
 					*p++ = palette[BIT(gfx, 6)];
 					*p++ = palette[BIT(gfx, 5)];
@@ -628,11 +665,11 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 					*p++ = palette[BIT(gfx, 0)];
 				}
 			}
-		} else if(video_control & bitmap_mode) {
+		} else if(video_control & BITMAP_MODE) {
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t *p = &bitmap.pix(y);
 				for(auto x = 0; x < 480; x += 8) {
-					auto gfx = videoram[y * 64 + x / 8];
+					const auto gfx = videoram[y * 64 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
 					*p++ = palette[BIT(gfx, 6)];
 					*p++ = palette[BIT(gfx, 5)];
@@ -648,37 +685,37 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 			uint8_t pixmap[80 * 128]{}; // pixel data
 			for(auto y = 0; y < 14; y++) {
 				for(auto x = 0; x < 80; x++) {
-					auto atr = videoram[y * 256 + x * 2 + 0];
-					auto chr = videoram[y * 256 + x * 2 + 1];
-					auto fnt = (atr & bold) ? &font_bold[chr * 8] : &font_normal[chr * 8];
+					const auto atr = videoram[y * 256 + x * 2 + 0];
+					const auto chr = videoram[y * 256 + x * 2 + 1];
+					const auto fnt = (atr & BOLD) ? &font_bold[chr * 8] : &font_normal[chr * 8];
 					uint8_t charbuf[9];
 					charbuf[0] = 0x00;
 					for(int i = 0; i < 8; i++) {
 						charbuf[i + 1] = fnt[i];
 					}
 
-					if(atr & underline) {
+					if(atr & UNDERLINE) {
 						charbuf[8] = 0xff;
 					}
-					if(atr & overline) {
+					if(atr & OVERLINE) {
 						charbuf[0] = 0xff;
 					}
-					if(atr & vertical_line) {
+					if(atr & VERTICAL_LINE) {
 						for(int i = 0; i < 9; i++) {
 							charbuf[i] |= 0b1;
 						}
 					}
-					if(atr & invert_full) {
+					if(atr & INVERT_FULL) {
 						for(int i = 0; i < 9; i++) {
 							charbuf[i] ^= 0xff;
 						}
 					}
-					if(atr & invert_lower_half) {
+					if(atr & INVERT_LOWER_HALF) {
 						for(int i = 4; i < 9; i++) {
 							charbuf[i] ^= 0xff;
 						}
 					}
-					if(atr & invert_upper_half) {
+					if(atr & INVERT_UPPER_HALF) {
 						for(int i = 0; i < 5; i++) {
 							charbuf[i] ^= 0xff;
 						}
@@ -692,8 +729,8 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 
 			// draw cursor; TODO: shape
 			if(cursor_state) {
-				auto cursor_x = video_cursor_x & 0x7f;
-				auto cursor_y = (video_cursor_x >> 7) | ((video_cursor_y & 7) << 1);
+				const auto cursor_x = video_cursor_x & 0x7f;
+				const auto cursor_y = (video_cursor_x >> 7) | ((video_cursor_y & 7) << 1);
 				if(cursor_x < 80 && cursor_y < 14) {
 					for(int i = 0; i < 9; i++) {
 						pixmap[(cursor_y * 9 + i) * 80 + cursor_x] ^= 0xff;
@@ -701,9 +738,9 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix(y);
+				uint32_t *p = &bitmap.pix(y);
 				for(auto x = 0; x < 640; x += 8) {
-					auto gfx = pixmap[y * 80 + x / 8];
+					const auto gfx = pixmap[y * 80 + x / 8];
 					*p++ = palette[BIT(gfx, 5)];
 					*p++ = palette[BIT(gfx, 4)];
 					*p++ = palette[BIT(gfx, 3)];
@@ -713,10 +750,10 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 		}
-	} else { 
+	} else {
 		// display off
 		for(auto y = 0; y < 128; y++) {
-			uint32_t* p = &bitmap.pix(y);
+			uint32_t *p = &bitmap.pix(y);
 			for(auto x = 0; x < 480; x++) {
 				*p++ = palette[0];
 			}
@@ -849,7 +886,8 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-void lw30_state::lw30(machine_config& config) {
+void lw30_state::lw30(machine_config &config)
+{
 	// basic machine hardware
 	HD64180RP(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw30_state::map_program);
@@ -891,5 +929,7 @@ ROM_START( lw30 )
 	ROM_LOAD("font-bold", 0x00000, 0x800, CRC(D81B79C4) SHA1(fa6be6f9dd0d7ae6d001802778272ecce8f425bc))
 ROM_END
 
+} // anonymous namespace
+
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME          FLAGS
-COMP( 1991, lw30,   0,   0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
+COMP( 1991, lw30, 0,     0,       lw30,   lw30,  lw30_state,     empty_init,       "Brother",      "Brother LW-30",  MACHINE_NODEVICE_PRINTER )
