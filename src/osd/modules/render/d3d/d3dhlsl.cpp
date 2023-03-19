@@ -879,6 +879,7 @@ int shaders::create_resources()
 	color_effect->add_uniform("Scale", uniform::UT_VEC3, uniform::CU_COLOR_SCALE);
 	color_effect->add_uniform("Saturation", uniform::UT_FLOAT, uniform::CU_COLOR_SATURATION);
 	color_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
+	color_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
 
 	deconverge_effect->add_uniform("ConvergeX", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_X);
 	deconverge_effect->add_uniform("ConvergeY", uniform::UT_VEC3, uniform::CU_CONVERGE_LINEAR_Y);
@@ -932,9 +933,6 @@ int shaders::create_resources()
 
 	prescale_point_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 
-	default_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
-	default_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
-
 	ui_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
 	ui_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
 
@@ -942,7 +940,6 @@ int shaders::create_resources()
 	ui_wrap_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
 
 	vector_buffer_effect->add_uniform("LutEnable", uniform::UT_BOOL, uniform::CU_LUT_ENABLE);
-	vector_buffer_effect->add_uniform("UiLutEnable", uniform::UT_BOOL, uniform::CU_UI_LUT_ENABLE);
 
 	return 0;
 }
@@ -1159,6 +1156,8 @@ int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, pol
 	uint32_t tint = (uint32_t)poly->tint();
 	float prim_tint[3] = { ((tint >> 16) & 0xff) / 255.0f, ((tint >> 8) & 0xff) / 255.0f, (tint & 0xff) / 255.0f };
 	curr_effect->set_vector("PrimTint", 3, prim_tint);
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_bool("UiLutEnable", false);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->source_surface[next_index].Get(), false, D3DPT_TRIANGLELIST, 0, 2);
@@ -1467,6 +1466,7 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
 	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_bool("UiLutEnable", false);
 
 	// we need to clear the vector render target here
 	next_index = rt->next_index(next_index);
@@ -1486,7 +1486,9 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->update_uniforms();
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
-	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", nullptr);
+	curr_effect->set_bool("LutEnable", false);
+	curr_effect->set_bool("UiLutEnable", false);
 
 	blit(backbuffer.Get(), false, poly->type(), vertnum, poly->count());
 
