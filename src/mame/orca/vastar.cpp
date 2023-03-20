@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders: Allard van der Bas
 
+// Game plate and ROM provided by Ignacio Seki. Mame emulator code by Alberto Salso
+// here is the ROM
+// https://www.mediafire.com/file/r0qft5t6z1jpvk6/akazukin.zip/file
+
 /***************************************************************************
 
 Vastar memory map (preliminary)
@@ -109,6 +113,7 @@ Vsync : 60.58hz
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
@@ -137,7 +142,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_sharedram(*this, "sharedram")
+		m_sharedram(*this, "sharedram"),
+		m_ay(*this, "aysnd")
 	{ }
 
 	void common(machine_config &config);
@@ -148,7 +154,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 
-	required_shared_ptr<uint8_t> m_sharedram;
+	optional_shared_ptr<uint8_t> m_sharedram;
+	required_device<ay8910_device> m_ay;
 
 	uint8_t m_nmi_mask = 0;
 
@@ -165,11 +172,11 @@ class vastar_state : public vastar_common_state
 public:
 	vastar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vastar_common_state(mconfig, type, tag),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_bgvideoram(*this, "bg%uvideoram", 1U),
 		m_fgvideoram(*this, "fgvideoram"),
-		m_sprite_priority(*this, "sprite_priority")
+		m_sprite_priority(*this, "sprite_priority"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{ }
 
 	void vastar(machine_config &config);
@@ -177,10 +184,6 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-private:
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
@@ -190,11 +193,23 @@ private:
 	uint8_t* m_bg_scroll[2]{};
 	uint8_t* m_spriteram[3]{};
 
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap[2]{};
+	uint16_t m_fg_codebase;
+	uint16_t m_fg_attrbase;
+	uint16_t m_fg_colbase;
+
+	uint16_t m_bg_codebase;
+	uint16_t m_bg_attrbase;
+	uint16_t m_bg_colbase;
 
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void bgvideoram_w(offs_t offset, uint8_t data);
+
+private:
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -204,6 +219,35 @@ private:
 
 	void main_map(address_map &map);
 };
+
+class akazukin_state : public vastar_state
+{
+public:
+	akazukin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vastar_state(mconfig, type, tag),
+		m_ay2(*this, "aysnd2")
+	{ }
+
+	void akazukin(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<ay8910_device> m_ay2;
+
+	void nmi_sub_mask_w(uint8_t data);
+	INTERRUPT_GEN_MEMBER(sub_irq);
+
+	uint8_t m_nmi_sub_mask = 0;
+
+	void akazukin_main_map(address_map &map);
+	void akazukin_cpu2_map(address_map &map);
+	void akazukin_cpu2_port_map(address_map &map);
+	void akazukin_main_port_map(address_map &map);
+};
+
 
 class dogfightp_state : public vastar_common_state
 {
@@ -229,8 +273,8 @@ private:
 
 TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 {
-	int const code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
-	int const color = m_fgvideoram[tile_index];
+	int const code = m_fgvideoram[tile_index + m_fg_codebase] | (m_fgvideoram[tile_index + m_fg_attrbase] << 8);
+	int const color = m_fgvideoram[tile_index + m_fg_colbase];
 	int const fxy = (code & 0xc00) >> 10; // maybe, based on the other layers
 	tileinfo.set(0,
 			code,
@@ -241,8 +285,8 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(vastar_state::get_bg_tile_info)
 {
-	int const code = m_bgvideoram[Which][tile_index + 0x800] | (m_bgvideoram[Which][tile_index] << 8);
-	int const color = m_bgvideoram[Which][tile_index + 0xc00];
+	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
+	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
 	int fxy = (code & 0xc00) >> 10;
 	tileinfo.set(4 - Which,
 			code,
@@ -291,7 +335,6 @@ void vastar_state::bgvideoram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
 }
 
-
 /***************************************************************************
 
   Display refresh
@@ -309,6 +352,9 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 //  for (int offs = 0; offs < 0x40; offs += 2)
 	for (int offs = 0x40 - 2; offs >= 0; offs -= 2)
 	{
+		if (!(offs & 0x10))
+			continue;
+
 		int const code = ((m_spriteram[2][offs] & 0xfc) >> 2) + ((m_spriteram[1][offs] & 0x01) << 6)
 						+ ((offs & 0x20) << 2);
 
@@ -320,8 +366,9 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if (flip_screen())
 		{
-			flipx = !flipx;
-			flipy = !flipy;
+			int temp = flipx;
+			flipx = !flipy;
+			flipy = !temp;
 		}
 
 		if (m_spriteram[1][offs] & 0x08)   // double width
@@ -334,12 +381,26 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					color,
 					flipx, flipy,
 					sx, sy, 0);
-			// redraw with wraparound
+			// redraw with wraparound y
 			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
 					code / 2,
 					color,
 					flipx, flipy,
 					sx, sy + 256, 0);
+
+			// redraw with wraparound x
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx-256, sy, 0);
+
+			// redraw with wraparound xy
+			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx-256, sy + 256, 0);
 		}
 		else
 		{
@@ -351,6 +412,13 @@ void vastar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					color,
 					flipx, flipy,
 					sx, sy, 0);
+
+			// redraw with wraparound x
+			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+					code,
+					color,
+					flipx, flipy,
+					sx-256, sy, 0);
 		}
 	}
 }
@@ -394,6 +462,13 @@ uint32_t vastar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		draw_sprites(bitmap, cliprect);
 		break;
 
+	case 4:
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+
 	default:
 		LOGPRIORITY("Unimplemented priority %X\n", *m_sprite_priority);
 		break;
@@ -418,13 +493,51 @@ void vastar_state::machine_reset()
 	m_bg_scroll[1] = m_fgvideoram + 0x3e0;
 	m_spriteram[1] = m_fgvideoram + 0x400;
 	m_spriteram[2] = m_fgvideoram + 0x800;
+
+	m_fg_codebase = 0x800;
+	m_fg_attrbase = 0x400;
+	m_fg_colbase = 0x000;
+
+	m_bg_codebase = 0x800;
+	m_bg_attrbase = 0x000;
+	m_bg_colbase = 0xc00;
 }
+
+void akazukin_state::machine_start()
+{
+	vastar_common_state::machine_start();
+	save_item(NAME(m_nmi_sub_mask));
+}
+
+void akazukin_state::machine_reset()
+{
+	vastar_state::machine_reset();
+
+	m_spriteram[0] = m_fgvideoram + 0x800;
+	m_bg_scroll[0] = m_fgvideoram + 0xbe0;
+	m_bg_scroll[1] = m_fgvideoram + 0xbc0;
+	m_spriteram[1] = m_fgvideoram + 0x400;
+	m_spriteram[2] = m_fgvideoram + 0x000;
+
+	m_fg_codebase = 0x000;
+	m_fg_attrbase = 0x400;
+	m_fg_colbase = 0x800;
+
+	m_bg_codebase = 0x000;
+	m_bg_attrbase = 0x800;
+	m_bg_colbase = 0x400;
+}
+
 
 WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
 }
 
+void akazukin_state::nmi_sub_mask_w(uint8_t data)
+{
+	m_nmi_sub_mask = data & 1;
+}
 
 void vastar_state::main_map(address_map &map)
 {
@@ -443,7 +556,6 @@ void vastar_common_state::main_port_map(address_map &map)
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
-
 void vastar_common_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
@@ -456,8 +568,47 @@ void vastar_common_state::cpu2_map(address_map &map)
 void vastar_common_state::cpu2_port_map(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x00, 0x01).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r(m_ay, FUNC(ay8910_device::data_r));
+}
+
+void akazukin_state::akazukin_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(FUNC(akazukin_state::bgvideoram_w<1>)).share(m_bgvideoram[1]);
+	map(0x9000, 0x9fff).ram().w(FUNC(akazukin_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0xa000, 0xabff).ram().w(FUNC(akazukin_state::fgvideoram_w)).share(m_fgvideoram); // fg videoram + sprites
+	map(0xac00, 0xac00).ram().share(m_sprite_priority); // sprite / BG priority
+	map(0xac01, 0xafff).ram();
+	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xe000, 0xe000).portr("SYSTEM");
+	map(0xe800, 0xe800).portr("P1");
+	map(0xf000, 0xf000).portr("P2");
+	map(0xf800, 0xffff).ram();
+}
+
+void akazukin_state::akazukin_main_port_map(address_map &map)
+{
+	map(0x10, 0x10).r("soundlatch2", FUNC(generic_latch_8_device::read)).w("soundlatch", FUNC(generic_latch_8_device::write)); // to/from sound CPU
+	map.global_mask(0xff);
+}
+
+void akazukin_state::akazukin_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x5000, 0x5000).w(FUNC(akazukin_state::nmi_sub_mask_w));
+}
+
+void akazukin_state::akazukin_cpu2_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).r("soundlatch", FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write)); // to/from main CPU
+	map(0x40, 0x41).w(m_ay2, FUNC(ay8910_device::address_data_w));
+	map(0x42, 0x42).r(m_ay2, FUNC(ay8910_device::data_r));
+	map(0x80, 0x81).w(m_ay, FUNC(ay8910_device::address_data_w));
+	map(0x82, 0x82).r(m_ay, FUNC(ay8910_device::data_r));
+//  map(0xc0, 0xc0).nopw();
 }
 
 void dogfightp_state::main_map(address_map &map)
@@ -659,6 +810,95 @@ static INPUT_PORTS_START( pprobe )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( akazukin )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )        PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x00, "255" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Skip Level 1" )          PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0, 0xe0, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW2:5,6,7,8")
+	PORT_DIPSETTING(    0xb0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0x50, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+//  PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+//  PORT_DIPSETTING(    0x70, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
+//  PORT_DIPSETTING(    0x60, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -709,7 +949,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(vastar_common_state::vblank_irq)
 {
-	if(m_nmi_mask)
+	if (m_nmi_mask)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -735,10 +975,10 @@ void vastar_common_state::common(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.port_b_read_callback().set_ioport("DSW2");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, m_ay, XTAL(18'432'000) / 12);
+	m_ay->port_a_read_callback().set_ioport("DSW1");
+	m_ay->port_b_read_callback().set_ioport("DSW2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void vastar_state::vastar(machine_config &config)
@@ -780,6 +1020,40 @@ void dogfightp_state::dogfightp(machine_config &config)
 	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }
+
+INTERRUPT_GEN_MEMBER(akazukin_state::sub_irq)
+{
+	if (m_nmi_sub_mask)
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void akazukin_state::akazukin(machine_config &config)
+{
+	vastar(config);
+
+	// m_maincpu NMI from vblank, IRQ0 from subcpu
+	//m_maincpu->set_vblank_int("screen", FUNC(akazukin_state::akazukin_vblank_irq));
+	m_maincpu->set_addrmap(AS_PROGRAM, &akazukin_state::akazukin_main_map);
+	m_maincpu->set_addrmap(AS_IO, &akazukin_state::akazukin_main_port_map);
+
+	// sound as sub.cpp
+
+	// m_subcpu NMI from period, IRQ0 from maincpu
+	m_subcpu->set_addrmap(AS_PROGRAM, &akazukin_state::akazukin_cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &akazukin_state::akazukin_cpu2_port_map);
+	m_subcpu->set_periodic_int(FUNC(akazukin_state::sub_irq), attotime::from_hz(60));
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_subcpu, 0);
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, 0);
+
+	m_ay->port_b_read_callback().set_constant(0xff);
+
+	AY8910(config, m_ay2, XTAL(18'432'000) / 12);
+	m_ay2->port_a_read_callback().set_ioport("DSW2");
+	m_ay2->port_b_read_callback().set_constant(0xff);
+	m_ay2->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
 
 /***************************************************************************
 
@@ -996,6 +1270,39 @@ ROM_START( pprobe )
 	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )  // ???? == vastar - tbp24s10.8n
 ROM_END
 
+ROM_START( akazukin )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // on ORCA OVG-33c board
+	ROM_LOAD( "1.j2",  0x0000, 0x2000, CRC(8987f1e0) SHA1(a7a705f83a8b53c3c7b74b695a086516e3316219) )
+	ROM_LOAD( "2.l2",  0x2000, 0x2000, CRC(c8b040e4) SHA1(36b37f75080b682405ce1ad093538f6a1231fe72) )
+	ROM_LOAD( "3.m2",  0x4000, 0x2000, CRC(262edb0d) SHA1(afb2994274ae3d189ca3ffad556727afb0a8b1a4) )
+	ROM_LOAD( "4.n2",  0x6000, 0x2000, CRC(3569221f) SHA1(045cf99fe85b26503d368fecf1dad5f3785b5d79) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) // on ORCA OVG-33c board
+	ROM_LOAD( "5.h7",  0x0000, 0x2000, CRC(c34486ae) SHA1(28b3db7e906202ee0d49907f66202544d352ff3f) )
+	ROM_LOAD( "6.j7",  0x2000, 0x1000, CRC(b5e1d77f) SHA1(637f17d04976bc43801012280010df8500313331) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "10.b9",  0x0000, 0x1000, CRC(0145ded8) SHA1(515f3943579f2a8e17ca05959b9354981219d9d9) )
+
+	ROM_REGION( 0x4000, "sprites", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "9.e9",   0x0000, 0x2000, CRC(5fecc3d7) SHA1(619584936382c38c391c654684b24f6d642dff03) )
+	ROM_LOAD( "11.e7",  0x2000, 0x2000, CRC(448b28b8) SHA1(3a379c0a57ac89698b332d0af20ca8a3b0476d79) )
+
+	ROM_REGION( 0x1000, "bgtiles0", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "7.t4",  0x0000, 0x1000, CRC(7b4124da) SHA1(9bd713ac660920f6c5b407e80df9438df575de88) )
+
+	ROM_REGION( 0x2000, "bgtiles1", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "8.p4",  0x0000, 0x2000, CRC(193f6bcb) SHA1(0f4699052b2c66fabd293e7ef08fd25de7af42f3) )
+
+	ROM_REGION( 0x0300, "proms", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "r.r6",  0x0000, 0x0100, CRC(77ccc932) SHA1(5bd23ca5ab80ac9c19e85ea79ba3d276c4be59cb) ) // red component
+	ROM_LOAD( "g.m6",  0x0100, 0x0100, CRC(eddc3acf) SHA1(0fca5d36ccbd5191ce8a59d070112ae4a3297b0b) ) // green component
+	ROM_LOAD( "b.l6",  0x0200, 0x0100, CRC(059dae45) SHA1(26c9b975804fc206e80ee21361e489824f39e0c0) ) // blue component
+
+	ROM_REGION( 0x0100, "unkprom", 0 ) // on ORCA OVG-46C sub board
+	ROM_LOAD( "8n",  0x0000, 0x0100, CRC(e1b815ca) SHA1(df2b99259bf1023d37aa3b54247721d657d7e9c9) ) // ????
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1005,3 +1312,4 @@ GAME( 1983, vastar3,   vastar,   vastar,    vastar,  vastar_state,    empty_init
 GAME( 1983, vastar4,   vastar,   vastar,    vastar4, vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 4)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1983, dogfightp, dogfight, dogfightp, vastar,  dogfightp_state, empty_init, ROT270, "Orca",                        "Dog Fight (Orca, prototype)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
 GAME( 1985, pprobe,    0,        vastar,    pprobe,  vastar_state,    empty_init, ROT90,  "Crux / Kyugo?",               "Planet Probe (prototype?)",   MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, akazukin,  0,        akazukin,  akazukin,akazukin_state,  empty_init, ROT0,   "Sigma",                       "Aka Zukin",                   MACHINE_SUPPORTS_SAVE ) // ORCA OVG-33C + ORCA OVG-46C
