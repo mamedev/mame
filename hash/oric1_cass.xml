@@ -678,7 +678,7 @@ license:CC0-1.0
 
 	<software name="cobrapinball">
 		<description>Cobra Pinball</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>Cobra Soft - ARG Informatique</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="46881">
@@ -1401,13 +1401,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="froghop!">
+	<software name="froghop">
 		<description>Frog-Hop!</description>
 		<year>1984</year>
 		<publisher>Tansoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18155">
-				<rom name="Frog-Hop! (1984)(Tansoft)(GB).tap" size="18155" crc="1951f0dd" sha1="069a8f53933931078cef9ac5d1ba66678572890d"/>
+				<rom name="Frog-Hop (1984)(Tansoft)(GB).tap" size="18155" crc="1951f0dd" sha1="069a8f53933931078cef9ac5d1ba66678572890d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2732,22 +2732,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="paras1">
-		<description>Paras (part 1)</description>
+	<software name="paras">
+		<description>Paras</description>
 		<year>1983</year>
 		<publisher>M.C. Lothlorien</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
 			<dataarea name="cass" size="1014">
 				<rom name="Paras (1983)(M.C. Lothlorien)(GB)(Part 1 of 2).tap" size="1014" crc="811a225f" sha1="2f7d5c5ded9e570c39de442ae7c7f49c5369d52f"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="paras2" cloneof="paras">
-		<description>Paras (part 2))</description>
-		<year>1983</year>
-		<publisher>M.C. Lothlorien</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass2" interface="oric1_cass">
 			<dataarea name="cass" size="12893">
 				<rom name="Paras (1983)(M.C. Lothlorien)(GB)(Part 2 of 2).tap" size="12893" crc="3c93cfe4" sha1="1703e86d96db4784c065f37d11afd597eca00da0"/>
 			</dataarea>
@@ -3541,7 +3535,7 @@ license:CC0-1.0
 		<publisher>A.R.G. Informatique - Cobra Soft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="11070">
-				<rom name="Stress! (1984)(A.R.G. Informatique - Cobra Soft)(FR).tap" size="11070" crc="d9c71c75" sha1="dadadd56d74ef37ee8ff7a178b783d6019bff300"/>
+				<rom name="Stress (1984)(A.R.G. Informatique - Cobra Soft)(FR).tap" size="11070" crc="d9c71c75" sha1="dadadd56d74ef37ee8ff7a178b783d6019bff300"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3810,13 +3804,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="trésor">
+	<software name="tresor">
 		<description>Trésor de Tarakunda, Le</description>
 		<year>1984</year>
 		<publisher>Micro Programmes 5</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="35155">
-				<rom name="Trésor de Tarakunda, Le (1984)(Micro Programmes 5)(Atmos)(FR)(Face A).tap" size="35155" crc="99347cc2" sha1="76f0fb037288575963dfe45d143e4d86cd3c97ba"/>
+				<rom name="Tresor de Tarakunda, Le (1984)(Micro Programmes 5)(Atmos)(FR)(Face A).tap" size="35155" crc="99347cc2" sha1="76f0fb037288575963dfe45d143e4d86cd3c97ba"/>
 			</dataarea>
 		</part>
 	</software>
