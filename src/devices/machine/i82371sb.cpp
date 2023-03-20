@@ -132,8 +132,9 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 
 void i82371sb_isa_device::device_config_complete()
 {
-	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
-	m_isabus->set_iospace(m_maincpu, AS_IO);
+	auto isabus = m_isabus.finder_target();
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_maincpu, AS_PROGRAM);
+	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_maincpu, AS_IO);
 
 	pci_device::device_config_complete();
 }
@@ -979,8 +980,10 @@ void i82371sb_ide_device::device_add_mconfig(machine_config &config)
 
 void i82371sb_ide_device::device_config_complete()
 {
-	m_ide1->set_bus_master_space(m_maincpu, AS_PROGRAM);
-	m_ide2->set_bus_master_space(m_maincpu, AS_PROGRAM);
+	auto ide1 = m_ide1.finder_target();
+	auto ide2 = m_ide2.finder_target();
+	ide1.first.subdevice<bus_master_ide_controller_device>(ide1.second)->set_bus_master_space(m_maincpu, AS_PROGRAM);
+	ide2.first.subdevice<bus_master_ide_controller_device>(ide2.second)->set_bus_master_space(m_maincpu, AS_PROGRAM);
 
 	pci_device::device_config_complete();
 }

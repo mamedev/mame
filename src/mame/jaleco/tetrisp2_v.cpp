@@ -125,8 +125,8 @@ void rocknms_state::rocknms_sub_priority_w(offs_t offset, u16 data, u16 mem_mask
 
 TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 {
-	u16 code_hi = m_vram_bg[ 2 * tile_index + 0];
-	u16 code_lo = m_vram_bg[ 2 * tile_index + 1];
+	u16 code_hi = m_vram_bg[2 * tile_index + 0];
+	u16 code_lo = m_vram_bg[2 * tile_index + 1];
 	tileinfo.set(0,
 			code_hi,
 			code_lo & 0xf,
@@ -145,8 +145,8 @@ void tetrisp2_state::tetrisp2_vram_bg_w(offs_t offset, u16 data, u16 mem_mask)
 
 TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 {
-	u16 code_hi = m_vram_fg[ 2 * tile_index + 0];
-	u16 code_lo = m_vram_fg[ 2 * tile_index + 1];
+	u16 code_hi = m_vram_fg[2 * tile_index + 0];
+	u16 code_lo = m_vram_fg[2 * tile_index + 1];
 	tileinfo.set(2,
 			code_hi,
 			code_lo & 0xf,
