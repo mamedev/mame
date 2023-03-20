@@ -54,7 +54,7 @@ u32 m6x09_base_disassembler::opcode_alignment() const
 //-------------------------------------------------
 
 m6x09_base_disassembler::m6x09_base_disassembler(const opcodeinfo *opcodes, size_t opcode_count, uint32_t level)
-	: m_level(level)
+	: m_level(level), m_page(0)
 {
 	// create filtered opcode table
 	for (int i=0; i<opcode_count; i++)
@@ -91,14 +91,13 @@ bool m6x09_base_disassembler::opcodeinfo::compare::operator()(opcodeinfo const& 
 
 const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode(const data_buffer &opcodes, offs_t &p)
 {
-	int infloop = 0;
-	uint16_t page = 0;
+	uint8_t page_count = 0;
 	const opcodeinfo *op = nullptr;
 
 	while(!op)
 	{
 		// retrieve the opcode
-		uint16_t opcode = page | opcodes.r8(p++);
+		uint16_t opcode = m_page | opcodes.r8(p++);
 
 		// perform the lookup
 		auto iter = m_opcodes.find(opcode);
@@ -107,11 +106,11 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 		if (iter == m_opcodes.end())
 		{
 			// on the 6809 an unimplemented page 2 or 3 opcodes fall through to the first page.
-			if (!(m_level & HD6309_EXCLUSIVE) && (page != 0))
+			if (!(m_level & HD6309_EXCLUSIVE) && (m_page != 0))
 			{
 				// backup the opcode pointer and disassemble the bare opcode.
 				--p;
-				page = 0;
+				m_page = 0;
 			}
 			else
 				// nothing to disassemble.
@@ -124,27 +123,32 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 			{
 			case PG2:
 			case PG3:
-				if (page == 0)
-				{
-					// remember the page that comes first
-					page = iter->opcode() << 8;
-				}
-				else if (m_level & HD6309_EXCLUSIVE)
+				if (m_page != 0 && m_level & HD6309_EXCLUSIVE)
 				{
 					// multiple pages are illegal on the 6309
+					m_page = 0;
 					return nullptr;
 				}
-
-				if (infloop++ > 65534)
+				else if (m_page == 0)
 				{
-					// detect infinite loop of page opcodes
-					return nullptr;
+					// remember the page that comes first
+					page_count++;
+					m_page = iter->opcode() << 8;
 				}
-
+				else
+				{
+					// output single page opcode after a two pages
+					if (page_count++)
+					{
+						--p;
+						return nullptr;
+					}
+				}
 				break;
 
 			default:
 				op = &*iter;
+				m_page = 0;
 				break;
 			}
 		}

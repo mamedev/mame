@@ -117,6 +117,7 @@ private:
 	std::set<opcodeinfo, opcodeinfo::compare> m_opcodes;
 
 	uint32_t m_level;
+	uint16_t m_page;
 
 	const opcodeinfo *fetch_opcode(const data_buffer &opcodes, offs_t &p);
 
