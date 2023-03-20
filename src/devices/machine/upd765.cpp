@@ -20,7 +20,7 @@
 #define LOG_LIVE    (1U << 12)  // Live states
 #define LOG_DONE    (1U << 13)  // Command done
 
-#define VERBOSE (0xffff)
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
