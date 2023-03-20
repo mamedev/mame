@@ -1032,7 +1032,7 @@ void shaders::blit(
 
 		if (clear_dst)
 		{
-			result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
+			result = d3d->get_device()->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0xff,0,0,0), 0, 0);
 			if (FAILED(result))
 			{
 				osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
