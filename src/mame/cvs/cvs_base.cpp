@@ -33,7 +33,8 @@ uint8_t cvs_base_state::collision_r()
 
 uint8_t cvs_base_state::collision_clear()
 {
-	m_collision_register = 0;
+	if (!machine().side_effects_disabled())
+		m_collision_register = 0;
 	return 0;
 }
 
@@ -57,15 +58,15 @@ void cvs_base_state::init_stars()
 		for (int x = 511; x >= 0; x--)
 		{
 			generator <<= 1;
-			int const bit1 = (~generator >> 17) & 1;
-			int const bit2 = (generator >> 5) & 1;
+			int const bit1 = BIT(~generator, 17);
+			int const bit2 = BIT(generator, 5);
 
 			if (bit1 ^ bit2)
 				generator |= 1;
 
-			if (((~generator >> 16) & 1) && (generator & 0xfe) == 0xfe)
+			if (BIT(~generator, 16) && (generator & 0xfe) == 0xfe)
 			{
-				if(((~(generator >> 12)) & 0x01) && ((~(generator >> 13)) & 0x01))
+				if (BIT(~generator, 12) && BIT(~generator, 13))
 				{
 					if (m_total_stars < CVS_MAX_STARS)
 					{
@@ -88,7 +89,7 @@ void cvs_base_state::update_stars(bitmap_ind16 &bitmap, const rectangle &cliprec
 		uint8_t x = (m_stars[offs].x + m_stars_scroll) >> 1;
 		uint8_t y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
 
-		if ((y & 1) ^ ((x >> 4) & 1))
+		if (BIT(y, 0) ^ BIT(x, 4))
 		{
 			if (flip_screen_x())
 				x = ~x;

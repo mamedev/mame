@@ -24,39 +24,22 @@
 
 class cvs_base_state : public driver_device
 {
-public:
-	cvs_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_bullet_ram(*this, "bullet_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_s2636(*this, "s2636%u", 0U)
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
-		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
-		, m_ram_view(*this, "video_color_ram_view")
-	{ }
-
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-	// memory pointers
-	required_shared_ptr<uint8_t> m_bullet_ram;
-
-	// video-related
-	static constexpr uint8_t CVS_MAX_STARS = 250;
-	static constexpr int8_t CVS_S2636_Y_OFFSET = -5;
-	static constexpr int8_t CVS_S2636_X_OFFSET = -26;
+	static inline constexpr uint8_t CVS_MAX_STARS = 250;
+	static inline constexpr int8_t CVS_S2636_Y_OFFSET = -5;
+	static inline constexpr int8_t CVS_S2636_X_OFFSET = -26;
 
 	struct cvs_star
 	{
 		int x = 0, y = 0, code = 0;
 	};
 
-	cvs_star m_stars[CVS_MAX_STARS]{};
-	bitmap_ind16 m_collision_background = 0;
+	// memory pointers
+	required_shared_ptr<uint8_t> m_bullet_ram;
+
+	// video-related
+	cvs_star m_stars[CVS_MAX_STARS];
+	bitmap_ind16 m_collision_background;
 	uint8_t m_collision_register = 0U;
 	uint16_t m_total_stars = 0U;
 	int32_t m_stars_scroll = 0U;
@@ -73,6 +56,22 @@ protected:
 	memory_share_creator<uint8_t> m_color_ram;
 
 	memory_view m_ram_view;
+
+	cvs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_bullet_ram(*this, "bullet_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_s2636(*this, "s2636%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_BIG)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_BIG)
+		, m_ram_view(*this, "video_color_ram_view")
+	{ }
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
 	uint8_t collision_r();
