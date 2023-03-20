@@ -14795,6 +14795,9 @@ ax145                           // Brother AX-145 (c) 198? Brother Industries, L
 @source:brother/lw30.cpp
 lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
 
+@source:brother/lw700i.cpp
+lw700i                          // (c) 1995 Brother
+
 @source:brother/lw840.cpp
 lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
 
@@ -20813,7 +20816,7 @@ imgfight                        // (c) 1988 (World)
 imgfightj                       // (c) 1988 (Japan)
 imgfightjb                      // bootleg
 kengo                           // (c) 1991 (Japan)
-kengoa                          // (c) 1991 (Japan)
+kengoj                          // (c) 1991 (Japan)
 loht                            // (c) 1989 (World)
 loht_ms                         // (c) 1989 (bootleg)
 lohtb                           // (c) 1989 (bootleg)
@@ -20880,6 +20883,7 @@ inthunt                         // (c) 1993 Irem (World)
 inthuntu                        // (c) 1993 Irem America (US)
 kaiteids                        // (c) 1993 Irem (Japan)
 leaguemn                        // (c) 1993 Irem (Japan)
+leaguemna                       // (c) 1993 Irem (Japan)
 lethalth                        // (c) 1991 Irem (World)
 majtitl2                        // (c) 1992 Irem (World)
 majtitl2a                       //
@@ -40713,9 +40717,6 @@ bitgrphb                        //
 
 @source:skeleton/blit.cpp
 blit
-
-@source:skeleton/blw700i.cpp
-blw700i                         // (c) 1995 Brother
 
 @source:skeleton/bpmmicro.cpp
 bp1200                          // (c) 1991 BP Microsystems

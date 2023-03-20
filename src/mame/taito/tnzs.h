@@ -6,7 +6,6 @@
 #pragma once
 
 #include "cpu/mcs48/mcs48.h"
-#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
@@ -17,50 +16,66 @@
 #include "screen.h"
 
 
-class tnzs_base_state : public driver_device
+class tnzs_video_state_base : public driver_device
 {
-public:
-	tnzs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	tnzs_video_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "sub")
 		, m_spritegen(*this, "spritegen")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_mainbank(*this, "mainbank")
-		, m_subbank(*this, "subbank")
-	{ }
-
-	void tnzs_base(machine_config &config);
-	void tnzs_mainbank(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-
-	virtual void bankswitch1_w(uint8_t data);
-
-	void ramrom_bankswitch_w(uint8_t data);
+	{
+	}
 
 	void prompalette(palette_device &palette) const;
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tnzs);
 
-	void base_sub_map(address_map &map);
-	void main_map(address_map &map);
-	void mainbank_map(address_map &map);
-
-	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_subcpu;
 	required_device<x1_001_device> m_spritegen;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */
-	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */
-
-	/* misc / mcu */
-	int      m_bank2 = 0;
 };
+
+
+class tnzs_base_state : public tnzs_video_state_base
+{
+protected:
+	tnzs_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_video_state_base(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
+		, m_subbank(*this, "subbank")
+		, m_mainrombank(*this, "rombank")
+		, m_mainrambank(*this, "rambank")
+		, m_bankedram(*this, "bankedram", 0x8000, ENDIANNESS_LITTLE)
+		, m_ramromview(*this, "ramrom")
+	{ }
+
+	void tnzs_base(machine_config &config) ATTR_COLD;
+
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual void bankswitch1_w(uint8_t data);
+
+	void ramrom_bankswitch_w(uint8_t data);
+
+	void prompal_main_map(address_map &map) ATTR_COLD;
+	void rampal_main_map(address_map &map) ATTR_COLD;
+
+	void base_sub_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<cpu_device> m_subcpu;
+	required_memory_bank m_subbank;
+
+private:
+	required_memory_bank m_mainrombank;
+	required_memory_bank m_mainrambank;
+	memory_share_creator<uint8_t> m_bankedram;
+	memory_view m_ramromview;
+};
+
 
 class tnzs_mcu_state : public tnzs_base_state
 {
@@ -76,7 +91,7 @@ public:
 		, m_lockout_level(lockout_level)
 	{ }
 
-	void tnzs(machine_config &config);
+	void tnzs(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void bankswitch1_w(uint8_t data) override;
@@ -88,7 +103,7 @@ protected:
 
 	uint8_t analog_r(offs_t offset);
 
-	void tnzs_sub_map(address_map &map);
+	void tnzs_sub_map(address_map &map) ATTR_COLD;
 
 	required_device<upi41_cpu_device> m_mcu;
 	optional_device<upd4701_device> m_upd4701;
@@ -115,11 +130,9 @@ public:
 	extrmatn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tnzs_mcu_state(mconfig, type, tag, false)
 	{ }
-	void extrmatn(machine_config &config);
-	void plumppop(machine_config &config);
 
-protected:
-	void prompal_main_map(address_map &map);
+	void extrmatn(machine_config &config) ATTR_COLD;
+	void plumppop(machine_config &config) ATTR_COLD;
 };
 
 class arknoid2_state : public extrmatn_state
@@ -134,11 +147,11 @@ public:
 		, m_in2(*this, "IN2")
 	{ }
 
-	void arknoid2(machine_config &config);
+	void arknoid2(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void bankswitch1_w(uint8_t data) override;
 
@@ -146,7 +159,9 @@ private:
 	void mcu_w(offs_t offset, uint8_t data);
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 
-	void arknoid2_sub_map(address_map &map);
+	void arknoid2_sub_map(address_map &map) ATTR_COLD;
+
+	void mcu_reset();
 
 	required_ioport m_coin1;
 	required_ioport m_coin2;
@@ -154,18 +169,16 @@ private:
 	required_ioport m_in1;
 	required_ioport m_in2;
 
-	void mcu_reset();
-
 	int      m_mcu_initializing = 0;
 	int      m_mcu_coinage_init = 0;
 	int      m_mcu_command = 0;
 	int      m_mcu_readcredits = 0;
 	int      m_mcu_reportcoin = 0;
 	int      m_insertcoin = 0;
-	uint8_t    m_mcu_coinage[4]{};
-	uint8_t    m_mcu_coins_a = 0;
-	uint8_t    m_mcu_coins_b = 0;
-	uint8_t    m_mcu_credits = 0;
+	uint8_t  m_mcu_coinage[4]{};
+	uint8_t  m_mcu_coins_a = 0;
+	uint8_t  m_mcu_coins_b = 0;
+	uint8_t  m_mcu_credits = 0;
 
 	void mcu_handle_coins(int coin);
 };
@@ -181,13 +194,13 @@ public:
 		, m_csport_sel(0)
 	{ }
 
-	void kageki(machine_config &config);
+	void kageki(machine_config &config) ATTR_COLD;
 
-	void init_kageki();
+	void init_kageki() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr unsigned MAX_SAMPLES = 0x2f;
@@ -197,18 +210,16 @@ private:
 	uint8_t csport_r();
 	void csport_w(uint8_t data);
 
-	DECLARE_MACHINE_RESET(kageki);
-
 	SAMPLES_START_CB_MEMBER(init_samples);
 
-	void kageki_sub_map(address_map &map);
+	void kageki_sub_map(address_map &map) ATTR_COLD;
 
 	required_device<samples_device> m_samples;
 
 	required_ioport m_dswa;
 	required_ioport m_dswb;
 
-	/* sound-related */
+	// sound-related
 	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
 	int      m_samplesize[MAX_SAMPLES]{};
 
@@ -223,16 +234,14 @@ public:
 		, m_upd4701(*this, "upd4701")
 	{ }
 
-	void jpopnics(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
+	void jpopnics(machine_config &config) ATTR_COLD;
 
 private:
 	void subbankswitch_w(uint8_t data);
 
-	void jpopnics_main_map(address_map &map);
-	void jpopnics_sub_map(address_map &map);
+	void jpopnics_main_map(address_map &map) ATTR_COLD;
+	void jpopnics_sub_map(address_map &map) ATTR_COLD;
+
 	required_device<upd4701_device> m_upd4701;
 };
 
@@ -243,11 +252,11 @@ public:
 		: tnzs_base_state(mconfig, type, tag)
 	{ }
 
-	void insectx(machine_config &config);
+	void insectx(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void bankswitch1_w(uint8_t data) override;
-	void insectx_sub_map(address_map &map);
+	void insectx_sub_map(address_map &map) ATTR_COLD;
 };
 
 class tnzsb_state : public tnzs_base_state
@@ -259,7 +268,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void tnzsb(machine_config &config);
+	void tnzsb(machine_config &config) ATTR_COLD;
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
@@ -268,11 +277,10 @@ protected:
 
 	virtual void bankswitch1_w(uint8_t data) override;
 
-	void tnzsb_base_sub_map(address_map &map);
-	void tnzsb_cpu2_map(address_map &map);
-	void tnzsb_io_map(address_map &map);
-	void tnzsb_main_map(address_map &map);
-	void tnzsb_sub_map(address_map &map);
+	void tnzsb_base_sub_map(address_map &map) ATTR_COLD;
+	void tnzsb_sub_map(address_map &map) ATTR_COLD;
+	void tnzsb_cpu2_map(address_map &map) ATTR_COLD;
+	void tnzsb_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -286,16 +294,16 @@ public:
 		, m_audiobank(*this, "audiobank")
 	{ }
 
-	void kabukiz(machine_config &config);
+	void kabukiz(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound_bank_w(uint8_t data);
 
-	void kabukiz_cpu2_map(address_map &map);
-	void kabukiz_sub_map(address_map &map);
+	void kabukiz_cpu2_map(address_map &map) ATTR_COLD;
+	void kabukiz_sub_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_audiobank;
 };

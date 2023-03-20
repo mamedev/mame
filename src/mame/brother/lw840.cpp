@@ -49,7 +49,7 @@ clone of WD37C65
 
 #6
 NKK
-N341256SJ 
+N341256SJ
 CMOS SRAM (32k x 8)
 
 #8
@@ -63,7 +63,7 @@ H8/300H Advanced Mode
 14.74 MHz CPU Core (XT4), 20 MHz Printer Control (XT3)
 
 #10
-Nippon Steel Semiconductor 
+Nippon Steel Semiconductor
 NN514260J-60
 Fast Page Mode CMOS 256k x 16bit Dynamic RAM
 
@@ -98,7 +98,7 @@ public:
 
 DEFINE_DEVICE_TYPE(GM82C765B, gm82c765b_device, "gm82c765b", "GoldStar GM82C765B FDC") // also sold with Hynix branding
 
-gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
+gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	upd765_family_device(mconfig, GM82C765B, tag, owner, clock)
 {
 	ready_polled = true;
@@ -253,20 +253,20 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)																    
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(TAB))
-																											    
-	PORT_START("kbrow.1")																					    
+
+	PORT_START("kbrow.1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR(U'£')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('_')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)																    
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP)                 PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
-																											    
-	PORT_START("kbrow.2")																					    
+
+	PORT_START("kbrow.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('\'')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
@@ -309,7 +309,7 @@ static INPUT_PORTS_START(lw840)
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INSERT")                PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR(':')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'⅔') PORT_CHAR(U'⅓')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x2154) PORT_CHAR(0x2153) // ⅔ ⅓
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'|') PORT_CHAR('$')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
@@ -378,5 +378,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS         INIT        COMPANY         FULLNAME            FLAGS
-COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,  empty_init, "Brother",      "Brother LW-840ic", MACHINE_NODEVICE_PRINTER )
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS         INIT        COMPANY         FULLNAME    FLAGS
+COMP( 1997, lw840,  0,   0,       lw840,  lw840, lw840_state,  empty_init, "Brother",      "LW-840ic", MACHINE_NODEVICE_PRINTER )
