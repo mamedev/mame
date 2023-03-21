@@ -614,7 +614,6 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
           | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
-          |                                         |  A = Auto animation enable?
           |                                         |  u = bit 0 is explicitly cleared from initialized value in sams64, both bits turned on for buriki 'split' effect
  *   1    | oooo oooo oooo oooA ---- ---- ---- ---- |  A = tile animation enable? (buriki intro sets this to 0, then expects tile anim to stop while still updating registers below)  whole register gets set to 0xffff during mosaic bit of roadedge intro.
  *        | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
