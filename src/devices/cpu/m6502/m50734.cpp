@@ -15,9 +15,9 @@
 #include "emu.h"
 #include "m50734.h"
 
-#define LOG_INIT    (1 << 1U)
-#define LOG_TIMER   (1 << 2U)
-#define LOG_TIMER_X (1 << 3U)
+#define LOG_INIT    (1U << 1)
+#define LOG_TIMER   (1U << 2)
+#define LOG_TIMER_X (1U << 3)
 #define VERBOSE     (0)
 #include "logmacro.h"
 
