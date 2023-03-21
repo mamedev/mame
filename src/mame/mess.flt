@@ -1,3 +1,6 @@
+// Example system driver filter file - includes systems that are not arcade amusement or gambling machines
+// May be out of sync with source code
+
 access/acvirus.cpp
 acorn/aa310.cpp
 acorn/accomm.cpp

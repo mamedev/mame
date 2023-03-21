@@ -157,7 +157,10 @@ void tetrisp2_state::tetrisp2_vram_fg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// VJ and Stepping Stage write to the upper byte here to display ASCII text,
 	// other usages in those games outside of ASCII text write a full 16-bit value.
-	m_vram_fg[offset] = data & 0x00ff;
+	if (mem_mask == 0xff00)
+		m_vram_fg[offset] = data & 0x00ff;
+	else
+		m_vram_fg[offset] = data;
 
 	m_tilemap_fg->mark_tile_dirty(offset/2);
 }

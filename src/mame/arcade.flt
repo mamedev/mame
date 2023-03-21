@@ -1,3 +1,6 @@
+// Example system driver filter file - includes only arcade amusement and gambling machines
+// May be out of sync with source code
+
 acorn/aristmk5.cpp
 acorn/ertictac.cpp
 acorn/ssfindo.cpp
