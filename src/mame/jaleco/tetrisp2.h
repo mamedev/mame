@@ -6,6 +6,7 @@
 #pragma once
 
 #include "jaleco_ms32_sysctrl.h"
+#include "jaleco_vj_pc.h"
 #include "ms32_sprite.h"
 
 #include "machine/gen_latch.h"
@@ -222,14 +223,13 @@ public:
 		, m_vj_paletteram_m(*this, "paletteram2")
 		, m_vj_paletteram_r(*this, "paletteram3")
 		, m_soundlatch(*this, "soundlatch")
+		, m_jaleco_vj_pc(*this, "jaleco_vj_pc")
 		, m_soundvr(*this, "SOUND_VR%u", 1)
 		, m_rscreen(*this, "rscreen")
 	{ }
 
 	void stepstag(machine_config &config);
 	void vjdash(machine_config &config);
-
-	void init_stepstag();
 
 	DECLARE_VIDEO_START(stepstag);
 
@@ -243,10 +243,8 @@ private:
 	bool vj_upload_fini = false;
 	void stepstag_b00000_w(u16 data);
 	void stepstag_b20000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void stepstag_main2pc_w(u16 data);
 	u16 stepstag_sprite_status_status_r();
 	u16 unknown_read_0xffff00();
-	u16 stepstag_pc2main_r();
 	void stepstag_soundlatch_word_w(u16 data);
 	void stepstag_neon_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void stepstag_step_leds_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -295,6 +293,7 @@ private:
 	optional_shared_ptr<u16> m_vj_paletteram_m;
 	optional_shared_ptr<u16> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
+	required_device<jaleco_vj_pc_device> m_jaleco_vj_pc;
 	optional_ioport_array<2> m_soundvr;
 	required_device<screen_device> m_rscreen;
 

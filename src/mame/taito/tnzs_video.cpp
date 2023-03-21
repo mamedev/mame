@@ -2,25 +2,12 @@
 // copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
 /***************************************************************************
 
-  video.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "tnzs.h"
-
-/***************************************************************************
-
-  The New Zealand Story doesn't have a color PROM. It uses 1024 bytes of RAM
-  to dynamically create the palette. Each couple of bytes defines one
-  color (15 bits per pixel; the top bit of the second byte is unused).
-  Since the graphics use 4 bitplanes, hence 16 colors, this makes for 32
-  different color codes.
-
-***************************************************************************/
-
+#include "tnzs_video.h"
 
 /***************************************************************************
 

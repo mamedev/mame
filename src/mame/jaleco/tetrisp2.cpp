@@ -523,11 +523,6 @@ void stepstag_state::stepstag_b00000_w(u16 data)
 	vj_upload_fini = false;
 }
 
-void  stepstag_state::stepstag_main2pc_w(u16 data)
-{
-	popmessage("cmd @ pc: 0x%x\n", data);
-}
-
 u16 stepstag_state::stepstag_sprite_status_status_r()
 {
 	// Guessed based on usage, but this is checked to make sure
@@ -538,11 +533,6 @@ u16 stepstag_state::stepstag_sprite_status_status_r()
 u16 stepstag_state::unknown_read_0xffff00()
 {
 	return machine().rand();
-}
-
-u16 stepstag_state::stepstag_pc2main_r()
-{
-	return 0xffff;
 }
 
 void stepstag_state::stepstag_soundlatch_word_w(u16 data)
@@ -726,7 +716,7 @@ void stepstag_state::adv7176a_w(u16 data)
 
 				logerror("Mode register 0\n");
 				logerror("\tencode mode control %02x ", encode_mode_control);
-				switch(encode_mode_control)
+				switch (encode_mode_control)
 				{
 					case 0b00: logerror("NTSC\n"); break;
 					case 0b01: logerror("PAL (B, D, G, H, I)\n"); break;
@@ -737,7 +727,7 @@ void stepstag_state::adv7176a_w(u16 data)
 				logerror("\tpedestal control %02x %s\n", pedestal_control, pedestal_control ? "on" : "off");
 
 				logerror("\tluminance filter control %02x ", luminance_filter_control);
-				switch(luminance_filter_control)
+				switch (luminance_filter_control)
 				{
 					case 0b00: logerror("Low pass filter (A)\n"); break;
 					case 0b01: logerror("Notch filter\n"); break;
@@ -762,7 +752,7 @@ void stepstag_state::adv7176a_w(u16 data)
 				logerror("Mode register 1\n");
 				logerror("\tinterlaced mode control %02x %s\n", interlaced_mode_control, interlaced_mode_control ? "non-interlaced" : "interlaced");
 				logerror("\tclosed captioning field control %02x ", closed_captioning_field_control);
-				switch(closed_captioning_field_control)
+				switch (closed_captioning_field_control)
 				{
 					case 0b00: logerror("No data out\n"); break;
 					case 0b01: logerror("Odd field only\n"); break;
@@ -798,7 +788,7 @@ void stepstag_state::adv7176a_w(u16 data)
 				logerror("\tblank control %02x %s\n", blank_control, blank_control ? "disable" : "enable");
 
 				logerror("\tluma delay %02x ", luma_delay_control);
-				switch(luma_delay_control)
+				switch (luma_delay_control)
 				{
 					case 0b00: logerror("0ns delay\n"); break;
 					case 0b01: logerror("74ns delay\n"); break;
@@ -819,7 +809,7 @@ void stepstag_state::adv7176a_w(u16 data)
 
 				logerror("Timing register 1\n");
 				auto d = 1;
-				switch(hsync_width)
+				switch (hsync_width)
 				{
 					case 0b00: d = 1; break;
 					case 0b01: d = 4; break;
@@ -827,7 +817,7 @@ void stepstag_state::adv7176a_w(u16 data)
 					case 0b11: d = 128; break;
 				}
 				logerror("\thsync width %02x %d\n", hsync_width, d);
-				switch(hsync_to_vsync_delay)
+				switch (hsync_to_vsync_delay)
 				{
 					case 0b00: d = 0; break;
 					case 0b01: d = 4; break;
@@ -852,7 +842,7 @@ void stepstag_state::adv7176a_w(u16 data)
 				logerror("Mode register 2\n");
 				logerror("\tsquare pixel control %02x %s\n", square_pixel_mode_control, square_pixel_mode_control ? "enable" : "disable");
 				logerror("\tgenlock control %02x ", genlock_control);
-				switch(genlock_control)
+				switch (genlock_control)
 				{
 					case 0b00: case 0b10:
 						logerror("Disable genlock\n"); break;
@@ -918,12 +908,12 @@ void stepstag_state::stepstag_map(address_map &map)
 	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));          // I/O
 	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));                    // I/O
 	map(0xa30000, 0xa30001).r(FUNC(stepstag_state::stepstag_soundvolume_r)).nopw();         // Sound Volume
-	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));
+	map(0xa42000, 0xa42001).r(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::response_r));
 	map(0xa44000, 0xa44001).nopr();     // watchdog
-	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));                                   // PC Comm
+	map(0xa48000, 0xa48001).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::comm_w));
 	// map(0xa4c000, 0xa4c001).noprw(); // Related to 0xa60000
 	map(0xa50000, 0xa50001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(stepstag_state::stepstag_soundlatch_word_w));
-	map(0xa60000, 0xa60003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);             // Sound
+	map(0xa60000, 0xa60003).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::ymz_w));
 
 	map(0xb00000, 0xb00001).w(FUNC(stepstag_state::stepstag_b00000_w));                                    // init xilinx uploading??
 	map(0xb20000, 0xb20001).w(FUNC(stepstag_state::stepstag_b20000_w));                                    // 98343 interface board xilinx uploading?
@@ -974,9 +964,9 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 //  map(0xac0000, 0xac0001).nopw(); // cleared at boot
 
 	// The code for PC comms fully exists in VJ but it doesn't appear to ever be called
-	// map(0xa42000, 0xa42001).r(":jaleco_vj_pc:isa1:jaleco_vj_sound", FUNC(jaleco_vj_isa16_sound_device::response_r));
-	// map(0xa44000, 0xa44001).nopr();     // watchdog
-	// map(0xa48000, 0xa48001).w(":jaleco_vj_pc:isa1:jaleco_vj_sound", FUNC(jaleco_vj_isa16_sound_device::comm_w));
+	//map(0xa42000, 0xa42001).r(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::response_r));
+	//map(0xa44000, 0xa44001).nopr();     // watchdog
+	//map(0xa48000, 0xa48001).w(m_jaleco_vj_pc, FUNC(jaleco_vj_pc_device::comm_w));
 
 	map(0xb00000, 0xb00001).rw(m_soundlatch, FUNC(generic_latch_16_device::read), FUNC(generic_latch_16_device::write));
 
@@ -1762,12 +1752,6 @@ void tetrisp2_state::init_rockn3()
 	m_rockn_protectdata = 4;
 }
 
-void stepstag_state::init_stepstag()
-{
-	init_rockn_timer();        // used
-	m_rockn_protectdata = 1;    // unused?
-}
-
 WRITE_LINE_MEMBER(tetrisp2_state::field_irq_w)
 {
 	// irq1 is valid on all games but tetrisp2, but always masked by SR?
@@ -2137,9 +2121,10 @@ void stepstag_state::stepstag(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
+	m_jaleco_vj_pc->set_steppingstage_mode(true);
+	m_jaleco_vj_pc->add_route(0, "lspeaker", 1.0);
+	m_jaleco_vj_pc->add_route(1, "rspeaker", 1.0);
 }
 
 void stepstag_state::vjdash(machine_config &config)    // 4 Screens
@@ -2224,9 +2209,10 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
+	m_jaleco_vj_pc->set_steppingstage_mode(false);
+	m_jaleco_vj_pc->add_route(0, "lspeaker", 1.0);
+	m_jaleco_vj_pc->add_route(1, "rspeaker", 1.0);
 }
 
 void stepstag_state::machine_start()
@@ -3251,9 +3237,6 @@ ROM_START( vjdasha )
 	ROM_REGION( 0x010000, "xilinx", 0 )  // XILINX CPLD
 	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
 
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
-	ROM_LOAD( "vjdash-sound", 0x000000, 0x400000, NO_DUMP )
-
 	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
 	DISK_IMAGE( "vj_ver1", 0, SHA1(bf5c70fba13186854ff0b7eafab07dd527aac663) BAD_DUMP )
 ROM_END
@@ -3303,9 +3286,6 @@ ROM_START( stepstag )
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 	ROM_LOAD( "stepstag_rott", 0x000000, 0x400000, NO_DUMP )
-
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
-	ROM_LOAD( "stepstag-sound", 0x000000, 0x400000, NO_DUMP )
 
 	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
 	DISK_IMAGE( "stepstag", 0, NO_DUMP )
@@ -3357,9 +3337,6 @@ ROM_START( step3 )
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  /* Samples */
-	ROM_LOAD( "step3-sound", 0x000000, 0x400000, NO_DUMP )
-
 	DISK_REGION( "jaleco_vj_pc:pci:07.1:ide1:0:hdd:image" )
 	DISK_IMAGE( "step3", 0, SHA1(926a32998c837f7ba45d07db243c43c1f9d46d6a) )
 ROM_END
@@ -3399,5 +3376,5 @@ GAME( 1999, vjdasha,   vjslap,   vjdash,   vjdash,    stepstag_state, empty_init
 // - Stepping Stage <- the original Game
 // - Stepping Stage 2 Supreme
 // Dumped (partially):
-GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping Stage Special",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, init_stepstag, ROT0,   "Jaleco",         "Stepping 3 Superior",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, stepstag,  0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,   "Jaleco",         "Stepping Stage Special",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, step3,     0,        stepstag, stepstag,  stepstag_state, empty_init,   ROT0,   "Jaleco",         "Stepping 3 Superior",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
