@@ -14801,6 +14801,9 @@ lw700i                          // (c) 1995 Brother
 @source:brother/lw840.cpp
 lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
 
+@source:burroughs/td831.cpp
+td831							// (c) 1976 Burroughs
+
 @source:camputers/camplynx.cpp
 lynx128k                        //
 lynx48k                         //
