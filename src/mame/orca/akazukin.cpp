@@ -247,7 +247,7 @@ uint32_t akazukin_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap[1]->set_scrolly(i, m_bg_scroll[1][i]);
 	}
 
-	
+
 	// TODO: copied from orca/vastar.cpp
 	// Looks like $ac00 is some kind of '46C mixer control.
 	switch (m_fg_vregs[0])
@@ -544,7 +544,7 @@ void akazukin_state::akazukin(machine_config &config)
 	m_mainlatch->q_out_cb<1>().set(FUNC(akazukin_state::flip_screen_set));
 	m_mainlatch->q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-//	WATCHDOG_TIMER(config, "watchdog");
+//  WATCHDOG_TIMER(config, "watchdog");
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_subcpu, 0);
 	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_maincpu, 0);
