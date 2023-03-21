@@ -695,6 +695,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	//const uint8_t bpp = (tileregs & 0x0400) >> 10; // not used?
 	const uint8_t big = (tileregs & 0x0200) >>  9;
 	const uint8_t enable = (tileregs & 0x0040) >>  6;
+	const uint8_t wrap = (tileregs & 0x0100) >>  8;
 
 	// this bit is used to disable tilemaps, note on fatfurwa a raster interrupt is used to change this mid-screen, swapping between
 	// the background layers and the floor being enabled!
@@ -733,15 +734,15 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	{
 		clip.min_x = 256;
 		clip.max_x = 512;
-		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 1);
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 1);
 		clip.min_x = 0;
 		clip.max_x = 256;
-		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 2);
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 2);
 
 	}
 	else
 	{
-		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 0);
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 0);
 	}
 
 g_profiler.stop();
@@ -1000,10 +1001,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	
 	if (1)
 		popmessage("%08x %08x\n\
-			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
 			SB(%04x %04x %04x %04x)\n\
 			%08x %08x %08x\n\
 			SPLIT?(%04x %04x %04x %04x)\n\
@@ -1029,13 +1030,14 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	
     // Individual tilemap regs format
     // ------------------------------
-    // mmmm dbr? FELz zzzz
+    // mmmm dbrW FELz zzzz
     // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
     //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
     //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
     // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // r = tile size (seems correct)
+	// W = allow wraparound? (not set on Fatal Fury title logo, or rotating 'name entry' in Roads Edge, both confirmed to need wraparound disabled)
 	// F = allow fade1 or fade2 to apply? (complete guess!)
 	// E = tilemap enable bit according to sams64_2
 	// L = related to output layer? seems to be tied to which mixing bits are used to enable blending
