@@ -12,18 +12,18 @@
 #include "leland.h"
 #include "leland_a.h"
 
+/* debugging */
+#define LOG_WARN    (1U << 1)
+#define LOG_COMM    (1U << 2)
+
+#define VERBOSE     LOG_WARN
+#include "logmacro.h"
+
 
 /* constants */
 static constexpr int VRAM_SIZE = 0x10000;
 static constexpr int QRAM_SIZE = 0x10000;
 
-
-/* debugging */
-#define LOG_WARN    (1 << 1)
-#define LOG_COMM    (1 << 2)
-
-#define VERBOSE     LOG_WARN
-#include "logmacro.h"
 
 /*************************************
  *
