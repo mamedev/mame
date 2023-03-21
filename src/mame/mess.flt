@@ -120,6 +120,7 @@ brother/ax145.cpp
 brother/lw30.cpp
 brother/lw700i.cpp
 brother/lw840.cpp
+burroughs/anzterm.cpp
 camputers/camplynx.cpp
 canon/canon_s80.cpp
 canon/cat.cpp
@@ -806,7 +807,6 @@ skeleton/alphasma3k.cpp
 skeleton/am1000.cpp
 skeleton/ampex.cpp
 skeleton/ampex210.cpp
-skeleton/anzterm.cpp
 skeleton/argox.cpp
 skeleton/attache.cpp
 skeleton/ax20.cpp
