@@ -1007,7 +1007,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="diamantm">
-		<description>Diamant de l'ile Maudite, Le</description>
+		<description>Diamant de l'île Maudite, Le</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass1" interface="oric1_cass">
@@ -3909,7 +3909,7 @@ license:CC0-1.0
 		<publisher>Norsoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="75581">
-				<rom name="Tyrann (1984)(Norsoft)(Atmos)(FR).tap" size="75581" crc="1.23E+08" sha1="6bdec1debcfaf3bfa885928e7234c7a304b37499"/>
+				<rom name="Tyrann (1984)(Norsoft)(Atmos)(FR).tap" size="75581" crc="123359e3" sha1="6bdec1debcfaf3bfa885928e7234c7a304b37499"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3953,7 +3953,7 @@ license:CC0-1.0
 		<publisher>ASP</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18855">
-				<rom name="Valley, The (1982)(ASP)(GB)[48K].tap" size="18855" crc="5.13E+05" sha1="85dc80697e8d69aa7ec829cf50e1f8945169d846"/>
+				<rom name="Valley, The (1982)(ASP)(GB)[48K].tap" size="18855" crc="512962e0" sha1="85dc80697e8d69aa7ec829cf50e1f8945169d846"/>
 			</dataarea>
 		</part>
 	</software>
