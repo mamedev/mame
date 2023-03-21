@@ -43,7 +43,8 @@ void hng64_state::hng64_mark_tile_dirty(int tilemap, int tile_index)
 																				\
 	if (tileno&0x200000)                                                        \
 	{                                                                           \
-		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];              \
+		if ((m_videoregs[0x01] >> 16) & 0x0001)                                 \
+			tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];          \
 	}                                                                           \
 																				\
 	tileno &= 0x1fffff;                                                         \
@@ -613,8 +614,9 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
           | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
+          |                                         |  A = Auto animation enable?
           |                                         |  u = bit 0 is explicitly cleared from initialized value in sams64, both bits turned on for buriki 'split' effect
- *   1    | oooo oooo oooo oooX ---- ---- ---- ---- | unknown - X is sometimes used (1 in demo of xrally, 0 in game) not always initialized  whole register gets set to 0xffff during mosaic bit of roadedge intro. Also buriki intro
+ *   1    | oooo oooo oooo oooA ---- ---- ---- ---- |  A = tile animation enable? (buriki intro sets this to 0, then expects tile anim to stop while still updating registers below)  whole register gets set to 0xffff during mosaic bit of roadedge intro.
  *        | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
  *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
@@ -847,7 +849,14 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 
 	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
-	const uint32_t animmask = m_videoregs[0x0b];
+	uint32_t animmask;
+
+	// this bit either disables the feature entirely, or maybe disables the latching of these animation registers (leaving them in last used state)
+	if ((m_videoregs[0x01] >> 16) & 0x0001)
+		animmask = m_videoregs[0x0b];
+	else
+		animmask = 0xffffffff;
+
 	const uint32_t animbits = m_videoregs[0x0c];
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
@@ -998,19 +1007,18 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	
 	if (1)
-		popmessage("%08x %08x\n\
-			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			SB(%04x %04x %04x %04x)\n\
-			%08x %08x %08x\n\
-			SPLIT?(%04x %04x %04x %04x)\n\
-			AA(%08x %08x)\n%08x\n",
+		popmessage("Nv(%02x) CZ(%d), DIM(%d) Nv(%02x) Al(%d) GZ(%d)  %04x %04x AE(%d) %04x\n"
+				   "TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "tSB(%04x %04x %04x %04x)\n"
+				   "%08x %08x %08x\n"
+				   "SPLIT?(%04x %04x %04x %04x)\n"
+				   "AA(%08x %08x)\n%08x\n",
 			// global tilemap control regs?
-			m_videoregs[0x00], m_videoregs[0x01],
+			(m_videoregs[0x00] & 0xf8000000) >> 24, (m_videoregs[0x00] & 0x04000000) >> 26, (m_videoregs[0x00] & 0x03000000) >> 24, (m_videoregs[0x00] & 0x00f80000) >> 16, (m_videoregs[0x00] & 0x00060000) >> 17, (m_videoregs[0x00] & 0x00010000) >> 16,  m_videoregs[0x00] & 0xffff, (m_videoregs[0x01] & 0xfffe0000) >> 16, (m_videoregs[0x01] & 0x00010000) >> 16, m_videoregs[0x01] & 0xffff,
 			// general per-tilemap regs
 			(get_tileregs(0) & 0xf000)>>12, (get_tileregs(0) & 0x0800)>>11, (get_tileregs(0) & 0x0400)>>10,(get_tileregs(0) & 0x0200)>>9,(get_tileregs(0) & 0x0100)>>8,(get_tileregs(0) & 0x0080)>>7,(get_tileregs(0) & 0x0040)>>6,(get_tileregs(0) & 0x0020)>>5,(get_tileregs(0) & 0x0010)>>4,(get_tileregs(0) & 0x0008)>>3,(get_tileregs(0) & 0x0004)>>2,(get_tileregs(0) & 0x0002)>>1,(get_tileregs(0) & 0x0001)>>0,(get_tileregs(0) & 0x001f)>>0,
 			(get_tileregs(1) & 0xf000)>>12, (get_tileregs(1) & 0x0800)>>11, (get_tileregs(1) & 0x0400)>>10,(get_tileregs(1) & 0x0200)>>9,(get_tileregs(1) & 0x0100)>>8,(get_tileregs(1) & 0x0080)>>7,(get_tileregs(1) & 0x0040)>>6,(get_tileregs(1) & 0x0020)>>5,(get_tileregs(1) & 0x0010)>>4,(get_tileregs(1) & 0x0008)>>3,(get_tileregs(1) & 0x0004)>>2,(get_tileregs(1) & 0x0002)>>1,(get_tileregs(1) & 0x0001)>>0,(get_tileregs(1) & 0x001f)>>0,
@@ -1027,38 +1035,38 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// unused?
 			m_videoregs[0x0d]
 		);
-	
-    // Individual tilemap regs format
-    // ------------------------------
-    // mmmm dbrW FELz zzzz
-    // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
-    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
-    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
-    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
-    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-    // r = tile size (seems correct)
+
+	// Individual tilemap regs format
+	// ------------------------------
+	// mmmm dbrW FELz zzzz
+	// m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
+	//  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+	//     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
+	// d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
+	// b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+	// r = tile size (seems correct)
 	// W = allow wraparound? (not set on Fatal Fury title logo, or rotating 'name entry' in Roads Edge, both confirmed to need wraparound disabled)
 	// F = allow fade1 or fade2 to apply? (complete guess!)
 	// E = tilemap enable bit according to sams64_2
 	// L = related to output layer? seems to be tied to which mixing bits are used to enable blending
-    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
-    //              (debug layer on buriki has priority 0x020, which would be highest)
+	// z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
+	//              (debug layer on buriki has priority 0x020, which would be highest)
 
 
 
 	if (0)
-		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\n\
-			MIX BITSA Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
-			MIX BITSB Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
-			UNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\n\
-			For FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\n\
-			For FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\n\
-			MASTER FADES - FADE1?(%08x)\n\
-			MASTER FADES - FADE2?(%08x)\n\
-			UNUSED?(%08x)\n\
-			UNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\n\
-			PALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n\
-			%08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\n"
+				   "MIX BITSA Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n"
+				   "MIX BITSB Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n"
+				   "UNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\n"
+				   "For FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\n"
+				   "For FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\n"
+				   "MASTER FADES - FADE1?(%08x)\n"
+				   "MASTER FADES - FADE2?(%08x)\n"
+				   "UNUSED?(%08x)\n"
+				   "UNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\n"
+				   "PALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n"
+				   "%08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
