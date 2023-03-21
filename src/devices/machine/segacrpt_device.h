@@ -157,12 +157,19 @@ protected:
 	virtual void decrypt() override;
 };
 
-class sega_315_spat_device : public segacrpt_z80_device
+class sega_315_5006_device : public segacrpt_z80_device
 {
 public:
-	sega_315_spat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	sega_315_5006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 protected:
+	sega_315_5006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void decrypt() override;
+};
+
+class sega_315_5096_device : public sega_315_5006_device
+{
+public:
+	sega_315_5096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 };
 
 class sega_315_5015_device : public segacrpt_z80_device
@@ -263,7 +270,8 @@ DECLARE_DEVICE_TYPE(SEGA_315_5041, sega_315_5041_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5048, sega_315_5048_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5093, sega_315_5093_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5099, sega_315_5099_device)
-DECLARE_DEVICE_TYPE(SEGA_315_SPAT, sega_315_spat_device)
+DECLARE_DEVICE_TYPE(SEGA_315_5006, sega_315_5006_device)
+DECLARE_DEVICE_TYPE(SEGA_315_5096, sega_315_5096_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5015, sega_315_5015_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5133, sega_315_5133_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5014, sega_315_5014_device)
