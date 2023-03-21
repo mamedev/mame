@@ -85,9 +85,9 @@
 #include "cpu/z80/z80.h"
 #include "speaker.h"
 
-#define LOG_WARN   (1 << 1)
-#define LOG_COMM   (1 << 2)
-#define LOG_EXTERN (1 << 3)
+#define LOG_WARN   (1U << 1)
+#define LOG_COMM   (1U << 2)
+#define LOG_EXTERN (1U << 3)
 
 #define VERBOSE    LOG_WARN
 #include "logmacro.h"
@@ -433,13 +433,13 @@ void leland_80186_sound_device::leland_80186_control_w(u8 data)
 		return;
 	m_last_control = data;
 
-	LOGMASKED(LOG_COMM, "%s:80186 control = %02X", machine().describe_context(), data);
-	if (!(data & 0x80)) LOGMASKED(LOG_COMM, "  /RESET");
-	if (!(data & 0x40)) LOGMASKED(LOG_COMM, "  ZNMI");
-	if (!(data & 0x20)) LOGMASKED(LOG_COMM, "  INT0");
-	if (!(data & 0x10)) LOGMASKED(LOG_COMM, "  /TEST");
-	if (!(data & 0x08)) LOGMASKED(LOG_COMM, "  INT1");
-	LOGMASKED(LOG_COMM, "\n");
+	LOGMASKED(LOG_COMM, "%s:80186 control = %02X%s%s%s%s%s\n",
+			machine().describe_context(), data,
+			(data & 0x80) ? "" : "  /RESET",
+			(data & 0x40) ? "" : "  ZNMI",
+			(data & 0x20) ? "" : "  INT0",
+			(data & 0x10) ? "" : "  /TEST",
+			(data & 0x08) ? "" : "  INT1");
 
 	/* /RESET */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
