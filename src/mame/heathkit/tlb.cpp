@@ -703,8 +703,8 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
-heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
+heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
 {
 }
 
@@ -718,8 +718,8 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(super19);
 }
 
-heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, HEATH_WATZ, tag, owner, clock)
+heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_WATZ, tag, owner, clock)
 {
 }
 
@@ -733,8 +733,8 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(watz19);
 }
 
-heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
+heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
 {
 }
 
