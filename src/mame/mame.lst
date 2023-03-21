@@ -34432,6 +34432,9 @@ hektor                          // Hektor
 hektor2                         // Hektor II
 hektor3                         // Hektor III
 
+@source:orca/akazukin.cpp
+akazukin                        // (c) 1984 Sigma
+
 @source:orca/espial.cpp
 espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
