@@ -21,15 +21,15 @@
  *
  *************************************/
 
-#define LOG_WARN            (1 << 1)
-#define LOG_KEYCARDS        (1 << 2)
-#define LOG_KEYCARDS_FULL   (1 << 3)
-#define LOG_BANKSWITCHING_M (1 << 4)
-#define LOG_BANKSWITCHING_S (1 << 5)
-#define LOG_SOUNDPORT       (1 << 6)
-#define LOG_EEPROM          (1 << 7)
-#define LOG_BATTERY_RAM     (1 << 8)
-#define LOG_XROM            (1 << 9)
+#define LOG_WARN            (1U << 1)
+#define LOG_KEYCARDS        (1U << 2)
+#define LOG_KEYCARDS_FULL   (1U << 3)
+#define LOG_BANKSWITCHING_M (1U << 4)
+#define LOG_BANKSWITCHING_S (1U << 5)
+#define LOG_SOUNDPORT       (1U << 6)
+#define LOG_EEPROM          (1U << 7)
+#define LOG_BATTERY_RAM     (1U << 8)
+#define LOG_XROM            (1U << 9)
 
 #define VERBOSE             LOG_WARN
 #include "logmacro.h"
