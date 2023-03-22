@@ -191,7 +191,7 @@ protected:
 	required_device<z80_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ay8910_device> m_ay8910;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_device<i8255_device> m_ppi;
 	optional_device<tms9928a_device> m_tms9928a;
 	optional_device<input_buffer_device> m_cent_status_in;
@@ -263,7 +263,8 @@ private:
 	template <typename T, typename U>
 	auto &add_base_slot(machine_config &config, T &&type, U &&tag, u8 prim, bool expanded, u8 sec, u8 page, u8 numpages)
 	{
-		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 0U));
+		// TODO The clock should not be hardcoded here.
+		auto &device(std::forward<T>(type)(config, std::forward<U>(tag), 10.738635_MHz_XTAL / 3));
 		device.set_memory_space(m_maincpu, AS_PROGRAM);
 		device.set_io_space(m_maincpu, AS_IO);
 		device.set_maincpu(m_maincpu);
@@ -316,6 +317,7 @@ private:
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
+		device.add_route(ALL_OUTPUTS, m_speaker, 0.9);
 		return device;
 	}
 	template <int N>

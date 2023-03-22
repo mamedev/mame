@@ -19,9 +19,8 @@ msx_cart_majutsushi_device::msx_cart_majutsushi_device(const machine_config &mco
 
 void msx_cart_majutsushi_device::device_add_mconfig(machine_config &config)
 {
-	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.05); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, soundin(), 0.15, AUTO_ALLOC_INPUT, 0); // unknown DAC
 }
 
 image_init_result msx_cart_majutsushi_device::initialize_cartridge(std::string &message)

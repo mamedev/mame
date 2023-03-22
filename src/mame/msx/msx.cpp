@@ -583,7 +583,8 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 
 	// sound hardware
 	SPEAKER(config, m_speaker).front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.1);
+	DAC_1BIT(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_speaker, 0.2);
 
 	if (ay8910_type == SND_AY8910)
 		AY8910(config, m_ay8910, xtal / cpu_divider / 2);
@@ -594,7 +595,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 	m_ay8910->port_b_read_callback().set(FUNC(msx2_base_state::psg_port_b_r));
 	m_ay8910->port_a_write_callback().set(FUNC(msx2_base_state::psg_port_a_w));
 	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
-	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.3);
+	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.9);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
@@ -619,7 +620,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		CASSETTE(config, m_cassette);
 		m_cassette->set_formats(fmsx_cassette_formats);
 		m_cassette->set_default_state(CASSETTE_PLAY);
-		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.05);
+		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.15);
 		m_cassette->set_interface("msx_cass");
 	}
 
@@ -747,7 +748,7 @@ WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
 
 void msx2_base_state::msx_ym2413(machine_config &config)
 {
-	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, m_speaker, 0.4);
+	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, m_speaker, 0.9);
 }
 
 void msx2_base_state::msx2_64kb_vram(machine_config &config)
