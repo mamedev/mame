@@ -26,9 +26,9 @@
 #include "z8.h"
 #include "z8dasm.h"
 
-#define LOG_TIMER       (1 << 1U)
-#define LOG_RECEIVE     (1 << 2U)
-#define LOG_TRANSMIT    (1 << 3U)
+#define LOG_TIMER       (1U << 1)
+#define LOG_RECEIVE     (1U << 2)
+#define LOG_TRANSMIT    (1U << 3)
 
 #define VERBOSE 0
 #include "logmacro.h"

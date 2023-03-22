@@ -9,16 +9,16 @@
 #include "pci.h"
 #include "machine/pci-ide.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/isa/isa.h"
+
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "bus/ata/ataintf.h"
-
 #include "sound/spkrdev.h"
 #include "machine/ram.h"
-#include "bus/isa/isa.h"
 #include "machine/nvram.h"
 
 #include "machine/am9517a.h"
@@ -26,12 +26,22 @@
 
 class i82371sb_isa_device : public pci_device {
 public:
+	template <typename T>
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: i82371sb_isa_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto smi() { return m_smi_callback.bind(); }
 	auto nmi() { return m_nmi_callback.bind(); }
 	auto stpclk() { return m_stpclk_callback.bind(); }
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
+
+	template <typename T>
+	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_pirqb_w);
@@ -57,10 +67,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -210,16 +220,26 @@ DECLARE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device)
 
 class i82371sb_ide_device : public pci_device {
 public:
+	template <typename T>
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: i82371sb_ide_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
+	template <typename T>
+	void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+
 protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -262,6 +282,7 @@ private:
 	devcb_write_line m_irq_pri_callback;
 	devcb_write_line m_irq_sec_callback;
 
+	required_device<cpu_device> m_maincpu;
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;
 };

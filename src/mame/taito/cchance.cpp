@@ -29,14 +29,14 @@ cha1    $dc81
 cha2    $cca8
 cha3    $10d8
 
-2 color proms for the output. will get those dumped as well.
+2 color PROMs for the output. will get those dumped as well.
 
 
 *****************************************************************************************************************************/
 
 
 #include "emu.h"
-#include "tnzs.h"
+#include "tnzs_video.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -228,8 +228,8 @@ void cchance_state::cchance(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cchance_state::irq0_line_hold));
 
 	X1_001(config, m_spritegen, 12_MHz_XTAL, m_palette, gfx_cchance);
-	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
-	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
+	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
+	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -261,7 +261,7 @@ ROM_START( cchance )
 	ROM_LOAD("chance-cccha2.bin", 0x10000, 0x10000, CRC(fa5ccf5b) SHA1(21957a6a7b88c315d1fbb82e98a924a637a28397) )
 	ROM_LOAD("chance-cccha3.bin", 0x00000, 0x10000, CRC(2a2979c9) SHA1(5036313e219ec561fa6753f0db6bb28c6fc97963) )
 
-	ROM_REGION( 0x0400, "proms", 0 )        /* color proms */
+	ROM_REGION( 0x0400, "proms", 0 )        // color PROMs
 	ROM_LOAD( "prom1", 0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END

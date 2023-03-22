@@ -61,10 +61,10 @@ Notes:
 
 
 TODO:
-- Dip switches! They might be right for mjhokite, but I haven't verified the other
+- DIP switches! They might be right for mjhokite, but I haven't verified the other
   games.
 
-- In the newer mahjong games, the second bank of dips is read in reverse order.
+- In the newer mahjong games, the second bank of DIPs is read in reverse order.
 
 - In mjikaga bit 2 of bankswitch_w() and bit 7 of pteacher_blitter_bank_w() might
   have some other function, since the ROMs are smaller.
@@ -617,7 +617,7 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-		PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
@@ -644,11 +644,11 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:6" )
-		PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:4" )
-		PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:3" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:2" )
-		PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -668,7 +668,7 @@ static INPUT_PORTS_START( mjhokite )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1                              )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )

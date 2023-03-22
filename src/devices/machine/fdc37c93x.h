@@ -7,24 +7,19 @@ fdc37c93x.h
 SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 
 ***************************************************************************/
-
 #ifndef MAME_MACHINE_FDC37C93X_H
 #define MAME_MACHINE_FDC37C93X_H
 
 #pragma once
 
-#include "machine/8042kbdc.h"
-// floppy disk controller
-#include "machine/upd765.h"
+#include "bus/isa/isa.h"
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
-#include "formats/naslite_dsk.h"
-// parallel port
-#include "machine/pc_lpt.h"
-// serial port
+#include "machine/8042kbdc.h"
+#include "machine/ds128x.h"
 #include "machine/ins8250.h"
+#include "machine/pc_lpt.h"
+#include "machine/upd765.h"
 
-// make sure that pckeybrd.cpp 8042kbdc.cpp are present in project
 
 class fdc37c93x_device : public device_t, public device_isa16_card_interface
 {

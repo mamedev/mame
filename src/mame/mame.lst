@@ -14801,6 +14801,12 @@ lw700i                          // (c) 1995 Brother
 @source:brother/lw840.cpp
 lw840                           // Brother LW-840ic (c) 1997 Brother Industries, Ltd.
 
+@source:burroughs/anzterm.cpp
+anzterm                         // Burroughs EF315-I220
+
+@source:burroughs/td831.cpp
+td831							// (c) 1976 Burroughs
+
 @source:camputers/camplynx.cpp
 lynx128k                        //
 lynx48k                         //
@@ -21321,7 +21327,9 @@ tetrisp2                        // (c) 1997 Jaleco (World v2.8)
 tetrisp2a                       // (c) 1997 Jaleco (World v2.7)
 tetrisp2j                       // (c) 1997 Jaleco (Japan v2.2)
 tetrisp2ja                      // (c) 1997 Jaleco (Japan v2.1)
-vjdash                          // (c) 1999 Jaleco
+vjdash                          // (c) 1999 Jaleco (v1.0)
+vjdasha                         // (c) 1999 Jaleco (v1.2)
+vjslap                          // (c) 1999 Jaleco
 
 @source:jpm/guab.cpp
 crisscrs                        // (c) 1986
@@ -34424,6 +34432,9 @@ hektor                          // Hektor
 hektor2                         // Hektor II
 hektor3                         // Hektor III
 
+@source:orca/akazukin.cpp
+akazukin                        // (c) 1984 Sigma
+
 @source:orca/espial.cpp
 espial                          // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
 espialu                         // (c) 1983 Thunderbolt, Orca logo is hidden in title screen
@@ -40691,9 +40702,6 @@ dialog80                        // Ampex Dialogue 80
 @source:skeleton/ampex210.cpp
 ampex210p                       //
 ampex230p                       //
-
-@source:skeleton/anzterm.cpp
-anzterm                         // Burroughs EF315-I220
 
 @source:skeleton/argox.cpp
 os214                           //

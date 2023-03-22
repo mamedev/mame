@@ -1329,6 +1329,7 @@ void lua_engine::initialize()
 					m.popmessage();
 			});
 	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
+	machine_type["ui_active"] = sol::property(&running_machine::ui_active, &running_machine::set_ui_active);
 	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
 	machine_type["parameters"] = sol::property(&running_machine::parameters);

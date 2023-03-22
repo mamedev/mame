@@ -405,7 +405,7 @@ inline void mrokumei_state::mrokumei_info0(tile_data &tileinfo, int tile_index, 
 	int const code  = m_videoram[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int const color = (attr >> 2) + (gfxbank << 6);
 
-	tileinfo.set(0, code, color, m_flipscreen );
+	tileinfo.set(0, code, color, m_flipscreen);
 }
 
 inline void mrokumei_state::mrokumei_info1(tile_data &tileinfo, int tile_index, int page, int gfxbank)
@@ -415,7 +415,7 @@ inline void mrokumei_state::mrokumei_info1(tile_data &tileinfo, int tile_index, 
 	int const code  = m_videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int const color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	tileinfo.set(1, code, color, m_flipscreen );
+	tileinfo.set(1, code, color, m_flipscreen);
 }
 
 TILE_GET_INFO_MEMBER(mrokumei_state::mrokumei_get_info0_0)
@@ -449,7 +449,7 @@ inline void homedata_upd7807_state::reikaids_info(tile_data &tileinfo, int tile_
 
 	if (attr & 0x80) flags ^= TILE_FLIPX;
 
-	tileinfo.set(layer, code, color, flags );
+	tileinfo.set(layer, code, color, flags);
 }
 
 	/* reikaids_gfx_bank[0]:

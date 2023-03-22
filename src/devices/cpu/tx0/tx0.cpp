@@ -14,7 +14,7 @@
 #include "tx0.h"
 #include "tx0dasm.h"
 
-#define LOG_RIM (1 << 1U)
+#define LOG_RIM (1U << 1)
 //#define VERBOSE (LOG_RIM)
 #include "logmacro.h"
 

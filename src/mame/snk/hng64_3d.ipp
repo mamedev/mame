@@ -568,13 +568,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
 			//                            a = blend this sprite (blend might use 'lighting' level as alpha?)
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
-			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
-			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
-			//                            X = horizontal subtexture
-			//                            * = broken banners in xrally
-			//                            Y = vertical subtexture
-			//                            # = broken banners in xrally
-			//                            u = unknown, set late on 2nd race+3rd race in xrally
+			// [2] S?hh hhhh hvvv vvvv    S = use texture offsets in lower bits
+			//                            ? = unknown, sometimes used on objects further way, then flipped off, maybe precision related / texturing sampling mode?
+			//                            h = horizontal offset into texture
+			//                            v = vertical offset into texture
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
 			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..

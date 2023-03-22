@@ -1032,7 +1032,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	{
 		if (is_last_selected() && m_needs_prev_menu_item)
 		{
-			iptkey = IPT_UI_BACK;
+			iptkey = IPT_INVALID;
 			stack_pop();
 			if (is_special_main_menu())
 				machine().schedule_exit();
@@ -1059,6 +1059,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	{
 		if (!custom_ui_back())
 		{
+			iptkey = IPT_INVALID;
 			stack_pop();
 			if (is_special_main_menu())
 				machine().schedule_exit();

@@ -15,9 +15,10 @@
 #include "emu.h"
 #include "m50734.h"
 
-#define LOG_INIT  (1 << 1U)
-#define LOG_TIMER (1 << 2U)
-#define VERBOSE   (0)
+#define LOG_INIT    (1U << 1)
+#define LOG_TIMER   (1U << 2)
+#define LOG_TIMER_X (1U << 3)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 // device type definition
@@ -38,6 +39,8 @@ m50734_device::m50734_device(const machine_config &mconfig, const char *tag, dev
 	, m_step_counter{0, 0}
 	, m_phase_counter(0)
 	, m_smcon{0, 0}
+	, m_tx_count(0)
+	, m_tx_reload(0xffff)
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(m50734_device::internal_map), this);
 }
@@ -110,6 +113,7 @@ void m50734_device::device_start()
 	m_timer[0] = timer_alloc(FUNC(m50734_device::timer_interrupt<0>), this);
 	m_timer[1] = timer_alloc(FUNC(m50734_device::timer_interrupt<1>), this);
 	m_timer[2] = timer_alloc(FUNC(m50734_device::timer_interrupt<2>), this);
+	m_timer_x = timer_alloc(FUNC(m50734_device::timer_x_interrupt), this);
 
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_direction));
@@ -122,6 +126,8 @@ void m50734_device::device_start()
 	save_item(NAME(m_step_counter));
 	save_item(NAME(m_phase_counter));
 	save_item(NAME(m_smcon));
+	save_item(NAME(m_tx_count));
+	save_item(NAME(m_tx_reload));
 	save_item(NAME(m_interrupt_control));
 }
 
@@ -149,6 +155,10 @@ void m50734_device::device_reset()
 	std::fill(std::begin(m_interrupt_control), std::end(m_interrupt_control), 0x00);
 	set_input_line(M740_INT2_LINE, CLEAR_LINE);
 	set_input_line(M740_INT3_LINE, CLEAR_LINE);
+	set_input_line(M740_INT4_LINE, CLEAR_LINE);
+
+	// Initialize Timer X
+	set_timer_x(0x0200);
 }
 
 void m50734_device::read_dummy(u16 adr)
@@ -177,6 +187,15 @@ u8 m50734_device::interrupt_control_r(offs_t offset)
 	return m_interrupt_control[2 - offset];
 }
 
+// TODO: emulate modes other than timer mode
+static const char *const s_timer_x_modes[4] =
+{
+	"timer",
+	"pulse output",
+	"event count",
+	"PWM"
+};
+
 void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 {
 	if (offset == 1)
@@ -200,6 +219,31 @@ void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 		{
 			LOGMASKED(LOG_TIMER, "%s: Timer interrupt %sactivated by write to interrupt control register 2 ($%02X -> $%02X)\n", machine().describe_context(), timer_interrupt ? "": "de", old_control, data);
 			set_input_line(M740_INT2_LINE, timer_interrupt ? ASSERT_LINE : CLEAR_LINE);
+		}
+	}
+	else
+	{
+		bool tx_run = BIT(data, 0, 2) != 2 && !BIT(data, 2);
+		if (!tx_run && m_timer_x->enabled())
+		{
+			m_tx_count = get_timer_x();
+			LOGMASKED(LOG_TIMER_X, "%s: Timer X count stopped at $%04X in %s mode by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(),
+									m_tx_count, s_timer_x_modes[BIT(data, 0, 2)], old_control, data);
+			m_timer_x->enable(false);
+		}
+		else if (tx_run && !m_timer_x->enabled() && (m_tx_count != 0 || m_tx_reload != 0))
+		{
+			LOGMASKED(LOG_TIMER_X, "%s: Timer X count restarted from $%04X in %s mode by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(),
+									m_tx_count, s_timer_x_modes[BIT(data, 0, 2)], old_control, data);
+			m_timer_x->adjust(clocks_to_attotime(16 * (m_tx_count != 0 ? m_tx_count : m_tx_reload + 1)));
+			m_timer_x->enable(true);
+		}
+		bool tx_interrupt = (data & (data >> 1) & 0x15) != 0;
+		bool old_interrupt = (old_control & (old_control >> 1) & 0x15) != 0;
+		if (tx_interrupt != old_interrupt)
+		{
+			LOGMASKED(LOG_TIMER_X, "%s: Timer X interrupt %sactivated by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(), tx_interrupt ? "": "de", old_control, data);
+			set_input_line(M740_INT4_LINE, tx_interrupt ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -348,9 +392,68 @@ void m50734_device::smcon_w(offs_t offset, u8 data)
 	m_smcon[offset] = data & 0x0f;
 }
 
+TIMER_CALLBACK_MEMBER(m50734_device::timer_x_interrupt)
+{
+	if (!BIT(m_interrupt_control[2], 5))
+	{
+		m_interrupt_control[2] |= 0x20;
+		if (BIT(m_interrupt_control[2], 4))
+		{
+			LOGMASKED(LOG_TIMER_X, "Timer X interrupt asserted at %s\n", machine().time().to_string());
+			set_input_line(M740_INT4_LINE, ASSERT_LINE);
+		}
+	}
+
+	if (m_tx_reload != 0)
+		m_timer_x->adjust(clocks_to_attotime(16 * (m_tx_reload + 1)));
+	else
+	{
+		m_tx_count = 0;
+		m_timer_x->enable(false);
+	}
+}
+
+u16 m50734_device::get_timer_x() const
+{
+	if (m_timer_x->enabled())
+	{
+		unsigned count = attotime_to_clocks(m_timer_x->remaining()) / 16;
+		return count > m_tx_reload ? 0 : count;
+	}
+	else
+		return m_tx_count;
+}
+
+void m50734_device::set_timer_x(u16 count)
+{
+	LOGMASKED(LOG_TIMER_X, "%s: Timer X reload value = $%04X (%s mode)\n", machine().describe_context(), count, s_timer_x_modes[BIT(m_interrupt_control[2], 0, 2)]);
+	m_tx_reload = count;
+	if (BIT(m_interrupt_control[2], 0, 2) != 2 && !BIT(m_interrupt_control[2], 2))
+	{
+		m_timer_x->adjust(clocks_to_attotime(16 * count));
+		m_timer_x->enable(true);
+	}
+	else
+		m_tx_count = count;
+}
+
+u8 m50734_device::timer_x_r(offs_t offset)
+{
+	return BIT(get_timer_x(), BIT(offset, 0) ? 8 : 0, 8);
+}
+
+void m50734_device::timer_x_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		set_timer_x(data << 8 | (m_tx_reload & 0x00ff));
+	else
+		set_timer_x(data | (m_tx_reload & 0xff00));
+}
+
 void m50734_device::internal_map(address_map &map)
 {
 	// TODO: other timers, UART, etc.
+	map(0x00da, 0x00db).rw(FUNC(m50734_device::timer_x_r), FUNC(m50734_device::timer_x_w));
 	map(0x00dc, 0x00e1).rw(FUNC(m50734_device::timer_r), FUNC(m50734_device::timer_w));
 	map(0x00e2, 0x00e3).rw(FUNC(m50734_device::step_counter_r), FUNC(m50734_device::step_counter_w));
 	map(0x00e9, 0x00e9).rw(FUNC(m50734_device::ad_control_r), FUNC(m50734_device::ad_control_w));
