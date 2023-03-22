@@ -900,6 +900,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+	// NOTE: buriki 'how to play' might be a sprite vs 3D edge case
+	// while the 3D is currently positioned badly due to unhandled 3D packet registers, it should still go behind the shutters, not in front
+	// it could also be a unique mixing case
+
 	// tilemaps with 'priority' 0x10 - 0x1f are always behind the 3d?
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -968,13 +972,16 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 					uint16_t srcpix = src[((cliprect.min_x + x) + xscroll) & 0x1ff];
 					if (srcpix & 0x07ff)
 					{
+						// format in our framebuffer is llll appp pppp pppp
+						// where l = lighting, a = alpha, p = palindex
+						// our m_palette_3d has 16 copies of the palette at different brightness levels, so we can pass directly
 						if (srcpix & 0x0800)
 						{
-							*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0x7ff) | palbase], 0x80);
+							*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0xf7ff) | palbase], 0x80);
 						}
 						else
 						{
-							*dst = clut_3d[(srcpix & 0x7ff) | palbase];
+							*dst = clut_3d[(srcpix & 0xf7ff) | palbase];
 						}
 					}
 
@@ -1468,7 +1475,15 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds());
+
+		// TODO: properly calculate this from screen params
+		attoseconds_t period;
+		if (max_y == 448)
+			period = HZ_TO_ATTOSECONDS(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
+		else
+			period = HZ_TO_ATTOSECONDS(61.651673); // fatfurwa uses 512x432, sync frequency not verified
+
+		m_screen->configure(HTOTAL, VTOTAL, visarea, period);
 	}
 
 	if ((offset >= (0x28 / 4)) && (offset < (0x48 / 4)))
