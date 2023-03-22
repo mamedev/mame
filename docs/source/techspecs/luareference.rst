@@ -250,6 +250,8 @@ machine:logerror(msg)
 Properties
 ^^^^^^^^^^
 
+machine.ui_active (read/write)
+    A Boolean indicating whether UI control inputs are currently enabled.
 machine.time (read-only)
     The elapsed emulated time for the current session as an
     :ref:`attotime <luareference-core-attotime>`.

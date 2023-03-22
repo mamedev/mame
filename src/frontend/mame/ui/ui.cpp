@@ -335,6 +335,7 @@ void mame_ui_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 void mame_ui_manager::initialize(running_machine &machine)
 {
 	m_machine_info = std::make_unique<ui::machine_info>(machine);
+	machine.set_ui_active(!machine_info().has_keyboard() || machine.options().ui_active());
 
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
@@ -1241,8 +1242,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// determine if we should disable the rest of the UI
-	bool has_keyboard = machine_info().has_keyboard();
-	bool ui_disabled = (has_keyboard && !machine().ui_active());
+	bool const has_keyboard = machine_info().has_keyboard();
+	bool const ui_disabled = !machine().ui_active();
 
 	// is ScrLk UI toggling applicable here?
 	if (has_keyboard)

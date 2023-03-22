@@ -71,7 +71,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_exit_pending(false),
 		m_soft_reset_timer(nullptr),
 		m_rand_seed(0x9d14abd7),
-		m_ui_active(_config.options().ui_active()),
+		m_ui_active(true),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
 		m_saveload_schedule(saveload_schedule::NONE),
