@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders: Alberto Salso, Ignacio Seki
+// copyright-holders: Alberto Salso
+// thanks-to: Ignacio Seki
 /*
 ORCA OVG-33C + ORCA OVG-46C
+
+Based off orca/vastar.cpp
 
 TODO:
 - Unify '46C to common device implementations;
