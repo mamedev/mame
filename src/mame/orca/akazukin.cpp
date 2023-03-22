@@ -418,7 +418,8 @@ void akazukin_state::sub_io(address_map &map)
 
 
 static INPUT_PORTS_START( akazukin )
-	// up/down used on high score entry, useable with 2 way gate
+	// up/down optionally used on high score entry.
+	// Can move on the other row with left/right so 2 way mountable here.
 	// 8 way causes locks in place during gameplay on diagonals, assume 4 way
 	// TODO: is b2 really used?
 	PORT_START("P1")
