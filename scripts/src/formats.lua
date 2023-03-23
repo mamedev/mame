@@ -541,18 +541,6 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/cd90_640_dsk.h,FORMATS["CD90_640_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "CD90_640_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/lib/formats/cgenie_dsk.h,FORMATS["CGENIE_DSK"] = true
 --------------------------------------------------
 
