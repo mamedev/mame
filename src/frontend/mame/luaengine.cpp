@@ -65,6 +65,7 @@ struct thread_context
 private:
 	struct environment
 	{
+		environment() = default;
 		sol::state state;
 		bool busy = false;
 	};
