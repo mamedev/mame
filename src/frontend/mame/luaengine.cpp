@@ -63,47 +63,40 @@ namespace {
 struct thread_context
 {
 private:
-	struct environment
-	{
-		environment() = default;
-		sol::state state;
-		bool busy = false;
-	};
-
-	std::optional<environment> m_environment;
+	sol::state m_state;
 	std::string m_result;
 	std::mutex m_guard;
 	std::condition_variable m_sync;
+	bool m_busy = false;
 
 public:
 	bool m_yield = false;
 
+	thread_context()
+	{
+		m_state.open_libraries();
+		m_state["package"]["preload"]["zlib"] = &luaopen_zlib;
+		m_state["package"]["preload"]["lfs"] = &luaopen_lfs;
+		m_state["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+		m_state.set_function(
+				"yield",
+				[this] ()
+				{
+					std::unique_lock<std::mutex> yield_lock(m_guard);
+					m_result = m_state["status"];
+					m_yield = true;
+					m_sync.wait(yield_lock);
+					m_yield = false;
+				});
+	}
+
 	bool start(sol::this_state s, char const *scr)
 	{
 		std::unique_lock<std::mutex> caller_lock(m_guard);
-		if (m_environment && m_environment->busy)
+		if (m_busy)
 			return false;
 
-		if (!m_environment)
-		{
-			m_environment.emplace();
-			m_environment->state.open_libraries();
-			m_environment->state["package"]["preload"]["zlib"] = &luaopen_zlib;
-			m_environment->state["package"]["preload"]["lfs"] = &luaopen_lfs;
-			m_environment->state["package"]["preload"]["linenoise"] = &luaopen_linenoise;
-			m_environment->state.set_function(
-					"yield",
-					[this] ()
-					{
-						std::unique_lock<std::mutex> yield_lock(m_guard);
-						m_result = m_environment->state["status"];
-						m_yield = true;
-						m_sync.wait(yield_lock);
-						m_yield = false;
-					});
-		}
-
-		sol::load_result res = m_environment->state.load(scr);
+		sol::load_result res = m_state.load(scr);
 		if (!res.valid())
 		{
 			sol::error err = res;
@@ -131,9 +124,9 @@ public:
 						sol::error err = ret;
 						osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
 					}
-					m_environment->busy = false;
+					m_busy = false;
 				});
-		m_environment->busy = true;
+		m_busy = true;
 		m_yield = false;
 		th.detach(); // FIXME: this is unsafe as the thread function modifies members of the object
 		return true;
@@ -145,9 +138,9 @@ public:
 		if (m_yield)
 		{
 			if (val)
-				m_environment->state["status"] = val;
+				m_state["status"] = val;
 			else
-				m_environment->state["status"] = sol::lua_nil;
+				m_state["status"] = sol::lua_nil;
 			m_sync.notify_all();
 		}
 	}
@@ -155,7 +148,7 @@ public:
 	char const *result()
 	{
 		std::unique_lock<std::mutex> lock(m_guard);
-		if (m_environment && m_environment->busy && !m_yield)
+		if (m_busy && !m_yield)
 			return "";
 		else
 			return m_result.c_str();
@@ -163,7 +156,7 @@ public:
 
 	bool busy() const
 	{
-		return m_environment && m_environment->busy;
+		return m_busy;
 	}
 };
 
