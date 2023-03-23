@@ -129,7 +129,7 @@ u32 bandit_host_device::be_config_address_r()
 
 void bandit_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 tempdata = (data >> 24) | (data << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8);
+	u32 tempdata = swapendian_int32(data);
 
 	m_last_config_address = tempdata;
 
@@ -143,18 +143,14 @@ void bandit_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_ma
 
 u32 bandit_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
 {
-	u32 temp = pci_host_device::config_data_ex_r(offset, mem_mask);
-	return (temp >> 24) | (temp << 24) | ((temp & 0xff00) << 8) | ((temp & 0xff0000) >> 8);
+	return swapendian_int32(pci_host_device::config_data_ex_r(offset, mem_mask));
 }
 
 void bandit_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 tempdata;
-
 	// printf("config_data_w: %08x @ %08x mask %08x\n", data, offset, mem_mask);
 
-	tempdata = (data >> 24) | (data << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8);
-	pci_host_device::config_data_ex_w(offset, tempdata, mem_mask);
+	pci_host_device::config_data_ex_w(offset, swapendian_int32(data), mem_mask);
 }
 
 template <u32 Base>

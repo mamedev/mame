@@ -49,9 +49,9 @@
 
 #include "screen.h"
 
-#define LOG_SETUP   (1 << 1U)
-#define LOG_REGS    (1 << 2U)
-#define LOG_CONF    (1 << 3U)
+#define LOG_SETUP   (1U << 1)
+#define LOG_REGS    (1U << 2)
+#define LOG_CONF    (1U << 3)
 
 //#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_STREAM std::cout
