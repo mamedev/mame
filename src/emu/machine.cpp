@@ -60,29 +60,28 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: m_side_effects_disabled(0),
-		debug_flags(0),
-		m_config(_config),
-		m_system(_config.gamedrv()),
-		m_manager(manager),
-		m_current_phase(machine_phase::PREINIT),
-		m_paused(false),
-		m_hard_reset_pending(false),
-		m_exit_pending(false),
-		m_soft_reset_timer(nullptr),
-		m_rand_seed(0x9d14abd7),
-		m_ui_active(true),
-		m_basename(_config.gamedrv().name),
-		m_sample_rate(_config.options().sample_rate()),
-		m_saveload_schedule(saveload_schedule::NONE),
-		m_saveload_schedule_time(attotime::zero),
-		m_saveload_searchpath(nullptr),
+	: m_side_effects_disabled(0)
+	, debug_flags(0)
+	, m_config(_config)
+	, m_system(_config.gamedrv())
+	, m_manager(manager)
+	, m_current_phase(machine_phase::PREINIT)
+	, m_paused(false)
+	, m_hard_reset_pending(false)
+	, m_exit_pending(false)
+	, m_soft_reset_timer(nullptr)
+	, m_rand_seed(0x9d14abd7)
+	, m_basename(_config.gamedrv().name)
+	, m_sample_rate(_config.options().sample_rate())
+	, m_saveload_schedule(saveload_schedule::NONE)
+	, m_saveload_schedule_time(attotime::zero)
+	, m_saveload_searchpath(nullptr)
 
-		m_save(*this),
-		m_memory(*this),
-		m_ioport(*this),
-		m_parameters(*this),
-		m_scheduler(*this)
+	, m_save(*this)
+	, m_memory(*this)
+	, m_ioport(*this)
+	, m_parameters(*this)
+	, m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
 

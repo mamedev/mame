@@ -63,73 +63,76 @@ namespace {
 struct thread_context
 {
 private:
+	struct environment
+	{
+		sol::state state;
+		bool busy = false;
+	};
+
+	std::optional<environment> m_environment;
 	std::string m_result;
 	std::mutex m_guard;
 	std::condition_variable m_sync;
 
 public:
-	bool m_busy = false;
 	bool m_yield = false;
 
-	bool start(char const *scr)
+	bool start(sol::this_state s, char const *scr)
 	{
 		std::unique_lock<std::mutex> caller_lock(m_guard);
-		if (m_busy)
+		if (m_environment && m_environment->busy)
 			return false;
 
-		std::string script(scr);
-		std::thread th(
-				[this, script = std::string(scr)] ()
-				{
-					sol::state thstate;
-					thstate.open_libraries();
-					thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
-					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
-					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
-					sol::load_result res = thstate.load(script);
-					std::unique_lock<std::mutex> result_lock(m_guard, std::defer_lock);
-					if (res.valid())
+		if (!m_environment)
+		{
+			m_environment.emplace();
+			m_environment->state.open_libraries();
+			m_environment->state["package"]["preload"]["zlib"] = &luaopen_zlib;
+			m_environment->state["package"]["preload"]["lfs"] = &luaopen_lfs;
+			m_environment->state["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+			m_environment->state.set_function(
+					"yield",
+					[this] ()
 					{
-						sol::protected_function func = res.get<sol::protected_function>();
-						thstate.set_function(
-								"yield",
-								[this, &thstate]()
-								{
-									std::unique_lock<std::mutex> yield_lock(m_guard);
-									m_result = thstate["status"];
-									m_yield = true;
-									m_sync.wait(yield_lock);
-									m_yield = false;
-									thstate["status"] = m_result;
-								});
-						auto ret = func();
-						result_lock.lock();
-						if (ret.valid())
-						{
-							auto result = ret.get<std::optional<char const *> >();
-							if (!result)
-								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
-							else if (!*result)
-								m_result.clear();
-							else
-								m_result = *result;
-						}
+						std::unique_lock<std::mutex> yield_lock(m_guard);
+						m_result = m_environment->state["status"];
+						m_yield = true;
+						m_sync.wait(yield_lock);
+						m_yield = false;
+					});
+		}
+
+		sol::load_result res = m_environment->state.load(scr);
+		if (!res.valid())
+		{
+			sol::error err = res;
+			luaL_error(s, err.what());
+			return false; // unreachable - luaL_error throws
+		}
+
+		std::thread th(
+				[this, func = res.get<sol::protected_function>()] ()
+				{
+					auto ret = func();
+					std::unique_lock<std::mutex> result_lock(m_guard);
+					if (ret.valid())
+					{
+						auto result = ret.get<std::optional<char const *> >();
+						if (!result)
+							osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
+						else if (!*result)
+							m_result.clear();
 						else
-						{
-							sol::error err = ret;
-							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
-						}
+							m_result = *result;
 					}
 					else
 					{
-						result_lock.lock();
-						sol::error err = res;
-						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
+						sol::error err = ret;
+						osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
 					}
-					assert(result_lock);
-					m_busy = false;
-			});
-		m_busy = true;
+					m_environment->busy = false;
+				});
+		m_environment->busy = true;
 		m_yield = false;
 		th.detach(); // FIXME: this is unsafe as the thread function modifies members of the object
 		return true;
@@ -141,9 +144,9 @@ public:
 		if (m_yield)
 		{
 			if (val)
-				m_result = val;
+				m_environment->state["status"] = val;
 			else
-				m_result.clear();
+				m_environment->state["status"] = sol::lua_nil;
 			m_sync.notify_all();
 		}
 	}
@@ -151,10 +154,15 @@ public:
 	char const *result()
 	{
 		std::unique_lock<std::mutex> lock(m_guard);
-		if (m_busy && !m_yield)
+		if (m_environment && m_environment->busy && !m_yield)
 			return "";
 		else
 			return m_result.c_str();
+	}
+
+	bool busy() const
+	{
+		return m_environment && m_environment->busy;
 	}
 };
 
@@ -1019,16 +1027,16 @@ void lua_engine::initialize()
  *                     thread runs until yield() and/or terminates on return.
  * thread:continue(val) - resume thread that has yielded and pass val to it
  *
- * thread.result - get result of a terminated thread as string
- * thread.busy - check if thread is running
- * thread.yield - check if thread is yielded
+ * thread.result - get result of a terminated or yielding thread as string
+ * thread.busy - check if thread is running or yielding
+ * thread.yield - check if thread is yielding
  */
 
 	auto thread_type = emu.new_usertype<thread_context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
 	thread_type.set_function("start", &thread_context::start);
 	thread_type.set_function("continue", &thread_context::resume);
 	thread_type["result"] = sol::property(&thread_context::result);
-	thread_type["busy"] = sol::readonly(&thread_context::m_busy);
+	thread_type["busy"] = sol::property(&thread_context::busy);
 	thread_type["yield"] = sol::readonly(&thread_context::m_yield);
 
 
@@ -1329,7 +1337,6 @@ void lua_engine::initialize()
 					m.popmessage();
 			});
 	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
-	machine_type["ui_active"] = sol::property(&running_machine::ui_active, &running_machine::set_ui_active);
 	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
 	machine_type["parameters"] = sol::property(&running_machine::parameters);
@@ -1939,6 +1946,7 @@ void lua_engine::initialize()
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
 	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
+	ui_type["ui_active"] = sol::property(&mame_ui_manager::ui_active, &mame_ui_manager::set_ui_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);

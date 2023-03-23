@@ -250,8 +250,6 @@ machine:logerror(msg)
 Properties
 ^^^^^^^^^^
 
-machine.ui_active (read/write)
-    A Boolean indicating whether UI control inputs are currently enabled.
 machine.time (read-only)
     The elapsed emulated time for the current session as an
     :ref:`attotime <luareference-core-attotime>`.
@@ -565,6 +563,8 @@ ui.line_height (read-only)
 ui.menu_active (read-only)
     A Boolean indicating whether an interactive UI element is currently active.
     Examples include menus and slider controls.
+ui.ui_active (read/write)
+    A Boolean indicating whether UI control inputs are currently enabled.
 ui.single_step (read/write)
     A Boolean controlling whether the emulated system should be automatically
     paused when the next frame is drawn.  This property is automatically reset
