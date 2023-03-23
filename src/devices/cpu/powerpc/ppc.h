@@ -263,7 +263,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry) override;
@@ -635,7 +635,7 @@ protected:
 	void set_timebase(uint64_t newtb);
 	uint32_t get_decrementer();
 	void set_decrementer(uint32_t newdec);
-	uint32_t ppccom_translate_address_internal(int intention, offs_t &address);
+	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
 	void ppc4xx_set_irq_line(uint32_t bitmask, int state);
 	int ppc4xx_get_irq_line(uint32_t bitmask);
 	void ppc4xx_dma_update_irq_states();

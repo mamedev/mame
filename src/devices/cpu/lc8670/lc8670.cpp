@@ -640,6 +640,7 @@ void lc8670_cpu_device::check_irqs()
 		if (irq != 0)
 		{
 			LOGMASKED(LOG_IRQ, "%s: interrupt %d (Priority=%d, Level=%d) executed\n", tag(), irq, priority, m_irq_lev);
+			standard_irq_callback(irq, m_pc);
 
 			m_irq_lev |= (1 << priority);
 
@@ -652,8 +653,6 @@ void lc8670_cpu_device::check_irqs()
 
 			// clear the IRQ flag
 			m_irq_flag &= ~(1 << irq);
-
-			standard_irq_callback(irq);
 		}
 	}
 

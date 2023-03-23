@@ -219,11 +219,11 @@ void mc88100_device::execute_run()
 		// interrupt check
 		if (m_int_state && !(m_cr[PSR] & PSR_IND))
 		{
-			exception(E_INTERRUPT);
-
 			// notify debugger
 			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debug()->interrupt_hook(INPUT_LINE_IRQ0);
+				debug()->interrupt_hook(INPUT_LINE_IRQ0, m_fip);
+
+			exception(E_INTERRUPT);
 		}
 
 		// update shadow registers
@@ -564,7 +564,7 @@ void mc88100_device::execute(u32 const inst)
 				unsigned const offset = inst & 31;
 
 				if (width && (width + offset) < 32)
-					m_r[D] = s32(m_r[S1] << (32 - (width + offset))) >> (32 - width);
+					m_r[D] = util::sext(m_r[S1] >> offset, width);
 				else
 					m_r[D] = s32(m_r[S1]) >> offset;
 			}
@@ -884,7 +884,7 @@ void mc88100_device::execute(u32 const inst)
 			// bit field register
 		case 0x400: // clr: clear bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				m_r[D] = m_r[S1] & ~(make_bitmask<u32>(width ? width : 32) << offset);
@@ -892,7 +892,7 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x440: // set: set bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				m_r[D] = m_r[S1] | (make_bitmask<u32>(width ? width : 32) << offset);
@@ -900,18 +900,18 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x480: // ext: extract signed bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width && (width + offset) < 32)
-					m_r[D] = s32(m_r[S1] << (32 - (width + offset))) >> (32 - width);
+					m_r[D] = util::sext(m_r[S1] >> offset, width);
 				else
 					m_r[D] = s32(m_r[S1]) >> offset;
 			}
 			break;
 		case 0x4c0: // extu: extract unsigned bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width)
@@ -922,7 +922,7 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x500: // mak: make bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width)
@@ -1473,8 +1473,8 @@ template <typename T> void mc88100_device::ld(u32 address, unsigned const reg)
 		}
 		else
 		{
-			std::optional<u32> const lo = m_cmmu_d->read<u32>(address + 0, m_cr[PSR] & PSR_MODE);
-			std::optional<u32> const hi = m_cmmu_d->read<u32>(address + 4, m_cr[PSR] & PSR_MODE);
+			std::optional<u32> const hi = m_cmmu_d->read<u32>(address + 0, m_cr[PSR] & PSR_MODE);
+			std::optional<u32> const lo = m_cmmu_d->read<u32>(address + 4, m_cr[PSR] & PSR_MODE);
 			if (lo.has_value() && hi.has_value())
 			{
 				if (reg != 0)
@@ -1511,12 +1511,13 @@ template <typename T> void mc88100_device::ld(u32 address, unsigned const reg)
 		}
 		else if constexpr (sizeof(T) == 8)
 		{
-			u64 const data = m_data_space.read_qword(address);
+			u32 const hi = m_data_space.read_dword(address + 0);
+			u32 const lo = m_data_space.read_dword(address + 4);
 
 			if (reg != 0)
-				m_r[(reg + 0) & 31] = u32(data >> 32);
+				m_r[(reg + 0) & 31] = hi;
 			if (reg != 31)
-				m_r[(reg + 1) & 31] = u32(data >> 0);
+				m_r[(reg + 1) & 31] = lo;
 		}
 	}
 }
@@ -1550,8 +1551,8 @@ template <typename T> bool mc88100_device::st(u32 address, unsigned const reg)
 		else
 		{
 			bool result = true;
-			result &= m_cmmu_d->write(address + 0, m_r[(reg + 1) & 31], m_cr[PSR] & PSR_MODE);
-			result &= m_cmmu_d->write(address + 4, m_r[(reg + 0) & 31], m_cr[PSR] & PSR_MODE);
+			result &= m_cmmu_d->write(address + 0, m_r[(reg + 0) & 31], m_cr[PSR] & PSR_MODE);
+			result &= m_cmmu_d->write(address + 4, m_r[(reg + 1) & 31], m_cr[PSR] & PSR_MODE);
 
 			if (!result)
 				exception(E_DATA);
@@ -1568,7 +1569,10 @@ template <typename T> bool mc88100_device::st(u32 address, unsigned const reg)
 		else if constexpr (sizeof(T) == 4)
 			m_data_space.write_dword(address, m_r[reg]);
 		else if constexpr (sizeof(T) == 8)
-			m_data_space.write_qword(address, (u64(m_r[(reg + 0) & 31]) << 32) | m_r[(reg + 1) & 31]);
+		{
+			m_data_space.write_dword(address + 0, m_r[(reg + 0) & 31]);
+			m_data_space.write_dword(address + 4, m_r[(reg + 1) & 31]);
+		}
 
 		return true;
 	}

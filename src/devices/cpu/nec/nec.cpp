@@ -196,8 +196,10 @@ offs_t nec_common_device::v33_translate(offs_t addr)
 		return addr & 0xfffff;
 }
 
-bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
+
 	if (spacenum == AS_PROGRAM)
 		address = v33_translate(address);
 	return true;
@@ -323,7 +325,7 @@ void nec_common_device::nec_interrupt(unsigned int_num, int/*INTSOURCES*/ source
 	m_MF = 1;
 
 	if (source == INT_IRQ)  /* get vector */
-		int_num = standard_irq_callback(0);
+		int_num = standard_irq_callback(0, PC());
 	debugger_exception_hook(int_num);
 
 	dest_off = read_mem_word(int_num*4);

@@ -31,7 +31,6 @@ No software to test with, so we'll never know if the FDC works.
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/f4702.h"
-#include "machine/bankdev.h"
 #include "machine/wd_fdc.h"
 #include "bus/rs232/rs232.h"
 #include "imagedev/floppy.h"
@@ -45,10 +44,10 @@ public:
 	mccpm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_bank(*this, "bankdev_map")
 		, m_fdc(*this, "fdc")
 		, m_fdd(*this, "fdc:%u", 0U)
 		, m_brg(*this, "brg%u", 1U)
+		, m_view(*this, "view")
 	{ }
 
 	void mccpm(machine_config &config);
@@ -60,7 +59,6 @@ protected:
 private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	void bankdev_map(address_map &map);
 	void port44_w(u8);
 	u8 port44_r();
 	void fdc_irq(bool);
@@ -70,25 +68,20 @@ private:
 	floppy_image_device *m_floppy = 0;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_bank;
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_fdd;
 	required_device_array<f4702_device, 2> m_brg;
+	memory_view m_view;
 };
 
 
-void mccpm_state::bankdev_map(address_map &map)
-{
-	// bank 0
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	map(0x4000, 0x7fff).lr8(NAME([this] () { if (!machine().side_effects_disabled()) m_bank->set_bank(1); return 0xff; }));
-	// bank 1
-	map(0x8000, 0xffff).ram();
-}
 
 void mccpm_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0x7fff).view(m_view);
+	m_view[0](0x0000, 0x3fff).rom().region("maincpu", 0);
+	m_view[0](0x4000, 0x7fff).lr8(NAME([this] () { if (!machine().side_effects_disabled()) m_view.select(1); return 0xff; }));
+	m_view[1](0x0000, 0x7fff).ram();
 	map(0x8000, 0xffff).ram();
 }
 
@@ -184,7 +177,7 @@ template <int N> void mccpm_state::bd_q_w(offs_t offset, u8 data)
 
 void mccpm_state::machine_reset()
 {
-	m_bank->set_bank(0);
+	m_view.select(0);
 	m_fdc_status = 0xfb;
 	m_floppy = nullptr;
 }
@@ -205,12 +198,6 @@ void mccpm_state::mccpm(machine_config &config)
 	Z80(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mccpm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mccpm_state::io_map);
-
-	ADDRESS_MAP_BANK(config, m_bank, 0);
-	m_bank->set_addrmap(0, &mccpm_state::bankdev_map);
-	m_bank->set_data_width(8);
-	m_bank->set_addr_width(16);
-	m_bank->set_stride(0x8000);
 
 	/* Devices */
 	// clock supplied by pair of HD4702 baud rate generators

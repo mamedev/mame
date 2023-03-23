@@ -50,7 +50,6 @@ enum
 enum
 {
 	MCS48_INPUT_IRQ = 0,
-	UPI41_INPUT_IBF = 0,
 	MCS48_INPUT_EA
 };
 

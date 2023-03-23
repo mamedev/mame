@@ -35,9 +35,9 @@
 #include "emu.h"
 #include "st2xxx.h"
 
-#define LOG_IRQ (1 << 1U)
-#define LOG_BT (1 << 2U)
-#define LOG_LCDC (1 << 3U)
+#define LOG_IRQ  (1U << 1)
+#define LOG_BT   (1U << 2)
+#define LOG_LCDC (1U << 3)
 #define VERBOSE LOG_IRQ
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"

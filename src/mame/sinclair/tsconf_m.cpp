@@ -613,7 +613,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 
 	case SYS_CONFIG:
 		// 0 - 3.5MHz, 1 - 7MHz, 2 - 14MHz, 3 - reserved
-		m_maincpu->set_clock(3.5_MHz_XTAL * (1 << (data & 0x03)));
+		m_maincpu->set_clock_scale(1 << (data & 0x03));
 		m_regs[CACHE_CONFIG] = BIT(data, 2) ? 0x0f : 0x00;
 		break;
 
@@ -745,15 +745,48 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 	m_zctl_di |= data;
 }
 
+IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
+{
+	u8 vector = 0xff;
+	if (m_int_mask & 1)
+		m_int_mask &= ~1;
+	else if (m_int_mask & 2)
+	{
+		m_int_mask &= ~2;
+		vector = 0xfd;
+	}
+	else if (m_int_mask & 4)
+	{
+		m_int_mask &= ~4;
+		vector = 0xfb;
+	}
+
+	if (!m_int_mask)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	return vector;
+}
+
+TIMER_CALLBACK_MEMBER(tsconf_state::irq_on)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+}
+
+TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)
+{
+	m_int_mask = 0;
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
 void tsconf_state::update_frame_timer()
 {
 	u16 vpos = OFFS_512(VS_INT_L);
 	u16 hpos = m_regs[HS_INT];
-	if (hpos > 0 && vpos <= 319 && hpos <= 223)
-		// Only if not overlapping with scanline. Otherwise we need to prioritize.
-		m_frame_irq_timer->adjust(m_screen->time_until_pos(vpos, hpos << 1));
-	else
-		m_frame_irq_timer->adjust(attotime::never);
+	attotime at = (BIT(m_regs[INT_MASK], 0) && vpos <= 319 && hpos <= 223) ? m_screen->time_until_pos(vpos, hpos << 1) : m_screen->time_until_pos(0, 0);
+	if (at >= m_screen->frame_period())
+		at = attotime::zero;
+	m_frame_irq_timer->adjust(at);
 
 	m_gfx_y_frame_offset = -get_screen_area().top();
 }
@@ -761,43 +794,35 @@ void tsconf_state::update_frame_timer()
 INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
 	update_frame_timer();
-	m_line_irq_timer->adjust(attotime::zero);
+	m_scanline_irq_timer->adjust(attotime::zero);
 }
 
 void tsconf_state::dma_ready(int line)
 {
 	if (BIT(m_regs[INT_MASK], 4))
 	{
-		m_maincpu->set_input_line_and_vector(line, ASSERT_LINE, 0xfb);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+		m_int_mask |= 4;
+		m_irq_on_timer->adjust(attotime::zero);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 {
 	if (BIT(m_regs[INT_MASK], 0))
-	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-	}
+		m_int_mask |= 1;
+	m_irq_on_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 {
-	u16 screen_vpos = m_screen->vpos();
-	m_line_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
 	if (BIT(m_regs[INT_MASK], 1))
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
-		// Not quite precise. Scanline can't be skipped.
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
-	}
-	if (BIT(m_regs[INT_MASK], 0) && OFFS_512(VS_INT_L) == screen_vpos && m_regs[HS_INT] == 0)
-	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
-		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32 * (1 << (m_regs[SYS_CONFIG] & 0x03))));
+		m_int_mask |= 2;
+		m_irq_on_timer->adjust(attotime::zero);
 	}
 
+	u16 screen_vpos = m_screen->vpos();
+	m_scanline_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
 	m_screen->update_now();
 	for (const auto &[reg, val] : m_scanline_delayed_regs_update)
 	{

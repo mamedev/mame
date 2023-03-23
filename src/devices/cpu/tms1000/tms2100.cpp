@@ -243,6 +243,8 @@ void tms2100_cpu_device::read_opcode()
 
 void tms2100_cpu_device::interrupt()
 {
+	standard_irq_callback(0, m_rom_address);
+
 	// save registers
 	m_pb_save = m_pb;
 	m_cb_save = m_cb;
@@ -264,8 +266,6 @@ void tms2100_cpu_device::interrupt()
 	m_cb = 0;
 	m_status = 1;
 	m_il |= 1;
-
-	standard_irq_callback(0);
 }
 
 

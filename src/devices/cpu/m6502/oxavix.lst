@@ -57,6 +57,7 @@ brk_xav_imp
 	write_stack(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_pending) {
+		standard_irq_callback(NMI_LINE, PC);
 		if (m_vector_callback.isnull())
 		{
 			PC = read_arg(0xfffa);
@@ -77,8 +78,9 @@ brk_xav_imp
 		}
 
 		nmi_pending = false;
-		standard_irq_callback(NMI_LINE);
 	} else {
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE, PC);
 		if (m_vector_callback.isnull())
 		{
 			PC = read_arg(0xfffe);
@@ -97,9 +99,6 @@ brk_xav_imp
 				PC = set_h(PC, read_arg(0xffff));
 			}
 		}
-
-		if(irq_taken)
-			standard_irq_callback(IRQ_LINE);
 	}
 	irq_taken = false;
 	P |= F_I; // Do *not* move after the prefetch

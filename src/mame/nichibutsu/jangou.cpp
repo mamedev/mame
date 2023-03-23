@@ -1000,7 +1000,7 @@ void cntrygrl_state::luckygrl(machine_config &config)
 {
 	cntrygrl(config);
 
-	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_cpu_0, MASTER_CLOCK / 8)); // actually Falcon 03155096 encrypted Z80
+	sega_315_5096_device &maincpu(SEGA_315_5096(config.replace(), m_cpu_0, MASTER_CLOCK / 8)); // actually Falcon 03155096 encrypted Z80
 	maincpu.set_addrmap(AS_PROGRAM, &cntrygrl_state::luckygrl_cpu0_map);
 	maincpu.set_addrmap(AS_IO, &cntrygrl_state::cntrygrl_cpu0_io);
 	maincpu.set_addrmap(AS_OPCODES, &cntrygrl_state::decrypted_opcodes_map);

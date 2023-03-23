@@ -315,12 +315,11 @@ void irobot_state::irmb_dout(const irmb_ops *curop, uint32_t d)
 void irobot_state::load_oproms()
 {
 	uint8_t *MB = memregion("proms")->base() + 0x20;
-	int i;
 
 	/* allocate RAM */
 	m_mbops = std::make_unique<irmb_ops[]>(1024);
 
-	for (i = 0; i < 1024; i++)
+	for (int i = 0; i < 1024; i++)
 	{
 		int nxtadd, func, ramsel, diradd, latchmask, dirmask, time;
 
@@ -386,13 +385,10 @@ void irobot_state::load_oproms()
 /* Init mathbox (only called once) */
 void irobot_state::init_irobot()
 {
-	for (int i = 0; i < 16; i++)
-	{
-		m_irmb_stack[i] = &m_mbops[0];
-		m_irmb_regs[i] = 0;
-	}
-	m_irmb_latch = 0;
 	load_oproms();
+
+	for (int i = 0; i < 16; i++)
+		m_irmb_stack[i] = &m_mbops[0];
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)

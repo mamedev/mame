@@ -559,6 +559,7 @@ void v60_device::stall()
 
 void v60_device::v60_do_irq(int vector)
 {
+	debugger_exception_hook(vector);
 	uint32_t oldPSW = v60_update_psw_for_exception(1, 0);
 
 	// Push PC and PSW onto the stack
@@ -580,7 +581,7 @@ void v60_device::v60_try_irq()
 		if(m_irq_line != ASSERT_LINE)
 			m_irq_line = CLEAR_LINE;
 
-		vector = standard_irq_callback(0);
+		vector = standard_irq_callback(0, PC);
 
 		v60_do_irq(vector + 0x40);
 	}

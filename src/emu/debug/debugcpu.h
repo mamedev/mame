@@ -51,7 +51,7 @@ public:
 	// hooks used by the rest of the system
 	void start_hook(const attotime &endtime);
 	void stop_hook();
-	void interrupt_hook(int irqline);
+	void interrupt_hook(int irqline, offs_t pc);
 	void exception_hook(int exception);
 	void privilege_hook();
 	void instruction_hook(offs_t curpc);
@@ -227,6 +227,7 @@ private:
 		~tracer();
 
 		void update(offs_t pc);
+		void interrupt_update(int irqline, offs_t pc);
 		void vprintf(util::format_argument_pack<std::ostream> const &args);
 		void flush();
 		bool logerror() const { return m_logerror; }

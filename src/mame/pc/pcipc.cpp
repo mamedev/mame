@@ -18,21 +18,22 @@
 
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/i82439hx.h"
-#include "machine/i82439tx.h"
-#include "machine/i82371sb.h"
-#include "video/mga2064w.h"
-#include "video/virge_pci.h"
+
 #include "bus/isa/isa_cards.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
+#include "cpu/i386/i386.h"
 #include "machine/fdc37c93x.h"
+#include "machine/i82371sb.h"
+#include "machine/i82439hx.h"
+#include "machine/i82439tx.h"
+#include "machine/pci-ide.h"
+#include "machine/pci.h"
+#include "video/mga2064w.h"
+#include "video/virge_pci.h"
 
 
 namespace {
@@ -533,11 +534,11 @@ void pcipc_state::pcipc(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	I82439HX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_phoenix_ver40_rev6_w));
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0));
+	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 //  MGA2064W(config, "pci:12.0", 0);
@@ -573,7 +574,7 @@ void pcipc_state::pcipctx(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	I82439TX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0));
+	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
 	MGA2064W(config, "pci:12.0", 0);

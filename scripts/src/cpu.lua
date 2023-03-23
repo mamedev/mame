@@ -3780,3 +3780,13 @@ if opt_tool(CPUS, "NOVA") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.h")
 end
+
+--------------------------------------------------
+-- Interdata Series 16, disassembler only
+--@src/devices/cpu/interdata16/interdata16.h,CPUS["INTERDATA16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "INTERDATA16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
+end
