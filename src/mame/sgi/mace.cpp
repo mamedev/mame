@@ -29,7 +29,7 @@
 #define LOG_WRITE_AUDIO     (1U << 17)
 #define LOG_WRITE_ISA       (1U << 18)
 #define LOG_WRITE_KBDMS     (1U << 19)
-#define LOG_WRITE_I2C       (1U << 20(
+#define LOG_WRITE_I2C       (1U << 20)
 #define LOG_WRITE_UST_MSC   (1U << 21)
 #define LOG_WRITE_ISA_EXT   (1U << 22)
 #define LOG_WRITE_RTC       (1U << 23)
