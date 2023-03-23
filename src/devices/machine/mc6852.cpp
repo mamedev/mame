@@ -24,8 +24,16 @@
 #include "emu.h"
 #include "mc6852.h"
 
-//#define VERBOSE 1
+#define LOG_CONF  (1 << 1U)
+#define LOG_TX     (1 << 2U)
+#define LOG_RX     (1 << 3U)
+#define VERBOSE (LOG_TX)
+
 #include "logmacro.h"
+
+#define LOGCONF(...) LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGRX(...)   LOGMASKED(LOG_RX,  __VA_ARGS__)
+#define LOGTX(...)   LOGMASKED(LOG_TX,  __VA_ARGS__)
 
 
 //**************************************************************************
@@ -51,6 +59,7 @@ mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, dev
 	m_write_irq(*this),
 	m_write_sm_dtr(*this),
 	m_write_tuf(*this),
+	m_tx_bit_count(0),
 	m_rx_clock(0),
 	m_tx_clock(0),
 	m_cts(1),
@@ -121,7 +130,42 @@ void mc6852_device::device_reset()
 
 void mc6852_device::tra_callback()
 {
-	m_write_tx_data(transmit_register_get_data_bit());
+	int bit=0;
+	const uint8_t tx_bit_total = 8; 
+
+	int size = m_tx_fifo.size();
+	LOGTX("Transmit FIFO size %d\n", size);
+
+	if (size > 0)
+	{
+
+		uint8_t data = m_tx_fifo.front();
+
+		bit = (data>>(tx_bit_total-1-m_tx_bit_count))&1;
+
+		LOGTX("Transmitting bit %d as %d\n", m_tx_bit_count, bit);
+		m_tx_bit_count++;
+
+		/* have all bits of this stream formatted byte been sent? */
+		if (m_tx_bit_count==tx_bit_total)
+		{
+			/* yes - generate a new byte to send */
+			LOGTX("Transmit byte completed\n");
+			m_tx_fifo.pop();
+			m_tx_bit_count=0;
+			size--;
+		}
+
+		int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
+		int available = 3 - size;
+
+		if (available >= trigger)
+		{
+			m_status |= S_TDRA;
+		}
+	}
+
+	m_write_tx_data(bit);
 }
 
 
@@ -312,7 +356,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 		{
 		case C1_AC_C2: {
 			/* control 2 */
-			LOG("MC6852 Control 2 %02x\n", data);
+			LOGTX("MC6852 Control 2 %02x\n", data);
 			m_cr[1] = data;
 
 			int data_bit_count = 0;
@@ -354,7 +398,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 		case C1_AC_C3:
 			/* control 3 */
-			LOG("MC6852 Control 3 %02x\n", data);
+			LOGTX("MC6852 Control 3 %02x\n", data);
 			m_cr[2] = data;
 			if (m_cr[2] & C3_CTUF)
 			{
@@ -370,7 +414,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 		case C1_AC_SYNC:
 			/* sync code */
-			LOG("MC6852 Sync Code %02x\n", data);
+			LOGTX("MC6852 Sync Code %02x\n", data);
 			m_scr = data;
 			break;
 
@@ -379,13 +423,14 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			int available = 3 - m_tx_fifo.size();
 			if (available > 0)
 			{
-				LOG("MC6852 Transmit FIFO %02x\n", data);
+				LOGTX("MC6852 Transmit FIFO %02x\n", data);
 				m_tx_fifo.push(data);
+				transmit_register_setup(data);
 				available--;
 			}
 			else
 			{
-				LOG("MC6852 Transmit FIFO OVERFLOW %02x\n", data);
+				LOGTX("MC6852 Transmit FIFO OVERFLOW %02x\n", data);
 			}
 			int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
 			if (available < trigger)
@@ -398,7 +443,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		LOG("MC6852 Control 1 %02x\n", data);
+		LOGTX("MC6852 Control 1 %02x\n", data);
 
 		/* receiver reset */
 		if (data & C1_RX_RS)
@@ -409,7 +454,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			Register is set to ones.
 			*/
 
-			LOG("MC6852 Receiver Reset\n");
+			LOGTX("MC6852 Receiver Reset\n");
 
 			m_status &= ~(S_RX_OVRN | S_PE | S_DCD | S_RDA);
 			m_rsr = 0xff;
@@ -427,7 +472,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 			// after one E clock pulse), the Transmitter Underflow
 			// status bit, and the CTS interrupt.
 
-			LOG("MC6852 Transmitter Reset\n");
+			LOGTX("MC6852 Transmitter Reset\n");
 
 			m_status &= ~(S_TUF | S_CTS);
 			m_status |= S_TDRA;
@@ -437,11 +482,11 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 		}
 
 		if (data & C1_STRIP_SYNC)
-			LOG("MC6852 Strip Synchronization Characters\n");
+			LOGTX("MC6852 Strip Synchronization Characters\n");
 
 		if (data & C1_CLEAR_SYNC)
 		{
-			LOG("MC6852 Clear Synchronization\n");
+			LOGTX("MC6852 Clear Synchronization\n");
 			m_in_sync = 0;
 		}
 

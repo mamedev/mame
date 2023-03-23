@@ -53,8 +53,9 @@
 #define LOG_CONF      (1 << 1U)
 #define LOG_KEYBOARD  (1 << 2U)
 #define LOG_DISPLAY   (1 << 3U)
+#define LOG_SOUND     (1 << 4U)
 
-//#define VERBOSE (LOG_CONF|LOG_DISPLAY|LOG_KEYBOARD)
+#define VERBOSE (LOG_CONF|LOG_SOUND)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -62,6 +63,7 @@
 #define LOGCONF(...)     LOGMASKED(LOG_CONF,  __VA_ARGS__)
 #define LOGKEYBOARD(...) LOGMASKED(LOG_KEYBOARD,  __VA_ARGS__)
 #define LOGDISPLAY(...)  LOGMASKED(LOG_DISPLAY,  __VA_ARGS__)
+#define LOGSOUND(...)  LOGMASKED(LOG_SOUND,  __VA_ARGS__)
 
 
 //**************************************************************************
@@ -572,9 +574,13 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 void victor9k_state::via3_pb_w(uint8_t data)
 {
 	// codec clock output
-	m_ssda->rx_clk_w(!BIT(data, 7));
-	m_ssda->tx_clk_w(!BIT(data, 7));
+	m_ssda->rx_clock_w(!BIT(data, 7));
+	m_ssda->tx_clock_w(!BIT(data, 7));
 	m_cvsd->clock_w(!BIT(data, 7));
+
+	long now = machine().time().as_double();
+	LOGSOUND("VICTOR9K tx_clk_w %02x %d\n", !BIT(data, 7),  now);
+
 }
 
 WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
@@ -738,6 +744,11 @@ void victor9k_state::victor9k(machine_config &config)
 	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
 	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
 
+	MC6852(config, m_ssda, 0);
+	m_ssda->tx_data_callback().set(HC55516_TAG, FUNC(hc55516_device::digit_w));
+	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
+	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
+
 	// devices
 	IEEE488(config, m_ieee488, 0);
 
@@ -754,11 +765,11 @@ void victor9k_state::victor9k(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	pit8253_device &pit(PIT8253(config, I8253_TAG, 0));
-	pit.set_clk<0>(2500000);
+	pit.set_clk<0>(15_MHz_XTAL / 12);
 	pit.out_handler<0>().set(FUNC(victor9k_state::mux_serial_b_w));
-	pit.set_clk<1>(2500000);
+	pit.set_clk<1>(15_MHz_XTAL / 12);
 	pit.out_handler<1>().set(FUNC(victor9k_state::mux_serial_a_w));
-	pit.set_clk<2>(100000);
+	pit.set_clk<2>(15_MHz_XTAL / 150);
 	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
 	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
@@ -769,11 +780,6 @@ void victor9k_state::victor9k(machine_config &config)
 	m_upd7201->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_upd7201->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
 	m_upd7201->out_int_callback().set(I8259A_TAG, FUNC(pic8259_device::ir1_w));
-
-	MC6852(config, m_ssda, 15_MHz_XTAL / 15);
-	m_ssda->tx_data_callback().set(HC55516_TAG, FUNC(hc55516_device::digit_w));
-	m_ssda->sm_dtr_callback().set(FUNC(victor9k_state::ssda_sm_dtr_w));
-	m_ssda->irq_callback().set(FUNC(victor9k_state::ssda_irq_w));
 
 	MOS6522(config, m_via1, 15_MHz_XTAL / 15);
 	m_via1->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));

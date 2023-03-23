@@ -38,7 +38,7 @@
 // ======================> mc6852_device
 
 class mc6852_device :   public device_t,
-						public device_serial_interface
+						      public device_serial_interface
 {
 public:
 	// construction/destruction
@@ -143,6 +143,7 @@ private:
 	uint8_t m_tsr;            // transmit shift register
 	uint8_t m_rdr;            // receive data register
 	uint8_t m_rsr;            // receive shift register
+	uint8_t m_tx_bit_count;   // count of bits transmitted
 
 	std::queue<uint8_t> m_rx_fifo;
 	std::queue<uint8_t> m_tx_fifo;
