@@ -82,7 +82,8 @@ msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machi
 void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &config)
 {
 	Y8950(config, m_y8950, DERIVED_CLOCK(1, 1)); // Not verified
-	m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
 	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 
@@ -143,7 +144,8 @@ void msx_cart_msx_audio_nms1205_device::device_add_mconfig(machine_config &confi
 {
 	// At the same time the sound is also output on two outputs on the nms1205 cartridge itself
 	Y8950(config, m_y8950, DERIVED_CLOCK(1, 1));
-	m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
 	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 	m_y8950->irq_handler().set(FUNC(msx_cart_msx_audio_nms1205_device::irq_write));
@@ -235,7 +237,8 @@ msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_c
 void msx_cart_msx_audio_fsca1_device::device_add_mconfig(machine_config &config)
 {
 	Y8950(config, m_y8950, DERIVED_CLOCK(1, 1));
-	m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_y8950->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
 	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 	m_y8950->io_read().set(FUNC(msx_cart_msx_audio_fsca1_device::y8950_io_r));

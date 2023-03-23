@@ -90,7 +90,8 @@ msx_cart_konami_scc_device::msx_cart_konami_scc_device(const machine_config &mco
 void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
 	K051649(config, m_k051649, DERIVED_CLOCK(1, 1));
-	m_k051649->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_k051649->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 }
 
 void msx_cart_konami_scc_device::device_reset()
@@ -272,7 +273,8 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
 	DAC_8BIT_R2R(config, m_dac, 0);
-	m_dac->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0); // unknown DAC
+	if (parent_slot())
+		m_dac->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0); // unknown DAC
 }
 
 image_init_result msx_cart_synthesizer_device::initialize_cartridge(std::string &message)
@@ -318,7 +320,8 @@ msx_cart_konami_sound_device::msx_cart_konami_sound_device(const machine_config 
 void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
 	K051649(config, m_k052539, DERIVED_CLOCK(1, 1));
-	m_k052539->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_k052539->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 }
 
 void msx_cart_konami_sound_device::device_start()
@@ -543,7 +546,8 @@ void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 void msx_cart_keyboard_master_device::device_add_mconfig(machine_config &config)
 {
 	VLM5030(config, m_vlm5030, DERIVED_CLOCK(1, 1));
-	m_vlm5030->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_vlm5030->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 	m_vlm5030->set_addrmap(0, &msx_cart_keyboard_master_device::vlm_map);
 }
 

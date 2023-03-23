@@ -31,7 +31,8 @@ msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, cons
 void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
 {
 	YM2413(config, m_ym2413, DERIVED_CLOCK(1, 1));
-	m_ym2413->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+	if (parent_slot())
+		m_ym2413->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
 }
 
 
