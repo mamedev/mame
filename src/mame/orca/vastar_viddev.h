@@ -28,16 +28,16 @@ public:
 	// construction/destruction
 	vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_bg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_bg_codebase = code; m_bg_attrbase = attr;  m_bg_colbase = col;  }
+	void set_fg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_fg_codebase = code; m_fg_attrbase = attr;  m_fg_colbase = col;  }
+	void set_other_bases(uint16_t spy, uint16_t atr, uint16_t spx, uint16_t bgs0, uint16_t bgs1) { m_spr_y_col = spy; m_spr_attr = atr; m_spr_code_x = spx; m_bg_scroll0 = bgs0; m_bg_scroll1 = bgs1; }
+
 	// memory handlers
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram0_w(offs_t offset, uint8_t data);
 	void bgvideoram1_w(offs_t offset, uint8_t data);
 	void flipscreen_w(uint8_t data);
 	void priority_w(uint8_t data) { m_fg_vregs = data; }
-
-	void set_bg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_bg_codebase = code; m_bg_attrbase = attr;  m_bg_colbase = col;  }
-	void set_fg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_fg_codebase = code; m_fg_attrbase = attr;  m_fg_colbase = col;  }
-	void set_other_bases(uint16_t spy, uint16_t atr, uint16_t spx, uint16_t bgs0, uint16_t bgs1) { m_spr_y_col = spy; m_spr_attr = atr; m_spr_code_x = spx; m_bg_scroll0 = bgs0; m_bg_scroll1 = bgs1; }
 
 protected:
 	// device-level overrides
