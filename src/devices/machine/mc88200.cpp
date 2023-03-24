@@ -374,6 +374,18 @@ void mc88200_device::bwp_w(offs_t offset, u32 data)
 {
 	LOG("bwp_w %x,0x%08x (%s)\n", offset, data, machine().describe_context());
 
+	if (data & BATC_V)
+	{
+		for (unsigned i = 0; i < std::size(m_batc); i++)
+		{
+			if ((i != offset) && (m_batc[i] & BATC_V) && BIT(m_batc[i], 19, 13) == BIT(data, 19, 13))
+			{
+				logerror("duplicate batc entry 0x%08x invalidated (%s)\n", data, machine().describe_context());
+				data &= ~BATC_V;
+			}
+		}
+	}
+
 	m_batc[offset] = data;
 }
 
