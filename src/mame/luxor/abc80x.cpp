@@ -2067,6 +2067,7 @@ void abc800_state::common(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc800_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
@@ -2087,7 +2088,8 @@ void abc800_state::common(machine_config &config)
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb));
+	QUICKLOAD(config, m_quickload, "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb));
+	m_quickload->set_interface("abc800_quik");
 }
 
 
@@ -2113,7 +2115,6 @@ void abc800c_state::abc800c(machine_config &config)
 	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
-
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
