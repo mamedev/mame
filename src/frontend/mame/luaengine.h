@@ -57,9 +57,8 @@ public:
 	std::pair<bool, std::optional<long> > menu_callback(const std::string &menu, int index, const std::string &event);
 
 	void set_machine(running_machine *machine);
-	std::vector<std::string> &get_menu() { return m_menu; }
+	std::vector<std::string> const &get_menu() { return m_menu; }
 	void attach_notifiers();
-	void on_frame_done();
 	void on_sound_update();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
@@ -168,6 +167,9 @@ private:
 	running_machine *m_machine;
 
 	std::vector<std::string> m_menu;
+
+	std::vector<int> m_update_tasks;
+	std::vector<int> m_frame_tasks;
 
 	template <typename R, typename T, typename D>
 	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);

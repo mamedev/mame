@@ -462,11 +462,11 @@ static std::string process_snapshot_filename(running_machine &machine, const cha
 lua_engine::lua_engine()
 {
 	m_machine = nullptr;
-	m_lua_state = luaL_newstate();  /* create state */
+	m_lua_state = luaL_newstate();  // create state
 	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
 
 	luaL_checkversion(m_lua_state);
-	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
+	lua_gc(m_lua_state, LUA_GCSTOP, 0);  // stop collector during initialization
 	sol().open_libraries();
 
 	// Get package.preload so we can store builtins in it.
@@ -646,12 +646,12 @@ void lua_engine::on_machine_resume()
 
 void lua_engine::on_machine_frame()
 {
-	execute_function("LUA_ON_FRAME");
-}
+	std::vector<int> tasks = std::move(m_frame_tasks);
+	m_frame_tasks.clear();
+	for (int ref : tasks)
+		resume(ref);
 
-void lua_engine::on_frame_done()
-{
-	execute_function("LUA_ON_FRAME_DONE");
+	execute_function("LUA_ON_FRAME");
 }
 
 void lua_engine::on_sound_update()
@@ -865,6 +865,22 @@ void lua_engine::initialize()
 					luaL_error(s, "cannot wait from outside coroutine");
 				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
 				machine().scheduler().timer_set(duration, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
+			});
+	emu["wait_next_update"] = sol::yielding(
+			[this] (sol::this_state s)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+			});
+	emu["wait_next_frame"] = sol::yielding(
+			[this] (sol::this_state s)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
 			});
 	emu["lang_translate"] = sol::overload(
 			static_cast<char const *(*)(char const *)>(&lang_translate),
@@ -2025,6 +2041,11 @@ void lua_engine::initialize()
 //-------------------------------------------------
 bool lua_engine::frame_hook()
 {
+	std::vector<int> tasks = std::move(m_update_tasks);
+	m_update_tasks.clear();
+	for (int ref : tasks)
+		resume(ref);
+
 	return execute_function("LUA_ON_FRAME_DONE");
 }
 
@@ -2034,6 +2055,9 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
+	m_menu.clear();
+	m_update_tasks.clear();
+	m_frame_tasks.clear();
 	m_sol_state.reset();
 	if (m_lua_state)
 	{

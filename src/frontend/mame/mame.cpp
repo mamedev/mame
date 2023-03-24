@@ -74,6 +74,7 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
+	m_autoboot_script.reset();
 	m_lua.reset();
 	s_manager = nullptr;
 }
