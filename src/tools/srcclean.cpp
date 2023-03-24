@@ -119,6 +119,7 @@ protected:
 	static constexpr char32_t CYRILLIC_SUPPLEMENT_LAST  = 0x0000'052fU;
 	static constexpr char32_t LINE_SEPARATOR            = 0x0000'2028U;
 	static constexpr char32_t PARAGRAPH_SEPARATOR       = 0x0000'2029U;
+	static constexpr char32_t SUPPLEMENTARY_FIRST       = 0x0001'0000U;
 
 	template <typename OutputIt>
 	cleaner_base(OutputIt &&output, newline newline_mode, unsigned tab_width);
@@ -138,7 +139,6 @@ private:
 	static constexpr char32_t NONCHARACTER_LAST     = 0x0000'fdefU;
 	static constexpr char32_t ZERO_WIDTH_NB_SPACE   = 0x0000'feffU;
 	static constexpr char32_t REPLACEMENT_CHARACTER = 0x0000'fffdU;
-	static constexpr char32_t SUPPLEMENTARY_FIRST   = 0x0001'0000U;
 	static constexpr char32_t SUPPLEMENTARY_LAST    = 0x0010'ffffU;
 
 	static constexpr char32_t CODE_LENGTH_THRESHOLDS[6]{
@@ -1007,7 +1007,6 @@ void cpp_cleaner::output_character(char32_t ch)
 	{
 	case parse_state::DEFAULT:
 	case parse_state::TOKEN:
-	case parse_state::CHARACTER_CONSTANT:
 	case parse_state::NUMERIC_CONSTANT:
 		if (BASIC_LATIN_LAST < ch)
 		{
@@ -1017,13 +1016,8 @@ void cpp_cleaner::output_character(char32_t ch)
 		break;
 	case parse_state::COMMENT:
 	case parse_state::LINE_COMMENT:
-		break;
 	case parse_state::STRING_CONSTANT:
-		if (CYRILLIC_SUPPLEMENT_LAST < ch)
-		{
-			++m_non_ascii;
-			ch = QUESTION_MARK;
-		}
+	case parse_state::CHARACTER_CONSTANT:
 		break;
 	}
 
@@ -1323,9 +1317,25 @@ void cpp_cleaner::process_text(char32_t ch)
 		output_character(char32_t(std::uint8_t('v')));
 		break;
 	default:
-		output_character(ch);
-		if (!m_escape && (((parse_state::STRING_CONSTANT == m_parse_state) ? DOUBLE_QUOTE : SINGLE_QUOTE) == ch))
-			m_parse_state = parse_state::DEFAULT;
+		if (CYRILLIC_SUPPLEMENT_LAST >= ch)
+		{
+			output_character(ch);
+			if (!m_escape && (((parse_state::STRING_CONSTANT == m_parse_state) ? DOUBLE_QUOTE : SINGLE_QUOTE) == ch))
+				m_parse_state = parse_state::DEFAULT;
+		}
+		else
+		{
+			++m_non_ascii;
+			bool const supplementary(SUPPLEMENTARY_FIRST <= ch);
+			if (!m_escape)
+				output_character(BACKSLASH);
+			output_character(char32_t(std::uint8_t(supplementary ? 'U' : 'u')));
+			for (int shift = supplementary ? 28 : 12; 0 <= shift; shift -= 4)
+			{
+				std::uint8_t const digit((ch >> shift) & 0x0fU);
+				output_character(std::uint8_t((10U > digit) ? '0' : ('a' - 10)) + digit);
+			}
+		}
 	}
 	m_escape = (BACKSLASH == ch) && !m_escape;
 }

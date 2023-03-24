@@ -862,14 +862,17 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 		auto dis = machine().disable_side_effects();
 
 		bool ismapped = offs <= m_maxaddr;
+		address_space *tspace;
 		if (ismapped && !m_no_translation)
 		{
 			offs_t dummyaddr = offs;
-			ismapped = source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
+			ismapped = source.m_memintf->translate(source.m_space->spacenum(), device_memory_interface::TR_READ, dummyaddr, tspace);
 		}
+		else
+			tspace = source.m_space;
 		data = ~u64(0);
 		if (ismapped)
-			data = m_expression.context().read_memory(*source.m_space, offs, size, !m_no_translation);
+			data = m_expression.context().read_memory(*tspace, offs, size, !m_no_translation);
 		return ismapped;
 	}
 

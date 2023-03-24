@@ -107,16 +107,16 @@ brk_r_imp
 	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
 	dec_SP();
 	if(irq_taken && nmi_pending) {
+		standard_irq_callback(NMI_LINE, PC);
 		PC = read_arg(0xfffc);
 		PC = set_h(PC, read_arg(0xfffd));
 		nmi_pending = false;
-		standard_irq_callback(NMI_LINE);
 	} else {
+		if(irq_taken)
+			standard_irq_callback(((~TMP & 0x000e) >> 1) - 1, PC);
 		TMP = get_irq_vector();
 		PC = read_arg(TMP);
 		PC = set_h(PC, read_arg(TMP+1));
-		if(irq_taken)
-			standard_irq_callback(((~TMP & 0x000e) >> 1) - 1);
 	}
 	irq_taken = false;
 	P = (P | F_I) & ~F_D; // Do *not* move after the prefetch

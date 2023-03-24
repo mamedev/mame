@@ -395,9 +395,9 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
 	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
 
-	m_audiocpu->out_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
-	m_audiocpu->out_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
-	m_audiocpu->out_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
+	m_audiocpu->tout_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
+	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
+	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

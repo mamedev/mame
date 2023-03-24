@@ -549,7 +549,7 @@ void i8085a_cpu_device::check_for_interrupts()
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_TRAP_LINE);
+		standard_irq_callback(I8085_TRAP_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $0024 */
 		op_push(m_PC);
@@ -566,7 +566,7 @@ void i8085a_cpu_device::check_for_interrupts()
 
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST75_LINE);
+		standard_irq_callback(I8085_RST75_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $003C */
 		op_push(m_PC);
@@ -580,7 +580,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST65_LINE);
+		standard_irq_callback(I8085_RST65_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $0034 */
 		op_push(m_PC);
@@ -594,7 +594,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt();
-		standard_irq_callback(I8085_RST55_LINE);
+		standard_irq_callback(I8085_RST55_LINE, m_PC.w.l);
 
 		/* push the PC and jump to $002C */
 		op_push(m_PC);
@@ -608,7 +608,7 @@ void i8085a_cpu_device::check_for_interrupts()
 	{
 		/* break out of HALT state and call the IRQ ack callback */
 		if (!m_in_inta_func.isnull())
-			standard_irq_callback(I8085_INTR_LINE);
+			standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 		break_halt_for_interrupt();
 
 		u8 vector = read_inta();
@@ -713,7 +713,7 @@ u8 i8085a_cpu_device::read_op()
 u8 i8085a_cpu_device::read_inta()
 {
 	if (m_in_inta_func.isnull())
-		return standard_irq_callback(I8085_INTR_LINE);
+		return standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 	else
 		return m_in_inta_func(m_PC.w.l);
 }

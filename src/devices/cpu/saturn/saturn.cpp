@@ -332,15 +332,14 @@ void saturn_device::device_reset()
 
 void saturn_device::saturn_take_irq()
 {
+	LOG("SATURN takes IRQ ($%04x)\n", m_pc);
+	standard_irq_callback(SATURN_IRQ_LINE, m_pc);
+
 	m_in_irq = 1;       /* reset by software, using RTI */
 	m_pending_irq = 0;
 	m_icount -= 7;
 	saturn_push(m_pc);
 	m_pc=IRQ_ADDRESS;
-
-	LOG("SATURN takes IRQ ($%04x)\n", m_pc);
-
-	standard_irq_callback(SATURN_IRQ_LINE);
 }
 
 void saturn_device::execute_run()
@@ -398,7 +397,6 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			if (m_sleeping && state==1)
 			{
 				LOG("SATURN set_wakeup_line(ASSERT)\n");
-				standard_irq_callback(SATURN_WAKEUP_LINE);
 				m_sleeping = 0;
 			}
 			break;

@@ -12,13 +12,397 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "flstory.h"
+
+#include "taito68705.h"
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/input_merger.h"
+#include "sound/ay8910.h"
+#include "sound/msm5232.h"
+#include "sound/ta7630.h"
 #include "sound/dac.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class flstory_state : public driver_device
+{
+public:
+	flstory_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrlram(*this, "scrlram"),
+		m_workram(*this, "workram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_bmcu(*this, "bmcu"),
+		m_msm(*this, "msm"),
+		m_ay(*this, "aysnd"),
+		m_ta7630(*this, "ta7630"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundnmi(*this, "soundnmi"),
+		m_extraio1(*this, "EXTRA_P1")
+	{ }
+
+	void flstory(machine_config &config) ATTR_COLD;
+	void rumba(machine_config &config) ATTR_COLD;
+	void onna34ro(machine_config &config) ATTR_COLD;
+	void victnine(machine_config &config) ATTR_COLD;
+	void onna34ro_mcu(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	// memory pointers
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrlram;
+	optional_shared_ptr<uint8_t> m_workram;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<taito68705_mcu_device> m_bmcu;
+	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<input_merger_device> m_soundnmi;
+
+	optional_ioport m_extraio1;
+
+	// video-related
+	tilemap_t  *m_bg_tilemap = nullptr;
+	std::unique_ptr<uint8_t []> m_paletteram;
+	std::unique_ptr<uint8_t []> m_paletteram_ext;
+	uint8_t    m_gfxctrl = 0;
+	uint8_t    m_char_bank = 0;
+	uint8_t    m_palette_bank = 0;
+
+	// sound-related
+	uint8_t    m_snd_ctrl0 = 0;
+	uint8_t    m_snd_ctrl1 = 0;
+	uint8_t    m_snd_ctrl2 = 0;
+	uint8_t    m_snd_ctrl3 = 0;
+
+	uint8_t snd_flag_r();
+	void snd_reset_w(uint8_t data);
+	uint8_t flstory_mcu_status_r();
+	uint8_t victnine_mcu_status_r();
+	void flstory_videoram_w(offs_t offset, uint8_t data);
+	void flstory_palette_w(offs_t offset, uint8_t data);
+	uint8_t flstory_palette_r(offs_t offset);
+	void flstory_gfxctrl_w(uint8_t data);
+	uint8_t victnine_gfxctrl_r();
+	void victnine_gfxctrl_w(uint8_t data);
+	void flstory_scrlram_w(offs_t offset, uint8_t data);
+	void sound_control_0_w(uint8_t data);
+	void sound_control_1_w(uint8_t data);
+	void sound_control_2_w(uint8_t data);
+	void sound_control_3_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
+	DECLARE_VIDEO_START(flstory);
+	DECLARE_VIDEO_START(victnine);
+	DECLARE_VIDEO_START(rumba);
+	uint32_t screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void flstory_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void victnine_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void common(machine_config &config) ATTR_COLD;
+
+	void base_map(address_map &map) ATTR_COLD;
+	void flstory_map(address_map &map) ATTR_COLD;
+	void onna34ro_map(address_map &map) ATTR_COLD;
+	void onna34ro_mcu_map(address_map &map) ATTR_COLD;
+	void rumba_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void victnine_map(address_map &map) ATTR_COLD;
+};
+
+
+/***************************************************************************
+  Functions to emulate the video hardware of the machine.
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
+{
+	int const code = m_videoram[tile_index * 2];
+	int const attr = m_videoram[tile_index * 2 + 1];
+	int const tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * m_char_bank;
+	int const flags = TILE_FLIPYX((attr & 0x18) >> 3);
+
+	tileinfo.category = BIT(attr, 5);
+	tileinfo.group = BIT(attr, 5);
+	tileinfo.set(0, tile_number, attr & 0x0f, flags);
+}
+
+TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
+{
+	int const code = m_videoram[tile_index * 2];
+	int const attr = m_videoram[tile_index * 2 + 1];
+	int const tile_number = ((attr & 0x38) << 5) + code;
+	int const flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
+
+	tileinfo.set(0, tile_number, attr & 0x07, flags);
+}
+
+TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
+{
+	int const code = m_videoram[tile_index * 2];
+	int const attr = m_videoram[tile_index * 2 + 1];
+	int const tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * m_char_bank;
+	int const col = (attr & 0x0f);
+
+	tileinfo.category = BIT(attr, 5);
+	tileinfo.group = BIT(attr, 5);
+	tileinfo.set(0, tile_number, col, 0);
+}
+
+VIDEO_START_MEMBER(flstory_state,flstory)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+//  m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_paletteram = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_paletteram_ext = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_palette->basemem().set(m_paletteram.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(m_paletteram_ext.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+
+	save_pointer(NAME(m_paletteram), m_palette->entries());
+	save_pointer(NAME(m_paletteram_ext), m_palette->entries());
+}
+
+VIDEO_START_MEMBER(flstory_state,rumba)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::get_rumba_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+//  m_bg_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
+	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_paletteram = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_paletteram_ext = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_palette->basemem().set(m_paletteram.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(m_paletteram_ext.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+
+	save_pointer(NAME(m_paletteram), m_palette->entries());
+	save_pointer(NAME(m_paletteram_ext), m_palette->entries());
+}
+
+VIDEO_START_MEMBER(flstory_state,victnine)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::victnine_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_paletteram = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_paletteram_ext = make_unique_clear<uint8_t []>(m_palette->entries());
+	m_palette->basemem().set(m_paletteram.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+	m_palette->extmem().set(m_paletteram_ext.get(), m_palette->entries(), 8, ENDIANNESS_LITTLE, 1);
+
+	save_pointer(NAME(m_paletteram), m_palette->entries());
+	save_pointer(NAME(m_paletteram_ext), m_palette->entries());
+}
+
+void flstory_state::flstory_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void flstory_state::flstory_palette_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x100)
+		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
+	else
+		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
+}
+
+uint8_t flstory_state::flstory_palette_r(offs_t offset)
+{
+	if (offset & 0x100)
+		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
+	else
+		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
+}
+
+void flstory_state::flstory_gfxctrl_w(uint8_t data)
+{
+	m_gfxctrl = data;
+
+	flip_screen_set(~data & 0x01);
+	if (m_char_bank != ((data & 0x10) >> 4))
+	{
+		m_char_bank = (data & 0x10) >> 4;
+		m_bg_tilemap->mark_all_dirty();
+	}
+	m_palette_bank = (data & 0x20) >> 5;
+}
+
+uint8_t flstory_state::victnine_gfxctrl_r()
+{
+	return m_gfxctrl;
+}
+
+void flstory_state::victnine_gfxctrl_w(uint8_t data)
+{
+	m_gfxctrl = data;
+
+	m_palette_bank = (data & 0x20) >> 5;
+
+	if (data & 0x04)
+		flip_screen_set(data & 0x01);
+}
+
+void flstory_state::flstory_scrlram_w(offs_t offset, uint8_t data)
+{
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
+}
+
+
+void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+{
+	int flip = flip_screen();
+
+	for (int i = 0; i < 0x20; i++)
+	{
+		int pr = m_spriteram[m_spriteram.bytes() - 1 - i];
+		int offs = (pr & 0x1f) * 4;
+
+		if ((pr & 0x80) == pri)
+		{
+			int code, sx, sy, flipx, flipy;
+
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x30) << 4);
+			sx = m_spriteram[offs + 3];
+			sy = m_spriteram[offs + 0];
+
+			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6);
+			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7);
+
+			if (flip)
+			{
+				sx = (240 - sx) & 0xff ;
+				sy = sy - 1 ;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+			else
+				sy = 240 - sy - 1 ;
+
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					code,
+					m_spriteram[offs + 1] & 0x0f,
+					flipx,flipy,
+					sx,sy,15);
+			/* wrap around */
+			if (sx > 240)
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+						code,
+						m_spriteram[offs + 1] & 0x0f,
+						flipx,flipy,
+						sx-256,sy,15);
+		}
+	}
+}
+
+uint32_t flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
+	flstory_draw_sprites(bitmap, cliprect, 0x00);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
+	flstory_draw_sprites(bitmap, cliprect, 0x80);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
+
+void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int flip = flip_screen();
+
+	for (int i = 0; i < 0x20; i++)
+	{
+		int pr = m_spriteram[m_spriteram.bytes() - 1 - i];
+		int offs = (pr & 0x1f) * 4;
+
+		//if ((pr & 0x80) == pri)
+		{
+			int code, sx, sy, flipx, flipy;
+
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x20) << 3);
+			sx = m_spriteram[offs + 3];
+			sy = m_spriteram[offs + 0];
+
+			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6);
+			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7);
+
+			if (flip)
+			{
+				sx = (240 - sx + 1) & 0xff ;
+				sy = sy + 1 ;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+			else
+				sy = 240 - sy + 1 ;
+
+			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+					code,
+					m_spriteram[offs + 1] & 0x0f,
+					flipx,flipy,
+					sx,sy,15);
+			/* wrap around */
+			if (sx > 240)
+				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+						code,
+						m_spriteram[offs + 1] & 0x0f,
+						flipx,flipy,
+						sx-256,sy,15);
+		}
+	}
+}
+
+uint32_t flstory_state::screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	victnine_draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+uint32_t flstory_state::screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
+	victnine_draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
+	victnine_draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
 
 
 uint8_t flstory_state::snd_flag_r()
@@ -54,10 +438,10 @@ void flstory_state::base_map(address_map &map)
 
 	// rumba lumber reads area 0xc800-0xcfff
 	// onna34ro checks the whole range during POST but having a mirror or not doesn't make any difference for the check to pass
-	map(0xc000, 0xc7ff).mirror(0x800).ram().w(FUNC(flstory_state::flstory_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).mirror(0x800).ram().w(FUNC(flstory_state::flstory_videoram_w)).share(m_videoram);
 
-	map(0xd001, 0xd001).nopw();    /* watchdog */
-	map(0xd002, 0xd002).noprw();         /* unknown read & coin lock out? */
+	map(0xd001, 0xd001).nopw();    // watchdog
+	map(0xd002, 0xd002).noprw();   // unknown read & coin lock out?
 
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
 	map(0xd400, 0xd400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -71,13 +455,13 @@ void flstory_state::base_map(address_map &map)
 	map(0xd804, 0xd804).portr("P1");
 	map(0xd806, 0xd806).portr("P2");
 
-	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(FUNC(flstory_state::flstory_scrlram_w)).share("scrlram");
+	map(0xdc00, 0xdc9f).ram().share(m_spriteram);
+	map(0xdca0, 0xdcbf).ram().w(FUNC(flstory_state::flstory_scrlram_w)).share(m_scrlram);
 
 	map(0xdd00, 0xdeff).rw(FUNC(flstory_state::flstory_palette_r), FUNC(flstory_state::flstory_palette_w));
 
 	// victorious nine read 0xf80a during attract, unknown purpose
-	map(0xe000, 0xe7ff).mirror(0x1800).ram().share("workram"); /* work RAM */
+	map(0xe000, 0xe7ff).mirror(0x1800).ram().share(m_workram);
 }
 
 void flstory_state::flstory_map(address_map &map)
@@ -87,7 +471,7 @@ void flstory_state::flstory_map(address_map &map)
 
 	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 //  map(0xda00, 0xda00).writeonly();
-	map(0xdcc0, 0xdcff).ram(); /* unknown */
+	map(0xdcc0, 0xdcff).ram(); // unknown
 	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
 
@@ -97,7 +481,7 @@ void flstory_state::onna34ro_map(address_map &map)
 //  map(0xd000, 0xd000).rw("bmcu", FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 //  map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 //  map(0xda00, 0xda00).writeonly();
-	map(0xdcc0, 0xdcff).ram(); /* unknown */
+	map(0xdcc0, 0xdcff).ram(); // unknown
 	map(0xdf03, 0xdf03).w(FUNC(flstory_state::flstory_gfxctrl_w));
 }
 
@@ -117,7 +501,7 @@ void flstory_state::victnine_map(address_map &map)
 	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  map(0xda00, 0xda00).writeonly();
 	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
-	map(0xdce1, 0xdce1).nopw();    /* unknown */
+	map(0xdce1, 0xdce1).nopw();    // unknown
 }
 
 void flstory_state::rumba_map(address_map &map)
@@ -129,7 +513,7 @@ void flstory_state::rumba_map(address_map &map)
 	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  map(0xda00, 0xda00).writeonly();
 	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
-//  map(0xdce1, 0xdce1).nopw();    /* unknown */
+//  map(0xdce1, 0xdce1).nopw();    // unknown
 }
 
 
@@ -139,7 +523,7 @@ void flstory_state::sound_control_0_w(uint8_t data)
 	m_snd_ctrl0 = data & 0xff;
 	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 
-	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
+	// this definitely controls main melody voice on 2'-1 and 4'-1 outputs
 	for(int i=0;i<4;i++)
 		m_ta7630->set_channel_volume(m_msm,i,m_snd_ctrl0 >> 4);
 	//m_msm->set_output_gain(0, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
@@ -189,14 +573,14 @@ void flstory_state::sound_map(address_map &map)
 	map(0xd800, 0xd800).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 	map(0xda00, 0xda00).r(FUNC(flstory_state::snd_flag_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<1>));
 	map(0xdc00, 0xdc00).w(m_soundnmi, FUNC(input_merger_device::in_clear<1>));
-	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w)); /* signed 8-bit DAC &  unknown read */
-	map(0xe000, 0xefff).rom();                                         /* space for diagnostics ROM */
+	map(0xde00, 0xde00).nopr().w("dac", FUNC(dac_byte_interface::data_w)); // signed 8-bit DAC &  unknown read
+	map(0xe000, 0xefff).rom();                                         // space for diagnostics ROM
 }
 
 
 
 
-/* When "Debug Mode" Dip Switch is ON, keep IPT_SERVICE1 ('9') pressed to freeze the game.
+/* When "Debug Mode" DIP Switch is ON, keep IPT_SERVICE1 ('9') pressed to freeze the game.
    Once the game is frozen, you can press IPT_START1 ('5') to advance 1 frame, or IPT_START2
    ('6') to advance 6 frames.
 
@@ -290,8 +674,8 @@ static INPUT_PORTS_START( flstory )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* "BAD IO" if low */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // "BAD IO" if low
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // "BAD IO" if low
 
 	PORT_START("P1")      /* D804 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -514,8 +898,8 @@ static INPUT_PORTS_START( victnine )
 
 	PORT_START("EXTRA_P1")      /* D805 */
 	/* bits 0,1 are MCU related:
-	    - bit 0: mcu is ready to receive data from main cpu
-	    - bit 1: mcu has sent data to the main cpu       */
+	    - bit 0: MCU is ready to receive data from main CPU
+	    - bit 1: MCU has sent data to the main CPU       */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("SWA", 0xa0, NOTEQUALS, 0x00)  // button a = 1st base
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("SWA", 0xa0, NOTEQUALS, 0x00)  // button b = 2nd base  |  Used to throw the ball back to a specific base when fielding
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )                                               // button c = 3rd base  |  On MA/MB cab, only button 'c' is active and throws only to 3rd base
@@ -706,56 +1090,50 @@ GFXDECODE_END
 
 void flstory_state::machine_start()
 {
-	/* video */
+	// video
 	save_item(NAME(m_gfxctrl));
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));
-	/* sound */
+
+	// sound
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
 	save_item(NAME(m_snd_ctrl2));
 	save_item(NAME(m_snd_ctrl3));
-	/* mcu */
-	save_item(NAME(m_mcu_select));
-	save_item(NAME(m_from_mcu));
 }
 
 
 
-MACHINE_RESET_MEMBER(flstory_state,flstory)
+void flstory_state::machine_reset()
 {
-//  MACHINE_RESET_CALL_MEMBER(ta7630);
-
-	/* video */
+	// video
 	m_gfxctrl = 0;
 //  onna34ro doesn't set this up when checking RAM/VRAM (available by keeping pressed service button at startup)
 //  so we invert the logic here
 	m_char_bank = 1;
 	m_palette_bank = 0;
-	/* sound */
+
+	// sound
 	m_snd_ctrl0 = 0;
 	m_snd_ctrl1 = 0;
 	m_snd_ctrl2 = 0;
 	m_snd_ctrl3 = 0;
-	/* mcu */
-	m_mcu_select = 0;
-	m_from_mcu = 0;
 }
 
 void flstory_state::common(machine_config &config)
 {
-	Z80(config, m_maincpu, XTAL(10'733'000)/2); /* verified on pcb */
+	Z80(config, m_maincpu, XTAL(10'733'000)/2); // verified on PCB
 	m_maincpu->set_vblank_int("screen", FUNC(flstory_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flstory_state::sound_map);
-	/* IRQ generated by ???, NMI generated by the main CPU */
+	// IRQ generated by ???, NMI generated by the main CPU
 	m_audiocpu->set_periodic_int(FUNC(flstory_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	/* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	// 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// derived from ladyfrog.cpp, guess
 	screen.set_raw(XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
@@ -765,7 +1143,7 @@ void flstory_state::common(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flstory);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -776,12 +1154,12 @@ void flstory_state::common(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch2);
 	TA7630(config, m_ta7630);
 
-	YM2149(config, m_ay, XTAL(8'000'000)/4); /* verified on pcb */
+	YM2149(config, m_ay, XTAL(8'000'000)/4); // verified on PCB
 	m_ay->port_a_write_callback().set(FUNC(flstory_state::sound_control_2_w));
 	m_ay->port_b_write_callback().set(FUNC(flstory_state::sound_control_3_w));
 	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	MSM5232(config, m_msm, XTAL(8'000'000)/4); /* verified on pcb */
+	MSM5232(config, m_msm, XTAL(8'000'000)/4); // verified on PCB
 	m_msm->set_capacitors(1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6); /* 1.0 uF capacitors (verified on real PCB) */
 	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
@@ -804,9 +1182,8 @@ void flstory_state::flstory(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::flstory_map);
 
-	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);    /* verified on pcb */
+	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);    // verified on PCB
 
-	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 }
 
@@ -816,7 +1193,6 @@ void flstory_state::onna34ro(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::onna34ro_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,flstory)
 }
 
@@ -825,26 +1201,24 @@ void flstory_state::onna34ro_mcu(machine_config &config)
 	onna34ro(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::onna34ro_mcu_map);
 
-	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);    /* ? */
+	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);    // ?
 }
 
 void flstory_state::victnine(machine_config &config)
 {
 	common(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_clock(XTAL(8'000'000)/2);      /* 4 MHz */
+	// basic machine hardware
+	m_maincpu->set_clock(XTAL(8'000'000)/2);      // 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::victnine_map);
 
 	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);
 
-	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
-
-	/* video hardware */
+	// video hardware
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(flstory_state::screen_update_victnine));
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,victnine)
 
-	/* sound hardware */
+	// sound hardware
 	m_ay->reset_routes();
 	m_ay->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
@@ -853,15 +1227,13 @@ void flstory_state::rumba(machine_config &config)
 {
 	common(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::rumba_map);
 	m_maincpu->set_clock(XTAL(8'000'000) / 2); // verified on PCB
 
-	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6); /* ? */
+	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6); // ?
 
-	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
-
-	/* video hardware */
+	// video hardware
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(flstory_state::screen_update_rumba));
 	MCFG_VIDEO_START_OVERRIDE(flstory_state,rumba)
 }
@@ -896,7 +1268,7 @@ ROM_START( flstory )
 	ROM_LOAD( "vid-a45.21",   0x1c000, 0x4000, CRC(fc382bd1) SHA1(a773c87454a3d7b80374a6d38ecb8633af2cd990) )
 ROM_END
 
-ROM_START( flstoryj )
+ROM_START( flstoryo )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
 	ROM_LOAD( "cpu-a45.15",   0x0000, 0x4000, CRC(f03fc969) SHA1(c8dd25ca25fd413b1a29bd4e58ce5820e5f852b2) )
 	ROM_LOAD( "cpu-a45.16",   0x4000, 0x4000, CRC(311aa82e) SHA1(c2dd806f70ea917818ec844a275fb2fecc2e6c19) )
@@ -1157,9 +1529,11 @@ ROM_START( rumba )
 	ROM_LOAD( "a23_04.bin",   0x04000, 0x2000, CRC(1d4f001f) SHA1(c3245650e57138ed89e7de8289fe37c5d933ddca) )
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flstoryo,  flstory,  flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story (earlier)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, empty_init, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

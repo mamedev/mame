@@ -432,11 +432,11 @@ void m68000_device::start_interrupt_vector_lookup()
 
 	int level = m_next_state >> 24;
 	if(m_interrupt_mixer)
-		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level);
+		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
 	else {
 		for(int i=0; i<3; i++)
 			if(level & (1<<i))
-				standard_irq_callback(i);
+				standard_irq_callback(i, m_pc);
 	}
 
 	// Clear the nmi flag

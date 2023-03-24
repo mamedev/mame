@@ -227,6 +227,8 @@ DAC_GENERATOR(DAC_3BIT_BINARY_WEIGHTED,      dac_3bit_binary_weighted_device,   
 DAC_GENERATOR(DAC_3BIT_R2R,                  dac_3bit_r2r_device,                  dac_byte_device_base, dac_mapper_unsigned,        3, dac_gain_r2r, "3-Bit R-2R DAC",                  "dac_3bit_r2r")
 DAC_GENERATOR(DAC_4BIT_BINARY_WEIGHTED,      dac_4bit_binary_weighted_device,      dac_byte_device_base, dac_mapper_unsigned,        4, dac_gain_bw,  "4-Bit Binary Weighted DAC",       "dac_4bit_bw")
 DAC_GENERATOR(DAC_4BIT_R2R,                  dac_4bit_r2r_device,                  dac_byte_device_base, dac_mapper_unsigned,        4, dac_gain_r2r, "4-Bit R-2R DAC",                  "dac_4bit_r2r")
+DAC_GENERATOR(DAC_5BIT_BINARY_WEIGHTED,      dac_5bit_binary_weighted_device,      dac_byte_device_base, dac_mapper_unsigned,        5, dac_gain_bw,  "5-Bit Binary Weighted DAC",       "dac_5bit_bw")
+DAC_GENERATOR(DAC_5BIT_R2R,                  dac_5bit_r2r_device,                  dac_byte_device_base, dac_mapper_unsigned,        5, dac_gain_r2r, "5-Bit R-2R DAC",                  "dac_5bit_r2r")
 DAC_GENERATOR(DAC_6BIT_BINARY_WEIGHTED,      dac_6bit_binary_weighted_device,      dac_byte_device_base, dac_mapper_unsigned,        6, dac_gain_bw,  "6-Bit Binary Weighted DAC",       "dac_6bit_bw")
 DAC_GENERATOR(DAC_6BIT_R2R,                  dac_6bit_r2r_device,                  dac_byte_device_base, dac_mapper_unsigned,        6, dac_gain_r2r, "6-Bit R-2R DAC",                  "dac_6bit_r2r")
 DAC_GENERATOR(DAC_8BIT_BINARY_WEIGHTED,      dac_8bit_binary_weighted_device,      dac_byte_device_base, dac_mapper_unsigned,        8, dac_gain_bw,  "8-Bit Binary Weighted DAC",       "dac_8bit_bw")

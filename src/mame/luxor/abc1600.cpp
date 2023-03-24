@@ -36,13 +36,15 @@
 
     TODO:
 
-	- systest1600
-		- chip test fails
+	- systest1600 failures
+		- CIO timer
+		- RTC (seconds advance too slowly)
+		- DMA
+	- bootpar writes console bauds without high order byte (9600=>128)
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
 	- crashes after reset
     - CIO
         - optimize timers!
-        - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
@@ -1016,7 +1018,8 @@ void abc1600_state::abc1600(machine_config &config)
 
 	NMC9306(config, m_nvram, 0);
 
-	E0516(config, E050_C16PC_TAG, 32.768_kHz_XTAL);
+	E0516(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->outsel_rd_cb().set_constant(0);
 
 	FD1797(config, m_fdc, 64_MHz_XTAL / 64); // clocked by 9229B
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));

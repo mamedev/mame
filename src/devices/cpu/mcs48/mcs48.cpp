@@ -717,8 +717,6 @@ OPHANDLER( in_a_dbb )
 	burn_cycles(1);
 
 	// acknowledge the IBF IRQ and clear the bit in STS
-	if ((m_sts & STS_IBF) != 0)
-		standard_irq_callback(UPI41_INPUT_IBF);
 	m_sts &= ~STS_IBF;
 
 	// if P2 flags are enabled, update the state of P2
@@ -1258,6 +1256,9 @@ void mcs48_cpu_device::check_irqs()
 	// external interrupts take priority
 	else if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
+		// indicate we took the external IRQ
+		standard_irq_callback(0, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 
@@ -1270,14 +1271,13 @@ void mcs48_cpu_device::check_irqs()
 
 		// transfer to location 0x03
 		execute_call(0x03);
-
-		// indicate we took the external IRQ
-		standard_irq_callback(0);
 	}
 
 	// timer overflow interrupts follow
 	else if (m_timer_overflow && m_tirq_enabled)
 	{
+		standard_irq_callback(1, m_pc);
+
 		burn_cycles(2);
 		m_irq_in_progress = true;
 

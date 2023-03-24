@@ -136,7 +136,7 @@ void hp_nanoprocessor_device::execute_run()
 		// outside of the NP, usually by ANDing the DC7 line with the interrupt
 		// request signal)
 		if (BIT(m_flags, NANO_I_BIT)) {
-			standard_irq_callback(0);
+			standard_irq_callback(0, m_reg_PA);
 			m_reg_ISR = m_reg_PA;
 			m_reg_PA = m_int_ack_func();
 			// Vector fetching takes 1 cycle

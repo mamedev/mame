@@ -48,15 +48,15 @@ struct polygon
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
 	uint8_t tex4bpp = 0;              // How to index into the texture
-	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
-	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
-	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
-
+	uint16_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
 	uint16_t colorIndex = 0;
 
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 
@@ -85,14 +85,15 @@ struct hng64_poly_data
 {
 	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
-	uint8_t texPageSmall = 0;
-	uint8_t texPageHorizOffset = 0;
-	uint8_t texPageVertOffset = 0;
+	uint16_t texPageSmall = 0;
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
 	bool blend = false;
 	uint16_t texscrollx = 0;
 	uint16_t texscrolly = 0;
+
+	uint16_t tex_mask_x = 1024;
+	uint16_t tex_mask_y = 1024;
 };
 
 class hng64_state;
@@ -144,6 +145,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_palette_fade0(*this, "palette0"),
+		m_palette_fade1(*this, "palette1"),
 		m_palette_3d(*this, "palette3d"),
 		m_paletteram(*this, "paletteram"),
 		m_vblank(*this, "VBLANK"),
@@ -164,7 +167,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_fbtable(*this, "fbtable"),
 		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
@@ -195,6 +197,8 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette_fade0;
+	required_device<palette_device> m_palette_fade1;
 	required_device<palette_device> m_palette_3d;
 	required_shared_ptr<u32> m_paletteram;
 	required_ioport m_vblank;
@@ -233,7 +237,6 @@ private:
 	required_shared_ptr<uint32_t> m_tcram;
 
 	std::unique_ptr<uint16_t[]> m_dl;
-	required_shared_ptr<uint32_t> m_fbtable;
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_fbram1;
 	required_shared_ptr<uint32_t> m_fbram2;
@@ -263,6 +266,7 @@ private:
 	int m_roadedge_3d_hack;
 
 	uint8_t m_fbcontrol[4]{};
+	uint8_t m_texture_wrapsize_table[0x20];
 
 	std::unique_ptr<uint16_t[]> m_soundram;
 	std::unique_ptr<uint16_t[]> m_soundram2;
@@ -290,6 +294,8 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_sprite_zbuffer;
 
+	uint8_t m_irq_pos_half;
+	uint32_t m_raster_irq_pos[2];
 
 	uint8_t m_screen_dis = 0U;
 
@@ -335,6 +341,7 @@ private:
 	uint32_t hng64_irqc_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_mips_to_iomcu_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void raster_irq_pos_w(uint32_t data);
 
 	uint8_t hng64_dualport_r(offs_t offset);
 	void hng64_dualport_w(offs_t offset, uint8_t data);
@@ -347,8 +354,8 @@ private:
 
 	void hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
-	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t hng64_texture_wrapsize_table_r(offs_t offset);
+	void hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data);
 
 	uint32_t hng64_fbram1_r(offs_t offset);
 	void hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -363,6 +370,7 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void set_palette_entry_with_faderegs(int entry, uint8_t r, uint8_t g, uint8_t b, uint32_t rgbfade, uint8_t r_mode, uint8_t g_mode, uint8_t b_mode, palette_device *palette);
 	void set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b);
 	void update_palette_entry(int entry);
 	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -461,9 +469,11 @@ private:
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
 
+	void mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t priority, int y);
+
 	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
-	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t cury, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, bool checkerboard, uint8_t mosaic);
+	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t cury, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic);
 
 	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
 		gfx_element* gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
@@ -471,7 +481,7 @@ private:
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
 
 	void setCameraTransformation(const uint16_t* packet);
 	void setLighting(const uint16_t* packet);

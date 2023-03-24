@@ -81,7 +81,8 @@ class xbox_superio_device : public device_t, public lpcbus_device_interface
 public:
 	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
-	virtual void set_host(int index, lpcbus_host_interface *host) override;
+	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
+	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

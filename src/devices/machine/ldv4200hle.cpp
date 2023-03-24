@@ -32,15 +32,15 @@
 #include "ldv4200hle.h"
 
 
-#define LOG_COMMAND_BYTES       (1 << 1U)
-#define LOG_COMMANDS            (1 << 2U)
-#define LOG_COMMAND_BUFFERS     (1 << 3U)
-#define LOG_REPLIES             (1 << 4U)
-#define LOG_REPLY_BYTES         (1 << 5U)
-#define LOG_SEARCHES            (1 << 6U)
-#define LOG_STOPS               (1 << 7U)
-#define LOG_SQUELCHES           (1 << 8U)
-#define LOG_FRAMES              (1 << 9U)
+#define LOG_COMMAND_BYTES       (1U << 1)
+#define LOG_COMMANDS            (1U << 2)
+#define LOG_COMMAND_BUFFERS     (1U << 3)
+#define LOG_REPLIES             (1U << 4)
+#define LOG_REPLY_BYTES         (1U << 5)
+#define LOG_SEARCHES            (1U << 6)
+#define LOG_STOPS               (1U << 7)
+#define LOG_SQUELCHES           (1U << 8)
+#define LOG_FRAMES              (1U << 9)
 #define LOG_ALL                 (LOG_COMMAND_BYTES | LOG_COMMANDS | LOG_COMMAND_BUFFERS | LOG_REPLY_BYTES | LOG_SEARCHES | LOG_STOPS | LOG_SQUELCHES | LOG_FRAMES)
 
 #define VERBOSE (0)

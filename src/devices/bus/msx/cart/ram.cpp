@@ -1,13 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#include "emu.h"
-#include "ram.h"
-
-#include "bus/msx/slot/cartridge.h"
-
-#include "bus/generic/slot.h"
-
-
 /*
 Emulation of memory expansions for the MSX system.
 
@@ -103,6 +95,15 @@ Not supported memory mappers:
 - Stichting CODE MCR-102 - 1MB memory mapper + RAM Disk + Printer buffer
 - Stichting CODE MCR-204 - 2MB memory mapper + RAM Disk + Printer buffer
 */
+#include "emu.h"
+#include "ram.h"
+#include "slotoptions.h"
+
+#include "bus/msx/slot/cartridge.h"
+
+#include "bus/generic/slot.h"
+
+
 
 DECLARE_DEVICE_TYPE(MSX_CART_16K_RAM,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_32K_RAM,      msx_cart_interface)
@@ -117,16 +118,17 @@ DECLARE_DEVICE_TYPE(MSX_CART_4096K_MM_RAM, msx_cart_interface)
 
 void msx_cart_ram_register_options(device_slot_interface &device)
 {
-	device.option_add("ram16k", MSX_CART_16K_RAM);
-	device.option_add("ram32k", MSX_CART_32K_RAM);
-	device.option_add("ram48k", MSX_CART_48K_RAM);
-	device.option_add("ram64k", MSX_CART_64K_RAM);
-	device.option_add("mm256k", MSX_CART_256K_MM_RAM);
-	device.option_add("mm512k", MSX_CART_512K_MM_RAM);
-	device.option_add("mm768k", MSX_CART_768K_MM_RAM);
-	device.option_add("mm1024k", MSX_CART_1024K_MM_RAM);
-	device.option_add("mm2048k", MSX_CART_2048K_MM_RAM);
-	device.option_add("mm4096k", MSX_CART_4096K_MM_RAM);
+	using namespace bus::msx::cart;
+	device.option_add(slotoptions::RAM16K,  MSX_CART_16K_RAM);
+	device.option_add(slotoptions::RAM32K,  MSX_CART_32K_RAM);
+	device.option_add(slotoptions::RAM48K,  MSX_CART_48K_RAM);
+	device.option_add(slotoptions::RAM64K,  MSX_CART_64K_RAM);
+	device.option_add(slotoptions::MM256K,  MSX_CART_256K_MM_RAM);
+	device.option_add(slotoptions::MM512K,  MSX_CART_512K_MM_RAM);
+	device.option_add(slotoptions::MM768K,  MSX_CART_768K_MM_RAM);
+	device.option_add(slotoptions::MM1024K, MSX_CART_1024K_MM_RAM);
+	device.option_add(slotoptions::MM2048K, MSX_CART_2048K_MM_RAM);
+	device.option_add(slotoptions::MM4096K, MSX_CART_4096K_MM_RAM);
 }
 
 namespace {

@@ -131,6 +131,8 @@ protected:
 	void map_mem(address_map &map);
 	void map_fetch(address_map &map);
 	u8 m1_r(offs_t offset);
+	bool cs0_r(u16 addr);
+	bool cs1_r(u16 addr);
 
 	void init_taps();
 
@@ -141,7 +143,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
-	void sprinter_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -344,12 +345,6 @@ void sprinter_state::update_memory()
 void sprinter_state::update_cpu()
 {
 	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
-}
-
-void sprinter_state::sprinter_palette(palette_device &palette) const
-{
-	const rgb_t colors[256 * 8] = { palette_device::BLACK };
-	palette.set_pen_colors(0, colors);
 }
 
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -601,7 +596,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		else
 			data = m_ata_data_latch;
 		break;
-	case 0x21 ... 0x27:
+	case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		if (BIT(~offset, 8))
 			data = m_ata[m_ata_selected]->cs0_r(dcpp & 0x07);
 		break;
@@ -643,10 +638,16 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		data = m_cbl_xx;
 		break;
 
-	case 0xc0 ... 0xef:
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+	case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+	case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
+	case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+	case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 		data = m_ram_pages[dcpp - 0xc0];
 		break;
-	case 0xf0 ... 0xff:
+	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
+	case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
 		data = m_ram_pages[m_pg3];
 		break;
 
@@ -718,7 +719,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		else
 			m_ata_data_latch = data;
 		break;
-	case 0x21 ... 0x27:
+	case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		if (BIT(offset, 8))
 			m_ata[m_ata_selected]->cs0_w(dcpp & 0x07, data);
 		break;
@@ -841,10 +842,14 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_xagr = 0;
 		break;
 
-	case 0xd0 ... 0xef:
+	case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
+	case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
+	case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
 		update_memory();
 		break;
-	case 0xf0 ... 0xff:
+	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
+	case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
 		m_ram_pages[m_pg3] = data;
 		update_memory();
 		break;
@@ -889,7 +894,7 @@ void sprinter_state::accel_control_r(u8 data)
 
 void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 {
-	const std::string m = (m_fn_acc == MODE_AND) ? "&" : (m_fn_acc == MODE_OR) ? "|" : (m_fn_acc == MODE_XOR) ? "^" : "";
+	const std::string_view m{(m_fn_acc == MODE_AND) ? "&" : (m_fn_acc == MODE_OR) ? "|" : (m_fn_acc == MODE_XOR) ? "^" : ""};
 	if (m_acc_dir == SET_BUFFER)
 	{
 		m_acc_cnt = data;
@@ -924,8 +929,6 @@ void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 		}
 		else if (m_acc_dir == FILL_VERT)
 			m_port_y += acc_cnt;
-		else
-			return;
 	}
 }
 
@@ -1028,12 +1031,36 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
+bool sprinter_state::cs0_r(u16 addr)
+{
+	bool cs0 = m_maincpu->cs0_r() & 1;
+	if (!cs0)
+	{
+		const u8 at = BIT(addr, 12, 4);
+		cs0 = ((m_maincpu->csbr_r() & 0x0f) >= at) && (at >= 0);
+	}
+
+	return cs0;
+}
+
+bool sprinter_state::cs1_r(u16 addr)
+{
+	bool cs1 = m_maincpu->cs1_r() & 1;
+	if (!cs1)
+	{
+		const u8 at = BIT(addr, 12, 4);
+		cs1 = ((m_maincpu->csbr_r() >> 4) >= at) && (at > (m_maincpu->csbr_r() & 0x0f));
+	}
+
+	return cs1;
+}
+
 u8 sprinter_state::cs_r(offs_t offset)
 {
 	u8 data = 0xff;
-	if (m_maincpu->cs0_r(offset))
+	if (cs0_r(offset))
 		data = m_rom->as_u8((0x0c << 14) + offset);
-	else if (m_maincpu->cs1_r(offset))
+	else if (cs1_r(offset))
 		data = m_fastram.target()[offset];
 
 	return data;
@@ -1057,8 +1084,8 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 	if (m_conf_loading && m_starting)
 	{
 		m_conf_loading = 0;
-		m_ram_pages[0x2e] = m_maincpu->cs1_r(0x1000) ? 0x41 : 0x00;
-		m_conf = m_maincpu->cs1_r(0x1000);
+		m_ram_pages[0x2e] = cs1_r(0x1000) ? 0x41 : 0x00;
+		m_conf = cs1_r(0x1000);
 		machine().schedule_soft_reset();
 		return;
 	}
@@ -1537,7 +1564,7 @@ INPUT_PORTS_START( sprinter )
 	                                                           PORT_CODE(KEYCODE_TAB)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN")     PORT_CODE(KEYCODE_2)       PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('2') PORT_CHAR('@')
 	                                                       PORT_CODE(KEYCODE_F2)
-                                                               PORT_CODE(KEYCODE_CAPSLOCK)
+	                                                           PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE")   PORT_CODE(KEYCODE_3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('3') PORT_CHAR('#')
 	                                                       PORT_CODE(KEYCODE_F3)
 	                                                           PORT_CODE(KEYCODE_PGUP)
@@ -1653,7 +1680,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
 
-	PALETTE(config, "palette", FUNC(sprinter_state::sprinter_palette), 256 * 8);
+	PALETTE(config, "palette", palette_device::BLACK).set_entries(256 * 8);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR

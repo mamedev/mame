@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(Z84C015, z84c015_device, "z84c015", "Zilog Z84C015")
 
 void z84c015_device::internal_io_map(address_map &map) const
 {
-    tmpz84c015_device::internal_io_map(map);
+	tmpz84c015_device::internal_io_map(map);
 	map(0xee, 0xee).mirror(0xff00).rw(FUNC(z84c015_device::scrp_r), FUNC(z84c015_device::scrp_w));
 	map(0xef, 0xef).mirror(0xff00).rw(FUNC(z84c015_device::scdp_r), FUNC(z84c015_device::scdp_w));
 }
@@ -42,31 +42,6 @@ void z84c015_device::device_start()
 	m_mwbr = 0xf0;
 	m_csbr = 0xff; // Must be `|= 0x0f` but keep ff for reproducible startup
 	m_mcr = 0x01;
-}
-
-
-int z84c015_device::cs0_r(u16 addr)
-{
-	int cs0 = BIT(~m_mcr, 0);
-	if (!cs0)
-	{
-		const u8 at = BIT(addr, 12, 4);
-		cs0 = ((m_csbr & 0x0f) >= at) && (at >= 0);
-    }
-
-    return cs0;
-}
-
-int z84c015_device::cs1_r(u16 addr)
-{
-    int cs1 = BIT(~m_mcr, 1);
-    if (!cs1)
-    {
-		const u8 at = BIT(addr, 12, 4);
-		cs1 = ((m_csbr >> 4) >= at) && (at > (m_csbr & 0x0f));
-    }
-
-    return cs1;
 }
 
 u8 z84c015_device::scdp_r()
