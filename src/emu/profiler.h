@@ -223,12 +223,15 @@ class dummy_profiler_state
 public:
 	class scope
 	{
+	private:
+		dummy_profiler_state &m_host;
+
 	public:
 		scope(scope const &) = delete;
 		scope &operator=(scope const &) = delete;
 		scope(scope &&that) = default;
-		scope(dummy_profiler_state &host, profile_type type) { }
-		~scope() = default;
+		scope(dummy_profiler_state &host, profile_type type) : m_host(host) { }
+		~scope() { m_host.real_stop(); }
 		void stop() { }
 	};
 
@@ -244,6 +247,9 @@ public:
 
 	// start/stop
 	[[nodiscard]] auto start(profile_type type) { return scope(*this, type); }
+
+private:
+	void real_stop() { }
 };
 
 
