@@ -794,215 +794,212 @@ void ms32_sprite_device::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectan
 template <typename BitmapType, typename FunctionClass>
 inline void ms32_sprite_device::draw_sprite_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 tx, u32 ty, u32 srcwidth, u32 srcheight, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
-	do {
-		assert(dest.valid());
-		assert(dest.cliprect().contains(cliprect));
-		assert(code < gfx(0)->elements());
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-		// ignore empty/invalid cliprects
-		if (cliprect.empty())
-			break;
+	assert(dest.valid());
+	assert(dest.cliprect().contains(cliprect));
+	assert(code < gfx(0)->elements());
 
-		// compute final pixel in X and exit if we are entirely clipped
-		s32 destendx = destx + srcwidth - 1;
-		if (destx > cliprect.right() || destendx < cliprect.left())
-			break;
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
 
-		// apply left clip
-		u32 srcx = 0;
-		if (destx < cliprect.left())
+	// compute final pixel in X and exit if we are entirely clipped
+	s32 destendx = destx + srcwidth - 1;
+	if (destx > cliprect.right() || destendx < cliprect.left())
+		return;
+
+	// apply left clip
+	u32 srcx = 0;
+	if (destx < cliprect.left())
+	{
+		srcx = cliprect.left() - destx;
+		destx = cliprect.left();
+	}
+
+	// apply right clip
+	if (destendx > cliprect.right())
+		destendx = cliprect.right();
+
+	// compute final pixel in Y and exit if we are entirely clipped
+	s32 destendy = desty + srcheight - 1;
+	if (desty > cliprect.bottom() || destendy < cliprect.top())
+		return;
+
+	// apply top clip
+	u32 srcy = 0;
+	if (desty < cliprect.top())
+	{
+		srcy = cliprect.top() - desty;
+		desty = cliprect.top();
+	}
+
+	// apply bottom clip
+	if (destendy > cliprect.bottom())
+		destendy = cliprect.bottom();
+
+	// apply X flipping
+	s32 dx = 1;
+	if (flipx)
+	{
+		srcx = srcwidth - 1 - srcx;
+		dx = -dx;
+	}
+
+	// apply Y flipping
+	s32 dy = 1;
+	if (flipy)
+	{
+		srcy = srcheight - 1 - srcy;
+		dy = -dy;
+	}
+
+	// fetch the source data
+	const u8 *srcdata = gfx(0)->get_data(code);
+
+	// compute how many blocks of 4 pixels we have
+	u32 numblocks = (destendx + 1 - destx) / 4;
+	u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
+
+	// iterate over pixels in Y
+	for (s32 cury = desty; cury <= destendy; cury++)
+	{
+		u32 drawy = ty + srcy;
+		srcy += dy;
+		if (drawy >= gfx(0)->height())
+			continue;
+
+		auto *destptr = &dest.pix(cury, destx);
+		const u8 *srcptr = srcdata + (drawy * gfx(0)->rowbytes());
+
+		u32 cursrcx = srcx;
+		// iterate over unrolled blocks of 4
+		for (s32 curx = 0; curx < numblocks; curx++)
 		{
-			srcx = cliprect.left() - destx;
-			destx = cliprect.left();
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[1], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[2], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[3], srcptr[tx + cursrcx]); } cursrcx += dx;
+
+			destptr += 4;
 		}
 
-		// apply right clip
-		if (destendx > cliprect.right())
-			destendx = cliprect.right();
-
-		// compute final pixel in Y and exit if we are entirely clipped
-		s32 destendy = desty + srcheight - 1;
-		if (desty > cliprect.bottom() || destendy < cliprect.top())
-			break;
-
-		// apply top clip
-		u32 srcy = 0;
-		if (desty < cliprect.top())
+		// iterate over leftover pixels
+		for (s32 curx = 0; curx < leftovers; curx++)
 		{
-			srcy = cliprect.top() - desty;
-			desty = cliprect.top();
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
+			destptr++;
 		}
-
-		// apply bottom clip
-		if (destendy > cliprect.bottom())
-			destendy = cliprect.bottom();
-
-		// apply X flipping
-		s32 dx = 1;
-		if (flipx)
-		{
-			srcx = srcwidth - 1 - srcx;
-			dx = -dx;
-		}
-
-		// apply Y flipping
-		s32 dy = 1;
-		if (flipy)
-		{
-			srcy = srcheight - 1 - srcy;
-			dy = -dy;
-		}
-
-		// fetch the source data
-		const u8 *srcdata = gfx(0)->get_data(code);
-
-		// compute how many blocks of 4 pixels we have
-		u32 numblocks = (destendx + 1 - destx) / 4;
-		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
-
-		// iterate over pixels in Y
-		for (s32 cury = desty; cury <= destendy; cury++)
-		{
-			u32 drawy = ty + srcy;
-			srcy += dy;
-			if (drawy >= gfx(0)->height())
-				continue;
-
-			auto *destptr = &dest.pix(cury, destx);
-			const u8 *srcptr = srcdata + (drawy * gfx(0)->rowbytes());
-
-			u32 cursrcx = srcx;
-			// iterate over unrolled blocks of 4
-			for (s32 curx = 0; curx < numblocks; curx++)
-			{
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[1], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[2], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[3], srcptr[tx + cursrcx]); } cursrcx += dx;
-
-				destptr += 4;
-			}
-
-			// iterate over leftover pixels
-			for (s32 curx = 0; curx < leftovers; curx++)
-			{
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
-				destptr++;
-			}
-		}
-	} while (0);
-	g_profiler.stop();
+	}
 }
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
 inline void ms32_sprite_device::draw_sprite_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 tx, u32 ty, u32 srcwidth, u32 srcheight, PriorityType &priority, FunctionClass pixel_op)
 {
-	g_profiler.start(PROFILER_DRAWGFX);
-	do {
-		assert(dest.valid());
-		assert(priority.valid());
-		assert(dest.cliprect().contains(cliprect));
-		assert(code < gfx(0)->elements());
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-		// ignore empty/invalid cliprects
-		if (cliprect.empty())
-			break;
+	assert(dest.valid());
+	assert(priority.valid());
+	assert(dest.cliprect().contains(cliprect));
+	assert(code < gfx(0)->elements());
 
-		// compute final pixel in X and exit if we are entirely clipped
-		s32 destendx = destx + srcwidth - 1;
-		if (destx > cliprect.right() || destendx < cliprect.left())
-			break;
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
 
-		// apply left clip
-		u32 srcx = 0;
-		if (destx < cliprect.left())
+	// compute final pixel in X and exit if we are entirely clipped
+	s32 destendx = destx + srcwidth - 1;
+	if (destx > cliprect.right() || destendx < cliprect.left())
+		return;
+
+	// apply left clip
+	u32 srcx = 0;
+	if (destx < cliprect.left())
+	{
+		srcx = cliprect.left() - destx;
+		destx = cliprect.left();
+	}
+
+	// apply right clip
+	if (destendx > cliprect.right())
+		destendx = cliprect.right();
+
+	// compute final pixel in Y and exit if we are entirely clipped
+	s32 destendy = desty + srcheight - 1;
+	if (desty > cliprect.bottom() || destendy < cliprect.top())
+		return;
+
+	// apply top clip
+	u32 srcy = 0;
+	if (desty < cliprect.top())
+	{
+		srcy = cliprect.top() - desty;
+		desty = cliprect.top();
+	}
+
+	// apply bottom clip
+	if (destendy > cliprect.bottom())
+		destendy = cliprect.bottom();
+
+	// apply X flipping
+	s32 dx = 1;
+	if (flipx)
+	{
+		srcx = srcwidth - 1 - srcx;
+		dx = -dx;
+	}
+
+	// apply Y flipping
+	s32 dy = 1;
+	if (flipy)
+	{
+		srcy = srcheight - 1 - srcy;
+		dy = -dy;
+	}
+
+	// fetch the source data
+	const u8 *srcdata = gfx(0)->get_data(code);
+
+	// compute how many blocks of 4 pixels we have
+	u32 numblocks = (destendx + 1 - destx) / 4;
+	u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
+
+	// iterate over pixels in Y
+	for (s32 cury = desty; cury <= destendy; cury++)
+	{
+		u32 drawy = ty + srcy;
+		srcy += dy;
+		if (drawy >= gfx(0)->height())
+			continue;
+
+		auto *priptr = &priority.pix(cury, destx);
+		auto *destptr = &dest.pix(cury, destx);
+		const u8 *srcptr = srcdata + (drawy * gfx(0)->rowbytes());
+
+		u32 cursrcx = srcx;
+		// iterate over unrolled blocks of 4
+		for (s32 curx = 0; curx < numblocks; curx++)
 		{
-			srcx = cliprect.left() - destx;
-			destx = cliprect.left();
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], priptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[1], priptr[1], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[2], priptr[2], srcptr[tx + cursrcx]); } cursrcx += dx;
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[3], priptr[3], srcptr[tx + cursrcx]); } cursrcx += dx;
+
+			destptr += 4;
+			priptr += 4;
 		}
 
-		// apply right clip
-		if (destendx > cliprect.right())
-			destendx = cliprect.right();
-
-		// compute final pixel in Y and exit if we are entirely clipped
-		s32 destendy = desty + srcheight - 1;
-		if (desty > cliprect.bottom() || destendy < cliprect.top())
-			break;
-
-		// apply top clip
-		u32 srcy = 0;
-		if (desty < cliprect.top())
+		// iterate over leftover pixels
+		for (s32 curx = 0; curx < leftovers; curx++)
 		{
-			srcy = cliprect.top() - desty;
-			desty = cliprect.top();
+			if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], priptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
+			destptr++;
+			priptr++;
 		}
-
-		// apply bottom clip
-		if (destendy > cliprect.bottom())
-			destendy = cliprect.bottom();
-
-		// apply X flipping
-		s32 dx = 1;
-		if (flipx)
-		{
-			srcx = srcwidth - 1 - srcx;
-			dx = -dx;
-		}
-
-		// apply Y flipping
-		s32 dy = 1;
-		if (flipy)
-		{
-			srcy = srcheight - 1 - srcy;
-			dy = -dy;
-		}
-
-		// fetch the source data
-		const u8 *srcdata = gfx(0)->get_data(code);
-
-		// compute how many blocks of 4 pixels we have
-		u32 numblocks = (destendx + 1 - destx) / 4;
-		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
-
-		// iterate over pixels in Y
-		for (s32 cury = desty; cury <= destendy; cury++)
-		{
-			u32 drawy = ty + srcy;
-			srcy += dy;
-			if (drawy >= gfx(0)->height())
-				continue;
-
-			auto *priptr = &priority.pix(cury, destx);
-			auto *destptr = &dest.pix(cury, destx);
-			const u8 *srcptr = srcdata + (drawy * gfx(0)->rowbytes());
-
-			u32 cursrcx = srcx;
-			// iterate over unrolled blocks of 4
-			for (s32 curx = 0; curx < numblocks; curx++)
-			{
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], priptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[1], priptr[1], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[2], priptr[2], srcptr[tx + cursrcx]); } cursrcx += dx;
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[3], priptr[3], srcptr[tx + cursrcx]); } cursrcx += dx;
-
-				destptr += 4;
-				priptr += 4;
-			}
-
-			// iterate over leftover pixels
-			for (s32 curx = 0; curx < leftovers; curx++)
-			{
-				if (tx + cursrcx < gfx(0)->width()) { pixel_op(destptr[0], priptr[0], srcptr[tx + cursrcx]); } cursrcx += dx;
-				destptr++;
-				priptr++;
-			}
-		}
-	} while (0);
-	g_profiler.stop();
+	}
 }
+
 /***************************************************************************
     BASIC DRAWGFXZOOM CORE
 ***************************************************************************/
@@ -1029,65 +1026,63 @@ inline void ms32_sprite_device::draw_sprite_zoom_core(BitmapType &dest, const re
 	if (!incx || !incy)
 		return;
 
-	g_profiler.start(PROFILER_DRAWGFX);
-	do {
-		assert(dest.valid());
-		assert(dest.cliprect().contains(cliprect));
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-		// ignore empty/invalid cliprects
-		if (cliprect.empty())
-			break;
+	assert(dest.valid());
+	assert(dest.cliprect().contains(cliprect));
 
-		s32 srcstartx = tx << 8;
-		s32 srcstarty = ty << 8;
-		s32 srcendx = srcwidth << 8;
-		s32 srcendy = srcheight << 8;
-		// apply left clip
-		u32 srcx = 0;
-		if (destx < cliprect.left())
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
+
+	s32 srcstartx = tx << 8;
+	s32 srcstarty = ty << 8;
+	s32 srcendx = srcwidth << 8;
+	s32 srcendy = srcheight << 8;
+	// apply left clip
+	u32 srcx = 0;
+	if (destx < cliprect.left())
+	{
+		srcx = (cliprect.left() - destx) * incx;
+		destx = cliprect.left();
+	}
+	if (srcx >= srcendx)
+		return;
+
+	// apply top clip
+	u32 srcy = 0;
+	if (desty < cliprect.top())
+	{
+		srcy = (cliprect.top() - desty) * incy;
+		desty = cliprect.top();
+	}
+	if (srcy >= srcendy)
+		return;
+
+	// fetch the source data
+	const u8 *srcdata = gfx(0)->get_data(code);
+
+	// iterate over pixels in Y
+	for (s32 cury = desty; (cury <= cliprect.bottom()) && (srcy < srcendy); cury++, srcy += incy)
+	{
+		u32 drawy = (srcstarty + (flipy ? (srcendy - srcy - 1) : srcy)) >> 8;
+		if (drawy >= gfx(0)->height())
+			continue;
+
+		auto *destptr = &dest.pix(cury);
+		const u8 *srcptr = srcdata + drawy * gfx(0)->rowbytes();
+		u32 cursrcx = srcx;
+
+		// iterate over pixels
+		for (s32 curx = destx; (curx <= cliprect.right()) && (cursrcx < srcendx); curx++, cursrcx += incx)
 		{
-			srcx = (cliprect.left() - destx) * incx;
-			destx = cliprect.left();
-		}
-		if (srcx >= srcendx)
-			break;
-
-		// apply top clip
-		u32 srcy = 0;
-		if (desty < cliprect.top())
-		{
-			srcy = (cliprect.top() - desty) * incy;
-			desty = cliprect.top();
-		}
-		if (srcy >= srcendy)
-			break;
-
-		// fetch the source data
-		const u8 *srcdata = gfx(0)->get_data(code);
-
-		// iterate over pixels in Y
-		for (s32 cury = desty; (cury <= cliprect.bottom()) && (srcy < srcendy); cury++, srcy += incy)
-		{
-			u32 drawy = (srcstarty + (flipy ? (srcendy - srcy - 1) : srcy)) >> 8;
-			if (drawy >= gfx(0)->height())
+			u32 drawx = (srcstartx + (flipx ? (srcendx - cursrcx - 1) : cursrcx)) >> 8;
+			if (drawx >= gfx(0)->width())
 				continue;
 
-			auto *destptr = &dest.pix(cury);
-			const u8 *srcptr = srcdata + drawy * gfx(0)->rowbytes();
-			u32 cursrcx = srcx;
-
-			// iterate over pixels
-			for (s32 curx = destx; (curx <= cliprect.right()) && (cursrcx < srcendx); curx++, cursrcx += incx)
-			{
-				u32 drawx = (srcstartx + (flipx ? (srcendx - cursrcx - 1) : cursrcx)) >> 8;
-				if (drawx >= gfx(0)->width())
-					continue;
-
-				pixel_op(destptr[curx], srcptr[drawx]);
-			}
+			pixel_op(destptr[curx], srcptr[drawx]);
 		}
-	} while (0);
-	g_profiler.stop();
+	}
 }
 
 
@@ -1097,65 +1092,63 @@ inline void ms32_sprite_device::draw_sprite_zoom_core(BitmapType &dest, const re
 	if (!incx || !incy)
 		return;
 
-	g_profiler.start(PROFILER_DRAWGFX);
-	do {
-		assert(dest.valid());
-		assert(priority.valid());
-		assert(dest.cliprect().contains(cliprect));
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-		// ignore empty/invalid cliprects
-		if (cliprect.empty())
-			break;
+	assert(dest.valid());
+	assert(priority.valid());
+	assert(dest.cliprect().contains(cliprect));
 
-		s32 srcstartx = tx << 8;
-		s32 srcstarty = ty << 8;
-		s32 srcendx = srcwidth << 8;
-		s32 srcendy = srcheight << 8;
-		// apply left clip
-		u32 srcx = 0;
-		if (destx < cliprect.left())
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
+
+	s32 srcstartx = tx << 8;
+	s32 srcstarty = ty << 8;
+	s32 srcendx = srcwidth << 8;
+	s32 srcendy = srcheight << 8;
+	// apply left clip
+	u32 srcx = 0;
+	if (destx < cliprect.left())
+	{
+		srcx = (cliprect.left() - destx) * incx;
+		destx = cliprect.left();
+	}
+	if (srcx >= srcendx)
+		return;
+
+	// apply top clip
+	u32 srcy = 0;
+	if (desty < cliprect.top())
+	{
+		srcy = (cliprect.top() - desty) * incy;
+		desty = cliprect.top();
+	}
+	if (srcy >= srcendy)
+		return;
+
+	// fetch the source data
+	const u8 *srcdata = gfx(0)->get_data(code);
+
+	// iterate over pixels in Y
+	for (s32 cury = desty; (cury <= cliprect.bottom()) && (srcy < srcendy); cury++, srcy += incy)
+	{
+		u32 drawy = (srcstarty + (flipy ? (srcendy - srcy - 1) : srcy)) >> 8;
+		if (drawy >= gfx(0)->height())
+			continue;
+
+		auto *priptr = &priority.pix(cury);
+		auto *destptr = &dest.pix(cury);
+		const u8 *srcptr = srcdata + drawy * gfx(0)->rowbytes();
+		u32 cursrcx = srcx;
+
+		// iterate over pixels
+		for (s32 curx = destx; (curx <= cliprect.right()) && (cursrcx < srcendx); curx++, cursrcx += incx)
 		{
-			srcx = (cliprect.left() - destx) * incx;
-			destx = cliprect.left();
-		}
-		if (srcx >= srcendx)
-			break;
-
-		// apply top clip
-		u32 srcy = 0;
-		if (desty < cliprect.top())
-		{
-			srcy = (cliprect.top() - desty) * incy;
-			desty = cliprect.top();
-		}
-		if (srcy >= srcendy)
-			break;
-
-		// fetch the source data
-		const u8 *srcdata = gfx(0)->get_data(code);
-
-		// iterate over pixels in Y
-		for (s32 cury = desty; (cury <= cliprect.bottom()) && (srcy < srcendy); cury++, srcy += incy)
-		{
-			u32 drawy = (srcstarty + (flipy ? (srcendy - srcy - 1) : srcy)) >> 8;
-			if (drawy >= gfx(0)->height())
+			u32 drawx = (srcstartx + (flipx ? (srcendx - cursrcx - 1) : cursrcx)) >> 8;
+			if (drawx >= gfx(0)->width())
 				continue;
 
-			auto *priptr = &priority.pix(cury);
-			auto *destptr = &dest.pix(cury);
-			const u8 *srcptr = srcdata + drawy * gfx(0)->rowbytes();
-			u32 cursrcx = srcx;
-
-			// iterate over pixels
-			for (s32 curx = destx; (curx <= cliprect.right()) && (cursrcx < srcendx); curx++, cursrcx += incx)
-			{
-				u32 drawx = (srcstartx + (flipx ? (srcendx - cursrcx - 1) : cursrcx)) >> 8;
-				if (drawx >= gfx(0)->width())
-					continue;
-
-				pixel_op(destptr[curx], priptr[curx], srcptr[drawx]);
-			}
+			pixel_op(destptr[curx], priptr[curx], srcptr[drawx]);
 		}
-	} while (0);
-	g_profiler.stop();
+	}
 }

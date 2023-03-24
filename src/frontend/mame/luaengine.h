@@ -124,20 +124,11 @@ public:
 	template <typename Func, typename... Params>
 	sol::protected_function_result invoke(Func &&func, Params&&... args)
 	{
-		g_profiler.start(PROFILER_LUA);
-		try
-		{
-			sol::thread th = sol::thread::create(m_lua_state);
-			sol::coroutine cr(th.state(), std::forward<Func>(func));
-			auto result = cr(std::forward<Params>(args)...);
-			g_profiler.stop();
-			return result;
-		}
-		catch (...)
-		{
-			g_profiler.stop();
-			throw;
-		}
+		auto profile = g_profiler.start(PROFILER_LUA);
+
+		sol::thread th = sol::thread::create(m_lua_state);
+		sol::coroutine cr(th.state(), std::forward<Func>(func));
+		return cr(std::forward<Params>(args)...);
 	}
 
 private:
