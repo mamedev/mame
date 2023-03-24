@@ -123,12 +123,14 @@ public:
 	sol::state_view &sol() const { return *m_sol_state; }
 
 	template <typename Func, typename... Params>
-	static std::decay_t<std::invoke_result_t<Func, Params...> > invoke(Func &&func, Params&&... args)
+	sol::protected_function_result invoke(Func &&func, Params&&... args)
 	{
 		g_profiler.start(PROFILER_LUA);
 		try
 		{
-			auto result = func(std::forward<Params>(args)...);
+			sol::thread th = sol::thread::create(m_lua_state);
+			sol::coroutine cr(th.state(), std::forward<Func>(func));
+			auto result = cr(std::forward<Params>(args)...);
 			g_profiler.stop();
 			return result;
 		}

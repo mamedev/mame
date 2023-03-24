@@ -704,6 +704,7 @@ void device_scheduler::postload()
 			assert(!timer.expire().is_never());
 
 			// temporary timers go away entirely (except our special never-expiring one)
+			timer.m_callback.reset();
 			m_timer_allocator.reclaim(timer_list_remove(timer));
 		}
 		else
@@ -965,6 +966,7 @@ inline void device_scheduler::execute_timers()
 			else
 			{
 				// otherwise, remove it now
+				timer.m_callback.reset();
 				m_timer_allocator.reclaim(timer_list_remove(timer));
 			}
 		}

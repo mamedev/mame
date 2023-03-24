@@ -336,7 +336,7 @@ TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 		strreplace(cmd, "'", "\\'");
 		std::string val = std::string("emu.keypost('").append(cmd).append("')");
 		auto &l(*lua());
-		l.invoke(l.load_string(val));
+		l.invoke(l.load_string(val).get<sol::protected_function>());
 	}
 }
 

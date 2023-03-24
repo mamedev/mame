@@ -585,7 +585,7 @@ template <typename R, typename T, typename D>
 auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc)
 {
 	return
-		[setter, dflt, name, desc] (T &self, sol::object cb)
+		[this, setter, dflt, name, desc] (T &self, sol::object cb)
 		{
 			if (cb == sol::lua_nil)
 			{
@@ -594,7 +594,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[this, dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
 							{
 								if constexpr (std::is_same_v<R, void>)
 								{

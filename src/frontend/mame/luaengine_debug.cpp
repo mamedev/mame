@@ -89,8 +89,9 @@ class lua_engine::symbol_table_wrapper
 public:
 	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
 
-	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
-		: m_table(machine, parent ? &parent->table() : nullptr, device)
+	symbol_table_wrapper(lua_engine &host, running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+		: m_host(host)
+		, m_table(machine, parent ? &parent->table() : nullptr, device)
 		, m_parent(parent)
 	{
 	}
@@ -105,12 +106,12 @@ public:
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
-			setfun = [cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { m_host.invoke(cbfunc, value); };
 		return m_table.add(
 				name,
-				[cbfunc = std::move(getter)] () -> u64
+				[this, cbfunc = std::move(getter)] () -> u64
 				{
-					auto result = invoke(cbfunc).get<std::optional<u64> >();
+					auto result = m_host.invoke(cbfunc).get<std::optional<u64> >();
 					if (result)
 					{
 						return *result;
@@ -134,6 +135,7 @@ public:
 	void write_memory(addr_space &space, offs_t address, u64 data, int size, bool translate) { m_table.write_memory(space.space, address, data, size, translate); }
 
 private:
+	lua_engine &m_host;
 	symbol_table m_table;
 	std::shared_ptr<symbol_table_wrapper> const m_parent;
 };
@@ -229,21 +231,21 @@ void lua_engine::initialize_debug(sol::table &emu)
 	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
 			"symbol_table",
 			sol::call_constructor, sol::factories(
-				[] (running_machine &machine)
-				{ return std::make_shared<symbol_table_wrapper>(machine, nullptr, nullptr); },
-				[] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
-				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, device); },
-				[] (std::shared_ptr<symbol_table_wrapper> const &parent)
-				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, nullptr); },
-				[] (device_t &device)
-				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
+				[this] (running_machine &machine)
+				{ return std::make_shared<symbol_table_wrapper>(*this, machine, nullptr, nullptr); },
+				[this] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+				{ return std::make_shared<symbol_table_wrapper>(*this, parent->table().machine(), parent, device); },
+				[this] (std::shared_ptr<symbol_table_wrapper> const &parent)
+				{ return std::make_shared<symbol_table_wrapper>(*this, parent->table().machine(), parent, nullptr); },
+				[this] (device_t &device)
+				{ return std::make_shared<symbol_table_wrapper>(*this, device.machine(), nullptr, &device); }));
 	symbol_table_type.set_function("set_memory_modified_func",
-			[] (symbol_table_wrapper &st, sol::object cb)
+			[this] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});

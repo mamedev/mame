@@ -592,7 +592,7 @@ bool lua_engine::execute_function(const char *id)
 {
 	size_t count = enumerate_functions(
 			id,
-			[] (const sol::protected_function &func)
+			[this] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func);
 				if (!ret.valid())
@@ -669,7 +669,7 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 	bool handled = false;
 	enumerate_functions(
 			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
-			[&instance_name, &handled] (const sol::protected_function &func)
+			[this, &instance_name, &handled] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func, instance_name);
 
@@ -841,17 +841,30 @@ void lua_engine::initialize()
 				return sol::lua_nil;
 			return sol::make_object(s, driver_list::driver(i));
 		};
-	emu["wait"] = lua_CFunction(
-			[] (lua_State *L)
+	emu["wait"] = sol::yielding(
+			[this] (sol::this_state s, sol::object arg)
 			{
-				lua_engine *engine = mame_machine_manager::instance()->lua();
-				luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-				int ret = lua_pushthread(L);
+				attotime duration;
+				if (!arg)
+				{
+					luaL_error(s, "waiting duration expected");
+				}
+				else if (arg.is<attotime>())
+				{
+					duration = arg.as<attotime>();
+				}
+				else
+				{
+					auto seconds = arg.as<std::optional<double> >();
+					if (!seconds)
+						luaL_error(s, "waiting duration must be attotime or number");
+					duration = attotime::from_double(*seconds);
+				}
+				int const ret = lua_pushthread(s);
 				if (ret == 1)
-					return luaL_error(L, "cannot wait from outside coroutine");
-				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref);
-				return lua_yield(L, 0);
+					luaL_error(s, "cannot wait from outside coroutine");
+				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
+				machine().scheduler().timer_set(duration, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
 			});
 	emu["lang_translate"] = sol::overload(
 			static_cast<char const *(*)(char const *)>(&lang_translate),
@@ -2037,7 +2050,7 @@ void lua_engine::resume(int nparam)
 	lua_pop(m_lua_state, 1);
 	int nresults = 0;
 	int stat = lua_resume(L, nullptr, 0, &nresults);
-	if((stat != LUA_OK) && (stat != LUA_YIELD))
+	if ((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
