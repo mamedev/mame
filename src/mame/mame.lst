@@ -863,9 +863,6 @@ maccclas                        // 1993 Apple Macintosh Color Classic
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
 
-@source:apple/macpci.cpp
-pippin                          //
-
 @source:apple/macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
 
@@ -897,6 +894,9 @@ mp130
 emate
 mp2000
 mp2100
+
+@source:apple/pippin.cpp
+pippin                          // 1996 Apple/Bandai Pippin @Mark / @World
 
 @source:apple/powermacg3.cpp
 pwrmacg3                        // November 10, 1997 Apple Power Macintosh G3 (beige)
