@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macpci.cpp: Apple/Bandai Pippin
+  pippin.cpp: Apple/Bandai Pippin
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
 
   Apple ASICs identified:
