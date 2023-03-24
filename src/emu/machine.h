@@ -397,7 +397,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 	// process only if there is a target
 	if (allow_logging())
 	{
-		g_profiler.start(PROFILER_LOGERROR);
+		auto profile = g_profiler.start(PROFILER_LOGERROR);
 
 		// dump to the buffer
 		m_string_buffer.clear();
@@ -406,9 +406,7 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 		m_string_buffer.put('\0');
 
 		strlog(&m_string_buffer.vec()[0]);
-
-		g_profiler.stop();
 	}
 }
 
-#endif  /* MAME_EMU_MACHINE_H */
+#endif // MAME_EMU_MACHINE_H

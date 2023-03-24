@@ -757,7 +757,7 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 	{
 		if (data & 1)
 		{
-			//g_profiler.start(PROFILER_USER1);
+			//auto profile = g_profiler.start(PROFILER_USER1);
 			// make sure we've not already got a request running
 			if (m_blitter_request)
 			{
@@ -784,7 +784,6 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 			m_gfx_scroll_1_x_shadowcopy = m_gfx_scroll_1_x;
 			m_gfx_scroll_1_y_shadowcopy = m_gfx_scroll_1_y;
 			m_blitter_request = osd_work_item_queue(m_work_queue, blit_request_callback, (void*)this, 0);
-			//g_profiler.stop();
 		}
 	}
 }
@@ -796,7 +795,7 @@ void epic12_device::gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask)
 	{
 		if (data & 1)
 		{
-			//g_profiler.start(PROFILER_USER1);
+			//auto profile = g_profiler.start(PROFILER_USER1);
 			// make sure we've not already got a request running
 			if (m_blitter_request)
 			{
@@ -821,7 +820,6 @@ void epic12_device::gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask)
 			}
 
 			m_blitter_request = osd_work_item_queue(m_work_queue, blit_request_callback_unsafe, (void*)this, 0);
-			//g_profiler.stop();
 		}
 	}
 }

@@ -721,7 +721,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	rectangle clip = cliprect;
 	clip.min_y = clip.max_y = line;
 
-g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* get the full pixmap for the tilemap */
 	tilemap->pixmap();
 
@@ -745,9 +745,6 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	{
 		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 0);
 	}
-
-g_profiler.stop();
-
 }
 
 void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t priority, int y)

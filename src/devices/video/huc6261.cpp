@@ -106,14 +106,12 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	{
 		if ( m_pixel_clock == 0 )
 		{
-			g_profiler.start( PROFILER_VIDEO );
+			auto profile = g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
 			m_pixel_data_a = m_huc6270_a->next_pixel();
 			m_pixel_data_b = m_huc6270_b->next_pixel();
 			apply_pal_offs(&m_pixel_data_a);
 			apply_pal_offs(&m_pixel_data_b);
-
-			g_profiler.stop();
 		}
 
 		bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_a ] );

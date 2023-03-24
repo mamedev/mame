@@ -8,11 +8,11 @@
 
 ****************************************************************************
 
-    Profiling is scope-based. To start profiling, put a profiler_scope
+    Profiling is scope-based. To start profiling, put a profiler scope
     object on the stack. To end profiling, just end the scope:
 
     {
-        profiler_scope scope(PROFILER_VIDEO);
+        auto scope = g_profiler.start(PROFILER_VIDEO);
 
         your_work_here();
     }
@@ -25,6 +25,12 @@
 #define MAME_EMU_PROFILER_H
 
 #pragma once
+
+#include "emufwd.h"
+
+#include "attotime.h"
+
+#include "osdcore.h"
 
 
 //**************************************************************************
@@ -83,6 +89,45 @@ DECLARE_ENUM_INCDEC_OPERATORS(profile_type)
 class real_profiler_state
 {
 public:
+	class scope
+	{
+	private:
+		real_profiler_state &m_host;
+		bool m_active;
+
+	public:
+		scope(scope const &) = delete;
+		scope &operator=(scope const &) = delete;
+
+		scope(scope &&that) : m_host(that.m_host), m_active(that.m_active)
+		{
+			that.m_active = false;
+		}
+
+		scope(real_profiler_state &host, profile_type type) : m_host(host), m_active(false)
+		{
+			if (m_host.enabled())
+			{
+				m_host.real_start(type);
+				m_active = true;
+			}
+		}
+
+		~scope()
+		{
+			stop();
+		}
+
+		void stop()
+		{
+			if (m_active)
+			{
+				m_host.real_stop();
+				m_active = false;
+			}
+		}
+	};
+
 	// construction/destruction
 	real_profiler_state();
 
@@ -103,8 +148,7 @@ public:
 	}
 
 	// start/stop
-	void start(profile_type type) { if (enabled()) real_start(type); }
-	void stop() { if (enabled()) real_stop(); }
+	[[nodiscard]] auto start(profile_type type) { return scope(*this, type); }
 
 private:
 	void reset(bool enabled);
@@ -177,6 +221,17 @@ private:
 class dummy_profiler_state
 {
 public:
+	class scope
+	{
+	public:
+		scope(scope const &) = delete;
+		scope &operator=(scope const &) = delete;
+		scope(scope &&that) = default;
+		scope(dummy_profiler_state &host, profile_type type) { }
+		~scope() = default;
+		void stop() { }
+	};
+
 	// construction/destruction
 	dummy_profiler_state();
 
@@ -188,8 +243,7 @@ public:
 	void enable(bool state = true) { }
 
 	// start/stop
-	void start(profile_type type) { }
-	void stop() { }
+	[[nodiscard]] auto start(profile_type type) { return scope(*this, type); }
 };
 
 
@@ -210,4 +264,4 @@ typedef dummy_profiler_state profiler_state;
 extern profiler_state g_profiler;
 
 
-#endif  /* MAME_EMU_PROFILER_H */
+#endif // MAME_EMU_PROFILER_H

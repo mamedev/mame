@@ -1162,7 +1162,7 @@ void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data)
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	switch (offset)
 	{
@@ -1302,8 +1302,6 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 		}
 	}
-
-g_profiler.stop();
 }
 
 
@@ -1314,7 +1312,7 @@ void ddenlovr_state::blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	switch(offset)
 	{
@@ -1459,8 +1457,6 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 		}
 	}
-
-g_profiler.stop();
 }
 
 
@@ -1476,7 +1472,7 @@ void hanakanz_state::hanakanz_blitter_data_w(uint8_t data)
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	hi_bits = (m_ddenlovr_blit_latch & 0x03) << 8;
 
@@ -1657,8 +1653,6 @@ g_profiler.start(PROFILER_VIDEO);
 			logerror("%06x: Blitter 0 reg %02x = %02x\n", m_maincpu->pc(), m_ddenlovr_blit_latch, data);
 			break;
 	}
-
-g_profiler.stop();
 }
 
 
