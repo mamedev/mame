@@ -15,8 +15,9 @@ vastar_video_device::vastar_video_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, VASTAR_VIDEO_DEVICE, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, nullptr, "palette"),
 		device_video_interface(mconfig, *this),
-		m_bgvideoram(*this, "bg%uvideoram", 0U),
-		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram0(*this, finder_base::DUMMY_TAG),
+		m_bgvideoram1(*this, finder_base::DUMMY_TAG),
+		m_fgvideoram(*this, finder_base::DUMMY_TAG),
 		m_flip_screen(false)
 {
 }
@@ -84,8 +85,8 @@ void vastar_video_device::device_start()
 	decode_gfx(gfxinfo);
 
 	m_fg_tilemap  = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[0] =&machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap[0] =&machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap[0]->set_transparent_pen(0);
@@ -110,13 +111,13 @@ void vastar_video_device::fgvideoram_w(offs_t offset, uint8_t data)
 
 void vastar_video_device::bgvideoram0_w(offs_t offset, uint8_t data)
 {
-	m_bgvideoram[0][offset] = data;
+	m_bgvideoram0[offset] = data;
 	m_bg_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 }
 
 void vastar_video_device::bgvideoram1_w(offs_t offset, uint8_t data)
 {
-	m_bgvideoram[1][offset] = data;
+	m_bgvideoram1[offset] = data;
 	m_bg_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 }
 
@@ -130,14 +131,23 @@ void vastar_video_device::flipscreen_w(uint8_t data)
 }
 
 
-
-template <uint8_t Which>
-TILE_GET_INFO_MEMBER(vastar_video_device::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(vastar_video_device::get_bg0_tile_info)
 {
-	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
-	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
+	int const code = m_bgvideoram0[tile_index + m_bg_codebase] | (m_bgvideoram0[tile_index + m_bg_attrbase] << 8);
+	int const color = m_bgvideoram0[tile_index + m_bg_colbase];
 	int fxy = (code & 0xc00) >> 10;
-	tileinfo.set(4 - Which,
+	tileinfo.set(4,
+			code,
+			color & 0x3f,
+			TILE_FLIPXY(fxy));
+}
+
+TILE_GET_INFO_MEMBER(vastar_video_device::get_bg1_tile_info)
+{
+	int const code = m_bgvideoram1[tile_index + m_bg_codebase] | (m_bgvideoram1[tile_index + m_bg_attrbase] << 8);
+	int const color = m_bgvideoram1[tile_index + m_bg_colbase];
+	int fxy = (code & 0xc00) >> 10;
+	tileinfo.set(3,
 			code,
 			color & 0x3f,
 			TILE_FLIPXY(fxy));

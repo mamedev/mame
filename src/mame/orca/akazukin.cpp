@@ -102,9 +102,9 @@ void akazukin_state::nmi_sub_mask_w(uint8_t data)
 void akazukin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram1_w)).share("vasvid:bg1videoram");
-	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram0_w)).share("vasvid:bg0videoram");
-	map(0xa000, 0xabff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("vasvid:fgvideoram");
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram1_w)).share("bg1videoram");
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram0_w)).share("bg0videoram");
+	map(0xa000, 0xabff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("fgvideoram");
 	map(0xac00, 0xac00).w(m_vasvid, FUNC(vastar_video_device::priority_w));
 	map(0xac01, 0xafff).ram();
 	map(0xc000, 0xc007).w(m_mainlatch, FUNC(ls259_device::write_d0));
@@ -284,7 +284,10 @@ void akazukin_state::akazukin(machine_config &config)
 	m_vasvid->set_bg_bases(0x000, 0x800, 0x400);
 	m_vasvid->set_fg_bases(0x000, 0x400, 0x800);
 	m_vasvid->set_other_bases(0x800, 0x400, 0x000, 0xbe0, 0xbc0);
-
+	m_vasvid->set_bg0ram_tag("bg0videoram");
+	m_vasvid->set_bg1ram_tag("bg1videoram");
+	m_vasvid->set_fgram_tag("fgvideoram");
+		
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
