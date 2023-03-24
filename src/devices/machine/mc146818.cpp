@@ -24,6 +24,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
 DEFINE_DEVICE_TYPE(DS1287,   ds1287_device,   "ds1287",   "DS1287 RTC")
+DEFINE_DEVICE_TYPE(DS1397,   ds1397_device,   "ds1397",   "DS1397 RAMified RTC")
 
 //-------------------------------------------------
 //  mc146818_device - constructor
@@ -46,6 +47,11 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 
 ds1287_device::ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc146818_device(mconfig, DS1287, tag, owner, clock)
+{
+}
+
+ds1397_device::ds1397_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc146818_device(mconfig, DS1397, tag, owner, clock)
 {
 }
 
@@ -720,4 +726,34 @@ void mc146818_device::internal_write(offs_t offset, uint8_t data)
 		m_data[offset] = data;
 		break;
 	}
+}
+
+void ds1397_device::device_start()
+{
+	mc146818_device::device_start();
+
+	save_item(NAME(m_xram_page));
+}
+
+void ds1397_device::device_reset()
+{
+	mc146818_device::device_reset();
+
+	m_xram_page = 0;
+}
+
+u8 ds1397_device::xram_r(offs_t offset)
+{
+	if (offset < 0x20)
+		return m_data[0x40 + m_xram_page * 0x20 + offset];
+	else
+		return m_xram_page;
+}
+
+void ds1397_device::xram_w(offs_t offset, u8 data)
+{
+	if (offset < 0x20)
+		m_data[0x40 + m_xram_page * 0x20 + offset] = data;
+	else
+		m_xram_page = data & 0x7f;
 }

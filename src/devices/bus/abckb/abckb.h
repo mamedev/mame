@@ -78,6 +78,7 @@ DECLARE_DEVICE_TYPE(ABC_KEYBOARD_PORT, abc_keyboard_port_device)
 
 
 // supported devices
+void abc800_keyboard_devices(device_slot_interface &device);
 void abc_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ABCKB_ABCKB_H
