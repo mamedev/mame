@@ -1,0 +1,71 @@
+// license:BSD-3-Clause
+// copyright-holders: Allard van der Bas
+
+/***************************************************************************
+
+    orca40c.h
+
+***************************************************************************/
+
+#ifndef MAME_ORCA_VASTAR_VIDDEV_H
+#define MAME_ORCA_VASTAR_VIDDEV_H
+
+#pragma once
+
+#include "emupal.h"
+#include "tilemap.h"
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> vastar_video_device
+
+class vastar_video_device : public device_t, public device_gfx_interface, public device_video_interface
+{
+public:
+	// construction/destruction
+	vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// memory handlers
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void bgvideoram0_w(offs_t offset, uint8_t data);
+	void bgvideoram1_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void priority_w(uint8_t data) { m_fg_vregs = data; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_config_complete() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	// shared memory finders
+	required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	// internal state
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
+	uint8_t* m_bg_scroll[2]{};
+	uint8_t* m_spriteram[3]{};
+
+	uint8_t m_fg_vregs;
+	uint8_t m_flip_screen;
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(VASTAR_VIDEO_DEVICE, vastar_video_device)
+
+#endif  // MAME_ORCA_VASTAR_VIDDEV_H

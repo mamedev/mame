@@ -1,0 +1,317 @@
+// license:BSD-3-Clause
+// copyright-holders: Allard van der Bas
+
+#include "emu.h"
+#include "vastar_viddev.h"
+
+#include "emupal.h"
+#include "screen.h"
+
+DEFINE_DEVICE_TYPE(VASTAR_VIDEO_DEVICE, vastar_video_device, "vastar_viddev", "Orca Vastar Video Device")
+
+vastar_video_device::vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VASTAR_VIDEO_DEVICE, tag, owner, clock),
+		device_gfx_interface(mconfig, *this, nullptr, "palette"),
+		device_video_interface(mconfig, *this),
+		m_bgvideoram(*this, "bg%uvideoram", 0U),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_flip_screen(false)
+{
+}
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
+static const gfx_layout charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	16*8
+};
+
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	64*8
+};
+
+static const gfx_layout spritelayoutdw =
+{
+	16,32,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
+			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
+			96*8, 97*8, 98*8, 99*8, 100*8, 101*8, 102*8, 103*8 },
+	128*8
+};
+
+GFXDECODE_MEMBER(vastar_video_device::gfxinfo)
+	GFXDECODE_ENTRY( "fgtiles",  0, charlayout,     0, 64 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout,   0, 64 )
+	GFXDECODE_ENTRY( "sprites",  0, spritelayoutdw, 0, 64 )
+	GFXDECODE_ENTRY( "bgtiles0", 0, charlayout,     0, 64 )
+	GFXDECODE_ENTRY( "bgtiles1", 0, charlayout,     0, 64 )
+GFXDECODE_END
+
+
+//-------------------------------------------------
+//  device_start: Start up the device
+//-------------------------------------------------
+
+void vastar_video_device::device_start()
+{
+	decode_gfx(gfxinfo);
+
+	m_spriteram[0] = m_fgvideoram + 0x800;
+	m_bg_scroll[0] = m_fgvideoram + 0xbe0;
+	m_bg_scroll[1] = m_fgvideoram + 0xbc0;
+	m_spriteram[1] = m_fgvideoram + 0x400;
+	m_spriteram[2] = m_fgvideoram + 0x000;
+
+	m_fg_tilemap  = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap[0] =&machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+
+	m_bg_tilemap[0]->set_scroll_cols(32);
+	m_bg_tilemap[1]->set_scroll_cols(32);
+
+	m_fg_vregs = 0;
+	m_flip_screen = 0;
+
+	save_item(NAME(m_fg_vregs));
+	save_item(NAME(m_flip_screen));
+}
+
+void vastar_video_device::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+void vastar_video_device::bgvideoram0_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[0][offset] = data;
+	m_bg_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
+}
+
+void vastar_video_device::bgvideoram1_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[1][offset] = data;
+	m_bg_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
+}
+
+void vastar_video_device::flipscreen_w(uint8_t data)
+{
+	m_flip_screen = data & 1;
+
+	m_bg_tilemap[0]->set_flip(m_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_bg_tilemap[1]->set_flip(m_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_fg_tilemap->set_flip(m_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+}
+
+
+
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(vastar_video_device::get_bg_tile_info)
+{
+	const u32 m_bg_codebase = 0x000;
+	const u32 m_bg_attrbase = 0x800;
+	const u32 m_bg_colbase = 0x400;
+
+	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
+	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
+	int fxy = (code & 0xc00) >> 10;
+	tileinfo.set(4 - Which,
+			code,
+			color & 0x3f,
+			TILE_FLIPXY(fxy));
+}
+
+TILE_GET_INFO_MEMBER(vastar_video_device::get_fg_tile_info)
+{
+	const u32 m_fg_codebase = 0x000;
+	const u32 m_fg_attrbase = 0x400;
+	const u32 m_fg_colbase = 0x800;
+
+	int const code = m_fgvideoram[tile_index + m_fg_codebase] | (m_fgvideoram[tile_index + m_fg_attrbase] << 8);
+	int const color = m_fgvideoram[tile_index + m_fg_colbase];
+	// TODO: guess, based on the other layers
+	int const fxy = (code & 0xc00) >> 10;
+	tileinfo.set(0,
+			code,
+			color & 0x3f,
+			TILE_FLIPXY(fxy));
+}
+
+
+
+void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+//  for (int offs = 0; offs < 0x40; offs += 2)
+	for (int offs = 0x40 - 2; offs >= 0; offs -= 2)
+	{
+		if (!(offs & 0x10))
+			continue;
+
+		const int code = ((m_spriteram[2][offs] & 0xfc) >> 2) + ((m_spriteram[1][offs] & 0x01) << 6)
+						+ ((offs & 0x20) << 2);
+
+		const int sx = m_spriteram[2][offs + 1];
+		int sy = m_spriteram[0][offs];
+		const int color = m_spriteram[0][offs + 1] & 0x3f;
+		int flipx = m_spriteram[2][offs] & 0x02;
+		int flipy = m_spriteram[2][offs] & 0x01;
+
+		if (m_flip_screen)
+		{
+			int temp = flipx;
+			flipx = !flipy;
+			flipy = !temp;
+		}
+
+		if (m_spriteram[1][offs] & 0x08)   // double width
+		{
+			if (!m_flip_screen)
+				sy = 224 - sy;
+
+			gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx, sy, 0);
+			// redraw with wraparound y
+			gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx, sy + 256, 0);
+
+			// redraw with wraparound x
+			gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx - 256, sy, 0);
+
+			// redraw with wraparound xy
+			gfx(2)->transpen(bitmap, cliprect,
+					code / 2,
+					color,
+					flipx, flipy,
+					sx - 256, sy + 256, 0);
+		}
+		else
+		{
+			if (!m_flip_screen)
+				sy = 240 - sy;
+
+			gfx(1)->transpen(bitmap, cliprect,
+					code,
+					color,
+					flipx, flipy,
+					sx, sy, 0);
+
+			// redraw with wraparound x
+			gfx(1)->transpen(bitmap, cliprect,
+					code,
+					color,
+					flipx, flipy,
+					sx - 256, sy, 0);
+		}
+	}
+}
+
+uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	for (int i = 0; i < 32; i++)
+	{
+		m_bg_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i]);
+		m_bg_tilemap[1]->set_scrolly(i, m_bg_scroll[1][i]);
+	}
+
+
+	// TODO: copied from orca/vastar.cpp
+	// Looks like $ac00 is some kind of '46C mixer control.
+	switch (m_fg_vregs)
+	{
+	case 0:
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+
+	case 1: // ?? planet probe
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+
+	case 2:
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+
+	case 3:
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+		break;
+
+	case 4: // akazukin title screen
+		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(bitmap, cliprect);
+		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		break;
+
+	default:
+		popmessage("Unimplemented priority %X\n", m_fg_vregs);
+		break;
+	}
+
+	return 0;
+}
+
+void vastar_video_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(*this, FUNC(vastar_video_device::screen_update));
+}
+
+void vastar_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
+}
