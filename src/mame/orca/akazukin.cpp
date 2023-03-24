@@ -25,10 +25,8 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 namespace {
 
@@ -282,6 +280,9 @@ void akazukin_state::akazukin(machine_config &config)
 
 	vastar_video_device &videopcb(VASTAR_VIDEO_DEVICE(config, "vasvid", 0));
 	videopcb.set_screen("screen");
+	videopcb.set_bg_bases(0x000, 0x800, 0x400);
+	videopcb.set_fg_bases(0x000, 0x400, 0x800);
+	videopcb.set_other_bases(0x800, 0x400, 0x000, 0xbe0, 0xbc0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

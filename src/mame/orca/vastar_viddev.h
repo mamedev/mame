@@ -35,6 +35,10 @@ public:
 	void flipscreen_w(uint8_t data);
 	void priority_w(uint8_t data) { m_fg_vregs = data; }
 
+	void set_bg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_bg_codebase = code; m_bg_attrbase = attr;  m_bg_colbase = col;  }
+	void set_fg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_fg_codebase = code; m_fg_attrbase = attr;  m_fg_colbase = col;  }
+	void set_other_bases(uint16_t spy, uint16_t atr, uint16_t spx, uint16_t bgs0, uint16_t bgs1) { m_spr_y_col = spy; m_spr_attr = atr; m_spr_code_x = spx; m_bg_scroll0 = bgs0; m_bg_scroll1 = bgs1; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -52,11 +56,23 @@ private:
 	// internal state
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap[2]{};
-	uint8_t* m_bg_scroll[2]{};
-	uint8_t* m_spriteram[3]{};
 
 	uint8_t m_fg_vregs;
 	uint8_t m_flip_screen;
+
+	// config
+	uint16_t m_bg_codebase = 0;
+	uint16_t m_bg_attrbase = 0;
+	uint16_t m_bg_colbase = 0;
+	uint16_t m_fg_codebase = 0;
+	uint16_t m_fg_attrbase = 0;
+	uint16_t m_fg_colbase = 0;
+
+	uint16_t m_spr_y_col = 0;
+	uint16_t m_spr_attr = 0;
+	uint16_t m_spr_code_x = 0;
+	uint16_t m_bg_scroll0 = 0;
+	uint16_t m_bg_scroll1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);

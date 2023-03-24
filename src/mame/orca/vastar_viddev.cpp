@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Allard van der Bas
 
+// Orca video system, implemented on ORCA OVG-46C PCB
+
 #include "emu.h"
 #include "vastar_viddev.h"
 
@@ -81,12 +83,6 @@ void vastar_video_device::device_start()
 {
 	decode_gfx(gfxinfo);
 
-	m_spriteram[0] = m_fgvideoram + 0x800;
-	m_bg_scroll[0] = m_fgvideoram + 0xbe0;
-	m_bg_scroll[1] = m_fgvideoram + 0xbc0;
-	m_spriteram[1] = m_fgvideoram + 0x400;
-	m_spriteram[2] = m_fgvideoram + 0x000;
-
 	m_fg_tilemap  = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_bg_tilemap[0] =&machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(vastar_video_device::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
@@ -138,10 +134,6 @@ void vastar_video_device::flipscreen_w(uint8_t data)
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(vastar_video_device::get_bg_tile_info)
 {
-	const u32 m_bg_codebase = 0x000;
-	const u32 m_bg_attrbase = 0x800;
-	const u32 m_bg_colbase = 0x400;
-
 	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
 	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
 	int fxy = (code & 0xc00) >> 10;
@@ -153,10 +145,6 @@ TILE_GET_INFO_MEMBER(vastar_video_device::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(vastar_video_device::get_fg_tile_info)
 {
-	const u32 m_fg_codebase = 0x000;
-	const u32 m_fg_attrbase = 0x400;
-	const u32 m_fg_colbase = 0x800;
-
 	int const code = m_fgvideoram[tile_index + m_fg_codebase] | (m_fgvideoram[tile_index + m_fg_attrbase] << 8);
 	int const color = m_fgvideoram[tile_index + m_fg_colbase];
 	// TODO: guess, based on the other layers
@@ -177,14 +165,14 @@ void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &c
 		if (!(offs & 0x10))
 			continue;
 
-		const int code = ((m_spriteram[2][offs] & 0xfc) >> 2) + ((m_spriteram[1][offs] & 0x01) << 6)
+		const int code = ((m_fgvideoram[m_spr_code_x + offs] & 0xfc) >> 2) + ((m_fgvideoram[m_spr_attr + offs] & 0x01) << 6)
 						+ ((offs & 0x20) << 2);
 
-		const int sx = m_spriteram[2][offs + 1];
-		int sy = m_spriteram[0][offs];
-		const int color = m_spriteram[0][offs + 1] & 0x3f;
-		int flipx = m_spriteram[2][offs] & 0x02;
-		int flipy = m_spriteram[2][offs] & 0x01;
+		const int sx = m_fgvideoram[m_spr_code_x + offs + 1];
+		int sy = m_fgvideoram[m_spr_y_col + offs];
+		const int color = m_fgvideoram[m_spr_y_col + offs + 1] & 0x3f;
+		int flipx = m_fgvideoram[m_spr_code_x + offs] & 0x02;
+		int flipy = m_fgvideoram[m_spr_code_x + offs] & 0x01;
 
 		if (m_flip_screen)
 		{
@@ -193,7 +181,7 @@ void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &c
 			flipy = !temp;
 		}
 
-		if (m_spriteram[1][offs] & 0x08)   // double width
+		if (m_fgvideoram[m_spr_attr + offs] & 0x08)   // double width
 		{
 			if (!m_flip_screen)
 				sy = 224 - sy;
@@ -249,10 +237,9 @@ uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32
 {
 	for (int i = 0; i < 32; i++)
 	{
-		m_bg_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i]);
-		m_bg_tilemap[1]->set_scrolly(i, m_bg_scroll[1][i]);
+		m_bg_tilemap[0]->set_scrolly(i, m_fgvideoram[m_bg_scroll0+i]);
+		m_bg_tilemap[1]->set_scrolly(i, m_fgvideoram[m_bg_scroll1+i]);
 	}
-
 
 	// TODO: copied from orca/vastar.cpp
 	// Looks like $ac00 is some kind of '46C mixer control.
