@@ -37,6 +37,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_mainlatch(*this, "mainlatch")
+		, m_vasvid(*this, "vasvid")
 		, m_soundlatch(*this, "soundlatch%u", 0)
 		, m_ay(*this, "ay%u", 0)
 	{ }
@@ -51,6 +52,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<ls259_device> m_mainlatch;
+	required_device<vastar_video_device> m_vasvid;
 
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device_array<ay8910_device, 2> m_ay;
@@ -100,10 +102,10 @@ void akazukin_state::nmi_sub_mask_w(uint8_t data)
 void akazukin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w("vasvid", FUNC(vastar_video_device::bgvideoram1_w)).share("vasvid:bg1videoram");
-	map(0x9000, 0x9fff).ram().w("vasvid", FUNC(vastar_video_device::bgvideoram0_w)).share("vasvid:bg0videoram");
-	map(0xa000, 0xabff).ram().w("vasvid", FUNC(vastar_video_device::fgvideoram_w)).share("vasvid:fgvideoram");
-	map(0xac00, 0xac00).w("vasvid", FUNC(vastar_video_device::priority_w));
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram1_w)).share("vasvid:bg1videoram");
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram0_w)).share("vasvid:bg0videoram");
+	map(0xa000, 0xabff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("vasvid:fgvideoram");
+	map(0xac00, 0xac00).w(m_vasvid, FUNC(vastar_video_device::priority_w));
 	map(0xac01, 0xafff).ram();
 	map(0xc000, 0xc007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xe000, 0xe000).portr("SYSTEM");
@@ -262,7 +264,7 @@ void akazukin_state::akazukin(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(akazukin_state::nmi_mask_w));
-	m_mainlatch->q_out_cb<1>().set("vasvid", FUNC(vastar_video_device::flipscreen_w));
+	m_mainlatch->q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 	m_mainlatch->q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 //  WATCHDOG_TIMER(config, "watchdog");
@@ -277,11 +279,11 @@ void akazukin_state::akazukin(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	vastar_video_device &videopcb(VASTAR_VIDEO_DEVICE(config, "vasvid", 0));
-	videopcb.set_screen("screen");
-	videopcb.set_bg_bases(0x000, 0x800, 0x400);
-	videopcb.set_fg_bases(0x000, 0x400, 0x800);
-	videopcb.set_other_bases(0x800, 0x400, 0x000, 0xbe0, 0xbc0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	m_vasvid->set_screen("screen");
+	m_vasvid->set_bg_bases(0x000, 0x800, 0x400);
+	m_vasvid->set_fg_bases(0x000, 0x400, 0x800);
+	m_vasvid->set_other_bases(0x800, 0x400, 0x000, 0xbe0, 0xbc0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

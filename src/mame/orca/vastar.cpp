@@ -165,7 +165,8 @@ class vastar_state : public vastar_common_state
 {
 public:
 	vastar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		vastar_common_state(mconfig, type, tag)
+		vastar_common_state(mconfig, type, tag),
+		m_vasvid(*this, "vasvid")
 	{ }
 
 	void vastar(machine_config &config);
@@ -174,6 +175,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_device<vastar_video_device> m_vasvid;
 
 	void main_map(address_map &map);
 };
@@ -211,10 +213,10 @@ WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
 void vastar_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w("vasvid", FUNC(vastar_video_device::bgvideoram1_w)).share("vasvid:bg1videoram").mirror(0x2000);
-	map(0x9000, 0x9fff).ram().w("vasvid", FUNC(vastar_video_device::bgvideoram0_w)).share("vasvid:bg0videoram").mirror(0x2000);
-	map(0xc000, 0xc000).w("vasvid", FUNC(vastar_video_device::priority_w));
-	map(0xc400, 0xcfff).ram().w("vasvid", FUNC(vastar_video_device::fgvideoram_w)).share("vasvid:fgvideoram");
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram1_w)).share("vasvid:bg1videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram0_w)).share("vasvid:bg0videoram").mirror(0x2000);
+	map(0xc000, 0xc000).w(m_vasvid, FUNC(vastar_video_device::priority_w));
+	map(0xc400, 0xcfff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("vasvid:fgvideoram");
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0xf000, 0xf7ff).ram().share(m_sharedram);
 }
@@ -485,7 +487,7 @@ void vastar_state::vastar(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(vastar_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
-	mainlatch.q_out_cb<1>().set("vasvid", FUNC(vastar_video_device::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 
 	// video hardware
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -494,11 +496,11 @@ void vastar_state::vastar(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	vastar_video_device &videopcb(VASTAR_VIDEO_DEVICE(config, "vasvid", 0));
-	videopcb.set_screen("screen");
-	videopcb.set_bg_bases(0x800, 0x000, 0xc00);
-	videopcb.set_fg_bases(0x800, 0x400, 0x000);
-	videopcb.set_other_bases(0x000, 0x400, 0x800, 0x3c0, 0x3e0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	m_vasvid->set_screen("screen");
+	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
+	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
+	m_vasvid->set_other_bases(0x000, 0x400, 0x800, 0x3c0, 0x3e0);
 }
 
 void dogfightp_state::dogfightp(machine_config &config)
