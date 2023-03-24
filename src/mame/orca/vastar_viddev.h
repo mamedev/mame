@@ -78,7 +78,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t rambase, uint16_t tilebase );
 };
 
 // device type definition

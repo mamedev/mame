@@ -157,22 +157,19 @@ TILE_GET_INFO_MEMBER(vastar_video_device::get_fg_tile_info)
 
 
 
-void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void vastar_video_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t rambase, uint16_t tilebase)
 {
-//  for (int offs = 0; offs < 0x40; offs += 2)
-	for (int offs = 0x40 - 2; offs >= 0; offs -= 2)
+	for (int offs = 0; offs < 0x10; offs += 2)
 	{
-		if (!(offs & 0x10))
-			continue;
+		uint8_t* spriteram = m_fgvideoram + rambase;
 
-		const int code = ((m_fgvideoram[m_spr_code_x + offs] & 0xfc) >> 2) + ((m_fgvideoram[m_spr_attr + offs] & 0x01) << 6)
-						+ ((offs & 0x20) << 2);
+		const int code = ((spriteram[m_spr_code_x + offs] & 0xfc) >> 2) + ((spriteram[m_spr_attr + offs] & 0x01) << 6) + tilebase;
 
-		const int sx = m_fgvideoram[m_spr_code_x + offs + 1];
-		int sy = m_fgvideoram[m_spr_y_col + offs];
-		const int color = m_fgvideoram[m_spr_y_col + offs + 1] & 0x3f;
-		int flipx = m_fgvideoram[m_spr_code_x + offs] & 0x02;
-		int flipy = m_fgvideoram[m_spr_code_x + offs] & 0x01;
+		const int sx = spriteram[m_spr_code_x + offs + 1];
+		int sy = spriteram[m_spr_y_col + offs];
+		const int color = spriteram[m_spr_y_col + offs + 1] & 0x3f;
+		int flipx = spriteram[m_spr_code_x + offs] & 0x02;
+		int flipy = spriteram[m_spr_code_x + offs] & 0x01;
 
 		if (m_flip_screen)
 		{
@@ -181,36 +178,36 @@ void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &c
 			flipy = !temp;
 		}
 
-		if (m_fgvideoram[m_spr_attr + offs] & 0x08)   // double width
+		if (spriteram[m_spr_attr + offs] & 0x08)   // double width
 		{
 			if (!m_flip_screen)
 				sy = 224 - sy;
 
 			gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
+				code / 2,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
 			// redraw with wraparound y
 			gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy + 256, 0);
+				code / 2,
+				color,
+				flipx, flipy,
+				sx, sy + 256, 0);
 
 			// redraw with wraparound x
 			gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx - 256, sy, 0);
+				code / 2,
+				color,
+				flipx, flipy,
+				sx - 256, sy, 0);
 
 			// redraw with wraparound xy
 			gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx - 256, sy + 256, 0);
+				code / 2,
+				color,
+				flipx, flipy,
+				sx - 256, sy + 256, 0);
 		}
 		else
 		{
@@ -218,17 +215,17 @@ void vastar_video_device::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &c
 				sy = 240 - sy;
 
 			gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
 
 			// redraw with wraparound x
 			gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx - 256, sy, 0);
+				code,
+				color,
+				flipx, flipy,
+				sx - 256, sy, 0);
 		}
 	}
 }
@@ -241,13 +238,13 @@ uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32
 		m_bg_tilemap[1]->set_scrolly(i, m_fgvideoram[m_bg_scroll1+i]);
 	}
 
-	// TODO: copied from orca/vastar.cpp
 	// Looks like $ac00 is some kind of '46C mixer control.
 	switch (m_fg_vregs)
 	{
 	case 0:
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect, 0x30, 0x80);
+		draw_sprites(bitmap, cliprect, 0x10, 0x00);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
@@ -255,13 +252,15 @@ uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32
 	case 1: // ?? planet probe
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect, 0x30, 0x80);
+		draw_sprites(bitmap, cliprect, 0x10, 0x00);
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		break;
 
 	case 2:
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect, 0x30, 0x80);
+		draw_sprites(bitmap, cliprect, 0x10, 0x00);
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -271,12 +270,14 @@ uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect, 0x30, 0x80);
+		draw_sprites(bitmap, cliprect, 0x10, 0x00);
 		break;
 
 	case 4: // akazukin title screen
 		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect, 0x30, 0x80);
+		draw_sprites(bitmap, cliprect, 0x10, 0x00);
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		break;
