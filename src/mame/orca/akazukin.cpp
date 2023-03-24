@@ -7,7 +7,6 @@ ORCA OVG-33C + ORCA OVG-46C
 Based off orca/vastar.cpp
 
 TODO:
-- Unify '46C to common device implementations;
 - Unify sound section, it's ported from sigma/sub.cpp;
 
 Notes:
@@ -323,28 +322,6 @@ ROM_START( akazukin )
 	ROM_REGION( 0x2000, "bgtiles1", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "8.p4",  0x0000, 0x2000, CRC(193f6bcb) SHA1(0f4699052b2c66fabd293e7ef08fd25de7af42f3) )
 
-	ROM_REGION( 0x0300, "proms", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "r.r6",  0x0000, 0x0100, CRC(77ccc932) SHA1(5bd23ca5ab80ac9c19e85ea79ba3d276c4be59cb) ) // red component
-	ROM_LOAD( "g.m6",  0x0100, 0x0100, CRC(eddc3acf) SHA1(0fca5d36ccbd5191ce8a59d070112ae4a3297b0b) ) // green component
-	ROM_LOAD( "b.l6",  0x0200, 0x0100, CRC(059dae45) SHA1(26c9b975804fc206e80ee21361e489824f39e0c0) ) // blue component
-
-	ROM_REGION( 0x0100, "unkprom", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "8n",  0x0000, 0x0100, CRC(e1b815ca) SHA1(df2b99259bf1023d37aa3b54247721d657d7e9c9) ) // ????
-
-
-	ROM_REGION( 0x1000, "vasvid:fgtiles", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "10.b9",  0x0000, 0x1000, CRC(0145ded8) SHA1(515f3943579f2a8e17ca05959b9354981219d9d9) )
-
-	ROM_REGION( 0x4000, "vasvid:sprites", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "9.e9",   0x0000, 0x2000, CRC(5fecc3d7) SHA1(619584936382c38c391c654684b24f6d642dff03) )
-	ROM_LOAD( "11.e7",  0x2000, 0x2000, CRC(448b28b8) SHA1(3a379c0a57ac89698b332d0af20ca8a3b0476d79) )
-
-	ROM_REGION( 0x1000, "vasvid:bgtiles0", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "7.t4",  0x0000, 0x1000, CRC(7b4124da) SHA1(9bd713ac660920f6c5b407e80df9438df575de88) )
-
-	ROM_REGION( 0x2000, "vasvid:bgtiles1", 0 ) // on ORCA OVG-46C sub board
-	ROM_LOAD( "8.p4",  0x0000, 0x2000, CRC(193f6bcb) SHA1(0f4699052b2c66fabd293e7ef08fd25de7af42f3) )
-
 	ROM_REGION( 0x0300, "vasvid:proms", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "r.r6",  0x0000, 0x0100, CRC(77ccc932) SHA1(5bd23ca5ab80ac9c19e85ea79ba3d276c4be59cb) ) // red component
 	ROM_LOAD( "g.m6",  0x0100, 0x0100, CRC(eddc3acf) SHA1(0fca5d36ccbd5191ce8a59d070112ae4a3297b0b) ) // green component
@@ -352,7 +329,6 @@ ROM_START( akazukin )
 
 	ROM_REGION( 0x0100, "vasvid:unkprom", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "8n",  0x0000, 0x0100, CRC(e1b815ca) SHA1(df2b99259bf1023d37aa3b54247721d657d7e9c9) ) // ????
-
 ROM_END
 
 } // anonymous namespace
