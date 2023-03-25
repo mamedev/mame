@@ -7,7 +7,6 @@ ORCA OVG-33C + ORCA OVG-46C
 Based off orca/vastar.cpp
 
 TODO:
-- Unify '46C to common device implementations;
 - Unify sound section, it's ported from sigma/sub.cpp;
 
 Notes:
@@ -18,18 +17,15 @@ Notes:
 
 #include "emu.h"
 
-//#include "orca40c.h"
+#include "vastar_viddev.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
-//#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 namespace {
 
@@ -41,11 +37,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
 		, m_mainlatch(*this, "mainlatch")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
-		, m_bgvideoram(*this, "bg%uvideoram", 1U)
-		, m_fgvideoram(*this, "fgvideoram")
-		, m_fg_vregs(*this, "fg_vregs")
+		, m_vasvid(*this, "vasvid")
 		, m_soundlatch(*this, "soundlatch%u", 0)
 		, m_ay(*this, "ay%u", 0)
 	{ }
@@ -55,18 +47,12 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<ls259_device> m_mainlatch;
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
-	required_shared_ptr<uint8_t> m_fgvideoram;
-	required_shared_ptr<uint8_t> m_fg_vregs;
+	required_device<vastar_video_device> m_vasvid;
 
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device_array<ay8910_device, 2> m_ay;
@@ -84,269 +70,7 @@ private:
 	void main_io(address_map &map);
 	void sub_map(address_map &map);
 	void sub_io(address_map &map);
-
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap[2]{};
-	uint8_t* m_bg_scroll[2]{};
-	uint8_t* m_spriteram[3]{};
-
-	void fgvideoram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void bgvideoram_w(offs_t offset, uint8_t data);
-
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/******************
- *
- * Video section
- *
- *****************/
-
-void akazukin_state::video_start()
-{
-	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akazukin_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akazukin_state::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(akazukin_state::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
-
-	m_fg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap[0]->set_transparent_pen(0);
-	m_bg_tilemap[1]->set_transparent_pen(0);
-
-	m_bg_tilemap[0]->set_scroll_cols(32);
-	m_bg_tilemap[1]->set_scroll_cols(32);
-}
-
-
-TILE_GET_INFO_MEMBER(akazukin_state::get_fg_tile_info)
-{
-	const u32 m_fg_codebase = 0x000;
-	const u32 m_fg_attrbase = 0x400;
-	const u32 m_fg_colbase = 0x800;
-
-	int const code = m_fgvideoram[tile_index + m_fg_codebase] | (m_fgvideoram[tile_index + m_fg_attrbase] << 8);
-	int const color = m_fgvideoram[tile_index + m_fg_colbase];
-	// TODO: guess, based on the other layers
-	int const fxy = (code & 0xc00) >> 10;
-	tileinfo.set(0,
-			code,
-			color & 0x3f,
-			TILE_FLIPXY(fxy));
-}
-
-template <uint8_t Which>
-TILE_GET_INFO_MEMBER(akazukin_state::get_bg_tile_info)
-{
-	const u32 m_bg_codebase = 0x000;
-	const u32 m_bg_attrbase = 0x800;
-	const u32 m_bg_colbase = 0x400;
-
-	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
-	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
-	int fxy = (code & 0xc00) >> 10;
-	tileinfo.set(4 - Which,
-			code,
-			color & 0x3f,
-			TILE_FLIPXY(fxy));
-}
-
-template <uint8_t Which>
-void akazukin_state::bgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_bgvideoram[Which][offset] = data;
-	m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
-}
-
-void akazukin_state::fgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-void akazukin_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-//  for (int offs = 0; offs < 0x40; offs += 2)
-	for (int offs = 0x40 - 2; offs >= 0; offs -= 2)
-	{
-		if (!(offs & 0x10))
-			continue;
-
-		const int code = ((m_spriteram[2][offs] & 0xfc) >> 2) + ((m_spriteram[1][offs] & 0x01) << 6)
-						+ ((offs & 0x20) << 2);
-
-		const int sx = m_spriteram[2][offs + 1];
-		int sy = m_spriteram[0][offs];
-		const int color = m_spriteram[0][offs + 1] & 0x3f;
-		int flipx = m_spriteram[2][offs] & 0x02;
-		int flipy = m_spriteram[2][offs] & 0x01;
-
-		if (flip_screen())
-		{
-			int temp = flipx;
-			flipx = !flipy;
-			flipy = !temp;
-		}
-
-		if (m_spriteram[1][offs] & 0x08)   // double width
-		{
-			if (!flip_screen())
-				sy = 224 - sy;
-
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
-			// redraw with wraparound y
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx, sy + 256, 0);
-
-			// redraw with wraparound x
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx - 256, sy, 0);
-
-			// redraw with wraparound xy
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect,
-					code / 2,
-					color,
-					flipx, flipy,
-					sx - 256, sy + 256, 0);
-		}
-		else
-		{
-			if (!flip_screen())
-				sy = 240 - sy;
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx, sy, 0);
-
-			// redraw with wraparound x
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx - 256, sy, 0);
-		}
-	}
-}
-
-uint32_t akazukin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	for (int i = 0; i < 32; i++)
-	{
-		m_bg_tilemap[0]->set_scrolly(i, m_bg_scroll[0][i]);
-		m_bg_tilemap[1]->set_scrolly(i, m_bg_scroll[1][i]);
-	}
-
-
-	// TODO: copied from orca/vastar.cpp
-	// Looks like $ac00 is some kind of '46C mixer control.
-	switch (m_fg_vregs[0])
-	{
-	case 0:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 1: // ?? planet probe
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 2:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	case 3:
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);
-		break;
-
-	case 4: // akazukin title screen
-		m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		break;
-
-	default:
-		popmessage("Unimplemented priority %X\n", m_fg_vregs[0]);
-		break;
-	}
-
-	return 0;
-}
-
-
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
-};
-
-static const gfx_layout spritelayoutdw =
-{
-	16,32,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
-			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
-			96*8, 97*8, 98*8, 99*8, 100*8, 101*8, 102*8, 103*8 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_vastar )
-	GFXDECODE_ENTRY( "fgtiles",  0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "sprites",  0, spritelayout,   0, 64 )
-	GFXDECODE_ENTRY( "sprites",  0, spritelayoutdw, 0, 64 )
-	GFXDECODE_ENTRY( "bgtiles0", 0, charlayout,     0, 64 )
-	GFXDECODE_ENTRY( "bgtiles1", 0, charlayout,     0, 64 )
-GFXDECODE_END
-
 
 /******************
  *
@@ -356,13 +80,8 @@ GFXDECODE_END
 
 void akazukin_state::machine_start()
 {
-	m_spriteram[0] = m_fgvideoram + 0x800;
-	m_bg_scroll[0] = m_fgvideoram + 0xbe0;
-	m_bg_scroll[1] = m_fgvideoram + 0xbc0;
-	m_spriteram[1] = m_fgvideoram + 0x400;
-	m_spriteram[2] = m_fgvideoram + 0x000;
-
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_nmi_sub_mask));
 }
 
 void akazukin_state::machine_reset()
@@ -380,14 +99,14 @@ void akazukin_state::nmi_sub_mask_w(uint8_t data)
 	m_nmi_sub_mask = data & 1;
 }
 
-
 void akazukin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(FUNC(akazukin_state::bgvideoram_w<1>)).share(m_bgvideoram[1]);
-	map(0x9000, 0x9fff).ram().w(FUNC(akazukin_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
-	map(0xa000, 0xabff).ram().w(FUNC(akazukin_state::fgvideoram_w)).share(m_fgvideoram);
-	map(0xac00, 0xafff).ram().share(m_fg_vregs);
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<1>)).share("bg1videoram");
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<0>)).share("bg0videoram");
+	map(0xa000, 0xabff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("fgvideoram");
+	map(0xac00, 0xac00).w(m_vasvid, FUNC(vastar_video_device::priority_w));
+	map(0xac01, 0xafff).ram();
 	map(0xc000, 0xc007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xe000, 0xe000).portr("SYSTEM");
 	map(0xe800, 0xe800).portr("P1");
@@ -545,7 +264,7 @@ void akazukin_state::akazukin(machine_config &config)
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(akazukin_state::nmi_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(akazukin_state::flip_screen_set));
+	m_mainlatch->q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 	m_mainlatch->q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 //  WATCHDOG_TIMER(config, "watchdog");
@@ -559,12 +278,16 @@ void akazukin_state::akazukin(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(akazukin_state::screen_update));
-	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-
+	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	m_vasvid->set_screen("screen");
+	m_vasvid->set_bg_bases(0x000, 0x800, 0x400);
+	m_vasvid->set_fg_bases(0x000, 0x400, 0x800);
+	m_vasvid->set_other_bases(0x800, 0x400, 0x000, 0xbe0, 0xbc0);
+	m_vasvid->set_bg0ram_tag("bg0videoram");
+	m_vasvid->set_bg1ram_tag("bg1videoram");
+	m_vasvid->set_fgram_tag("fgvideoram");
+		
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -604,12 +327,12 @@ ROM_START( akazukin )
 	ROM_REGION( 0x2000, "bgtiles1", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "8.p4",  0x0000, 0x2000, CRC(193f6bcb) SHA1(0f4699052b2c66fabd293e7ef08fd25de7af42f3) )
 
-	ROM_REGION( 0x0300, "proms", 0 ) // on ORCA OVG-46C sub board
+	ROM_REGION( 0x0300, "vasvid:proms", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "r.r6",  0x0000, 0x0100, CRC(77ccc932) SHA1(5bd23ca5ab80ac9c19e85ea79ba3d276c4be59cb) ) // red component
 	ROM_LOAD( "g.m6",  0x0100, 0x0100, CRC(eddc3acf) SHA1(0fca5d36ccbd5191ce8a59d070112ae4a3297b0b) ) // green component
 	ROM_LOAD( "b.l6",  0x0200, 0x0100, CRC(059dae45) SHA1(26c9b975804fc206e80ee21361e489824f39e0c0) ) // blue component
 
-	ROM_REGION( 0x0100, "unkprom", 0 ) // on ORCA OVG-46C sub board
+	ROM_REGION( 0x0100, "vasvid:unkprom", 0 ) // on ORCA OVG-46C sub board
 	ROM_LOAD( "8n",  0x0000, 0x0100, CRC(e1b815ca) SHA1(df2b99259bf1023d37aa3b54247721d657d7e9c9) ) // ????
 ROM_END
 

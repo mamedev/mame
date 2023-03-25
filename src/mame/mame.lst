@@ -30054,29 +30054,6 @@ maxideal                        // (c) 1983 American Communications Laboratories
 kurukuru                        // (c) 1990 Success / Taiyo Jidoki.
 ppj                             // (c) 199? Success / Taiyo Jidoki.
 
-@source:misc/kyugo.cpp
-99lstwar                        // (c) 1985 Proma
-99lstwara                       // (c) 1985 Proma
-99lstwarb                       // bootleg
-99lstwark                       // (c) 1985 Kyugo
-airwolf                         // (c) 1987 Kyugo
-airwolfa                        // (c) 1987 Kyugo
-buzzard                         // (c) 1984 Crux
-flashgal                        // (c) 1985 Sega
-flashgala                       // (c) 1985 Sega
-flashgalk                       // (c) 1985 Kyugo
-fx                              // bootleg
-gyrodine                        // (c) 1984 Crux
-gyrodinet                       // (c) 1984 Crux (Taito Corporation license)
-legend                          // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
-legendb                         // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
-repulse                         // (c) 1985 Sega
-skywolf                         // bootleg
-skywolf2                        // bootleg
-skywolf3                        // bootleg
-sonofphx                        // bootleg
-srdmissn                        // (c) 1986 Taito Corporation
-
 @source:misc/ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
 toucheme                        //
@@ -34446,6 +34423,29 @@ funkybeeb                       // (c) 1982 Orca
 skylancr                        // (c) 1983 Orca
 skylancre                       // (c) 1983 Orca + Esco Trading Co license
 
+@source:orca/kyugo.cpp
+99lstwar                        // (c) 1985 Proma
+99lstwara                       // (c) 1985 Proma
+99lstwarb                       // bootleg
+99lstwark                       // (c) 1985 Kyugo
+airwolf                         // (c) 1987 Kyugo
+airwolfa                        // (c) 1987 Kyugo
+buzzard                         // (c) 1984 Crux
+flashgal                        // (c) 1985 Sega
+flashgala                       // (c) 1985 Sega
+flashgalk                       // (c) 1985 Kyugo
+fx                              // bootleg
+gyrodine                        // (c) 1984 Crux
+gyrodinet                       // (c) 1984 Crux (Taito Corporation license)
+legend                          // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
+legendb                         // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
+repulse                         // (c) 1985 Sega
+skywolf                         // bootleg
+skywolf2                        // bootleg
+skywolf3                        // bootleg
+sonofphx                        // bootleg
+srdmissn                        // (c) 1986 Taito Corporation
+
 @source:orca/marineb.cpp
 bcruzm12                        // (c) 1983 Sigma Ent. Inc.
 changes                         // (c) 1982 Orca
@@ -34457,6 +34457,9 @@ looper                          // (c) 1982 Orca
 marineb                         // (c) 1982 Orca
 springer                        // (c) 1982 Orca
 wanted                          // (c) 1984 Sigma Ent. Inc.
+
+@source:orca/sub.cpp
+sub                             // (c) 1985 Sigma Ent. Inc.
 
 @source:orca/vastar.cpp
 dogfightp                       // (c) 1983 Orca
@@ -40561,9 +40564,6 @@ spiders                         // (c) 1981 Sigma Ent. Inc.
 spiders2                        // (c) 1981 Sigma Ent. Inc.
 spiders3                        // (c) 1981 Sigma Ent. Inc.
 spinner                         // bootleg
-
-@source:sigma/sub.cpp
-sub                             // (c) 1985 Sigma Ent. Inc.
 
 @source:sinclair/atm.cpp
 atm                             //
