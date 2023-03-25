@@ -2213,7 +2213,8 @@ void abc806_state::abc806(machine_config &config)
 	// peripheral hardware
 	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	E0516(config, E0516_TAG, ABC806_X02);
+	E0516(config, m_rtc, ABC806_X02);
+	m_rtc->outsel_rd_cb().set_constant(1);
 
 	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc77"));
 	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));

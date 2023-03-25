@@ -55,7 +55,7 @@ e0516_device::e0516_device(const machine_config &mconfig, const char *tag, devic
 	m_data_latch(0),
 	m_reg_latch(0),
 	m_state(STATE_ADDRESS),
-	m_bits_left(0),
+	m_bits_left(4),
 	m_dio(0),
 	m_reset(1),
 	m_timer(nullptr)
