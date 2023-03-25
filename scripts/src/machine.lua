@@ -2869,6 +2869,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
+---------------------------------------------------
+
+if (MACHINES["PSION_ASIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic5.h",
+		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic9.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pxa255.h,MACHINES["PXA255"] = true
 ---------------------------------------------------
 

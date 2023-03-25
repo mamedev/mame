@@ -37602,8 +37602,23 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion/psion3a.cpp
+pocketbk2                       // 1994 Acorn Pocket Book II
+psion3a                         // 1993 Psion Series 3a
+psion3a2                        // 1995 Psion Series 3a
+psion3a2_de                     // 1995 Psion Series 3a (German)
+psion3c                         // 1996 Psion Series 3c
+psion3mx                        // 1998 Psion Series 3mx
+
 @source:psion/psion5.cpp
 psion5mx                        //
+
+@source:psion/siena.cpp
+siena                           // 1996 Psion Siena
+
+@source:psion/workabout.cpp
+psionwa                         // 1995 Psion Workabout
+psionwamx                       // 1998 Psion Workabout mx
 
 @source:quantel/dpb7000.cpp
 dpb7000                         //
