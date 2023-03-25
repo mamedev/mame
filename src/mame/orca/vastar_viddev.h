@@ -32,8 +32,8 @@ public:
 	void set_fg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_fg_codebase = code; m_fg_attrbase = attr;  m_fg_colbase = col;  }
 	void set_other_bases(uint16_t spy, uint16_t atr, uint16_t spx, uint16_t bgs0, uint16_t bgs1) { m_spr_y_col = spy; m_spr_attr = atr; m_spr_code_x = spx; m_bg_scroll0 = bgs0; m_bg_scroll1 = bgs1; }
 
-	template <typename... T> void set_bg0ram_tag(T &&... args) { m_bgvideoram0.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_bg1ram_tag(T &&... args) { m_bgvideoram1.set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_bg0ram_tag(T &&... args) { m_bgvideoram[0].set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_bg1ram_tag(T &&... args) { m_bgvideoram[1].set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_fgram_tag(T &&... args) { m_fgvideoram.set_tag(std::forward<T>(args)...); }
 
 	// memory handlers
@@ -51,8 +51,7 @@ protected:
 
 private:
 	// shared memory finders
-	required_shared_ptr<uint8_t> m_bgvideoram0;
-	required_shared_ptr<uint8_t> m_bgvideoram1;
+    required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
 	// decoding info
@@ -80,8 +79,7 @@ private:
 	uint16_t m_bg_scroll1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+    template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t rambase, uint16_t tilebase );
