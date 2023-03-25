@@ -12,12 +12,13 @@
 DEFINE_DEVICE_TYPE(VASTAR_VIDEO_DEVICE, vastar_video_device, "vastar_viddev", "Orca Vastar Video Device")
 
 vastar_video_device::vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VASTAR_VIDEO_DEVICE, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, nullptr, "palette"),
-		device_video_interface(mconfig, *this),
-		m_bgvideoram(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }),
-		m_fgvideoram(*this, finder_base::DUMMY_TAG),
-		m_flip_screen(false)
+	: device_t(mconfig, VASTAR_VIDEO_DEVICE, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr, "palette")
+	, device_video_interface(mconfig, *this)
+	, m_bgvideoram(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG })
+	, m_fgvideoram(*this, finder_base::DUMMY_TAG)
+	, m_fg_vregs(0)
+	, m_flip_screen(0)
 {
 }
 
@@ -101,9 +102,9 @@ void vastar_video_device::device_start()
 	save_item(NAME(m_flip_screen));
 }
 
-void vastar_video_device::flipscreen_w(uint8_t data)
+WRITE_LINE_MEMBER(vastar_video_device::flipscreen_w)
 {
-	m_flip_screen = data & 1;
+	m_flip_screen = state ? 1 : 0;
 
 	m_bg_tilemap[0]->set_flip(m_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap[1]->set_flip(m_flip_screen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -115,7 +116,7 @@ TILE_GET_INFO_MEMBER(vastar_video_device::get_bg_tile_info)
 {
 	int const code = m_bgvideoram[Which][tile_index + m_bg_codebase] | (m_bgvideoram[Which][tile_index + m_bg_attrbase] << 8);
 	int const color = m_bgvideoram[Which][tile_index + m_bg_colbase];
-	int fxy = (code & 0xc00) >> 10;
+	int const fxy = (code & 0xc00) >> 10;
 	tileinfo.set(4 - Which,
 			code,
 			color & 0x3f,
@@ -136,10 +137,9 @@ TILE_GET_INFO_MEMBER(vastar_video_device::get_fg_tile_info)
 
 void vastar_video_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t rambase, uint16_t tilebase)
 {
+	uint8_t const *const spriteram = &m_fgvideoram[rambase];
 	for (int offs = 0; offs < 0x10; offs += 2)
 	{
-		uint8_t* spriteram = m_fgvideoram + rambase;
-
 		const int code = ((spriteram[m_spr_code_x + offs] & 0xfc) >> 2) + ((spriteram[m_spr_attr + offs] & 0x01) << 6) + tilebase;
 
 		const int sx = spriteram[m_spr_code_x + offs + 1];
@@ -207,12 +207,12 @@ void vastar_video_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cl
 	}
 }
 
-uint32_t vastar_video_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t vastar_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int i = 0; i < 32; i++)
 	{
-		m_bg_tilemap[0]->set_scrolly(i, m_fgvideoram[m_bg_scroll0+i]);
-		m_bg_tilemap[1]->set_scrolly(i, m_fgvideoram[m_bg_scroll1+i]);
+		m_bg_tilemap[0]->set_scrolly(i, m_fgvideoram[m_bg_scroll0 + i]);
+		m_bg_tilemap[1]->set_scrolly(i, m_fgvideoram[m_bg_scroll1 + i]);
 	}
 
 	// Looks like $ac00 is some kind of '46C mixer control.
