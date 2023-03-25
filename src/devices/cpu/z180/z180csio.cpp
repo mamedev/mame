@@ -207,7 +207,7 @@ WRITE_LINE_MEMBER(z180csio_device::cks_wr)
 	if (m_cks_in != state)
 	{
 		m_cks_in = state;
-	   	if ((m_cntr & Z180_CNTR_SS) == 0x07)
+		if ((m_cntr & Z180_CNTR_SS) == 0x07)
 			clock_edge(m_cks_in);
 	}
 }

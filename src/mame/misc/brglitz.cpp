@@ -35,7 +35,7 @@
   |                                        |M74HC373B1               |
   |                         __________                               |
   | :                      |M74HC373B1      __________          _____|
-  | : CN11                                 |M74HC373B1         |o o || 
+  | : CN11                                 |M74HC373B1         |o o ||
   | :        __________     __________                         |o o |CN10
   | :       |M74HC244B1    |M74HC373B1      __________         |o_o_||
   | :                                      |M74HC373B1          ___  |
@@ -95,7 +95,7 @@
 
 #include "speaker.h"
 
-namespace 
+namespace
 {
 
 class brglitz_state : public driver_device

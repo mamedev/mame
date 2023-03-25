@@ -158,8 +158,8 @@ void psion_asic5_device::data_w(uint16_t data)
 			break;
 
 		//case 0x07: // Control register
-		//	m = data;
-		//	break;
+		//  m = data;
+		//  break;
 
 		default:
 			LOG("%s data_w: unknown control %02x data %02x\n", machine().describe_context(), m_sibo_control, data);
@@ -211,8 +211,8 @@ uint8_t psion_asic5_device::data_r()
 			break;
 
 			//case 0x07: // Control register
-			//	m = data;
-			//	break;
+			//  m = data;
+			//  break;
 
 		default:
 			LOG("%s data_r: unknown control %02x data %02x\n", machine().describe_context(), m_sibo_control, data);

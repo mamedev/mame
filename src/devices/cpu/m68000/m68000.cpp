@@ -122,7 +122,7 @@ void m68000_device::execute_run()
 		if(m_post_run)
 			do_post_run();
 		else
-			break;			
+			break;
 	}
 
 	if(m_icount < 0) {
@@ -405,7 +405,7 @@ void m68000_device::init_decode_table()
 
 		u16 cvalue = 0;
 		do {
-			//			logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
+			//          logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
 			if(m_decode_table[value | cvalue] == S_ILLEGAL)
 				m_decode_table[value | cvalue] = state;
 			else if(((value | cvalue) & 0xf0ff) != 0x6000)

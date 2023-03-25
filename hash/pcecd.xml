@@ -1914,7 +1914,7 @@ Hangs on FMV playback (skippable thru Run button), [SCSI] timing sensitive
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unsupported [セーブくん] joypad slot peripheral
 ]]></notes>
 		<info name="serial" value="KOCD3004"/>
@@ -2807,7 +2807,7 @@ Doesn't survive a soft reset
 		<description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Intro goes silent [ADPCM]
 ]]></notes>
 		<info name="serial" value="PVCD4011"/>
@@ -2862,7 +2862,7 @@ Sets high transfer length (0xfc), stalls, [SCSI] timing sensitive
 		<description>Lady Phantom (Japan)</description>
 		<year>1991</year>
 		<publisher>Laser Soft</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs after first attack turn (shoot to the foe behind the tree) (fixed)
 ]]></notes>
 		<info name="serial" value="TJCD1019"/>
@@ -3857,7 +3857,7 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unsupported [セーブくん] joypad slot peripheral
 ]]></notes>
 		<info name="serial" value="KOCD2001"/>
@@ -3876,7 +3876,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unsupported [セーブくん] joypad slot peripheral
 ]]></notes>
 		<info name="serial" value="KOCD3005"/>
@@ -4301,7 +4301,7 @@ Unsupported [セーブくん] joypad slot peripheral
 		<description>Psychic Detective Series Vol. III - Aya - Auto Demo (Japan)</description>
 		<year>1992</year>
 		<publisher>Data West</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs at 3 minutes mark (verify, [ADPCM] or [SCSI])
 ]]></notes>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -4653,7 +4653,7 @@ Hangs at 3 minutes mark (verify, [ADPCM] or [SCSI])
 		<description>Renny Blaster (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs on technique screen after level select (assuming you pick them up in stages) [pce_ctrl] reads at vpos = 10
 [ADPCM] streaming cuts off on gameplay dialogues
 ]]></notes>
@@ -4942,7 +4942,7 @@ Hangs on technique screen after level select (assuming you pick them up in stage
 		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unsupported [セーブくん] joypad slot peripheral
 ]]></notes>
 		<info name="serial" value="KOCD3003"/>
@@ -5571,7 +5571,7 @@ Offset [CRTC] screen
 		<description>Space Invaders - The Original Game (Japan)</description>
 		<year>1995</year>
 		<publisher>NEC Avenue</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Crashes with [redbook] static if attract mode opening isn't skipped
 ]]></notes>
 		<info name="serial" value="NAPR-1050"/>
@@ -5702,7 +5702,7 @@ Crashes with [redbook] static if attract mode opening isn't skipped
 		<description>Steam Heart's (Japan)</description>
 		<year>1996</year>
 		<publisher>TGL</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Enables [ADPCM] half irqs, stops voice playback in the middle
 [redbook] doesn't playback during gameplay
 Eventually hangs requiring a transfer ready irq [SCSI] (untested)
@@ -6343,7 +6343,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 		<description>The Pro Yakyuu (Japan)</description>
 		<year>1990</year>
 		<publisher>Intec</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Verify sound mixing, [PSG] covers [ADPCM]
 ]]></notes>
 		<info name="serial" value="IGCD0001"/>
@@ -6544,7 +6544,7 @@ Verify sound mixing, [PSG] covers [ADPCM]
 		<description>Travelers! Densetsu wo Buttobase (Japan)</description>
 		<year>1994</year>
 		<publisher>Victor Entertainment</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cuts off [ADPCM] playback, enables half irq
 ]]></notes>
 		<info name="serial" value="JCCD4015"/>
@@ -7053,7 +7053,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-4-1108-R1F)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cuts off [ADPCM] playbacks, uses half irq
 ]]></notes>
 		<info name="serial" value="HCD3051"/>
@@ -7072,7 +7072,7 @@ Cuts off [ADPCM] playbacks, uses half irq
 		<description>Ys IV - The Dawn of Ys (Japan, HCD3051-5-1116-R1P)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cuts off [ADPCM] playbacks, uses half irq
 ]]></notes>
 		<info name="serial" value="HCD3051"/>

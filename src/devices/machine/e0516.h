@@ -51,7 +51,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	devcb_read_line	m_read_outsel;
+	devcb_read_line m_read_outsel;
 	devcb_write_line m_write_sec;
 	devcb_write_line m_write_min;
 	devcb_write_line m_write_hrs;

@@ -510,23 +510,23 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 		return;
 	}
 	// support up to 8 drq lines
-    line = line - 16;
-    if (line < 8)
-    {
-        switch (line)
-        {
-        case 0:
+	line = line - 16;
+	if (line < 8)
+	{
+		switch (line)
+		{
+		case 0:
 			m_dma8237_1->dreq0_w(state);
-            break;
-        case 1:
+			break;
+		case 1:
 			m_dma8237_1->dreq1_w(state);
-            break;
-        case 2:
+			break;
+		case 2:
 			m_dma8237_1->dreq2_w(state);
-            break;
-        case 3:
+			break;
+		case 3:
 			m_dma8237_1->dreq3_w(state);
-            break;
+			break;
 		case 5:
 			m_dma8237_2->dreq1_w(state);
 			break;
@@ -537,7 +537,7 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 			m_dma8237_2->dreq3_w(state);
 			break;
 		}
-    }
+	}
 	// next would be the 8 dack lines
 	line = line - 8;
 }

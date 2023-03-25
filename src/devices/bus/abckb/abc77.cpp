@@ -45,7 +45,7 @@ Notes:
 
     TODO:
 
-	- serial input is not working, fails systest1600 keyboard test
+    - serial input is not working, fails systest1600 keyboard test
 
 */
 

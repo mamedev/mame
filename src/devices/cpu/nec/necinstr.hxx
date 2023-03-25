@@ -46,7 +46,7 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x31 : // INS reg1,reg2
 			ModRM = fetch();
 			tmp = GetRMByte(0xc0 | (ModRM & 7)) & 0x0f;
-			tmp2 = (GetRMByte(0xc0 |(ModRM >> 3) & 7) & 0x0f) + 1;
+			tmp2 = (GetRMByte(0xc0 | ((ModRM >> 3) & 7)) & 0x0f) + 1;
 			PutMemW(DS1, Wreg(IY), (GetMemW(DS1, Wreg(IY)) & ~(((1 << tmp2) - 1) << tmp)) | ((Wreg(AW) & ((1 << tmp2) - 1)) << tmp));
 			if (tmp + tmp2 > 15) {
 				Wreg(IY) += 2;
@@ -68,7 +68,7 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x33 : // EXT reg1,reg2
 			ModRM = fetch();
 			tmp = GetRMByte(0xc0 | (ModRM & 7)) & 0x0f;
-			tmp2 = (GetRMByte(0xc0 |(ModRM >> 3) & 7) & 0x0f) + 1;
+			tmp2 = (GetRMByte(0xc0 | ((ModRM >> 3) & 7)) & 0x0f) + 1;
 			Wreg(AW) = GetMemW(DS0, Wreg(IX)) >> tmp;
 			if (tmp + tmp2 > 15) {
 				Wreg(IX) += 2;

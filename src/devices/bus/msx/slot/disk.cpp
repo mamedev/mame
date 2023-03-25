@@ -1350,7 +1350,7 @@ void msx_slot_disk11_wd2793_device::control_w(u8 data)
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 6));  // Wild guess based on other floppy interfaces
 		break;
-	
+
 	default:
 		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);

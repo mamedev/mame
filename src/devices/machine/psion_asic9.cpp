@@ -406,10 +406,10 @@ bool psion_asic9_device::is_protected(offs_t offset)
 {
 	//if (m_a9_protection_mode && (offset <= m_a9_protection_lower || offset > m_a9_protection_upper))
 	//{
-	//	LOG("%s is_protected: %05x < %05x <= %05x\n", machine().describe_context(), m_a9_protection_lower, offset, m_a9_protection_upper);
-	//	m_a9_status |= 0x0002; // A9MProtectedModeNMI
-	//	update_interrupts();
-	//	return true;
+	//  LOG("%s is_protected: %05x < %05x <= %05x\n", machine().describe_context(), m_a9_protection_lower, offset, m_a9_protection_upper);
+	//  m_a9_status |= 0x0002; // A9MProtectedModeNMI
+	//  update_interrupts();
+	//  return true;
 	//}
 	return false;
 }

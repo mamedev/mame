@@ -2,7 +2,7 @@
 // copyright-holders:Andrei I. Holub
 /*******************************************************************************************
 
-	Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
+    Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
 Spectrum-compatible computers with ZXBUS slot.
 
 Hardware:
@@ -19,9 +19,9 @@ Hardware:
 - Parallel working (NeoGS play music independently from ZX).
 
 Refs:
-	http://nedopc.com/gs/ngs_eng.php
-	https://github.com/psbhlw/gs-firmware
-	https://8bit.yarek.pl/interface/zx.generalsound/index.html
+    http://nedopc.com/gs/ngs_eng.php
+    https://github.com/psbhlw/gs-firmware
+    https://8bit.yarek.pl/interface/zx.generalsound/index.html
 
 TODO:
 - ZXBUS
@@ -166,7 +166,7 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 void neogs_device::device_start()
 {
 	if (!m_ram->started())
-        throw device_missing_dependencies();
+		throw device_missing_dependencies();
 
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom->configure_entries(0, rom->bytes() / 0x8000,  rom->base(), 0x8000);

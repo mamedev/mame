@@ -11051,7 +11051,7 @@ The following floppies came with the machines.
 				<rom name="psy-o-blade (1988)(t&amp;e soft)(jp)(disk 3 of 3).dsk" size="737280" crc="a531c335" sha1="16bf809c6a2e296a48a8697bab613e36090fcf22"/>
 			</dataarea>
 		</part>
-<!-- 
+<!--
 <feature name="part_id" value="User Disk"/>
 -->
 	</software>
@@ -11082,7 +11082,7 @@ The following floppies came with the machines.
 				<rom name="psy-o-blade (1988)(t&amp;e soft)(jp)(disk 3 of 3)[a].dsk" size="737280" crc="15470f67" sha1="51203417b86c6d20d99560ac7beadb35641e7291"/>
 			</dataarea>
 		</part>
-<!-- 
+<!--
 <feature name="part_id" value="User Disk"/>
 -->
 	</software>
@@ -11113,7 +11113,7 @@ The following floppies came with the machines.
 				<rom name="psy-o-blade (1988)(t&amp;e soft)(jp)(disk 3 of 3)[a2].dsk" size="737280" crc="8e89aa86" sha1="019a8122f6c805f575a03a6571ddc1a282c8f3bb"/>
 			</dataarea>
 		</part>
-<!-- 
+<!--
 <feature name="part_id" value="User Disk"/>
 -->
 	</software>
