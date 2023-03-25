@@ -50,7 +50,7 @@ public:
 		m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
 	}
 
-	void flipscreen_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	void priority_w(uint8_t data) { m_fg_vregs = data; }
 
 protected:
@@ -61,7 +61,7 @@ protected:
 
 private:
 	// shared memory finders
-    required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
+	required_shared_ptr_array<uint8_t, 2> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
 	// decoding info
@@ -89,7 +89,7 @@ private:
 	uint16_t m_bg_scroll1 = 0;
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-    template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t rambase, uint16_t tilebase );
