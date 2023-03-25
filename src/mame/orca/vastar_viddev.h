@@ -37,9 +37,19 @@ public:
 	template <typename... T> void set_fgram_tag(T &&... args) { m_fgvideoram.set_tag(std::forward<T>(args)...); }
 
 	// memory handlers
-	void fgvideoram_w(offs_t offset, uint8_t data);
-	void bgvideoram0_w(offs_t offset, uint8_t data);
-	void bgvideoram1_w(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data)
+	{
+		m_fgvideoram[offset] = data;
+		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	}
+
+	template <uint8_t Which>
+	void bgvideoram_w(offs_t offset, uint8_t data)
+	{
+		m_bgvideoram[Which][offset] = data;
+		m_bg_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
+	}
+
 	void flipscreen_w(uint8_t data);
 	void priority_w(uint8_t data) { m_fg_vregs = data; }
 

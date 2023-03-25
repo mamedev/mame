@@ -213,8 +213,8 @@ WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
 void vastar_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram1_w)).share("bg1videoram").mirror(0x2000);
-	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram0_w)).share("bg0videoram").mirror(0x2000);
+	map(0x8000, 0x8fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<1>)).share("bg1videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(m_vasvid, FUNC(vastar_video_device::bgvideoram_w<0>)).share("bg0videoram").mirror(0x2000);
 	map(0xc000, 0xc000).w(m_vasvid, FUNC(vastar_video_device::priority_w));
 	map(0xc400, 0xcfff).ram().w(m_vasvid, FUNC(vastar_video_device::fgvideoram_w)).share("fgvideoram");
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));

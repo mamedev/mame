@@ -101,25 +101,6 @@ void vastar_video_device::device_start()
 	save_item(NAME(m_flip_screen));
 }
 
-void vastar_video_device::fgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-void vastar_video_device::bgvideoram0_w(offs_t offset, uint8_t data)
-{
-	m_bgvideoram[0][offset] = data;
-	m_bg_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
-}
-
-void vastar_video_device::bgvideoram1_w(offs_t offset, uint8_t data)
-{
-	m_bgvideoram[1][offset] = data;
-	m_bg_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
-}
-
 void vastar_video_device::flipscreen_w(uint8_t data)
 {
 	m_flip_screen = data & 1;
@@ -152,8 +133,6 @@ TILE_GET_INFO_MEMBER(vastar_video_device::get_fg_tile_info)
 			color & 0x3f,
 			TILE_FLIPXY(fxy));
 }
-
-
 
 void vastar_video_device::draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t rambase, uint16_t tilebase)
 {
