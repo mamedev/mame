@@ -8,7 +8,7 @@ license:CC0-1.0
 	<software name="007danger">
 		<description>007 - Dangereusement Votre</description>
 		<year>1985</year>
-		<publisher>Domark - Ere Informatique</publisher>
+		<publisher>Domark, ERE Informatique</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="28630">
 				<rom name="007 - Dangereusement Votre (1985)(Domark - Ere Informatique)(FR).tap" size="28630" crc="693b1888" sha1="e2b86ae997cbf944b5cd2c0d715d78875efa3f19"/>
@@ -83,7 +83,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="3dtunnel">
-		<description>3D Tunnel, The</description>
+		<description>The 3D Tunnel</description>
 		<year>1998</year>
 		<publisher>Dbug</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -127,7 +127,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="affaire">
-		<description>Affaire En Or, Une</description>
+		<description>Une Affaire En Or</description>
 		<year>1984</year>
 		<publisher>Free Game Blot</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -160,7 +160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aigledor">
-		<description>Aigle D'Or, L'</description>
+		<description>L'Aigle D'Or</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -184,7 +184,7 @@ license:CC0-1.0
 	<software name="amorspilar">
 		<description>Amor's Pilar</description>
 		<year>1983</year>
-		<publisher>Jocke, J.</publisher>
+		<publisher>J. Jocke</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4629">
 				<rom name="Amor's Pilar (1983-12-21)(Jocke, J.)(SE).tap" size="4629" crc="8bc8895f" sha1="bf8911c1d4390f5671093323515d17e4039764a9"/>
@@ -193,7 +193,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="antrede">
-		<description>Antre de la Peur, Le</description>
+		<description>Le Antre de la Peur</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -228,7 +228,7 @@ license:CC0-1.0
 	<software name="asciichase">
 		<description>ASCII Chase</description>
 		<year>2017</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="30460">
 				<rom name="ASCII Chase (2017-07-08)(Caruso, Fabrizio).tap" size="30460" crc="8b5f0ea9" sha1="cb9c88efdacdf2f15e22bacacd54a220443ecc35"/>
@@ -239,7 +239,7 @@ license:CC0-1.0
 	<software name="astrolander">
 		<description>Astro-Lander</description>
 		<year>1984</year>
-		<publisher>Gardner, A.P.</publisher>
+		<publisher>A.P. Gardner</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2861">
 				<rom name="Astro-Lander (1984)(Gardner, A.P.).tap" size="2861" crc="7bb12b71" sha1="6f0cda060c0e5423b307af19da472b74b76efb6f"/>
@@ -281,7 +281,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aventures">
-		<description>Aventures de Lilla et Jacky, Les</description>
+		<description>Les Aventures de Lilla et Jacky</description>
 		<year>1984</year>
 		<publisher>Micropace</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -294,7 +294,7 @@ license:CC0-1.0
 	<software name="awari">
 		<description>Awari</description>
 		<year>1983</year>
-		<publisher>Phillips, G.</publisher>
+		<publisher>G. Phillips</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2464">
 				<rom name="Awari (1983)(Phillips, G.).tap" size="2464" crc="5c6a0c1b" sha1="915dfdeda6e7346b4d46680f801fbd2693f9e851"/>
@@ -327,7 +327,7 @@ license:CC0-1.0
 	<software name="bataille">
 		<description>Bataille Des Couleurs, La</description>
 		<year>1983</year>
-		<publisher>Jablonka, P &amp; A</publisher>
+		<publisher>P &amp; A Jablonka</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="20579">
 				<rom name="Bataille Des Couleurs, La (1983)(Jablonka, PA)(FR).tap" size="20579" crc="5aa120ef" sha1="844aff7ae19214850750b3207406e8870c6c8ba1"/>
@@ -360,7 +360,7 @@ license:CC0-1.0
 	<software name="blockbuster">
 		<description>Blockbuster</description>
 		<year>1983</year>
-		<publisher>Gardner, A.P.</publisher>
+		<publisher>A.P. Gardner</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2218">
 				<rom name="Blockbuster (1983)(Gardner, A.P.)(PD).tap" size="2218" crc="d306ffca" sha1="82fe7da03013354fd449ba72ca7df7788156454f"/>
@@ -435,9 +435,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="business">
-		<description>Business, The</description>
+		<description>The Business</description>
 		<year>19??</year>
-		<publisher>Arnold, Peter - Goodrum, David</publisher>
+		<publisher>Peter Arnold, David Goodrum</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12056">
 				<rom name="Business, The (19xx)(Arnold, Peter - Goodrum, David)[BBC Port].tap" size="12056" crc="7f3dc3fd" sha1="82d73a2fe73464fe1fac6d15f97d9bb2f5627826"/>
@@ -644,7 +644,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="citeinterdite">
-		<description>Cite Interdite, La</description>
+		<description>La Cite Interdite</description>
 		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -811,7 +811,7 @@ license:CC0-1.0
 	<software name="crossbomber">
 		<description>Cross Bomber</description>
 		<year>2021</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6412">
 				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
@@ -822,7 +822,7 @@ license:CC0-1.0
 	<software name="crossbomber1" cloneof="crossbomber">
 		<description>Cross Bomber (alt)</description>
 		<year>2020</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6825">
 				<rom name="Cross Bomber (2020-08-26)(Caruso, Fabrizio)[48K].tap" size="6825" crc="94f6274b" sha1="bfcf65fc2d83fd97e42874cf0cab34b037c2cf62"/>
@@ -833,7 +833,7 @@ license:CC0-1.0
 	<software name="crosschase">
 		<description>Cross Chase</description>
 		<year>2021</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="13877">
 				<rom name="Cross Chase (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="13877" crc="d6c535c3" sha1="bc97c142b7b871226a3023bce38db6bbf38c2fe7"/>
@@ -844,7 +844,7 @@ license:CC0-1.0
 	<software name="crosshorde">
 		<description>Cross Horde v1.0</description>
 		<year>2021</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio, Carus</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10604">
 				<rom name="Cross Horde v1.0 (2021-05-01)(Caruso, Fabrizio)[48K].tap" size="10604" crc="77953696" sha1="a5860a886232f1689bb8294c214742dd3b944b03"/>
@@ -855,7 +855,7 @@ license:CC0-1.0
 	<software name="crossshoot">
 		<description>Cross Shoot</description>
 		<year>2021</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="19190">
 				<rom name="Cross Shoot (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="19190" crc="b8ba95d0" sha1="67f632ad5b1c5439f8f461c31d66308d6bfc00c8"/>
@@ -866,7 +866,7 @@ license:CC0-1.0
 	<software name="crossshoot1" cloneof="crossshoot">
 		<description>Cross Shoot (alt)</description>
 		<year>2020</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="19190">
 				<rom name="Cross Shoot (2020-07-03)(Caruso, Fabrizio)[48K].tap" size="19190" crc="b8ba95d0" sha1="67f632ad5b1c5439f8f461c31d66308d6bfc00c8"/>
@@ -877,7 +877,7 @@ license:CC0-1.0
 	<software name="crosssnake">
 		<description>Cross Snake (v2.0)</description>
 		<year>2020</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12115">
 				<rom name="Cross Snake v2.0 (2020-12-31)(Caruso, Fabrizio)[48K].tap" size="12115" crc="20de70a6" sha1="a60a5c7eeae0a8cb4ff97d90a874f42d840fee4c"/>
@@ -888,7 +888,7 @@ license:CC0-1.0
 	<software name="crosssnakep" cloneof="crosssnake">
 		<description>Cross Snake (preview)</description>
 		<year>2020</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8428">
 				<rom name="Cross Snake Preview (2020-12-05)(Caruso, Fabrizio)[48K].tap" size="8428" crc="7a9b27f8" sha1="2a93e6ab42043a668f81ce7c5c8b34e21d0d720b"/>
@@ -899,7 +899,7 @@ license:CC0-1.0
 	<software name="crosssnake1" cloneof="crosssnake">
 		<description>Cross Snake (v1.0)</description>
 		<year>2020</year>
-		<publisher>Caruso, Fabrizio</publisher>
+		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12110">
 				<rom name="Cross Snake v1.0 (2020-12-12)(Caruso, Fabrizio)[48K].tap" size="12110" crc="6fc09666" sha1="5079c5565a3dd2944ff40b5585a06cc7072062fc"/>
@@ -908,9 +908,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="crypte">
-		<description>Crypte, La</description>
+		<description>La Crypte</description>
 		<year>1983</year>
-		<publisher>Querne, Serge</publisher>
+		<publisher>Serge Querne</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="37729">
 				<rom name="Crypte, La (1983-11-06)(Querne, Serge)(FR).tap" size="37729" crc="83f0a97b" sha1="ed4a7f729ecddabf8499d16a546e177244e692df"/>
@@ -996,7 +996,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="diamant">
-		<description>Diamant de Kheops, Le</description>
+		<description>Le Diamant de Kheops</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1028,7 +1028,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="digdog">
-		<description>Dig Dog (oric 1)</description>
+		<description>Dig Dog (Oric 1)</description>
 		<year>1983</year>
 		<publisher>Taskset</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1039,7 +1039,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="digdog1" cloneof="digdog">
-		<description>Dig Dog (atmos)</description>
+		<description>Dig Dog (Atmos)</description>
 		<year>1983</year>
 		<publisher>Taskset</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1072,7 +1072,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="donjuan">
-		<description>Don Juan (en)</description>
+		<description>Don Juan (English)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1083,7 +1083,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="donjuanf" cloneof="donjuan">
-		<description>Don Juan (fr)</description>
+		<description>Don Juan (French)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1094,7 +1094,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="donjuan1" cloneof="donjuan">
-		<description>Don Juan (alt 1)</description>
+		<description>Don Juan (French, alt 1)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1105,7 +1105,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="donjuan2" cloneof="donjuan">
-		<description>Don Juan (alt 2)</description>
+		<description>Don Juan (French, alt 2)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1149,9 +1149,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="drapeaux">
-		<description>Drapeaux Aux Jeux Olympiques, Les</description>
+		<description>Les Drapeaux Aux Jeux Olympiques</description>
 		<year>1984</year>
-		<publisher>Suau, Jean-Pierre</publisher>
+		<publisher>Jean-Pierre Suau</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="12022">
 				<rom name="Drapeaux Aux Jeux Olympiques, Les (1984)(Suau, Jean-Pierre)(Atmos)(FR).tap" size="12022" crc="fd060957" sha1="c3bcca47028ec8f6fc795c7cf33db1eeedca3fb3"/>
@@ -1184,7 +1184,7 @@ license:CC0-1.0
 	<software name="electric">
 		<description>Electric Eel</description>
 		<year>19??</year>
-		<publisher>Poeschel, Knut</publisher>
+		<publisher>Knut Poeschel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3232">
 				<rom name="Electric Eel (19xx)(Poeschel, Knut).tap" size="3232" crc="b0b5c004" sha1="3dd60a130c72520d74090e72e400a9b809bef618"/>
@@ -1237,7 +1237,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fantasy">
-		<description>Fantasy Quest</description>
+		<description>Fantasy Quest (UK)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1248,7 +1248,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fantasy1" cloneof="fantasy">
-		<description>Fantasy Quest (fr)</description>
+		<description>Fantasy Quest (France)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1303,7 +1303,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flight401a" cloneof="flight401">
-		<description>Flight 401 (alt a)</description>
+		<description>Flight 401 (alt 1)</description>
 		<year>1984</year>
 		<publisher>KnightSoft</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1314,7 +1314,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flight401b" cloneof="flight401">
-		<description>Flight 401 (alt b)</description>
+		<description>Flight 401 (alt 2)</description>
 		<year>1984</year>
 		<publisher>KnightSoft</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1325,7 +1325,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flightsim">
-		<description>Flight Simulator (club euro)</description>
+		<description>Flight Simulator (Club Europe)</description>
 		<year>19??</year>
 		<publisher>Club Europe Oric</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1336,7 +1336,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flightsimq">
-		<description>Flight Simulator (quark)</description>
+		<description>Flight Simulator (Quark Data)</description>
 		<year>19??</year>
 		<publisher>Quark Data</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1347,7 +1347,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="flightsimq1" cloneof="flightsimq">
-		<description>Flight Simulator (quark alt)</description>
+		<description>Flight Simulator (Quark Data, alt)</description>
 		<year>19??</year>
 		<publisher>Quark Data</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1459,7 +1459,7 @@ license:CC0-1.0
 	<software name="ghosts">
 		<description>Ghosts and Ghouls</description>
 		<year>19??</year>
-		<publisher>Overy, Simon</publisher>
+		<publisher>Simon Overy</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4438">
 				<rom name="Ghosts and Ghouls (19xx)(Overy, Simon).tap" size="4438" crc="1ac22b7b" sha1="c54015923fe1306c28051b8db0325a55d60eaac2"/>
@@ -1490,9 +1490,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="ghostman1" cloneof="ghostman">
-		<description>Ghostman (infogames)</description>
+		<description>Ghostman (Infogrames)</description>
 		<year>1984</year>
-		<publisher>Infogrames - Severn Software</publisher>
+		<publisher>Infogrames, Severn Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="16974">
 				<rom name="Ghostman (1984)(Infogrames - Severn Software)(FR).tap" size="16974" crc="cd890bce" sha1="aa2ef0d8c7c15c4423851ede1cee9e453a628d8d"/>
@@ -1578,7 +1578,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hellion">
-		<description>Hellion, The</description>
+		<description>The Hellion</description>
 		<year>1984</year>
 		<publisher>Orpheus</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -1589,9 +1589,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="hobbit">
-		<description>Hobbit, The</description>
+		<description>The Hobbit</description>
 		<year>1983</year>
-		<publisher>Melbourne House - Tansoft</publisher>
+		<publisher>Melbourne House, Tansoft</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="36212">
 				<rom name="Hobbit, The (1983)(Melbourne House - Tansoft)(GB)[48K].tap" size="36212" crc="c164a97c" sha1="77a5439e347123c83638b585bfecd21960bdcfc4"/>
@@ -1646,7 +1646,7 @@ license:CC0-1.0
 	<software name="hoverrescue">
 		<description>Hover Rescue</description>
 		<year>1984</year>
-		<publisher>Prowse, Barbara</publisher>
+		<publisher>Barbara Prowse</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8921">
 				<rom name="Hover Rescue (1984)(Prowse, Barbara).tap" size="8921" crc="8c6fbbc0" sha1="f7cbadbd2f2c24b41499635e77952e9ca844bda4"/>
@@ -1701,7 +1701,7 @@ license:CC0-1.0
 	<software name="hyperolympics">
 		<description>Hyper Olympics</description>
 		<year>1985</year>
-		<publisher>Fabre, J.F.</publisher>
+		<publisher>Jean Francois Fabre</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="15565">
 				<rom name="Hyper Olympics (1985)(Fabre, J.F.)(FR)[b].tap" size="15565" crc="1ae543c3" sha1="8e84537ed38f036757dfe7928f7e4c5f0f4d6ee4"/>
@@ -1721,9 +1721,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="immonde">
-		<description>Immonde Dr Kokus, L'</description>
+		<description>L'Immonde Dr Kokus</description>
 		<year>1986</year>
-		<publisher>Fabre, Jean Francois</publisher>
+		<publisher>Jean Francois Fabre</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="26298">
 				<rom name="Immonde Dr Kokus, L' (1986)(Fabre, Jean Francois)(Atmos)(FR).tap" size="26298" crc="7cccd95d" sha1="7f18422971ea49815cc5e569a75d4025985f0250"/>
@@ -1789,7 +1789,7 @@ license:CC0-1.0
 	<software name="invasion">
 		<description>Invasion</description>
 		<year>19??</year>
-		<publisher>de Guerra, Alain</publisher>
+		<publisher>Alain de Guerra</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6072">
 				<rom name="Invasion (19xx)(de Guerra, Alain)(FR).tap" size="6072" crc="19eba71d" sha1="acf6d02aebc8e283cbb780f0fbd8527c4c28c56e"/>
@@ -1853,9 +1853,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="jeudugigabonux">
-		<description>Jeu Du Gigabonux, Le</description>
+		<description>Le Jeu Du Gigabonux (v0.2)</description>
 		<year>1995</year>
-		<publisher>Guyart, Simon</publisher>
+		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4768">
 				<rom name="Jeu Du Gigabonux, Le v0.2 (1995)(Guyart, Simon)(FR)(PD)[ROM v1.1].tap" size="4768" crc="7215180a" sha1="2934fac3b2a0bf23162f8cb877b7a9f47a335fda"/>
@@ -1864,9 +1864,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="jeudugigabonuxd" cloneof="jeudugigabonux">
-		<description>Jeu Du Gigabonux, Le (v0.1)</description>
+		<description>Le Jeu Du Gigabonux (v0.1)</description>
 		<year>1995</year>
-		<publisher>Guyart, Simon</publisher>
+		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3473">
 				<rom name="Jeu Du Gigabonux, Le v0.1 (1995)(Guyart, Simon)(FR)(PD).tap" size="3473" crc="6786fc7c" sha1="c91e0052026da786548cd2bf52cb19d84cdc8a28"/>
@@ -1875,9 +1875,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="jeudugigabonux1" cloneof="jeudugigabonux">
-		<description>Jeu Du Gigabonux, Le (alt)</description>
+		<description>Le Jeu Du Gigabonux (v0.2, alt)</description>
 		<year>1995</year>
-		<publisher>Guyart, Simon</publisher>
+		<publisher>Simon Guyart</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="4837">
 				<rom name="Jeu Du Gigabonux, Le v0.2 (1995)(Guyart, Simon)(FR)(PD)[a][ROM v1.1].tap" size="4837" crc="b933a80a" sha1="44bba84e23c545ce6918f0b2b369dab6b2b3bedd"/>
@@ -1910,7 +1910,7 @@ license:CC0-1.0
 	<software name="johnny">
 		<description>Johnny Reb</description>
 		<year>1983</year>
-		<publisher>M.C. M.C. Lothlorien</publisher>
+		<publisher>M.C. Lothlorien</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="14534">
 				<rom name="Johnny Reb (1983)(M.C. M.C. Lothlorien)(GB)[48K].tap" size="14534" crc="bb8acda2" sha1="bdd3349ee015eb6d9247b700e4792c5f9f6270e6"/>
@@ -1921,7 +1921,7 @@ license:CC0-1.0
 	<software name="jump">
 		<description>Jump</description>
 		<year>19??</year>
-		<publisher>Kartmann, A &amp; E</publisher>
+		<publisher>A &amp; E Kartmann</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="10684">
 				<rom name="Jump (19xx)(Kartmann, AE)(FR).tap" size="10684" crc="e3e3b2cf" sha1="ddd1f81858403dce516af2b0ecafad773576a06d"/>
@@ -1952,9 +1952,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="keysof">
-		<description>Keys of Kraal, The</description>
+		<description>The Keys of Kraal</description>
 		<year>19??</year>
-		<publisher>Marshall, John</publisher>
+		<publisher>John Marshall</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="23739">
 				<rom name="Keys of Kraal, The (19xx)(Marshall, John)(GB).tap" size="23739" crc="2cb09f3d" sha1="990ea4e8a3539da43dd94b4049b28b0fbd9bb8c0"/>
@@ -1987,7 +1987,7 @@ license:CC0-1.0
 	<software name="lcontre">
 		<description>L Contre L</description>
 		<year>1985</year>
-		<publisher>Bosc, Dany</publisher>
+		<publisher>Dany Bosc</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8912">
 				<rom name="L Contre L (1985-08)(Bosc, Dany)(Atmos)(FR).tap" size="8912" crc="c540c5ea" sha1="6a606db515f55e14dffa38aa98550a244a9d854d"/>
@@ -2183,7 +2183,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="manoir">
-		<description>Manoir Du Dr.Genius, Le</description>
+		<description>Le Manoir Du Dr.Genius</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2249,7 +2249,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="minesof">
-		<description>Mines of Moria, The</description>
+		<description>The Mines of Moria</description>
 		<year>1983</year>
 		<publisher>Severn Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2263,29 +2263,19 @@ license:CC0-1.0
 		<description>Mission Delta</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
 			<dataarea name="cass" size="25301">
 				<rom name="Mission Delta (1984)(ERE Informatique)(FR).tap" size="25301" crc="a414fea2" sha1="9024f5af095d25712c410fc4a709cadb74038601"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="missione" cloneof="mission">
-		<description>Mission Delta (ecole de pilotage)</description>
-		<year>1984</year>
-		<publisher>ERE Informatique</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="Ecole de Pilotage" />
 			<dataarea name="cass" size="35622">
 				<rom name="Mission Delta (1984)(ERE Informatique)(FR)(Side A)[Ecole de Pilotage].tap" size="35622" crc="0480429a" sha1="f1e3dfe9d1b442480cb7e722bebdf027ee9648db"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="missiont" cloneof="mission">
-		<description>Mission Delta (tests)</description>
-		<year>1984</year>
-		<publisher>ERE Informatique</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass3" interface="oric1_cass">
+			<feature name="part_id" value="Tests" />
 			<dataarea name="cass" size="6493">
 				<rom name="Mission Delta (1984)(ERE Informatique)(FR)(Side B)[Tests].tap" size="6493" crc="fe8cc6e8" sha1="3be1bb505ec2cb612e8f5d62be674623868e3ae0"/>
 			</dataarea>
@@ -2296,9 +2286,21 @@ license:CC0-1.0
 		<description>Mission Delta (alt)</description>
 		<year>1984</year>
 		<publisher>ERE Informatique</publisher>
-		<part name="cass" interface="oric1_cass">
+		<part name="cass1" interface="oric1_cass">
 			<dataarea name="cass" size="35824">
 				<rom name="Mission Delta (1984)(ERE Informatique)(FR)[a].tap" size="35824" crc="ba16ca44" sha1="78926bf33ab520e4f53e02e993fed9b578257f57"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="oric1_cass">
+			<feature name="part_id" value="Ecole de Pilotage" />
+			<dataarea name="cass" size="35622">
+				<rom name="Mission Delta (1984)(ERE Informatique)(FR)(Side A)[Ecole de Pilotage].tap" size="35622" crc="0480429a" sha1="f1e3dfe9d1b442480cb7e722bebdf027ee9648db"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="oric1_cass">
+			<feature name="part_id" value="Tests" />
+			<dataarea name="cass" size="6493">
+				<rom name="Mission Delta (1984)(ERE Informatique)(FR)(Side B)[Tests].tap" size="6493" crc="fe8cc6e8" sha1="3be1bb505ec2cb612e8f5d62be674623868e3ae0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2336,8 +2338,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="morpiona">
-		<description>Morpion (asn)</description>
+	<software name="morpion">
+		<description>Morpion (ASN Diffusion)</description>
 		<year>1983</year>
 		<publisher>ASN Diffusion</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2348,7 +2350,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="morpionh">
-		<description>Morpion (hebdogiciel)</description>
+		<description>Morpion (Hebdogiciel)</description>
 		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2425,7 +2427,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mystere">
-		<description>Mystere De Kikekankoi, Le</description>
+		<description>Le Mystere De Kikekankoi</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2480,7 +2482,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nowotnik">
-		<description>Nowotnik Puzzle, The</description>
+		<description>The Nowotnik Puzzle</description>
 		<year>1983</year>
 		<publisher>Tansoft</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2612,7 +2614,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="oreverse">
-		<description>Oric-1 48K Reverse v8.3 (alt)</description>
+		<description>Oric-1 48K Reverse v8.3</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2647,7 +2649,7 @@ license:CC0-1.0
 	<software name="oricqs">
 		<description>Oricqs</description>
 		<year>1984</year>
-		<publisher>Lars, L.</publisher>
+		<publisher>L. Lars</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="2058">
 				<rom name="Oricqs (1984)(Lars, L.)[b].tap" size="2058" crc="ef07f082" sha1="83a40eb1ad6c3ceab334c04fc2c6c43842547637"/>
@@ -2702,7 +2704,7 @@ license:CC0-1.0
 	<software name="othello1">
 		<description>Othello (alt)</description>
 		<year>19??</year>
-		<publisher>Edgar, Jacob - Portelli, Joseph</publisher>
+		<publisher>Jacob Edgar, Joseph Portelli</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="14280">
 				<rom name="Othello (19xx)(Edgar, Jacob - Portelli, Joseph)(FR).tap" size="14280" crc="5f66edec" sha1="898fb9d15c7916a756a263370145f606987db3ac"/>
@@ -2749,7 +2751,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="parcours">
-		<description>Parcours Du Combattant, Le</description>
+		<description>Le Parcours Du Combattant</description>
 		<year>19??</year>
 		<publisher>Hebdogiciel</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2848,9 +2850,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="plouf">
-		<description>Plouf (en)</description>
+		<description>Plouf (English)</description>
 		<year>19??</year>
-		<publisher>Larcher, Dominique</publisher>
+		<publisher>Dominique Larcher</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8697">
 				<rom name="Plouf (19xx)(Larcher, Dominique)(en).tap" size="8697" crc="b97dad05" sha1="46142e273f3ac41f73883ec4711b333aab0f3ed6"/>
@@ -2859,9 +2861,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="plouf1" cloneof="plouf">
-		<description>Plouf (fr)</description>
+		<description>Plouf (French)</description>
 		<year>19??</year>
-		<publisher>Larcher, Dominique</publisher>
+		<publisher>Dominique Larcher</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8769">
 				<rom name="Plouf (19xx)(Larcher, Dominique)(fr)(PD).tap" size="8769" crc="df64306e" sha1="6b8cfcdd812975cb7a75dcb24e453ac585d73d21"/>
@@ -2894,7 +2896,7 @@ license:CC0-1.0
 	<software name="poursuite">
 		<description>Poursuite</description>
 		<year>1983</year>
-		<publisher>Querne, Serge</publisher>
+		<publisher>Serge Querne</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="3143">
 				<rom name="Poursuite (1983-11-21)(Querne, Serge)(FR).tap" size="3143" crc="2cfc322b" sha1="0ab1bbfd7b0962fc1b3b57d2e6f7603886119d31"/>
@@ -2902,8 +2904,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="probe3i">
-		<description>Probe 3 (ijk)</description>
+	<software name="probe3">
+		<description>Probe 3 (IJK Software)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2914,7 +2916,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="probe3p">
-		<description>Probe 3 (peps)</description>
+		<description>Probe 3 (Peps)</description>
 		<year>1985</year>
 		<publisher>Peps</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -2936,7 +2938,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="protector">
-		<description>Protector, Le</description>
+		<description>Le Protector</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3002,7 +3004,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="questof">
-		<description>Quest of the Holy Grail, The</description>
+		<description>The Quest of the Holy Grail</description>
 		<year>1983</year>
 		<publisher>Severn Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3068,7 +3070,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="retour">
-		<description>Retour du Dr Genius, Le</description>
+		<description>Le Retour du Dr Genius</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3079,7 +3081,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="reversi">
-		<description>Reversi (tansoft)</description>
+		<description>Reversi (Tansoft)</description>
 		<year>1983</year>
 		<publisher>Tansoft</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3090,7 +3092,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="reversic">
-		<description>Reversi (cds)</description>
+		<description>Reversi (CDS Micro Systems)</description>
 		<year>1983</year>
 		<publisher>CDS Micro Systems</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3112,7 +3114,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="reversichamp">
-		<description>Reversi Champion (alt)</description>
+		<description>Reversi Champion</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3189,7 +3191,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sceptre1" cloneof="sceptre">
-		<description>Sceptre d'Anubis, Le (alt)</description>
+		<description>Le Sceptre d'Anubis (alt)</description>
 		<year>1984</year>
 		<publisher>Micro Programmes 5</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3233,7 +3235,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="secret">
-		<description>Secret du Tombeau, Le</description>
+		<description>Le Secret du Tombeau</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3244,7 +3246,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="secret1" cloneof="secret">
-		<description>Secret du Tombeau, Le (alt)</description>
+		<description>Le Secret du Tombeau (alt)</description>
 		<year>1985</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3309,8 +3311,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="skramblem">
-		<description>Skramble (microdeal)</description>
+	<software name="skramble">
+		<description>Skramble (Microdeal)</description>
 		<year>1983</year>
 		<publisher>Microdeal</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3321,7 +3323,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skramblep">
-		<description>Skramble (prism)</description>
+		<description>Skramble (Prism)</description>
 		<year>1983</year>
 		<publisher>Prism</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3653,7 +3655,7 @@ license:CC0-1.0
 	<software name="teafor">
 		<description>Tea for Two</description>
 		<year>1995</year>
-		<publisher>Frances, Fabrice</publisher>
+		<publisher>Fabrice Frances</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="18765">
 				<rom name="Tea for Two (1995)(Frances, Fabrice)(FR).tap" size="18765" crc="de83ed27" sha1="acbbefd6a4fb6a7c84cb5e21e70620906df27a29"/>
@@ -3761,7 +3763,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tourdu">
-		<description>Tour Du Monde En 80 Jours, Le</description>
+		<description>Le Tour Du Monde En 80 Jours</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3772,7 +3774,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tourdu1" cloneof="tourdu">
-		<description>Tour Du Monde En 80 Jours, Le (demo)</description>
+		<description>Le Tour Du Monde En 80 Jours (demo)</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3805,7 +3807,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tresor">
-		<description>Trésor de Tarakunda, Le</description>
+		<description>Le Trésor de Tarakunda</description>
 		<year>1984</year>
 		<publisher>Micro Programmes 5</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3871,7 +3873,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="trident">
-		<description>Trident De Neptune, Le</description>
+		<description>Le Trident De Neptune</description>
 		<year>1984</year>
 		<publisher>No Man's Land</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3925,8 +3927,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultrathe">
-		<description>Ultra, The</description>
+	<software name="ultra">
+		<description>The Ultra</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3936,8 +3938,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultrathe1" cloneof="ultrathe">
-		<description>Ultra, The (alt)</description>
+	<software name="ultra1" cloneof="ultrathe">
+		<description>The Ultra (alt)</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3948,7 +3950,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="valley">
-		<description>Valley, The</description>
+		<description>The Valley</description>
 		<year>1982</year>
 		<publisher>ASP</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -3992,7 +3994,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="warlocks">
-		<description>Warlock's Mountain, The</description>
+		<description>The Warlock's Mountain</description>
 		<year>1984</year>
 		<publisher>Your Computer</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -4025,7 +4027,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="waytoking">
-		<description>Way To King Kung Fu, The</description>
+		<description>The Way To King Kung Fu</description>
 		<year>1989</year>
 		<publisher>O.N. Software</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -4058,7 +4060,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="whitebarrows">
-		<description>White Barrows, The</description>
+		<description>The White Barrows</description>
 		<year>1983</year>
 		<publisher>ASP</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -4079,7 +4081,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="xenon1a1" cloneof="xenon1" supported="no">
+	<software name="xenon1a" cloneof="xenon1" supported="no">
 		<description>Xenon 1 (alt 1)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
@@ -4090,7 +4092,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="xenon1a2" cloneof="xenon1">
+	<software name="xenon1b" cloneof="xenon1">
 		<description>Xenon 1 (alt 2)</description>
 		<year>1983</year>
 		<publisher>IJK Software</publisher>
@@ -4115,7 +4117,7 @@ license:CC0-1.0
 	<software name="yatzy">
 		<description>Yatzy</description>
 		<year>1985</year>
-		<publisher>Poetschel, Knut</publisher>
+		<publisher>Knut Poetschel</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="7521">
 				<rom name="Yatzy (1985)(Poetschel, Knut)(de).tap" size="7521" crc="4f1d1d1d" sha1="ee1fe2f57cd64bde2de9da3ac2a49df15428e214"/>
@@ -4126,7 +4128,7 @@ license:CC0-1.0
 	<software name="yatzyv51">
 		<description>Yatzy v5.1</description>
 		<year>1984</year>
-		<publisher>Lundgren, Lars</publisher>
+		<publisher>Lars Lundgren</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="8588">
 				<rom name="Yatzy v5.1 (1984)(Lundgren, Lars)(SE).tap" size="8588" crc="884badec" sha1="3b087fbbb16f72caeb47c35778e000940c1ccff5"/>
@@ -4137,7 +4139,7 @@ license:CC0-1.0
 	<software name="zagorsk">
 		<description>Zagorsk</description>
 		<year>19??</year>
-		<publisher>Lundgren, Lars</publisher>
+		<publisher>Lars Lundgren</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="9224">
 				<rom name="Zagorsk (19xx)(Lundgren, Lars)(Atmos)(SE)[port of C64 The St Petersburg Ikon].tap" size="9224" crc="0b23a62c" sha1="87bbc6bf05fd4cd3d150e56e61e41a3b7d480ff2"/>
