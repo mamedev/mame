@@ -10569,7 +10569,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="thenebea" cloneof="thenebe">
-		<description>Les Cavernes de Thenebe (compilation Top Arcade)</description>
+		<description>Les Cavernes de Thenebe (Compilation Top Arcade)</description>
 		<year>198?</year>
 		<publisher>Loriciels</publisher>
 
@@ -11927,7 +11927,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="malefatla" cloneof="malefatl">
-		<description>Le Malefice des Atlantes (compilation Top Arcade)</description>
+		<description>Le Malefice des Atlantes (Compilation Top Arcade)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12071,7 +12071,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="masqueb" cloneof="masque">
-		<description>Masque (compilation Top Adventure)</description>
+		<description>Masque (Compilation Top Adventure)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
 
@@ -14171,7 +14171,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="traitbzzb" cloneof="traitbzz">
-		<description>Traitement Bzzz (compilation Top Arcade)</description>
+		<description>Traitement Bzzz (Compilation Top Arcade)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -14317,7 +14317,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="trivialpb" cloneof="trivialp">
-		<description>Trivial Pursuit (compilation Top Adventure)</description>
+		<description>Trivial Pursuit (Compilation Top Adventure)</description>
 		<year>198?</year>
 		<publisher>Ubisoft</publisher>
 
