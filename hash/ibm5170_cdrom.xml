@@ -446,7 +446,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<year>1995</year>
 		<publisher>WizardWorks</publisher>
 		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
-		<info name="distributed" value="Multi Media International" />
+		<info name="distributor" value="Multi Media International" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
 		<sharedfeat name="platform" value="DOS" />
