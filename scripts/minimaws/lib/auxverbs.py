@@ -132,7 +132,7 @@ class _Identifier(object):
         if os.path.splitext(path)[1].lower() != '.chd':
             if zipfile.is_zipfile(path):
                 with zipfile.ZipFile(path, 'r') as zip:
-                    for info in zip.namelist():
+                    for info in zip.infolist():
                         if info.filename[-1] != '/':
                             with zip.open(info, mode='r') as f:
                                 self.processRomFile(path + '/' + info.filename, f)
