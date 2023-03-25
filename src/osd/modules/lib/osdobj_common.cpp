@@ -365,7 +365,7 @@ void osd_common_t::update_option(const std::string &key, std::vector<std::string
 //-------------------------------------------------
 //  output_callback  - callback for osd_printf_...
 //-------------------------------------------------
-void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
+void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
 {
 	switch (channel)
 	{

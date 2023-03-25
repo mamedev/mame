@@ -59,12 +59,6 @@ bool cpu_device::cpu_is_interruptible() const
 	return false;
 }
 
-void cpu_device::defer_access(void)
-{
-	m_access_to_be_redone = true;
-	*m_icountptr = 0;
-}
-
 bool cpu_device::access_before_time(u64 access_time, u64 current_time)
 {
 	s32 delta = access_time - current_time;
@@ -104,3 +98,8 @@ void cpu_device::access_after_delay(u32 cycles)
 	*m_icountptr -= cycles;
 }
 
+void cpu_device::defer_access()
+{
+	m_access_to_be_redone = true;
+	*m_icountptr = 0;
+}

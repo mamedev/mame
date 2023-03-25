@@ -818,7 +818,7 @@ void lua_engine::initialize()
 		{
 			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 			render_container &container = machine().render().ui_container();
-			ui::menu_plugin::show_menu(mui, container, (char *)name);
+			ui::menu_plugin::show_menu(mui, container, name);
 		};
 	emu["register_callback"] =
 		[this] (sol::function cb, const std::string &name)

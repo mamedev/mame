@@ -8,7 +8,8 @@
 
 #include "emu.h"
 #include "hpblp.h"
-#include "bus/isa/isa.h"
+
+//#define VERBOSE 1
 #include "logmacro.h"
 
 #define BLP_TAG "blpcpu"

@@ -2895,7 +2895,7 @@ void validity_checker::build_output_prefix(std::ostream &str) const
 //  error_output - error message output override
 //-------------------------------------------------
 
-void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
+void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
 {
 	std::ostringstream output;
 	switch (channel)

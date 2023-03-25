@@ -388,7 +388,7 @@ void debugger_cpu::go_vblank()
 	m_execution_state = exec_state::RUNNING;
 }
 
-void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args)
+void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argument_pack<char> &&args)
 {
 	// if something is pending on this CPU already, ignore this request
 	if (device == m_breakcpu)
@@ -1176,7 +1176,7 @@ void device_debug::go_branch(bool sense, const char *condition)
 //  to templates in C++ being janky as all get out
 //-------------------------------------------------
 
-void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args)
+void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<char> &&args)
 {
 	assert(m_exec != nullptr);
 	m_device.machine().debugger().cpu().halt_on_next_instruction(&m_device, std::move(args));
@@ -2079,7 +2079,7 @@ void device_debug::tracer::interrupt_update(int irqline, offs_t pc)
 //  vprintf - generic print to the trace file
 //-------------------------------------------------
 
-void device_debug::tracer::vprintf(util::format_argument_pack<std::ostream> const &args)
+void device_debug::tracer::vprintf(util::format_argument_pack<char> const &args)
 {
 	// pass through to the file
 	util::stream_format(*m_file, args);

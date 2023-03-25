@@ -30,7 +30,12 @@
 
 #include "attotime.h"
 
+#include "eminline.h" // for get_profile_ticks()
 #include "osdcore.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <string>
 
 
 //**************************************************************************
@@ -99,12 +104,12 @@ public:
 		scope(scope const &) = delete;
 		scope &operator=(scope const &) = delete;
 
-		scope(scope &&that) : m_host(that.m_host), m_active(that.m_active)
+		scope(scope &&that) noexcept : m_host(that.m_host), m_active(that.m_active)
 		{
 			that.m_active = false;
 		}
 
-		scope(real_profiler_state &host, profile_type type) : m_host(host), m_active(false)
+		scope(real_profiler_state &host, profile_type type) noexcept : m_host(host), m_active(false)
 		{
 			if (m_host.enabled())
 			{
@@ -118,7 +123,7 @@ public:
 			stop();
 		}
 
-		void stop()
+		void stop() noexcept
 		{
 			if (m_active)
 			{
@@ -132,14 +137,14 @@ public:
 	real_profiler_state();
 
 	// getters
-	bool enabled() const
+	bool enabled() const noexcept
 	{
 		return m_filoptr != nullptr;
 	}
 	const char *text(running_machine &machine);
 
 	// enable/disable
-	void enable(bool state = true)
+	void enable(bool state = true) noexcept
 	{
 		if (state != enabled())
 		{
@@ -148,21 +153,31 @@ public:
 	}
 
 	// start/stop
-	[[nodiscard]] auto start(profile_type type) { return scope(*this, type); }
+	[[nodiscard]] auto start(profile_type type) noexcept { return scope(*this, type); }
 
 private:
-	void reset(bool enabled);
+	// an entry in the FILO
+	struct filo_entry
+	{
+		int             type;                       // type of entry
+		osd_ticks_t     start;                      // start time
+	};
+
+	void reset(bool enabled) noexcept;
 	void update_text(running_machine &machine);
 
 	//-------------------------------------------------
 	//  real_start - mark the beginning of a
 	//  profiler entry
 	//-------------------------------------------------
-	ATTR_FORCE_INLINE void real_start(profile_type type)
+	ATTR_FORCE_INLINE void real_start(profile_type type) noexcept
 	{
 		// fail if we overflow
-		if (m_filoptr >= &m_filo[std::size(m_filo) - 1])
-			throw emu_fatalerror("Profiler FILO overflow (type = %d)\n", type);
+		if (UNEXPECTED(m_filoptr >= &m_filo[std::size(m_filo) - 1]))
+		{
+			std::fprintf(stderr, "Profiler FILO overflow (type = %d)\n", int(type));
+			std::abort();
+		}
 
 		// get current tick count
 		osd_ticks_t curticks = get_profile_ticks();
@@ -181,7 +196,7 @@ private:
 	//-------------------------------------------------
 	//  real_stop - mark the end of a profiler entry
 	//-------------------------------------------------
-	ATTR_FORCE_INLINE void real_stop()
+	ATTR_FORCE_INLINE void real_stop() noexcept
 	{
 		// degenerate scenario
 		if (UNEXPECTED(m_filoptr <= m_filo))
@@ -199,13 +214,6 @@ private:
 		// reset previous entry start time
 		m_filoptr->start = curticks;
 	}
-
-	// an entry in the FILO
-	struct filo_entry
-	{
-		int             type;                       // type of entry
-		osd_ticks_t     start;                      // start time
-	};
 
 	// internal state
 	filo_entry *        m_filoptr;                  // current FILO index
@@ -229,27 +237,27 @@ public:
 	public:
 		scope(scope const &) = delete;
 		scope &operator=(scope const &) = delete;
-		scope(scope &&that) = default;
-		scope(dummy_profiler_state &host, profile_type type) : m_host(host) { }
+		scope(scope &&that) noexcept = default;
+		scope(dummy_profiler_state &host, profile_type type) noexcept : m_host(host) { }
 		~scope() { m_host.real_stop(); }
-		void stop() { }
+		void stop() noexcept { }
 	};
 
 	// construction/destruction
 	dummy_profiler_state();
 
 	// getters
-	bool enabled() const { return false; }
+	bool enabled() const noexcept { return false; }
 	const char *text(running_machine &machine) { return ""; }
 
 	// enable/disable
-	void enable(bool state = true) { }
+	void enable(bool state = true) noexcept { }
 
 	// start/stop
-	[[nodiscard]] auto start(profile_type type) { return scope(*this, type); }
+	[[nodiscard]] auto start(profile_type type) noexcept { return scope(*this, type); }
 
 private:
-	void real_stop() { }
+	void real_stop() noexcept { }
 };
 
 

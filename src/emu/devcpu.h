@@ -48,7 +48,7 @@ public:
 
 	// The access has already happened, nothing to abort
 	void access_after_delay(u32 cycles);
-	void defer_access(void);
+	void defer_access();
 
 protected:
 	// construction/destruction

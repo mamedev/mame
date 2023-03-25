@@ -89,7 +89,7 @@ real_profiler_state::real_profiler_state()
 //  reset - initializes state
 //-------------------------------------------------
 
-void real_profiler_state::reset(bool enabled)
+void real_profiler_state::reset(bool enabled) noexcept
 {
 	assert(!m_filoptr || (m_filoptr == m_filo));
 

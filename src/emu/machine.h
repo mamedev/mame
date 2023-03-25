@@ -251,7 +251,7 @@ private:
 	void nvram_load();
 	void nvram_save();
 	void popup_clear() const;
-	void popup_message(util::format_argument_pack<std::ostream> const &args) const;
+	void popup_message(util::format_argument_pack<char> const &args) const;
 
 	// internal callbacks
 	void logfile_callback(const char *buffer);

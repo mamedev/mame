@@ -165,7 +165,7 @@ public:
 	void compute_debug_flags();
 
 private:
-	void halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args);
+	void halt_on_next_instruction_impl(util::format_argument_pack<char> &&args);
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
@@ -228,7 +228,7 @@ private:
 
 		void update(offs_t pc);
 		void interrupt_update(int irqline, offs_t pc);
-		void vprintf(util::format_argument_pack<std::ostream> const &args);
+		void vprintf(util::format_argument_pack<char> const &args);
 		void flush();
 		bool logerror() const { return m_logerror; }
 
@@ -406,7 +406,7 @@ public:
 	void stop_hook(device_t *device);
 	void go_next_device(device_t *device);
 	void go_vblank();
-	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
+	void halt_on_next_instruction(device_t *device, util::format_argument_pack<char> &&args);
 	void ensure_comments_loaded();
 	void reset_transient_flags();
 
