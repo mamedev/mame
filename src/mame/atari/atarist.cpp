@@ -1362,8 +1362,8 @@ void st_state::common(machine_config &config)
 	WD1772(config, m_fdc, Y2/4);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
 	m_fdc->drq_wr_callback().set(m_mmu, FUNC(st_mmu_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd",  st_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, nullptr, st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd",  st_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, nullptr, st_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
@@ -1605,8 +1605,8 @@ void stbook_state::stbook(machine_config &config)
 	WD1772(config, m_fdc, U517/2);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
 	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
