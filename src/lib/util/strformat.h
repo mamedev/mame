@@ -1908,16 +1908,6 @@ extern template std::wostream::off_type stream_format(std::wostream &, format_ar
 
 } // namespace detail
 
-extern template std::string string_format(format_argument_pack<char> const &);
-extern template std::string string_format(format_argument_pack<char> &&);
-extern template std::string string_format(std::locale const &, format_argument_pack<char> const &);
-extern template std::string string_format(std::locale const &, format_argument_pack<char> &&);
-
-extern template std::wstring string_format(format_argument_pack<wchar_t> const &);
-extern template std::wstring string_format(format_argument_pack<wchar_t> &&);
-extern template std::wstring string_format(std::locale const &, format_argument_pack<wchar_t> const &);
-extern template std::wstring string_format(std::locale const &, format_argument_pack<wchar_t> &&);
-
 } // namespace util
 
 #endif // MAME_UTIL_STRFORMAT_H

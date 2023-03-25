@@ -135,14 +135,4 @@ template std::wostream::off_type stream_format(std::wostream &, format_argument_
 
 } // namespace detail
 
-template std::string string_format(format_argument_pack<char> const &);
-template std::string string_format(format_argument_pack<char> &&);
-template std::string string_format(std::locale const &, format_argument_pack<char> const &);
-template std::string string_format(std::locale const &, format_argument_pack<char> &&);
-
-template std::wstring string_format(format_argument_pack<wchar_t> const &);
-template std::wstring string_format(format_argument_pack<wchar_t> &&);
-template std::wstring string_format(std::locale const &, format_argument_pack<wchar_t> const &);
-template std::wstring string_format(std::locale const &, format_argument_pack<wchar_t> &&);
-
 } // namespace util
