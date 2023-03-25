@@ -879,7 +879,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<notes><![CDATA[
 Crashes when attempting to start a practice match
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1"/>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1617,7 +1617,7 @@ Doesn't recognize mouse
 		<year>1988</year>
 		<publisher>Lankhor</publisher>
 		<notes><![CDATA[
-Unresponsive after pressing fire on title screen
+Main menu is unresponsive, likely [GPIO4] irq
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -2233,7 +2233,7 @@ Mouse doesn't respond after setting up MFSM system
 		<description>Hammerfist (Europe)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
-		<info name="usage" value="Requires joystick in port 1"/>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3132,7 +3132,7 @@ Hangs on title screen
 		<year>1986</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
-Fails disk swap, requests disk A again, never leaves TOS
+Fails [disk swap], requests disk A again, never leaves TOS
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -3332,7 +3332,7 @@ Pauses itself when pressing fire on joystick during gameplay (?)
 		<year>1990</year>
 		<publisher>Lucasfilm</publisher>
 		<notes><![CDATA[
-Doesn't recognize disk swap when prompted to
+Doesn't recognize [disk swap] when prompted to
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -4060,7 +4060,7 @@ During gameplay player loses a life with no chance of actual game.
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Fails disk swap when prompted to after title screen
+Fails [disk swap] when prompted to after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -4186,7 +4186,7 @@ White screen
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-Fails disk swap
+Fails [disk swap]
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -4720,7 +4720,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-[68k] stalls after disk swap, PC=a34a
+[68k] stalls after [disk swap], PC=a34a
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -4798,7 +4798,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
-Prompts user to play with same car or a new one after disk swap with no gameplay, assume [FDC] copy protection
+Prompts user to play with same car or a new one after [disk swap] with no gameplay, assume [FDC] copy protection
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -5049,7 +5049,7 @@ First two copy protection codes are always W/16 - A/5 (verify)
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 	    <notes><![CDATA[
-Fails disk swap after title screen
+Fails [disk swap] after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -5209,7 +5209,7 @@ White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
 		<year>1990</year>
 		<publisher>Impressions</publisher>
 	    <notes><![CDATA[
-Fails disk swap when launching univers3.prg
+Fails [disk swap] when launching univers3.prg
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -5262,6 +5262,9 @@ Fails disk swap when launching univers3.prg
 		<description>Vectorball (Europe)</description>
 		<year>1988</year>
 		<publisher>MAD</publisher>
+	    <notes><![CDATA[
+2 or 3 [bombs] bus error by pressing fire on title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5276,6 +5279,7 @@ Fails disk swap when launching univers3.prg
 		<description>Vindicators (Europe)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
+		<info name="usage" value="Requires joystick in port 0"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5312,6 +5316,9 @@ Fails disk swap when launching univers3.prg
 		<description>Wanderer 3D (Euro, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
+	    <notes><![CDATA[
+Unsupported optional 3d glasses
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5348,6 +5355,9 @@ Fails disk swap when launching univers3.prg
 		<description>War in Middle Earth (Europe)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
+		<notes><![CDATA[
+Fails to recognize [disk swap] after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5405,6 +5415,7 @@ Fails disk swap when launching univers3.prg
 		<description>Warlock (Euro, The Edge)</description>
 		<year>19??</year>
 		<publisher>The Edge</publisher>
+		<info name="usage" value="Keyboard only, where pause is space key and S to resume" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5419,6 +5430,9 @@ Fails disk swap when launching univers3.prg
 		<description>Where Time Stood Still (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
+	    <notes><![CDATA[
+Randomly hangs after few seconds in gameplay or doesn't recognize fire button on title screen, likely [GPIO4] irq
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5433,6 +5447,7 @@ Fails disk swap when launching univers3.prg
 		<description>Whirligig (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5464,6 +5479,9 @@ Fails disk swap when launching univers3.prg
 		<description>World Championship Boxing Manager (Europe)</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
+	    <notes><![CDATA[
+Prompts user to insert the "other" disk, fails [disk swap]
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5486,6 +5504,9 @@ Fails disk swap when launching univers3.prg
 		<description>World Class Leader Board (Euro, Budget)</description>
 		<year>1990</year>
 		<publisher>Klassix</publisher>
+	    <notes><![CDATA[
+Randomly hangs on main menu, [joystick] or [keyboard] becomes unresponsive, likely [GPIO4] irq
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5514,6 +5535,9 @@ Fails disk swap when launching univers3.prg
 		<description>X-Out (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Static sound during intro and gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
