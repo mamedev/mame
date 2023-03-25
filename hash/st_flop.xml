@@ -470,7 +470,7 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 		<year>1989</year>
 		<publisher>Lucasfilm</publisher>
 		<notes><![CDATA[
-Fussy on disk swap, will return to TOS when trying to begin a flight
+Fussy on [disk swap], will return to TOS when trying to begin a flight
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -671,7 +671,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<year>1987</year>
 		<publisher>Loriciel</publisher>
 		<notes><![CDATA[
-'P' doesn't pause the game, 'space bar' doesn't change fighting stance
+[keyboard] 'P' doesn't pause the game, 'space bar' doesn't change fighting stance (verify)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -2146,7 +2146,7 @@ Unresponsive [mouse] on TOS (random)
 		<year>1990</year>
 		<publisher>Image Works</publisher>
 		<notes><![CDATA[
-Fails on disk swap after title screen
+Fails on [disk swap] after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
