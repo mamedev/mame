@@ -131,10 +131,11 @@ class _Identifier(object):
     def processFile(self, path):
         if os.path.splitext(path)[1].lower() != '.chd':
             if zipfile.is_zipfile(path):
-                with zipfile.ZipFile(path, "r") as zip:
-                    for name in zip.namelist():
-                        with zip.open(name, mode="r") as f:
-                            self.processRomFile(path + "/" + name, f)
+                with zipfile.ZipFile(path, 'r') as zip:
+                    for info in zip.namelist():
+                        if info.filename[-1] != '/':
+                            with zip.open(info, mode='r') as f:
+                                self.processRomFile(path + '/' + info.filename, f)
             else:
                 with open(path, mode='rb', buffering=0) as f:
                     self.processRomFile(path, f)
