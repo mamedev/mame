@@ -204,8 +204,8 @@ private:
 	memory_view m_pfview;
 	memory_view m_sndview;
 
-	int m_prot_state = 0;
-	int m_sound_prot_state = 0;
+	uint8_t m_prot_state = 0;
+	uint8_t m_sound_prot_state = 0;
 
 	uint16_t prot_r(offs_t offset);
 	void prot_state_w(uint16_t data);
