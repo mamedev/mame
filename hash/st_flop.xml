@@ -50,7 +50,7 @@ license:CC0-1.0
 		<description>5th Gear (Europe)</description>
 		<year>1989</year>
 		<publisher>Hewson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 11 [bombs] Line 1111 Emulator
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -124,7 +124,7 @@ license:CC0-1.0
 		<description>Adidas Championship Tie Break (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Title screen shows a bit of GFX garbage
 Doesn't show credits before main menu, hangs there (input devices don't work)
 ]]></notes>
@@ -142,7 +142,7 @@ Doesn't show credits before main menu, hangs there (input devices don't work)
 		<description>Advanced Fruit Machine Simulator (Europe)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, [68k] stalls on bootstrap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -239,7 +239,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Anarchy (Europe)</description>
 		<year>1990</year>
 		<publisher>Psyclapse</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, [68k] stalls on bootstrap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -293,7 +293,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Archipelagos (Europe)</description>
 		<year>1989</year>
 		<publisher>Logotron</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 4 [bombs] Illegal instruction
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -310,7 +310,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Arcticfox (Europe)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -327,7 +327,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Artificial Dreams (Europe)</description>
 		<year>1988</year>
 		<publisher>Addictive</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -358,7 +358,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Atomix (Europe)</description>
 		<year>1989</year>
 		<publisher>Thalion</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -469,7 +469,7 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 		<description>Battlehawks 1942 (Euro, v1.0 19890301)</description>
 		<year>1989</year>
 		<publisher>Lucasfilm</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fussy on disk swap, will return to TOS when trying to begin a flight
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -639,7 +639,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<description>The Blues Brothers (Europe)</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -670,7 +670,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<description>Bob Winner (Europe)</description>
 		<year>1987</year>
 		<publisher>Loriciel</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 'P' doesn't pause the game, 'space bar' doesn't change fighting stance
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -845,7 +845,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<description>Championship Baseball (Europe)</description>
 		<year>1987</year>
 		<publisher>Gamestar</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 4 [bombs] Illegal instruction when trying to execute auto/baseball.prg
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -876,7 +876,7 @@ Fussy on disk swap, will return to TOS when trying to begin a flight
 		<description>Championship Wrestling (Europe)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Crashes when attempting to start a practice match
 ]]></notes>
 		<info name="usage" value="Requires joystick in port 1"/>
@@ -908,7 +908,7 @@ Crashes when attempting to start a practice match
 		<description>Chase H.Q. (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Keeps returning to TOS on loading
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1090,7 +1090,7 @@ Keeps returning to TOS on loading
 		<description>Conquests of Camelot (Euro, v1.019)</description>
 		<year>1990</year>
 		<publisher>Sierra</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Starting a game will fail on [disk swap], doesn't recognize disk 2
 Has [MIDI] options
 ]]></notes>
@@ -1209,7 +1209,7 @@ Has [MIDI] options
 		<description>Cyberball (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen, expects an irq reading work RAM $ac02
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1262,7 +1262,7 @@ Black screen, expects an irq reading work RAM $ac02
 		<description>Darius+ (Europe)</description>
 		<year>1989</year>
 		<publisher>The Edge</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 No backgrounds during gameplay
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1287,7 +1287,7 @@ No backgrounds during gameplay
 		<description>Day of the Viper (Europe)</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs on starfield intro
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1354,7 +1354,7 @@ Hangs on starfield intro
 		<description>Deliverance (Europe)</description>
 		<year>1992</year>
 		<publisher>21st Century</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1407,7 +1407,7 @@ Black screen
 		<description>Dick Tracy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1482,7 +1482,7 @@ Black screen
 		<description>Double Dragon II - The Revenge (Euro, v1.2, Budget)</description>
 		<year>1989</year>
 		<publisher>16 Blitz</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs during loading with a 000000A0 printed on screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1507,7 +1507,7 @@ Hangs during loading with a 000000A0 printed on screen
 		<description>Dragon Spirit (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, fails to bootstrap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1590,7 +1590,7 @@ White screen, fails to bootstrap
 		<description>East vs. West Berlin 1948 (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, attempts to r/w [FPU] $fffa40 on boot
 Doesn't recognize mouse
 ]]></notes>
@@ -1616,7 +1616,7 @@ Doesn't recognize mouse
 		<description>Elemental (Europe)</description>
 		<year>1988</year>
 		<publisher>Lankhor</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unresponsive after pressing fire on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1676,7 +1676,7 @@ Unresponsive after pressing fire on title screen
 		<description>Erik (Europe)</description>
 		<year>1992</year>
 		<publisher>Atlantis Software</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 No sound during gameplay
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1693,7 +1693,7 @@ No sound during gameplay
 		<description>Exolon (Europe)</description>
 		<year>1988</year>
 		<publisher>Hewson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 11 [bombs] Line 1111 Emulator for a split second
 Manually trying to execute auto/exolon.prg will crash TOS
 ]]></notes>
@@ -1785,7 +1785,7 @@ Manually trying to execute auto/exolon.prg will crash TOS
 		<description>Fantasy World Dizzy (Europe)</description>
 		<year>1991</year>
 		<publisher>Codemasters</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, [68k] stalls on bootstrap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1800,7 +1800,7 @@ White screen, [68k] stalls on bootstrap
 		<description>Ferrari Formula One (Europe)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Red screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1823,7 +1823,7 @@ Red screen
 		<description>Fire and Forget II - The Death Convoy (Europe)</description>
 		<year>1990</year>
 		<publisher>Titus</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1912,7 +1912,7 @@ Red screen
 		<description>Future Basketball (Europe)</description>
 		<year>1990</year>
 		<publisher>Hewson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, never completes bootstrap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1959,7 +1959,7 @@ White screen, never completes bootstrap
 		<description>Galaxy Force II (Europe)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Red screen with broken GFXs, tight loops at PC=10bbc
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1998,7 +1998,7 @@ Red screen with broken GFXs, tight loops at PC=10bbc
 		<description>Gazza's Super Soccer (Europe)</description>
 		<year>1989</year>
 		<publisher>Empire Interactive</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 4 [bombs] Illegal instruction
 Trying to manually launch auto/gazzaeng.prg will just punt to TOS
 ]]></notes>
@@ -2016,7 +2016,7 @@ Trying to manually launch auto/gazzaeng.prg will just punt to TOS
 		<description>Gemini Wing (Europe)</description>
 		<year>1989</year>
 		<publisher>Virgin Mastertronic</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Tries to read [ACIA] byte $fffc02 at PC=74e, expects a value of $39 actual $00
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2055,7 +2055,7 @@ Tries to read [ACIA] byte $fffc02 at PC=74e, expects a value of $39 actual $00
 		<description>GFL Championship Football (Europe)</description>
 		<year>1987</year>
 		<publisher>Gamestar</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2072,7 +2072,7 @@ White screen
 		<description>Ghosts 'n' Goblins (Euro, Finale)</description>
 		<year>1990</year>
 		<publisher>Elite</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [68k] stalls, hangs on illegal instruction at PC=14b0c
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2111,7 +2111,7 @@ White screen
 		<description>Gomoku and Renju (Europe)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unresponsive [mouse] on TOS (random)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2128,7 +2128,7 @@ Unresponsive [mouse] on TOS (random)
 		<description>Goofy's Railway Express (Europe)</description>
 		<year>1989</year>
 		<publisher>Disney Software</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2145,7 +2145,7 @@ Unresponsive [mouse] on TOS (random)
 		<description>Gravity (Europe)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails on disk swap after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2184,7 +2184,7 @@ Fails on disk swap after title screen
 		<description>The Guardian Angel (Europe)</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, [68k] stalls with illegal A0 and A1 stacks
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2215,7 +2215,7 @@ White screen, [68k] stalls with illegal A0 and A1 stacks
 		<description>Hacker II - The Doomsday Papers (Europe)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Requires a working [printer] according to manual
 Mouse doesn't respond after setting up MFSM system
 ]]></notes>
@@ -2285,7 +2285,7 @@ Mouse doesn't respond after setting up MFSM system
 		<description>Harley-Davidson - The Road to Sturgis (Europe)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Keeps attempting to bootstrap with no success (cycles between white and black screens)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2488,7 +2488,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 		<description>The Immortal (Europe)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 4 [bombs] Illegal instruction when trying to start a game "Error loading file: MAZE0.CNM"
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2513,7 +2513,7 @@ Keeps attempting to bootstrap with no success (cycles between white and black sc
 		<description>Indiana Jones and the Temple of Doom (USA)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails autobooting, wants a disk B that is missing from the set.
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -2650,7 +2650,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 		<description>Kick Off 2 (Euro, v1.4e)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Master file not present or damaged ERROR"
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2685,7 +2685,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 		<description>Kick Off 2 - The Final Whistle (Euro, v2.1e)</description>
 		<year>1991</year>
 		<publisher>Anco</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Master file not present or damaged ERROR"
 ]]></notes>
 		<info name="usage" value="Requires &quot;Kick Off 2&quot; to work" />
@@ -2770,7 +2770,7 @@ Fails autobooting, wants a disk B that is missing from the set.
 		<description>Klax (Europe)</description>
 		<year>1990</year>
 		<publisher>Domark</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2877,7 +2877,7 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 		<description>Lethal Xcess (Europe)</description>
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -2942,7 +2942,7 @@ Tight loops at PC=71b26, cmp.l #$a2b2c837 (D0 is 0), boots if bypassed
 		<description>Logical (Europe)</description>
 		<year>1991</year>
 		<publisher>Rainbow Arts</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unresponsive [mouse] on TOS (random)
 ]]></notes>
 		<info name="usage" value="Sports code wheel copy protection" />
@@ -3033,7 +3033,7 @@ Unresponsive [mouse] on TOS (random)
 		<description>Mafdet and the Book of the Dead (Europe)</description>
 		<year>1988</year>
 		<publisher>Software Horizons</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3131,7 +3131,7 @@ Hangs on title screen
 		<description>Mean 18 + Famous Courses Disk Volume I &amp; Volume II (Euro, Accolade All Time Favourites)</description>
 		<year>1986</year>
 		<publisher>Accolade</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails disk swap, requests disk A again, never leaves TOS
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3212,7 +3212,7 @@ Fails disk swap, requests disk A again, never leaves TOS
 		<description>Midwinter (Europe)</description>
 		<year>1992</year>
 		<publisher>Kixx XL</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, executes illegal code
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3228,7 +3228,7 @@ White screen, executes illegal code
 		<description>Mindwheel (Europe)</description>
 		<year>1985</year>
 		<publisher>Brøderbund</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unresponsive [mouse] on TOS
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3259,7 +3259,7 @@ Unresponsive [mouse] on TOS
 		<description>Mission Genocide (Europe)</description>
 		<year>1987</year>
 		<publisher>Firebird</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Pauses itself when pressing fire on joystick during gameplay (?)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3277,7 +3277,7 @@ Pauses itself when pressing fire on joystick during gameplay (?)
 		<description>Monster Business (Europe)</description>
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3331,7 +3331,7 @@ Pauses itself when pressing fire on joystick during gameplay (?)
 		<description>Night Shift (Europe)</description>
 		<year>1990</year>
 		<publisher>Lucasfilm</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Doesn't recognize disk swap when prompted to
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3406,7 +3406,7 @@ Doesn't recognize disk swap when prompted to
 		<description>No Excuses (Europe)</description>
 		<year>1988</year>
 		<publisher>Arcana</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs during gameplay, or black screen after title screen, or doesn't recognize keyboard input on main menu
 Cannot choose option 4 (Italian)
 ]]></notes>
@@ -3475,7 +3475,7 @@ Cannot choose option 4 (Italian)
 		<description>Operation Harrier (Europe)</description>
 		<year>1990</year>
 		<publisher>U.S. Gold</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3522,7 +3522,7 @@ Black screen
 		<description>Operation Thunderbolt (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen, enables [68k] trace mode
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3619,7 +3619,7 @@ Black screen, enables [68k] trace mode
 		<description>Overlander (Euro, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Executes illegal opcode at PC=126f4, [68k] hangs
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3664,7 +3664,7 @@ Executes illegal opcode at PC=126f4, [68k] hangs
 		<description>Pandora (Europe)</description>
 		<year>1988</year>
 		<publisher>Firebird</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Doesn't recognize fire button or space key on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3681,7 +3681,7 @@ Doesn't recognize fire button or space key on title screen
 		<description>Paperboy (Euro, Finale)</description>
 		<year>1989</year>
 		<publisher>Elite</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Executes illegal opcode at PC=af06, [68k] hangs
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3726,7 +3726,7 @@ Executes illegal opcode at PC=af06, [68k] hangs
 		<description>Pharaoh III (Europe)</description>
 		<year>1989</year>
 		<publisher>Digita International</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 F3 doesn't show key configure screen, doesn't seem joystick controllable?
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3771,7 +3771,7 @@ F3 doesn't show key configure screen, doesn't seem joystick controllable?
 		<description>Player Manager (Euro, Football Crazy Challenge)</description>
 		<year>1990</year>
 		<publisher>Anco</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs after title screen with a broken icon in the middle.
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3847,7 +3847,7 @@ Hangs after title screen with a broken icon in the middle.
 		<description>Prince (Europe)</description>
 		<year>1989</year>
 		<publisher>ARC</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3886,7 +3886,7 @@ White screen
 		<description>Puzznic (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Broken white screen with black box, [68k] stalls at invalid opcode PC=4d1c
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -3903,7 +3903,7 @@ Broken white screen with black box, [68k] stalls at invalid opcode PC=4d1c
 		<description>Quink (USA)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Prompts for a disk B: that doesn't exist in the set.
 ]]></notes>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -3934,7 +3934,7 @@ Prompts for a disk B: that doesn't exist in the set.
 		<description>Rally Cross (Europe)</description>
 		<year>1989</year>
 		<publisher>Anco</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen, enables [68k] trace mode
 ]]></notes>
 		<info name="alt_title" value="Rally Cross Challenge (Box)" />
@@ -3988,7 +3988,7 @@ White screen, enables [68k] trace mode
 		<description>Red Storm Rising (Euro, v743.01)</description>
 		<year>1990</year>
 		<publisher>MicroProse</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Prompts user to insert "ORIGINAL" DISK A, assume failed copy protection
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4013,7 +4013,7 @@ Prompts user to insert "ORIGINAL" DISK A, assume failed copy protection
 		<description>Resolution 101 (Europe)</description>
 		<year>1990</year>
 		<publisher>Millennium</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 During gameplay player loses a life with no chance of actual game.
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4059,7 +4059,7 @@ During gameplay player loses a life with no chance of actual game.
 		<description>RoboCop (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails disk swap when prompted to after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4084,7 +4084,7 @@ Fails disk swap when prompted to after title screen
 		<description>Rock Star Ate My Hamster (Europe)</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 11 [bombs] Line 1111 Emulator
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4129,7 +4129,7 @@ Fails disk swap when prompted to after title screen
 		<description>Sargon III (Europe)</description>
 		<year>1988</year>
 		<publisher>Logotron</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "An error has occurred , Re-Load"
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4146,7 +4146,7 @@ Fails disk swap when prompted to after title screen
 		<description>SAS Combat Simulator (Europe)</description>
 		<year>1990</year>
 		<publisher>Codemasters</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 White screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4185,7 +4185,7 @@ White screen
 		<description>Shadowgate (Europe)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails disk swap
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4275,7 +4275,7 @@ Fails disk swap
 		<description>Space Harrier (Europe)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Randomly hangs, stalls waiting for a $bcbe that never becomes 1, supposed to be provided by [GPIO4] irq, manually triggering a [ikbd] rx_cb 0 will resume comms with [ACIA0]
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4300,7 +4300,7 @@ Randomly hangs, stalls waiting for a $bcbe that never becomes 1, supposed to be 
 		<description>Space Harrier (Euro, Finale)</description>
 		<year>1988</year>
 		<publisher>Elite</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Draws "ELTE" instead of "ELITE" on game select
 Random hangs, cfr. sharrier
 ]]></notes>
@@ -4538,7 +4538,7 @@ Random hangs, cfr. sharrier
 		<description>Steel (Europe)</description>
 		<year>1989</year>
 		<publisher>Hewson</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 11 [bombs] Line 1111 Emulator, resets TOS if trying to run auto/steel.prg manually
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4555,7 +4555,7 @@ Random hangs, cfr. sharrier
 		<description>Storm Master (Europe)</description>
 		<year>1992</year>
 		<publisher>Silmarils</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4634,7 +4634,7 @@ Hangs on title screen
 		<description>Striker (Europe)</description>
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Black screen, hangs in TOS comparing buffers coming from $db0
 Player cursor oddly appears a bit lower compared to the shadow (verify)
 ]]></notes>
@@ -4702,7 +4702,7 @@ Player cursor oddly appears a bit lower compared to the shadow (verify)
 		<description>Tai-Pan (Europe)</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs after selecting input device on title screen, looping on [MFP] and [MMU] interactions
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4719,7 +4719,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 		<description>Tass Times in Tonetown (Europe)</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [68k] stalls after disk swap, PC=a34a
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4772,7 +4772,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 		<description>Terramex (Europe)</description>
 		<year>1987</year>
 		<publisher>Grandslam</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 2 [bombs] bus error on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4797,7 +4797,7 @@ Hangs after selecting input device on title screen, looping on [MFP] and [MMU] i
 		<description>Test Drive (Euro, Accolade All Time Favourites)</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Prompts user to play with same car or a new one after disk swap with no gameplay, assume [FDC] copy protection
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4822,6 +4822,9 @@ Prompts user to play with same car or a new one after disk swap with no gameplay
 		<description>Theme Park Mystery - Variations on a Theme (Europe)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
+		<notes><![CDATA[
+Mouse pointer becomes invisible when selecting fortune teller cabinet in gameplay
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -4878,7 +4881,7 @@ Prompts user to play with same car or a new one after disk swap with no gameplay
 		<description>ThunderWing (Europe)</description>
 		<year>1989</year>
 		<publisher>Artronic Products</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Player bullets color clash with backgrounds (btanb)
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -4973,7 +4976,7 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Tower of Babel (Europe)</description>
 		<year>1990</year>
 		<publisher>Rainbird</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Load time: 50 seconds", never completes [FDC]
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5002,6 +5005,9 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Trailblazer (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin</publisher>
+		<notes><![CDATA[
+editor.prg hangs when creating a folder, [FDC] write
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5016,6 +5022,10 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Trash Heap (Europe)</description>
 		<year>1987</year>
 		<publisher>Robtek</publisher>
+	    <notes><![CDATA[
+First two copy protection codes are always W/16 - A/5 (verify)
+]]></notes>
+		<info name="usage" value="Sports code wheel copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5038,6 +5048,9 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Trauma (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
+	    <notes><![CDATA[
+Fails disk swap after title screen
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5074,6 +5087,7 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Trinity (Euro, r11)</description>
 		<year>1986</year>
 		<publisher>Infocom</publisher>
+		<info name="usage" value="Requires Medium or High res screen setup in TOS (disk defaults to Low)" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5116,7 +5130,7 @@ Player bullets color clash with backgrounds (btanb)
 		<description>Turbo Out Run (Euro, Budget)</description>
 		<year>1989</year>
 		<publisher>KIXX</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Prompts user on inserting disk 2, but there's only one disk in the set.
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5148,6 +5162,9 @@ Prompts user on inserting disk 2, but there's only one disk in the set.
 		<description>TV Sports Football (Europe)</description>
 		<year>1989</year>
 		<publisher>Mirrorsoft</publisher>
+		<notes><![CDATA[
+White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5176,6 +5193,7 @@ Prompts user on inserting disk 2, but there's only one disk in the set.
 		<description>UMS - The Universal Military Simulator (Europe)</description>
 		<year>1988</year>
 		<publisher>Rainbird</publisher>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -5190,19 +5208,22 @@ Prompts user on inserting disk 2, but there's only one disk in the set.
 		<description>Universe 3 (Euro, v1.0)</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
+	    <notes><![CDATA[
+Fails disk swap when launching univers3.prg
+]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Data Disk" />
+			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="918252">
-				<rom name="universe 3 (europe) (v1.0) (data disk).ipf" size="918252" crc="9191ed09" sha1="d5480fd0c2b32249d6d82d4a1b967e8498c125db" offset="0" />
+				<rom name="universe 3 (europe) (v1.0) (game disk).ipf" size="918252" crc="b58abf6c" sha1="c21ac500f72528e457a1c0dbb594db2c79ef98d9" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Game Disk" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="918252">
-				<rom name="universe 3 (europe) (v1.0) (game disk).ipf" size="918252" crc="b58abf6c" sha1="c21ac500f72528e457a1c0dbb594db2c79ef98d9" offset="0" />
+				<rom name="universe 3 (europe) (v1.0) (data disk).ipf" size="918252" crc="9191ed09" sha1="d5480fd0c2b32249d6d82d4a1b967e8498c125db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5426,7 +5447,7 @@ Prompts user on inserting disk 2, but there's only one disk in the set.
 		<description>Wild Streets (Euro, Budget)</description>
 		<year>1990</year>
 		<publisher>Fox Hits</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 "Incompatible image format or corrupted data" on mount
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
