@@ -61,7 +61,7 @@ bool cpu_device::cpu_is_interruptible() const
 
 void cpu_device::defer_access(void)
 {
-  m_access_to_be_redone = true;
+	m_access_to_be_redone = true;
 	*m_icountptr = 0;
 }
 

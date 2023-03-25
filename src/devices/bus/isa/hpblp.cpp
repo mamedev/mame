@@ -7,12 +7,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
-#include "bus/ieee488/ieee488.h"
-#include "bus/hp_dio/hp_dio.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/tms9914.h"
 #include "hpblp.h"
+#include "bus/isa/isa.h"
 #include "logmacro.h"
 
 #define BLP_TAG "blpcpu"
@@ -102,7 +98,6 @@ void isa8_hpblp_device::device_add_mconfig(machine_config &config)
 
 	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, nullptr, false);
 	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, nullptr, false);
-
 }
 
 offs_t isa8_hpblp_device::get_bus_address(offs_t offset, uint16_t mem_mask)
