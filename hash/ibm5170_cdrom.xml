@@ -450,7 +450,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
 		<sharedfeat name="platform" value="DOS" />
-		
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alien carnage (1994)(multi media international)(nl)(en)" sha1="de45bd5492cb07bd1de9167bcf8b2f55e5f1780c" />
@@ -2780,7 +2780,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<sharedfeat name="platform" value="Windows 95" />
-	
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Ecstatica II (Germany) (Rerelease)" sha1="228ccad352d42f318f4b1dcfb00f67c13c0c504a" />

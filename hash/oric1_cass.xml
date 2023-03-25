@@ -77,7 +77,7 @@ license:CC0-1.0
 		<publisher>IJK Software</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="16771">
-				<rom name="3D Noughts And Crosses v6.3 (1984-05-22)(IJK Software)(GB)	.tap" size="16771" crc="830ef5b3" sha1="b00acbcc840c7bfb31778c10df23ce4dadebcf22"/>
+				<rom name="3D Noughts And Crosses v6.3 (1984-05-22)(IJK Software)(GB).tap" size="16771" crc="830ef5b3" sha1="b00acbcc840c7bfb31778c10df23ce4dadebcf22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3938,7 +3938,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ultra1" cloneof="ultrathe">
+	<software name="ultra1" cloneof="ultra">
 		<description>The Ultra (alt)</description>
 		<year>1983</year>
 		<publisher>Personal Software Services</publisher>

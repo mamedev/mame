@@ -287,7 +287,7 @@ void akazukin_state::akazukin(machine_config &config)
 	m_vasvid->set_bg0ram_tag("bg0videoram");
 	m_vasvid->set_bg1ram_tag("bg1videoram");
 	m_vasvid->set_fgram_tag("fgvideoram");
-		
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
