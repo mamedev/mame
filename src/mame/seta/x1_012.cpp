@@ -12,7 +12,6 @@
 #include "emu.h"
 #include "x1_012.h"
 
-
 DEFINE_DEVICE_TYPE(X1_012, x1_012_device, "x1_012", "Seta X1-012 Tile Layer")
 
 x1_012_device::x1_012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -78,7 +77,26 @@ u16 x1_012_device::vctrl_r(offs_t offset, u16 mem_mask)
 
 void x1_012_device::vctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_screen->update_partial(m_screen->vpos()); // needed for calibr50 effect when entering underground area
+	// HACK:
+	// In reality all MAME drivers should work with VIDEO_UPDATE_SCANLINE, ie a partial update every single line.
+	// However timing problems in various drivers means that registers (both here for the tilemap chip, but also
+	// in the sprite chip) end up being written at the wrong time, causing corruption if partial updates are
+	// allowed at all.  MAME's default behavior of only updating the entire screen at a single point masks this
+	// otherwise incorrect timing.
+	//
+	// This is especially noticeable in Zombie Raid, which even writes the horizontal scroll in the middle of the
+	// screen, meaning that we can't even cheat by only updating on that.  Caliber 50 shows that the tilemap chip
+	// does read the scroll registers every scanline as it is needed for a raster effect when entering the
+	// underground area.
+	//
+	// In addition to Zombie Raid, Blandia (Athena stage) and Strike Gunner STG are also good cases to demonstrate
+	// the broken timing that comes to light once partial updates are allowed.
+	//
+	// For the time being, we simply use a trampoline in the seta.cpp driver for Caliber 50 _only_, rather than
+	// correctly reflecting current register values in all games.
+
+	// m_screen->update_partial(m_screen->vpos()); // causes breakage, see note above
+
 
 	// Select tilemap bank. Only one tilemap bank per layer is enabled.
 	if (offset == 2 && ACCESSING_BITS_0_7)

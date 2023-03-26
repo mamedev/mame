@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_INFORMER_207_376_KBD_H
-#define MAME_MACHINE_INFORMER_207_376_KBD_H
+#ifndef MAME_INFORMER_INFORMER_207_376_KBD_H
+#define MAME_INFORMER_INFORMER_207_376_KBD_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(INFORMER_207_376_KBD_HLE, informer_207_376_kbd_hle_device)
 
-#endif // MAME_MACHINE_INFORMER_207_376_KBD_H
+#endif // MAME_INFORMER_INFORMER_207_376_KBD_H

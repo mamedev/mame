@@ -25,6 +25,7 @@
 #include "emumem_hedw.h"
 #include "emumem_hep.h"
 #include "emumem_het.h"
+#include "emumem_hws.h"
 
 #define VERBOSE 0
 
@@ -137,6 +138,17 @@ public:
 	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, u16 flags, std::string rtag, std::string wtag) override;
 	virtual void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask, int cswidth, u16 flags) override;
 
+	void install_read_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) override;
+	void install_read_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
+	void install_read_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
+
+	void install_write_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) override;
+	void install_write_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
+	void install_write_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
+
+	void install_readwrite_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) override;
+	void install_readwrite_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
+	void install_readwrite_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) override;
 
 	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0, u16 flags = 0) override
 	{ install_read_handler_impl(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, rhandler); }
@@ -587,7 +599,7 @@ void memory_view::memory_view_entry::prepare_map_generic(address_map &map, bool 
 			if (!allow_alloc)
 				fatalerror("Trying to create memory in range %X-%X too late\n", entry.m_addrstart, entry.m_addrend);
 
-			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend);
+			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend, key());
 		}
 	}
 }
@@ -1018,6 +1030,215 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 
 	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_read_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_read_before_time(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_read_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_before_time<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_read_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_read_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_read_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_before_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_read_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_read_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_read_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_after_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+}
+
+
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_write_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_write_before_time(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_write_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_w = new handler_entry_write_before_time<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_write_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_write_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_write_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_w = new handler_entry_write_before_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_write_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_write_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_write_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_w = new handler_entry_write_after_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_readwrite_before_time(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_readwrite_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_before_time<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+	auto hand_w = new handler_entry_write_before_time<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_readwrite_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_readwrite_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_before_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+	auto hand_w = new handler_entry_write_before_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws)
+{
+	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
+	if (!cpu)
+		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+	if (!cpu->cpu_is_interruptible())
+		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+
+	VPRINTF("memory_view::install_readwrite_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
+			m_addrchars, addrstart, m_addrchars, addrend,
+			m_addrchars, addrmirror, ws.name());
+
+	offs_t nstart, nend, nmask, nmirror;
+	check_optimize_mirror("install_readwrite_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+
+	r()->select_u(m_id);
+	w()->select_u(m_id);
+
+	auto hand_r = new handler_entry_read_after_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	r()->populate_passthrough(nstart, nend, nmirror, hand_r);
+	auto hand_w = new handler_entry_write_after_delay<Width, AddrShift>(m_view.m_space, *m_view.m_space->get_default_mpl(), ws);
+	w()->populate_passthrough(nstart, nend, nmirror, hand_w);
+}
+
+
 template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, u16 flags, memory_bank *rbank, memory_bank *wbank)
 {
 	VPRINTF("memory_view::install_readwrite_bank(%*x-%*x mirror=%*x, read=\"%s\" / write=\"%s\")\n",

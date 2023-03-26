@@ -1604,6 +1604,64 @@ static INPUT_PORTS_START( ffight )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ffightae )
+	PORT_INCLUDE( cps1_3players )
+
+	PORT_START("DSWA")
+	CPS1_COINAGE_1( "SW(A)" )
+	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level 1" )                PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )      // "01"
+	PORT_DIPSETTING(    0x06, DEF_STR( Easier ) )       // "02"
+	PORT_DIPSETTING(    0x05, DEF_STR( Easy ) )         // "03"
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )       // "04"
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )       // "05"
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )         // "06"
+	PORT_DIPSETTING(    0x01, DEF_STR( Harder ) )       // "07"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "08"
+	PORT_DIPNAME( 0x18, 0x10, "Difficulty Level 2" )                PORT_DIPLOCATION("SW(B):4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )         // "01"
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       // "02"
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )         // "03"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "04"
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )               PORT_DIPLOCATION("SW(B):6,7")
+	PORT_DIPSETTING(    0x60, "100k" )
+	PORT_DIPSETTING(    0x40, "200k" )
+	PORT_DIPSETTING(    0x20, "100k and every 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(B):8" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("SW(C):1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )                PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                            PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )              PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )           PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                          PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( 1941 )
 	PORT_INCLUDE( cps1_2b )
 
@@ -3607,6 +3665,26 @@ static INPUT_PORTS_START( pokonyan )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW(C):8" )
+INPUT_PORTS_END
+
+static const ioport_value mpumpkin_handle[] = { 0, 1, 3, 2 };
+
+static INPUT_PORTS_START( mpumpkin )
+	PORT_INCLUDE( pokonyan )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0003, 0x0000, IPT_POSITIONAL ) PORT_POSITIONS(4) PORT_REMAP_TABLE(mpumpkin_handle) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_WRAPS
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Kitty
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Keroppi
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Badtz-Maru
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*
@@ -5842,6 +5920,37 @@ ROM_START( ffightjh )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+ROM_END
+
+ROM_START( ffightae )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ff-23m.8h", 0x00000, 0x80000, CRC(86def74f) SHA1(5206cc13bfe40fb4f9c3677629aee89099623ee6) )
+	ROM_LOAD16_WORD_SWAP( "ff-22m.7h", 0x80000, 0x80000, CRC(cbdd8689) SHA1(a75918ee837dfccdd4fd02b716928a2de2003103) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD64_WORD( "ff-5m.7a", 0x000000, 0x80000, CRC(91a909bd) SHA1(09621cb33a9c26798b1bba186dceb02e5f126e1a) )
+	ROM_LOAD64_WORD( "ff-7m.9a", 0x000002, 0x80000, CRC(89f8b4cd) SHA1(c169c445686d3c79eae2dc42460b8194c491ccb0) )
+	ROM_LOAD64_WORD( "ff-1m.3a", 0x000004, 0x80000, CRC(d5469303) SHA1(0c1e33a87eb3ef79e6a5ba80753eb495284e666c) )
+	ROM_LOAD64_WORD( "ff-3m.5a", 0x000006, 0x80000, CRC(0c6302bf) SHA1(03ee13a67a8a3b92fac462623ace752d77b9e9f1) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ff_09.12b", 0x00000, 0x08000, CRC(b8367eb5) SHA1(ec3db29fdd6200e9a8f4f8073a7e34aef731354f) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ff_18.11c", 0x00000, 0x20000, CRC(375c66e7) SHA1(36189e23209ce4ae5d9cbabd1574540d0591e7b3) )
+	ROM_LOAD( "ff_19.12c", 0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "s224bn.1a",    0x0000, 0x0117, CRC(31367e94) SHA1(87b42d20bfe078c8352f7c2a40f7ce6b1be4a1af) ) /* GAL16V8 */
+	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -13819,7 +13928,7 @@ ROM_START( pokonyan )
 	*/
 ROM_END
 
-ROM_START( hkittymp ) // B board: ? C board: 92631C-6
+ROM_START( mpumpkin ) // B board: 91634B-?  C board: 92631C-6
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mpa_23.8f", 0x00000, 0x80000, CRC(38b9883a) SHA1(94a89a360a502f209aa905e7eb2f1d472960850f) )
 	// remaining sockets are empty
@@ -13974,6 +14083,9 @@ ROM_START( sfach )
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "sfz18",         0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz19",         0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",     0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
@@ -14012,6 +14124,12 @@ ROM_START( sfzch )
 	ROM_REGION( 0x40000, "oki",0 )  /* Samples */
 	ROM_LOAD( "sfz_18.11c",  0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz_19.12c",  0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	// SFZ63B was found on mpumpkin, assumed to be from SFZ
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )  // PAL16L8
+
+	// TODO... confirm other pals (could be unique as this is the "cps changer" home console)
 ROM_END
 
 /* FIXME B-Board uncertain but should be 91634B from the program ROM names */
@@ -14050,6 +14168,9 @@ ROM_START( sfzbch )
 	ROM_REGION( 0x40000, "oki",0 )  /* Samples */
 	ROM_LOAD( "sfz_18.11c",  0x00000, 0x20000, CRC(61022b2d) SHA1(6369d0c1d08a30ee19b94e52ab1463a7784b9de5) )
 	ROM_LOAD( "sfz_19.12c",  0x20000, 0x20000, CRC(3b5886d5) SHA1(7e1b7d40ef77b5df628dd663d45a9a13c742cf58) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "sfz63b.1a",   0x0000, 0x0104, CRC(f5a351da) SHA1(a867947d784167b5284efb76a8634ca5713dafdb) )
 ROM_END
 
 
@@ -14494,6 +14615,7 @@ GAME( 1989, ffightj2,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,  
 GAME( 1989, ffightj3,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "Capcom", "Final Fight (Japan 900405)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightj4,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "Capcom", "Final Fight (Japan 900613)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightjh,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Smart / Final Fight (Japan, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2019, ffightae,    ffight,   cps1_12MHz, ffightae, cps_state, init_cps1,     ROT0,   "hack",   "Final Fight 30th Anniversary Edition (World, hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 1941,        0,        cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (World 900227)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, 1941r1,      1941,     cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 1941u,       1941,     cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (USA 900227)", MACHINE_SUPPORTS_SAVE )
@@ -14664,7 +14786,7 @@ GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state, init_cps1,  
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state, init_cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state, init_ganbare,  ROT0,   "Capcom", "Ganbare! Marine Kun (Japan 2K0411)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, pokonyan,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Pokonyan! Balloon (Japan 940322)", MACHINE_SUPPORTS_SAVE ) // 2002-10-24 was on the ROM labels, 940322 on the startup screen... take your pick
-GAME( 1996, hkittymp,    0,        cps1_10MHz, pokonyan, cps_state, init_cps1,     ROT0,   "Capcom", "Hello Kitty Magical Pumpkin (Japan 960712)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs 'wheel' emulation
+GAME( 1996, mpumpkin,    0,        cps1_10MHz, mpumpkin, cps_state, init_cps1,     ROT0,   "Capcom", "Magical Pumpkin: Puroland de Daibouken (Japan 960712)", MACHINE_SUPPORTS_SAVE )
 
 /* Games released on CPS-1 hardware by Mitchell */
 

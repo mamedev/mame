@@ -67,6 +67,7 @@ public:
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return m_interface; }
 	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
 	virtual const char *image_type_name() const noexcept override { return "cassette"; }
@@ -107,7 +108,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
+	virtual bool use_software_list_file_extension_for_filetype() const override { return true; }
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;

@@ -7,8 +7,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_MARKHAM_H
-#define MAME_INCLUDES_MARKHAM_H
+#ifndef MAME_SUNELECTRONICS_MARKHAM_H
+#define MAME_SUNELECTRONICS_MARKHAM_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ private:
 	u8 m_strnskil_slave_irq = 0;
 };
 
-#endif // MAME_INCLUDES_MARKHAM_H
+#endif // MAME_SUNELECTRONICS_MARKHAM_H

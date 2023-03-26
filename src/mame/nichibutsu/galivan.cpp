@@ -14,7 +14,7 @@ Ninja Emaki (US)
 Youma Ninpou Chou (Japan)
 (c)1986 NihonBussan Co.,Ltd.
 Driver by
-Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
+Takahiro Nogi 1999/12/17 -
 
 TODO
 - Find out how layers are enabled\disabled

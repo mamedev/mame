@@ -2,8 +2,8 @@
 // copyright-holders:Philip Bennett, Carl
 
 // SoftFloat 2 lacks an include guard
-#ifndef softfloat_h
-#define softfloat_h 1
+#ifndef softfloat2_h
+#define softfloat2_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #endif

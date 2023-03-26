@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K007420_H
-#define MAME_VIDEO_K007420_H
+#ifndef MAME_KONAMI_K007420_H
+#define MAME_KONAMI_K007420_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ DECLARE_DEVICE_TYPE(K007420, k007420_device)
 #define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)
 
 
-#endif // MAME_VIDEO_K007420_H
+#endif // MAME_KONAMI_K007420_H

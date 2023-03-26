@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
-<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader Cartridges">
+<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader cartridges">
 
 	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
 	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->

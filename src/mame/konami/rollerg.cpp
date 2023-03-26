@@ -17,7 +17,7 @@
 #include "k053244_k053245.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/k053252.h"
 #include "machine/watchdog.h"
@@ -351,7 +351,7 @@ void rollerg_state::machine_reset()
 void rollerg_state::rollerg(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 24_MHz_XTAL / 8); // divider not verified
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollerg_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rollerg_state::irq0_line_assert));
 	m_maincpu->line().set_membank(m_mainbank).mask(0x07);

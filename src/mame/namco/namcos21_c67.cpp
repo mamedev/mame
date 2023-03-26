@@ -273,6 +273,9 @@ Namco System 21 Video Hardware
 
 #define ENABLE_LOGGING      0
 
+
+namespace {
+
 class namcos21_c67_state : public driver_device
 {
 public:
@@ -1230,6 +1233,9 @@ void namcos21_c67_state::init_solvalou()
 	mem[0x20cf4/2+1] = 0x4e71;
 	mem[0x20cf4/2+2] = 0x4e71;
 }
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 

@@ -5,8 +5,8 @@
     Lethal Enforcers
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LETHAL_H
-#define MAME_INCLUDES_LETHAL_H
+#ifndef MAME_KONAMI_LETHAL_H
+#define MAME_KONAMI_LETHAL_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 	void le_sound(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LETHAL_H
+#endif // MAME_KONAMI_LETHAL_H

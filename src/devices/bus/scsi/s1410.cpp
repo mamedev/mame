@@ -173,7 +173,7 @@ void s1410_device::device_add_mconfig(machine_config &config)
 	z8400a.set_addrmap(AS_IO, &s1410_device::s1410_io);
 	z8400a.set_disable();
 
-	HARDDISK(config, "image");
+	HARDDISK(config, "image").set_interface("scsi_hdd");
 }
 
 

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_NMK004_H
-#define MAME_MACHINE_NMK004_H
+#ifndef MAME_NMK_NMK004_H
+#define MAME_NMK_NMK004_H
 
 #include "cpu/tlcs90/tlcs90.h"
 
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NMK004, nmk004_device)
 
-#endif // MAME_MACHINE_NMK004_H
+#endif // MAME_NMK_NMK004_H

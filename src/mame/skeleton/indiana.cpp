@@ -8,8 +8,6 @@
         01/20/2014 Added ISA bus and peripherals
 
         TODO: Text appears in VGA f/b (0x6B8000), but doesn't display?
-        TODO: Keyboard doesn't work very well. Scancodes are often lost
-              because the 68030 doesn't poll the MFP frequently enough.
 
 ****************************************************************************/
 
@@ -26,6 +24,9 @@
 #include "machine/mc68901.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
+
+
+namespace {
 
 #define ISABUS_TAG "isa"
 
@@ -97,6 +98,8 @@ void indiana_state::indiana(machine_config &config)
 	M68030(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indiana_state::indiana_mem);
 
+	config.set_maximum_quantum(attotime::from_msec(2)); // the MFP loses keyboard scancodes too often when longer quanta are enabled
+
 	isa16_device &isa(ISA16(config, ISABUS_TAG, 16_MHz_XTAL / 2)); // OSC = CLK = CLK8
 	isa.set_custom_spaces();
 	isa.irq3_callback().set_inputline(m_maincpu, M68K_IRQ_5);
@@ -141,6 +144,9 @@ ROM_START( indiana )
 	ROM_SYSTEM_BIOS( 2, "v7", "ver 0.7" )
 	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

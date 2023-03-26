@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/***************************************************************************
+/**************************************************************************************************
 
     CAVE PC hardware
     placeholder file for information
 
-***************************************************************************
+TODO:
+- Cannot continue without a proper Athlon 64 X2 core (uses lots of unsupported RDMSR / WRMSR)
+
+***************************************************************************************************
 
  Cave used a one-off PC platform for
 
@@ -52,45 +55,35 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
 
+
+namespace {
 
 class cavepc_state : public driver_device
 {
 public:
 	cavepc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 
-	void init_cavepc();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_cavepc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cavepc(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void cavepc_io(address_map &map);
 	void cavepc_map(address_map &map);
 };
-
-void cavepc_state::video_start()
-{
-}
-
-uint32_t cavepc_state::screen_update_cavepc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 /*****************************************************************************/
 
 void cavepc_state::cavepc_map(address_map &map)
 {
-	map(0x000f0000, 0x000fffff).bankr("bank1");
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0xe0000);
+	map(0xfff00000, 0xffffffff).rom().region("bios", 0);
 }
 
 void cavepc_state::cavepc_io(address_map &map)
@@ -103,39 +96,17 @@ void cavepc_state::cavepc_io(address_map &map)
 static INPUT_PORTS_START(cavepc)
 INPUT_PORTS_END
 
-void cavepc_state::machine_start()
-{
-}
-
-void cavepc_state::machine_reset()
-{
-	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
-}
 
 void cavepc_state::cavepc(machine_config &config)
 {
-	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 200000000); /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
+	PENTIUM3(config, m_maincpu, 200'000'000); /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cavepc_state::cavepc_map);
 	m_maincpu->set_addrmap(AS_IO, &cavepc_state::cavepc_io);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 199);
-	screen.set_screen_update(FUNC(cavepc_state::screen_update_cavepc));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(16);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
-
-
-void cavepc_state::init_cavepc()
-{
-}
 
 /*****************************************************************************/
 
@@ -178,7 +149,9 @@ ROM_START(deathsm2)
 	DISK_IMAGE( "cave_ds2_usb", 0, SHA1(b601985c7f6e6a20b0b7999167b7ccdd12ab80d0) )
 ROM_END
 
+} // anonymous namespace
+
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, init_cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )
+GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, empty_init, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )

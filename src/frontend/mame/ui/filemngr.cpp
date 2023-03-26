@@ -54,6 +54,18 @@ menu_file_manager::~menu_file_manager()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
@@ -101,7 +113,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 //  populate
 //-------------------------------------------------
 
-void menu_file_manager::populate(float &customtop, float &custombottom)
+void menu_file_manager::populate()
 {
 	std::string tmp_inst, tmp_name;
 
@@ -152,8 +164,6 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 
 	if (m_warnings.empty() || !missing_mandatory)
 		item_append(m_warnings.empty() ? _("Reset System") : _("Start System"), 0, (void *)1);
-
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -161,31 +171,32 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_manager::handle(event const *ev)
+bool menu_file_manager::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref && (ev->iptkey == IPT_UI_SELECT))
-	{
-		if ((uintptr_t)ev->itemref == 1)
-		{
-			machine().schedule_hard_reset();
-		}
-		else
-		{
-			selected_device = (device_image_interface *) ev->itemref;
-			if (selected_device)
-			{
-				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
-				if (floppy_device)
-					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
-				else
-					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+	if (!ev || !ev->itemref || (ev->iptkey != IPT_UI_SELECT))
+		return false;
 
-				// reset the existing menu
-				reset(reset_options::REMEMBER_POSITION);
-			}
+	if ((uintptr_t)ev->itemref == 1)
+	{
+		machine().schedule_hard_reset();
+	}
+	else
+	{
+		selected_device = (device_image_interface *) ev->itemref;
+		if (selected_device)
+		{
+			floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
+			if (floppy_device)
+				menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
+			else
+				menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+
+			// reset the existing menu
+			reset(reset_options::REMEMBER_POSITION);
 		}
 	}
+
+	return false;
 }
 
 // force file manager menu

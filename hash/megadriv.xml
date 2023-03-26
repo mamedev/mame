@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     UNDUMPED / TO BE REDUMPED LIST
 
@@ -117,7 +117,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 			<feature name="left" value="GD74HC00"/>
 			<feature name="right" value="GD74HC74"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003"/>
+				<rom name="fantastic dizzy md mdfd bb07.u2" size="524288" crc="46447e7a" sha1="b320174d3b43f30b477818a27b4da30462a52003" offset="0x000000"/>
 				<rom name="cosmic spacehead md mdcs e4f7.u1" size="1048576" crc="cb89e605" sha1="b5bc4a786639d1b8ae6de76f40dbe907b3f0b642" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -152,7 +152,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 			<feature name="ic2" value="MPR-18213-MX"/>
 			<feature name="ic3" value="74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-18212-mx.ic1" size="2097152" crc="f1a28bdc" sha1="980f80041d06f711bdc252f4de2f75144c589eab"/>
+				<rom name="mpr-18212-mx.ic1" size="2097152" crc="f1a28bdc" sha1="980f80041d06f711bdc252f4de2f75144c589eab" offset="0x000000"/>
 				<rom name="mpr-18213-mx.ic2" size="1048576" crc="21c7c561" sha1="37a599434b56b7d9aa102a7b23a084000d30d8fd" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -289,6 +289,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<description>After Burner II (Europe, USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13261-H"/>
@@ -382,7 +383,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 			<feature name="ic2" value="MPR-15960 T67"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="mpr-15959 t66.ic1" size="1048576" crc="32324c70" sha1="dccbb7006ac7dccb454389b2a9e18cd17cd22abb"/>
+				<rom name="mpr-15959 t66.ic1" size="1048576" crc="32324c70" sha1="dccbb7006ac7dccb454389b2a9e18cd17cd22abb" offset="0x000000"/>
 				<rom name="mpr-15960 t67.ic2" size="1048576" crc="004025f3" sha1="88eab5db861b87d4c28b1c0e308faca23aa77d9c" offset="0x100000"/>
 			</dataarea>
 		</part>
@@ -735,7 +736,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 			<feature name="ic2" value="MPR-15962-F"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="mpr-15961-f.ic1" size="1048576" crc="5e84f375" sha1="74201ead2acbecb0b6213ace53a1106900c9f459"/>
+				<rom name="mpr-15961-f.ic1" size="1048576" crc="5e84f375" sha1="74201ead2acbecb0b6213ace53a1106900c9f459" offset="0x000000"/>
 				<rom name="mpr-15962-f.ic2" size="1048576" crc="714ac01d" sha1="25468d71702d8fe22af2dc7b9217ae8f304b3606" offset="0x100000"/>
 			</dataarea>
 		</part>
@@ -804,6 +805,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<info name="serial" value="G-5514 (Jpn), MK-1135-50 (Euro)"/>
 		<info name="release" value="19920717"/>
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<sharedfeat name="compatibility" value="PAL,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -827,6 +829,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-1135"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -1363,13 +1366,11 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		</part>
 	</software>
 
-	<software name="cfodder" supported="partial">
+	<software name="cfodder">
 		<description>Cannon Fodder (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
+		<info name="usage" value="Supports mouse." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
 			<feature name="ic1" value="MPR-17322-H"/>
@@ -1484,7 +1485,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="u2" value="CENTURION U3 CEN03"/>
 			<feature name="u5" value="SN74LS138N"/>
 			<dataarea name="rom" width="16" endianness="big" size="786432">
-				<rom name="centurion u1 cen03.u1" size="524288" crc="47e6d79e" sha1="aa67727152101c54585d255446c2ac0dcf9d9a9a"/>
+				<rom name="centurion u1 cen03.u1" size="524288" crc="47e6d79e" sha1="aa67727152101c54585d255446c2ac0dcf9d9a9a" offset="0x000000"/>
 				<rom name="centurion u3 cen03.u2" size="131072" crc="323c82c1" sha1="b2b3631472320b380c9f4e3e654bc4de9a2ebbe7" offset="0x080001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
@@ -1753,7 +1754,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic4" value="IC4"/> <!-- EPROM4 -->
 			<feature name="ic5" value="IC5"/> <!-- 74HC139P -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="Cool Spot Sega Mega Drive EP ROM 0 of 4.ic1" size="262144" crc="eaa7a911" sha1="663b8394eee1d6b679db7ae45ee39df9e3aaabd6"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 0 of 4.ic1" size="262144" crc="eaa7a911" sha1="663b8394eee1d6b679db7ae45ee39df9e3aaabd6" offset="0x000000"/>
 				<rom name="Cool Spot Sega Mega Drive EP ROM 1 of 4.ic2" size="262144" crc="c7bc6cfb" sha1="e5d818993d162b5f2ed18b74848a514525cfd587" offset="0x040000"/>
 				<rom name="Cool Spot Sega Mega Drive EP ROM 2 of 4.ic3" size="262144" crc="3dff64f4" sha1="380c1e183769d8a32b9e52ce7465090ac3872580" offset="0x080000"/>
 				<rom name="Cool Spot Sega Mega Drive EP ROM 3 of 4.ic4" size="262144" crc="8fcce53a" sha1="cbe736a696319771b670c6c539f49d7d1956cd8e" offset="0x0c0000"/>
@@ -1861,14 +1862,14 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="dipswitch" value="SW1"/> <!-- (....) -->
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom loadflag="load16_byte" name="hn27c301ag.ic1" offset="0x00001" size="131072" crc="cfcea09b" sha1="59be32d111315bf7d1f8221724f54a840dd2814f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic2" offset="0x00000" size="131072" crc="60829383" sha1="ade97f9046896dd59335eee272e6b3f84bb787e0"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic3" offset="0x40001" size="131072" crc="e8342dd7" sha1="dcd3f8bb8849d85d10f442ad84c34c7ebf2aa19f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic4" offset="0x40000" size="131072" crc="1fdb0ed2" sha1="0fb8446d21de80efc8ef6cef40df96c335a55a3b"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic5" offset="0x80001" size="131072" crc="a9a4704f" sha1="1bf0176b68269c21e48b75e244ec9b755f71f12f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic6" offset="0x80000" size="131072" crc="76c96b1a" sha1="cda1ed7da5ef9835e6d20e90b844755288d44f84"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic7" offset="0xc0001" size="131072" crc="5864d4ba" sha1="ee8ad53e424b99cff525df8278ebd854d64c5bd9"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.ic8" offset="0xc0000" size="131072" crc="a6a02e5f" sha1="cc586e0dee3642e9d1f9e24cb1d5c4ca5bde4bfe"/>
+				<rom name="hn27c301ag.ic1" size="131072" crc="cfcea09b" sha1="59be32d111315bf7d1f8221724f54a840dd2814f" offset="0x00001" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic2" size="131072" crc="60829383" sha1="ade97f9046896dd59335eee272e6b3f84bb787e0" offset="0x00000" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic3" size="131072" crc="e8342dd7" sha1="dcd3f8bb8849d85d10f442ad84c34c7ebf2aa19f" offset="0x40001" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic4" size="131072" crc="1fdb0ed2" sha1="0fb8446d21de80efc8ef6cef40df96c335a55a3b" offset="0x40000" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic5" size="131072" crc="a9a4704f" sha1="1bf0176b68269c21e48b75e244ec9b755f71f12f" offset="0x80001" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic6" size="131072" crc="76c96b1a" sha1="cda1ed7da5ef9835e6d20e90b844755288d44f84" offset="0x80000" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic7" size="131072" crc="5864d4ba" sha1="ee8ad53e424b99cff525df8278ebd854d64c5bd9" offset="0xc0001" loadflag="load16_byte"/>
+				<rom name="hn27c301ag.ic8" size="131072" crc="a6a02e5f" sha1="cc586e0dee3642e9d1f9e24cb1d5c4ca5bde4bfe" offset="0xc0000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2414,7 +2415,7 @@ No [VDP] sprites
 			<feature name="ic2" value="MPR-17119-SM"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-17118-h.ic1" size="2097152" crc="bb3aa04e" sha1="5686b89a7c89e5aee1a84c2022bad3506d9eef08"/>
+				<rom name="mpr-17118-h.ic1" size="2097152" crc="bb3aa04e" sha1="5686b89a7c89e5aee1a84c2022bad3506d9eef08" offset="0x000000"/>
 				<rom name="mpr-17119-sm.ic2" size="1048576" crc="69853962" sha1="3f60a9bcee219d98204eee33b4608e62ab96df7d" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -2432,7 +2433,7 @@ No [VDP] sprites
 			<feature name="ic2" value="MPR-18677-MX"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-18589-mx.ic1" size="2097152" crc="2619cfc6" sha1="e4effd2801e1825f62b548d58edad09af4c8a97a"/>
+				<rom name="mpr-18589-mx.ic1" size="2097152" crc="2619cfc6" sha1="e4effd2801e1825f62b548d58edad09af4c8a97a" offset="0x000000"/>
 				<rom name="mpr-18677-mx.ic2" size="1048576" crc="8e6a0ea8" sha1="b853945408fb945437a485684880d16e27c6a939" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -2586,7 +2587,7 @@ No [VDP] sprites
 			<feature name="ic2" value="MPR-16213-SM"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-16212-sm.ic1" size="2097152" crc="9b662efc" sha1="e7591f30b1016c4ceaa22e649933162e0e5c4ccd"/>
+				<rom name="mpr-16212-sm.ic1" size="2097152" crc="9b662efc" sha1="e7591f30b1016c4ceaa22e649933162e0e5c4ccd" offset="0x000000"/>
 				<rom name="mpr-16213-sm.ic2" size="1048576" crc="81bbdd0e" sha1="f8755e397f64f04ce6b58e1f009e2b5a3aac9e10" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -2604,7 +2605,7 @@ No [VDP] sprites
 			<feature name="ic2" value="MPR-16048 T98"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-16047-t.ic1" size="2097152" crc="7252a1ef" sha1="5d9e25ea43185b481d241ac648874a63ddfb5573"/>
+				<rom name="mpr-16047-t.ic1" size="2097152" crc="7252a1ef" sha1="5d9e25ea43185b481d241ac648874a63ddfb5573" offset="0x000000"/>
 				<rom name="mpr-16048 t98.ic2" size="1048576" crc="69977fca" sha1="23d5d113743f560feec702c87507210aadc5eb08" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -2859,7 +2860,7 @@ No [VDP] sprites
 			<feature name="ic2" value="MPR-15409-F"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
-				<rom name="mpr-15404 t17.ic1" size="1048576" crc="40c67691" sha1="e96ee6fb0a5b53debabb5730afee36ee5b5d2057"/>
+				<rom name="mpr-15404 t17.ic1" size="1048576" crc="40c67691" sha1="e96ee6fb0a5b53debabb5730afee36ee5b5d2057" offset="0x000000"/>
 				<rom name="mpr-15409-f.ic2" size="524288" crc="28707491" sha1="ccdf39b180c9ca08eff1f022e6fc2d029da9a632" offset="0x100000"/>
 			</dataarea>
 		</part>
@@ -3188,13 +3189,10 @@ Crashes after EA logo, requires better [VDP] irq handling
 	</software>
 
 
-	<software name="funngame" supported="partial">
+	<software name="funngame">
 		<description>Fun 'N Games (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -3242,7 +3240,7 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+	<!-- Only Euro is confirmed - this revision fixes graphical corruption on PAL consoles -->
 	<software name="gforce2">
 		<description>Galaxy Force II (World, rev. B)</description>
 		<year>1991</year>
@@ -3250,6 +3248,7 @@ Unsupported [Sega Mouse] peripheral
 		<info name="serial" value="T-68013 (JPN)"/>
 		<info name="release" value="19910913 (JPN)"/>
 		<info name="alt_title" value="ギャラクシーフォースII"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
 			<feature name="u1" value="MPR-14248B-F"/>  <!-- location not really marked on PCB, using u1 for consistency -->
@@ -4172,13 +4171,10 @@ Moans about [Sega Mega Modem] not hooked up, punts to a red screen
 	</software>
 
 
-	<software name="jimmywws" supported="partial">
+	<software name="jimmywws">
 		<description>Jimmy White's Whirlwind Snooker (Europe)</description>
 		<year>1991</year>
 		<publisher>Virgin Games</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
@@ -4657,13 +4653,10 @@ Unsupported [Sega Mouse] peripheral
 	</software>
 
 
-	<software name="lemming2" supported="partial">
+	<software name="lemming2">
 		<description>Lemmings 2 - The Tribes (Europe)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -4756,7 +4749,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-17274-F, MPR-17274 T18"/>
 			<feature name="ic3" value="74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-17270.ic1" size="2097152" crc="f36bcfd7" sha1="44def056d4d1bdd71ceb5c6bce21fea37afd0f20"/>
+				<rom name="mpr-17270.ic1" size="2097152" crc="f36bcfd7" sha1="44def056d4d1bdd71ceb5c6bce21fea37afd0f20" offset="0x000000"/>
 				<rom name="mpr-17274.ic2" size="1048576" crc="f87c9656" sha1="355619d1fd708819e413b94c61d4fecbfec46fc1" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -4983,7 +4976,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-15965-F"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="mpr-15964-f.ic1" size="1048576" crc="70562d28" sha1="aa9ecae81b58bb6eabb4aac2e0d3b56d7c807b1e"/>
+				<rom name="mpr-15964-f.ic1" size="1048576" crc="70562d28" sha1="aa9ecae81b58bb6eabb4aac2e0d3b56d7c807b1e" offset="0x000000"/>
 				<rom name="mpr-15965-f.ic2" size="1048576" crc="edf0fb81" sha1="0eb3175aa794636f946acf1a6cf910dd6d9ad782" offset="0x100000"/>
 			</dataarea>
 		</part>
@@ -5015,7 +5008,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-18177-U"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-18176-u.ic1" size="2097152" crc="5f972198" sha1="4652f26a828123d7a6801aff8a67e952f8ac988e"/>
+				<rom name="mpr-18176-u.ic1" size="2097152" crc="5f972198" sha1="4652f26a828123d7a6801aff8a67e952f8ac988e" offset="0x000000"/>
 				<rom name="mpr-18177-u.ic2" size="1048576" crc="5af94653" sha1="9bbde1cbb5d87e5277bc9f48327075d020afeb9c" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -5517,7 +5510,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic23" value="74hc32"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="jamod0.ic1" size="524288" crc="8506240d" sha1="d452094ef243df6acb1cc4b6d579fa4cae0907be" offset="0x000001" loadflag="load16_byte"/>
-				<rom name="jamev0.ic2" size="524288" crc="2e597f94" sha1="6b08454f1dd88e71ca67ebd7d9616151b8ab20cf" loadflag="load16_byte"/>
+				<rom name="jamev0.ic2" size="524288" crc="2e597f94" sha1="6b08454f1dd88e71ca67ebd7d9616151b8ab20cf" offset="0x000000" loadflag="load16_byte"/>
 				<rom name="jamod1.ic3" size="524288" crc="762c4fac" sha1="fd3d4eef44a5792bc864baad72ac6c51c4c36e9b" offset="0x100001" loadflag="load16_byte"/>
 				<rom name="jamev1.ic4" size="524288" crc="8735b9f6" sha1="480346cc0980c183f70c674b8ef7d89a4d603cc3" offset="0x100000" loadflag="load16_byte"/>
 			</dataarea>
@@ -5543,7 +5536,7 @@ Unsupported [Menacer] peripheral
 			<feature name="u3" value="LZ95A53"/>
 			<feature name="slot" value="rom_nbajamte"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="u1 nba jam te.u1" size="2097152" crc="6396cdc1" sha1="f1a53fe470d65e5be408809ab2aa717cc162ba60"/>
+				<rom name="u1 nba jam te.u1" size="2097152" crc="6396cdc1" sha1="f1a53fe470d65e5be408809ab2aa717cc162ba60" offset="0x000000"/>
 				<rom name="u2 nba jam te.u2" size="1048576" crc="4b763b0d" sha1="62c5912ce769896a0d887e27eddd2b0d6b862056" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -5808,7 +5801,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-15006 W88"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
-				<rom name="mpr-15005-sm.ic1" size="1048576" crc="fe6e1dcf" sha1="8dcb55cb473e8f1ec1a35d94b04747341399a8c3"/>
+				<rom name="mpr-15005-sm.ic1" size="1048576" crc="fe6e1dcf" sha1="8dcb55cb473e8f1ec1a35d94b04747341399a8c3" offset="0x000000"/>
 				<rom name="mpr-15006 w88.ic2" size="524288" crc="69fa64b5" sha1="d952772bdf3cdaee8e3b2d9bfb30dff34c8f54af" offset="0x100000"/>
 			</dataarea>
 		</part>
@@ -6427,7 +6420,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic4" value="067-1026B"/>
 			<feature name="ic5" value="PC74HC139P"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="mpr-12851a s40.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" loadflag="load16_word_swap"/>
+				<rom name="mpr-12851a s40.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="0x000000" loadflag="load16_word_swap"/>
 				<rom name="mpr-12852a-s.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="0x080000" loadflag="load16_word_swap"/>
 			</dataarea>
 			<dataarea name="sram" size="16384">
@@ -6495,7 +6488,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-19085-MX"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="mpr-19084-mx.ic1" size="2097152" crc="6bcf72de" sha1="d1823b946980d9e0763e35e2d794f3c931c99db5"/>
+				<rom name="mpr-19084-mx.ic1" size="2097152" crc="6bcf72de" sha1="d1823b946980d9e0763e35e2d794f3c931c99db5" offset="0x000000"/>
 				<rom name="mpr-19085-mx.ic2" size="2097152" crc="cc453625" sha1="a711ae8cf75d88af0d14ceda79c5c0bb3b318efe" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -6603,7 +6596,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="TWI 1995 335108-1050A"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="twi 1995 335108-1050.ic1" size="2097152" crc="384f3021" sha1="87d16b90c8949c74fcabf489c6e452ac235eee65"/>
+				<rom name="twi 1995 335108-1050.ic1" size="2097152" crc="384f3021" sha1="87d16b90c8949c74fcabf489c6e452ac235eee65" offset="0x000000"/>
 				<rom name="twi 1995 335108-1050a.ic2" size="1048576" crc="bc0966cb" sha1="dbdd2bdb32a6a1e12d24ccf950a1fe2974bc8d81" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -6704,7 +6697,7 @@ Unsupported [Menacer] peripheral
 			<feature name="pcb" value="171-6206A"/>
 			<feature name="ic1" value="MPR-14371-F, MPR-14371-H"/>
 			<dataarea name="rom" width="16" endianness="big" size="1310720">
-				<rom name="mpr-14371-f.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e"/>
+				<rom name="mpr-14371-f.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="0x000000"/>
 				<rom size="262144" offset="0x100000" loadflag="continue"/>
 			</dataarea>
 		</part>
@@ -6869,7 +6862,7 @@ Unsupported [Menacer] peripheral
 			<feature name="u2" value="REVOLUTION X U2"/>
 			<feature name="u3" value="GD74LS139"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="revolution x u1.u1" size="2097152" crc="786248a7" sha1="4923973b65537b3737986a58bf4fac973ac54f37"/>
+				<rom name="revolution x u1.u1" size="2097152" crc="786248a7" sha1="4923973b65537b3737986a58bf4fac973ac54f37" offset="0x000000"/>
 				<rom name="revolution x u2.u2" size="2097152" crc="3f04f118" sha1="58b06c1ed0268274d28b73109b22b7263d6a7b22" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -6969,7 +6962,7 @@ Unsupported [Menacer] peripheral
 			<feature name="u3" value="ROAD RASH U3 ROA03-1"/> <!-- location not really marked on PCB, using u3 for consistency -->
 			<feature name="u4" value="SN74LS138N"/> <!-- location not really marked on PCB, using u4 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="786432">
-				<rom name="road rash u1 roa03-4.u1" size="524288" crc="e90337ee" sha1="f025979d35fdb7285a0158e390fdb824551a1ee1"/>
+				<rom name="road rash u1 roa03-4.u1" size="524288" crc="e90337ee" sha1="f025979d35fdb7285a0158e390fdb824551a1ee1" offset="0x000000"/>
 				<!-- no even rom, like f22a -->
 				<rom name="road rash u3 roa03-1.u3" size="131072" crc="32c1af50" sha1="7e43c8cb6cc2047c1ac8457e8bcc83d2b326172c" offset="0x080001" loadflag="load16_byte"/>
 			</dataarea>
@@ -7078,7 +7071,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-17609-U"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-17608-u.ic1" size="2097152" crc="f70d4334" sha1="c7c31510ce0b15e00beabc680a395991c60c35f1"/>
+				<rom name="mpr-17608-u.ic1" size="2097152" crc="f70d4334" sha1="c7c31510ce0b15e00beabc680a395991c60c35f1" offset="0x000000"/>
 				<rom name="mpr-17609-u.ic2" size="1048576" crc="8713fc5e" sha1="f987d1b33b041e4c5008b7225557463a53427813" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7096,7 +7089,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-17502-SM"/>
 			<feature name="ic3" value="74HC00AP"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-17501-sm.ic1" size="2097152" crc="e06dd5cb" sha1="fe6dd1618b1e263c2a8485c70d02e172eb46070a"/>
+				<rom name="mpr-17501-sm.ic1" size="2097152" crc="e06dd5cb" sha1="fe6dd1618b1e263c2a8485c70d02e172eb46070a" offset="0x000000"/>
 				<rom name="mpr-17502-sm.ic2" size="1048576" crc="63bb11a6" sha1="db9be899159039c9f500c57de611e70a4e7e74a3" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7114,7 +7107,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-17903-F"/>
 			<feature name="ic3" value="74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="mpr-17902-f.ic1" size="2097152" crc="bfacdf54" sha1="2c9e878c0a9bb44ec7d71caf7da986f1a7ebdaf8"/>
+				<rom name="mpr-17902-f.ic1" size="2097152" crc="bfacdf54" sha1="2c9e878c0a9bb44ec7d71caf7da986f1a7ebdaf8" offset="0x000000"/>
 				<rom name="mpr-17903-f.ic2" size="2097152" crc="3a20db0a" sha1="f48873b2662c1ccf5635d5331d92f58175982e6f" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7132,7 +7125,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="SLM-GS-2"/>
 			<feature name="ic3" value="HD74HC139P"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="slm-gs-1.ic1" size="2097152" crc="04132699" sha1="cc5e310a8835641001fbfa116dcf03d95957c9c5"/>
+				<rom name="slm-gs-1.ic1" size="2097152" crc="04132699" sha1="cc5e310a8835641001fbfa116dcf03d95957c9c5" offset="0x000000"/>
 				<rom name="slm-gs-2.ic2" size="2097152" crc="3a20db0a" sha1="f48873b2662c1ccf5635d5331d92f58175982e6f" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7178,7 +7171,7 @@ Unsupported [Menacer] peripheral
 			<feature name="ic2" value="MPR-17328-F"/>
 			<feature name="ic3" value="74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="2621440">
-				<rom name="mpr-17323-f.ic1" size="2097152" crc="dc8c0473" sha1="e7a47bc9e9ebb6946b3b520c2826e0a097fa502d"/>
+				<rom name="mpr-17323-f.ic1" size="2097152" crc="dc8c0473" sha1="e7a47bc9e9ebb6946b3b520c2826e0a097fa502d" offset="0x000000"/>
 				<rom name="mpr-17328-f.ic2" size="524288" crc="50f85508" sha1="45d8bce549605534dfda9822664b42c318ba3109" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7263,13 +7256,10 @@ Unsupported [Menacer] peripheral
 	</software>
 
 
-	<software name="shangh2" supported="partial">
+	<software name="shangh2">
 		<description>Shanghai II - Dragon's Eye (USA)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="800057-02"/>
@@ -7292,7 +7282,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="u2" value="U2 SHAQ FU SFB2"/>
 			<feature name="u3" value="GD74LS138"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="u1 shaq fu sfb2.u1" size="2097152" crc="1bf9e4f9" sha1="7edaaedd67a112d1d2b77f8a9f486b984537ca13"/>
+				<rom name="u1 shaq fu sfb2.u1" size="2097152" crc="1bf9e4f9" sha1="7edaaedd67a112d1d2b77f8a9f486b984537ca13" offset="0x000000"/>
 				<rom name="u2 shaq fu sfb2.u2" size="1048576" crc="41054fb3" sha1="c7205485f189742a7efcd4ba7b80b64a8e4735e4" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7545,7 +7535,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-19102-MX"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="mpr-19101-mx.ic1" size="2097152" crc="ebd93b32" sha1="49fe35a5515d935961eafe396e261e194f194d10"/>
+				<rom name="mpr-19101-mx.ic1" size="2097152" crc="ebd93b32" sha1="49fe35a5515d935961eafe396e261e194f194d10" offset="0x000000"/>
 				<rom name="mpr-19102-mx.ic2" size="2097152" crc="7ed2592f" sha1="1ba5e24e193cfdb5c023d6fec74ec279905279be" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7898,7 +7888,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-15911 T65, MPR-15911-S"/>
 			<feature name="ic3" value="HD74HC00P"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-15910 w39.ic1" size="2097152" crc="77a2d058" sha1="586ec3031de0a80b9b80f3945f468b5676bc23fc"/>
+				<rom name="mpr-15910 w39.ic1" size="2097152" crc="77a2d058" sha1="586ec3031de0a80b9b80f3945f468b5676bc23fc" offset="0x000000"/>
 				<rom name="mpr-15911 t65.ic2" size="1048576" crc="a9ab58ba" sha1="76fa72262e7cf93f4ae866e0aab64cdb43bbf6f7" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -7916,7 +7906,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="SF2P-GS-2"/>
 			<feature name="ic3" value="74HC139AP"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="sf2p-gs-1.ic1" size="2097152" crc="8cfffff5" sha1="b25000ac155132a05ad01c8fefdde24dd0b9ea87"/>
+				<rom name="sf2p-gs-1.ic1" size="2097152" crc="8cfffff5" sha1="b25000ac155132a05ad01c8fefdde24dd0b9ea87" offset="0x000000"/>
 				<rom name="sf2p-gs-2.ic2" size="1048576" crc="a9ab58ba" sha1="76fa72262e7cf93f4ae866e0aab64cdb43bbf6f7" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -8009,7 +7999,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-16835-MX"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-16834-mx.ic1" size="2097152" crc="4cb2c999" sha1="eddbdb075331e540341d9e01ee64800672bdc269"/>
+				<rom name="mpr-16834-mx.ic1" size="2097152" crc="4cb2c999" sha1="eddbdb075331e540341d9e01ee64800672bdc269" offset="0x000000"/>
 				<rom name="mpr-16835-mx.ic2" size="1048576" crc="40992c0a" sha1="228d2a4ae8771fab536cbdf12ec9c427d79e59e2" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -8425,7 +8415,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic5" value="PC74HC139P"/>
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="655360">
-				<rom name="mpr-13430-t.ic1" size="131072" crc="9a6d1110" sha1="acadd3cf6c1eb346db4f9746134fb8a957e3b147"/>
+				<rom name="mpr-13430-t.ic1" size="131072" crc="9a6d1110" sha1="acadd3cf6c1eb346db4f9746134fb8a957e3b147" offset="0x000000"/>
 				<rom name="mpr-13431-h.ic2" size="131072" crc="793fd7a3" sha1="5a4425727463992fabd0ff3422d1894aaf686b5f" offset="0x080000"/>
 				<rom size="393216" offset="0x020000" loadflag="continue"/>
 			</dataarea>
@@ -8825,7 +8815,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="u2" value="TMB2 U2"/>
 			<feature name="u3" value="GD74HC138"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="tmb2 u1.u1" size="2097152" crc="4d14abe9" sha1="35f4949e7dcb77196298dfc76d8923a665b5e274"/>
+				<rom name="tmb2 u1.u1" size="2097152" crc="4d14abe9" sha1="35f4949e7dcb77196298dfc76d8923a665b5e274" offset="0x000000"/>
 				<rom name="tmb2 u2.u2" size="2097152" crc="8214b730" sha1="30d73ec44176cb717d0ef30067c603a7495c57b8" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -8920,7 +8910,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-13936-F"/>
 			<feature name="ic3" value="PC74HC139P"/>
 			<dataarea name="rom" width="16" endianness="big" size="655360">
-				<rom name="mpr-13935-t.ic1" size="131072" crc="04d94498" sha1="43e3483715d8a5af4241863f4559df417c6f61ad"/>
+				<rom name="mpr-13935-t.ic1" size="131072" crc="04d94498" sha1="43e3483715d8a5af4241863f4559df417c6f61ad" offset="0x000000"/>
 				<rom name="mpr-13936-f.ic2" size="131072" crc="cf88666e" sha1="8e04c17a720e917bf4ca12c44f637822efcfe979" offset="0x080000"/>
 				<rom size="393216" offset="0x020000" loadflag="continue"/>
 			</dataarea>
@@ -9103,7 +9093,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic5" value="D74HC139C"/>
 			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="655360">
-				<rom name="mpr-12708-t.ic1" size="131072" crc="5ae36ea5" sha1="1b7defa4f69d199fffe025b804390cef304b200d"/>
+				<rom name="mpr-12708-t.ic1" size="131072" crc="5ae36ea5" sha1="1b7defa4f69d199fffe025b804390cef304b200d" offset="0x000000"/>
 				<rom name="mpr-12709-s.ic2" size="131072" crc="3abb96be" sha1="d1b02aaa03776ae9426591f7d0cb1476d2d012c5" offset="0x080000"/>
 				<rom size="393216" offset="0x020000" loadflag="continue"/>
 			</dataarea>
@@ -9139,7 +9129,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic2" value="MPR-19108-MX"/>
 			<feature name="ic3" value="SN74HC00N"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="mpr-19107-mx.ic1" size="2097152" crc="1645fd9f" sha1="10571f7171e2b9e48178a8031d9654ee8883717b"/>
+				<rom name="mpr-19107-mx.ic1" size="2097152" crc="1645fd9f" sha1="10571f7171e2b9e48178a8031d9654ee8883717b" offset="0x000000"/>
 				<rom name="mpr-19108-mx.ic2" size="2097152" crc="03ca9dc2" sha1="aed36c31c5f33e49e2909d83a3649e66c7932b40" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -9545,7 +9535,7 @@ Unsupported [Sega Mouse] peripheral
 			<feature name="ic7" value="74HC74A"/>  <!-- On the back of the PCB -->
 			<feature name="batt" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
-				<rom name="mpr-19766-mx.ic1" size="2097152" crc="99545a01" sha1="f56f4376e45917c875b9286b1bfe90c2b67c29c1"/>
+				<rom name="mpr-19766-mx.ic1" size="2097152" crc="99545a01" sha1="f56f4376e45917c875b9286b1bfe90c2b67c29c1" offset="0x000000"/>
 				<rom name="mpr-19767-mx.ic2" size="1048576" crc="0e584348" sha1="9b599b237106335a4da0c2a1e88b4d10e2b8330f" offset="0x200000"/>
 			</dataarea>
 			<dataarea name="sram" size="65536">
@@ -10006,7 +9996,7 @@ Doesn't accept any input
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_cm2in1"/>
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49"/>
+				<rom name="mdppf821.bin" size="2097152" crc="32dd8351" sha1="928f46ca87886c6e72d10f7c9db29b09e483bc49" offset="0x000000"/>
 				<rom name="mdmm acd3.bin" size="524288" crc="50081a0b" sha1="56a8844c376f2e79e92cf128681fa3fef81c36d6" offset="0x200000"/>
 			</dataarea>
 		</part>
@@ -10598,6 +10588,7 @@ Only Road Rash portion is present in the dump, the other two entries and menu ar
 		<info name="serial" value="T-17013"/>
 		<info name="release" value="19900323"/>
 		<info name="alt_title" value="アフターバーナーII"/>
+		<info name="usage" value="Supports XE-1AP analog pad." />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-12941.bin" size="524288" crc="4ff37e66" sha1="8f1e6a3e83094e5d0e237d6a1ffcc87171595ea5"/>
@@ -12285,7 +12276,6 @@ https://bootleggames.fandom.com/wiki/Barver_Battle_Saga:_Tai_Kong_Zhan_Shi
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Unsupported [Menacer] peripheral (joypad works)
-Unsupported [Sega Mouse] peripheral
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="megadriv_cart">
@@ -13594,6 +13584,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Columns III - Revenge of Columns (USA)</description>
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
+		<info name="usage" value="Supports up to five players with 4-Player Adaptor connected to second controller port." />
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -16853,10 +16844,13 @@ https://segaretro.org/Feng_Shen_Ying_Jie_Chuan
 		</part>
 	</software>
 
+	<!-- Heavy graphical corruption on PAL consoles - original game bug, fixed in rev. B (gforce2) -->
 	<software name="gforce2a" cloneof="gforce2">
 		<description>Galaxy Force II (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Supports XE-1AP analog pad." />
+		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="galaxy force ii (world).bin" size="1048576" crc="cae883c5" sha1="d4143bf5f49b0d03f4b8fe270c2ecc23fa6627e0"/>
@@ -18123,13 +18117,10 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="janout" supported="partial">
+	<software name="janout">
 		<description>Janou Touryuumon (Japan)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="G-4096"/>
 		<info name="release" value="19931105"/>
 		<info name="alt_title" value="日本プロ麻雀連盟公認 雀皇登龍門"/>
@@ -19019,13 +19010,10 @@ Black screen
 		</part>
 	</software>
 
-	<software name="lemming2u" cloneof="lemming2" supported="partial">
+	<software name="lemming2u" cloneof="lemming2">
 		<description>Lemmings 2 - The Tribes (USA)</description>
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -19236,13 +19224,10 @@ Unsupported [Justifier] peripheral (joypad works)
 		</part>
 	</software>
 
-	<software name="lordmon" supported="partial">
+	<software name="lordmon">
 		<description>Lord Monarch - Tokoton Sentou Densetsu (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="G-5534"/>
 		<info name="release" value="19940624"/>
 		<info name="alt_title" value="ロードモナーク とことん戦闘伝説"/>
@@ -19623,13 +19608,10 @@ https://segaretro.org/Ma_Qiao_E_Mo_Ta:_Devilish_Mahjong_Tower
 		</part>
 	</software>
 
-	<software name="marblej" supported="partial">
+	<software name="marblej">
 		<description>Marble Madness (Japan)</description>
 		<year>1993</year>
 		<publisher>Tengen</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral (trackball)
-]]></notes>
 		<info name="serial" value="T-48113"/>
 		<info name="release" value="19930813"/>
 		<info name="alt_title" value="マーブル マッドネス"/>
@@ -19906,7 +19888,7 @@ Unsupported [Sega Mouse] peripheral (trackball)
 	</software>
 
 	<software name="rockman" cloneof="megaman">
-		<description>Rockman Mega World (Japan)</description>
+		<description>Rockman Mega World (Japan, SRAM)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-12053"/>
@@ -19922,22 +19904,17 @@ Unsupported [Sega Mouse] peripheral (trackball)
 		</part>
 	</software>
 
-	<software name="rockman1" cloneof="megaman" supported="no">
-		<description>Rockman Mega World (Japan, alt)</description>
+	<software name="rockman1" cloneof="megaman">
+		<description>Rockman Mega World (Japan, EEPROM)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
-		<notes><![CDATA[
-Black screen
-]]></notes>
 		<info name="serial" value="T-12053"/>
 		<info name="release" value="19941021"/>
 		<info name="alt_title" value="ロックマン メガワールド"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram"/>
+			<feature name="slot" value="rom_eeprom_mode1"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="rockman mega world (jpn) (alt).bin" size="2097152" crc="85c956ef" sha1="a435ac53589a29dbb655662c942daab425d3f6bd"/>
-			</dataarea>
-			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -22327,13 +22304,10 @@ Unemulated [Sega Mega Modem] features
 		</part>
 	</software>
 
-	<software name="nobuhao" supported="partial">
+	<software name="nobuhao">
 		<description>Nobunaga no Yabou - Haouden (Japan)</description>
 		<year>1994</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="T-76153"/>
 		<info name="release" value="19940225"/>
 		<info name="alt_title" value="信長の野望 覇王伝"/>
@@ -22347,13 +22321,10 @@ Unsupported [Sega Mouse] peripheral
 		</part>
 	</software>
 
-	<software name="nobuamb" supported="partial">
+	<software name="nobuamb">
 		<description>Nobunaga's Ambition (USA)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -22364,13 +22335,10 @@ Unsupported [Sega Mouse] peripheral
 		</part>
 	</software>
 
-	<software name="nobuzenk" cloneof="nobuamb" supported="partial">
+	<software name="nobuzenk" cloneof="nobuamb">
 		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<info name="serial" value="T-76133"/>
 		<info name="release" value="19930915"/>
 		<info name="alt_title" value="信長の野望 全・国・版"/>
@@ -24541,13 +24509,10 @@ https://segaretro.org/Rastan_Saga_II
 		</part>
 	</software>
 
-	<software name="rsbt" supported="partial">
+	<software name="rsbt">
 		<description>Richard Scarry's BusyTown (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
 		<sharedfeat name="compatibility" value="NTSC-U,NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -26224,7 +26189,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3"/>
+				<rom name="mpr-16910-u.ic1" size="2097152" crc="0658f691" sha1="88d6499d874dcb5721ff58d76fe1b9af811192e3" offset="0x000000"/>
 				<rom name="mpr-16911-s.ic2" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26237,7 +26202,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0606 - jun 06, 1994, 10.02).bin" size="2097152" crc="03a52f63" sha1="173524ffae78438b5ddd039ec8b8def786f28aee"/>
+				<rom name="sonic &amp; knuckles (prototype 0606 - jun 06, 1994, 10.02).bin" size="2097152" crc="03a52f63" sha1="173524ffae78438b5ddd039ec8b8def786f28aee" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0606 - jun 05, 1994, 22.25).bin" size="262144" crc="bd619ea9" sha1="f557741d93f8d3e8a84099ab88f0331ced2875c8" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26250,7 +26215,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0608 - jun 08, 1994, 05.03).bin" size="2097152" crc="7a6c1317" sha1="a55b784590e602a82719d6721b2789f686564d2b"/>
+				<rom name="sonic &amp; knuckles (prototype 0608 - jun 08, 1994, 05.03).bin" size="2097152" crc="7a6c1317" sha1="a55b784590e602a82719d6721b2789f686564d2b" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0608 - jun 08, 1994, 03.35).bin" size="262144" crc="6a5dcbe6" sha1="f27434f63ce45de92c361b0b3aabdfde80c237da" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26263,7 +26228,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80"/>
+				<rom name="sonic &amp; knuckles (prototype 0610 - jun 10, 1994, 07.49).bin" size="2097152" crc="7092f368" sha1="bc67cb9edb8958a66723a8346c9d58d43d18ca80" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0610 - jun 10, 1994, 03.11).bin" size="262144" crc="0f6ff22b" sha1="d2b4003a7110f258641b7b76d7716acbcb3b62ab" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26276,7 +26241,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0612 - jun 12, 1994, 18.27).bin" size="2097152" crc="b0a253e8" sha1="8585b617e6828bf0b255d4ef747384db7ff67826"/>
+				<rom name="sonic &amp; knuckles (prototype 0612 - jun 12, 1994, 18.27).bin" size="2097152" crc="b0a253e8" sha1="8585b617e6828bf0b255d4ef747384db7ff67826" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0612 - jun 12, 1994, 18.18).bin" size="262144" crc="9a5f8183" sha1="eb29700a161a1949ed3057a3580911c7932315a5" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26289,7 +26254,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0618 - jun 18, 1994, 09.15).bin" size="2097152" crc="2615f5dc" sha1="e365c42a2c754b9df98b5b74dbc3e7f94c1a84f4"/>
+				<rom name="sonic &amp; knuckles (prototype 0618 - jun 18, 1994, 09.15).bin" size="2097152" crc="2615f5dc" sha1="e365c42a2c754b9df98b5b74dbc3e7f94c1a84f4" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -26302,7 +26267,7 @@ https://bootleggames.fandom.com/wiki/Shui_Hu_Feng_Yun_Zhuan
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sk"/>
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
-				<rom name="sonic &amp; knuckles (prototype 0619 - jun 19, 1994, 08.18).bin" size="2097152" crc="1ea5b9d1" sha1="b84d197e646ceece8681d35af3b4014c1bbeae35"/>
+				<rom name="sonic &amp; knuckles (prototype 0619 - jun 19, 1994, 08.18).bin" size="2097152" crc="1ea5b9d1" sha1="b84d197e646ceece8681d35af3b4014c1bbeae35" offset="0x000000"/>
 				<rom name="sonic &amp; knuckles (s2k chip) (prototype 0618 - jun 18, 1994, 9.07).bin" size="262144" crc="4dcfd55c" sha1="70429f1d80503a0632f603bf762fe0bbaa881d22" offset="0x300000"/>
 			</dataarea>
 		</part>
@@ -30485,14 +30450,12 @@ No BGMs
 		</part>
 	</software>
 
-	<software name="wworlds" supported="partial">
+	<software name="wworlds">
 		<description>Wacky Worlds (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
-		<notes><![CDATA[
-Unsupported [Sega Mouse] peripheral
-]]></notes>
-		<info name="alt_title" value="Wacky Worlds Creativity Studio (Box)"/>
+		<info name="alt_title" value="Wacky Worlds Creativity Studio"/> <!-- on box -->
+		<info name="usage" value="Supports mouse." />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -33673,7 +33636,7 @@ https://bootleggames.fandom.com/wiki/Super_Bubble_Bobble_MD
 		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102"/>
+				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102" offset="0x000000"/>
 				<rom size="2097152" offset="0x200000" loadflag="reload"/>
 			</dataarea>
 		</part>

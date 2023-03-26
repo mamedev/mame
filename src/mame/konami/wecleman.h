@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_WECLEMAN_H
-#define MAME_INCLUDES_WECLEMAN_H
+#ifndef MAME_KONAMI_WECLEMAN_H
+#define MAME_KONAMI_WECLEMAN_H
 
 #pragma once
 
@@ -199,4 +199,4 @@ private:
 	void hotchase_sub_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_WECLEMAN_H
+#endif // MAME_KONAMI_WECLEMAN_H

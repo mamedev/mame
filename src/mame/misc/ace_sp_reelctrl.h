@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_ACE_SP_REELCTRL_H
-#define MAME_MACHINE_ACE_SP_REELCTRL_H
+#ifndef MAME_MISC_ACE_SP_REELCTRL_H
+#define MAME_MISC_ACE_SP_REELCTRL_H
 
 #pragma once
 
@@ -50,5 +50,5 @@ DECLARE_DEVICE_TYPE(ACE_SP_REELCTRL, ace_sp_reelctrl_device)
 DECLARE_DEVICE_TYPE(ACE_SP_REELCTRL_PCP, ace_sp_reelctrl_pcp_device)
 
 
-#endif // #define MAME_MACHINE_ACE_SP_REELCTRL_H
+#endif // #define MAME_MISC_ACE_SP_REELCTRL_H
 

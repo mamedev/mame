@@ -74,6 +74,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class mycom_state : public driver_device
 {
 public:
@@ -583,6 +585,9 @@ ROM_START( mycom )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

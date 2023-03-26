@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="abc800_hdd" description="Luxor ABC 800 hard disks">
 
@@ -9,6 +9,7 @@ license:CC0
 		<description>ABC 850</description>
 		<year>1983</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc850" />
 
 		<!-- Rodime RO202 -->
 		<part name="hdd" interface="scsi_hdd">
@@ -22,6 +23,7 @@ license:CC0
 		<description>ABC 852</description>
 		<year>1986</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc852" />
 
 		<!-- BASF 6185 -->
 		<part name="hdd" interface="scsi_hdd">
@@ -35,6 +37,7 @@ license:CC0
 		<description>ABC 856</description>
 		<year>1986</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc856" />
 
 		<!-- Micropolis 1325 -->
 		<part name="hdd" interface="scsi_hdd">

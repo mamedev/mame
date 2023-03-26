@@ -55,16 +55,10 @@ uint8_t tanbus_tanram_device::read(offs_t offset, int inhrom, int inhram, int be
 
 	if (be && !inhram)
 	{
-		/* 32K dynamic ram */
-		if ((offset >= 0x2000) && (offset < 0xa000))
+		/* 32K dynamic ram + 7K static ram */
+		if ((offset >= 0x2000) && (offset < 0xbc00))
 		{
 			data = m_ram[offset - 0x2000];
-		}
-
-		/* 7K static ram */
-		if ((offset >= 0xa000) && (offset < 0xbc00))
-		{
-			data = m_ram[offset - 0xa000];
 		}
 	}
 	return data;
@@ -78,16 +72,10 @@ void tanbus_tanram_device::write(offs_t offset, uint8_t data, int inhrom, int in
 {
 	if (be && !inhram)
 	{
-		/* 32K dynamic ram */
-		if ((offset >= 0x2000) && (offset < 0xa000))
+		/* 32K dynamic ram + 7K static ram */
+		if ((offset >= 0x2000) && (offset < 0xbc00))
 		{
 			m_ram[offset - 0x2000] = data;
-		}
-
-		/* 7K static ram */
-		if ((offset >= 0xa000) && (offset < 0xbc00))
-		{
-			m_ram[offset - 0xa000] = data;
 		}
 	}
 }

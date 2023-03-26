@@ -53,8 +53,7 @@ void mpu4crystal_machines_state::crystal_f(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(mpu4crystal_machines_state,mpu4cry)
 
 	upd7759_device &upd(UPD7759(config, "upd"));
-	upd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	upd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	upd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 uint8_t mpu4crystal_machines_state::crystal_sound_r()
@@ -237,7 +236,7 @@ ROM_END
 
 
 #define M4BASCSH_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4bagcsh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -252,7 +251,7 @@ ROM_START( m4bagcsha )
 ROM_END
 
 #define M4BUCCLB_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4bucclb )
@@ -278,7 +277,7 @@ ROM_END
 
 
 #define M4BULLIO_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4bullio )
@@ -301,7 +300,7 @@ ROM_END
 
 
 #define M4CAROU_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "fa_sound.bin", 0x0000, 0x080000, CRC(39837e76) SHA1(74b66f77d9af47a5caab5b6441563b196fdadb37) )
 ROM_START( m4carou )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -329,7 +328,7 @@ ROM_END
 
 
 #define M4CCLIMB_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4cclimb )
@@ -345,7 +344,7 @@ ROM_START( m4cclimba )
 ROM_END
 
 #define M4CRZCL_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4crzcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -378,7 +377,7 @@ ROM_START( m4crzcld )
 ROM_END
 
 #define M4ELITC_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4elitc )
@@ -395,7 +394,7 @@ ROM_END
 
 
 #define M4FAIRG_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "fairgroundcrysv2-1snd.bin", 0x0000, 0x040000, CRC(9b09f98a) SHA1(e980bb0039f087ee563165a3aeb66e627fc3afe9) )
 ROM_START( m4fairg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -405,7 +404,7 @@ ROM_END
 
 
 #define M4FRMANI_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4frmani )
@@ -435,7 +434,7 @@ ROM_END
 
 
 #define M4GOLDXC_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4goldxc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -475,7 +474,7 @@ ROM_END
 
 
 #define M4GOLDFC_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "goldfeversamplesound.bin", 0x0000, 0x080000, CRC(eb7d3c7b) SHA1(53b7c048e78506f0188b4dd2750c8dc31a625523) )
 
 
@@ -500,7 +499,7 @@ ROM_END
 
 
 #define M4HIROL_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4hirol )
@@ -517,7 +516,7 @@ ROM_END
 
 
 #define M4KINGQN_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "kingsandqueenscrystalsnd.bin", 0x0000, 0x080000, CRC(93e4b644) SHA1(920579db52c5bb820437023e35707780ed503acc) )
 
 ROM_START( m4kingqn )
@@ -535,7 +534,7 @@ ROM_END
 
 
 #define M4LOTCLB_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4lotclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -554,7 +553,7 @@ ROM_END
 
 
 #define M4MONTRL_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "moneytrailsnd.bin", 0x0000, 0x040000, CRC(0f0d52dc) SHA1(79e1a89858f95006a1d2a0dd18d677c84a3087c6) )
 
 ROM_START( m4montrl )
@@ -591,7 +590,7 @@ ROM_END
 
 
 #define M4MYSTIQ_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4mystiq )
@@ -620,7 +619,7 @@ ROM_END
 
 
 #define M4NUDWIN_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4nudwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -636,7 +635,7 @@ ROM_END
 
 
 #define M4PARACL_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 
@@ -654,7 +653,7 @@ ROM_END
 
 
 #define M4RLPICK_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4rlpick )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -683,7 +682,7 @@ ROM_END
 
 
 #define M4TWSTR_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )
 
 ROM_START( m4twstr )
@@ -721,7 +720,7 @@ ROM_END
 
 
 #define M4TWSTCL_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )/* From original, may be wrong */
 ROM_START( m4twstcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -745,7 +744,7 @@ ROM_END
 
 
 #define M4DZ_SOUND \
-	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "dangerzonesnd.bin", 0x0000, 0x080000, CRC(bdfcffa2) SHA1(9e3be8fd1c42fd19afcde682662bef82f7e0f7e9) )
 ROM_START( m4dz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -754,7 +753,7 @@ ROM_START( m4dz )
 ROM_END
 
 #define M4TYLB_SOUND \
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "tylbsnd.bin", 0x0000, 0x080000, CRC(781175c7) SHA1(43cf6fe91c756cdd4acc735411ac166647bf29e7) )
 
 ROM_START( m4tylb )
@@ -771,7 +770,7 @@ ROM_END
 
 
 #define M4MAGI7_SOUND \
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4magi7 )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -787,7 +786,7 @@ ROM_END
 
 
 #define M4RAGS_SOUND \
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4rags )
 	ROM_REGION( 0x010000, "maincpu", 0 )
@@ -814,7 +813,7 @@ ROM_START( m4ragsc )
 ROM_END
 
 #define M4RIOCR_SOUND \
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 
 ROM_START( m4riocr )
@@ -830,7 +829,7 @@ ROM_START( m4riocra )
 ROM_END
 
 #define M4NDUP_SOUND \
-	ROM_REGION( 0x080000, "msm6376", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x080000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	/* missing? */
 ROM_START( m4ndup )
 	ROM_REGION( 0x010000, "maincpu", 0 )

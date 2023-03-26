@@ -33,19 +33,47 @@ void nscsi_s1410_device::device_reset()
 	params[7] = 11;
 }
 
+bool nscsi_s1410_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	if(!length)
+		return false;
+	switch(command >> 5) {
+	case 0: return length == 6;
+	case 1: return true;
+	case 2: return true;
+	case 3: return true;
+	case 4: return true;
+	case 5: return true;
+	case 6: return true;
+	case 7: return length == 6;
+	}
+	return true;
+}
+
 void nscsi_s1410_device::scsi_command()
 {
+	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
+
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 	case SC_REZERO:
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
+		if (scsi_cmdbuf[1] >> 5) {
+			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		} else {
+			nscsi_harddisk_device::scsi_command();
+		}
+		break;
+
 	case SC_SEEK:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			nscsi_harddisk_device::scsi_command();
+			scsi_status_complete(SS_GOOD);
 		}
 		break;
 
@@ -71,6 +99,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_TRACK: {
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
@@ -84,6 +113,7 @@ void nscsi_s1410_device::scsi_command()
 		if(!harddisk->write(lba, &block[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
 			scsi_status_complete(SS_FORMAT_ERROR);
+			scsi_sense_buffer[0] = SK_FORMAT_ERROR;
 		} else {
 			scsi_status_complete(SS_GOOD);
 		}
@@ -93,6 +123,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_FORMAT_ALT_TRACK:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
@@ -118,6 +149,7 @@ void nscsi_s1410_device::scsi_command()
 	case SC_CHECK_TRACK_FORMAT:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 		scsi_status_complete(SS_GOOD);

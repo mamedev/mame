@@ -5,8 +5,8 @@
  * includes/radio86.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_RADIO86_H
-#define MAME_INCLUDES_RADIO86_H
+#ifndef MAME_USSR_RADIO86_H
+#define MAME_USSR_RADIO86_H
 
 #pragma once
 
@@ -117,4 +117,4 @@ private:
 INPUT_PORTS_EXTERN( radio86 );
 INPUT_PORTS_EXTERN( ms7007 );
 
-#endif // MAME_INCLUDES_RADIO86_H
+#endif // MAME_USSR_RADIO86_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NAOMIBD_H
-#define MAME_MACHINE_NAOMIBD_H
+#ifndef MAME_SEGA_NAOMIBD_H
+#define MAME_SEGA_NAOMIBD_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ private:
 	bool pio_ready = false, dma_ready = false;
 };
 
-#endif // MAME_MACHINE_NAOMIBD_H
+#endif // MAME_SEGA_NAOMIBD_H

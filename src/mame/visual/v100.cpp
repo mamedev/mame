@@ -23,6 +23,9 @@
 #include "video/tms9927.h"
 #include "screen.h"
 
+
+namespace {
+
 // character matrix is supposed to be only 7x7, but 15 produces correct timings
 #define V100_CH_WIDTH 15
 
@@ -438,5 +441,8 @@ ROM_START( v100 )
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "241-001.u29",   0x0000, 0x0800, CRC(ef807141) SHA1(cbf3fed001811c5840b9a131d2d3133843cb3b6a) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1980, v100, 0, 0, v100, v100, v100_state, empty_init, "Visual Technology", "Visual 100", MACHINE_IS_SKELETON )

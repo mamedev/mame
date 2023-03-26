@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_VIDEO_AGAT7_H
-#define MAME_VIDEO_AGAT7_H
+#ifndef MAME_AGAT_AGAT7_H
+#define MAME_AGAT_AGAT7_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(AGAT7VIDEO, agat7video_device)
 
-#endif // MAME_VIDEO_AGAT7_H
+#endif // MAME_AGAT_AGAT7_H

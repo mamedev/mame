@@ -50,6 +50,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class toratora_state : public driver_device
 {
 public:
@@ -511,6 +513,8 @@ ROM_START( toratorab )
 	ROM_LOAD( "1027.u9",  0x2800, 0x0800, CRC(59b021b5) SHA1(ea5a0c1f58c0e08231969ad161b79af6e1ae4431) )
 	ROM_LOAD( "1027.u11", 0xf800, 0x0800, CRC(336f6659) SHA1(ea1151db54b68316908874da6983d6de5c94c29e) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

@@ -17,6 +17,9 @@
 #include "emu.h"
 #include "spg2xx.h"
 
+
+namespace {
+
 class spg2xx_game_wiwi18_state : public spg2xx_game_state
 {
 public:
@@ -980,6 +983,8 @@ ROM_START( ddmmeg12 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doubledancemania.bin", 0x000000, 0x800000, CRC(fcffb21e) SHA1(802a3c2d6bcbd729b9a483d42d912ca8b9abdccd) )
 ROM_END
+
+} // anonymous namespace
 
 
 // box marked 'Wireless game console' 'Drahtlose Spielekonsole' 87 Sports games included : 18 hyper sports games, 69 arcade games.

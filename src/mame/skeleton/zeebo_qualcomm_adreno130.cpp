@@ -43,6 +43,8 @@ This driver needs a proper owner.
 #include "screen.h"
 
 
+namespace {
+
 class zeebo_game_state : public driver_device
 {
 public:
@@ -138,5 +140,8 @@ ROM_START( zeebo )
 	// older versions should be dumped too if possible
 	ROM_LOAD( "1.1.2_spare.bin", 0x000000, 0x8400000, CRC(64bd6faa) SHA1(da0db9585d15cf7f1f127e39b0a5fa47f3c13cc0) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_IS_SKELETON )

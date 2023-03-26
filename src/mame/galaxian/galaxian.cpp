@@ -10210,6 +10210,22 @@ ROM_START( kamakazi3 ) /* Hack of Video Games (UK) Ltd. version???? flyer spells
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
+ROM_START( spacian2 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "an1.7k",    0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
+	ROM_LOAD( "an2.7j",    0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
+	ROM_LOAD( "an3.7h",    0x1000, 0x0800, CRC(ddeabdae) SHA1(daa5109a32c7c9a80bdb212dc3e4e3e3c104a731) )
+	ROM_LOAD( "an4.7f",    0x1800, 0x0800, CRC(232dd045) SHA1(4f07538462a6cb8824571954438ccf28fda7e68f) )
+	ROM_LOAD( "an5.7l",    0x2000, 0x0800, CRC(e80fec29) SHA1(cdc1b2df14051f56bd8f55d5f379e5f60fc23d66) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "an-2g.1k",  0x0000, 0x0800, CRC(b4784fac) SHA1(9a8c398afdc72ac7b6af975f8d29e0757d6f14a6) )
+	ROM_LOAD( "an-1g.1h",  0x0800, 0x0800, CRC(a32b7270) SHA1(1cd160b71fa79329cd1116ded16a6ed594d19c56) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
 ROM_START( supergx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sg1",          0x0000, 0x0800, CRC(b83f4578) SHA1(9a5d5fc291839f7f1e0a52cca7bea29e99c13315) )
@@ -12199,6 +12215,30 @@ ROM_START( ataqandr )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "ataque_androide_p.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+// Original Namco PCB. Program ROMs on a piggyback PCB from Bercle S.A.
+ROM_START( mutacion )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "mutacion_i.4", 0x0000, 0x1000, CRC(78290f7e) SHA1(20eb70f4c846873d178d55ef45a0add535891104) )
+	ROM_LOAD( "mutacion_i.3", 0x1000, 0x1000, BAD_DUMP CRC(c47a4d04) SHA1(4d2886de4b8644ff52f00f9e69c19deb951ad077) )
+	ROM_LOAD( "mutacion_i.2", 0x2000, 0x1000, CRC(f6121da2) SHA1(a6b3777989086290f8e5c49ed7643e7e86a694c2) )
+	ROM_LOAD( "mutacion_i.1", 0x3000, 0x1000, CRC(b622b601) SHA1(3bb006dd12239eb3a9fa45699b5cf1cc580d5668) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mutacion_i.f2", 0x0000, 0x0800, CRC(91664e98) SHA1(dbc192785bf35d0c45ee0f5a690d4c484f32330f) )
+	ROM_LOAD( "mutacion_i.f4", 0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(                      0x0c00, 0x0200 )
+	ROM_CONTINUE(                      0x0a00, 0x0200 )
+	ROM_CONTINUE(                      0x0e00, 0x0200 )
+	ROM_LOAD( "mutacion_i.f1", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "mutacion_i.f3", 0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(                      0x1c00, 0x0200 )
+	ROM_CONTINUE(                      0x1a00, 0x0200 )
+	ROM_CONTINUE(                      0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( sstarcrs )
@@ -16009,20 +16049,20 @@ GAME( 1979, galaxyx,     galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galartic,    galaxian, galartic,   galartic,   galaxian_state, init_galaxian,   ROT270, "bootleg (Artic System)",                     "Galaxian (Artic System bootleg)",                                                              MACHINE_SUPPORTS_SAVE )
 
 // These have the extra 'linescroll effect' title screens, like Moon Alien 2 but made out of a random tile, they lack an energy bar.
-GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                          MACHINE_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien",                          MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 GAME( 1979, galapx,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack",                                   "Galaxian Part X ('Moon Alien' hack)", MACHINE_SUPPORTS_SAVE )
 
 // Like above but does have the energy bar, also GFX changed to planes.
 GAME( 1979, kamikazp,    galaxian, galaxian,   kamikazp,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Potomac Games)", "Kamikaze (Potomac Games, bootleg of Galaxian)", MACHINE_SUPPORTS_SAVE )
 
 // This has the tiles to display the energy bar, but use the flag gfx for the 'linescroll effect' title screen, also doesn't work due to bad rom.
-GAME( 1980, supergx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu",      "Super GX",                                      MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, supergx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu",      "Super GX",                                      MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 
 // These have the energy bar, and the tiles needed to display a less corrupt 'linescroll effect' title, but don't display one
 GAME( 1979, swarm,       galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg? (Subelectro)",   "Swarm (bootleg?)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1980, astrians,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (BGV Ltd.)",      "Astrians (clone of Swarm)",                     MACHINE_SUPPORTS_SAVE )
 
-GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "<unknown>", "Galaxian Test ROM", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, tst_galx,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "<unknown>",               "Galaxian Test ROM",                             MACHINE_SUPPORTS_SAVE )
 
 // Other games on basic galaxian hardware
 GAME( 1981, blkhole,     0,        galaxian,   blkhole,    galaxian_state, init_galaxian,   ROT90,  "TDS & MINTS",                     "Black Hole",       MACHINE_SUPPORTS_SAVE )
@@ -16053,7 +16093,8 @@ GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_
 GAME( 1981, redufob3,    redufo,   galaxian,   redufob3,   galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III ('Super Galaxians' hack)",                               MACHINE_SUPPORTS_SAVE )  // Hack of a hack (superg)
+GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III ('Super Galaxians' hack)",                               MACHINE_SUPPORTS_SAVE ) // Hack of a hack (superg)
+GAME( 1979, spacian2,    galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "Namco / Taito",                   "T.T Spacian Part-2",                                                  MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 
 // Different bullet color
 GAME( 1982, azurian,     0,        galaxian,   azurian,    galaxian_state, init_azurian,    ROT90,  "Rait Electronics Ltd", "Azurian Attack", MACHINE_SUPPORTS_SAVE )
@@ -16146,6 +16187,7 @@ GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_
 GAME( 1980?,mouncrst,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)",             "Moune Creste (Jeutel French Moon Cresta bootleg)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,ataqandr,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (FAR S.A.)",           "Ataque Androide - Moon Cresta (FAR S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,mutacion,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Explomatic)",         "Mutacion (Explomatic Spanish Moon Cresta bootleg)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Bad program ROM (bitrot)
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)",    "Super Star Crest",                                         MACHINE_SUPPORTS_SAVE ) // There may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon War (Moon Cresta bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)",                        MACHINE_SUPPORTS_SAVE )

@@ -56,7 +56,7 @@ protected:
 
 	// methods
 	virtual void menu_activated() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 	virtual void hook_load(const std::string &filename);
 
 private:
@@ -68,7 +68,7 @@ private:
 	std::string                     m_software_info_name;
 
 	// methods
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	void test_create(bool &can_create, bool &need_confirm);
 	void load_software_part();
 };

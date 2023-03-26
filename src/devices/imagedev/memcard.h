@@ -27,6 +27,7 @@ public:
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *image_type_name() const noexcept override { return "memcard"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "memc"; }
 

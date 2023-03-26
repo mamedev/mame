@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "entry_p.h"
@@ -43,15 +43,6 @@ namespace entry
 		WSTRING utf16(len);
 		MultiByteToWideChar(CP_UTF8, 0, utf8_str, -1, utf16.data(), len);
 		return utf16;
-	}
-
-	///
-	inline void winSetHwnd(::HWND _window)
-	{
-		bgfx::PlatformData pd;
-		bx::memSet(&pd, 0, sizeof(pd) );
-		pd.nwh = _window;
-		bgfx::setPlatformData(pd);
 	}
 
 	typedef DWORD (WINAPI* PFN_XINPUT_GET_STATE)(DWORD dwUserIndex, XINPUT_STATE* pState);
@@ -502,8 +493,6 @@ namespace entry
 				| ENTRY_WINDOW_FLAG_FRAME
 				;
 
-			winSetHwnd(m_hwnd[0]);
-
 			adjust(m_hwnd[0], ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT, true);
 			clear(m_hwnd[0]);
 
@@ -938,6 +927,7 @@ namespace entry
 			SelectObject(hdc, brush);
 			FillRect(hdc, &rect, brush);
 			ReleaseDC(_hwnd, hdc);
+			DeleteObject(brush);
 		}
 
 		void adjust(HWND _hwnd, uint32_t _width, uint32_t _height, bool _windowFrame)
@@ -1167,6 +1157,16 @@ namespace entry
 	void setMouseLock(WindowHandle _handle, bool _lock)
 	{
 		PostMessage(s_ctx.m_hwnd[0], WM_USER_WINDOW_MOUSE_LOCK, _handle.idx, _lock);
+	}
+
+	void* getNativeWindowHandle(WindowHandle _handle)
+	{
+		return s_ctx.m_hwnd[_handle.idx];
+	}
+
+	void* getNativeDisplayHandle()
+	{
+		return NULL;
 	}
 
 	int32_t MainThreadEntry::threadFunc(bx::Thread* /*_thread*/, void* _userData)

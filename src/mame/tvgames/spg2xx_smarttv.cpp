@@ -14,6 +14,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class smarttv_state : public spg2xx_game_state
 {
 public:
@@ -227,6 +229,8 @@ ROM_START( smartvad )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM (just the single SunPlus SoC glob)
 ROM_END
+
+} // anonymous namespace
 
 
 // Toyquest games

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_SPECIAL_H
-#define MAME_AUDIO_SPECIAL_H
+#ifndef MAME_USSR_SPECIAL_H
+#define MAME_USSR_SPECIAL_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device)
 
-#endif // MAME_AUDIO_SPECIAL_H
+#endif // MAME_USSR_SPECIAL_H

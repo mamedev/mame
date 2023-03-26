@@ -4,9 +4,13 @@
 // Skeleton driver for medal games on NMK hardware.
 
 #include "emu.h"
+
 #include "cpu/tlcs90/tlcs90.h"
+#include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/okim6376.h"
+#include "sound/ymz280b.h"
+
 #include "speaker.h"
 
 
@@ -18,10 +22,10 @@ Recording of some of the music: https://www.youtube.com/watch?v=TZMr-MX_M0w
 
 PCBs:
 
-NMK MEC95110 - maincpu board
+NMK MEC95110 - main CPU board
 - Toshiba TMP90C041AN
 - 16.5000 MHz XTAL
-- maincpu ROM
+- main CPU ROM
 - Oki M6650
 - OKI ROM
 - 8 x connectors
@@ -39,7 +43,7 @@ Video of the game: https://www.youtube.com/watch?v=t4-IN1v_DOQ
 
 PCBs:
 
-NMK MAC96112 - maincpu board, stickered 961409
+NMK MAC96112 - main CPU board, stickered 961409
 - Toshiba TMP90C041AN
 - 16.0000 MHz XTAL
 - main CPU ROM
@@ -47,6 +51,69 @@ NMK MAC96112 - maincpu board, stickered 961409
 - Oki ROM
 - 2 x 8-dip banks
 - 7 x connectors
+
+Other PCBs unknown
+
+-------
+Dream Rail by NMK
+
+PCBs:
+
+NMK MAC94104 - main CPU board, stickered 957G. 0144
+- Toshiba TMP90C041? Empty socket marked TMP041
+- 16.0000 MHz XTAL
+- main CPU ROM
+- Oki M6295
+- Oki ROM
+- NMK005 custom
+- NMK112 custom
+- 2 x 8-dip banks
+- 5 x connectors
+
+Other PCBs unknown
+
+-------
+Sweetheart by NMK
+
+PCBs:
+
+NMK MAC96114 - main CPU board, stickered 9607 M. M.
+- NMK-113 2321 9140EBI - A TMP90C041 MCU with internal program ROM, possibly grafted to a NMK-112? Seen also on Hacha Mecha Fighter PCBs
+- 16.0000 MHz XTAL
+- MCU external ROM. In this case, internal ROM is not used, as the /EA pin (External Access) is asserted, so all the program code is located in the external EPROM.
+- 2 x Oki M6295
+- 4 x Oki ROMs (identical pairs)
+- 2 x 8-dip banks (don't seem to be on PCB)
+- 9 x connectors
+
+NMK MAC96115 - lamp / leds board
+- 7 x connectors
+- lamp
+- 8 x LEDs
+
+NMK MAC96116
+- 4 x connectors
+- TTLs
+
+NMK MAC96117
+- 5 x connectors
+- TTLs
+
+-------
+Shimura Ken no Bakatono-sama Ooedomatsuri by NMK
+
+Video of the game: https://www.youtube.com/watch?v=9HGdS2ydZDo
+
+NMK MAC98205-1 - main CPU board, stickered 99040048
+- Toshiba TMP90C041AN
+- 16.0000 MHz XTAL
+- main CPU ROM
+- YMZ280B-F
+- 2 x YMZ ROMs
+- NMK001 custom
+- NMK003 custom
+- 2 x 8-dip banks
+- 9 x connectors
 
 Other PCBs unknown
 */
@@ -89,15 +156,29 @@ class hpierrot_state : public nmkmedal_state
 public:
 	hpierrot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nmkmedal_state(mconfig, type, tag)
-		, m_oki(*this, "oki")
 	{ }
 
+	void drail(machine_config &config);
 	void hpierrot(machine_config &config);
+	void sweethrt(machine_config &config);
+
+private:
+	void drail_mem_map(address_map &map);
+	void mem_map(address_map &map);
+	void sweethrt_mem_map(address_map &map);
+};
+
+class omatsuri_state : public nmkmedal_state
+{
+public:
+	omatsuri_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmkmedal_state(mconfig, type, tag)
+	{ }
+
+	void omatsuri(machine_config &config);
 
 private:
 	void mem_map(address_map &map);
-
-	required_device<okim6295_device> m_oki;
 };
 
 
@@ -125,7 +206,46 @@ void trocana_state::mem_map(address_map &map)
 void hpierrot_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	//map(0xa800, 0xa80f).w() // to the mechanical parts?? or leds / lamps?
+	map(0xc000, 0xc7ff).ram();
 }
+
+void hpierrot_state::drail_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8004, 0x8004).portr("IN4"); // probably 1 of the 2 dip banks
+	map(0x8005, 0x8005).portr("IN5"); // "
+	map(0x8800, 0x8800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x8820, 0x8827).w("nmk112", FUNC(nmk112_device::okibank_w));
+	map(0xa000, 0xa000).portr("IN0");
+	map(0xa001, 0xa001).portr("IN1");
+	map(0xa002, 0xa002).portr("IN2");
+	//map(0xa800, 0xa80f).w() // to the mechanical parts?? or leds / lamps?
+	map(0xc000, 0xc7ff).ram();
+}
+
+void hpierrot_state::sweethrt_mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8000).portr("IN0");
+	map(0x8001, 0x8001).portr("IN1");
+	map(0x8002, 0x8002).portr("IN2");
+	map(0x8003, 0x8003).portr("IN3");
+	map(0x8004, 0x8004).portr("IN4");
+	map(0x8005, 0x8005).portr("IN5");
+	map(0x9000, 0x9007).w("nmk112", FUNC(nmk112_device::okibank_w));
+	//map(0xa000, 0xa00f).w() // to the mechanical parts?? or leds / lamps?
+	map(0xb000, 0xb000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xb800, 0xb800).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc000, 0xdfff).ram();
+}
+
+void omatsuri_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom().region("maincpu", 0);
+	map(0xd000, 0xefff).ram();
+}
+
 
 static INPUT_PORTS_START( trocana )
 	PORT_START("IN0")
@@ -183,43 +303,118 @@ static INPUT_PORTS_START( trocana )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+
 void trocana_state::trocana(machine_config &config)
 {
-	TMP90841(config, m_maincpu, 16000000 / 2); // actually TMP90C041AN
+	TMP90841(config, m_maincpu, 16'000'000 / 2); // actually TMP90C041AN
 	m_maincpu->set_addrmap(AS_PROGRAM, &trocana_state::mem_map);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6650(config, m_oki, 16500000 / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6650(config, m_oki, 16'500'000 / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void hpierrot_state::hpierrot(machine_config &config)
 {
-	TMP90841(config, m_maincpu, 16000000 / 2); // actually TMP90C041AN
+	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2); // actually TMP90C041AN
 	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::mem_map);
 
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, 16000000 / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
 }
 
+void hpierrot_state::drail(machine_config &config)
+{
+	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2); // exact model unknown as the socket was empty
+	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::drail_mem_map);
+
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki");
+
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+}
+
+void hpierrot_state::sweethrt(machine_config &config)
+{
+	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2); // actually a NMK-113 custom
+	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::sweethrt_mem_map);
+
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // actually thought to be included in the NMK-113 custom
+	nmk112.set_rom0_tag("oki");
+	nmk112.set_rom1_tag("oki2");
+
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+
+	OKIM6295(config, "oki2", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+}
+
+void omatsuri_state::omatsuri(machine_config &config)
+{
+	TMP90841(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &omatsuri_state::mem_map);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16_MHz_XTAL));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
+
+
+ROM_START( drail ) // handwritten labels
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "1_dream rail v08c 2c0c v957220.u4", 0x00000, 0x10000, CRC(c14fae88) SHA1(f0478b563ac851372bc0b93772d89ab70ad61877) ) // 通ドリームレール V08C 2C0C V957220, 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0xc0000, "oki", 0) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_LOAD( "2_dream rail pcm.u11", 0x40000, 0x80000, CRC(efdc1eea) SHA1(c39fed6f97b71556b468e0872a8240fe7b6495e6) ) // ドリームレールPCM
+	// empty socket 3.u10
+ROM_END
 
 ROM_START( trocana )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "tro1e.u12", 0x00000, 0x10000, CRC(f285043f) SHA1(6691091c1ecdab10c390db1d82c9d1d1dd0ded1f) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x80000, "oki", 0)
-	ROM_LOAD( "tro2.u16",  0x00000, 0x80000, CRC(c801d8ca) SHA1(f57026f5386467c054299556dd8665e62557aa91) )
+	ROM_LOAD( "tro2.u16", 0x00000, 0x80000, CRC(c801d8ca) SHA1(f57026f5386467c054299556dd8665e62557aa91) )
 ROM_END
 
 ROM_START( hpierrot )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "v8210.u44", 0x00000, 0x10000, CRC(313d5d07) SHA1(2802c88a21a311d552e8f2bd9e588ca7450f695d) ) //  1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "v8210.u44", 0x00000, 0x10000, CRC(313d5d07) SHA1(2802c88a21a311d552e8f2bd9e588ca7450f695d) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x80000, "oki", 0)
-	ROM_LOAD( "sound.u27",  0x00000, 0x80000, CRC(fb6b4361) SHA1(7aaecf55efe219cb0b5eb93fee329b8e6ce0b307) )
+	ROM_LOAD( "sound.u27", 0x00000, 0x80000, CRC(fb6b4361) SHA1(7aaecf55efe219cb0b5eb93fee329b8e6ce0b307) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( sweethrt )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "sweethart-typeb-v96b290.u55", 0x00000, 0x10000, CRC(d5ccce6d) SHA1(ef4c1a19df0bcf7961dc8df0ebc7a1654f4a86ca) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x140000, "oki", 0) // NMK112 device expects the first 0x40000 bytes to be left empty.
+	ROM_LOAD( "sweethart-typeb-sound-2.u37", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-3.u38", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x140000, "oki2", 0) // identical to the above
+	ROM_LOAD( "sweethart-typeb-sound-4.u18", 0x40000, 0x80000, CRC(19caa092) SHA1(0a12e8524abdd09259e8f8c00f26807f2f2ef525) )
+	ROM_LOAD( "sweethart-typeb-sound-5.u19", 0xc0000, 0x80000, CRC(03255848) SHA1(dfecc863e6b9dec7aa0b2430b43a3d6d9b15bbea) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+ROM_START( omatsuri ) // seems to hit some unimplemented CPU regs
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "1bv994220.1", 0x00000, 0x10000, CRC(c67907f5) SHA1(9e3a8eddc4dd315bcd9e577808e4f913fc30bba0) )
+
+	ROM_REGION(0x100000, "ymz", 0)
+	ROM_LOAD( "2", 0x00000, 0x80000, CRC(39c9d3a8) SHA1(9ea7e1ab51d68f014e15b09ac421d51441712a47) )
+	ROM_LOAD( "3", 0x80000, 0x80000, CRC(0e6afb1f) SHA1(e016a684fb41acb55057797b22a07dab72ff9e9d) )
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1996, trocana,  0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK", "Trocana",       MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
-GAME( 1996, hpierrot, 0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK", "Happy Pierrot", MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
+GAME( 1995, drail,    0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, N.T.C., H07051, V39, TEST2, V07  strings
+GAME( 1996, trocana,  0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
+GAME( 1996, hpierrot, 0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings
+GAME( 1996, sweethrt, 0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V96B29° strings
+GAME( 1999, omatsuri, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo

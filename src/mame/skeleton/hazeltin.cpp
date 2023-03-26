@@ -39,6 +39,8 @@ References:
 #include "screen.h"
 
 
+namespace {
+
 #define CPU_TAG         "maincpu"
 #define NETLIST_TAG     "videobrd"
 #define UART_TAG        "uart"
@@ -803,6 +805,9 @@ ROM_START( hazl1552 )
 	ROM_REGION( 0x100, VIDEO_PROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u90.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

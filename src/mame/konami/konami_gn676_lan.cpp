@@ -56,25 +56,25 @@ This pcb is the same as the A version but with one added chip:
 FPGA Bitstreams
 ---------------
 - Racing Jam (racingj)
-	- Uses type A board
-	- Firmware (CRC32 92fde8df, 29491 bytes)
+    - Uses type A board
+    - Firmware (CRC32 92fde8df, 29491 bytes)
 
 - Racing Jam 2 (racingj2, racingj2j)
-	- Uses type B board with x76 chip? (x76 isn't used?)
-	- Firmware (CRC32 dfc74cc9, 29491 bytes)
+    - Uses type B board with x76 chip? (x76 isn't used?)
+    - Firmware (CRC32 dfc74cc9, 29491 bytes)
 
 - Thrill Drive (thrilld, thrilldb, thrilldbu)
-	- Uses type B board with x76 chip (except thrilldbu which uses type A without the x76 chip)
-	- Firmware #1 (CRC32 3760e3ce, 29490 bytes)
-		- Used during initial device test (does not get uploaded with skip post)
-		- Tests every register and expects to be able to read back the values it wrote for every register *except* 0x05, 0x06, and 0x09 on lanc2
-		- Seems to be a stubbed version of the normal firmware with the logic for all registers stubbed except memory-related registers
-	- Firmware #2 (CRC32 a8c97a75, 29490 bytes)
-		- Uploaded after boot sequence (even with skip post)
-		- Allows usage of x76 chip
-	- Firmware #3 (CRC32 93b86e35, 29490 bytes)
-		- Uploaded after security check (boot finishes, just as it starts the actual game)
-		- x76 chip capability unknown (TODO: this should be tested on real hardware)
+    - Uses type B board with x76 chip (except thrilldbu which uses type A without the x76 chip)
+    - Firmware #1 (CRC32 3760e3ce, 29490 bytes)
+        - Used during initial device test (does not get uploaded with skip post)
+        - Tests every register and expects to be able to read back the values it wrote for every register *except* 0x05, 0x06, and 0x09 on lanc2
+        - Seems to be a stubbed version of the normal firmware with the logic for all registers stubbed except memory-related registers
+    - Firmware #2 (CRC32 a8c97a75, 29490 bytes)
+        - Uploaded after boot sequence (even with skip post)
+        - Allows usage of x76 chip
+    - Firmware #3 (CRC32 93b86e35, 29490 bytes)
+        - Uploaded after security check (boot finishes, just as it starts the actual game)
+        - x76 chip capability unknown (TODO: this should be tested on real hardware)
 
 Racing Jam 1 and 2 are both programmed to send one extra 0xff at the end of the upload sequence. The Thrill Drive a8c97a75 firmware
 and the Racing Jam 2 dfc74cc9 firmware are actually the same except for the final 0xff.
@@ -314,11 +314,11 @@ void konami_gn676_lan_device::lanc2_w(offs_t offset, uint8_t data)
 			if (m_x76f041 && m_x76f041_enabled)
 			{
 				/*
-					0x01 = x76 SDA
-					0x02 = x76 RST
-					0x04 = x76 CS???
-					0x08 = x76 SCL
-					0x10 = Controls direction of x76 SDA
+				    0x01 = x76 SDA
+				    0x02 = x76 RST
+				    0x04 = x76 CS???
+				    0x08 = x76 SCL
+				    0x10 = Controls direction of x76 SDA
 				*/
 
 				if (BIT(data, 1))

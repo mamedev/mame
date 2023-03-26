@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
-#ifndef MAME_INCLUDES_GAPLUS_H
-#define MAME_INCLUDES_GAPLUS_H
+#ifndef MAME_NAMCO_GAPLUS_H
+#define MAME_NAMCO_GAPLUS_H
 
 #pragma once
 
@@ -153,4 +153,4 @@ protected:
 	output_finder<2> m_lamps;
 };
 
-#endif // MAME_INCLUDES_GAPLUS_H
+#endif // MAME_NAMCO_GAPLUS_H

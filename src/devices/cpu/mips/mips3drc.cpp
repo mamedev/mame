@@ -300,7 +300,7 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 	const opcode_desc *desclist;
 	bool override = false;
 
-	g_profiler.start(PROFILER_DRC_COMPILE);
+	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
@@ -395,7 +395,6 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 
 			/* end the sequence */
 			block.end();
-			g_profiler.stop();
 			succeeded = true;
 		}
 		catch (drcuml_block::abort_compilation &)
@@ -703,9 +702,9 @@ void mips3_device::static_generate_tlb_mismatch()
 		UML_MOV(block, mem(&m_core->arg1), I1);                                 // mov     [arg1],i1
 		UML_CALLC(block, cfunc_printf_debug, this);                             // callc   printf_debug
 	}
-	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                    // test    i1,VTLB_FETCH_ALLOWED
+	UML_TEST(block, I1, FETCH_ALLOWED);                                    // test    i1,FETCH_ALLOWED
 	UML_JMPc(block, COND_NZ, 1);                                                // jmp     1,nz
-	UML_TEST(block, I1, VTLB_FLAG_FIXED);                                       // test    i1,VTLB_FLAG_FIXED
+	UML_TEST(block, I1, FLAG_FIXED);                                       // test    i1,FLAG_FIXED
 	UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBLOAD], I0);              // exh     exception[TLBLOAD],i0,nz
 	UML_EXH(block, *m_exception[EXCEPTION_TLBLOAD_FILL], I0);                   // exh     exception[TLBLOAD_FILL],i0
 	UML_LABEL(block, 1);                                                        // 1:
@@ -873,7 +872,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 	/* general case: assume paging and perform a translation */
 	UML_SHR(block, I3, I0, 12);                                     // shr     i3,i0,12
 	UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb_table],i3,dword
-	UML_TEST(block, I3, iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED);// test    i3,iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED
+	UML_TEST(block, I3, iswrite ? WRITE_ALLOWED : READ_ALLOWED);// test    i3,iswrite ? WRITE_ALLOWED : READ_ALLOWED
 	UML_JMPc(block, COND_Z, tlbmiss = label++);                                     // jmp     tlbmiss,z
 	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                   // rolins  i0,i3,0,0xfffff000
 
@@ -1022,11 +1021,11 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 		UML_LABEL(block, tlbmiss);                                              // tlbmiss:
 		if (iswrite)
 		{
-			UML_TEST(block, I3, VTLB_READ_ALLOWED);                     // test    i3,VTLB_READ_ALLOWED
+			UML_TEST(block, I3, READ_ALLOWED);                     // test    i3,READ_ALLOWED
 			UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBMOD], I0);
 																					// exh     tlbmod,i0,nz
 		}
-		UML_TEST(block, I3, VTLB_FLAG_FIXED);                               // test    i3,VTLB_FLAG_FIXED
+		UML_TEST(block, I3, FLAG_FIXED);                               // test    i3,FLAG_FIXED
 		UML_EXHc(block, COND_NZ, exception_tlb, I0);                                // exh     tlb,i0,nz
 		UML_EXH(block, exception_tlbfill, I0);                                  // exh     tlbfill,i0
 	}
@@ -1365,7 +1364,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 		const vtlb_entry *tlbtable = vtlb_table();
 
 		/* if we currently have a valid TLB read entry, we just verify */
-		if (tlbtable[desc->pc >> 12] & VTLB_FETCH_ALLOWED)
+		if (tlbtable[desc->pc >> 12] & FETCH_ALLOWED)
 		{
 			if (PRINTF_MMU)
 			{

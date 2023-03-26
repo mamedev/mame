@@ -5,7 +5,7 @@
 #include "mdconsole.h"
 
 #include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
+#include "bus/sms_ctrl/controllers.h"
 #include "imagedev/chd_cd.h"
 #include "sound/sn76496.h"
 
@@ -20,143 +20,31 @@
  *
  *************************************/
 
-/* These overwrite the MAME ones in DRIVER_INIT */
-/* They're needed to give the users the choice between different controllers */
-uint8_t md_cons_state::mess_md_io_read_data_port(offs_t offset)
+void md_cons_state::md_ctrl_ports(machine_config &config)
 {
-	int portnum = offset;
+	SMS_CONTROL_PORT(config, m_ctrl_ports[0], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
+	m_ctrl_ports[0]->th_handler().set(m_ioports[0], FUNC(megadrive_io_port_device::th_w));
+	m_ctrl_ports[0]->set_screen(m_screen);
 
-	uint8_t retdata;
-	int controller;
-	uint8_t helper_6b = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
-	uint8_t helper_3b = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
+	m_ioports[0]->set_in_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::in_r));
+	m_ioports[0]->set_out_handler(m_ctrl_ports[0], FUNC(sms_control_port_device::out_w));
 
-	switch (portnum)
-	{
-		case 0:
-			controller = (m_io_ctrlr->read() & 0x0f);
-			break;
+	SMS_CONTROL_PORT(config, m_ctrl_ports[1], sms_control_port_devices, SMS_CTRL_OPTION_MD_PAD);
+	m_ctrl_ports[1]->th_handler().set(m_ioports[1], FUNC(megadrive_io_port_device::th_w));
+	m_ctrl_ports[1]->set_screen(m_screen);
 
-		case 1:
-			controller = (m_io_ctrlr->read() & 0xf0);
-			break;
-
-		default:
-			controller = 0;
-			break;
-	}
-
-	/* Are we using a 6 buttons Joypad? */
-	if (controller)
-	{
-		if (m_megadrive_io_data_regs[portnum] & 0x40)
-		{
-			if (m_io_stage[portnum] == 2)
-			{
-				/* here we read B, C & the additional buttons */
-				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x30) |
-								((m_io_pad6b[1][portnum] ? m_io_pad6b[1][portnum]->read() : 0) & 0x0f)) & ~helper_6b);
-			}
-			else
-			{
-				/* here we read B, C & the directional buttons */
-				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x3f) & ~helper_6b);
-			}
-		}
-		else
-		{
-			if (m_io_stage[portnum] == 1)
-			{
-				/* here we read ((Start & A) >> 2) | 0x00 */
-				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) & ~helper_6b);
-			}
-			else if (m_io_stage[portnum]==2)
-			{
-				/* here we read ((Start & A) >> 2) | 0x0f */
-				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
-			}
-			else
-			{
-				/* here we read ((Start & A) >> 2) | Up and Down */
-				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0xc0) >> 2) |
-								((m_io_pad6b[0][portnum] ? m_io_pad6b[0][portnum]->read() : 0) & 0x03)) & ~helper_6b);
-			}
-		}
-
-	//  osd_printf_debug("read io data port stage %d port %d %02x\n",mess_io_stage[portnum],portnum,retdata);
-
-		retdata |= (retdata << 8);
-	}
-	/* Otherwise it's a 3 buttons Joypad */
-	else
-	{
-		uint8_t svp_test = 0;
-		if (m_cart)
-			svp_test = m_cart->read_test();
-
-		// handle test input for SVP test
-		if (portnum == 0 && svp_test)
-		{
-			retdata = (m_megadrive_io_data_regs[0] & 0xc0);
-		}
-		else if (m_megadrive_io_data_regs[portnum] & 0x40)
-		{
-			/* here we read B, C & the directional buttons */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x3f) | 0x40) & ~helper_3b);
-		}
-		else
-		{
-			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						(((((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0xc0) >> 2) |
-							((m_io_pad3b[portnum] ? m_io_pad3b[portnum]->read() : 0) & 0x03) | 0x40) & ~helper_3b);
-		}
-	}
-
-	return retdata;
+	m_ioports[1]->set_in_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::in_r));
+	m_ioports[1]->set_out_handler(m_ctrl_ports[1], FUNC(sms_control_port_device::out_w));
 }
 
-
-void md_cons_state::mess_md_io_write_data_port(offs_t offset, uint16_t data)
+void md_cons_state::md_exp_port(machine_config &config)
 {
-	int portnum = offset;
-	int controller;
+	SMS_CONTROL_PORT(config, m_ctrl_ports[2], sms_control_port_devices, nullptr);
+	m_ctrl_ports[2]->th_handler().set(m_ioports[2], FUNC(megadrive_io_port_device::th_w));
+	m_ctrl_ports[2]->set_screen(m_screen);
 
-	switch (portnum)
-	{
-		case 0:
-			controller = (m_io_ctrlr->read() & 0x0f);
-			break;
-
-		case 1:
-			controller = (m_io_ctrlr->read() & 0xf0);
-			break;
-
-		default:
-			controller = 0;
-			break;
-	}
-
-	if (controller)
-	{
-		if (m_megadrive_io_ctrl_regs[portnum] & 0x40)
-		{
-			if (((m_megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
-			{
-				m_io_stage[portnum]++;
-				m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192));
-			}
-
-		}
-	}
-	m_megadrive_io_data_regs[portnum] = data;
-	//osd_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
+	m_ioports[2]->set_in_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::in_r));
+	m_ioports[2]->set_out_handler(m_ctrl_ports[2], FUNC(sms_control_port_device::out_w));
 }
 
 
@@ -167,98 +55,13 @@ void md_cons_state::mess_md_io_write_data_port(offs_t offset, uint16_t data)
  *************************************/
 
 
-static INPUT_PORTS_START( md_base )
-	PORT_START("PAD1_3B")       /* Joypad 1 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x00)
-
-	PORT_START("PAD2_3B")       /* Joypad 2 (3 button + start) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x00)
-
-	PORT_START("PAD1_6B")       /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 B") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 C") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 A") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Z") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Y") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 X") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Mode") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x01)
-
-	PORT_START("PAD2_6B")       /* Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 B") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 C") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 A") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-
-	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Z") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Y") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 X") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("P2 Mode") PORT_CONDITION("CTRLSEL", 0xf0, EQUALS, 0x10)
-
-	PORT_START("RESET")     /* Buttons on Genesis Console */
+static INPUT_PORTS_START( md )
+	PORT_START("RESET")     // Buttons on Mega Drive console
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Reset Button") PORT_IMPULSE(1) // reset, resets 68k (and..?)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( md )
-	PORT_INCLUDE( md_base )
-
-	PORT_START("CTRLSEL")   /* Controller selection */
-	PORT_CONFNAME( 0x0f, 0x00, "Player 1 Controller" )
-	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
-	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
-//  PORT_CONFSETTING( 0x02, "Sega Mouse" )
-/* there exists both a 2 buttons version of the Mouse (Jpn ver, to be used with RPGs, it
-    can aslo be used as trackball) and a 3 buttons version (US ver, no trackball feats.) */
-//  PORT_CONFSETTING( 0x03, "Sega Menacer" )
-//  PORT_CONFSETTING( 0x04, "Konami Justifier" )
-//  PORT_CONFSETTING( 0x05, "Team Player (Sega Multitap)" )
-//  PORT_CONFSETTING( 0x06, "4-Play (EA Multitap)" )
-//  PORT_CONFSETTING( 0x07, "J-Cart" )
-	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
-	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
-	PORT_CONFSETTING( 0x10, "Joystick 6 Buttons" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( megajet )
-	PORT_INCLUDE( md_base )
-
-	PORT_START("CTRLSEL")   /* Fixed controller setting for Player 1 */
-	PORT_CONFNAME( 0x0f, 0x01, "Player 1 Controller" ) // Fixed
-	PORT_CONFSETTING( 0x01, "Joystick 6 Buttons" )
-	PORT_CONFNAME( 0xf0, 0x00, "Player 2 Controller" )
-	PORT_CONFSETTING( 0x00, "Joystick 3 Buttons" )
-	PORT_CONFSETTING( 0x10, "Joystick 6 Buttons" )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( gen_nomd )
-	PORT_INCLUDE( megajet )
-
-	PORT_MODIFY("RESET")     /* No reset button */
+	PORT_START("RESET")     // No reset button
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -271,32 +74,12 @@ INPUT_PORTS_END
 
 void md_cons_state::machine_start()
 {
-	static const char *const pad6names[2][4] = {
-		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
-		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
-	};
-	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
-
-	m_io_ctrlr = ioport("CTRLSEL");
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_io_pad3b[i] = ioport(pad3names[i]);
-		m_io_pad6b[0][i] = ioport(pad6names[0][i]);
-		m_io_pad6b[1][i] = ioport(pad6names[1][i]);
-	}
-
-	// setup timers for 6 button pads
-	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = timer_alloc(FUNC(md_base_state::io_timeout_timer_callback), this);
-
 	m_vdp->stop_timers();
 
 	if (m_cart)
 		m_cart->save_nvram();
 
-	if (m_z80snd)
-		m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
+	m_genz80.z80_run_timer = timer_alloc(FUNC(md_cons_state::megadriv_z80_run_state), this);
 }
 
 void md_cons_state::install_cartslot()
@@ -331,6 +114,14 @@ void md_cons_state::tmss_swap_w(uint16_t data)
 	{
 		install_tmss();
 	}
+}
+
+
+void md_cons_state::dcat16_megadriv_map(address_map &map)
+{
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x7fffff).rom();
 }
 
 
@@ -408,14 +199,17 @@ void md_cons_state::dcat16_megadriv_base(machine_config &config)
 {
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::dcat16_megadriv_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_cons_state::dcat16_megadriv_map);
 }
 
 void md_cons_slot_state::ms_megadriv(machine_config &config)
 {
 	md_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_slot_state::screen_vblank_console));
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
@@ -425,7 +219,10 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 {
 	md_pal(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_slot_state::screen_vblank_console));
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
@@ -435,10 +232,21 @@ void md_cons_slot_state::ms_megadriv2(machine_config &config)
 {
 	md2_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_slot_state::screen_vblank_console));
+
+	md_ctrl_ports(config);
 
 	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
+}
+
+void md_cons_slot_state::ms_megajet(machine_config &config)
+{
+	ms_megadriv2(config);
+
+	// P1 controller is integrated
+	m_ctrl_ports[0]->set_default_option(SMS_CTRL_OPTION_MD_6BUTTON);
+	m_ctrl_ports[0]->set_fixed(true);
 }
 
 void md_cons_slot_state::genesis_tmss(machine_config &config)
@@ -451,7 +259,9 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
 {
 	dcat16_megadriv_base(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+
+	md_ctrl_ports(config);
 
 //  has SD card slot instead?
 //  MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
@@ -465,7 +275,7 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
  *************************************/
 
 
-/* we don't use the bios rom (it's not needed and only provides security on early models) */
+/* we don't use the BIOS ROM (it's not needed and only provides security on early models) */
 
 ROM_START(genesis)
 	ROM_REGION(MD_CPU_REGION_SIZE, "maincpu", ROMREGION_ERASEFF)
@@ -513,16 +323,9 @@ ROM_END
  *
  *************************************/
 
-void md_cons_state::init_mess_md_common()
-{
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_cons_state::mess_md_io_read_data_port));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_cons_state::mess_md_io_write_data_port));
-}
-
 void md_cons_state::init_genesis()
 {
 	init_megadriv();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -544,7 +347,6 @@ void md_cons_state::init_genesis()
 void md_cons_state::init_md_eur()
 {
 	init_megadrie();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -566,7 +368,6 @@ void md_cons_state::init_md_eur()
 void md_cons_state::init_md_jpn()
 {
 	init_megadrij();
-	init_mess_md_common();
 
 	if (m_32x)
 	{
@@ -660,13 +461,16 @@ void md_cons_state::genesis_32x(machine_config &config)
 	m_32x->add_route(0, "lspeaker", 1.00);
 	m_32x->add_route(1, "rspeaker", 1.00);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
@@ -692,13 +496,16 @@ void md_cons_state::mdj_32x(machine_config &config)
 	m_32x->add_route(0, "lspeaker", 1.00);
 	m_32x->add_route(1, "rspeaker", 1.00);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
@@ -724,13 +531,16 @@ void md_cons_state::md_32x(machine_config &config)
 	m_32x->add_route(0, "lspeaker", 1.00);
 	m_32x->add_route(1, "rspeaker", 1.00);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
@@ -776,7 +586,7 @@ void md_cons_cd_state::genesis_scd(machine_config &config)
 {
 	md_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -784,6 +594,9 @@ void md_cons_cd_state::genesis_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -794,7 +607,7 @@ void md_cons_cd_state::genesis2_scd(machine_config &config)
 {
 	md2_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -802,6 +615,8 @@ void md_cons_cd_state::genesis2_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -812,7 +627,7 @@ void md_cons_cd_state::md_scd(machine_config &config)
 {
 	md_pal(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -820,6 +635,9 @@ void md_cons_cd_state::md_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -830,7 +648,7 @@ void md_cons_cd_state::md2_scd(machine_config &config)
 {
 	md2_pal(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -838,6 +656,8 @@ void md_cons_cd_state::md2_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -848,7 +668,7 @@ void md_cons_cd_state::mdj_scd(machine_config &config)
 {
 	md_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -856,6 +676,9 @@ void md_cons_cd_state::mdj_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
+	md_exp_port(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -866,7 +689,7 @@ void md_cons_cd_state::md2j_scd(machine_config &config)
 {
 	md2_ntsc(config);
 
-	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
+	m_screen->screen_vblank().set(FUNC(md_cons_cd_state::screen_vblank_console));
 
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:gfx_palette");
@@ -874,6 +697,8 @@ void md_cons_cd_state::md2j_scd(machine_config &config)
 	m_segacd->set_screen("megadriv");
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
+	md_ctrl_ports(config);
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -896,7 +721,7 @@ void md_cons_cd_state::genesis_32x_scd(machine_config &config)
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
@@ -916,7 +741,7 @@ void md_cons_cd_state::md_32x_scd(machine_config &config)
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
@@ -936,7 +761,7 @@ void md_cons_cd_state::mdj_32x_scd(machine_config &config)
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
@@ -1190,10 +1015,10 @@ CONS( 1995, 32x_mcd,      32x_scd,  0,      md_32x_scd,      md,       md_cons_c
 CONS( 1994, 32x_mcdj,     32x_scd,  0,      mdj_32x_scd,     md,       md_cons_cd_state, init_md_jpn,  "Sega",   "Mega-CD with 32X (Japan, NTSC)", MACHINE_NOT_WORKING )
 
 // handheld hardware
-CONS( 1995, gen_nomd,     0,        0,      ms_megadriv2,    gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1995, gen_nomd,     0,        0,      ms_megajet,      gen_nomd, md_cons_slot_state, init_genesis, "Sega",   "Genesis Nomad (USA Genesis handheld)",  MACHINE_SUPPORTS_SAVE )
 
 // handheld without LCD
-CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1993, megajet,      gen_nomd, 0,      ms_megajet,      md,       md_cons_slot_state, init_md_jpn,  "Sega",   "Mega Jet (Japan Mega Drive handheld)",  MACHINE_SUPPORTS_SAVE )
 
 // LaserActive (Laserdisc Player(ex: CLD-A100) with 'Control Pack' Addon slot)
 // Mega Drive Pack(PAC-S1)/Genesis Pack(PAC-S10) plugged into the Control Pack slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs

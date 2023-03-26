@@ -5,8 +5,8 @@
     Sega 16-bit common hardware
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_SEGAIC16_H
-#define MAME_VIDEO_SEGAIC16_H
+#ifndef MAME_SEGA_SEGAIC16_H
+#define MAME_SEGA_SEGAIC16_H
 
 #pragma once
 
@@ -187,4 +187,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
 
-#endif // MAME_VIDEO_SEGAIC16_H
+#endif // MAME_SEGA_SEGAIC16_H

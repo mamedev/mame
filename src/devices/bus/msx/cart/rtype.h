@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cartridge.h"
+#include "bus/msx/slot/cartridge.h"
 
 
 DECLARE_DEVICE_TYPE(MSX_CART_RTYPE, msx_cart_rtype_device)
@@ -16,7 +16,7 @@ class msx_cart_rtype_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_rtype_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void initialize_cartridge() override;
+	virtual image_init_result initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides

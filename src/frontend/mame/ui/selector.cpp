@@ -49,53 +49,54 @@ menu_selector::~menu_selector()
 //  handle
 //-------------------------------------------------
 
-void menu_selector::handle(event const *ev)
+bool menu_selector::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
+	if (!ev)
+		return false;
+
+	switch (ev->iptkey)
 	{
-		switch (ev->iptkey)
+	case IPT_UI_SELECT:
+		if (ev->itemref)
 		{
-		case IPT_UI_SELECT:
-			if (ev->itemref)
-			{
-				int selection(-1);
-				for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
-					if ((void*)&m_str_items[idx] == ev->itemref)
-						selection = int(unsigned(idx));
+			int selection(-1);
+			for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
+				if ((void*)&m_str_items[idx] == ev->itemref)
+					selection = int(unsigned(idx));
 
-				m_handler(selection);
-				stack_pop();
-			}
-			break;
-
-		case IPT_UI_PASTE:
-			if (paste_text(m_search, uchar_is_printable))
-				reset(reset_options::SELECT_FIRST);
-			break;
-
-		case IPT_SPECIAL:
-			if (input_character(m_search, ev->unichar, uchar_is_printable))
-				reset(reset_options::SELECT_FIRST);
-			break;
-
-		case IPT_UI_CANCEL:
-			if (!m_search.empty())
-			{
-				// escape pressed with non-empty search text clears the search text
-				m_search.clear();
-				reset(reset_options::SELECT_FIRST);
-			}
-			break;
+			m_handler(selection);
+			stack_pop();
 		}
+		break;
+
+	case IPT_UI_PASTE:
+		if (paste_text(m_search, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+
+	case IPT_SPECIAL:
+		if (input_character(m_search, ev->unichar, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+
+	case IPT_UI_CANCEL:
+		if (!m_search.empty())
+		{
+			// escape pressed with non-empty search text clears the search text
+			m_search.clear();
+			reset(reset_options::SELECT_FIRST);
+		}
+		break;
 	}
+
+	return false; // any changes will trigger an item reset
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_selector::populate(float &customtop, float &custombottom)
+void menu_selector::populate()
 {
 	set_heading(util::string_format(_("menu-selector", "%1$s - Search: %2$s_"), m_title, m_search));
 
@@ -124,8 +125,18 @@ void menu_selector::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 	m_initial = -1;
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
 }
 
 //-------------------------------------------------
@@ -138,9 +149,9 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	std::string const tempbuf[] = { util::string_format(_("menu-selector", "Double-click or press %1$s to select"), ui().get_general_input_setting(IPT_UI_SELECT)) };
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 }
 
 //-------------------------------------------------

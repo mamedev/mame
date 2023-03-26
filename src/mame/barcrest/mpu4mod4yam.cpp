@@ -80,8 +80,7 @@ private:
 void mpu4mod4yam_machines_state::add_ym2413(machine_config &config)
 {
 	YM2413(config, m_ym2413, XTAL(3'579'545)); // XTAL on sound board
-	m_ym2413->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym2413->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void mpu4mod4yam_machines_state::base_f(machine_config &config)
@@ -1623,11 +1622,6 @@ GAME(199?, m4nspotb,  m4nspot,    cheatchr_pal<mpu4_characteriser_pal::celclb_ch
 *
 *****************************************************************************************************************************************************************************/
 
-ROM_START( m4tst )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
-	ROM_LOAD( "ut4.p1",  0xC000, 0x4000,  CRC(086dc325) SHA1(923caeb61347ac9d3e6bcec45998ddf04b2c8ffd))
-ROM_END
-
 ROM_START( m4joljokd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "djj15.bin", 0x0000, 0x010000, CRC(155cb134) SHA1(c1026effeceba131df9681afd91ccd6fb43b738a) )
@@ -1659,8 +1653,6 @@ ROM_START( m4addrd )
 	ROM_LOAD( "dal12.bin", 0x0000, 0x010000, CRC(4affa79a) SHA1(68bceab42b3616641a34a64a83306175ffc1ce32) )
 ROM_END
 
-
-GAME(198?, m4tst, 0, no_bacta(R4, RT1, OVER), mpu4, mpu4mod4yam_machines_state, init_m4, ROT0,"Barcrest","MPU4 Unit Test (Program 4)",MACHINE_MECHANICAL )
 
 GAME(199?, m4joljokd, 0,       cheatchr_pal<mpu4_characteriser_pal::celclb_characteriser_prot>(R4, RT1), mpu4, mpu4mod4yam_machines_state, init_m4,  ROT0,   "Barcrest","Jolly Joker (Barcrest) (Dutch) (MPU4) (DJJ 1.5)",GAME_FLAGS) // Geen Tubes
 

@@ -130,7 +130,7 @@ function cheat.startplugin()
 
 	local function load_hotkeys()
 		local json = require("json")
-		local file = io.open(emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)")) .. "/" .. cheatname .. "_hotkeys.json", "r")
+		local file = io.open(manager.machine.options.entries.cheatpath:value():match("([^;]+)") .. "/" .. cheatname .. "_hotkeys.json", "r")
 		if not file then
 			return
 		end
@@ -154,7 +154,7 @@ function cheat.startplugin()
 				end
 			end
 		end
-		local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
+		local path = manager.machine.options.entries.cheatpath:value():match("([^;]+)")
 		local filepath = path .. "/" .. cheatname .. "_hotkeys.json"
 		if #hotkeys > 0 then
 			local json = require("json")
@@ -714,7 +714,7 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "cancel" then
+			if event == "back" then
 				hotkeymenu = false
 				return true
 			else

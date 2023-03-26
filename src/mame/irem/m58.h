@@ -6,8 +6,8 @@
     Irem M58 hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_M58_H
-#define MAME_INCLUDES_M58_H
+#ifndef MAME_IREM_M58_H
+#define MAME_IREM_M58_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 	void yard_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M58_H
+#endif // MAME_IREM_M58_H

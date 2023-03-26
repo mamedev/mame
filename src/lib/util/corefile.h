@@ -87,7 +87,7 @@ public:
 	virtual int puts(std::string_view s) = 0;
 
 	// printf-style text write to a file
-	virtual int vprintf(util::format_argument_pack<std::ostream> const &args) = 0;
+	virtual int vprintf(util::format_argument_pack<char> const &args) = 0;
 	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
 	{
 		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));

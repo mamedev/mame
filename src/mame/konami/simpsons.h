@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_SIMPSONS_H
-#define MAME_INCLUDES_SIMPSONS_H
+#ifndef MAME_KONAMI_SIMPSONS_H
+#define MAME_KONAMI_SIMPSONS_H
 
 #pragma once
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "k052109.h"
 #include "k053251.h"
 #include "k053246_k053247_k055673.h"
@@ -82,4 +82,4 @@ private:
 	K053246_CB_MEMBER(sprite_callback);
 };
 
-#endif // MAME_INCLUDES_SIMPSONS_H
+#endif // MAME_KONAMI_SIMPSONS_H

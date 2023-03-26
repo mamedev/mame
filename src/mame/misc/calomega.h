@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders: Roberto Fresca, Grull Osgo
 
-#ifndef MAME_INCLUDES_CALOMEGA_H
-#define MAME_INCLUDES_CALOMEGA_H
+#ifndef MAME_MISC_CALOMEGA_H
+#define MAME_MISC_CALOMEGA_H
 
 #pragma once
 
@@ -161,4 +161,4 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 };
 
-#endif // MAME_INCLUDES_CALOMEGA_H
+#endif // MAME_MISC_CALOMEGA_H

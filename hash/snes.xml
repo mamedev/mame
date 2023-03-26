@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
   Credits:
   - Maintainers : Fabio Priuli, Yakushi~Kabuto
@@ -34794,6 +34794,32 @@ List of unclassified roms
 				<rom name="'96 zenkoku koukou soccer senshuken (japan).sfc" size="1572864" crc="05fbb855" sha1="005ccd8362dc41491f89f31fc9326a6688300e0c" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas11">
+		<description>16 Bit Xmas 2011 - Christmas Craze (USA)</description>
+		<year>2011</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-H1-GBL" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="xmas11demo.smc" size="0x80000" crc="d23ca2d7" sha1="7b3fcb6f3cc80ae6a8ba496669944b2d9dccb6be" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas12">
+		<description>16 Bit Xmas 2012 - Snowball Fight (USA)</description>
+		<year>2012</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-H2-GBL" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="xmas12demo.smc" size="0x20000" crc="db518e68" sha1="03241ca4455840420b5780e579c614f3f08eab41" />
 			</dataarea>
 		</part>
 	</software>

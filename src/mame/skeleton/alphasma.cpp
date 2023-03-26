@@ -21,6 +21,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class alphasmart_state : public driver_device
 {
 public:
@@ -100,7 +103,8 @@ private:
 
 INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
 {
-	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
+	// IRQ on every key transition
+	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, ASSERT_LINE);
 }
 
 uint8_t alphasmart_state::kb_r()
@@ -118,6 +122,7 @@ uint8_t alphasmart_state::kb_r()
 void alphasmart_state::kb_matrixl_w(uint8_t data)
 {
 	m_matrix[0] = data;
+	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, CLEAR_LINE);
 }
 
 void alphasmart_state::kb_matrixh_w(uint8_t data)
@@ -621,6 +626,8 @@ ROM_START( asma2k )
 	ROM_REGION( 0x20000, "spellcheck", 0 )
 	ROM_LOAD( "dictrom__v1.stm_m27c1001-1501.plcc32.bin", 0x00000, 0x20000, CRC(a143949c) SHA1(033094bb850c614008b4ecc2eefbcb01b8a2bcda) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                           FULLNAME           FLAGS

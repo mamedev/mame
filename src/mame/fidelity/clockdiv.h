@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_MACHINE_FIDEL_CLOCKDIV_H
-#define MAME_MACHINE_FIDEL_CLOCKDIV_H
+#ifndef MAME_FIDELITY_FIDEL_CLOCKDIV_H
+#define MAME_FIDELITY_FIDEL_CLOCKDIV_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 INPUT_PORTS_EXTERN( fidel_clockdiv_2 );
 INPUT_PORTS_EXTERN( fidel_clockdiv_4 );
 
-#endif // MAME_MACHINE_FIDEL_CLOCKDIV_H
+#endif // MAME_FIDELITY_FIDEL_CLOCKDIV_H

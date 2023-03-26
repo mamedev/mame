@@ -8,8 +8,8 @@
 
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_NES_H
-#define MAME_INCLUDES_NES_H
+#ifndef MAME_NINTENDO_NES_H
+#define MAME_NINTENDO_NES_H
 
 #pragma once
 
@@ -64,7 +64,6 @@ public:
 	uint8_t fc_in0_r();
 	uint8_t fc_in1_r();
 	void fc_in0_w(uint8_t data);
-	void nes_vh_sprite_dma_w(address_space &space, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -115,4 +114,4 @@ private:
 	memory_bank_array_creator<4> m_prg_bank;
 };
 
-#endif // MAME_INCLUDES_NES_H
+#endif // MAME_NINTENDO_NES_H

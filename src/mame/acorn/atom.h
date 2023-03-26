@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#ifndef MAME_INCLUDES_ATOM_H
-#define MAME_INCLUDES_ATOM_H
+#ifndef MAME_ACORN_ATOM_H
+#define MAME_ACORN_ATOM_H
 
 #pragma once
 
@@ -143,4 +143,4 @@ private:
 	void atomeb_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ATOM_H
+#endif // MAME_ACORN_ATOM_H

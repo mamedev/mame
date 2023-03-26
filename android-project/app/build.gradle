@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "org.mamedev.mame"
@@ -10,7 +9,10 @@ android {
         ndk {
             moduleName 'main'
         }
+    }
 
+    lintOptions {
+        abortOnError false
     }
 
     sourceSets.main {
@@ -25,3 +27,20 @@ android {
         }
     }
 }
+
+task copyFiles_bgfx(type: Copy)
+task copyFiles_language(type: Copy)
+
+copyFiles_bgfx {
+    from '../../bgfx'
+    into 'src/main/assets/bgfx'
+    include('**/*')
+}
+copyFiles_language {
+    from '../../language'
+    into 'src/main/assets/language'
+    include('**/*.mo')
+}
+
+preBuild.dependsOn copyFiles_bgfx
+preBuild.dependsOn copyFiles_language

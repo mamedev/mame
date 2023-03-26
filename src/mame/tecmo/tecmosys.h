@@ -5,8 +5,8 @@
     tecmosys protection simulation
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_TECMOSYS_H
-#define MAME_INCLUDES_TECMOSYS_H
+#ifndef MAME_TECMO_TECMOSYS_H
+#define MAME_TECMO_TECMOSYS_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TECMOSYS_H
+#endif // MAME_TECMO_TECMOSYS_H

@@ -132,6 +132,9 @@ expansion.
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 #define XTAL_UCHROMA68 3.579545_MHz_XTAL
 
 class uchroma68_state : public driver_device
@@ -481,6 +484,9 @@ ROM_START(uchroma68)
 	ROM_LOAD("tvbug.rom", 0xf800, 0x0800, CRC(47f721e4) SHA1(31ea8d596f1f99ee26c4bea694245448bfdc3ee6))
 	ROM_LOAD("uch68s19.rom", 0xe800, 0x0400, CRC(8932484f) SHA1(231098ab10185d400032415cf9b7273d736d3b87))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

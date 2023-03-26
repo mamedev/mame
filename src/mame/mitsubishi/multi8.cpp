@@ -34,6 +34,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class multi8_state : public driver_device
 {
 public:
@@ -692,6 +694,9 @@ ROM_START( multi8 )
 
 	ROM_REGION( 0x4000, "wram", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

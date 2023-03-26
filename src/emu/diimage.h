@@ -64,26 +64,12 @@ private:
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };
 
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
-
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
-
-
 // ======================> device_image_interface
 
 // class representing interface-specific live image
 class device_image_interface : public device_interface
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
-	typedef device_delegate<void (device_image_interface &)> unload_delegate;
-
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
 	// construction/destruction
@@ -231,7 +217,7 @@ protected:
 	virtual void interface_config_complete() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
-	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
+	virtual bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);

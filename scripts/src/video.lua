@@ -691,6 +691,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mc68328lcd.h,VIDEOS["MC68328LCD"] = true
+--------------------------------------------------
+
+if (VIDEOS["MC68328LCD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mc68328lcd.cpp",
+		MAME_DIR .. "src/devices/video/mc68328lcd.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mc6845.h,VIDEOS["MC6845"] = true
 --------------------------------------------------
 
@@ -770,6 +782,18 @@ if (VIDEOS["MOS6566"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/mos6566.cpp",
 		MAME_DIR .. "src/devices/video/mos6566.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mos8563.h,VIDEOS["MOS8563"] = true
+--------------------------------------------------
+
+if (VIDEOS["MOS8563"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mos8563.cpp",
+		MAME_DIR .. "src/devices/video/mos8563.h",
 	}
 end
 
@@ -914,6 +938,17 @@ if (VIDEOS["SED1356"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/sed1356.cpp",
 		MAME_DIR .. "src/devices/video/sed1356.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sed1375.h,VIDEOS["SED1375"] = true
+--------------------------------------------------
+if (VIDEOS["SED1375"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sed1375.cpp",
+		MAME_DIR .. "src/devices/video/sed1375.h",
 	}
 end
 

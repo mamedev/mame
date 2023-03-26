@@ -3,10 +3,15 @@
 /******************************************************************************
 
 Easi-Speech cartridge (R.Amy, 1987)
+It has a GI SP0256A-AL2 (no XTAL)
 
 The program adds a hook to 0xfd29, usage appears to be something like this:
-defusr0=&hfd29
-a$=usr0("hello")
+n%=(number 0-511):a=usr9(n%)
+or a=usr9(number)
+
+Or a custom string:
+a$="hello world":a$=usr9(a$)
+or a$=usr9("string")
 
 ******************************************************************************/
 
@@ -40,16 +45,25 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, ":speaker", 1.00);
 }
 
-void msx_cart_easispeech_device::initialize_cartridge()
+image_init_result msx_cart_easispeech_device::initialize_cartridge(std::string &message)
 {
-	if (get_rom_size() != 0x2000)
+	if (!cart_rom_region())
 	{
-		fatalerror("easispeech: Invalid ROM size\n");
+		message = "msx_cart_easispeech_device: Required region 'rom' was not found.";
+		return image_init_result::FAIL;
 	}
 
-	page(1)->install_rom(0x4000, 0x5fff, 0x2000, get_rom_base());
+	if (cart_rom_region()->bytes() != 0x2000)
+	{
+		message = "msx_cart_easispeech_device: Region 'rom' has unsupported size.";
+		return image_init_result::FAIL;
+	}
+
+	page(1)->install_rom(0x4000, 0x5fff, 0x2000, cart_rom_region()->base());
 	page(2)->install_read_handler(0x8000, 0x8000, read8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
 	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
+
+	return image_init_result::PASS;
 }
 
 u8 msx_cart_easispeech_device::speech_r()

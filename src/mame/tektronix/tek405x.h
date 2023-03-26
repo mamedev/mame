@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_TEK405X_H
-#define MAME_INCLUDES_TEK405X_H
+#ifndef MAME_TEKTRONIX_TEK405X_H
+#define MAME_TEKTRONIX_TEK405X_H
 
 #pragma once
 
@@ -173,4 +173,4 @@ private:
 	required_device<ram_device> m_ram;
 };
 
-#endif // MAME_INCLUDES_TEK405X_H
+#endif // MAME_TEKTRONIX_TEK405X_H

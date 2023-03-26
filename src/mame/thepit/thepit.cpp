@@ -913,6 +913,25 @@ ROM_START( thepitu2 )
 	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 ROM_END
 
+ROM_START( thepitu3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pi-38.ic38",   0x0000, 0x1000, CRC(71affecc) SHA1(e64cb2f8d546f5d44dc10a4178f3d211882c45a9) )
+	ROM_LOAD( "pi-39.ic39",   0x1000, 0x1000, CRC(894063cd) SHA1(772ff81cf44d21981f9768f017af5cb81ff57be3) )
+	ROM_LOAD( "pi-40.ic40",   0x2000, 0x1000, CRC(1b488543) SHA1(8991c6424f008ddd15edac953635aecdba4ea696) )
+	ROM_LOAD( "pi-41.ic41",   0x3000, 0x1000, CRC(f33aab67) SHA1(edcc4222c78ce7d8accd4e6ef9f81600a066bda0) )
+	ROM_LOAD( "pi-33.ic33",   0x4000, 0x1000, CRC(394ef216) SHA1(e9f7a3697183e15507b81147ac7b87c24802c65c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "pi-30.ic30",   0x0000, 0x0800, CRC(1b79dfb6) SHA1(ba78b035a91a67732414ba327640fb771d4323c5) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "pi-9.ic9",     0x0000, 0x0800, CRC(69502afc) SHA1(9baf094baab8325af659879cfb6984eeca0d94bd) )
+	ROM_LOAD( "pi-8.ic8",     0x1000, 0x0800, CRC(2ddd5045) SHA1(baa962a874f00e56c15c264980b1e31a2c9dc270) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.ic4",   0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // not dumped for this set
+ROM_END
+
 ROM_START( thepitj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pit01.ic38",   0x0000, 0x1000, CRC(87c269bf) SHA1(78a85a637cbf0dcfde7ccaa9a2d543078655b566) )
@@ -1440,6 +1459,7 @@ GAME( 1981, ttfitter,   roundup,  fitter,   fitter,   thepit_state, empty_init, 
 GAME( 1982, thepit,     0,        thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics",                           "The Pit", MACHINE_SUPPORTS_SAVE ) // AW == Andy Walker
 GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
+GAME( 1982, thepitu3,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, thehole,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "bootleg",                                     "The Hole (bootleg of The Pit)", MACHINE_SUPPORTS_SAVE )
 

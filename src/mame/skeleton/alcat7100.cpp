@@ -15,6 +15,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class alcat7100_state : public driver_device
 {
 public:
@@ -114,5 +117,8 @@ ROM_START(alcat7100) // Z80  // 256k ram // b&w  // looks like it needs a boot f
 	ROM_REGION(0x1000, "chargen", 0) // first half blank
 	ROM_LOAD("906_513301_rev00_ba6d.u20", 0x0000, 0x1000, CRC(143cfdfc) SHA1(4d924d1f16c30d72e1fdbb786488156bb9961442))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, alcat7100, 0, 0, alcat7100, alcat7100, alcat7100_state, empty_init, "Alcatel", "Terminal 7100", MACHINE_IS_SKELETON)

@@ -1452,14 +1452,34 @@ static const struct gfx_range mapper_TN2292_table[] =
 };
 
 
+// RCM63B, SFZ63B (megaman, sfzch) are equivalent, should be interchangeable on real PCBs without issue
+
 #define mapper_RCM63B   { 0x8000, 0x8000, 0x8000, 0x8000 }, mapper_RCM63B_table
 static const struct gfx_range mapper_RCM63B_table[] =
 {
 	// verified from PAL dump:
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
-	// bank0 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
-	// bank1 = pin 13 (ROMs 14,16) & pin 12 (ROMs 15,17)
+	// bank2 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
+	// bank3 = pin 13 (ROMs 14,16) & pin 12 (ROMs 15,17)
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 2 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 3 },
+	{ 0 }
+};
+
+
+#define mapper_SFZ63B   { 0x8000, 0x8000, 0x8000, 0x8000 }, mapper_SFZ63B_table
+static const struct gfx_range mapper_SFZ63B_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// bank2 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
+	// bank3 = pin 13 (ROMs 14,16) & pin 12 (ROMs 15,17)
 
 	/* type                                                                  start    end      bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
@@ -1551,9 +1571,9 @@ static const struct gfx_range mapper_CP1B1F_boot_table[] =
 };
 
 
-/* unverified, no dump */
-#define mapper_sfzch    { 0x20000, 0, 0, 0 }, mapper_sfzch_table
-static const struct gfx_range mapper_sfzch_table[] =
+// varthb2, slampic2 bootlegs
+#define mapper_varthb2    { 0x20000, 0, 0, 0 }, mapper_varthb2_table
+static const struct gfx_range mapper_varthb2_table[] =
 {
 	/* type                                                                  start    end      bank */
 	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 0 },
@@ -1760,6 +1780,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj3",    CPS_B_03,     mapper_S222B },   // equivalent to S224B
 	{"ffightj4",    CPS_B_05,     mapper_S222B },   // equivalent to S224B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
+	{"ffightae",    CPS_B_21_DEF, mapper_S224B,  0x36 },
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
 	{"1941u",       CPS_B_05,     mapper_YI24B },
@@ -1821,7 +1842,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2qp2",      CPS_B_14,     mapper_STF29,  0x36 },
 	{"sf2thndr",    CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2thndr2",   CPS_B_17,     mapper_STF29,  0x36 },
-	{"hkittymp",    CPS_B_21_DEF, mapper_sfzch }, // PAL is dumped but not analyzed yet, same as SFZCH
+	{"mpumpkin",    CPS_B_21_DEF, mapper_SFZ63B },
 
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 
@@ -1913,7 +1934,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2mkot",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 0x41 },
 	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
-	{"varthb2",     HACK_B_3,     mapper_sfzch, 0, 0, 0, 0xc1 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
+	{"varthb2",     HACK_B_3,     mapper_varthb2, 0, 0, 0, 0xc1 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
 	{"varthb3",     CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F }, // TODO: wrong
 	{"varthr1",     CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
@@ -1948,7 +1969,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"slammast",    CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",   CPS_B_21_QS4, mapper_MB63B },
 	{"slampic",     CPS_B_21_QS4, mapper_MB63B },
-	{"slampic2",    CPS_B_21_QS4, mapper_sfzch },  // default cps2 mapper breaks scroll layers
+	{"slampic2",    CPS_B_21_QS4, mapper_varthb2 },  // default cps2 mapper breaks scroll layers
 	{"mbomberj",    CPS_B_21_QS4, mapper_MB63B },
 	{"mbombrd",     CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj",    CPS_B_21_QS5, mapper_MB63B },
@@ -1975,9 +1996,9 @@ static const struct CPS1config cps1_config_table[]=
 
 	/* CPS Changer */
 
-	{"sfach",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
-	{"sfzbch",      CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
-	{"sfzch",       CPS_B_21_DEF, mapper_sfzch },   // wrong, this set uses an unknown PAL, still not dumped
+	{"sfach",       CPS_B_21_DEF, mapper_SFZ63B },  // SFZ63B found on mpumpkin, assumed to be from SFZ
+	{"sfzbch",      CPS_B_21_DEF, mapper_SFZ63B },
+	{"sfzch",       CPS_B_21_DEF, mapper_SFZ63B },
 	{"wofch",       CPS_B_21_DEF, mapper_TK263B },
 
 	/* CPS2 games */

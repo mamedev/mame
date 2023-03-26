@@ -33,6 +33,7 @@ Printer Unit:
 
 PSU ("permanent storage unit"?) is just a 256x4 battery-backed RAM (TC5501P)
 module, not sure why it was so expensive (~180DM).
+
 A chess clock accessory was also announced but unreleased.
 
 SciSys Super System IV (AKA MK IV) is on similar hardware. It was supposed to
@@ -42,11 +43,6 @@ reversi program called "The Moor". The chesscomputer was discontinued soon after
 release, and none of the accessories or other games came out.
 
 TODO:
-- 6522 ACR register is initialized with 0xe3. Meaning: PA and PB inputs are set
-  to latch mode, but the program then never clocks the latch, it functions as if
-  it meant to write 0xe0. Maybe 6522 CA1 pin emulation is wrong? Documentation
-  says it's edge-triggered, but here it's tied to VCC. I added a trivial hack to
-  work around this, see rom defs.
 - 2nd 7474 /2 clock divider on each 4000-7fff access, this also applies to 6522 clock
   (doesn't affect chess calculation speed, only I/O access, eg. beeper pitch).
   Should be doable to add, but 6522 device doesn't support live clock changes.
@@ -539,9 +535,6 @@ ROM_START( ssystem3 )
 	ROM_LOAD("c19081e_ss-3-lrom.u4", 0x8000, 0x1000, CRC(9ea46ed3) SHA1(34eef85b356efbea6ddac1d1705b104fc8e2731a) ) // 2332
 	ROM_LOAD("c19082_ss-3-hrom.u5",  0x9000, 0x1000, CRC(52741e0b) SHA1(2a7b950f9810c5a14a1b9d5e6b2bd93da621662e) ) // "
 
-	// HACK! 6522 ACR register setup
-	ROM_FILL(0x946d, 1, 0xe0) // was 0xe3
-
 	ROM_REGION(0x10000, "subcpu", 0)
 	ROM_LOAD("c28a97m_ss-3l-rom", 0x4000, 0x0800, CRC(bf0b2a84) SHA1(286f56aca2e50b78ac1fae4a89413659aceb71d9) ) // 2316
 
@@ -560,9 +553,6 @@ ROM_START( ssystem4 )
 	ROM_LOAD("c45021_ss4-lrom", 0xd000, 0x1000, CRC(fc86a4fc) SHA1(ee292925165d4bf7b948c60a81d95f7a4064e797) ) // 2332
 	ROM_LOAD("c45022_ss4-mrom", 0xe000, 0x1000, CRC(c6110af1) SHA1(4b63454a23b2fe6b5c8f3fa6718eb49770cb6907) ) // "
 	ROM_LOAD("c45023_ss4-hrom", 0xf000, 0x1000, CRC(ab4a4343) SHA1(6eeee7168e13dc1115cb5833f1938a8ea8c01d69) ) // "
-
-	// HACK! 6522 ACR register setup
-	ROM_FILL(0xd05b, 1, 0xe0) // was 0xe3
 
 	ROM_REGION(53552, "screen", 0) // looks same, but different pinout
 	ROM_LOAD("ssystem4.svg", 0, 53552, CRC(b69b12e3) SHA1(c2e39d015397d403309f1c23619fe8abc3745d87) )

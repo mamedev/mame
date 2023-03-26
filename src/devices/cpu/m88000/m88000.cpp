@@ -5,10 +5,6 @@
  * Motorola M88000 Family of RISC microprocessors.
  *
  * TODO:
- *  - cache/mmu interface
- *  - misaligned access exceptions
- *  - floating point exceptions
- *  - user/supervisor space
  *  - xip/fip/nip exception flag
  *  - pipeline and cycles counts
  *  - mc88110
@@ -131,9 +127,8 @@ mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, MC88100, tag, owner, clock)
 	, m_code_config("code", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
-	, m_xip(0)
-	, m_nip(0)
-	, m_fip(0)
+	, m_cmmu_d(*this, finder_base::DUMMY_TAG)
+	, m_cmmu_i(*this, finder_base::DUMMY_TAG)
 	, m_sb(0)
 	, m_r{ 0 }
 	, m_cr{ 0 }
@@ -161,7 +156,7 @@ device_memory_interface::space_config_vector mc88100_device::memory_space_config
 
 void mc88100_device::device_start()
 {
-	space(AS_PROGRAM).cache(m_inst_cache);
+	space(AS_PROGRAM).specific(m_inst_space);
 
 	if (has_configured_map(AS_DATA))
 		space(AS_DATA).specific(m_data_space);
@@ -191,7 +186,7 @@ void mc88100_device::device_start()
 	state_add(36 + SR2, "sr2", m_cr[SR2]);
 	state_add(36 + SR3, "sr3", m_cr[SR3]);
 
-	for (int i = 1; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 		state_add(i, string_format("r%d", i).c_str(), m_r[i]);
 
 	save_item(NAME(m_xip));
@@ -224,11 +219,11 @@ void mc88100_device::execute_run()
 		// interrupt check
 		if (m_int_state && !(m_cr[PSR] & PSR_IND))
 		{
-			exception(E_INTERRUPT);
-
 			// notify debugger
 			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debug()->interrupt_hook(INPUT_LINE_IRQ0);
+				debug()->interrupt_hook(INPUT_LINE_IRQ0, m_fip);
+
+			exception(E_INTERRUPT);
 		}
 
 		// update shadow registers
@@ -246,20 +241,19 @@ void mc88100_device::execute_run()
 			execute(m_xop);
 		}
 
-		// fetch
-		if (m_fip & IP_V)
-			fetch(m_fip & IP_A, m_fop);
+		if (fetch(m_fip & IP_A, m_fop))
+		{
+			// next becomes execute
+			m_xop = m_nop;
+			m_xip = m_nip;
 
-		// next becomes execute
-		m_xop = m_nop;
-		m_xip = m_nip;
+			// fetch becomes next
+			m_nop = m_fop;
+			m_nip = m_fip;
 
-		// fetch becomes next
-		m_nop = m_fop;
-		m_nip = m_fip;
-
-		// increment fetch
-		m_fip += 4;
+			// increment fetch
+			m_fip += 4;
+		}
 
 		m_icount--;
 	}
@@ -570,7 +564,7 @@ void mc88100_device::execute(u32 const inst)
 				unsigned const offset = inst & 31;
 
 				if (width && (width + offset) < 32)
-					m_r[D] = s32(m_r[S1] << (32 - (width + offset))) >> (32 - width);
+					m_r[D] = util::sext(m_r[S1] >> offset, width);
 				else
 					m_r[D] = s32(m_r[S1]) >> offset;
 			}
@@ -764,6 +758,7 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x340: // divu: unsigned integer divide (register)
+		case 0x348:
 			if (!(m_cr[PSR] & PSR_SFD1))
 			{
 				if (m_r[S2])
@@ -775,6 +770,7 @@ void mc88100_device::execute(u32 const inst)
 				exception(E_SFU1_P);
 			break;
 		case 0x360: // mul: integer multiply (register)
+		case 0x368:
 			if (!(m_cr[PSR] & PSR_SFD1))
 				m_r[D] = m_r[S1] * m_r[S2];
 			else
@@ -869,6 +865,7 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x3c0: // div: signed integer divide (register)
+		case 0x3c8:
 			if (!(m_cr[PSR] & PSR_SFD1))
 			{
 				if (m_r[S2] && !BIT(m_r[S1], 31) && !BIT(m_r[S2], 31))
@@ -880,13 +877,14 @@ void mc88100_device::execute(u32 const inst)
 				exception(E_SFU1_P);
 			break;
 		case 0x3e0: // cmp: integer compare (register)
+		case 0x3e8:
 			m_r[D] = cmp(m_r[S1], m_r[S2]);
 			break;
 
 			// bit field register
 		case 0x400: // clr: clear bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				m_r[D] = m_r[S1] & ~(make_bitmask<u32>(width ? width : 32) << offset);
@@ -894,7 +892,7 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x440: // set: set bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				m_r[D] = m_r[S1] | (make_bitmask<u32>(width ? width : 32) << offset);
@@ -902,18 +900,18 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x480: // ext: extract signed bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width && (width + offset) < 32)
-					m_r[D] = s32(m_r[S1] << (32 - (width + offset))) >> (32 - width);
+					m_r[D] = util::sext(m_r[S1] >> offset, width);
 				else
 					m_r[D] = s32(m_r[S1]) >> offset;
 			}
 			break;
 		case 0x4c0: // extu: extract unsigned bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width)
@@ -924,7 +922,7 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x500: // mak: make bit field (register)
 			{
-				unsigned const width = (m_r[S2] >> 5) & 31;
+				unsigned const width = BIT(m_r[S2], 5, 5);
 				unsigned const offset = m_r[S2] & 31;
 
 				if (width)
@@ -1429,9 +1427,22 @@ void mc88100_device::fset(unsigned const td, unsigned const d, float64_t const d
 
 bool mc88100_device::fetch(u32 address, u32 &inst)
 {
-	inst = m_inst_cache.read_dword(address);
+	if (m_cmmu_i)
+	{
+		std::optional<u32> data = m_cmmu_i->read<u32>(address, m_cr[PSR] & PSR_MODE);
+		if (data.has_value())
+			inst = data.value();
+		else
+			exception(E_INSTRUCTION);
 
-	return true;
+		return data.has_value();
+	}
+	else
+	{
+		inst = m_inst_space.read_dword(address);
+
+		return true;
+	}
 }
 
 template <typename T> void mc88100_device::ld(u32 address, unsigned const reg)
@@ -1449,35 +1460,65 @@ template <typename T> void mc88100_device::ld(u32 address, unsigned const reg)
 			address &= ~(sizeof(T) - 1);
 	}
 
-	if constexpr (sizeof(T) == 1)
+	if (m_cmmu_d)
 	{
-		u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_byte(address))) : m_data_space.read_byte(address);
+		if constexpr (sizeof(T) < 8)
+		{
+			std::optional<T> const data = m_cmmu_d->read<typename std::make_unsigned<T>::type>(address, m_cr[PSR] & PSR_MODE);
 
-		if (reg)
-			m_r[reg] = data;
+			if (data.has_value() && reg)
+				m_r[reg] = std::is_signed<T>() ? s32(data.value()) : data.value();
+			else if (!data.has_value())
+				exception(E_DATA);
+		}
+		else
+		{
+			std::optional<u32> const hi = m_cmmu_d->read<u32>(address + 0, m_cr[PSR] & PSR_MODE);
+			std::optional<u32> const lo = m_cmmu_d->read<u32>(address + 4, m_cr[PSR] & PSR_MODE);
+			if (lo.has_value() && hi.has_value())
+			{
+				if (reg != 0)
+					m_r[(reg + 0) & 31] = hi.value();
+				if (reg != 31)
+					m_r[(reg + 1) & 31] = lo.value();
+			}
+			else
+				exception(E_DATA);
+		}
 	}
-	else if constexpr (sizeof(T) == 2)
+	else
 	{
-		u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_word(address))) : m_data_space.read_word(address);
+		if constexpr (sizeof(T) == 1)
+		{
+			u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_byte(address))) : m_data_space.read_byte(address);
 
-		if (reg)
-			m_r[reg] = data;
-	}
-	else if constexpr (sizeof(T) == 4)
-	{
-		u32 const data = m_data_space.read_dword(address);
+			if (reg)
+				m_r[reg] = data;
+		}
+		else if constexpr (sizeof(T) == 2)
+		{
+			u32 const data = std::is_signed<T>() ? s32(T(m_data_space.read_word(address))) : m_data_space.read_word(address);
 
-		if (reg)
-			m_r[reg] = data;
-	}
-	else if constexpr (sizeof(T) == 8)
-	{
-		u64 const data = m_data_space.read_qword(address);
+			if (reg)
+				m_r[reg] = data;
+		}
+		else if constexpr (sizeof(T) == 4)
+		{
+			u32 const data = m_data_space.read_dword(address);
 
-		if (reg != 0)
-			m_r[(reg + 0) & 31] = u32(data >> 32);
-		if (reg != 31)
-			m_r[(reg + 1) & 31] = u32(data >> 0);
+			if (reg)
+				m_r[reg] = data;
+		}
+		else if constexpr (sizeof(T) == 8)
+		{
+			u32 const hi = m_data_space.read_dword(address + 0);
+			u32 const lo = m_data_space.read_dword(address + 4);
+
+			if (reg != 0)
+				m_r[(reg + 0) & 31] = hi;
+			if (reg != 31)
+				m_r[(reg + 1) & 31] = lo;
+		}
 	}
 }
 
@@ -1496,16 +1537,45 @@ template <typename T> bool mc88100_device::st(u32 address, unsigned const reg)
 			address &= ~(sizeof(T) - 1);
 	}
 
-	if constexpr (sizeof(T) == 1)
-		m_data_space.write_byte(address, m_r[reg]);
-	else if constexpr (sizeof(T) == 2)
-		m_data_space.write_word(address, m_r[reg]);
-	else if constexpr (sizeof(T) == 4)
-		m_data_space.write_dword(address, m_r[reg]);
-	else if constexpr (sizeof(T) == 8)
-		m_data_space.write_qword(address, (u64(m_r[(reg + 0) & 31]) << 32) | m_r[(reg + 1) & 31]);
+	if (m_cmmu_d)
+	{
+		if constexpr (sizeof(T) < 8)
+		{
+			bool const result = m_cmmu_d->write(address, T(m_r[reg]), m_cr[PSR] & PSR_MODE);
 
-	return true;
+			if (!result)
+				exception(E_DATA);
+
+			return result;
+		}
+		else
+		{
+			bool result = true;
+			result &= m_cmmu_d->write(address + 0, m_r[(reg + 0) & 31], m_cr[PSR] & PSR_MODE);
+			result &= m_cmmu_d->write(address + 4, m_r[(reg + 1) & 31], m_cr[PSR] & PSR_MODE);
+
+			if (!result)
+				exception(E_DATA);
+
+			return result;
+		}
+	}
+	else
+	{
+		if constexpr (sizeof(T) == 1)
+			m_data_space.write_byte(address, m_r[reg]);
+		else if constexpr (sizeof(T) == 2)
+			m_data_space.write_word(address, m_r[reg]);
+		else if constexpr (sizeof(T) == 4)
+			m_data_space.write_dword(address, m_r[reg]);
+		else if constexpr (sizeof(T) == 8)
+		{
+			m_data_space.write_dword(address + 0, m_r[(reg + 0) & 31]);
+			m_data_space.write_dword(address + 4, m_r[(reg + 1) & 31]);
+		}
+
+		return true;
+	}
 }
 
 template <typename T> void mc88100_device::xmem(u32 address, unsigned const reg)
@@ -1522,28 +1592,48 @@ template <typename T> void mc88100_device::xmem(u32 address, unsigned const reg)
 	// save source value
 	T const src = m_r[reg];
 
-	if constexpr (sizeof(T) == 1)
+	if (m_cmmu_d)
 	{
 		// read destination
-		T const dst = m_data_space.read_byte(address);
+		std::optional<T> const dst = m_cmmu_d->read<T>(address, m_cr[PSR] & PSR_MODE);
+		if (dst.has_value())
+		{
+			// update register
+			if (reg)
+				m_r[reg] = dst.value();
 
-		// update register
-		if (reg)
-			m_r[reg] = dst;
-
-		// write destination
-		m_data_space.write_byte(address, src);
+			// write destination
+			if (!m_cmmu_d->write(address, src, m_cr[PSR] & PSR_MODE))
+				exception(E_DATA);
+		}
+		else
+			exception(E_DATA);
 	}
-	else if constexpr (sizeof(T) == 4)
+	else
 	{
-		// read destination
-		T const dst = m_data_space.read_dword(address);
+		if constexpr (sizeof(T) == 1)
+		{
+			// read destination
+			T const dst = m_data_space.read_byte(address);
 
-		// update register
-		if (reg)
-			m_r[reg] = dst;
+			// update register
+			if (reg)
+				m_r[reg] = dst;
 
-		// write destination
-		m_data_space.write_dword(address, src);
+			// write destination
+			m_data_space.write_byte(address, src);
+		}
+		else if constexpr (sizeof(T) == 4)
+		{
+			// read destination
+			T const dst = m_data_space.read_dword(address);
+
+			// update register
+			if (reg)
+				m_r[reg] = dst;
+
+			// write destination
+			m_data_space.write_dword(address, src);
+		}
 	}
 }

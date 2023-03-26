@@ -18,6 +18,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hazl1420_state : public driver_device
 {
 public:
@@ -396,5 +399,8 @@ ROM_START(hazl1420)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("8316.u23", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1979, hazl1420, 0, 0, hazl1420, hazl1420, hazl1420_state, empty_init, "Hazeltine", "1420 Video Display Terminal", MACHINE_NOT_WORKING)

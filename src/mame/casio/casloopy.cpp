@@ -157,6 +157,9 @@ PCB 'Z545-1 A240570-1'
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class casloopy_state : public driver_device
 {
 public:
@@ -201,8 +204,8 @@ private:
 	void pal_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
-	uint16_t sh7021_r(offs_t offset);
-	void sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	[[maybe_unused]] uint16_t sh7021_r(offs_t offset);
+	[[maybe_unused]] void sh7021_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t bitmap_r(offs_t offset);
 	void bitmap_w(offs_t offset, uint8_t data);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
@@ -565,5 +568,8 @@ void casloopy_state::init_casloopy()
 	for(int i = 0x400/4; i < 0x8000/4; i++)
 		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
+
+} // anonymous namespace
+
 
 CONS( 1995, casloopy, 0, 0, casloopy, casloopy, casloopy_state, init_casloopy, "Casio", "Loopy", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_PRINTER )

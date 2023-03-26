@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Roberto Fresca
+// copyright-holders: Ernesto Corvi, Roberto Fresca
+
 /******************************************************************************************************
 
   Truco-Tron - (c) 198? Playtronic SRL, Argentina.
@@ -194,19 +195,121 @@
 
 
 #include "emu.h"
-#include "truco.h"
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/watchdog.h"
+#include "sound/dac.h"
 #include "video/mc6845.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL(12'000'000)    // confirmed
-#define CPU_CLOCK       (MASTER_CLOCK/16)   // guess
-#define CRTC_CLOCK      (MASTER_CLOCK/8)    // guess
+// configurable logging
+#define LOG_PIA     (1U <<  1)
 
+//#define VERBOSE (LOG_GENERAL | LOG_PIA)
+
+#include "logmacro.h"
+
+#define LOGPIA(...)     LOGMASKED(LOG_PIA,     __VA_ARGS__)
+
+
+namespace {
+
+class truco_state : public driver_device
+{
+public:
+	truco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_palette(*this, "palette"),
+		m_dac(*this, "dac"),
+		m_videoram(*this, "videoram"),
+		m_battery_ram(*this, "battery_ram"),
+		m_coin(*this, "COIN")
+	{ }
+
+	void truco(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<palette_device> m_palette;
+	required_device<dac_bit_interface> m_dac;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_battery_ram;
+
+	required_ioport m_coin;
+
+	uint8_t m_trigger = 0;
+
+	void porta_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	void portb_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	void main_map(address_map &map);
+};
+
+
+// video
+
+void truco_state::palette(palette_device &palette) const
+{
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int r = (i & 0x8) ? 0xff : 0x00;
+		int g = (i & 0x4) ? 0xff : 0x00;
+		int b = (i & 0x2) ? 0xff : 0x00;
+
+		int const dim = (i & 0x1);
+
+		if (dim)
+		{
+			r >>= 1;
+			g >>= 1;
+			b >>= 1;
+		}
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+uint32_t truco_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *videoram = m_videoram;
+
+	for (int y = 0; y < 192; y++)
+	{
+		for (int x = 0; x < 256; x++)
+		{
+			int const pixel = (videoram[x >> 1] >> ((x & 1) ? 0 : 4)) & 0x0f;
+
+			bitmap.pix(y, x) = m_palette->pen(pixel);
+		}
+
+		videoram += 0x80;
+	}
+	return 0;
+}
+
+
+// machine
 
 /*******************************************
 *           Read/Write Handlers            *
@@ -214,7 +317,7 @@
 
 void truco_state::porta_w(uint8_t data)
 {
-	logerror("Port A writes: %2x\n", data);
+	LOGPIA("Port A writes: %2x\n", data);
 }
 
 WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
@@ -235,17 +338,17 @@ void truco_state::portb_w(uint8_t data)
 	m_dac->write(BIT(data, 7)); // Isolated the bit for Delta-Sigma DAC
 
 	if (data & 0x7f)
-		logerror("Port B writes: %2x\n", data);
+		LOGPIA("Port B writes: %2x\n", data);
 }
 
 WRITE_LINE_MEMBER(truco_state::pia_irqa_w)
 {
-	logerror("PIA irq A: %2x\n", state);
+	LOGPIA("PIA irq A: %2x\n", state);
 }
 
 WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 {
-	logerror("PIA irq B: %2x\n", state);
+	LOGPIA("PIA irq B: %2x\n", state);
 }
 
 
@@ -256,8 +359,8 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 void truco_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();                          // General purpose RAM
-	map(0x1800, 0x7bff).ram().share("videoram");        // Video RAM
-	map(0x7c00, 0x7fff).ram().share("battery_ram");     // Battery backed RAM
+	map(0x1800, 0x7bff).ram().share(m_videoram);
+	map(0x7c00, 0x7fff).ram().share(m_battery_ram);
 	map(0x8000, 0x8003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8004, 0x8004).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x8005, 0x8005).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -336,8 +439,6 @@ void truco_state::machine_start()
 
 void truco_state::machine_reset()
 {
-	int a;
-
 	// Setup the data on the battery backed RAM
 
 	// IRQ check
@@ -349,17 +450,17 @@ void truco_state::machine_reset()
 
 	// mainloop check
 	m_battery_ram[0x005] = 0x04;
-	m_battery_ram[0x22B] = 0x46;
+	m_battery_ram[0x22b] = 0x46;
 	m_battery_ram[0x236] = 0xfb;
-	m_battery_ram[0x2fe] = 0x1D;
-	m_battery_ram[0x359] = 0x5A;
+	m_battery_ram[0x2fe] = 0x1d;
+	m_battery_ram[0x359] = 0x5a;
 
 	// boot check
-	a = ( m_battery_ram[0x000] << 8 ) | m_battery_ram[0x001];
+	int a = (m_battery_ram[0x000] << 8) | m_battery_ram[0x001];
 
 	a += 0x4d2;
 
-	m_battery_ram[0x01d] = ( a >> 8 ) & 0xff;
+	m_battery_ram[0x01d] = (a >> 8) & 0xff;
 	m_battery_ram[0x01e] = a & 0xff;
 	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
@@ -373,14 +474,15 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 {
 	// coinup
 
-	if ( ioport("COIN")->read() & 1 )
+	if (m_coin->read() & 1)
 	{
-		if ( m_trigger == 0 )
+		if (m_trigger == 0)
 		{
 			device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 			m_trigger++;
 		}
-	} else
+	}
+	else
 		m_trigger = 0;
 }
 
@@ -391,6 +493,10 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 
 void truco_state::truco(machine_config &config)
 {
+	constexpr XTAL MASTER_CLOCK = XTAL(12'000'000); // confirmed
+	constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 16;  // guess
+	constexpr XTAL CRTC_CLOCK = MASTER_CLOCK / 8;  // guess
+
 	// basic machine hardware
 	M6809(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &truco_state::main_map);
@@ -412,10 +518,10 @@ void truco_state::truco(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
 	screen.set_size(256, 192);
-	screen.set_visarea(0, 256-1, 0, 192-1);
+	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(truco_state::screen_update));
 
-	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
+	PALETTE(config, "palette", FUNC(truco_state::palette), 16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    // identified as UM6845
 	crtc.set_screen("screen");
@@ -439,6 +545,8 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u3",   0x08000, 0x4000, CRC(4642fb96) SHA1(e821f6fd582b141a5ca2d5bd53f817697048fb81) )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT        ROT    COMPANY           FULLNAME     FLAGS

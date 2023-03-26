@@ -37,6 +37,8 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 #include "screen.h"
 
 
+namespace {
+
 #define BITS(x,m,n) (((x)>>(n))&(((uint32_t)1<<((m)-(n)+1))-1))
 
 class gizmondo_state : public driver_device
@@ -236,5 +238,8 @@ ROM_START( gizmondo )
 	ROM_SYSTEM_BIOS( 0, "fboot", "fboot" )
 	ROMX_LOAD( "fboot.bin", 0, 0x800, CRC(28887c29) SHA1(e625caaa63b9db74cb6d7499dce12ac758c5fe76), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(2005, gizmondo, 0, 0, gizmondo, gizmondo, gizmondo_state, init_gizmondo, "Tiger Telematics", "Gizmondo", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

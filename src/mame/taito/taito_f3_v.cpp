@@ -65,7 +65,7 @@ Line ram memory map:
                 Where bit 1 of x enables effect on playfield 2
                 Where bit 2 of x enables effect on playfield 3
                 Where bit 3 of x enables effect on playfield 4
-    0x0a00: Assumed unused.
+    0x0a00: Palette add line control ram (256 lines)
     0x0c00: Rowscroll line control ram (256 lines)
         280x:   Where bit 0 of x enables effect on playfield 1
                 Where bit 1 of x enables effect on playfield 2
@@ -77,13 +77,15 @@ Line ram memory map:
                 Where bit 2 of x enables effect on playfield 3
                 Where bit 3 of x enables effect on playfield 4
 
+    0x1000: Unknown control word?
+        (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
+
     0x4000: Column scroll & clipping info
 
-    0x5000: Clip plane 0 (low bits)
-    0x5200: Clip plane 1 (low bits)
-    0x5400: Unused?
-    0x5600: Used by quizhuhu (taito logo and ingame text), and landmakr (winning text),
-            special clip used in tandem with b*00 bit 11? [unemulated]
+    0x5000: Clip plane 0 (low bits (high in 4400))
+    0x5200: Clip plane 1 (low bits (high in 4400))
+    0x5400: Clip plane 2 (low bits (high in 4600))
+    0x5600: Clip plane 3 (low bits (high in 4600))
 
     0x6000: Sync register
     0x6004: Sprite alpha control
@@ -122,7 +124,7 @@ Line ram memory map:
 
     0x7000: Pivot/vram layer enable
     0x7200: Cram layer priority
-    0x7400: Sprite clipping
+    0x7400: Sprite clipping (like playfield priority clip bits but shifted)
     0x7600: Sprite priority values
         0xf000: Relative priority for sprites with pri value 0xc0
         0x0f00: Relative priority for sprites with pri value 0x80
@@ -139,7 +141,7 @@ Line ram memory map:
         Playfield 2 & 4 registers seem to be interleaved, playfield 2 Y zoom is stored where you would
         expect playfield 4 y zoom to be and vice versa.
 
-    0x9000: Palette add (can affect opacity) [ not emulated ]
+    0x9000: Palette add (can affect opacity)
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
     0xa200: Playfield 2 rowscroll
@@ -150,15 +152,17 @@ Line ram memory map:
     0xb200: Playfield 2 priority
     0xb400: Playfield 3 priority
     0xb600: Playfield 4 priority
-        0xf000 = Blend mode, 0x3000 = Normal, 0x7000 = Alpha A, 0xb000 = Alpha B, others disable line
-        0x0800 = Clip line (totally disable line)
-        0x0400 = Assumed unused
-        0x0200 = If set enable clip plane 1
-        0x0100 = If set enable clip plane 0
-        0x00c0 = Assumed unused
-        0x0020 = Enable clip inverse mode for plane 1
-        0x0010 = Enable clip inverse mode for plane 0
         0x000f = Layer priority
+        0x0010 = Clip inverse mode for plane 0
+        0x0020 = Clip inverse mode for plane 1
+        0x0040 = Clip inverse mode for plane 2
+        0x0080 = Clip inverse mode for plane 3
+        0x0100 = If set enable clip plane 0
+        0x0200 = If set enable clip plane 1
+        0x0400 = If set enable clip plane 2
+        0x0800 = If set enable clip plane 3
+        0x1000 = Affects interpretation of inverse mode bits. If on, 1 = invert. if off, 0 = invert.
+        0xe000 = Blend mode, 0x3000 = Normal, 0x7000 = Alpha A, 0xb000 = Alpha B, others disable line
 
     0xc000 - 0xffff: Unused.
 
@@ -218,16 +222,15 @@ Playfield tile info:
 //#define DEBUG_F3 1
 
 
-/* Game specific data, some of this can be
-removed when the software values are figured out */
-struct F3config
+// Game specific data - some of this can be removed when the software values are figured out
+struct taito_f3_state::F3config
 {
 	int name;
 	int extend;
 	int sprite_lag;
 };
 
-static const F3config f3_config_table[] =
+const taito_f3_state::F3config taito_f3_state::f3_config_table[] =
 {
 	/* Name    Extend  Lag */
 	{ RINGRAGE,  0,     2 },
@@ -380,14 +383,28 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	const u32 tile = (m_pf_data[Layer][tile_index * 2 + 0] << 16) | (m_pf_data[Layer][tile_index * 2 + 1] & 0xffff);
 	const u8 abtype = (tile >> (16 + 9)) & 1;
 	// tiles can be configured to use 4, 5, or 6 bpp data.
-	// if tiles use more than 4bpp, the bottom bits of the color code must be masked out.
-	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	const u8 extra_planes = ((tile >> (16 + 10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	tileinfo.set(3,
-			tile & 0xffff,
-			(tile >> 16) & 0x1ff & (~extra_planes),
-			TILE_FLIPYX(tile >> 30));
+	// FIXME: some (5bpp?) games need the bottom bits of the color code to be masked out.
+	// (mt00895 arabian magic stage 6 rain (color 0x105->104), mt01925 rayforce explosion, mt01917 rayforce ships, mt00900 kaiser knuckle azteca throw)
+	// however, there are (6bpp) cases which *don't* want any adjustment that this breaks:
+	// (quizhuhu fade palette 0x7, landmakrj win message palette 0xBE)
+	// special case until better understood.
+	if (m_game == LANDMAKR || m_game == QUIZHUHU)
+	{
+		tileinfo.set(3,
+				tile & 0xffff,
+				(tile >> 16) & 0x1ff,
+				TILE_FLIPYX(tile >> 30));
+	}
+	else
+	{
+		tileinfo.set(3,
+				tile & 0xffff,
+				(tile >> 16) & 0x1ff & (~extra_planes),
+				TILE_FLIPYX(tile >> 30));
+	}
+
 	tileinfo.category =  abtype & 1;      /* alpha blending type */
 	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
@@ -913,17 +930,17 @@ inline void taito_f3_state::alpha_blend_3b_2(u32 s) { alpha_blend32_d(m_alpha_s_
 
 /*============================================================================*/
 
-int taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return 1; }
-int taito_f3_state::dpix_ret1(u32 s_pix) { return 1; }
-int taito_f3_state::dpix_ret0(u32 s_pix) { return 0; }
-int taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return 1; }
-int taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return 1; }
-int taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return 1; }
-int taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return 1; }
-int taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return 1; }
-int taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return 1; }
-int taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return 1; }
-int taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return 1; }
+inline int taito_f3_state::dpix_ret1(u32 s_pix) { return 1; }
+inline int taito_f3_state::dpix_ret0(u32 s_pix) { return 0; }
+inline int taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return 1; }
 
 int taito_f3_state::dpix_2a_0(u32 s_pix)
 {
@@ -1284,10 +1301,11 @@ void taito_f3_state::init_alpha_blend_func()
 	m_tsrc_s[pf_num] = line_tmp->tsrc_s[y]; \
 	m_x_count[pf_num] = line_tmp->x_count[y]; \
 	m_x_zoom[pf_num] = line_tmp->x_zoom[y]; \
-	m_clip_al[pf_num] = line_tmp->clip0[y] & 0xffff; \
-	m_clip_ar[pf_num] = line_tmp->clip0[y] >> 16; \
-	m_clip_bl[pf_num] = line_tmp->clip1[y] & 0xffff; \
-	m_clip_br[pf_num] = line_tmp->clip1[y] >> 16; \
+	m_clip_al[pf_num] = line_tmp->clip_in[y] & 0xffff; \
+	m_clip_ar[pf_num] = line_tmp->clip_in[y] >> 16; \
+	m_clip_bl[pf_num] = line_tmp->clip_ex[y] & 0xffff; \
+	m_clip_br[pf_num] = line_tmp->clip_ex[y] >> 16; \
+	m_pal_add[pf_num] = line_tmp->pal_add[y]; \
 }
 
 #define CULC_PIXMAP_POINTER(pf_num) \
@@ -1323,7 +1341,7 @@ void taito_f3_state::init_alpha_blend_func()
 	{ \
 		m_tval = *m_tsrc[pf_num]; \
 		if (m_tval & 0xf0) \
-			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[*m_src[pf_num]])) { *dsti = m_dval; break; } \
+			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[(*m_src[pf_num] + m_pal_add[pf_num]) & 0x1fff])) { *dsti = m_dval; break; } \
 	}
 
 
@@ -1372,10 +1390,10 @@ inline void taito_f3_state::draw_scanlines(
 		{
 			int cx = 0;
 
-			clip_als = m_sa_line_inf[0].sprite_clip0[y] & 0xffff;
-			clip_ars = m_sa_line_inf[0].sprite_clip0[y] >> 16;
-			clip_bls = m_sa_line_inf[0].sprite_clip1[y] & 0xffff;
-			clip_brs = m_sa_line_inf[0].sprite_clip1[y] >> 16;
+			clip_als = m_sa_line_inf[0].sprite_clip_in[y] & 0xffff;
+			clip_ars = m_sa_line_inf[0].sprite_clip_in[y] >> 16;
+			clip_bls = m_sa_line_inf[0].sprite_clip_ex[y] & 0xffff;
+			clip_brs = m_sa_line_inf[0].sprite_clip_ex[y] >> 16;
 
 			int length = xsize;
 			u32 *dsti = dsti0;
@@ -1452,12 +1470,11 @@ void taito_f3_state::visible_tile_check(
 						f3_playfield_line_inf *line_t,
 						int line,
 						u32 x_index_fx,u32 y_index,
-						u16 *pf_data_n)
+						const u16 *pf_data_n)
 {
-	u16 *pf_base;
-
-	int alpha_mode = line_t->alpha_mode[line];
-	if (!alpha_mode) return;
+	const int alpha_mode = line_t->alpha_mode[line];
+	if (!alpha_mode)
+		return;
 
 	const u32 total_elements = m_gfxdecode->gfx(3)->elements();
 
@@ -1465,6 +1482,7 @@ void taito_f3_state::visible_tile_check(
 	const int tile_num = (((line_t->x_zoom[line] * 320 + (x_index_fx & 0xffff) + 0xffff) >> 16) + (tile_index & 0xf) + 15) >> 4;
 	tile_index >>= 4;
 
+	const u16 *pf_base;
 	if (m_flipscreen)
 	{
 		pf_base = pf_data_n + ((31 - (y_index >> 4)) << m_twidth_mask_bit);
@@ -1519,108 +1537,54 @@ void taito_f3_state::visible_tile_check(
 
 /******************************************************************************/
 
-void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip0, u32 *clip1, int *line_enable)
+void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, int &line_enable)
 {
-	const f3_spritealpha_line_inf *sa_line_t = &m_sa_line_inf[0];
+	const f3_spritealpha_line_inf *sa_line = &m_sa_line_inf[0];
 
-	switch (pri)
-	{
-	case 0x0100: /* Clip plane 1 enable */
+	/* landmakr and quizhuhu use clip planes 2 and 3,
+	   commandw enables all clip planes.
+	   only up to 2 valid clips ever used in existing games? */
+	u16 normal_planes = (pri >> 8) & (pri >> 4);
+	u16 invert_planes = (pri >> 8) & ~(pri >> 4);
+	// when bit 0x1000 set, invert bit ON is normal clip, OFF is inverted
+	if (pri & 0x1000)
+		std::swap(normal_planes, invert_planes);
+
+	s16 clipl = 0, clipr = 0x7fff;
+
+	const auto calc_clip =
+		[&sa_line, y, &clipl, &clipr] (unsigned p)
 		{
-			if (sa_line_t->clip0_l[y] > sa_line_t->clip0_r[y])
-				*line_enable = 0;
-			else
-				*clip0 = (sa_line_t->clip0_l[y]) | (sa_line_t->clip0_r[y] << 16);
-			*clip1 = 0;
-		}
-		break;
-	case 0x0110: /* Clip plane 1 enable, inverted */
+			clipl = std::max(sa_line->clip_l[p][y], clipl);
+			clipr = std::min(sa_line->clip_r[p][y], clipr);
+		};
+	const auto calc_clip_inv =
+		[&sa_line, y, &clipl, &clipr]
+		(unsigned p)
 		{
-			*clip1 = (sa_line_t->clip0_l[y]) | (sa_line_t->clip0_r[y] << 16);
-			*clip0 = 0x7fff0000;
-		}
-		break;
-	case 0x0200: /* Clip plane 2 enable */
-		{
-			if (sa_line_t->clip1_l[y] > sa_line_t->clip1_r[y])
-				*line_enable = 0;
-			else
-				*clip0 = (sa_line_t->clip1_l[y]) | (sa_line_t->clip1_r[y] << 16);
-			*clip1 = 0;
-		}
-		break;
-	case 0x0220: /* Clip plane 2 enable, inverted */
-		{
-			*clip1 = (sa_line_t->clip1_l[y]) | (sa_line_t->clip1_r[y] << 16);
-			*clip0 = 0x7fff0000;
-		}
-		break;
-	case 0x0300: /* Clip plane 1 & 2 enable */
-		{
-			int clipl = 0, clipr = 0;
+			clipl = std::min(sa_line->clip_l[p][y], clipl);
+			clipr = std::max(sa_line->clip_r[p][y], clipr);
+		};
 
-			if (sa_line_t->clip1_l[y] > sa_line_t->clip0_l[y])
-				clipl = sa_line_t->clip1_l[y];
-			else
-				clipl = sa_line_t->clip0_l[y];
+	if (normal_planes & 0b0001) { calc_clip(0); };
+	if (normal_planes & 0b0010) { calc_clip(1); };
+	if (normal_planes & 0b0100) { calc_clip(2); };
+	if (normal_planes & 0b1000) { calc_clip(3); };
+	if (clipl > clipr)
+		line_enable = 0;
+	else
+		clip_in = clipl | (clipr << 16);
 
-			if (sa_line_t->clip1_r[y] < sa_line_t->clip0_r[y])
-				clipr = sa_line_t->clip1_r[y];
-			else
-				clipr = sa_line_t->clip0_r[y];
-
-			if (clipl > clipr)
-				*line_enable = 0;
-			else
-				*clip0 = (clipl) | (clipr << 16);
-			*clip1 = 0;
-		}
-		break;
-	case 0x0310: /* Clip plane 1 & 2 enable, plane 1 inverted */
-		{
-			if (sa_line_t->clip1_l[y] > sa_line_t->clip1_r[y])
-				line_enable = nullptr;
-			else
-				*clip0 = (sa_line_t->clip1_l[y]) | (sa_line_t->clip1_r[y] << 16);
-
-			*clip1 = (sa_line_t->clip0_l[y]) | (sa_line_t->clip0_r[y] << 16);
-		}
-		break;
-	case 0x0320: /* Clip plane 1 & 2 enable, plane 2 inverted */
-		{
-			if (sa_line_t->clip0_l[y] > sa_line_t->clip0_r[y])
-				line_enable = nullptr;
-			else
-				*clip0 = (sa_line_t->clip0_l[y]) | (sa_line_t->clip0_r[y] << 16);
-
-			*clip1 = (sa_line_t->clip1_l[y]) | (sa_line_t->clip1_r[y] << 16);
-		}
-		break;
-	case 0x0330: /* Clip plane 1 & 2 enable, both inverted */
-		{
-			int clipl = 0, clipr = 0;
-
-			if (sa_line_t->clip1_l[y] < sa_line_t->clip0_l[y])
-				clipl = sa_line_t->clip1_l[y];
-			else
-				clipl = sa_line_t->clip0_l[y];
-
-			if (sa_line_t->clip1_r[y] > sa_line_t->clip0_r[y])
-				clipr = sa_line_t->clip1_r[y];
-			else
-				clipr = sa_line_t->clip0_r[y];
-
-			if (clipl > clipr)
-				*line_enable = 0;
-			else
-				*clip1 = (clipl) | (clipr << 16);
-			*clip0 = 0x7fff0000;
-		}
-		break;
-	default:
-		// popmessage("Illegal clip mode");
-		break;
-	}
+	// reset temp clip sides for the inverted/excluded window
+	clipl = 0x7fff; clipr = 0;
+	if (invert_planes & 0b0001) { calc_clip_inv(0); };
+	if (invert_planes & 0b0010) { calc_clip_inv(1); };
+	if (invert_planes & 0b0100) { calc_clip_inv(2); };
+	if (invert_planes & 0b1000) { calc_clip_inv(3); };
+	if (clipl > clipr)
+		clip_ex = 0;
+	else
+		clip_ex = clipl | (clipr << 16);
 }
 
 void taito_f3_state::get_spritealphaclip_info()
@@ -1634,6 +1598,7 @@ void taito_f3_state::get_spritealphaclip_info()
 	u16 spri = 0;
 	u16 sprite_clip = 0;
 	u16 clip0_low = 0, clip0_high = 0, clip1_low = 0;
+	u16 clip2_low = 0, clip2_high = 0, clip3_low = 0;
 	int alpha_level = 0;
 	u16 sprite_alpha = 0;
 
@@ -1663,12 +1628,19 @@ void taito_f3_state::get_spritealphaclip_info()
 	{
 		/* The zoom, column and row values can latch according to control ram */
 		{
-			if (m_line_ram[0x100 + y] & 1)
+			if (m_line_ram[0x100 + y] & 1) // 5000 control playfield 1
 				clip0_low = (m_line_ram[clip_base_low / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x000 + y] & 4)
+			if (m_line_ram[0x000 + y] & 4) // 4000 control
 				clip0_high = (m_line_ram[clip_base_high / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x100 + y] & 2)
+			if (m_line_ram[0x100 + y] & 2) // 5000 control playfield 2
 				clip1_low = (m_line_ram[(clip_base_low + 0x200) / 2] >> 0) & 0xffff;
+
+			if (m_line_ram[0x100 + y] & 4) // 5000 control playfield 3
+				clip2_low = (m_line_ram[(clip_base_low + 0x400) / 2] >> 0) & 0xffff;
+			if (m_line_ram[0x000 + y] & 8) // 4000 control
+				clip2_high = (m_line_ram[(clip_base_high + 0x200) / 2] >> 0) & 0xffff;
+			if (m_line_ram[0x100 + y] & 8) // 5000 control playfield 4
+				clip3_low = (m_line_ram[(clip_base_low + 0x600) / 2] >> 0) & 0xffff;
 
 			if (m_line_ram[(0x0600 / 2) + y] & 0x8)
 				spri = m_line_ram[spri_base / 2] & 0xffff;
@@ -1684,32 +1656,35 @@ void taito_f3_state::get_spritealphaclip_info()
 		line_t->alpha_level[y] = alpha_level;
 		line_t->spri[y] = spri;
 		line_t->sprite_alpha[y] = sprite_alpha;
-		line_t->clip0_l[y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
-		line_t->clip0_r[y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
-		line_t->clip1_l[y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
-		line_t->clip1_r[y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
-		if (line_t->clip0_l[y] < 0) line_t->clip0_l[y] = 0;
-		if (line_t->clip0_r[y] < 0) line_t->clip0_r[y] = 0;
-		if (line_t->clip1_l[y] < 0) line_t->clip1_l[y] = 0;
-		if (line_t->clip1_r[y] < 0) line_t->clip1_r[y] = 0;
+		line_t->clip_l[0][y] = ((clip0_low & 0xff) | ((clip0_high & 0x1000) >> 4)) - 47;
+		line_t->clip_r[0][y] = (((clip0_low & 0xff00) >> 8) | ((clip0_high & 0x2000) >> 5)) - 48;
+		line_t->clip_l[1][y] = ((clip1_low & 0xff) | ((clip0_high & 0x4000) >> 6)) - 47;
+		line_t->clip_r[1][y] = (((clip1_low & 0xff00) >> 8) | ((clip0_high & 0x8000) >> 7)) - 48;
+		line_t->clip_l[2][y] = ((clip2_low & 0xff) | ((clip2_high & 0x1000) >> 4)) - 47;
+		line_t->clip_r[2][y] = (((clip2_low & 0xff00) >> 8) | ((clip2_high & 0x2000) >> 5)) - 48;
+		line_t->clip_l[3][y] = ((clip3_low & 0xff) | ((clip2_high & 0x4000) >> 6)) - 47;
+		line_t->clip_r[3][y] = (((clip3_low & 0xff00) >> 8) | ((clip2_high & 0x8000) >> 7)) - 48;
+		if (line_t->clip_l[0][y] < 0) line_t->clip_l[0][y] = 0;
+		if (line_t->clip_r[0][y] < 0) line_t->clip_r[0][y] = 0;
+		if (line_t->clip_l[1][y] < 0) line_t->clip_l[1][y] = 0;
+		if (line_t->clip_r[1][y] < 0) line_t->clip_r[1][y] = 0;
+		if (line_t->clip_l[2][y] < 0) line_t->clip_l[2][y] = 0;
+		if (line_t->clip_r[2][y] < 0) line_t->clip_r[2][y] = 0;
+		if (line_t->clip_l[3][y] < 0) line_t->clip_l[3][y] = 0;
+		if (line_t->clip_r[3][y] < 0) line_t->clip_r[3][y] = 0;
 
 		/* Evaluate sprite clipping */
-		if (sprite_clip & 0x080)
-		{
-			line_t->sprite_clip0[y] = 0x7fff7fff;
-			line_t->sprite_clip1[y] = 0;
-		}
-		else if (sprite_clip & 0x33)
+		if (sprite_clip & 0xf0)
 		{
 			int line_enable = 1;
-			calculate_clip(y, ((sprite_clip & 0x33) << 4), &line_t->sprite_clip0[y], &line_t->sprite_clip1[y], &line_enable);
+			calculate_clip(y, ((sprite_clip & 0x1ff) << 4), line_t->sprite_clip_in[y], line_t->sprite_clip_ex[y], line_enable);
 			if (line_enable == 0)
-				line_t->sprite_clip0[y] = 0x7fff7fff;
+				line_t->sprite_clip_in[y] = 0x7fff7fff;
 		}
 		else
 		{
-			line_t->sprite_clip0[y] = 0x7fff0000;
-			line_t->sprite_clip1[y] = 0;
+			line_t->sprite_clip_in[y] = 0x7fff0000;
+			line_t->sprite_clip_ex[y] = 0;
 		}
 
 		spri_base += inc;
@@ -1720,17 +1695,17 @@ void taito_f3_state::get_spritealphaclip_info()
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n)
+void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n)
 {
 	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
 
 	int y_start, y_end, y_inc;
-	int line_base, zoom_base, col_base, pri_base, inc;
+	int line_base, zoom_base, col_base, pri_base, pal_add_base, inc;
 
 	int line_enable;
 	int colscroll = 0, x_offset = 0, line_zoom = 0;
 	u32 _y_zoom[256];
-	u16 pri = 0;
+	u16 pri = 0, pal_add = 0;
 	int bit_select = 1 << pos;
 
 	int _colscroll[256];
@@ -1745,6 +1720,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		zoom_base = 0x81fe;// + (pos << 9);
 		col_base = 0x41fe + (pos << 9);
 		pri_base = 0xb1fe + (pos << 9);
+		pal_add_base = 0x91fe + (pos << 9);
 		inc = -2;
 		y_start = 255;
 		y_end = -1;
@@ -1764,6 +1740,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		zoom_base = 0x8000;// + (pos << 9);
 		col_base = 0x4000 + (pos << 9);
 		pri_base = 0xb000 + (pos << 9);
+		pal_add_base = 0x9000 + (pos << 9);
 		inc = 2;
 		y_start = 0;
 		y_end = 256;
@@ -1813,6 +1790,9 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			// Column scroll only affects playfields 2 & 3
 			if (pos >= 2 && m_line_ram[0x000 + y] & bit_select)
 				colscroll = (m_line_ram[col_base / 2] >> 0) & 0x3ff;
+
+			if (m_line_ram[0x500 + y] & bit_select)
+				pal_add = (m_line_ram[pal_add_base / 2] & 0x1ff) * 16;
 		}
 
 		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
@@ -1830,28 +1810,28 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		_y_zoom[y] = (line_zoom & 0xff) << 9;
 
 		/* Evaluate clipping */
-		if (pri & 0x0800)
-			line_enable = 0;
-		else if (pri & 0x0330)
+		if (pri & 0x0f00)
 		{
 			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
+			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
 		}
 		else
 		{
 			/* No clipping */
-			line_t->clip0[y] = 0x7fff0000;
-			line_t->clip1[y] = 0;
+			line_t->clip_in[y] = 0x7fff0000;
+			line_t->clip_ex[y] = 0;
 		}
 
 		line_t->x_zoom[y] = 0x10000 - (line_zoom & 0xff00);
 		line_t->alpha_mode[y] = line_enable;
 		line_t->pri[y] = pri;
+		line_t->pal_add[y] = pal_add;
 
 		zoom_base += inc;
 		line_base += inc;
 		col_base += inc;
 		pri_base += inc;
+		pal_add_base += inc;
 		y += y_inc;
 	}
 
@@ -1905,7 +1885,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			visible_tile_check(line_t, y, x_index_fx, y_index, pf_data_n);
 
 			/* If clipping enabled for this line have to disable 'all opaque' optimisation */
-			if (line_t->clip0[y] != 0x7fff0000 || line_t->clip1[y] != 0)
+			if (line_t->clip_in[y] != 0x7fff0000 || line_t->clip_ex[y] != 0)
 				line_t->alpha_mode[y] &= ~0x80;
 
 			/* set pixmap index */
@@ -1977,18 +1957,16 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 		line_t->pri[y] = pri;
 
 		/* Evaluate clipping */
-		if (pri & 0x0800)
-			line_enable = 0;
-		else if (pri & 0x0330)
+		if (pri & 0x0f00)
 		{
 			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x0330, &line_t->clip0[y], &line_t->clip1[y], &line_enable);
+			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
 		}
 		else
 		{
 			/* No clipping */
-			line_t->clip0[y] = 0x7fff0000;
-			line_t->clip1[y] = 0;
+			line_t->clip_in[y] = 0x7fff0000;
+			line_t->clip_ex[y] = 0;
 		}
 
 		line_t->x_zoom[y] = 0x10000;

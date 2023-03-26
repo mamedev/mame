@@ -26,10 +26,237 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
-#include "pecom.h"
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "sound/cdp1869.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
+namespace {
+
+class pecom_state : public driver_device
+{
+public:
+	pecom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cdp1869(*this, "cdp1869")
+		, m_cassette(*this, "cassette")
+		, m_bank1(*this, "bank1")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_rom(*this, "maincpu")
+		, m_ram(*this, "mainram")
+		, m_io_cnt(*this, "CNT")
+		, m_io_keyboard(*this, "LINE%d", 0U)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
+	void pecom64(machine_config &config);
+
+private:
+	void bank_w(uint8_t data);
+	uint8_t keyboard_r();
+	void cdp1869_w(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(reset_tick);
+	DECLARE_READ_LINE_MEMBER(clear_r);
+	DECLARE_READ_LINE_MEMBER(ef2_r);
+	DECLARE_WRITE_LINE_MEMBER(q_w);
+	void sc_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(prd_w);
+	CDP1869_CHAR_RAM_READ_MEMBER(char_ram_r);
+	CDP1869_CHAR_RAM_WRITE_MEMBER(char_ram_w);
+	CDP1869_PCB_READ_MEMBER(pcb_r);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	void cdp1869_page_ram(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	std::unique_ptr<uint8_t[]> m_charram;           /* character generator ROM */
+	bool m_reset = false;                /* CPU mode */
+	bool m_dma = false;              /* memory refresh DMA */
+
+	/* timers */
+	emu_timer *m_reset_timer = nullptr;   /* power on reset timer */
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1869_device> m_cdp1869;
+	required_device<cassette_image_device> m_cassette;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_region_ptr<u8> m_rom;
+	required_shared_ptr<u8> m_ram;
+	required_ioport m_io_cnt;
+	required_ioport_array<26> m_io_keyboard;
+};
+
+TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
+{
+	m_reset = true;
+}
+
+void pecom_state::machine_reset()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_bank1->set_entry(1);
+
+	space.unmap_write(0xf000, 0xffff);
+	space.install_read_bank (0xf000, 0xf7ff, m_bank3);
+	space.install_read_bank (0xf800, 0xffff, m_bank4);
+	m_bank3->set_base(m_rom + 0x7000);
+	m_bank4->set_base(m_rom + 0x7800);
+
+	m_reset = false;
+	m_dma = false;
+	m_reset_timer->adjust(attotime::from_msec(5));
+}
+
+void pecom_state::bank_w(uint8_t data)
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_bank1->set_entry(0);
+
+	if (data==2)
+	{
+		space.install_read_handler (0xf000, 0xf7ff, read8sm_delegate(m_cdp1869, FUNC(cdp1869_device::char_ram_r)));
+		space.install_write_handler(0xf000, 0xf7ff, write8sm_delegate(m_cdp1869, FUNC(cdp1869_device::char_ram_w)));
+		space.install_read_handler (0xf800, 0xffff, read8sm_delegate(m_cdp1869, FUNC(cdp1869_device::page_ram_r)));
+		space.install_write_handler(0xf800, 0xffff, write8sm_delegate(m_cdp1869, FUNC(cdp1869_device::page_ram_w)));
+	}
+	else
+	{
+		space.unmap_write(0xf000, 0xffff);
+		space.install_read_bank (0xf000, 0xf7ff, m_bank3);
+		space.install_read_bank (0xf800, 0xffff, m_bank4);
+		m_bank3->set_base(m_rom + 0x7000);
+		m_bank4->set_base(m_rom + 0x7800);
+	}
+}
+
+uint8_t pecom_state::keyboard_r()
+{
+	/*
+	   INP command BUS -> M(R(X)) BUS -> D
+	   so on each input, address is also set, 8 lower bits are used as input for keyboard
+	   Address is available on address bus during reading of value from port, and that is
+	   used to determine keyboard line reading
+	*/
+	uint16_t addr = m_maincpu->state_int(cosmac_device::COSMAC_R0 + m_maincpu->state_int(cosmac_device::COSMAC_X));
+	/* just in case someone is reading non existing ports */
+	if (addr<0x7cca || addr>0x7ce3) return 0;
+	return m_io_keyboard[addr - 0x7cca]->read();
+}
+
+/* CDP1802 Interface */
+
+READ_LINE_MEMBER(pecom_state::clear_r)
+{
+	return m_reset;
+}
+
+READ_LINE_MEMBER(pecom_state::ef2_r)
+{
+	bool shift = BIT(m_io_cnt->read(), 1);
+	double cas = false;//m_cassette->input();
+
+	return (cas < -0.02) | shift; // touching shift kills cassette load
+}
+
+WRITE_LINE_MEMBER(pecom_state::q_w)
+{
+	m_cassette->output(state ? -1.0 : +1.0);
+}
+
+void pecom_state::sc_w(uint8_t data)
+{
+	switch (data)
+	{
+		case COSMAC_STATE_CODE_S2_DMA:
+			// DMA acknowledge clears the DMAOUT request
+			m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, CLEAR_LINE);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void pecom_state::cdp1869_w(offs_t offset, uint8_t data)
+{
+	uint16_t ma = m_maincpu->get_memory_address();
+
+	switch (offset + 3)
+	{
+	case 3:
+		m_cdp1869->out3_w(data);
+		break;
+
+	case 4:
+		m_cdp1869->out4_w(ma);
+		break;
+
+	case 5:
+		m_cdp1869->out5_w(ma);
+		break;
+
+	case 6:
+		m_cdp1869->out6_w(ma);
+		break;
+
+	case 7:
+		m_cdp1869->out7_w(ma);
+		break;
+	}
+}
+
+CDP1869_CHAR_RAM_READ_MEMBER(pecom_state::char_ram_r )
+{
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
+
+	return m_charram[charaddr];
+}
+
+CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_state::char_ram_w )
+{
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
+
+	m_charram[charaddr] = data;
+}
+
+CDP1869_PCB_READ_MEMBER(pecom_state::pcb_r )
+{
+	return BIT(pmd, 7);
+}
+
+WRITE_LINE_MEMBER(pecom_state::prd_w)
+{
+	// every other PRD triggers a DMAOUT request
+	if (m_dma)
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
+
+	m_dma = !m_dma;
+}
+
+void pecom_state::machine_start()
+{
+	m_bank1->configure_entry(0, m_ram);
+	m_bank1->configure_entry(1, m_rom);
+
+	/* allocate memory */
+	m_charram = std::make_unique<uint8_t[]>(0x0800);
+
+	/* register for state saving */
+	save_item(NAME(m_reset));
+	save_item(NAME(m_dma));
+	save_pointer(NAME(m_charram), 0x0800);
+	m_reset_timer = timer_alloc(FUNC(pecom_state::reset_tick), this);
+}
 
 /* Address maps */
 void pecom_state::mem_map(address_map &map)
@@ -237,6 +464,8 @@ ROM_START( pecom64 )
 	ROMX_LOAD( "170887-rom1.bin", 0x0000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(1) )
 	ROMX_LOAD( "170887-rom2.bin", 0x4000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(1) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

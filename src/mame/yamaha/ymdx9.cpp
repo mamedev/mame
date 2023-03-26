@@ -159,6 +159,14 @@ private:
 	 * @return uint8_t The value read from the port.
 	 */
 	uint8_t p1_r(offs_t offset);
+
+	/**
+	 * @brief Handle a read from the synth's IO Port 2.
+	 * This function is used to handle incoming serial data.
+	 * @param offset The offset into the memory mapped region being read.
+	 * @return uint8_t The value read from the port.
+	 */
+	uint8_t p2_r(offs_t offset);
 };
 
 
@@ -242,6 +250,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	// Unlike the DX7 only IO port 1 is used.
 	// The direction flags of other ports are set, however they are never read, or written.
 	m_maincpu->in_p1_cb().set(FUNC(yamaha_dx9_state::p1_r));
+	m_maincpu->in_p2_cb().set(FUNC(yamaha_dx9_state::p2_r));
 	m_maincpu->out_p1_cb().set(FUNC(yamaha_dx9_state::p1_w));
 
 	NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0);
@@ -255,7 +264,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	m_adc->in_callback<4>().set_constant(0x80);
 
 	// Configure MIDI.
-	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL));
+	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL / 2));
 	midiclock.signal_handler().set(FUNC(yamaha_dx9_state::midiclock_w));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(yamaha_dx9_state::midi_r));
@@ -321,6 +330,15 @@ uint8_t yamaha_dx9_state::p1_r(offs_t offset)
 	// The ADC EOC line is wired to bit 4, as well as the Cassette Interface input, which
 	// is wired to bit 7. This is currently not fully implemented.
 	return m_adc->eoc_r() << 4;
+}
+
+
+/**
+ * yamaha_dx9_state::p2_r
+ */
+uint8_t yamaha_dx9_state::p2_r(offs_t offset)
+{
+	return m_rx_data << 3;
 }
 
 

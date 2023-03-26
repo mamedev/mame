@@ -8,8 +8,8 @@
     see cpu/apexc.cpp for background and tech info
 */
 
-#ifndef MAME_MACHINE_APEXC
-#define MAME_MACHINE_APEXC
+#ifndef MAME_BOOTH_APEXC_M_H
+#define MAME_BOOTH_APEXC_M_H
 
 #pragma once
 
@@ -138,4 +138,4 @@ DECLARE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device)
 DECLARE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device)
 DECLARE_DEVICE_TYPE(APEXC_TAPE_READER, apexc_tape_reader_image_device)
 
-#endif // MAME_MACHINE_APEXC
+#endif // MAME_BOOTH_APEXC_M_H

@@ -44,6 +44,9 @@
 
 #include "beta.lh"
 
+
+namespace {
+
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "m6502"
 #define M6532_TAG       "m6532"
@@ -381,6 +384,9 @@ ROM_START( beta )
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "beta.rom", 0x8000, 0x0800, CRC(d42fdb17) SHA1(595225a0cd43dd76c46b2aff6c0f27d5991cc4f0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

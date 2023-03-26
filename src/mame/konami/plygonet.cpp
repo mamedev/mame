@@ -73,6 +73,7 @@
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "video/k053936.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -773,7 +774,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 
 	for (s16 y = y_start; y < y_end; y++, start_addr++, end_addr++)
 	{
-		const u16 bitmap_y = (u16)(y + 1024) - 896;
+		const u16 bitmap_y = u16(y + 1024) - 896;
 
 		if (bitmap_y < 256)
 		{
@@ -782,7 +783,7 @@ void polygonet_state::draw_poly(bitmap_rgb32 &bitmap, const u16 raw_color, const
 			u32 *dst = &bitmap.pix(bitmap_y);
 			for (s16 x = x_start; x <= x_end; x++)
 			{
-				const u16 bitmap_x = (u16)(x + 1024) - 832;
+				const u16 bitmap_x = u16(x + 1024) - 832;
 				if (bitmap_x < 384 && (dst[bitmap_x] & 0xff000000) == 0)
 				{
 					dst[bitmap_x] = color888;
@@ -965,17 +966,27 @@ void polygonet_state::dsp_data_map(address_map &map)
 {
 	map(0x0000, 0xffff).view(m_dsp_data_view);
 
-	m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-	m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
-	m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
-	m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
-	m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
-	m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+	if ((VERBOSE & LOG_DSP_AB0) != 0) m_dsp_data_view[0](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+	else                              m_dsp_data_view[0](0x0000, 0x5fff).ram().share(m_dsp_ab_0);
+	if ((VERBOSE & LOG_DSP_A6) != 0)  m_dsp_data_view[0](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_a_6_read), FUNC(polygonet_state::dsp_ram_a_6_write)).share(m_dsp_a_6);
+	else                              m_dsp_data_view[0](0x6000, 0x6fff).ram().share(m_dsp_a_6);
+	if ((VERBOSE & LOG_DSP_A7) != 0)  m_dsp_data_view[0](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_a_7_read), FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+	else                              m_dsp_data_view[0](0x7000, 0x7fff).ram().w(FUNC(polygonet_state::dsp_ram_a_7_write)).share(m_dsp_a_7);
+	if ((VERBOSE & LOG_DSP_A8) != 0)  m_dsp_data_view[0](0x8000, 0xbfff).rw(FUNC(polygonet_state::dsp_ram_a_8_read), FUNC(polygonet_state::dsp_ram_a_8_write));
+	else                              m_dsp_data_view[0](0x8000, 0xbfff).bankrw(m_dsp_bank_a_8);
+	if ((VERBOSE & LOG_DSP_AC) != 0)  m_dsp_data_view[0](0xc000, 0xdfff).rw(FUNC(polygonet_state::dsp_ram_a_c_read), FUNC(polygonet_state::dsp_ram_a_c_write)).share(m_dsp_share);
+	else                              m_dsp_data_view[0](0xc000, 0xdfff).ram().share(m_dsp_share);
+	if ((VERBOSE & LOG_DSP_AE) != 0)  m_dsp_data_view[0](0xe000, 0xffff).rw(FUNC(polygonet_state::dsp_ram_a_e_read), FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
+	else                              m_dsp_data_view[0](0xe000, 0xffff).ram().w(FUNC(polygonet_state::dsp_ram_a_e_write)).share(m_dsp_a_e);
 
-	m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
-	m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
-	m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
-	m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
+	if ((VERBOSE & LOG_DSP_AB0) != 0) m_dsp_data_view[1](0x0000, 0x5fff).rw(FUNC(polygonet_state::dsp_ram_ab_0_read), FUNC(polygonet_state::dsp_ram_ab_0_write)).share(m_dsp_ab_0);
+	else                              m_dsp_data_view[1](0x0000, 0x5fff).ram().share(m_dsp_ab_0);
+	if ((VERBOSE & LOG_DSP_B6) != 0)  m_dsp_data_view[1](0x6000, 0x6fff).rw(FUNC(polygonet_state::dsp_ram_b_6_read), FUNC(polygonet_state::dsp_ram_b_6_write));
+	else                              m_dsp_data_view[1](0x6000, 0x6fff).bankrw(m_dsp_bank_b_6);
+	if ((VERBOSE & LOG_DSP_B7) != 0)  m_dsp_data_view[1](0x7000, 0x7fff).rw(FUNC(polygonet_state::dsp_ram_b_7_read), FUNC(polygonet_state::dsp_ram_b_7_write));
+	else                              m_dsp_data_view[1](0x7000, 0x7fff).bankrw(m_dsp_bank_b_7);
+	if ((VERBOSE & LOG_DSP_B8) != 0)  m_dsp_data_view[1](0x8000, 0xffbf).rw(FUNC(polygonet_state::dsp_ram_b_8_read), FUNC(polygonet_state::dsp_ram_b_8_write));
+	else                              m_dsp_data_view[1](0x8000, 0xffbf).bankrw(m_dsp_bank_b_8);
 }
 
 

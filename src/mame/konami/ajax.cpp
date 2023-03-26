@@ -554,7 +554,7 @@ void ajax_state::volume_callback1(uint8_t data)
 void ajax_state::ajax(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4);    // 052001 12/4 MHz
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2);    // 052001 12/4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::main_map);
 
 	HD6309E(config, m_subcpu, 3000000); // ?

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_SHANGKID_H
-#define MAME_INCLUDES_SHANGKID_H
+#ifndef MAME_MISC_SHANGKID_H
+#define MAME_MISC_SHANGKID_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SHANGKID_H
+#endif // MAME_MISC_SHANGKID_H

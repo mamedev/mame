@@ -6,15 +6,15 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_P2000T_H
-#define MAME_INCLUDES_P2000T_H
+#ifndef MAME_PHILIPS_P2000T_H
+#define MAME_PHILIPS_P2000T_H
 
 #pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
-#include "p2000t_mdcr.h"
+#include "machine/mdcr.h"
 #include "machine/ram.h"
 #include "emupal.h"
 
@@ -96,4 +96,4 @@ private:
 	int8_t m_frame_count = 0;
 };
 
-#endif // MAME_INCLUDES_P2000T_H
+#endif // MAME_PHILIPS_P2000T_H

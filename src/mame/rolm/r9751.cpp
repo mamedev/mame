@@ -63,6 +63,8 @@
 #include "softlist.h"
 
 
+namespace {
+
 /* Log defines */
 #define TRACE_FDC 0
 #define TRACE_HDC 0
@@ -147,7 +149,7 @@ private:
 	uint32_t debug_a6();
 	uint32_t debug_a5();
 	uint32_t debug_a5_20();
-	void UnifiedTrace(u32 address, u32 data, const char* operation="Read", const char* Device="SMIOC", const char* RegisterName=nullptr, const char* extraText=nullptr);
+	[[maybe_unused]] void UnifiedTrace(u32 address, u32 data, const char* operation="Read", const char* Device="SMIOC", const char* RegisterName=nullptr, const char* extraText=nullptr);
 
 	virtual void machine_reset() override;
 	void trace_device(int address, int data, const char* direction);
@@ -1019,6 +1021,7 @@ ROM_START(r9751)
 	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

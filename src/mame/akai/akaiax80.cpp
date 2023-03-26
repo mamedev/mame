@@ -42,6 +42,9 @@
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 
+
+namespace {
+
 #define PIT0_TAG "pit0"
 #define PIT1_TAG "pit1"
 #define PIT2_TAG "pit2"
@@ -131,5 +134,8 @@ ROM_START( ax80 )
 	ROM_SYSTEM_BIOS( 2, "i", "REV.I" )
 	ROMX_LOAD( "ax-80i.ic4", 0x000000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, empty_init, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

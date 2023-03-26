@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -538,10 +538,10 @@ license:CC0
 		<group ref="lcd1"><bounds x="43.5" y="90.2" width="10" height="4.4" /></group>
 		<group ref="lcd2"><bounds x="63.5" y="90.2" width="10" height="4.4" /></group>
 
-		<element ref="text_black"><bounds x="47" y="90" width="11.8" height="1.5" /></element>
+		<element ref="text_black"><bounds x="47" y="90" width="11.5" height="1.5" /></element>
 		<element name="8.7" ref="led2"><bounds x="57" y="91.5" width="1.5" height="1.5" /></element>
 
-		<element ref="text_white"><bounds x="67" y="90" width="11.8" height="1.5" /></element>
+		<element ref="text_white"><bounds x="67" y="90" width="11.5" height="1.5" /></element>
 		<element name="8.6" ref="led2"><bounds x="77" y="91.5" width="1.5" height="1.5" /></element>
 
 	</view>

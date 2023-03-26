@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
-#ifndef MAME_INCLUDES_FROMANC2_H
-#define MAME_INCLUDES_FROMANC2_H
+#ifndef MAME_VSYSTEM_FROMANC2_H
+#define MAME_VSYSTEM_FROMANC2_H
 
 #pragma once
 
@@ -131,4 +131,4 @@ private:
 	void fromancr_main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FROMANC2_H
+#endif // MAME_VSYSTEM_FROMANC2_H

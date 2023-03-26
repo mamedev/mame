@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SSV_H
-#define MAME_INCLUDES_SSV_H
+#ifndef MAME_SETA_SSV_H
+#define MAME_SETA_SSV_H
 
 #pragma once
 
@@ -256,4 +256,4 @@ private:
 	required_ioport m_io_service;
 };
 
-#endif // MAME_INCLUDES_SSV_H
+#endif // MAME_SETA_SSV_H

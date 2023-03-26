@@ -43,6 +43,9 @@
 #include "emu.h"
 #include "cpu/h8/h83002.h"
 
+
+namespace {
+
 class os214_state : public driver_device
 {
 public:
@@ -89,6 +92,9 @@ ROM_START( os214 )
 	ROM_LOAD16_BYTE( "u9_s2a2-4.03_argox_am.u9", 0x000000, 0x040000, CRC(3bd8b2b1) SHA1(546f9fd8d7e1f589f6e594a332a3429041b49eea) )
 	ROM_LOAD16_BYTE( "u8_s2a2-4.03_argox_am.u8", 0x000001, 0x040000, CRC(d49f52af) SHA1(0ca5a70c6c3995f275226af26db965f6ba7ed123) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                         FLAGS
 COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, init_os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)

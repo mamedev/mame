@@ -163,7 +163,7 @@ struct LoopUnrollState {
 };
 
 // This class implements the actual unrolling. It uses a LoopUnrollState to
-// maintain the state of the unrolling inbetween steps.
+// maintain the state of the unrolling in between steps.
 class LoopUnrollerUtilsImpl {
  public:
   using BasicBlockListTy = std::vector<std::unique_ptr<BasicBlock>>;
@@ -209,7 +209,7 @@ class LoopUnrollerUtilsImpl {
   // Add all blocks_to_add_ to function_ at the |insert_point|.
   void AddBlocksToFunction(const BasicBlock* insert_point);
 
-  // Duplicates the |old_loop|, cloning each body and remaping the ids without
+  // Duplicates the |old_loop|, cloning each body and remapping the ids without
   // removing instructions or changing relative structure. Result will be stored
   // in |new_loop|.
   void DuplicateLoop(Loop* old_loop, Loop* new_loop);
@@ -241,7 +241,7 @@ class LoopUnrollerUtilsImpl {
   // Remap all the in |basic_block| to new IDs and keep the mapping of new ids
   // to old
   // ids. |loop| is used to identify special loop blocks (header, continue,
-  // ect).
+  // etc).
   void AssignNewResultIds(BasicBlock* basic_block);
 
   // Using the map built by AssignNewResultIds, replace the uses in |inst|
@@ -320,7 +320,7 @@ class LoopUnrollerUtilsImpl {
   // and then be remapped at the end.
   std::vector<Instruction*> loop_phi_instructions_;
 
-  // The number of loop iterations that the loop would preform pre-unroll.
+  // The number of loop iterations that the loop would perform pre-unroll.
   size_t number_of_loop_iterations_;
 
   // The amount that the loop steps each iteration.
@@ -384,6 +384,7 @@ void LoopUnrollerUtilsImpl::PartiallyUnrollResidualFactor(Loop* loop,
   std::unique_ptr<Instruction> new_label{new Instruction(
       context_, SpvOp::SpvOpLabel, 0, context_->TakeNextId(), {})};
   std::unique_ptr<BasicBlock> new_exit_bb{new BasicBlock(std::move(new_label))};
+  new_exit_bb->SetParent(&function_);
 
   // Save the id of the block before we move it.
   uint32_t new_merge_id = new_exit_bb->id();
@@ -839,7 +840,7 @@ void LoopUnrollerUtilsImpl::DuplicateLoop(Loop* old_loop, Loop* new_loop) {
   new_loop->SetMergeBlock(new_merge);
 }
 
-// Whenever the utility copies a block it stores it in a tempory buffer, this
+// Whenever the utility copies a block it stores it in a temporary buffer, this
 // function adds the buffer into the Function. The blocks will be inserted
 // after the block |insert_point|.
 void LoopUnrollerUtilsImpl::AddBlocksToFunction(
@@ -996,6 +997,20 @@ bool LoopUtils::CanPerformUnroll() {
   if (!loop_->FindNumberOfIterations(induction, &*condition->ctail(), nullptr))
     return false;
 
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  // ClusterFuzz/OSS-Fuzz is likely to yield examples with very high loop
+  // iteration counts. This can cause timeouts and memouts during fuzzing that
+  // are not classed as bugs. To avoid this noise, loop unrolling is not applied
+  // to loops with large iteration counts when fuzzing.
+  const size_t kFuzzerIterationLimit = 100;
+  size_t num_iterations;
+  loop_->FindNumberOfIterations(induction, &*condition->ctail(),
+                                &num_iterations);
+  if (num_iterations > kFuzzerIterationLimit) {
+    return false;
+  }
+#endif
+
   // Make sure the latch block is a unconditional branch to the header
   // block.
   const Instruction& branch = *loop_->GetLatchBlock()->ctail();
@@ -1102,6 +1117,10 @@ void LoopUtils::Finalize() {
 Pass::Status LoopUnroller::Process() {
   bool changed = false;
   for (Function& f : *context()->module()) {
+    if (f.IsDeclaration()) {
+      continue;
+    }
+
     LoopDescriptor* LD = context()->GetLoopDescriptor(&f);
     for (Loop& loop : *LD) {
       LoopUtils loop_utils{context(), &loop};

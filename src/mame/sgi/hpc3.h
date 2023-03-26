@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_HPC3_H
-#define MAME_MACHINE_HPC3_H
+#ifndef MAME_SGI_HPC3_H
+#define MAME_SGI_HPC3_H
 
 #pragma once
 
@@ -298,4 +298,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_HPC3, hpc3_device)
 
-#endif // MAME_MACHINE_HPC3_H
+#endif // MAME_SGI_HPC3_H

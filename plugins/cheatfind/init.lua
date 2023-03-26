@@ -965,7 +965,7 @@ function cheatfind.startplugin()
 								end
 							end
 						end
-						cheat_save.path = emu.subst_env(manager.machine.options.entries.cheatpath:value()):match("([^;]+)")
+						cheat_save.path = manager.machine.options.entries.cheatpath:value():match("([^;]+)")
 						cheat_save.filename = string.format("%s/%s", cheat_save.path, setname)
 						cheat_save.name = cheat.desc
 						local json = require("json")
@@ -1044,7 +1044,7 @@ function cheatfind.startplugin()
 	end
 
 	local function menu_callback(index, event)
-		if event == "cancel" and pausesel == 1 then
+		if event == "back" and pausesel == 1 then
 			emu.unpause()
 			menu_is_showing = false
 			return false -- return false so menu will be popped off the stack

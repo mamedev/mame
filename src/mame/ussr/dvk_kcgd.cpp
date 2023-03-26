@@ -45,6 +45,20 @@
 #include "screen.h"
 
 
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_VRAM      (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
+
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
+
+namespace {
+
 // these are unverified
 static constexpr int KCGD_TOTAL_HORZ = 977;
 static constexpr int KCGD_DISP_HORZ = 800;
@@ -56,18 +70,6 @@ static constexpr int KCGD_VERT_START = 0;
 
 static constexpr int KCGD_PAGE_0 = 015574;
 static constexpr int KCGD_PAGE_1 = 005574;
-
-
-//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
-#define LOG_VRAM      (1U <<  1)
-#define LOG_DEBUG     (1U <<  2)
-
-//#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC osd_printf_info
-#include "logmacro.h"
-
-#define LOGVRAM(...) LOGMASKED(LOG_VRAM, __VA_ARGS__)
-#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class kcgd_state : public driver_device
@@ -441,6 +443,9 @@ ROM_START( dvk_kcgd )
 	ROM_SYSTEM_BIOS(1, "182", "mask 182")
 	ROMX_LOAD("kr1801re2-182.bin", 0100000, 020000, CRC(3ca2921a) SHA1(389b30c40ed7e41dae71d58c7bff630359a48153), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

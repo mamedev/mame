@@ -119,7 +119,7 @@ protected:
 private:
 	uint8_t trident_seq_reg_read(uint8_t index);
 	void trident_seq_reg_write(uint8_t index, uint8_t data);
-	void trident_define_video_mode();
+	virtual void trident_define_video_mode();
 	uint8_t trident_crtc_reg_read(uint8_t index);
 	void trident_crtc_reg_write(uint8_t index, uint8_t data);
 	uint8_t trident_gc_reg_read(uint8_t index);
@@ -159,6 +159,8 @@ class tvga9000_device : public trident_vga_device
 {
 public:
 	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void trident_define_video_mode() override;
 };
 
 // device type definition

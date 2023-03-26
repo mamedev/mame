@@ -128,15 +128,14 @@
 
 #include "emu.h"
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsihd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/m68000/m68030.h"
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/icm7170.h"
-#include "machine/ncr539x.h"
+#include "machine/ncr53c90.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
@@ -149,10 +148,11 @@
 #include "screen.h"
 
 
+namespace {
+
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
-#define ESP_TAG         "esp"
 #define FDC_TAG         "fdc"
 #define FLOPPY_CONN_TAG "fdc:0"
 #define RS232A_TAG      "rs232a"
@@ -168,6 +168,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
+		m_esp(*this, "scsibus:7:esp"),
 		m_fdc(*this, FDC_TAG),
 		m_floppy_connector(*this, FLOPPY_CONN_TAG),
 		m_p_ram(*this, "p_ram"),
@@ -181,6 +182,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
+	optional_device<ncr53c90_device> m_esp;
 	optional_device<n82077aa_device> m_fdc;
 	optional_device<floppy_connector> m_floppy_connector;
 	virtual void machine_reset() override;
@@ -241,7 +243,7 @@ void sun3x_state::sun3_80_mem(address_map &map)
 	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
 	map(0x64000000, 0x640007ff).rw(TIMEKEEPER_TAG, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
-	map(0x66000000, 0x6600003f).rw(ESP_TAG, FUNC(ncr539x_device::read), FUNC(ncr539x_device::write)).umask32(0xff000000);
+	map(0x66000000, 0x6600003f).m(m_esp, FUNC(ncr53c90_device::map)).umask32(0xff000000);
 	map(0x6e000000, 0x6e000007).m(m_fdc, FUNC(n82077aa_device::map));
 	map(0x6e000400, 0x6e000403).rw(FUNC(sun3x_state::fdc_control_r), FUNC(sun3x_state::fdc_control_w));
 	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
@@ -581,6 +583,18 @@ static void sun_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
+static void sun_cdrom(device_t *device)
+{
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+}
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.set_option_machine_config("cdrom", sun_cdrom);
+}
+
 void sun3x_state::sun3_80(machine_config &config)
 {
 	/* basic machine hardware */
@@ -610,11 +624,15 @@ void sun3x_state::sun3_80(machine_config &config)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-
-	NCR539X(config, ESP_TAG, 20000000/2).set_scsi_port("scsi");
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("esp", NCR53C90).clock(20000000/2); // Emulex 2400138 (68-pin PLCC)
 
 	N82077AA(config, m_fdc, 24000000, n82077aa_device::mode_t::PS2);
 	FLOPPY_CONNECTOR(config, "fdc:0", sun_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
@@ -696,6 +714,9 @@ Sun 3/460/480 V3.0 Bootprom (2 Files, one for odd and one for even addresses)
 	ROMX_LOAD( "sun3_460_v2.9.1_0", 0x00000, 0x10000, CRC(d62dbf09) SHA1(4a6b5fd7840b44fe93c9058a8973d8dd3c9f7d24), ROM_BIOS(1))
 	ROMX_LOAD( "sun3_460_v2.9.1_1", 0x10000, 0x10000, CRC(3b5a5942) SHA1(ed6250e3c07d7cb62d4dd517a8637c8d37e16dc5), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

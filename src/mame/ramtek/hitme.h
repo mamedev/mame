@@ -5,8 +5,8 @@
     Hitme hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_HITME_H
-#define MAME_INCLUDES_HITME_H
+#ifndef MAME_RAMTEK_HITME_H
+#define MAME_RAMTEK_HITME_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 /*----------- defined in audio/hitme.c -----------*/
 DISCRETE_SOUND_EXTERN( hitme_discrete );
 
-#endif // MAME_INCLUDES_HITME_H
+#endif // MAME_RAMTEK_HITME_H

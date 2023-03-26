@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCOS2_SPRITE_H
-#define MAME_VIDEO_NAMCOS2_SPRITE_H
+#ifndef MAME_NAMCO_NAMCOS2_SPRITE_H
+#define MAME_NAMCO_NAMCOS2_SPRITE_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ DECLARE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device)
 DECLARE_DEVICE_TYPE(NAMCOS2_SPRITE_FINALLAP, namcos2_sprite_finallap_device)
 DECLARE_DEVICE_TYPE(NAMCOS2_SPRITE_METALHAWK, namcos2_sprite_metalhawk_device)
 
-#endif // MAME_VIDEO_NAMCOS2_SPRITE_H
+#endif // MAME_NAMCO_NAMCOS2_SPRITE_H

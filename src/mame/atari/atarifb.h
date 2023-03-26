@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_ATARIFB_H
-#define MAME_INCLUDES_ATARIFB_H
+#ifndef MAME_ATARI_ATARIFB_H
+#define MAME_ATARI_ATARIFB_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 DISCRETE_SOUND_EXTERN( atarifb_discrete );
 DISCRETE_SOUND_EXTERN( abaseb_discrete );
 
-#endif // MAME_INCLUDES_ATARIFB_H
+#endif // MAME_ATARI_ATARIFB_H

@@ -40,6 +40,9 @@ For BIOS CRC confirmation
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pv2000_state : public driver_device
 {
 public:
@@ -421,6 +424,8 @@ ROM_START (pv2000)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hn613128pc64.bin", 0x0000, 0x4000, CRC(8f31f297) SHA1(94b5f54dd7bce321e377fdaaf592acd3870cf621) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* System Drivers */

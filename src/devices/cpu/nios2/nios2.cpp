@@ -398,7 +398,7 @@ void nios2_device::execute_run()
 				break;
 
 			case 0x16: // or
-				m_gpr[BIT(inst, 17, 5)] = get_reg(BIT(inst, 27, 5)) & get_reg(BIT(inst, 22, 5));
+				m_gpr[BIT(inst, 17, 5)] = get_reg(BIT(inst, 27, 5)) | get_reg(BIT(inst, 22, 5));
 				m_pc += 4;
 				m_icount--;
 				break;

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-#ifndef MAME_AUDIO_T5182_H
-#define MAME_AUDIO_T5182_H
+#ifndef MAME_SEIBU_T5182_H
+#define MAME_SEIBU_T5182_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 
 DECLARE_DEVICE_TYPE(T5182, t5182_device)
 
-#endif // MAME_AUDIO_T5182_H
+#endif // MAME_SEIBU_T5182_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
-#ifndef MAME_INCLUDES_NAUGHTYB_H
-#define MAME_INCLUDES_NAUGHTYB_H
+#ifndef MAME_PHOENIX_NAUGHTYB_H
+#define MAME_PHOENIX_NAUGHTYB_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	void popflame_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NAUGHTYB_H
+#endif // MAME_PHOENIX_NAUGHTYB_H

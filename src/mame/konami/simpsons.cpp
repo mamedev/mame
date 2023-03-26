@@ -313,7 +313,7 @@ INTERRUPT_GEN_MEMBER(simpsons_state::periodic_irq)
 void simpsons_state::simpsons(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpsons_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(simpsons_state::periodic_irq)); /* IRQ triggered by the 052109, FIRQ by the sprite hardware */
 	m_maincpu->line().set(FUNC(simpsons_state::banking_callback));

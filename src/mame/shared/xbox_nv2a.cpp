@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
 #include "emu.h"
-#include "video/poly.h"
 #include "bitmap.h"
 #include "xbox_nv2a.h"
 #include <bitset>

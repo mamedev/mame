@@ -66,6 +66,9 @@
 #include "tilemap.h"
 
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(22'118'400)
 
 
@@ -463,6 +466,8 @@ ROM_START( nsmpoker )
 	ROM_LOAD( "113_280.3g", 0x6000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
 	ROM_LOAD( "113_281.2g", 0xb000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

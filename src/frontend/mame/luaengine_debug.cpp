@@ -89,8 +89,9 @@ class lua_engine::symbol_table_wrapper
 public:
 	symbol_table_wrapper(symbol_table_wrapper const &) = delete;
 
-	symbol_table_wrapper(running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
-		: m_table(machine, parent ? &parent->table() : nullptr, device)
+	symbol_table_wrapper(lua_engine &host, running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+		: m_host(host)
+		, m_table(machine, parent ? &parent->table() : nullptr, device)
 		, m_parent(parent)
 	{
 	}
@@ -105,12 +106,12 @@ public:
 	{
 		symbol_table::setter_func setfun;
 		if (setter)
-			setfun = [cbfunc = std::move(*setter)] (u64 value) { invoke(cbfunc, value); };
+			setfun = [this, cbfunc = std::move(*setter)] (u64 value) { m_host.invoke(cbfunc, value); };
 		return m_table.add(
 				name,
-				[cbfunc = std::move(getter)] () -> u64
+				[this, cbfunc = std::move(getter)] () -> u64
 				{
-					auto result = invoke(cbfunc).get<std::optional<u64> >();
+					auto result = m_host.invoke(cbfunc).get<std::optional<u64> >();
 					if (result)
 					{
 						return *result;
@@ -134,6 +135,7 @@ public:
 	void write_memory(addr_space &space, offs_t address, u64 data, int size, bool translate) { m_table.write_memory(space.space, address, data, size, translate); }
 
 private:
+	lua_engine &m_host;
 	symbol_table m_table;
 	std::shared_ptr<symbol_table_wrapper> const m_parent;
 };
@@ -151,21 +153,35 @@ public:
 	{
 	}
 
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
-		: m_expression(symtable->table(), expression, default_base)
-		, m_symbols(symtable)
-	{
-	}
-
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
-		: m_expression(symtable->table(), expression)
-		, m_symbols(symtable)
-	{
-	}
-
 	void set_default_base(int base) { m_expression.set_default_base(base); }
-	void parse(char const *string) { m_expression.parse(string); }
-	u64 execute() { return m_expression.execute(); }
+
+	void parse(sol::this_state s, char const *string)
+	{
+		try
+		{
+			m_expression.parse(string);
+		}
+		catch (expression_error const &err)
+		{
+			sol::stack::push(s, err);
+			lua_error(s);
+		}
+	}
+
+	u64 execute(sol::this_state s)
+	{
+		try
+		{
+			return m_expression.execute();
+		}
+		catch (expression_error const &err)
+		{
+			sol::stack::push(s, err);
+			lua_error(s);
+			return 0; // unreachable - lua_error doesn't return
+		}
+	}
+
 	bool is_empty() const { return m_expression.is_empty(); }
 	char const *original_string() const { return m_expression.original_string(); }
 	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
@@ -204,24 +220,32 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "m", EXPSPACE_REGION }
 	};
 
+	auto expression_error_type = emu.new_usertype<expression_error>(
+			"expression_error",
+			sol::no_constructor);
+	expression_error_type["code"] = sol::property(
+			[] (expression_error const &err) { return int(err.code()); });
+	expression_error_type["offset"] = sol::property(&expression_error::offset);
+	expression_error_type[sol::meta_function::to_string] = &expression_error::code_string;
+
 	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
 			"symbol_table",
 			sol::call_constructor, sol::factories(
-				[] (running_machine &machine)
-				{ return std::make_shared<symbol_table_wrapper>(machine, nullptr, nullptr); },
-				[] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
-				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, device); },
-				[] (std::shared_ptr<symbol_table_wrapper> const &parent)
-				{ return std::make_shared<symbol_table_wrapper>(parent->table().machine(), parent, nullptr); },
-				[] (device_t &device)
-				{ return std::make_shared<symbol_table_wrapper>(device.machine(), nullptr, &device); }));
+				[this] (running_machine &machine)
+				{ return std::make_shared<symbol_table_wrapper>(*this, machine, nullptr, nullptr); },
+				[this] (std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
+				{ return std::make_shared<symbol_table_wrapper>(*this, parent->table().machine(), parent, device); },
+				[this] (std::shared_ptr<symbol_table_wrapper> const &parent)
+				{ return std::make_shared<symbol_table_wrapper>(*this, parent->table().machine(), parent, nullptr); },
+				[this] (device_t &device)
+				{ return std::make_shared<symbol_table_wrapper>(*this, device.machine(), nullptr, &device); }));
 	symbol_table_type.set_function("set_memory_modified_func",
-			[] (symbol_table_wrapper &st, sol::object cb)
+			[this] (symbol_table_wrapper &st, sol::object cb)
 			{
 				if (cb == sol::lua_nil)
 					st.table().set_memory_modified_func(nullptr);
 				else if (cb.is<sol::protected_function>())
-					st.table().set_memory_modified_func([cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
+					st.table().set_memory_modified_func([this, cbfunc = cb.as<sol::protected_function>()] () { invoke(cbfunc); });
 				else
 					osd_printf_error("[LUA ERROR] must call set_memory_modified_func with function or nil\n");
 			});
@@ -287,10 +311,22 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto parsed_expression_type = emu.new_usertype<expression_wrapper>(
 			"parsed_expression",
-			sol::call_constructor, sol::constructors<
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &),
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *, int),
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *)>());
+			sol::call_constructor, sol::initializers(
+				[] (expression_wrapper &wrapper, std::shared_ptr<symbol_table_wrapper> const &symbols)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+				},
+				[] (expression_wrapper &wrapper, sol::this_state s, std::shared_ptr<symbol_table_wrapper> const &symbols, char const *expression, int base)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+					wrapper.set_default_base(base);
+					wrapper.parse(s, expression);
+				},
+				[] (expression_wrapper &wrapper, sol::this_state s, std::shared_ptr<symbol_table_wrapper> const &symbols, char const *expression)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+					wrapper.parse(s, expression);
+				}));
 	parsed_expression_type.set_function("set_default_base", &expression_wrapper::set_default_base);
 	parsed_expression_type.set_function("parse", &expression_wrapper::parse);
 	parsed_expression_type.set_function("execute", &expression_wrapper::execute);

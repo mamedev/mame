@@ -241,7 +241,7 @@ protected:
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
 	devcb_write8 us_cb;
-	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
+	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
@@ -483,6 +483,8 @@ public:
 class upd72069_device : public upd72065_device {
 public:
 	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void auxcmd_w(uint8_t data) override;
 };
 
 class n82077aa_device : public ps2_fdc_device {

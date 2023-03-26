@@ -20,6 +20,8 @@ Inputs and Dip Switches by Stephh
 #include "sidewndr.lh"
 
 
+namespace {
+
 class acefruit_state : public driver_device
 {
 public:
@@ -745,6 +747,8 @@ ROM_START( acefruit  )
 	ROM_LOAD( "16-1-101.b10", 0x0100, 0x0100, NO_DUMP )
 	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )

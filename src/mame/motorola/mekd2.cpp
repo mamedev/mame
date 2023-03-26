@@ -84,6 +84,9 @@ TODO
 
 #include "mekd2.lh"
 
+
+namespace {
+
 #define XTAL_MEKD2 1228800
 
 class mekd2_state : public driver_device
@@ -411,6 +414,9 @@ ROM_START(mekd2)
 	ROM_REGION(0x0400,"maincpu",0)
 	ROM_LOAD("jbug.rom", 0x0000, 0x0400, CRC(5ed08792) SHA1(b06e74652a4c4e67c4a12ddc191ffb8c07f3332e) )
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

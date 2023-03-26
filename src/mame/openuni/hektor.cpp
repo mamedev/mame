@@ -95,6 +95,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class hektor_base_state : public driver_device
 {
 public:
@@ -613,6 +615,8 @@ ROM_START(hektor3)
 	ROM_RELOAD(               0x6000, 0x2000)
 	ROM_LOAD("fra24_az.rom2", 0x8000, 0x4000, CRC(5cbf89d6) SHA1(b4a94eb0ba548e281c24ff118ddaca4fe66802fa))
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME             FLAGS */

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_CINEMAT_H
-#define MAME_AUDIO_CINEMAT_H
+#ifndef MAME_CINEMATRONICS_CINEMAT_A_H
+#define MAME_CINEMATRONICS_CINEMAT_A_H
 
 #pragma once
 
@@ -139,4 +139,4 @@ DECLARE_DEVICE_TYPE(BOXING_BUGS_AUDIO, boxingb_audio_device)
 DECLARE_DEVICE_TYPE(STAR_CASTLE_AUDIO, starcas_audio_device)
 DECLARE_DEVICE_TYPE(WAR_OF_THE_WORLDS_AUDIO, wotw_audio_device)
 
-#endif // MAME_AUDIO_CINEMAT_H
+#endif // MAME_CINEMATRONICS_CINEMAT_A_H

@@ -5,8 +5,8 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MICRO3D_H
-#define MAME_INCLUDES_MICRO3D_H
+#ifndef MAME_MISC_MICRO3D_H
+#define MAME_MISC_MICRO3D_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 	required_device<scn2651_device> m_vgb_uart;
 };
 
-#endif // MAME_INCLUDES_MICRO3D_H
+#endif // MAME_MISC_MICRO3D_H

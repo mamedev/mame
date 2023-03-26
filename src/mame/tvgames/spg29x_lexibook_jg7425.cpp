@@ -22,6 +22,9 @@ If SPG290, should probably be merged with hyperscan.cpp (it is)
 #include "screen.h"
 #include "cpu/score/score.h"
 
+
+namespace {
+
 class lexibook_jg7425_state : public driver_device
 {
 public:
@@ -113,6 +116,8 @@ ROM_START( lx_aven )
 	DISK_REGION( "ata:0:hdd:image" ) /* 4GB SD Card */
 	DISK_IMAGE( "sd-card", 0, SHA1(911da7bf7dac391e3329e17e3f411caafac52f0f) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2015, lx_jg7425,   0,         0,      lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Lexibook", "Lexibook JG7425 221-in-1", MACHINE_IS_SKELETON )

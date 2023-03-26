@@ -6,9 +6,9 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_APPLE2E_H
-#define MAME_INCLUDES_APPLE2E_H
+#ifndef MAME_APPLE_APPLE2E_H
+#define MAME_APPLE_APPLE2E_H
 
 INPUT_PORTS_EXTERN( apple2ep );
 
-#endif // MAME_INCLUDES_APPLE2E_H
+#endif // MAME_APPLE_APPLE2E_H

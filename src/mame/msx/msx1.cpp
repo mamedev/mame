@@ -266,7 +266,9 @@ void msx1_state::perfect1(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	// expansion slot in slot #2
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	// The bios code sets the bit for the language mode LED but there is no LED present on the keyboard.
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_ARAB);
 }
 
 /* MSX - Canon V-8 */
@@ -290,7 +292,7 @@ void msx1_state::canonv8(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_YM2149, config);
+	msx1(VDP_TMS9118, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Canon V-10 */
@@ -312,7 +314,7 @@ void msx1_state::canonv10(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9918A, SND_YM2149, config);
+	msx1(VDP_TMS9918A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Canon V-20 */
@@ -336,7 +338,7 @@ void msx1_state::canonv20(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9918A, SND_YM2149, config);
+	msx1(VDP_TMS9918A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Canon V-20E */
@@ -360,7 +362,8 @@ void msx1_state::canonv20e(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Canon V-20F */
@@ -403,8 +406,8 @@ void msx1_state::mx10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led().no_code_led();
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Casio MX-15 */
@@ -426,8 +429,8 @@ void msx1_state::mx15(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.has_printer_port(false).no_caps_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Casio MX-101 */
@@ -449,8 +452,8 @@ void msx1_state::mx101(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1); // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_cassette(false).has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led().no_code_led();
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Casio PV-7 */
@@ -474,8 +477,8 @@ void msx1_state::pv7(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1).force_start_address(0xe000);   // 8KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_printer_port(false).no_caps_led().no_code_led();
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Casio PV-16 */
@@ -498,8 +501,8 @@ void msx1_state::pv16(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 3, 1);   // 16KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_printer_port(false).no_caps_led().no_code_led();
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - CE-TEC MPC-80, German version of Daewoo DPC-200, dump needed to verify */
@@ -530,7 +533,7 @@ void msx1_state::cpc88(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Daewoo DPC-100 */
@@ -558,7 +561,7 @@ void msx1_state::dpc100(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);   // 16KB RAM
 	// expansion slot is in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Daewoo DPC-180 */
@@ -585,7 +588,7 @@ void msx1_state::dpc180(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 	// Expansion slot is in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Daewoo DPC-200 */
@@ -613,7 +616,7 @@ void msx1_state::dpc200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	// Expansion slot is in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Daewoo DPC-200E (France) */
@@ -635,7 +638,8 @@ void msx1_state::dpc200e(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot is in slot #3
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Daewoo Zemmix CPC-50 */
@@ -664,9 +668,9 @@ void msx1_state::cpc50a(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1).force_start_address(0xe000);  // 8KB RAM
 
-	m_hw_def.has_cassette(false)
-		.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led().no_code_led();
+	// It was released in Korea but there are no Korean specific things about the hardware
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Daewoo Zemmix CPC-50B */
@@ -690,9 +694,9 @@ void msx1_state::cpc50b(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);  // 16KB RAM
 
-	m_hw_def.has_cassette(false)
-		.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led().no_code_led();
+	// It was released in Korea but there are no Korean specific things about the hardware
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Daewoo Zemmix CPC-51 */
@@ -718,9 +722,9 @@ void msx1_state::cpc51(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 
-	m_hw_def.has_cassette(false)
-		.has_printer_port(false);
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	m_hw_def.has_cassette(false).has_printer_port(false).no_caps_led().no_code_led();
+	// It was released in Korea but there are no Korean specific things about the hardware
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Daewoo Zemmix DTX-1493FW */
@@ -745,7 +749,8 @@ void msx1_state::dgnmsx(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Dynadata DPC-200 */
@@ -774,7 +779,8 @@ void msx1_state::fdpc200(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Fenner FPC-500 */
@@ -797,7 +803,8 @@ void msx1_state::fpc500(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Fenner SPC-800 */
@@ -819,7 +826,8 @@ void msx1_state::fspc800(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Fujitsu FM-X */
@@ -844,7 +852,7 @@ void msx1_state::fmx(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - General PCT-50 */
@@ -878,7 +886,7 @@ void msx1_state::gsfc80u(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Goldstar FC-200 */
@@ -901,7 +909,8 @@ void msx1_state::gsfc200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Goldstar GFC-1080 */
@@ -931,7 +940,7 @@ void msx1_state::gfc1080(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4); // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Goldstar GFC-1080A */
@@ -958,7 +967,7 @@ void msx1_state::gfc1080a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4); // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Gradiente Expert 1.3 - source? */
@@ -979,7 +988,8 @@ void msx1_state::expert13(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Gradiente Expert DDPlus */
@@ -1007,7 +1017,8 @@ void msx1_state::expertdp(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_MB8877, "diskrom", 3, 3, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Gradiente Expert Plus */
@@ -1033,7 +1044,8 @@ void msx1_state::expertpl(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "demo", 3, 3, 2, 1, "demo");
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Gradiente Expert XP-800 (1.0) */
@@ -1057,7 +1069,8 @@ void msx1_state::expert10(machine_config &config)
 	// when no cartridge is inserted the expansion slot can be used in this slot
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9128, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9128, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Gradiente Expert XP-800 (1.1) / GPC-1 */
@@ -1078,7 +1091,8 @@ void msx1_state::expert11(machine_config &config)
 	// when no cartridge is inserted the expansion slot can be used in this slot
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9128, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9128, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Hitachi MB-H1 */
@@ -1105,7 +1119,7 @@ void msx1_state::mbh1(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 1, 1, "firmware");
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Hitachi MB-H1E */
@@ -1127,7 +1141,7 @@ void msx1_state::mbh1e(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Hitachi MB-H2 */
@@ -1154,7 +1168,7 @@ void msx1_state::mbh2(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4); // 64KB RAM
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Hitachi MB-H21 */
@@ -1178,7 +1192,7 @@ void msx1_state::mbh25(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Hitachi MB-H50 */
@@ -1201,7 +1215,7 @@ void msx1_state::mbh50(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4); // 64KB RAM
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Hitachi MB-H80 (unreleased) */
@@ -1226,7 +1240,8 @@ void msx1_state::jvchc7gb(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Jotan Holland Bingo */
@@ -1256,7 +1271,7 @@ void msx1_state::ml8000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 2); // 32KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Mitsubishi ML-F48 */
@@ -1279,7 +1294,8 @@ void msx1_state::mlf48(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config); // videochip needs verification
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL); // videochip needs verification
 }
 
 /* MSX - Mitsubishi ML-F80 */
@@ -1302,7 +1318,8 @@ void msx1_state::mlf80(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config); // videochip needs verification
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL); // videochip needs verification
 }
 
 /* MSX - Mitsubishi ML-F110 */
@@ -1325,7 +1342,7 @@ void msx1_state::mlf110(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Mitsubishi ML-F120 / ML-F120D */
@@ -1353,7 +1370,7 @@ void msx1_state::mlf120(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 1, 1, "firmware");
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Mitsubishi ML-F120D (functionality wise same as ML-F120 but with RGB out instead of composite)
@@ -1385,7 +1402,8 @@ void msx1_state::mlfx1(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Mitsubishi ML-FX2 */
@@ -1410,7 +1428,7 @@ void msx1_state::cf1200(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9918A, SND_AY8910, config); // soundchip needs verification
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN); // soundchip needs verification
 }
 
 /* MSX - National CF-2000 */
@@ -1431,7 +1449,7 @@ void msx1_state::cf2000(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config); // soundchip needs verification
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN); // soundchip needs verification
 }
 
 /* MSX - National CF-2700 */
@@ -1453,7 +1471,7 @@ void msx1_state::cf2700(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - National CF-3000 */
@@ -1474,7 +1492,7 @@ void msx1_state::cf3000(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - National CF-3300 */
@@ -1499,7 +1517,7 @@ void msx1_state::cf3300(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_MB8877_SS, "diskrom", 3, 1, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - National FS-1300 */
@@ -1520,7 +1538,8 @@ void msx1_state::fs1300(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	// Unclear from images whether caps and code leds are present; assuming they are present.
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - National FS-4000 */
@@ -1553,7 +1572,7 @@ void msx1_state::fs4000(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9128, SND_YM2149, config);
+	msx1(VDP_TMS9128, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - National FS-4000 (Alt) */
@@ -1586,7 +1605,7 @@ void msx1_state::fs4000a(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "kdr", 3, 1, 1, 2, "kdr");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9128, SND_YM2149, config);
+	msx1(VDP_TMS9128, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Network DPC-200 */
@@ -1615,7 +1634,8 @@ void msx1_state::phc2(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Olympia PHC-28 */
@@ -1638,7 +1658,8 @@ void msx1_state::phc28(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9929A, SND_AY8910, config); // soundchip and videochip need verification
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL); // soundchip and videochip need verification
 }
 
 /* MSX - Panasonic CF-2700 (Germany) */
@@ -1661,7 +1682,8 @@ void msx1_state::cf2700g(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Panasonic CF-2700 (UK) */
@@ -1684,7 +1706,8 @@ void msx1_state::cf2700uk(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Panasonic FS-3900 */
@@ -1715,8 +1738,8 @@ void msx1_state::nms801(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.has_printer_port(false).no_caps_led().no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8000 */
@@ -1740,7 +1763,7 @@ void msx1_state::vg8000(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8010 / VG-8010/00 */
@@ -1764,7 +1787,7 @@ void msx1_state::vg8010(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8010F / VG-8010/19 */
@@ -1788,7 +1811,7 @@ void msx1_state::vg8010f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8020-00 */
@@ -1809,7 +1832,8 @@ void msx1_state::vg802000(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8020/19 / VG-8020F */
@@ -1831,7 +1855,8 @@ void msx1_state::vg8020f(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);   // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Philips VG-8020/20 */
@@ -1855,7 +1880,8 @@ void msx1_state::vg802020(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);   // 64KB RAM
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Phonola VG-8000 (Italian market, mostly likely same as Philips VG-8000) */
@@ -1969,7 +1995,7 @@ void msx1_state::piopx7(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 1, 1, "pbasic");
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Pioneer PX-7UK */
@@ -1999,7 +2025,8 @@ void msx1_state::piopx7uk(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 1, 1, "pbasic");
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Pioneer PX-V60 */
@@ -2027,7 +2054,7 @@ void msx1_state::piopxv60(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "pbasic", 2, 1, 1, "pbasic");
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9128, SND_YM2149, config);
+	msx1(VDP_TMS9128, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Pioneer PX-V7 */
@@ -2063,7 +2090,7 @@ void msx1_state::ax150(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9918, SND_YM2149, config);
+	msx1(VDP_TMS9918, SND_YM2149, config, REGION_ARAB);
 }
 
 /* MSX - Sakhr AX-170 */
@@ -2090,7 +2117,7 @@ void msx1_state::ax170(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, 3, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_ARAB);
 }
 
 /* MSX - Sakhr AX-170F */
@@ -2121,7 +2148,7 @@ void msx1_state::ax230(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4); // 64KB RAM
 	add_internal_slot(config, MSX_SLOT_AX230, "games", 3, 3, 1, 2, "games");
 
-	msx1(VDP_TMS9918, SND_AY8910, config);
+	msx1(VDP_TMS9918, SND_AY8910, config, REGION_ARAB);
 }
 
 /* MSX - Sakhr AX-330 */
@@ -2154,7 +2181,7 @@ void msx1_state::spc800(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB?? RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9118, SND_AY8910, config);
+	msx1(VDP_TMS9118, SND_AY8910, config, REGION_KOREA);
 }
 
 /* MSX - Sanno PHC-SPC */
@@ -2186,7 +2213,8 @@ void msx1_state::mpc64(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo MPC-100 */
@@ -2208,7 +2236,8 @@ void msx1_state::mpc100(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_caps_led().no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo MPC-200 */
@@ -2231,7 +2260,8 @@ void msx1_state::mpc200(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4); // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo MPC-200SP (same as Sanyo MPC-200 ?) */
@@ -2252,7 +2282,8 @@ void msx1_state::mpc200sp(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4); // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo PHC-28L */
@@ -2274,7 +2305,8 @@ void msx1_state::phc28l(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo PHC-28S */
@@ -2297,7 +2329,8 @@ void msx1_state::phc28s(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 2);   // 32KB RAM
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sanyo Wavy MPC-10 */
@@ -2322,7 +2355,7 @@ void msx1_state::mpc10(machine_config &config)
 	// Expansion slot in slot #2
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 2);   // 32KB RAM
 
-	msx1(VDP_TMS9918, SND_AY8910, config);
+	msx1(VDP_TMS9918, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Schneider MC 810 */
@@ -2349,7 +2382,8 @@ void msx1_state::hb8000(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9128, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9128, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sharp Epcom HB-8000 (HotBit 1.3b) */
@@ -2370,7 +2404,8 @@ void msx1_state::hotbi13b(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sharp Epcom HB-8000 (HotBit 1.3p) */
@@ -2391,7 +2426,8 @@ void msx1_state::hotbi13p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sincorp SBX (Argentina, homebrew) */
@@ -2417,7 +2453,7 @@ void msx1_state::hb10(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 
-	msx1(VDP_TMS9118, SND_YM2149, config);
+	msx1(VDP_TMS9118, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Sony HB-10B */
@@ -2446,7 +2482,8 @@ void msx1_state::hb10p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-20P */
@@ -2470,7 +2507,8 @@ void msx1_state::hb20p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-201 */
@@ -2495,7 +2533,7 @@ void msx1_state::hb201(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9118, SND_YM2149, config);
+	msx1(VDP_TMS9118, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Sony HB-201P */
@@ -2520,7 +2558,8 @@ void msx1_state::hb201p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-501F */
@@ -2549,7 +2588,8 @@ void msx1_state::hb501p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-55 (Version 1) */
@@ -2574,7 +2614,7 @@ void msx1_state::hb55(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Sony HB-55D, is this HB-55 2nd version? */
@@ -2599,7 +2639,8 @@ void msx1_state::hb55d(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 3, 1);   // 16KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-55P */
@@ -2628,7 +2669,8 @@ void msx1_state::hb55p(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-75 */
@@ -2653,7 +2695,7 @@ void msx1_state::hb75(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Sony HB-75AS */
@@ -2682,7 +2724,8 @@ void msx1_state::hb75d(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-75F */
@@ -2713,7 +2756,8 @@ void msx1_state::hb75p(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-101 */
@@ -2740,7 +2784,7 @@ void msx1_state::hb101(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 1, 1, "firmware");
 
-	msx1(VDP_TMS9118, SND_YM2149, config);
+	msx1(VDP_TMS9118, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Sony HB-101P */
@@ -2767,7 +2811,8 @@ void msx1_state::hb101p(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 1, 1, "firmware");
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Sony HB-701 */
@@ -2795,7 +2840,7 @@ void msx1_state::hb701fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_SS, "disk", 3, 1, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Spectravideo SVI-728 */
@@ -2817,7 +2862,8 @@ void msx1_state::svi728(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot (for eg SVI-707) in slot #3
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Spectravideo SVI-728 (Arabic) */
@@ -2859,7 +2905,8 @@ void msx1_state::tadpc200(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9129, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Talent DPS-201 */
@@ -2949,7 +2996,8 @@ void msx1_state::hx10(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-10AA */
@@ -2973,7 +3021,7 @@ void msx1_state::hx10d(machine_config &config)
 	// Expansion slot in slot #3
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-10DP */
@@ -2994,7 +3042,7 @@ void msx1_state::hx10dp(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-10DPN */
@@ -3017,7 +3065,8 @@ void msx1_state::hx10e(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-10F */
@@ -3038,7 +3087,8 @@ void msx1_state::hx10f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);   // 64KB RAM
 	// Expansion slot in slot #3
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-10I */
@@ -3063,7 +3113,7 @@ void msx1_state::hx10s(machine_config &config)
 	// Expansion slot in slot #3
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-10SA */
@@ -3085,7 +3135,7 @@ void msx1_state::hx10sa(machine_config &config)
 	// Expansion slot in slot #3
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9918A, SND_AY8910, config);
+	msx1(VDP_TMS9918A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-10SF */
@@ -3117,7 +3167,7 @@ void msx1_state::hx20(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-20AR */
@@ -3147,7 +3197,8 @@ void msx1_state::hx20e(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-20I */
@@ -3174,7 +3225,8 @@ void msx1_state::hx20i(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9129, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9129, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-21 */
@@ -3202,7 +3254,7 @@ void msx1_state::hx21(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror1", 3, 3, 0, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror2", 3, 3, 3, 1, "firmware", 0x4000);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-21F */
@@ -3228,7 +3280,8 @@ void msx1_state::hx21f(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   // 32KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-22 */
@@ -3256,7 +3309,7 @@ void msx1_state::hx22(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror1", 3, 3, 0, 1, "firmware");
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware_mirror2", 3, 3, 3, 1, "firmware", 0x4000);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-22CH */
@@ -3288,7 +3341,8 @@ void msx1_state::hx22i(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2, 2);   // 32KB RAM
 	add_internal_slot_irq<3>(config, MSX_SLOT_RS232_TOSHIBA, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9929A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-30 */
@@ -3323,7 +3377,7 @@ void msx1_state::hx32(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 0, 4);   // 64KB RAM
 	add_internal_slot(config, MSX_SLOT_ROM, "firmware", 3, 3, 1, 2, "firmware");
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Toshiba HX-51I */
@@ -3347,7 +3401,8 @@ void msx1_state::hx51i(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram2", 3, 0, 2);   // 32KB RAM
 
-	msx1(VDP_TMS9918, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9918, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Toshiba HX-52 */
@@ -3375,7 +3430,7 @@ void msx1_state::hc5(machine_config &config)
 	// Expansion slot in slot #2
 	// Module slot in slot #3
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Victor HC-6 */
@@ -3397,7 +3452,7 @@ void msx1_state::hc6(machine_config &config)
 	// Expansion slot in slot #2
 	// Module slot in slot #3
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Victor HC-7 */
@@ -3422,7 +3477,7 @@ void msx1_state::hc7(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4); // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_JAPAN);
 }
 
 /* MSX - Victor HC-30 */
@@ -3456,7 +3511,7 @@ void msx1_state::cx5f1(machine_config &config)
 	// Expansion bus in slot #2
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, "sfg01");
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Yamaha CX5F (with SFG05) */
@@ -3482,7 +3537,7 @@ void msx1_state::cx5f(machine_config &config)
 	// Expansion bus in slot #2
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, "sfg05");
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Yamaha CX5MA (Australia / New Zealand */
@@ -3518,7 +3573,8 @@ void msx1_state::cx5mu(machine_config &config)
 	// Expansion slot in slot #2
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, "sfg01");
 
-	msx1(VDP_TMS9918A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9918A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha SX-100 */
@@ -3540,7 +3596,7 @@ void msx1_state::sx100(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 0, 2, 2);   // 32KB RAM
 	add_cartridge_slot<1>(config, 1);
 
-	msx1(VDP_TMS9918, SND_YM2149, config);
+	msx1(VDP_TMS9918, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Yamaha YIS-303 */
@@ -3567,7 +3623,7 @@ void msx1_state::yis303(machine_config &config)
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 0, msx_yamaha_60pin, nullptr);
 
 	m_hw_def.has_printer_port(false);
-	msx1(VDP_TMS9918A, SND_YM2149, config);
+	msx1(VDP_TMS9918A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Yamaha YIS-503 */
@@ -3591,7 +3647,7 @@ void msx1_state::yis503(machine_config &config)
 	// Expansion slot in slot #2
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, nullptr);
 
-	msx1(VDP_TMS9928A, SND_YM2149, config);
+	msx1(VDP_TMS9928A, SND_YM2149, config, REGION_JAPAN);
 }
 
 /* MSX - Yamaha YIS-503F */
@@ -3615,7 +3671,8 @@ void msx1_state::yis503f(machine_config &config)
 	// Expansion slot in slot #2
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, nullptr);
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha YIS-603 */
@@ -3637,7 +3694,8 @@ void msx1_state::yc64(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 4);  // 64KB RAM
 
-	msx1(VDP_TMS9929A, SND_YM2149, config);
+	m_hw_def.no_caps_led().no_code_led();
+	msx1(VDP_TMS9929A, SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yeno DPC-64 */
@@ -3661,7 +3719,8 @@ void msx1_state::mx64(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<2>(config, 3);
 
-	msx1(VDP_TMS9928A, SND_AY8910, config);
+	m_hw_def.no_code_led();
+	msx1(VDP_TMS9928A, SND_AY8910, config, REGION_INTERNATIONAL);
 }
 
 } // anonymous namespace

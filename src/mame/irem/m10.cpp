@@ -2,7 +2,7 @@
 // copyright-holders:Lee Taylor, Couriersud
 /***************************************************************************
 
-    Irem M10/M11/M15 hardware
+    Irem M-10 / M-11 / M-15 hardware
 
 ****************************************************************************
 
@@ -14,7 +14,9 @@ Notes:
 - The bitmap strips in IPM Invader might be slightly misplaced
 
 TODO:
-- Dip switches
+- DIP switches
+- andromed M-29S starfield
+
 
 Head On
 -------
@@ -51,7 +53,7 @@ Notes:
       All IC's are listed
       All ROMs type 2708 (1K x8)
 
-      6502 clock: 1.173MHz
+      6502 clock: 733kHz
                *: These 2 IC's piggybacked. 74S04 on top
          VR1/2/3: 5K potentiometers
             2114: 1K x4 SRAM
@@ -85,16 +87,15 @@ Notes:
             C1815: Transistor (x9)
            TA7222: Power Amp
 
-***************************************************************************/
+****************************************************************************
 
-/***************************************************************************
 Notes (couriersud)
 
     From http://www.crazykong.com/tech/IremBoardList.txt
 
+    ipminvad:       M-10L + M-10S (also exists on M-11 hw)
+    andromed:       M-11L + M-11S + M-29S
     skychut:        M-11 (?)
-    andromed:       N/A
-    ipminvad:       N/A
     spacbeam:       not listed
     headon:         not listed
     greenber:       M-15T, M-24S
@@ -112,12 +113,12 @@ Notes (couriersud)
     been a prototype or eventually the famous "capsule invader".
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "m10.h"
 
 #include "cpu/m6502/m6502.h"
-#include "machine/rescap.h"
-#include "sound/samples.h"
+
 #include "speaker.h"
 
 
@@ -130,20 +131,6 @@ Notes (couriersud)
 #define M10_DEBUG       (0)
 
 #define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
-
-WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
-{
-	LOG(("ic8j1: %d %d\n", state, m_screen->vpos()));
-	m_maincpu->set_input_line(0, !state ? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
-{
-	// written from /Q to A with slight delight
-	LOG(("ic8j2: %d\n", state));
-	m_ic8j2->a_w(state);
-	m_ic8j1->a_w(state);
-}
 
 /*************************************
  *
@@ -162,8 +149,6 @@ void m1x_state::palette(palette_device &palette) const
 
 void m1x_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(FUNC(m1x_state::interrupt_callback), this);
-
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
@@ -185,6 +170,8 @@ void m10_state::machine_reset()
 	m1x_state::machine_reset();
 	m_bottomline = 0;
 }
+
+
 /*************************************
  *
  *  I/O handling
@@ -441,24 +428,6 @@ void m15_state::a100_w(uint8_t data)
 	m_last = data;
 }
 
-uint8_t m10_state::m10_a700_r()
-{
-	//LOG(("rd:%d\n",m_screen->vpos()));
-	LOG(("clear\n"));
-	m_ic8j1->clear_w(0);
-	m_ic8j1->clear_w(1);
-	return 0x00;
-}
-
-uint8_t m10_state::m11_a700_r()
-{
-	//LOG(("rd:%d\n",m_screen->vpos()));
-	//m_maincpu->set_input_line(0, CLEAR_LINE);
-	LOG(("clear\n"));
-	m_ic8j1->clear_w(0);
-	m_ic8j1->clear_w(1);
-	return 0x00;
-}
 
 /*************************************
  *
@@ -466,47 +435,27 @@ uint8_t m10_state::m11_a700_r()
  *
  *************************************/
 
+uint8_t m10_state::clear_74123_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_ic8j1->clear_w(0);
+		m_ic8j1->clear_w(1);
+	}
+	return 0;
+}
+
 INPUT_CHANGED_MEMBER(m1x_state::coin_inserted)
 {
 	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-TIMER_CALLBACK_MEMBER(m1x_state::interrupt_callback)
-{
-	if (param == 0)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 16), 1);
-	}
-	if (param == 1)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 24), 2);
-	}
-	if (param == -1)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-#if 0
-INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
-{
-	device.execute().set_input_line(0, ASSERT_LINE);
-	//m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBEND), -1);
-}
-
-INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
-{
-	device.execute().set_input_line(0, ASSERT_LINE);
-}
-#endif
-
 INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
-	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
+	device.execute().pulse_input_line(0, m_screen->time_until_pos(IREMM11_VBSTART + 1, 80));
 }
+
 
 /*************************************
  *
@@ -525,7 +474,7 @@ void m10_state::m10_main(address_map &map)
 	map(0xa300, 0xa300).portr("INPUTS");
 	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   // line at bottom of screen?, sound, flip screen
 	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   // ???
-	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
+	map(0xa700, 0xa700).r(FUNC(m10_state::clear_74123_r));
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
@@ -535,12 +484,12 @@ void m10_state::m11_main(address_map &map)
 	map(0x1000, 0x2fff).rom();
 	map(0x4000, 0x43ff).ram().share(m_videoram);
 	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::colorram_w)).share(m_colorram); // foreground colour
-	map(0x5000, 0x53ff).ram().share(m_chargen); // background ?????
+	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::chargen_w)).share(m_chargen); // background ?????
 	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); // sound writes ????
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
 	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   // line at bottom of screen?, sound, flip screen
-	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
+	map(0xa700, 0xa700).r(FUNC(m10_state::clear_74123_r));
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
@@ -559,66 +508,27 @@ void m15_state::m15_main(address_map &map)
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
+
 /*************************************
  *
  *  Port definitions
  *
  *************************************/
 
-#define CAB_PORTENV \
-	/* fake port for cabinet type */                    \
-	PORT_START("CAB")                               \
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )     \
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )     \
-	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )    \
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )     \
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )     \
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )  \
+static INPUT_PORTS_START( cabinet )
+	PORT_START("CAB") // fake port for cabinet type
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-
-static INPUT_PORTS_START( skychut )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-
-	PORT_START("DSW")
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING (  0x00, "3" )
-	PORT_DIPSETTING (  0x01, "4" )
-	PORT_DIPSETTING (  0x02, "5" )
-	PORT_DIPNAME( 0x04, 0x00, "Unknown 1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Unknown 2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown 3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ipminvad )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -630,10 +540,11 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 
 	PORT_START("DSW")
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING (  0x00, "3" )
-	PORT_DIPSETTING (  0x01, "4" )
-	PORT_DIPSETTING (  0x02, "5" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x01, "4" )
+	PORT_DIPSETTING (   0x02, "5" )
+	PORT_DIPSETTING (   0x03, "6" )
 	PORT_DIPNAME( 0x04, 0x00, "Capsules" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
@@ -643,23 +554,56 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )  // Verified with debugger
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, 0x00 ) // Verified with debugger
+	PORT_DIPUNUSED( 0x40, 0x00 )
+	PORT_DIPUNUSED( 0x80, 0x00 )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
-	CAB_PORTENV
+	PORT_START("VR1") // VR1 20K variable resistor on main PCB
+	PORT_ADJUSTER(30, "IRQ Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, set_vr1, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( skychut )
+	PORT_INCLUDE( ipminvad )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x01, "4" )
+//  PORT_DIPSETTING (   0x03, "4" ) // dupe
+	PORT_DIPSETTING (   0x02, "5" )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPUNKNOWN( 0x10, 0x00 )
+	PORT_DIPUNKNOWN( 0x20, 0x00 )
+	PORT_DIPUNKNOWN( 0x40, 0x00 )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( andromed )
+	PORT_INCLUDE( ipminvad )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x01, "4" )
+	PORT_DIPSETTING (   0x02, "5" )
+	PORT_DIPSETTING (   0x03, "6" )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPUNKNOWN( 0x40, 0x00 )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacbeam )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -683,17 +627,17 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_DIPSETTING (  0x00, "30000" )
 	PORT_DIPSETTING (  0x08, DEF_STR( None ) )
 	PORT_DIPNAME(0x30, 0x10, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (  0x00, "Testmode" )
 	PORT_DIPSETTING (  0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (  0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING (  0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( headoni )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -723,9 +667,9 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x00, "30000" )
 	PORT_DIPSETTING (  0x08, DEF_STR( None ) )
 	PORT_DIPNAME(0x30, 0x10, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (  0x00, "Testmode" )
 	PORT_DIPSETTING (  0x10, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (  0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING (  0x00, DEF_STR( Free_Play ) )
 
 //  PORT_START("VR1")
 //  PORT_ADJUSTER( 50, "Car Rumble Volume" )
@@ -744,11 +688,11 @@ static INPUT_PORTS_START( headoni )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greenber )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -776,14 +720,12 @@ static INPUT_PORTS_START( greenber )
 	PORT_DIPSETTING (  0x00, "5000" )
 	PORT_DIPSETTING (  0x08, "7000" )
 	PORT_DIPNAME(0x30, 0x20, DEF_STR( Coinage ) )
-	PORT_DIPSETTING (  0x00, "Testmode" )
 	PORT_DIPSETTING (  0x20, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (  0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING (  0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 
@@ -833,6 +775,7 @@ static const char *const m10_sample_names[] =
 	nullptr
 };
 
+
 /*************************************
  *
  *  Machine driver
@@ -858,20 +801,21 @@ void m10_state::m10(machine_config &config)
 	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	m_ic8j1->set_resistor_value(RES_K(1));                      // resistor connected to RCext
 	m_ic8j1->set_capacitor_value(CAP_U(1));                     // capacitor connected to Cext and RCext
-	m_ic8j1->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j1->set_a_pin_value(1);                                // A pin - driven by #2 /Q
 	m_ic8j1->set_b_pin_value(1);                                // B pin - pulled high
 	m_ic8j1->set_clear_pin_value(1);                            // Clear pin - pulled high
-	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
+	m_ic8j1->out_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	TTL74123(config, m_ic8j2, 0);
 	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	// 10k + 20k variable resistor
-	m_ic8j2->set_resistor_value(RES_K(22));                     // resistor connected to RCext
+	m_ic8j2->set_resistor_value(RES_K(10 + 6));                 // resistor connected to RCext
 	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   // capacitor connected to Cext and RCext
-	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by #2 /Q
 	m_ic8j2->set_b_pin_value(1);                                // B pin - pulled high
 	m_ic8j2->set_clear_pin_value(1);                            // Clear pin - pulled high
-	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
+	m_ic8j2->out_cb().set(m_ic8j2, FUNC(ttl74123_device::a_w));
+	m_ic8j2->out_cb().append(m_ic8j1, FUNC(ttl74123_device::a_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -880,26 +824,35 @@ void m10_state::m10(machine_config &config)
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(m10_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	m_back_color[0] = 3; m_back_color[1] = 3; m_back_color[2] = 5; m_back_color[3] = 5;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 7 * 8; m_back_xpos[3] = 6 * 8;
 }
 
 void m10_state::m11(machine_config &config)
 {
 	m10(config);
 
+	m_maincpu->set_clock(IREMM11_CPU_CLOCK);
+	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
+
+	m_back_color[0] = 3; m_back_color[1] = 0; m_back_color[2] = 3; m_back_color[3] = 3;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 2 * 8; m_back_xpos[3] = 3 * 8;
 }
 
 void m15_state::m15(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM15_CPU_CLOCK);
+	M6502(config, m_maincpu, IREMM11_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m15_state::m15_main);
 	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART);
+	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
 	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -913,12 +866,6 @@ void m15_state::m15(machine_config &config)
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(m10_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-void m15_state::headoni(machine_config &config)
-{
-	m15(config);
-	m_maincpu->set_clock(11730000/16);
 }
 
 
@@ -961,7 +908,7 @@ ROM_START( ipminvad1 )
 	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
 ROM_END
 
-ROM_START( andromed ) // Jumps to an unmapped sub-routine at $2fc9
+ROM_START( andromed )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
 	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
@@ -971,8 +918,7 @@ ROM_START( andromed ) // Jumps to an unmapped sub-routine at $2fc9
 	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
 	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
 	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
-	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
-	ROM_FILL(         0x2c00, 0x0400, 0x60)
+	ROM_LOAD( "am8",  0x2c00, 0x0400, CRC(57294dff) SHA1(3ef8d561e33434dce6e7d45e4739ca3b333681a8) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
@@ -1032,10 +978,14 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) )
 ROM_END
 
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
-GAME( 1980, andromed,  0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump, export version known as simply "Andromeda"
-GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headoni,   0,        headoni, headoni,  m15_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, m15_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1980, greenber,  0,        m15,     greenber, m15_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+
+//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME, FLAGS
+GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+
+GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
+GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -270,7 +270,7 @@ There are read/writes on bit 7 of 0xfff009 ($f009) ...
     Miyasu Nonki no Quiz 18-Kin (Japan)
     (c)1992 EIM
 
-    Added by Takahiro Nogi <nogi@kt.rim.or.jp> 2003/08/15 -
+    Added by Takahiro Nogi 2003/08/15 -
 
 
 Board:  OW-13 CPU

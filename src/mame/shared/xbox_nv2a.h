@@ -3,12 +3,11 @@
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */
-#ifndef MAME_INCLUDES_XBOX_NV2A_H
-#define MAME_INCLUDES_XBOX_NV2A_H
+#ifndef MAME_SHARED_XBOX_NV2A_H
+#define MAME_SHARED_XBOX_NV2A_H
 
 #pragma once
 
-#include "machine/pic8259.h"
 #include "video/poly.h"
 
 class vertex_program_disassembler {
@@ -892,4 +891,4 @@ public:
 	bool enable_clipping_w = false;
 };
 
-#endif // MAME_INCLUDES_XBOX_NV2A_H
+#endif // MAME_SHARED_XBOX_NV2A_H

@@ -25,6 +25,9 @@
 #include "machine/ins8250.h"
 #include "machine/timer.h"
 
+
+namespace {
+
 #define RS232_TAG "rs232"
 
 class h89_state : public driver_device
@@ -212,7 +215,10 @@ ROM_START( h89 )
 	ROM_LOAD( "2732_mms84a_magnoliamms.bin", 0x0000, 0x1000, CRC(5563f42a) SHA1(1b74cafca8213d5c083f16d8a848933ab56eb43b))
 ROM_END
 
+} // anonymous namespace
+
+
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Inc", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

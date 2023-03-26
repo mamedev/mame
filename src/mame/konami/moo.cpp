@@ -464,7 +464,7 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(moo_state,moo)
+void moo_state::machine_start()
 {
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
@@ -476,7 +476,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	m_dmaend_timer = timer_alloc(FUNC(moo_state::dmaend_callback), this);
 }
 
-MACHINE_RESET_MEMBER(moo_state,moo)
+void moo_state::machine_reset()
 {
 	int i;
 
@@ -503,9 +503,6 @@ void moo_state::moo(machine_config &config)
 
 	Z80(config, m_soundcpu, XTAL(32'000'000)/4); // 8MHz verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_state::sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
-	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -560,9 +557,6 @@ void moo_state::moobl(machine_config &config)
 	M68000(config, m_maincpu, 16100000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
-	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 

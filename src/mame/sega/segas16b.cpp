@@ -1153,9 +1153,9 @@ void segas16b_state::upd7759_control_w(uint8_t data)
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
 	{
-		// it is important to write in this order: if the /START line goes low
+		// it is important to write in this order: if the /MD line goes low
 		// at the same time /RESET goes low, no sample should be started
-		m_upd7759->start_w(BIT(data, 7));
+		m_upd7759->md_w(BIT(~data, 7));
 		m_upd7759->reset_w(BIT(data, 6));
 
 		// banking depends on the ROM board
@@ -1280,6 +1280,7 @@ void segas16b_state::machine_reset()
 	m_hwc_input_value = 0;
 	m_mj_input_num = 0;
 	m_mj_last_val = 0;
+
 	// if we have a hard-coded mapping configuration, set it now
 	if (m_i8751_initial_config != nullptr)
 		m_mapper->configure_explicit(m_i8751_initial_config);
@@ -1727,7 +1728,6 @@ void dfjail_state::dfjail_map(address_map &map)
 	map(0xc42000, 0xc42001).portr("DSW1");
 	map(0xc42002, 0xc42003).portr("DSW2");
 	map(0xc43000, 0xc43001).nopw();
-
 }
 
 void segas16b_state::map_fpointbla(address_map &map)
@@ -3945,13 +3945,14 @@ void segas16b_state::system16b(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-#if USE_NL
-	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2)
-		.add_route(0, "netlist", 0.43, 0)
-		.add_route(1, "netlist", 0.43, 1);
+	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2);
+
 	UPD7759(config, m_upd7759);
-	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+
+#if USE_NL
+	m_ym2151->add_route(0, "netlist", 0.43, 0);
+	m_ym2151->add_route(1, "netlist", 0.43, 1);
 	m_upd7759->add_route(0, "netlist", 0.48, 2);
 
 	NETLIST_SOUND(config, "netlist", 48000)
@@ -3969,11 +3970,7 @@ void segas16b_state::system16b(machine_config &config)
 
 	NETLIST_STREAM_OUTPUT(config, "netlist:cout0", 0, "OUT").set_mult_offset(1.0 / 0.2, 0.0);
 #else
-	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2).add_route(ALL_OUTPUTS, "mono", 0.43);
-
-	UPD7759(config, m_upd7759);
-	m_upd7759->md_w(0);
-	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
+	m_ym2151->add_route(ALL_OUTPUTS, "mono", 0.43);
 	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.48);
 #endif
 }

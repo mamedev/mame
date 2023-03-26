@@ -21,27 +21,112 @@
 
 #include "emu.h"
 #include "megadriv.h"
-#include "megadriv_rad.h"
 
-// todo, use actual MD map, easier once maps are part of base class.
-void megadriv_radica_state::megadriv_base_map(address_map &map)
+
+namespace {
+
+class megadriv_radica_state_base : public md_ctrl_state
 {
-	map(0x000000, 0x3fffff).r(FUNC(megadriv_radica_state::read)); /* Cartridge Program Rom */
-	map(0xa00000, 0xa01fff).rw(FUNC(megadriv_radica_state::megadriv_68k_read_z80_ram), FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(megadriv_radica_state::megadriv_68k_YM2612_read), FUNC(megadriv_radica_state::megadriv_68k_YM2612_write));
-	map(0xa06000, 0xa06001).w(FUNC(megadriv_radica_state::megadriv_68k_z80_bank_write));
-	map(0xa10000, 0xa1001f).rw(FUNC(megadriv_radica_state::megadriv_68k_io_read), FUNC(megadriv_radica_state::megadriv_68k_io_write));
-	map(0xa11100, 0xa11101).rw(FUNC(megadriv_radica_state::megadriv_68k_check_z80_bus), FUNC(megadriv_radica_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(FUNC(megadriv_radica_state::megadriv_68k_req_z80_reset));
-	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
+public:
+	megadriv_radica_state_base(const machine_config &mconfig, device_type type, const char *tag) :
+		md_ctrl_state(mconfig, type, tag),
+		m_bank(0),
+		m_romsize(0x400000),
+		m_rom(*this, "maincpu")
+	{ }
+
+protected:
+	uint16_t read(offs_t offset);
+	uint16_t read_a13(offs_t offset);
+
+	void megadriv_radica_map(address_map &map);
+
+	void radica_base_map(address_map &map);
+
+	int m_bank;
+	int m_romsize;
+
+private:
+	required_region_ptr<uint16_t> m_rom;
+};
+
+
+class megadriv_radica_state : public megadriv_radica_state_base
+{
+public:
+	megadriv_radica_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_radica_state_base(mconfig, type, tag)
+	{ }
+
+	void megadriv_radica_3button_ntsc(machine_config &config);
+	void megadriv_radica_3button_pal(machine_config &config);
+
+	void megadriv_radica_6button_ntsc(machine_config &config);
+	void megadriv_radica_6button_pal(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
+
+class megadriv_dgunl_state : public megadriv_radica_state
+{
+public:
+	megadriv_dgunl_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_radica_state(mconfig, type, tag)
+	{ }
+
+	void megadriv_dgunl_ntsc(machine_config &config);
+
+	void init_dgunl3227();
+
+protected:
+	virtual void machine_start() override;
+
+	uint16_t m_a1630a = 0;
+
+private:
+	uint16_t read_a16300(offs_t offset, uint16_t mem_mask);
+	uint16_t read_a16302(offs_t offset, uint16_t mem_mask);
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	void megadriv_dgunl_map(address_map &map);
+};
+
+
+class megadriv_ra145_state : public megadriv_dgunl_state
+{
+public:
+	megadriv_ra145_state(const machine_config& mconfig, device_type type, const char* tag) :
+		megadriv_dgunl_state(mconfig, type, tag)
+	{ }
+
+	void megadriv_ra145_ntsc(machine_config &config);
+
+	void init_ra145();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	virtual void write_a1630a(offs_t offset, uint16_t data, uint16_t mem_mask) override;
+};
+
+
+
+void megadriv_radica_state_base::radica_base_map(address_map &map)
+{
+	megadriv_68k_base_map(map);
+
+	map(0x000000, 0x3fffff).r(FUNC(megadriv_radica_state_base::read)); // Cartridge Program ROM
 }
 
-void megadriv_radica_state::megadriv_radica_map(address_map &map)
+void megadriv_radica_state_base::megadriv_radica_map(address_map &map)
 {
-	megadriv_base_map(map);
-	map(0xa13000, 0xa130ff).r(FUNC(megadriv_radica_state::read_a13));
+	radica_base_map(map);
+
+	map(0xa13000, 0xa130ff).r(FUNC(megadriv_radica_state_base::read_a13));
 }
 
 uint16_t megadriv_dgunl_state::read_a16300(offs_t offset, uint16_t mem_mask)
@@ -251,7 +336,7 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 
 void megadriv_dgunl_state::megadriv_dgunl_map(address_map &map)
 {
-	megadriv_base_map(map);
+	radica_base_map(map);
 
 	map(0xa16300, 0xa16301).r(FUNC(megadriv_dgunl_state::read_a16300));
 	map(0xa16302, 0xa16303).r(FUNC(megadriv_dgunl_state::read_a16302));
@@ -259,12 +344,12 @@ void megadriv_dgunl_state::megadriv_dgunl_map(address_map &map)
 	map(0xa1630a, 0xa1630b).w(FUNC(megadriv_dgunl_state::write_a1630a));
 }
 
-uint16_t megadriv_radica_state::read(offs_t offset)
+uint16_t megadriv_radica_state_base::read(offs_t offset)
 {
 	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_romsize - 1))/2];
 }
 
-uint16_t megadriv_radica_state::read_a13(offs_t offset)
+uint16_t megadriv_radica_state_base::read_a13(offs_t offset)
 {
 	if (offset < 0x80)
 		m_bank = offset & 0x3f;
@@ -278,70 +363,60 @@ uint16_t megadriv_radica_state::read_a13(offs_t offset)
 }
 
 // controller is wired directly into unit, no controller slots
-static INPUT_PORTS_START( megadriv_radica_3button )
+static INPUT_PORTS_START( radica_3button )
 	PORT_INCLUDE( md_common )
 
-	PORT_MODIFY("PAD1")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	// TODO: how do the MENU buttons on the two controllers work?
 INPUT_PORTS_END
 
 // the 6-in-1 and Sonic Gold units really only have a single wired controller, and no way to connect a 2nd one, despite having some 2 player games!
-static INPUT_PORTS_START( megadriv_radica_3button_1player )
-	PORT_INCLUDE( megadriv_radica_3button )
+static INPUT_PORTS_START( radica_3button_1player )
+	PORT_INCLUDE( md_common )
 
 	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// TODO: how does the MENU button on the controller work?
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( megadriv_radica_6button )
-	PORT_INCLUDE( megadriv_radica_3button )
+static INPUT_PORTS_START( radica_6button )
+	PORT_INCLUDE( md_common )
 
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("PAD1") // Extra buttons for Joypad 1 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(1) PORT_NAME("%p Mode")
 
-	PORT_START("EXTRA2")    /* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN0")
-	PORT_START("UNK")
+	PORT_MODIFY("PAD2") // Extra buttons for Joypad 2 (6 button + start + mode)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("%p Z")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("%p Y")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("%p X")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(2) PORT_NAME("%p Mode")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( megadriv_msi_6button )
-	PORT_INCLUDE( megadriv_radica_3button )
-
-	PORT_START("EXTRA1")    /* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("EXTRA2") // no 2nd pad
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+static INPUT_PORTS_START( msi_6button )
+	PORT_INCLUDE( radica_6button )
 
 	PORT_MODIFY("PAD2") // no 2nd pad
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN0")
-	PORT_START("UNK")
+	PORT_START("RESET") // RESET button on controller to the left of START
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( megadriv_dgunl_1player )
-	PORT_INCLUDE( megadriv_radica_3button )
+static INPUT_PORTS_START( dgunl_1player )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED  )                                  PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("%p C") PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
+
+	PORT_MODIFY("PAD2") // no 2nd pad
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("RESET") // RESET button to the left of START
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
 
 	// the unit only has 2 buttons, A and B, strings are changed to remove references to C, even if behavior in Pac-Mania still exists and differs between them
 	// however, Pac-Man still has a test mode which requires holding A+C on startup
@@ -349,108 +424,95 @@ static INPUT_PORTS_START( megadriv_dgunl_1player )
 	PORT_CONFNAME( 0x01, 0x00, "Enable Button C" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-
-	PORT_MODIFY("PAD1")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED  )                PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01)
-
-	PORT_MODIFY("PAD2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void megadriv_radica_6button_state::machine_start()
+
+void megadriv_radica_state::machine_start()
 {
-	md_base_state::machine_start();
+	megadriv_radica_state_base::machine_start();
+
 	m_vdp->stop_timers();
-
-	m_io_pad_6b[0] = ioport("EXTRA1");
-	m_io_pad_6b[1] = ioport("EXTRA2");
-	m_io_pad_6b[2] = ioport("IN0");
-	m_io_pad_6b[3] = ioport("UNK");
-
-	// setup timers for 6 button pads
-	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = timer_alloc(FUNC(md_base_state::io_timeout_timer_callback), this);
 
 	save_item(NAME(m_bank));
 }
-
-void megadriv_radica_3button_state::machine_start()
-{
-	md_base_state::machine_start();
-	m_vdp->stop_timers();
-	save_item(NAME(m_bank));
-}
-
 
 void megadriv_dgunl_state::machine_start()
 {
-	megadriv_radica_3button_state::machine_start();
+	megadriv_radica_state::machine_start();
+
 	m_a1630a = 0;
+
 	save_item(NAME(m_a1630a));
 }
 
-void megadriv_ra145_state::machine_start()
-{
-	md_base_state::machine_start();
-	m_vdp->stop_timers();
-
-	m_io_pad_6b[0] = ioport("EXTRA1");
-	m_io_pad_6b[1] = ioport("EXTRA2");
-	m_io_pad_6b[2] = ioport("IN0");
-	m_io_pad_6b[3] = ioport("UNK");
-
-	// setup timers for 6 button pads
-	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = timer_alloc(FUNC(md_base_state::io_timeout_timer_callback), this);
-
-	m_a1630a = 0;
-	save_item(NAME(m_a1630a));
-	save_item(NAME(m_bank));
-}
 
 void megadriv_ra145_state::machine_reset()
 {
 	m_bank = 4;
-	md_base_state::machine_reset();
+	megadriv_radica_state_base::machine_reset();
 }
 
-
-void megadriv_radica_3button_state::machine_reset()
+void megadriv_radica_state::machine_reset()
 {
 	m_bank = 0;
-	md_base_state::machine_reset();
+	megadriv_radica_state_base::machine_reset();
 }
 
-void megadriv_radica_3button_state::megadriv_radica_3button_ntsc(machine_config &config)
+
+void megadriv_radica_state::megadriv_radica_3button_ntsc(machine_config &config)
 {
 	md_ntsc(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 }
 
-void megadriv_radica_3button_state::megadriv_radica_3button_pal(machine_config &config)
+void megadriv_radica_state::megadriv_radica_3button_pal(machine_config &config)
 {
 	md_pal(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
 }
 
-void megadriv_radica_6button_state::megadriv_radica_6button_pal(machine_config &config)
+void megadriv_radica_state::megadriv_radica_6button_pal(machine_config &config)
 {
-	md_pal(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
+	megadriv_radica_3button_pal(config);
+
+	ctrl1_6button(config);
+	ctrl2_6button(config);
 }
 
-void megadriv_radica_6button_state::megadriv_radica_6button_ntsc(machine_config &config)
+void megadriv_radica_state::megadriv_radica_6button_ntsc(machine_config &config)
 {
-	md_ntsc(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_radica_state::megadriv_radica_map);
+	megadriv_radica_3button_ntsc(config);
+
+	ctrl1_6button(config);
+	ctrl2_6button(config);
 }
 
 void megadriv_dgunl_state::megadriv_dgunl_ntsc(machine_config &config)
 {
 	md_ntsc(config);
+
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_dgunl_state::megadriv_dgunl_map);
 }
+
+void megadriv_ra145_state::megadriv_ra145_ntsc(machine_config &config)
+{
+	megadriv_dgunl_ntsc(config);
+
+	ctrl1_6button(config);
+	ctrl2_6button(config);
+}
+
 
 ROM_START( rad_sf2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -547,23 +609,6 @@ ROM_END
 
 
 
-
-void megadriv_radica_6button_state::init_megadriv_radica_6button_pal()
-{
-	init_megadrie();
-	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
-}
-
-void megadriv_radica_6button_state::init_megadriv_radica_6button_ntsc()
-{
-	init_megadriv();
-	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
-}
-
 void megadriv_dgunl_state::init_dgunl3227()
 {
 	uint8_t* rom = memregion("rom")->base();
@@ -646,43 +691,43 @@ void megadriv_ra145_state::init_ra145()
 {
 	m_romsize = 0x8000000;
 	init_megadriv();
-	// 6 button game, so overwrite 3 button io handlers
-	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_6button));
-	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_6button));
 }
+
+} // anonymous namespace
+
 
 // US versions show 'Genesis' on the menu,    show a www.radicagames.com splash screen, and use NTSC versions of the ROMs, sometimes region locked
 // EU versions show 'Mega Drive' on the menu, show a www.radicagames.com splash screen, and use PAL versions of the ROMs, sometimes region locked
 // UK versions show "Mega Drive' on the menu, show a www.radicauk.com splash screen,    and use PAL versions of the ROMs, sometimes region locked
 
 
-CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
+CONS( 2004, rad_gen1,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_md1,   rad_gen1, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 1 (Radica, Arcade Legends) (Europe)", 0)
 // A UK version exists, showing the Radica UK boot screen
 
-CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_md2,   rad_gen2, 0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, rad_gen2,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Genesis Collection Volume 2 (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_md2,   rad_gen2, 0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Mega Drive Collection Volume 2 (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // box calls this Volume 3
-CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadriv,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
-CONS( 2004, rad_sonicp,rad_sonic,0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (UK)", 0)
+CONS( 2004, rad_sonic, 0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (USA)", 0)
+CONS( 2004, rad_sonicp,rad_sonic,0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Super Sonic Gold (Radica Plug & Play) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
-CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_radica_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,"Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
-CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, rad_sf2,   0,        0, megadriv_radica_6button_ntsc, radica_6button,         megadriv_radica_state, init_megadriv, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (USA)", 0)
+CONS( 2004, rad_sf2p,  rad_sf2,  0, megadriv_radica_6button_pal,  radica_6button,         megadriv_radica_state, init_megadrie, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // still branded as Arcade Legends even if none of these were ever arcade games, European exclusive
-CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button,         megadriv_radica_3button_state, init_megadrie,                    "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (UK)", 0)
+CONS( 2004, rad_ssoc,  0,        0, megadriv_radica_3button_pal,  radica_3button,         megadriv_radica_state, init_megadrie, "Radica / Sensible Software / Sega", "Sensible Soccer plus [Cannon Fodder, Mega lo Mania] (Radica, Arcade Legends) (UK)", 0)
 // is there a Europe version with Radica Games boot screen and Mega Drive text?
 
 // not region locked, no Radica logos, uncertain if other regions would differ
-CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  megadriv_radica_3button_1player, megadriv_radica_3button_state, init_megadrie,                    "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
+CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button_1player, megadriv_radica_state, init_megadrie, "Radica / Sega",                     "Out Run 2019 (Radica Plug & Play, UK)", 0)
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
-CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6button,         megadriv_radica_6button_state, init_megadriv_radica_6button_ntsc,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, msi_6button,         megadriv_radica_state, init_megadriv,    "MSI / Capcom / Sega",            "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
 
 // Are these (dgunl3227, ra145) actually emulation based? there is a block of 0x40000 bytes at the start of the ROM that doesn't
 // appear to be used, very similar in both units.  Banking also seems entirely illogical unless something else is managing it.
@@ -693,7 +738,6 @@ CONS( 2018, msi_sf2,   0,        0, megadriv_radica_6button_ntsc, megadriv_msi_6
 
 // this is the only 'Pocket Player' unit to use Genesis on a Chip tech, the others are NES on a chip.
 // some versions of this unit have an additional "Add Credits with 'A' or 'B'" screen after you select Pac-Man, this version does not.
-CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, megadriv_dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
+CONS( 2018, dgunl3227, 0,        0, megadriv_dgunl_ntsc, dgunl_1player,         megadriv_dgunl_state, init_dgunl3227,    "dreamGEAR",            "My Arcade Pac-Man Pocket Player (DGUNL-3227)", 0 )
 
-CONS( 2018, ra145,     0,        0, megadriv_dgunl_ntsc, megadriv_msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )
-
+CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           megadriv_ra145_state, init_ra145,        "<unknown>",            "Retro Arcade 16 Bits Classic Edition Mini TV Game Console - 145 Classic Games - TV Arcade Plug and Play (Mega Drive bootlegs)", MACHINE_NOT_WORKING )

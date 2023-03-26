@@ -82,6 +82,7 @@
 #include "softlist_dev.h"
 
 
+namespace {
 
 class spg29x_game_state : public driver_device
 {
@@ -519,10 +520,8 @@ void spg29x_nand_game_state::nand_init(int blocksize, int blocksize_stripped)
 	// debug to allow for easy use of unidasm.exe
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"stripped_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "stripped_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(&m_strippedrom[0], blocksize_stripped * numblocks, 1, fp);
@@ -607,6 +606,8 @@ ROM_START( zone3d )
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

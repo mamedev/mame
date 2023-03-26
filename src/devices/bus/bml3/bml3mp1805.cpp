@@ -53,7 +53,6 @@ void bml3bus_mp1805_device::floppy_drives(device_slot_interface &device)
 void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 {
 	MC6843(config, m_mc6843, 500000);
-	m_mc6843->force_ready();
 	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::nmi_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "mb_6890", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);

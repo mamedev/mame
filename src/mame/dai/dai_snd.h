@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_DAI_SND_H
-#define MAME_AUDIO_DAI_SND_H
+#ifndef MAME_DAI_DAI_SND_H
+#define MAME_DAI_DAI_SND_H
 
 
 // ======================> dai_sound_device
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DAI_SOUND, dai_sound_device)
 
-#endif // MAME_AUDIO_DAI_SND_H
+#endif // MAME_DAI_DAI_SND_H

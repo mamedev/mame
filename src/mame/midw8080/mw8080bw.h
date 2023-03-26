@@ -6,8 +6,8 @@
     Midway 8080-based black and white hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_MW8080BW_H
-#define MAME_INCLUDES_MW8080BW_H
+#ifndef MAME_MIDW8080_MW8080BW_H
+#define MAME_MIDW8080_MW8080BW_H
 
 #pragma once
 
@@ -452,4 +452,4 @@ private:
 
 extern const internal_layout layout_invaders;
 
-#endif // MAME_INCLUDES_MW8080BW_H
+#endif // MAME_MIDW8080_MW8080BW_H

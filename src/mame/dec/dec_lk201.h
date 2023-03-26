@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, M. Burke
-#ifndef MAME_MACHINE_DEC_LK201_H
-#define MAME_MACHINE_DEC_LK201_H
+#ifndef MAME_DEC_DEC_LK201_H
+#define MAME_DEC_DEC_LK201_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(LK201, lk201_device)
 
-#endif // MAME_MACHINE_DEC_LK201_H
+#endif // MAME_DEC_DEC_LK201_H

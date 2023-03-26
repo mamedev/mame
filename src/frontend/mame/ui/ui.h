@@ -57,9 +57,6 @@ class laserdisc_device;
 #define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
 #define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
 
-/* cancel return value for a UI handler */
-#define UI_HANDLER_CANCEL       ((uint32_t)~0)
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -122,6 +119,12 @@ private:
 class mame_ui_manager : public ui_manager
 {
 public:
+	enum : uint32_t
+	{
+	   HANDLER_UPDATE = 1U << 0, // force video update
+	   HANDLER_CANCEL = 1U << 1  // return to in-game event handler
+	};
+
 	enum draw_mode
 	{
 		NONE,
@@ -151,15 +154,17 @@ public:
 
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
-	void update_and_render(render_container &container);
+	bool update_and_render(render_container &container);
 	render_font *get_font();
-	float get_line_height();
+	float get_line_height(float scale = 1.0F);
 	float get_char_width(char32_t ch);
-	float get_string_width(std::string_view s, float text_size = 1.0f);
+	float get_string_width(std::string_view s);
+	float get_string_width(std::string_view s, float text_size);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
 	void draw_text(render_container &container, std::string_view buf, float x, float y);
-	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr, float text_size = 1.0f);
+	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth = nullptr, float *totalheight = nullptr);
+	void draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size);
 	void draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor);
 	void draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor);
 	void draw_message_window(render_container &container, std::string_view text);
@@ -170,6 +175,8 @@ public:
 	void save_main_option();
 
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
+	void set_ui_active(bool active) { m_ui_active = active; }
+	bool ui_active() const { return m_ui_active; }
 	void show_fps_temp(double seconds);
 	void set_show_fps(bool show);
 	bool show_fps() const;
@@ -187,11 +194,9 @@ public:
 	void request_quit();
 	void draw_fps_counter(render_container &container);
 	void draw_profiler(render_container &container);
-	void start_save_state();
-	void start_load_state();
 
 	// slider controls
-	std::vector<ui::menu_item>&  get_slider_list(void);
+	std::vector<ui::menu_item>&  get_slider_list();
 
 	// metrics
 	float target_font_height() const { return m_target_font_height; }
@@ -235,16 +240,20 @@ private:
 	std::unique_ptr<render_font> m_font;
 	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
-	uint32_t                m_handler_param;
+	bool                    m_ui_active;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
 	std::unique_ptr<uint8_t []> m_non_char_keys_down;
+
 	bitmap_argb32           m_mouse_bitmap;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
+	int                     m_mouse_target;
+	std::pair<float, float> m_mouse_position;
+
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;

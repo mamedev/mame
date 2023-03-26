@@ -114,8 +114,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	m_buffered_data(0),
 	m_sprite_page(0),
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-	m_draw_phase(0),
-	m_use_sprite_write_limitation(true)
+	m_draw_phase(0)
 {
 	for (auto& elem : m_regs)
 		elem = 0;
@@ -1001,33 +1000,26 @@ void ppu2c0x_device::render_scanline()
 {
 	uint8_t line_priority[VISIBLE_SCREEN_WIDTH];
 
-	/* lets see how long it takes */
-	g_profiler.start(PROFILER_USER1);
+	// lets see how long it takes
+	auto profile = g_profiler.start(PROFILER_USER1);
 
-	/* clear the line priority for this scanline */
+	// clear the line priority for this scanline
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
 
 	m_draw_phase = PPU_DRAW_BG;
 
-	/* see if we need to render the background */
+	// see if we need to render the background
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND)
-	{
 		draw_background(line_priority);
-	}
 	else
-	{
 		draw_background_pen();
-	}
 
 	m_draw_phase = PPU_DRAW_OAM;
 
-	/* if sprites are on, draw them, but we call always to process them */
+	// if sprites are on, draw them, but we call always to process them
 	draw_sprites(line_priority);
 
 	m_draw_phase = PPU_DRAW_BG;
-
-	/* done updating, whew */
-	g_profiler.stop();
 }
 
 void ppu2c0x_device::scanline_increment_fine_ycounter()
@@ -1284,12 +1276,13 @@ void ppu2c0x_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case PPU_SPRITE_DATA: /* 4 */
-		// If the PPU is currently rendering the screen, 0xff is written instead of the desired data.
-		if (m_use_sprite_write_limitation)
-			if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
-				data = 0xff;
-		m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
-		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		// writes to sprite data during rendering do not modify memory
+		// TODO: however writes during rendering do perform a glitchy increment to the address
+		if (m_scanline > BOTTOM_VISIBLE_SCANLINE || !(m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)))
+		{
+			m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
+			m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		}
 		break;
 
 	case PPU_SCROLL: /* 5 */

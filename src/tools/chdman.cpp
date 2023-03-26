@@ -13,6 +13,7 @@
 #include "bitmap.h"
 #include "cdrom.h"
 #include "corefile.h"
+#include "coretmpl.h"
 #include "hashing.h"
 #include "md5.h"
 #include "path.h"
@@ -517,8 +518,8 @@ public:
 				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = unsigned((std::min<std::size_t>)(m_info.channels, std::size(m_audio)));
-				int16_t *samplesptr[std::size(m_audio)];
+				int channels = unsigned(std::min<std::size_t>(m_info.channels, std::size(m_audio)));
+				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
@@ -2428,8 +2429,7 @@ static void do_extract_cd(parameters_map &params)
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
 		default_name.erase(chop, default_name.size());
-	char basename[128];
-	strncpy(basename, default_name.c_str(), 127);
+	std::string basename = default_name;
 	default_name.append(".bin");
 	std::string *output_bin_file_str;
 	if (output_bin_file_fnd == params.end())
@@ -2526,17 +2526,15 @@ static void do_extract_cd(parameters_map &params)
 		std::vector<uint8_t> buffer;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			std::string trackbin_name(basename);
+			std::string trackbin_name = basename;
 
 			if (mode == MODE_GDI)
 			{
-				char temp[11];
-				sprintf(temp, "%02d", tracknum+1);
-				trackbin_name.append(temp);
+				trackbin_name += util::string_format("%02d", tracknum+1);
 				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
-					trackbin_name.append(".raw");
+					trackbin_name += ".raw";
 				else
-					trackbin_name.append(".bin");
+					trackbin_name += ".bin";
 
 				output_bin_file.reset();
 

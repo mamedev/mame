@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "common.h"
@@ -279,8 +279,9 @@ public:
 
 		if (kNaturalAlignment >= _align)
 		{
+			intptr_t _ptrOld = intptr_t(_ptr);
 			void* ptr = ::realloc(_ptr, _size);
-			bx::debugPrintf("%s(%d): REALLOC %p (old %p) of %d byte(s)\n", _file, _line, ptr, _ptr, _size);
+			bx::debugPrintf("%s(%d): REALLOC %p (old %p) of %d byte(s)\n", _file, _line, ptr, _ptrOld, _size);
 
 			if (NULL == _ptr)
 			{
@@ -328,6 +329,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;

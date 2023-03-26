@@ -38,7 +38,7 @@ Known games on this hardware include....
 Game                      (C)      Year
 ---------------------------------------
 Racing Jam                Konami   1998
-Racing Jam : Chapter 2    Konami   1998
+Racing Jam : Chapter II   Konami   1998
 Thrill Drive              Konami   1998
 
 
@@ -51,7 +51,7 @@ DIPSW are present on the main board (instead of on the filter board) and the
 SOIC8 chip (an XICOR X76F041 Secure SerialFlash) is not populated (the solder pads are there though).
 There's an extra sound IC AN7395S (not populated on Hornet).
 The PALs/PLDs are the same on both NWK-TR and Hornet.
-Both Racing JAM/Chapter 2 and Thrill Drive use two video boards.
+Both Racing JAM/Chapter II and Thrill Drive use two video boards.
 The top video board is set to MASTER/TWIN, lower video board is set to SLAVE
 They are otherwise identical.
 
@@ -1357,14 +1357,15 @@ ROM_END
 // GQ picked because it uses the least number of devices that need to be emulated for controls and boots without device errors.
 // Change the first two bytes in the NVRAM and fix the checksum at 0x0e-0x0f (calculated as the negated sum of 0x00-0x0e as 16-bit big endian values)
 // to generate new NVRAMs in the future when more of the hardware is emulated.
-GAME( 1998, racingj,    0,       nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",            GAME_FLAGS )
-GAME( 1998, racingje,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",            GAME_FLAGS )
-GAME( 1998, racingjj,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",            GAME_FLAGS )
-GAME( 1998, racingja,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",            GAME_FLAGS )
-GAME( 1998, racingj2,   racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888UAA)", GAME_FLAGS )
-GAME( 1998, racingj2e,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888EAA)", GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888JAA)", GAME_FLAGS )
-GAME( 1998, racingj2a,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter 2 (GQ888AAA)", GAME_FLAGS )
+GAME( 1998, racingj,    0,       nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676UAC)",             GAME_FLAGS )
+GAME( 1998, racingje,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",             GAME_FLAGS )
+GAME( 1998, racingjj,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",             GAME_FLAGS )
+GAME( 1998, racingja,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",             GAME_FLAGS )
+
+GAME( 1998, racingj2,   0,       nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)", GAME_FLAGS )
+GAME( 1998, racingj2e,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)", GAME_FLAGS )
+GAME( 1998, racingj2j,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)", GAME_FLAGS )
+GAME( 1998, racingj2a,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)", GAME_FLAGS )
 
 // JAx and ABx revisions are for the DX cabinet type with a full 5+R type gear shifter and a clutch pedal.
 // The EDx version asks you to select if you have a hand brake lever installed, a clutch pedal installed,

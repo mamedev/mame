@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SETA_H
-#define MAME_INCLUDES_SETA_H
+#ifndef MAME_SETA_SETA_H
+#define MAME_SETA_SETA_H
 
 #pragma once
 
@@ -165,6 +165,7 @@ protected:
 	void ipl1_ack_w(u16 data);
 	u16 ipl2_ack_r();
 	void ipl2_ack_w(u16 data);
+	void vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask);
 	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
@@ -611,4 +612,4 @@ private:
 	void show_outputs();
 };
 
-#endif // MAME_INCLUDES_SETA_H
+#endif // MAME_SETA_SETA_H

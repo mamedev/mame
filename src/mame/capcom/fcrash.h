@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_FCRASH_H
-#define MAME_INCLUDES_FCRASH_H
+#ifndef MAME_CAPCOM_FCRASH_H
+#define MAME_CAPCOM_FCRASH_H
 
 #pragma once
 
@@ -128,4 +128,4 @@ private:
 	void fcrash_build_palette() override;
 };
 
-#endif // MAME_INCLUDES_FCRASH_H
+#endif // MAME_CAPCOM_FCRASH_H

@@ -5,8 +5,8 @@
     Exidy Vertigo hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_VERTIGO_H
-#define MAME_INCLUDES_VERTIGO_H
+#ifndef MAME_EXIDY_VERTIGO_H
+#define MAME_EXIDY_VERTIGO_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ private:
 	microcode m_mc[MC_LENGTH];
 };
 
-#endif // MAME_INCLUDES_VERTIGO_H
+#endif // MAME_EXIDY_VERTIGO_H

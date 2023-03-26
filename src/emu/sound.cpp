@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "main.h"
 #include "speaker.h"
 
 #include "wavwrite.h"
@@ -711,7 +712,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	if (start > end)
 		start = end;
 
-	g_profiler.start(PROFILER_SOUND);
+	auto profile = g_profiler.start(PROFILER_SOUND);
 
 	// reposition our start to coincide with the current buffer end
 	attotime update_start = m_output[outputnum].end_time();
@@ -759,7 +760,6 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 #endif
 		}
 	}
-	g_profiler.stop();
 
 	// return the requested view
 	return read_stream_view(m_output_view[outputnum], start);
@@ -1481,7 +1481,7 @@ void sound_manager::update(int param)
 {
 	LOG("sound_update\n");
 
-	g_profiler.start(PROFILER_SOUND);
+	auto profile = g_profiler.start(PROFILER_SOUND);
 
 	// determine the duration of this update
 	attotime update_period = machine().time() - m_last_update;
@@ -1617,6 +1617,4 @@ void sound_manager::update(int param)
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();
-
-	g_profiler.stop();
 }

@@ -10,10 +10,9 @@
 
 #if defined(OSD_WINDOWS)
 
-// MAME headers
-#include "emu.h"
-
 #include "input_windows.h"
+
+#include "input_wincommon.h"
 
 #include "winmain.h"
 #include "window.h"
@@ -21,7 +20,11 @@
 #include "modules/lib/osdlib.h"
 #include "strconv.h"
 
+// MAME headers
+#include "inpttype.h"
+
 #include <algorithm>
+#include <cassert>
 #include <functional>
 #include <mutex>
 #include <new>
@@ -30,6 +33,8 @@
 #include <windows.h>
 #include <tchar.h>
 
+
+namespace osd {
 
 namespace {
 
@@ -222,6 +227,7 @@ std::wstring improve_name_from_usb_path(const std::wstring &regpath)
 	return trim_prefix(regstring);
 }
 
+
 //============================================================
 //  rawinput_device_improve_name
 //============================================================
@@ -262,18 +268,35 @@ std::wstring rawinput_device_improve_name(const std::wstring &name)
 
 class rawinput_device : public event_based_device<RAWINPUT>
 {
-private:
-	HANDLE  m_handle = nullptr;
-
 public:
-	rawinput_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
-		event_based_device(machine, std::move(name), std::move(id), deviceclass, module)
+	rawinput_device(std::string &&name, std::string &&id, input_module &module, HANDLE handle) :
+		event_based_device(std::move(name), std::move(id), module),
+		m_handle(handle)
 	{
 	}
 
 	HANDLE device_handle() const { return m_handle; }
-	void set_handle(HANDLE handle) { m_handle = handle; }
+
+	bool reconnect_candidate(std::string_view i) const { return !m_handle && (id() == i); }
+
+	void detach_device()
+	{
+		assert(m_handle);
+		m_handle = nullptr;
+		osd_printf_verbose("RawInput: %s [ID %s] disconnected\n", name(), id());
+	}
+
+	void attach_device(HANDLE handle)
+	{
+		assert(!m_handle);
+		m_handle = handle;
+		osd_printf_verbose("RawInput: %s [ID %s] reconnected\n", name(), id());
+	}
+
+private:
+	HANDLE m_handle;
 };
+
 
 //============================================================
 //  rawinput_keyboard_device
@@ -282,20 +305,18 @@ public:
 class rawinput_keyboard_device : public rawinput_device
 {
 public:
-	keyboard_state keyboard;
-
-	rawinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
-		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
-		keyboard({ { 0 } })
+	rawinput_keyboard_device(std::string &&name, std::string &&id, input_module &module, HANDLE handle) :
+		rawinput_device(std::move(name), std::move(id), module, handle),
+		m_keyboard({ { 0 } })
 	{
 	}
 
-	void reset() override
+	virtual void reset() override
 	{
-		memset(&keyboard, 0, sizeof(keyboard));
+		memset(&m_keyboard, 0, sizeof(m_keyboard));
 	}
 
-	void process_event(RAWINPUT &rawinput) override
+	virtual void process_event(RAWINPUT const &rawinput) override
 	{
 		// determine the full DIK-compatible scancode
 		uint8_t scancode = (rawinput.data.keyboard.MakeCode & 0x7f) | ((rawinput.data.keyboard.Flags & RI_KEY_E0) ? 0x80 : 0x00);
@@ -305,9 +326,37 @@ public:
 			return;
 
 		// set or clear the key
-		keyboard.state[scancode] = (rawinput.data.keyboard.Flags & RI_KEY_BREAK) ? 0x00 : 0x80;
+		m_keyboard.state[scancode] = (rawinput.data.keyboard.Flags & RI_KEY_BREAK) ? 0x00 : 0x80;
 	}
+
+	virtual void configure(input_device &device) override
+	{
+		keyboard_trans_table const &table = keyboard_trans_table::instance();
+
+		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
+		{
+			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
+			WCHAR keyname[100];
+
+			// generate the name
+			if (GetKeyNameTextW(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
+				_snwprintf(keyname, std::size(keyname), L"Scan%03d", keynum);
+			std::string name = text::from_wstring(keyname);
+
+			// add the item to the device
+			device.add_item(
+					name,
+					util::string_format("SCAN%03d", keynum),
+					itemid,
+					generic_button_get_state<std::uint8_t>,
+					&m_keyboard.state[keynum]);
+		}
+	}
+
+private:
+	keyboard_state m_keyboard;
 };
+
 
 //============================================================
 //  rawinput_mouse_device
@@ -315,59 +364,91 @@ public:
 
 class rawinput_mouse_device : public rawinput_device
 {
-private:
-	std::mutex  m_device_lock;
 public:
-	mouse_state mouse;
-
-	rawinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
-		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
-		mouse({0})
+	rawinput_mouse_device(std::string &&name, std::string &&id, input_module &module, HANDLE handle) :
+		rawinput_device(std::move(name), std::move(id), module, handle),
+		m_mouse({0}),
+		m_x(0),
+		m_y(0),
+		m_z(0)
 	{
 	}
 
-	void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		mouse.lX = 0;
-		mouse.lY = 0;
-		mouse.lZ = 0;
-
-		rawinput_device::poll();
+		rawinput_device::poll(relative_reset);
+		if (relative_reset)
+		{
+			m_mouse.lX = std::exchange(m_x, 0);
+			m_mouse.lY = std::exchange(m_y, 0);
+			m_mouse.lZ = std::exchange(m_z, 0);
+		}
 	}
 
-	void reset() override
+	virtual void reset() override
 	{
-		memset(&mouse, 0, sizeof(mouse));
+		memset(&m_mouse, 0, sizeof(m_mouse));
+		m_x = m_y = m_z = 0;
 	}
 
-	void process_event(RAWINPUT &rawinput) override
+	virtual void configure(input_device &device) override
+	{
+		// populate the axes
+		for (int axisnum = 0; axisnum < 3; axisnum++)
+		{
+			device.add_item(
+					default_axis_name[axisnum],
+					std::string_view(),
+					input_item_id(ITEM_ID_XAXIS + axisnum),
+					generic_axis_get_state<LONG>,
+					&m_mouse.lX + axisnum);
+		}
+
+		// populate the buttons
+		for (int butnum = 0; butnum < 5; butnum++)
+		{
+			device.add_item(
+					default_button_name(butnum),
+					std::string_view(),
+					input_item_id(ITEM_ID_BUTTON1 + butnum),
+					generic_button_get_state<BYTE>,
+					&m_mouse.rgbButtons[butnum]);
+		}
+	}
+
+	virtual void process_event(RAWINPUT const &rawinput) override
 	{
 
 		// If this data was intended for a rawinput mouse
 		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
 		{
 
-			mouse.lX += rawinput.data.mouse.lLastX * osd::INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += rawinput.data.mouse.lLastY * osd::INPUT_RELATIVE_PER_PIXEL;
+			m_x += rawinput.data.mouse.lLastX * input_device::RELATIVE_PER_PIXEL;
+			m_y += rawinput.data.mouse.lLastY * input_device::RELATIVE_PER_PIXEL;
 
-			// update zaxis
+			// update Z axis (vertical scroll)
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				mouse.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
+				m_z += int16_t(rawinput.data.mouse.usButtonData) * input_device::RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) mouse.rgbButtons[0] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   mouse.rgbButtons[0] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) mouse.rgbButtons[1] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   mouse.rgbButtons[1] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) mouse.rgbButtons[2] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   mouse.rgbButtons[2] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) mouse.rgbButtons[3] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   mouse.rgbButtons[3] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) mouse.rgbButtons[4] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   mouse.rgbButtons[4] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) m_mouse.rgbButtons[0] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   m_mouse.rgbButtons[0] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) m_mouse.rgbButtons[1] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   m_mouse.rgbButtons[1] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) m_mouse.rgbButtons[2] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   m_mouse.rgbButtons[2] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) m_mouse.rgbButtons[3] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   m_mouse.rgbButtons[3] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) m_mouse.rgbButtons[4] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   m_mouse.rgbButtons[4] = 0x00;
 		}
 	}
+
+private:
+	mouse_state m_mouse;
+	LONG m_x, m_y, m_z;
 };
+
 
 //============================================================
 //  rawinput_lightgun_device
@@ -375,79 +456,117 @@ public:
 
 class rawinput_lightgun_device : public rawinput_device
 {
-private:
-	std::mutex  m_device_lock;
 public:
-	mouse_state          lightgun;
-
-	rawinput_lightgun_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
-		rawinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_LIGHTGUN, module),
-		lightgun({0})
+	rawinput_lightgun_device(std::string &&name, std::string &&id, input_module &module, HANDLE handle) :
+		rawinput_device(std::move(name), std::move(id), module, handle),
+		m_lightgun({0}),
+		m_z(0)
 	{
 	}
 
-	void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		lightgun.lZ = 0;
-
-		rawinput_device::poll();
+		rawinput_device::poll(relative_reset);
+		if (relative_reset)
+			m_lightgun.lZ = std::exchange(m_z, 0);
 	}
 
-	void reset() override
+	virtual void reset() override
 	{
-		memset(&lightgun, 0, sizeof(lightgun));
+		memset(&m_lightgun, 0, sizeof(m_lightgun));
+		m_z = 0;
 	}
 
-	void process_event(RAWINPUT &rawinput) override
+	virtual void configure(input_device &device) override
+	{
+		// populate the axes
+		for (int axisnum = 0; axisnum < 2; axisnum++)
+		{
+			device.add_item(
+					default_axis_name[axisnum],
+					std::string_view(),
+					input_item_id(ITEM_ID_XAXIS + axisnum),
+					generic_axis_get_state<LONG>,
+					&m_lightgun.lX + axisnum);
+		}
+
+		// scroll wheel is always relative if present
+		device.add_item(
+				default_axis_name[2],
+				std::string_view(),
+				ITEM_ID_ADD_RELATIVE1,
+				generic_axis_get_state<LONG>,
+				&m_lightgun.lZ);
+
+		// populate the buttons
+		for (int butnum = 0; butnum < 5; butnum++)
+		{
+			device.add_item(
+					default_button_name(butnum),
+					std::string_view(),
+					input_item_id(ITEM_ID_BUTTON1 + butnum),
+					generic_button_get_state<BYTE>,
+					&m_lightgun.rgbButtons[butnum]);
+		}
+	}
+
+	virtual void process_event(RAWINPUT const &rawinput) override
 	{
 		// If this data was intended for a rawinput lightgun
 		if (rawinput.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)
 		{
 
 			// update the X/Y positions
-			lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, osd::INPUT_ABSOLUTE_MAX);
-			lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, osd::INPUT_ABSOLUTE_MAX);
+			m_lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, input_device::ABSOLUTE_MAX);
+			m_lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, input_device::ABSOLUTE_MAX);
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				lightgun.lZ += static_cast<int16_t>(rawinput.data.mouse.usButtonData) * osd::INPUT_RELATIVE_PER_PIXEL;
+				m_z += int16_t(rawinput.data.mouse.usButtonData) * input_device::RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) lightgun.rgbButtons[0] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   lightgun.rgbButtons[0] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) lightgun.rgbButtons[1] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   lightgun.rgbButtons[1] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) lightgun.rgbButtons[2] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   lightgun.rgbButtons[2] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) lightgun.rgbButtons[3] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   lightgun.rgbButtons[3] = 0x00;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) lightgun.rgbButtons[4] = 0x80;
-			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   lightgun.rgbButtons[4] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) m_lightgun.rgbButtons[0] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)   m_lightgun.rgbButtons[0] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) m_lightgun.rgbButtons[1] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)   m_lightgun.rgbButtons[1] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) m_lightgun.rgbButtons[2] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)   m_lightgun.rgbButtons[2] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) m_lightgun.rgbButtons[3] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)   m_lightgun.rgbButtons[3] = 0x00;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) m_lightgun.rgbButtons[4] = 0x80;
+			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)   m_lightgun.rgbButtons[4] = 0x00;
 		}
 	}
+
+private:
+	mouse_state m_lightgun;
+	LONG m_z;
 };
+
 
 //============================================================
 //  rawinput_module - base class for rawinput modules
 //============================================================
 
-class rawinput_module : public wininput_module
+class rawinput_module : public wininput_module<rawinput_device>
 {
 private:
 	std::mutex  m_module_lock;
 
 public:
-	rawinput_module(const char *type, const char *name) : wininput_module(type, name)
+	rawinput_module(const char *type, const char *name) : wininput_module<rawinput_device>(type, name)
 	{
 	}
 
-	bool probe() override
+	virtual bool probe() override
 	{
 		return true;
 	}
 
-	void input_init(running_machine &machine) override
+	virtual void input_init(running_machine &machine) override
 	{
+		wininput_module<rawinput_device>::input_init(machine);
+
 		// get initial number of devices
 		UINT device_count = 0;
 		if (GetRawInputDeviceList(nullptr, &device_count, sizeof(RAWINPUTDEVICELIST)) != 0)
@@ -479,11 +598,7 @@ public:
 
 		// iterate backwards through devices; new devices are added at the head
 		for (int devnum = retrieved - 1; devnum >= 0; devnum--)
-			add_rawinput_device(machine, rawinput_devices[devnum]);
-
-		// don't enable global inputs when debugging
-		if (!machine.options().debug())
-			m_global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
+			add_rawinput_device(rawinput_devices[devnum]);
 
 		// If we added no devices, no need to register for notifications
 		if (devicelist().empty())
@@ -494,26 +609,21 @@ public:
 		registration.usUsagePage = usagepage();
 		registration.usUsage = usage();
 		registration.dwFlags = RIDEV_DEVNOTIFY;
-		if (m_global_inputs_enabled)
+		if (background_input())
 			registration.dwFlags |= RIDEV_INPUTSINK;
-		registration.hwndTarget = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+		registration.hwndTarget = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 
 		// register the device
 		RegisterRawInputDevices(&registration, 1, sizeof(registration));
 	}
 
 protected:
-	virtual void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) = 0;
+	virtual void add_rawinput_device(RAWINPUTDEVICELIST const &device) = 0;
 	virtual USHORT usagepage() = 0;
 	virtual USHORT usage() = 0;
 
-	int init_internal() override
-	{
-		return 0;
-	}
-
 	template<class TDevice>
-	TDevice *create_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &rawinputdevice)
+	TDevice *create_rawinput_device(input_device_class deviceclass, RAWINPUTDEVICELIST const &rawinputdevice)
 	{
 		// determine the length of the device name, allocate it, and fetch it if not nameless
 		UINT name_length = 0;
@@ -528,34 +638,30 @@ protected:
 		if (wcsstr(tname.get(), L"Root#RDP_") != nullptr)
 			return nullptr;
 
-		// improve the name and then allocate a device
-		std::string utf8_name = osd::text::from_wstring(rawinput_device_improve_name(tname.get()));
+		// improve the name
+		std::string utf8_name = text::from_wstring(rawinput_device_improve_name(tname.get()));
 
 		// set device ID to raw input name
-		std::string utf8_id = osd::text::from_wstring(tname.get());
+		std::string utf8_id = text::from_wstring(tname.get());
 
 		tname.reset();
 
-		TDevice &devinfo = devicelist().create_device<TDevice>(machine, std::move(utf8_name), std::move(utf8_id), *this);
-
-		// Add the handle
-		devinfo.set_handle(rawinputdevice.hDevice);
-
-		return &devinfo;
+		// allocate a device
+		return &create_device<TDevice>(
+				deviceclass,
+				std::move(utf8_name),
+				std::move(utf8_id),
+				rawinputdevice.hDevice);
 	}
 
-	bool handle_input_event(input_event eventid, void *eventdata) override
+	virtual bool handle_input_event(input_event eventid, void *eventdata) override
 	{
 		switch (eventid)
 		{
 		// handle raw input data
 		case INPUT_EVENT_RAWINPUT:
 			{
-				// ignore if not enabled
-				if (!input_enabled())
-					return false;
-
-				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
 
 				BYTE small_buffer[4096];
 				std::unique_ptr<BYTE []> larger_buffer;
@@ -595,13 +701,12 @@ protected:
 							devicelist().end(),
 							[input] (auto const &device)
 							{
-								auto devinfo = dynamic_cast<rawinput_device *>(device.get());
-								return devinfo && (input->header.hDevice == devinfo->device_handle());
+								return input->header.hDevice == device->device_handle();
 							});
 					if (devicelist().end() == target_device)
 						return false;
 
-					static_cast<rawinput_device *>(target_device->get())->queue_events(input, 1);
+					(*target_device)->queue_events(input, 1);
 					return true;
 				}
 			}
@@ -609,7 +714,7 @@ protected:
 
 		case INPUT_EVENT_ARRIVAL:
 			{
-				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
 
 				// determine the length of the device name, allocate it, and fetch it if not nameless
 				UINT name_length = 0;
@@ -619,7 +724,7 @@ protected:
 				std::unique_ptr<WCHAR []> tname = std::make_unique<WCHAR []>(name_length + 1);
 				if (name_length > 1 && GetRawInputDeviceInfoW(rawinputdevice, RIDI_DEVICENAME, tname.get(), &name_length) == UINT(-1))
 					return false;
-				std::string utf8_id = osd::text::from_wstring(tname.get());
+				std::string utf8_id = text::from_wstring(tname.get());
 				tname.reset();
 
 				std::lock_guard<std::mutex> scope_lock(m_module_lock);
@@ -630,20 +735,19 @@ protected:
 						devicelist().end(),
 						[&utf8_id] (auto const &device)
 						{
-							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
-							return devinfo && !devinfo->device_handle() && (devinfo->id() == utf8_id);
+							return device->reconnect_candidate(utf8_id);
 						});
 				if (devicelist().end() == target_device)
 					return false;
 
-				static_cast<rawinput_device *>(target_device->get())->set_handle(rawinputdevice);
+				(*target_device)->attach_device(rawinputdevice);
 				return true;
 			}
 			break;
 
 		case INPUT_EVENT_REMOVAL:
 			{
-				HRAWINPUT rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
+				HRAWINPUT const rawinputdevice = *static_cast<HRAWINPUT *>(eventdata);
 
 				std::lock_guard<std::mutex> scope_lock(m_module_lock);
 
@@ -653,15 +757,14 @@ protected:
 						devicelist().end(),
 						[rawinputdevice] (auto const &device)
 						{
-							auto devinfo = dynamic_cast<rawinput_device *>(device.get());
-							return devinfo && (rawinputdevice == devinfo->device_handle());
+							return rawinputdevice == device->device_handle();
 						});
 
 				if (devicelist().end() == target_device)
 					return false;
 
 				(*target_device)->reset();
-				static_cast<rawinput_device *>(target_device->get())->set_handle(nullptr);
+				(*target_device)->detach_device();
 				return true;
 			}
 			break;
@@ -675,6 +778,7 @@ protected:
 	}
 };
 
+
 //============================================================
 //  keyboard_input_rawinput - rawinput keyboard module
 //============================================================
@@ -682,44 +786,25 @@ protected:
 class keyboard_input_rawinput : public rawinput_module
 {
 public:
-	keyboard_input_rawinput()
-		: rawinput_module(OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
+	keyboard_input_rawinput() : rawinput_module(OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 	{
 	}
 
 protected:
-	USHORT usagepage() override { return 1; }
-	USHORT usage() override { return 6; }
+	virtual USHORT usagepage() override { return 1; }
+	virtual USHORT usage() override { return 6; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
+	virtual void add_rawinput_device(RAWINPUTDEVICELIST const &device) override
 	{
 		// make sure this is a keyboard
 		if (device.dwType != RIM_TYPEKEYBOARD)
 			return;
 
 		// allocate and link in a new device
-		auto *devinfo = create_rawinput_device<rawinput_keyboard_device>(machine, device);
-		if (devinfo == nullptr)
-			return;
-
-		keyboard_trans_table &table = keyboard_trans_table::instance();
-
-		// populate it
-		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
-		{
-			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
-			WCHAR keyname[100];
-
-			// generate the name
-			if (GetKeyNameTextW(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, std::size(keyname)) == 0)
-				_snwprintf(keyname, std::size(keyname), L"Scan%03d", keynum);
-			std::string name = osd::text::from_wstring(keyname);
-
-			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
-		}
+		create_rawinput_device<rawinput_keyboard_device>(DEVICE_CLASS_KEYBOARD, device);
 	}
 };
+
 
 //============================================================
 //  mouse_input_rawinput - rawinput mouse module
@@ -728,47 +813,25 @@ protected:
 class mouse_input_rawinput : public rawinput_module
 {
 public:
-	mouse_input_rawinput()
-		: rawinput_module(OSD_MOUSEINPUT_PROVIDER, "rawinput")
+	mouse_input_rawinput() : rawinput_module(OSD_MOUSEINPUT_PROVIDER, "rawinput")
 	{
 	}
 
 protected:
-	USHORT usagepage() override { return 1; }
-	USHORT usage() override { return 2; }
+	virtual USHORT usagepage() override { return 1; }
+	virtual USHORT usage() override { return 2; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
+	virtual void add_rawinput_device(RAWINPUTDEVICELIST const &device) override
 	{
 		// make sure this is a mouse
 		if (device.dwType != RIM_TYPEMOUSE)
 			return;
 
 		// allocate and link in a new device
-		auto *devinfo = create_rawinput_device<rawinput_mouse_device>(machine, device);
-		if (devinfo == nullptr)
-			return;
-
-		// populate the axes
-		for (int axisnum = 0; axisnum < 3; axisnum++)
-		{
-			devinfo->device()->add_item(
-				default_axis_name[axisnum],
-				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
-				generic_axis_get_state<LONG>,
-				&devinfo->mouse.lX + axisnum);
-		}
-
-		// populate the buttons
-		for (int butnum = 0; butnum < 5; butnum++)
-		{
-			devinfo->device()->add_item(
-				default_button_name(butnum),
-				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
-				generic_button_get_state<BYTE>,
-				&devinfo->mouse.rgbButtons[butnum]);
-		}
+		create_rawinput_device<rawinput_mouse_device>(DEVICE_CLASS_MOUSE, device);
 	}
 };
+
 
 //============================================================
 //  lightgun_input_rawinput - rawinput lightgun module
@@ -777,61 +840,47 @@ protected:
 class lightgun_input_rawinput : public rawinput_module
 {
 public:
-	lightgun_input_rawinput()
-		: rawinput_module(OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
+	lightgun_input_rawinput() : rawinput_module(OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
 	{
 	}
 
 protected:
-	USHORT usagepage() override { return 1; }
-	USHORT usage() override { return 2; }
+	virtual USHORT usagepage() override { return 1; }
+	virtual USHORT usage() override { return 2; }
 
-	void add_rawinput_device(running_machine &machine, RAWINPUTDEVICELIST const &device) override
+	virtual void add_rawinput_device(RAWINPUTDEVICELIST const &device) override
 	{
-
 		// make sure this is a mouse
 		if (device.dwType != RIM_TYPEMOUSE)
 			return;
 
 		// allocate and link in a new device
-		auto *devinfo = create_rawinput_device<rawinput_lightgun_device>(machine, device);
-		if (devinfo == nullptr)
-			return;
-
-		// populate the axes
-		for (int axisnum = 0; axisnum < 3; axisnum++)
-		{
-			devinfo->device()->add_item(
-				default_axis_name[axisnum],
-				static_cast<input_item_id>(ITEM_ID_XAXIS + axisnum),
-				generic_axis_get_state<LONG>,
-				&devinfo->lightgun.lX + axisnum);
-		}
-
-		// populate the buttons
-		for (int butnum = 0; butnum < 5; butnum++)
-		{
-			devinfo->device()->add_item(
-				default_button_name(butnum),
-				static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
-				generic_button_get_state<BYTE>,
-				&devinfo->lightgun.rgbButtons[butnum]);
-		}
+		create_rawinput_device<rawinput_lightgun_device>(DEVICE_CLASS_LIGHTGUN, device);
 	}
 };
 
 } // anonymous namespace
 
+} // namespace osd
+
 #else // defined(OSD_WINDOWS)
 
 #include "input_module.h"
+
+namespace osd {
+
+namespace {
 
 MODULE_NOT_SUPPORTED(keyboard_input_rawinput, OSD_KEYBOARDINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(mouse_input_rawinput, OSD_MOUSEINPUT_PROVIDER, "rawinput")
 MODULE_NOT_SUPPORTED(lightgun_input_rawinput, OSD_LIGHTGUNINPUT_PROVIDER, "rawinput")
 
+} // anonymous namespace
+
+} // namespace osd
+
 #endif // defined(OSD_WINDOWS)
 
-MODULE_DEFINITION(KEYBOARDINPUT_RAWINPUT, keyboard_input_rawinput)
-MODULE_DEFINITION(MOUSEINPUT_RAWINPUT, mouse_input_rawinput)
-MODULE_DEFINITION(LIGHTGUNINPUT_RAWINPUT, lightgun_input_rawinput)
+MODULE_DEFINITION(KEYBOARDINPUT_RAWINPUT, osd::keyboard_input_rawinput)
+MODULE_DEFINITION(MOUSEINPUT_RAWINPUT, osd::mouse_input_rawinput)
+MODULE_DEFINITION(LIGHTGUNINPUT_RAWINPUT, osd::lightgun_input_rawinput)

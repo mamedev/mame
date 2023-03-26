@@ -58,6 +58,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "acrnsys1.lh"
 
 
+namespace {
+
 class acrnsys1_state : public driver_device
 {
 public:
@@ -66,6 +68,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ttl74145(*this, "ic8_7445")
 		, m_cass(*this, "cassette")
+		, m_keyboard(*this, "X%u", 0U)
 		, m_display(*this, "digit%u", 0U)
 	{ }
 
@@ -83,6 +86,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
+	required_ioport_array<8> m_keyboard;
 	output_finder<9> m_display;
 	uint8_t m_digit = 0;
 	uint8_t m_cass_data[4]{};
@@ -115,9 +119,7 @@ uint8_t acrnsys1_state::ins8154_b1_port_a_r()
 	{
 		if (BIT(key_line, i))
 		{
-			char kbdrow[6];
-			sprintf(kbdrow,"X%X",i);
-			data = (ioport(kbdrow)->read() & 0x38) | m_digit;
+			data = (m_keyboard[i]->read() & 0x38) | m_digit;
 			break;
 		}
 	}
@@ -299,6 +301,8 @@ ROM_START( acrnsys1 )
 	ROM_REGION(0x0200, "maincpu", 0)
 	ROM_LOAD("acrnsys1.bin", 0x0000, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

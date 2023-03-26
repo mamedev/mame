@@ -1,14 +1,17 @@
 .. _index-commandline:
 
-Commandline Index
-=================
+Command-line Index
+==================
 
-This is a complete index of all commandline options and commands for MAME, suitable for quickly finding a given command.
+This is a complete index of all command-line options and verbs for MAME,
+suitable for quickly finding a given option.
 
-Universal Commandline Options
------------------------------
 
-This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
+Universal Command-line Options
+------------------------------
+
+This section contains configuration options that are applicable to *all* MAME
+configurations (including both SDL and Windows native).
 
 
 Core Verbs
@@ -36,6 +39,7 @@ Frontend Verbs
 | :ref:`listbrothers <mame-commandline-listbrothers>`
 | :ref:`listcrc <mame-commandline-listcrc>`
 | :ref:`listroms <mame-commandline-listroms>`
+| :ref:`listbios <mame-commandline-listbios>`
 | :ref:`listsamples <mame-commandline-listsamples>`
 | :ref:`verifyroms <mame-commandline-verifyroms>`
 | :ref:`verifysamples <mame-commandline-verifysamples>`
@@ -53,11 +57,15 @@ OSD-related Options
 ~~~~~~~~~~~~~~~~~~~
 
 | :ref:`uimodekey <mame-commandline-uimodekey>`
+| :ref:`controller_map <mame-commandline-controllermap>`
+| :ref:`background_input <mame-commandline-backgroundinput>`
 | :ref:`uifontprovider <mame-commandline-uifontprovider>`
 | :ref:`keyboardprovider <mame-commandline-keyboardprovider>`
 | :ref:`mouseprovider <mame-commandline-mouseprovider>`
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
+| :ref:`midiprovider <mame-commandline-midiprovider>`
+| :ref:`networkprovider <mame-commandline-networkprovider>`
 
 
 OSD CLI Verbs
@@ -260,6 +268,7 @@ Core Input Options
 | :ref:`joystick_map <mame-commandline-joystickmap>`
 | :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
 | :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
+| :ref:`joystick_threshold <mame-commandline-joystickthreshold>`
 | :ref:`[no]natural <mame-commandline-natural>`
 | :ref:`[no]joystick_contradictory <mame-commandline-joystickcontradictory>`
 | :ref:`coin_impulse <mame-commandline-coinimpulse>`
@@ -351,8 +360,11 @@ PortAudio Options
 | :ref:`pa_latency <mame-commandline-palatency>`
 
 
-Windows-Specific Commandline Options
-------------------------------------
+Windows-Specific Command-line Options
+-------------------------------------
+
+This section contains configuration options that are specific to the native
+(non-SDL) Windows version of MAME.
 
 
 Windows Performance Options
@@ -377,10 +389,12 @@ Windows Input Device Options
 | :ref:`[no]dual_lightgun <mame-wcommandline-duallightgun>`
 
 
-SDL-Specific Commandline Options
---------------------------------
 
-This section contains configuration options that are specific to any build supported by SDL (including Windows where compiled as SDL instead of native).
+SDL-Specific Command-line Options
+---------------------------------
+
+This section contains configuration options that are specific to any build
+supported by SDL (including Windows when built with SDL instead of native).
 
 
 SDL Performance Options

@@ -5,8 +5,8 @@
     UPL "sprite framebuffer" hardware
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_NINJAKD2_H
-#define MAME_INCLUDES_NINJAKD2_H
+#ifndef MAME_UPL_NINJAKD2_H
+#define MAME_UPL_NINJAKD2_H
 
 #pragma once
 
@@ -126,7 +126,6 @@ private:
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
-
 };
 
 class robokid_state : public mnight_state
@@ -202,4 +201,4 @@ private:
 	int m_io_protection_tick = 0;
 };
 
-#endif // MAME_INCLUDES_NINJAKD2_H
+#endif // MAME_UPL_NINJAKD2_H

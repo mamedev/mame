@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_M90_H
-#define MAME_INCLUDES_M90_H
+#ifndef MAME_IREM_M90_H
+#define MAME_IREM_M90_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ private:
 	void quizf1_main_cpu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M90_H
+#endif // MAME_IREM_M90_H

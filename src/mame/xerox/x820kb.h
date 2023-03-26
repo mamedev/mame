@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_X820KB_H
-#define MAME_MACHINE_X820KB_H
+#ifndef MAME_XEROX_X820KB_H
+#define MAME_XEROX_X820KB_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 DECLARE_DEVICE_TYPE(XEROX_820_KEYBOARD, xerox_820_keyboard_device)
 
 
-#endif // MAME_MACHINE_X820KB_H
+#endif // MAME_XEROX_X820KB_H

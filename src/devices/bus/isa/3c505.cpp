@@ -405,7 +405,8 @@ void isa16_3c505_device::acr_w(u8 data)
 	if ((data ^ m_acr) & ACR_LED2)
 		m_led[1] = bool(data & ACR_LED2);
 
-	m_net->reset_w((data & ACR_R586) ? 1 : 0);
+	if ((data ^ m_acr) & ACR_R586)
+		m_net->reset_w((data & ACR_R586) ? 1 : 0);
 
 	if ((data ^ m_acr) & ACR_FLSH)
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_VIDEO_PCD_H
-#define MAME_VIDEO_PCD_H
+#ifndef MAME_SIEMENS_PCD_H
+#define MAME_SIEMENS_PCD_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)
 DECLARE_DEVICE_TYPE(PCX_VIDEO, pcx_video_device)
 
-#endif // MAME_VIDEO_PCD_H
+#endif // MAME_SIEMENS_PCD_H

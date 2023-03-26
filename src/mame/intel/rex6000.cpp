@@ -42,6 +42,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MAKE_BANK(lo, hi)       ((lo) | ((hi)<<8))
 
 //irq flag/mask bits
@@ -1051,6 +1053,9 @@ ROM_START( oz750 )
 	ROM_REGION( 0x200000, "flash1a", ROMREGION_ERASEFF )
 	ROM_LOAD( "oz750_1.bin", 0x0000, 0x100000, CRC(d74e97d7) SHA1(19d17393a9af85e07773feaf1aed5e2cfa80f7cc))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

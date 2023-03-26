@@ -94,6 +94,9 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define LOG_TLCS_TO_PPC_COMMANDS        0
 #define LOG_PPC_TO_TLCS_COMMANDS        0
 #define LOG_DISPLAY_LIST                    0
@@ -155,7 +158,7 @@ private:
 	uint32_t videochip_r(offs_t address);
 	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
-	void print_display_list();
+	[[maybe_unused]] void print_display_list();
 	TILE_GET_INFO_MEMBER(tile_get_info);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
 	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
@@ -917,7 +920,7 @@ ROM_START( optiger )
 	ROM_LOAD32_WORD_SWAP( "e63-22_m-h.25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) )
 	ROM_LOAD32_WORD_SWAP( "e63-16_m-l.10", 0x800002, 0x400000, CRC(d39c1e34) SHA1(6db0ce2251841db3518a9bd9c4520c3c666d19a0) )
 
-	ROM_REGION16_BE( 0xc00000, "poly", 0 )
+	ROM_REGION16_BE( 0x1000000, "poly", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "e63-09_poly0.3", 0x000000, 0x400000, CRC(c3e2b1e0) SHA1(ee71f3f59b46e26dbe2ff724da2c509267c8bf2f) )
 	ROM_LOAD16_WORD_SWAP( "e63-10_poly1.4", 0x400000, 0x400000, CRC(f4a56390) SHA1(fc3c51a7f4639479e66ad50dcc94255d94803c97) )
 	ROM_LOAD16_WORD_SWAP( "e63-11_poly2.5", 0x800000, 0x400000, CRC(2293d9f8) SHA1(16adaa0523168ee63a7a34b29622c623558fdd82) )
@@ -937,5 +940,8 @@ ROM_START( optiger )
 	ROM_LOAD( "e63-07_palce16v8h-10-4.ic43", 0x622, 0x117, CRC(eb77b03f) SHA1(567f92a4fd1fa919d5e9047ee15c058bf40855fb) )
 	ROM_LOAD( "e63-08_palce16v8h-15-4.ic49", 0x739, 0x117, CRC(c305c56d) SHA1(49592fa43c548ac6b08951d03677a3f23e9c8de8) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, init_optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
