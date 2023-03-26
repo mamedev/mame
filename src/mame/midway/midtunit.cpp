@@ -1702,4 +1702,4 @@ GAME( 1994, nbajamte3a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nb
 GAME( 1994, nbajamte2,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam: Tournament Edition (rev 2.1 2/06/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, nbajamte2a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam: Tournament Edition (rev 2.0 1/28/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, nbajamte1,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam: Tournament Edition (rev 1.00 1/17/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, nbajamten,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam: Tournament Edition Nani Edition (rev 5.2 8/11/95, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nbajamten,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam: Tournament Edition (Nani Edition, rev 5.2 8/11/95, prototype)", MACHINE_SUPPORTS_SAVE )
