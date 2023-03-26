@@ -4509,6 +4509,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
+---------------------------------------------------
+
+if (BUSES["ZXBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/uts_kbd/uts_kbd.h,BUSES["UTS_KBD"] = true
 ---------------------------------------------------
 
