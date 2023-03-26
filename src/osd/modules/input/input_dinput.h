@@ -87,12 +87,16 @@ public:
 	template <typename T>
 	HRESULT enum_attached_devices(int devclass, T &&callback) const
 	{
+		struct helper
+		{
+			static BOOL CALLBACK callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+			{
+				return (*reinterpret_cast<T *>(ref))(instance);
+			}
+		};
 		return m_dinput->EnumDevices(
 				devclass,
-				[] (LPCDIDEVICEINSTANCE instance, LPVOID ref) -> BOOL
-				{
-					return (*reinterpret_cast<T *>(ref))(instance);
-				},
+				&helper::callback,
 				reinterpret_cast<LPVOID>(&callback),
 				DIEDFL_ATTACHEDONLY);
 	}
