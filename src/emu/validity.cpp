@@ -836,6 +836,15 @@ void validate_rgb()
 	rgb.shl(rgbaint_t(19, 3, 21, 6));
 	check_expected("rgbaint_t::shl");
 
+	// test shift left out of range
+	expected_a = (actual_a = random_i32()) & 0;
+	expected_r = (actual_r = random_i32()) & 0;
+	expected_g = (actual_g = random_i32()) & 0;
+	expected_b = (actual_b = random_i32()) & 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shl(rgbaint_t(-19, 32, -21, 38));
+	check_expected("rgbaint_t::shl");
+
 	// test shift left immediate
 	expected_a = (actual_a = random_i32()) << 7;
 	expected_r = (actual_r = random_i32()) << 7;
@@ -843,6 +852,15 @@ void validate_rgb()
 	expected_b = (actual_b = random_i32()) << 7;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shl_imm(7);
+	check_expected("rgbaint_t::shl_imm");
+
+	// test shift left immediate out of range
+	expected_a = (actual_a = random_i32()) & 0;
+	expected_r = (actual_r = random_i32()) & 0;
+	expected_g = (actual_g = random_i32()) & 0;
+	expected_b = (actual_b = random_i32()) & 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shl_imm(32);
 	check_expected("rgbaint_t::shl_imm");
 
 	// test logical shift right
@@ -863,6 +881,15 @@ void validate_rgb()
 	rgb.shr(rgbaint_t(21, 13, 11, 17));
 	check_expected("rgbaint_t::shr");
 
+	// test logical shift right out of range
+	expected_a = (actual_a = random_i32()) & 0;
+	expected_r = (actual_r = random_i32()) & 0;
+	expected_g = (actual_g = random_i32()) & 0;
+	expected_b = (actual_b = random_i32()) & 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr(rgbaint_t(40, -18, -26, 32));
+	check_expected("rgbaint_t::shr");
+
 	// test logical shift right immediate
 	expected_a = s32(u32(actual_a = random_i32()) >> 5);
 	expected_r = s32(u32(actual_r = random_i32()) >> 5);
@@ -879,6 +906,15 @@ void validate_rgb()
 	expected_b = s32(u32(actual_b = -actual_b) >> 15);
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb.shr_imm(15);
+	check_expected("rgbaint_t::shr_imm");
+
+	// test logical shift right immediate out of range
+	expected_a = (actual_a = random_i32()) & 0;
+	expected_r = (actual_r = random_i32()) & 0;
+	expected_g = (actual_g = random_i32()) & 0;
+	expected_b = (actual_b = random_i32()) & 0;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.shr_imm(35);
 	check_expected("rgbaint_t::shr_imm");
 
 	// test arithmetic shift right
@@ -899,6 +935,15 @@ void validate_rgb()
 	rgb.sra(rgbaint_t(1, 29, 10, 22));
 	check_expected("rgbaint_t::sra");
 
+	// test arithmetic shift right out of range
+	expected_a = (actual_a = random_i32()) >> 31;
+	expected_r = (actual_r = random_i32()) >> 31;
+	expected_g = (actual_g = random_i32()) >> 31;
+	expected_b = (actual_b = random_i32()) >> 31;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra(rgbaint_t(-16, -20, 46, 32));
+	check_expected("rgbaint_t::sra");
+
 	// test arithmetic shift right immediate (method)
 	expected_a = (actual_a = random_i32()) >> 12;
 	expected_r = (actual_r = random_i32()) >> 12;
@@ -917,6 +962,15 @@ void validate_rgb()
 	rgb.sra_imm(9);
 	check_expected("rgbaint_t::sra_imm");
 
+	// test arithmetic shift right immediate out of range (method)
+	expected_a = (actual_a = random_i32()) >> 31;
+	expected_r = (actual_r = random_i32()) >> 31;
+	expected_g = (actual_g = random_i32()) >> 31;
+	expected_b = (actual_b = random_i32()) >> 31;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb.sra_imm(38);
+	check_expected("rgbaint_t::sra_imm");
+
 	// test arithmetic shift right immediate (operator)
 	expected_a = (actual_a = random_i32()) >> 7;
 	expected_r = (actual_r = random_i32()) >> 7;
@@ -933,6 +987,15 @@ void validate_rgb()
 	expected_b = (actual_b = -actual_b) >> 11;
 	rgb.set(actual_a, actual_r, actual_g, actual_b);
 	rgb >>= 11;
+	check_expected("rgbaint_t::operator>>=");
+
+	// test arithmetic shift right immediate out of range (operator)
+	expected_a = (actual_a = random_i32()) >> 31;
+	expected_r = (actual_r = random_i32()) >> 31;
+	expected_g = (actual_g = random_i32()) >> 31;
+	expected_b = (actual_b = random_i32()) >> 31;
+	rgb.set(actual_a, actual_r, actual_g, actual_b);
+	rgb >>= 41;
 	check_expected("rgbaint_t::operator>>=");
 
 	// test RGB equality comparison
@@ -2832,7 +2895,7 @@ void validity_checker::build_output_prefix(std::ostream &str) const
 //  error_output - error message output override
 //-------------------------------------------------
 
-void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
+void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)
 {
 	std::ostringstream output;
 	switch (channel)

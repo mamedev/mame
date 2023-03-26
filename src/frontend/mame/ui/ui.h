@@ -175,6 +175,8 @@ public:
 	void save_main_option();
 
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
+	void set_ui_active(bool active) { m_ui_active = active; }
+	bool ui_active() const { return m_ui_active; }
 	void show_fps_temp(double seconds);
 	void set_show_fps(bool show);
 	bool show_fps() const;
@@ -192,11 +194,9 @@ public:
 	void request_quit();
 	void draw_fps_counter(render_container &container);
 	void draw_profiler(render_container &container);
-	void start_save_state();
-	void start_load_state();
 
 	// slider controls
-	std::vector<ui::menu_item>&  get_slider_list(void);
+	std::vector<ui::menu_item>&  get_slider_list();
 
 	// metrics
 	float target_font_height() const { return m_target_font_height; }
@@ -240,6 +240,7 @@ private:
 	std::unique_ptr<render_font> m_font;
 	handler_callback_func   m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
+	bool                    m_ui_active;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;

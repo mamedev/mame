@@ -9,8 +9,8 @@
 
 #include <algorithm>
 
-#define LOG_BASE (1 << 1U)
-#define LOG_IPL (1 << 2U)
+#define LOG_BASE (1U << 1)
+#define LOG_IPL (1U << 2)
 #define VERBOSE (LOG_BASE)
 #include "logmacro.h"
 

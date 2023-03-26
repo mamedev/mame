@@ -516,17 +516,14 @@ void tc0180vcu_device::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &
 {
 	rectangle myclip = cliprect;
 
-g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	priority <<= 4;
 
 	if (m_video_control & 0x08)
 	{
 		if (priority)
-		{
-			g_profiler.stop();
 			return;
-		}
 
 		if (m_video_control & 0x10)   /*flip screen*/
 		{
@@ -606,7 +603,6 @@ g_profiler.start(PROFILER_USER1);
 			}
 		}
 	}
-g_profiler.stop();
 }
 
 void tc0180vcu_device::vblank_update()

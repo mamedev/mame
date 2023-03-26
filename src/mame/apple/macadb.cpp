@@ -9,9 +9,9 @@
 #include "emu.h"
 #include "macadb.h"
 
-#define LOG_TALK_LISTEN     (1 << 1U)
-#define LOG_STATE           (1 << 2U)
-#define LOG_LINESTATE       (1 << 3U)
+#define LOG_TALK_LISTEN     (1U << 1)
+#define LOG_STATE           (1U << 2)
+#define LOG_LINESTATE       (1U << 3)
 #define VERBOSE             (0)
 #include "logmacro.h"
 

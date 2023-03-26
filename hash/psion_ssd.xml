@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="psion_ssd" description="Psion Solid State Disks">
+
+	<!-- Series 3 -->
+
+	<software name="3achess">
+		<description>3a Chess</description>
+		<year>1995</year>
+		<publisher>Purple Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Chess_3a.rom" size="131072" crc="d1c8f7e3" sha1="05a343e2726128088f74a219a95e6b736b72a09c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="act">
+		<description>ACT!</description>
+		<year>1996</year>
+		<publisher>Symantec</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="ACT.rom" size="262144" crc="2d3ee05c" sha1="100b2df8d73e60f017f589015457b5acc3eb6f1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autoroute">
+		<description>AutoRoute Express</description>
+		<year>1995</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="Autoroute_Express_V1.0.rom" size="1048576" crc="a365cbb6" sha1="29dd1e7787d1ae90cf89262b68647e8b7ac31c5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berlitzint">
+		<description>Berlitz Interpreter</description>
+		<year>1992</year>
+		<publisher>Berlitz Publications</publisher>
+		<sharedfeat name="compatibility" value="S3,S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="Berlitz_Interpreter.rom" size="1048576" crc="d847fe72" sha1="9fd9aadcfdf040cf4f56387de6b3f1c200727b92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berlitzpbk">
+		<description>Berlitz Phrase Book</description>
+		<year>1994</year>
+		<publisher>Turing Machine Company</publisher>
+		<sharedfeat name="compatibility" value="S3,S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Berlitz_Phrase_Book.rom" size="524288" crc="79382d37" sha1="c14a4630abd102de504f81157e283dc03e7f4ef3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="datadeluxe">
+		<description>DataDeLuxe</description>
+		<year>1994</year>
+		<publisher>Pocket &amp; Soul</publisher>
+		<sharedfeat name="compatibility" value="S3,S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="DataDeluxe.rom" size="131072" crc="a0a3077d" sha1="c1b86b67a497dedd4c2652c3cd1c8a79584ef704"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enroute">
+		<description>En Route: Belgium, Netherlands, Luxembourg</description>
+		<year>1997</year>
+		<publisher>Palmtop</publisher>
+		<info name="usage" value="Requires 512K" />
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="EnRoute.rom" size="1048576" crc="5af14e37" sha1="8ce7adfad71392a2d5854c5bb1e7724ac36ce1f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fincalc">
+		<description>Financial Calculator</description>
+		<year>1993</year>
+		<publisher>Turing Machine Company</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Financial_Calculator.rom" size="131072" crc="36189a36" sha1="2f28f634f3e52ead7332c279e26b944a72b1b765"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flochart">
+		<description>FloChart</description>
+		<year>1995</year>
+		<publisher>Purple Software</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="FloChart.rom" size="131072" crc="e3ec67e4" sha1="0dc652e9de2a0059742b6e7a4310a6de10a693b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games1">
+		<description>Games 1</description>
+		<year>1993</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Games_1.rom" size="262144" crc="f552bc07" sha1="9bddddb5f8d2bffde9f707d9e91130ccd3fd5471"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games2">
+		<description>Games 2</description>
+		<year>1993</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Games_2.rom" size="262144" crc="c57a07a5" sha1="88955bd972c6bc3536e64c889e9238ff5ad482c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesd3a">
+		<description>Games Deluxe 3a</description>
+		<year>1995</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Games_Deluxe_3a.rom" size="524288" crc="4b27847c" sha1="3aae9bdf13d0448164b881786415835bedb89390"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="messenger3a">
+		<description>Messenger 3a</description>
+		<year>1995</year>
+		<publisher>Palmtop</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Palmtop_Messenger_3a.rom" size="131072" crc="5f55fdb7" sha1="16da9893de9ad26aca1884da6b31a66b474401f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="messenger3c">
+		<description>Messenger 3c</description>
+		<year>1997</year>
+		<publisher>Palmtop</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Palmtop_Messenger_3c.rom" size="131072" crc="7eff1e8a" sha1="21afe3e53b701837d5147813fa5da0f6c58cfdb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="money">
+		<description>Money</description>
+		<year>1991</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Money.rom" size="131072" crc="ebb4e1d4" sha1="5aa2028cf90fb8dfa309407465c6e214e40edc31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopoly">
+		<description>Monopoly</description>
+		<year>1997</year>
+		<publisher>Psion</publisher>
+		<info name="usage" value="Requires 512K" />
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Monopoly.rom" size="262144" crc="b0a5a030" sha1="fe196bb255860c6dfbab6ed0c880d881b61eaef2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paint">
+		<description>Paint &amp; Compose</description>
+		<year>1994</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Paint_Compose.rom" size="131072" crc="772c4ebf" sha1="84587c43e70dd56c40ad9dc5c71a53d9cfcc7301"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persacct">
+		<description>Personal Accounts &amp; Expenses</description>
+		<year>1993</year>
+		<publisher>Transform</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Personal_Accounts.rom" size="131072" crc="11cb3bd8" sha1="10dccee9d7ee12aa7f9438bcb15dc4cb56b46062"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="persaccta" cloneof="persacct">
+		<description>Personal Accounts &amp; Expenses 3a</description>
+		<year>1994</year>
+		<publisher>Transform</publisher>
+		<sharedfeat name="compatibility" value="S3,S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Personal_Accounts_3a.rom" size="262144" crc="cf5400f3" sha1="ffed63f1e971d5c32cfd869c2ba55d4eaf1b7df1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipemania">
+		<description>PipeMania</description>
+		<year>1993</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="PipeMania.rom" size="262144" crc="638b0af3" sha1="20c49b78b2e9d3da418b29fa2e8b2961f102ec0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabble">
+		<description>Scrabble</description>
+		<year>1996</year>
+		<publisher>Psion</publisher>
+		<info name="usage" value="Requires 256K" />
+		<sharedfeat name="compatibility" value="S3,S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="Scrabble.rom" size="1048576" crc="6e32cc02" sha1="5441d873f8a5ae95bd9085711d88fa41641321b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellchk">
+		<description>Spell Checker &amp; Thesaurus</description>
+		<year>1992</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="524288">
+				<rom name="Spell_Checker.rom" size="524288" crc="2e55032a" sha1="560a425a19b3f3d12da9a0e2127f2c67aa829082"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolkit1">
+		<description>ToolKit 1</description>
+		<year>1995</year>
+		<publisher>Purple Software</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="262144">
+				<rom name="Toolkit_1.rom" size="262144" crc="43691316" sha1="0a0349cf17fd6af43b36c92883be16ed34a06f9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

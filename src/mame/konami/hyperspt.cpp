@@ -761,8 +761,6 @@ ROM_START( hyperspt )
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 
-
-
 ROM_START( hypersptb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.5g",          0x4000, 0x2000, CRC(0cfc68a7) SHA1(48ddd444f4366a39afb589e1c5df10d815b4b64f) )
@@ -848,6 +846,8 @@ ROM_START( hpolym84 )
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
 ROM_END
 
+/* Tecfri manufactures a Road Fighter PCB (probaby bootleg) with exactly the same software as the 'roadf'
+   set, but with ROMs 'J19_E14', 'G19_E18', 'A14_E26' and 'C14_E22' split on half capacity EPROMs. */
 ROM_START( roadf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g05_g01.bin",  0x4000, 0x2000, CRC(e2492a06) SHA1(e03895b83f1529dd7bb20e1380cb60c7606db3e4) )

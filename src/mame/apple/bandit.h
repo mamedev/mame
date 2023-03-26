@@ -13,8 +13,8 @@
 
 #include "machine/pci.h"
 
-class bandit_host_device : public pci_host_device {
-	friend class aspen_host_device;
+class bandit_host_device : public pci_host_device
+{
 public:
 	template <typename T>
 	bandit_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
@@ -22,13 +22,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	bandit_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	bandit_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_dev_offset(int devOffset) { m_dev_offset = devOffset; }
 
 protected:
+	bandit_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -40,6 +41,8 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	u32 m_last_config_address;
 
 private:
 	void cpu_map(address_map &map);
@@ -68,8 +71,6 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 	aspen_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
 
 private:
 	virtual u32 be_config_address_r() override;

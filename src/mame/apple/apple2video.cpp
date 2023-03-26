@@ -687,7 +687,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				words[col] = (vaux_row[col] & 0x7f) + ((vram_row[col] & 0x7f) << 7);
 			}
 
-			if (rgbmode < 0)
+			if (monochrome)
 			{
 				render_line(p, words, startcol, stopcol, monochrome, true);
 			}

@@ -80,10 +80,13 @@ public:
 		m_bus0i(*this, BUS0I_TAG),
 		m_bus0x(*this, BUS0X_TAG),
 		m_bus1(*this, BUS1_TAG),
-		m_bus2(*this, BUS2_TAG)
+		m_bus2(*this, BUS2_TAG),
+		m_kb(*this, ABC_KEYBOARD_PORT_TAG)
 	{ }
 
 	void abc1600(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
 
 private:
 	required_device<m68008_device> m_maincpu;
@@ -105,6 +108,7 @@ private:
 	required_device<abcbus_slot_device> m_bus0x;
 	required_device<abcbus_slot_device> m_bus1;
 	required_device<abcbus_slot_device> m_bus2;
+	required_device<abc_keyboard_port_device> m_kb;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -128,8 +132,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dmadis_w);
 	DECLARE_WRITE_LINE_MEMBER(sysscc_w);
 	DECLARE_WRITE_LINE_MEMBER(sysfs_w);
-
-	void dbrq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(dbrq0_w) { m_dbrq0 = state; update_br(); }
+	DECLARE_WRITE_LINE_MEMBER(dbrq1_w) { m_dbrq1 = state; update_br(); }
+	DECLARE_WRITE_LINE_MEMBER(dbrq2_w) { m_dbrq2 = state; update_br(); }
 
 	uint8_t cio_pa_r();
 	uint8_t cio_pb_r();
@@ -141,6 +146,7 @@ private:
 
 	void cpu_space_map(address_map &map);
 
+	void update_br();
 	void update_pren0(int state);
 	void update_pren1(int state);
 	void update_drdy0(int state);
@@ -154,6 +160,9 @@ private:
 	int m_dmadis = 0;
 	int m_sysscc = 0;
 	int m_sysfs = 0;
+	int m_dbrq0 = CLEAR_LINE;
+	int m_dbrq1 = CLEAR_LINE;
+	int m_dbrq2 = CLEAR_LINE;
 
 	void abc1600_mem(address_map &map);
 	void mac_mem(address_map &map);

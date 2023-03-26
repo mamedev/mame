@@ -921,6 +921,8 @@ def code_find_deps(ci):
             return [DEP.aluo, expr_deps(ci[4])]
         else:
             return [DEP.aluo, expr_deps(ci[4]) | expr_deps(ci[5])]
+    elif ci[0] == "trap":
+        return [0, expr_deps(ci[1:])]
     print(ci)
     sys.exit(1)
 
@@ -1464,12 +1466,15 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     if upd_ssw:
         code.append(["update_ssw"])
 
-    if wait_bus_finish:
-        code.append(["bus_end"])
-
     if drop_critical:
         code.append(["drop_critical"])
-        
+
+    if tvn_to_ftu:
+        if tvn != None:
+            code.append(["trap", tvn])
+        else:
+            code.append(["trap", macro_tvn])
+
     dbl_to_pcl = dbl_to_reg and pcl_dbl
     dbh_to_pch = dbh_to_reg and pch_dbh
     abl_to_pcl = abl_to_reg and pcl_abl
@@ -1600,17 +1605,18 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             code_to_sort.append(["=sri"])
         else:
             code_to_sort.append(["=sri7"])
-        
+
     if tvn_to_ftu:
         if tvn != None:
             if type(tvn) == str:
                 code_to_sort.append(["=", R.ftu, tvn])
             else:
                 code_to_sort.append(["=", R.ftu, "c", tvn << 2])
-        elif type(macro_tvn) == str:
-            code_to_sort.append(["=", R.ftu, macro_tvn])
         else:
-            code_to_sort.append(["=", R.ftu, "c", macro_tvn << 2])
+            if type(macro_tvn) == str:
+                code_to_sort.append(["=", R.ftu, macro_tvn])
+            else:
+                code_to_sort.append(["=", R.ftu, "c", macro_tvn << 2])
 
     if ird_to_ftu:
         code_to_sort.append(["=", R.ftu, R.ird])
@@ -1635,9 +1641,6 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
         
     
     # T4
-    if to_irc:
-        code_to_sort.append(["=", R.irc, R.edb])
-
     if au_clk_en:
 #        code.append(["i", "// auc=%s dbl=%s dbh=%s (%d %d) abl=%s abh=%s ftuc=%x" % (au_cntrl, dbl, dbh, dbl_dbd, dbl_dbh, abl, abh, nanox(nano, 39, 4))])
         if au_cntrl == 0:
@@ -1674,14 +1677,6 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             else:
                 code_to_sort.append(["=", R.aul, "-1/2", maybe_merge(dbh, dbl), "ry"])
 
-    if to_dbin:
-        if no_high_byte:
-            code_to_sort.append(["=8", R.dbin, R.edb])
-        elif no_low_byte:
-            code_to_sort.append(["=8h", R.dbin, R.edb])
-        else:
-            code_to_sort.append(["=", R.dbin, R.edb])
-
     if alu_op:
         if ftu_to_ccr or no_ccr_en or not (alu_info & (ALUInfo.init|ALUInfo.finish)):
             alu_mask = 0
@@ -1715,6 +1710,20 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             code_to_sort.append(["alu", alu_op, alu_mask, alu_info, ["c", 0], ["c", 0]])
 
     sort_and_append(code_to_sort, code)
+
+    if wait_bus_finish:
+        code.append(["bus_end"])
+
+    if to_irc:
+        code.append(["=", R.irc, R.edb])
+
+    if to_dbin:
+        if no_high_byte:
+            code.append(["=8", R.dbin, R.edb])
+        elif no_low_byte:
+            code.append(["=8h", R.dbin, R.edb])
+        else:
+            code.append(["=", R.dbin, R.edb])
 
     if const_to_ftu:
         code.append(["i", "set_ftu_const();"])
@@ -2267,6 +2276,11 @@ def generate_source_from_code(code, gen_mode):
                     source.append("\t\tgoto %s;" % ci[1][2])
                     source.append("\telse")
                     source.append("\t\tgoto %s;" % ci[1][3])
+            elif ci[0] == "trap":
+                if type(ci[1]) == str:
+                    source.append("\tdebugger_exception_hook((%s) >> 2);" % make_expression(ci[1]))
+                else:
+                    source.append("\tdebugger_exception_hook(0x%02x);" % ci[1])
             else:
                 source.append("\t%s" % ci)
 

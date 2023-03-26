@@ -1162,7 +1162,7 @@ void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data)
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	switch (offset)
 	{
@@ -1302,8 +1302,6 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 		}
 	}
-
-g_profiler.stop();
 }
 
 
@@ -1314,7 +1312,7 @@ void ddenlovr_state::blitter_w_funkyfig(int blitter, offs_t offset, uint8_t data
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	switch(offset)
 	{
@@ -1459,8 +1457,6 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 		}
 	}
-
-g_profiler.stop();
 }
 
 
@@ -1476,7 +1472,7 @@ void hanakanz_state::hanakanz_blitter_data_w(uint8_t data)
 {
 	int hi_bits;
 
-g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	hi_bits = (m_ddenlovr_blit_latch & 0x03) << 8;
 
@@ -1657,8 +1653,6 @@ g_profiler.start(PROFILER_VIDEO);
 			logerror("%06x: Blitter 0 reg %02x = %02x\n", m_maincpu->pc(), m_ddenlovr_blit_latch, data);
 			break;
 	}
-
-g_profiler.stop();
 }
 
 
@@ -10029,11 +10023,11 @@ WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
 void mmpanic_state::mmpanic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000) / 2);
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
 
-	Z80(config, m_soundcpu, XTAL(14'318'181) / 4);
+	Z80(config, m_soundcpu, 14.318181_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_sound_portmap);
 
@@ -10062,15 +10056,15 @@ void mmpanic_state::mmpanic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2413(config, "ym2413", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	AY8910(config, "aysnd", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", 14.318181_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki, XTAL(14'318'181) / 14, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 14.318181_MHz_XTAL / 14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-	msm6242_device &rtc(MSM6242(config, "rtc", XTAL(32'768)));
+	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set(FUNC(mmpanic_state::mmpanic_rtc_irq));
 }
 
@@ -10090,7 +10084,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
 	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
@@ -10122,9 +10116,9 @@ void hanakanz_state::hanakanz(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ym2413", XTAL(28'375'160) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", 28.37516_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 28.37516_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */

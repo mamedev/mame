@@ -439,19 +439,15 @@ void model2_tgp_state::copro_tgp_data_map(address_map &map)
 	map(0x0200, 0x03ff).ram();
 }
 
-void model2_tgp_state::copro_tgp_bank_map(address_map &map)
+void model2_tgp_state::copro_tgp_io_map(address_map &map)
 {
 	map(0x00020, 0x00023).rw(FUNC(model2_tgp_state::copro_sincos_r), FUNC(model2_tgp_state::copro_sincos_w));
 	map(0x00024, 0x00027).rw(FUNC(model2_tgp_state::copro_atan_r), FUNC(model2_tgp_state::copro_atan_w));
 	map(0x00028, 0x00029).rw(FUNC(model2_tgp_state::copro_inv_r), FUNC(model2_tgp_state::copro_inv_w));
 	map(0x0002a, 0x0002b).rw(FUNC(model2_tgp_state::copro_isqrt_r), FUNC(model2_tgp_state::copro_isqrt_w));
 
-	map(0x10000, 0x1ffff).rw(FUNC(model2_tgp_state::copro_tgp_memory_r), FUNC(model2_tgp_state::copro_tgp_memory_w));
-}
-
-void model2_tgp_state::copro_tgp_io_map(address_map &map)
-{
-	map(0x0000, 0xffff).m(m_copro_tgp_bank, FUNC(address_map_bank_device::amap32));
+	map(0x0000, 0xffff).view(m_copro_tgp_bank);
+	m_copro_tgp_bank[0](0x0000, 0xffff).rw(FUNC(model2_tgp_state::copro_tgp_memory_r), FUNC(model2_tgp_state::copro_tgp_memory_w));
 }
 
 void model2_tgp_state::copro_tgp_rf_map(address_map &map)
@@ -491,7 +487,10 @@ void model2_tgp_state::copro_tgp_memory_w(offs_t offset, u32 data, u32 mem_mask)
 void model2_tgp_state::copro_tgp_bank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_copro_tgp_bank_reg);
-	m_copro_tgp_bank->set_bank(m_copro_tgp_bank_reg & 0xc00000 ? 1 : 0);
+	if(m_copro_tgp_bank_reg & 0xc00000)
+		m_copro_tgp_bank.select(0);
+	else
+		m_copro_tgp_bank.disable();
 }
 
 void model2_tgp_state::copro_sincos_w(offs_t offset, u32 data, u32 mem_mask)
@@ -2520,14 +2519,6 @@ void model2o_state::model2o(machine_config &config)
 	m_copro_tgp->set_addrmap(AS_IO, &model2o_state::copro_tgp_io_map);
 	m_copro_tgp->set_addrmap(mb86233_device::AS_RF, &model2o_state::copro_tgp_rf_map);
 
-	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
-	m_copro_tgp_bank->set_addrmap(0, &model2o_state::copro_tgp_bank_map);
-	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
-	m_copro_tgp_bank->set_data_width(32);
-	m_copro_tgp_bank->set_addr_width(17);
-	m_copro_tgp_bank->set_shift(-2);
-	m_copro_tgp_bank->set_stride(0x10000);
-
 	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
 	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);
 
@@ -2677,14 +2668,6 @@ void model2a_state::model2a(machine_config &config)
 	m_copro_tgp->set_addrmap(AS_DATA, &model2a_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2a_state::copro_tgp_io_map);
 	m_copro_tgp->set_addrmap(mb86233_device::AS_RF, &model2a_state::copro_tgp_rf_map);
-
-	ADDRESS_MAP_BANK(config, m_copro_tgp_bank, 0);
-	m_copro_tgp_bank->set_addrmap(0, &model2a_state::copro_tgp_bank_map);
-	m_copro_tgp_bank->set_endianness(ENDIANNESS_LITTLE);
-	m_copro_tgp_bank->set_data_width(32);
-	m_copro_tgp_bank->set_addr_width(17);
-	m_copro_tgp_bank->set_shift(-2);
-	m_copro_tgp_bank->set_stride(0x10000);
 
 	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
 	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);

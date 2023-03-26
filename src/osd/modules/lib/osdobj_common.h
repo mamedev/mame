@@ -183,7 +183,7 @@ public:
 	// PortAudio options
 	const char *pa_api() const { return value(OSDOPTION_PA_API); }
 	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
-	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
+	float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
 	static const options_entry s_option_entries[];
 };
@@ -262,7 +262,7 @@ public:
 	virtual osd_options &options() { return m_options; }
 
 	// osd_output interface ...
-	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)  override;
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<char> &args)  override;
 	bool verbose() const { return m_print_verbose; }
 	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 

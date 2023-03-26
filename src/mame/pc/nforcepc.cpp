@@ -33,6 +33,7 @@
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci-ide.h"
+#include "bus/isa/isa.h"
 #include "video/virge_pci.h"
 
 
@@ -598,7 +599,10 @@ void it8703f_device::write_fdd_configuration_register(int index, int data)
 		}
 	}
 	if (index == 0x74)
+	{
+		assign_dma_channels();
 		logerror("Set FDD dma channel %d\n", configuration_registers[LogicalDevice::FDC][0x74]);
+	}
 }
 
 void it8703f_device::write_parallel_configuration_register(int index, int data)
@@ -624,7 +628,10 @@ void it8703f_device::write_parallel_configuration_register(int index, int data)
 		}
 	}
 	if (index == 0x74)
+	{
+		assign_dma_channels();
 		logerror("Set LPT dma channel %d\n", configuration_registers[LogicalDevice::Parallel][0x74]);
+	}
 }
 
 void it8703f_device::write_serial1_configuration_register(int index, int data)
@@ -1030,10 +1037,39 @@ void it8703f_device::map_extra(address_space *memory_space, address_space *io_sp
 		map_keyboard_addresses();
 }
 
-void it8703f_device::set_host(int index, lpcbus_host_interface *host)
+void it8703f_device::set_host(int device_index, lpcbus_host_interface *host)
 {
 	lpchost = host;
-	lpcindex = index;
+	lpcindex = device_index;
+	lpchost->assign_virtual_line(24 + configuration_registers[LogicalDevice::FDC][0x74], lpcindex);
+	lpchost->assign_virtual_line(24 + configuration_registers[LogicalDevice::Parallel][0x74], lpcindex);
+}
+
+uint32_t it8703f_device::dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data)
+{
+	uint32_t ret = 0;
+
+	if (enabled_logical[LogicalDevice::FDC] == true)
+		if (channel == configuration_registers[LogicalDevice::FDC][0x74])
+		{
+			if (operation == dma_operation::WRITE)
+				ret = (uint32_t)floppy_controller_fdcdev->dma_r();
+			else if (operation == dma_operation::READ)
+				floppy_controller_fdcdev->dma_w((uint8_t)data);
+			else if (operation == dma_operation::END)
+				floppy_controller_fdcdev->tc_w(data == ASSERT_LINE);
+		}
+	if (enabled_logical[LogicalDevice::Parallel] == true)
+		if (channel == configuration_registers[LogicalDevice::Parallel][0x74])
+			printf("it8703f_device::dma_transfer LPT channel %d op %d size %d\n", channel, (int)operation, (int)size);
+	return ret;
+}
+
+void it8703f_device::assign_dma_channels()
+{
+	lpchost->assign_virtual_line(-1, lpcindex); // remove assigments
+	lpchost->assign_virtual_line(24 + configuration_registers[LogicalDevice::FDC][0x74], lpcindex);
+	lpchost->assign_virtual_line(24 + configuration_registers[LogicalDevice::Parallel][0x74], lpcindex);
 }
 
 /*
@@ -1171,6 +1207,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
+	isa.set_dma_space("maincpu", AS_OPCODES);
 	it8703f_device &ite(IT8703F(config, "pci:01.0:0", 0));
 	ite.pin_reset().set_inputline("maincpu", INPUT_LINE_RESET);
 	ite.pin_gatea20().set_inputline("maincpu", INPUT_LINE_A20);
@@ -1199,6 +1236,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	mcpx_ide_device &ide(MCPX_IDE(config, "pci:09.0", 0, 0x10430c11)); // 10de:01bc NVIDIA Corporation nForce IDE
 	ide.pri_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq14));
 	ide.sec_interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq15));
+	ide.set_bus_master_space("maincpu", AS_OPCODES);
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge

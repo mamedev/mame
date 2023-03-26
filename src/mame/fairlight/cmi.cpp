@@ -104,7 +104,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_CHANNELS (1 << 1U)
+#define LOG_CHANNELS (1U << 1)
 
 #define VERBOSE     (0)
 #include "logmacro.h"

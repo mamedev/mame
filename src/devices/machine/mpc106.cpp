@@ -144,34 +144,23 @@ void mpc106_host_device::access_map(address_map &map)
 
 u32 mpc106_host_device::be_config_address_r()
 {
-	u32 temp = pci_host_device::config_address_r();
-	return (temp>>24) | (temp<<24) | ((temp & 0xff00) << 8) | ((temp & 0xff0000) >> 8);
+	return swapendian_int32(pci_host_device::config_address_r());
 }
 
 void mpc106_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 tempdata;
-
-	//printf("config_address_w: %08x mask %08x\n", data, mem_mask);
-
-	tempdata = (data >> 24) | (data << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8);
+	const u32 tempdata = swapendian_int32(data);
 	pci_host_device::config_address_w(offset, tempdata, mem_mask);
 }
 
 u32 mpc106_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
 {
-	u32 temp = pci_host_device::config_data_r(offset, mem_mask);
-	//printf("config_data_r: @ %08x mask %08x => %08x\n", offset, mem_mask, temp);
-	return (temp >> 24) | (temp << 24) | ((temp & 0xff00) << 8) | ((temp & 0xff0000) >> 8);
+	return swapendian_int32(pci_host_device::config_data_r(offset, mem_mask));
 }
 
 void mpc106_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 tempdata;
-
-	//printf("config_data_w: %08x @ %08x mask %08x\n", data, offset, mem_mask);
-
-	tempdata = (data >> 24) | (data << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8);
+	const u32 tempdata = swapendian_int32(data);
 	pci_host_device::config_data_w(offset, tempdata, mem_mask);
 }
 

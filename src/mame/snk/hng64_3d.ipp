@@ -9,10 +9,11 @@
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	: poly_manager<float, hng64_poly_data, 7>(state.machine())
 	, m_state(state)
-	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
-	const int32_t bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	const int32_t bufferSize = 512 * 512;
 	m_depthBuffer3d = std::make_unique<float[]>(bufferSize);
+	m_colorBuffer3d = std::make_unique<uint16_t[]>(bufferSize);
+
 }
 
 
@@ -73,7 +74,7 @@ void hng64_state::dl_upload_w(uint32_t data)
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
@@ -83,7 +84,6 @@ g_profiler.start(PROFILER_USER1);
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
 	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200*8));
-g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
@@ -182,6 +182,7 @@ void hng64_state::setCameraTransformation(const uint16_t* packet)
 	// [10] - xxxx ... Extrinsic camera matrix
 	// [11] - xxxx ... Extrinsic camera matrix
 	// [12] - xxxx ... Extrinsic camera matrix
+	// following might be unused leftover data
 	// [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
 	// [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
 	// [15] - ???? ... ? Same as 13 & 14
@@ -224,6 +225,7 @@ void hng64_state::setLighting(const uint16_t* packet)
 	// [7]  - ???? ... ? Seems to be another light vector ?
 	// [8]  - ???? ... ? Seems to be another light vector ?
 	// [9]  - xxxx ... Strength according to sams64_2 (in combination with vector length) [0,512]
+	// following could just be leftover data
 	// [10] - ???? ... ? Used in fatfurwa
 	// [11] - ???? ... ? Used in fatfurwa
 	// [12] - ???? ... ? Used in fatfurwa
@@ -247,14 +249,15 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0011 ... ID
-	// [1]  - ???? ...
-	// [2]  - ???? ...
+	// [1]  - ???? ... texture scrolling x (c000 - ffff)
+	// [2]  - ???? ... texture scrolling y (c000 - ffff)
 	// [3]  - ???? ...
 	// [4]  - ???? ...
-	// [5]  - ???? ...
-	// [6]  - ???? ...
-	// [7]  - ???? ...
+	// [5]  - ???? ... scale?
+	// [6]  - ???? ... scale?
+	// [7]  - ???? ... scale?
 	// [8]  - xx?? ... Palette offset & ??
+	// following could just be leftover data
 	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
 	// [10] - ???? ... ? ''  ''
 	// [11] - ???? ... ? ''  ''
@@ -263,7 +266,13 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	// [14] - ???? ... ? ''  ''
 	// [15] - ???? ... ? ''  ''
 	////////////*/
-	m_paletteState3d = (packet[8] & 0xff00) >> 8;
+	m_texturescrollx = packet[1];
+	m_texturescrolly = packet[2];
+	m_paletteState3d = packet[8];
+
+	m_modelscalex = packet[5];
+	m_modelscaley = packet[6];
+	m_modelscalez = packet[7];
 }
 
 // Operation 0012
@@ -273,19 +282,20 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0012 ... ID
-	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [3]  - ???? ... ? Contains a value
+	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.  value used is 0xffc0 ( -0x40 )  64 pixels?  not used anywhere else?
+	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.  value used is 0x0018            24 pixels?  not used anywhere else?
+	// [3]  - ???? ... ? Contains a value   (always? 0x0a00)
 	// [4]  - xxxx ... Camera projection Z scale
 	// [5]  - xxxx ... Camera projection near Z
 	// [6]  - xxxx ... Camera projection screen Z
-	// [7]  - xxxx ... Camera projection (?)
-	// [8]  - xxxx ... Camera projection (?)
-	// [9]  - xxxx ... Camera projection (?)
+	// [7]  - xxxx ... Camera projection (?)  (always? 0x0b10)
+	// [8]  - xxxx ... Camera projection (?)  (always? 0x0a00)
+	// [9]  - xxxx ... Camera projection (?)  (always? 0x0b00)
 	// [10] - xxxx ... Camera projection right  - confirmed by sams64_2
 	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
 	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
 	// [13] - xxxx ... Camera projection bottom - confirmed by sams64_2
+	// following could just be leftover data
 	// [14] - ???? ... ? Gets data during buriki door-run
 	// [15] - ???? ... ? Gets data during buriki door-run
 	////////////*/
@@ -323,6 +333,61 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	m_projectionMatrix[13] = 0.0f;
 	m_projectionMatrix[14] = -((2.0f*far*near)/(far-near));
 	m_projectionMatrix[15] = 0.0f;
+
+#if 0
+	if ((packet[1] != 0x0000) || (packet[2] != 0x0000))
+		printf("camera packet[1] %04x packet[2] %04x\n", packet[1], packet[2]);
+
+	if (packet[3] != 0x0a00)
+		printf("camera packet[3] %04x\n", packet[3]);
+
+	if (packet[7] != 0x0b10)
+		printf("camera packet[7] %04x\n", packet[7]);
+
+	if (packet[8] != 0x0a00)
+		printf("camera packet[7] %04x\n", packet[8]);
+
+	if (packet[9] != 0x0b00)
+		printf("camera packet[9] %04x\n", packet[9]);
+#endif
+}
+
+void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter, const uint16_t* packet)
+{
+	currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[3] = 1.0f;
+	currentPoly.n = 3;
+
+	// this seems to be some kind of default lighting value / brightness, probably for unlit polys? used in various places, eg side of house in ice stage of ss64, some shadows
+	[[maybe_unused]] uint16_t maybe_blend = chunkOffset_verts[counter++];
+
+	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
+	if (currentPoly.flatShade)
+		currentPoly.colorIndex = chunkOffset_verts[counter] >> 5;
+	counter++;
+	currentPoly.vert[m].texCoords[1] = uToF(chunkOffset_verts[counter++]);
+
+
+	// set on the Hyper 64 logos for roadedge and xrally which are known to be scaled
+	// also set on the car select screen in roadedge, and the car on the stage name screen
+	// not set anywhere else?
+	//
+	// params for car select screen / stage name screen are always 0x100, which would be
+	// 'no scale' anyway, and no scaling is observed in hardware videos
+	//
+	// the m_modelscalex etc. do contain values in fatal fury intro, but not valid looking
+	// ones, so probably unrelated to how that screen is scaled
+	if (packet[1] & 0x0040)
+	{
+		currentPoly.vert[m].worldCoords[0] = (currentPoly.vert[m].worldCoords[0] * m_modelscalez) / 0x100;
+		currentPoly.vert[m].worldCoords[1] = (currentPoly.vert[m].worldCoords[1] * m_modelscaley) / 0x100;
+		currentPoly.vert[m].worldCoords[2] = (currentPoly.vert[m].worldCoords[2] * m_modelscalex) / 0x100;
+
+	//  if ((m_modelscalex != 0x100) || (m_modelscaley != 0x100) || (m_modelscalez != 0x100))
+	//      logerror("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
+	}
 }
 
 // Operation 0100
@@ -334,12 +399,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - --c- ---p ---b l---
+	// [1]  - ---- --cp os0b l--?
 	//      l = use lighting
 	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
+	//      o = use dynamic texture offset (sky reflection in xrally/roadedge windows, also waterfalls?)
+	//      s = use dynamic scaling (hyper64 logos on xrally/roadedge)
+	//      0 = always 0?
 	//      b = backface culling?
 	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
-	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
+	//      ? = roadedge: all vehicles ingame + select screen (also 3d maps on select screen), vehicle lights+windows only in attract, nothing else?
+	//          all vehicles ingame + select screen, vehicle lights+windows only in attract, NOT on vehicles between stages, nothing else?
+	//          nothing on other games?
 	//
 	//
 	// [2]  - xxxx ... offset into ROM
@@ -460,10 +530,13 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
-	//           ????         [11]; Used.
-	//           ????         [12]; Used.
-	//           ????         [13]; Used.
-	//           ????         [14]; Used.
+
+	// the low 8-bits of each of these is used (or at least contains data, probably one byte for each hunk?)
+	//if (threeDPointer[11] != 0x0000) logerror("3dPointer[11] is %04x!\n", threeDPointer[11]); //           ????         [11]; Used.
+	//if (threeDPointer[12] != 0x0000) logerror("3dPointer[12] is %04x!\n", threeDPointer[12]); //           ????         [12]; Used.
+	//if (threeDPointer[13] != 0x0000) logerror("3dPointer[13] is %04x!\n", threeDPointer[13]); //           ????         [13]; Used.
+	//if (threeDPointer[14] != 0x0000) logerror("3dPointer[14] is %04x!\n", threeDPointer[14]); //           ????         [14]; Used.
+
 
 	if (threeDPointer[15] != 0x0000) logerror("3dPointer[15] is non-zero!\n");
 	if (threeDPointer[16] != 0x0000) logerror("3dPointer[16] is non-zero!\n");
@@ -479,12 +552,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	address[2] |= (megaOffset << 16);
 	address[3] |= (megaOffset << 16);
 
-	// Debug - ajg
-	//uint32_t tdColor = 0xff000000;
-	//if (threeDPointer[14] & 0x0002) tdColor |= 0x00ff0000;
-	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
-	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
-
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
@@ -496,17 +563,14 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
 			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
-			// [1] tu-4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
+			// [1] ta-4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
-			//                            u = unknown, set on sams64 / buriki at times, never on racing games
+			//                            a = blend this sprite (blend might use 'lighting' level as alpha?)
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
-			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
-			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
-			//                            X = horizontal subtexture
-			//                            * = broken banners in xrally
-			//                            Y = vertical subtexture
-			//                            # = broken banners in xrally
-			//                            u = unknown, set late on 2nd race+3rd race in xrally
+			// [2] S?hh hhhh hvvv vvvv    S = use texture offsets in lower bits
+			//                            ? = unknown, sometimes used on objects further way, then flipped off, maybe precision related / texturing sampling mode?
+			//                            h = horizontal offset into texture
+			//                            v = vertical offset into texture
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
 			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..
@@ -526,10 +590,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// Syntactical simplification
 			polygon& currentPoly = m_polys[numPolys];
 
-			// Debug - Colors polygons with certain flags bright blue! ajg
-			currentPoly.debugColor = 0;
-			//currentPoly.debugColor = tdColor;
-
 			// Debug - ajg
 			//logerror("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
@@ -537,11 +597,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
 			else                         currentPoly.tex4bpp = 0x0;
 
-			currentPoly.texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
-			currentPoly.texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
-			currentPoly.texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
-
+			currentPoly.texPageSmall = chunkOffset[2];
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
+
+			// only values 07/08/09 have been observed.  Textures are only 1024 wide, so values above 09 (512) make little sense anyway
+			currentPoly.tex_mask_x = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 0];
+			currentPoly.tex_mask_y = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 1];
 
 			// Flat shaded polygon, no texture, no lighting
 			if (chunkOffset[1] & 0x8000)
@@ -549,17 +610,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			else
 				currentPoly.flatShade = true;
 
+			currentPoly.blend = false;
+
 			// PALETTE
 			currentPoly.palOffset = 0;
-
-			// FIXME: This isn't correct.
-			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
-			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
-			if (m_fbcontrol[2] & 0x20)
-			{
-				if (!m_roadedge_3d_hack)
-					currentPoly.palOffset += 0x800;
-			}
 
 			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
 			uint16_t explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
@@ -579,23 +633,40 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
 				// used for 2nd car on roadedge, used for 2nd player on buriki
 				// used for buildings in fatfurwa intro and characters
-				explicitPaletteValue |= (m_paletteState3d & 0x3f) * 0x80;
+				explicitPaletteValue |= ((m_paletteState3d >> 8) & 0x3f) * 0x80;
 			}
 
 			currentPoly.palOffset += explicitPaletteValue;
 
-#if 0
-			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
+			//if (chunkOffset[1] & 0x4000)
+			//  currentPoly.palOffset = machine().rand()&0x3ff;
+
+			//if (packet[1] & 0x0006)
+			//  currentPoly.palOffset = machine().rand()&0x3ff;
+
+			if (chunkOffset[1] & 0x4000)
+				currentPoly.blend = true;
+
+			// These are definitely the scroll values, used on player car windows and waterfalls
+			// but if we always use them things get very messy when they're used for the waterfalls on xrally
+			// as they never get turned back off again for the objects after the waterfalls
+			// Must be a conditional enable?
+			// 0x0100 is set on the cars, but not the waterfall
+			// 0x0080 is set on the cars, and the waterfall - maybe correct?
+			// 0x0001 is set on the cars, but not the waterfall
+			if ((packet[1] & 0x0080))
 			{
-			//  if (chunkOffset[2] == 0xd870)
-				{
-					currentPoly.debugColor = 0xffff0000;
-					logerror("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
-				}
+				currentPoly.texscrollx = m_texturescrollx;
+				currentPoly.texscrolly = m_texturescrolly;
 			}
-#endif
+			else
+			{
+				currentPoly.texscrollx = 0;
+				currentPoly.texscrolly = 0;
+			}
 
 			uint8_t chunkLength = 0;
+			int counter = 3;
 			switch(chunkType)
 			{
 			/*/////////////////////////
@@ -609,42 +680,31 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// ---- --x- -
 			// ---- ---x - 1 = Has per-vert normals
 			//
-			// none of these seem directly connected to texture size to solve texturing problem in the racing games
-			// maybe some of the actual packet data is being used incorrectly?
 			/////////////////////////*/
 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:  // 0000 0101
 			case 0x0f:  // 0000 1111
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter, packet);
 
-					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
+					currentPoly.vert[m].normal[0] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[1] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[2] = uToF(chunkOffset[counter++]);
 					currentPoly.vert[m].normal[3] = 0.0f;
-
-					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (9*m)] >> 5;
 				}
 
 				// Redundantly called, but it works...
-				currentPoly.faceNormal[0] = uToF(chunkOffset[30]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[31]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[32]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 33;
+				chunkLength = counter;
 				break;
+			}
 
 
 			// 24 word chunk, 3 vertices, per-vertex UVs
@@ -652,26 +712,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0x0e:  // 0000 1110
 			case 0x24:  // 0010 0100
 			case 0x2e:  // 0010 1110
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
-
-					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-
-					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[23]);
-					currentPoly.vert[m].normal[3] = 0.0f;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter, packet);
 				}
+
+				currentPoly.vert[0].normal[0] = currentPoly.vert[1].normal[0] = currentPoly.vert[2].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = currentPoly.vert[1].normal[1] = currentPoly.vert[2].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = currentPoly.vert[1].normal[2] = currentPoly.vert[2].normal[2] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[3] = currentPoly.vert[1].normal[3] = currentPoly.vert[2].normal[3] = 0.0f;
 
 				// Redundantly called, but it works...
 				currentPoly.faceNormal[0] = currentPoly.vert[2].normal[0];
@@ -679,46 +729,35 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[2] = currentPoly.vert[2].normal[2];
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 24;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
 			case 0x87:  // 1000 0111
 			case 0x97:  // 1001 0111
 			case 0xd7:  // 1101 0111
 			case 0xc7:  // 1100 0111
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				// Fill in the appropriate data...
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter, packet);
 
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
-
-				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
-				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
-				currentPoly.vert[0].normal[2] = uToF(chunkOffset[11]);
+				currentPoly.vert[0].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.vert[0].normal[3] = 0.0f;
 
-				currentPoly.faceNormal[0] = uToF(chunkOffset[12]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[13]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[14]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 15;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
 			case 0x86:  // 1000 0110
@@ -726,22 +765,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0xb6:  // 1011 0110
 			case 0xc6:  // 1100 0110
 			case 0xd6:  // 1101 0110
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
-
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter, packet);
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -755,25 +784,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal)
+				[[maybe_unused]] uint16_t unused;
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
 
-#if 0
-				// DEBUG
-				logerror("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-				for (int m = 0; m < 13; m++)
-					logerror("%04x ", chunkOffset[m]);
-				logerror("\n");
-
-				for (int m = 0; m < 13; m++)
-					logerror("%3.4f ", uToF(chunkOffset[m]));
-				logerror("\n\n");
-#endif
-
-				chunkLength = 12;
+				chunkLength = counter;
 				break;
-
+			}
 			default:
 				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
-				chunkLength = 0;
+				chunkLength = counter;
 				break;
 			}
 
@@ -817,9 +838,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
-					currentPoly.vert[v].light[0] = intensity;
-					currentPoly.vert[v].light[1] = intensity;
-					currentPoly.vert[v].light[2] = intensity;
+					currentPoly.vert[v].light = intensity;
 				}
 			}
 			else
@@ -827,12 +846,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// Just clear out the light values
 				for (int v = 0; v < 3; v++)
 				{
-					currentPoly.vert[v].light[0] = 0;
-					currentPoly.vert[v].light[1] = 0;
-					currentPoly.vert[v].light[2] = 0;
+					currentPoly.vert[v].light = 0;
 				}
 			}
-
 
 			float cullRay[4];
 			float cullNorm[4];
@@ -856,6 +872,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				else
 					currentPoly.visible = false;
 			}
+
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
@@ -883,9 +900,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
 					clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
 					clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
-					clipVerts[m].p[2] = currentPoly.vert[m].light[0];
-					clipVerts[m].p[3] = currentPoly.vert[m].light[1];
-					clipVerts[m].p[4] = currentPoly.vert[m].light[2];
+					clipVerts[m].p[2] = currentPoly.vert[m].light;
 				}
 
 				if (currentPoly.visible)
@@ -903,12 +918,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 						currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
 						currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
 						currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
-						currentPoly.vert[m].light[0] = clipVerts[m].p[2];
-						currentPoly.vert[m].light[1] = clipVerts[m].p[3];
-						currentPoly.vert[m].light[2] = clipVerts[m].p[4];
+						currentPoly.vert[m].light = clipVerts[m].p[2];
 					}
 
-					const rectangle& visarea = m_screen->visible_area();
+					//const rectangle& visarea = m_screen->visible_area();
 					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
@@ -920,12 +933,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 						// Final pixel values are garnered here :
 						float windowCoords[4];  // Mapped ndCoordinates to screen space
-						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
-						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
+						windowCoords[0] = (ndCoords[0]+1.0f) * (512.0f / 2.0f) + 0.0f;
+						windowCoords[1] = (ndCoords[1]+1.0f) * (512.0f / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
 						// Flip Y
-						windowCoords[1] = (float)visarea.max_y - windowCoords[1];
+						windowCoords[1] = 512.0f - windowCoords[1];
 
 						// Store the points in a list for later use...
 						currentPoly.vert[m].clipCoords[0] = windowCoords[0];
@@ -1044,14 +1057,14 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 void hng64_state::clear3d()
 {
 	// Reset the buffers...
-	const rectangle& visarea = m_screen->visible_area();
-	for (int i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
+	//const rectangle& visarea = m_screen->visible_area();
+	for (int i = 0; i < 512*512; i++)
 	{
 		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
+		m_poly_renderer->colorBuffer3d()[i] = 0;
 	}
 
-	// Clear the 3d rasterizer buffer
-	m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());
+
 
 	m_paletteState3d = 0;
 
@@ -1095,6 +1108,8 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 
 	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
 	   according to above table bit 0x20 is color base, but implementation for it is a hack
+	   roadedge ends up leaving 0x20 set after the car selection, which breaks ingame 3D palette if
+	   we use it as a palette base? see hack
 
 	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
 
@@ -1104,44 +1119,123 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 	m_fbcontrol[offset] = data;
 }
 
-void hng64_state::hng64_fbunkpair_w(offs_t offset, uint16_t data)
-{
-	// set to fixed values?
 
-	logerror("%s: hng64_fbunkpair_w (%03x) %04x\n", machine().describe_context(), offset, data);
+// the framebuffer scroll and scale registers are used in fatfurwa (intro scaling) and xrally (course select, car select)
+// they are NOT used for buriki 'how to play' scren, which uses unhandled values in the 3d packets to reposition the fighters instead
+void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_fbscale[offset]);
+
+	if (mem_mask & 0xffff0000)
+	{
+		// NORMAL value is 3fe0 (0x400 / 2 = 0x200 = 512)
+		// ':maincpu' (8006E46C): hng64_fb_scale_x 3fe00000 ffff0000
+
+		// on xrally course select this is 39e0 (0x3a0 / 2 = 0x1d0 = 464)
+		// hng64_fb_scale_x 39e00000 ffff0000
+
+		//logerror("%s: hng64_fb_scale_x %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
+
+	if (mem_mask & 0x0000ffff)
+	{
+		// NORMAL value is 37e0  (0x380 / 2 = 0x1c0 = 448)
+		// hng64_fb_scale_y 000037e0 0000ffff
+
+		// on xrally course select this is 32e0 (0x330 / 2 = 408)
+		// hng64_fb_scale_y 000032e0 0000ffff
+
+		// during fatfurwa scaled intro it uses 2de0, although writes 37e0 in the same frame; presumably rendering takes place while it is 2de0 though
+		// 0x2e0 / 2 = 0x170 = 368    (needs to be ~287 pixels though)
+		// ':maincpu' (800667A0): hng64_fb_scale_y 00002de0 0000ffff
+		//logerror("%s: hng64_fb_scale_y %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
 }
 
-void hng64_state::hng64_fbscroll_w(offs_t offset, uint16_t data)
+void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	COMBINE_DATA(&m_fbscroll[offset]);
+
 	// this is used ingame on the samsho games, and on the car select screen in xrally (youtube video confirms position of car needs to change)
-
-	logerror("%s: hng64_fbscroll_w (%03x) %04x\n", machine().describe_context(), offset, data);
-}
-
-void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)
+	if (mem_mask & 0xffff0000)
 	{
-		// | ---- --?x | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
-		logerror("%s: hng64_unkbyte_w (%03x) %02x\n", machine().describe_context(), offset, data);
+		// NORMAL value is e000 (e0 = 224)
+		// hng64_fbscroll x e0000000 ffff0000
+
+		// on xrally course select this is e600  (+0600 from normal)
+		// ':maincpu' (8002327C): hng64_fbscroll x e6000000 ffff0000
+
+		// on xrally car select this is e680
+		// hng64_fbscroll x e6800000 ffff0000
+		//logerror("%s: hng64_fbscroll x %08x (%d) %08x\n", machine().describe_context(), data, ((data&0x7fff0000) >> 21), mem_mask);
 	}
-	else
+
+	if (mem_mask & 0x0000ffff)
 	{
-		logerror("%s: hng64_unkbyte_w (%03x - unexpected) %02x \n", machine().describe_context(), offset, data);
+		// NORMAL value is 1c00  (1c0 = 448) /2 = 224 (midpoint y?)
+		// ':maincpu' (8006FA18): hng64_fbscroll y 00001c00 0000ffff
+
+		// on xrally course select this is 1700  (0x170 = 368)
+		// ':maincpu' (8002327C): hng64_fbscroll y 00001700 0000ffff (-0500 from normal)
+
+		// on xrally car select this is 1260 (and needs to be higher up)
+		// ':maincpu' (80012820): hng64_fbscroll y 00001260 0000ffff
+		// 00001a60 on screen after, not quite as high up, but higher than 1c00
+		//logerror("%s: hng64_fbscroll y %08x (%d) %08x\n", machine().describe_context(), data, (data >> 5), mem_mask);
 	}
 }
 
-// this is a table filled with 0x0? data, seems to be 16-bit values
-uint32_t hng64_state::hng64_fbtable_r(offs_t offset, uint32_t mem_mask)
+void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	logerror("%s: hng64_fbtable_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-	return m_fbtable[offset];
+	COMBINE_DATA(&m_fbunk[offset]);
+
+	// | ---- --?x ---- ---- ---- ---- ---- ----| unknown
+	// is 02 in most games, 03 in samsh4 games
+	// could be related to how fbscrolly is applied?
+
+	logerror("%s: hng64_unkbyte_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
-void hng64_state::hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+/*
+this is a table filled with 0x0? data, seems to be 8-bit values
+
+roadedge  08080808 08080808 08080808 08080808 08080808 08080808 08080707 08080909 (ingame)
+          08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808 (hyper logo)
+
+xrally    08080808 08080808 08070707 08070807 07070807 08070707 08070707 07070808 (comms screen + ingame)
+          08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808 (hyper logo)
+
+buriki    08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+fatfurwa  08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+bbust2    08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+
+sams64    00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
+sams64_2  00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
+
+these values are used in the rendering, to control the size at which a texture wraps on each of
+the texture pages.
+*/
+uint8_t hng64_state::hng64_texture_wrapsize_table_r(offs_t offset)
 {
-	logerror("%s: hng64_fbtable_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-	COMBINE_DATA(&m_fbtable[offset]);
+	logerror("%s: hng64_texture_wrapsize_table_r (%03x)\n", machine().describe_context(), offset * 4);
+	return m_texture_wrapsize_table[offset];
+}
+
+void hng64_state::hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: hng64_texture_wrapsize_table_w (%03x) %08x\n", machine().describe_context(), offset * 4, data);
+	m_texture_wrapsize_table[offset] = data;
+
+#if 0
+	{
+		printf("m_texture_wrapsize_table is now\n");
+		for (int i = 0; i < 0x20; i+=2)
+		{
+			printf("%01x:%02x,%02x| ", i/2, m_texture_wrapsize_table[i],m_texture_wrapsize_table[i+1]);
+		}
+		printf("\n");
+	}
+#endif
 }
 
 /////////////////////
@@ -1197,14 +1291,14 @@ void hng64_state::setIdentity(float *matrix)
 float hng64_state::uToF(uint16_t input)
 {
 	float retVal;
-	retVal = (float)((int16_t)input) / 32768.0f;
+	retVal = float(int16_t(input)) / 32768.0f;
 	return retVal;
 
 #if 0
-	if ((int16_t)input < 0)
-		retVal = (float)((int16_t)input) / 32768.0f;
+	if (int16_t(input) < 0)
+		retVal = float(int16_t(input)) / 32768.0f;
 	else
-		retVal = (float)((int16_t)input) / 32767.0f;
+		retVal = float(int16_t(input)) / 32767.0f;
 #endif
 }
 
@@ -1213,9 +1307,9 @@ void hng64_state::normalize(float* x)
 	double l2 = (x[0]*x[0]) + (x[1]*x[1]) + (x[2]*x[2]);
 	double l = sqrt(l2);
 
-	x[0] = (float)(x[0] / l);
-	x[1] = (float)(x[1] / l);
-	x[2] = (float)(x[2] / l);
+	x[0] = float(x[0] / l);
+	x[1] = float(x[1] / l);
+	x[2] = float(x[2] / l);
 }
 
 
@@ -1225,57 +1319,39 @@ void hng64_state::normalize(float* x)
 
 void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
-	float lightR = extent.param[2].start;
-	float lightG = extent.param[3].start;
-	float lightB = extent.param[4].start;
+	float light = extent.param[2].start;
 	float s = extent.param[5].start;
 	float t = extent.param[6].start;
 
 	const float dz = extent.param[0].dpdx;
 	const float dw = extent.param[1].dpdx;
-	const float dlightR = extent.param[2].dpdx;
-	const float dlightG = extent.param[3].dpdx;
-	const float dlightB = extent.param[4].dpdx;
+	const float dlight = extent.param[2].dpdx;
 	const float ds = extent.param[5].dpdx;
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
 			const float tCorrect = t / w;
-			const float rCorrect = lightR / w;
-			const float gCorrect = lightG / w;
-			const float bCorrect = lightB / w;
 
-			if ((renderData.debugColor & 0xff000000) == 0x01000000)
-			{
-				// ST color mode
-				*colorBuffer = rgb_t(255, uint8_t(sCorrect*255.0f), uint8_t(tCorrect*255.0f), uint8_t(0));
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
-			{
-				// Lighting only
-				*colorBuffer = rgb_t(255, (uint8_t)rCorrect, (uint8_t)gCorrect, (uint8_t)bCorrect);
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
-			{
-				// Debug color mode
-				*colorBuffer = renderData.debugColor;
-			}
-			else
+			const float rCorrect = light / w;
+
 			{
 				float textureS = 0.0f;
 				float textureT = 0.0f;
@@ -1284,33 +1360,32 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
-#if 1
+				textureS += (renderData.texscrolly & 0x3fff)>>5;
+				textureT += (renderData.texscrollx & 0x3fff)>>5;
+
+
+				int textPageSub = (renderData.texPageSmall & 0xc000) >> 14;
+				int texPageHorizOffset = (renderData.texPageSmall & 0x3f80) >> 7;
+				int texPageVertOffset =  (renderData.texPageSmall & 0x007f) >> 0;
+
 				// Small-Page textures
-				if (renderData.texPageSmall == 2)
+				// what is textPageSub & 1 used for? seems to be enabled on almost everything? it does not control wrap enable?
+				if (textPageSub & 2)
 				{
-					textureT = fmod(textureT, 256.0f);
-					textureS = fmod(textureS, 256.0f);
-
-					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
-					textureS += (256.0f * (renderData.texPageVertOffset>>1));
+					textureT = fmod(textureT, (float)renderData.tex_mask_x); textureT += (8.0f * texPageHorizOffset);
+					textureS = fmod(textureS, (float)renderData.tex_mask_y); textureS += (8.0f * texPageVertOffset);
 				}
-				else if (renderData.texPageSmall == 3)
-				{
-					// this can't be 128x128 textures, it is needed for the road etc. in xrally which is 256 wide,
-					// but also overhead objects which are 128 (eg lamps, near top left hand side on 8bpp texture page 8)
-					textureT = fmod(textureT, 128.0f);
-					textureS = fmod(textureS, 128.0f);
-
-					textureT += (128.0f * (renderData.texPageHorizOffset >> 0));
-					textureS += (128.0f * (renderData.texPageVertOffset >> 0));
-				}
-#endif
 
 				uint8_t paletteEntry;
 				int t = (int)textureT;
+				int s = (int)textureS;
+
+				t &= 1023;
+				s &= 1023; // 4bpp pages seem to be limited to 1024 pixels, with page numbering being the same, the bottom 1024 pixels of 4bpp pages are unsed?
+
 				if (renderData.tex4bpp)
 				{
-					paletteEntry = textureOffset[((int)textureS) * 512 + (t >> 1)];
+					paletteEntry = textureOffset[s * 512 + (t >> 1)];
 
 					if (t & 1)
 						paletteEntry = (paletteEntry >> 4) & 0x0f;
@@ -1319,94 +1394,55 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				}
 				else
 				{
-					paletteEntry = textureOffset[((int)textureS) * 1024 + t];
+					paletteEntry = textureOffset[s * 1024 + t];
 				}
 
-				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
+				// pen 0 in textures is always transparent
 				if (paletteEntry != 0)
 				{
-					// The color out of the texture
-					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
+					float rIntensity = rCorrect / 16.0f;
+					uint8_t lightval = (uint8_t)rIntensity;
+					uint16_t color = ((renderData.palOffset + paletteEntry) & 0x7ff) | (lightval << 12);
+					if (renderData.blend)
+						color |= 0x800;
 
-					// Apply the lighting
-					float rIntensity = rCorrect / 255.0f;
-					float gIntensity = gCorrect / 255.0f;
-					float bIntensity = bCorrect / 255.0f;
-					float red   = color.r() * rIntensity;
-					float green = color.g() * gIntensity;
-					float blue  = color.b() * bIntensity;
-
-					// Clamp and finalize
-					red = color.r() + red;
-					green = color.g() + green;
-					blue = color.b() + blue;
-
-					if (red >= 255) red = 255;
-					if (green >= 255) green = 255;
-					if (blue >= 255) blue = 255;
-
-					color = rgb_t(255, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
-
-					*colorBuffer = color;
-					*depthBuffer = z;
+					colorBuffer[x & 511] = color;
+					depthBuffer[x & 511] = z;
 				}
 			}
 		}
 
 		z += dz;
 		w += dw;
-		lightR += dlightR;
-		lightG += dlightG;
-		lightB += dlightB;
+		light += dlight;
 		s += ds;
 		t += dt;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
 void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
-	float r = extent.param[1].start;
-	float g = extent.param[2].start;
-	float b = extent.param[3].start;
-
 	const float dz = extent.param[0].dpdx;
-	const float dr = extent.param[1].dpdx;
-	const float dg = extent.param[2].dpdx;
-	const float db = extent.param[3].dpdx;
 
 	// Pointers to the pixel buffers
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512)];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
-
-			// Clamp and finalize
-			if (r >= 255) r = 255;
-			if (g >= 255) g = 255;
-			if (b >= 255) b = 255;
-
-			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
-
-			*colorBuffer = color;
-			*depthBuffer = z;
+			colorBuffer[x & 511] = renderData.palOffset + renderData.colorIndex;
+			depthBuffer[x & 511] = z;
 		}
 
 		z += dz;
-		r += dr;
-		g += dg;
-		b += db;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
@@ -1417,16 +1453,21 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.tex4bpp = p->tex4bpp;
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
-	rOptions.debugColor = p->debugColor;
 	rOptions.texPageSmall = p->texPageSmall;
-	rOptions.texPageHorizOffset = p->texPageHorizOffset;
-	rOptions.texPageVertOffset = p->texPageVertOffset;
+	rOptions.colorIndex = p->colorIndex;
+	rOptions.blend = p->blend;
+	rOptions.texscrollx = p->texscrollx;
+	rOptions.texscrolly = p->texscrolly;
+	rOptions.tex_mask_x = p->tex_mask_x;
+	rOptions.tex_mask_y = p->tex_mask_y;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();
 	renderData = rOptions;
 
-	const rectangle& visibleArea = m_state.m_screen->visible_area();
+	rectangle visibleArea;
+	visibleArea.set(0, 512, 0, 512);
+
 
 	if (p->flatShade)
 	{
@@ -1435,34 +1476,21 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		{
 			// Build some MAME rasterizer vertices from the hng64 vertices
 			vertex_t pVert[3];
-			rgb_t color;
 
 			const polyVert& pv0 = p->vert[0];
-			color = m_state.m_palette->pen(renderData.palOffset + pv0.colorIndex);
 			pVert[0].x = pv0.clipCoords[0];
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
-			pVert[0].p[1] = color.r();
-			pVert[0].p[2] = color.g();
-			pVert[0].p[3] = color.b();
 
 			const polyVert& pvj = p->vert[j];
-			color = m_state.m_palette->pen(renderData.palOffset + pvj.colorIndex);
 			pVert[1].x = pvj.clipCoords[0];
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
-			pVert[1].p[1] = color.r();
-			pVert[1].p[2] = color.g();
-			pVert[1].p[3] = color.b();
 
 			const polyVert& pvjp1 = p->vert[j+1];
-			color = m_state.m_palette->pen(renderData.palOffset + pvjp1.colorIndex);
 			pVert[2].x = pvjp1.clipCoords[0];
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
-			pVert[2].p[1] = color.r();
-			pVert[2].p[2] = color.g();
-			pVert[2].p[3] = color.b();
 
 			render_triangle<4>(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
@@ -1474,9 +1502,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		for (int j = 0; j < p->n; j++)
 		{
 			p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
-			p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[1]      = p->vert[j].light[1]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[2]      = p->vert[j].light[2]     * p->vert[j].clipCoords[3];
+			p->vert[j].light      = p->vert[j].light     * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[0]  = p->vert[j].texCoords[0] * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 		}
@@ -1492,9 +1518,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
 			pVert[0].p[1] = pv0.clipCoords[3];
-			pVert[0].p[2] = pv0.light[0];
-			pVert[0].p[3] = pv0.light[1];
-			pVert[0].p[4] = pv0.light[2];
+			pVert[0].p[2] = pv0.light;
 			pVert[0].p[5] = pv0.texCoords[0];
 			pVert[0].p[6] = pv0.texCoords[1];
 
@@ -1503,9 +1527,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
 			pVert[1].p[1] = pvj.clipCoords[3];
-			pVert[1].p[2] = pvj.light[0];
-			pVert[1].p[3] = pvj.light[1];
-			pVert[1].p[4] = pvj.light[2];
+			pVert[1].p[2] = pvj.light;
 			pVert[1].p[5] = pvj.texCoords[0];
 			pVert[1].p[6] = pvj.texCoords[1];
 
@@ -1514,9 +1536,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
 			pVert[2].p[1] = pvjp1.clipCoords[3];
-			pVert[2].p[2] = pvjp1.light[0];
-			pVert[2].p[3] = pvjp1.light[1];
-			pVert[2].p[4] = pvjp1.light[2];
+			pVert[2].p[2] = pvjp1.light;
 			pVert[2].p[5] = pvjp1.texCoords[0];
 			pVert[2].p[6] = pvjp1.texCoords[1];
 

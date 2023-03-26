@@ -56,11 +56,12 @@ private:
 	emu_timer *m_event_timer;
 	emu_timer *m_de_timer;
 
-	u64 m_start_screen_time, m_start_line_time, m_shifter_base_x, m_shifter_update_time;
+	u64 m_start_screen_time, m_hsc_base, m_hdec_base, m_shifter_base_x, m_shifter_update_time;
+	u64 m_prev_glue_tick;
 	u64 m_load_current, m_load_end;
 	u16 m_ir[4], m_rr[4];
 	u32 m_adr_base, m_adr_live;
-	u16 m_hsc_base, m_hdec_base, m_vsc, m_vdec, m_shifter_y;
+	u16 m_vsc, m_vdec, m_shifter_y;
 	u16 m_palette[16];
 	u8 m_sync, m_res, m_vsync, m_hsync, m_vde, m_hde, m_de;
 	u8 m_mode;
@@ -85,7 +86,7 @@ private:
 	u8 res_r();
 
 	void palette_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 palette_r(offs_t offset);  
+	u16 palette_r(offs_t offset);
 
 	void hsync_on();
 	void hsync_off(u64 glue_tick);
@@ -95,8 +96,12 @@ private:
 	void update_mode();
 	void shifter_handle_load();
 	void shifter_sync(u64 now = 0);
+	void de_set(bool level);
+	std::tuple<u64, u16, u16> compute_glue_tick(u64 now);
+	void glue_sync();
 	void glue_determine_next_event();
 
+	u64 time_now();
 	void next_event(u64 when);
 	void next_de_event(u64 glue_tick, int level);
 

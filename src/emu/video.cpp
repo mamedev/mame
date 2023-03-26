@@ -239,9 +239,10 @@ void video_manager::frame_update(bool from_debugger)
 		update_throttle(current_time);
 
 	// ask the OSD to update
-	g_profiler.start(PROFILER_BLIT);
-	machine().osd().update(!from_debugger && skipped_it);
-	g_profiler.stop();
+	{
+		auto profile = g_profiler.start(PROFILER_BLIT);
+		machine().osd().update(!from_debugger && skipped_it);
+	}
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
 	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
@@ -806,7 +807,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	bool const allowed_to_sleep = (machine().options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0)) || machine().paused();
 
 	// loop until we reach our target
-	g_profiler.start(PROFILER_IDLE);
+	auto profile = g_profiler.start(PROFILER_IDLE);
 	osd_ticks_t current_ticks = osd_ticks();
 	while (current_ticks < target_ticks)
 	{
@@ -842,7 +843,6 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 		}
 		current_ticks = new_ticks;
 	}
-	g_profiler.stop();
 
 	return current_ticks;
 }
@@ -1233,7 +1233,7 @@ void video_manager::record_frame()
 		return;
 
 	// start the profiler and get the current time
-	g_profiler.start(PROFILER_MOVIE_REC);
+	auto profile = g_profiler.start(PROFILER_MOVIE_REC);
 	attotime curtime = machine().time();
 
 	bool error = false;
@@ -1252,7 +1252,6 @@ void video_manager::record_frame()
 
 	if (error)
 		end_recording();
-	g_profiler.stop();
 }
 
 

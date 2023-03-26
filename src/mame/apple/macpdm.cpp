@@ -3,20 +3,22 @@
 
 #include "emu.h"
 
-#include "bus/nubus/nubus.h"
+#include "cuda.h"
+#include "macadb.h"
+
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/nubus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "cuda.h"
-#include "macadb.h"
 #include "machine/mv_sonora.h"
 #include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
-#include "softlist_dev.h"
 #include "sound/awacs.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -280,17 +282,18 @@ void macpdm_state::driver_init()
 
 	m_maincpu->space().install_read_tap(0x4000c2e0, 0x4000c2e7, 0, "cuda", [this](offs_t offset, u64 &data, u64 mem_mask) {
 											if(mem_mask == 0xffff000000000000) {
+												address_space *space;
 												offs_t badr = m_maincpu->state_int(PPC_R16);
-												m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, badr);
+												m_maincpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, badr, space);
 												logerror("cuda packet %08x : type %02x cmd %02x - %02x %02x %02x %02x bytecnt %04x\n",
 														 badr,
-														 m_maincpu->space().read_byte(badr),
-														 m_maincpu->space().read_byte(badr+1),
-														 m_maincpu->space().read_byte(badr+2),
-														 m_maincpu->space().read_byte(badr+3),
-														 m_maincpu->space().read_byte(badr+4),
-														 m_maincpu->space().read_byte(badr+5),
-														 m_maincpu->space().read_word(badr+6));
+														 space->read_byte(badr),
+														 space->read_byte(badr+1),
+														 space->read_byte(badr+2),
+														 space->read_byte(badr+3),
+														 space->read_byte(badr+4),
+														 space->read_byte(badr+5),
+														 space->read_word(badr+6));
 											}
 										});
 }

@@ -16,7 +16,8 @@ TODO:
 - dump/add concvicp library module (L/L16 don't work, manual says it has its own add-on)
 - concvicp unmapped reads/writes
 - verify irq/beeper for concvicp, though it is probably correct
-- official rom labels for concams5, concams8
+- official rom label for concams8
+- is concams8 actually 4MHz?
 
 --------------------------------------------------------------------------------
 
@@ -140,7 +141,8 @@ void conchess_state::clear_irq()
 
 u8 conchess_state::input_r()
 {
-	clear_irq();
+	if (!machine().side_effects_disabled())
+		clear_irq();
 
 	u8 data = 0;
 
@@ -339,7 +341,7 @@ ROM_END
 
 ROM_START( concams5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("amsterdam_5.5mhz.bin", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) )
+	ROM_LOAD("s5.a1", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) ) // AT27C256
 ROM_END
 
 ROM_START( concams8 )
@@ -365,4 +367,4 @@ CONS( 1982, conc,     0,        0,      conc,     conchess, conchess_state, empt
 CONS( 1984, concgla,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, concams5, 0,        0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, concams8, concams5, 0,      concams8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, concvicp, 0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, concvicp, 0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

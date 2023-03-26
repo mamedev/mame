@@ -16,8 +16,8 @@ Hardware notes:
 - 3*1KB M58732S 2708 ROM, 4th socket is empty
 - 256 bytes RAM (2*M58722P 2111A)
 - 0.5KB DRAM (M58755S) for framebuffer
-- M58741P Color TV Interface, 64*64 pixels (192 scanlines), chip supports 3bpp,
-  but this game only uses 1 bit per pixel
+- M58741P Color TV Interface, 64*64 pixels (192 scanlines), chip supports 3bpp
+  and the software does write 3bpp, but the VRAM only has 1 bit per pixel
 - 7seg time counter (not software controlled)
 - beeper
 

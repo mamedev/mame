@@ -126,7 +126,6 @@ private:
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);
 	DECLARE_VIDEO_START(mnight);
 	DECLARE_VIDEO_START(arkarea);
-
 };
 
 class robokid_state : public mnight_state

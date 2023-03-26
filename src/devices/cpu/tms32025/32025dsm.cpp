@@ -445,27 +445,25 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	{
 		if (*cp == '%')
 		{
-			char num[30];
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"%02Xh",a); break;
-				case 'B': sprintf(num,"%04Xh",b); break;
-				case 'C': sprintf(num,"%s",cmpmode[c]); break;
-				case 'D': sprintf(num,"%02Xh",d); break;
-				case 'K': sprintf(num,"%d",k); break;
-				case 'M': sprintf(num,"%s",arith[m]); break;
-				case 'N': sprintf(num,"%s",nextar[n]); break;
-				case 'P': sprintf(num,"PA$%01X",p); break;
-				case 'R': sprintf(num,"AR%d",r); break;
-				case 'S': sprintf(num,",%d",s); break;
-				case 'T': sprintf(num,"%01Xh",t); break;
-				case 'W': sprintf(num,"%04Xh",w); break;
+				case 'A': util::stream_format(stream,"%02Xh",a); break;
+				case 'B': util::stream_format(stream,"%04Xh",b); break;
+				case 'C': stream << cmpmode[c]; break;
+				case 'D': util::stream_format(stream,"%02Xh",d); break;
+				case 'K': util::stream_format(stream,"%d",k); break;
+				case 'M': stream << arith[m]; break;
+				case 'N': stream << nextar[n]; break;
+				case 'P': util::stream_format(stream,"PA$%01X",p); break;
+				case 'R': util::stream_format(stream,"AR%d",r); break;
+				case 'S': util::stream_format(stream,",%d",s); break;
+				case 'T': util::stream_format(stream,"%01Xh",t); break;
+				case 'W': util::stream_format(stream,"%04Xh",w); break;
 				case 'X': break;
 				default:
 					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
-			stream << num;
 		}
 		else
 		{

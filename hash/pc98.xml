@@ -38351,13 +38351,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 	</software>
 
 	<software name="rogus">
-		<description>Rogus</description>
+		<description>Juushin Rogus</description>
 		<year>1987</year>
 		<publisher>ランダムハウス (Random House)</publisher>
 		<info name="alt_title" value="獣神ローガス ~ Juushin Rogus" />
+		<!-- baddump: contains 6.22 COMMAND.COM -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="rogus.fdi" size="1265664" crc="2bf79fed" sha1="97626b5939e516e4cd6e06a2e45dd686026e03d7" offset="0" />
+				<rom name="rogus.fdi" size="1265664" crc="2bf79fed" sha1="97626b5939e516e4cd6e06a2e45dd686026e03d7" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>

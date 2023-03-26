@@ -3,6 +3,15 @@
 #include "emu.h"
 #include "hng64.h"
 
+/*
+    final mix can clearly only process 2 possibilities for any screen pixel; a 'top' and 'bottom' pixel option
+    one of those can be blended.
+    blended pixels can't be stacked (only one still appears as blended, the other becomes solid)
+
+    many examples can be found where using alpha effects just cuts holes in sprites/3D or erases other alpha
+    tilemap layers due to this
+*/
+
 #define HNG64_VIDEO_DEBUG 0
 
 
@@ -34,7 +43,8 @@ void hng64_state::hng64_mark_tile_dirty(int tilemap, int tile_index)
 																				\
 	if (tileno&0x200000)                                                        \
 	{                                                                           \
-		tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];              \
+		if ((m_videoregs[0x01] >> 16) & 0x0001)                                 \
+			tileno = (tileno & m_videoregs[0x0b]) | m_videoregs[0x0c];          \
 	}                                                                           \
 																				\
 	tileno &= 0x1fffff;                                                         \
@@ -189,7 +199,7 @@ do { \
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm)
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm, int splitside)
 {
 	int source_line_to_use = cliprect.min_y;
 	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
@@ -205,6 +215,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 	{
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+
 
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
@@ -255,6 +266,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 		}
 		else
 		{
+
 			/* simple zoom mode? - only 4 regs? */
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
 			    this allows simple zooming, but not rotation */
@@ -293,6 +305,23 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 				xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
 				ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
 				ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
+
+				if (splitside == 1)
+				{
+					xtopleft += ((m_videoregs[0x0a] >> 0) & 0xffff) << 16;
+					ytopleft += ((m_videoregs[0x0a] >> 16) & 0xffff) << 16;
+
+					xmiddle += ((m_videoregs[0x0a] >> 0) & 0xffff) << 16;
+					ymiddle += ((m_videoregs[0x0a] >> 16) & 0xffff) << 16;
+				}
+				else if (splitside == 2)
+				{
+					xtopleft += ((m_videoregs[0x9] >> 0) & 0xffff) << 16;
+					ytopleft += ((m_videoregs[0x9] >> 16) & 0xffff) << 16;
+
+					xmiddle += ((m_videoregs[0x09] >> 0) & 0xffff) << 16;
+					ymiddle += ((m_videoregs[0x09] >> 16) & 0xffff) << 16;
+				}
 			}
 
 			xinc = (xmiddle - xtopleft) / 512;
@@ -354,7 +383,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 			xinc2 = 0;
 			yinc2 = 0;
 		}
-		
+
 	}
 
 	uint32_t startx = xtopleft;
@@ -366,7 +395,28 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 
 	// we have the scroll values for the current line, draw
 
-	pen_t const *const clut = &m_palette->pen(0);
+	pen_t* clut;
+
+	// allow one of the 2 pairs of fade values to be used (complete guess! but fatfurwa turns this bit on whenever it wants to do a fade effect and off when it's done)
+	if ((get_tileregs(tm) & 0x0080) >> 7)
+	{
+		// which one depends on target layer? (also complete guess!)
+		// (buriki intro suggests this is wrong, it should be fading tilemaps to black on the discipline name screens with a full subtractive blend, but picks the wrong register?
+		//  as we're already using this to decide which layer we're on for blending, it's probably not got a double use)
+		if (get_tileregs(tm) & 0x0020)
+		{
+			clut = (pen_t*)&m_palette_fade0->pen(0);
+		}
+		else
+		{
+			clut = (pen_t*)&m_palette_fade1->pen(0);
+		}
+	}
+	else
+	{
+		clut = (pen_t*)&m_palette->pen(0);
+	}
+
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = dest;
 	const bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -560,26 +610,28 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
  * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---u |  C = global complex zoom
+ *   0    | ---- -Cdd ---- -??Z ---- ---- ---- --uu |  C = global complex zoom
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
           | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
-		  |                                         |  u = explicitly cleared from initialized value in sams64
- *   1    | oooo oooo oooo oooX ---- ---- ---- ---- | unknown - X is sometimes used (1 in demo of xrally, 0 in game) not always initialized  whole register gets set to 0xffff during mosaic bit of roadedge intro
- *   1    | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
+          |                                         |  u = bit 0 is explicitly cleared from initialized value in sams64, both bits turned on for buriki 'split' effect
+ *   1    | oooo oooo oooo oooA ---- ---- ---- ---- |  A = tile animation enable? (buriki intro sets this to 0, then expects tile anim to stop while still updating registers below)  whole register gets set to 0xffff during mosaic bit of roadedge intro.
+ *        | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
- *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
  *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
- *   3    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
  *   4    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 scrollbase when not floor, lineram offset when floor
- *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
  *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 scrollbase when not floor, lineram offset when floor
- *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
  *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  ---- bfff (xrally, and fatfurwa despite comment? maybe reads MAME initialized value and changes it?)
  *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  5e00 3fff (xrally ^^ )
  *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)  9e00 be00 (xrally ^^ )
- *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
- *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   9    | oooo oooo oooo oooo ---- ---- ---- ---- | some kind of tilemap split effect?
+          | ---- ---- ---- ---- oooo oooo oooo oooo | ^
+ *   a    | oooo oooo oooo oooo ---- ---- ---- ---- | ^
+ *        | ---- ---- ---- ---- oooo oooo oooo oooo | ^
  *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps
  *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps
  *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
@@ -591,19 +643,6 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
     // 08e0 - fatal fury wa during transitions
     // 0940 - samurai shodown 64
     // 0880 - buriki
-
-    // Individual tilemap regs format
-    // ------------------------------
-    // mmmm dbr? ??ez zzzz
-    // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
-    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
-    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
-    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
-    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-    // r = tile size (seems correct)
-    // e = tilemap enable bit according to sams64_2
-    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
-    //              (debug layer on buriki has priority 0x020, which would be highest)
  */
 
 
@@ -621,23 +660,19 @@ uint16_t hng64_state::get_scrollbase(int tm)
 int hng64_state::get_blend_mode(int tm)
 {
 	// this is based on xrally and sams64/sams64_2 use, it could be incorrect
-	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down
+	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down - that is a blended sprite and blended tilemap mixing in a weird way to produce a darker than expected image as there are can be no other components in said mix
 
-	// m_tcram[0x14/4] may be some additional per layer for this?
 	uint8_t blendmode = 1;
-	if ((m_tcram[0x0c / 4] & 0x04000000) && (tm == 1)) // only enable it for the 2nd tilemap right now, find other use cases!
-		blendmode = 2;
-
-
-	// the bit below also gets set for certain blending effects
-	// for example a mist effect in the long tunnel on the South America course
-	// ( https://youtu.be/9rOPkNHTmYA?t=403 6:43 )
-	// this is the only course which has this bit set (it is set all the time) and is the only course using blending
-	//
-	// the problem here however is that the tilemap used for blending has a lower tilemap priority than the background tilemap?!
-	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage
-	//if ((m_tcram[0x0c / 4] & 0x00000004) && (tm == 3))
-	//  blendmode = 2;
+	if ((get_tileregs(tm) & 0x0020) >> 5) // for layers with L(1)
+	{
+		if ((m_tcram[0x0c / 4] >> 2) & 0x1)
+			blendmode = 2;
+	}
+	else // for layers with L(0)
+	{
+		if ((m_tcram[0x0c / 4] >> 26) & 0x1)
+			blendmode = 2;
+	}
 
 	return blendmode;
 }
@@ -658,22 +693,14 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// Useful bits from the tilemap registers
 	const uint8_t mosaic = (tileregs & 0xf000) >> 12;
-	const uint8_t not_line_mode = (tileregs & 0x0800) >> 11;
 	//const uint8_t bpp = (tileregs & 0x0400) >> 10; // not used?
 	const uint8_t big = (tileregs & 0x0200) >>  9;
 	const uint8_t enable = (tileregs & 0x0040) >>  6;
+	const uint8_t wrap = (tileregs & 0x0100) >>  8;
 
-	// Tilemap drawing enable?
-	//
-	// Definitely used to disable tilemaps in sams64_2 demo mode
-	// and is also set on the 'debug layer' of buriki
-	// however the floor layer of fatfurwa also has it set, and that must be enabled!
-	//
-	// Speculate that floormode ignores this flag, because lines can be disabled on
-	// a per-line basis?
-	//
-	// Could also just be another priority bits with some priorities being filtered
-	if (!enable && not_line_mode)
+	// this bit is used to disable tilemaps, note on fatfurwa a raster interrupt is used to change this mid-screen, swapping between
+	// the background layers and the floor being enabled!
+	if (!enable)
 	{
 		return;
 	}
@@ -694,16 +721,91 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	rectangle clip = cliprect;
 	clip.min_y = clip.max_y = line;
 
-g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* get the full pixmap for the tilemap */
 	tilemap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm);
-g_profiler.stop();
 
+	// buriki also turns on bit 0x00000002 and the effect is expected to apply to tm2 and tm3 at least (tm0/tm1 not used at this time)
+	// sams64 does not initialize bit 0x00000002 though, only 0x00000001 to 0
+	const int global_split_format = m_videoregs[0x00] & 0x00000001;
+
+	if (global_split_format)
+	{
+		clip.min_x = 256;
+		clip.max_x = 512;
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 1);
+		clip.min_x = 0;
+		clip.max_x = 256;
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 2);
+
+	}
+	else
+	{
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 0);
+	}
 }
 
+void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t priority, int y)
+{
+	// this correctly allows buriki intro sprites to use regular alpha, not additive
+	// while also being correct for sams64, which wants additive, but appears to be
+	// incorrect for Fatal Fury's hit effects which want additive
+	//
+	// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
+	// to control the blend type.
+	//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+
+	// would be an odd place for it, after the 'vblank' flag but...
+	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
+	pen_t const* const spriteclut = &m_palette->pen(0);
+
+	if (true)
+	{
+		const uint16_t* spritesrc = &m_sprite_bitmap.pix(y, cliprect.min_x);
+		uint32_t* spritedst = &bitmap.pix(y, cliprect.min_x);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t srcpix = *spritesrc;
+			if (srcpix & 0x0fff)
+			{
+				// if ((srcpix & 0x7000) == 0x7000) // buriki jumbotron (behind all tilemaps, behind 3d) (behind tilemap prio 1b)
+				// if ((srcpix & 0x7000) == 0x6000) // people behind arena walls (above lowest tilemap, behind others, behind 3d) (behind tilemap prio 16)
+
+				//if ((srcpix & 0x7000) == 0x5000) // not used on buriki?
+				//if ((srcpix & 0x7000) == 0x4000) // character portraits on buriki select screen (still behind 3d)
+
+				//if ((srcpix & 0x7000) == 0x3000) // character names and bio (above 3D graphics)
+
+				//if ((srcpix & 0x7000) == 0x2000) // select cursor, second system graphic, timers etc. (above ring tilemap, above 3d)
+
+				//if ((srcpix & 0x7000) == 0x1000) // credit text etc.
+				//if ((srcpix & 0x7000) == 0x0000 // not used on buriki ?
+
+				if ((srcpix & 0x7000) == priority)
+				{
+					if (srcpix & 0x8000)
+					{
+						if (spriteblendtype)
+							*spritedst = alpha_blend_r32(*(uint32_t*)spritedst, spriteclut[srcpix & 0x0fff], 0x80);
+						else
+							*spritedst = add_blend_r32(*spritedst, spriteclut[srcpix & 0x0fff]);
+					}
+					else
+					{
+						*spritedst = spriteclut[srcpix & 0x0fff];
+					}
+				}
+			}
+
+			spritedst++;
+			spritesrc++;
+		}
+
+	}
+}
 
 uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -734,8 +836,23 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (m_screen_dis)
 		return 0;
 
+	// Draw sprites to buffer for later mixing
+	draw_sprites_buffer(screen, cliprect);
+
+	// set during transitions, could be 'disable all palette output'?
+	if ((m_tcram[0x24 / 4] >> 16) & 0x0002)
+		return 0;
+
+
 	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
-	const uint32_t animmask = m_videoregs[0x0b];
+	uint32_t animmask;
+
+	// this bit either disables the feature entirely, or maybe disables the latching of these animation registers (leaving them in last used state)
+	if ((m_videoregs[0x01] >> 16) & 0x0001)
+		animmask = m_videoregs[0x0b];
+	else
+		animmask = 0xffffffff;
+
 	const uint32_t animbits = m_videoregs[0x0c];
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
@@ -780,131 +897,297 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+	// NOTE: buriki 'how to play' might be a sprite vs 3D edge case
+	// while the 3D is currently positioned badly due to unhandled 3D packet registers, it should still go behind the shutters, not in front
+	// it could also be a unique mixing case
+
+	// tilemaps with 'priority' 0x10 - 0x1f are always behind the 3d?
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int i = 0x3f; i >= 0; i--)
+		for (int i = 0x1f; i >= 0x10; i--)
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				uint16_t pri = get_tileregs(j) & 0x3f;
+				uint16_t pri = get_tileregs(j) & 0x1f;
 
 				if (pri == i)
 					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
 			}
+
+			if ((i&3) == 0)
+				mixsprites_test(screen, bitmap, cliprect, (i/4)<<12, y);
 		}
 	}
+
+	/*
+	   Each framebuffer has enough RAM for 24 bits of data for a 512x256
+	   layer (screen is interlaced, so it doesn't really have 448 pixels
+	   in height)
+
+	   theory: 11 bit palette index (can use either half of palette)
+	            1 bit 'blend'
+	            4 bit 'light'
+	            8 bit depth?
+	*/
 
 	// 3d gets drawn next
-	if (!(m_fbcontrol[0] & 0x01))
+	uint16_t palbase = 0x000;
+	if (m_fbcontrol[2] & 0x20)
 	{
-		// Blit the color buffer into the primary bitmap
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		if (!m_roadedge_3d_hack)
+			palbase = 0x800;
+	}
+
+	rectangle visarea = m_screen->visible_area();
+	int ysize = visarea.max_y - visarea.min_y;
+
+	if (ysize)
+	{
+		int yinc = (512 << 16) / ysize;
+
+		pen_t const* const clut_3d = &m_palette_3d->pen(0);
+		if (!(m_fbcontrol[0] & 0x01))
 		{
-			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
-			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+			// this moves the car in the xrally selection screen the correct number of pixels to the left
+			int xscroll = (m_fbscroll[0] >> 21);
+			if (xscroll & 0x400)
+				xscroll -= 0x800;
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			// value is midpoint?
+			xscroll += 256;
+
+			// Blit the color buffer into the primary bitmap
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				if (*src & 0xff000000)
-					*dst = *src;
+				int realy = (((y-visarea.min_y) * yinc) >> 16);
 
-				dst++;
-				src++;
+				const uint16_t* src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
+				uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
+
+				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				{
+					uint16_t srcpix = src[((cliprect.min_x + x) + xscroll) & 0x1ff];
+					if (srcpix & 0x07ff)
+					{
+						// format in our framebuffer is llll appp pppp pppp
+						// where l = lighting, a = alpha, p = palindex
+						// our m_palette_3d has 16 copies of the palette at different brightness levels, so we can pass directly
+						if (srcpix & 0x0800)
+						{
+							*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0xf7ff) | palbase], 0x80);
+						}
+						else
+						{
+							*dst = clut_3d[(srcpix & 0xf7ff) | palbase];
+						}
+					}
+
+					dst++;
+				}
 			}
 		}
 	}
 
-	// Draw the sprites on top of everything
-	draw_sprites_buffer(screen, cliprect);
-
-	// copy sprites into display
-	pen_t const *const clut = &m_palette->pen(0);
+	// tilemaps with 'priority' 0x00 - 0x0f are always above the 3d? - could bit 0x10 really be a 'relative to 3d' bit, rather than a 'relative to other tilemaps' bit?
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
-		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int i = 0x0f; i >= 0x00; i--)
 		{
-			uint16_t srcpix = *src;
-			if (srcpix & 0x7fff)
+			for (int j = 0; j < 4; j++)
 			{
-				if (srcpix & 0x8000)
-				{
-					*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
-				}
-				else
-				{
-					*dst = clut[srcpix & 0x7fff];
-				}
+				uint16_t pri = get_tileregs(j) & 0x1f;
+
+				if (pri == i)
+					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
 			}
 
-			dst++;
-			src++;
+			if ((i&3) == 0)
+				mixsprites_test(screen, bitmap, cliprect, (i/4)<<12, y);
 		}
 	}
-
-	// Layer the global frame buffer operations on top of everything
-	// transition_control(bitmap, cliprect);
-
 
 #if HNG64_VIDEO_DEBUG
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (0)
-		popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
-			m_videoregs[0x00],
-			m_videoregs[0x01],
-			(m_videoregs[0x02] >> 16) & 0xffff,
-			(m_videoregs[0x02] >> 0) & 0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
-			(m_videoregs[0x03] >> 16) & 0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
-			(m_videoregs[0x03] >> 0) & 0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
-			(m_videoregs[0x04] >> 16) & 0xffff,
-			(m_videoregs[0x04] >> 0) & 0xffff,
-			(m_videoregs[0x05] >> 16) & 0xffff,
-			(m_videoregs[0x05] >> 0) & 0xffff,
-			m_videoregs[0x06],
-			m_videoregs[0x07],
-			m_videoregs[0x08],
-			m_videoregs[0x09],
-			m_videoregs[0x0a],
-			m_videoregs[0x0b],
-			m_videoregs[0x0c],
-			m_videoregs[0x0d]);
+	if (1)
+		popmessage("Nv(%02x) CZ(%d), DIM(%d) Nv(%02x) Al(%d) GZ(%d)  %04x %04x AE(%d) %04x\n"
+				   "TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) W(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n"
+				   "tSB(%04x %04x %04x %04x)\n"
+				   "%08x %08x %08x\n"
+				   "SPLIT?(%04x %04x %04x %04x)\n"
+				   "AA(%08x %08x)\n%08x\n",
+			// global tilemap control regs?
+			(m_videoregs[0x00] & 0xf8000000) >> 24, (m_videoregs[0x00] & 0x04000000) >> 26, (m_videoregs[0x00] & 0x03000000) >> 24, (m_videoregs[0x00] & 0x00f80000) >> 16, (m_videoregs[0x00] & 0x00060000) >> 17, (m_videoregs[0x00] & 0x00010000) >> 16,  m_videoregs[0x00] & 0xffff, (m_videoregs[0x01] & 0xfffe0000) >> 16, (m_videoregs[0x01] & 0x00010000) >> 16, m_videoregs[0x01] & 0xffff,
+			// general per-tilemap regs
+			(get_tileregs(0) & 0xf000)>>12, (get_tileregs(0) & 0x0800)>>11, (get_tileregs(0) & 0x0400)>>10,(get_tileregs(0) & 0x0200)>>9,(get_tileregs(0) & 0x0100)>>8,(get_tileregs(0) & 0x0080)>>7,(get_tileregs(0) & 0x0040)>>6,(get_tileregs(0) & 0x0020)>>5,(get_tileregs(0) & 0x0010)>>4,(get_tileregs(0) & 0x0008)>>3,(get_tileregs(0) & 0x0004)>>2,(get_tileregs(0) & 0x0002)>>1,(get_tileregs(0) & 0x0001)>>0,(get_tileregs(0) & 0x001f)>>0,
+			(get_tileregs(1) & 0xf000)>>12, (get_tileregs(1) & 0x0800)>>11, (get_tileregs(1) & 0x0400)>>10,(get_tileregs(1) & 0x0200)>>9,(get_tileregs(1) & 0x0100)>>8,(get_tileregs(1) & 0x0080)>>7,(get_tileregs(1) & 0x0040)>>6,(get_tileregs(1) & 0x0020)>>5,(get_tileregs(1) & 0x0010)>>4,(get_tileregs(1) & 0x0008)>>3,(get_tileregs(1) & 0x0004)>>2,(get_tileregs(1) & 0x0002)>>1,(get_tileregs(1) & 0x0001)>>0,(get_tileregs(1) & 0x001f)>>0,
+			(get_tileregs(2) & 0xf000)>>12, (get_tileregs(2) & 0x0800)>>11, (get_tileregs(2) & 0x0400)>>10,(get_tileregs(2) & 0x0200)>>9,(get_tileregs(2) & 0x0100)>>8,(get_tileregs(2) & 0x0080)>>7,(get_tileregs(2) & 0x0040)>>6,(get_tileregs(2) & 0x0020)>>5,(get_tileregs(2) & 0x0010)>>4,(get_tileregs(2) & 0x0008)>>3,(get_tileregs(2) & 0x0004)>>2,(get_tileregs(2) & 0x0002)>>1,(get_tileregs(2) & 0x0001)>>0,(get_tileregs(2) & 0x001f)>>0,
+			(get_tileregs(3) & 0xf000)>>12, (get_tileregs(3) & 0x0800)>>11, (get_tileregs(3) & 0x0400)>>10,(get_tileregs(3) & 0x0200)>>9,(get_tileregs(3) & 0x0100)>>8,(get_tileregs(3) & 0x0080)>>7,(get_tileregs(3) & 0x0040)>>6,(get_tileregs(3) & 0x0020)>>5,(get_tileregs(3) & 0x0010)>>4,(get_tileregs(3) & 0x0008)>>3,(get_tileregs(3) & 0x0004)>>2,(get_tileregs(3) & 0x0002)>>1,(get_tileregs(3) & 0x0001)>>0,(get_tileregs(3) & 0x001f)>>0,
+			// scrollbase regs
+			(m_videoregs[0x04] >> 16) & 0xffff, (m_videoregs[0x04] >> 0) & 0xffff, (m_videoregs[0x05] >> 16) & 0xffff, (m_videoregs[0x05] >> 0) & 0xffff,
+			// initialized to fixed values?
+			m_videoregs[0x06], m_videoregs[0x07], m_videoregs[0x08],
+			// used when a single tilemap gets 'split' on Buriki player entrances?
+			(m_videoregs[0x09] >> 16) & 0xffff, (m_videoregs[0x09] >> 0) & 0xffff, (m_videoregs[0x0a] >> 16) & 0xffff, (m_videoregs[0x0a] >> 0) & 0xffff,
+			// Auto Animation registers
+			m_videoregs[0x0b], m_videoregs[0x0c],
+			// unused?
+			m_videoregs[0x0d]
+		);
+
+	// Individual tilemap regs format
+	// ------------------------------
+	// mmmm dbrW FELz zzzz
+	// m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
+	//  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+	//     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
+	// d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
+	// b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+	// r = tile size (seems correct)
+	// W = allow wraparound? (not set on Fatal Fury title logo, or rotating 'name entry' in Roads Edge, both confirmed to need wraparound disabled)
+	// F = allow fade1 or fade2 to apply? (complete guess!)
+	// E = tilemap enable bit according to sams64_2
+	// L = related to output layer? seems to be tied to which mixing bits are used to enable blending
+	// z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
+	//              (debug layer on buriki has priority 0x020, which would be highest)
+
+
 
 	if (0)
-		popmessage("TC: %08x %08x %08x %08x : %08x %08x\n%08x %08x\n%08x %08x\n%08x %08x : %08x %08x %08x %08x : %08x %08x\n%08x %08x : %08x %08x %08x %08x",
-			m_tcram[0x00 / 4],
-			m_tcram[0x04 / 4],
-			m_tcram[0x08 / 4], // tilemaps 0/1 ?
-			m_tcram[0x0c / 4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
-			m_tcram[0x10 / 4],
-			m_tcram[0x14 / 4],
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\n"
+				   "MIX BITSA Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n"
+				   "MIX BITSB Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n"
+				   "UNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\n"
+				   "For FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\n"
+				   "For FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\n"
+				   "MASTER FADES - FADE1?(%08x)\n"
+				   "MASTER FADES - FADE2?(%08x)\n"
+				   "UNUSED?(%08x)\n"
+				   "UNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\n"
+				   "PALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n"
+				   "%08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
+			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
+			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
+			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
+
+			// is this 2 groups of 3 regs?
+			//(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1
+			//(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
+			//(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
+			(m_tcram[0x0c / 4] >> 31) & 0x1,
+			(m_tcram[0x0c / 4] >> 30) & 0x1,
+			(m_tcram[0x0c / 4] >> 29) & 0x1,
+			(m_tcram[0x0c / 4] >> 28) & 0x1,
+			(m_tcram[0x0c / 4] >> 27) & 0x1,
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)
+
+			(m_tcram[0x0c / 4] >> 25) & 0x1,
+			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set
+
+			(m_tcram[0x0c / 4] >> 23) & 0x1,
+			(m_tcram[0x0c / 4] >> 22) & 0x1, // set on POST in xrally etc.
+			(m_tcram[0x0c / 4] >> 21) & 0x1,
+			(m_tcram[0x0c / 4] >> 20) & 0x1,
+			(m_tcram[0x0c / 4] >> 19) & 0x1,
+			(m_tcram[0x0c / 4] >> 18) & 0x1, // set on some fades in buriki attract intro (related to the sprites being blended during the fade?)
+			(m_tcram[0x0c / 4] >> 17) & 0x1,
+			(m_tcram[0x0c / 4] >> 16) & 0x1,
+
+			(m_tcram[0x0c / 4] >> 15) & 0x1,
+			(m_tcram[0x0c / 4] >> 14) & 0x1,
+			(m_tcram[0x0c / 4] >> 13) & 0x1,
+			(m_tcram[0x0c / 4] >> 12) & 0x1,
+			(m_tcram[0x0c / 4] >> 11) & 0x1,
+			(m_tcram[0x0c / 4] >> 10) & 0x1,
+			(m_tcram[0x0c / 4] >> 9) & 0x1,
+			(m_tcram[0x0c / 4] >> 8) & 0x1,
+
+			// 2nd group?
+			//(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
+			//(m_tcram[0x10 / 4] >> 24) & 0xff, // usually (always?) 00
+			//(m_tcram[0x10 / 4] >> 16) & 0xff, // upper bit not used? value usually 2x, 4x, 5x or 6x
+			(m_tcram[0x0c / 4] >> 7) & 0x1,
+			(m_tcram[0x0c / 4] >> 6) & 0x1,
+			(m_tcram[0x0c / 4] >> 5) & 0x1,
+			(m_tcram[0x0c / 4] >> 4) & 0x1,
+			(m_tcram[0x0c / 4] >> 3) & 0x1, // set in POST on xrally etc.
+			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used. tm0 blends on fatfurwa frontmost layer U(0 1) E(1) L(1) DEPTH ( 0 0 0 0 0 )   set on SS64 Portrait Win blend TM1 (U1 1 ) E(1) L(1) DEPT( 0 0 1 0 1) (other blend enabled here too!)
+
+			(m_tcram[0x0c / 4] >> 1) & 0x1,
+			(m_tcram[0x0c / 4] >> 0) & 0x1, // always set
+
+			(m_tcram[0x10 / 4] >> 31) & 0x1,
+			(m_tcram[0x10 / 4] >> 30) & 0x1,
+			(m_tcram[0x10 / 4] >> 29) & 0x1,
+			(m_tcram[0x10 / 4] >> 28) & 0x1,
+			(m_tcram[0x10 / 4] >> 27) & 0x1,
+			(m_tcram[0x10 / 4] >> 26) & 0x1,
+			(m_tcram[0x10 / 4] >> 25) & 0x1,
+			(m_tcram[0x10 / 4] >> 24) & 0x1,
+
+			(m_tcram[0x10 / 4] >> 23) & 0x1,
+			(m_tcram[0x10 / 4] >> 22) & 0x1,
+			(m_tcram[0x10 / 4] >> 21) & 0x1,
+			(m_tcram[0x10 / 4] >> 20) & 0x1,
+			(m_tcram[0x10 / 4] >> 19) & 0x1,
+			(m_tcram[0x10 / 4] >> 18) & 0x1,
+			(m_tcram[0x10 / 4] >> 17) & 0x1,
+			(m_tcram[0x10 / 4] >> 16) & 0x1,
+
+			m_tcram[0x10 / 4] & 0xffff, // unused?
+
+			// also seems fade mode related?
+			(m_tcram[0x14 / 4] >> 16) & 0xffff,  // typically 0007 or 0001, - 0011 on ss64 ingame, 0009 on continue screen
+
+			// 0xxx ?  (often 0555 or 0fff, seen 56a, 57f too) -  register split into 2 bits - typically a bit will be 3 or 1 depending if the effect is additive / subtractive
+			// usually relate to the RGB pairings at m_tcram[0x18 / 4] & m_tcram[0x1c / 4] but m_tcram[0x24 / 4] & 1 may cause it to use the registers at m_tcram[0x28 / 4] instead?
+			(m_tcram[0x14 / 4] >> 14) & 0x3, (m_tcram[0x14 / 4] >> 12) & 0x3, // unused?
+			(m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, // for 'fade1' or first register in group of 8?
+			(m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 0) & 0x3, // for 'fade2' or 2nd register in group of 8?
 
 			// these are used for 'fade to black' in most cases, but
 			// in xrally attract, when one image is meant to fade into another, one value increases while the other decreases
 			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
 			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
 
-			m_tcram[0x20 / 4],  // something else?
-			m_tcram[0x24 / 4],  // something else?
+			m_tcram[0x20 / 4], // unused?
+
+			(m_tcram[0x24 / 4] >> 16) & 0xfffc,
+			((m_tcram[0x24 / 4] >> 16) & 0x0002)>>1, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001
+			(m_tcram[0x24 / 4] >> 16) & 0x0001, // 0001 may indicate if to use the 8 below for standard fade, set on SNK logo in roadedge, in FFWA
+
+			// some kind of bitfields, these appear related to fade mode for the registers at 0x28 / 4, set to either 3 or 2 which is additive or subtractive
+			(m_tcram[0x24 / 4] >> 0) & 0x3, // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
+			(m_tcram[0x24 / 4] >> 2) & 0x3,
+			(m_tcram[0x24 / 4] >> 4) & 0x3,
+			(m_tcram[0x24 / 4] >> 6) & 0x3,
+			(m_tcram[0x24 / 4] >> 8) & 0x3,
+			(m_tcram[0x24 / 4] >> 10) & 0x3,
+			(m_tcram[0x24 / 4] >> 12) & 0x3,
+			(m_tcram[0x24 / 4] >> 14) & 0x3,
 
 			// 7 of these fade during the buriki SNK logo (probably redundant)
 			// in roadedge they're just set to
 			// 0x00000000, 0x01000000, 0x02000000, 0x03000000, 0x04000000, 0x05000000, 0x06000000, 0x07000000
+			// the first 8 bits seem to be which palette this affects (so 0x0b is colours 0xb00-0xbff as you see with xrally 1st person?)
+			// enabled with m_tcram[0x24 / 4] regs above? (see note)
+
 			m_tcram[0x28 / 4],  // ?RGB fade values (buriki jumbotron)  fades on fatfurwa before high score table etc. + bottom value only on 'fade to red' part of fatfurywa intro
 			m_tcram[0x2c / 4],  // ?RGB fade values (buriki jumbotron)
 			m_tcram[0x30 / 4],
 			m_tcram[0x34 / 4],
 			m_tcram[0x38 / 4],
-			m_tcram[0x3c / 4],
+			m_tcram[0x3c / 4],  // gets used for the 1st person view on xrally - maybe some fade effect on the front of the car?
 			m_tcram[0x40 / 4],
 			m_tcram[0x44 / 4],
 
 
 			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
-			m_tcram[0x4c / 4],
+			m_tcram[0x4c / 4], // 0001 0000 or 0000 0000 - works(?) as blend type selection for sprite mixing?
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
 			m_tcram[0x58 / 4],
@@ -919,6 +1202,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	    0011057f  blending?
 	    0001057f
 	*/
+
+
+	/*
+	    palette manipulation note
+
+	    pal7 pal6 pal5 pal4 pal3 pal2 pal1 pal0  // which fade register those bits relate to?
+	    00   00   11   00   00   00   10   10    // bits in  (m_tcram[0x24 / 4] >> 0)  (set to 0c0a in this example)
+
+	    an entry of 00 means palette effect not in use?
+	    an entry of 11 means subtractive?
+	    an entry of 10 means addition?
+	    an entry of 01 means??
+	*/
+
+
 #endif
 
 	return 0;
@@ -932,7 +1230,7 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 }
 
 
-/* Transition Control Video Registers
+/* Transition Control Video Registers  **OUTDATED, see notes with popmessage**
  * ----------------------------------
  *
  * uint32_t | Bits                                    | Use
@@ -971,11 +1269,189 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+
+
+inline void hng64_state::set_palette_entry_with_faderegs(int entry, uint8_t r, uint8_t g, uint8_t b, uint32_t rgbfade, uint8_t r_mode, uint8_t g_mode, uint8_t b_mode, palette_device *palette)
+{
+
+	int r_fadeval = (rgbfade >> 16) & 0xff;
+	int g_fadeval = (rgbfade >> 8) & 0xff;
+	int b_fadeval = (rgbfade >> 0) & 0xff;
+
+	int r_new = r;
+	int g_new = g;
+	int b_new = b;
+
+	switch (r_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		r_new = r_new + r_fadeval;
+		if (r_new > 255)
+			r_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		r_new = r_new - r_fadeval;
+		if (r_new < 0)
+			r_new = 0;
+		break;
+	}
+
+	switch (g_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		g_new = g_new + g_fadeval;
+		if (g_new > 255)
+			g_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		g_new = g_new - g_fadeval;
+		if (g_new < 0)
+			g_new = 0;
+		break;
+	}
+
+	switch (b_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		b_new = b_new + b_fadeval;
+		if (b_new > 255)
+			b_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		b_new = b_new - b_fadeval;
+		if (b_new < 0)
+			b_new = 0;
+		break;
+	}
+
+	palette->set_pen_color(entry, r_new, g_new, b_new);
+}
+
+inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b)
+{
+	m_palette->set_pen_color(entry, r, g, b);
+
+	set_palette_entry_with_faderegs(entry, r, g, b, m_tcram[0x18 / 4], (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, m_palette_fade0);
+	set_palette_entry_with_faderegs(entry, r, g, b, m_tcram[0x1c / 4], (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 0) & 0x3, m_palette_fade1);
+
+	// our code assumes the 'lighting' values from the 3D framebuffer can be 4-bit precision
+	// based on 'banding' seen in buriki reference videos.  precalculate those here to avoid
+	// having to do it in the video update function
+	//
+	// note, it is unlikely intensity is meant to be added, probably instead it should
+	// be multipled, reducing overall brightness, not increasing beyond max?
+	for (int intensity = 0; intensity < 0x10; intensity++)
+	{
+		uint16_t newr = r + (intensity << 2);
+		uint16_t newg = g + (intensity << 2);
+		uint16_t newb = b + (intensity << 2);
+
+		if (newr > 255)
+			newr = 255;
+		if (newg > 255)
+			newg = 255;
+		if (newb > 255)
+			newb = 255;
+
+		//m_palette_3d->set_pen_color((intensity * 0x1000) + entry, newr, newg, newb);
+		// always use 1nd fade register for 3D (very unlikely!) (allows 3d to flash correctly in sams64 how to play, but applies wrong fade register on 3d in buriki discipline intro screens, assuming those are meant to be blacked out this way)
+		set_palette_entry_with_faderegs((intensity * 0x1000) + entry, newr, newg, newb, m_tcram[0x18 / 4], (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, m_palette_3d);
+		// always use 2nd fade register for 3D (very unlikely!)
+		//set_palette_entry_with_faderegs((intensity * 0x1000) + entry, newr, newg, newb, m_tcram[0x1c / 4], (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 0) & 0x3, m_palette_3d);
+	}
+}
+
+void hng64_state::update_palette_entry(int entry)
+{
+	uint32_t data = m_paletteram[entry];
+
+	int16_t r = (data >> 16) & 0xff;
+	int16_t g = (data >> 8) & 0xff;
+	int16_t b = (data >> 0) & 0xff;
+
+	for (int i = 0; i < 8; i++)
+	{
+		uint32_t tcdata = m_tcram[(0x28 / 4) + i];
+
+		// correct for buriki (jumbotron fading images) and xrally / roadedge (palette effect on front of car in first person view)
+		//
+		// however this logic fails on fatal fury fades, as the msb is 00, indicating apply to palette entries 000-0ff but the actual
+		// palette needing the changes is 0x900 - 0x9ff (hng64 logo white flash) so there must be further ways in which this is
+		// configured ** NO, see below!
+		//
+		// ** this is instead meant to apply to the tm0 in fatfurwa, basically a full screen blended layer so IS being applied to the
+		// correct palettes, it's currently a blend / priority issue causing it to not show
+		uint8_t tcregion = (tcdata & 0x0f000000) >> 24;
+
+		if (tcregion == (entry >> 8))
+		{
+			uint8_t bmod = (tcdata >> 16) & 0xff;
+			uint8_t gmod = (tcdata >> 8) & 0xff;
+			uint8_t rmod = (tcdata >> 0) & 0xff;
+
+			uint8_t tcreg = (m_tcram[0x24 / 4] >> (i << 1)) & 3;
+			switch (tcreg)
+			{
+			case 0x00: // this entry is disabled
+				break;
+			case 0x01: // this entry is disabled(?)
+				break;
+			case 0x02: // additive blending
+				r = r + rmod;
+				if (r > 0xff)
+					r = 0xff;
+				g = g + gmod;
+				if (g > 0xff)
+					g = 0xff;
+				b = b + bmod;
+				if (b > 0xff)
+					b = 0xff;
+				break;
+			case 0x03: // subtractive blending
+				r = r - rmod;
+				if (r < 0x00)
+					r = 0x00;
+				g = g - gmod;
+				if (g < 0x00)
+					g = 0x00;
+				b = b - bmod;
+				if (b < 0x00)
+					b = 0x00;
+				break;
+			}
+		}
+	}
+
+	set_single_palette_entry(entry, r, g, b);
+}
+
+void hng64_state::pal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	update_palette_entry(offset);
+}
+
 // Transition Control memory.
 void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *hng64_tcram = m_tcram;
 
+	uint32_t old_data = hng64_tcram[offset];
 	COMBINE_DATA(&hng64_tcram[offset]);
 
 	if (offset == 0x02)
@@ -996,7 +1472,48 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds());
+
+		// TODO: properly calculate this from screen params
+		attoseconds_t period;
+		if (max_y == 448)
+			period = HZ_TO_ATTOSECONDS(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
+		else
+			period = HZ_TO_ATTOSECONDS(61.651673); // fatfurwa uses 512x432, sync frequency not verified
+
+		m_screen->configure(HTOTAL, VTOTAL, visarea, period);
+	}
+
+	if ((offset >= (0x28 / 4)) && (offset < (0x48 / 4)))
+	{
+		uint32_t new_data = hng64_tcram[offset];
+		if (old_data != new_data)
+		{
+			// the old blend value no longer applies, so update the colours referenced by that
+			uint8_t old_tcregion = (old_data & 0x0f000000) >> 24;
+			for (int i = 0; i < 0x100; i++)
+			{
+				update_palette_entry((old_tcregion * 0x100) + i);
+			}
+			// update the colours referenced by the new blend register
+			uint8_t new_tcregion = (new_data & 0x0f000000) >> 24;
+			for (int i = 0; i < 0x100; i++)
+			{
+				update_palette_entry((new_tcregion * 0x100) + i);
+			}
+		}
+	}
+
+	if ((offset == (0x24 / 4)) || (offset == (0x14 / 4)) || (offset == (0x18 / 4)) || (offset == (0x1c / 4)))
+	{
+		// lazy, just update the lot
+		uint32_t new_data = hng64_tcram[offset];
+		if (old_data != new_data)
+		{
+			for (int i = 0; i < 0x1000; i++)
+			{
+				update_palette_entry(i);
+			}
+		}
 	}
 }
 
@@ -1010,88 +1527,6 @@ uint32_t hng64_state::tcram_r(offs_t offset)
 	return m_tcram[offset];
 }
 
-// Very much a work in progress - no hard testing has been done
-void hng64_state::transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// If either of the fading memory regions is non-zero...
-	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
-	{
-		const int32_t darkR = int32_t(m_tcram[0x00000007] & 0xff);
-		const int32_t darkG = int32_t((m_tcram[0x00000007] >> 8) & 0xff);
-		const int32_t darkB = int32_t((m_tcram[0x00000007] >> 16) & 0xff);
-
-		const int32_t brigR = int32_t(m_tcram[0x0000000a] & 0xff);
-		const int32_t brigG = int32_t((m_tcram[0x0000000a] >> 8) & 0xff);
-		const int32_t brigB = int32_t((m_tcram[0x0000000a] >> 16) & 0xff);
-
-		for (int i = cliprect.min_x; i < cliprect.max_x; i++)
-		{
-			for (int j = cliprect.min_y; j < cliprect.max_y; j++)
-			{
-				rgb_t *thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix(j, i));
-
-				int32_t finR = (int32_t)thePixel->r();
-				int32_t finG = (int32_t)thePixel->g();
-				int32_t finB = (int32_t)thePixel->b();
-
-#if 0
-				float colorScaleR, colorScaleG, colorScaleB;
-
-				// Apply the darkening pass (0x07)...
-				colorScaleR = 1.0f - (float)(m_tcram[0x00000007] & 0xff) / 255.0f;
-				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8) & 0xff) / 255.0f;
-				colorScaleB = 1.0f - (float)((m_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
-
-				finR = ((float)thePixel->r() * colorScaleR);
-				finG = ((float)thePixel->g() * colorScaleG);
-				finB = ((float)thePixel->b() * colorScaleB);
-
-				// Apply the lightening pass (0x0a)...
-				colorScaleR = 1.0f + (float)(m_tcram[0x0000000a] & 0xff) / 255.0f;
-				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8) & 0xff) / 255.0f;
-				colorScaleB = 1.0f + (float)((m_tcram[0x0000000a] >> 16) & 0xff) / 255.0f;
-
-				finR *= colorScaleR;
-				finG *= colorScaleG;
-				finB *= colorScaleB;
-
-				// Clamp
-				if (finR > 255.0f) finR = 255.0f;
-				if (finG > 255.0f) finG = 255.0f;
-				if (finB > 255.0f) finB = 255.0f;
-#endif
-
-				// Subtractive fading
-				if (m_tcram[0x00000007] != 0x00000000)
-				{
-					finR -= darkR;
-					finG -= darkG;
-					finB -= darkB;
-				}
-
-				// Additive fading
-				if (m_tcram[0x0000000a] != 0x00000000)
-				{
-					finR += brigR;
-					finG += brigG;
-					finB += brigB;
-				}
-
-				// Clamp the high end
-				if (finR > 255) finR = 255;
-				if (finG > 255) finG = 255;
-				if (finB > 255) finB = 255;
-
-				// Clamp the low end
-				if (finR < 0) finR = 0;
-				if (finG < 0) finG = 0;
-				if (finB < 0) finB = 0;
-
-				*thePixel = rgb_t(255, (uint8_t)finR, (uint8_t)finG, (uint8_t)finB);
-			}
-		}
-	}
-}
 
 void hng64_state::video_start()
 {
@@ -1132,7 +1567,7 @@ void hng64_state::video_start()
 	m_dl = std::make_unique<uint16_t[]>(0x100);
 	m_polys.resize(HNG64_MAX_POLYGONS);
 
-	m_texturerom = memregion("textures")->base();
+	m_texturerom = memregion("textures0")->base();
 	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 

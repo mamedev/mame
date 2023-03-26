@@ -691,15 +691,15 @@ void tms340x0_device::check_interrupt()
 	/* if we took something, generate it */
 	if (vector)
 	{
+		/* call the callback for externals */
+		if (irqline >= 0)
+			standard_irq_callback(irqline, m_pc);
+
 		PUSH(m_pc);
 		PUSH(m_st);
 		RESET_ST();
 		m_pc = RLONG(vector);
 		COUNT_CYCLES(16);
-
-		/* call the callback for externals */
-		if (irqline >= 0)
-			standard_irq_callback(irqline);
 	}
 }
 

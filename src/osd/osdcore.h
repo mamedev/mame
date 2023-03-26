@@ -86,7 +86,7 @@ typedef uint64_t osd_ticks_t;
         accurate. It is ok if this call is not ultra-fast, since it is
         primarily used for once/frame synchronization.
 -----------------------------------------------------------------------------*/
-osd_ticks_t osd_ticks();
+osd_ticks_t osd_ticks() noexcept;
 
 
 /*-----------------------------------------------------------------------------
@@ -101,7 +101,7 @@ osd_ticks_t osd_ticks();
         an osd_ticks_t value which represents the number of ticks per
         second
 -----------------------------------------------------------------------------*/
-osd_ticks_t osd_ticks_per_second();
+osd_ticks_t osd_ticks_per_second() noexcept;
 
 
 /*-----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ osd_ticks_t osd_ticks_per_second();
         sleep occurs for, the OSD layer should strive to sleep for less time
         than specified rather than sleeping too long.
 -----------------------------------------------------------------------------*/
-void osd_sleep(osd_ticks_t duration);
+void osd_sleep(osd_ticks_t duration) noexcept;
 
 /***************************************************************************
     WORK ITEM INTERFACES
@@ -538,14 +538,14 @@ public:
 	osd_output() { }
 	virtual ~osd_output() { }
 
-	virtual void output_callback(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) = 0;
+	virtual void output_callback(osd_output_channel channel, util::format_argument_pack<char> const &args) = 0;
 
 	static void push(osd_output *delegate);
 	static void pop(osd_output *delegate);
 
 protected:
 
-	void chain_output(osd_output_channel channel, util::format_argument_pack<std::ostream> const &args) const
+	void chain_output(osd_output_channel channel, util::format_argument_pack<char> const &args) const
 	{
 		if (m_chain)
 			m_chain->output_callback(channel, args);
@@ -555,11 +555,11 @@ private:
 	osd_output *m_chain = nullptr;
 };
 
-void osd_vprintf_error(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_warning(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_info(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_verbose(util::format_argument_pack<std::ostream> const &args);
-void osd_vprintf_debug(util::format_argument_pack<std::ostream> const &args);
+void osd_vprintf_error(util::format_argument_pack<char> const &args);
+void osd_vprintf_warning(util::format_argument_pack<char> const &args);
+void osd_vprintf_info(util::format_argument_pack<char> const &args);
+void osd_vprintf_verbose(util::format_argument_pack<char> const &args);
+void osd_vprintf_debug(util::format_argument_pack<char> const &args);
 
 /// \brief Print error message
 ///

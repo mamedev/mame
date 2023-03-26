@@ -36,14 +36,20 @@
 
     TODO:
 
+    - systest1600 failures
+        - CIO timer
+        - RTC (seconds advance too slowly)
+        - DMA
+    - bootpar writes console bauds without high order byte (9600=>128)
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
-    - short/long reset (RSTBUT)
+    - crashes after reset
     - CIO
         - optimize timers!
-        - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
+        [:] SCC write 000003
+        [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
 
 */
 
@@ -531,11 +537,29 @@ void abc1600_state::mac_mem(address_map &map)
 //**************************************************************************
 
 //-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( reset )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( abc1600_state::reset )
+{
+	if (!oldval && newval)
+	{
+		machine_reset();
+	}
+
+	m_mac->rstbut_w(newval);
+}
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( abc1600 )
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
-	// inputs defined in machine/abc99.cpp
+	// keyboard inputs defined in machine/abc99.cpp
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc1600_state, reset, 0)
 INPUT_PORTS_END
 
 
@@ -547,6 +571,19 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  Z80DMA 0
 //-------------------------------------------------
+
+void abc1600_state::update_br()
+{
+	// disabled since this breaks the systest, should use 68000 BR line instead
+	if (!m_dmadis)
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+	else
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, m_dbrq0 || m_dbrq1 || m_dbrq2);
+	}
+}
 
 void abc1600_state::update_pren0(int state)
 {
@@ -580,10 +617,6 @@ void abc1600_state::update_drdy0(int state)
 	}
 }
 
-WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state && m_dmadis);
-}
 
 //-------------------------------------------------
 //  Z80DMA 1
@@ -837,6 +870,9 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
+	save_item(NAME(m_dbrq0));
+	save_item(NAME(m_dbrq1));
+	save_item(NAME(m_dbrq2));
 	save_item(NAME(m_cs7));
 	save_item(NAME(m_bus0));
 	save_item(NAME(m_csb));
@@ -857,6 +893,13 @@ void abc1600_state::machine_reset()
 
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+
+	// reset devices
+	m_mac->reset();
+	m_maincpu->reset();
+	m_cio->reset();
+	m_scc->reset();
+	m_kb->reset();
 }
 
 
@@ -900,7 +943,7 @@ void abc1600_state::abc1600(machine_config &config)
 	spec_contr_reg.q_out_cb<7>().set(FUNC(abc1600_state::sysfs_w));
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
-	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq0_w));
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
 	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
 	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
@@ -909,7 +952,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
 
 	Z80DMA(config, m_dma1, 64_MHz_XTAL / 16);
-	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq1_w));
 	m_dma1->out_bao_callback().set(m_dma2, FUNC(z80dma_device::bai_w));
 	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_r));
 	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_w));
@@ -918,7 +961,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_w));
 
 	Z80DMA(config, m_dma2, 64_MHz_XTAL / 16);
-	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq2_w));
 	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_r));
 	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_w));
 	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w)).exor(1);
@@ -975,7 +1018,8 @@ void abc1600_state::abc1600(machine_config &config)
 
 	NMC9306(config, m_nvram, 0);
 
-	E0516(config, E050_C16PC_TAG, 32.768_kHz_XTAL);
+	E0516(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->outsel_rd_cb().set_constant(0);
 
 	FD1797(config, m_fdc, 64_MHz_XTAL / 64); // clocked by 9229B
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));

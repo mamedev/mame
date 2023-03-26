@@ -261,13 +261,15 @@ void cammu_device::set_spaces(address_space &main_space, address_space &io_space
 		memory.space->cache(memory.cache);
 }
 
-bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address)
+bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address, address_space *&target_space)
 {
 	// translate the address
 	translated_t translated = translate_address(ssw, address, BYTE,
-		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ ? READ :
-		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE ? WRITE :
+		intention == device_memory_interface::TR_READ ? READ :
+		intention == device_memory_interface::TR_WRITE ? WRITE :
 		EXECUTE);
+
+	target_space = &translated.cache->space();
 
 	// check that the requested space number matches the mapped space
 	if (translated.cache && translated.cache->space().spacenum() == spacenum)

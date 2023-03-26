@@ -2134,7 +2134,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-	g_profiler.start(PROFILER_INPUT);
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2171,8 +2171,6 @@ void ioport_manager::frame_update()
 			if (dynfield.field().type() != IPT_OUTPUT)
 				dynfield.write(newvalue);
 	}
-
-	g_profiler.stop();
 }
 
 
@@ -2460,6 +2458,7 @@ bool ioport_manager::load_controller_config(
 
 	// find the matching field
 	ioport_value const defvalue = portnode.get_attribute_int("defvalue", 0);
+	bool matched = false;
 	for (ioport_field &field : port->second->fields())
 	{
 		// find the matching mask and default value
@@ -2521,13 +2520,16 @@ bool ioport_manager::load_controller_config(
 #endif
 			}
 
-			// successfully applied
-			return true;
+			// only break out of the loop for unconditional inputs
+			if (field.condition().condition() == ioport_condition::ALWAYS)
+				return true;
+			else
+				matched = true;
 		}
 	}
 
-	// no matching field
-	return false;
+	// return whether any field matched
+	return matched;
 }
 
 
@@ -2598,7 +2600,10 @@ void ioport_manager::load_system_config(
 					else if (revstring && !strcmp(revstring, "no"))
 						field.live().analog->m_reverse = false;
 				}
-				break;
+
+				// only break out of the loop for unconditional inputs
+				if (field.condition().condition() == ioport_condition::ALWAYS)
+					break;
 			}
 		}
 	}
@@ -2822,7 +2827,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 	// iterate over ports
 	for (auto &port : m_portlist)
 		for (ioport_field const &field : port.second->fields())
-			if (save_this_input_field_type(field.type()))
+			if (save_this_input_field_type(field.type()) && field.enabled())
 			{
 				// determine if we changed
 				bool changed = false;

@@ -153,11 +153,6 @@ newoption {
 }
 
 newoption {
-	trigger = 'with-bundled-sdl2',
-	description = 'Build bundled SDL2 library',
-}
-
-newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {
@@ -518,24 +513,7 @@ configuration { "Release", "vs20*" }
 		}
 	end
 
--- Force Visual Studio targets to use bundled SDL2
-if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
-	if _OPTIONS["with-bundled-sdl2"]==nil then
-		_OPTIONS["with-bundled-sdl2"] = "1"
-	end
-end
--- Build SDL2 for Android
-if _OPTIONS["targetos"] == "android" then
-	_OPTIONS["with-bundled-sdl2"] = "1"
-end
-
 configuration {}
-
-if _OPTIONS["osd"] == "uwp" then
-	windowstargetplatformversion("10.0.14393.0")
-	windowstargetplatformminversion("10.0.14393.0")
-	premake._filelevelconfig = true
-end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
@@ -1095,7 +1073,7 @@ end
 				"-Wimplicit-fallthrough",
 			}
 			buildoptions {
-				"-Wno-unused-result", -- needed for fgets,fread on linux
+				"-Wno-error=unused-result", -- needed for fgets,fread on linux
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
@@ -1234,23 +1212,10 @@ configuration { "asmjs" }
 
 configuration { "android*" }
 	buildoptions {
-		"-Wno-undef",
-		"-Wno-typedef-redefinition",
-		"-Wno-unknown-warning-option",
-		"-Wno-incompatible-ms-struct",
-	}
-	buildoptions_cpp {
-		"-std=c++17",
-		"-Wno-extern-c-compat",
-		"-Wno-tautological-constant-out-of-range-compare",
-		"-Wno-tautological-pointer-compare",
+		"-Wno-error=undef", -- in ASIO
+		"-Wno-error=macro-redefined", -- PAGE_SIZE,PAGE_MASK in fairlight/cmi.cpp
 	}
 	archivesplit_size "20"
-
-configuration { "android-arm64" }
-	buildoptions {
-		"-Wno-asm-operand-widths",
-	}
 
 configuration { "linux-*" }
 		links {
