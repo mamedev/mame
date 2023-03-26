@@ -23,6 +23,8 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+
 protected:
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const override;
 

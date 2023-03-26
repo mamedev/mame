@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "formats/abc800i_dsk.h"
+#include "ioprocs.h"
 
 abc800i_format::abc800i_format() : wd177x_format(formats)
 {
@@ -82,6 +83,19 @@ const abc800i_format::format abc800i_format::formats[] = {
 };
 
 const abc800i_format FLOPPY_ABC800I_FORMAT;
+
+int abc800i_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+{
+	uint8_t h[1];
+	size_t actual;
+	io.read_at(0x810, h, 1, actual);
+
+	// start of directory
+	if (h[0] == 0x03)
+		return FIFID_SIGN;
+
+	return 0;
+}
 
 void abc800i_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
 {
