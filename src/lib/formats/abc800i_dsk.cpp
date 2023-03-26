@@ -85,7 +85,6 @@ const abc800i_format FLOPPY_ABC800I_FORMAT;
 
 void abc800i_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
 {
-	printf("fu");
 	if(f.sector_base_id == -1) {
 		for(int i=0; i<f.sector_count; i++) {
 			int cur_offset = 0;
