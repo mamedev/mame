@@ -3,7 +3,11 @@
 #include "emu.h"
 #include "debuggerview.h"
 
+#include "../xmlconfig.h"
+
 #include "modules/lib/osdobj_common.h"
+
+#include "xmlfile.h"
 
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
@@ -190,9 +194,43 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 	}
 }
 
+
+void DebuggerView::restoreConfigurationFromNode(util::xml::data_node const &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node const *const selection = node.get_child(NODE_WINDOW_SELECTION);
+		if (selection)
+		{
+			debug_view_xy pos = m_view->cursor_position();
+			m_view->set_cursor_visible(0 != selection->get_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0));
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->get_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
+			m_view->set_cursor_position(pos);
+		}
+	}
+}
+
+
+void DebuggerView::saveConfigurationToNode(util::xml::data_node &node)
+{
+	if (m_view->cursor_supported())
+	{
+		util::xml::data_node *const selection = node.add_child(NODE_WINDOW_SELECTION, nullptr);
+		if (selection)
+		{
+			debug_view_xy const pos = m_view->cursor_position();
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_VISIBLE, m_view->cursor_visible() ? 1 : 0);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_X, pos.x);
+			selection->set_attribute_int(ATTR_SELECTION_CURSOR_Y, pos.y);
+		}
+	}
+}
+
+
 void DebuggerView::keyPressEvent(QKeyEvent* event)
 {
-	if (m_view == nullptr)
+	if (!m_view)
 		return QWidget::keyPressEvent(event);
 
 	Qt::KeyboardModifiers keyMods = QApplication::keyboardModifiers();

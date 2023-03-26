@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-16 02:30+1100\n"
-"PO-Revision-Date: 2022-09-05 19:00+0300\n"
+"PO-Revision-Date: 2022-11-19 18:27+0200\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Virtaal 0.7.1\n"
+"X-Generator: Poedit 3.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -961,6 +961,7 @@ msgid ""
 "There is nothing you can do to fix this problem except wait for the "
 "developers to improve the emulation.\n"
 msgstr ""
+"\n"
 "ΑΥΤΟ ΤΟ ΣΥΣΤΗΜΑ ΔΕΝ ΛΕΙΤΟΥΡΓΕΙ. Η εξομοίωση για αυτό το σύστημα δεν είναι "
 "ακόμα πλήρης. Δεν υπάρχει τίποτα που μπορείτε να κάνετε για να διορθώσετε "
 "αυτό το πρόβλημα εκτός από την αναμονή για τους προγραμματιστές να "
@@ -973,6 +974,10 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"Στοιχεία αυτού του συστήματος δεν μπορούν να εξομοιωθούν με ακρίβεια, καθώς "
+"απαιτούν φυσική αλληλεπίδραση ή αποτελούνται από μηχανικές συσκευές. Δεν "
+"είναι δυνατόν να βιώσετε πλήρως αυτό το σύστημα.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1863,7 +1868,7 @@ msgstr "Πιέστε το πλήκτρο %1$s για προσθήκη\n"
 #: src/frontend/mame/ui/inputmap.cpp:609
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr "Πιέστε το πλήκτρο %1$s για καθαρισμό"
+msgstr "Πιέστε το πλήκτρο %1$s για καθαρισμό\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:610
 #, c-format
@@ -4672,7 +4677,7 @@ msgstr "Κουπί 10"
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr "Κουπί Κάθ."
+msgstr "Κουπί Κάθετο"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
@@ -4772,7 +4777,7 @@ msgstr "Θέσεως 10"
 #: src/emu/inpttype.ipp:700
 msgctxt "input-name"
 msgid "Positional V"
-msgstr "Θέσεως Κάθ."
+msgstr "Θέσεως Κάθετο"
 
 #: src/emu/inpttype.ipp:701
 msgctxt "input-name"
@@ -4872,7 +4877,7 @@ msgstr "Περιστροφικό 10"
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "Dial V"
-msgstr "Περιστροφικό Κάθ."
+msgstr "Περιστροφικό Κάθετο"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
@@ -6522,14 +6527,3 @@ msgid ""
 msgstr ""
 "Εισάγετε συνδυασμό ή πατήστε %s για ακύρωση\n"
 "%s"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this system cannot be emulated as they require physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this system.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Στοιχεία αυτού του συστήματος δεν μπορούν να εξομοιωθούν, καθώς απαιτούν "
-#~ "φυσική αλληλεπίδραση ή αποτελούνται από μηχανικές συσκευές. Δεν είναι "
-#~ "δυνατόν να δοκιμάσετε πλήρως αυτό το σύστημα.\n"

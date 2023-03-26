@@ -214,6 +214,9 @@ public:
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
+	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
+	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
 	void ppcdrc_set_options(uint32_t options);
@@ -297,6 +300,7 @@ protected:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache32;
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
+	uint32_t c_serial_clock;
 
 	struct internal_ppc_state
 	{
@@ -499,9 +503,11 @@ protected:
 
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;
+	uint32_t          m_serial_clock;
 	uint64_t          m_tb_zero_cycles;
 	uint64_t          m_dec_zero_cycles;
 	emu_timer *     m_decrementer_int_timer;
+
 
 	read32sm_delegate  m_dcr_read_func;
 	write32sm_delegate m_dcr_write_func;

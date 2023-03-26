@@ -10930,6 +10930,18 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<software name="simcopt">
+		<description>SimCopter 64 (prototype 19970616)</description>
+		<year>1997</year>
+		<publisher>Maxis</publisher>
+		<info name="alt_title" value="シムコプター64"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="simcop11.bin" size="0x1000000" crc="5334451f" sha1="f7aa2b5f1df09e48aa3093ede2ea6f6ab0828211" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="snobokidj" cloneof="snobokid">
 		<description>Snobo Kids (Japan)</description>
 		<year>1997</year>

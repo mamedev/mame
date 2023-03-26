@@ -892,15 +892,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int shift = REG(ry);
 						if (shift < 0)
 						{
-							int s = (-shift) & 0x1f;
-							REG(rn) = (((uint32_t)REG(rx) >> s) & ((uint32_t)(0xffffffff) >> s)) |
-										(((uint32_t)REG(rx) << (32-s)) & ((uint32_t)(0xffffffff) << (32-s)));
+							REG(rn) = rotr_32(REG(rx), -shift);
 						}
 						else
 						{
-							int s = shift & 0x1f;
-							REG(rn) = (((uint32_t)REG(rx) << s) & ((uint32_t)(0xffffffff) << s)) |
-										(((uint32_t)REG(rx) >> (32-s)) & ((uint32_t)(0xffffffff) >> (32-s)));
+							REG(rn) = rotl_32(REG(rx), shift);
 							if (shift > 0)
 							{
 								m_core->astat |= SV;

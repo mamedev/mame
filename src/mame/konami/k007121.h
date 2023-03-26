@@ -29,7 +29,7 @@ protected:
 
 private:
 	// internal state
-	uint8_t    m_ctrlram[8];
+	uint8_t  m_ctrlram[8];
 	int      m_flipscreen;
 	required_device<palette_device> m_palette;
 };

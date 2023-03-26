@@ -852,7 +852,7 @@ void mpu3_state::mpu3base(machine_config &config)
 	m_reels[0]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<0>));
 	REEL(config, m_reels[1], MPU3_48STEP_REEL, 96, 2, 0x00, 2);
 	m_reels[1]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<1>));
-	REEL(config, m_reels[2], MPU3_48STEP_REEL, 96, 2, 0x00, 2);;
+	REEL(config, m_reels[2], MPU3_48STEP_REEL, 96, 2, 0x00, 2);
 	m_reels[2]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<2>));
 	REEL(config, m_reels[3], MPU3_48STEP_REEL, 96, 2, 0x00, 2);
 	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));

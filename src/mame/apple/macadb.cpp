@@ -202,8 +202,11 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
 		m_keys(*this, "KEY%u", 0),
+		write_via_clock(*this),
+		write_via_data(*this),
 		write_adb_data(*this),
-		write_adb_irq(*this)
+		write_adb_irq(*this),
+		m_bIsMCUMode(true)
 {
 }
 
@@ -214,6 +217,8 @@ ioport_constructor macadb_device::device_input_ports() const
 
 void macadb_device::device_start()
 {
+	write_via_clock.resolve_safe();
+	write_via_data.resolve_safe();
 	write_adb_data.resolve_safe();
 	write_adb_irq.resolve_safe();
 
@@ -233,9 +238,13 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_datasize));
 	save_item(NAME(m_adb_buffer));
 	save_item(NAME(m_adb_command));
+	save_item(NAME(m_adb_send));
+	save_item(NAME(m_adb_timer_ticks));
+	save_item(NAME(m_adb_extclock));
 	save_item(NAME(m_adb_direction));
 	save_item(NAME(m_adb_listenreg));
 	save_item(NAME(m_adb_listenaddr));
+	save_item(NAME(m_adb_last_talk));
 	save_item(NAME(m_adb_srq_switch));
 	save_item(NAME(m_adb_stream_ptr));
 	save_item(NAME(m_adb_linestate));
@@ -253,6 +262,22 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_linein));
+}
+
+WRITE_LINE_MEMBER(macadb_device::adb_data_w)
+{
+	if (m_adb_timer_ticks > 0)
+	{
+		m_adb_command <<= 1;
+		if (state)
+		{
+			m_adb_command |= 1;
+		}
+		else
+		{
+			m_adb_command &= ~1;
+		}
+	}
 }
 
 /* *************************************************************************
@@ -487,12 +512,14 @@ void macadb_device::adb_talk()
 					case ADB_CMD_RESET:
 						LOGMASKED(LOG_TALK_LISTEN, "ADB RESET: reg %x address %x\n", reg, addr);
 						m_adb_direction = 0;
+						m_adb_send = 0;
 						break;
 
 					case ADB_CMD_FLUSH:
 						LOGMASKED(LOG_TALK_LISTEN, "ADB FLUSH: reg %x address %x\n", reg, addr);
 
 						m_adb_direction = 0;
+						m_adb_send = 0;
 						break;
 
 					default:    // reserved/unused
@@ -521,6 +548,9 @@ void macadb_device::adb_talk()
 
 			case 3: // talk
 				LOGMASKED(LOG_TALK_LISTEN, "ADB TALK: reg %x address %x (K %x M %x)\n", reg, addr, m_adb_keybaddr, m_adb_mouseaddr);
+
+				// keep track of what device the Mac last TALKed to
+				m_adb_last_talk = addr;
 
 				m_adb_direction = 0;    // output to Mac
 				if (addr == m_adb_mouseaddr)
@@ -693,118 +723,271 @@ void macadb_device::adb_talk()
 
 TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 {
-	switch (m_adb_linestate)
+	if (m_bIsMCUMode)
 	{
-		case LST_SRQNODATA:
-			set_adb_line(ASSERT_LINE);
-			m_adb_linestate = LST_IDLE;
-			break;
+		switch (m_adb_linestate)
+		{
+			case LST_SRQNODATA:
+				set_adb_line(ASSERT_LINE);
+				m_adb_linestate = LST_IDLE;
+				break;
 
-		case LST_TSTOPSTART:
-			LOGMASKED(LOG_LINESTATE, "Send: TStopStart begin\n");
-			set_adb_line(ASSERT_LINE);
-			m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
-			m_adb_linestate++;
-			break;
-
-		case LST_TSTOPSTARTa:
-			LOGMASKED(LOG_LINESTATE, "Send: TStopStart end\n");
-			set_adb_line(CLEAR_LINE);
-			m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
-			m_adb_linestate++;
-			break;
-
-		case LST_STARTBIT:
-			LOGMASKED(LOG_LINESTATE, "Send: Start bit\n");
-			set_adb_line(ASSERT_LINE);
-			m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
-			m_adb_linestate++;
-			break;
-
-		case LST_SENDBIT0:
-		case LST_SENDBIT1:
-		case LST_SENDBIT2:
-		case LST_SENDBIT3:
-		case LST_SENDBIT4:
-		case LST_SENDBIT5:
-		case LST_SENDBIT6:
-		case LST_SENDBIT7:
-			set_adb_line(CLEAR_LINE);
-			if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
-			{
-				LOGMASKED(LOG_LINESTATE, "Send: 1\n");
+			case LST_TSTOPSTART:
+				LOGMASKED(LOG_LINESTATE, "Send: TStopStart begin\n");
+				set_adb_line(ASSERT_LINE);
 				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
-			}
-			else
-			{
-				LOGMASKED(LOG_LINESTATE, "Send: 0\n");
-				m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
-			}
-			m_adb_linestate++;
-			break;
-
-		case LST_SENDBIT0a:
-		case LST_SENDBIT1a:
-		case LST_SENDBIT2a:
-		case LST_SENDBIT3a:
-		case LST_SENDBIT4a:
-		case LST_SENDBIT5a:
-		case LST_SENDBIT6a:
-			set_adb_line(ASSERT_LINE);
-			if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
-			{
-				m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
-			}
-			else
-			{
-				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
-			}
-			m_adb_buffer[m_adb_stream_ptr] <<= 1;
-			m_adb_linestate++;
-			break;
-
-		case LST_SENDBIT7a:
-			set_adb_line(ASSERT_LINE);
-			if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
-			{
-//                    printf("  ");
-				m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
-			}
-			else
-			{
-//                    printf("  ");
-				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
-			}
-
-			m_adb_stream_ptr++;
-			if (m_adb_stream_ptr == m_adb_datasize)
-			{
 				m_adb_linestate++;
-			}
-			else
-			{
-				m_adb_linestate = LST_SENDBIT0;
-			}
-			break;
+				break;
 
-		case LST_SENDSTOP:
-			LOGMASKED(LOG_LINESTATE, "Send: Stop bit begin\n");
-			set_adb_line(CLEAR_LINE);
-			m_adb_timer->adjust(attotime::from_ticks((adb_short*2), adb_timebase));
-			m_adb_linestate++;
-			break;
+			case LST_TSTOPSTARTa:
+				LOGMASKED(LOG_LINESTATE, "Send: TStopStart end\n");
+				set_adb_line(CLEAR_LINE);
+				m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
+				m_adb_linestate++;
+				break;
 
-		case LST_SENDSTOPa:
-			LOGMASKED(LOG_LINESTATE, "Send: Stop bit end\n");
-			set_adb_line(ASSERT_LINE);
+			case LST_STARTBIT:
+				LOGMASKED(LOG_LINESTATE, "Send: Start bit\n");
+				set_adb_line(ASSERT_LINE);
+				m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
+				m_adb_linestate++;
+				break;
+
+			case LST_SENDBIT0:
+			case LST_SENDBIT1:
+			case LST_SENDBIT2:
+			case LST_SENDBIT3:
+			case LST_SENDBIT4:
+			case LST_SENDBIT5:
+			case LST_SENDBIT6:
+			case LST_SENDBIT7:
+				set_adb_line(CLEAR_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
+				{
+					LOGMASKED(LOG_LINESTATE, "Send: 1\n");
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
+				}
+				else
+				{
+					LOGMASKED(LOG_LINESTATE, "Send: 0\n");
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
+				}
+				m_adb_linestate++;
+				break;
+
+			case LST_SENDBIT0a:
+			case LST_SENDBIT1a:
+			case LST_SENDBIT2a:
+			case LST_SENDBIT3a:
+			case LST_SENDBIT4a:
+			case LST_SENDBIT5a:
+			case LST_SENDBIT6a:
+				set_adb_line(ASSERT_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
+				{
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
+				}
+				else
+				{
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
+				}
+				m_adb_buffer[m_adb_stream_ptr] <<= 1;
+				m_adb_linestate++;
+				break;
+
+			case LST_SENDBIT7a:
+				set_adb_line(ASSERT_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
+				{
+//                    printf("  ");
+					m_adb_timer->adjust(attotime::from_ticks(adb_long, adb_timebase));
+				}
+				else
+				{
+//                    printf("  ");
+					m_adb_timer->adjust(attotime::from_ticks(adb_short, adb_timebase));
+				}
+
+				m_adb_stream_ptr++;
+				if (m_adb_stream_ptr == m_adb_datasize)
+				{
+					m_adb_linestate++;
+				}
+				else
+				{
+					m_adb_linestate = LST_SENDBIT0;
+				}
+				break;
+
+			case LST_SENDSTOP:
+				LOGMASKED(LOG_LINESTATE, "Send: Stop bit begin\n");
+				set_adb_line(CLEAR_LINE);
+				m_adb_timer->adjust(attotime::from_ticks((adb_short*2), adb_timebase));
+				m_adb_linestate++;
+				break;
+
+			case LST_SENDSTOPa:
+				LOGMASKED(LOG_LINESTATE, "Send: Stop bit end\n");
+				set_adb_line(ASSERT_LINE);
+				m_adb_timer->adjust(attotime::never);
+				m_adb_linestate = LST_IDLE;
+				break;
+		}
+	}
+	else
+	{
+		// for input to Mac, the VIA reads on the *other* clock edge, so update this here
+		if (!m_adb_direction)
+		{
+			write_via_data((m_adb_send & 0x80)>>7);
+			m_adb_send <<= 1;
+		}
+
+		// do one clock transition on CB1 to advance the VIA shifter
+		//printf("ADB transition (%d)\n", m_adb_timer_ticks);
+		if (m_adb_direction)
+		{
+			write_via_clock(m_adb_extclock ^ 1);
+			write_via_clock(m_adb_extclock);
+		}
+		else
+		{
+			write_via_clock(m_adb_extclock);
+			write_via_clock(m_adb_extclock ^ 1);
+		}
+
+		m_adb_timer_ticks--;
+		if (!m_adb_timer_ticks)
+		{
 			m_adb_timer->adjust(attotime::never);
-			m_adb_linestate = LST_IDLE;
-			break;
+
+			if ((m_adb_direction) && (!m_bIsMCUMode))
+			{
+				adb_talk();
+				if((m_adb_last_talk == 2) && m_adb_datasize) {
+					m_adb_timer_ticks = 8;
+					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				}
+			}
+
+			if (!(m_adb_direction) && !(m_bIsMCUMode))
+			{
+			//  write_via_clock(m_adb_extclock);
+				write_via_clock(m_adb_extclock ^ 1);
+			}
+		}
+		else
+		{
+			m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+		}
+	}
+}
+
+void macadb_device::mac_adb_newaction(int state)
+{
+	if (state != m_adb_state)
+	{
+		LOGMASKED(LOG_STATE, "New ADB state: %s\n", adb_statenames[state]);
+
+		m_adb_state = state;
+		m_adb_timer_ticks = 8;
+
+		switch (state)
+		{
+			case ADB_STATE_NEW_COMMAND:
+				m_adb_command = m_adb_send = 0;
+				m_adb_direction = 1;    // Mac is shifting us a command
+				m_adb_waiting_cmd = 1;  // we're going to get a command
+				write_adb_irq(CLEAR_LINE);
+				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				break;
+
+			case ADB_STATE_XFER_EVEN:
+			case ADB_STATE_XFER_ODD:
+				//printf("EVEN/ODD: adb datasize %d\n", m_adb_datasize);
+				if (m_adb_datasize > 0)
+				{
+					int i;
+
+					// is something trying to send to the Mac?
+					if (m_adb_direction == 0)
+					{
+						// set up the byte
+						m_adb_send = m_adb_buffer[0];
+						//printf("ADB sending %02x\n", m_adb_send);
+						m_adb_datasize--;
+
+						// move down the rest of the buffer, if any
+						for (i = 0; i < m_adb_datasize; i++)
+						{
+							m_adb_buffer[i] = m_adb_buffer[i+1];
+						}
+					}
+
+				}
+				else
+				{
+					m_adb_send = 0;
+					write_adb_irq(ASSERT_LINE);
+				}
+
+				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				break;
+
+			case ADB_STATE_IDLE:
+				write_adb_irq(CLEAR_LINE);
+				break;
+		}
 	}
 }
 
 void macadb_device::adb_vblank()
 {
+	if (m_adb_state == ADB_STATE_IDLE)
+	{
+		if (this->adb_pollmouse())
+		{
+			// if the mouse was the last TALK, we can just send the new data
+			// otherwise we need to pull SRQ
+			if (m_adb_last_talk == m_adb_mouseaddr)
+			{
+				// repeat last TALK to get updated data
+				m_adb_waiting_cmd = 1;
+				this->adb_talk();
+
+				m_adb_timer_ticks = 8;
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			}
+			else
+			{
+				write_adb_irq(ASSERT_LINE);
+				m_adb_command = m_adb_send = 0;
+				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see the IRQ
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				m_adb_srq_switch = 1;
+			}
+		}
+		else if (this->adb_pollkbd(0))
+		{
+			if (m_adb_last_talk == m_adb_keybaddr)
+			{
+				// repeat last TALK to get updated data
+				m_adb_waiting_cmd = 1;
+				this->adb_talk();
+
+				m_adb_timer_ticks = 8;
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+			}
+			else
+			{
+				write_adb_irq(ASSERT_LINE);
+				m_adb_command = m_adb_send = 0;
+				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
+				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				m_adb_srq_switch = 1;
+			}
+		}
+	}
 }
 
 void macadb_device::device_reset()
@@ -813,11 +996,17 @@ void macadb_device::device_reset()
 
 	m_adb_srq_switch = 0;
 	write_adb_irq(CLEAR_LINE);      // no interrupt
+	m_adb_timer_ticks = 0;
 	m_adb_command = 0;
+	m_adb_extclock = 0;
+	m_adb_send = 0;
 	m_adb_waiting_cmd = 0;
+	m_adb_state = 0;
 	m_adb_srqflag = false;
+	m_adb_state = ADB_STATE_NOTINIT;
 	m_adb_direction = 0;
 	m_adb_datasize = 0;
+	m_adb_last_talk = -1;
 
 	m_adb_linestate = 0;
 

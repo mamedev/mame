@@ -258,7 +258,7 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0x0c0080, 0x0c0081).nopw(); // CRTC related ?
 	map(0x0c00c0, 0x0c00c1).nopw(); // CRTC related ?
 	map(0x0c0100, 0x0c0101).w(FUNC(banprestoms_state::okibank_w));
-//	map(0x0c0140, 0x0c0141).nopw(); // in marioun bit 3 is lamp according to test mode
+//  map(0x0c0140, 0x0c0141).nopw(); // in marioun bit 3 is lamp according to test mode
 	map(0x0e0000, 0x0e0001).portr("DSW1");
 	map(0x0e0002, 0x0e0003).portr("IN1");
 	map(0x0e0004, 0x0e0005).portr("IN2");

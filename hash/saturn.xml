@@ -5457,7 +5457,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -11732,7 +11732,7 @@ Sega logo animation draws offset [VDP2]
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -23907,7 +23907,7 @@ Sega logo animation draws offset [VDP2]
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">

@@ -122,8 +122,10 @@ void upd71071_device::device_start()
 
 	m_reg.device_control = 0;
 	m_reg.mask = 0x0f;  // mask all channels
-	for (int x = 0; x < 4; x++)
-		m_reg.mode_control[x] = 0;
+
+	std::fill(std::begin(m_reg.address_current), std::end(m_reg.address_current), 0);
+	std::fill(std::begin(m_reg.count_current), std::end(m_reg.count_current), 0);
+	std::fill(std::begin(m_reg.mode_control), std::end(m_reg.mode_control), 0);
 
 	save_item(NAME(m_reg.initialise));
 	save_item(NAME(m_reg.channel));

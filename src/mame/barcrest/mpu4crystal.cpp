@@ -44,6 +44,7 @@ MACHINE_START_MEMBER(mpu4crystal_machines_state,mpu4cry)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 }
 
 void mpu4crystal_machines_state::crystal_f(machine_config &config)

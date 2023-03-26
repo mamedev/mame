@@ -13043,7 +13043,9 @@ ROM_START( galactica2 ) // on a PCB silkscreend 'Cirsa'
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "h_2_galactica_cirsa", 0x0000, 0x0800, CRC(6babd14e) SHA1(c8601803bc74c1089f767c4672376d4788dc4f49) )
-	ROM_LOAD( "i_2_galactica_cirsa", 0x0800, 0x0800, CRC(0997e81b) SHA1(a5c6b2b59f7a807b44e5d49c54c42d1abf2fc71a) )
+	ROM_RELOAD(                      0x0800, 0x0800 )
+	ROM_LOAD( "i_2_galactica_cirsa", 0x1000, 0x0800, CRC(0997e81b) SHA1(a5c6b2b59f7a807b44e5d49c54c42d1abf2fc71a) )
+	ROM_RELOAD(                      0x1800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "74s288n", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
