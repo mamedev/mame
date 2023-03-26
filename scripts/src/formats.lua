@@ -133,6 +133,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/abc800i_dsk.h,FORMATS["ABC800I_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ABC800I_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/abc1600_dsk.h,FORMATS["ABC1600_DSK"] = true
 --------------------------------------------------
 

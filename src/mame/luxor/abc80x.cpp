@@ -2084,7 +2084,9 @@ void abc800_state::common(machine_config &config)
 	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
+	SOFTWARE_LIST(config, "flop_list_830").set_original("abc830_flop");
+	SOFTWARE_LIST(config, "flop_list_832").set_original("abc832_flop");
+	SOFTWARE_LIST(config, "flop_list_838").set_original("abc838_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
@@ -2227,7 +2229,7 @@ void abc806_state::abc806(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
+	SOFTWARE_LIST(config, "flop_list_806").set_original("abc806_flop");
 }
 
 

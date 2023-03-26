@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="abc806" description="Luxor ABC 806 diskettes">
+<softwarelist name="abc806_flop" description="Luxor ABC 806 diskettes">
 
 	<software name="graf806" supported="no">
 		<description>Graf806</description>

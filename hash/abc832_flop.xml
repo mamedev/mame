@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="abc832_flop" description="Luxor ABC 832 diskettes">
+
+	<software name="abc832" supported="no">
+		<description>ABC832 Systemskiva v2.5 (Sweden)</description>
+		<year>1982</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="BYE" />
+		<sharedfeat name="bus_default" value="abc832" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abc832.img" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
