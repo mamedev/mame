@@ -19,4 +19,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ufd631">
+		<description>Systemskiva v6.31 för UFD-DOS (Sweden)</description>
+		<year>198?</year>
+		<publisher>Luxor</publisher>
+		<info name="serial" value="68 29251-51" />
+		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<sharedfeat name="bus_default" value="abc832" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="140772">
+				<rom name="ufd631.td0" size="140772" crc="c767e073" sha1="42fb39f3a9fe5020d339d6b00c13170898a6059e"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
