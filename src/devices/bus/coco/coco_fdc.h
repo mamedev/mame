@@ -22,48 +22,49 @@
 // ======================> coco_family_fdc_device_base
 
 class coco_family_fdc_device_base :
-		public device_t,
-		public device_cococart_interface
+                public device_t,
+                public device_cococart_interface
 {
 public:
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
+        DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
+        DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
 
-	static void floppy_formats(format_registration &fr);
+        static void floppy_formats(format_registration &fr);
 
 protected:
-	// construction/destruction
-	coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-		: device_t(mconfig, type, tag, owner, clock)
-		, device_cococart_interface(mconfig, *this)
-	{
-	};
+        // construction/destruction
+        coco_family_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+                : device_t(mconfig, type, tag, owner, clock)
+                , device_cococart_interface(mconfig, *this)
+        {
+        };
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+        // device-level overrides
+        virtual void device_start() override;
+        virtual void device_reset() override;
 
-	// FDC overrides
-	virtual void update_lines() = 0;
-	virtual u8 *get_cart_base() override;
-	virtual memory_region *get_cart_memregion() override;
+        // FDC overrides
+        virtual void update_lines() = 0;
+        virtual u8 *get_cart_base() override;
+        virtual memory_region *get_cart_memregion() override;
 
-	// accessors
-	u8 dskreg() const { return m_dskreg; }
-	bool intrq() const { return m_intrq; }
-	bool drq() const { return m_drq; }
-	void set_dskreg(u8 data) { m_dskreg = data; }
+        // accessors
+        u8 dskreg() const { return m_dskreg; }
+        bool intrq() const { return m_intrq; }
+        bool drq() const { return m_drq; }
+        void set_dskreg(u8 data) { m_dskreg = data; }
 
 private:
-	// registers
-	u8 m_dskreg;
-	bool m_intrq;
-	bool m_drq;
+        // registers
+        u8 m_dskreg;
+        bool m_intrq;
+        bool m_drq;
 };
 
 // device type definitions - CoCo FDC
 DECLARE_DEVICE_TYPE(COCO_FDC,       coco_family_fdc_device_base)
 DECLARE_DEVICE_TYPE(COCO_FDC_V11,   coco_family_fdc_device_base)
+DECLARE_DEVICE_TYPE(COCO_LOCAL,     coco_family_fdc_device_base)
 DECLARE_DEVICE_TYPE(COCO_SCII_CC1,  coco_family_fdc_device_base)
 DECLARE_DEVICE_TYPE(COCO_SCII_CC3,  coco_family_fdc_device_base)
 DECLARE_DEVICE_TYPE(COCO3_HDB1,     coco_family_fdc_device_base)
