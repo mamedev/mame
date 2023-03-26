@@ -26,7 +26,7 @@ const char *abc800_format::description() const
 
 const char *abc800_format::extensions() const
 {
-	return "dsk";
+	return "dsk,img";
 }
 
 const abc800_format::format abc800_format::formats[] = {
@@ -162,4 +162,23 @@ void abc800_format::build_sector_description(const format &f, uint8_t *sectdata,
 			sectors[i].sector_id = i + f.sector_base_id;
 		}
 	}
+}
+
+int abc800_format::get_image_offset(const format &f, int head, int track) const
+{
+	int offset = 0;
+
+	if(head) {
+		for(int trk=0; trk < f.track_count; trk++) {
+			const format &tf = get_track_format(f, 0, trk);
+			offset += compute_track_size(tf);
+		}
+	}
+
+	for(int trk=0; trk < track; trk++) {
+		const format &tf = get_track_format(f, head, trk);
+		offset += compute_track_size(tf);
+	}
+
+	return offset;
 }
