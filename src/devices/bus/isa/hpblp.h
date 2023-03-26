@@ -19,6 +19,9 @@ class isa8_hpblp_device :
 public:
 	isa8_hpblp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// indicate not working because ROMs don't exist
+	static constexpr feature_type imperfect_features() { return feature::ALL; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -26,6 +29,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
 private:
 	// ISA part
 	void isamap(address_map &map);

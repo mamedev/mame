@@ -523,6 +523,9 @@ void isa8_hpblp_device::device_reset()
 		}
 		m_isa->install_device(port, port + 7, *this, &isa8_hpblp_device::isamap);
 		m_installed = true;
+
+		// halt until ROMs are found
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	m_ack_buscycle = false;
@@ -538,8 +541,8 @@ void isa8_hpblp_device::device_reset()
 
 ROM_START(hpblp)
 	ROM_REGION(0x20000, BLP_TAG, 0)
-	ROM_LOAD16_BYTE( "1818-4576.bin", 0x000000, 0x008000, CRC(8beb6bdb) SHA1(9b620c577aea54841608d0d46f7e8077eef607c6))
-	ROM_LOAD16_BYTE( "1818-4577.bin", 0x000001, 0x008000, CRC(e8a5c071) SHA1(9e13c0ef2aed6565c33795780b7102f2647cf2a0))
+//	ROM_LOAD16_BYTE( "1818-4576.bin", 0x000000, 0x008000, CRC(8beb6bdb) SHA1(9b620c577aea54841608d0d46f7e8077eef607c6))
+//	ROM_LOAD16_BYTE( "1818-4577.bin", 0x000001, 0x008000, CRC(e8a5c071) SHA1(9e13c0ef2aed6565c33795780b7102f2647cf2a0))
 ROM_END
 
 const tiny_rom_entry *isa8_hpblp_device::device_rom_region() const
