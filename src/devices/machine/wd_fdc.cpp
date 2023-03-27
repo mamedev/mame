@@ -136,9 +136,10 @@ static const char *const states[] =
 	"WRITE_SECTOR_PRE_BYTE"
 };
 
-uint32_t wd_fdc_device_base::live_info::shift_reg_low(int n) const
+//uint32_t wd_fdc_device_base::live_info::shift_reg_low(int n) const
+template <unsigned B> uint32_t wd_fdc_device_base::live_info::shift_reg_low() const
 {
-	return shift_reg & make_bitmask<uint32_t>(n);
+	return shift_reg & make_bitmask<uint32_t>(B);
 }
 
 uint8_t wd_fdc_device_base::live_info::shift_reg_data() const
@@ -1817,13 +1818,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 					cur_live.shift_reg_data(),
 					cur_live.bit_counter);
 
-			if(!dden && cur_live.shift_reg_low(16) == 0x4489) {
+			if(!dden && cur_live.shift_reg_low<16>() == 0x4489) {
 				cur_live.crc = 0x443b;
 				reset_data_sync();
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
-			if(dden && cur_live.shift_reg_low(23) == 0x2af57e) {
+			if(dden && cur_live.shift_reg_low<23>() == 0x2af57e) {
 				cur_live.crc = 0xef21;
 				reset_data_sync();
 				if(main_state == READ_ID)
@@ -1848,7 +1849,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			int slot = cur_live.bit_counter >> 4;
 
 			if(slot < 3) {
-				if(cur_live.shift_reg_low(16) != 0x4489)
+				if(cur_live.shift_reg_low<16>() != 0x4489)
 					cur_live.state = SEARCH_ADDRESS_MARK_HEADER;
 				break;
 			}
@@ -1929,7 +1930,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 					return;
 				}
 
-				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg_low(16) == 0x4489) {
+				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg_low<16>() == 0x4489) {
 					cur_live.crc = 0x443b;
 					reset_data_sync();
 					cur_live.state = READ_DATA_BLOCK_HEADER;
@@ -1940,12 +1941,12 @@ void wd_fdc_device_base::live_run(attotime limit)
 					return;
 				}
 
-				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg_low(16) == 0xf56a || cur_live.shift_reg_low(16) == 0xf56b ||
-														cur_live.shift_reg_low(16) == 0xf56e || cur_live.shift_reg_low(16) == 0xf56f)) {
+				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg_low<16>() == 0xf56a || cur_live.shift_reg_low<16>() == 0xf56b ||
+														cur_live.shift_reg_low<16>() == 0xf56e || cur_live.shift_reg_low<16>() == 0xf56f)) {
 					cur_live.crc =
-						cur_live.shift_reg_low(16) == 0xf56a ? 0x8fe7 :
-						cur_live.shift_reg_low(16) == 0xf56b ? 0x9fc6 :
-						cur_live.shift_reg_low(16) == 0xf56e ? 0xafa5 :
+						cur_live.shift_reg_low<16>() == 0xf56a ? 0x8fe7 :
+						cur_live.shift_reg_low<16>() == 0xf56b ? 0x9fc6 :
+						cur_live.shift_reg_low<16>() == 0xf56e ? 0xafa5 :
 						0xbf84;
 
 					reset_data_sync();
@@ -1978,7 +1979,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 			int slot = cur_live.bit_counter >> 4;
 
 			if(slot < 3) {
-				if(cur_live.shift_reg_low(16) != 0x4489) {
+				if(cur_live.shift_reg_low<16>() != 0x4489) {
 					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
 					return;
 				}
@@ -2044,7 +2045,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			if(dden) {
 				//FM Prefix match
-				if(cur_live.shift_reg_low(17) == 0xabd5)	// 17-bit match
+				if(cur_live.shift_reg_low<17>() == 0xabd5)	// 17-bit match
 				{
 					cur_live.data_separator_phase = false;
 					cur_live.bit_counter = 5*2;	// prefix is 5 of 8 bits
@@ -2061,8 +2062,8 @@ void wd_fdc_device_base::live_run(attotime limit)
 			// !dden
 			if(cur_live.bit_counter != 16
 				// MFM resyncs
-				&& !((cur_live.shift_reg_low(16) == 0x4489
-							|| cur_live.shift_reg_low(16) == 0x5224))
+				&& !((cur_live.shift_reg_low<16>() == 0x4489
+							|| cur_live.shift_reg_low<16>() == 0x5224))
 				)
 				break;
 

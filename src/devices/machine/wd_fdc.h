@@ -260,7 +260,7 @@ private:
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
-		uint32_t shift_reg_low(int n) const;
+		template <unsigned B> uint32_t shift_reg_low() const;
 		uint8_t shift_reg_data() const;
 	};
 
