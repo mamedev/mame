@@ -156,7 +156,7 @@ void brglitz_state::brglitz(machine_config &config)
 
 ROM_START(brglitz)
 	ROM_REGION(0x02000, "maincpu", 0)
-	ROM_LOAD("bg_04_v1.3.u1",    0x00000, 0x02000, BAD_DUMP CRC(f414b736) SHA1(0280adb1de085f2774ad58872cb171a65cf85fbe)) // PIC17C43-8. Bad dump? Needs further checking
+	ROM_LOAD("bg_04_v1.3.u1",    0x00000, 0x02000, BAD_DUMP CRC(f414b736) SHA1(0280adb1de085f2774ad58872cb171a65cf85fbe)) // PIC17C43-8, protected
 
 	ROM_REGION(0x00400, "soundcpu", 0)
 	/*
