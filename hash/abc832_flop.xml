@@ -164,7 +164,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
-				<rom name="ok├ñnd.img" size="655360" crc="64a139ac" sha1="110516288aacf899ae3000dec66ba6bb5f7a1986"/>
+				<rom name="okand.img" size="655360" crc="64a139ac" sha1="110516288aacf899ae3000dec66ba6bb5f7a1986"/>
 			</dataarea>
 		</part>
 	</software>
