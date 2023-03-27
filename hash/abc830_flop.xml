@@ -43,7 +43,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ord800">
-		<description>ORD 800 v2.4 (Sweden)</description>
+		<description>ORD 800 v2.4</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 
@@ -55,7 +55,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="prommis">
-		<description>PROMMIS v6.2 (Sweden)</description>
+		<description>PROMMIS v6.2</description>
 		<year>1983</year>
 		<publisher>ELogik</publisher>
 
@@ -67,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="red800">
-		<description>Bokföring 800 v2.0 (Sweden)</description>
+		<description>Bokföring 800 v2.0</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 
@@ -92,7 +92,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tty800">
-		<description>TTY800 v1.5 (Sweden)</description>
+		<description>TTY800 v1.5</description>
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
 
@@ -104,10 +104,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="tty800a" cloneof="tty800">
-		<description>TTY800 v1.5 (Sweden) (no autoboot)</description>
+		<description>TTY800 v1.5 (no autoboot)</description>
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
-		<info name="usage" value="RUN&quot;TTY&quot;" />
+		<info name="usage" value="RUN TTY" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="40815">
@@ -120,7 +120,7 @@ license:CC0-1.0
 		<description>CAT800L v8.6 for CATNET v1.3</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;CATNETL&quot;" />
+		<info name="usage" value="RUN CATNETL" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="32173">
@@ -133,7 +133,7 @@ license:CC0-1.0
 		<description>Systeemilevy ABC800 v1.0 (Finland)</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="22884">
@@ -143,11 +143,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="sys10sw">
-		<description>Systemskiva ABC800 v1.0 (Sweden)</description>
+		<description>Systemskiva ABC800 v1.0</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="serial" value="68 29011-41" />
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="24026">
@@ -160,7 +160,7 @@ license:CC0-1.0
 		<description>System disk v6.19 for UFD-DOS</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="119474">
@@ -173,7 +173,7 @@ license:CC0-1.0
 		<description>System disk v6.19a6 for UFD-DOS</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="136796">
@@ -205,6 +205,31 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="77214">
 				<rom name="pascal10.td0" size="77214" crc="5ded710c" sha1="66be481e7bff83c1dc3c7c7af85bc34f6813dc6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kompil">
+		<description>Kompil</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+		<info name="usage" value="RUN KOMPIL" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="830_kompil.img" size="163840" crc="961c00be" sha1="1672c14c931633d9f6e7f8af629e081daa710570"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trim">
+		<description>Trim</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="trim.img" size="163840" crc="f3a6b2ff" sha1="a4253906d483697891314537882c82ff9288cfeb"/>
 			</dataarea>
 		</part>
 	</software>
