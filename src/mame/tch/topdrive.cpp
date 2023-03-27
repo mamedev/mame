@@ -262,19 +262,8 @@ static INPUT_PORTS_START( topdrive )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gfx_layout stlforce_splayout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(3,4),RGN_FRAC(2,4),RGN_FRAC(1,4),RGN_FRAC(0,4) },
-	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15},
-	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16},
-	16*16
-};
-
 static GFXDECODE_START( gfx_topdrive )
-	GFXDECODE_ENTRY( "gfx1", 0, stlforce_splayout,  0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_planar,  0x000, 0x40 )
 GFXDECODE_END
 
 
