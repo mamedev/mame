@@ -214,7 +214,7 @@ void topdrive_state::topdrive_map(address_map &map)
 	map(0xa10000, 0xa1000f).ram().share("scrram");
 
 	map(0xb00000, 0xb007ff).ram().share("spriteram");
-	map(0xc00000, 0xc007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); 
+	map(0xc00000, 0xc007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe00003, 0xe00003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe00004, 0xe00005).w(FUNC(topdrive_state::soundbank_w));
 
@@ -325,4 +325,4 @@ ROM_START( topdrive )
 	ROM_LOAD( "3-27c040.bin",      0x00000, 0x80000, CRC(2894b89b) SHA1(cf884042edd2fc05e04d21ccd36f5183f9a7ec5c) )
 ROM_END
 
-GAME( 1995, topdrive,     0,        topdrive,    topdrive,    topdrive_state, empty_init, ROT0,  "Proyesel", "Top Driving (Version 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, topdrive,     0,        topdrive,    topdrive,    topdrive_state, empty_init, ROT0,  "Proyesel", "Top Driving (version 1.1)", MACHINE_SUPPORTS_SAVE )
