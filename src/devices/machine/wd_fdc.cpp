@@ -136,6 +136,16 @@ static const char *const states[] =
 	"WRITE_SECTOR_PRE_BYTE"
 };
 
+uint32_t wd_fdc_device_base::live_info::shift_reg_low(int n) const
+{
+	return shift_reg & make_bitmask<uint32_t>(n);
+}
+
+uint8_t wd_fdc_device_base::live_info::shift_reg_data() const
+{
+	return bitswap<8>(shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+}
+
 wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
@@ -2032,17 +2042,15 @@ void wd_fdc_device_base::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 
-			if (dden) {
+			if(dden) {
 				//FM Prefix match
-				if (cur_live.shift_reg_low(17) == 0xabd5)	// 17-bit match
+				if(cur_live.shift_reg_low(17) == 0xabd5)	// 17-bit match
 				{
 					cur_live.data_separator_phase = false;
 					cur_live.bit_counter = 5*2;	// prefix is 5 of 8 bits
 					cur_live.data_reg = 0xff;
 					break;
-				}
-				else if (cur_live.bit_counter == 16)
-				{
+				} else if(cur_live.bit_counter == 16) {
 					cur_live.data_separator_phase = false;
 					cur_live.bit_counter = 0;
 					live_delay(READ_TRACK_DATA_BYTE);
