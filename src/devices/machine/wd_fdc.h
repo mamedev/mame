@@ -254,12 +254,20 @@ private:
 
 		attotime tm;
 		int state, next_state;
-		uint16_t shift_reg;
+		uint32_t shift_reg;
 		uint16_t crc;
 		int bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
+		uint32_t shift_reg_low(int n) const
+		{
+			return shift_reg & make_bitmask<uint32_t>(n);
+		}
+		uint8_t shift_reg_data() const
+		{
+			return bitswap<8>(shift_reg, 14, 12, 10, 8, 6, 4, 2, 0);
+		}
 	};
 
 	enum {
