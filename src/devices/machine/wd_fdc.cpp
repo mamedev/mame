@@ -136,7 +136,6 @@ static const char *const states[] =
 	"WRITE_SECTOR_PRE_BYTE"
 };
 
-//uint32_t wd_fdc_device_base::live_info::shift_reg_low(int n) const
 template <unsigned B> uint32_t wd_fdc_device_base::live_info::shift_reg_low() const
 {
 	return shift_reg & make_bitmask<uint32_t>(B);
