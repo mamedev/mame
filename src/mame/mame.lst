@@ -18863,8 +18863,9 @@ cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
 comp4                           // Milton Bradley
+comparc                         // Tandy Corporation
 copycat                         // Tiger Electronics
-copycatm2                       // Tiger Electronics
+copycata                        // Tiger Electronics
 cqback                          // Coleco
 dataman                         // Texas Instruments
 ditto                           // Tiger Electronics
@@ -18895,7 +18896,7 @@ h2hfootb                        // Coleco
 h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
-lilprof78                       // Texas Instruments
+lilprofa                        // Texas Instruments
 liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -18932,7 +18933,6 @@ stopthiefp                      // Parker Bros (patent)
 subwars                         // Tiger Electronics
 t3in1sa                         // Tandy Corporation
 t7in1ss                         // Tiger Electronics
-tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
 tc7atc                          // Bandai
@@ -18941,7 +18941,7 @@ tcfballa                        // Tandy Corporation
 tdracula                        // Tsukuda
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
-ti125076                        // Texas Instruments
+ti1250a                         // Texas Instruments
 ti1270                          // Texas Instruments
 ti1680                          // Texas Instruments
 ti25503                         // Texas Instruments
@@ -18961,6 +18961,8 @@ zodiac                          // Coleco
 alnchase                        // Tomy
 astrocmd                        // Epoch
 bcclimbr                        // Bandai
+bgalaxn                         // Bandai
+bgunf                           // Bandai
 bmcfball                        // Bambino
 bmsafari                        // Bambino
 bmsoccer                        // Bambino
@@ -38782,6 +38784,9 @@ wccf2chk                        // 2004.?? World Club Champion Football Serie A 
 wccf310j                        // 2005.06 World Club Champion Football European Clubs 2004-2005
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf331j                        // 2005.12 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf341j                        // 2006.02 World Club Champion Football European Clubs 2004-2005 Ver.1.2
+wccf400j                        // 2006.07 World Club Champion Football European Clubs 2005-2006
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
 wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)

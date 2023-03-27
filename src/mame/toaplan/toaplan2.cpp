@@ -403,7 +403,6 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "speaker.h"
 
 
-#define UNICODE_YEN             "\xC2\xA5"
 #define PWRKICK_HOPPER_PULSE    50          // time between hopper pulses in milliseconds (probably wrong)
 
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
@@ -2414,10 +2413,10 @@ static INPUT_PORTS_START( pwrkick )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x00, "Play Credit" ) PORT_DIPLOCATION("SW2:!1,!2")
-	PORT_DIPSETTING(    0x00, UNICODE_YEN "10" )
-	PORT_DIPSETTING(    0x01, UNICODE_YEN "20" )
-	PORT_DIPSETTING(    0x02, UNICODE_YEN "30" )
-	PORT_DIPSETTING(    0x03, UNICODE_YEN "40" )
+	PORT_DIPSETTING(    0x00, u8"¥10" )
+	PORT_DIPSETTING(    0x01, u8"¥20" )
+	PORT_DIPSETTING(    0x02, u8"¥30" )
+	PORT_DIPSETTING(    0x03, u8"¥40" )
 	PORT_DIPNAME( 0x0c, 0x00, "Coin Exchange" ) PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "12" )
 	PORT_DIPSETTING(    0x04, "10" )
@@ -2449,7 +2448,7 @@ static INPUT_PORTS_START( pwrkick )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin 2 (" UNICODE_YEN "10)")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME(u8"Coin 2 (¥10)")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP4 ) PORT_NAME("Down") // does this button really exist?
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
@@ -2458,7 +2457,7 @@ static INPUT_PORTS_START( pwrkick )
 
 	PORT_START("SYS")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin Exchange (" UNICODE_YEN "100)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME(u8"Coin Exchange (¥100)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Key")
