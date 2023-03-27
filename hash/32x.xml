@@ -1634,7 +1634,7 @@ license:CC0-1.0
 
 	<!-- missing I2C hookup so POST fails with blue/black vertical stripes (same I2C type as plain MD version) -->
 	<software name="nbajamte" supported="no">
-		<description>NBA Jam: Tournament Edition (World)</description>
+		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8102A (JPN)"/>

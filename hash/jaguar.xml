@@ -594,7 +594,7 @@ Unreleased (possibly no prototypes exist):
 	<!-- exception on non-debug, on debug gameplay sports no sprite GFXs -->
 	<!-- minor glitch on team box when selecting one (blitter not filling properly) -->
 	<software name="nbajamte" supported="no">
-		<description>NBA Jam: Tournament Edition</description>
+		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="J9089E 705089-002"/>
