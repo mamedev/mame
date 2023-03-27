@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 // Top Driving by Proyesel - PRO-4/B PCB
-// an alt version of this called Mortal Driving has been seen, a logo for it also exists in the ROM.
+// an alt version of this called Mortal Race has been seen, a logo for it also exists in the ROM.
 // https://www.recreativas.org/mortal-race-2435-ecogames-sl "1995 New Dream Games S.L. Palma MCA Spain"
 
 #include "emu.h"
