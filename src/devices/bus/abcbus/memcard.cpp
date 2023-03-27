@@ -81,13 +81,14 @@ ROM_START( abc_dos )
 	ROMX_LOAD( "ufddos20.3d", 0x0000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(2) )
 
 	ROM_REGION( 0x400, "iec", 0 )
-	ROM_LOAD( "iec.4b", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "abc80-iec-option-4027-ver1.02.4b", 0x000, 0x400, CRC(b4998599) SHA1(1d46d1334599c31025cc8481daa4d38d470a7b48) )
 
 	ROM_REGION( 0x400, "opt", 0 )
-	ROM_LOAD( "spare.4a", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD_OPTIONAL( "spare.4a", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x400, "prn", 0 )
-	ROM_LOAD( "printer.3b", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "abc80-printer-option-9704.3b", 0x000, 0x400, CRC(f2f0d808) SHA1(6355495542e77411137426effbe1059532735bb2) )
+	ROM_LOAD( "abc80-printer-option-9704-0.1.3b", 0x000, 0x400, CRC(5bfaee54) SHA1(fc62d8c27c69c7ca0870faa922ccd7aa1b650ecf) )
 ROM_END
 
 

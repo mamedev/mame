@@ -72,7 +72,7 @@ public:
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
 		m_bus(*this, "bus"),
-		m_kb(*this, ABC80_KEYBOARD_TAG),
+		m_kb(*this, KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
 		m_palette(*this, "palette"),
