@@ -3,14 +3,14 @@ Current only SNES and Mega Drive/Genesis are supported, and only IPS format patc
 supported. Place IPS patches in a directory to match the software list item you are running.
 For example, your autopatch directory should look something like this:
 
-plugins/
-plugins/autopatch/
-plugins/autopatch/init.lua
-plugins/autopatch/plugin.json
-plugins/autopatch/genesis
-plugins/autopatch/genesis/sonic.ips
-plugins/autopatch/snes/
-plugins/autopatch/snes/smwu.ips
+plugins/\
+plugins/autopatch/\
+plugins/autopatch/init.lua\
+plugins/autopatch/plugin.json\
+plugins/autopatch/genesis\
+plugins/autopatch/genesis/sonic.ips\
+plugins/autopatch/snes/\
+plugins/autopatch/snes/smwu.ips\
 
 Execute MAME using the -plugin autopatch command line arguments, or edit the plugin.json file to set 
 the "start" variable to "true". If the IPS patching is successful there will be an indication on the 
