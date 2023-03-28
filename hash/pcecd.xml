@@ -463,6 +463,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 	</software>
 
 	<software name="blodgear">
+		<!-- "- Aurail 2 - Scenario Blood Gear" at ending screen -->
 		<description>Blood Gear (Japan)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
@@ -470,6 +471,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<info name="release" value="19941028"/>
 		<info name="alt_title" value="ブラッド・ギア"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
+		<!-- ending screen developers: Westone, Red. Aoni-Production also credited, presumably for voice dubs -->
 		<sharedfeat name="requirement" value="scdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
