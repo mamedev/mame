@@ -810,7 +810,7 @@ license:CC0-1.0
 
 	<software name="crossbomber">
 		<description>Cross Bomber</description>
-		<year>2021</year>
+		<year>2022</year>
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="6684">
