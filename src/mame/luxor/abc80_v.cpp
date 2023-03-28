@@ -10,34 +10,6 @@
 #include "abc80.h"
 #include "screen.h"
 
-
-
-//-------------------------------------------------
-//  gfx_layout charlayout
-//-------------------------------------------------
-
-static const gfx_layout charlayout =
-{
-	6, 10,
-	128,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	10*8
-};
-
-
-//-------------------------------------------------
-//  GFXDECODE( abc80 )
-//-------------------------------------------------
-
-static GFXDECODE_START( gfx_abc80 )
-	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 1 ) // normal characters
-	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 1 ) // graphics characters
-GFXDECODE_END
-
-
 void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 {
 	uint8_t vsync_data = m_vsync_prom->base()[y];
@@ -114,9 +86,7 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 		else
 		{
 			// text mode
-			uint16_t chargen_addr = ((videoram_data & 0x7f) * 10) + l;
-
-			data = m_char_rom->base()[chargen_addr];
+			data = m_rocg->read(videoram_data & 0x7f, l);
 		}
 
 		// shift out pixels
@@ -191,10 +161,11 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void abc80_state::abc80_video(machine_config &config)
 {
+	SN74S263(config, m_rocg, 0);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(abc80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_abc80);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
