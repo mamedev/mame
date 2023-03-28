@@ -813,8 +813,11 @@ license:CC0-1.0
 		<year>2021</year>
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="6412">
+			<dataarea name="cass" size="6684">
+				<!-- originally released version seems to have disappeared off the Internet
 				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
+				-->
+				<rom name="Cross Bomber (2022-07-20)(Caruso, Fabrizio)[48K].tap" size="6684" crc="952b37c8" sha1="8298e07d262181611ab7286719830f5d66d670b6"/>
 			</dataarea>
 		</part>
 	</software>
