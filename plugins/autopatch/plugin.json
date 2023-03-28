@@ -1,0 +1,10 @@
+{
+  "plugin": {
+	"name": "autopatch",
+	"description": "Automatically apply corresponding patch",
+	"version": "1",
+	"author": "jflatt",
+	"type": "plugin",
+	"start": "false"
+  }
+}
