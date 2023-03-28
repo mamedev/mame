@@ -39,10 +39,10 @@ public:
 		m_fg_videoram(*this, "fg_videoram")
 	{ }
 
-	void topdrive(machine_config &config);
+	void topdrive(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -80,7 +80,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_16x16);
 
-	void topdrive_map(address_map &map);
+	void topdrive_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int drawpri);
 };
@@ -94,7 +94,7 @@ TILEMAP_MAPPER_MEMBER(topdrive_state::tilemap_scan_16x16)
 
 void topdrive_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int drawpri)
 {
-	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	for (int offs = 0; offs < m_spriteram.length(); offs += 4)
 	{
 		int xpos         = m_spriteram[offs + 3];
 		int ypos         = m_spriteram[offs + 0] & 0x00ff;
@@ -109,11 +109,11 @@ void topdrive_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		ypos = 0x110 - ypos;
 
-		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 				tileno,
 				color + 0x30,
 				0,0,
-				xpos-64+2,ypos-31,15);
+				xpos-64+2, ypos-31, 15);
 	}
 }
 
@@ -125,8 +125,8 @@ void topdrive_state::bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 TILE_GET_INFO_MEMBER(topdrive_state::get_bg2_tile_info)
 {
-	int tileno = m_bg2_videoram[tile_index] & 0x1fff;
-	int color = (m_bg2_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_bg2_videoram[tile_index] & 0x1fff;
+	int const color = (m_bg2_videoram[tile_index] & 0xe000) >> 13;
 	tileinfo.set(0, tileno+0x3000, color+0x20, 0);
 }
 
@@ -138,8 +138,8 @@ void topdrive_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 TILE_GET_INFO_MEMBER(topdrive_state::get_bg_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index] & 0x1fff;
-	int color = (m_bg_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_bg_videoram[tile_index] & 0x1fff;
+	int const color = (m_bg_videoram[tile_index] & 0xe000) >> 13;
 	tileinfo.set(0, tileno+0x6000, color+0x10, 0);
 }
 
@@ -151,8 +151,8 @@ void topdrive_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 TILE_GET_INFO_MEMBER(topdrive_state::get_fg_tile_info)
 {
-	int tileno = m_fg_videoram[tile_index] & 0x1fff;
-	int color = (m_fg_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_fg_videoram[tile_index] & 0x1fff;
+	int const color = (m_fg_videoram[tile_index] & 0xe000) >> 13;
 	tileinfo.set(0, tileno+0x4000, color+0x00, 0);
 }
 
@@ -195,7 +195,7 @@ void topdrive_state::topdrive_map(address_map &map)
 	map(0x900001, 0x900001).lw8(NAME([this] (u8 data) { m_eeprom->cs_write(BIT(data, 0)); }));
 	map(0x900003, 0x900003).lw8(NAME([this] (u8 data) { m_eeprom->clk_write(BIT(data, 0)); }));
 	map(0x900005, 0x900005).lw8(NAME([this] (u8 data) { m_eeprom->di_write(BIT(data, 0)); }));
-	map(0x900007, 0x900007).lr8(NAME([this] () { return m_eeprom->do_read(); }));
+	map(0x900007, 0x900007).lr8(NAME([this] () { return u8(m_eeprom->do_read()); }));
 
 	map(0xa00000, 0xa003ff).ram().w(FUNC(topdrive_state::fg_videoram_w)).share(m_fg_videoram);
 	map(0xa00400, 0xa01fff).ram();
@@ -211,9 +211,9 @@ void topdrive_state::topdrive_map(address_map &map)
 	map(0xa0c000, 0xa0c3ff).ram(); // seems to be a buffer for data that gets put at 0xa00000?
 	map(0xa0c400, 0xa0ffff).ram();
 
-	map(0xa10000, 0xa1000f).ram().share("scrram");
+	map(0xa10000, 0xa1000f).ram().share(m_scrram);
 
-	map(0xb00000, 0xb007ff).ram().share("spriteram");
+	map(0xb00000, 0xb007ff).ram().share(m_spriteram);
 	map(0xc00000, 0xc007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe00003, 0xe00003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe00004, 0xe00005).w(FUNC(topdrive_state::soundbank_w));
@@ -281,7 +281,7 @@ void topdrive_state::topdrive(machine_config &config)
 	screen.set_refresh_hz(50); // not verified
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2000));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8,48*8-1, 0*8, 30*8-1);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(topdrive_state::screen_update));
 	screen.set_palette("palette");
 
@@ -292,8 +292,6 @@ void topdrive_state::topdrive(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
-
-} // anonymous namespace
 
 ROM_START( topdrive )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -313,5 +311,7 @@ ROM_START( topdrive )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "3-27c040.bin",      0x00000, 0x80000, CRC(2894b89b) SHA1(cf884042edd2fc05e04d21ccd36f5183f9a7ec5c) )
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1995, topdrive,     0,        topdrive,    topdrive,    topdrive_state, empty_init, ROT0,  "Proyesel", "Top Driving (version 1.1)", MACHINE_SUPPORTS_SAVE )
