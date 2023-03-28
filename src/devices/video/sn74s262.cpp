@@ -19,12 +19,38 @@ DEFINE_DEVICE_TYPE(SN74S263, sn74s263_device, "sn74s263", "SN74S263N Row Output 
 
 
 //-------------------------------------------------
+//  gfx_layout charlayout
+//-------------------------------------------------
+
+const gfx_layout sn74s262_device::charlayout =
+{
+	6, 10,
+	128,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	10*8
+};
+
+
+//-------------------------------------------------
+//  GFXDECODE( sn74s262 )
+//-------------------------------------------------
+
+GFXDECODE_MEMBER( sn74s262_device::gfxinfo )
+	GFXDECODE_DEVICE("chargen", 0,     charlayout, 0, 1 ) // normal characters
+	GFXDECODE_DEVICE("chargen", 0x500, charlayout, 0, 1 ) // graphics characters
+GFXDECODE_END
+
+
+//-------------------------------------------------
 //  ROM( sn74s262 )
 //-------------------------------------------------
 
 ROM_START( sn74s262 )
 	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "sn74s262.h2", 0x000, 0xa00, NO_DUMP )
+	ROM_LOAD( "sn74s262", 0x000, 0xa00, NO_DUMP )
 ROM_END
 
 
@@ -34,7 +60,7 @@ ROM_END
 
 ROM_START( sn74s263 )
 	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "sn74s263.h2", 0x000, 0xa00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
+	ROM_LOAD( "sn74s263", 0x000, 0xa00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
 ROM_END
 
 
@@ -73,6 +99,7 @@ void sn74s262_device::device_start()
 
 sn74s262_device::sn74s262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_char_rom(*this, "chargen")
 {
 }

@@ -31,7 +31,8 @@
 
 // ======================> sn74s262_device
 
-class sn74s262_device : public device_t
+class sn74s262_device : public device_t,
+                        public device_gfx_interface
 {
 public:
 	// construction/destruction
@@ -49,6 +50,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	static const gfx_layout charlayout;
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
 	required_region_ptr<uint8_t> m_char_rom;
 };
 

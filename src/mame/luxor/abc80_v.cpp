@@ -161,11 +161,12 @@ uint32_t abc80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void abc80_state::abc80_video(machine_config &config)
 {
-	SN74S263(config, m_rocg, 0);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(abc80_state::screen_update));
 	m_screen->set_raw(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART);
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	SN74S263(config, m_rocg, 0);
+	m_rocg->set_palette(m_palette);
 }
