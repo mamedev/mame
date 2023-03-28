@@ -5,14 +5,14 @@
  * Omron Luna 88K and 88K² systems.
  *
  * Sources:
+ *  - Tetsuya Isaki's nono Luna emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *  - OpenBSD source code
- *  - Tetsuya Isaki's nono LUNA emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *
  * TODO:
- *  - keyboard
  *  - scsi controller
  *  - xp i/o controller
  *  - lance memory
+ *  - crt controller
  *  - slotify graphics
  *  - expansion slots
  *  - abort/power switches
@@ -72,6 +72,8 @@
  */
 
 #include "emu.h"
+
+#include "luna_kbd.h"
 
 #include "cpu/m88000/m88000.h"
 #include "cpu/z180/hd647180x.h"
@@ -316,6 +318,11 @@ void luna_88k_state::iop_map_pio(address_map &map)
 	map(0x0049, 0x0049).nopr();
 }
 
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", LUNA_KEYBOARD);
+}
+
 void luna_88k_state::luna88k2(machine_config &config)
 {
 	MC88100(config, m_cpu, 33.333_MHz_XTAL);
@@ -353,7 +360,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_serial[0]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsa_w));
 
 	// keyboard/mouse
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[1], keyboard_devices, "keyboard");
 	m_sio->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
