@@ -321,6 +321,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "ti25503.lh"
 #include "ti30.lh"
 #include "ti5100.lh"
+#include "ti5200.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
@@ -1105,8 +1106,8 @@ ROM_START( racetime )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_racetime_output.pla", 0, 365, CRC(192c6a44) SHA1(db0b441252d1e6bf3885e528756cfecc0468c664) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_racetime_output.pla", 0, 406, CRC(21e966b0) SHA1(ce918302d2b462df81b2d0cf2145e2351c98a0c0) )
 
 	ROM_REGION( 221716, "screen", 0)
 	ROM_LOAD( "racetime.svg", 0, 221716, CRC(d3934aed) SHA1(40b1fde191506c884b16b2ee3daaee2c6a4f4f08) )
@@ -1570,8 +1571,8 @@ ROM_START( palmmd8 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_palmmd8_output.pla", 0, 406, CRC(55117610) SHA1(fd06060ae5f04b802ae26697935d4a9765e1a7d7) )
 ROM_END
 
 
@@ -11396,7 +11397,7 @@ INPUT_PORTS_END
 void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
@@ -11798,7 +11799,7 @@ private:
 void ti5100_state::update_display()
 {
 	// extra segment on R10
-	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
+	m_display->matrix(m_r, m_o | ((m_r & 0x400) ? 0x180 : 0));
 }
 
 void ti5100_state::write_r(u32 data)
@@ -11826,17 +11827,17 @@ u8 ti5100_state::read_k()
 static INPUT_PORTS_START( ti5100 )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "K" ) // constant mode
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "DP" ) // display point
-	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFNAME( 0x08, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x00, "F" ) // floating
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // R3
@@ -11874,7 +11875,7 @@ static INPUT_PORTS_START( ti5100 )
 
 	PORT_START("IN.9") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R9 0x02
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
@@ -11888,14 +11889,14 @@ INPUT_PORTS_END
 void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
-	TMS1070(config, m_maincpu, 250000); // approximation
+	TMS1070(config, m_maincpu, 350000); // approximation
 	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
-	m_display->set_segmask(0x7ff, 0xff);
+	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_ti5100);
 
 	// no sound!
@@ -11909,8 +11910,146 @@ ROM_START( ti5100 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_ti5100_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ti5100_output.pla", 0, 365, CRC(11f6f0f4) SHA1(f25cf6bd284ab4614746b2e3f98d42d2585e425a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5100_output.pla", 0, 406, CRC(b4a3aa6e) SHA1(812b5483a26ae3aa05661c86841d2d3d163e6c46) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-5200
+  * TMS1270 MCU label TMS1278NL or TMC1278NL (die label: 1070B, 1278A)
+  * 13-digit 7seg VFD Itron FG139A1 (1 custom digit)
+
+***************************************************************************/
+
+class ti5200_state : public hh_tms1k_state
+{
+public:
+	ti5200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti5200(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti5200_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ti5200_state::write_r(u32 data)
+{
+	// R0-R5,R9,R12: input mux
+	m_inp_mux = (data & 0x3f) | (data >> 3 & 0x40) | (data >> 5 & 0x80);
+
+	// R0-R12: select digit
+	m_r = data;
+	update_display();
+}
+
+void ti5200_state::write_o(u16 data)
+{
+	// O1-O9: digit segments
+	m_o = bitswap<9>(data,7,8,3,6,5,4,9,2,1);
+	update_display();
+}
+
+u8 ti5200_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(8);
+}
+
+// config
+
+static INPUT_PORTS_START( ti5200 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.6") // R9
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
+
+	PORT_START("IN.7") // R12
+	PORT_CONFNAME( 0x01, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x01, "S" ) // set DP with number key
+	PORT_CONFSETTING(    0x00, "R" )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ti5200_state::ti5200(machine_config &config)
+{
+	// basic machine hardware
+	TMS1270(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pF
+	m_maincpu->read_k().set(FUNC(ti5200_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti5200_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti5200_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(13, 9);
+	m_display->set_segmask(0xfff, 0xff);
+	config.set_default_layout(layout_ti5200);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( ti5200 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1278nl", 0x0000, 0x0400, CRC(6829f24d) SHA1(d7cf358a26a347d6a2ca4313cb7ffd5082e19885) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti5200_micro.pla", 0, 867, CRC(61bd20fc) SHA1(fbdc87138975e2e10f92f75dcae5ca900f78475a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5200_output.pla", 0, 406, CRC(6f37c393) SHA1(5252a5ac05c65326ee189f859904007e11b0009d) )
 ROM_END
 
 
@@ -15327,6 +15466,7 @@ COMP( 1976, ti1250a,    ti1250,    0, ti1270,    ti1250,    ti1250_state,    emp
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti5200,     0,         0, ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
