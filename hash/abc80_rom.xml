@@ -56,7 +56,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prn">
+	<software name="printer">
 		<description>Printer option 9704</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
@@ -68,7 +68,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="prna" cloneof="prn">
+	<software name="printera" cloneof="printer">
 		<description>Printer option 9704 0.1</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
