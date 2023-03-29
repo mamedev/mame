@@ -41151,6 +41151,9 @@ palestra
 @source:skeleton/pdt3100.cpp
 pdt3100                         //
 
+@source:skeleton/pegasos2.cpp
+pegasos2                        //
+
 @source:skeleton/pencil2.cpp
 pencil2                         //
 
