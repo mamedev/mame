@@ -4147,7 +4147,7 @@ Fails [disk swap] when prompted to after title screen
 		<year>1990</year>
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
-White screen
+White screen. Track 1 appears to be malformed, causing CRC errors on reads; 68000 eventually hangs on double bus error after SSP is corrupted.
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 
