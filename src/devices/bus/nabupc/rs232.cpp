@@ -31,12 +31,14 @@ public:
 	// device_option_expansion_interface implementation
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
+
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
+
 private:
 	required_device<i8251_device> m_i8251;
 	required_device<pit8253_device> m_pit8253;
@@ -78,6 +80,7 @@ void rs232_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 	rs232.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 
