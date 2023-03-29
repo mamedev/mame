@@ -24439,6 +24439,7 @@ octopus                         //
 
 @source:luxor/abc80.cpp
 abc80                           //
+tkn80                           //
 
 @source:luxor/abc80x.cpp
 abc800c                         //
