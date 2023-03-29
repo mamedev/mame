@@ -550,6 +550,7 @@ void abc80_state::abc80(machine_config &config)
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
+	SOFTWARE_LIST(config, "rom_list").set_original("abc80_rom");
 }
 
 
