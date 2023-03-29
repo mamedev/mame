@@ -375,6 +375,9 @@ void h19_state::machine_start()
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
 
+	m_keyclickactive = false;
+	m_bellactive = false;
+
 	m_key_click_timer = timer_alloc(FUNC(h19_state::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(h19_state::bell_off), this);
 }
