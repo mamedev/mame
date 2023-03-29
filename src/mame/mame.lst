@@ -32699,6 +32699,9 @@ skykids                         // (c) 1985
 @source:namco/sweetland.cpp
 sweetlnd                        //
 
+@source:namco/sweetland4.cpp
+sweetld4                        //
+
 @source:namco/tankbatt.cpp
 tankbatt                        // (c) 1980 Namco
 tankbattb                       // bootleg
