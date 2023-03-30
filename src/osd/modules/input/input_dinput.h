@@ -90,7 +90,7 @@ public:
 	{
 		return m_dinput->EnumDevices(
 				devclass,
-				&di_emun_devices_cb<std::remove_reference_t<T> >,
+				&di_enum_devices_cb<std::remove_reference_t<T> >,
 				LPVOID(&callback),
 				DIEDFL_ATTACHEDONLY);
 	}
@@ -123,7 +123,7 @@ private:
 	static std::string make_id(LPCDIDEVICEINSTANCE instance);
 
 	template <typename T>
-	static BOOL CALLBACK di_emun_devices_cb(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+	static BOOL CALLBACK di_enum_devices_cb(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	{
 		return (*reinterpret_cast<T *>(ref))(instance);
 	}
