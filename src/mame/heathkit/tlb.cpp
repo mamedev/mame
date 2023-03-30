@@ -160,12 +160,14 @@ void heath_tlb_device::device_resolve_objects()
 void heath_tlb_device::device_start()
 {
 
-	m_strobe = m_keyclickactive = m_bellactive = false;
-
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
+
+	m_strobe = false;
+	m_keyclickactive = false;
+	m_bellactive = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
