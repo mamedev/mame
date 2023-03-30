@@ -24,7 +24,10 @@ Sweet Land 4 video: https://www.youtube.com/watch?v=Zj8_RRGlCI4
 #include "cpu/h8/h83006.h"
 #include "machine/msm6242.h"
 #include "sound/okim9810.h"
+//#include "video/hd44780.h"
 
+//#include "emupal.h"
+//#include "screen.h"
 #include "speaker.h"
 
 
@@ -42,15 +45,27 @@ public:
 
 private:
 	required_device<h83007_device> m_maincpu;
+	//required_device<hd44780_device> m_lcdc;
+
+	void lcdc_w(u8 data);
 
 	void program_map(address_map &map);
 	void io_map(address_map &map);
 };
 
 
+void sweetland4_state::lcdc_w(u8 data)
+{
+	//m_lcdc->db_w(data << 4);
+	//m_lcdc->rs_w(BIT(data, 7));
+	//m_lcdc->e_w(BIT(data, 5));
+}
+
 void sweetland4_state::program_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x200000, 0x20000f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
+	map(0x40000f, 0x40000f).w(FUNC(sweetland4_state::lcdc_w));
 }
 
 void sweetland4_state::io_map(address_map &map)
