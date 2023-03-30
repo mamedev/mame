@@ -224,6 +224,9 @@ void huc6270_device::select_sprites()
 		static const int cgy_table[4] = { 16, 32, 64, 64 };
 		int cgy = ( m_sat[i+3] >> 12 ) & 0x03;
 		int height = cgy_table[ cgy ];
+		// TODO: we are one line off in alignment, is following compensation right?
+		// cfr. rennybla & draculax (at least), they are otherwise offset by 1
+		// compared to background.
 		int sprite_line = m_raster_count - 1 - m_sat[i];
 
 		if ( sprite_line >= 0 && sprite_line < height )
