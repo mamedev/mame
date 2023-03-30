@@ -399,17 +399,30 @@ void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 //**************************************************************************
 
 ROM_START(coco_fdc)
-	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
-ROM_END
-
-ROM_START(coco_fdc_v11)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_DEFAULT_BIOS("v1.1")
+
+	ROM_SYSTEM_BIOS(0, "v1.0", "v1.0")
+	ROMX_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03), ROM_BIOS(0))
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
+
+	ROM_SYSTEM_BIOS(1, "v1.1", "v1.1")
+	ROMX_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1), ROM_BIOS(1))
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+
 ROM_END
+
+// ROM_START(coco_fdc_v11)
+// 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+// 	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+// 	ROM_RELOAD(0x2000, 0x2000)
+// 	ROM_RELOAD(0x4000, 0x2000)
+// 	ROM_RELOAD(0x6000, 0x2000)
+// ROM_END
 
 ROM_START(coco_scii_cc1)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
@@ -476,22 +489,22 @@ namespace
 //              COCO FDC v1.1
 //**************************************************************************
 
-	class coco_fdc_v11_device : public coco_fdc_device_base
-	{
-	public:
-		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
-		{
-		}
+	// class coco_fdc_v11_device : public coco_fdc_device_base
+	// {
+	// public:
+	// 	// construction/destruction
+	// 	coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	// 		: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
+	// 	{
+	// 	}
 
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_fdc_v11);
-		}
-	};
+	// protected:
+	// 	// optional information overrides
+	// 	virtual const tiny_rom_entry *device_rom_region() const override
+	// 	{
+	// 		return ROM_NAME(coco_fdc_v11);
+	// 	}
+	// };
 
 
 //**************************************************************************
@@ -884,7 +897,7 @@ namespace
 } // Anonymous namepace
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_device, "coco_fdc", "CoCo FDC")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
+// DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC1, coco_family_fdc_device_base, coco_scii_device_cc1, "coco_scii_cc1", "Disto Super Controller II (CoCo 1/2 ROM)")
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC3, coco_family_fdc_device_base, coco_scii_device_cc3, "coco_scii_cc3", "Disto Super Controller II (CoCo 3 ROM)")
 DEFINE_DEVICE_TYPE_PRIVATE(COCO3_HDB1, coco_family_fdc_device_base, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
