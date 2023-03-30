@@ -260,8 +260,8 @@ private:
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
-		template <unsigned B> inline uint32_t shift_reg_low() const;
-		inline uint8_t shift_reg_data() const;
+		template <unsigned B> uint32_t shift_reg_low() const;
+		uint8_t shift_reg_data() const;
 	};
 
 	enum {
