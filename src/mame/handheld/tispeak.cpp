@@ -68,7 +68,7 @@ above expectations. TI continued to manufacture many products for this line.
     Speak & Spell (US), 1981
     - MCU: same as 1980 version
     - TMS51xx: TMC0281D
-    - VSM: 16KB CD2350(rev.A)
+    - VSM: 16KB CD2350A
     - notes: only 1 VSM, meaning much smaller internal vocabulary
 
     Speak & Spell (Japan), 1980
@@ -124,7 +124,7 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
     English:
     - Vowel Power: VSM: 16KB CD2302
     - Number Stumpers 4-6: VSM: 16KB CD2305
-    - Number Stumpers 7-8: VSM: 16KB CD2307(rev.A)
+    - Number Stumpers 7-8: VSM: 16KB CD2307A
     - Basic Builders: VSM: 16KB CD2308
     - Mighty Verbs: VSM: 16KB CD2309(rev.B)
     - Homonym Heroes: VSM: 16KB CD2310
@@ -169,16 +169,16 @@ Speak & Read:
     Speak & Read (US), 1980
     - MCU: CD2705, label CD2705B-N2L (die label: TMC0270E, 2705B) - 2nd revision?(late-1981)
     - TMS51xx: CD2801
-    - VSM(1/2): 16KB CD2394(rev.A)
-    - VSM(2/2): 16KB CD2395(rev.A)
+    - VSM(1/2): 16KB CD2394A
+    - VSM(2/2): 16KB CD2395A
     - VFD: same as Language Translator, rightmost digit unused
 
 Speak & Read modules:
 
     English:
-    - Sea Sights: VSM: 16KB CD2396(rev.A)
+    - Sea Sights: VSM: 16KB CD2396A
     - Who's Who at the Zoo: VSM: 16KB CD2397
-    - A Dog on a Log: VSM: 16KB CD3534(rev.A)
+    - A Dog on a Log: VSM: 16KB CD3534A
     - The Seal That Could Fly: VSM: 16KB CD3535
     - A Ghost in the House: VSM: 16KB CD3536
     - On the Track: VSM: 16KB CD3538
@@ -287,7 +287,7 @@ namespace {
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK 640000
+static constexpr u32 MASTER_CLOCK = 640'000;
 
 
 class tispeak_state : public hh_tms1k_state

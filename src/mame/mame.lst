@@ -43476,6 +43476,7 @@ geneve                          // 1987 Myarc Geneve 9640
 genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 
 @source:ti/snspellc.cpp
+mathsmag                        //
 snspellc                        //
 snspellca                       //
 snwrite                         //

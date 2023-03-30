@@ -8,13 +8,13 @@ Texas Instruments Speak & Spell Compact, Touch & Tell
 Speak & Spell Compact (US), 1981
 - MCU: CD8011, label CD8011A-NL (die label: 1100B, CD8011A)
 - TMS51xx: TMC0281D (die label: T0280F 0281D)
-- VSM: 16KB CD2354, CD2354(rev.A)
+- VSM: 16KB CD2354, CD2354A
 - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
 
 Speak & Spell Compact (UK) "Speak & Write", 1981
 - MCU: same as US 1981 version
 - TMS51xx: CD2801A
-- VSM: 16KB CD62174(rev.A)
+- VSM: 16KB CD62174A
 - notes: BTANB: gibberish when the module button is pressed (with module present)
 
 Speak & Spell Compact is compatible with Speak & Spell modules.
@@ -36,7 +36,8 @@ Speak & Math 'Compact' (France) "Les Maths Magiques", 1982
 - notes: this is not the same as "Le Calcul Magique", that's from a
   series centered around a TMS50C40 instead of MCU+TMS51xx
 
-No known external modules were released.
+There is no English version, but likewise there is no French version of the
+regular Speak & Math. No known external modules were released.
 
 ================================================================================
 
@@ -76,7 +77,7 @@ Touch & Tell modules:
 English:
 - Alphabet Fun: VSM: 4KB CD2611
 - Animal Friends: VSM: 16KB CD2355
-- Number Fun: VSM: 4KB CD2612*, CD2612(rev.A)
+- Number Fun: VSM: 4KB CD2612*, CD2612A
 - All About Me: VSM: 4KB CD2613
 - World of Transportation: VSM: 16KB CD2361
 - Little Creatures: VSM: 16KB CD2362
@@ -171,6 +172,11 @@ $00: none inserted, and $1F is for diagnostics
 
 namespace {
 
+// master clock for TMS5100, see snspell driver
+
+static constexpr u32 MASTER_CLOCK = 640'000;
+
+
 // Speak & Spell Compact / common
 
 class snspellc_state : public driver_device
@@ -190,6 +196,7 @@ public:
 	void tms5110_route(machine_config &config);
 	void snspellc(machine_config &config);
 	void snwrite(machine_config &config);
+	void mathsmag(machine_config &config);
 
 	void init_snspellc();
 
@@ -218,8 +225,6 @@ protected:
 	u16 m_inp_mux = 0;
 	u16 m_o = 0;
 	u32 m_r = 0;
-
-	static constexpr u32 MASTER_CLOCK = 640'000; // approximation
 };
 
 void snspellc_state::machine_start()
@@ -534,6 +539,63 @@ static INPUT_PORTS_START( snwrite )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mathsmag )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"Répète")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME(">")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("<")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Efface")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("*")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"Problèmes")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Plus grand, plus petit que")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME(u8"Dictée")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_HOME) PORT_NAME(u8"Départ / Continue")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Essaie")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.9") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Marche / Calcule") PORT_CHANGED_MEMBER(DEVICE_SELF, snspellc_state, power_on, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME(u8"Arrét") // -> auto_power_off
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tntell )
 	PORT_INCLUDE( overlay )
 
@@ -647,6 +709,15 @@ void snspellc_state::snwrite(machine_config &config)
 	tms5110_route(config);
 }
 
+void snspellc_state::mathsmag(machine_config &config)
+{
+	snwrite(config);
+
+	// cartridge
+	m_cart->set_interface("mathsmag");
+	config.device_remove("cart_list"); // N/A
+}
+
 
 void tntell_state::tntell(machine_config &config)
 {
@@ -717,6 +788,20 @@ ROM_START( snwrite )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cd62174a.vsm", 0x0000, 0x4000, CRC(b7bbaaf3) SHA1(9eb949fcf522982f9c3c4649f207703b746b90ef) )
+ROM_END
+
+
+ROM_START( mathsmag )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "cp3447-nl", 0x0000, 0x0800, CRC(890751a1) SHA1(bd8bbd50f8ed31b2ae2d567c22cd92b21021bd20) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_mathsmag_output.pla", 0, 365, CRC(d21f19a2) SHA1(9781da173d473c255fa5cc5fcc8ae09c097c682d) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge?
+	ROM_LOAD( "cd62173a.vsm", 0x0000, 0x4000, CRC(a7230863) SHA1(8a6d1742fb94555f3b3fe37554a7c46fe4213116) )
 ROM_END
 
 
@@ -798,6 +883,8 @@ ROM_END
 COMP( 1982, snspellc,  0,        0,     snspellc, snspellc, snspellc_state, init_snspellc, "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1981, snspellca, snspellc, 0,     snspellc, snspellc, snspellc_state, init_snspellc, "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1982, snwrite,   snspellc, 0,     snwrite,  snwrite,  snspellc_state, init_snspellc, "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+
+COMP( 1982, mathsmag,  0,        0,     mathsmag, mathsmag, snspellc_state, init_snspellc, "Texas Instruments", "Les Maths Magiques (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1981, tntell,    0,        0,     tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 COMP( 1980, tntellp,   tntell,   0,     tntell,   tntell,   tntell_state,   init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
