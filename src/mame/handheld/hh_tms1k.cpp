@@ -81,7 +81,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
- @MP0271   TMS1000   1982, Radio Shack Monkey See
+ @MP0271   TMS1000   1982, Tandy (RadioShack) Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
@@ -111,8 +111,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP1272   TMS1100   1981, Tandy Computerized Arcade (assumed same as CD7282, not confirmed)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
- @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
- *MP1343   TMS1100   1984, Micronta VoxClock 3
+ @MP1312   TMS1100   1981, Gakken FX-Micom R-165/RadioShack Science Fair Microcomputer Trainer
+ @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
  *MP1359   TMS1100   1985, Capsela CRC2000
  *MP1362   TMS1100   1985, Technasonic Weight Talker (have dump)
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
@@ -216,10 +216,12 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "machine/timer.h"
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
+#include "machine/tms6100.h"
 #include "sound/beep.h"
 #include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
+#include "sound/tms5110.h"
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -318,13 +320,14 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti1680.lh"
-#include "ti25503.lh"
+#include "ti25502.lh"
 #include "ti30.lh"
 #include "ti5100.lh"
 #include "ti5200.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
+#include "vclock3.lh"
 #include "wizatron.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
@@ -6657,7 +6660,7 @@ ROM_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was published later in the USA by Tandy(Radio Shack),
+  for more information. It was published later in the USA by Tandy(RadioShack),
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
@@ -10567,11 +10570,11 @@ ROM_END
 
   known releases:
   - World: Tandy-12: Computerized Arcade, published by Tandy, model 60-2159.
-  - World: Computerized Arcade, Radio Shack brand, also model 60-2159 and same
+  - World: Computerized Arcade, RadioShack brand, also model 60-2159 and same
     hardware as above. "Tandy-12" on the side of the handheld was changed to
-    "Radio Shack-12", but there's no title prefix on the box.
-  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU.
-  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
+    "RadioShack-12", but there's no title prefix on the box.
+  - World: Computerized Arcade, RadioShack brand, model 60-2159A, COP421 MCU.
+  - World: Computerized Arcade, RadioShack brand, model 60-2495, hardware unknown.
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -10741,7 +10744,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy(Radio Shack division) Monkey See (1982 version)
+  Tandy (RadioShack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
@@ -11031,6 +11034,192 @@ ROM_END
 
 /***************************************************************************
 
+  Tandy (Micronta) VoxClock 3 (sold by RadioShack, model 63-906)
+  * PCB label: VOXCLOCK 3
+  * TMS1100 MP1343 (die label: 1100E, MP1343)
+  * TMS5110AN2L-1 speech chip, 4KB VSM CM72010NL (die label: T0355C, 72010U)
+  * 4-digit 7seg LED display, 6 other LEDs
+
+  Micronta is not a company, but one of the RadioShack house brands. Schematics
+  are included in the manual, they also mention a CM72005 VSM.
+
+  Spartus AVT from 1982 is nearly the same as VoxClock 3.
+
+***************************************************************************/
+
+class vclock3_state : public hh_tms1k_state
+{
+public:
+	vclock3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_tms5100(*this, "tms5100"),
+		m_tms6100(*this, "tms6100"),
+		m_ac_power(*this, "ac_power")
+	{ }
+
+	void vclock3(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(switch_hz) { m_ac_power->set_clock(newval ? 50 : 60); }
+
+private:
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	required_device<clock_device> m_ac_power;
+
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void vclock3_state::update_display()
+{
+	m_display->matrix(m_r, m_o | (m_r << 2 & 0x180));
+}
+
+void vclock3_state::write_r(u32 data)
+{
+	// R0-R4,R8: input mux
+	m_inp_mux = (data & 0x1f) | (data >> 3 & 0x20);
+
+	// R0-R3: select digit
+	// R5,R6: led data
+	m_r = data;
+	update_display();
+
+	// R7: TMS5100 PDC
+	m_tms5100->pdc_w(BIT(data, 7));
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+}
+
+void vclock3_state::write_o(u16 data)
+{
+	// O0-O3: TMS5100 CTL
+	m_tms5100->ctl_w(data & 0xf);
+
+	// O0-O6: digit segments
+	m_o = data & 0x7f;
+	update_display();
+}
+
+u8 vclock3_state::read_k()
+{
+	// K1-K4: multiplexed inputs
+	u8 data = read_inputs(6) & 7;
+
+	// K4: TMS5100 CTL1
+	// K8: AC power osc
+	data |= m_tms5100->ctl_r() << 2 & 4;
+	data |= (m_inputs[6]->read() & m_ac_power->signal_r()) << 3;
+	return data;
+}
+
+// config
+
+static INPUT_PORTS_START( vclock3 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Snooze / Date")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Alarm 2 On/Off")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Alarm 1 On/Off")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Announce")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Set Alarm 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Set Alarm 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Chime")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Minute Reverse")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Minute Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set Time")
+
+	PORT_START("IN.4") // R4 (factory-set jumpers)
+	PORT_CONFNAME( 0x01, 0x01, "AC Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, vclock3_state, switch_hz, 0)
+	PORT_CONFSETTING( 0x00, "50 Hz" )
+	PORT_CONFSETTING( 0x01, "60 Hz" )
+	PORT_CONFNAME( 0x02, 0x00, "Chime / Announce" )
+	PORT_CONFSETTING(    0x02, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "Recall" )
+	PORT_CONFSETTING(    0x04, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN.5") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Hour Reverse")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Hour Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Set Calendar")
+
+	PORT_START("IN.6")
+	PORT_CONFNAME( 0x01, 0x01, "Power Source" )
+	PORT_CONFSETTING(    0x00, "Battery" )
+	PORT_CONFSETTING(    0x01, "Mains" )
+	PORT_CONFNAME( 0x02, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x02, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
+INPUT_PORTS_END
+
+void vclock3_state::vclock3(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(vclock3_state::read_k));
+	m_maincpu->write_r().set(FUNC(vclock3_state::write_r));
+	m_maincpu->write_o().set(FUNC(vclock3_state::write_o));
+
+	CLOCK(config, m_ac_power, 60); // from mains power
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(4, 9);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0x1, 0x06); // 1st digit only has segments B,C
+	config.set_default_layout(layout_vclock3);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	TMS5110A(config, m_tms5100, 640000); // approximation - RC osc. R=47K, C=47pF
+	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
+	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
+	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
+	m_tms5100->data().set(m_tms6100, FUNC(tms6100_device::data_line_r));
+	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
+	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	TMS6100(config, m_tms6100, 640000/4);
+
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( vclock3 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1343.u1", 0x0000, 0x0800, CRC(d8fac397) SHA1(65003ec70ae3d45296c08b10aff85ca29c0f573e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_vclock3_output.pla", 0, 365, CRC(e5b0e95b) SHA1(6d624bfefd302fd04c02177081cea9416ba344ee) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cm72010.u3", 0x0000, 0x1000, CRC(2054847c) SHA1(716592f4cd01a9edf16b1061431bd6dc934d9053) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Telesensory Systems, Inc.(TSI) Speech+
   * TMS1000 MCU, label TMS1007NL (die label: 1000B, 1007A)
   * TSI S14001A speech chip, GI S14007-A 2KB maskrom for samples
@@ -11198,11 +11387,11 @@ ROM_END
 
 /***************************************************************************
 
-  TI SR-16 (1974, first consumer product with TMS1000 series MCU)
+  Texas Instruments SR-16 (1974, first consumer product with TMS1000 series MCU)
   * TMS1000 MCU label TMS1001NL (die label: 1000, 1001A)
   * 12-digit 7seg LED display
 
-  TI SR-16 II (1975 version)
+  Texas Instruments SR-16 II (1975 version)
   * TMS1000 MCU label TMS1016NL (die label: 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
@@ -11438,7 +11627,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1250/TI-1200 (1975 version), Spirit of '76
+  Texas Instruments TI-1250/TI-1200 (1975 version), Spirit of '76
   * TMS0950 MCU label TMC0952NL, K0952 (die label: 0950A 0952)
   * 9-digit 7seg LED display
 
@@ -11635,7 +11824,149 @@ ROM_END
 
 /***************************************************************************
 
-  TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
+  Texas Instruments TI-2550 II, more (see below)
+  * TMS1070 TMS1071NL (die label: 1070A, 1071A)
+  * 9-digit cyan VFD
+
+  This chip was also used in 3rd-party calculators, like Citizen 831RD,
+  Prinztronic M800, Lloyd's E311, Privileg 861MD.
+
+***************************************************************************/
+
+class ti25502_state : public hh_tms1k_state
+{
+public:
+	ti25502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti25502(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti25502_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ti25502_state::write_r(u32 data)
+{
+	// R0-R6,R9: input mux
+	m_inp_mux = (data & 0x7f) | (data >> 2 & 0x80);
+
+	// R0-R8: select digit
+	m_r = data;
+	update_display();
+}
+
+void ti25502_state::write_o(u16 data)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+u8 ti25502_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(8);
+}
+
+// config
+
+static INPUT_PORTS_START( ti25502 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-") // N/A on TI-2550 II
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+
+	PORT_START("IN.7") // R9
+	PORT_CONFNAME( 0x0f, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFSETTING(    0x01, "1" ) // N/A on TI-2550 II
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "4" ) // "
+INPUT_PORTS_END
+
+void ti25502_state::ti25502(machine_config &config)
+{
+	// basic machine hardware
+	TMS1070(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pF
+	m_maincpu->read_k().set(FUNC(ti25502_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti25502_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti25502_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_ti25502);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( ti25502 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1071nl", 0x0000, 0x0400, CRC(0f5640c9) SHA1(6e8b54d8ceed8850d1186204ea26b6657add3d48) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti25502_micro.pla", 0, 867, CRC(639cbc13) SHA1(a96152406881bdfc7ddc542cf4b478525c8b0e23) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti25502_output.pla", 0, 406, CRC(c1df3ae6) SHA1(f106caaea1ac4787d8b579f16177dbf2f35b094d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Texas Instruments TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
   * 9-digit cyan VFD
 
@@ -11737,7 +12068,7 @@ INPUT_PORTS_END
 void ti25503_state::ti25503(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 250000); // approximation
+	TMS1040(config, m_maincpu, 350000); // approximation
 	m_maincpu->read_k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti25503_state::write_r));
@@ -11745,7 +12076,7 @@ void ti25503_state::ti25503(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_ti25503);
+	config.set_default_layout(layout_ti25502);
 
 	// no sound!
 }
@@ -11768,12 +12099,12 @@ ROM_END
 
 /***************************************************************************
 
-  TI-5100, more (see below)
+  Texas Instruments TI-5100, more (see below)
   * TMS1070 MCU label TMS1073NL or TMC1073NL (die label: 1070B, 1073)
   * 11-digit 7seg VFD (1 custom digit)
 
   This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
-  Panasonic JE1601U, Radio Shack EC2001, Triumph-Adler D100. The original
+  Panasonic JE1601U, RadioShack EC2001, Triumph-Adler D100. The original
   TI version did not have the 3 buttons at R4.
 
 ***************************************************************************/
@@ -11920,7 +12251,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-5200
+  Texas Instruments TI-5200
   * TMS1270 MCU label TMS1278NL or TMC1278NL (die label: 1070B, 1278A)
   * 13-digit 7seg VFD Itron FG139A1 (1 custom digit)
 
@@ -12058,7 +12389,7 @@ ROM_END
 
 /***************************************************************************
 
-  TMC098x series Majestic-line calculators
+  Texas Instruments TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
   * TMS0980 MCU label TMC0981NL (die label: 0980B-81F)
@@ -12362,11 +12693,11 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1000 (1977 version)
+  Texas Instruments TI-1000 (1977 version)
   * TMS1990 MCU label TMC1991NL (die label: 1991-91A)
   * 8-digit 7seg LED display
 
-  TI-1000 (1978 version)
+  Texas Instruments TI-1000 (1978 version)
   * TMS1990 MCU label TMC1992-4NL **not dumped yet
 
 ***************************************************************************/
@@ -12481,7 +12812,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI WIZ-A-TRON
+  Texas Instruments WIZ-A-TRON
   * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12600,7 +12931,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Little Professor (1976 version)
+  Texas Instruments Little Professor (1976 version)
   * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12687,7 +13018,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Little Professor (1978 version)
+  Texas Instruments Little Professor (1978 version)
   * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12815,7 +13146,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1680, TI-2550-IV
+  Texas Instruments TI-1680, TI-2550-IV
   * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
   * TMC0999NL 256x4 RAM (die label: 0999B)
   * 9-digit cyan VFD(leftmost digit is custom)
@@ -12962,7 +13293,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI DataMan
+  Texas Instruments DataMan
   * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
   * 10-digit cyan VFD(3 digits are custom)
 
@@ -13092,7 +13423,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Math Marvel
+  Texas Instruments Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
   * 9-digit cyan VFD(2 digits are custom), 1-bit sound
 
@@ -13283,13 +13614,13 @@ class tithermos_state : public hh_tms1k_state
 public:
 	tithermos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
-		m_60hz(*this, "ac_line")
+		m_ac_power(*this, "ac_power")
 	{ }
 
 	void tithermos(machine_config &config);
 
 private:
-	required_device<clock_device> m_60hz;
+	required_device<clock_device> m_ac_power;
 
 	void write_r(u32 data);
 	void write_o(u16 data);
@@ -13323,10 +13654,10 @@ u8 tithermos_state::read_k()
 	// when SB/SD/SP is high:
 	if (m_inp_mux & 0x8a)
 	{
-		// K1: 60hz from AC line
+		// K1: 60hz from AC power
 		// K2: battery low?
 		// K8: A/D output (TODO)
-		data |= (m_60hz->signal_r()) ? 1 : 0;
+		data |= m_ac_power->signal_r() ? 1 : 0;
 	}
 
 	return data;
@@ -13351,7 +13682,7 @@ static INPUT_PORTS_START( tithermos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Time Row PM 1")
 
 	PORT_START("IN.3") // SD
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC power osc
 	PORT_CONFNAME( 0x06, 0x04, "System")
 	PORT_CONFSETTING(    0x04, "Heat" )
 	PORT_CONFSETTING(    0x00, "Off" )
@@ -13377,7 +13708,7 @@ static INPUT_PORTS_START( tithermos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Time / Clock")
 
 	PORT_START("IN.7") // SP
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC power osc
 	PORT_CONFNAME( 0x06, 0x04, "Mode")
 	PORT_CONFSETTING(    0x04, "Constant" )
 	PORT_CONFSETTING(    0x00, "Day/Night" )
@@ -13398,7 +13729,7 @@ void tithermos_state::tithermos(machine_config &config)
 	m_maincpu->write_r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->write_o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60);
+	CLOCK(config, m_ac_power, 60); // from mains power
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -15456,6 +15787,7 @@ CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  emp
 CONS( 1981, comparc,    0,         0, comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, vclock3,    0,         0, vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
@@ -15464,6 +15796,7 @@ COMP( 1975, tisr16ii,   0,         0, tisr16,    tisr16ii,  tisr16_state,    emp
 COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1250a,    ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, ti25502,    0,         0, ti25502,   ti25502,   ti25502_state,   empty_init, "Texas Instruments", "TI-2550 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti5200,     0,         0, ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

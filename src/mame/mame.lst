@@ -18944,6 +18944,7 @@ ti1250                          // Texas Instruments
 ti1250a                         // Texas Instruments
 ti1270                          // Texas Instruments
 ti1680                          // Texas Instruments
+ti25502                         // Texas Instruments
 ti25503                         // Texas Instruments
 ti30                            // Texas Instruments
 ti5100                          // Texas Instruments
@@ -18954,6 +18955,7 @@ tiprog                          // Texas Instruments
 tisr16                          // Texas Instruments
 tisr16ii                        // Texas Instruments
 tithermos                       // Texas Instruments
+vclock3                         // Tandy Corporation
 wizatron                        // Texas Instruments
 xl25                            // Vulcan
 zodiac                          // Coleco

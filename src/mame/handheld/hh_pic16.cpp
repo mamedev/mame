@@ -41,7 +41,7 @@ known chips:
 
 ROM source notes when dumped from another title, but confident it's the same:
 - drdunk: Tandy Electronic Basketball
-- flash: Radio Shack Sound Effects Chassis
+- flash: RadioShack Sound Effects Chassis
 - hccbaskb: Sears Electronic Basketball
 - ttfballa: (no brand) Football
 - us2pfball: Tandy 2-Player Football
@@ -836,7 +836,7 @@ ROM_END
   possible by properly throwing beanbags at it. This bug is warned about in
   the manual.
 
-  This could also be purchased as a bare PCB from Radio Shack under the Archer
+  This could also be purchased as a bare PCB from RadioShack under the Archer
   brand, catalog number 277-1013. It was named "Sound Effects Chassis" but
   clearly it's nothing like that. The instruction leaflet that came with the
   PCB says to attach a speaker and a 9V power source. It actually takes 5V,
