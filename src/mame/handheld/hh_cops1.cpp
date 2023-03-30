@@ -8,7 +8,7 @@ National Semiconductor COPS(MM57 MCU series) handhelds
 MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
 ROM source notes when dumped from another title, but confident it's the same:
-- cambrp: RadioShack EC-4001 Programmable
+- cambrp: Radio Shack EC-4001 Programmable
 
 TODO:
 - qkracerm link cable (already tested locally and it works, so driver notes
@@ -688,7 +688,7 @@ ROM_END
 
   known releases:
   - World: Cambridge Programmable, published by Sinclair Radionics
-  - USA: EC-4001 Programmable, published by Tandy Corporation, RadioShack brand
+  - USA: EC-4001 Programmable, published by Tandy Corporation, Radio Shack brand
 
 ***************************************************************************/
 

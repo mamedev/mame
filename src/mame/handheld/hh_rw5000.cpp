@@ -726,7 +726,7 @@ ROM_END
   * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
-  Tandy (RadioShack) as EC-220.
+  Tandy (Radio Shack) as EC-220.
 
   8R/9TR doesn't have the memory store/recall buttons.
 

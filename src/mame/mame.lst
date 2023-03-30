@@ -19024,8 +19024,6 @@ snmatha                         //
 snmathp                         //
 snread                          //
 snspell                         //
-snspellc                        //
-snspellca                       //
 snspellfr                       //
 snspellit                       //
 snspelljp                       //
@@ -19035,12 +19033,6 @@ snspellua                       //
 snspellub                       //
 snspelluk                       //
 snspelluka                      //
-snwrite                         //
-tntell                          //
-tntellfr                        //
-tntellp                         //
-tntelluk                        //
-vocaid                          //
 
 @source:handheld/wildfire.cpp
 wildfire                        // Parker Bros
@@ -43482,6 +43474,16 @@ exl100                          //
 @source:ti/geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
 genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
+
+@source:ti/snspellc.cpp
+snspellc                        //
+snspellca                       //
+snwrite                         //
+tntell                          //
+tntellfr                        //
+tntellp                         //
+tntelluk                        //
+vocaid                          //
 
 @source:ti/spellb.cpp
 letterlf                        //

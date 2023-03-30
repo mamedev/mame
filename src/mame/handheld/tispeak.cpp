@@ -118,25 +118,6 @@ above expectations. TI continued to manufacture many products for this line.
     - VSM: 16KB CD62190
     - VFD: same as Speak & Math
 
-    Speak & Spell Compact (US), 1981
-    - MCU: CD8011, label CD8011A-NL (die label: 1100B)
-    - TMS51xx: TMC0281D (die label: T0280F 0281D)
-    - VSM: 16KB CD2354, CD2354(rev.A)
-    - notes: no display, MCU is TMS1100 instead of TMS0270, overall similar to Touch & Tell
-
-    Speak & Spell Compact (UK) "Speak & Write", 1981
-    - MCU: same as US 1981 version
-    - TMS51xx: CD2801A
-    - VSM: 16KB CD62174(rev.A)
-    - notes: BTANB: gibberish when the module button is pressed (with module present),
-      anecdotes from the developer, the same person working on the original UK version:
-          "We included a pencil and writing pad - it was now about 'writing'.",
-      and one about the welcome message:
-          "I had to manually create a sentence of digital speech from thin air.
-           I had to write down a 20 character code which would create each 10/s
-           sound bite that made up the phrase "Welcome to Speak and Write".
-           It took me 1 week. (...) Even Larry Brantingham was amazed."
-
 Speak & Spell modules:
 Note that they are interchangeable, eg. you can use a French module on a US Speak & Spell.
 
@@ -182,13 +163,6 @@ Speak & Math:
     - VSM(1/2): 16KB CD2381
     - VSM(2/2): 4KB CD2614
 
-    Speak & Math 'Compact' (France) "Les Maths Magiques", 1982
-    - MCU: CP3447-NL* (TMS1100?)
-    - TMS51xx: CD2801A
-    - VSM: 16KB? CD62173*
-    - notes: this is not the same as "Le Calcul Magique", that's from a
-      series centered around a TMS50C40 instead of MCU+TMS51xx
-
 
 Speak & Read:
 
@@ -211,118 +185,6 @@ Speak & Read modules:
     - The Third Circle: VSM: 16KB CD3539
     - The Millionth Knight: VSM: 16KB CD3540
 
-
-Touch & Tell:
-
-    Touch & Tell (US), 1981
-    - MCU: CD8012, label CD8012NL (die label: 1100G, CD8012)
-    - TMS51xx: CD2802
-    - VSM: 4KB CD2610
-    - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices
-      too, maybe an earlier version? For some reason, it doesn't use the standard
-      TMS1100 microinstructions, the opcodes are scrambled.
-
-    Touch & Tell (UK), 1981
-    - MCU & TMS51xx: same as US version
-    - VSM: 16KB CD62170
-
-    Touch & Tell (France) "Le Livre Magique", 1981
-    - MCU & TMS51xx: same as US version
-    - VSM: 16KB CD62171
-
-    Touch & Tell (Germany) "Tipp & Sprich", 1981
-    - MCU & TMS51xx: same as US version
-    - VSM: 16KB? CD62172*
-
-    Touch & Tell (Italy) "Libro Parlante", 1982
-    - MCU & TMS51xx: same as US version
-    - VSM: 16KB? CD62176* (on a module)
-
-    Vocaid (US), 1982
-    - MCU & TMS51xx: same as Touch & Tell (US)
-    - VSM: 16KB CD2357
-    - notes: MCU is the same as in Touch & Tell, but instead of a toddler's toy,
-      you get a serious medical aid device for the voice-impaired. The PCB is
-      identical, it includes the edge connector for modules but no external slot.
-
-Touch & Tell modules:
-
-    English:
-    - Alphabet Fun: VSM: 4KB CD2611
-    - Animal Friends: VSM: 16KB CD2355
-    - Number Fun: VSM: 4KB CD2612*, CD2612(rev.A)
-    - All About Me: VSM: 4KB CD2613
-    - World of Transportation: VSM: 16KB CD2361
-    - Little Creatures: VSM: 16KB CD2362
-    - E.T.: VSM: 16KB CD2363
-
-Touch & Tell/Vocaid overlay reference:
-
-    tntell CD2610:
-    - $04: a - Colors
-    - $01: b - Objects
-    - $05: c - Shapes
-    - $09: d - Home Scene
-    tntelluk CD62170, tntellfr CD62171:
-    - see tntell
-    - see numfun(not A)
-    - see animalfr
-    - $08: ? - Clown Face
-    - $0B: ? - Body Parts
-    vocaid CD2357:
-    - $1C: 1 - Leisure
-    - $1E: 2 - Telephone
-    - $1B: 3 - Bedside
-    - $1D: 4 - Alphabet
-    alphabet CD2611:
-    - $0E: 1a - Alphabet A-M
-    - $0D: 1b - Alphabet N-Z
-    - $0C: 1c - Letter Jumble A-M
-    - $0B: 1d - Letter Jumble N-Z
-    animalfr CD2355:
-    - $0A: 2a - Farm Animals
-    - $0F: 2b - At The Farm
-    - $0E: 2c - Animal Babies
-    - $0D: 2d - In The Jungle
-    numfun CD2612:
-    - $02/$0A(rev.A): 3a - Numbers 1-10
-    - $03/$0F(rev.A): 3b - Numbers 11-30
-    - $07/$0D(rev.A): 3c - How Many?
-    - $06/$0E(rev.A): 3d - Hidden Numbers
-    aboutme CD2613:
-    - $0E: 4a - Clown Face
-    - $0B: 4b - Body Parts
-    - $0D: 4c - Things to Wear
-    - $0C: 4d - Just For Me
-    wot CD2361:
-    - $0A: 5a - On Land
-    - $0B: 5b - In The Air
-    - $0C: 5c - On The Water
-    - $0D: 5d - In Space
-    - $10: 5e - What Belongs Here?
-    - $11: 5f - How It Used To Be
-    - $12: 5g - Word Fun
-    - $13: 5h - In the Surprise Garage
-    lilcreat CD2362:
-    - $14: 6a - In The Park
-    - $15: 6b - In The Sea
-    - $16: 6c - In The Woods
-    - $17: 6d - Whose House?
-    - $18: 6e - Hide & Seek
-    - $1A: 6f - Who Is It?
-    - $19: 6g - But It's Not
-    - $1B: 6h - Word Fun
-    et CD2363:
-    - $0F: 7a - The Adventure On Earth I
-    - $10: 7b - The Adventure On Earth II
-    - $11: 7c - Fun And Friendship I
-    - $12: 7d - Fun And Friendship II
-    - $13: 7e - E.T. The Star I
-    - $14: 7f - E.T. The Star II
-    - $15: 7g - Do You Remember? I
-    - $16: 7h - Do You Remember? II
-
-    $00: none inserted, and $1F is for diagnostics
 
 
 Magic Wand "Speaking Reader" or "Speak & Learn":
@@ -410,14 +272,12 @@ Language Teacher modules (only 1 known released):
 
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "render.h"
 
 // internal artwork
 #include "snmath.lh"
 #include "snread.lh"
 #include "snspell.lh"
 #include "snspellsp.lh"
-#include "tntell.lh" // keyboard overlay
 
 namespace {
 
@@ -437,12 +297,10 @@ public:
 		hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot"),
-		m_ol_out(*this, "ol%u", 1U)
+		m_cart(*this, "cartslot")
 	{ }
 
 	void init_snspell();
-	void init_tntell();
 	void init_lantrans();
 
 	// machine configs
@@ -452,12 +310,8 @@ public:
 	void sns_cd2801(machine_config &config);
 	void snspellit(machine_config &config);
 	void snspellsp(machine_config &config);
-	void snspellc(machine_config &config);
-	void snwrite(machine_config &config);
 	void snmath(machine_config &config);
 	void snread(machine_config &config);
-	void tntell(machine_config &config);
-	void vocaid(machine_config &config);
 	void lantrans(machine_config &config);
 	void lanteach(machine_config &config);
 
@@ -471,15 +325,7 @@ private:
 	void snspell_write_r(u32 data);
 	void lantrans_write_r(u32 data);
 
-	u8 snspellc_read_k();
-	void snspellc_write_o(u16 data);
-	void snspellc_write_r(u32 data);
-	u8 tntell_read_k();
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u8 tntell_get_hexchar(const char c);
-	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
 
 	virtual void machine_start() override;
 
@@ -488,20 +334,14 @@ private:
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 
-	output_finder<5> m_ol_out;
-
 	// cartridge
 	u32 m_cart_max_size = 0;
 	u8 *m_cart_base = nullptr;
-
-	u8 m_overlay = 0;
 };
 
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
-
-	m_ol_out.resolve();
 }
 
 
@@ -531,12 +371,6 @@ void tispeak_state::init_snspell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x8000;
-}
-
-void tispeak_state::init_tntell()
-{
-	m_cart_max_size = 0x4000;
-	m_cart_base = memregion("tms6100")->base() + 0x4000;
 }
 
 void tispeak_state::init_lantrans()
@@ -618,90 +452,6 @@ void tispeak_state::lantrans_write_r(u32 data)
 	m_r = m_inp_mux = data;
 	m_grid = data & 0xa1ff;
 	update_display();
-}
-
-
-// snspellc specific
-
-void tispeak_state::snspellc_write_r(u32 data)
-{
-	// R0-R8: input mux
-	m_inp_mux = data;
-
-	// R10: TMS5100 PDC pin
-	m_tms5100->pdc_w(data >> 10 & 1);
-
-	// R9: power-off request, on falling edge
-	if (~data & m_r & 0x200)
-		power_off();
-
-	m_r = data;
-}
-
-void tispeak_state::snspellc_write_o(u16 data)
-{
-	// O3210: TMS5100 CTL8124
-	m_tms5100->ctl_w(bitswap<4>(data,3,0,1,2));
-	m_o = data;
-}
-
-u8 tispeak_state::snspellc_read_k()
-{
-	// K4: TMS5100 CTL1
-	u8 k4 = m_tms5100->ctl_r() << 2 & 4;
-
-	// K: multiplexed inputs (note: the Vss row is always on)
-	return k4 | m_inputs[9]->read() | read_inputs(9);
-}
-
-
-// tntell specific
-
-u8 tispeak_state::tntell_read_k()
-{
-	// K8: overlay code from R5,O4-O7
-	u8 k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
-
-	// rest is same as snpellc
-	return k8 | snspellc_read_k();
-}
-
-u8 tispeak_state::tntell_get_hexchar(const char c)
-{
-	if (c >= '0' && c <= '9') return c - '0';
-	if (c >= 'A' && c <= 'F') return c - 'A' + 10;
-	if (c >= 'a' && c <= 'f') return c - 'a' + 10;
-
-	return 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
-{
-	// Each keyboard overlay insert has 5 holes, used by the game to determine
-	// which one is active(if any). If it matches with the internal ROM or
-	// external module, the game continues.
-
-	// pick overlay code from input config, see comment section above for reference
-	m_overlay = m_inputs[10]->read();
-
-	// try to get it from (external) layout
-	if (m_overlay == 0x20)
-	{
-		// as output value, eg. with defstate (in decimal)
-		m_overlay = output().get_value("overlay_code") & 0x1f;
-
-		// and from current view name ($ + 2 hex digits)
-		render_target *target = machine().render().first_target();
-		const char *name = target->view_name(target->view());
-
-		for (int i = 0; name && i < strlen(name); i++)
-			if (name[i] == '$' && strlen(&name[i]) > 2)
-				m_overlay = (tntell_get_hexchar(name[i + 1]) << 4 | tntell_get_hexchar(name[i + 2])) & 0x1f;
-	}
-
-	// overlay holes
-	for (int i = 0; i < 5; i++)
-		m_ol_out[i] = BIT(m_overlay, i);
 }
 
 
@@ -985,173 +735,6 @@ static INPUT_PORTS_START( lantrans )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( snspellc )
-	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Stumper")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-
-	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-
-	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Review")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-
-	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Repeat")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-
-	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Erase")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-
-	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("Module")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-
-	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_HOME) PORT_NAME("Go")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-
-	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Enter")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-
-	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
-
-	PORT_START("IN.9") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( snwrite )
-	PORT_INCLUDE( snspellc )
-
-	PORT_MODIFY("IN.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F1) PORT_NAME("Write/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true) // just the label changed from Spell to Write
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( tntell )
-	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Grid 1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Grid 1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("Grid 1-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Grid 1-3")
-
-	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Grid 2-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Grid 2-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Grid 2-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Grid 2-3")
-
-	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Grid 3-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Grid 3-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Grid 3-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Grid 3-3")
-
-	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Grid 4-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Grid 4-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Grid 4-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Grid 4-3")
-
-	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("Grid 5-1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("Grid 5-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Grid 5-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Grid 5-3")
-
-	PORT_START("IN.5") // R5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Grid 5-6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Grid 6-5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Grid 5-5")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // overlay code
-
-	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Grid 3-5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Grid 2-5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Grid 4-5")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Grid 1-5")
-
-	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Grid 3-6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Grid 2-6")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Grid 4-6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("Grid 1-6")
-
-	PORT_START("IN.8") // R8
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_F2) PORT_NAME("Grid 6-1 (Off)") // -> auto_power_off
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Grid 6-2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Grid 6-4")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Grid 6-3")
-
-	PORT_START("IN.9") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_F1) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.10")
-	PORT_CONFNAME( 0x3f, 0x20, "Overlay Code" )
-	PORT_CONFSETTING(    0x20, "From Artwork View" )
-	PORT_CONFSETTING(    0x00, "$00 (None)" )
-	PORT_CONFSETTING(    0x01, "$01" )
-	PORT_CONFSETTING(    0x02, "$02" )
-	PORT_CONFSETTING(    0x03, "$03" )
-	PORT_CONFSETTING(    0x04, "$04" )
-	PORT_CONFSETTING(    0x05, "$05" )
-	PORT_CONFSETTING(    0x06, "$06" )
-	PORT_CONFSETTING(    0x07, "$07" )
-	PORT_CONFSETTING(    0x08, "$08" )
-	PORT_CONFSETTING(    0x09, "$09" )
-	PORT_CONFSETTING(    0x0a, "$0A" )
-	PORT_CONFSETTING(    0x0b, "$0B" )
-	PORT_CONFSETTING(    0x0c, "$0C" )
-	PORT_CONFSETTING(    0x0d, "$0D" )
-	PORT_CONFSETTING(    0x0e, "$0E" )
-	PORT_CONFSETTING(    0x0f, "$0F" )
-	PORT_CONFSETTING(    0x10, "$10" )
-	PORT_CONFSETTING(    0x11, "$11" )
-	PORT_CONFSETTING(    0x12, "$12" )
-	PORT_CONFSETTING(    0x13, "$13" )
-	PORT_CONFSETTING(    0x14, "$14" )
-	PORT_CONFSETTING(    0x15, "$15" )
-	PORT_CONFSETTING(    0x16, "$16" )
-	PORT_CONFSETTING(    0x17, "$17" )
-	PORT_CONFSETTING(    0x18, "$18" )
-	PORT_CONFSETTING(    0x19, "$19" )
-	PORT_CONFSETTING(    0x1a, "$1A" )
-	PORT_CONFSETTING(    0x1b, "$1B" )
-	PORT_CONFSETTING(    0x1c, "$1C" )
-	PORT_CONFSETTING(    0x1d, "$1D" )
-	PORT_CONFSETTING(    0x1e, "$1E" )
-	PORT_CONFSETTING(    0x1f, "$1F (Diagnostic)" )
-INPUT_PORTS_END
 
 
 
@@ -1298,71 +881,6 @@ void tispeak_state::lanteach(machine_config &config)
 	// sound hardware
 	m_tms5100->reset_routes();
 	config.device_remove("mono");
-}
-
-
-void tispeak_state::snspellc(machine_config &config)
-{
-	// basic machine hardware
-	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->read_k().set(FUNC(tispeak_state::snspellc_read_k));
-	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
-
-	// no visual feedback!
-
-	// sound hardware
-	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
-
-	SPEAKER(config, "mono").front_center();
-	TMC0281D(config, m_tms5100, MASTER_CLOCK);
-	tms5110_route(config);
-
-	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm,bin");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
-
-	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
-}
-
-void tispeak_state::snwrite(machine_config &config)
-{
-	snspellc(config);
-
-	// sound hardware
-	CD2801(config.replace(), m_tms5100, MASTER_CLOCK); // CD2801A!
-	tms5110_route(config);
-}
-
-
-void tispeak_state::vocaid(machine_config &config)
-{
-	// basic machine hardware
-	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->read_k().set(FUNC(tispeak_state::tntell_read_k));
-	m_maincpu->write_o().set(FUNC(tispeak_state::snspellc_write_o));
-	m_maincpu->write_r().set(FUNC(tispeak_state::snspellc_write_r));
-
-	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
-	config.set_default_layout(layout_tntell);
-
-	// sound hardware
-	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
-
-	SPEAKER(config, "mono").front_center();
-	CD2802(config, m_tms5100, MASTER_CLOCK);
-	tms5110_route(config);
-}
-
-void tispeak_state::tntell(machine_config &config)
-{
-	vocaid(config);
-
-	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm,bin");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
-
-	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
 }
 
 
@@ -1530,46 +1048,6 @@ ROM_START( snspellit )
 ROM_END
 
 
-ROM_START( snspellc )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
-
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd2354a.vsm", 0x0000, 0x4000, CRC(548a940c) SHA1(c37e620c4c70a05cbaaff9a166c6da2e2420196f) )
-ROM_END
-
-ROM_START( snspellca )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
-
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd2354.vsm", 0x0000, 0x4000, CRC(3af3232e) SHA1(f89d90dca209ee612634d664d5d4562f1d1786cf) )
-ROM_END
-
-ROM_START( snwrite )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8011a-nl", 0x0000, 0x0800, CRC(8a82a467) SHA1(fa4f8a232392603721bd8136c141a340fd5936a0) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8011_micro.pla", 0, 867, CRC(bbb64ddc) SHA1(602cd5eef897c9115c12db7367c5654ab2297fa1) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
-
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd62174a.vsm", 0x0000, 0x4000, CRC(b7bbaaf3) SHA1(9eb949fcf522982f9c3c4649f207703b746b90ef) )
-ROM_END
-
-
 ROM_START( snmath )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cd2704b-n2l", 0x0000, 0x1000, CRC(7e06c7c5) SHA1(d60a35a8163ab593c31afc840a0d8a9b3a762f29) )
@@ -1683,73 +1161,6 @@ ROM_START( lanteach )
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // cartridge area
 ROM_END
 
-
-ROM_START( tntell )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
-ROM_END
-
-ROM_START( tntelluk )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd62170.vsm", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
-ROM_END
-
-ROM_START( tntellfr )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd62171.vsm", 0x0000, 0x4000, CRC(cc26f7d1) SHA1(2b03e37b3bf3cbeca36980acfc45246dac706b83) )
-ROM_END
-
-ROM_START( tntellp )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "us4403965_cd1100", 0x0000, 0x0800, BAD_DUMP CRC(863a1c9e) SHA1(f2f9eb0ae17eedd4ef2b887b34601e75b4f6c720) ) // typed in from patent US4403965/EP0048835A2, may have errors
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) ) // from cd8012, matches patent source code
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_us4403965_output.pla", 0, 365, CRC(66cfb3c3) SHA1(80a05e5d729518e1f35d8f26438f56e80ffbd003) )
-
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
-ROM_END
-
-
-ROM_START( vocaid )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "cd8012nl", 0x0000, 0x0800, CRC(3d0fee24) SHA1(8b1b1df03d50ffe8adea59ece212dece5245fe86) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_cd8012_micro.pla", 0, 867, CRC(46d936c8) SHA1(b0aad486a90a5dec7fd2fb07caa503be771f91c8) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
-
-	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // same hw as tntell, but no external slot
-	ROM_LOAD( "cd2357.vsm", 0x0000, 0x4000, CRC(19c251fa) SHA1(8f8163069f32413379e7e1681ce6a4d0819d4ebc) )
-ROM_END
-
 } // anonymous namespace
 
 
@@ -1766,10 +1177,6 @@ COMP( 1980, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, in
 COMP( 1981, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1983, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1982, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snwrite,    snspellc, 0, snwrite,      snwrite,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-
 COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 1984, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1984 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
 COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
@@ -1780,10 +1187,3 @@ COMP( 1979, lantrans,   0,        0, lantrans,     lantrans,   tispeak_state, in
 COMP( 1979, lantransp,  lantrans, 0, lantrans,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Translator (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 COMP( 1980, lanteach,   0,        0, lanteach,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-
-COMP( 1981, tntell,     0,        0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-
-COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     tispeak_state, empty_init,    "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

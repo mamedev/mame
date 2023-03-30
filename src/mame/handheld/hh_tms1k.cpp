@@ -81,7 +81,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
- @MP0271   TMS1000   1982, Tandy (RadioShack) Monkey See
+ @MP0271   TMS1000   1982, Tandy (Radio Shack) Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
@@ -111,7 +111,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP1272   TMS1100   1981, Tandy Computerized Arcade (assumed same as CD7282, not confirmed)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
- @MP1312   TMS1100   1981, Gakken FX-Micom R-165/RadioShack Science Fair Microcomputer Trainer
+ @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
  *MP1359   TMS1100   1985, Capsela CRC2000
  *MP1362   TMS1100   1985, Technasonic Weight Talker (have dump)
@@ -6660,7 +6660,7 @@ ROM_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was published later in the USA by Tandy(RadioShack),
+  for more information. It was published later in the USA by Tandy (Radio Shack),
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
@@ -10570,11 +10570,11 @@ ROM_END
 
   known releases:
   - World: Tandy-12: Computerized Arcade, published by Tandy, model 60-2159.
-  - World: Computerized Arcade, RadioShack brand, also model 60-2159 and same
+  - World: Computerized Arcade, Radio Shack brand, also model 60-2159 and same
     hardware as above. "Tandy-12" on the side of the handheld was changed to
-    "RadioShack-12", but there's no title prefix on the box.
-  - World: Computerized Arcade, RadioShack brand, model 60-2159A, COP421 MCU.
-  - World: Computerized Arcade, RadioShack brand, model 60-2495, hardware unknown.
+    "Radio Shack-12", but there's no title prefix on the box.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -10744,7 +10744,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy (RadioShack division) Monkey See (1982 version)
+  Tandy (Radio Shack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
@@ -11034,13 +11034,13 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy (Micronta) VoxClock 3 (sold by RadioShack, model 63-906)
+  Tandy (Micronta) VoxClock 3 (sold by Radio Shack, model 63-906)
   * PCB label: VOXCLOCK 3
   * TMS1100 MP1343 (die label: 1100E, MP1343)
   * TMS5110AN2L-1 speech chip, 4KB VSM CM72010NL (die label: T0355C, 72010U)
   * 4-digit 7seg LED display, 6 other LEDs
 
-  Micronta is not a company, but one of the RadioShack house brands. Schematics
+  Micronta is not a company, but one of the Radio Shack house brands. Schematics
   are included in the manual, they also mention a CM72005 VSM.
 
   Spartus AVT from 1982 is nearly the same as VoxClock 3.
@@ -12104,7 +12104,7 @@ ROM_END
   * 11-digit 7seg VFD (1 custom digit)
 
   This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
-  Panasonic JE1601U, RadioShack EC2001, Triumph-Adler D100. The original
+  Panasonic JE1601U, Radio Shack EC2001, Triumph-Adler D100. The original
   TI version did not have the 3 buttons at R4.
 
 ***************************************************************************/
