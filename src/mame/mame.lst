@@ -19015,25 +19015,6 @@ talkingfb
 @source:handheld/teammate.cpp
 teammate
 
-@source:handheld/tispeak.cpp
-lanteach                        //
-lantrans                        //
-lantransp                       //
-snmath                          //
-snmatha                         //
-snmathp                         //
-snread                          //
-snspell                         //
-snspellfr                       //
-snspellit                       //
-snspelljp                       //
-snspellp                        //
-snspellsp                       //
-snspellua                       //
-snspellub                       //
-snspelluk                       //
-snspelluka                      //
-
 @source:handheld/wildfire.cpp
 wildfire                        // Parker Bros
 
@@ -43474,6 +43455,25 @@ exl100                          //
 @source:ti/geneve.cpp
 geneve                          // 1987 Myarc Geneve 9640
 genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
+
+@source:ti/snspell.cpp
+lanteach                        //
+lantrans                        //
+lantransp                       //
+snmath                          //
+snmatha                         //
+snmathp                         //
+snread                          //
+snspell                         //
+snspellfr                       //
+snspellit                       //
+snspelljp                       //
+snspellp                        //
+snspellsp                       //
+snspellua                       //
+snspellub                       //
+snspelluk                       //
+snspelluka                      //
 
 @source:ti/snspellc.cpp
 mathsmag                        //
