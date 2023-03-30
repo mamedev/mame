@@ -1,47 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:hap, Jonathan Gevaryahu
 // thanks-to:Sean Riddle, David Viens, Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
-  ** subclass of hh_tms1k_state (hh_tms1k.h, hh_tms1k.cpp) **
+Texas Instruments 1st-gen. Speak & Spell family
 
-  Texas Instruments 1st-gen. handheld speech devices.
+These devices, mostly edu-toys, are based around an MCU(TMS0270), TMS51xx speech,
+and VSM ROM(s). Newer devices, such as Speak & Music, are based around the
+TMP50C40 and belong in another driver, probably.
 
-  These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
-  TMS51xx speech, and VSM ROM(s). Newer devices, such as Speak & Music,
-  are based around the TMP50C40 and belong in another driver, probably.
+MAME external artwork is not required. But it is objectively a large improvement.
+For the 'Compact' series, see the snspellc driver.
 
-  note: except for tntell, MAME external artwork is not required. But it
-  is objectively a large improvement.
+TODO:
+- why doesn't lantransp work? maybe incompatible with released modules?
 
-  TODO:
-  - disconnect from hh_tms1k_state, split driver and move to ti folder
-  - why doesn't lantransp work? maybe incompatible with released modules?
-  - emulate other known devices
-
-  Dick Smith catalog numbers, taken from advertisements:
-
-  X-1300, Y-1300 : T.I. Speak & Spell
-  X-1301 : Super Stumper 1 (for Speak & Spell)
-  X-1302 : Super Stumper 2 (for Speak & Spell)
-  X-1305 : Vowel Power (for Speak & Spell)
-  Y-1310 : T.I. Speak & Math
-  Y-1313 : T.I. Speak & Read
-  Y-1320 : T.I. Dataman
-
-----------------------------------------------------------------------------
+================================================================================
 
 Known devices on this hardware: (* denotes not dumped)
-
-
-ROM (and/or source) code obtained from patents:
-Some of these may have pre-release bugs.
-
-    Speak & Spell: US4189779
-    Speak & Math: US4946391
-    Touch & Tell: US4403965, EP0048835A2 (patent calls it "Speak & Seek")
-    Language Translator: US4631748
-
 
 Speak & Spell:
 
@@ -49,201 +25,190 @@ This is the original Speak & Spell. TI had done educational toys before, like
 Wiz-A-Tron or Little Professor. But the popularity of this product was much
 above expectations. TI continued to manufacture many products for this line.
 
-    Speak & Spell (US), 1978
-    - MCU: TMC0271, label TMC0271NL DBS (die label: T0270B, 0271B)
-    - TMS51xx: TMC0281
-    - VSM(1/2): 16KB TMC0351NL
-    - VSM(2/2): 16KB TMC0352NL
-    - VFD: NEC FIP8A5AR no. 3A
-    - notes: keyboard has buttons instead of cheap membrane
+Speak & Spell (US), 1978
+- MCU: TMC0271, label TMC0271NL DBS (die label: T0270B, 0271B)
+- TMS51xx: TMC0281
+- VSM(1/2): 16KB TMC0351NL
+- VSM(2/2): 16KB TMC0352NL
+- VFD: NEC FIP8A5AR no. 3A
+- notes: keyboard has buttons instead of cheap membrane
 
-    Speak & Spell (US), 1980
-    - MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D, 0271H)
-    - TMS51xx: TMC0281
-    - VSM(1/2): 16KB TMC0351N2L
-    - VSM(2/2): 16KB TMC0352N2L
-    - notes: fixed a funny bug with gibberish-talk when Module button is pressed
-      with no module inserted, MCU ROM contents differs from 1978 version
+Speak & Spell (US), 1980
+- MCU: TMC0271, label TMC0271H-N2L FDS (die label: T0270D, 0271H)
+- TMS51xx: TMC0281
+- VSM(1/2): 16KB TMC0351N2L
+- VSM(2/2): 16KB TMC0352N2L
+- notes: fixed a funny bug with gibberish-talk when Module button is pressed
+  with no module inserted, MCU ROM contents differs from 1978 version
 
-    Speak & Spell (US), 1981
-    - MCU: same as 1980 version
-    - TMS51xx: TMC0281D
-    - VSM: 16KB CD2350A
-    - notes: only 1 VSM, meaning much smaller internal vocabulary
+Speak & Spell (US), 1981
+- MCU: same as 1980 version
+- TMS51xx: TMC0281D
+- VSM: 16KB CD2350A
+- notes: only 1 VSM, meaning much smaller internal vocabulary
 
-    Speak & Spell (Japan), 1980
-    - MCU: TMC0271 (assume same as US 1980 version)
-    - TMS51xx: TMC0281
-    - VSM(1/2): 16KB CD2321
-    - VSM(2/2): 16KB CD2322
-    - notes: no local name for the product, words are in English but very low difficulty
+Speak & Spell (Japan), 1980
+- MCU: TMC0271 (assume same as US 1980 version)
+- TMS51xx: TMC0281
+- VSM(1/2): 16KB CD2321
+- VSM(2/2): 16KB CD2322
+- notes: no local name for the product, words are in English but very low difficulty
 
-    Speak & Spell (UK), 1978
-    - MCU: TMC0271 (assume same as US 1978 version)
-    - TMS51xx: TMC0281
-    - VSM(1/2): 16KB CD2303
-    - VSM(2/2): 16KB CD2304
-    - notes: voice data was manually altered to give it a UK accent,
-      here's a small anecdote from developer:
-          "(...) I cannot bear to listen the product even now. I remember the
-           word 'butcher' took 3 days - I still don't know if it sounds right."
+Speak & Spell (UK), 1978
+- MCU: TMC0271 (assume same as US 1978 version)
+- TMS51xx: TMC0281
+- VSM(1/2): 16KB CD2303
+- VSM(2/2): 16KB CD2304
+- notes: voice data was manually altered to give it a UK accent,
+  here's a small anecdote from developer:
+  "(...) I cannot bear to listen the product even now. I remember the
+   word 'butcher' took 3 days - I still don't know if it sounds right."
 
-    Speak & Spell (UK), 1981
-    - MCU: TMC0271 (assume same as US 1980 version)
-    - TMS51xx: CD2801
-    - VSM: 16KB CD62175
-    - VFD: some seen with the one from Speak & Math(!)
-    - notes: this one has a dedicated voice actor
+Speak & Spell (UK), 1981
+- MCU: TMC0271 (assume same as US 1980 version)
+- TMS51xx: CD2801
+- VSM: 16KB CD62175
+- VFD: some seen with the one from Speak & Math(!)
+- notes: this one has a dedicated voice actor
 
-    Speak & Spell (Spanish, prototype), 1980
-    - MCU: CD2701N2L P (die label: T0270D, 2701)
-    - TMS51xx: TMC0281 (die label: T0280A 0281)
-    - VSM(1/2): 16KB CD2319
-    - VSM(2/2): 16KB CD2320
-    - VFD: 8 digits with 14 segments, DP and accent mark
+Speak & Spell (Spanish, prototype), 1980
+- MCU: CD2701N2L P (die label: T0270D, 2701)
+- TMS51xx: TMC0281 (die label: T0280A 0281)
+- VSM(1/2): 16KB CD2319
+- VSM(2/2): 16KB CD2320
+- VFD: 8 digits with 14 segments, DP and accent mark
 
-    Speak & Spell (France) "La Dictée Magique", 1981
-    - MCU: CD2702, label CD2702AN2L (die label: TMC0270F, 2702A)
-    - TMS51xx: CD2801
-    - VSM: 16KB CD2352
+Speak & Spell (France) "La Dictée Magique", 1981
+- MCU: CD2702, label CD2702AN2L (die label: TMC0270F, 2702A)
+- TMS51xx: CD2801
+- VSM: 16KB CD2352
 
-    Speak & Spell (Germany) "Buddy", 1980 (stylized as "buddy")
-    - MCU & TMS51xx: same as French version
-    - VSM(1/2): 16KB CD2345*
-    - VSM(2/2): 16KB CD2346*
-    - VFD: has umlaut instead of apostrophe
+Speak & Spell (Germany) "Buddy", 1980 (stylized as "buddy")
+- MCU & TMS51xx: same as French version
+- VSM(1/2): 16KB CD2345*
+- VSM(2/2): 16KB CD2346*
+- VFD: has umlaut instead of apostrophe
 
-    Speak & Spell (Italy) "Grillo Parlante", 1983
-    - MCU & TMS51xx: same as French version
-    - VSM: 16KB CD62190
-    - VFD: same as Speak & Math
+Speak & Spell (Italy) "Grillo Parlante", 1983
+- MCU & TMS51xx: same as French version
+- VSM: 16KB CD62190
+- VFD: same as Speak & Math
 
 Speak & Spell modules:
 Note that they are interchangeable, eg. you can use a French module on a US Speak & Spell.
 
-    English:
-    - Vowel Power: VSM: 16KB CD2302
-    - Number Stumpers 4-6: VSM: 16KB CD2305
-    - Number Stumpers 7-8: VSM: 16KB CD2307A
-    - Basic Builders: VSM: 16KB CD2308
-    - Mighty Verbs: VSM: 16KB CD2309(rev.B)
-    - Homonym Heroes: VSM: 16KB CD2310
-    - Vowel Ventures: VSM: 16KB CD2347(rev.C)
-    - Noun Endings: VSM: 16KB CD2348
-    - Magnificent Modifiers: VSM: 16KB CD2349
-    - E.T. Fantasy: VSM: 16KB CD2360
+English:
+- Vowel Power: VSM: 16KB CD2302
+- Number Stumpers 4-6: VSM: 16KB CD2305
+- Number Stumpers 7-8: VSM: 16KB CD2307A
+- Basic Builders: VSM: 16KB CD2308
+- Mighty Verbs: VSM: 16KB CD2309(rev.B)
+- Homonym Heroes: VSM: 16KB CD2310
+- Vowel Ventures: VSM: 16KB CD2347(rev.C)
+- Noun Endings: VSM: 16KB CD2348
+- Magnificent Modifiers: VSM: 16KB CD2349
+- E.T. Fantasy: VSM: 16KB CD2360
 
-    French:
-    - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
-    - No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
-    - No.3: Les Animaux Familiers: VSM: 16KB CD62047*
-    - No.4: Les Magasins de la Rue: VSM: 16KB CD62048
-    - No.5: Les Extra-Terrestres: VSM: 16KB CD62178*
+French:
+- No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
+- No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
+- No.3: Les Animaux Familiers: VSM: 16KB CD62047*
+- No.4: Les Magasins de la Rue: VSM: 16KB CD62048
+- No.5: Les Extra-Terrestres: VSM: 16KB CD62178*
 
-    Italian:
-    - Super Modulo: VSM: 16KB? CD62313*
+Italian:
+- Super Modulo: VSM: 16KB? CD62313*
 
-
-Speak & Math:
-
-    Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-    - MCU: CD2704, label CD2704B-N2L (die label: TMC0270F, 2704B) - 2nd revision?(mid-1982)
-    - TMS51xx: CD2801
-    - VSM(1/2): 16KB CD2392
-    - VSM(2/2): 16KB CD2393
-    - VFD: Futaba 9SY -02Z 7E
-    - notes: As with the Speak & Spell, the voice actor was a radio announcer.
-      However, the phrase "is greater than or less than" had to be added by one
-      of the TI employees in a hurry, the day before a demo. Apparently QA
-      never found out and it ended up in the final product.
-
-    Speak & Math (US), 1984
-    - MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
-    - TMS51xx: CD2801
-    - VSM(1/2): 16KB CD2381
-    - VSM(2/2): 4KB CD2614
-
+================================================================================
 
 Speak & Read:
 
-    Speak & Read (US), 1980
-    - MCU: CD2705, label CD2705B-N2L (die label: TMC0270E, 2705B) - 2nd revision?(late-1981)
-    - TMS51xx: CD2801
-    - VSM(1/2): 16KB CD2394A
-    - VSM(2/2): 16KB CD2395A
-    - VFD: same as Language Translator, rightmost digit unused
+Speak & Read (US), 1980
+- MCU: CD2705, label CD2705B-N2L (die label: TMC0270E, 2705B) - 2nd revision?(late-1981)
+- TMS51xx: CD2801
+- VSM(1/2): 16KB CD2394A
+- VSM(2/2): 16KB CD2395A
+- VFD: same as Language Translator, rightmost digit unused
 
 Speak & Read modules:
 
-    English:
-    - Sea Sights: VSM: 16KB CD2396A
-    - Who's Who at the Zoo: VSM: 16KB CD2397
-    - A Dog on a Log: VSM: 16KB CD3534A
-    - The Seal That Could Fly: VSM: 16KB CD3535
-    - A Ghost in the House: VSM: 16KB CD3536
-    - On the Track: VSM: 16KB CD3538
-    - The Third Circle: VSM: 16KB CD3539
-    - The Millionth Knight: VSM: 16KB CD3540
+English:
+- Sea Sights: VSM: 16KB CD2396A
+- Who's Who at the Zoo: VSM: 16KB CD2397
+- A Dog on a Log: VSM: 16KB CD3534A
+- The Seal That Could Fly: VSM: 16KB CD3535
+- A Ghost in the House: VSM: 16KB CD3536
+- On the Track: VSM: 16KB CD3538
+- The Third Circle: VSM: 16KB CD3539
+- The Millionth Knight: VSM: 16KB CD3540
 
+================================================================================
 
+Speak & Math:
 
-Magic Wand "Speaking Reader" or "Speak & Learn":
+Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
+- MCU: CD2704, label CD2704B-N2L (die label: TMC0270F, 2704B) - 2nd revision?(mid-1982)
+- TMS51xx: CD2801
+- VSM(1/2): 16KB CD2392
+- VSM(2/2): 16KB CD2393
+- VFD: Futaba 9SY -02Z 7E
+- notes: As with the Speak & Spell, the voice actor was a radio announcer.
+  However, the phrase "is greater than or less than" had to be added by one
+  of the TI employees in a hurry, the day before a demo. Apparently QA
+  never found out and it ended up in the final product.
 
-Limited release barcode reader text-to-speech device, meant for children.
-The text is coded as phonemes. Books were sold separately.
+Speak & Math (US), 1984
+- MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
+- TMS51xx: CD2801
+- VSM(1/2): 16KB CD2381
+- VSM(2/2): 4KB CD2614
 
-    Magic Wand "Speaking Reader" (US), 1982
-    - MCU: C14007* (TMS1400?)
-    - TMS5220
-    - VSM: 4KB? CD2228*
-
-    Magic Wand "Speak & Learn" (US), 1983
-    - notes: same hardware
-
+================================================================================
 
 Language Translator/Tutor:
 
 Initially sold as Language Translator, renamed to Language Tutor a year later.
 It was rebranded from translator to a 'language aid'.
 
-    Language Translator (US), 1979
-    - MCU: TMC0275 (die label: T0270D, 0275B)
-    - TMS51xx: CD2801 (die label: T0280B 2801)
-    - VFD: Itron FG106A2
-    - notes: external module is required (see below)
+Language Translator (US), 1979
+- MCU: TMC0275 (die label: T0270D, 0275B)
+- TMS51xx: CD2801 (die label: T0280B 2801)
+- VFD: Itron FG106A2
+- notes: external module is required (see below)
 
-    Language Tutor (US), 1980
-    - notes: identical hardware, module stickers differ but have same VSMs
+Language Tutor (US), 1980
+- notes: identical hardware, module stickers differ but have same VSMs
 
 Language Translator modules:
 
-    - Ingles(1/4): VSM: 16KB CD2311
-    - Ingles(2/4): VSM: 16KB CD2312
-    - Ingles(3/4): VSM: 16KB CD2313
-    - Ingles(4/4): VSM: 16KB CD2314
+- Ingles(1/4): VSM: 16KB CD2311
+- Ingles(2/4): VSM: 16KB CD2312
+- Ingles(3/4): VSM: 16KB CD2313
+- Ingles(4/4): VSM: 16KB CD2314
 
-    - Spanish(1/4): VSM: 16KB CD2315
-    - Spanish(2/4): VSM: 16KB CD2316
-    - Spanish(3/4): VSM: 16KB CD2317
-    - Spanish(4/4): VSM: 16KB CD2318
+- Spanish(1/4): VSM: 16KB CD2315
+- Spanish(2/4): VSM: 16KB CD2316
+- Spanish(3/4): VSM: 16KB CD2317
+- Spanish(4/4): VSM: 16KB CD2318
 
-    - French(1/4): VSM: 16KB CD2327
-    - French(2/4): VSM: 16KB CD2328
-    - French(3/4): VSM: 16KB CD2329
-    - French(4/4): VSM: 16KB CD2330
+- French(1/4): VSM: 16KB CD2327
+- French(2/4): VSM: 16KB CD2328
+- French(3/4): VSM: 16KB CD2329
+- French(4/4): VSM: 16KB CD2330
 
-    - German(1/4): VSM: 16KB CD2331
-    - German(2/4): VSM: 16KB CD2332
-    - German(3/4): VSM: 16KB CD2333
-    - German(4/4): VSM: 16KB CD2334
+- German(1/4): VSM: 16KB CD2331
+- German(2/4): VSM: 16KB CD2332
+- German(3/4): VSM: 16KB CD2333
+- German(4/4): VSM: 16KB CD2334
 
-    - English(1/4): VSM: 16KB CD3526
-    - English(2/4): VSM: 16KB CD3527
-    - English(3/4): VSM: 16KB CD3528
-    - English(4/4): VSM: 16KB CD3529
+- English(1/4): VSM: 16KB CD3526
+- English(2/4): VSM: 16KB CD3527
+- English(3/4): VSM: 16KB CD3528
+- English(4/4): VSM: 16KB CD3529
 
-    Some other language modules were announced by TI, but not released.
+Some other language modules were announced by TI, but not released.
 
+================================================================================
 
 Language Teacher:
 
@@ -251,24 +216,24 @@ A cost-reduced version of the translator. Similar PCB, the speaker was removed.
 Modules require less ROMs due to missing speech data. Translator/Teacher modules
 are not interchangeable.
 
-    Language Teacher (US), 1980
-    - MCU: TMC0270N2LP CD2706 (die label: T0270D, 2706)
-    - other: see Language Translator
+Language Teacher (US), 1980
+- MCU: TMC0270N2LP CD2706 (die label: T0270D, 2706)
+- other: see Language Translator
 
 Language Teacher modules (only 1 known released):
 
-    - German For Travel: VSM: 16KB CD3509
+- German For Travel: VSM: 16KB CD3509
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "hh_tms1k.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "machine/timer.h"
+#include "cpu/tms1000/tms0270.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
+#include "video/pwm.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -278,6 +243,7 @@ Language Teacher modules (only 1 known released):
 #include "snread.lh"
 #include "snspell.lh"
 #include "snspellsp.lh"
+
 
 namespace {
 
@@ -290,14 +256,18 @@ namespace {
 static constexpr u32 MASTER_CLOCK = 640'000;
 
 
-class tispeak_state : public hh_tms1k_state
+class snspell_state : public driver_device
 {
 public:
-	tispeak_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
+	snspell_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_softlist(*this, "cart_list"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void init_snspell();
@@ -315,44 +285,84 @@ public:
 	void lantrans(machine_config &config);
 	void lanteach(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	virtual void power_off() override;
+	// devices
+	required_device<tms0270_cpu_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	optional_device<generic_slot_device> m_cart;
+	optional_device<software_list_device> m_softlist;
+	required_ioport_array<9> m_inputs;
+
+	void power_off();
 	void update_display();
 
-	u8 snspell_read_k();
+	u8 read_k();
+	void write_o(u16 data);
+	void write_r(u32 data);
+
 	void snmath_write_o(u16 data);
-	void snspell_write_o(u16 data);
-	void snspell_write_r(u32 data);
 	void lantrans_write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	virtual void machine_start() override;
-
-	// devices
-	required_device<tms5110_device> m_tms5100;
-	required_device<tms6100_device> m_tms6100;
-	optional_device<generic_slot_device> m_cart;
-
-	// cartridge
 	u32 m_cart_max_size = 0;
 	u8 *m_cart_base = nullptr;
+
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
 };
 
-void tispeak_state::machine_start()
+void snspell_state::machine_start()
 {
-	hh_tms1k_state::machine_start();
+	// register for savestates
+	save_item(NAME(m_power_on));
+	save_item(NAME(m_r));
+	save_item(NAME(m_grid));
+	save_item(NAME(m_plate));
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Power
+*******************************************************************************/
 
-  Cartridge Handling
+void snspell_state::machine_reset()
+{
+	m_power_on = true;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+}
 
-***************************************************************************/
+INPUT_CHANGED_MEMBER(snspell_state::power_on)
+{
+	if (newval && !m_power_on)
+		machine_reset();
+}
 
-DEVICE_IMAGE_LOAD_MEMBER(tispeak_state::cart_load)
+void snspell_state::power_off()
+{
+	m_power_on = false;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_display->clear();
+}
+
+
+
+/*******************************************************************************
+    Cartridge
+*******************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER(snspell_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -366,14 +376,13 @@ DEVICE_IMAGE_LOAD_MEMBER(tispeak_state::cart_load)
 	return image_init_result::PASS;
 }
 
-
-void tispeak_state::init_snspell()
+void snspell_state::init_snspell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x8000;
 }
 
-void tispeak_state::init_lantrans()
+void snspell_state::init_lantrans()
 {
 	m_cart_max_size = 0x10000;
 	m_cart_base = memregion("tms6100")->base();
@@ -381,32 +390,23 @@ void tispeak_state::init_lantrans()
 
 
 
-/***************************************************************************
-
-  I/O
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 // common/snspell
 
-void tispeak_state::power_off()
-{
-	hh_tms1k_state::power_off();
-	m_tms5100->reset();
-}
-
-void tispeak_state::update_display()
+void snspell_state::update_display()
 {
 	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-void tispeak_state::snspell_write_r(u32 data)
+void snspell_state::write_r(u32 data)
 {
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
 	// other bits: MCU internal use
-	m_inp_mux = data;
 	m_grid = data & 0x81ff;
 	update_display();
 
@@ -417,7 +417,7 @@ void tispeak_state::snspell_write_r(u32 data)
 	m_r = data;
 }
 
-void tispeak_state::snspell_write_o(u16 data)
+void snspell_state::write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantrans and snread VFD has an accent triangle instead of DP, and no AP
@@ -426,16 +426,23 @@ void tispeak_state::snspell_write_o(u16 data)
 	update_display();
 }
 
-u8 tispeak_state::snspell_read_k()
+u8 snspell_state::read_k()
 {
-	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inputs[8]->read() | read_inputs(8);
+	u8 data = 0;
+
+	// K: multiplexed inputs
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_r, i))
+			data |= m_inputs[i]->read();
+
+	// Vss row is always on
+	return data | m_inputs[8]->read();
 }
 
 
 // snmath specific
 
-void tispeak_state::snmath_write_o(u16 data)
+void snspell_state::snmath_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
@@ -446,21 +453,19 @@ void tispeak_state::snmath_write_o(u16 data)
 
 // lantrans specific
 
-void tispeak_state::lantrans_write_r(u32 data)
+void snspell_state::lantrans_write_r(u32 data)
 {
-	// same as default, except R13 is used for an extra digit
-	m_r = m_inp_mux = data;
+	// same as default, except R13 is used for an extra digit instead of power-off
+	m_r = data;
 	m_grid = data & 0xa1ff;
 	update_display();
 }
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( snspell )
 	PORT_START("IN.0") // R0
@@ -520,7 +525,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellfr ) // French button names
@@ -543,7 +548,7 @@ static INPUT_PORTS_START( snspellfr ) // French button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Code Secret")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Lettre")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Dis-le")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellit ) // Italian button names
@@ -566,7 +571,7 @@ static INPUT_PORTS_START( snspellit ) // Italian button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Codice")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Alfabeto")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ripeti")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabet
@@ -627,7 +632,7 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Palabra Secreta")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Dilo")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 INPUT_PORTS_END
 
 
@@ -679,7 +684,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -701,7 +706,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, true)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
 INPUT_PORTS_END
 
 
@@ -736,15 +741,11 @@ INPUT_PORTS_END
 
 
 
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
-
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void tispeak_state::tms5110_route(machine_config &config)
+void snspell_state::tms5110_route(machine_config &config)
 {
 	// sound hardware
 	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
@@ -755,13 +756,13 @@ void tispeak_state::tms5110_route(machine_config &config)
 	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void tispeak_state::snmath(machine_config &config)
+void snspell_state::sns_tmc0281(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->read_k().set(FUNC(tispeak_state::snspell_read_k));
-	m_maincpu->write_o().set(FUNC(tispeak_state::snmath_write_o));
-	m_maincpu->write_r().set(FUNC(tispeak_state::snspell_write_r));
+	m_maincpu->read_k().set(FUNC(snspell_state::read_k));
+	m_maincpu->write_o().set(FUNC(snspell_state::write_o));
+	m_maincpu->write_r().set(FUNC(snspell_state::write_r));
 
 	m_maincpu->read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
 	m_maincpu->write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
@@ -770,126 +771,115 @@ void tispeak_state::snmath(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(16, 16);
 	m_display->set_segmask(0x21ff, 0x3fff);
-	config.set_default_layout(layout_snmath);
+	config.set_default_layout(layout_snspell);
 
 	// sound hardware
 	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
 	SPEAKER(config, "mono").front_center();
-	CD2801(config, m_tms5100, MASTER_CLOCK);
+	TMC0281(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
-}
-
-
-void tispeak_state::sns_cd2801(machine_config &config)
-{
-	snmath(config);
-
-	// basic machine hardware
-	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
-
-	config.set_default_layout(layout_snspell);
 
 	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm,bin");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
+	m_cart->set_device_load(FUNC(snspell_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
+	SOFTWARE_LIST(config, m_softlist).set_original("snspell");
 }
 
-void tispeak_state::snspellit(machine_config &config)
-{
-	sns_cd2801(config);
-
-	// basic machine hardware
-	config.set_default_layout(layout_snmath);
-}
-
-void tispeak_state::sns_tmc0281(machine_config &config)
-{
-	sns_cd2801(config);
-
-	// sound hardware
-	TMC0281(config.replace(), m_tms5100, MASTER_CLOCK);
-	tms5110_route(config);
-}
-
-void tispeak_state::snspellsp(machine_config &config)
+void snspell_state::sns_tmc0281d(machine_config &config)
 {
 	sns_tmc0281(config);
-
-	// basic machine hardware
-	config.set_default_layout(layout_snspellsp);
-}
-
-void tispeak_state::sns_tmc0281d(machine_config &config)
-{
-	sns_cd2801(config);
 
 	// sound hardware
 	TMC0281D(config.replace(), m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 }
 
-
-void tispeak_state::snread(machine_config &config)
+void snspell_state::sns_cd2801(machine_config &config)
 {
-	snmath(config);
+	sns_tmc0281(config);
 
-	// basic machine hardware
-	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
+	// sound hardware
+	CD2801(config.replace(), m_tms5100, MASTER_CLOCK);
+	tms5110_route(config);
+}
 
-	config.set_default_layout(layout_snread);
+void snspell_state::snspellit(machine_config &config)
+{
+	sns_cd2801(config);
 
-	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm,bin");
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
+	config.set_default_layout(layout_snmath);
+}
 
-	SOFTWARE_LIST(config, "cart_list").set_original("snread");
+void snspell_state::snspellsp(machine_config &config)
+{
+	sns_tmc0281(config);
+
+	config.set_default_layout(layout_snspellsp);
 }
 
 
-void tispeak_state::lantrans(machine_config &config)
+void snspell_state::snread(machine_config &config)
 {
-	snmath(config);
-
-	// basic machine hardware
-	m_maincpu->write_o().set(FUNC(tispeak_state::snspell_write_o));
-	m_maincpu->write_r().set(FUNC(tispeak_state::lantrans_write_r));
+	sns_cd2801(config);
 
 	config.set_default_layout(layout_snread);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantrans", "vsm,bin");
+	m_cart->set_interface("snread");
+	m_softlist->set_original("snread");
+}
+
+
+void snspell_state::snmath(machine_config &config)
+{
+	sns_cd2801(config);
+
+	// basic machine hardware
+	m_maincpu->write_o().set(FUNC(snspell_state::snmath_write_o));
+
+	config.set_default_layout(layout_snmath);
+
+	// no cartridge
+	config.device_remove("cartslot");
+	config.device_remove("cart_list");
+}
+
+
+void snspell_state::lantrans(machine_config &config)
+{
+	sns_cd2801(config);
+
+	// basic machine hardware
+	m_maincpu->write_r().set(FUNC(snspell_state::lantrans_write_r));
+
+	config.set_default_layout(layout_snread);
+
+	// cartridge
+	m_cart->set_interface("lantrans");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
-
-	SOFTWARE_LIST(config, "cart_list").set_original("lantrans");
+	m_softlist->set_original("lantrans");
 }
 
-void tispeak_state::lanteach(machine_config &config)
+void snspell_state::lanteach(machine_config &config)
 {
 	lantrans(config);
 
 	// cartridge
-	GENERIC_CARTSLOT(config.replace(), m_cart, generic_plain_slot, "lanteach", "vsm,bin");
-	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(tispeak_state::cart_load));
+	m_cart->set_interface("lanteach");
+	m_softlist->set_original("lanteach");
 
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("lanteach");
-
-	// sound hardware
+	// no sound
 	m_tms5100->reset_routes();
 	config.device_remove("mono");
 }
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( snspell )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -1165,25 +1155,29 @@ ROM_END
 
 
 
-//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       CLASS          INIT           COMPANY, FULLNAME, FLAGS
-COMP( 1980, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
-COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
-COMP( 1980, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // speaks English
-COMP( 1980, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1983, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
-COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1984, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1984 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
-COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE       INPUT       CLASS          INIT           COMPANY, FULLNAME, FLAGS
+COMP( 1980, snspell,    0,        0,      sns_tmc0281,  snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspellua,  snspell,  0,      sns_tmc0281,  snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspellub,  snspell,  0,      sns_tmc0281d, snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1978, snspellp,   snspell,  0,      sns_tmc0281,  snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell,  0,      sns_tmc0281,  snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspelluka, snspell,  0,      sns_cd2801,   snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1980, snspelljp,  snspell,  0,      sns_tmc0281,  snspell,    snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // speaks English
+COMP( 1980, snspellsp,  snspell,  0,      snspellsp,    snspellsp,  snspell_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspellfr,  snspell,  0,      sns_cd2801,   snspellfr,  snspell_state, init_snspell,  "Texas Instruments", u8"La Dictée Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1983, snspellit,  snspell,  0,      snspellit,    snspellit,  snspell_state, init_snspell,  "Texas Instruments / Clementoni", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, init_snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snmath,     0,        0,      snmath,       snmath,     snspell_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1984, snmatha,    snmath,   0,      snmath,       snmath,     snspell_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1984 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1980, snmathp,    snmath,   0,      snmath,       snmath,     snspell_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
 
-COMP( 1979, lantrans,   0,        0, lantrans,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Translator", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1979, lantransp,  lantrans, 0, lantrans,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Translator (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1980, snread,     0,        0,      snread,       snread,     snspell_state, init_snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1980, lanteach,   0,        0, lanteach,     lantrans,   tispeak_state, init_lantrans, "Texas Instruments", "Language Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, lantrans,   0,        0,      lantrans,     lantrans,   snspell_state, init_lantrans, "Texas Instruments", "Language Translator", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1979, lantransp,  lantrans, 0,      lantrans,     lantrans,   snspell_state, init_lantrans, "Texas Instruments", "Language Translator (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
+COMP( 1980, lanteach,   0,        0,      lanteach,     lantrans,   snspell_state, init_lantrans, "Texas Instruments", "Language Teacher", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

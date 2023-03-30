@@ -68,12 +68,12 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
 
+	void power_off();
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void power_off();
 
 	bool m_power_on = false;
 	u16 m_inp_mux = 0;

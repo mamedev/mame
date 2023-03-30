@@ -9,11 +9,10 @@ part of a series is (or will be) in its own driver, see:
 - entex/sag.cpp: Entex Select-A-Game Machine (actually most games are on HMCS40)
 - miltonbradley/microvsn.cpp: Milton Bradley Microvision
 - misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
+- ti/snspell.cpp: TI Speak & Spell series gen. 1
+- ti/snspellc.cpp: TI Speak & Spell Compact / Touch & Tell
 - ti/spellb.cpp: TI Spelling B series gen. 1
 - tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
-
-(contd.) hh_tms1k child drivers:
-- tispeak.cpp: TI Speak & Spell series gen. 1
 
 About the approximated MCU frequency everywhere: The RC osc. is not that
 stable on most of these handhelds. When comparing multiple video recordings
@@ -208,8 +207,19 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 ***************************************************************************/
 
 #include "emu.h"
-#include "hh_tms1k.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1000c.h"
+#include "cpu/tms1000/tms1100.h"
+#include "cpu/tms1000/tms1400.h"
+#include "cpu/tms1000/tms2100.h"
+#include "cpu/tms1000/tms2400.h"
+#include "cpu/tms1000/tms0970.h"
+#include "cpu/tms1000/tms0980.h"
+#include "cpu/tms1000/tms0270.h"
+#include "cpu/tms1000/tp0320.h"
 #include "machine/clock.h"
 #include "machine/ds8874.h"
 #include "machine/netlist.h"
@@ -221,10 +231,10 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
+#include "sound/spkrdev.h"
 #include "sound/tms5110.h"
 #include "video/hlcd0515.h"
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
+#include "video/pwm.h"
 
 #include "softlist_dev.h"
 #include "screen.h"
@@ -335,6 +345,55 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 //#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
+namespace {
+
+class hh_tms1k_state : public driver_device
+{
+public:
+	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0),
+		m_out_power(*this, "power")
+	{ }
+
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<tms1k_base_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<18> m_inputs; // max 18
+	output_finder<> m_out_power; // power state, eg. led
+
+	// misc common
+	u32 m_r = 0U;                        // MCU R-pins data
+	u16 m_o = 0U;                        // MCU O-pins data
+	u32 m_inp_mux = 0U;                  // multiplexed inputs mask
+	bool m_power_on = false;
+
+	u32 m_grid = 0U;                     // VFD/LED current row data
+	u32 m_plate = 0U;                    // VFD/LED current column data
+
+	u8 read_inputs(int columns);
+	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
+	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void power_off();
+	virtual void set_power(bool state);
+	void switch_change(int sel, u32 mask, bool next);
+};
+
+
 // machine_start/reset
 
 void hh_tms1k_state::machine_start()
@@ -443,8 +502,6 @@ void hh_tms1k_state::set_power(bool state)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

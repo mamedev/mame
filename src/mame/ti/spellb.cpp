@@ -71,8 +71,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_tms6100(*this, "tms6100"),
 		m_display(*this, "display"),
+		m_tms6100(*this, "tms6100"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -90,8 +90,8 @@ private:
 	// devices
 	required_device<tms0270_cpu_device> m_maincpu;
 	optional_device<tms1980_cpu_device> m_subcpu;
-	optional_device<tms6100_device> m_tms6100;
 	required_device<pwm_display_device> m_display;
+	optional_device<tms6100_device> m_tms6100;
 	optional_device<speaker_sound_device> m_speaker;
 	required_ioport_array<8> m_inputs;
 

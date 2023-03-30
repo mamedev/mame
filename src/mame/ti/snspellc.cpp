@@ -83,6 +83,8 @@ English:
 - Little Creatures: VSM: 16KB CD2362
 - E.T.: VSM: 16KB CD2363
 
+(* denotes not dumped)
+
 Touch & Tell/Vocaid overlay reference:
 
 tntell CD2610:
@@ -214,15 +216,14 @@ protected:
 	required_ioport_array<10> m_inputs;
 	output_finder<> m_power_on;
 
+	void power_off();
 	virtual u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void power_off();
 
 	u8 *m_cart_base = nullptr;
-	u16 m_inp_mux = 0;
 	u16 m_o = 0;
 	u32 m_r = 0;
 };
@@ -232,7 +233,6 @@ void snspellc_state::machine_start()
 	m_power_on.resolve();
 
 	// register for savestates
-	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
 }
@@ -339,9 +339,6 @@ void tntell_state::init_tntell()
 
 void snspellc_state::write_r(u32 data)
 {
-	// R0-R8: input mux
-	m_inp_mux = data;
-
 	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10 & 1);
 
@@ -349,6 +346,7 @@ void snspellc_state::write_r(u32 data)
 	if (~data & m_r & 0x200)
 		power_off();
 
+	// R0-R8: input mux
 	m_r = data;
 }
 
@@ -366,7 +364,7 @@ u8 snspellc_state::read_k()
 
 	// K: multiplexed inputs (note: the Vss row is always on)
 	for (int i = 0; i < 9; i++)
-		if (BIT(m_inp_mux, i))
+		if (BIT(m_r, i))
 			data |= m_inputs[i]->read();
 
 	return data | m_inputs[9]->read();
@@ -676,7 +674,6 @@ void snspellc_state::tms5110_route(machine_config &config)
 	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
 	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
-
 
 void snspellc_state::snspellc(machine_config &config)
 {
