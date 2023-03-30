@@ -193,5 +193,8 @@ void pce_control_port_devices(device_slot_interface &device)
 	// NEC Memory Base 128 (PI-AD19, ﾒﾓﾘﾍﾞｰｽ128)
 	// Koei Save-Kun (セーブくん), clone of above?
 
+	// Serial Monitor for PCEMon
+	// https://www.chrismcovell.com/PCEmon/index.html
+
 	// etc...
 }
