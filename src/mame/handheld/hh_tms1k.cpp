@@ -37,6 +37,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 - gpoker: Entex Electronic Poker
 - matchnum: LJN Electronic Concentration
 - palmf31: Toshiba BC-8018B
+- racetime: Bandai FL Grand Prix Champion
 - ti1250: Texas Instruments TI-1200
 - ti25503: Texas Instruments TI-1265
 - ti5100: loose 1979 TMS1073NL chip
@@ -107,11 +108,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  @MP1228   TMS1100   1980, Entex Musical Marvin (6014)
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
+ *MP1272   TMS1100   1981, Tandy Computerized Arcade (assumed same as CD7282, not confirmed)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
- *MP1343   TMS1100   1989, Micronta Vox Clock 3
- *MP1359   TMS1100?  1985, Capsela CRC2000
+ *MP1343   TMS1100   1984, Micronta VoxClock 3
+ *MP1359   TMS1100   1985, Capsela CRC2000
+ *MP1362   TMS1100   1985, Technasonic Weight Talker (have dump)
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
@@ -121,8 +124,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2787   TMS1040?  1980, Bandai Race Time (? note: VFD-capable)
- *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ @MP2787   TMS1070   1980, Bandai Race Time
+ *MP2788   TMS1070   1980, Bandai Flight Time
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
@@ -174,7 +177,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, Microvision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
- *M34137   TMS1100?  1985, Technasonic Weight Talker
+ *M34137   TMS1100   1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -198,7 +201,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
   inconsistent:
 
  @TMS1007  TMS1000   1976, TSI Speech+ (S14002-A)
- @CD7282SL TMS1100   1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100   1981, Tandy Computerized Arcade (serial is similar to TI Speak & Spell series?)
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -246,8 +249,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
 #include "comp4.lh" // clickable
+#include "comparc.lh" // clickable
 #include "copycat.lh" // clickable
-#include "copycatm2.lh" // clickable
+#include "copycata.lh" // clickable
 #include "dataman.lh"
 #include "ditto.lh" // clickable
 #include "dxfootb.lh"
@@ -305,7 +309,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "stopthief.lh" // clickable
 #include "subwars.lh"
 #include "t3in1sa.lh"
-#include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
 #include "tc7atc.lh"
@@ -318,6 +321,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "ti25503.lh"
 #include "ti30.lh"
 #include "ti5100.lh"
+#include "ti5200.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
@@ -1000,6 +1004,121 @@ ROM_END
 
 /***************************************************************************
 
+  Bandai Race Time
+  * PCB label: SM-007
+  * TMS1070 MP2787 (die label: 1070B, MP2787)
+  * cyan/red VFD Futaba DM-8Z, 1-bit sound
+
+  known releases:
+  - World: Race Time (model 8007), published by Bandai
+  - Japan: FL Grand Prix Champion (model 16162), published by Bandai
+
+***************************************************************************/
+
+class racetime_state : public hh_tms1k_state
+{
+public:
+	racetime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void racetime(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void racetime_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void racetime_state::write_r(u32 data)
+{
+	// R7: input mux
+	m_inp_mux = BIT(data, 7);
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+
+	// R0-R8: VFD grid
+	// R9: VFD plate
+	m_grid = data & 0x1ff;
+	m_plate = (m_plate & 0xff) | (data >> 1 & 0x100);
+	update_display();
+}
+
+void racetime_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	update_display();
+}
+
+u8 racetime_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( racetime )
+	PORT_START("IN.0") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+INPUT_PORTS_END
+
+void racetime_state::racetime(machine_config &config)
+{
+	// basic machine hardware
+	TMS1070(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(racetime_state::read_k));
+	m_maincpu->write_r().set(FUNC(racetime_state::write_r));
+	m_maincpu->write_o().set(FUNC(racetime_state::write_o));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(229, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( racetime )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp2787", 0x0000, 0x0400, CRC(38c668b9) SHA1(2181647d4f2385a81355eaf99a40ad82f57ecdc6) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_racetime_output.pla", 0, 406, CRC(21e966b0) SHA1(ce918302d2b462df81b2d0cf2145e2351c98a0c0) )
+
+	ROM_REGION( 221716, "screen", 0)
+	ROM_LOAD( "racetime.svg", 0, 221716, CRC(d3934aed) SHA1(40b1fde191506c884b16b2ee3daaee2c6a4f4f08) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Bandai TC7: Air Traffic Control
   * TMS1100 MCU, label MP1311 (die label: 1100E, MP1311)
   * 4-digit 7seg LED display, 40 other LEDs, 1-bit sound
@@ -1297,7 +1416,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * cyan VFD Futaba 20-ST-22, 2-line 9-digit 7seg + 1 custom
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -1452,8 +1571,8 @@ ROM_START( palmmd8 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_palmmd8_output.pla", 0, 406, CRC(55117610) SHA1(fd06060ae5f04b802ae26697935d4a9765e1a7d7) )
 ROM_END
 
 
@@ -10441,23 +10560,23 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Computerized Arcade (model 60-2159 or 60-2159A)
-  * TMS1100 MCU, label CD7282SL
+  Tandy Computerized Arcade (model 60-2159)
+  * PCB label: HP-805 or CDC-805
+  * TMS1100 MCU, label MP1272 or CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
   known releases:
-  - World: Tandy-12: Computerized Arcade, published by Tandy
-  - World: Computerized Arcade, published by Tandy, Radio Shack brand.
-    This one is model 60-2495 from the mid-90s, perhaps different hardware!
+  - World: Tandy-12: Computerized Arcade, published by Tandy, model 60-2159.
+  - World: Computerized Arcade, Radio Shack brand, also model 60-2159 and same
+    hardware as above. "Tandy-12" on the side of the handheld was changed to
+    "Radio Shack-12", but there's no title prefix on the box.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
-  This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
-  Takatoku Toys (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of
-  Merlin and Simon. Unlike Merlin and Simon, spin-offs were not as successful in
-  the USA. There were releases with and without the prefix "Tandy-12", I don't
-  know which name was more common. Also not worth noting is that it needed five
-  batteries; four C-cells and a 9-volt.
+  This handheld contains 12 minigames. It looks and plays like Takatoku Toys'
+  Game Robot 9 from 1980 (aka Mego's Fabulous Fred).
 
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
@@ -10468,14 +10587,14 @@ ROM_END
 
 ***************************************************************************/
 
-class tandy12_state : public hh_tms1k_state
+class comparc_state : public hh_tms1k_state
 {
 public:
-	tandy12_state(const machine_config &mconfig, device_type type, const char *tag) :
+	comparc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void tandy12(machine_config &config);
+	void comparc(machine_config &config);
 
 private:
 	void update_display();
@@ -10486,12 +10605,12 @@ private:
 
 // handlers
 
-void tandy12_state::update_display()
+void comparc_state::update_display()
 {
 	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
-void tandy12_state::write_r(u32 data)
+void comparc_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -10504,14 +10623,14 @@ void tandy12_state::write_r(u32 data)
 	update_display();
 }
 
-void tandy12_state::write_o(u16 data)
+void comparc_state::write_o(u16 data)
 {
 	// O0-O7: button lamps 1-8
 	m_o = data;
 	update_display();
 }
 
-u8 tandy12_state::read_k()
+u8 comparc_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -10540,7 +10659,7 @@ u8 tandy12_state::read_k()
          START      SELECT    PLAY-2/HIT-7
 */
 
-static INPUT_PORTS_START( tandy12 )
+static INPUT_PORTS_START( comparc )
 	PORT_START("IN.0") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Button 12")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Button 11")
@@ -10573,7 +10692,7 @@ static INPUT_PORTS_START( tandy12 )
 INPUT_PORTS_END
 
 // output PLA is not decapped, this was made by hand
-static const u16 tandy12_output_pla[0x20] =
+static const u16 comparc_output_pla[0x20] =
 {
 	// these are certain
 	0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
@@ -10585,18 +10704,18 @@ static const u16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-void tandy12_state::tandy12(machine_config &config)
+void comparc_state::comparc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->set_output_pla(tandy12_output_pla);
-	m_maincpu->read_k().set(FUNC(tandy12_state::read_k));
-	m_maincpu->write_r().set(FUNC(tandy12_state::write_r));
-	m_maincpu->write_o().set(FUNC(tandy12_state::write_o));
+	m_maincpu->set_output_pla(comparc_output_pla);
+	m_maincpu->read_k().set(FUNC(comparc_state::read_k));
+	m_maincpu->write_r().set(FUNC(comparc_state::write_r));
+	m_maincpu->write_o().set(FUNC(comparc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
-	config.set_default_layout(layout_tandy12);
+	config.set_default_layout(layout_comparc);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10606,14 +10725,14 @@ void tandy12_state::tandy12(machine_config &config)
 
 // roms
 
-ROM_START( tandy12 )
+ROM_START( comparc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
-	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_comparc_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
 
@@ -11278,7 +11397,7 @@ INPUT_PORTS_END
 void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
@@ -11482,7 +11601,7 @@ ROM_START( ti1250 )
 	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
-ROM_START( ti125076 )
+ROM_START( ti1250a )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
 
@@ -11680,7 +11799,7 @@ private:
 void ti5100_state::update_display()
 {
 	// extra segment on R10
-	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
+	m_display->matrix(m_r, m_o | ((m_r & 0x400) ? 0x180 : 0));
 }
 
 void ti5100_state::write_r(u32 data)
@@ -11708,17 +11827,17 @@ u8 ti5100_state::read_k()
 static INPUT_PORTS_START( ti5100 )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "K" ) // constant mode
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "DP" ) // display point
-	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFNAME( 0x08, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x00, "F" ) // floating
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // R3
@@ -11756,7 +11875,7 @@ static INPUT_PORTS_START( ti5100 )
 
 	PORT_START("IN.9") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R9 0x02
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
@@ -11770,14 +11889,14 @@ INPUT_PORTS_END
 void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
-	TMS1070(config, m_maincpu, 250000); // approximation
+	TMS1070(config, m_maincpu, 350000); // approximation
 	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
-	m_display->set_segmask(0x7ff, 0xff);
+	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_ti5100);
 
 	// no sound!
@@ -11791,8 +11910,146 @@ ROM_START( ti5100 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_ti5100_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ti5100_output.pla", 0, 365, CRC(11f6f0f4) SHA1(f25cf6bd284ab4614746b2e3f98d42d2585e425a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5100_output.pla", 0, 406, CRC(b4a3aa6e) SHA1(812b5483a26ae3aa05661c86841d2d3d163e6c46) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-5200
+  * TMS1270 MCU label TMS1278NL or TMC1278NL (die label: 1070B, 1278A)
+  * 13-digit 7seg VFD Itron FG139A1 (1 custom digit)
+
+***************************************************************************/
+
+class ti5200_state : public hh_tms1k_state
+{
+public:
+	ti5200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti5200(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti5200_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ti5200_state::write_r(u32 data)
+{
+	// R0-R5,R9,R12: input mux
+	m_inp_mux = (data & 0x3f) | (data >> 3 & 0x40) | (data >> 5 & 0x80);
+
+	// R0-R12: select digit
+	m_r = data;
+	update_display();
+}
+
+void ti5200_state::write_o(u16 data)
+{
+	// O1-O9: digit segments
+	m_o = bitswap<9>(data,7,8,3,6,5,4,9,2,1);
+	update_display();
+}
+
+u8 ti5200_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(8);
+}
+
+// config
+
+static INPUT_PORTS_START( ti5200 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.6") // R9
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
+
+	PORT_START("IN.7") // R12
+	PORT_CONFNAME( 0x01, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x01, "S" ) // set DP with number key
+	PORT_CONFSETTING(    0x00, "R" )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ti5200_state::ti5200(machine_config &config)
+{
+	// basic machine hardware
+	TMS1270(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pF
+	m_maincpu->read_k().set(FUNC(ti5200_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti5200_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti5200_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(13, 9);
+	m_display->set_segmask(0xfff, 0xff);
+	config.set_default_layout(layout_ti5200);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( ti5200 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1278nl", 0x0000, 0x0400, CRC(6829f24d) SHA1(d7cf358a26a347d6a2ca4313cb7ffd5082e19885) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti5200_micro.pla", 0, 867, CRC(61bd20fc) SHA1(fbdc87138975e2e10f92f75dcae5ca900f78475a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5200_output.pla", 0, 406, CRC(6f37c393) SHA1(5252a5ac05c65326ee189f859904007e11b0009d) )
 ROM_END
 
 
@@ -12439,14 +12696,14 @@ ROM_END
 
 ***************************************************************************/
 
-class lilprof78_state : public hh_tms1k_state
+class lilprofa_state : public hh_tms1k_state
 {
 public:
-	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag) :
+	lilprofa_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void lilprof78(machine_config &config);
+	void lilprofa(machine_config &config);
 
 private:
 	void write_o(u16 data);
@@ -12456,7 +12713,7 @@ private:
 
 // handlers
 
-void lilprof78_state::write_r(u32 data)
+void lilprofa_state::write_r(u32 data)
 {
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -12470,7 +12727,7 @@ void lilprof78_state::write_r(u32 data)
 	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
 }
 
-void lilprof78_state::write_o(u16 data)
+void lilprofa_state::write_o(u16 data)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
@@ -12479,7 +12736,7 @@ void lilprof78_state::write_o(u16 data)
 	m_o = data;
 }
 
-u8 lilprof78_state::read_k()
+u8 lilprofa_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -12487,7 +12744,7 @@ u8 lilprof78_state::read_k()
 
 // config
 
-static INPUT_PORTS_START( lilprof78 )
+static INPUT_PORTS_START( lilprofa )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
@@ -12520,13 +12777,13 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-void lilprof78_state::lilprof78(machine_config &config)
+void lilprofa_state::lilprofa(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->read_k().set(FUNC(lilprof78_state::read_k));
-	m_maincpu->write_o().set(FUNC(lilprof78_state::write_o));
-	m_maincpu->write_r().set(FUNC(lilprof78_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprofa_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprofa_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprofa_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12538,7 +12795,7 @@ void lilprof78_state::lilprof78(machine_config &config)
 
 // roms
 
-ROM_START( lilprof78 )
+ROM_START( lilprofa )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
 
@@ -12547,7 +12804,7 @@ ROM_START( lilprof78 )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
+	ROM_LOAD( "tms0980_lilprofa_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
 ROM_END
@@ -13704,14 +13961,14 @@ ROM_END
 
 ***************************************************************************/
 
-class copycatm2_state : public hh_tms1k_state
+class copycata_state : public hh_tms1k_state
 {
 public:
-	copycatm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	copycata_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void copycatm2(machine_config &config);
+	void copycata(machine_config &config);
 
 private:
 	void write_r(u32 data);
@@ -13720,13 +13977,13 @@ private:
 
 // handlers
 
-void copycatm2_state::write_r(u32 data)
+void copycata_state::write_r(u32 data)
 {
 	// R1-R4: leds
 	m_display->matrix(1, data >> 1 & 0xf);
 }
 
-void copycatm2_state::write_o(u16 data)
+void copycata_state::write_o(u16 data)
 {
 	// O0,O6: speaker out
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
@@ -13734,7 +13991,7 @@ void copycatm2_state::write_o(u16 data)
 
 // config
 
-static INPUT_PORTS_START( copycatm2 )
+static INPUT_PORTS_START( copycata )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Orange Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red Button")
@@ -13742,17 +13999,17 @@ static INPUT_PORTS_START( copycatm2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
 
-void copycatm2_state::copycatm2(machine_config &config)
+void copycata_state::copycata(machine_config &config)
 {
 	// basic machine hardware
 	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
-	m_maincpu->write_r().set(FUNC(copycatm2_state::write_r));
-	m_maincpu->write_o().set(FUNC(copycatm2_state::write_o));
+	m_maincpu->write_r().set(FUNC(copycata_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycata_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_copycatm2);
+	config.set_default_layout(layout_copycata);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -13764,14 +14021,14 @@ void copycatm2_state::copycatm2(machine_config &config)
 
 // roms
 
-ROM_START( copycatm2 )
+ROM_START( copycata )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(a87649cb) SHA1(14ef7967a80578885f0b905772c3bb417b5b3255) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_LOAD( "tms1000_copycata_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
+	ROM_LOAD( "tms1000_copycata_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
 ROM_END
 
 
@@ -15107,6 +15364,7 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1980, racetime,   0,         0, racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -15195,7 +15453,7 @@ CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    emp
 
 CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Corporation", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1981, comparc,    0,         0, comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
@@ -15204,17 +15462,18 @@ COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   emp
 COMP( 1974, tisr16,     0,         0, tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,   0,         0, tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti125076,   ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti1250a,    ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti5200,     0,         0, ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti1000,     0,         0, ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, wizatron,   0,         0, wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, lilprof,    0,         0, lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1978, lilprof78,  lilprof,   0, lilprof78, lilprof78, lilprof78_state, empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, lilprofa,   lilprof,   0, lilprofa,  lilprofa,  lilprofa_state,  empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti1680,     0,         0, ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
@@ -15225,7 +15484,7 @@ CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   emp
 CONS( 1980, playmaker,  0,         0, playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, copycata,   copycat,   0, copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

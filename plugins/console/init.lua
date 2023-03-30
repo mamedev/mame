@@ -23,16 +23,6 @@ function console.startplugin()
 	local matches = {}
 	local lastindex = 0
 	local consolebuf
-	_G.history = function (index)
-		local history = ln.historyget()
-		if index then
-			ln.preload(history[index])
-			return
-		end
-		for num, line in ipairs(history) do
-			print(num, line)
-		end
-	end
 	print("       /|  /|    /|     /|  /|    _______")
 	print("      / | / |   / |    / | / |   /      /")
 	print("     /  |/  |  /  |   /  |/  |  /  ____/ ")
@@ -51,11 +41,14 @@ function console.startplugin()
 	ln.historysetmaxlen(50)
 	local scr = [[
 		local ln = require('linenoise')
-		ln.setcompletion(function(c, str, pos)
-				status = str .. "\x01" .. tostring(pos)
+		ln.setcompletion(
+			function(c, str)
+				status = str
 				yield()
-				ln.addcompletion(c, status:match("([^\x01]*)\x01(.*)"))
-		end)
+				for candidate in status:gmatch('([^\001]+)') do
+					ln.addcompletion(c, candidate)
+				end
+			end)
 		local ret = ln.linenoise('$PROMPT')
 		if ret == nil then
 			return "\n"
@@ -201,11 +194,8 @@ function console.startplugin()
 		return curstring, strs, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
 	end
 
-	local function get_completions(line, endpos)
+	local function get_completions(line)
 		matches = {}
-		local endstr = line:sub(endpos + 1, -1)
-		line = line:sub(1, endpos)
-		endstr = endstr or ""
 		local start, word = line:match("^(.*[ \t\n\"\\'><=;:%+%-%*/%%^~#{}%(%)%[%].,])(.-)$")
 		if not start then
 			start = ""
@@ -216,16 +206,18 @@ function console.startplugin()
 
 		local str, strs, expr, sep = simplify_expression(line, word)
 		contextual_list(expr, sep, str, word, strs)
-		if #matches > 1 then
-			print("\n")
-			for k, v in pairs(matches) do
-				print(v)
-			end
-			return "\x01" .. "-1"
+		if #matches == 0 then
+			return line
 		elseif #matches == 1 then
-			return start .. matches[1] .. endstr .. "\x01" .. (#start + #matches[1])
+			return start .. matches[1]
 		end
-		return "\x01" .. "-1"
+		print("")
+		result = { }
+		for k, v in pairs(matches) do
+			print(v)
+			table.insert(result, start .. v)
+		end
+		return table.concat(result, '\001')
 	end
 
 	emu.register_start(function()
@@ -256,10 +248,10 @@ function console.startplugin()
 				lastindex = lastindex + 1
 				print(consolebuf[lastindex])
 			end
-			ln.refresh()
+			-- ln.refresh() FIXME: how to replicate this now that the API has been removed?
 		end
 		if conth.yield then
-			conth:continue(get_completions(conth.result:match("([^\x01]*)\x01(.*)")))
+			conth:continue(get_completions(conth.result))
 			return
 		elseif conth.busy then
 			return
@@ -275,6 +267,7 @@ function console.startplugin()
 				end
 			else
 				cmdbuf = cmdbuf .. "\n" .. cmd
+				ln.historyadd(cmd)
 				local func, err = load(cmdbuf)
 				if not func then
 					if err:match("<eof>") then
@@ -284,14 +277,15 @@ function console.startplugin()
 						cmdbuf = ""
 					end
 				else
+					cmdbuf = ""
+					stopped = true
 					local status
 					status, err = pcall(func)
 					if not status then
 						print("error: ", err)
 					end
-					cmdbuf = ""
+					stopped = false
 				end
-				ln.historyadd(cmd)
 			end
 		end
 		conth:start(scr:gsub("$PROMPT", prompt))

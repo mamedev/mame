@@ -785,8 +785,13 @@ void stbook_state::lcd_control_w(uint16_t data)
 
 void st_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 { m_maincpu->set_input_line(2, CLEAR_LINE); return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 { m_maincpu->set_input_line(4, CLEAR_LINE); return 28; }));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
 	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 //-------------------------------------------------
@@ -800,23 +805,30 @@ void st_state::st_super_map(address_map &map)
 	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
 	map(0x000000, 0x000007).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0x400000, 0xf9ffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
-	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
+	map(0xfa0000, 0xfbffff).noprw();      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 	map(0xfc0000, 0xfeffff).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 
-	// Do a bus error if nothing answers
-	map(0xff0000, 0xffffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 
 	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
 	map(0xff8000, 0xff8fff).m(m_video, FUNC(st_video_device::map));
-	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
-	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
+	map(0xff8800, 0xff8800).after_delay(NAME([](offs_t) { return 1; })).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
+	map(0xff8802, 0xff8802).after_delay(NAME([](offs_t) { return 1; })).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
 
 	// no blitter on original ST
 
-	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffa00, 0xfffa3f).after_delay(NAME([](offs_t) { return 4; })).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+
+	// Do a bus error where nothing answers in 64 cycles
+	map(0xff0000, 0xff7fff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xff8100, 0xff81ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xff8300, 0xff85ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xff8700, 0xff87ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xff8900, 0xfff9ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xfffb00, 0xfffbff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xfffd00, 0xffffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
 void st_state::st_user_map(address_map &map)
@@ -824,8 +836,10 @@ void st_state::st_user_map(address_map &map)
 	// Ram mapped by the mmu
 	map.unmap_value_high();
 	map(0x000000, 0x0007ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
-	map(0x400000, 0xfbffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0x400000, 0xf9ffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	map(0xfa0000, 0xfbffff).noprw();      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
+	map(0xfc0000, 0xfeffff).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0xff0000, 0xffffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
@@ -1427,8 +1441,8 @@ void st_state::st(machine_config &config)
 	m_video->set_ram(m_mainram);
 	m_video->set_mmu(m_mmu);
 	m_video->de_cb().set(m_mfp, FUNC(mc68901_device::tbi_w));
-	m_video->hsync_cb().set_inputline(m_maincpu, 2);
-	m_video->vsync_cb().set_inputline(m_maincpu, 4);
+	m_video->hsync_cb().set([this](int state) { if(!state) m_maincpu->set_input_line(2, ASSERT_LINE); });
+	m_video->vsync_cb().set([this](int state) { if(!state) m_maincpu->set_input_line(4, ASSERT_LINE); });
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

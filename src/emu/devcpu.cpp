@@ -59,8 +59,7 @@ bool cpu_device::cpu_is_interruptible() const
 	return false;
 }
 
-
-bool cpu_device::access_before_time(u64 access_time, u64 current_time)
+bool cpu_device::access_before_time(u64 access_time, u64 current_time) noexcept
 {
 	s32 delta = access_time - current_time;
 	if(*m_icountptr <= delta) {
@@ -75,7 +74,7 @@ bool cpu_device::access_before_time(u64 access_time, u64 current_time)
 	return false;
 }
 
-bool cpu_device::access_before_delay(u32 cycles, const void *tag)
+bool cpu_device::access_before_delay(u32 cycles, const void *tag) noexcept
 {
 	if(tag == m_access_before_delay_tag) {
 		m_access_before_delay_tag = nullptr;
@@ -94,8 +93,13 @@ bool cpu_device::access_before_delay(u32 cycles, const void *tag)
 	return false;
 }
 
-void cpu_device::access_after_delay(u32 cycles)
+void cpu_device::access_after_delay(u32 cycles) noexcept
 {
 	*m_icountptr -= cycles;
 }
 
+void cpu_device::defer_access() noexcept
+{
+	m_access_to_be_redone = true;
+	*m_icountptr = 0;
+}

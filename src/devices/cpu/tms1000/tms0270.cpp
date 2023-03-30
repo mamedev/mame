@@ -12,7 +12,8 @@ TMS0270 is a TMS0980 with earrings and a new hat. The new changes look like a qu
 
 newer TMS0270 chips (eg. Speak & Math) have 42 pins
 
-TMS0260 is same or similar?
+TODO:
+- TMS0260 is same or similar?
 
 */
 
@@ -33,9 +34,9 @@ tms0270_cpu_device::tms0270_cpu_device(const machine_config &mconfig, const char
 void tms0270_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA
-	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 6, 16, 48).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 6, 16, 48).set_format(pla_device::FMT::BERKELEY);
 }
 
 

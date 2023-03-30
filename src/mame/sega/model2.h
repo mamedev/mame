@@ -18,7 +18,6 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
@@ -342,7 +341,7 @@ protected:
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<u32> m_copro_tgp_program;
 	required_region_ptr<u32> m_copro_tgp_tables;
-	required_device<address_map_bank_device> m_copro_tgp_bank;
+	memory_view m_copro_tgp_bank;
 
 	u32 m_copro_tgp_bank_reg = 0;
 	u32 m_copro_sincos_base = 0;
@@ -373,7 +372,6 @@ protected:
 
 	void copro_tgp_prog_map(address_map &map);
 	void copro_tgp_data_map(address_map &map);
-	void copro_tgp_bank_map(address_map &map);
 	void copro_tgp_io_map(address_map &map);
 	void copro_tgp_rf_map(address_map &map);
 

@@ -103,6 +103,7 @@
 
 #include "emu.h"
 #include "disk.h"
+#include "slotoptions.h"
 
 #include "bus/msx/slot/cartridge.h"
 #include "imagedev/floppy.h"
@@ -137,24 +138,25 @@ DECLARE_DEVICE_TYPE(MSX_CART_VY0010,   msx_cart_interface)
 
 void msx_cart_disk_register_options(device_slot_interface &device)
 {
-	device.option_add_internal("disk_avdpf550", MSX_CART_AVDPF550);
-	device.option_add_internal("disk_cdx2", MSX_CART_CDX2);
-	device.option_add_internal("disk_ddx3", MSX_CART_DDX3);
-	device.option_add_internal("disk_fd03", MSX_CART_FD03);
-	device.option_add_internal("disk_fd051", MSX_CART_FD051);
-	device.option_add_internal("disk_fscf351", MSX_CART_FSCF351);
-	device.option_add_internal("disk_fsfd1", MSX_CART_FSFD1);
-	device.option_add_internal("disk_fsfd1a", MSX_CART_FSFD1A);
-	device.option_add_internal("disk_hb3600", MSX_CART_HB3600);
-	device.option_add_internal("disk_hbd20w", MSX_CART_HBD20W);
-	device.option_add_internal("disk_hbd50", MSX_CART_HBD50);
-	device.option_add_internal("disk_hbdf1", MSX_CART_HBDF1);
-	device.option_add_internal("disk_hxf101pe", MSX_CART_HXF101PE);
-	device.option_add_internal("disk_mfd001", MSX_CART_MFD001);
-	device.option_add_internal("disk_ml30dc", MSX_CART_ML30DC);
-	device.option_add_internal("disk_nms1200", MSX_CART_NMS1200);
-	device.option_add_internal("disk_tadpf550", MSX_CART_TADPF550);
-	device.option_add_internal("disk_vy0010", MSX_CART_VY0010);
+	using namespace bus::msx::cart;
+	device.option_add_internal(slotoptions::DISK_AVDPF550, MSX_CART_AVDPF550);
+	device.option_add_internal(slotoptions::DISK_CDX2,     MSX_CART_CDX2);
+	device.option_add_internal(slotoptions::DISK_DDX3,     MSX_CART_DDX3);
+	device.option_add_internal(slotoptions::DISK_FD03,     MSX_CART_FD03);
+	device.option_add_internal(slotoptions::DISK_FD051,    MSX_CART_FD051);
+	device.option_add_internal(slotoptions::DISK_FSCF351,  MSX_CART_FSCF351);
+	device.option_add_internal(slotoptions::DISK_FSFD1,    MSX_CART_FSFD1);
+	device.option_add_internal(slotoptions::DISK_FSFD1A,   MSX_CART_FSFD1A);
+	device.option_add_internal(slotoptions::DISK_HB3600,   MSX_CART_HB3600);
+	device.option_add_internal(slotoptions::DISK_HBD20W,   MSX_CART_HBD20W);
+	device.option_add_internal(slotoptions::DISK_HBD50,    MSX_CART_HBD50);
+	device.option_add_internal(slotoptions::DISK_HBDF1,    MSX_CART_HBDF1);
+	device.option_add_internal(slotoptions::DISK_HXF101PE, MSX_CART_HXF101PE);
+	device.option_add_internal(slotoptions::DISK_MFD001,   MSX_CART_MFD001);
+	device.option_add_internal(slotoptions::DISK_ML30DC,   MSX_CART_ML30DC);
+	device.option_add_internal(slotoptions::DISK_NMS1200,  MSX_CART_NMS1200);
+	device.option_add_internal(slotoptions::DISK_TADPF550, MSX_CART_TADPF550);
+	device.option_add_internal(slotoptions::DISK_VY0010,   MSX_CART_VY0010);
 }
 
 

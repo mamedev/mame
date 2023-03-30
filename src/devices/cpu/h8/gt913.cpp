@@ -242,7 +242,7 @@ void gt913_device::update_irq_filter()
 
 void gt913_device::interrupt_taken()
 {
-	standard_irq_callback(m_intc->interrupt_taken(taken_irq_vector));
+	standard_irq_callback(m_intc->interrupt_taken(taken_irq_vector), NPC);
 }
 
 void gt913_device::internal_update(uint64_t current_time)

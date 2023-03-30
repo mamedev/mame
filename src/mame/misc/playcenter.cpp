@@ -12,6 +12,8 @@
           VT82C686A, built-in SoundBlaster Pro with AC'97 codec support).
          -Unknown RAM size, AMD K6 processor (unknown speed).
          -PCI Ethernet card (unknown chipset).
+         -Trident Blade3D/MVP4 AGP video.
+         -Elo Touch CTR-231000 touch screen (87C51-based, undumped).
       "K6" version:
          -Unknown AMD K6 CPU based hardware.
       "Celeron" version:

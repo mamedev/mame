@@ -122,7 +122,7 @@ void m68000_device::execute_run()
 		if(m_post_run)
 			do_post_run();
 		else
-			break;			
+			break;
 	}
 
 	if(m_icount < 0) {
@@ -405,7 +405,7 @@ void m68000_device::init_decode_table()
 
 		u16 cvalue = 0;
 		do {
-			//			logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
+			//          logerror("%04x/%04x %04x %4d\n", value, mask, cvalue, state);
 			if(m_decode_table[value | cvalue] == S_ILLEGAL)
 				m_decode_table[value | cvalue] = state;
 			else if(((value | cvalue) & 0xf0ff) != 0x6000)
@@ -432,11 +432,11 @@ void m68000_device::start_interrupt_vector_lookup()
 
 	int level = m_next_state >> 24;
 	if(m_interrupt_mixer)
-		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level);
+		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
 	else {
 		for(int i=0; i<3; i++)
 			if(level & (1<<i))
-				standard_irq_callback(i);
+				standard_irq_callback(i, m_pc);
 	}
 
 	// Clear the nmi flag

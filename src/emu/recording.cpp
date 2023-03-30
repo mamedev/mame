@@ -222,14 +222,13 @@ bool avi_movie_recording::append_single_video_frame(bitmap_rgb32 &bitmap, const 
 
 bool avi_movie_recording::add_sound_to_recording(const s16 *sound, int numsamples)
 {
-	g_profiler.start(PROFILER_MOVIE_REC);
+	auto profile = g_profiler.start(PROFILER_MOVIE_REC);
 
 	// write the next frame
 	avi_file::error avierr = m_avi_file->append_sound_samples(0, sound + 0, numsamples, 1);
 	if (avierr == avi_file::error::NONE)
 		avierr = m_avi_file->append_sound_samples(1, sound + 1, numsamples, 1);
 
-	g_profiler.stop();
 	return avierr == avi_file::error::NONE;
 }
 

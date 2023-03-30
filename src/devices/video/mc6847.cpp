@@ -279,7 +279,7 @@ std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 {
 	bool line = (bool)param;
-	g_profiler.start(PROFILER_USER1);
+	auto profile1 = g_profiler.start(PROFILER_USER1);
 
 	// are we on a rising edge?
 	if (line && !m_horizontal_sync)
@@ -288,30 +288,32 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 			logerror("%s: change_horizontal_sync():  Recording scanline\n", describe_context());
 
 		// first store the scanline
-		g_profiler.start(PROFILER_USER2);
-		switch((scanline_zone) m_logical_scanline_zone)
 		{
-			case SCANLINE_ZONE_TOP_BORDER:
-			case SCANLINE_ZONE_BOTTOM_BORDER:
-				record_border_scanline(m_physical_scanline);
-				break;
+			auto profile2 = g_profiler.start(PROFILER_USER2);
+			switch((scanline_zone) m_logical_scanline_zone)
+			{
+				case SCANLINE_ZONE_TOP_BORDER:
+				case SCANLINE_ZONE_BOTTOM_BORDER:
+					record_border_scanline(m_physical_scanline);
+					break;
 
-			case SCANLINE_ZONE_BODY:
-				m_recording_scanline = true;
-				if (m_partial_scanline_clocks > 0)
-					record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, 228);
-				else
-					record_body_scanline(m_physical_scanline, m_logical_scanline);
-				m_recording_scanline = false;
-				break;
+				case SCANLINE_ZONE_BODY:
+					m_recording_scanline = true;
+					if (m_partial_scanline_clocks > 0)
+						record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, 228);
+					else
+						record_body_scanline(m_physical_scanline, m_logical_scanline);
+					m_recording_scanline = false;
+					break;
 
-			case SCANLINE_ZONE_RETRACE:
-			case SCANLINE_ZONE_VBLANK:
-			case SCANLINE_ZONE_FRAME_END:
-				// do nothing
-				break;
+				case SCANLINE_ZONE_RETRACE:
+				case SCANLINE_ZONE_VBLANK:
+				case SCANLINE_ZONE_FRAME_END:
+					// do nothing
+					break;
+			}
+			// stop profiling USER2
 		}
-		g_profiler.stop();
 
 		// advance to next scanline
 		next_scanline();
@@ -335,8 +337,6 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		// call virtual function
 		horizontal_sync_changed(m_horizontal_sync);
 	}
-
-	g_profiler.stop();
 }
 
 

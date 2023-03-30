@@ -16,6 +16,7 @@ public:
 
 	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor, bool debug = false);
 	template <typename T> bool write(u32 virtual_address, T data, bool supervisor, bool debug = false);
+	WRITE_LINE_MEMBER(bus_error_w) { m_bus_error = true; }
 
 protected:
 	virtual void device_start() override;
@@ -92,8 +93,8 @@ protected:
 			bool match_segment(u32 const address) const;
 			bool match_page(u32 const address) const;
 
-			void load_line(required_address_space bus, u32 const address);
-			void copy_back(required_address_space bus, u32 const address);
+			bool load_line(mc88200_device &cmmu, u32 const address);
+			bool copy_back(mc88200_device &cmmu, u32 const address, bool const flush = false);
 
 			u32 tag;
 			u32 data[4];
@@ -104,8 +105,11 @@ protected:
 
 	std::optional<unsigned> cache_replace(cache_set const &cs);
 	template <typename T> std::optional<T> cache_read(u32 physical_address);
-	template <typename T> void cache_write(u32 physical_address, T data, bool writethrough, bool global);
+	template <typename T> bool cache_write(u32 physical_address, T data, bool writethrough, bool global);
 	void cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate);
+
+	template <typename T> std::optional<T> mbus_read(u32 address);
+	template <typename T> bool mbus_write(u32 address, T data, bool flush = false);
 
 private:
 	required_address_space m_mbus;

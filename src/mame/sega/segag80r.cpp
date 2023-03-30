@@ -922,7 +922,7 @@ void segag80r_state::monsterb(machine_config &config)
 void segag80r_state::monster2(machine_config &config)
 {
 	monsterb(config);
-	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	sega_315_5006_device &maincpu(SEGA_315_5006(config.replace(), m_maincpu, VIDEO_CLOCK/4));
 	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
 	maincpu.set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
 	maincpu.set_vblank_int("screen", FUNC(segag80r_state::segag80r_vblank_start));
@@ -1375,6 +1375,22 @@ ROM_START( monsterb )
 	ROM_LOAD( "pr1512.u31",     0x0000, 0x0020, CRC(414ebe9b) SHA1(3df8694e3d26635d19fd4cdf02bd0998e8538b5b) )  /* U31 */
 ROM_END
 
+/*
+
+Monster Bash
+  Main PCB: 834-0318
+ Sound PCB: 834-0316
+
+Set labled as:
+
+2-BOARD NO. REV.
+834-0317
+MONSTER BASH
+83830
+
+Uses a SEGA 315-5006 security CPU
+
+*/
 ROM_START( monsterb2 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr-1548.2",   0x0000, 0x2000, CRC(239f77c1) SHA1(2945e4b135c1c46bf3e0d947b3d9be052f12e8d8) )

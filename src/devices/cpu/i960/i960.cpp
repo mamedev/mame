@@ -2263,7 +2263,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 		}
 
 		// and ack it to the core now that it's queued
-		standard_irq_callback(irqline);
+		standard_irq_callback(irqline, m_IP);
 	}
 }
 

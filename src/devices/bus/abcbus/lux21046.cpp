@@ -257,6 +257,7 @@ void luxor_55_21046_device::io_write_byte(offs_t offset, uint8_t data)
 void luxor_55_21046_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800I_FORMAT);
 	fr.add(FLOPPY_ABC800_FORMAT);
 }
 

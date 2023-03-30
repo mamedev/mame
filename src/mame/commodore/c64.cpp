@@ -74,7 +74,9 @@ public:
 		m_hiram(1),
 		m_charen(1),
 		m_va14(1),
-		m_va15(1)
+		m_va15(1),
+		m_cass_rd(1),
+		m_iec_srq(1)
 	{ }
 
 	// ROM
@@ -147,6 +149,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
 
+	void update_cia1_flag() { m_cia1->flag_w(m_cass_rd & m_iec_srq); }
+	DECLARE_WRITE_LINE_MEMBER( cass_rd_w ) { m_cass_rd = state; update_cia1_flag(); }
+	DECLARE_WRITE_LINE_MEMBER( iec_srq_w ) { m_iec_srq = state; update_cia1_flag(); }
+
 	// memory state
 	int m_loram;
 	int m_hiram;
@@ -158,9 +164,12 @@ public:
 
 	// interrupt state
 	int m_exp_dma;
+	int m_cass_rd;
+	int m_iec_srq;
 
 	int m_user_pa2;
 	int m_user_pb;
+
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
@@ -1428,8 +1437,10 @@ void c64_state::machine_start()
 	save_item(NAME(m_va14));
 	save_item(NAME(m_va15));
 	save_item(NAME(m_exp_dma));
-	save_item(NAME(m_user_pb));
+	save_item(NAME(m_cass_rd));
+	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_user_pa2));
+	save_item(NAME(m_user_pb));
 }
 
 
@@ -1521,10 +1532,10 @@ void c64_state::ntsc(machine_config &config)
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
-	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
 	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
@@ -1694,10 +1705,10 @@ void c64_state::pal(machine_config &config)
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
-	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
+	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
 	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);

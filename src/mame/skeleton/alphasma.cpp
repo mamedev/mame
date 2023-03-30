@@ -103,7 +103,8 @@ private:
 
 INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
 {
-	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
+	// IRQ on every key transition
+	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, ASSERT_LINE);
 }
 
 uint8_t alphasmart_state::kb_r()
@@ -121,6 +122,7 @@ uint8_t alphasmart_state::kb_r()
 void alphasmart_state::kb_matrixl_w(uint8_t data)
 {
 	m_matrix[0] = data;
+	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, CLEAR_LINE);
 }
 
 void alphasmart_state::kb_matrixh_w(uint8_t data)

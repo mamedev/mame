@@ -15,107 +15,107 @@ PCB 251
 Doesn't say Key Tronic, but clearly Key Tronic.
 
 Row 1
-1	help
-2	F1
-3	F2
-4	F3
-5	F4
-6	F5
-7	F6
-8	F7
-9	F8
-10	F9
-11	F10
-12	F11
-13	F12
-14	F13
-15	F14
-16	up
-17	down
-18	left
-19	right
+1   help
+2   F1
+3   F2
+4   F3
+5   F4
+6   F5
+7   F6
+8   F7
+9   F8
+10  F9
+11  F10
+12  F11
+13  F12
+14  F13
+15  F14
+16  up
+17  down
+18  left
+19  right
 
 Row 2
-20	esc
-21	1
-22	2
-23	3
-24	4
-25	5
-26	6
-27	7
-28	8
-29	9
-30	0
-31	-
-32	=
-33	`
-34	del
-35	10-key 7
-36	10-key 8
-37	10-key 9
-38	10-key -
+20  esc
+21  1
+22  2
+23  3
+24  4
+25  5
+26  6
+27  7
+28  8
+29  9
+30  0
+31  -
+32  =
+33  `
+34  del
+35  10-key 7
+36  10-key 8
+37  10-key 9
+38  10-key -
 
 Row 3
-39	tab
-40	q
-41	w
-42	e
-43	r
-44	t
-45	y
-46	u
-47	i
-48	o
-49	p
-50	[
-51	]
-52	backspace
-53	10-key 4
-54	10-key 5
-55	10-key 6
-56	10-key ,
+39  tab
+40  q
+41  w
+42  e
+43  r
+44  t
+45  y
+46  u
+47  i
+48  o
+49  p
+50  [
+51  ]
+52  backspace
+53  10-key 4
+54  10-key 5
+55  10-key 6
+56  10-key ,
 
 Row 4
-57	ctrl
-58	caps lock
-59	a
-60	s
-61	d
-62	f
-63	g
-64	h
-65	j
-66	k
-67	l
-68	;
-69	'
-70	return
-71	\
-72	10-key 1
-73	10-key 2
-74	10-key 3
+57  ctrl
+58  caps lock
+59  a
+60  s
+61  d
+62  f
+63  g
+64  h
+65  j
+66  k
+67  l
+68  ;
+69  '
+70  return
+71  \
+72  10-key 1
+73  10-key 2
+74  10-key 3
 
 Row 5
-75	left shift
-76	z
-77	x
-78	c
-79	v
-80	b
-81	n
-82	m
-83	,
-84	.
-85	/
-86	right shift
-87	line feed
-88	10-key 0
-89	10-key .
-90	10-key enter
+75  left shift
+76  z
+77  x
+78  c
+79  v
+80  b
+81  n
+82  m
+83  ,
+84  .
+85  /
+86  right shift
+87  line feed
+88  10-key 0
+89  10-key .
+90  10-key enter
 
 Row 6
-91	space
+91  space
 
 1. https://archive.org/details/7200-0001-vector-4-technical-information-sep-82
 

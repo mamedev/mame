@@ -144,6 +144,7 @@ const double XTAL::known_xtals[] = {
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'200'000, /* 7.2_MHz_XTAL           Novag Constellation (later models, with /2 divider), Kawai K1 keyscan IC */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
+	  7'680'000, /* 7.68_MHz_XTAL          Psion Series 3 */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
 	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
 	  7'995'500, /* 7.9955_MHz_XTAL        Used on Electronic Devices Italy Galaxy Gunners sound board */

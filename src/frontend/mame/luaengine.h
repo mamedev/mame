@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -21,6 +20,7 @@
 #include <tuple>
 #include <vector>
 
+#define SOL_USING_CXX_LUA 1
 #ifdef MAME_DEBUG
 #define SOL_ALL_SAFETIES_ON 1
 #else
@@ -57,9 +57,8 @@ public:
 	std::pair<bool, std::optional<long> > menu_callback(const std::string &menu, int index, const std::string &event);
 
 	void set_machine(running_machine *machine);
-	std::vector<std::string> &get_menu() { return m_menu; }
+	std::vector<std::string> const &get_menu() { return m_menu; }
 	void attach_notifiers();
-	void on_frame_done();
 	void on_sound_update();
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
@@ -123,20 +122,13 @@ public:
 	sol::state_view &sol() const { return *m_sol_state; }
 
 	template <typename Func, typename... Params>
-	static std::decay_t<std::invoke_result_t<Func, Params...> > invoke(Func &&func, Params&&... args)
+	sol::protected_function_result invoke(Func &&func, Params&&... args)
 	{
-		g_profiler.start(PROFILER_LUA);
-		try
-		{
-			auto result = func(std::forward<Params>(args)...);
-			g_profiler.stop();
-			return result;
-		}
-		catch (...)
-		{
-			g_profiler.stop();
-			throw;
-		}
+		auto profile = g_profiler.start(PROFILER_LUA);
+
+		sol::thread th = sol::thread::create(m_lua_state);
+		sol::coroutine cr(th.state(), std::forward<Func>(func));
+		return cr(std::forward<Params>(args)...);
 	}
 
 private:
@@ -160,21 +152,15 @@ private:
 		unsigned int stride;
 	};
 
-	struct context
-	{
-		context() { busy = false; yield = false; }
-		std::string result;
-		std::condition_variable sync;
-		bool busy;
-		bool yield;
-	};
-
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
 	running_machine *m_machine;
 
 	std::vector<std::string> m_menu;
+
+	std::vector<int> m_update_tasks;
+	std::vector<int> m_frame_tasks;
 
 	template <typename R, typename T, typename D>
 	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);

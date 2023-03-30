@@ -23,13 +23,12 @@ function autofire.startplugin()
 	--   'counter' - position in autofire cycle
 	local buttons = {}
 
+	local input_manager
 	local menu_handler
 
 	local function process_frame()
-		local input = manager.machine.input
-
 		local function process_button(button)
-			local pressed = input:seq_pressed(button.key)
+			local pressed = input_manager:seq_pressed(button.key)
 			if pressed then
 				local state = button.counter < button.on_frames and 1 or 0
 				button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
@@ -65,6 +64,8 @@ function autofire.startplugin()
 		if loader then
 			buttons = loader:load_settings()
 		end
+
+		input_manager = manager.machine.input
 	end
 
 	local function save_settings()
@@ -74,6 +75,7 @@ function autofire.startplugin()
 		end
 
 		menu_handler = nil
+		input_manager = nil
 		buttons = {}
 	end
 
@@ -87,7 +89,10 @@ function autofire.startplugin()
 
 	local function menu_populate()
 		if not menu_handler then
-			menu_handler = require('autofire/autofire_menu')
+			local status, msg = pcall(function () menu_handler = require('autofire/autofire_menu') end)
+			if not status then
+				emu.print_error(string.format('Error loading autofire menu: %s', msg))
+			end
 			if menu_handler then
 				menu_handler:init_menu(buttons)
 			end

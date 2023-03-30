@@ -51,7 +51,7 @@ public:
 	// hooks used by the rest of the system
 	void start_hook(const attotime &endtime);
 	void stop_hook();
-	void interrupt_hook(int irqline);
+	void interrupt_hook(int irqline, offs_t pc);
 	void exception_hook(int exception);
 	void privilege_hook();
 	void instruction_hook(offs_t curpc);
@@ -165,7 +165,7 @@ public:
 	void compute_debug_flags();
 
 private:
-	void halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args);
+	void halt_on_next_instruction_impl(util::format_argument_pack<char> &&args);
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
@@ -227,7 +227,8 @@ private:
 		~tracer();
 
 		void update(offs_t pc);
-		void vprintf(util::format_argument_pack<std::ostream> const &args);
+		void interrupt_update(int irqline, offs_t pc);
+		void vprintf(util::format_argument_pack<char> const &args);
 		void flush();
 		bool logerror() const { return m_logerror; }
 
@@ -405,7 +406,7 @@ public:
 	void stop_hook(device_t *device);
 	void go_next_device(device_t *device);
 	void go_vblank();
-	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
+	void halt_on_next_instruction(device_t *device, util::format_argument_pack<char> &&args);
 	void ensure_comments_loaded();
 	void reset_transient_flags();
 

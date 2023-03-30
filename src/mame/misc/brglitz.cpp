@@ -35,7 +35,7 @@
   |                                        |M74HC373B1               |
   |                         __________                               |
   | :                      |M74HC373B1      __________          _____|
-  | : CN11                                 |M74HC373B1         |o o || 
+  | : CN11                                 |M74HC373B1         |o o ||
   | :        __________     __________                         |o o |CN10
   | :       |M74HC244B1    |M74HC373B1      __________         |o_o_||
   | :                                      |M74HC373B1          ___  |
@@ -95,7 +95,7 @@
 
 #include "speaker.h"
 
-namespace 
+namespace
 {
 
 class brglitz_state : public driver_device
@@ -156,7 +156,7 @@ void brglitz_state::brglitz(machine_config &config)
 
 ROM_START(brglitz)
 	ROM_REGION(0x02000, "maincpu", 0)
-	ROM_LOAD("bg_04_v1.3.u1",    0x00000, 0x02000, BAD_DUMP CRC(f414b736) SHA1(0280adb1de085f2774ad58872cb171a65cf85fbe)) // PIC17C43-8. Bad dump? Needs further checking
+	ROM_LOAD("bg_04_v1.3.u1",    0x00000, 0x02000, BAD_DUMP CRC(f414b736) SHA1(0280adb1de085f2774ad58872cb171a65cf85fbe)) // PIC17C43-8, protected
 
 	ROM_REGION(0x00400, "soundcpu", 0)
 	/*

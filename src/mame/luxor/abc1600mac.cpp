@@ -113,6 +113,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_watchdog(*this, "watchdog"),
 	m_read_tren(*this),
 	m_write_tren(*this),
+	m_rstbut(0),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
@@ -133,6 +134,7 @@ void abc1600_mac_device::device_start()
 	m_write_tren.resolve_all_safe();
 
 	// state saving
+	save_item(NAME(m_rstbut));
 	save_item(NAME(m_boote));
 	save_item(NAME(m_magic));
 	save_item(NAME(m_task));
@@ -192,7 +194,10 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
-	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	if (!machine().side_effects_disabled())
+	{
+		m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	}
 
 	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_cpu->get_fc(), m_magic);
@@ -330,14 +335,17 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_rstbut;
 
 	if (!m_partst)
 	{
 		data = 0x02 | m_cause;
 	}
 
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+	{
+		m_watchdog->watchdog_reset();
+	}
 
 	return data;
 }
@@ -571,7 +579,13 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 
 offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 {
-	// A0 = DMA15, A1 = BA1, A2 = BA2
+	/*
+	            BA2 BA1 A15
+	    DMA0     1   1   x
+	    DMA1     1   0   x
+	    DMA2     0   0   x
+	*/
+
 	uint8_t dmamap_addr = index | BIT(offset, 15);
 	uint8_t dmamap = m_dmamap[dmamap_addr];
 

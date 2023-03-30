@@ -706,10 +706,8 @@ void generalplus_gpac800_game_state::nand_create_stripped_region()
 	// debug to allow for easy use of unidasm.exe
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"stripped_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "stripped_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(&m_strippedrom[0], m_nandblocksize_stripped * numblocks, 1, fp);

@@ -563,6 +563,8 @@ ui.line_height (read-only)
 ui.menu_active (read-only)
     A Boolean indicating whether an interactive UI element is currently active.
     Examples include menus and slider controls.
+ui.ui_active (read/write)
+    A Boolean indicating whether UI control inputs are currently enabled.
 ui.single_step (read/write)
     A Boolean controlling whether the emulated system should be automatically
     paused when the next frame is drawn.  This property is automatically reset
@@ -852,6 +854,11 @@ device.debug (read-only)
     The :ref:`debugger interface <luareference-debug-devdebug>` to the device if
     it is a CPU device, or ``nil`` if it is not a CPU device or the debugger is
     not enabled.
+device.state[] (read-only)
+    The :ref:`state entries <luareference-dev-stateentry>` for devices that
+    expose the register state interface, indexed by symbol, or ``nil`` for other
+    devices.  The index operator and ``index_of`` methods have O(n) complexity;
+    all other supported operations have O(1) complexity.
 device.spaces[] (read-only)
     A table of the device’s :ref:`address spaces <luareference-mem-space>`,
     indexed by name.  Only valid for devices that implement the memory
@@ -1310,6 +1317,46 @@ slot.options[] (read-only)
     operations have O(1) complexity.
 slot.device (read-only)
     The underlying :ref:`device <luareference-dev-device>`.
+
+.. _luareference-dev-stateentry:
+
+Device state entry
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_state_entry`` class, which allows access to named
+registers exposed by a :ref:`device <luareference-dev-device>`.  Supports
+conversion to string for display.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag].state[symbol]
+    Gets a state entry for a given device by symbol.
+
+Properties
+^^^^^^^^^^
+
+entry.value (read/write)
+    The numeric value of the state entry, as either an integer or floating-point
+    number.  Attempting to set the value of a read-only state entry raises an
+    error.
+entry.symbol (read-only)
+    The state entry’s symbolic name.
+entry.visible (read-only)
+    A Boolean indicating whether the state entry should be displayed in the
+    debugger register view.
+entry.writeable (read-only)
+    A Boolean indicating whether it is possible to modify the state entry’s
+    value.
+entry.is_float (read-only)
+    A Boolean indicating whether the state entry’s value is a floating-point
+    number.
+entry.datamask (read-only)
+    A bit mask of the valid bits of the value for integer state entries.
+entry.datasize (read-only)
+    The size of the underlying value in bytes for integer state entries.
+entry.max_length (read-only)
+    The maximum display string length for the state entry.
 
 .. _luareference-dev-imagefmt:
 
@@ -3953,8 +4000,9 @@ emu.parsed_expression(symbols, string, [default_base])
     Creates an expression by parsing the supplied string, looking up symbols in
     the supplied :ref:`symbol table <luareference-debug-symtable>`.  If the
     default base for interpreting integer literals is not supplied, 16 is used
-    (hexadecimal).  Raises an error if the string contains syntax errors or uses
-    undefined symbols.
+    (hexadecimal).  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.
 
 Methods
 ^^^^^^^
@@ -3964,13 +4012,14 @@ expression:set_default_base(base)
     positive integer.
 expression:parse(string)
     Parse a debugger expression string.  Replaces the current contents of the
-    expression if it is not empty.  Raises an error if the string contains
-    syntax errors or uses undefined symbols.  The previous content of the
-    expression is not preserved when attempting to parse an invalid expression
-    string.
+    expression if it is not empty.  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.  The previous content of the expression is not
+    preserved when attempting to parse an invalid expression string.
 expression:execute()
     Evaluates the expression, returning an unsigned integer result.  Raises an
-    error if the expression cannot be evaluated (e.g. calling a function with an
+    :ref:`expression error <luareference-debug-expressionerror>` if the
+    expression cannot be evaluated (e.g. attempting to call a function with an
     invalid number of arguments).
 
 Properties
@@ -4224,3 +4273,22 @@ watchpoint.condition (read-only)
 watchpoint.action (read-only)
     An action the debugger will run when the watchpoint is hit and the condition
     evaluates to a non-zero value.  An empty string if no action was specified.
+
+.. _luareference-debug-expressionerror:
+
+Expression error
+~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``expression_error`` class, describing an error occurring while
+parsing or executing a debugger expression.  Raised on errors when using
+:ref:`parsed expressions <luareference-debug-expression>`.  Can be converted to
+a string to provide a description of the error.
+
+Properties
+^^^^^^^^^^
+
+err.code (read-only)
+    An implementation-dependent number representing the category of error.
+    Should not be displayed to the user.
+err.offset (read-only)
+    The offset within the expression string where the error was encountered.

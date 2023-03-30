@@ -419,12 +419,37 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/35406/ -->
+	<!-- <rom name="Alien Carnage (Europe).cue" size="111" crc="96edaefe" sha1="8dd29ce05d4847d3985afc315ca9605a05334594"/> -->
+	<!-- <rom name="Alien Carnage (Europe).bin" size="4581696" crc="e95dc8f7" sha1="385197d55051c18edf5fd31b17c13ac5b38c8141"/> -->
+	<software name="aliencrn">
+		<description>Alien Carnage (Europe)</description>
+		<year>1995</year>
+		<publisher>Kixx XL</publisher>
+		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="region" value="ver acs 1.0" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Alien Carnage (Europe)" sha1="f42252a8619061cb9ff5a18353cab55c92621ed0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: weird fade in/out effects at every transition (inverted?) -->
-	<software name="aliencrn">
-		<description>Halloween Harry - Alien Carnage</description>
-		<year>1994</year>
-		<publisher>Multi Media International / Apogee / Interactive Binary Illusions / Sub Zer0</publisher>
+	<software name="aliencrn_nl" cloneof="aliencrn">
+		<description>Alien Carnage (Netherlands)</description>
+		<year>1995</year>
+		<publisher>WizardWorks</publisher>
+		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="distributor" value="Multi Media International" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1263,9 +1288,11 @@ Cannot read sound configuration from Windows 95
 	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
 	<!-- Game can be run straight from the CD." -->
 	<software name="bad_dudescd">
-		<description>Bad Dudes (1995 CD release)</description>
+		<description>Bad Dudes (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2666,6 +2693,101 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/5880/ -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De).cue" size="95" crc="d6fe9e0f" sha1="71104571e9d57292d7e45edacb0ad37181c48a3f"/> -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De).bin" size="76056624" crc="a224e5b2" sha1="3e3c9414371c70f58edd9ed78d50d0af7517fb59"/> -->
+	<software name="ecstatica">
+		<description>Ecstatica (Europe)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe) (En,Fr,De)" sha1="23a1690fa7d93b00b774a10f44e39293acc2d1d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/29282/ -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De) (Alt).cue" size="124" crc="ff3ed7c1" sha1="33585a3f140ba63716982ed74a799771a9718a27"/> -->
+	<!-- <rom name="Ecstatica (Europe) (En,Fr,De) (Alt).bin" size="76409424" crc="efe73db1" sha1="9773a85f821c4ffe3085bfa2e99713ad54554bf4"/> -->
+	<software name="ecstaticaa" cloneof="ecstatica">
+		<description>Ecstatica (Europe, Argentum Collection release)</description>
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe) (En,Fr,De) (Alt)" sha1="c2d8f6caf4ece6a2003754b964f210b13423945d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/40711/ -->
+	<!-- <rom name="Ecstatica (Europe).cue" size="107" crc="e235bf90" sha1="7cab865a753a901dd88d38196f81b99572201bd8"/> -->
+	<!-- <rom name="Ecstatica (Europe).bin" size="163071216" crc="977c5750" sha1="cec3628ec6ac083a1bae81a746508aa52e2b046d"/> -->
+	<software name="ecstaticab" cloneof="ecstatica">
+		<description>Ecstatica (Europe, English only)</description>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica (Europe)" sha1="78e72c028320f4e7093991c07b0bd0d12d45ac8f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/44349/ -->
+	<!-- <rom name="Ecstatica II (Germany).cue" size="111" crc="72babfd0" sha1="84fd919cfbf37a6c2b05c56c30ca3947b10dc22f"/> -->
+	<!-- <rom name="Ecstatica II (Germany).bin" size="726036528" crc="a2b0d681" sha1="22ba1668737ed624fb4f6e7bf33502f313697366"/> -->
+	<software name="ecstatic2">
+		<description>Ecstatica II (Germany)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica II (Germany)" sha1="b65fcff8a53f3b0a72907dd4f0115328ae7deb07" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31008/ -->
+	<!-- <rom name="Ecstatica II (Germany) (Rerelease).cue" size="100" crc="8ae1c02b" sha1="0ae8414de5743ad6ee74a3306cddb9de60d9a22c"/> -->
+	<!-- <rom name="Ecstatica II (Germany) (Rerelease).bin" size="737923536" crc="0895fae6" sha1="ff39112b3133876bc9f3ac6f266f62eb80681cb9"/> -->
+	<software name="ecstatic2a_de" cloneof="ecstatic2">
+		<description>Ecstatica II (Germany, Mega 3 Pak Volume 1 release)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="Andrew Spencer Studios" />
+		<info name="language" value="German" />
+		<info name="region" value="Germany" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ecstatica II (Germany) (Rerelease)" sha1="228ccad352d42f318f4b1dcfb00f67c13c0c504a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ecoquest">
 		<description>EcoQuest 1 - The Search for Cetus</description>
 		<year>1992</year>
@@ -2728,8 +2850,8 @@ Includes 13 tables
 	</software>
 
 	<!-- Source: http://redump.org/disc/43549/ -->
-	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).cue" size="130" crc="2d2e97b7" md5="1592f4ef45f2ff976cf174ab650c6034" sha1="30aa7ffbe9c8415742ef97eae018f094d9a5a0c2"/> -->
-	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).bin" size="44017680" crc="37efa6a4" md5="6e286e134d7b54244022b4d2c6e77ec6" sha1="31bb2132dd3fb0e61d784b9692a4143495f4e769"/> -->
+	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).cue" size="130" crc="2d2e97b7" sha1="30aa7ffbe9c8415742ef97eae018f094d9a5a0c2"/> -->
+	<!-- <rom name="Epic Pinball (USA) (Rerelease) (19970206).bin" size="44017680" crc="37efa6a4" sha1="31bb2132dd3fb0e61d784b9692a4143495f4e769"/> -->
 	<software name="epicpinbus" cloneof="epicpinb">
 		<description>Epic Pinball (USA, mail order release)</description>
 		<year>1997</year>
@@ -2779,6 +2901,198 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/16162/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De).cue" size="120" crc="d91e22eb" sha1="7bd294539b73687dc29f52f1aada01c8285d9404"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De).bin" size="580003200" crc="759a56ff" sha1="6c8fc483f302be8be3149e528a5c06bc98d80301"/> -->
+	<software name="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De)" sha1="1d1e2eeb684815e0a591340477f586c0f5283cc2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38201/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt).cue" size="126" crc="da589d22" sha1="65b86b295c3068d23e5b86108cffd4272d26d730"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt).bin" size="580356000" crc="ce343c04" sha1="d9e2c9a102d76e8a227a2ef704acff120be283ea"/> -->
+	<software name="kyrandiaa" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe, Westwood 10th Anniversary release)</description>
+		<year>1995</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (En,Fr,De) (Alt)" sha1="f44778ff877042e5ee6953ed5578c47c01a56be1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/72015/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad).cue" size="121" crc="1fdd165e" sha1="64f9e331bdde917e96166695d872aa07a2000e04"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad).bin" size="50462160" crc="10c8f72e" sha1="8962d7ff48d1c97966707bfb7424bae53955343a"/> -->
+	<software name="kyrandiab" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Europe, The Hit Squad release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Europe) (Hit Squad)" sha1="b3e6b632c220f8577b444284db4bf85620bc51ea" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/71060/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad).cue" size="143" crc="997c7eea" sha1="a749a97349364234f109d035536b84713bd21858"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad).bin" size="7074816" crc="5fa678eb" sha1="94765e8d8d6eb54c1433cf6b64332a251dbf3ef8"/> -->
+	<software name="kyrandia_sp" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Spain, Golden Line-Arcadia release)</description>
+		<year>1993</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="Spanish" />
+		<info name="region" value="Spain" />
+		<info name="version" value="2.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Spain) (Hit Squad)" sha1="ab7f808d0935b3eb3ffa0c2c91ea8f61f58dcc63" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/87644/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Denmark) (Alt).cue" size="116" crc="d5b6fe46" sha1="bdecd03de4e303b828dc8c98e43655d548dec810"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Denmark) (Alt).bin" size="16910880" crc="96c67627" sha1="16de0f17d793558d70bf3fbda0278841be8d3bec"/> -->
+	<software name="kyrandia_dk" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Denmark, Euro Power Pack release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Denmark" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Denmark) (Alt)" sha1="cfa61e159e51221deb71b5459b06a4d3dd16af59" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/76433/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad).cue" size="126" crc="c2cebecf" sha1="d115d851ebdae1ddcd5be16b460a6548a064c379"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad).bin" size="51402960" crc="fc0301dc" sha1="ff80adb8c6a9ed5f01db36554ed8409c7782500f"/> -->
+	<software name="kyrandia_nl" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Netherlands, The Hit Squad release)</description>
+		<year>1995</year>
+		<publisher>The Hit Squad</publisher>
+		<notes><![CDATA[
+This release doesn't have audio speech.
+]]></notes>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="1.3" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Netherlands) (Hit Squad)" sha1="37a7e8427fd59a21c349e568910d60769d81171d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/65309/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De).cue" size="140" crc="75b4dbd1" sha1="41f36b91415c9327c0c22192b14724744a36d3d0"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De).bin" size="586057248" crc="4663b299" sha1="f9a75162811f4ee23ded4301ac8ef4a0e97b3298"/> -->
+	<software name="kyrandia_us" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (USA)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="USA" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De)" sha1="b2d660758f7d610f8daf373f6e1e8a12c329bf35" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/50564/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease).cue" size="129" crc="bfe546a9" sha1="cb8a576ae5a49e91141e19e54857e07e842c2960"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease).bin" size="577397184" crc="e34cac0d" sha1="f02564cd47d17e0a66bad9d0031ef2c056610554"/> -->
+	<software name="kyrandiaa_us" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (USA, Slash release)</description>
+		<year>1997</year>
+		<publisher>Slash</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="USA" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (USA) (En,Fr,De) (Rerelease)" sha1="751fce222049e7a6c4ba6d40efe1c57bee466d2e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/61197/ -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De).cue" size="141" crc="bfda0c62" sha1="11c5d472025100a829363eddd64a39d033fc0aed"/> -->
+	<!-- <rom name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De).bin" size="629411664" crc="307b8278" sha1="d4234cc483e7070139bd8a7781b1a76e6236602e"/> -->
+	<software name="kyrandia_as" cloneof="kyrandia">
+		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (Asia)</description>
+		<year>1993</year>
+		<publisher>Asia-CD</publisher>
+		<info name="developer" value="Westwood Studios" />
+		<info name="language" value="English/French/German" />
+		<info name="region" value="Asia" />
+		<info name="version" value="3.7" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Legend of Kyrandia, The - Book One (Asia) (En,Fr,De)" sha1="882c5955baf18918984fb210708a122854ad3b9a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- requires 600k of free memory -->
 	<!-- has no manual copy protection -->
@@ -2815,6 +3129,82 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Formula One Grand Prix (Netherlands) (Crucial)" sha1="03b22b58db9eb73171cd4ed3f342ddc2303aad1b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/71267/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).cue" size="109" crc="5e8474f8" sha1="68a991ada01834068146886b8d6b2542e7ca2a55"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It).bin" size="443196768" crc="c9cf791c" sha1="97dcd74ff7be51f5676f3e1eb5233e6644eab8f9"/> -->
+	<software name="flamazon">
+		<description>Flight of the Amazon Queen (Europe)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (En,It)" sha1="727ccb7582fffa698f7a382b89615bec258a37ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/70771/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease).cue" size="121" crc="a9b91ac5" sha1="1826d020a9d7ad4b2cc02ad886d2938b86b71d22"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease).bin" size="443530752" crc="2433fa88" sha1="d0de4ff83f4331114138a2ba39802bae76f4f5e4"/> -->
+	<software name="flamazona" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (Europe, re-release)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English/Italian" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (En,It) (Rerelease)" sha1="c9fa0e30ad083ae9af43f3f8ecf28991212a659a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/48851/ -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (Fr,De).cue" size="109" crc="78151e68" sha1="5905e2a0a294090b8e2a7403227bd8edecdd5d73"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (Europe) (Fr,De).bin" size="466554480" crc="0290d014" sha1="2ba6c4a5348948095366ac1ed073dfec31744955"/> -->
+	<software name="flamazonb" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (Europe, alt)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="French/German" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (Europe) (Fr,De)" sha1="e90f68a406dc93d846d0d104d062052dd00dd93d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/14723/ -->
+	<!-- <rom name="Flight of the Amazon Queen (USA).cue" size="98" crc="21446a5b" sha1="8ff34f4f33005f1330a882d46671f2450fbbeb10"/> -->
+	<!-- <rom name="Flight of the Amazon Queen (USA).bin" size="223416480" crc="2caa8fd6" sha1="0d580a1f0a4d9c433e99838955245c57533786d9"/> -->
+	<software name="flamazon_us" cloneof="flamazon">
+		<description>Flight of the Amazon Queen (USA)</description>
+		<year>1995</year>
+		<publisher>Renegade Software</publisher>
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Flight of the Amazon Queen (USA)" sha1="d5574d406c16fb2d8e982604f23a0dcaa7ee5b8f" />
 			</diskarea>
 		</part>
 	</software>
@@ -3041,9 +3431,11 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="heavybarrelcd">
-		<description>Heavy Barrel (1995 CD release)</description>
+		<description>Heavy Barrel (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3581,9 +3973,11 @@ Untested multiplayer options
 	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="karnovcd">
-		<description>Karnov (1995 CD release)</description>
+		<description>Karnov (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3752,9 +4146,33 @@ https://www.pcgamingwiki.com/wiki/Myst
 		<description>Network Q RAC Rally (USA)</description>
 		<year>1996</year>
 		<publisher>Europress Software</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Network Q RAC Rally (USA)" sha1="953ab84ace809f851ba536bf66df86618c9add29" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/68521/ -->
+	<!-- <rom name="Network Q RAC Rally (France) (Rerelease).cue" size="106" crc="d917c0ad" sha1="438c564cdb23556654d84ae756815e9410fb3a66"/> -->
+	<!-- <rom name="Network Q RAC Rally (France) (Rerelease).bin" size="35691600" crc="e6cdd65a" sha1="05b10adbb10e25da7830bc0ee3b921fabf0b6956"/> -->
+	<software name="qracrally_fr" cloneof="qracrally">
+		<description>Network Q RAC Rally (France)</description>
+		<year>1999</year>
+		<publisher>Pointsoft</publisher>
+		<notes><![CDATA[
+Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
+]]></notes>
+		<info name="language" value="French" />
+		<info name="region" value="France" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Network Q RAC Rally (France) (Rerelease)" sha1="10420a8b0fe1e5571b345a2b07c557ef9b0fc089" />
 			</diskarea>
 		</part>
 	</software>
@@ -3846,15 +4264,53 @@ https://www.pcgamingwiki.com/wiki/Myst
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/31339/ -->
+	<!-- <rom name="Pipe Mania + Volfied (Europe).cue" size="118" crc="ee9643cc" sha1="b23b28f62a745d801f191ae534ebf6245316730d"/> -->
+	<!-- <rom name="Pipe Mania + Volfied (Europe).bin" size="10760400" crc="16f45ce9" sha1="7037ce9956460b0af7cd027cb01bbb26634f6fe6"/> -->
+	<software name="pipevolf">
+		<description>Pipe Mania + Volfied (Europe, 2 Game Pack release)</description>
+		<year>1996</year>
+		<publisher>Empire Interactive</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pipe Mania and Volfied (Europe)" sha1="26212549f0c3c432862885f907dea17e0f6fc39c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/16271/ -->
+	<!-- <rom name="Pipe Mania + Volfied (Netherlands).cue" size="100" crc="ae628bd4" sha1="0080b8c2fc66c19196cd6449105f8a5795411d02"/> -->
+	<!-- <rom name="Pipe Mania + Volfied (Netherlands).bin" size="11113200" crc="c191275a" sha1="7669e39d106952c0fbb8526ffeb0481e32e967ff"/> -->
+	<software name="pipevolf_nl" cloneof="pipevolf">
+		<description>Pipe Mania + Volfied (Netherlands)</description>
+		<year>1996</year>
+		<publisher>Multi Media International</publisher>
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Pipe Mania and Volfied (Netherlands)" sha1="bcaa399213f391edf71c04578b0149b9f3711cb1" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
 	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
 	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
 	<software name="pipemaniacd">
-		<description>Pipe Mania (1995 CD release)</description>
+		<description>Pipe Mania (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="alt_title" value="Pipe Dream" />
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4210,6 +4666,86 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/3568/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA, Europe).cue" size="131" crc="f4cd062c" sha1="d4a9b0d4b56d20efa5e86244725e9417f1fdd6a5"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA, Europe).bin" size="14283696" crc="c39a3def" sha1="808b476eafd7a2f50afe563096f464d221e68198"/> -->
+	<software name="raptor">
+		<description>Raptor: Call of the Shadows (Europe, USA)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe/USA" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (USA, Europe)" sha1="6f175c25df380aa5d7a4cb3d41450e774a4dc5c2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/19959/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA) (Rerelease).cue" size="135" crc="6f425bf4" sha1="e9444e33910d0aa0e29cd0bf1155bd7ea671af15"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (USA) (Rerelease).bin" size="14641200" crc="7ad7b04a" sha1="9d0743c722cfa1828baea654a2110c313b41a0a6"/> -->
+	<software name="raptor_us" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (USA)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (USA) (Rerelease)" sha1="b4abcaeee40bc1ae53546985aa00670b0e9af0f2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/42935/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (Germany).cue" size="127" crc="1869eaf6" sha1="7f7285ff2321afb10f7cc63cd01a33a1920a26fc"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (Germany).bin" size="54157152" crc="b56255d0" sha1="e19b4aba1fe2f6b8532c7940ed375d8d7f2b0d7f"/> -->
+	<software name="raptor_de" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (Germany)</description>
+		<year>1994</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Germany" />
+		<info name="version" value="V1.1" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (Germany)" sha1="23f263f2d7af71e2e7b947cf44cdb4e379303729" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/29454/ -->
+	<!-- <rom name="Raptor - Call of the Shadows (Netherlands).cue" size="108" crc="8f23b55a" sha1="ad6f9de6b999fde3f806a9f0fd4cb40cea2460a5"/> -->
+	<!-- <rom name="Raptor - Call of the Shadows (Netherlands).bin" size="14286048" crc="b3a4efa2" sha1="ceca7743fb02ff8f93cb48efec523c1d3234e8fb"/> -->
+	<software name="raptor_nl" cloneof="raptor">
+		<description>Raptor: Call of the Shadows (Netherlands)</description>
+		<year>1995</year>
+		<publisher>Apogee</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="V1.2" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Raptor - Call of the Shadows (Netherlands)" sha1="fef49aee7a9d7c742072dcba197049bce62b03d7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS 5.0 / Windows 95 -->
 	<!-- TODO: return errno 1 under DOS and MSCDEX -->
 	<software name="rayman" supported="partial">
@@ -4467,6 +5003,26 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 	</software>
 
 
+	<!-- Source: http://redump.org/disc/80024/ -->
+	<!-- <rom name="Simon the Sorcerer (USA).cue" size="90" crc="d2cfbefe" sha1="eafd4929c6c3e53a7a8a77f5a05dea10157aa224"/> -->
+	<!-- <rom name="Simon the Sorcerer (USA).bin" size="209269200" crc="db6ee4ac" sha1="1982a6578857b8218680eba69f6cced9c97cbae1"/> -->
+	<software name="simon">
+		<description>Simon the Sorcerer (USA)</description>
+		<year>1994</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Adventuresoft" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.00" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Simon the Sorcerer (USA)" sha1="61508e2be53c61afaa289570907e5aee024bae8c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 / 3.11 / 95 -->
 	<!-- 486 66 MHz -->
 	<!-- SVGA 256 colors -->
@@ -4637,9 +5193,11 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
 	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
 	<software name="tagteamcd">
-		<description>Tag Team Wrestling (1995 CD release)</description>
+		<description>Tag Team Wrestling (Arcade Favorites CD-ROM 5 Pak release)</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5575,6 +6133,36 @@ Has setup menu glitch with text [8514]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sb16" sha1="c87097c58d1c3fcea03e5e4b50d2cafdcb870f16" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- <rom name="Sound Blaster 16 CD.cue" size="475" crc="dd9e3752" sha1="bbf49ed1b322ba873a9befcf42d72e86368c76e0"/> -->
+	<!-- <rom name="Sound Blaster 16 CD.bin" size="310741536" crc="295cb2d2" sha1="f09805b982a17b756626e9702d8e2b8f6da68e60"/> -->
+	<software name="sb16cd">
+		<description>Sound Blaster 16 CD</description>
+		<year>1996</year>
+		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+CD-ROM includes those Creative's audio tools:
+Creative CD v2.03
+Creative MIDI v2.03
+Creative Mixer
+Creative Remote v2.03
+Creative Wave v2.03
+TextAssist Dictionary v1.30
+Singing Text
+Soundo'LE v3.11
+Text Reader
+Texto'LE v1.2
+Wave Studio v3.12
+]]></notes>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<sharedfeat name="platform" value="Windows 3.x/Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sound Blaster 16 CD" sha1="7e91bd013f18a9a9d5b5459280e3a075b49309f6" />
 			</diskarea>
 		</part>
 	</software>

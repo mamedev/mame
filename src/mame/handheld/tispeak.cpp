@@ -176,7 +176,7 @@ Speak & Math:
       of the TI employees in a hurry, the day before a demo. Apparently QA
       never found out and it ended up in the final product.
 
-    Speak & Math (US), 1986
+    Speak & Math (US), 1984
     - MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
     - TMS51xx: CD2801
     - VSM(1/2): 16KB CD2381
@@ -1771,7 +1771,7 @@ COMP( 1981, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, in
 COMP( 1982, snwrite,    snspellc, 0, snwrite,      snwrite,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
+COMP( 1984, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1984 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // less speech data
 COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
 
 COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, init_snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

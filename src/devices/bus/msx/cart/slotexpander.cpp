@@ -2,6 +2,7 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "slotexpander.h"
+#include "bus/msx/cart/cartridge.h"
 #include "machine/input_merger.h"
 
 /*
@@ -149,7 +150,7 @@ void msx_cart_slotexpander_device::secondary_slot_w(u8 data)
 	m_view1.select((data >> 2) & 0x03);
 	m_view2.select((data >> 4) & 0x03);
 	m_view3.select((data >> 6) & 0x03);
-	m_secondary_slot = data;	
+	m_secondary_slot = data;
 }
 
 } // anonymous namespace

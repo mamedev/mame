@@ -257,40 +257,32 @@ void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 
 inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 {
-//  g_profiler.start(PROFILER_USER1);
-	int x, y;
-	uint8_t stepx, stepy;
+//  auto profile1 = g_profiler.start(PROFILER_USER1);
 
-	y = ypos >>3;
-	x = xpos >>3;
+	int const y = ypos >>3;
+	int const x = xpos >>3;
 
-	stepx = (x & 0x1c0) >> 6;
-	stepy = ((y & 0x1c0) >> 6) * (stepx+1);
-	uint16_t val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
-	int pal = m_vip_regs.GPLT[(val >> 14) & 3];
-	int code = val & 0x3fff;
+	uint8_t const stepx = (x & 0x1c0) >> 6;
+	uint8_t const stepy = ((y & 0x1c0) >> 6) * (stepx+1);
+	uint16_t const val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
+	int const pal = m_vip_regs.GPLT[(val >> 14) & 3];
+	int const code = val & 0x3fff;
 
-	uint16_t data;
-	uint8_t yi, xi, dat;
-
-	yi = ypos & 7;
-	data = READ_FONT(code * 8 + yi);
-	xi = xpos & 7;
-	dat = ((data >> (xi << 1)) & 0x03);
+	uint8_t const yi = ypos & 7;
+	uint16_t const data = READ_FONT(code * 8 + yi);
+	uint8_t const xi = xpos & 7;
+	uint8_t const dat = ((data >> (xi << 1)) & 0x03);
 
 	if(dat == 0)
-	{
-		//g_profiler.stop();
 		return -1;
-	}
-	//  g_profiler.stop();
-	return (pal >> (dat*2)) & 3;
+	else
+		return (pal >> (dat*2)) & 3;
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
 													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
-//  g_profiler.start(PROFILER_USER2);
+//  auto profile2 = g_profiler.start(PROFILER_USER2);
 
 	for(int y=0;y<=h;y++)
 	{
@@ -323,9 +315,8 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 			{
 				if ((src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
 				{
-					g_profiler.start(PROFILER_USER3);
+					auto profile3 = g_profiler.start(PROFILER_USER3);
 					pix = READ_OVR_TEMPDRAW_MAP((src_y & 7)*8+(src_x & 7));
-					g_profiler.stop();
 				}
 				else
 				{
@@ -341,13 +332,12 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 				bitmap.pix(y1, x1) = m_palette->pen(pix & 3);
 		}
 	}
-//  g_profiler.stop();
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
 														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
-//  g_profiler.start(PROFILER_USER3);
+//  auto profile3 = g_profiler.start(PROFILER_USER3);
 
 	for(int y=0;y<=h;y++)
 	{
@@ -385,7 +375,6 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 					bitmap.pix(y1, x1) = m_palette->pen(pix & 3);
 		}
 	}
-//  g_profiler.stop();
 }
 
 /*

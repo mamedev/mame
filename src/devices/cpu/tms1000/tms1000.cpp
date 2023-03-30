@@ -15,9 +15,6 @@ TMS1000
 - 20-term output PLA(opla) at the top-left
 - the ALU is between the opla and mpla
 
-TODO:
-- add TMS1270 (10 O pins, how does that work?)
-
 */
 
 #include "emu.h"
@@ -27,9 +24,10 @@ TODO:
 
 // device definitions
 DEFINE_DEVICE_TYPE(TMS1000,  tms1000_cpu_device,  "tms1000",  "Texas Instruments TMS1000") // 28-pin DIP, 11 R pins
-DEFINE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device,  "tms1070",  "Texas Instruments TMS1070") // high voltage version
-DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "Texas Instruments TMS1040") // same as TMS1070 with just a different pinout?
+DEFINE_DEVICE_TYPE(TMS1040,  tms1040_cpu_device,  "tms1040",  "Texas Instruments TMS1040") // high voltage version, different pinout
+DEFINE_DEVICE_TYPE(TMS1070,  tms1070_cpu_device,  "tms1070",  "Texas Instruments TMS1070") // high voltage version, output PLA is 10-bit like TMS1270 but has 8 O pins
 DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "Texas Instruments TMS1200") // 40-pin DIP, 13 R pins
+DEFINE_DEVICE_TYPE(TMS1270,  tms1270_cpu_device,  "tms1270",  "Texas Instruments TMS1270") // high voltage version, 10 O pins (output PLA order is O9,O8,O0-O7)
 DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "Texas Instruments TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
 DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "Texas Instruments TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
 
@@ -45,16 +43,24 @@ tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, device_typ
 	tms1k_base_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
-tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1070_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1070_cpu_device::ram_6bit), this))
-{ }
-
 tms1040_cpu_device::tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1000_cpu_device(mconfig, TMS1040, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1040_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1040_cpu_device::ram_6bit), this))
 { }
 
 tms1200_cpu_device::tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1000_cpu_device(mconfig, TMS1200, tag, owner, clock, 8, 13, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1200_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1200_cpu_device::ram_6bit), this))
+{ }
+
+tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1070_cpu_device(mconfig, TMS1070, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1070_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1070_cpu_device::ram_6bit), this))
+{ }
+
+tms1070_cpu_device::tms1070_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
+	tms1000_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms1270_cpu_device::tms1270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1070_cpu_device(mconfig, TMS1270, tag, owner, clock, 10, 13, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1270_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(tms1270_cpu_device::ram_6bit), this))
 { }
 
 tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -91,8 +97,14 @@ void tms1000_cpu_device::ram_32x4(address_map &map)
 void tms1000_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 20).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 8, 20).set_format(pla_device::FMT::BERKELEY);
+}
+
+void tms1070_cpu_device::device_add_mconfig(machine_config &config)
+{
+	tms1000_cpu_device::device_add_mconfig(config);
+	m_opla->set_num_outputs(10);
 }
 
 

@@ -489,7 +489,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 		mappings.emplace_back(mapping{ original, replacement });
 		target->unref();
 		target = replacement;
-		
+
 	} else {
 		// New one goes under the old one
 		//   both are passthrough and new one has lower priority
@@ -498,7 +498,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 
 		handler_entry_read<Width, AddrShift> *recursive = static_cast<handler_entry_read_passthrough<Width, AddrShift> *>(original)->get_subhandler();
 		recursive->ref();
-		
+
 		passthrough_patch(handler, mappings, recursive);
 
 		handler_entry_read<Width, AddrShift> *replacement = static_cast<handler_entry_read_passthrough<Width, AddrShift> *>(original)->instantiate(recursive);

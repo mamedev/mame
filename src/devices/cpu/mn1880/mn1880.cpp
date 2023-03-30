@@ -339,8 +339,9 @@ void mn1880_device::device_reset()
 	m_mmu_enable = 0;
 }
 
-bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	switch (spacenum)
 	{
 	case AS_PROGRAM:
@@ -2427,7 +2428,7 @@ void mn1880_device::execute_run()
 			{
 				// IRQ0 (first of four external edge inputs?) has the highest priority (after RESET)
 				unsigned level = 32 - count_leading_zeros_32((m_irq - 1) & ~m_irq);
-				(void)standard_irq_callback(level);
+				(void)standard_irq_callback(level, cpu.ip);
 				cpu.ie &= ~(1 << level); // No separate in-service lockout; handler must re-enable specific interrupt
 				m_if &= ~(1 << level);
 				cpu.iemask = true;
