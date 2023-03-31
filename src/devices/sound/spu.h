@@ -37,8 +37,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	float spu_base_frequency_hz;
-	float ms_to_rate(float ms) { return 1.0f / (ms * (spu_base_frequency_hz / 1000.0f)); }
-	float s_to_rate(float s) { return ms_to_rate(s * 1000.0f); }
 	float linear_rate[108];
 	float pos_exp_rate[100];
 	float neg_exp_rate[108];
@@ -144,6 +142,9 @@ protected:
 
 	static reverb_preset reverb_presets[];
 	static reverb_params *spu_reverb_cfg;
+
+	const float ms_to_rate(float ms) { return 1.0f / (ms * (spu_base_frequency_hz / 1000.0f)); }
+	const float s_to_rate(float s) { return ms_to_rate(s * 1000.0f); }
 
 	void key_on(const int v);
 	void key_off(const int v);
