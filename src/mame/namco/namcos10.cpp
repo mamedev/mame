@@ -448,6 +448,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_decrypter(*this, "decrypter")
 		, m_io_update_interrupt(*this)
+		, m_io_system(*this, "SYSTEM")
 	{ }
 
 	void namcos10_base(machine_config &config);
@@ -456,6 +457,8 @@ public:
 	void namcos10_map(address_map &map);
 
 protected:
+	using unscramble_func = uint16_t (*)(uint16_t);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_resolve_objects() override;
@@ -463,10 +466,10 @@ protected:
 	required_device<psxcpu_device> m_maincpu;
 	optional_device<ns10_decrypter_device> m_decrypter; // not every game has a decrypter implemented yet, so optional for now
 
-	uint8_t m_scramble[16];
+	unscramble_func m_unscrambler;
 
 private:
-	enum {
+	enum : int8_t {
 		I2CP_IDLE,
 		I2CP_RECIEVE_BYTE,
 		I2CP_RECIEVE_ACK_1,
@@ -490,11 +493,14 @@ private:
 	devcb_write_line m_io_update_interrupt;
 
 	uint16_t m_i2c_host_clock, m_i2c_host_data, m_i2c_dev_clock, m_i2c_dev_data, m_i2c_prev_clock, m_i2c_prev_data;
-	int m_i2cp_mode;
+	int8_t m_i2cp_mode;
 	uint8_t m_i2c_byte;
-	int m_i2c_bit;
+	int32_t m_i2c_bit;
 
-	int m_sprot_bit, m_sprot_byte;
+	int32_t m_sprot_bit;
+	uint32_t m_sprot_byte;
+
+	required_ioport m_io_system;
 };
 
 class namcos10_memm_state : public namcos10_state
@@ -574,7 +580,7 @@ public:
 	void init_knpuzzle();
 	void init_panikuru();
 	void init_startrgn();
-	void init_gunbalna();
+	void init_gunbalina();
 	void init_nflclsfb();
 	void init_gjspace();
 	void init_gamshara();
@@ -751,7 +757,7 @@ uint16_t namcos10_state::control_r(offs_t offset)
 {
 	// logerror("%s: control_r %d\n", machine().describe_context(), offset);
 	if(offset == 0)
-		return ioport("SYSTEM")->read();
+		return m_io_system->read();
 
 	if(offset == 13) {
 		// bit = cleared registers
@@ -941,25 +947,7 @@ uint16_t namcos10_memm_state::range_r(offs_t offset)
 
 	if (m_bank_idx < 0x10) {
 		// TODO: Need more MEM(M) samples to verify if all of the data ROMs are unscrambled normally
-		data = bitswap<16>(
-			data ^ 0xaaaa,
-			m_scramble[0],
-			m_scramble[1],
-			m_scramble[2],
-			m_scramble[3],
-			m_scramble[4],
-			m_scramble[5],
-			m_scramble[6],
-			m_scramble[7],
-			m_scramble[8],
-			m_scramble[9],
-			m_scramble[10],
-			m_scramble[11],
-			m_scramble[12],
-			m_scramble[13],
-			m_scramble[14],
-			m_scramble[15]
-		);
+		data = m_unscrambler(data ^ 0xaaaa);
 	}
 
 	return data;
@@ -1021,25 +1009,7 @@ void namcos10_memm_state::decrypt_bios_region(int start, int end)
 	uint16_t *bios = (uint16_t *)(memregion("maincpu:rom")->base() + start);
 
 	for(int i = start / 2; i < end / 2; i++) {
-		bios[i] = bitswap<16>(
-			bios[i] ^ 0xaaaa,
-			m_scramble[0],
-			m_scramble[1],
-			m_scramble[2],
-			m_scramble[3],
-			m_scramble[4],
-			m_scramble[5],
-			m_scramble[6],
-			m_scramble[7],
-			m_scramble[8],
-			m_scramble[9],
-			m_scramble[10],
-			m_scramble[11],
-			m_scramble[12],
-			m_scramble[13],
-			m_scramble[14],
-			m_scramble[15]
-		);
+		bios[i] = m_unscrambler(bios[i] ^ 0xaaaa);
 	}
 }
 
@@ -1054,8 +1024,7 @@ void namcos10_memm_state::memm_driver_init()
 
 void namcos10_memm_state::init_mrdrilr2()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3); };
 	memm_driver_init();
 	decrypt_bios_region(0, 0x62000);
 }
@@ -1137,25 +1106,7 @@ uint16_t namcos10_memn_state::nand_data_r()
 	if ((BIT(m_nand_address, 8, 16) >> 5) < 0x3ec
 		&& (m_nand_device_idx != 0 || (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) >= 0x0a)))
 	{
-		data = bitswap<16>(
-			(BIT(data, 8, 8) | (BIT(data, 0, 8) << 8)) ^ 0xaaaa,
-			m_scramble[8],
-			m_scramble[9],
-			m_scramble[10],
-			m_scramble[11],
-			m_scramble[12],
-			m_scramble[13],
-			m_scramble[14],
-			m_scramble[15],
-			m_scramble[0],
-			m_scramble[1],
-			m_scramble[2],
-			m_scramble[3],
-			m_scramble[4],
-			m_scramble[5],
-			m_scramble[6],
-			m_scramble[7]
-		);
+		data = m_unscrambler(data ^ 0xaaaa);
 	}
 
 	return data;
@@ -1269,29 +1220,8 @@ void namcos10_memn_state::nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t 
 		int address = page * 0x210;
 
 		for (int i = 0; i < 0x200; i += 2) {
-			uint16_t data = nand_base[address + i] | (nand_base[address + i + 1] << 8);
-
-			data = bitswap<16>(
-				data ^ 0xaaaa,
-				m_scramble[8],
-				m_scramble[9],
-				m_scramble[10],
-				m_scramble[11],
-				m_scramble[12],
-				m_scramble[13],
-				m_scramble[14],
-				m_scramble[15],
-				m_scramble[0],
-				m_scramble[1],
-				m_scramble[2],
-				m_scramble[3],
-				m_scramble[4],
-				m_scramble[5],
-				m_scramble[6],
-				m_scramble[7]
-			);
-
-			*dst = data;
+			uint16_t data = nand_base[address + i + 1] | (nand_base[address + i] << 8);
+			*dst = m_unscrambler(data ^ 0xaaaa);
 			dst++;
 		}
 	}
@@ -1308,120 +1238,103 @@ void namcos10_memn_state::memn_driver_init()
 
 void namcos10_memn_state::init_gjspace()
 {
-	uint8_t scramble[] = {0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb, 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0x8, 0xa, 0x6, 0x5, 0x7, 0xe, 0x4, 0xf, 0xd, 0x9, 0x1, 0x0, 0x2, 0xb, 0xc, 0x3); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_mrdrilrg()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_knpuzzle()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_startrgn()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_gamshara()
 {
-	uint8_t scramble[] = {0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
 	memn_driver_init();
 }
 
-void namcos10_memn_state::init_gunbalna()
+void namcos10_memn_state::init_gunbalina()
 {
-	uint8_t scramble[] = {0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xa, 0xb, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_chocovdr()
 {
-	uint8_t scramble[] = {0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0x8, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x0, 0x3, 0x2, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_panikuru()
 {
-	uint8_t scramble[] = {0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x2, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x1, 0x0, 0x3, 0x2); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_nflclsfb()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_konotako()
 {
-	uint8_t scramble[] = {0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0x8, 0x9, 0xb, 0xa, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_taiko6()
 {
-	uint8_t scramble[] = {0xd, 0xc, 0xf, 0xe, 0xa, 0x9, 0x8, 0xb, 0x6, 0x4, 0x7, 0x5, 0x1, 0x3, 0x0, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_puzzball()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xf, 0xe, 0x9, 0x8, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x0, 0x1, 0x2, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x7, 0x6, 0x1, 0x0, 0x2, 0x3); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_pacmball()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xf, 0xe, 0x8, 0xb, 0xa, 0x9, 0x5, 0x7, 0x4, 0x6, 0x0, 0x3, 0x2, 0x1};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0xb, 0xa, 0x9, 0x4, 0x5, 0x7, 0x6, 0x0, 0x3, 0x2, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_sekaikh()
 {
-	uint8_t scramble[] = {0xe, 0xd, 0xc, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_keroro()
 {
-	uint8_t scramble[] = {0xc, 0xd, 0xf, 0xe, 0xa, 0x9, 0x8, 0xb, 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_unks10md()
 {
-	uint8_t scramble[] = {0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
 	memn_driver_init();
 }
 
 void namcos10_memn_state::init_unks10md2()
 {
-	uint8_t scramble[] = {0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
 	memn_driver_init();
 }
 
@@ -1692,29 +1605,8 @@ void namcos10_memp3_state::nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t
 		int address = page * 0x210;
 
 		for (int i = 0; i < 0x200; i += 2) {
-			uint16_t data = nand_base[address + i] | (nand_base[address + i + 1] << 8);
-
-			data = bitswap<16>(
-				data ^ 0xaaaa,
-				m_scramble[8],
-				m_scramble[9],
-				m_scramble[10],
-				m_scramble[11],
-				m_scramble[12],
-				m_scramble[13],
-				m_scramble[14],
-				m_scramble[15],
-				m_scramble[0],
-				m_scramble[1],
-				m_scramble[2],
-				m_scramble[3],
-				m_scramble[4],
-				m_scramble[5],
-				m_scramble[6],
-				m_scramble[7]
-			);
-
-			*dst = data;
+			uint16_t data = nand_base[address + i + 1] | (nand_base[address + i] << 8);
+			*dst = m_unscrambler(data ^ 0xaaaa);
 			dst++;
 		}
 	}
@@ -1739,8 +1631,7 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 
 void namcos10_memp3_state::init_g13jnc()
 {
-	uint8_t scramble[] = {0xe, 0xf, 0xc, 0xd, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2};
-	memcpy(m_scramble, scramble, 16);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x7, 0x4, 0x5, 0x1, 0x3, 0x0, 0x2); };
 	memp3_driver_init();
 }
 
@@ -2235,8 +2126,8 @@ GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      mrdrilr2, namcos10_memm_sta
 GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
 
 // MEM(N)
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalna,  ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalna,  ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING ) // broken decrypter?
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
@@ -2245,7 +2136,7 @@ GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, 
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0)
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING ) // Ver. 20020912A ETC
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", 0 )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
