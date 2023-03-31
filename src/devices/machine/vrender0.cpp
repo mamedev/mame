@@ -130,7 +130,8 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
+	// runs at double speed wrt of the CPU clock
+	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(2, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
@@ -713,8 +714,9 @@ WRITE_LINE_MEMBER(vrender0soc_device::screen_vblank)
 	if (state)
 	{
 		if (crt_active_vblank_irq() == true)
+		{
 			IntReq(24);      //VRender0 VBlank
-
-		m_vr0vid->execute_flipping();
+			m_vr0vid->execute_flipping();
+		}
 	}
 }
