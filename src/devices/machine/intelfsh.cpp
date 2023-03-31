@@ -1004,9 +1004,9 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		// Datasheets don't specify what happens when the word count is outside of
 		// the valid range so clamp and pray
 		if ( m_bits == 16 )
-			m_write_buffer_count = (data > 0xf ? 0xf : data) + 1;
+			m_write_buffer_count = std::min<uint32_t>(data, 0xf) + 1;
 		else
-			m_write_buffer_count = (data > 0x1f ? 0x1f : data) + 1;
+			m_write_buffer_count = std::min<uint32_t>(data, 0x1f) + 1;
 
 		m_status = 0x80;
 		m_flash_mode = FM_WRITEBUFFER2;
