@@ -1683,10 +1683,13 @@ Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug
 		</part>
 	</software>
 
-	<software name="flashhid">
+	<software name="flashhid" supported="partial">
 		<description>Flash Hiders (Japan)</description>
 		<year>1993</year>
 		<publisher>Right Stuff</publisher>
+		<notes><![CDATA[
+Uses sound LFO FM
+]]></notes>
 		<info name="serial" value="RSCD3004"/>
 		<info name="release" value="19931219"/>
 		<info name="alt_title" value="フラッシュハイダース"/>
@@ -2329,10 +2332,13 @@ Unsupported [セーブくん] joypad slot peripheral
 		</part>
 	</software>
 
-	<software name="hyperdyn">
+	<software name="hyperdyn" supported="partial">
 		<description>Hyper Dyne SideArms Special (Japan)</description>
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8105 (verify)
+]]></notes>
 		<info name="serial" value="HACD9002"/>
 		<info name="release" value="19891215"/>
 		<info name="alt_title" value="サイドアームスペシャル"/>
@@ -2587,10 +2593,13 @@ New game intro sports glitchy portraits
 		</part>
 	</software>
 
-	<software name="juuouki">
+	<software name="juuouki" supported="partial">
 		<description>Juuouki (Japan)</description>
 		<year>1989</year>
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+Uses Sound LFO FM
+]]></notes>
 		<info name="serial" value="HACD9001"/>
 		<info name="release" value="19890922"/>
 		<info name="alt_title" value="獣王記"/>
@@ -7187,10 +7196,14 @@ Omake: Press U R D L II at menu to access Bomberman
 		</part>
 	</software>
 
-	<software name="addfam">
+	<software name="addfam" supported="no">
 		<description>The Addams Family (USA)</description>
 		<year>1991</year>
 		<publisher>ICOM Simulations</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7261 check [ADPCM] irq ack
+Abruptly stops [ADPCM] playback on title screen
+]]></notes>
 		<info name="serial" value="TGXCD1019"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7243,10 +7256,13 @@ Omake: Press U R D L II at menu to access Bomberman
 		</part>
 	</software>
 
-	<software name="campcali">
+	<software name="campcali" supported="no">
 		<description>Camp California (USA)</description>
 		<year>1993</year>
 		<publisher>ICOM Simulations</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7262
+]]></notes>
 		<info name="serial" value="TGXCD1013"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7607,6 +7623,9 @@ Crashes after first action, [SCSI] timing sensitive
 		<description>Prince of Persia (USA)</description>
 		<year>1992</year>
 		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=7727 (fixed)
+]]></notes>
 		<info name="serial" value="TGXCD1027"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
