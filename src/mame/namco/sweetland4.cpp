@@ -138,4 +138,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4, 0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2004, sweetld4, 0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
