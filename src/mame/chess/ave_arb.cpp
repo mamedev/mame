@@ -174,7 +174,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arb_state::cart_load)
 
 	m_altboard = bool(image.get_feature("altboard"));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

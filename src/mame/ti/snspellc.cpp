@@ -313,12 +313,12 @@ DEVICE_IMAGE_LOAD_MEMBER(snspellc_state::cart_load)
 
 	if (size > 0x4000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid file size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->common_load_rom(m_cart_base, size, "rom");
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void snspellc_state::init_snspellc()

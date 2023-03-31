@@ -13,6 +13,8 @@
 
 #pragma once
 
-image_init_result z80bin_load_file(device_image_interface &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr);
+class snapshot_image_device;
+
+std::error_condition z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr);
 
 #endif // MAME_SHARED_Z80BIN_H

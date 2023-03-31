@@ -32,7 +32,7 @@ void msx_slot_cartridge_base_device::device_start()
 }
 
 
-image_init_result msx_slot_cartridge_base_device::call_load()
+std::error_condition msx_slot_cartridge_base_device::call_load()
 {
 	if (m_cartridge)
 	{
@@ -60,16 +60,16 @@ image_init_result msx_slot_cartridge_base_device::call_load()
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length_aligned, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
 			{
-				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Unable to fully read file\n", basename());
+				return image_error::UNSPECIFIED;
 			}
 		}
 
 		std::string message;
-		image_init_result result = m_cartridge->initialize_cartridge(message);
-		if (image_init_result::PASS != result)
+		std::error_condition result = m_cartridge->initialize_cartridge(message);
+		if (result)
 		{
-			seterror(image_error::INVALIDIMAGE, message.c_str());
+			osd_printf_error("%s: %s\n", basename(), message);
 			return result;
 		}
 
@@ -78,7 +78,7 @@ image_init_result msx_slot_cartridge_base_device::call_load()
 			battery_load(m_cartridge->cart_sram_region()->base(), m_cartridge->cart_sram_region()->bytes(), 0x00);
 		}
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

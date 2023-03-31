@@ -606,8 +606,8 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 
 			if (image.length() < 0x200)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Invalid ROM file\n", image.basename());
+				return image_error::INVALIDLENGTH;
 			}
 
 			image.fread(&header, 0x100);
@@ -615,15 +615,15 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			// validate
 			if (strncmp((const char *)header, "RCA2", 4))
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Not an .ST2 file");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Not an .ST2 file\n", image.basename());
+				return image_error::INVALIDIMAGE;
 			}
 
 			blocks = header[4];
 			if ((blocks < 2) || (blocks > 11))
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Invalid .ST2 file");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Invalid .ST2 file\n", image.basename());
+				return image_error::INVALIDIMAGE;
 			}
 
 			if (image.length() != (blocks << 8))
@@ -656,8 +656,8 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			size = image.length();
 			if (size > 0x400)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+				return image_error::INVALIDIMAGE;
 			}
 			else
 				image.fread(m_cart->get_rom_base(), size);
@@ -675,7 +675,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

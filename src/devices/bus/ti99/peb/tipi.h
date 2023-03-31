@@ -116,7 +116,7 @@ public:
 protected:
 	void device_start() override { }
 	void call_unload() override;
-	image_init_result call_load() override;
+	std::error_condition call_load() override;
 };
 
 

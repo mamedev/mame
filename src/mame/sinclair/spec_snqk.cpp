@@ -121,7 +121,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
 		{
 			logerror("Invalid .SNA file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_sna(&snapshot_data[0], snapshot_size);
 	}
@@ -132,7 +132,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			if (snapshot_size != SP_OLD_SIZE)
 			{
 				logerror("Invalid .SP file size.\n");
-				goto error;
+				return image_error::INVALIDLENGTH;
 			}
 		}
 		setup_sp(&snapshot_data[0], snapshot_size);
@@ -142,7 +142,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != ACH_SIZE)
 		{
 			logerror("Invalid .ACH file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_ach(&snapshot_data[0], snapshot_size);
 	}
@@ -151,7 +151,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != PRG_SIZE)
 		{
 			logerror("Invalid .PRG file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_prg(&snapshot_data[0], snapshot_size);
 	}
@@ -160,7 +160,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
 		{
 			logerror("Invalid .PLUSD file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_plusd(&snapshot_data[0], snapshot_size);
 	}
@@ -173,7 +173,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			if (snapshot_size != SEM_SIZE)
 			{
 				logerror("Invalid .SEM file size.\n");
-				goto error;
+				return image_error::INVALIDLENGTH;
 			}
 		}
 		setup_sem(&snapshot_data[0], snapshot_size);
@@ -183,7 +183,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != SIT_SIZE)
 		{
 			logerror("Invalid .SIT file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_sit(&snapshot_data[0], snapshot_size);
 	}
@@ -192,7 +192,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != ZX_SIZE)
 		{
 			logerror("Invalid .ZX file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_zx(&snapshot_data[0], snapshot_size);
 	}
@@ -201,7 +201,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != SNP_SIZE)
 		{
 			logerror("Invalid .SNP file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_snp(&snapshot_data[0], snapshot_size);
 	}
@@ -210,8 +210,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
 		{
-			logerror("Invalid .SNX file size.\n");
-			goto error;
+			logerror("Invalid .SNX file header.\n");
+			return image_error::INVALIDIMAGE;
 		}
 		setup_snx(&snapshot_data[0], snapshot_size);
 	}
@@ -220,7 +220,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if (snapshot_size != FRZ_SIZE)
 		{
 			logerror("Invalid .FRZ file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_frz(&snapshot_data[0], snapshot_size);
 	}
@@ -229,10 +229,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		setup_z80(&snapshot_data[0], snapshot_size);
 	}
 
-	return image_init_result::PASS;
-
-error:
-	return image_init_result::FAIL;
+	return std::error_condition();
 }
 
 /*******************************************************************
@@ -2431,7 +2428,7 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 		if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
 		{
 			logerror("Invalid .SCR file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_scr(&quickload_data[0], quickload_size);
 	}
@@ -2440,15 +2437,12 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 		if (quickload_size != RAW_SIZE)
 		{
 			logerror("Invalid .RAW file size.\n");
-			goto error;
+			return image_error::INVALIDLENGTH;
 		}
 		setup_raw(&quickload_data[0], quickload_size);
 	}
 
-	return image_init_result::PASS;
-
-error:
-	return image_init_result::FAIL;
+	return std::error_condition();
 }
 
 /*******************************************************************

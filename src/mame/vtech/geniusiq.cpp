@@ -692,7 +692,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)

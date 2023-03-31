@@ -263,16 +263,16 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %u", size).c_str());
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid cartridge size %u\n", image.basename(), size);
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread( pos, size ) != size )
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Read error\n", image.basename());
+			return image_error::UNSPECIFIED;
 		}
 	}
 	else
@@ -295,7 +295,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, m_thom_cart_nb_banks, size ));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -1088,16 +1088,16 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %d", size).c_str());
-		return image_init_result::FAIL;
+		osd_printf_error("Invalid cartridge size %d\n", size);
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (!image.loaded_through_softlist())
 	{
 		if ( image.fread(pos, size ) != size )
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
+			osd_printf_error("Read error\n");
+			return image_error::UNSPECIFIED;
 		}
 	}
 	else
@@ -1120,7 +1120,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

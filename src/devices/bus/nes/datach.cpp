@@ -92,20 +92,20 @@ uint8_t nes_datach_slot_device::read(offs_t offset)
 		return 0xff;
 }
 
-image_init_result nes_datach_slot_device::call_load()
+std::error_condition nes_datach_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint8_t *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 
 		// Existing Datach carts are all 256K, so we only load files of this size
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x40000 && length() != 0x40010)
-				return image_init_result::FAIL;
+				return image_error::INVALIDLENGTH;
 
 			int shift = length() - 0x40000;
 			uint8_t temp[0x40010];
@@ -120,20 +120,20 @@ image_init_result nes_datach_slot_device::call_load()
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 157 && mapper != 16)
 				{
-					return image_init_result::FAIL;
+					return image_error::INVALIDIMAGE;
 				}
 			}
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x40000)
-				return image_init_result::FAIL;
+				return image_error::BADSOFTWARE;
 
 			memcpy(ROM, get_software_region("rom"), 0x40000);
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

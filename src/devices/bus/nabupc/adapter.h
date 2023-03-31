@@ -43,7 +43,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "pak"; }
 	virtual const char *image_type_name() const noexcept override { return "Segment Pak"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "hcca"; }
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 
 
 	virtual DECLARE_WRITE_LINE_MEMBER(input_txd) override;

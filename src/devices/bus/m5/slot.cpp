@@ -145,7 +145,7 @@ static const char *m5_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result m5_cart_slot_device::call_load()
+std::error_condition m5_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -166,8 +166,8 @@ image_init_result m5_cart_slot_device::call_load()
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
-				seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an M5 cart");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Image extends beyond the expected size for an M5 cart\n", basename());
+				return image_error::INVALIDLENGTH;
 			}
 
 			m_cart->rom_alloc(size, tag());
@@ -186,7 +186,7 @@ image_init_result m5_cart_slot_device::call_load()
 		//printf("Type: %s\n", m5_get_slot(m_type));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

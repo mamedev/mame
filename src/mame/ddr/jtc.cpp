@@ -594,20 +594,22 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u16 i, quick_addr, quick_length;
 	std::vector<u8> quick_data;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSUPPORTED;
 
 	quick_length = image.length();
 	if (image.is_filetype("jtc"))
 	{
 		if (quick_length < 0x0088)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "File too short");
+			result = image_error::INVALIDLENGTH;
+			osd_printf_error("%s: File too short\n", image.basename());
 			image.message(" File too short");
 		}
 		else
 		if (quick_length > 0x8000)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "File too long");
+			result = image_error::INVALIDLENGTH;
+			osd_printf_error("%s: File too long\n", image.basename());
 			image.message(" File too long");
 		}
 		else
@@ -616,7 +618,8 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 			u16 read_ = image.fread(&quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+				result = image_error::UNSPECIFIED;
+				osd_printf_error("%s: Cannot read the file\n", image.basename());
 				image.message(" Cannot read the file");
 			}
 			else
@@ -625,7 +628,8 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 				quick_length = quick_data[0x14] * 256 + quick_data[0x13] - quick_addr + 0x81;
 				if (image.length() != quick_length)
 				{
-					image.seterror(image_error::INVALIDIMAGE, "Invalid file header");
+					result = image_error::INVALIDIMAGE;
+					osd_printf_error("%s: Invalid file header\n", image.basename());
 					image.message(" Invalid file header");
 				}
 				else
@@ -636,7 +640,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 					/* display a message about the loaded quickload */
 					image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
 
-					result = image_init_result::PASS;
+					result = std::error_condition();
 				}
 			}
 		}
@@ -647,7 +651,8 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 		quick_addr = 0xe000;
 		if (quick_length > 0x8000)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "File too long");
+			result = image_error::INVALIDLENGTH;
+			osd_printf_error("%s: File too long\n", image.basename());
 			image.message(" File too long");
 		}
 		else
@@ -656,7 +661,8 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 			u16 read_ = image.fread( &quick_data[0], quick_length);
 			if (read_ != quick_length)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+				result = image_error::UNSPECIFIED;
+				osd_printf_error("%s: Cannot read the file\n", image.basename());
 				image.message(" Cannot read the file");
 			}
 			else
@@ -667,7 +673,7 @@ QUICKLOAD_LOAD_MEMBER(jtc_state::quickload_cb)
 				/* display a message about the loaded quickload */
 				image.message(" Quickload: size=%04X : loaded at %04X",quick_length,quick_addr);
 
-				result = image_init_result::PASS;
+				result = std::error_condition();
 				m_maincpu->set_pc(quick_addr);
 			}
 		}

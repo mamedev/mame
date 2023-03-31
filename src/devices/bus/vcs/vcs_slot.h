@@ -32,7 +32,7 @@ public:
 	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }

@@ -51,25 +51,25 @@ image_manager::image_manager(running_machine &machine)
 		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			image_init_result result = image_init_result::FAIL;
+			std::error_condition result = image_error::UNSPECIFIED;
 
 			// try as a softlist
 			if (software_name_parse(startup_image))
 				result = image.load_software(startup_image);
 
 			// failing that, try as an image
-			if (result != image_init_result::PASS)
+			if (result)
 				result = image.load(startup_image);
 
 			// failing that, try creating it (if appropriate)
-			if (result != image_init_result::PASS && image.support_command_line_image_creation())
+			if (result && image.support_command_line_image_creation())
 				result = image.create(startup_image);
 
 			// did the image load fail?
-			if (result != image_init_result::PASS)
+			if (result)
 			{
 				// retrieve image error message
-				std::string image_err = std::string(image.error());
+				std::string image_err = std::string(result.message());
 				std::string startup_image_name = startup_image;
 
 				// unload the bad image
@@ -243,13 +243,13 @@ void image_manager::postdevice_init()
 	/* make sure that any required devices have been allocated */
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
-		image_init_result result = image.finish_load();
+		std::error_condition result = image.finish_load();
 
 		/* did the image load fail? */
-		if (result != image_init_result::PASS)
+		if (result)
 		{
 			/* retrieve image error message */
-			std::string image_err = std::string(image.error());
+			std::string image_err = std::string(result.message());
 
 			/* unload all images */
 			unload_all();

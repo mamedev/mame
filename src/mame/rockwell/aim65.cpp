@@ -178,29 +178,28 @@ void aim65_state::aim65_palette(palette_device &palette) const
     MACHINE DRIVERS
 ***************************************************************************/
 
-image_init_result aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
+std::error_condition aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
 {
 	uint32_t size = slot->common_get_size(slot_tag);
 
 	if (size > 0x1000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported ROM size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (image.loaded_through_softlist() && image.get_software_region(slot_tag) == nullptr)
 	{
-		std::string errmsg = string_format(
-				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
+		osd_printf_error(
+				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension\n",
 				slot_tag, slot_tag);
-		image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 // TTY terminal settings. To use, turn KB/TTY switch to TTY, reset, press DEL. All input to be in UPPERCASE.

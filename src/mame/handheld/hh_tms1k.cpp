@@ -2908,8 +2908,8 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge pinout K1 to R connections
@@ -2919,11 +2919,11 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 
 	if (m_pinout == 0)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid cartridge pinout");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid cartridge pinout\n", image.basename());
+		return image_error::BADSOFTWARE;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void quizwizc_state::update_display()
@@ -3103,15 +3103,15 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge pinout R9 to K connections
 	const char *pinout = image.get_feature("pinout");
 	m_pinout = pinout ? strtoul(pinout, nullptr, 0) & 0xf : 0xf;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tc4_state::update_display()
@@ -13971,15 +13971,15 @@ DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge notch
 	const char *notch = image.get_feature("notch");
 	m_notch = notch ? strtoul(notch, nullptr, 0) & 3 : 0;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void playmaker_state::update_display()

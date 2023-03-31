@@ -279,7 +279,7 @@ private:
 	void handle_stylus_press(int column);
 	void recompute_lcd_params();
 	void handle_input_press(uint16_t mux_data);
-	image_init_result common_load(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition common_load(device_image_interface &image, generic_slot_device *slot);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;

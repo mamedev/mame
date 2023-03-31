@@ -150,7 +150,7 @@ static const char *ws_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result ws_cart_slot_device::call_load()
+std::error_condition ws_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -203,7 +203,7 @@ image_init_result ws_cart_slot_device::call_load()
 		internal_header_logging(ROM, ((size >> 16) - 1) << 16, size);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------

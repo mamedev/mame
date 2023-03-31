@@ -117,7 +117,7 @@ public:
 	virtual ~sega8_cart_slot_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -132,7 +132,7 @@ public:
 
 	void setup_ram();
 	void internal_header_logging(uint8_t *ROM, uint32_t len, uint32_t nvram_len);
-	image_verify_result verify_cart(uint8_t *magic, int size);
+	std::error_condition verify_cart(const uint8_t *magic, int size);
 	void set_lphaser_xoffset(uint8_t *rom, int size);
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }

@@ -28,7 +28,7 @@ class imm4_90_device
 public:
 	imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual char const *file_extensions() const noexcept override { return "bnpf,hex,lst,txt"; }
@@ -65,13 +65,13 @@ imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-image_init_result imm4_90_device::call_load()
+std::error_condition imm4_90_device::call_load()
 {
 	m_step_timer->reset();
 	m_data = 0x00U;
 	m_ready = false;
 	m_stepping = false;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void imm4_90_device::call_unload()

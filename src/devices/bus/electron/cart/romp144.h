@@ -37,7 +37,7 @@ protected:
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom0) { return load_rom(image, m_romslot[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1) { return load_rom(image, m_romslot[1]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2) { return load_rom(image, m_romslot[2]); }

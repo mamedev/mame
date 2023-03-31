@@ -73,7 +73,7 @@ namespace {
 class mbc7_device_base : public mbc_device_base
 {
 public:
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	mbc7_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -157,12 +157,12 @@ INPUT_PORTS_END
 //  mbc7_device_base
 //**************************************************************************
 
-image_init_result mbc7_device_base::load(std::string &message)
+std::error_condition mbc7_device_base::load(std::string &message)
 {
 	// first check ROM
 	set_bank_bits_rom(7);
 	if (!check_rom(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// install ROM and handlers
 	install_rom();
@@ -199,7 +199,7 @@ image_init_result mbc7_device_base::load(std::string &message)
 			write8smo_delegate(*this, FUNC(mbc7_device_base::write_eeprom)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

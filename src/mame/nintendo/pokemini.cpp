@@ -1502,21 +1502,21 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state::cart_load )
 	/* Verify that the image is big enough */
 	if (size <= 0x2100)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too small");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid ROM image: ROM image is too small\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	/* Verify that the image is not too big */
 	if (size > 0x1fffff)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM image: ROM image is too big");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid ROM image: ROM image is too big\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

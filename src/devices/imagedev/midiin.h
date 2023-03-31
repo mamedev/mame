@@ -32,7 +32,7 @@ public:
 	auto input_callback() { return m_input_cb.bind(); }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	// image device
@@ -155,7 +155,7 @@ private:
 		void clear() { m_list.clear(); }
 
 		// parse a new sequence
-		bool parse(util::random_read &stream, u32 length);
+		std::error_condition parse(util::random_read &stream, u32 length);
 
 		// rewind to the start of time
 		void rewind(attotime const &basetime);

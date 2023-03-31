@@ -50,7 +50,7 @@ public:
 	void set_data_size(int data_size) { m_data_size = data_size; }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }

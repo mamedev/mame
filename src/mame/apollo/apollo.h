@@ -387,8 +387,8 @@ public:
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "ani,bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual const char *image_type_name() const noexcept override { return "node_id"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "ni"; }

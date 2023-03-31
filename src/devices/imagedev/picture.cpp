@@ -42,7 +42,7 @@ void picture_image_device::device_start()
 {
 }
 
-image_init_result picture_image_device::call_load()
+std::error_condition picture_image_device::call_load()
 {
 	switch (render_detect_image(image_core_file()))
 	{
@@ -62,7 +62,10 @@ image_init_result picture_image_device::call_load()
 		m_picture.reset();
 	}
 
-	return m_picture.valid() ? image_init_result::PASS : image_init_result::FAIL;
+	if (m_picture.valid())
+		return std::error_condition();
+	else
+		return image_error::UNSPECIFIED;
 }
 
 void picture_image_device::call_unload()

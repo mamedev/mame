@@ -96,33 +96,33 @@ uint8_t nes_kstudio_slot_device::read(offs_t offset)
 		return 0xff;
 }
 
-image_init_result nes_kstudio_slot_device::call_load()
+std::error_condition nes_kstudio_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint8_t *ROM = m_cart->get_cart_base();
 
 		if (!ROM)
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 
 		// Existing expansion carts are all 128K, so we only load files of this size
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20000)
-				return image_init_result::FAIL;
+				return image_error::INVALIDLENGTH;
 
 			fread(&ROM, 0x20000);
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x20000)
-				return image_init_result::FAIL;
+				return image_error::BADSOFTWARE;
 
 			memcpy(ROM, get_software_region("rom"), 0x20000);
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

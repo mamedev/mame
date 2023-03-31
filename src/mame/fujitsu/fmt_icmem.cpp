@@ -60,18 +60,18 @@ ioport_constructor fmt_icmem_device::device_input_ports() const
 	return INPUT_PORTS_NAME(fmt_icmem);
 }
 
-image_init_result fmt_icmem_device::call_load()
+std::error_condition fmt_icmem_device::call_load()
 {
 	memset(m_memcard_ram.get(), 0xff, 0x1000000);
 	fseek(0, SEEK_SET);
 	size_t ret = fread(m_memcard_ram.get(), 0x1000000);
 
 	if(ret != length())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	m_change = true;
 	m_detect = true;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void fmt_icmem_device::call_unload()
@@ -83,17 +83,17 @@ void fmt_icmem_device::call_unload()
 	m_detect = false;
 }
 
-image_init_result fmt_icmem_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition fmt_icmem_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	memset(m_memcard_ram.get(), 0xff, 0x1000000);
 
 	size_t ret = fwrite(m_memcard_ram.get(), 0x1000000);
 	if(ret != 0x1000000)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	m_change = true;
 	m_detect = true;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

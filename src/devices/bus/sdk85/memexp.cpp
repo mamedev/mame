@@ -22,14 +22,14 @@ sdk85_romexp_device::sdk85_romexp_device(const machine_config &mconfig, const ch
 {
 }
 
-image_init_result sdk85_romexp_device::call_load()
+std::error_condition sdk85_romexp_device::call_load()
 {
 	if (get_card_device() != nullptr)
 	{
 		u32 size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		u8 *base = get_card_device()->get_rom_base(size);
 		if (base == nullptr)
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 
 		if (loaded_through_softlist())
 			memcpy(base, get_software_region("rom"), size);
@@ -37,7 +37,7 @@ image_init_result sdk85_romexp_device::call_load()
 			fread(base, size);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 std::string sdk85_romexp_device::get_default_card_software(get_default_card_software_hook &hook) const

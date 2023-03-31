@@ -102,8 +102,8 @@ public:
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
 	auto out_idx_cb() { return m_out_idx_func.bind(); }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -159,7 +159,7 @@ private:
 	TIMER_CALLBACK_MEMBER(floppy_drive_index_callback);
 	void floppy_drive_init();
 	void floppy_drive_index_func();
-	image_init_result internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args);
+	std::error_condition internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args);
 	TIMER_CALLBACK_MEMBER( set_wpt );
 
 protected:

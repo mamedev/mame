@@ -898,7 +898,7 @@ public:
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -935,12 +935,12 @@ int ti990_tape_image_device::tape_get_id()
 /*
     Open a tape image
 */
-image_init_result ti990_tape_image_device::call_load()
+std::error_condition ti990_tape_image_device::call_load()
 {
 	tap_990_device* tpc = downcast<tap_990_device*>(owner());
 	tpc->set_tape(tape_get_id(), this, true, false, is_readonly());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*

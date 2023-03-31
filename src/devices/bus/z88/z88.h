@@ -105,7 +105,7 @@ public:
 	auto out_flp_callback() { return m_out_flp_cb.bind(); }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }

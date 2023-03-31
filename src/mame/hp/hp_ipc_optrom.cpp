@@ -49,33 +49,33 @@ void hp_ipc_optrom_device::device_start()
 {
 }
 
-image_init_result hp_ipc_optrom_device::call_load()
+std::error_condition hp_ipc_optrom_device::call_load()
 {
 	LOG("hp_ipc_optrom: call_load\n");
 	if (!loaded_through_softlist()) {
 		LOG("hp_ipc_optrom: must be loaded from sw list\n");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	const char *base_feature = get_feature("base");
 	if (base_feature == nullptr) {
 		LOG("hp_ipc_optrom: no 'base' feature\n");
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &m_base) != 1) {
 		LOG("hp_ipc_optrom: can't parse 'base' feature\n");
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	// Valid base values: multiple of 1M, [0x100000..0x4fffff]
 	if ((m_base & 0xfffffU) != 0 || m_base < 0x100000U || m_base > 0x400000U) {
 		LOG("hp_ipc_optrom: illegal base (%x)\n" , m_base);
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	LOG("hp_ipc_optrom: loaded base=0x%06x\n" , m_base);
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void hp_ipc_optrom_device::call_unload()

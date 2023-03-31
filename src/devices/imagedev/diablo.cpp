@@ -97,9 +97,9 @@ void diablo_image_device::device_stop()
 		delete m_hard_disk_handle;
 }
 
-image_init_result diablo_image_device::call_load()
+std::error_condition diablo_image_device::call_load()
 {
-	image_init_result our_result;
+	std::error_condition our_result;
 
 	our_result = internal_load_dsk();
 	/* Check if there is an image_load callback defined */
@@ -112,7 +112,7 @@ image_init_result diablo_image_device::call_load()
 
 }
 
-image_init_result diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
+std::error_condition diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	if (!create_args)
 		throw emu_fatalerror("diablo_image_device::call_create: Expected create_args to not be nullptr");
@@ -132,14 +132,14 @@ image_init_result diablo_image_device::call_create(int create_format, util::opti
 	if (!err)
 		m_origchd.create(std::move(proxy), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
 	if (err)
-		return image_init_result::FAIL;
+		return err;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
 	if (err)
-		return image_init_result::FAIL;
+		return err;
 
 	return internal_load_dsk();
 }
@@ -206,7 +206,7 @@ static std::error_condition open_disk_diff(emu_options &options, const char *nam
 	return std::errc::no_such_file_or_directory;
 }
 
-image_init_result diablo_image_device::internal_load_dsk()
+std::error_condition diablo_image_device::internal_load_dsk()
 {
 	std::error_condition err;
 
@@ -251,14 +251,16 @@ image_init_result diablo_image_device::internal_load_dsk()
 		/* open the hard disk file */
 		m_hard_disk_handle = new hard_disk_file(m_chd);
 		if (m_hard_disk_handle != nullptr)
-			return image_init_result::PASS;
+			return std::error_condition();
 	}
 
 	/* if we had an error, close out the CHD */
 	m_origchd.close();
 	m_diffchd.close();
 	m_chd = nullptr;
-	seterror(err, nullptr);
 
-	return image_init_result::FAIL;
+	if (err)
+		return err;
+	else
+		return image_error::UNSPECIFIED;
 }

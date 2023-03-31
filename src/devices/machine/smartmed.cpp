@@ -121,19 +121,19 @@ void nand_device::device_start()
 /*
     Load a SmartMedia image
 */
-image_init_result smartmedia_image_device::smartmedia_format_1()
+std::error_condition smartmedia_image_device::smartmedia_format_1()
 {
 	SM_disk_image_header custom_header;
 
 	const int bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return image_init_result::FAIL;
+		return std::errc::io_error;
 	}
 
 	if (custom_header.version > 1)
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	m_page_data_size = get_UINT32BE(custom_header.page_data_size);
@@ -177,7 +177,7 @@ image_init_result smartmedia_image_device::smartmedia_format_1()
 	m_image_format = 1;
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
@@ -216,24 +216,24 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 	return result;
 }
 
-image_init_result smartmedia_image_device::smartmedia_format_2()
+std::error_condition smartmedia_image_device::smartmedia_format_2()
 {
 	disk_image_format_2_header custom_header;
 
 	const int bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return image_init_result::FAIL;
+		return std::errc::io_error;
 	}
 
 	if ((custom_header.data1[0] != 0xEC) && (custom_header.data1[0] != 0x98))
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	if (!detect_geometry(custom_header.data1[0], custom_header.data1[1]))
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	m_feeprom_data_alloc = std::make_unique<uint8_t[]>(m_page_total_size*m_num_pages);
@@ -269,17 +269,17 @@ image_init_result smartmedia_image_device::smartmedia_format_2()
 	m_image_format = 2;
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result smartmedia_image_device::call_load()
+std::error_condition smartmedia_image_device::call_load()
 {
-	image_init_result result;
+	std::error_condition result;
 	uint64_t position;
 	// try format 1
 	position = ftell();
 	result = smartmedia_format_1();
-	if (result != image_init_result::PASS)
+	if (result)
 	{
 		// try format 2
 		fseek(position, SEEK_SET);

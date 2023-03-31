@@ -289,11 +289,12 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 	uint16_t i;
 	uint16_t quick_addr = 0x1800;
 	std::vector<uint8_t> quick_data;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSPECIFIED;
 	int quick_length = image.length();
 	if (quick_length > 0x4000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too long\n", image.basename());
 		image.message(" File too long");
 	}
 	else
@@ -316,7 +317,7 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 		m_maincpu->set_state_int(S2650_R3, 0x83);
 		m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-		result = image_init_result::PASS;
+		result = std::error_condition();
 	}
 
 	return result;

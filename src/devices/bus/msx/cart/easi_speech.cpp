@@ -45,25 +45,25 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 	m_speech->add_route(ALL_OUTPUTS, ":speaker", 1.00);
 }
 
-image_init_result msx_cart_easispeech_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_easispeech_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_easispeech_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x2000)
 	{
 		message = "msx_cart_easispeech_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	page(1)->install_rom(0x4000, 0x5fff, 0x2000, cart_rom_region()->base());
 	page(2)->install_read_handler(0x8000, 0x8000, read8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
 	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u8 msx_cart_easispeech_device::speech_r()

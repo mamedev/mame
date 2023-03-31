@@ -1927,7 +1927,7 @@ void jaguarcd_state::init_jaguarcd()
 	save_item(NAME(m_joystick_data));
 }
 
-image_init_result jaguar_state::quickload_cb(device_image_interface &image)
+std::error_condition jaguar_state::quickload_cb(snapshot_image_device &image)
 {
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
@@ -1992,7 +1992,7 @@ image_init_result jaguar_state::quickload_cb(device_image_interface &image)
 	/* Transfer control to image */
 	m_maincpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
@@ -2029,7 +2029,7 @@ DEVICE_IMAGE_LOAD_MEMBER( jaguar_state::cart_load )
 
 	/* Transfer control to the bios */
 	m_maincpu->reset();
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*************************************

@@ -210,7 +210,7 @@ static const char *pce_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result pce_cart_slot_device::call_load()
+std::error_condition pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -266,10 +266,10 @@ image_init_result pce_cart_slot_device::call_load()
 		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
 			m_cart->ram_alloc(0x30000);
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

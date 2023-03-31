@@ -429,8 +429,8 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	uint32_t size = pcmcard->common_get_size("rom");
 	if (size > 0x080000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid size: Only up to 512K is supported\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);    // cards are up to 512K
@@ -452,7 +452,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	descramble_rom_external(&dst[0x080000], &src[0x080000]);
 	pcmard_loaded = true;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(cm32p_state::card_unload)

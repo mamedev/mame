@@ -85,12 +85,12 @@ hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const 
 {
 }
 
-image_init_result hp_dc100_tape_device::call_load()
+std::error_condition hp_dc100_tape_device::call_load()
 {
 	return internal_load(false);
 }
 
-image_init_result hp_dc100_tape_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition hp_dc100_tape_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return internal_load(true);
 }
@@ -596,7 +596,7 @@ void hp_dc100_tape_device::clear_state()
 	set_tape_present(is_loaded());
 }
 
-image_init_result hp_dc100_tape_device::internal_load(bool is_create)
+std::error_condition hp_dc100_tape_device::internal_load(bool is_create)
 {
 	LOG("load %d\n", is_create);
 
@@ -607,9 +607,8 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		auto io = util::random_read_write_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
-			seterror(std::errc::not_enough_memory, nullptr);
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return std::errc::not_enough_memory;
 		}
 		m_image.clear_tape();
 		m_image.save_tape(*io);
@@ -617,15 +616,14 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 		auto io = util::random_read_fill(image_core_file(), 0);
 		if (!io) {
 			LOG("out of memory\n");
-			seterror(std::errc::not_enough_memory, nullptr);
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return std::errc::not_enough_memory;
 		}
 		if (!m_image.load_tape(*io)) {
 			LOG("load failed\n");
-			seterror(image_error::INVALIDIMAGE, "Wrong format");
+			//seterror(image_error::INVALIDIMAGE, "Wrong format");
 			set_tape_present(false);
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 	}
 	LOG("load OK\n");
@@ -633,7 +631,7 @@ image_init_result hp_dc100_tape_device::internal_load(bool is_create)
 	m_image_dirty = false;
 
 	set_tape_present(true);
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void hp_dc100_tape_device::set_tape_present(bool present)

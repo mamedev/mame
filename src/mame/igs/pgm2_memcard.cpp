@@ -43,24 +43,24 @@ void pgm2_memcard_device::device_start()
     with the given index
 -------------------------------------------------*/
 
-image_init_result pgm2_memcard_device::call_load()
+std::error_condition pgm2_memcard_device::call_load()
 {
 	m_authenticated = false;
 	if(length() != 0x108)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	fseek(0, SEEK_SET);
 	size_t ret = fread(m_memcard_data, 0x100);
 	if(ret != 0x100)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	ret = fread(m_protection_data, 4);
 	if (ret != 4)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	ret = fread(m_security_data, 4);
 	if (ret != 4)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pgm2_memcard_device::call_unload()
@@ -72,14 +72,14 @@ void pgm2_memcard_device::call_unload()
 	fwrite(m_security_data, 4);
 }
 
-image_init_result pgm2_memcard_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition pgm2_memcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_authenticated = false;
 	// cards must contain valid defaults for each game / region or they don't work?
 	memory_region *rgn = memregion("^default_card");
 
 	if (!rgn)
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 
 	memcpy(m_memcard_data, rgn->base(), 0x100);
 	memcpy(m_protection_data, rgn->base() + 0x100, 4);
@@ -87,9 +87,9 @@ image_init_result pgm2_memcard_device::call_create(int format_type, util::option
 
 	size_t ret = fwrite(rgn->base(), 0x108);
 	if(ret != 0x108)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pgm2_memcard_device::auth(u8 p1, u8 p2, u8 p3)

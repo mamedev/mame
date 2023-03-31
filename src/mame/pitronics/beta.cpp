@@ -300,14 +300,14 @@ DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 
 	if (size != 0x800)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)

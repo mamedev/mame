@@ -66,14 +66,14 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 
 	if (size > m_ram->size())
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	image.fread( header, 5);
 
 	if (header[1] != 'C' || header[2] != 'O' || header[3] != 'M' || header[4] != 'X' )
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	switch (header[0])
@@ -200,7 +200,7 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 		break;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 //**************************************************************************

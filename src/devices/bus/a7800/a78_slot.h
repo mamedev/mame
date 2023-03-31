@@ -101,7 +101,7 @@ public:
 	virtual ~a78_cart_slot_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -132,7 +132,7 @@ private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
 
-	image_verify_result verify_header(char *header);
+	std::error_condition verify_header(const char *header);
 	int validate_header(int head, bool log) const;
 	void internal_header_logging(uint8_t *header, uint32_t len);
 };

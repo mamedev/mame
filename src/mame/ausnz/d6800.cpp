@@ -349,9 +349,9 @@ QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 	u32 quick_length = image.length();
 	if (quick_length > 0xe00)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File exceeds 3584 bytes");
+		osd_printf_error("%s: File exceeds 3854 bytes\n", image.basename());
 		image.message(" File exceeds 3584 bytes");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	for (u32 i = 0; i < quick_length; i++)
@@ -369,7 +369,7 @@ QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 	// Start the quickload
 	m_maincpu->set_pc(exec_addr);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void d6800_state::d6800(machine_config &config)

@@ -152,7 +152,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
@@ -343,8 +343,8 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 		else
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file format");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported file format\n", image.basename());
+			return image_error::INVALIDIMAGE;
 		}
 		dummy = 0x00;
 		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
@@ -353,7 +353,7 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -361,15 +361,15 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 //  SOCKETS
 //**************************************************************************
 
-image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
+std::error_condition nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
 	// loading directly from file
 	if (!image.loaded_through_softlist())
 	{
 		if (slot->length() > 0x1000)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported file size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		slot->rom_alloc(slot->length(), GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -413,7 +413,7 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

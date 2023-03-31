@@ -262,11 +262,11 @@ QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 		}
 		else
 		{
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void cp1_state::cp1(machine_config &config)

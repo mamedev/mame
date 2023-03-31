@@ -757,8 +757,8 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 
 	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("Unsupported cartridge size\n");
+		return image_error::INVALIDLENGTH;
 	}
 
 	// alloc 0x400000 ROM to simplify mapping in the address map
@@ -794,7 +794,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 		m_flash_chip[1].state = F_READ;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

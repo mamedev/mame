@@ -21,6 +21,7 @@
 #include "cpu/m6502/m6510.h"
 #include "machine/6522via.h"
 #include "cbm_snqk.h"
+#include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "sound/mos6560.h"
 

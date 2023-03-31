@@ -37,19 +37,19 @@ void ds6417_device::device_reset()
 	m_command = 0;
 }
 
-image_init_result ds6417_device::call_load()
+std::error_condition ds6417_device::call_load()
 {
 	if(length() != 32768)
-		return image_init_result::FAIL;
-	return image_init_result::PASS;
+		return image_error::INVALIDLENGTH;
+	return std::error_condition();
 }
 
-image_init_result ds6417_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition ds6417_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	u8 buffer[32768] = {0};
 	if(fwrite(buffer, 32768) != 32768)
-		return image_init_result::FAIL;
-	return image_init_result::PASS;
+		return std::errc::io_error;
+	return std::error_condition();
 }
 
 uint8_t ds6417_device::calccrc(uint8_t bit, uint8_t crc) const

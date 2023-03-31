@@ -92,7 +92,7 @@ private:
 	TIMER_CALLBACK_MEMBER(printer_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 
 	void mem_map(address_map &map);
 

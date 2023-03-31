@@ -11,11 +11,9 @@
 
 #pragma once
 
-#include "imagedev/snapquik.h"
-
 #define CBM_QUICKLOAD_DELAY (attotime::from_seconds(3))
 
-image_init_result general_cbm_loadsnap(
+std::error_condition general_cbm_loadsnap(
 		device_image_interface &image,
 		address_space &space,
 		offs_t offset,

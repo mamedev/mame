@@ -370,9 +370,9 @@ void menu_control_device_image::menu_activated()
 	case DO_CREATE:
 		{
 			auto path = util::zippath_combine(m_current_directory, m_current_file);
-			image_init_result err = m_image.create(path, nullptr, nullptr);
-			if (err != image_init_result::PASS)
-				machine().popmessage("Error: %s", m_image.error());
+			std::error_condition err = m_image.create(path, nullptr, nullptr);
+			if (err)
+				machine().popmessage("Error: %s", err.message());
 			stack_pop();
 		}
 		break;

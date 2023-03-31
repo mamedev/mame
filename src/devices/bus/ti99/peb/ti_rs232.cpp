@@ -186,14 +186,14 @@ ti_pio_attached_device::ti_pio_attached_device(const machine_config &mconfig, co
 /*
     Initialize rs232 unit and open image
 */
-image_init_result ti_rs232_attached_device::call_load()
+std::error_condition ti_rs232_attached_device::call_load()
 {
 	m_uart->set_clock(true);
 
 	// The following line may cause trouble in the init phase
 	// card->incoming_dtr(devnumber, (m_file!=nullptr)? ASSERT_LINE : CLEAR_LINE);
 
-	return image_init_result::PASS;  // OK
+	return std::error_condition();  // OK
 }
 
 void ti_rs232_attached_device::call_unload()
@@ -204,7 +204,7 @@ void ti_rs232_attached_device::call_unload()
 /*
     Initialize pio unit and open image
 */
-image_init_result ti_pio_attached_device::call_load()
+std::error_condition ti_pio_attached_device::call_load()
 {
 	ti_rs232_pio_device* card = static_cast<ti_rs232_pio_device*>(owner());
 
@@ -218,7 +218,7 @@ image_init_result ti_pio_attached_device::call_load()
 	else
 		card->m_pio_handshakein = true;
 
-	return image_init_result::PASS;  // OK
+	return std::error_condition();  // OK
 }
 
 /*

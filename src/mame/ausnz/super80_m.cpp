@@ -271,8 +271,9 @@ QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 	uint16_t exec_addr, start_addr, end_addr;
 
 	// load the binary into memory
-	if (z80bin_load_file(image, m_maincpu->space(AS_PROGRAM), exec_addr, start_addr, end_addr) != image_init_result::PASS)
-		return image_init_result::FAIL;
+	std::error_condition err = z80bin_load_file(image, m_maincpu->space(AS_PROGRAM), exec_addr, start_addr, end_addr);
+	if (err)
+		return err;
 
 	// is this file executable?
 	if (exec_addr != 0xffff)
@@ -280,5 +281,5 @@ QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 		if (BIT(m_io_config->read(), 0))
 			m_maincpu->set_pc(exec_addr);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

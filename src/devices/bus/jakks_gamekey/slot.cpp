@@ -125,7 +125,7 @@ static const char *jakks_gamekey_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result jakks_gamekey_slot_device::call_load()
+std::error_condition jakks_gamekey_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -154,10 +154,10 @@ image_init_result jakks_gamekey_slot_device::call_load()
 				m_type = jakks_gamekey_get_pcb_id(pcb_name);
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

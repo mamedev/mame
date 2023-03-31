@@ -403,14 +403,14 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 
 	if (size > 0x80000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported rom size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported rom size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_extrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_extrom->common_load_rom(m_extrom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /***************************************************************************
@@ -425,29 +425,26 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 	if (length < 18)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: File too short\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (length >= 0x10000 - 0x4000 + 18)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: File too long\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	auto data = std::make_unique<uint8_t []>(length);
 	if (image.fread(data.get(), length) != length)
 	{
-		image.seterror(image_error::UNSPECIFIED, "Error reading file");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Error reading file\n", image.basename());
+		return image_error::UNSPECIFIED;
 	}
 
 	// verify first byte
 	if (data[0] != 0xff)
-	{
-		image.seterror(image_error::INVALIDIMAGE, nullptr);
-		return image_init_result::FAIL;
-	}
+		return image_error::INVALIDIMAGE;
 
 	// get tape name
 	char tape_name[16];
@@ -480,7 +477,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 	logerror("snapshot name = '%s', system_size = 0x%04x, data_size = 0x%04x\n", tape_name, system_variables_size, data_size);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /***************************************************************************
@@ -493,21 +490,21 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	if (length < 4)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: File too short\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (length >= 0x10000 - 0x4000 + 4)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: File too long\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	auto data = std::make_unique<uint8_t []>(length);
 	if (image.fread(data.get(), length) != length)
 	{
-		image.seterror(image_error::UNSPECIFIED, "Error reading file");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Error reading file\n", image.basename());
+		return image_error::UNSPECIFIED;
 	}
 
 	uint16_t code_base = pick_integer_le(data.get(), 0, 2);
@@ -515,14 +512,14 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	if (length < code_length)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: File too short\n", image.basename());
+		return image_error::INVALIDIMAGE;
 	}
 
 	if (code_base < 0x4000 || (code_base + code_length) >= 0x10000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid code base and length");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid code base and length\n", image.basename());
+		return image_error::INVALIDIMAGE;
 	}
 
 	// reset memory map
@@ -535,7 +532,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 
 	m_maincpu->set_pc(code_base);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /***************************************************************************

@@ -260,14 +260,14 @@ DEVICE_IMAGE_LOAD_MEMBER(telestory_state::cart_load_telestory)
 
 	if (size > 0x800000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void telestory_state::telestory(machine_config &config)

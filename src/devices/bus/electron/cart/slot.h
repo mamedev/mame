@@ -137,7 +137,7 @@ public:
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_writeable() const noexcept override { return true; }

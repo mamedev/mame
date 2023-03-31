@@ -55,17 +55,17 @@ void midiout_device::device_reset()
     call_load
 -------------------------------------------------*/
 
-image_init_result midiout_device::call_load()
+std::error_condition midiout_device::call_load()
 {
 	m_midi = machine().osd().create_midi_device();
 
 	if (!m_midi->open_output(filename()))
 	{
 		m_midi.reset();
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------

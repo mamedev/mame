@@ -422,7 +422,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "serial"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "serl"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -459,11 +459,11 @@ TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)
 	}
 }
 
-image_init_result tm990_189_rs232_image_device::call_load()
+std::error_condition tm990_189_rs232_image_device::call_load()
 {
 	m_tms9902->rcv_dsr(ASSERT_LINE);
 	m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

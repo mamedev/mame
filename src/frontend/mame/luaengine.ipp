@@ -360,8 +360,6 @@ int sol_lua_push(sol::types<std::error_condition>, lua_State &L, std::error_cond
 
 // enums to automatically convert to strings
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
-int sol_lua_push(sol::types<image_init_result>, lua_State *L, image_init_result &&value);
-int sol_lua_push(sol::types<image_verify_result>, lua_State *L, image_verify_result &&value);
 int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value);
 
 

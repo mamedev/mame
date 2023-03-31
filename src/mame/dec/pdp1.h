@@ -195,7 +195,7 @@ protected:
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 public:
@@ -245,7 +245,7 @@ protected:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 public:
@@ -291,7 +291,7 @@ protected:
 	virtual const char *image_type_name() const noexcept override { return "printout"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "prin"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 public:
@@ -348,7 +348,7 @@ protected:
 	virtual const char *image_brief_type_name() const noexcept override { return "cyln"; }
 
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 public:

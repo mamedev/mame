@@ -574,7 +574,7 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 //  call_load
 //-------------------------------------------------
 
-image_init_result cococart_slot_device::call_load()
+std::error_condition cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -596,7 +596,7 @@ image_init_result cococart_slot_device::call_load()
 			if (!err)
 				err = read_coco_rpk(std::move(proxy), base, cart_length, read_length);
 			if (err)
-				return image_init_result::FAIL;
+				return err;
 		}
 		else
 		{
@@ -611,7 +611,7 @@ image_init_result cococart_slot_device::call_load()
 			read_length += len;
 		}
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

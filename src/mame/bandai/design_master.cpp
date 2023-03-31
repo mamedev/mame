@@ -101,7 +101,7 @@ DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)
 	m_cartslot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cartslot->common_load_rom(m_cartslot->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void bdsm_state::mem_map(address_map &map)

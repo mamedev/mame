@@ -302,7 +302,7 @@ private:
 	void uart_reset();
 	void interrupt_set(u8 line);
 	void interrupt_update();
-	image_verify_result verify_cart(char *header, int kind);
+	std::error_condition verify_cart(const char *header, int kind);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 

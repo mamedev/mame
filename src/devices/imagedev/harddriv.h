@@ -41,7 +41,7 @@ protected:
 class harddisk_image_device : public harddisk_image_base_device
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<std::error_condition (device_image_interface &)> load_delegate;
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	// construction/destruction
@@ -58,8 +58,8 @@ public:
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
 	virtual bool image_is_chd_type() const noexcept override { return true; }
@@ -81,7 +81,7 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	image_init_result internal_load_hd();
+	std::error_condition internal_load_hd();
 
 	chd_file        *m_chd;
 	chd_file        m_origchd;              /* handle to the original CHD */

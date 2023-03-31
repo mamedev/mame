@@ -111,7 +111,7 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override ATTR_COLD;
 	virtual bool nvram_can_write() const override ATTR_COLD;
 
-	bool install_memory(std::string &message, unsigned highbits, unsigned lowbits) ATTR_COLD;
+	std::error_condition install_memory(std::string &message, unsigned highbits, unsigned lowbits) ATTR_COLD;
 
 protected:
 	u8 const rtc_select() const { return BIT(m_rtc_select, 3); }
@@ -158,7 +158,7 @@ class mbc3_device : public mbc3_device_base
 public:
 	mbc3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 };
 
 
@@ -167,7 +167,7 @@ class mbc30_device : public mbc3_device_base
 public:
 	mbc30_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 };
 
 
@@ -176,7 +176,7 @@ class tfboot_device : public mbc3_device_base
 public:
 	tfboot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -216,7 +216,7 @@ mbc3_device_base::mbc3_device_base(
 }
 
 
-bool mbc3_device_base::install_memory(
+std::error_condition mbc3_device_base::install_memory(
 		std::string &message,
 		unsigned highbits,
 		unsigned lowbits)
@@ -242,7 +242,7 @@ bool mbc3_device_base::install_memory(
 			else
 			{
 				message = "Invalid 'rtc' feature value (must be yes or no)";
-				return false;
+				return image_error::BADSOFTWARE;
 			}
 		}
 		else
@@ -321,7 +321,7 @@ bool mbc3_device_base::install_memory(
 	set_bank_bits_rom(highbits, lowbits);
 	set_bank_bits_ram(highbits);
 	if (!check_rom(message) || !check_ram(message))
-		return false;
+		return image_error::BADSOFTWARE;
 
 	// set up ROM and RAM
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
@@ -358,7 +358,7 @@ bool mbc3_device_base::install_memory(
 	}
 
 	// all good
-	return true;
+	return std::error_condition();
 }
 
 
@@ -717,12 +717,9 @@ mbc3_device::mbc3_device(
 }
 
 
-image_init_result mbc3_device::load(std::string &message)
+std::error_condition mbc3_device::load(std::string &message)
 {
-	if (!install_memory(message, 2, 7))
-		return image_init_result::FAIL;
-	else
-		return image_init_result::PASS;
+	return install_memory(message, 2, 7);
 }
 
 
@@ -741,12 +738,9 @@ mbc30_device::mbc30_device(
 }
 
 
-image_init_result mbc30_device::load(std::string &message)
+std::error_condition mbc30_device::load(std::string &message)
 {
-	if (!install_memory(message, 3, 8))
-		return image_init_result::FAIL;
-	else
-		return image_init_result::PASS;
+	return install_memory(message, 3, 8);
 }
 
 
@@ -766,12 +760,9 @@ tfboot_device::tfboot_device(
 }
 
 
-image_init_result tfboot_device::load(std::string &message)
+std::error_condition tfboot_device::load(std::string &message)
 {
-	if (!install_memory(message, 2, 7))
-		return image_init_result::FAIL;
-	else
-		return image_init_result::PASS;
+	return install_memory(message, 2, 7);
 }
 
 

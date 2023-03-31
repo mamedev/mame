@@ -124,14 +124,14 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 
 	if (size > 0x4000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid file size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	u8 *base = memregion("tms6100")->base() + 0x8000;
 	m_cart->common_load_rom(base, size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

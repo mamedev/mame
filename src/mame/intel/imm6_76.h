@@ -152,8 +152,8 @@ public:
 	intel_imm6_76_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// device_image_interface static info

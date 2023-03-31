@@ -64,7 +64,7 @@ public:
 	virtual ~nes_aladdin_slot_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "ade_cart"; }

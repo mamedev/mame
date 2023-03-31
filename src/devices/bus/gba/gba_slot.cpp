@@ -617,7 +617,7 @@ static const char *gba_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result gba_cart_slot_device::call_load()
+std::error_condition gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -625,8 +625,8 @@ image_init_result gba_cart_slot_device::call_load()
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x4000000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 64MB");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Attempted loading a cart larger than 64MB\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size, tag());
@@ -683,10 +683,10 @@ image_init_result gba_cart_slot_device::call_load()
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

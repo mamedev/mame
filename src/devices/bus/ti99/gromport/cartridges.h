@@ -51,7 +51,7 @@ protected:
 	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
-	image_init_result call_load() override;
+	std::error_condition call_load() override;
 	void call_unload() override;
 
 	void prepare_cartridge();

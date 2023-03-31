@@ -649,7 +649,7 @@ static int snes_find_addon_chip(const uint8_t *buffer, uint32_t start_offs, uint
  -------------------------------------------------*/
 
 
-image_init_result base_sns_cart_slot_device::call_load()
+std::error_condition base_sns_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -726,10 +726,10 @@ image_init_result base_sns_cart_slot_device::call_load()
 
 		internal_header_logging(ROM, len);
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

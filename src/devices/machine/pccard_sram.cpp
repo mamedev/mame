@@ -173,22 +173,22 @@ pccard_mitsubishi_sram_device::pccard_mitsubishi_sram_device(const machine_confi
 {
 }
 
-image_init_result pccard_mitsubishi_sram_device::call_load()
+std::error_condition pccard_mitsubishi_sram_device::call_load()
 {
 	card_inserted(false);
 
 	if (length() != m_sram.bytes())
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	if (fread(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result pccard_mitsubishi_sram_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition pccard_mitsubishi_sram_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	card_inserted(false);
 
@@ -196,11 +196,11 @@ image_init_result pccard_mitsubishi_sram_device::call_create(int format_type, ut
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
 
 	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pccard_mitsubishi_sram_device::call_unload()
@@ -255,25 +255,25 @@ pccard_centennial_sram_device::pccard_centennial_sram_device(const machine_confi
 {
 }
 
-image_init_result pccard_centennial_sram_device::call_load()
+std::error_condition pccard_centennial_sram_device::call_load()
 {
 	card_inserted(false);
 
 	if (length() != m_sram.bytes() + m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	if (fread(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	if (fread(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result pccard_centennial_sram_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition pccard_centennial_sram_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	card_inserted(false);
 
@@ -284,14 +284,14 @@ image_init_result pccard_centennial_sram_device::call_create(int format_type, ut
 	std::copy_n(m_eeprom_default->base(), m_eeprom.length(), &m_eeprom[0]);
 
 	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	if (fwrite(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pccard_centennial_sram_device::call_unload()

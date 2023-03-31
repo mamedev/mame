@@ -43,7 +43,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "cylinder"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cyln"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 	virtual const char *image_interface() const noexcept override { return "apexc_cyl"; }
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }

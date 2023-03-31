@@ -199,7 +199,7 @@ static const char *vcs_get_slot(int type)
 	return "a26_2k_4k";
 }
 
-image_init_result vcs_cart_slot_device::call_load()
+std::error_condition vcs_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -221,8 +221,8 @@ image_init_result vcs_cart_slot_device::call_load()
 				break;
 
 			default:
-				seterror(image_error::INVALIDIMAGE, "Invalid ROM file size" );
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Invalid ROM file size\n", basename());
+				return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(len, tag());
@@ -311,10 +311,10 @@ image_init_result vcs_cart_slot_device::call_load()
 
 		m_cart->install_memory_handlers(m_address_space.target());
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

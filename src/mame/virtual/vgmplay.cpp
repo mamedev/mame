@@ -2771,7 +2771,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 	else
 	{
@@ -2795,7 +2795,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			{
 				logerror("gzip header but not a gzip file\n");
 				m_file_data.clear();
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 			do
 			{
@@ -2810,7 +2810,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			{
 				logerror("broken gzip file\n");
 				m_file_data.clear();
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 			m_file_data.resize(str.total_out);
 			memcpy(&m_file_data[0], &decomp[0], str.total_out);
@@ -2820,7 +2820,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		{
 			logerror("Not a vgm/vgz file\n");
 			m_file_data.clear();
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 
 		uint32_t version = r32(8);
@@ -3070,7 +3070,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 
 		machine().schedule_soft_reset();
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 }
 

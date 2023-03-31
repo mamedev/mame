@@ -21,18 +21,18 @@ void msx_cart_dooly_device::device_reset()
 	m_view2.select(0);
 }
 
-image_init_result msx_cart_dooly_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_dooly_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_dooly_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x8000)
 	{
 		message = "msx_cart_dooly_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
@@ -45,7 +45,7 @@ image_init_result msx_cart_dooly_device::initialize_cartridge(std::string &messa
 	page(1)->install_write_handler(0x4000, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
 	page(2)->install_write_handler(0x8000, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u8 msx_cart_dooly_device::mode4_page1_r(offs_t offset)

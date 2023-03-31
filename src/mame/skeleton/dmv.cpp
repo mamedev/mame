@@ -404,10 +404,10 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 {
 	/* Avoid loading a program if CP/M-80 is not in memory */
 	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	/* Load image to the TPA (Transient Program Area) */
 	uint16_t quickload_size = image.length();
@@ -415,7 +415,7 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		m_ram->base()[i+0x100] = data;
 	}
 
@@ -424,7 +424,7 @@ QUICKLOAD_LOAD_MEMBER(dmv_state::quickload_cb)
 	m_maincpu->set_pc(0x100);                // start program
 	m_maincpu->set_state_int(Z80_SP, 256 * m_ram->base()[7] - 300); // put the stack a bit before BDOS
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 static void dmv_floppies(device_slot_interface &device)

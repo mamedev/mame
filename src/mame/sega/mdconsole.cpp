@@ -423,7 +423,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state::_32x_cart )
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

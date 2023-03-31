@@ -316,7 +316,7 @@ kccart_slot_device::~kccart_slot_device()
     call load
 -------------------------------------------------*/
 
-image_init_result kccart_slot_device::call_load()
+std::error_condition kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -337,10 +337,10 @@ image_init_result kccart_slot_device::call_load()
 			}
 		}
 		else
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------

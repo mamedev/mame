@@ -621,7 +621,7 @@ void gamecom_state::init_gamecom()
 	m_p_ram = m_share_maincpu; // required here because pio_w gets called before machine_reset
 }
 
-image_init_result gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
+std::error_condition gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 	uint32_t load_offset = 0;
@@ -629,8 +629,8 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	if (size != 0x008000 && size != 0x040000 && size != 0x080000
 			&& size != 0x100000 && size != 0x1c0000 && size != 0x200000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (size == 0x1c0000)
@@ -649,7 +649,7 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	if (size < 0x100000) { memcpy(crt + 0x080000, crt, 0x080000); } /* ->1MB */
 	if (size < 0x1c0000) { memcpy(crt + 0x100000, crt, 0x100000); } /* -> >=1.8MB */
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( gamecom_state::cart1_load )

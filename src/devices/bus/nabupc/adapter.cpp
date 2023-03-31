@@ -211,13 +211,12 @@ void network_adapter::postload()
 	}
 }
 
-image_init_result network_adapter::call_load()
+std::error_condition network_adapter::call_load()
 {
 	if (is_filetype("pak")) {
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
-	seterror(image_error::INVALIDIMAGE);
-	return image_init_result::FAIL;
+	return image_error::INVALIDIMAGE;
 }
 
 //**************************************************************************

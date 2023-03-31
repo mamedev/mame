@@ -267,7 +267,7 @@ void datapack_device::control_w(uint8_t data)
     DEVICE_IMAGE_LOAD( datapack )
 -------------------------------------------------*/
 
-image_init_result datapack_device::call_load()
+std::error_condition datapack_device::call_load()
 {
 	uint8_t data[0x10];
 
@@ -275,13 +275,13 @@ image_init_result datapack_device::call_load()
 
 	// check the OPK head
 	if(strncmp((const char*)data, "OPK", 3))
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 
 	// get datapack ID and size
 	m_id   = data[OPK_HEAD_SIZE + 0];
 	m_size = data[OPK_HEAD_SIZE + 1];
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -289,7 +289,7 @@ image_init_result datapack_device::call_load()
     DEVICE_IMAGE_CREATE( datapack )
 -------------------------------------------------*/
 
-image_init_result datapack_device::call_create(int format_type, util::option_resolution *create_args)
+std::error_condition datapack_device::call_create(int format_type, util::option_resolution *create_args)
 {
 	static const uint8_t opk_head[6] = {'O', 'P', 'K', 0x00, 0x00, 0x00};
 
@@ -314,7 +314,7 @@ image_init_result datapack_device::call_create(int format_type, util::option_res
 	fwrite(&m_id, 1);
 	fwrite(&m_size, 1);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

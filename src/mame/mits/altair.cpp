@@ -100,12 +100,12 @@ QUICKLOAD_LOAD_MEMBER(altair_state::quickload_cb)
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	read_ = image.fread(m_ram, quick_length);
 	if (read_ != quick_length)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void altair_state::machine_reset()

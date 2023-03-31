@@ -97,7 +97,7 @@ class imm6_26_device
 public:
 	imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool        is_readable()                   const noexcept override { return true; }
@@ -128,20 +128,20 @@ imm6_26_device::imm6_26_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-image_init_result imm6_26_device::call_load()
+std::error_condition imm6_26_device::call_load()
 {
 	if ((length() > 4096U) || (length() % 256U))
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	unmap();
 	allocate();
 	if (fread(m_data.get(), length()) != length())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	// FIXME: gimme a cookie!
 	rom_space().install_rom(0x1000U, offs_t(0x1000U + length()), m_data.get());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void imm6_26_device::call_unload()

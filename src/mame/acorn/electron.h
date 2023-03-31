@@ -181,7 +181,7 @@ private:
 	uint8_t m_sp64_bank = 0;
 	std::unique_ptr<uint8_t[]> m_sp64_ram;
 
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romi[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romi[1]); }
 };

@@ -41,9 +41,9 @@ void wafadrive_image_device::device_start()
 {
 }
 
-image_init_result wafadrive_image_device::call_load()
+std::error_condition wafadrive_image_device::call_load()
 {
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void wafadrive_image_device::call_unload()

@@ -155,7 +155,7 @@ void iq151cart_slot_device::video_update(bitmap_ind16 &bitmap, const rectangle &
     call load
 -------------------------------------------------*/
 
-image_init_result iq151cart_slot_device::call_load()
+std::error_condition iq151cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -176,10 +176,10 @@ image_init_result iq151cart_slot_device::call_load()
 			}
 		}
 		else
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------

@@ -238,7 +238,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 	memset(m_extram, 0, m_extram.bytes());
 	m_extram_enabled = image.get_feature("ram") != nullptr;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ggm_state::unload_cart)

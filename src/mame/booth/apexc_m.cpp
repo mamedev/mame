@@ -24,7 +24,7 @@ apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &m
 /*
     Open cylinder image and read RAM
 */
-image_init_result apexc_cylinder_image_device::call_load()
+std::error_condition apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
@@ -39,7 +39,7 @@ image_init_result apexc_cylinder_image_device::call_load()
 	}
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*

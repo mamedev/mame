@@ -322,14 +322,14 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 	int quick_length;
 	std::vector<u8> quick_data;
 	int read_;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSPECIFIED;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
 	read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+		result = image_error::INVALIDIMAGE;
 		image.message(" Cannot read the file");
 	}
 	else
@@ -344,7 +344,7 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 		else
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
 
-		result = image_init_result::PASS;
+		result = std::error_condition();
 	}
 
 	return result;

@@ -436,7 +436,7 @@ QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
 
 	std::unique_ptr<u8 []> ptr;
 	if (image.fread(ptr, length) != length)
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	auto &space = m_maincpu->space(AS_PROGRAM);
 	for (uint32_t i = 0; i < length; i++)
@@ -444,7 +444,7 @@ QUICKLOAD_LOAD_MEMBER(spg29x_game_state::quickload_hyper_exe)
 
 	m_maincpu->set_state_int(SCORE_PC, 0xa0091000); // Game entry point
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void spg29x_game_state::spg29x(machine_config &config)

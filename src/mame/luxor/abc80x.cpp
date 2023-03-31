@@ -2016,7 +2016,7 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 	space.write_byte(0xff32, comcs & 0xff);
 	space.write_byte(0xff33, comcs >> 8);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

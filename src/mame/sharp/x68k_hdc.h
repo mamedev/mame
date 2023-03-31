@@ -101,7 +101,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }
 	virtual const char *image_type_name() const noexcept override { return "sasihd"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "sasi"; }
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 	void hdc_w(offs_t offset, u16 data);
 	u16 hdc_r(offs_t offset);

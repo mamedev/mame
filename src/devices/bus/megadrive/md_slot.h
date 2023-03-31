@@ -157,7 +157,7 @@ public:
 	virtual ~base_md_cart_slot_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -167,8 +167,8 @@ public:
 
 	int get_type() { return m_type; }
 
-	image_init_result load_list();
-	image_init_result load_nonlist();
+	std::error_condition load_list();
+	std::error_condition load_nonlist();
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	void setup_custom_mappers();

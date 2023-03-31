@@ -147,7 +147,7 @@ static const char *scv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result scv_cart_slot_device::call_load()
+std::error_condition scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -157,8 +157,8 @@ image_init_result scv_cart_slot_device::call_load()
 
 		if (len > 0x20000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported cartridge size\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(len);
@@ -190,10 +190,10 @@ image_init_result scv_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", scv_get_slot(m_type));
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

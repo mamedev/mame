@@ -21,8 +21,8 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 	DECLARE_WRITE_LINE_MEMBER(data_w) { if(!m_read) m_data = state; }
 	DECLARE_WRITE_LINE_MEMBER(clock_w);

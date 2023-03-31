@@ -224,8 +224,7 @@ void neogeo_cart_slot_device::set_cart_type(const char *slot)
  call load
  -------------------------------------------------*/
 
-
-image_init_result neogeo_cart_slot_device::call_load()
+std::error_condition neogeo_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -305,11 +304,11 @@ image_init_result neogeo_cart_slot_device::call_load()
 			// a different format (we then always access such alt format for drawing)
 			m_cart->optimize_sprites(m_cart->get_sprites_base(), m_cart->get_sprites_size());
 
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

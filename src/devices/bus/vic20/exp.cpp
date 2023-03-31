@@ -92,7 +92,7 @@ void vic20_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result vic20_expansion_slot_device::call_load()
+std::error_condition vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -119,7 +119,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 				case 0x7000: fread(m_card->m_blk3, 0x2000, 0x1000); break;
 				case 0xa000: fread(m_card->m_blk5, 0x2000); break;
 				case 0xb000: fread(m_card->m_blk5, 0x2000, 0x1000); break;
-				default: return image_init_result::FAIL;
+				default: return image_error::INVALIDIMAGE;
 				}
 			}
 		}
@@ -132,7 +132,7 @@ image_init_result vic20_expansion_slot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

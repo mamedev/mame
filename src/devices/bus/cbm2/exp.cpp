@@ -83,7 +83,7 @@ void cbm2_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result cbm2_expansion_slot_device::call_load()
+std::error_condition cbm2_expansion_slot_device::call_load()
 {
 	size_t size;
 
@@ -117,7 +117,7 @@ image_init_result cbm2_expansion_slot_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

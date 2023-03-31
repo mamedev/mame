@@ -1295,19 +1295,19 @@ void sc499_ctape_image_device::write_block(int block_num, uint8_t *ptr)
 	memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
 }
 
-image_init_result sc499_ctape_image_device::call_load()
+std::error_condition sc499_ctape_image_device::call_load()
 {
 	try
 	{
 		auto const size = length();
 		m_ctape_data.resize(size);
 		if (!fseek(0, SEEK_SET) && (fread(m_ctape_data.data(), size) == size))
-			return image_init_result::PASS;
+			return std::error_condition();
 	}
 	catch (...)
 	{
 	}
-	return image_init_result::FAIL;
+	return image_error::UNSPECIFIED;
 }
 
 void sc499_ctape_image_device::call_unload()

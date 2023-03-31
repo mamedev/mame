@@ -168,7 +168,7 @@ class imm4_22_device
 public:
 	imm4_22_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool        is_readable()                   const noexcept override { return true; }
@@ -222,18 +222,18 @@ imm4_22_device::imm4_22_device(machine_config const &mconfig, char const *tag, d
 }
 
 
-image_init_result imm4_22_device::call_load()
+std::error_condition imm4_22_device::call_load()
 {
 	if ((length() > 1024U) || (length() % 256U))
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	allocate();
 	if (fread(m_prom.get(), length()) != length())
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 
 	map_prom();
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void imm4_22_device::call_unload()

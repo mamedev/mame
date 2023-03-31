@@ -310,19 +310,19 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// if there's no ROM region, there's nothing to do
 		memory_region *const romregion(cart_rom_region());
 		if (!romregion || !romregion->bytes())
-			return image_init_result::PASS;
+			return std::error_condition();
 
 		// check for supported size
 		auto const bytes(romregion->bytes());
 		if (0x8000 < bytes)
 		{
 			message = "Unsupported cartridge ROM size (must be no larger than 32 KiB)";
-			return image_init_result::FAIL;
+			return image_error::INVALIDLENGTH;
 		}
 
 		// install ROM
@@ -345,7 +345,7 @@ public:
 				});
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -378,7 +378,7 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// if there's no ROM region, there's nothing to do
 		memory_region *const romregion(cart_rom_region());
@@ -386,7 +386,7 @@ public:
 		{
 			// setting default bank on reset causes a fatal error when no banks are configured
 			message = "No ROM data found";
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		}
 
 		// work out whether a fixed bank is required
@@ -407,7 +407,7 @@ public:
 			else
 			{
 				message = "Invalid 'fixedbank' feature value (must be yes or no)";
-				return image_init_result::FAIL;
+				return image_error::BADSOFTWARE;
 			}
 		}
 		else if (bytes & 0x7fff)
@@ -425,7 +425,7 @@ public:
 		if ((bytes & 0x3fff) || ((0x8000 * 0x100) < bytes) || (fixedbank && (*fixedbank ? ((0x4000 * 0x100) < bytes) : (bytes & 0x7fff))))
 		{
 			message = "Unsupported cartridge ROM size (must be a multiple of bank size and no larger than 256 entries)";
-			return image_init_result::FAIL;
+			return image_error::INVALIDLENGTH;
 		}
 
 		// configure banks - low bank has 32 KiB entries, high bank has 16 KiB entries
@@ -480,7 +480,7 @@ public:
 		}
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -547,20 +547,20 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// first set up cartridge RAM if any
 		if (!check_ram(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 
 		// ROM is installed the same way as a Mega Duck flat ROM cartridge
-		image_init_result const romresult(megaduck_flat_device::load(message));
-		if (image_init_result::PASS != romresult)
+		std::error_condition const romresult(megaduck_flat_device::load(message));
+		if (romresult)
 			return romresult;
 		install_ram();
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 };
 
@@ -579,12 +579,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM
 		set_bank_bits_rom(8); // 74HC161A - 3-bit bank, 1-bit lockout
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 
@@ -592,7 +592,7 @@ public:
 		cart_space()->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(m161_device::bank_rom_switch)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 private:
@@ -638,12 +638,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM
 		set_bank_bits_rom(8); // 8 MiB real-world limit with 74LS377 - change to 14 for 512 MiB theoretical limit
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 		set_bank_rom(0);
@@ -652,7 +652,7 @@ public:
 		cart_space()->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(wisdom_device::bank_rom_switch)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 private:
@@ -676,12 +676,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM/RAM
 		set_bank_bits_rom(8);
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 
@@ -689,7 +689,7 @@ public:
 		cart_space()->install_write_handler(0x2000, 0x2000, write8smo_delegate(*this, FUNC(yong_device::bank_rom_switch)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -721,12 +721,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM/RAM
 		set_bank_bits_rom(5);
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 
@@ -734,7 +734,7 @@ public:
 		cart_space()->install_write_handler(0x2000, 0x3fff, write8smo_delegate(*this, FUNC(rockman8_device::bank_rom_switch)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -787,12 +787,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM/RAM
 		set_bank_bits_rom(5);
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 
@@ -801,7 +801,7 @@ public:
 		cart_space()->install_write_handler(0x5000, 0x5fff, write8smo_delegate(*this, FUNC(sm3sp_device::bank_rom_mode)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -904,11 +904,11 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// configure ROM banks but don't install directly
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		configure_bank_rom();
 
 		// actually install ROM and bank switch handlers
@@ -917,7 +917,7 @@ public:
 		install_bank_switch_handlers();
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -967,11 +967,11 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// configure ROM banks but don't install directly
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		configure_bank_rom();
 
 		// actually install ROM and bank switch handlers
@@ -980,7 +980,7 @@ public:
 		install_bank_switch_handlers();
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 private:
@@ -1005,12 +1005,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// configure ROM banks but don't install directly
 		set_bank_bits_rom(8, 4);
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		configure_bank_rom();
 		install_ram();
 
@@ -1021,7 +1021,7 @@ public:
 		cart_space()->install_write_handler(0x3fc0, 0x3fc0, write8smo_delegate(*this, FUNC(rocket_device::bank_rom_switch_coarse)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:
@@ -1080,12 +1080,12 @@ public:
 	{
 	}
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD
+	virtual std::error_condition load(std::string &message) override ATTR_COLD
 	{
 		// set up ROM/RAM
 		set_bank_bits_rom(1, 2);
 		if (!check_rom(message))
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		install_rom();
 		install_ram();
 
@@ -1094,7 +1094,7 @@ public:
 		cart_space()->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(lasama_device::ctrl_6000_w)));
 
 		// all good
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
 protected:

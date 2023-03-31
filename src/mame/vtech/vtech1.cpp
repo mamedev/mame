@@ -163,8 +163,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	uint8_t header[24];
 	if (image.fread(&header, sizeof(header)) != sizeof(header))
 	{
-		//image.seterror(image_error::UNSPECIFIED);
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	// get image name
@@ -182,8 +181,7 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	auto buf = std::make_unique<uint8_t []>(size);
 	if (image.fread(buf.get(), size) != size)
 	{
-		//image.seterror(image_error::UNSPECIFIED);
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 	uint8_t *ptr = &buf[0];
 
@@ -196,10 +194,10 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		// verify
 		if (space.read_byte(addr) != to_write)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Insufficient RAM to load snapshot");
+			osd_printf_error("%s: Insufficient RAM to load snapshot\n", image.basename());
 			image.message("Insufficient RAM to load snapshot (%d bytes needed) [%s]", size, pgmname);
 
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 	}
 
@@ -226,12 +224,12 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 		break;
 
 	default:
-		image.seterror(image_error::INVALIDIMAGE, "Snapshot format not supported.");
+		osd_printf_error("%s: Snapshot format not supported.\n", image.basename());
 		image.message("Snapshot format not supported.");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

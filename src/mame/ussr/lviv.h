@@ -71,7 +71,7 @@ private:
 	void update_memory();
 	void setup_snapshot(uint8_t * data);
 	void dump_registers();
-	image_verify_result verify_snapshot(uint8_t * data, uint32_t size);
+	std::error_condition verify_snapshot(const uint8_t * data, uint32_t size);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);

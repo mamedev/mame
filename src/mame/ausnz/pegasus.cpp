@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
@@ -416,15 +416,15 @@ void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 	}
 }
 
-image_init_result pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
+std::error_condition pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
 	u32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
 
 	if (size > 0x1000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (image.loaded_through_softlist() && size == 0)
@@ -436,11 +436,11 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 
 		if (size == 0)
 		{
-			std::string errmsg = string_format(
-					"Attempted to load a file that does not work in this socket.\n"
-					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
-			image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
-			return image_init_result::FAIL;
+			osd_printf_error(
+					"%s: Attempted to load a file that does not work in this socket.\n"
+					"Please check \"Usage\" field in the software list for the correct socket(s) to use.\n",
+					image.basename());
+			return image_error::INVALIDIMAGE;
 		}
 	}
 
@@ -450,7 +450,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 	// raw images have to be decrypted (in particular the ones from softlist)
 	pegasus_decrypt_rom(slot->get_rom_base());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pegasus_state::machine_start()

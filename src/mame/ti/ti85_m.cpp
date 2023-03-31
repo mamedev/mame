@@ -1195,7 +1195,7 @@ SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 	if (image.length() != expected_snapshot_size)
 	{
 		logerror("Incomplete snapshot file\n");
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	std::vector<uint8_t> ti8x_snapshot_data(image.length());
@@ -1206,5 +1206,5 @@ SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 	else if (!strncmp(machine().system().name, "ti86", 4))
 		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

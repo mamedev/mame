@@ -181,9 +181,9 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (m_ram->size() < 16*1024)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
+		osd_printf_error("%s: At least 16KB RAM expansion required\n", image.basename());
 		image.message("At least 16KB RAM expansion required");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	logerror("Loading file %s.\r\n", image.filename());
@@ -218,9 +218,9 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 
 	if (!done)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
+		osd_printf_error("%s: EOF marker not found\n", image.basename());
 		image.message("EOF marker not found");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 		// patch CPU registers
@@ -258,7 +258,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 //**************************************************************************

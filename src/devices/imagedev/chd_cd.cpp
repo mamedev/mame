@@ -81,7 +81,7 @@ void cdrom_image_device::device_stop()
 		m_self_chd.close();
 }
 
-image_init_result cdrom_image_device::call_load()
+std::error_condition cdrom_image_device::call_load()
 {
 	std::error_condition err;
 	chd_file *chd = nullptr;
@@ -112,14 +112,15 @@ image_init_result cdrom_image_device::call_load()
 	if (!m_cdrom_handle)
 		goto error;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 
 error:
 	if (chd && chd == &m_self_chd)
 		m_self_chd.close();
 	if (err)
-		seterror(err, nullptr);
-	return image_init_result::FAIL;
+		return err;
+	else
+		return image_error::UNSPECIFIED;
 }
 
 void cdrom_image_device::call_unload()

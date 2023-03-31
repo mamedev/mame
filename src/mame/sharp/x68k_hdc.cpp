@@ -55,7 +55,7 @@ void x68k_hdc_image_device::device_start()
 	save_item(NAME(m_transfer_byte_total));
 }
 
-image_init_result x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition x68k_hdc_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	// create 20MB HD
 	int x;
@@ -67,10 +67,10 @@ image_init_result x68k_hdc_image_device::call_create(int format_type, util::opti
 	{
 		ret = fwrite(sectordata,256);
 		if(ret < 256)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void x68k_hdc_image_device::hdc_w(offs_t offset, u16 data)

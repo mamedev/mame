@@ -417,9 +417,9 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 	{ }
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Not a Z1013 image");
+		osd_printf_error("%s: Not a Z1013 image\n", image.basename());
 		image.message(" Not a Z1013 image");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
@@ -429,11 +429,11 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Loaded but cannot run");
+		osd_printf_error("%s: Loaded but cannot run\n", image.basename());
 		image.message(" Loaded but cannot run");
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /* F4 Character Displayer */

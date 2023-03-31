@@ -417,26 +417,6 @@ int sol_lua_push(sol::types<screen_type_enum>, lua_State *L, screen_type_enum &&
 	return sol::stack::push(L, "unknown");
 }
 
-int sol_lua_push(sol::types<image_init_result>, lua_State *L, image_init_result &&value)
-{
-	switch (value)
-	{
-	case image_init_result::PASS:   return sol::stack::push(L, "pass");
-	case image_init_result::FAIL:   return sol::stack::push(L, "fail");
-	}
-	return sol::stack::push(L, "invalid");
-}
-
-int sol_lua_push(sol::types<image_verify_result>, lua_State *L, image_verify_result &&value)
-{
-	switch (value)
-	{
-	case image_verify_result::PASS: return sol::stack::push(L, "pass");
-	case image_verify_result::FAIL: return sol::stack::push(L, "fail");
-	}
-	return sol::stack::push(L, "invalid");
-}
-
 
 //-------------------------------------------------
 //  process_snapshot_filename - processes a snapshot
@@ -1761,9 +1741,9 @@ void lua_engine::initialize()
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
-	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
+	image_type["load_software"] = static_cast<std::error_condition (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
 	image_type["unload"] = &device_image_interface::unload;
-	image_type["create"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::create);
+	image_type["create"] = static_cast<std::error_condition (device_image_interface::*)(std::string_view)>(&device_image_interface::create);
 	image_type["display"] = &device_image_interface::call_display;
 	image_type["is_readable"] = sol::property(&device_image_interface::is_readable);
 	image_type["is_writeable"] = sol::property(&device_image_interface::is_writeable);

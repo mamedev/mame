@@ -733,10 +733,10 @@ QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 		m_warm_start = 1;
 		m_maincpu->reset();
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::FAIL;
+	return image_error::INVALIDLENGTH;
 }
 
 void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)

@@ -288,7 +288,7 @@ DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 static const gfx_layout i7000_charlayout =
