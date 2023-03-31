@@ -108,9 +108,6 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0x00bb, 0x00bb).mirror(0xff00).rw(m_gs, FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
-	map(0x00b3, 0x00b3).mirror(0xff00).rw(m_gs, FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
-	map(0x0033, 0x0033).mirror(0xff00).w(m_gs, FUNC(neogs_device::ctrl_w));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -277,6 +274,11 @@ void tsconf_state::tsconf(machine_config &config)
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace("maincpu", AS_IO);
+	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, "neogs", false);
+	//ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_cards, nullptr, false);
+
 	m_ram->set_default_size("4096K");
 
 	GLUKRS(config, m_glukrs);
@@ -301,8 +303,6 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "lspeaker", 0.25)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
-
-	NEOGS(config, m_gs);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);

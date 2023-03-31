@@ -2,7 +2,7 @@
 // copyright-holders:Andrei I. Holub
 /*******************************************************************************************
 
-    Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
+	Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
 Spectrum-compatible computers with ZXBUS slot.
 
 Hardware:
@@ -19,12 +19,11 @@ Hardware:
 - Parallel working (NeoGS play music independently from ZX).
 
 Refs:
-    http://nedopc.com/gs/ngs_eng.php
-    https://github.com/psbhlw/gs-firmware
-    https://8bit.yarek.pl/interface/zx.generalsound/index.html
+	http://nedopc.com/gs/ngs_eng.php
+	https://github.com/psbhlw/gs-firmware
+	https://8bit.yarek.pl/interface/zx.generalsound/index.html
 
 TODO:
-- ZXBUS
 - SPI
 - DMA
 - MP3
@@ -37,8 +36,6 @@ TODO:
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(NEOGS, neogs_device, "neogs", "NeoGS / General Sound")
-
 ROM_START( neogs )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("v1.08")
@@ -50,6 +47,16 @@ ROM_START( neogs )
 	ROMX_LOAD( "testrom_muchkin.rom", 0x0000, 0x80000, CRC(8ab10a88) SHA1(cff3ca96489e517568146a00412107259360d01e), ROM_BIOS(1))
 ROM_END
 
+neogs_device::neogs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, NEOGS, tag, owner, clock)
+	, device_zxbus_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_ram(*this, RAM_TAG)
+	, m_bank_rom(*this, "bank_rom")
+	, m_bank_ram(*this, "bank_ram")
+	, m_view(*this, "view")
+	, m_dac(*this, "dac%u", 0U)
+{ }
 
 void neogs_device::update_config()
 {
@@ -163,10 +170,17 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 	return ROM_NAME( neogs );
 }
 
+void neogs_device::neogsmap(address_map &map)
+{
+	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
+	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
+	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::ctrl_w));
+}
+
 void neogs_device::device_start()
 {
 	if (!m_ram->started())
-		throw device_missing_dependencies();
+        throw device_missing_dependencies();
 
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom->configure_entries(0, rom->bytes() / 0x8000,  rom->base(), 0x8000);
@@ -184,6 +198,9 @@ void neogs_device::device_start()
 				;
 		}
 	});
+
+	set_zxbus_device();
+	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 }
 
 void neogs_device::device_reset()
@@ -193,3 +210,5 @@ void neogs_device::device_reset()
 	m_mpag = 0;
 	update_config();
 }
+
+DEFINE_DEVICE_TYPE(NEOGS, neogs_device, "neogs", "NeoGS / General Sound")
