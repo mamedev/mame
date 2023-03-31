@@ -1012,8 +1012,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		m_flash_mode = FM_WRITEBUFFER2;
 		m_byte_count = 0;
 		break;
-	case FM_WRITEBUFFER2: {
-
+	case FM_WRITEBUFFER2:
+		{
 			if ( m_byte_count < m_write_buffer_count )
 			{
 				if ( m_byte_count == 0 )
