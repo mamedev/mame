@@ -43,10 +43,12 @@ TODO:
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
+#include "bus/isa/isa.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
+#include "bus/spectrum/zxbus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
@@ -99,6 +101,7 @@ public:
 	sprinter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_isa(*this, "isa%u", 0U)
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -151,6 +154,7 @@ protected:
 	std::pair<u8, u8> lookback_scroll(u8 a, u8 b);
 
 	required_device<z84c015_device> m_maincpu;
+	required_device_array<isa8_device, 2> m_isa;
 
 private:
 
@@ -183,6 +187,8 @@ private:
 	void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
 	void update_int(bool recalculate);
+	u8 isa_r(offs_t offset);
+	void isa_w(offs_t offset, u8 data);
 
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
@@ -244,6 +250,7 @@ private:
 	u8 m_port_y;
 	u8 m_rgmod;
 	u8 m_pg3;
+	u8 m_isa_addr_ext;
 	u8 m_hold;
 	u8 m_kbd_data_cnt;
 
@@ -708,6 +715,14 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 			m_beta->enable();
 		break;
 
+	case 0x1b:
+		if (data & 0x80)
+			; // RESET
+		if (data & 0x40)
+			; // AEN
+		m_isa_addr_ext = data & 0x3f;
+		break;
+
 	case 0x1d:
 	case 0x1e:
 		m_rtc->write(~dcpp & 1, data);
@@ -1162,6 +1177,22 @@ void sprinter_state::vram_w(offs_t offset, u8 data)
 	}
 }
 
+u8 sprinter_state::isa_r(offs_t offset)
+{
+	const u8 ctrl = m_ram_pages[m_pg3];
+	if ((ctrl & 0xfd) == 0xd4) // D:2 0-mem, 1-io
+		return m_isa[BIT(ctrl, 1)]->io_r((m_isa_addr_ext << 14) | offset);
+	else
+		return 0xff;
+}
+
+void sprinter_state::isa_w(offs_t offset, u8 data)
+{
+	const u8 ctrl = m_ram_pages[m_pg3];
+	if ((ctrl & 0xfd) == 0xd4)
+		m_isa[BIT(ctrl, 1)]->io_w((m_isa_addr_ext << 14) | offset, data);
+}
+
 void sprinter_state::update_int(bool recalculate)
 {
 	if (recalculate || m_ints.empty())
@@ -1237,7 +1268,7 @@ void sprinter_state::map_mem(address_map &map)
 	m_bank_view0[2](0x0000, 0x3fff).bankrw(m_bank0_fastram);
 
 	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).noprw(); // ISA
+	m_bank_view3[0](0xc000, 0xffff).rw(FUNC(sprinter_state::isa_r), FUNC(sprinter_state::isa_w)); // ISA
 }
 
 void sprinter_state::map_io(address_map &map)
@@ -1294,6 +1325,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_port_y));
 	save_item(NAME(m_rgmod));
 	save_item(NAME(m_pg3));
+	save_item(NAME(m_isa_addr_ext));
 	save_item(NAME(m_hold));
 	save_item(NAME(m_kbd_data_cnt));
 	save_item(NAME(m_ata_selected));
@@ -1359,6 +1391,7 @@ void sprinter_state::machine_reset()
 	m_sc = 0x00;
 	m_rom_rg = 0x00;
 	m_cash_on = 0;
+	m_isa_addr_ext = 0;
 
 	m_skip_write = false;
 	m_prf_d = false;
@@ -1676,6 +1709,15 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
+
+	ISA8(config, m_isa[0], 0);
+	m_isa[0]->set_custom_spaces();
+	ISA8(config, m_isa[1], 0);
+	m_isa[1]->set_custom_spaces();
+
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace("isa0", isa8_device::AS_ISA_IO);
+	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, "neogs", false);
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
