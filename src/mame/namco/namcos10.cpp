@@ -409,7 +409,7 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 -----------
 
 Note about the bit scramble order:
-For MEM(N) games you can use 0x8508-0x8528 and for MEM(M) games you can use 0x100-0x120 to brute force the scramble order.
+For MEM(N) games you can use 0x8508-0x8528 and for MEM(M) games you can use 0x108-0x128 to brute force the scramble order.
 Those bytes correspond to the "Sony Computer Entertainment Inc." string in the BIOS.
 Note: gjspace swaps between the entire 16-bit space but every other game I've tested swaps in an 8-bit space,
 so you can try every permutation of 0-7 bit swaps separately very quickly (<1 sec) first but if that fails you will need to
