@@ -1867,7 +1867,7 @@ static INPUT_PORTS_START( nflclsfb )
 INPUT_PORTS_END
 
 // MEM(M)
-ROM_START( mrdrilr2 )
+ROM_START( mrdrilr2j )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
@@ -1879,7 +1879,7 @@ ROM_START( mrdrilr2 )
 	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
 ROM_END
 
-ROM_START( mrdrlr2a )
+ROM_START( mrdrilr2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
@@ -2231,15 +2231,15 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
-GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
 
 // MEM(N)
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalna,  ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalna,  ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING ) // broken decrypter?
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G ALT (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
@@ -2250,7 +2250,7 @@ GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, 
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", 0)
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0)
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
