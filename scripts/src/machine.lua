@@ -2655,6 +2655,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/nandflash.h,MACHINES["NANDFLASH"] = true
+---------------------------------------------------
+
+if (MACHINES["NANDFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/nandflash.cpp",
+		MAME_DIR .. "src/devices/machine/nandflash.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/nmc9306.h,MACHINES["NMC9306"] = true
 ---------------------------------------------------
 
