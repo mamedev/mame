@@ -859,14 +859,10 @@ void coco_cart_add_fdcs(device_slot_interface &device)
 {
 	// FDCs are optional because if they are on a Multi-Pak interface, they must
 	// be on Slot 4
-	device.option_add("cc2hdb1", COCO2_HDB1);
-	device.option_add("cc3hdb1", COCO3_HDB1);
 	device.option_add("cd6809_fdc", CD6809_FDC);
 	device.option_add("cp450_fdc", CP450_FDC);
 	device.option_add("fdc", COCO_FDC);
-	// device.option_add("fdcv11", COCO_FDC_V11);
-	device.option_add("scii_cc1", COCO_SCII_CC1);
-	device.option_add("scii_cc3", COCO_SCII_CC3);
+	device.option_add("scii", COCO_SCII);
 }
 
 
