@@ -86,7 +86,7 @@ private:
 	u8 res_r();
 
 	void palette_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 palette_r(offs_t offset);  
+	u16 palette_r(offs_t offset);
 
 	void hsync_on();
 	void hsync_off(u64 glue_tick);

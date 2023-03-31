@@ -228,17 +228,17 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
-	emu_fatalerror(util::format_argument_pack<std::ostream> const &args);
-	emu_fatalerror(int _exitcode, util::format_argument_pack<std::ostream> const &args);
+	emu_fatalerror(util::format_argument_pack<char> const &args);
+	emu_fatalerror(int _exitcode, util::format_argument_pack<char> const &args);
 
 	template <typename Format, typename... Params>
 	emu_fatalerror(Format const &fmt, Params &&... args)
-		: emu_fatalerror(static_cast<util::format_argument_pack<std::ostream> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+		: emu_fatalerror(static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
 	{
 	}
 	template <typename Format, typename... Params>
 	emu_fatalerror(int _exitcode, Format const &fmt, Params &&... args)
-		: emu_fatalerror(_exitcode, static_cast<util::format_argument_pack<std::ostream> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+		: emu_fatalerror(_exitcode, static_cast<util::format_argument_pack<char> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
 	{
 	}
 

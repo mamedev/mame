@@ -462,11 +462,11 @@ static std::string process_snapshot_filename(running_machine &machine, const cha
 lua_engine::lua_engine()
 {
 	m_machine = nullptr;
-	m_lua_state = luaL_newstate();  /* create state */
+	m_lua_state = luaL_newstate();  // create state
 	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
 
 	luaL_checkversion(m_lua_state);
-	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
+	lua_gc(m_lua_state, LUA_GCSTOP, 0);  // stop collector during initialization
 	sol().open_libraries();
 
 	// Get package.preload so we can store builtins in it.
@@ -592,7 +592,7 @@ bool lua_engine::execute_function(const char *id)
 {
 	size_t count = enumerate_functions(
 			id,
-			[] (const sol::protected_function &func)
+			[this] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func);
 				if (!ret.valid())
@@ -646,12 +646,12 @@ void lua_engine::on_machine_resume()
 
 void lua_engine::on_machine_frame()
 {
-	execute_function("LUA_ON_FRAME");
-}
+	std::vector<int> tasks = std::move(m_frame_tasks);
+	m_frame_tasks.clear();
+	for (int ref : tasks)
+		resume(ref);
 
-void lua_engine::on_frame_done()
-{
-	execute_function("LUA_ON_FRAME_DONE");
+	execute_function("LUA_ON_FRAME");
 }
 
 void lua_engine::on_sound_update()
@@ -669,7 +669,7 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 	bool handled = false;
 	enumerate_functions(
 			"LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE",
-			[&instance_name, &handled] (const sol::protected_function &func)
+			[this, &instance_name, &handled] (const sol::protected_function &func)
 			{
 				auto ret = invoke(func, instance_name);
 
@@ -818,7 +818,7 @@ void lua_engine::initialize()
 		{
 			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
 			render_container &container = machine().render().ui_container();
-			ui::menu_plugin::show_menu(mui, container, (char *)name);
+			ui::menu_plugin::show_menu(mui, container, name);
 		};
 	emu["register_callback"] =
 		[this] (sol::function cb, const std::string &name)
@@ -841,17 +841,46 @@ void lua_engine::initialize()
 				return sol::lua_nil;
 			return sol::make_object(s, driver_list::driver(i));
 		};
-	emu["wait"] = lua_CFunction(
-			[] (lua_State *L)
+	emu["wait"] = sol::yielding(
+			[this] (sol::this_state s, sol::object arg)
 			{
-				lua_engine *engine = mame_machine_manager::instance()->lua();
-				luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-				int ret = lua_pushthread(L);
+				attotime duration;
+				if (!arg)
+				{
+					luaL_error(s, "waiting duration expected");
+				}
+				else if (arg.is<attotime>())
+				{
+					duration = arg.as<attotime>();
+				}
+				else
+				{
+					auto seconds = arg.as<std::optional<double> >();
+					if (!seconds)
+						luaL_error(s, "waiting duration must be attotime or number");
+					duration = attotime::from_double(*seconds);
+				}
+				int const ret = lua_pushthread(s);
 				if (ret == 1)
-					return luaL_error(L, "cannot wait from outside coroutine");
-				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref);
-				return lua_yield(L, 0);
+					luaL_error(s, "cannot wait from outside coroutine");
+				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
+				machine().scheduler().timer_set(duration, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
+			});
+	emu["wait_next_update"] = sol::yielding(
+			[this] (sol::this_state s)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+			});
+	emu["wait_next_frame"] = sol::yielding(
+			[this] (sol::this_state s)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
 			});
 	emu["lang_translate"] = sol::overload(
 			static_cast<char const *(*)(char const *)>(&lang_translate),
@@ -2012,6 +2041,11 @@ void lua_engine::initialize()
 //-------------------------------------------------
 bool lua_engine::frame_hook()
 {
+	std::vector<int> tasks = std::move(m_update_tasks);
+	m_update_tasks.clear();
+	for (int ref : tasks)
+		resume(ref);
+
 	return execute_function("LUA_ON_FRAME_DONE");
 }
 
@@ -2021,6 +2055,9 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
+	m_menu.clear();
+	m_update_tasks.clear();
+	m_frame_tasks.clear();
 	m_sol_state.reset();
 	if (m_lua_state)
 	{
@@ -2037,7 +2074,7 @@ void lua_engine::resume(int nparam)
 	lua_pop(m_lua_state, 1);
 	int nresults = 0;
 	int stat = lua_resume(L, nullptr, 0, &nresults);
-	if((stat != LUA_OK) && (stat != LUA_YIELD))
+	if ((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);

@@ -6562,15 +6562,3 @@ msgid ""
 msgstr ""
 "Vložte kombinaci nebo stiskněte %s pro storno\n"
 "%s"
-
-#, c-format
-#~ msgid "Press %s to show menu"
-#~ msgstr "Pro zobrazení menu stiskněte %s"
-
-#~ msgctxt "input-name"
-#~ msgid "Config Menu"
-#~ msgstr "Konfigurační menu"
-
-#~ msgctxt "input-name"
-#~ msgid "UI Toggle"
-#~ msgstr "Uživ. rozhraní - Přepnout"

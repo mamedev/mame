@@ -3,10 +3,10 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="abc800" description="Luxor ABC 800 diskettes">
+<softwarelist name="abc830_flop" description="Luxor ABC 830 diskettes">
 
 	<software name="basope10">
-		<description>Basope v1.0 (Fin)</description>
+		<description>Basope v1.0 (Finland)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="graf16">
-		<description>Grafiikka 800 v1.6 (Fin)</description>
+		<description>Grafiikka 800 v1.6 (Finland)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="68 20027-41" />
@@ -43,7 +43,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ord800">
-		<description>ORD 800 v2.4 (Swe)</description>
+		<description>ORD 800 v2.4</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 
@@ -55,7 +55,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="prommis">
-		<description>PROMMIS v6.2 (Swe)</description>
+		<description>PROMMIS v6.2</description>
 		<year>1983</year>
 		<publisher>ELogik</publisher>
 
@@ -67,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="red800">
-		<description>Bokföring 800 v2.0 (Swe)</description>
+		<description>Bokföring 800 v2.0</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 
@@ -79,7 +79,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sana800">
-		<description>Sana 800 v2.3 (Fin)</description>
+		<description>Sana 800 v2.3 (Finland)</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 		<info name="serial" value="68 20037-56" />
@@ -92,7 +92,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tty800">
-		<description>TTY800 v1.5 (Swe)</description>
+		<description>TTY800 v1.5</description>
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
 
@@ -104,10 +104,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="tty800a" cloneof="tty800">
-		<description>TTY800 v1.5 (Swe) (no autoboot)</description>
+		<description>TTY800 v1.5 (no autoboot)</description>
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
-		<info name="usage" value="RUN&quot;TTY&quot;" />
+		<info name="usage" value="RUN TTY" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="40815">
@@ -120,7 +120,7 @@ license:CC0-1.0
 		<description>CAT800L v8.6 for CATNET v1.3</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;CATNETL&quot;" />
+		<info name="usage" value="RUN CATNETL" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="32173">
@@ -130,10 +130,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="sys10fi">
-		<description>Systeemilevy ABC800 v1.0 (Fin)</description>
+		<description>Systeemilevy ABC800 v1.0 (Finland)</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="22884">
@@ -143,11 +143,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="sys10sw">
-		<description>Systemskiva ABC800 v1.0 (Swe)</description>
+		<description>Systemskiva ABC800 v1.0</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="serial" value="68 29011-41" />
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="24026">
@@ -160,7 +160,7 @@ license:CC0-1.0
 		<description>System disk v6.19 for UFD-DOS</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="119474">
@@ -173,7 +173,7 @@ license:CC0-1.0
 		<description>System disk v6.19a6 for UFD-DOS</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<info name="usage" value="RUN LIB" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="136796">
@@ -190,6 +190,7 @@ license:CC0-1.0
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
+				<!-- interleaved sectors -->
 				<rom name="demo11.dsk" size="163840" crc="f57d142d" sha1="f9c67904ddc8fa598353dcdcd8c0bc3eb4e91524"/>
 			</dataarea>
 		</part>
@@ -208,29 +209,27 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ufd631">
-		<description>Systemskiva v6.31 för UFD-DOS (Swe)</description>
+	<software name="kompil">
+		<description>Kompil</description>
 		<year>198?</year>
-		<publisher>Luxor</publisher>
-		<info name="serial" value="68 29251-51" />
-		<info name="usage" value="RUN&quot;LIB&quot;" />
+		<publisher>unknown</publisher>
+		<info name="usage" value="RUN KOMPIL" />
 
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="140772">
-				<rom name="ufd631.td0" size="140772" crc="c767e073" sha1="42fb39f3a9fe5020d339d6b00c13170898a6059e"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="830_kompil.img" size="163840" crc="961c00be" sha1="1672c14c931633d9f6e7f8af629e081daa710570"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="abc832">
-		<description>ABC832 Systemskiva v2.5 (Swe)</description>
-		<year>1982</year>
-		<publisher>Luxor</publisher>
-		<info name="usage" value="BYE" />
+	<software name="trim">
+		<description>Trim</description>
+		<year>198?</year>
+		<publisher>unknown</publisher>
 
-		<part name="flop" interface="floppy_5_25">
-			<dataarea name="flop" size="655360">
-				<rom name="abc832.dsk" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="trim.img" size="163840" crc="f3a6b2ff" sha1="a4253906d483697891314537882c82ff9288cfeb"/>
 			</dataarea>
 		</part>
 	</software>

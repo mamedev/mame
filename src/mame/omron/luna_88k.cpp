@@ -5,13 +5,14 @@
  * Omron Luna 88K and 88K² systems.
  *
  * Sources:
+ *  - Tetsuya Isaki's nono Luna emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *  - OpenBSD source code
- *  - Tetsuya Isaki's nono LUNA emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *
  * TODO:
  *  - scsi controller
  *  - xp i/o controller
  *  - lance memory
+ *  - crt controller
  *  - slotify graphics
  *  - expansion slots
  *  - abort/power switches
@@ -19,7 +20,6 @@
  *
  * WIP:
  *  - scsi probe/boot hangs
- *  - doesn't boot to graphics
  */
 
 /*
@@ -72,6 +72,8 @@
  */
 
 #include "emu.h"
+
+#include "luna_kbd.h"
 
 #include "cpu/m88000/m88000.h"
 #include "cpu/z180/hd647180x.h"
@@ -316,6 +318,11 @@ void luna_88k_state::iop_map_pio(address_map &map)
 	map(0x0049, 0x0049).nopr();
 }
 
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", LUNA_KEYBOARD);
+}
+
 void luna_88k_state::luna88k2(machine_config &config)
 {
 	MC88100(config, m_cpu, 33.333_MHz_XTAL);
@@ -345,7 +352,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_sio->out_int_callback().set(&luna_88k_state::irq<0, 5>, "irq0,5");
 
 	// RS-232C-A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_sio->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
@@ -353,7 +360,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_serial[0]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsa_w));
 
 	// keyboard/mouse
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[1], keyboard_devices, "keyboard");
 	m_sio->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
@@ -430,7 +437,6 @@ void luna_88k_state::luna88k2(machine_config &config)
 
 	MB89352A(config, m_spc[0], 0);
 	m_spc[0]->irq_cb().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
-	m_spc[0]->drq_cb().set(spc_irq, FUNC(input_merger_any_high_device::in_w<2>));
 	m_spc[0]->set_scsi_port("scsi0");
 
 	MB89352A(config, m_spc[1], 0);
@@ -471,16 +477,17 @@ u32 luna_88k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	{
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
 		{
-			u32 const plane0 = m_vram[0 * 0x1'0000 + (x >> 5)];
-			u32 const plane1 = m_vram[1 * 0x1'0000 + (x >> 5)];
-			u32 const plane2 = m_vram[2 * 0x1'0000 + (x >> 5)];
-			u32 const plane3 = m_vram[3 * 0x1'0000 + (x >> 5)];
-			u32 const plane4 = m_vram[4 * 0x1'0000 + (x >> 5)];
-			u32 const plane5 = m_vram[5 * 0x1'0000 + (x >> 5)];
-			u32 const plane6 = m_vram[6 * 0x1'0000 + (x >> 5)];
-			u32 const plane7 = m_vram[7 * 0x1'0000 + (x >> 5)];
+			unsigned const offset = (y * 64) + (x >> 5);
 
-			// TODO: verify pixel order
+			u32 const plane0 = m_vram[0 * 0x1'0000 + offset];
+			u32 const plane1 = m_vram[1 * 0x1'0000 + offset];
+			u32 const plane2 = m_vram[2 * 0x1'0000 + offset];
+			u32 const plane3 = m_vram[3 * 0x1'0000 + offset];
+			u32 const plane4 = m_vram[4 * 0x1'0000 + offset];
+			u32 const plane5 = m_vram[5 * 0x1'0000 + offset];
+			u32 const plane6 = m_vram[6 * 0x1'0000 + offset];
+			u32 const plane7 = m_vram[7 * 0x1'0000 + offset];
+
 			for (unsigned p = 0; p < 32; p++)
 			{
 				u8 const index
@@ -627,7 +634,7 @@ static INPUT_PORTS_START(luna88k)
 	PORT_DIPNAME(0x80, 0x00, "Start") PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(0x00, "Autoboot")
 	PORT_DIPSETTING(0x80, "Monitor")
-	PORT_DIPNAME(0x40, 0x00, "Console") PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPNAME(0x40, 0x40, "Console") PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(0x00, "Serial")
 	PORT_DIPSETTING(0x40, "Graphics")
 	PORT_DIPNAME(0x20, 0x00, "SW1#3") PORT_DIPLOCATION("SW1:!3")
@@ -645,7 +652,7 @@ static INPUT_PORTS_START(luna88k)
 	PORT_DIPNAME(0x02, 0x00, "SW1#7") PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x01, 0x00, "Mode") PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME(0x01, 0x01, "Mode") PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(0x00, "Diagnostic")
 	PORT_DIPSETTING(0x01, "Normal")
 
@@ -695,5 +702,5 @@ ROM_END
 
 } // anonymous namespace
 
-/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME     FLAGS */
-COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", "Luna 88K²", MACHINE_IS_SKELETON)
+/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME       FLAGS */
+COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", u8"Luna 88K²", MACHINE_IS_SKELETON)

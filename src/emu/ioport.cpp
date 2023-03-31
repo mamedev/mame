@@ -2134,7 +2134,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-	g_profiler.start(PROFILER_INPUT);
+	auto profile = g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2171,8 +2171,6 @@ void ioport_manager::frame_update()
 			if (dynfield.field().type() != IPT_OUTPUT)
 				dynfield.write(newvalue);
 	}
-
-	g_profiler.stop();
 }
 
 

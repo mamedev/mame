@@ -36,7 +36,7 @@
   note: TMS1070 is same as TMS1000, except pins 20 and 21 are swapped.
 
             ____   ____                      ____   ____
-     R8  1 |*   \_/    | 48 R7        R8  1 |*   \_/    | 48 NC
+     R8  1 |*   \_/    | 40 R7        R8  1 |*   \_/    | 40 NC
      R9  2 |           | 39 R6        R9  2 |           | 39 R7
     R10  3 |           | 38 R5       R10  3 |           | 38 R6
     R11  4 |           | 37 R4       R11  4 |           | 37 R5
@@ -85,17 +85,29 @@ public:
 	tms1040_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
-class tms1070_cpu_device : public tms1000_cpu_device
-{
-public:
-	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-
 class tms1200_cpu_device : public tms1000_cpu_device
 {
 public:
 	tms1200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class tms1070_cpu_device : public tms1000_cpu_device
+{
+public:
+	tms1070_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	tms1070_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void write_o_output(u16 data) override { tms1000_cpu_device::write_o_output(bitswap<10>(data,0,1,9,8,7,6,5,4,3,2)); }
+};
+
+class tms1270_cpu_device : public tms1070_cpu_device
+{
+public:
+	tms1270_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -129,6 +141,7 @@ DECLARE_DEVICE_TYPE(TMS1000, tms1000_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1040, tms1040_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1070, tms1070_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1200, tms1200_cpu_device)
+DECLARE_DEVICE_TYPE(TMS1270, tms1270_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1700, tms1700_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1730, tms1730_cpu_device)
 DECLARE_DEVICE_TYPE(MC141000, mc141000_cpu_device)

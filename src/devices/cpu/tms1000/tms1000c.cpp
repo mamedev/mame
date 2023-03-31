@@ -35,8 +35,8 @@ tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const ch
 void tms1000c_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 32).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 

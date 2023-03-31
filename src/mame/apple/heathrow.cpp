@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(GRAND_CENTRAL, grandcentral_device, "grndctrl", "Apple Grand 
     15000 : IWM/SWIM
     10000 : SCSI
 
-	DMA is at 8xxx (audio DMA at 88xx)
+    DMA is at 8xxx (audio DMA at 88xx)
     ATA is at 20000
 */
 void heathrow_device::map(address_map &map)

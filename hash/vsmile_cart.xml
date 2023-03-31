@@ -355,6 +355,7 @@ Regular game cartridges
 |        |          (FI)     | Puuha-Pete - Peten kiirenes päivä                                                              |
 +========+===================+================================================================================================+
 |        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                |
+|   XX   |          (US)     | The Wiggles - It's Wiggle Time! (may be the one above, but no cart pic)                        |
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
@@ -5197,6 +5198,18 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 				<rom name="80-067022 - V.Smile Estudio De Arte (SP).bin" size="4194304" crc="f9911730" sha1="bff0b2ca61a2e5a8ae42b5d78103862e7f6a357f" />
 			</dataarea>
 			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wiggles">
+		<description>The Wiggles - It's Wiggle Time! (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92502 - Truckie's Rekenrace (NL).bin" size="0x800000" crc="ede4c9b6" sha1="60489c116cb5a121b706739eb7ae73b296ea2484" />
 			</dataarea>
 		</part>
 	</software>

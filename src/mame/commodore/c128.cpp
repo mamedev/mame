@@ -31,8 +31,8 @@
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
-#include "video/mc6845.h"
 #include "video/mos6566.h"
+#include "video/mos8563.h"
 
 #define M8502_TAG       "u6"
 #define MOS8563_TAG     "u22"

@@ -388,7 +388,7 @@ void vertigo_state::vertigo_vproc(int cycles, int irq4)
 
 	if (irq4) m_vector->clear_list();
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	while (cycles--)
 	{
@@ -563,6 +563,4 @@ void vertigo_state::vertigo_vproc(int cycles, int irq4)
 			m_vs.pc = (m_vs.pc & 0x100) | ((m_vs.pc + 1) & 0xff);
 		}
 	}
-
-	g_profiler.stop();
 }

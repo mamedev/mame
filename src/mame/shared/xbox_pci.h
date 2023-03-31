@@ -160,7 +160,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq14);
 	DECLARE_WRITE_LINE_MEMBER(irq15);
 	DECLARE_WRITE_LINE_MEMBER(dma2_hreq_w) { m_dma8237_2->hack_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma1_eop_w) {	m_dma_eop = state; if (m_dma_channel != -1) signal_dma_end(m_dma_channel, state & 1); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_eop_w) { m_dma_eop = state; if (m_dma_channel != -1) signal_dma_end(m_dma_channel, state & 1); }
 	DECLARE_WRITE_LINE_MEMBER(dma1_dack0_w) { set_dma_channel(0, state); }
 	DECLARE_WRITE_LINE_MEMBER(dma1_dack1_w) { set_dma_channel(1, state); }
 	DECLARE_WRITE_LINE_MEMBER(dma1_dack2_w) { set_dma_channel(2, state); }

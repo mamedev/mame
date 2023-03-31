@@ -40,7 +40,7 @@ enum
      O4 14 |___________| 15 O3
 
             ____   ____
-   AVss  1 |*   \_/    | 48 EC1
+   AVss  1 |*   \_/    | 40 EC1
    AVdd  2 |           | 39 INT
      R0  3 |           | 38 OSC OUT
      R1  4 |           | 37 OSC IN

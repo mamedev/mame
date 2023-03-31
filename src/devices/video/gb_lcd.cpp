@@ -1136,7 +1136,7 @@ void dmg_ppu_device::update_scanline(uint32_t cycles_to_go)
 		return;
 	}
 
-	g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	/* Make sure we're in mode 3 */
 	if ((LCDSTAT & 0x03) == 0x03)
@@ -1270,8 +1270,6 @@ void dmg_ppu_device::update_scanline(uint32_t cycles_to_go)
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 /* --- Super Game Boy Specific --- */
@@ -1425,7 +1423,7 @@ void sgb_ppu_device::refresh_border()
 
 void sgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 {
-	g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	if ((LCDSTAT & 0x03) == 0x03)
 	{
@@ -1594,8 +1592,6 @@ void sgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 /* --- Game Boy Color Specific --- */
@@ -1715,7 +1711,7 @@ void cgb_ppu_device::update_sprites()
 
 void cgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 {
-	g_profiler.start(PROFILER_VIDEO);
+	auto profile = g_profiler.start(PROFILER_VIDEO);
 
 	if ((LCDSTAT & 0x03) == 0x03)
 	{
@@ -1891,8 +1887,6 @@ void cgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 

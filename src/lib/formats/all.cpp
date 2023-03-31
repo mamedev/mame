@@ -36,6 +36,10 @@
 #include "abc800_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_ABC800I_DSK
+#include "abc800i_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ABCFD2_DSK
 #include "abcfd2_dsk.h"
 #endif
@@ -819,6 +823,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Luxor ABC");
 #ifdef HAS_FORMATS_ABC800_DSK
 	en.add(FLOPPY_ABC800_FORMAT); // abc800_dsk.h
+#endif
+#ifdef HAS_FORMATS_ABC800I_DSK
+	en.add(FLOPPY_ABC800I_FORMAT); // abc800i_dsk.h
 #endif
 #ifdef HAS_FORMATS_ABCFD2_DSK
 	en.add(FLOPPY_ABC_FD2_FORMAT); // abcfd2_dsk.h

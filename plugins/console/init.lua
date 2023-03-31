@@ -267,6 +267,7 @@ function console.startplugin()
 				end
 			else
 				cmdbuf = cmdbuf .. "\n" .. cmd
+				ln.historyadd(cmd)
 				local func, err = load(cmdbuf)
 				if not func then
 					if err:match("<eof>") then
@@ -276,14 +277,15 @@ function console.startplugin()
 						cmdbuf = ""
 					end
 				else
+					cmdbuf = ""
+					stopped = true
 					local status
 					status, err = pcall(func)
 					if not status then
 						print("error: ", err)
 					end
-					cmdbuf = ""
+					stopped = false
 				end
-				ln.historyadd(cmd)
 			end
 		end
 		conth:start(scr:gsub("$PROMPT", prompt))

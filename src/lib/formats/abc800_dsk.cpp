@@ -26,7 +26,7 @@ const char *abc800_format::description() const
 
 const char *abc800_format::extensions() const
 {
-	return "dsk";
+	return "img";
 }
 
 const abc800_format::format abc800_format::formats[] = {
@@ -51,7 +51,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  80K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 16, 40, 1, 128, {}, -1, { 1,2,11,12,5,6,15,16,9,10,3,4,13,14,7,8 }, 28, 11, 27
+		4000, 16, 40, 1, 128, {}, 1, {}, 28, 11, 27
 	},
 
 	// track description
@@ -75,7 +75,7 @@ const abc800_format::format abc800_format::formats[] = {
 
 	{   //  160K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 16, 40, 1, 256, {}, -1, { 1,8,15,6,13,4,11,2,9,16,7,14,5,12,3,10 }, 55, 22, 54
+		2000, 16, 40, 1, 256, {}, 1, {}, 55, 22, 54
 	},
 
 	// track description
@@ -141,25 +141,21 @@ const abc800_format::format abc800_format::formats[] = {
 
 const abc800_format FLOPPY_ABC800_FORMAT;
 
-void abc800_format::build_sector_description(const format &f, uint8_t *sectdata, desc_s *sectors, int track, int head) const
+int abc800_format::get_image_offset(const format &f, int head, int track) const
 {
-	if(f.sector_base_id == -1) {
-		for(int i=0; i<f.sector_count; i++) {
-			int cur_offset = 0;
-			for(int j=0; j<f.sector_count; j++)
-				if(f.per_sector_id[j] < f.per_sector_id[i])
-					cur_offset += f.sector_base_size ? f.sector_base_size : f.per_sector_size[j];
-			sectors[i].data = sectdata + cur_offset;
-			sectors[i].size = f.sector_base_size ? f.sector_base_size : f.per_sector_size[i];
-			sectors[i].sector_id = i + f.per_sector_id[0];
-		}
-	} else {
-		int cur_offset = 0;
-		for(int i=0; i<f.sector_count; i++) {
-			sectors[i].data = sectdata + cur_offset;
-			sectors[i].size = f.sector_base_size ? f.sector_base_size : f.per_sector_size[i];
-			cur_offset += sectors[i].size;
-			sectors[i].sector_id = i + f.sector_base_id;
+	int offset = 0;
+
+	if(head) {
+		for(int trk=0; trk < f.track_count; trk++) {
+			const format &tf = get_track_format(f, 0, trk);
+			offset += compute_track_size(tf);
 		}
 	}
+
+	for(int trk=0; trk < track; trk++) {
+		const format &tf = get_track_format(f, head, trk);
+		offset += compute_track_size(tf);
+	}
+
+	return offset;
 }

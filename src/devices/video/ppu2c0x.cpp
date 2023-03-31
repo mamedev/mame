@@ -1000,33 +1000,26 @@ void ppu2c0x_device::render_scanline()
 {
 	uint8_t line_priority[VISIBLE_SCREEN_WIDTH];
 
-	/* lets see how long it takes */
-	g_profiler.start(PROFILER_USER1);
+	// lets see how long it takes
+	auto profile = g_profiler.start(PROFILER_USER1);
 
-	/* clear the line priority for this scanline */
+	// clear the line priority for this scanline
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
 
 	m_draw_phase = PPU_DRAW_BG;
 
-	/* see if we need to render the background */
+	// see if we need to render the background
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND)
-	{
 		draw_background(line_priority);
-	}
 	else
-	{
 		draw_background_pen();
-	}
 
 	m_draw_phase = PPU_DRAW_OAM;
 
-	/* if sprites are on, draw them, but we call always to process them */
+	// if sprites are on, draw them, but we call always to process them
 	draw_sprites(line_priority);
 
 	m_draw_phase = PPU_DRAW_BG;
-
-	/* done updating, whew */
-	g_profiler.stop();
 }
 
 void ppu2c0x_device::scanline_increment_fine_ycounter()

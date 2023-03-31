@@ -22,6 +22,7 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
+#include "video/sn74s262.h"
 #include "emupal.h"
 
 #define ABC80_HTOTAL    384
@@ -61,6 +62,7 @@
 #define CASSETTE_TAG        "cassette"
 #define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
+#define SN74S263_TAG        "h2"
 
 class abc80_state : public driver_device
 {
@@ -72,14 +74,14 @@ public:
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
 		m_bus(*this, "bus"),
-		m_kb(*this, ABC80_KEYBOARD_TAG),
+		m_kb(*this, KEYBOARD_TAG),
+		m_rocg(*this, SN74S263_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
 		m_palette(*this, "palette"),
 		m_screen(*this, SCREEN_TAG),
 		m_rom(*this, Z80_TAG),
 		m_mmu_rom(*this, "mmu"),
-		m_char_rom(*this, "chargen"),
 		m_hsync_prom(*this, "hsync"),
 		m_vsync_prom(*this, "vsync"),
 		m_line_prom(*this, "line"),
@@ -149,13 +151,13 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
+	required_device<sn74s262_device> m_rocg;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
-	required_memory_region m_char_rom;
 	required_memory_region m_hsync_prom;
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;

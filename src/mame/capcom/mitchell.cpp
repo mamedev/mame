@@ -465,7 +465,7 @@ void mstworld_state::gfxctrl_w(uint8_t data)
 {
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 
- 	// popmessage("%02x", data);
+	// popmessage("%02x", data);
 
 	// bit 0 is unknown (used, maybe back color enable?)
 

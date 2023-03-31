@@ -24,7 +24,7 @@ bool menu_plugin::handle(event const *ev)
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref);
+			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref, false);
 	}
 	return false;
 }
@@ -43,30 +43,25 @@ void menu_plugin::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, char *menu)
+void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu)
 {
-	// reset the menu stack
-	menu::stack_reset(mui);
-
 	// add the plugin menu entry
-	menu::stack_push<menu_plugin_opt>(mui, container, menu);
+	menu::stack_push<menu_plugin_opt>(mui, container, menu, true);
 
 	// force the menus on
 	mui.show_menu();
-
-	// make sure MAME is paused
-	mui.machine().pause();
 }
 
 menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu) :
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot) :
 	ui::menu(mui, container),
 	m_menu(menu),
 	m_need_idle(false)
 {
+	set_one_shot(one_shot);
 }
 
 bool menu_plugin_opt::handle(event const *ev)

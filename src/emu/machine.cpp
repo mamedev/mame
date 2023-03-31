@@ -323,7 +323,7 @@ int running_machine::run(bool quiet)
 		// run the CPUs until a reset or exit
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
-			g_profiler.start(PROFILER_EXTRA);
+			auto profile = g_profiler.start(PROFILER_EXTRA);
 
 			// execute CPUs if not paused
 			if (!m_paused)
@@ -335,8 +335,6 @@ int running_machine::run(bool quiet)
 			// handle save/load
 			if (m_saveload_schedule != saveload_schedule::NONE)
 				handle_saveload();
-
-			g_profiler.stop();
 		}
 		m_manager.http()->clear();
 
@@ -1177,7 +1175,7 @@ void running_machine::popup_clear() const
 	ui().popup_time(0, " ");
 }
 
-void running_machine::popup_message(util::format_argument_pack<std::ostream> const &args) const
+void running_machine::popup_message(util::format_argument_pack<char> const &args) const
 {
 	std::string const temp(string_format(args));
 	ui().popup_time(temp.length() / 40 + 2, "%s", temp);
@@ -1299,7 +1297,7 @@ void running_machine::emscripten_main_loop()
 {
 	running_machine *machine = emscripten_running_machine;
 
-	g_profiler.start(PROFILER_EXTRA);
+	auto profile = g_profiler.start(PROFILER_EXTRA);
 
 	// execute CPUs if not paused
 	if (!machine->m_paused)
@@ -1332,8 +1330,6 @@ void running_machine::emscripten_main_loop()
 	{
 		emscripten_cancel_main_loop();
 	}
-
-	g_profiler.stop();
 }
 
 void running_machine::emscripten_set_running_machine(running_machine *machine)

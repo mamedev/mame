@@ -74,7 +74,7 @@ void hng64_state::dl_upload_w(uint32_t data)
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
@@ -84,7 +84,6 @@ g_profiler.start(PROFILER_USER1);
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
 	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200*8));
-g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)

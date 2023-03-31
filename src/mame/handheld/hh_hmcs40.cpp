@@ -3720,8 +3720,8 @@ static INPUT_PORTS_START( ghalien )
 
 	PORT_START("IN.6") // D6 line D15
 	PORT_CONFNAME( 0x8000, 0x0000, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(      0x0000, "Amateur" )
-	PORT_CONFSETTING(      0x8000, "Professional" )
+	PORT_CONFSETTING(      0x0000, "1" ) // AMA
+	PORT_CONFSETTING(      0x8000, "2" ) // PRO
 INPUT_PORTS_END
 
 void ghalien_state::ghalien(machine_config &config)

@@ -1073,7 +1073,7 @@ end
 				"-Wimplicit-fallthrough",
 			}
 			buildoptions {
-				"-Wno-unused-result", -- needed for fgets,fread on linux
+				"-Wno-error=unused-result", -- needed for fgets,fread on linux
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				"-Wno-array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]

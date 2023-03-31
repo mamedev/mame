@@ -1361,10 +1361,11 @@ GAME( 1998, racingj,    0,       nwktr,       nwktr, nwktr_state, init_racingj, 
 GAME( 1998, racingje,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676EAC)",             GAME_FLAGS )
 GAME( 1998, racingjj,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676JAC)",             GAME_FLAGS )
 GAME( 1998, racingja,   racingj, nwktr,       nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam (GQ676AAC)",             GAME_FLAGS )
-GAME( 1998, racingj2,   racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)", GAME_FLAGS )
-GAME( 1998, racingj2e,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)", GAME_FLAGS )
-GAME( 1998, racingj2j,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)", GAME_FLAGS )
-GAME( 1998, racingj2a,  racingj, nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)", GAME_FLAGS )
+
+GAME( 1998, racingj2,   0,       nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888UAA)", GAME_FLAGS )
+GAME( 1998, racingj2e,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888EAA)", GAME_FLAGS )
+GAME( 1998, racingj2j,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888JAA)", GAME_FLAGS )
+GAME( 1998, racingj2a,  racingj2,nwktr_lan_b, nwktr, nwktr_state, init_racingj, ROT0, "Konami", "Racing Jam: Chapter II (GQ888AAA)", GAME_FLAGS )
 
 // JAx and ABx revisions are for the DX cabinet type with a full 5+R type gear shifter and a clutch pedal.
 // The EDx version asks you to select if you have a hand brake lever installed, a clutch pedal installed,

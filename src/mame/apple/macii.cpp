@@ -4,12 +4,12 @@
 
     mac.cpp
     Macintosh II ("Becks, Cabernet, Ikki, Little Big Mac, Paris, Reno, Uzi, Milwaukee")
-	Macintosh II FDHD (Codenames not known)
-	Macintosh IIx ("Spock, Stratos")
-	Macintosh IIcx ("Atlantic, Cobra, Aurora")
-	Macintosh SE/30 ("Fafnir, Green Jade")
+    Macintosh II FDHD (Codenames not known)
+    Macintosh IIx ("Spock, Stratos")
+    Macintosh IIcx ("Atlantic, Cobra, Aurora")
+    Macintosh SE/30 ("Fafnir, Green Jade")
 
-	Driver by R. Belmont and O. Galibert, based on work by Nathan Woods, Ernesto Corvi, and Raphael Nabet
+    Driver by R. Belmont and O. Galibert, based on work by Nathan Woods, Ernesto Corvi, and Raphael Nabet
 
 ****************************************************************************/
 
@@ -269,7 +269,7 @@ void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 }
 
 /*
-	Interrupt handling
+    Interrupt handling
 */
 
 void mac_state::field_interrupts()
@@ -383,8 +383,8 @@ Here's an example of the address expressed in binary:
   0101 1000 0000 00d0 0rrr 000n
 
 Note:  Asserting the DACK signal applies only to write operations to
-	   the output data register and read operations from the input
-	   data register.
+       the output data register and read operations from the input
+       data register.
 
   Symbolic            Memory
   Location            Location   NCR 5380 Internal Register
@@ -408,7 +408,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sBSR         $580050    Bus and Status Register
   scsiRd+sIDR         $580060    Input Data Register
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
-			 */
+             */
 
 uint16_t mac_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {

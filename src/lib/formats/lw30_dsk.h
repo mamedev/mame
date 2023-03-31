@@ -2,8 +2,8 @@
 // copyright-holders:Bartman/Abyss
 /***************************************************************************
 
-	Brother LW-30 Disk image format
-	see https://github.com/BartmanAbyss/brother-diskconv for disk conversion tool
+    Brother LW-30 Disk image format
+    see https://github.com/BartmanAbyss/brother-diskconv for disk conversion tool
 
 ***************************************************************************/
 #ifndef MAME_FORMATS_LW30_DSK_H

@@ -701,23 +701,20 @@ void bfm_sc2_state::mmtr_w(uint8_t data)
 void bfm_sc2_state::mux_output_w(offs_t offset, uint8_t data)
 {
 	// this is a useful profiler point to make sure the artwork writes / lookups are performing properly.
-	g_profiler.start(PROFILER_USER6);
+	auto profile = g_profiler.start(PROFILER_USER6);
 
-	int i;
-	int off = offset<<3;
+	int const off = offset<<3;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int oldbit = BIT(m_lamps_old[offset], i);
-		int newbit = BIT(data, i);
+		int const oldbit = BIT(m_lamps_old[offset], i);
+		int const newbit = BIT(data, i);
 
 		if (oldbit != newbit)
 			m_lamps[off + i] = newbit;
 	}
 
 	m_lamps_old[offset] = data;
-
-	g_profiler.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////

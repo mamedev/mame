@@ -100,7 +100,7 @@ uint8_t pccard_slot_device::read_memory_byte(offs_t offset)
 		if (BIT(offset, 0))
 			data = m_pccard->read_memory(offset / 2, 0xff00) >> 8;
 		else
-			data = m_pccard->read_memory(offset / 2, 0x00ff) >> 0;			
+			data = m_pccard->read_memory(offset / 2, 0x00ff) >> 0;
 	}
 
 	return data;
@@ -115,7 +115,7 @@ uint8_t pccard_slot_device::read_reg_byte(offs_t offset)
 		if (BIT(offset, 0))
 			data = m_pccard->read_reg(offset / 2, 0xff00) >> 8;
 		else
-			data = m_pccard->read_reg(offset / 2, 0x00ff) >> 0;			
+			data = m_pccard->read_reg(offset / 2, 0x00ff) >> 0;
 	}
 
 	return data;

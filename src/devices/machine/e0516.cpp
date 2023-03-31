@@ -55,7 +55,7 @@ e0516_device::e0516_device(const machine_config &mconfig, const char *tag, devic
 	m_data_latch(0),
 	m_reg_latch(0),
 	m_state(STATE_ADDRESS),
-	m_bits_left(0),
+	m_bits_left(4),
 	m_dio(0),
 	m_reset(1),
 	m_timer(nullptr)
@@ -123,7 +123,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 		if ((m_state == STATE_DATA_WRITE) && (m_bits_left == 0) && (get_address() != 7))
 		{
 			LOG("E05-16 '%s' Write Register %u : %02x\n", tag(), get_address(), m_data_latch);
-	
+
 			// write latched data to register
 			set_clock_register(get_address(), bcd_to_integer(m_data_latch));
 		}
@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 
 	m_bits_left--;
 	if ((m_state == STATE_DATA_READ) && (m_bits_left == 56) && !m_read_outsel()) return;
-	
+
 	if (m_state == STATE_ADDRESS)
 	{
 		LOG("E05-16 '%s' Command Bit %u\n", tag(), m_dio);
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 			if (BIT(m_reg_latch, 0))
 			{
 				m_state = STATE_DATA_READ;
-		
+
 				if (get_address() == 7)
 				{
 					LOG("E05-16 '%s' Continuous Read-Out Mode\n", tag());
@@ -320,7 +320,7 @@ WRITE_LINE_MEMBER( e0516_device::dio_w )
 READ_LINE_MEMBER( e0516_device::dio_r )
 {
 	if (m_cs || (m_state == STATE_HI_Z))
-	{ 
+	{
 		// high impedance
 		return 0;
 	}

@@ -539,7 +539,7 @@ void abc80_state::abc80(machine_config &config)
 	ABCBUS_SLOT(config, m_bus, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "generic_kb", 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
 	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
@@ -550,6 +550,7 @@ void abc80_state::abc80(machine_config &config)
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
+	SOFTWARE_LIST(config, "rom_list").set_original("abc80_rom");
 }
 
 
@@ -576,9 +577,6 @@ ROM_START( abc80 )
 	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
 	ROMX_LOAD( "3509_3_v2.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(1) )
 
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
-
 	ROM_REGION( 0x100, "hsync", 0 )
 	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0100, CRC(e4f7e018) SHA1(63e718a39537f37286ea183e6469808c271dbfa5) ) // "64 40029-01" 82S129 256x4 horizontal sync
 
@@ -596,10 +594,40 @@ ROM_START( abc80 )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( tkn80 )
+//-------------------------------------------------
+
+ROM_START( tkn80 )
+	ROM_REGION( 0x5000, Z80_TAG, 0 )
+	ROM_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9) )
+	ROM_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1) )
+	ROM_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b) )
+	ROM_LOAD( "3509_3_v2.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710) )
+	ROM_LOAD( "tkn80-iii", 0x4000, 0x1000, CRC(f0d2e4fa) SHA1(b0263c65db39667a6fe62e61f73fe591ea10f14b) )
+
+	ROM_REGION( 0x100, "hsync", 0 )
+	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0100, CRC(e4f7e018) SHA1(63e718a39537f37286ea183e6469808c271dbfa5) ) // "64 40029-01" 82S129 256x4 horizontal sync
+
+	ROM_REGION( 0x200, "vsync", 0 )
+	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0200, CRC(445a45b9) SHA1(bcc1c4fafe68b3500b03de785ca32abd63cea252) ) // "64 40030-01" 82S131 512x4 vertical sync
+
+	ROM_REGION( 0x100, "attr", 0 )
+	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0100, CRC(6c46811c) SHA1(2d3bdf2d3a2a88ddb1c0c637967e1b2b9541a928) ) // "64 40056-01" 82S129 256x4 attribute
+
+	ROM_REGION( 0x200, "line", 0 )
+	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0200, CRC(74de7a0b) SHA1(96f37b0ca65aa8af4242bad38124f410b7f657fe) ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
+
+	ROM_REGION( 0x100, "mmu", 0 )
+	ROM_LOAD( "tkn80-13.e7", 0x0000, 0x0100, CRC(28bfdf62) SHA1(209c4a29628168a27445b75f4c44aba2c7c49dbb) )
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
+COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 198?, tkn80, abc80,  0,      abc80,   0,     abc80_state,  empty_init, "MYAB",             "ABC 80 with TKN80", MACHINE_NOT_WORKING )

@@ -2195,6 +2195,8 @@ ROM_START( nbbatman ) // M92-F-A ROM board (also known to exist on M92-Z-B 05C04
 	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( nbbatmanu ) // M92-F-A ROM board
@@ -2227,6 +2229,8 @@ ROM_START( nbbatmanu ) // M92-F-A ROM board
 	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( leaguemn ) // M92-F-A ROM board
@@ -2259,6 +2263,8 @@ ROM_START( leaguemn ) // M92-F-A ROM board
 	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "mt2_b-2l-.ic7",   0x0600, 0x0117, CRC(3bab14ee) SHA1(312d19cd1a6ef636495bb9a3294261c10bab3a56) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_b-7h-d.ic47", 0x0800, 0x0117, CRC(59d86225) SHA1(9202bcf962f63edc0ef273f102c38337e90449cc) ) // PAL16L8 - bruteforced
 ROM_END
 
 ROM_START( leaguemna ) // M92-Z-C  05C04805C1 ROM board
@@ -2295,9 +2301,9 @@ ROM_START( leaguemna ) // M92-Z-C  05C04805C1 ROM board
 	ROM_LOAD( "m92_a-3m-.ic11",  0x0000, 0x0117, CRC(fc718efe) SHA1(d554dd74cecd95754a1e6e24c6a207d6d3428253) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-7j-.ic41",  0x0200, 0x0117, CRC(5730b25a) SHA1(1877b807f6a94f6d515afc940e1d615a453490fd) ) // PAL16L8 - bruteforced
 	ROM_LOAD( "m92_a-9j-.ic51",  0x0400, 0x0117, CRC(92d477cf) SHA1(6a1e9bfdb367384e8611f46300f378730817514b) ) // PAL16L8 - bruteforced
-	ROM_LOAD( "m92_z-2f-.ic64",  0x0600, 0x0117, NO_DUMP ) // PAL16L8
-	ROM_LOAD( "m92_z-2k-.ic15",  0x0800, 0x0117, NO_DUMP ) // PAL16L8
-	ROM_LOAD( "m92_z-2l-.ic16",  0x0a00, 0x0117, NO_DUMP ) // PAL16L8
+	ROM_LOAD( "m92_z-2k-.ic15",  0x0600, 0x0117, CRC(0646be21) SHA1(56a3980fd6af1896a6a2fb6310600e4553912809) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_z-2l-.ic16",  0x0800, 0x0117, CRC(a09df0ee) SHA1(6260e3ba896c8947f80916d8366f381b63212bfc) ) // PAL16L8 - bruteforced
+	ROM_LOAD( "m92_z-2f-.ic64",  0x0a00, 0x0117, NO_DUMP ) // PAL16L8
 ROM_END
 
 ROM_START( nbbatman2bl )

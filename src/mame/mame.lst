@@ -1824,7 +1824,7 @@ klaxj4                          // 136075           (c) 1989 (Japan)
 
 @source:atari/liberatr.cpp
 liberatr                        // 136012           (c) 1982
-liberatr2                       // 136012           (c) 1982
+liberatrp                       // 136012           (c) 1982
 
 @source:atari/lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -14805,7 +14805,7 @@ lw840                           // Brother LW-840ic (c) 1997 Brother Industries,
 anzterm                         // Burroughs EF315-I220
 
 @source:burroughs/td831.cpp
-td831							// (c) 1976 Burroughs
+td831                           // (c) 1976 Burroughs
 
 @source:camputers/camplynx.cpp
 lynx128k                        //
@@ -18863,8 +18863,9 @@ cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
 comp4                           // Milton Bradley
+comparc                         // Tandy Corporation
 copycat                         // Tiger Electronics
-copycatm2                       // Tiger Electronics
+copycata                        // Tiger Electronics
 cqback                          // Coleco
 dataman                         // Texas Instruments
 ditto                           // Tiger Electronics
@@ -18895,7 +18896,7 @@ h2hfootb                        // Coleco
 h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
-lilprof78                       // Texas Instruments
+lilprofa                        // Texas Instruments
 liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -18932,7 +18933,6 @@ stopthiefp                      // Parker Bros (patent)
 subwars                         // Tiger Electronics
 t3in1sa                         // Tandy Corporation
 t7in1ss                         // Tiger Electronics
-tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
 tc7atc                          // Bandai
@@ -18941,12 +18941,13 @@ tcfballa                        // Tandy Corporation
 tdracula                        // Tsukuda
 ti1000                          // Texas Instruments
 ti1250                          // Texas Instruments
-ti125076                        // Texas Instruments
+ti1250a                         // Texas Instruments
 ti1270                          // Texas Instruments
 ti1680                          // Texas Instruments
 ti25503                         // Texas Instruments
 ti30                            // Texas Instruments
 ti5100                          // Texas Instruments
+ti5200                          // Texas Instruments
 tibusan                         // Texas Instruments
 timaze                          // Texas Instruments
 tiprog                          // Texas Instruments
@@ -18961,6 +18962,8 @@ zodiac                          // Coleco
 alnchase                        // Tomy
 astrocmd                        // Epoch
 bcclimbr                        // Bandai
+bgalaxn                         // Bandai
+bgunf                           // Bandai
 bmcfball                        // Bambino
 bmsafari                        // Bambino
 bmsoccer                        // Bambino
@@ -24436,6 +24439,7 @@ octopus                         //
 
 @source:luxor/abc80.cpp
 abc80                           //
+tkn80                           //
 
 @source:luxor/abc80x.cpp
 abc800c                         //
@@ -28023,6 +28027,8 @@ draw88pkr                       // 1988, BTE, Inc.
 amhbattl
 docchift
 mmhammer
+shpchamp
+zenponta
 
 @source:misc/anes.cpp
 sanma                           // 2001, ANES
@@ -30053,29 +30059,6 @@ maxideal                        // (c) 1983 American Communications Laboratories
 @source:misc/kurukuru.cpp
 kurukuru                        // (c) 1990 Success / Taiyo Jidoki.
 ppj                             // (c) 199? Success / Taiyo Jidoki.
-
-@source:misc/kyugo.cpp
-99lstwar                        // (c) 1985 Proma
-99lstwara                       // (c) 1985 Proma
-99lstwarb                       // bootleg
-99lstwark                       // (c) 1985 Kyugo
-airwolf                         // (c) 1987 Kyugo
-airwolfa                        // (c) 1987 Kyugo
-buzzard                         // (c) 1984 Crux
-flashgal                        // (c) 1985 Sega
-flashgala                       // (c) 1985 Sega
-flashgalk                       // (c) 1985 Kyugo
-fx                              // bootleg
-gyrodine                        // (c) 1984 Crux
-gyrodinet                       // (c) 1984 Crux (Taito Corporation license)
-legend                          // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
-legendb                         // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
-repulse                         // (c) 1985 Sega
-skywolf                         // bootleg
-skywolf2                        // bootleg
-skywolf3                        // bootleg
-sonofphx                        // bootleg
-srdmissn                        // (c) 1986 Taito Corporation
 
 @source:misc/ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -32718,6 +32701,9 @@ skykids                         // (c) 1985
 @source:namco/sweetland.cpp
 sweetlnd                        //
 
+@source:namco/sweetland4.cpp
+sweetld4                        //
+
 @source:namco/tankbatt.cpp
 tankbatt                        // (c) 1980 Namco
 tankbattb                       // bootleg
@@ -34446,6 +34432,29 @@ funkybeeb                       // (c) 1982 Orca
 skylancr                        // (c) 1983 Orca
 skylancre                       // (c) 1983 Orca + Esco Trading Co license
 
+@source:orca/kyugo.cpp
+99lstwar                        // (c) 1985 Proma
+99lstwara                       // (c) 1985 Proma
+99lstwarb                       // bootleg
+99lstwark                       // (c) 1985 Kyugo
+airwolf                         // (c) 1987 Kyugo
+airwolfa                        // (c) 1987 Kyugo
+buzzard                         // (c) 1984 Crux
+flashgal                        // (c) 1985 Sega
+flashgala                       // (c) 1985 Sega
+flashgalk                       // (c) 1985 Kyugo
+fx                              // bootleg
+gyrodine                        // (c) 1984 Crux
+gyrodinet                       // (c) 1984 Crux (Taito Corporation license)
+legend                          // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
+legendb                         // no copyright notice [1986 Sega/Coreland] (Arcade TV Game List - P.104, Left, 14 from top)
+repulse                         // (c) 1985 Sega
+skywolf                         // bootleg
+skywolf2                        // bootleg
+skywolf3                        // bootleg
+sonofphx                        // bootleg
+srdmissn                        // (c) 1986 Taito Corporation
+
 @source:orca/marineb.cpp
 bcruzm12                        // (c) 1983 Sigma Ent. Inc.
 changes                         // (c) 1982 Orca
@@ -34457,6 +34466,9 @@ looper                          // (c) 1982 Orca
 marineb                         // (c) 1982 Orca
 springer                        // (c) 1982 Orca
 wanted                          // (c) 1984 Sigma Ent. Inc.
+
+@source:orca/sub.cpp
+sub                             // (c) 1985 Sigma Ent. Inc.
 
 @source:orca/vastar.cpp
 dogfightp                       // (c) 1983 Orca
@@ -37602,8 +37614,23 @@ psionp350                       //
 psionp464                       //
 psionxp                         //
 
+@source:psion/psion3a.cpp
+pocketbk2                       // 1994 Acorn Pocket Book II
+psion3a                         // 1993 Psion Series 3a
+psion3a2                        // 1995 Psion Series 3a
+psion3a2_de                     // 1995 Psion Series 3a (German)
+psion3c                         // 1996 Psion Series 3c
+psion3mx                        // 1998 Psion Series 3mx
+
 @source:psion/psion5.cpp
 psion5mx                        //
+
+@source:psion/siena.cpp
+siena                           // 1996 Psion Siena
+
+@source:psion/workabout.cpp
+psionwa                         // 1995 Psion Workabout
+psionwamx                       // 1998 Psion Workabout mx
 
 @source:quantel/dpb7000.cpp
 dpb7000                         //
@@ -38764,6 +38791,9 @@ wccf2chk                        // 2004.?? World Club Champion Football Serie A 
 wccf310j                        // 2005.06 World Club Champion Football European Clubs 2004-2005
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf331j                        // 2005.12 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf341j                        // 2006.02 World Club Champion Football European Clubs 2004-2005 Ver.1.2
+wccf400j                        // 2006.07 World Club Champion Football European Clubs 2005-2006
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
 wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
@@ -38809,6 +38839,7 @@ spongbob                        // (c) 200? Sega
 
 @source:sega/segac2.cpp
 anpanman                        // (c) 1993 Sega
+anpanmana                       // (c) 1993 Sega
 bloxeedc                        // (c) 1989 Sega / Elorg
 bloxeedu                        // (c) 1989 Sega / Elorg
 borench                         // (c) 1990 Sega
@@ -38857,6 +38888,7 @@ tfrceacb                        // bootleg
 tfrceacj                        // (c) 1990 Sega / Technosoft
 tfrceacjpb                      // prototype / bootleg
 twinsqua                        // (c) 1991 Sega
+wwanpanm                        // (c) 1992 Sega
 wwmarine                        // (c) 1992 Sega
 zunkyou                         // (c) 1994 Sega
 
@@ -40547,9 +40579,6 @@ spiders2                        // (c) 1981 Sigma Ent. Inc.
 spiders3                        // (c) 1981 Sigma Ent. Inc.
 spinner                         // bootleg
 
-@source:sigma/sub.cpp
-sub                             // (c) 1985 Sigma Ent. Inc.
-
 @source:sinclair/atm.cpp
 atm                             //
 atmtb2                          //
@@ -41129,6 +41158,9 @@ palestra
 
 @source:skeleton/pdt3100.cpp
 pdt3100                         //
+
+@source:skeleton/pegasos2.cpp
+pegasos2                        //
 
 @source:skeleton/pencil2.cpp
 pencil2                         //
@@ -42995,6 +43027,9 @@ rltennisa                       // (c) 1993 TCH
 
 @source:tch/speedspn.cpp
 speedspn                        // (c) 1994
+
+@source:tch/topdrive.cpp
+topdrive                        // (c) 1995
 
 @source:tch/wheelfir.cpp
 wheelfir                        // (c) 199? TCH
