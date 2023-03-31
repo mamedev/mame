@@ -168,8 +168,8 @@ void nand_device::device_reset()
 	m_page_addr = 0;
 	m_byte_addr = 0;
 	m_accumulated_status = 0;
-	m_mode_3065 = 0;
-	m_status = 0xC0;
+	m_mode_3065 = false;
+	m_status = 0xc0;
 
 	std::fill_n(m_pagereg.get(), m_page_total_size, 0);
 }
@@ -239,12 +239,10 @@ void nand_device::command_w(uint8_t data)
 		m_pointer_mode = SM_PM_A;
 		m_status = (m_status & 0x80) | 0x40;
 		m_accumulated_status = 0;
-		m_mode_3065 = 0;
-		if (!m_write_rnb.isnull())
-		{
-			m_write_rnb(0);
-			m_write_rnb(1);
-		}
+		m_mode_3065 = false;
+
+		m_write_rnb(0);
+		m_write_rnb(1);
 		break;
 	case 0x00: // Read (1st cycle)
 		m_mode = SM_M_READ;
@@ -306,11 +304,9 @@ void nand_device::command_w(uint8_t data)
 			else
 				m_accumulated_status = 0;
 			m_mode = SM_M_INIT;
-			if (!m_write_rnb.isnull())
-			{
-				m_write_rnb(0);
-				m_write_rnb(1);
-			}
+
+			m_write_rnb(0);
+			m_write_rnb(1);
 		}
 		break;
 	// case 0x11:
@@ -335,11 +331,9 @@ void nand_device::command_w(uint8_t data)
 			m_mode = SM_M_INIT;
 			if (m_pointer_mode == SM_PM_B)
 				m_pointer_mode = SM_PM_A;
-			if (!m_write_rnb.isnull())
-			{
-				m_write_rnb(0);
-				m_write_rnb(1);
-			}
+
+			m_write_rnb(0);
+			m_write_rnb(1);
 		}
 		break;
 	case 0x70: // Read Status
@@ -372,11 +366,8 @@ void nand_device::command_w(uint8_t data)
 			}
 			else
 			{
-				if (!m_write_rnb.isnull())
-				{
-					m_write_rnb(0);
-					m_write_rnb(1);
-				}
+				m_write_rnb(0);
+				m_write_rnb(1);
 			}
 		}
 		break;
@@ -388,7 +379,7 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			m_mode_3065 = 1;
+			m_mode_3065 = true;
 		}
 		break;
 	case 0x05: // Random Data Output (1st cycle)

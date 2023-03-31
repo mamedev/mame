@@ -40,7 +40,7 @@ public:
 	void data_w(uint8_t data);
 
 protected:
-	enum sm_mode_t
+	enum sm_mode_t : uint8_t
 	{
 		SM_M_INIT,       // initial state
 		SM_M_READ,       // read page data
@@ -53,7 +53,7 @@ protected:
 		SM_M_RANDOM_DATA_OUTPUT
 	};
 
-	enum pointer_sm_mode_t
+	enum pointer_sm_mode_t : uint8_t
 	{
 		SM_PM_A, // accessing first 256-byte half of 512-byte data field
 		SM_PM_B, // accessing second 256-byte half of 512-byte data field
@@ -64,12 +64,12 @@ protected:
 
 	optional_memory_region m_region;
 
-	int m_page_data_size;       // 256 for a 2MB card, 512 otherwise
-	int m_page_total_size;      // 264 for a 2MB card, 528 otherwise
-	int m_num_pages;            // 8192 for a 4MB card, 16184 for 8MB, 32768 for 16MB,
+	uint32_t m_page_data_size;       // 256 for a 2MB card, 512 otherwise
+	uint32_t m_page_total_size;      // 264 for a 2MB card, 528 otherwise
+	uint32_t m_num_pages;            // 8192 for a 4MB card, 16184 for 8MB, 32768 for 16MB,
 								// 65536 for 32MB, 131072 for 64MB, 262144 for 128MB...
 								// 0 means no card loaded
-	int m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
+	int32_t m_log2_pages_per_block; // log2 of number of pages per erase block (usually 4 or 5)
 
 	std::unique_ptr<uint8_t[]> m_feeprom_data; // FEEPROM data area
 	std::unique_ptr<uint8_t[]> m_data_uid_ptr; // TODO: this probably should be contained to smartmed
@@ -77,27 +77,27 @@ protected:
 	sm_mode_t m_mode;                 // current operation mode
 	pointer_sm_mode_t m_pointer_mode; // pointer mode
 
-	unsigned int m_page_addr; // page address pointer
-	int m_byte_addr;          // byte address pointer
-	int m_addr_load_ptr;      // address load pointer
+	uint32_t m_page_addr; // page address pointer
+	uint32_t m_byte_addr;          // byte address pointer
+	uint32_t m_addr_load_ptr;      // address load pointer
 
-	int m_status;             // current status
-	int m_accumulated_status; // accumulated status
+	uint8_t m_status;             // current status
+	uint8_t m_accumulated_status; // accumulated status
 
 	std::unique_ptr<uint8_t[]> m_pagereg; // page register used by program command
 	uint8_t m_id[5];                      // chip ID
 
-	int m_mode_3065;
+	bool m_mode_3065;
 
 	// Palm Z22 NAND has 512 + 16 byte pages but, for some reason, Palm OS writes 512 + 64 bytes when
 	// programming a page, so we need to keep track of the number of bytes written so we can ignore the
 	// last 48 (64 - 16) bytes or else the first 48 bytes get overwritten
-	int m_program_byte_count;
+	uint32_t m_program_byte_count;
 
-	int m_id_len;
-	int m_col_address_cycles;
-	int m_row_address_cycles;
-	int m_sequential_row_read;
+	uint32_t m_id_len;
+	uint32_t m_col_address_cycles;
+	uint32_t m_row_address_cycles;
+	uint32_t m_sequential_row_read;
 
 	devcb_write_line m_write_rnb;
 };
