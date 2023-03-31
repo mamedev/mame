@@ -166,8 +166,8 @@ protected:
 	void osborne1_op(address_map &map);
 	void osborne1_io(address_map &map);
 
-	u8 bank2_2xxx_3xxx_r(offs_t offset);
-	void bank2_2xxx_3xxx_w(offs_t offset, u8 data);
+	u8 bank2_peripherals_r(offs_t offset);
+	void bank2_peripherals_w(offs_t offset, u8 data);
 	void videoram_w(offs_t offset, u8 data);
 	u8 opcode_r(offs_t offset);
 	void bankswitch_w(offs_t offset, u8 data);
@@ -271,8 +271,8 @@ protected:
 
 	void osborne1sp_mem(address_map &map);
 
-	u8 bank2_2xxx_3xxx_r(offs_t offset);
-	void bank2_2xxx_3xxx_w(offs_t offset, u8 data);
+	u8 bank2_peripherals_r(offs_t offset);
+	void bank2_peripherals_w(offs_t offset, u8 data);
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -306,7 +306,7 @@ private:
 };
 
 
-u8 osborne1_state::bank2_2xxx_3xxx_r(offs_t offset)
+u8 osborne1_state::bank2_peripherals_r(offs_t offset)
 {
 	// Since each peripheral only checks two bits, many addresses will
 	// result in multiple peripherals attempting to drive the bus.  This is
@@ -333,7 +333,7 @@ u8 osborne1_state::bank2_2xxx_3xxx_r(offs_t offset)
 	return data;
 }
 
-void osborne1_state::bank2_2xxx_3xxx_w(offs_t offset, u8 data)
+void osborne1_state::bank2_peripherals_w(offs_t offset, u8 data)
 {
 	// Handle writes to the I/O area
 	if ((offset & 0x900) == 0x100) // Floppy
@@ -346,9 +346,9 @@ void osborne1_state::bank2_2xxx_3xxx_w(offs_t offset, u8 data)
 		m_pia1->write(offset & 0x03, data);
 }
 
-u8 osborne1sp_state::bank2_2xxx_3xxx_r(offs_t offset)
+u8 osborne1sp_state::bank2_peripherals_r(offs_t offset)
 {
-	u8 data = osborne1_state::bank2_2xxx_3xxx_r(offset);
+	u8 data = osborne1_state::bank2_peripherals_r(offset);
 
 	if ((offset & 0xc00) == 0x400) // SCREEN-PAC
 		data &= 0xfb;
@@ -356,9 +356,9 @@ u8 osborne1sp_state::bank2_2xxx_3xxx_r(offs_t offset)
 	return data;
 }
 
-void osborne1sp_state::bank2_2xxx_3xxx_w(offs_t offset, u8 data)
+void osborne1sp_state::bank2_peripherals_w(offs_t offset, u8 data)
 {
-	osborne1_state::bank2_2xxx_3xxx_w(offset, data);
+	osborne1_state::bank2_peripherals_w(offset, data);
 
 	if ((offset & 0xc00) == 0x400) // SCREEN-PAC
 	{
@@ -808,14 +808,14 @@ void osborne1_state::osborne1_mem(address_map &map)
 
 	map(0x0000, 0x3fff).view(m_rom_view);
 	m_rom_view[0](0x0000, 0x0fff).mirror(0x1000).rom().region("maincpu", 0).unmapw();
-	m_rom_view[0](0x2000, 0x2fff).mirror(0x1000).rw(FUNC(osborne1_state::bank2_2xxx_3xxx_r), FUNC(osborne1_state::bank2_2xxx_3xxx_w));
+	m_rom_view[0](0x2000, 0x2fff).mirror(0x1000).rw(FUNC(osborne1_state::bank2_peripherals_r), FUNC(osborne1_state::bank2_peripherals_w));
 }
 
 void osborne1sp_state::osborne1sp_mem(address_map &map)
 {
 	osborne1_mem(map);
 
-	m_rom_view[0](0x2000, 0x2fff).mirror(0x1000).rw(FUNC(osborne1sp_state::bank2_2xxx_3xxx_r), FUNC(osborne1sp_state::bank2_2xxx_3xxx_w));
+	m_rom_view[0](0x2000, 0x2fff).mirror(0x1000).rw(FUNC(osborne1sp_state::bank2_peripherals_r), FUNC(osborne1sp_state::bank2_peripherals_w));
 }
 
 
