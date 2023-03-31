@@ -28,7 +28,6 @@
 #include "tlb.h"
 
 namespace {
-#define H19_CLOCK (XTAL(12'288'000) / 6)
 
 class h19_state : public driver_device
 {
@@ -52,22 +51,22 @@ private:
 
 void h19_state::h19(machine_config &config)
 {
-	HEATH_TLB(config, m_tlb, H19_CLOCK);
+	HEATH_TLB(config, m_tlb);
 }
 
 void h19_state::h19_superh19(machine_config &config)
 {
-	HEATH_SUPER19(config, m_tlb, H19_CLOCK);
+	HEATH_SUPER19(config, m_tlb);
 }
 
 void h19_state::h19_watzh19(machine_config &config)
 {
-	HEATH_WATZ(config, m_tlb, H19_CLOCK);
+	HEATH_WATZ(config, m_tlb);
 }
 
 void h19_state::h19_ultrah19(machine_config &config)
 {
-	HEATH_ULTRA(config, m_tlb, H19_CLOCK);
+	HEATH_ULTRA(config, m_tlb);
 }
 
 /* ROM definition */

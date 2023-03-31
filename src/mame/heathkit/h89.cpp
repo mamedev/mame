@@ -28,7 +28,6 @@
 namespace {
 
 
-#define H19_CLOCK (XTAL(12'288'000) / 6)
 #define H89_CLOCK (XTAL(12'288'000) / 6)
 #define INS8250_CLOCK (XTAL(1'843'200))
 
@@ -191,7 +190,7 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
 	INS8250(config, m_console, INS8250_CLOCK);
-	HEATH_TLB(config, m_tlb, H19_CLOCK);
+	HEATH_TLB(config, m_tlb);
 
 	// Connect the console port on CPU board to serial port on TLB
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));

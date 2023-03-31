@@ -23,7 +23,7 @@
 class heath_tlb_device : public device_t
 {
 public:
-	heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// interface routines
 	auto serial_data_callback() { return m_write_sd.bind(); }
@@ -31,7 +31,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cb1_w);
 
 protected:
-	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -63,8 +63,8 @@ private:
 	TIMER_CALLBACK_MEMBER(key_click_off);
 	TIMER_CALLBACK_MEMBER(bell_off);
 
-	emu_timer *m_key_click_timer = nullptr;
-	emu_timer *m_bell_timer = nullptr;
+	emu_timer *m_key_click_timer;
+	emu_timer *m_bell_timer;
 
 	devcb_write_line m_write_sd;
 
@@ -89,7 +89,7 @@ private:
 class heath_super19_tlb_device : public heath_tlb_device
 {
 public:
-	heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -99,7 +99,7 @@ protected:
 class heath_watz_tlb_device : public heath_tlb_device
 {
 public:
-	heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -109,7 +109,7 @@ protected:
 class heath_ultra_tlb_device : public heath_tlb_device
 {
 public:
-	heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
