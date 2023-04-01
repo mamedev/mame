@@ -43845,7 +43845,6 @@ t4426                           // Terco 4426 CNC programming station
 
 @source:trs/coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
-coco3dw1                        // Coco 3 with HDB-DOS
 coco3h                          // Hacked Color Computer 3 (6309)
 coco3p                          // Color Computer 3 (PAL)
 msm3                            // ILCE / SEP Micro-SEP Model 3

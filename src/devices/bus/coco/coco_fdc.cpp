@@ -399,42 +399,81 @@ void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 //**************************************************************************
 
 ROM_START(coco_fdc)
-	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
+	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
+	ROM_DEFAULT_BIOS("v11")
+
+	ROM_SYSTEM_BIOS(0, "v10", "RSDOS v1.0")
+	ROMX_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03), ROM_BIOS(0))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(1, "v11", "RSDOS v1.1")
+	ROMX_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1), ROM_BIOS(1))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(2, "ados", "ADOS v1.02 for CoCo 1/2")
+	ROMX_LOAD("ados.rom", 0x0000, 0x2000, CRC(24e807cf) SHA1(a935ea11af4c600a771e4540b661cbb4258a21d6), ROM_BIOS(2))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(3, "ados2b", "ADOS v1.02 for CoCo 2B")
+	ROMX_LOAD("ados2b.rom", 0x0000, 0x2000, CRC(47a59ad4) SHA1(66bd3cf08e7f1b318e82e8c4a9848233f38f1a56), ROM_BIOS(3))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(4, "ados3", "ADOS3 v1.01.01")
+	ROMX_LOAD("ados3.rom", 0x0000, 0x2000, CRC(6f824cd1) SHA1(de602d8d219094f1237d37a4f80032c25808b358), ROM_BIOS(4))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(5, "ados340", "ADOS3 v1.01.01, 40 track disk drives")
+	ROMX_LOAD("ados3-40.rom", 0x0000, 0x2000, CRC(8afe1a04) SHA1(a8dcc6fc0aa5589612cea2a318e7fae58d930c6c), ROM_BIOS(5))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(6, "ados380", "ADOS3 v1.01.01, 80 track disk drives")
+	ROMX_LOAD("ados3-80.rom", 0x0000, 0x2000, CRC(859762f5) SHA1(957f7d5a10e61266193b636dbf642002bcedfaa3), ROM_BIOS(6))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(7, "rgbdos", "Hard Disk Basic for Emudsk")
+	ROMX_LOAD("rgbdos_mess.rom", 0x0000, 0x2000, CRC(0b0e64db) SHA1(062ffab14dc788ec7744e528bf9bb425c3ec60ed), ROM_BIOS(7))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(8, "hdbk12", "Hard Disk Basic for Becker Port and DriveWire 3, CoCo 1/2")
+	ROMX_LOAD("hdbdw3bck.rom", 0x0000, 0x2000, CRC(867a3f42) SHA1(8fd64f1c246489e0bf2b3743ae76332ff324716a), ROM_BIOS(8))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
+
+	ROM_SYSTEM_BIOS(9, "hdbk3", "Hard Disk Basic for Becker Port and DriveWire 3, CoCo 3")
+	ROMX_LOAD("hdbdw3bc3.rom", 0x0000, 0x2000, CRC(309a9efd) SHA1(671605d61811953860466f771c1594bbade331f4), ROM_BIOS(9))
+	ROM_RELOAD(0x2000,0x2000)
+	ROM_RELOAD(0x4000,0x2000)
+	ROM_RELOAD(0x6000,0x2000)
 ROM_END
 
-ROM_START(coco_fdc_v11)
+ROM_START(coco_scii)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
-	ROM_RELOAD(0x2000, 0x2000)
-	ROM_RELOAD(0x4000, 0x2000)
-	ROM_RELOAD(0x6000, 0x2000)
-ROM_END
+	ROM_DEFAULT_BIOS("cdos3")
 
-ROM_START(coco_scii_cc1)
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("cdos 4 4-6-89 cc1.bin", 0x0000, 0x4000, CRC(9da6db28) SHA1(2cc6e275178ca8d8f281d845792fb0ae069aaeda))
-ROM_END
+	ROM_SYSTEM_BIOS(0, "cdos", "Disto C-DOS v4.0 for the CoCo 1/2")
+	ROMX_LOAD("cdos 4 4-6-89 cc1.bin", 0x0000, 0x4000, CRC(9da6db28) SHA1(2cc6e275178ca8d8f281d845792fb0ae069aaeda), ROM_BIOS(0))
+	ROM_RELOAD(0x4000,0x4000)
 
-ROM_START(coco_scii_cc3)
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230))
-ROM_END
-
-ROM_START(coco3_hdb1)
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("hdbdw3bc3.rom", 0x0000, 0x2000, CRC(309a9efd) SHA1(671605d61811953860466f771c1594bbade331f4))
-	ROM_RELOAD(0x2000, 0x2000)
-	ROM_RELOAD(0x4000, 0x2000)
-	ROM_RELOAD(0x6000, 0x2000)
-ROM_END
-
-ROM_START(coco2_hdb1)
-	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD("hdbdw3bck.rom", 0x0000, 0x2000, CRC(867a3f42) SHA1(8fd64f1c246489e0bf2b3743ae76332ff324716a))
-	ROM_RELOAD(0x2000, 0x2000)
-	ROM_RELOAD(0x4000, 0x2000)
-	ROM_RELOAD(0x6000, 0x2000)
+	ROM_SYSTEM_BIOS(1, "cdos3", "Disto C-DOS 3 v1.2 for the CoCo 3")
+	ROMX_LOAD("cdos 1_2 3-30-89 cc3.bin", 0x0000, 0x4000, CRC(891c0094) SHA1(c1fa0fcbf1202a9b63aafd98dce777b502584230), ROM_BIOS(1))
+	ROM_RELOAD(0x4000,0x4000)
 ROM_END
 
 ROM_START(cp450_fdc)
@@ -449,7 +488,7 @@ ROM_END
 
 
 //**************************************************************************
-//  COCO FDC
+//  COCO Floppy Disk Controller
 //**************************************************************************
 
 namespace
@@ -464,7 +503,7 @@ namespace
 		}
 
 	protected:
-		// optional information overrides
+		// device_t implementation
 		virtual const tiny_rom_entry *device_rom_region() const override
 		{
 			return ROM_NAME(coco_fdc);
@@ -473,52 +512,35 @@ namespace
 
 
 //**************************************************************************
-//              COCO FDC v1.1
-//**************************************************************************
-
-	class coco_fdc_v11_device : public coco_fdc_device_base
-	{
-	public:
-		// construction/destruction
-		coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, COCO_FDC_V11, tag, owner, clock)
-		{
-		}
-
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_fdc_v11);
-		}
-	};
-
-
-//**************************************************************************
 //              Disto / CRC Super Controller II Base
 //**************************************************************************
 
-	class coco_scii_device_base
+	class coco_scii_device
 		: public coco_fdc_device_base
 	{
 	public:
 		// construction/destruction
-		coco_scii_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, type, tag, owner, clock)
+			// construction/destruction
+		coco_scii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+			: coco_fdc_device_base(mconfig, COCO_SCII, tag, owner, clock)
 			, m_slot(*this, MEB_TAG)
 			, m_carts(*this, "cart_line")
 		{
 		}
 
 	protected:
-		// device-level overrides
+		// device_t implementation
 		virtual void device_start() override;
 		virtual void device_reset() override;
 		virtual u8 scs_read(offs_t offset) override;
 		virtual void scs_write(offs_t offset, u8 data) override;
 
-		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
+
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_scii);
+		}
 
 		// methods
 		virtual void update_lines() override;
@@ -543,15 +565,15 @@ namespace
 //  device_start - device-specific start
 //-------------------------------------------------
 
-	void coco_scii_device_base::device_start()
+	void coco_scii_device::device_start()
 	{
 		coco_family_fdc_device_base::device_start();
 
 		m_cache = std::make_unique<uint8_t[]>(0x200);
 
 		install_readwrite_handler(0xFF74, 0xFF77,
-				read8sm_delegate(*this, FUNC(coco_scii_device_base::ff74_read)),
-				write8sm_delegate(*this, FUNC(coco_scii_device_base::ff74_write)));
+				read8sm_delegate(*this, FUNC(coco_scii_device::ff74_read)),
+				write8sm_delegate(*this, FUNC(coco_scii_device::ff74_write)));
 
 		save_pointer(NAME(m_cache), 0x200);
 		save_item(NAME(m_cache_pointer));
@@ -563,7 +585,7 @@ namespace
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-	void coco_scii_device_base::device_reset()
+	void coco_scii_device::device_reset()
 	{
 		coco_family_fdc_device_base::device_reset();
 
@@ -581,7 +603,7 @@ namespace
 //  device_add_mconfig - device-specific machine config
 //-------------------------------------------------
 
-	void coco_scii_device_base::device_add_mconfig(machine_config &config)
+	void coco_scii_device::device_add_mconfig(machine_config &config)
 	{
 		coco_fdc_device_base::device_add_mconfig(config);
 
@@ -596,7 +618,7 @@ namespace
 //  scs_read
 //-------------------------------------------------
 
-	u8 coco_scii_device_base::scs_read(offs_t offset)
+	u8 coco_scii_device::scs_read(offs_t offset)
 	{
 		if (offset > 0x0f && offset < 0x18)
 			return m_slot->meb_read(offset - 0x10);
@@ -609,7 +631,7 @@ namespace
 //  scs_write
 //-------------------------------------------------
 
-	void coco_scii_device_base::scs_write(offs_t offset, u8 data)
+	void coco_scii_device::scs_write(offs_t offset, u8 data)
 	{
 		if (offset > 0x0f && offset < 0x18)
 			m_slot->meb_write(offset - 0x10, data);
@@ -624,7 +646,7 @@ namespace
 //  update_lines - SCII controller lines
 //-------------------------------------------------
 
-	void coco_scii_device_base::update_lines()
+	void coco_scii_device::update_lines()
 	{
 		// clear HALT enable under certain circumstances
 		if (intrq() && (dskreg() & 0x20))
@@ -682,7 +704,7 @@ namespace
 //  ff74_read - no halt registers
 //-------------------------------------------------
 
-	u8 coco_scii_device_base::ff74_read(offs_t offset)
+	u8 coco_scii_device::ff74_read(offs_t offset)
 	{
 		u8 data = 0x0;
 
@@ -719,7 +741,7 @@ namespace
 //  ff74_write - no halt registers
 //-------------------------------------------------
 
-	void coco_scii_device_base::ff74_write(offs_t offset, u8 data)
+	void coco_scii_device::ff74_write(offs_t offset, u8 data)
 	{
 		switch(offset)
 		{
@@ -741,94 +763,6 @@ namespace
 				break;
 		}
 	}
-
-
-//**************************************************************************
-//  Disto / CRC  Super Controller II, CoCo 1 / 2 ROM
-//**************************************************************************
-
-	class coco_scii_device_cc1 : public coco_scii_device_base
-	{
-	public:
-		// construction/destruction
-		coco_scii_device_cc1(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_scii_device_base(mconfig, COCO_SCII_CC1, tag, owner, clock)
-		{
-		}
-
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_scii_cc1);
-		}
-	};
-
-
-//**************************************************************************
-//  Disto / CRC  Super Controller II, CoCo 3 ROM
-//**************************************************************************
-
-	class coco_scii_device_cc3 : public coco_scii_device_base
-	{
-	public:
-		// construction/destruction
-		coco_scii_device_cc3(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_scii_device_base(mconfig, COCO_SCII_CC3, tag, owner, clock)
-		{
-		}
-
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_scii_cc3);
-		}
-	};
-
-
-//**************************************************************************
-//              COCO-3 HDB-DOS
-//**************************************************************************
-
-	class coco3_hdb1_device : public coco_fdc_device_base
-	{
-	public:
-		// construction/destruction
-		coco3_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, COCO3_HDB1, tag, owner, clock)
-		{
-		}
-
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco3_hdb1);
-		}
-	};
-
-
-//**************************************************************************
-//              COCO-2 HDB-DOS
-//**************************************************************************
-
-	class coco2_hdb1_device : public coco_fdc_device_base
-	{
-	public:
-		// construction/destruction
-		coco2_hdb1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-			: coco_fdc_device_base(mconfig, COCO2_HDB1, tag, owner, clock)
-		{
-		}
-
-	protected:
-		// optional information overrides
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco2_hdb1);
-		}
-	};
 
 
 //**************************************************************************
@@ -883,11 +817,7 @@ namespace
 	};
 } // Anonymous namepace
 
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_device, "coco_fdc", "CoCo FDC")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC1, coco_family_fdc_device_base, coco_scii_device_cc1, "coco_scii_cc1", "Disto Super Controller II (CoCo 1/2 ROM)")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII_CC3, coco_family_fdc_device_base, coco_scii_device_cc3, "coco_scii_cc3", "Disto Super Controller II (CoCo 3 ROM)")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO3_HDB1, coco_family_fdc_device_base, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
-DEFINE_DEVICE_TYPE_PRIVATE(COCO2_HDB1, coco_family_fdc_device_base, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_device, "coco_fdc", "CoCo Floppy Disk Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_SCII, coco_family_fdc_device_base, coco_scii_device, "coco_scii", "Disto Super Controller II")
 DEFINE_DEVICE_TYPE_PRIVATE(CP450_FDC, coco_family_fdc_device_base, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
 DEFINE_DEVICE_TYPE_PRIVATE(CD6809_FDC, coco_family_fdc_device_base, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")
