@@ -56,7 +56,7 @@ void menu_control_floppy_image::do_load_create()
 		}
 	} else {
 		std::error_condition err = fd.load(input_filename);
-		if (!err && !output_filename.empty()) {
+		if (!err && !output_filename.empty())
 			err = fd.reopen_for_write(output_filename);
 		if (err) {
 			machine().popmessage("Error: %s", err.message());
