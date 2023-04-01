@@ -419,6 +419,9 @@ try all permutations of 0-15 bit swaps which will take much longer or manually w
 Known issues:
 - Opening the operator menu sometimes can crash Mr. Driller 2
 - nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal
+
+User data note:
+- the games store settings / rankings / bookkeeping data in the first NAND ROM - at 0x4200 for MEM(N) and 0x40000 for MEM(M), the ROMs used should be defaulted where possible
 */
 
 #include "emu.h"
@@ -1763,7 +1766,7 @@ ROM_START( mrdrilr2j )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(880300cf) SHA1(05fec7e675b96f8c9bd68be36ee6972fb742ca93) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
+	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(03e0241e) SHA1(de26054657cc129dd581e2672d5c81d26daeb5e6) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1775,7 +1778,7 @@ ROM_START( mrdrilr2 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(7aff14db) SHA1(9e76225d9dee12b968bc05644666c63058744f27) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
+	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1905,7 +1908,7 @@ ROM_START( chocovdr )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b8f73d0f) SHA1(32cb2127330c5369836ee56246c98cba99fa4fb1) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b8f73d0f) SHA1(32cb2127330c5369836ee56246c98cba99fa4fb1) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(4aecd6fc) SHA1(31fe8f36e38020a92f15c44fd1a4b486636b40ce) )
