@@ -190,7 +190,7 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 	clamp_to_uint8();
 }
 
-void rgbaint_t::scale_imm_and_clamp(const s32 scale)
+void rgbaint_t::scale_imm_and_clamp(s32 scale)
 {
 	mul_imm(scale);
 	sra_imm(8);

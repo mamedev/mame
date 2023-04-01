@@ -31,7 +31,6 @@ std::error_condition general_cbm_loadsnap( device_image_interface &image, addres
 	std::vector<uint8_t> data;
 	uint32_t bytesread;
 	uint16_t address = 0;
-	int i;
 
 	int snapshot_size = image.length();
 
@@ -76,14 +75,14 @@ std::error_condition general_cbm_loadsnap( device_image_interface &image, addres
 	if (bytesread != snapshot_size)
 		return image_error::UNSPECIFIED;
 
-	for (i = 0; i < snapshot_size; i++)
+	for (int i = 0; i < snapshot_size; i++)
 		space.write_byte(address + i + offset, data[i]);
 
 	cbm_sethiaddress(space, address + snapshot_size);
 	return std::error_condition();
 }
 
-void cbm_quick_sethiaddress( address_space &space, uint16_t hiaddress )
+void cbm_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 {
 	space.write_byte(0xae, hiaddress & 0xff);
 	space.write_byte(0x31, hiaddress & 0xff);

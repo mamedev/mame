@@ -13,6 +13,11 @@
 
 #pragma once
 
+#include <string>
+#include <system_error>
+#include <utility>
+
+
 // ======================> snapshot_image_device
 class snapshot_image_device :   public device_t,
 								public device_image_interface
@@ -32,7 +37,7 @@ public:
 
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }

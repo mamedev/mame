@@ -28,12 +28,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_serial_interface overrides
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;

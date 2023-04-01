@@ -188,11 +188,11 @@ public:
 	void iot_rrb(int op2, int nac, int mb, int &io, int ac);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual std::error_condition call_load() override;
@@ -234,11 +234,11 @@ public:
 	void iot_ppb(int op2, int nac, int mb, int &io, int ac);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -277,11 +277,11 @@ public:
 	void iot_tyi(int op2, int nac, int mb, int &io, int ac);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -335,10 +335,10 @@ public:
 	void iot_dra(int op2, int nac, int mb, int &io, int ac);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -386,8 +386,8 @@ struct lightpen_t
 class pdp1_state : public driver_device
 {
 public:
-	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pdp1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tape_reader(*this, "readt"),
 		m_tape_puncher(*this, "punch"),

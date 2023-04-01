@@ -13,6 +13,12 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+#include <system_error>
+#include <utility>
+
+
 class snapshot_image_device;
 
 std::error_condition z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr);

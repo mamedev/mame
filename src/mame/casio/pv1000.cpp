@@ -320,17 +320,15 @@ DEVICE_IMAGE_LOAD_MEMBER( pv1000_state::cart_load )
 
 uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	bitmap.fill(m_border_col); // TODO: might be either black or colored by this register
 
-	for ( y = 0; y < 24; y++ )
+	for (int y = 0; y < 24; y++)
 	{
-		for ( x = 2; x < 30; x++ ) // left-right most columns are definitely masked by the border color
+		for (int x = 2; x < 30; x++) // left-right most columns are definitely masked by the border color
 		{
 			uint16_t tile = m_p_videoram[ y * 32 + x ];
 
-			if ( tile < 0xe0 || m_force_pattern )
+			if (tile < 0xe0 || m_force_pattern)
 			{
 				tile += ( m_pcg_bank << 8);
 				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
