@@ -4359,6 +4359,41 @@ ROM_START( hharryb )
 	ROM_LOAD( "a-pal16l8.bin", 0x000, 0x104, CRC(1358c513) SHA1(7c8f44e4d63867d54e16fc29d168a27be5f4babf) )
 ROM_END
 
+ROM_START( hharryb2 ) // 2-PCB set marked TON/A and TON/B (same as the lohtb set). Audio is simplified (Z80 + YM2151)
+	ROM_REGION( 0x100000, "maincpu", 0 ) // on bottom PCB, code is most similar to the M84 version
+	ROM_LOAD16_BYTE( "3.ic30", 0x00001, 0x20000, CRC(026001f0) SHA1(bcbc6b44085336836885005dfe9d40c444e17b7b) )
+	ROM_LOAD16_BYTE( "1.ic33", 0x00000, 0x20000, CRC(4e0e6eff) SHA1(51d422d95acec37a2249e9137ad6b92909747373) )
+	ROM_LOAD16_BYTE( "4.ic29", 0x60001, 0x10000, CRC(31b741c5) SHA1(46c1c4cea09477cc4989f3e06e08851d02743e62) )
+	ROM_RELOAD(                0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "2.ic32", 0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
+	ROM_RELOAD(                0xe0000, 0x10000 )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 ) // on bottom PCB
+	ROM_LOAD( "5.ic23", 0x00000, 0x10000, CRC(6857913a) SHA1(4143b80a59414e77bedf5d7230d32207300e7301) )
+	ROM_LOAD( "6.ic22", 0x10000, 0x10000, CRC(812f94a2) SHA1(dc8be0e2db82d2b39c66dae68c28725371dd96c4) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) // on top PCB, no labels
+	ROM_LOAD( "ic1",  0x00000, 0x10000, CRC(a033002b) SHA1(d08a4b5ff704e8bb5c37c1285203265bdae8a0ec) )
+	ROM_LOAD( "ic30", 0x10000, 0x10000, CRC(2f8438e9) SHA1(73a04303d9713cb92600b98180f4eb158021a426) )
+	ROM_LOAD( "ic2",  0x20000, 0x10000, CRC(17d25f87) SHA1(b88ef27498993b596d587ea9bcdc149e0305be14) )
+	ROM_LOAD( "ic31", 0x30000, 0x10000, CRC(f548c48f) SHA1(c782c73017dc5bd9b3ce41bec985a4ccc7b33275) )
+	ROM_LOAD( "ic3",  0x40000, 0x10000, CRC(aa0256a0) SHA1(588a871ace051ac9c4e02c6777503eb8e040c587) )
+	ROM_LOAD( "ic32", 0x50000, 0x10000, CRC(85143b72) SHA1(08c6247604e937c58785194a9d77b40af4827795) )
+	ROM_LOAD( "ic4",  0x60000, 0x10000, CRC(2be70871) SHA1(2f3ba46cad67916d1067522fd1779119b71246c9) )
+	ROM_LOAD( "ic33", 0x70000, 0x10000, CRC(eb0ae4a1) SHA1(66da41ad424498c3f58865dbc1de2256a45fd05a) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) // on bottom PCB
+	ROM_LOAD( "8.ic139",  0x00000, 0x10000, CRC(208796b3) SHA1(38b90732c8d5c77ee84053364a8a7e3daaaabe66) )
+	ROM_LOAD( "7.ic140",  0x10000, 0x10000, CRC(f5f56b2a) SHA1(4ef6602052fa70e765d6d7747e672b7108b44f59) )
+	ROM_LOAD( "10.ic137", 0x20000, 0x10000, CRC(b4a7f490) SHA1(851b40650fc8920b49f43f9cc6f19e845a25e945) )
+	ROM_LOAD( "9.ic138",  0x30000, 0x10000, CRC(d194ea08) SHA1(0270897049cd256472df42f3dda856ee707535cd) )
+	ROM_LOAD( "12.ic135", 0x40000, 0x10000, CRC(34fe8f7f) SHA1(fbf8839b26be55ad83ad4db538ba3e196c1ab945) )
+	ROM_LOAD( "11.ic136", 0x50000, 0x10000, CRC(2b06bcc3) SHA1(36378a4a69f3c3da96d2dc8df48916af8de50009) )
+	ROM_LOAD( "14.ic133", 0x60000, 0x10000, CRC(4b0e92f4) SHA1(16ad9220ca6708028cea18c1c4b57e2b6eb425b4) )
+	ROM_LOAD( "13.ic134", 0x70000, 0x10000, CRC(94b96bfa) SHA1(33c1e9045e7a984097f3fe4954b20d954cffbafa) )
+
+	ROM_REGION( 0x20000, "samples", ROMREGION_ERASEFF ) // -- no sample ROMs on bootleg, included with Z80 code
+ROM_END
 
 ROM_START( cosmccop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -4737,3 +4772,4 @@ GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_
 /* bootlegs, unique hw */
 GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharryb2,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "bootleg (Playmark)", "Hammerin' Harry (World, Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

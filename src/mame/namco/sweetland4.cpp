@@ -10,6 +10,7 @@ Main components:
 1x H8/3007 5B4 HD6413007F20
 1x RTC 72423 A EPSON E220E
 1x Oki M9810B
+1x 14.7456 OSC near the H8
 1x HRD051R5 DC/DC converter
 2x MTB011 High Output Interface Driver ICs
 1x 4-dip bank
@@ -112,7 +113,7 @@ INPUT_PORTS_END
 
 void sweetland4_state::sweetland4(machine_config &config)
 {
-	H83007(config, m_maincpu, 16'000'000); // no evident XTAL on PCB
+	H83007(config, m_maincpu, 14.7456_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sweetland4_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &sweetland4_state::io_map);
 
