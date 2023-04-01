@@ -1553,6 +1553,8 @@ project "portaudio"
 				"-Wno-unused-but-set-variable",
 				"-Wno-maybe-uninitialized",
 				"-Wno-sometimes-uninitialized",
+				"-Wno-incompatible-pointer-types-discards-qualifiers",
+				"-Wno-pointer-sign",
 			}
 		else
 			buildoptions_c {
