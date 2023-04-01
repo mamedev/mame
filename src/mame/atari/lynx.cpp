@@ -151,13 +151,7 @@ ROM_END
 
 QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	std::vector<u8> data;
-	u8 *rom = memregion("maincpu")->base();
 	u8 header[10]; // 80 08 dw Start dw Len B S 9 3
-	uint16_t start, length;
-	int i;
-
 	if (image.fread( header, sizeof(header)) != sizeof(header))
 		return image_error::UNSPECIFIED;
 
@@ -169,21 +163,22 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 		return err;
 	}
 
-	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
-	length = header[5] | (header[4]<<8);
-	length -= 10;
+	uint16_t const start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
+	uint16_t const length = (header[5] | (header[4]<<8)) - 10;
 
+	std::vector<u8> data;
 	data.resize(length);
-
-	if (image.fread( &data[0], length) != length)
+	if (image.fread(&data[0], length) != length)
 	{
 		osd_printf_error("%s: Invalid length in file header\n", image.basename());
 		return image_error::INVALIDIMAGE;
 	}
 
-	for (i = 0; i < length; i++)
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	for (int i = 0; i < length; i++)
 		space.write_byte(start + i, data[i]);
 
+	u8 *rom = memregion("maincpu")->base();
 	rom[0x1fc] = start & 0xff;
 	rom[0x1fd] = start >> 8;
 	space.write_byte(0x1fc, start & 0xff);

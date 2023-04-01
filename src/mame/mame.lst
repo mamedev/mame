@@ -24372,7 +24372,7 @@ tandy102                        //
 tandy200                        //
 trsm100                         //
 
-@source:leapfrog/leapfrog_iquest.cpp
+@source:leapfrog/iquest.cpp
 iquest
 ttwistfb
 ttwistbq
@@ -24381,19 +24381,19 @@ ttwistsp
 ttwistvc
 turboex
 
-@source:leapfrog/leapfrog_leappad.cpp
+@source:leapfrog/leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
 mfleappad                       // (c) 2002 LeapFrog
 ltleappad                       // (c) 2005 LeapFrog
-
-@source:leapfrog/leapfrog_leapster_explorer.cpp
-leapexpr
 
 @source:leapfrog/leapster.cpp
 leapster                        //
 leapster2                       //
 leapsterlmx                     //
 leapstertv                      //
+
+@source:leapfrog/leapster_explorer.cpp
+leapexpr
 
 @source:learsiegler/adm11.cpp
 adm12                           //

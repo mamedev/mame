@@ -34,7 +34,7 @@ public:
 		m_max_size = max_size;
 	}
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -52,7 +52,7 @@ public:
 	uint8_t *port_data() const { return m_port_data.get(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

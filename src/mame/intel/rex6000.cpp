@@ -732,6 +732,7 @@ void rex6000_state::rex6000_palettte(palette_device &palette) const
 
 QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 {
+	// FIXME: this suffers buffer overruns on excessively short images and various kinds of invalid images
 	static const char magic[] = "ApplicationName:Addin";
 	uint32_t img_start = 0;
 

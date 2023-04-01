@@ -514,7 +514,7 @@ std::error_condition force68k_state::force68k_load_cart(device_image_interface &
 {
 	uint32_t size = slot->common_get_size("rom");
 
-	if (size > 0x20000) // Max 128Kb
+	if (size > 0x2'0000) // Max 128Kb
 	{
 		LOG("Cartridge size exceeding max size (128Kb): %d\n", size);
 		osd_printf_error("%s: Cartridge size exceeding max size (128Kb)\n", image.basename());

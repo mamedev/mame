@@ -316,12 +316,11 @@ QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 	int i;
 	int quick_addr = 0x900;
 	int exec_addr;
-	int quick_length;
 	std::vector<u8> quick_data;
 	int read_;
 	std::error_condition result = image_error::UNSPECIFIED;
 
-	quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x0900)
 	{
 		result = image_error::INVALIDLENGTH;

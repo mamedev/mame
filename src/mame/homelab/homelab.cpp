@@ -732,7 +732,7 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 
 	for (i = 0; i < quick_length; i++)
 	{
-		int j = (quick_addr + i);
+		unsigned j = (quick_addr + i);
 		if (image.fread(&ch, 1) != 1)
 		{
 			osd_printf_error("%s: Unexpected EOF while writing byte to %04X\n", image.basename(), j);

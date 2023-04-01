@@ -23,7 +23,7 @@ public:
 	// Construction
 	hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device_image_interface overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
@@ -100,7 +100,7 @@ public:
 	auto wr_bit() { return m_wr_bit_handler.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

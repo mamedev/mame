@@ -40,7 +40,7 @@ menu_control_floppy_image::~menu_control_floppy_image()
 
 void menu_control_floppy_image::do_load_create()
 {
-	if(input_filename.compare("")==0) {
+	if(input_filename.empty()) {
 		std::error_condition err = fd.create(output_filename, nullptr, nullptr);
 		if (err) {
 			machine().popmessage("Error: %s", err.message());
@@ -56,7 +56,7 @@ void menu_control_floppy_image::do_load_create()
 		}
 	} else {
 		std::error_condition err = fd.load(input_filename);
-		if (!err && (output_filename.compare("") != 0))
+		if (!err && !output_filename.empty()) {
 			err = fd.reopen_for_write(output_filename);
 		if (err) {
 			machine().popmessage("Error: %s", err.message());

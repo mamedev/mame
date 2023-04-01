@@ -36,8 +36,6 @@ public:
 	virtual void call_unload() override;
 	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
-	// device-level overrides
-	virtual void device_start() override;
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -49,7 +47,11 @@ public:
 
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }
+
 private:
+	// device_t implementation
+	virtual void device_start() override;
+
 	u8 m_memcard_data[0x100];
 	u8 m_protection_data[4];
 	u8 m_security_data[4];
