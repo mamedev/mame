@@ -25,6 +25,7 @@ void mz80_state::machine_reset()
 	m_mz80k_keyboard_line = 0;
 }
 
+
 uint8_t mz80_state::mz80k_8255_portb_r()
 {
 	if (m_mz80k_keyboard_line < 10)
