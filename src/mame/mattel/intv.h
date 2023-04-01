@@ -146,7 +146,7 @@ private:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_ioport_array<10> m_intv_keyboard;
+	optional_ioport_array<10> m_intv_keyboard;
 };
 
 #endif // MAME_MATTEL_INTV_H
