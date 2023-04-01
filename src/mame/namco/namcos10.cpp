@@ -1763,7 +1763,7 @@ ROM_START( mrdrilr2j )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(f93532a2) SHA1(8b72f2868978be1f0e0abd11425a3c8b2b0c4e99) )
+	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(880300cf) SHA1(05fec7e675b96f8c9bd68be36ee6972fb742ca93) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1775,7 +1775,7 @@ ROM_START( mrdrilr2 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(f2633388) SHA1(42e56c9758ee833390003d4b41956f75f5a22760) )
+	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(7aff14db) SHA1(9e76225d9dee12b968bc05644666c63058744f27) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1905,7 +1905,7 @@ ROM_START( chocovdr )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(f36eebb5) SHA1(a0464186b247b28f37005ffd9e9b7370145f67ef) )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b8f73d0f) SHA1(32cb2127330c5369836ee56246c98cba99fa4fb1) ) // settings and ranking data are stored in this NAND ROM alongside the game data, this has been defaulted in the service menu.
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(4aecd6fc) SHA1(31fe8f36e38020a92f15c44fd1a4b486636b40ce) )
