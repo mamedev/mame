@@ -1,13 +1,13 @@
 /** @file patest_wire.c
-	@ingroup test_src
-	@brief Pass input directly to output.
+    @ingroup test_src
+    @brief Pass input directly to output.
 
-	Note that some HW devices, for example many ISA audio cards
-	on PCs, do NOT support full duplex! For a PC, you normally need
-	a PCI based audio card such as the SBLive.
+    Note that some HW devices, for example many ISA audio cards
+    on PCs, do NOT support full duplex! For a PC, you normally need
+    a PCI based audio card such as the SBLive.
 
-	@author Phil Burk  http://www.softsynth.com
-    
+    @author Phil Burk  http://www.softsynth.com
+
  While adapting to V19-API, I excluded configs with framesPerCallback=0
  because of an assert in file pa_common/pa_process.c. Pieter, Oct 9, 2003.
 
@@ -40,13 +40,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -138,7 +138,7 @@ static int wireCallback( const void *inputBuffer, void *outputBuffer,
     if( (statusFlags & paOutputOverflow) != 0 ) config->numOutputOverflows += 1;
     if( (statusFlags & paPrimingOutput) != 0 ) config->numPrimingOutputs += 1;
     config->numCallbacks += 1;
-    
+
     inChannel=0, outChannel=0;
     while( !(inDone && outDone) )
     {
@@ -232,7 +232,7 @@ int main(void)
                         }
                         else if( err != paNoError ) goto error;
                     }
-               }
+                }
             }
         }
     }
@@ -246,7 +246,7 @@ done:
 
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     printf("Hit ENTER to quit.\n");  fflush(stdout);
@@ -260,7 +260,7 @@ static PaError TestConfiguration( WireConfig_t *config )
     PaError err = paNoError;
     PaStream *stream;
     PaStreamParameters inputParameters, outputParameters;
-    
+
     printf("input %sinterleaved!\n", (config->isInputInterleaved ? " " : "NOT ") );
     printf("output %sinterleaved!\n", (config->isOutputInterleaved ? " " : "NOT ") );
     printf("input channels = %d\n", config->numInputChannels );
@@ -304,13 +304,13 @@ static PaError TestConfiguration( WireConfig_t *config )
               wireCallback,
               config );
     if( err != paNoError ) goto error;
-    
+
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
-    
+
     printf("Now recording and playing. - Hit ENTER for next configuration, or 'q' to quit.\n");  fflush(stdout);
     c = getchar();
-    
+
     printf("Closing stream.\n");
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;

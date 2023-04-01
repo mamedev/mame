@@ -1607,11 +1607,6 @@ project "portaudio"
 			MAME_DIR .. "3rdparty/portaudio/src/os/win",
 		}
 
-		configuration { "mingw*" }
-		includedirs {
-			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
-		}
-
 		configuration { }
 		files {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win/pa_win_util.c",

@@ -47,7 +47,7 @@ On some systems you may need to use:
 cp /usr/local/lib/libportaudio.a /YOUR/PROJECT/DIR
 @endcode
 
-You may also need to copy portaudio.h, located in the include/ directory of PortAudio into your project. Note that you will usually need to link with the approriate libraries that you used, such as ALSA and JACK, as well as with librt and libpthread. For example:
+You may also need to copy portaudio.h, located in the include/ directory of PortAudio into your project. Note that you will usually need to link with the appropriate libraries that you used, such as ALSA and JACK, as well as with librt and libpthread. For example:
 
 @code
 gcc main.c libportaudio.a -lrt -lm -lasound -ljack -pthread -o YOUR_BINARY
