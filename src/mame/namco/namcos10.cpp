@@ -419,6 +419,9 @@ try all permutations of 0-15 bit swaps which will take much longer or manually w
 Known issues:
 - Opening the operator menu sometimes can crash Mr. Driller 2
 - nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal
+
+User data note:
+- the games store settings / rankings / bookkeeping data in the first NAND ROM - at 0x4200 for MEM(N) and 0x40000 for MEM(M), the ROMs used should be defaulted where possible
 */
 
 #include "emu.h"
@@ -1763,7 +1766,7 @@ ROM_START( mrdrilr2j )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(f93532a2) SHA1(8b72f2868978be1f0e0abd11425a3c8b2b0c4e99) )
+	ROM_LOAD( "dr21vera.1a", 0x000000, 0x800000, CRC(03e0241e) SHA1(de26054657cc129dd581e2672d5c81d26daeb5e6) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1775,7 +1778,7 @@ ROM_START( mrdrilr2 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(f2633388) SHA1(42e56c9758ee833390003d4b41956f75f5a22760) )
+	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -1905,7 +1908,7 @@ ROM_START( chocovdr )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(f36eebb5) SHA1(a0464186b247b28f37005ffd9e9b7370145f67ef) )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(330d86d3) SHA1(0d7ea7593510531ef7350dd7ee957208681708da) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(4aecd6fc) SHA1(31fe8f36e38020a92f15c44fd1a4b486636b40ce) )
