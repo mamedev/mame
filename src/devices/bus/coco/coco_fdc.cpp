@@ -503,7 +503,7 @@ namespace
 		}
 
 	protected:
-		// optional information overrides
+		// device_t implementation
 		virtual const tiny_rom_entry *device_rom_region() const override
 		{
 			return ROM_NAME(coco_fdc);
@@ -528,22 +528,19 @@ namespace
 		{
 		}
 
-		// coco_scii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-		// 	: coco_fdc_device_base(mconfig, type, tag, owner, clock)
-		// 	, m_slot(*this, MEB_TAG)
-		// 	, m_carts(*this, "cart_line")
-		// {
-		// }
-
 	protected:
-		// device-level overrides
+		// device_t implementation
 		virtual void device_start() override;
 		virtual void device_reset() override;
 		virtual u8 scs_read(offs_t offset) override;
 		virtual void scs_write(offs_t offset, u8 data) override;
 
-		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override;
+
+		virtual const tiny_rom_entry *device_rom_region() const override
+		{
+			return ROM_NAME(coco_scii);
+		}
 
 		// methods
 		virtual void update_lines() override;
@@ -556,11 +553,7 @@ namespace
 		required_device<distomeb_slot_device> m_slot;
 		required_device<input_merger_device> m_carts;
 
-		virtual const tiny_rom_entry *device_rom_region() const override
-		{
-			return ROM_NAME(coco_scii);
-		}
-private:
+	private:
 		// registers
 		std::unique_ptr<uint8_t[]> m_cache;
 		u8 m_cache_pointer;
