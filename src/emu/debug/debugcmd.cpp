@@ -3778,21 +3778,22 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 	address_space *space;
 	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
+	address &= space->logaddrmask();
 
 	// do the translation first
 	for (int intention = device_memory_interface::TR_READ; intention <= device_memory_interface::TR_FETCH; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		offs_t taddress = address & space->addrmask();
+		offs_t taddress = address;
 		address_space *tspace;
 		if (space->device().memory().translate(space->spacenum(), intention, taddress, tspace))
 		{
 			std::string mapname = tspace->get_handler_string((intention == device_memory_interface::TR_WRITE) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
-					"%7s: %0*X logical == %0*X physical -> %s\n",
+					"%7s: %0*X logical %s == %0*X physical %s -> %s\n",
 					intnames[intention & 3],
-					tspace->logaddrchars(), address,
-					tspace->addrchars(), taddress,
+					space->logaddrchars(), address, space->name(),
+					tspace->addrchars(), taddress, tspace->name(),
 					mapname);
 		}
 		else
