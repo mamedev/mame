@@ -899,7 +899,7 @@ ROM_START( pasopia7 )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(8a58fab6) SHA1(5e1a91dfb293bca5cf145b0a0c63217f04003ed1))
 
 	ROM_REGION( 0x1000, "font", ROMREGION_ERASEFF )
-	ROM_LOAD( "pasopia7_ic146_2732.bin", 0x0000, 0x1000, CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
+	ROM_LOAD( "2732.ic146", 0x0000, 0x1000, CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
 ROM_END
 
 /* using an identical ROMset from now, but the screen type is different */
@@ -911,7 +911,7 @@ ROM_START( pasopia7lcd )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(8a58fab6) SHA1(5e1a91dfb293bca5cf145b0a0c63217f04003ed1))
 
 	ROM_REGION( 0x1000, "font", ROMREGION_ERASEFF )
-	ROM_LOAD( "pasopia7_ic146_2732.bin", 0x0000, 0x1000, BAD_DUMP CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
+	ROM_LOAD( "2732.ic146", 0x0000, 0x1000, BAD_DUMP CRC(aabf66e8) SHA1(1ff5c2c35f07d7481c4c22a453192d9458590eb0))
 ROM_END
 
 
