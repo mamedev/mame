@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
-/* emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter */
+// emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter
 
 #include "emu.h"
 #include "epic12.h"
+
 #include "screen.h"
 
 #define LOG_DEBUG     (1U <<  1)
 
+//#define VERBOSE (LOG_DEBUG)
 #include "logmacro.h"
 
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
 
@@ -343,11 +346,11 @@ const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 };
 
 /*
-	Calculate number of VRAM row accesses a draw will perform.
-	Source data will typically be aligned well with VRAM, but this is not the case for the destination.
-	As an example, drawing a 64x32 pixel image will usually read from two VRAM rows for source data,
-	but if the destination start coordinate is (x=10, y=10), each of the 32x32px chunks of source data will
-	touch 4 rows of destination VRAM, leading to a total of 8 destination VRAM accesses.
+    Calculate number of VRAM row accesses a draw will perform.
+    Source data will typically be aligned well with VRAM, but this is not the case for the destination.
+    As an example, drawing a 64x32 pixel image will usually read from two VRAM rows for source data,
+    but if the destination start coordinate is (x=10, y=10), each of the 32x32px chunks of source data will
+    touch 4 rows of destination VRAM, leading to a total of 8 destination VRAM accesses.
 */
 inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy)
 {
@@ -913,7 +916,7 @@ void epic12_device::blitter_w(address_space &space, offs_t offset, u32 data, u32
 		case 0x30:  // Contrast (test menu).
 		case 0x34:  // Brightness (test menu).
 		case 0x38:  // V offset (test menu).
-		case 0x3C:  // H offset (test menu).
+		case 0x3c:  // H offset (test menu).
 			break;
 
 		case 0x40:
