@@ -954,22 +954,22 @@ void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 		// data & 0x10 = CLK
 		// data & 0x20 = DATA
 
-		if((data & 0x08) && !(m_firmware_port & 0x10) && (data & 0x10))
+		if ((data & 0x08) && !(m_firmware_port & 0x10) && (data & 0x10))
 		{
-			if(m_firmware_pos < 2323240 && (data & 0x20))
+			if (m_firmware_pos < 2323240 && (data & 0x20))
 				m_firmware[m_firmware_pos >> 3] |= 1 << (m_firmware_pos & 7);
 			m_firmware_pos++;
 		}
 
 		m_firmware_port = data;
 
-		if(m_firmware_pos == 2323240)
+		if (m_firmware_pos == 2323240)
 		{
 			u8 checksum = 0;
 			for(u8 c : m_firmware)
 				checksum += c;
 
-			switch(checksum)
+			switch (checksum)
 			{
 				case 0x03: m_firmware_version = FW_A; break;
 				case 0x3e: m_firmware_version = FW_B; break;
@@ -978,7 +978,7 @@ void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 				default: m_firmware_version = -1; break;
 			}
 
-			if(m_firmware_version < 0)
+			if (m_firmware_version < 0)
 				logerror("Unrecognized firmware version\n");
 			else
 				logerror("Detected firmware version %c\n", 'A' + m_firmware_version);
