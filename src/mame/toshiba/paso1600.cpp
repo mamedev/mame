@@ -334,7 +334,7 @@ ROM_START( paso1600 )
 	ROM_REGION(0x2000,"pcg", ROMREGION_ERASE00)
 
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
-	ROM_LOAD( "pasopia_ic79_5t_2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(b5693720) SHA1(d25327dfaa40b0f4144698e3bad43125fd8e46d0)) //stolen from pasopia
+	ROM_LOAD( "5t_2716.bin", 0x0000, 0x0800, BAD_DUMP CRC(b5693720) SHA1(d25327dfaa40b0f4144698e3bad43125fd8e46d0)) //stolen from pasopia - label and location unknown
 
 	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, NO_DUMP)
