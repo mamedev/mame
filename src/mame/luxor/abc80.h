@@ -92,6 +92,7 @@ public:
 		m_tape_in_latch(1)
 	{ }
 
+	void abc80_common(machine_config &config);
 	void abc80(machine_config &config);
 	void abc80_video(machine_config &config);
 
@@ -113,10 +114,13 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, int hsync_data, int dv);
+	virtual offs_t get_videoram_addr();
+	virtual u8 read_videoram(offs_t offset);
 
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
@@ -190,5 +194,51 @@ protected:
 	emu_timer *m_vsync_off_timer = nullptr;
 	emu_timer *m_keyboard_clear_timer = nullptr;
 };
+
+
+// ======================> tkn80_state
+
+class tkn80_state : public abc80_state
+{
+public:
+	tkn80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc80_state(mconfig, type, tag),
+		m_rom_e(*this, "tkn80"),
+		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
+		m_config(*this, "CONFIG"),
+		m_80(true)
+	{ }
+
+	void tkn80(machine_config &config);
+	void tkn80_video(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_reset() override;
+
+	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
+	virtual offs_t get_videoram_addr() override;
+	virtual u8 read_videoram(offs_t offset) override;
+
+	void set_screen_params(void);
+
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
+
+	uint8_t in3_r();
+	uint8_t in4_r();
+
+	void tkn80_io(address_map &map);
+
+	required_memory_region m_rom_e;
+	memory_share_creator<uint8_t> m_char_ram;
+	required_ioport m_config;
+
+	bool m_80;
+	offs_t m_rom_offset;
+};
+
+
 
 #endif // MAME_LUXOR_ABC80_H
