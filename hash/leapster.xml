@@ -612,7 +612,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12161-A" />
 		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="40 0000">
+			<dataarea name="rom" size="0x400000">
 				<rom name="500-12161-a.bin" size="0x400000" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" />
 			</dataarea>
 		</part>
