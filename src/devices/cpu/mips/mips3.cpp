@@ -1896,20 +1896,10 @@ void r4650_device::set_cop0_reg(int idx, uint64_t val)
 	switch (idx)
 	{
 		case COP0_R4650_IBase:
-			m_core->cpr[0][idx] = val;
-			printf("R4650 IBase: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
-			break;
 		case COP0_R4650_IBound:
-			m_core->cpr[0][idx] = val;
-			printf("R4650 IBound: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
-			break;
 		case COP0_R4650_DBase:
-			m_core->cpr[0][idx] = val;
-			printf("R4650 DBase: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
-			break;
 		case COP0_R4650_DBound:
 			m_core->cpr[0][idx] = val;
-			printf("R4650 DBound: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
 			break;
 		default:
 			mips3_device::set_cop0_reg(idx, val);
