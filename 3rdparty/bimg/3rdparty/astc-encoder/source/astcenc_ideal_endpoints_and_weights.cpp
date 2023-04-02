@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2022 Arm Limited
+// Copyright 2011-2023 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -41,10 +41,10 @@ static vfloat bilinear_infill_vla(
 	unsigned int index
 ) {
 	// Load the bilinear filter texel weight indexes in the decimated grid
-	vint weight_idx0 = vint(di.texel_weights_4t[0] + index);
-	vint weight_idx1 = vint(di.texel_weights_4t[1] + index);
-	vint weight_idx2 = vint(di.texel_weights_4t[2] + index);
-	vint weight_idx3 = vint(di.texel_weights_4t[3] + index);
+	vint weight_idx0 = vint(di.texel_weights_tr[0] + index);
+	vint weight_idx1 = vint(di.texel_weights_tr[1] + index);
+	vint weight_idx2 = vint(di.texel_weights_tr[2] + index);
+	vint weight_idx3 = vint(di.texel_weights_tr[3] + index);
 
 	// Load the bilinear filter weights from the decimated grid
 	vfloat weight_val0 = gatherf(weights, weight_idx0);
@@ -53,10 +53,10 @@ static vfloat bilinear_infill_vla(
 	vfloat weight_val3 = gatherf(weights, weight_idx3);
 
 	// Load the weight contribution factors for each decimated weight
-	vfloat tex_weight_float0 = loada(di.texel_weights_float_4t[0] + index);
-	vfloat tex_weight_float1 = loada(di.texel_weights_float_4t[1] + index);
-	vfloat tex_weight_float2 = loada(di.texel_weights_float_4t[2] + index);
-	vfloat tex_weight_float3 = loada(di.texel_weights_float_4t[3] + index);
+	vfloat tex_weight_float0 = loada(di.texel_weight_contribs_float_tr[0] + index);
+	vfloat tex_weight_float1 = loada(di.texel_weight_contribs_float_tr[1] + index);
+	vfloat tex_weight_float2 = loada(di.texel_weight_contribs_float_tr[2] + index);
+	vfloat tex_weight_float3 = loada(di.texel_weight_contribs_float_tr[3] + index);
 
 	// Compute the bilinear interpolation to generate the per-texel weight
 	return (weight_val0 * tex_weight_float0 + weight_val1 * tex_weight_float1) +
@@ -81,16 +81,16 @@ static vfloat bilinear_infill_vla_2(
 	unsigned int index
 ) {
 	// Load the bilinear filter texel weight indexes in the decimated grid
-	vint weight_idx0 = vint(di.texel_weights_4t[0] + index);
-	vint weight_idx1 = vint(di.texel_weights_4t[1] + index);
+	vint weight_idx0 = vint(di.texel_weights_tr[0] + index);
+	vint weight_idx1 = vint(di.texel_weights_tr[1] + index);
 
 	// Load the bilinear filter weights from the decimated grid
 	vfloat weight_val0 = gatherf(weights, weight_idx0);
 	vfloat weight_val1 = gatherf(weights, weight_idx1);
 
 	// Load the weight contribution factors for each decimated weight
-	vfloat tex_weight_float0 = loada(di.texel_weights_float_4t[0] + index);
-	vfloat tex_weight_float1 = loada(di.texel_weights_float_4t[1] + index);
+	vfloat tex_weight_float0 = loada(di.texel_weight_contribs_float_tr[0] + index);
+	vfloat tex_weight_float1 = loada(di.texel_weight_contribs_float_tr[1] + index);
 
 	// Compute the bilinear interpolation to generate the per-texel weight
 	return (weight_val0 * tex_weight_float0 + weight_val1 * tex_weight_float1);
@@ -894,8 +894,8 @@ void compute_ideal_weights_for_decimation(
 
 		for (unsigned int j = 0; j < max_texel_count; j++)
 		{
-			vint texel(di.weight_texel[j] + i);
-			vfloat weight = loada(di.weights_flt[j] + i);
+			vint texel(di.weight_texels_tr[j] + i);
+			vfloat weight = loada(di.weights_texel_contribs_tr[j] + i);
 
 			if (!constant_wes)
 			{
@@ -952,8 +952,8 @@ void compute_ideal_weights_for_decimation(
 
 		for (unsigned int j = 0; j < max_texel_count; j++)
 		{
-			vint texel(di.weight_texel[j] + i);
-			vfloat contrib_weight = loada(di.weights_flt[j] + i);
+			vint texel(di.weight_texels_tr[j] + i);
+			vfloat contrib_weight = loada(di.weights_texel_contribs_tr[j] + i);
 
 			if (!constant_wes)
 			{
