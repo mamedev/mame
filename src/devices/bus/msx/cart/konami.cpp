@@ -91,7 +91,7 @@ void msx_cart_konami_scc_device::device_add_mconfig(machine_config &config)
 {
 	K051649(config, m_k051649, DERIVED_CLOCK(1, 1));
 	if (parent_slot())
-		m_k051649->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+		m_k051649->add_route(ALL_OUTPUTS, soundin(), 0.4, AUTO_ALLOC_INPUT, 0);
 }
 
 void msx_cart_konami_scc_device::device_reset()
@@ -321,7 +321,7 @@ void msx_cart_konami_sound_device::device_add_mconfig(machine_config &config)
 {
 	K051649(config, m_k052539, DERIVED_CLOCK(1, 1));
 	if (parent_slot())
-		m_k052539->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+		m_k052539->add_route(ALL_OUTPUTS, soundin(), 0.4, AUTO_ALLOC_INPUT, 0);
 }
 
 void msx_cart_konami_sound_device::device_start()
