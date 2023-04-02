@@ -1555,6 +1555,7 @@ project "portaudio"
 				"-Wno-sometimes-uninitialized",
 				"-Wno-incompatible-pointer-types-discards-qualifiers",
 				"-Wno-pointer-sign",
+				"-Wno-switch"
 			}
 		else
 			buildoptions_c {
