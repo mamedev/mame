@@ -152,8 +152,8 @@ void k053260_device::device_reset()
 	attotime period = attotime::from_ticks(16, clock());
 	m_timer->adjust(period, 0, period);
 
-	for (auto & elem : m_voice)
-		elem.voice_reset();
+	for (auto & voice : m_voice)
+		voice.voice_reset();
 }
 
 
@@ -250,30 +250,33 @@ void k053260_device::write(offs_t offset, u8 data)
 
 		// 0x04 through 0x07 seem to be unused
 
-		case 0x28: // key on/off
+		case 0x28: // key on/off and reverse
 		{
 			u8 rising_edge = data & ~m_keyon;
 
 			for (int i = 0; i < 4; i++)
 			{
 				if (BIT(rising_edge, i))
-				{
-					m_voice[i].set_reverse(BIT(data, 4 + i));
 					m_voice[i].key_on();
-				}
 				else if (!BIT(data, i))
 					m_voice[i].key_off();
 			}
 			m_keyon = data;
+
+			for (auto & voice : m_voice)
+			{
+				voice.set_reverse(data >> 4);
+				data >>= 1;
+			}
 			break;
 		}
 
 		// 0x29 is a read register
 
 		case 0x2a: // loop and pcm/adpcm select
-			for (auto & elem : m_voice)
+			for (auto & voice : m_voice)
 			{
-				elem.set_loop_kadpcm(data);
+				voice.set_loop_kadpcm(data);
 				data >>= 1;
 			}
 			break;
