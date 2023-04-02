@@ -67,7 +67,7 @@ protected:
 };
 
 msx1_v9938_state::msx1_v9938_state(const machine_config &mconfig, device_type type, const char *tag)
-	: msx_state(mconfig, type, tag)
+	: msx_state(mconfig, type, tag, 21.477272_MHz_XTAL, 6)
 	, m_v9938(*this, "v9938")
 {
 }
@@ -80,7 +80,7 @@ void msx1_v9938_state::io_map(address_map &map)
 
 void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, region);
+	msx_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
 
