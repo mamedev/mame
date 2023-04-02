@@ -8897,6 +8897,18 @@ Prompts inserting a disc 3 which is undumped?
 		</part>
 	</software>
 
+	<software name="barbarian">
+		<description>Barbarian</description>
+		<year>1989</year>
+		<publisher>Melbourne House</publisher>
+		<info name="developer" value="Psygnosis" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Barbarian [Melbourne House] [1989] [5.25DD] [Disk 1 of 1].img" size="368640" crc="dcd88ebc" sha1="e36ed1ac686460d104c23780d8b2231371f33de7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brdtale">
 		<description>The Bard's Tale - Tales of the Unknown (5.25")</description>
 		<year>1987</year>
@@ -9003,6 +9015,27 @@ Prompts inserting a disc 3 which is undumped?
 		</part>
 	</software>
 
+	<software name="batmancc" supported="no">
+		<description>Batman: The Caped Crusader</description>
+		<year>1989</year>
+		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Error when starting the game: "Packed file is corrupt"
+]]></notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Special FX Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1095998">
+				<rom name="Batman - The Caped Crusader [Data East] [1989] [5.25DD] [Disk 1 of 2].mfm" size="1095998" crc="3482178b" sha1="bf66eca664ee9a8c630637ccf2de54c7fae87a9e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1115659">
+				<rom name="Batman - The Caped Crusader [Data East] [1989] [5.25DD] [Disk 2 of 2].mfm" size="1115659" crc="92ab6a4e" sha1="52b3269ad49e9d1a607aacd0219b5b9a12ad77ac"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanmv" supported="partial">
 		<!-- Dumped via Kryoflux -->
 		<description>Batman: The Movie</description>
@@ -9014,6 +9047,7 @@ Horizontal scrolling is a bit jerky in [VGA] mode, [pel_shift] timing?
 Stage 1 "nice outfit" has an extremely short [buzzer] pitch sound that should be a voice sample (verify)
 [EGA] mode doesn't draw stage 1 "nice outfit" screen like [VGA] mode (verify)
 ]]></notes>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="Ocean Software" />
 		<info name="ported by" value="Astros Productions" />
 		<part name="flop1" interface="floppy_3_5">
@@ -9888,11 +9922,13 @@ Hangs after few seconds of gameplay
 		</part>
 	</software>
 
-	<!-- The files in the [EGA] directory have a root modified date -->
 	<software name="chicag90">
 		<description>Chicago 90</description>
 		<year>1990</year>
 		<publisher>Microïds</publisher>
+		<notes><![CDATA[
+The files in the [EGA] directory have a root modified date
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Chicago 90 [Microids] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b551b41c" sha1="e7c53d41a1e22c2b7fa847a273acf46d74067745" status="baddump"/>
@@ -10584,6 +10620,7 @@ On CGA/Hercules video mode: "Invalid Disk ! err# "
 		<description>Dick Tracy: The Crime-Solving Adventure</description>
 		<year>1991</year>
 		<publisher>Walt Disney Computer Software</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -10946,23 +10983,6 @@ Very broken gfxs in [CGA] mode
 		</part>
 	</software>
 
-	<!-- TODO: consider moving to ibm5170 -->
-	<software name="dynablst" supported="no">
-		<description>Dyna Blaster</description>
-		<year>1992</year>
-		<publisher>Ubi Soft</publisher>
-		<notes><![CDATA[
-Prompts user to "press fire" but no correlated keyboard bind, requires unemulated parallel port dongle
-]]></notes>
-		<info name="developer" value="Hudson Soft" />
-		<info name="usage" value="Requires HDD install" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Dyna Blaster [Ubi Soft] [[1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6af7500" sha1="c4acd9f2731d9d80eda759d9833cc1c4e4c064ea"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="earlweav">
 		<description>Earl Weaver Baseball</description>
 		<year>1989</year>
@@ -11165,6 +11185,7 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<description>F29 Retaliator</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Digital Image Design" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -11195,15 +11216,18 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<description>Ferrari Formula One</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Imagitec Design" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Main Disk"/>
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Ferrari Formula One [5.25][1 of 2].img" size="368640" crc="e9f05a53" sha1="ca767c546a26bdcf57f0d30f8bc6c1d834c58a81"/>
+				<rom name="Ferrari Formula One [Electronic Arts] [1989] [5.25DD][Disk 1 of 2].img" size="368640" crc="7dfa7ad8" sha1="893ab80cc6992deb2e96c0e94e4aefba9b8fbf2b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Race Disk"/>
 			<dataarea name="flop" size = "368640">
-				<rom name="[PC] Ferrari Formula One [5.25][2 of 2].img" size="368640" crc="9815c5b6" sha1="ddb8e3bcea701b3a325a0e2a4359c491fde47a59"/>
+				<rom name="Ferrari Formula One [Electronic Arts] [1989] [5.25DD][Disk 2 of 2].img" size="368640" crc="24e3a090" sha1="4a0aeca8453d7fb722b3e5fb5324e378ec11fca2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15035,25 +15059,25 @@ When starting the game, the error "Packed file is corrupt" is shown.
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size = "1075964">
-				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 1 of 4].img" size="1075964" crc="bed956d5" sha1="a6c6397c49102c91b818b6d65be3e920d4d73512"/>
+				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 1 of 4].mfm" size="1075964" crc="bed956d5" sha1="a6c6397c49102c91b818b6d65be3e920d4d73512"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size = "1075985">
-				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 2 of 4].img" size="1075985" crc="f386e955" sha1="3334ef8dfbe05368df1f9759fef5f2e98f4ec554"/>
+				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 2 of 4].mfm" size="1075985" crc="f386e955" sha1="3334ef8dfbe05368df1f9759fef5f2e98f4ec554"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "1075965">
-				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 3 of 4].img" size="1075965" crc="64498f9b" sha1="6b120e4a331573d37869b5f0afd0af2473e6b051"/>
+				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 3 of 4].mfm" size="1075965" crc="64498f9b" sha1="6b120e4a331573d37869b5f0afd0af2473e6b051"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size = "1075935">
-				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 4 of 4].img" size="1075935" crc="0d485f9b" sha1="e4a24037c076479e52cfe35e2cea62aad271a7f4"/>
+				<rom name="Robocop [Data East] [1989] [5.25DD] [Disk 4 of 4].mfm" size="1075935" crc="0d485f9b" sha1="e4a24037c076479e52cfe35e2cea62aad271a7f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16973,6 +16997,34 @@ Disk 1 has a modified "go.bat" file
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "2111231">
 				<rom name="Test Drive 2 - Scenery Disk - California Challenge [Accolade] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2111231" crc="dbe8fe0a" sha1="951458b91a3679c07e8cf29a0fb1e8409e119bbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="td2sdec">
+		<description>Test Drive II - Scenery Disk: European Challenge (5.25")</description>
+		<year>1990</year>
+		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Distinctive Software" />
+		<info name="usage" value="Add-on for Test Drive II" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1092883">
+				<rom name="Test Drive 2 - Scenery Disk - European Challenge [Accolade] [1990] [5.25DD] [Disk 1 of 1].mfm" size="1092883" crc="dd20ee23" sha1="20634c950772aa5b5ecc556c4f23b970691abfed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="td2sdec_35" cloneof="td2sdec">
+		<description>Test Drive II - Scenery Disk: European Challenge (3.5")</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
+		<info name="developer" value="Distinctive Software" />
+		<info name="usage" value="Add-on for Test Drive II" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2111119">
+				<rom name="Test Drive 2 - Scenery Disk - European Challenge [Accolade] [1990] [3.5DD] [Disk 1 of 1].mfm" size="2111119" crc="bf278e6f" sha1="4b66ae8b0e69cbc8f316cbec05df034b610e6a7f"/>
 			</dataarea>
 		</part>
 	</software>
