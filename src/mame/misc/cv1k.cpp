@@ -139,11 +139,11 @@ Misc:
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * U4, U23, U24 flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
-	  * The game logic does a manufacturer check on U2. K9F1G08U0M and two other device codes are allowed.
-	    Trying to replace U2 with a flash ROM from another manufacturer does not work. Allowed devices are:
-		- Manufacturer ID: 0x98, ID code: 0x76
-		- Manufacturer ID: 0x98, ID code: 0x79
-		- Manufacturer ID: 0xEC, ID code: 0xF1  <- This is K9F1G08U0M
+      * The game logic does a manufacturer check on U2. K9F1G08U0M and two other device codes are allowed.
+        Trying to replace U2 with a flash ROM from another manufacturer does not work. Allowed devices are:
+        - Manufacturer ID: 0x98, ID code: 0x76
+        - Manufacturer ID: 0x98, ID code: 0x79
+        - Manufacturer ID: 0xEC, ID code: 0xF1  <- This is K9F1G08U0M
       * There are two known CV1000-B PCB revisions. The newer one has some minor hardware differences
         and uses an updated FPGA firmware, they are not compatible with eachother.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.

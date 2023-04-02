@@ -6,12 +6,6 @@
 
 #pragma once
 
-// Number of bytes that are read each time Blitter fetches operations from SRAM.
-#define EP1C_OPERATION_CHUNK_SIZE_BYTES 64
-// Approximate time it takes to fetch a chunk of operations.
-// This is composed of the time that the Blitter holds the Bus Request (BREQ) signal
-// of the SH-3, as well as the overhead between requests.
-#define EP1C_OPERATION_READ_CHUNK_INTERVAL_NS 700
 #define DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
 class epic12_device : public device_t, public device_video_interface
@@ -46,7 +40,6 @@ public:
 	int m_gfx_size;
 	std::unique_ptr<bitmap_rgb32> m_bitmaps;
 	rectangle m_clip;
-	int m_num_delays = 0;
 
 	u16* m_use_ram;
 	size_t m_main_ramsize; // type D has double the main ram
@@ -71,6 +64,14 @@ public:
 	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
+	// Number of bytes that are read each time Blitter fetches operations from SRAM.
+	static inline constexpr int OPERATION_CHUNK_SIZE_BYTES = 64;
+
+	// Approximate time it takes to fetch a chunk of operations.
+	// This is composed of the time that the Blitter holds the Bus Request (BREQ) signal
+	// of the SH-3, as well as the overhead between requests.
+	static inline constexpr int OPERATION_READ_CHUNK_INTERVAL_NS = 700;
+
 	// The firmware versions
 	enum {
 		// Used by ibara & mushisama
@@ -831,11 +832,13 @@ protected:
 	//   to idle if the operations are read from the same 64 byte chunk (and not split between two).
 	//   More proper handling of this would be to change the reads from SRAM to be done 64 bytes at the time
 	//   into a FIFO, but that's a fair amount of work.
-	inline void idle_blitter(u8 operation_size_bytes) {
+	void idle_blitter(u8 operation_size_bytes)
+	{
 		m_blit_idle_op_bytes += operation_size_bytes;
-		if (m_blit_idle_op_bytes >= EP1C_OPERATION_CHUNK_SIZE_BYTES) {
-			m_blit_idle_op_bytes -= EP1C_OPERATION_CHUNK_SIZE_BYTES;
-			m_blit_delay_ns += EP1C_OPERATION_READ_CHUNK_INTERVAL_NS;
+		if (m_blit_idle_op_bytes >= OPERATION_CHUNK_SIZE_BYTES)
+		{
+			m_blit_idle_op_bytes -= OPERATION_CHUNK_SIZE_BYTES;
+			m_blit_delay_ns += OPERATION_READ_CHUNK_INTERVAL_NS;
 		}
 	}
 
@@ -847,6 +850,7 @@ protected:
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
+	u64 m_blit_delay_ns;
 	u16 m_blit_idle_op_bytes;
 
 	// fpga firmware
@@ -869,7 +873,6 @@ protected:
 	static u8 colrtable[0x20][0x40];
 	static u8 colrtable_rev[0x20][0x40];
 	static u8 colrtable_add[0x20][0x20];
-	static u64 m_blit_delay_ns;
 
 	static const blitfunction f0_ti1_tr1_blit_funcs[64];
 	static const blitfunction f0_ti1_tr0_blit_funcs[64];

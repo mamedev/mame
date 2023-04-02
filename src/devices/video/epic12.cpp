@@ -6,16 +6,21 @@
 #include "epic12.h"
 #include "screen.h"
 
+#define LOG_DEBUG     (1U <<  1)
+
+#include "logmacro.h"
+
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
 
-#define EP1C_VRAM_CLK_NANOSEC 13
-#define EP1C_SRAM_CLK_NANOSEC 20
-#define EP1C_VRAM_H_LINE_PERIOD_NANOSEC 63600
-#define EP1C_VRAM_H_LINE_DURATION_NANOSEC 2160
-#define EP1C_FRAME_DURATION_NANOSEC 16666666
-#define EP1C_DRAW_OPERATION_SIZE_BYTES 20
-#define EP1C_CLIP_OPERATION_SIZE_BYTES 2
-#define EP1C_PRINT_BLITTER_DELAYS 0
+static constexpr int EP1C_VRAM_CLK_NANOSEC = 13;
+static constexpr int EP1C_SRAM_CLK_NANOSEC = 20;
+static constexpr int EP1C_VRAM_H_LINE_PERIOD_NANOSEC = 63600;
+static constexpr int EP1C_VRAM_H_LINE_DURATION_NANOSEC = 2160;
+static constexpr int EP1C_FRAME_DURATION_NANOSEC = 16666666;
+static constexpr int EP1C_DRAW_OPERATION_SIZE_BYTES = 20;
+static constexpr int EP1C_CLIP_OPERATION_SIZE_BYTES = 2;
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, EPIC12, tag, owner, clock)
@@ -126,7 +131,6 @@ void epic12_device::device_reset()
 u8 epic12_device::colrtable[0x20][0x40];
 u8 epic12_device::colrtable_rev[0x20][0x40];
 u8 epic12_device::colrtable_add[0x20][0x20];
-u64 epic12_device::m_blit_delay_ns;
 
 inline u16 epic12_device::READ_NEXT_WORD(offs_t *addr)
 {
@@ -345,15 +349,18 @@ const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 	but if the destination start coordinate is (x=10, y=10), each of the 32x32px chunks of source data will
 	touch 4 rows of destination VRAM, leading to a total of 8 destination VRAM accesses.
 */
-inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy) {
+inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy)
+{
 	int x_rows = 0;
 	int num_vram_rows = 0;
-	for (int x_pixels = dimx; x_pixels > 0; x_pixels -= 32) {
+	for (int x_pixels = dimx; x_pixels > 0; x_pixels -= 32)
+	{
 		x_rows++;
 		if (((start_x & 31) + std::min(32, x_pixels)) > 32)
 			x_rows++;  // Drawing across multiple horizontal VRAM row boundaries.
 	}
-	for (int y_pixels = dimy; y_pixels > 0; y_pixels -= 32) {
+	for (int y_pixels = dimy; y_pixels > 0; y_pixels -= 32)
+	{
 		num_vram_rows += x_rows;
 		if (((start_y & 31) + std::min(32, y_pixels)) > 32)
 			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.	
@@ -419,7 +426,8 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	u16 dst_y_end = dst_y_start + src_dimy - 1;
 
 	// Sprites fully outside of clipping area should not be drawn.
-	if (dst_x_start > m_clip.max_x || dst_x_end < m_clip.min_x || dst_y_start > m_clip.max_y || dst_y_end < m_clip.min_y) {
+	if (dst_x_start > m_clip.max_x || dst_x_end < m_clip.min_x || dst_y_start > m_clip.max_y || dst_y_end < m_clip.min_y)
+	{
 		idle_blitter(EP1C_DRAW_OPERATION_SIZE_BYTES);
 		return;
 	}
@@ -792,13 +800,11 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 			// to fetching a horizontal line from VRAM for output.
 			m_blit_delay_ns += std::floor( m_blit_delay_ns / EP1C_VRAM_H_LINE_PERIOD_NANOSEC ) * EP1C_VRAM_H_LINE_DURATION_NANOSEC;
 
-			#if EP1C_PRINT_BLITTER_DELAYS
-				// Check if Blitter takes longer than a frame to render.
-				// In practice, there's a bit less time than this to allow for lack of slowdown but
-				// for debugging purposes this is an ok approximation.
-				if (m_blit_delay_ns > EP1C_FRAME_DURATION_NANOSEC)
-					printf("Blitter delay! Blit duration %lld ns.\n", m_blit_delay_ns);
-			#endif
+			// Check if Blitter takes longer than a frame to render.
+			// In practice, there's a bit less time than this to allow for lack of slowdown but
+			// for debugging purposes this is an ok approximation.
+			if (m_blit_delay_ns > EP1C_FRAME_DURATION_NANOSEC)
+				LOGDBG("Blitter delay! Blit duration %lld ns.\n", m_blit_delay_ns);
 
 			m_blitter_busy = 1;
 			m_blitter_delay_timer->adjust(attotime::from_nsec(m_blit_delay_ns));
@@ -948,7 +954,8 @@ void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 		// data & 0x10 = CLK
 		// data & 0x20 = DATA
 
-		if((data & 0x08) && !(m_firmware_port & 0x10) && (data & 0x10)) {
+		if((data & 0x08) && !(m_firmware_port & 0x10) && (data & 0x10))
+		{
 			if(m_firmware_pos < 2323240 && (data & 0x20))
 				m_firmware[m_firmware_pos >> 3] |= 1 << (m_firmware_pos & 7);
 			m_firmware_pos++;
@@ -956,17 +963,19 @@ void epic12_device::fpga_w(offs_t offset, u64 data, u64 mem_mask)
 
 		m_firmware_port = data;
 
-		if(m_firmware_pos == 2323240) {
+		if(m_firmware_pos == 2323240)
+		{
 			u8 checksum = 0;
 			for(u8 c : m_firmware)
 				checksum += c;
 
-			switch(checksum) {
-			case 0x03: m_firmware_version = FW_A; break;
-			case 0x3e: m_firmware_version = FW_B; break;
-			case 0xf9: m_firmware_version = FW_C; break;
-			case 0xe1: m_firmware_version = FW_D; break;
-			default: m_firmware_version = -1; break;
+			switch(checksum)
+			{
+				case 0x03: m_firmware_version = FW_A; break;
+				case 0x3e: m_firmware_version = FW_B; break;
+				case 0xf9: m_firmware_version = FW_C; break;
+				case 0xe1: m_firmware_version = FW_D; break;
+				default: m_firmware_version = -1; break;
 			}
 
 			if(m_firmware_version < 0)
