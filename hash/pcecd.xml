@@ -7196,13 +7196,13 @@ Omake: Press U R D L II at menu to access Bomberman
 		</part>
 	</software>
 
-	<software name="addfam" supported="no">
+	<software name="addfam" supported="partial">
 		<description>The Addams Family (USA)</description>
 		<year>1991</year>
 		<publisher>ICOM Simulations</publisher>
 		<notes><![CDATA[
-https://mametesters.org/view.php?id=7261 check [ADPCM] irq ack
-Abruptly stops [ADPCM] playback on title screen
+https://mametesters.org/view.php?id=7261 check [ADPCM] irq ack (fixed)
+Abruptly stops [ADPCM] playback on title screen, when beating Uncle Fester (pre-mansion), probably others
 ]]></notes>
 		<info name="serial" value="TGXCD1019"/>
 		<info name="usage" value="CD-ROM System Card required" />
