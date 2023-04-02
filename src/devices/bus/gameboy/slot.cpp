@@ -47,22 +47,26 @@ void gb_cart_slot_device_base::device_start()
 }
 
 
-image_init_result gb_cart_slot_device_base::call_load()
+std::error_condition gb_cart_slot_device_base::call_load()
 {
 	if (!m_cart)
-		return image_init_result::PASS;
+		return std::error_condition();
 
-	image_init_result result;
+	std::error_condition result;
 	if (!loaded_through_softlist())
 	{
 		result = load_image_file(image_core_file());
-		if (image_init_result::PASS != result)
+		if (result)
 			return result;
 	}
 	std::string message;
 	result = m_cart->load(message);
-	if (image_init_result::PASS != result)
-		seterror(image_error::INVALIDIMAGE, message.c_str());
+	if (result)
+	{
+		if (result == image_error::BADSOFTWARE && !loaded_through_softlist())
+			result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: %s\n", basename(), message);
+	}
 	return result;
 }
 

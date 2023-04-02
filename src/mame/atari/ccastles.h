@@ -5,8 +5,8 @@
     Atari Crystal Castles hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CCASTLES_H
-#define MAME_INCLUDES_CCASTLES_H
+#ifndef MAME_ATARI_CCASTLES_H
+#define MAME_ATARI_CCASTLES_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 	uint8_t    m_irq_state = 0U;
 };
 
-#endif // MAME_INCLUDES_CCASTLES_H
+#endif // MAME_ATARI_CCASTLES_H

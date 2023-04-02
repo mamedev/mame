@@ -24,15 +24,15 @@ PCB Layout
 |   |   Z80A PIO   |  |    Z80A    |                                                   |
 |   |--------------|  |------------|   LS04   LS74A   LS86    LS161   LS166    74393   |
 |                                                                                      |
-|     ROM3   LS107    4116    4116     LS10   LS257   LS74A   LS08    LS107    PROM2   |
+|     ROM0   LS107    4116    4116     LS10   LS257   LS74A   LS08    LS107    PROM2   |
 |                                                                                      |
 |     ROM2   LS257    4116    4116     LS139  74393   LS107   LS32    LS175    74393   |
 |                                                                                      |
 |     ROM1   LS257    4116    4116     LS08   LS283   LS10    LS32    PROM1    74393   |
 |                                                                                      |
-|     ROM0   LS257    4116    4116     LS257  74393   LS375   74S263  LS145    PROM4   |
+|     ROM3   LS257    4116    4116     LS257  74393   LS375   74S263  LS145    PROM4   |
 |                                                                                      |
-|     DIPSW1 DIPSW2   4045    4045     LS257  LS245   LS375   LS273   LS166    PROM3   |
+|     SB1    SB2      4045    4045     LS257  LS245   LS375   LS273   LS166    PROM3   |
 |--------------------------------------------------------------------------------------|
 
 Notes:
@@ -56,14 +56,74 @@ Notes:
     CN5     - cassette connector
     CN6     - keyboard connector
     SW1     - reset switch
-    DIPSW1  -
-    DIPSW2  -
+    SB1   	- solder bridge for A11/CS1 to ROM1/ROM3
+    SB2   	- solder bridge for A11/CS1 to ROM0/ROM2
 
-ROM checksum program:
-    10 FOR I%=0% TO 16383%
-    20 A%=A%+PEEK(I%)
-    30 NEXT I%
-    40 ;A%; I%
+
+Calculate ROM checksum:
+
+10 FOR I%=0% TO 16383%
+20 A%=A%+PEEK(I%)
+30 NEXT I%
+40 ;A%
+RUN
+
+*/
+
+/*
+
+Luxor ABC 80 with TKN 80
+
+PCB Layout
+----------
+
+55 10470-02
+
+          CN1               CN2                                                CN5
+  SW1   |-----|  |------------------------|                                  |-----|
+|-------|     |--|                        |----------------------------------|     |---|
+|                                                             CN3       CN4            |
+|                                                    7912                              |
+|            MC1488                                                                    |
+|   MC1489                                           7812                              |
+|            LS245                     LS138                                           |
+|                                                   |-------|                          |
+|   |-----CN6-----|   LS241   LS241    LS138  LS32  |SN76477| LS04    LM339            |
+|                                                   |-------|                          |
+|   |--------------|  |------------|   PROM0  LS132   LS273   7406             LS08    |
+|   |   Z80A PIO   |  |    Z80A    |                                                   |
+|   |--------------|  |------------|   LS04   LS74A   LS86    LS161   LS166    74393   |
+|                                                                                      |
+|     ROM0   LS107    4116    4116     LS10   LS257   LS74A   LS08    LS107    PROM2   |
+|                                                                                      |
+|     ROM2   LS257    4116    4116     LS139  74393   LS107   LS32    LS175    74393   |
+|                                                                                      |
+|     ROM1   LS257    4116    4116     LS08   LS283   LS10    LS32    PROM1    74393   |
+|-----------|                                                                          |
+|     ROM3  |       |------------------------------------------------|LS145    PROM4   |
+|           |-------|                                                |                 |
+|     LS32   LS00 LS257  LS257  LS257  LS00 LS04  LS02  LS51  LS374  |LS166    PROM3   |
+|                                                                    |-----------------|
+|     ROM4   LS373    LS244   6116    LS74A LS74A LS163 LS163 LS374  |
+|                                                             LS374  |
+|--------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+	PROM0   - MMI 63S141N 512x4 TTL Bipolar PROM
+	ROM4    - 4Kx8 EPROM "TKN80-III"
+    6116    - Hitachi HM6116P-4 2Kx8 Static RAM
+
+
+Switch to 40 column mode:
+
+;INP(3);CHR$(12)
+
+Switch to 80 column mode:
+
+;INP(4);CHR$(12)
+
 */
 
 /*
@@ -72,11 +132,11 @@ ROM checksum program:
 
     - PWM sound in ABC-klubben/abc80/grafik/flagga.bac
     - proper keyboard controller emulation
-    - MyAB TKN80 80-column card
     - GeJo 80-column card
-    - Mikrodatorn 64K expansion
+	- 64K RAM expansions
+    	- Mikrodatorn
+		- MYAB UNI-80
     - Metric ABC CAD 1000
-    - ROMs with checksum 10042
 
 */
 
@@ -128,6 +188,62 @@ u8 abc80_state::read(offs_t offset)
 	return data;
 }
 
+u8 tkn80_state::read(offs_t offset)
+{
+	/*
+
+		TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
+		TKN 400-7ff -> ZA3507 000-3ff (9913/10042)
+		TKN 800-cff -> ZA3506 000-3ff (11273)
+		TKN c00-FFF -> ZA3507 000-3ff (11273)
+
+	*/
+
+	u8 data = 0xff;
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+
+	if (offset < 0x400)
+	{
+		if (m_80)
+			data = m_rom_e->base()[m_rom_offset | (offset & 0x3ff)];
+		else
+			data = m_rom->base()[offset & 0x3fff];
+	}
+	else if (offset >= 0x400 && offset < 0x2000)
+	{
+		data = m_rom->base()[offset & 0x3fff];
+	}
+	else if (offset >= 0x2000 && offset < 0x2400)
+	{
+		if (m_80)
+			data = m_rom_e->base()[m_rom_offset | 0x400 | (offset & 0x3ff)];
+		else
+			data = m_rom->base()[offset & 0x3fff];
+	}
+	else if (offset >= 0x2400 && offset < 0x4000)
+	{
+		data = m_rom->base()[offset & 0x3fff];
+	}
+	else if (offset >= 0x5800 && offset < 0x6000)
+	{
+		data = m_char_ram[offset & 0x7ff];
+	}
+	else if (offset >= 0x7c00 && offset < 0x8000)
+	{
+		data = m_char_ram[offset & 0x7ff];
+	}
+	else if (!(mmu & MMU_XM))
+	{
+		data = m_bus->xmemfl_r(offset);
+	}
+	else if (!(mmu & MMU_RAM))
+	{
+		data = m_ram->pointer()[offset & 0x3fff];
+	}
+
+	return data;
+}
+
 
 //-------------------------------------------------
 //  write -
@@ -144,6 +260,28 @@ void abc80_state::write(offs_t offset, u8 data)
 	else if (mmu & MMU_VRAMS)
 	{
 		m_video_ram[offset & 0x3ff] = data;
+	}
+	else if (!(mmu & MMU_RAM))
+	{
+		m_ram->pointer()[offset & 0x3fff] = data;
+	}
+}
+
+void tkn80_state::write(offs_t offset, u8 data)
+{
+	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+
+	if (offset >= 0x5800 && offset < 0x6000)
+	{
+		m_char_ram[offset & 0x7ff] = data;
+	}
+	else if (offset >= 0x7c00 && offset < 0x8000)
+	{
+		m_char_ram[offset & 0x7ff] = data;
+	}
+	else if (!(mmu & MMU_XM))
+	{
+		m_bus->xmemw_w(offset, data);
 	}
 	else if (!(mmu & MMU_RAM))
 	{
@@ -208,6 +346,41 @@ void abc80_state::abc80_io(address_map &map)
 	map(0x07, 0x07).r(m_bus, FUNC(abcbus_slot_device::rst_r));
 	map(0x10, 0x13).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( tkn80_io )
+//-------------------------------------------------
+
+void tkn80_state::tkn80_io(address_map &map)
+{
+	abc80_io(map);
+	map(0x03, 0x03).r(FUNC(tkn80_state::in3_r));
+	map(0x04, 0x04).r(FUNC(tkn80_state::in4_r));
+}
+
+
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  INPUT_PORTS( tkn80 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( tkn80 )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Columns" )
+	PORT_CONFSETTING(    0x00, "40" )
+	PORT_CONFSETTING(    0x01, "80" )
+	PORT_CONFNAME( 0x02, 0x02, "Cursor" )
+	PORT_CONFSETTING(    0x00, "Static" )
+	PORT_CONFSETTING(    0x02, "Blinking" )
+	PORT_CONFNAME( 0x04, 0x00, "ROM Checksum" )
+	PORT_CONFSETTING(    0x00, "9913/10042" )
+	PORT_CONFSETTING(    0x04, "11273" )
+INPUT_PORTS_END
 
 
 
@@ -454,11 +627,38 @@ void abc80_state::machine_start()
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
 
-	//zero-fill
+	// zero-fill
 	m_key_data = 0;
 	m_key_strobe = 0;
 	m_blink = 0;
 }
+
+
+void tkn80_state::machine_start()
+{
+	abc80_state::machine_start();
+
+	// register for state saving
+	save_item(NAME(m_80));
+	save_item(NAME(m_rom_offset));
+}
+
+
+//-------------------------------------------------
+//  machine_reset
+//-------------------------------------------------
+
+void tkn80_state::machine_reset()
+{
+	u8 config = m_config->read();
+
+	m_rom_offset = BIT(config, 2) << 11;
+}
+
+
+//-------------------------------------------------
+//  QUICKLOAD_LOAD_MEMBER( quickload_cb )
+//-------------------------------------------------
 
 QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 {
@@ -483,7 +683,7 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	space.write_byte(HEAD + 1, head >> 8);
 	if (LOG) logerror("HEAD %04x\n",address);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -493,19 +693,16 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( abc80 )
+//  machine_config( abc80_common )
 //-------------------------------------------------
 
-void abc80_state::abc80(machine_config &config)
+void abc80_state::abc80_common(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc80_state::abc80_io);
 	m_maincpu->set_daisy_config(abc80_daisy_chain);
-
-	// video hardware
-	abc80_video(config);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -539,7 +736,7 @@ void abc80_state::abc80(machine_config &config)
 	ABCBUS_SLOT(config, m_bus, XTAL(11'980'800)/2/2, abc80_cards, "abcexp");
 
 	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "generic_kb", 0));
 	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
 	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc80_state::quickload_cb));
@@ -550,6 +747,31 @@ void abc80_state::abc80(machine_config &config)
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("abc80_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("abc80_flop");
+	SOFTWARE_LIST(config, "rom_list").set_original("abc80_rom");
+}
+
+void abc80_state::abc80(machine_config &config)
+{
+	abc80_state::abc80_common(config);
+
+	// video hardware
+	abc80_video(config);
+}
+
+
+//-------------------------------------------------
+//  machine_config( tkn80 )
+//-------------------------------------------------
+
+void tkn80_state::tkn80(machine_config &config)
+{
+	abc80_state::abc80_common(config);
+	
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &tkn80_state::tkn80_io);
+
+	// video hardware
+	tkn80_video(config);
 }
 
 
@@ -566,18 +788,20 @@ ROM_START( abc80 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("9913")
 	ROM_SYSTEM_BIOS( 0, "11273", "Checksum 11273" )
-	ROMX_LOAD( "3506_3.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
-	ROMX_LOAD( "3507_3.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
-	ROMX_LOAD( "3508_3.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
-	ROMX_LOAD( "3509_3.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "9913", "Checksum 9913" )
-	ROMX_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
-	ROMX_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
-	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
-	ROMX_LOAD( "3509_3_v2.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(1) )
-
-	ROM_REGION( 0xa00, "chargen", 0 )
-	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
+	ROMX_LOAD( "za3506_11273.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
+	ROMX_LOAD( "za3507_11273.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
+	ROMX_LOAD( "za3508_11273.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
+	ROMX_LOAD( "za3509_11273.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "10042", "Checksum 10042" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
+	ROMX_LOAD( "za3509_10042.a2", 0x3000, 0x1000, CRC(346f0cdb) SHA1(4262137cff9dfc82c5bd5727994ed5f9b7d22395), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "9913", "Checksum 9913" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(2) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(2) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(2) )
+	ROMX_LOAD( "za3509_9913.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(2) )
 
 	ROM_REGION( 0x100, "hsync", 0 )
 	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0100, CRC(e4f7e018) SHA1(63e718a39537f37286ea183e6469808c271dbfa5) ) // "64 40029-01" 82S129 256x4 horizontal sync
@@ -596,10 +820,54 @@ ROM_START( abc80 )
 ROM_END
 
 
+//-------------------------------------------------
+//  ROM( tkn80 )
+//-------------------------------------------------
+
+ROM_START( tkn80 )
+	ROM_REGION( 0x4000, Z80_TAG, 0 )
+	ROM_DEFAULT_BIOS("9913")
+	ROM_SYSTEM_BIOS( 0, "11273", "Checksum 11273" )
+	ROMX_LOAD( "za3506_11273.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
+	ROMX_LOAD( "za3507_11273.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
+	ROMX_LOAD( "za3508_11273.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
+	ROMX_LOAD( "za3509_11273.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "10042", "Checksum 10042" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
+	ROMX_LOAD( "za3509_10042.a2", 0x3000, 0x1000, CRC(346f0cdb) SHA1(4262137cff9dfc82c5bd5727994ed5f9b7d22395), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "9913", "Checksum 9913" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(2) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(2) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(2) )
+	ROMX_LOAD( "za3509_9913.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(2) )
+
+	ROM_REGION( 0x1000, "tkn80", 0 )
+	ROM_LOAD( "tkn80-iii.e", 0x0000, 0x1000, CRC(f0d2e4fa) SHA1(b0263c65db39667a6fe62e61f73fe591ea10f14b) )
+
+	ROM_REGION( 0x100, "hsync", 0 )
+	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0100, CRC(e4f7e018) SHA1(63e718a39537f37286ea183e6469808c271dbfa5) ) // "64 40029-01" 82S129 256x4 horizontal sync
+
+	ROM_REGION( 0x200, "vsync", 0 )
+	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0200, CRC(445a45b9) SHA1(bcc1c4fafe68b3500b03de785ca32abd63cea252) ) // "64 40030-01" 82S131 512x4 vertical sync
+
+	ROM_REGION( 0x100, "attr", 0 )
+	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0100, CRC(6c46811c) SHA1(2d3bdf2d3a2a88ddb1c0c637967e1b2b9541a928) ) // "64 40056-01" 82S129 256x4 attribute
+
+	ROM_REGION( 0x200, "line", 0 )
+	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0200, CRC(74de7a0b) SHA1(96f37b0ca65aa8af4242bad38124f410b7f657fe) ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
+
+	ROM_REGION( 0x100, "mmu", 0 )
+	ROM_LOAD( "tkn80-13.e7", 0x0000, 0x0100, CRC(28bfdf62) SHA1(209c4a29628168a27445b75f4c44aba2c7c49dbb) )
+ROM_END
+
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME  FLAGS
-COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
+COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 198?, tkn80, abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",             "ABC 80 with TKN80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

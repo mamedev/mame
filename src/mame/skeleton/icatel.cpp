@@ -28,6 +28,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class icatel_state : public driver_device
 {
 public:
@@ -46,7 +48,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t magic_string(offs_t offset);
+	[[maybe_unused]] uint8_t magic_string(offs_t offset);
 
 	uint8_t i80c31_p1_r();
 	uint8_t i80c31_p3_r();
@@ -270,6 +272,9 @@ ROM_START( icatel )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "icatel_tpci_em._4_v16.05.ci14",  0x00000, 0x8000, CRC(d310586e) SHA1(21736ad5a06cf9695f8cc5ff2dc2d19b101504f5) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT         COMPANY   FULLNAME                            FLAGS
 COMP( 1995, icatel, 0,      0,      icatel,  0,     icatel_state, init_icatel, "Icatel", "TPCI (Brazilian public payphone)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

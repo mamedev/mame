@@ -140,15 +140,15 @@ void electron_romp144_device::write(offs_t offset, uint8_t data, int infc, int i
 //  IMPLEMENTATION
 //**************************************************************************
 
-image_init_result electron_romp144_device::load_rom(device_image_interface &image, generic_slot_device *slot)
+std::error_condition electron_romp144_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid size: Only 8K/16K is supported\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -158,5 +158,5 @@ image_init_result electron_romp144_device::load_rom(device_image_interface &imag
 	uint8_t *crt = slot->get_rom_base();
 	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

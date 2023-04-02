@@ -371,8 +371,8 @@ QUICKLOAD_LOAD_MEMBER(mk14_state::quickload_cb)
 {
 	if (image.software_entry() == nullptr)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported quickload format");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported quickload format", image.basename());
+		return image_error::UNSUPPORTED;
 	}
 	else
 	{
@@ -386,13 +386,13 @@ QUICKLOAD_LOAD_MEMBER(mk14_state::quickload_cb)
 			uint8_t data;
 
 			if (image.fread(&data, 1) != 1)
-				return image_init_result::FAIL;
+				return image_error::UNSPECIFIED;
 			m_maincpu->space(AS_PROGRAM).write_byte(load_addr + i, data);
 		}
 
 		m_maincpu->set_pc(exec_addr);
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void mk14_state::mk14(machine_config &config)

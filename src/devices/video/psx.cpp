@@ -16,9 +16,9 @@
 
 #define STOP_ON_ERROR ( 0 )
 
-#define LOG_WRITE        (1 << 1U)
-#define LOG_READ         (1 << 2U)
-#define LOG_TRANSPARENCY (1 << 3U)
+#define LOG_WRITE        (1U << 1)
+#define LOG_READ         (1U << 2)
+#define LOG_TRANSPARENCY (1U << 3)
 #define VERBOSE          (0)
 #include "logmacro.h"
 

@@ -40,7 +40,7 @@ public:
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_creatable() const noexcept override { return false; }

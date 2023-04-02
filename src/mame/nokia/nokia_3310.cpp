@@ -23,6 +23,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define LOG_MAD2_REGISTER_ACCESS    (0)
 #define LOG_CCONT_REGISTER_ACCESS   (0)
 
@@ -882,6 +884,8 @@ ROM_START( noki8890 )
 	ROMX_LOAD("8890_12.20_ppmc.fls", 0x000000, 0x1d0000, CRC(77206f78) SHA1(a214a0d69760ecd8eeca0b9d82f95c94bdfe70ed), ROM_BIOS(0))
 	ROM_LOAD("8890 virgin eeprom 003d0000.fls", 0x1d0000, 0x030000, CRC(1d8ef3b5) SHA1(cc0924cfd4c0ce796fca157c640fc3183c2b5f2c))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS

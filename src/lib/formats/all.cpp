@@ -36,6 +36,10 @@
 #include "abc800_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_ABC800I_DSK
+#include "abc800i_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ABCFD2_DSK
 #include "abcfd2_dsk.h"
 #endif
@@ -680,6 +684,10 @@
 #include "vg5k_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_VGI_DSK
+#include "vgi_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_VICTOR9K_DSK
 #include "victor9k_dsk.h"
 #endif
@@ -815,6 +823,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Luxor ABC");
 #ifdef HAS_FORMATS_ABC800_DSK
 	en.add(FLOPPY_ABC800_FORMAT); // abc800_dsk.h
+#endif
+#ifdef HAS_FORMATS_ABC800I_DSK
+	en.add(FLOPPY_ABC800I_FORMAT); // abc800i_dsk.h
 #endif
 #ifdef HAS_FORMATS_ABCFD2_DSK
 	en.add(FLOPPY_ABC_FD2_FORMAT); // abcfd2_dsk.h
@@ -1394,6 +1405,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Microbee");
 #ifdef HAS_FORMATS_MBEE_CAS
 	en.add(mbee_cassette_formats); // mbee_cas.h
+#endif
+
+	en.category("Micropolis");
+#ifdef HAS_FORMATS_VGI_DSK
+	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
 	en.category("Orao");

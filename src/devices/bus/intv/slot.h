@@ -112,7 +112,7 @@ public:
 	virtual ~intv_cart_slot_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override {}
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -123,7 +123,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
-	image_init_result load_fullpath();
+	std::error_condition load_fullpath();
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 

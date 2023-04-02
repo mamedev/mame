@@ -423,7 +423,9 @@ void mb88_cpu_device::update_pio( int cycles )
 	/* process pending interrupts */
 	if (m_pending_interrupt & m_pio)
 	{
-		m_SP[m_SI] = GETPC();
+		uint16_t intpc = GETPC();
+
+		m_SP[m_SI] = intpc;
 		m_SP[m_SI] |= TEST_CF() << 15;
 		m_SP[m_SI] |= TEST_ZF() << 14;
 		m_SP[m_SI] |= TEST_ST() << 13;
@@ -434,7 +436,7 @@ void mb88_cpu_device::update_pio( int cycles )
 		if (m_pending_interrupt & m_pio & INT_CAUSE_EXTERNAL)
 		{
 			/* if we have a live external source, call the irqcallback */
-			standard_irq_callback( 0 );
+			standard_irq_callback( 0, intpc );
 			/* The datasheet doesn't mention if the interrupt flag
 			 * is cleared, but it seems to be only for this case. */
 			m_pio &= ~INT_CAUSE_EXTERNAL;
@@ -442,10 +444,12 @@ void mb88_cpu_device::update_pio( int cycles )
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)
 		{
+			standard_irq_callback( 1, intpc );
 			m_PC = 0x04;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_SERIAL)
 		{
+			standard_irq_callback( 2, intpc );
 			m_PC = 0x06;
 		}
 

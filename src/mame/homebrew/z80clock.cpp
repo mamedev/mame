@@ -321,13 +321,13 @@ private:
 	{
 		auto length = image.length();
 		if (length > m_u13.bytes())
-			return image_init_result::FAIL;
+			return image_error::INVALIDLENGTH;
 
 		if (image.fread(m_u13, length) != length)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 
 		m_maincpu->set_pc(0x6000);
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 };
 

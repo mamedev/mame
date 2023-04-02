@@ -34,6 +34,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
@@ -409,7 +411,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	/* The right RAM bank must be active */
 
@@ -417,7 +419,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -426,7 +428,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -437,7 +439,7 @@ QUICKLOAD_LOAD_MEMBER(smc777_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 uint8_t smc777_state::fdc_r(offs_t offset)
@@ -1161,6 +1163,9 @@ ROM_START( smc777 )
 	ROM_REGION( 0x400, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l8041a-077p.bin", 0x000, 0x400, NO_DUMP ) // 8041 keyboard mcu, needs decapping
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

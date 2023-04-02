@@ -30,6 +30,8 @@ Ver. 2.2 should exist
 #include "mgavegas.lh"
 
 
+namespace {
+
 /****************************
 *    LOG defines            *
 ****************************/
@@ -643,6 +645,8 @@ ROM_START(mgavegas133)
 	ROM_REGION( 0x2000, "nvram", 0 )
 	ROM_LOAD( "mgavegas133.nv", 0x0000, 0x2000, CRC(20fe4db7) SHA1(887b69468ac7e6490827a06cd1f0ff15228a9c73) )  //default setting
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

@@ -93,7 +93,7 @@ uint8_t nes_aladdin_slot_device::read(offs_t offset)
 }
 
 // 128K for Dizzy The Adventurer, 256K for the others
-image_init_result nes_aladdin_slot_device::call_load()
+std::error_condition nes_aladdin_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -101,12 +101,12 @@ image_init_result nes_aladdin_slot_device::call_load()
 		uint32_t size;
 
 		if (!ROM)
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20010 && length() != 0x40010)
-				return image_init_result::FAIL;
+				return image_error::INVALIDLENGTH;
 
 			uint8_t temp[0x40010];
 			size = length() - 0x10;
@@ -118,13 +118,13 @@ image_init_result nes_aladdin_slot_device::call_load()
 				uint8_t mapper = (temp[6] & 0xf0) >> 4;
 				mapper |= temp[7] & 0xf0;
 				if (mapper != 71 && mapper != 232)
-					return image_init_result::FAIL;
+					return image_error::INVALIDIMAGE;
 			}
 		}
 		else
 		{
 			if (get_software_region_length("rom") != 0x20000 && get_software_region_length("rom") != 0x40000)
-				return image_init_result::FAIL;
+				return image_error::BADSOFTWARE;
 
 			size = get_software_region_length("rom");
 			memcpy(ROM, get_software_region("rom"), size);
@@ -133,7 +133,7 @@ image_init_result nes_aladdin_slot_device::call_load()
 		m_cart->set_cart_size(size);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

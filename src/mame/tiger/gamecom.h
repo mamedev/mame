@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_GAMECOM_H
-#define MAME_INCLUDES_GAMECOM_H
+#ifndef MAME_TIGER_GAMECOM_H
+#define MAME_TIGER_GAMECOM_H
 
 #pragma once
 
@@ -279,7 +279,7 @@ private:
 	void handle_stylus_press(int column);
 	void recompute_lcd_params();
 	void handle_input_press(uint16_t mux_data);
-	image_init_result common_load(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition common_load(device_image_interface &image, generic_slot_device *slot);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -303,4 +303,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif // MAME_INCLUDES_GAMECOM_H
+#endif // MAME_TIGER_GAMECOM_H

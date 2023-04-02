@@ -49,7 +49,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "disk"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -89,7 +89,7 @@ void nubus_image_device::messimg_disk_image_device::device_start()
 	}
 }
 
-image_init_result nubus_image_device::messimg_disk_image_device::call_load()
+std::error_condition nubus_image_device::messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
 	m_size = uint32_t(ftell());
@@ -97,14 +97,14 @@ image_init_result nubus_image_device::messimg_disk_image_device::call_load()
 	{
 		osd_printf_error("Mac image too large: must be 256MB or less!\n");
 		m_size = 0;
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	fseek(0, SEEK_SET);
 	fread(m_data, m_size);
 	m_ejected = false;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void nubus_image_device::messimg_disk_image_device::call_unload()

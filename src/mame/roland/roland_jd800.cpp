@@ -13,6 +13,9 @@
 //#include "machine/nvram.h"
 //#include "machine/ssc1000.h"
 
+
+namespace {
+
 class roland_jd800_state : public driver_device
 {
 public:
@@ -70,5 +73,8 @@ ROM_START(jd800)
 	ROM_LOAD("roland_r15209291_mb838000-20_2a7-aa_9119-r15.ic26", 0x100000, 0x100000, CRC(06098658) SHA1(5c364e3b9c1b206fe94fbaa190caa17b01189937))
 	ROM_LOAD("roland_r15209305_mb838000-20_2a8-aa_9102-r01.ic1",  0x200000, 0x100000, CRC(5c83e539) SHA1(2861baa9a6f42a1257c241927815ed366becd7dc)) // on card board
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1991, jd800, 0, 0, jd800, jd800, roland_jd800_state, empty_init, "Roland", "JD-800 Programmable Synthesizer", MACHINE_IS_SKELETON)

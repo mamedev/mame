@@ -68,7 +68,7 @@ class mmm01_device : public mbc_ram_device_base<mbc_dual_uniform_device_base>
 public:
 	mmm01_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -162,13 +162,13 @@ mmm01_device::mmm01_device(
 }
 
 
-image_init_result mmm01_device::load(std::string &message)
+std::error_condition mmm01_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(9);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 	install_rom();
 	install_ram(m_view_ram[0]);
@@ -188,7 +188,7 @@ image_init_result mmm01_device::load(std::string &message)
 			write8smo_delegate(*this, FUNC(mmm01_device::enable_bank_low_mid)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

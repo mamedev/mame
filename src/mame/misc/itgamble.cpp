@@ -124,6 +124,8 @@ Known games on this hardware revision are:
 #include "speaker.h"
 
 
+namespace {
+
 class itgamble_state : public driver_device
 {
 public:
@@ -664,6 +666,8 @@ ROM_START( mnumber )    /* clocks should be changed for this game */
 	ROM_REGION( 0x40000, "oki", 0 ) /* M6295 samples */
 	ROM_LOAD( "mysterynumber5.u6", 0x00000, 0x40000, CRC(80aba466) SHA1(e9bf7e1c3d1c6b1b0dba43dd79a71f89e63df814) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

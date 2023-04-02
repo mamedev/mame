@@ -195,17 +195,17 @@ protected:
 	uint8_t command[2], config, status, istatus;
 	uint8_t clock_conv, sync_offset, sync_period, bus_id, select_timeout, seq;
 	uint8_t fifo[16];
-	uint16_t tcount;
-	uint16_t tcounter;
+	uint32_t tcount;
+	uint32_t tcounter, tcounter_mask;
 	int mode, fifo_pos, command_pos;
 	int state, xfr_phase;
-	int command_length;
 
 	int dma_dir;
 
 	bool irq, drq;
 	bool dma_command;
 	bool test_mode;
+	int stepping;
 
 	void dma_set(int dir);
 	virtual void check_drq();
@@ -247,7 +247,7 @@ public:
 	virtual uint8_t status_r() override;
 
 	uint8_t conf2_r() { return config2; }
-	void conf2_w(uint8_t data) { config2 = data; }
+	virtual void conf2_w(uint8_t data) { config2 = data; }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -277,7 +277,7 @@ protected:
 		DAE   = 0x80, // data alignment enable
 	};
 
-private:
+protected:
 	u8 config2;
 };
 
@@ -299,6 +299,7 @@ public:
 
 	uint8_t conf3_r() { return config3; }
 	void conf3_w(uint8_t data) { config3 = data; }
+
 	void fifo_align_w(uint8_t data) { fifo_align = data; }
 
 	virtual uint8_t read(offs_t offset) override;
@@ -306,6 +307,9 @@ public:
 
 	u16 dma16_r();
 	void dma16_w(u16 data);
+
+	u16 dma16_swap_r() { return swapendian_int16(dma16_r()); }
+	void dma16_swap_w(u16 data) { return dma16_w(swapendian_int16(data)); }
 
 protected:
 	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -327,15 +331,53 @@ private:
 	busmd_t m_busmd;
 };
 
+class ncr53c96_device : public ncr53c94_device
+{
+public:
+	ncr53c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class ncr53cf94_device : public ncr53c94_device
 {
 public:
 	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override;
+
+	virtual void conf2_w(uint8_t data) override;
+
+	uint8_t conf4_r() { return config4; }
+	void conf4_w(uint8_t data) { config4 = data; }
+
+	uint8_t tcounter_hi2_r();
+	void tcount_hi2_w(uint8_t data);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 config4;
+	u8 family_id;
+	u8 revision_level;
+};
+
+class ncr53cf96_device : public ncr53cf94_device
+{
+public:
+	ncr53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(NCR53C90, ncr53c90_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+DECLARE_DEVICE_TYPE(NCR53C96, ncr53c96_device)
 DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
+DECLARE_DEVICE_TYPE(NCR53CF96, ncr53cf96_device)
 
 #endif // MAME_MACHINE_NCR53C90_H

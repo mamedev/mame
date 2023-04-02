@@ -52,18 +52,18 @@ public:
 	void io_w(offs_t offset, u8 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override { }
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "sdk85_rom"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 private:

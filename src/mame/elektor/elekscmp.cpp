@@ -31,6 +31,8 @@ ToDo:
 #include "elekscmp.lh"
 
 
+namespace {
+
 class elekscmp_state : public driver_device
 {
 public:
@@ -225,6 +227,9 @@ ROM_START( elekscmp )
 	ROM_LOAD( "elbug.002", 0x0200, 0x0200, CRC(529c0b88) SHA1(bd72dd890cd974e1744ca70aa3457657374cbf76))
 	ROM_LOAD( "elbug.003", 0x0400, 0x0200, CRC(13585ad1) SHA1(93f722b3e84095a1b701b04bf9018c891933b9ff))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

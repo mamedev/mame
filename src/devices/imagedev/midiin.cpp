@@ -165,11 +165,11 @@ TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
     call_load
 -------------------------------------------------*/
 
-image_init_result midiin_device::call_load()
+std::error_condition midiin_device::call_load()
 {
 	// attempt to load if it's a real file
-	m_err = load_image_by_path(OPEN_FLAG_READ, filename());
-	if (!m_err)
+	std::error_condition err = load_image_by_path(OPEN_FLAG_READ, filename());
+	if (!err)
 	{
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
@@ -178,9 +178,9 @@ image_init_result midiin_device::call_load()
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 	else
 	{
@@ -189,11 +189,11 @@ image_init_result midiin_device::call_load()
 		if (!m_midi->open_input(filename()))
 		{
 			m_midi.reset();
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 
 		m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 }
 
@@ -460,7 +460,7 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
+std::error_condition midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 {
 	// start with an empty list of events
 	m_list.clear();
@@ -497,14 +497,14 @@ bool midiin_device::midi_sequence::parse(util::random_read &stream, u32 length)
 			}
 		}
 		m_iterator = m_list.begin();
-		return true;
+		return std::error_condition();
 	}
 	catch (midi_parser::error &err)
 	{
 		osd_printf_error("MIDI file error: %s\n", err.description());
 		m_list.clear();
 		m_iterator = m_list.begin();
-		return false;
+		return image_error::UNSPECIFIED;
 	}
 }
 

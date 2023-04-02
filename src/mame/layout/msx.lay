@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of LEDs for an MSX
+-->
+
+<mamelayout version="2">
+	<element name="optional_green_led">
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="2">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="optional_orange_led">
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="2">
+			<color red="1.0" green="0.6" blue="0.0" />
+		</rect>
+	</element>
+	<element name="caps_name">
+		<text string="Caps" align="1" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="code_name">
+		<text string="Code" align="1" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="カナ" align="1" state="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+<!-- This is the text from the key/led but does not seem to get rendered properly.
+        <text string="عالي" align="1" state="3">
+-->
+		<text string="Arabic" align="1" state="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="한글" align="1" state="4">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="РУС" align="1" state="5">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv0">
+		<text string="Drive A" align="1" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="drv1">
+		<text string="Drive B" align="1" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="System LEDs">
+		<screen index="0">
+			<bounds x="75" y="0" width="1024" height="768" />
+		</screen>
+		<element name="caps_led_name" ref="caps_name">
+			<bounds left="0" right="74" top="0" bottom="30" />
+		</element>
+		<element name="caps_led" ref="optional_green_led">
+			<bounds left="0" right="20" top="31" bottom="39" />
+		</element>
+		<element name="code_led_name" ref="code_name">
+			<bounds left="0" right="74" top="40" bottom="70" />
+		</element>
+		<element name="code_led" ref="optional_green_led">
+			<bounds left="0" right="20" top="71" bottom="79" />
+		</element>
+		<element name="internal_drive0_name" ref="drv0">
+			<bounds left="0" right="74" top="80" bottom="110" />
+		</element>
+		<element name="internal_drive0_led" ref="optional_orange_led">
+			<bounds left="0" right="20" top="111" bottom="119" />
+		</element>
+		<element name="internal_drive1_name" ref="drv1">
+			<bounds left="0" right="74" top="120" bottom="150" />
+		</element>
+		<element name="internal_drive1_led" ref="optional_orange_led">
+			<bounds left="0" right="20" top="151" bottom="159" />
+		</element>
+	</view>
+</mamelayout>

@@ -1906,7 +1906,7 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 {
 	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
 	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+		m_maincpu->trigger_bus_error();
 }
 
 
@@ -7985,8 +7985,10 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	// special BIOS with trackball support, we only have one Irritating Maze bios and that's Asian
 	ROM_SYSTEM_BIOS( 0, "asia-sp1", "Asia MV1B 263" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "236-bios.sp1", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
+	ROM_SYSTEM_BIOS( 1, "japan", "Japan (hack?)" ) // from a 'refurbished' Japanese cabinet, had label of the arcade distributor rather than original sticker however, and looks like a hack of above Asia ROM
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "236-bios_japan_hack.sp1", 0x00000, 0x020000, CRC(02bf4426) SHA1(f4aa64bfe0b93e5df07b4fe2e0f638d91c7f2e71) )
 	// Universe BIOS 2.2 and later allow joystick play as a cheat
-	NEOGEO_UNIBIOS_2_2_AND_NEWER(1)
+	NEOGEO_UNIBIOS_2_2_AND_NEWER(2)
 
 	ROM_REGION( 0x30000, "cslot1:audiocpu", 0 )
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
@@ -12147,7 +12149,7 @@ GAME( 1996, neomrdo,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1995, goalx3,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Goal! Goal! Goal!", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, neodrift,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Neo Drift Out - New Technology", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, breakers,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, puzzldpr,   puzzledp, neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
+GAME( 1997, puzzldpr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Puzzle De Pon! R!", MACHINE_SUPPORTS_SAVE ) // game concept licensed from Taito
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )

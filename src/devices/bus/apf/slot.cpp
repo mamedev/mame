@@ -144,7 +144,7 @@ static const char *apf_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result apf_cart_slot_device::call_load()
+std::error_condition apf_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -152,8 +152,8 @@ image_init_result apf_cart_slot_device::call_load()
 
 		if (size > 0x3800)
 		{
-			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Image extends beyond the expected size for an APF cart\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size);
@@ -187,10 +187,10 @@ image_init_result apf_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", apf_get_slot(m_type));
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

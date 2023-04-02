@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
-#ifndef MAME_INCLUDES_XBOX_USB_H
-#define MAME_INCLUDES_XBOX_USB_H
+#ifndef MAME_SHARED_XBOX_USB_H
+#define MAME_SHARED_XBOX_USB_H
 
 #pragma once
 
@@ -531,4 +531,4 @@ private:
 	required_ioport m_White; // analog button
 };
 
-#endif // MAME_INCLUDES_XBOX_USB_H
+#endif // MAME_SHARED_XBOX_USB_H

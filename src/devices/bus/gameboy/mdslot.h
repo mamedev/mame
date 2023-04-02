@@ -61,7 +61,7 @@ public:
 
 protected:
 	// gb_cart_slot_device_base implementation
-	virtual image_init_result load_image_file(util::random_read &file) override ATTR_COLD;
+	virtual std::error_condition load_image_file(util::random_read &file) override ATTR_COLD;
 };
 
 

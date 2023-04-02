@@ -1858,8 +1858,8 @@ int tms32025_device::process_IRQs()
 
 		if ((m_IFR & 0x01) && (m_imr & 0x01)) {       /* IRQ line 0 */
 			//logerror("TMS32025:  Active INT0\n");
+			standard_irq_callback(0, m_PC);
 			m_PC = 0x0002;
-			standard_irq_callback(0);
 			m_idle = 0;
 			m_IFR &= (~0x01);
 			SET0(INTM_FLAG);
@@ -1867,8 +1867,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x02) && (m_imr & 0x02)) {       /* IRQ line 1 */
 			//logerror("TMS32025:  Active INT1\n");
+			standard_irq_callback(1, m_PC);
 			m_PC = 0x0004;
-			standard_irq_callback(1);
 			m_idle = 0;
 			m_IFR &= (~0x02);
 			SET0(INTM_FLAG);
@@ -1876,8 +1876,8 @@ int tms32025_device::process_IRQs()
 		}
 		if ((m_IFR & 0x04) && (m_imr & 0x04)) {       /* IRQ line 2 */
 			//logerror("TMS32025:  Active INT2\n");
+			standard_irq_callback(2, m_PC);
 			m_PC = 0x0006;
-			standard_irq_callback(2);
 			m_idle = 0;
 			m_IFR &= (~0x04);
 			SET0(INTM_FLAG);

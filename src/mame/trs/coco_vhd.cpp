@@ -104,12 +104,12 @@ void coco_vhd_image_device::device_start()
 //  call_load
 //-------------------------------------------------
 
-image_init_result coco_vhd_image_device::call_load()
+std::error_condition coco_vhd_image_device::call_load()
 {
 	m_status = VHDSTATUS_POWER_ON_STATE;
 	m_logical_record_number = 0;
 	m_buffer_address = 0;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

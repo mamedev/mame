@@ -266,6 +266,8 @@ Some routine locations
 #include "speaker.h"
 
 
+namespace {
+
 // unscramble address: ROM dump offset -> proper (descrambled) offset
 #define UNSCRAMBLE_ADDR_INT(_offset) \
 	bitswap<19>(_offset,18,17,15,14,16,12,11, 7, 9,13,10, 8, 3, 2, 1, 6, 4, 5, 0)
@@ -427,8 +429,8 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	uint32_t size = pcmcard->common_get_size("rom");
 	if (size > 0x080000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid size: Only up to 512K is supported\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);    // cards are up to 512K
@@ -450,7 +452,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	descramble_rom_external(&dst[0x080000], &src[0x080000]);
 	pcmard_loaded = true;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(cm32p_state::card_unload)
@@ -706,5 +708,8 @@ ROM_START( cm32p )
 	ROM_LOAD( "roland__r15179972__hn62304bpe98__9d1_japan.3f.ic20", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) ) // markings under chip footprint are "HN62304BPE98"
 	ROM_REGION( 0x400000, "pcm", ROMREGION_ERASEFF )    // ROMs after descrambling
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -1190,16 +1190,58 @@ ROM_END
     ROM_LOAD( "uj22.l1",  0xa00000, 0x080000, CRC(a6546b15) SHA1(756210dda34dbe7784a291a5f76c2b60cc214b3c) )
     ROM_LOAD( "uj23.l1",  0xa80000, 0x080000, CRC(45867c6f) SHA1(cf65f906c1f7f5b73cb71e4ae4e944646ef0bf98) )
 */
+/*
 
+Notes about NBA JAM's sound PCB & sound ROMs
+
+At least one PCB has been found with labels in the following format:
+
+NBA JAM       U3
+SOUND ROM
+(c)WMS INC     $ FC0A
+   2-10-93    REV SLA2
+
+NBA JAM       U13
+SOUND ROM
+(c)WMS INC     $ 9858
+   2-1-93     REV SLA1
+
+NBA JAM       U12
+SOUND ROM
+(c)WMS INC     $ 304A
+   2-1-93     REV SLA1
+
+Most commonly labels as ("L2" is printed in large black strip perpendicular to the rest of the print):
+
+L2 NBA JAM
+   U3  SOUND ROM
+   (c) 1993 MIDWAY
+   MANUFACTURING CO.
+
+L2 NBA JAM
+   U12  SOUND ROM
+   (c) 1993 MIDWAY
+   MANUFACTURING CO.
+
+L2 NBA JAM
+   U13  SOUND ROM
+   (c) 1993 MIDWAY
+   MANUFACTURING CO.
+
+
+NOTE: The current sound ROMs match the L1 checksums listed above. Midway would commonly raise all ROMs to the same revision.
+      The program ROMs for L2 report as 2-10-93 like the L2 sound ROM's label. Therefor there might be a L1 revision of the
+      U3 sound ROM dated 2-1-93 specific to the L1 program ROM set which report as 2-1-93 like the 2 listed above sound ROMs.
+*/
 
 ROM_START( nbajam )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l2_nba_jam_u3_sound_rom.u3", 0x010000, 0x20000, CRC(3a3ea480) SHA1(d12a45cba5c35f046b176661d7877fa4fd0e6c13) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                              0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
-	ROM_LOAD( "nbau12.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) )
-	ROM_LOAD( "nbau13.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) )
+	ROM_LOAD( "l1_nba_jam_u12_sound_rom.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) ) // may be labeled as L2 revision
+	ROM_LOAD( "l1_nba_jam_u13_sound_rom.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) ) // may be labeled as L2 revision
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "l3_nba_jam_game_rom_uj12.uj12", 0x00000, 0x80000, CRC(b93e271c) SHA1(b0e9f055376a4a4cd1115a81f71c933903c251b1) )
@@ -1231,11 +1273,11 @@ ROM_END
 ROM_START( nbajamr2 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l2_nba_jam_u3_sound_rom.u3", 0x010000, 0x20000, CRC(3a3ea480) SHA1(d12a45cba5c35f046b176661d7877fa4fd0e6c13) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                              0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
-	ROM_LOAD( "nbau12.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) )
-	ROM_LOAD( "nbau13.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) )
+	ROM_LOAD( "l1_nba_jam_u12_sound_rom.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) ) // may be labeled as L2 revision
+	ROM_LOAD( "l1_nba_jam_u13_sound_rom.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) ) // may be labeled as L2 revision
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "l2_nba_jam_game_rom_uj12.uj12", 0x00000, 0x80000, CRC(0fe80b36) SHA1(fe6b21dc9b393b25c511b2914b568fa92301d749) )
@@ -1266,12 +1308,12 @@ ROM_END
 
 ROM_START( nbajamr1 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
-	ROM_LOAD(  "l2_nba_jam_u3_sound_rom.u3", 0x010000, 0x20000, CRC(3a3ea480) SHA1(d12a45cba5c35f046b176661d7877fa4fd0e6c13) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_LOAD(  "l2_nba_jam_u3_sound_rom.u3", 0x010000, 0x20000, CRC(3a3ea480) SHA1(d12a45cba5c35f046b176661d7877fa4fd0e6c13) ) // is there an undumped L1 ROM???
+	ROM_RELOAD(                              0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
-	ROM_LOAD( "nbau12.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) )
-	ROM_LOAD( "nbau13.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) )
+	ROM_LOAD( "l1_nba_jam_u12_sound_rom.u12", 0x000000, 0x80000, CRC(b94847f1) SHA1(e7efa0a379bfa91fe4ffb75f07a5dfbfde9a96b4) )
+	ROM_LOAD( "l1_nba_jam_u13_sound_rom.u13", 0x080000, 0x80000, CRC(b6fe24bd) SHA1(f70f75b5570a2b368ebc74d2a7d264c618940430) )
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "l1_nba_jam_game_rom_uj12.uj12", 0x00000, 0x80000, CRC(4db672ec) SHA1(bb329c552473179f617d3bd038f47fb69d060b55) )
@@ -1303,7 +1345,7 @@ ROM_END
 ROM_START( nbajamte )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1339,7 +1381,7 @@ ROM_END
 ROM_START( nbajamte4 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1375,7 +1417,7 @@ ROM_END
 ROM_START( nbajamte3 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1411,7 +1453,7 @@ ROM_END
 ROM_START( nbajamte3a )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1447,7 +1489,7 @@ ROM_END
 ROM_START( nbajamte2 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1483,7 +1525,7 @@ ROM_END
 ROM_START( nbajamte2a )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1519,7 +1561,7 @@ ROM_END
 ROM_START( nbajamte1 )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1555,7 +1597,7 @@ ROM_END
 ROM_START( nbajamten )
 	ROM_REGION( 0x50000, "adpcm:cpu", 0 ) /* sound CPU */
 	ROM_LOAD(  "l1_nba_jam_tournament_u3_sound_rom.u3", 0x010000, 0x20000, CRC(d4551195) SHA1(e8908fbe4339fb8c93f7e74113dfd25dda1667ea) )
-	ROM_RELOAD(             0x030000, 0x20000 )
+	ROM_RELOAD(                                         0x030000, 0x20000 )
 
 	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
 	ROM_LOAD( "l1_nba_jam_tournament_u12_sound_rom.u12", 0x000000, 0x80000, CRC(4fac97bc) SHA1(bd88d8c3edab0e35ad9f9350bcbaa17cda61d87a) )
@@ -1653,11 +1695,11 @@ GAME( 1993, nbajam,     0,        tunit_adpcm, nbajam,   midtunit_state, init_nb
 GAME( 1993, nbajamr2,   nbajam,   tunit_adpcm, nbajam,   midtunit_state, init_nbajam,   ROT0, "Midway",   "NBA Jam (rev 2.00 2/10/93)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, nbajamr1,   nbajam,   tunit_adpcm, nbajam,   midtunit_state, init_nbajam,   ROT0, "Midway",   "NBA Jam (rev 1.00 2/1/93)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, nbajamte,   0,        tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 4.0 3/23/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte4,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 4.0 3/03/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte3,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 3.0 3/04/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte3a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 3.0 2/26/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte2,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 2.1 2/06/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte2a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 2.0 1/28/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nbajamte1,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam TE (rev 1.00 1/17/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, nbajamten,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam T.E. Nani Edition (rev 5.2 8/11/95, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte,   0,        tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 4.0 3/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte4,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 4.0 3/03/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte3,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 3.0 3/04/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte3a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 3.0 2/26/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte2,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 2.1 2/06/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte2a, nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 2.0 1/28/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nbajamte1,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (rev 1.00 1/17/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, nbajamten,  nbajamte, tunit_adpcm, nbajamte, midtunit_state, init_nbajamte, ROT0, "Midway",   "NBA Jam Tournament Edition (Nani Edition, rev 5.2 8/11/95, prototype)", MACHINE_SUPPORTS_SAVE )

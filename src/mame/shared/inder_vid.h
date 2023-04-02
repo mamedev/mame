@@ -6,8 +6,8 @@
 /* */
 
 
-#ifndef MAME_MACHINE_INDER_VID_H
-#define MAME_MACHINE_INDER_VID_H
+#ifndef MAME_SHARED_INDER_VID_H
+#define MAME_SHARED_INDER_VID_H
 
 #pragma once
 
@@ -54,4 +54,4 @@ private:
 	int m_bpp_mode;
 };
 
-#endif // MAME_MACHINE_INDER_VID_H
+#endif // MAME_SHARED_INDER_VID_H

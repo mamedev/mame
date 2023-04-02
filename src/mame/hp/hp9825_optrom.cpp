@@ -105,23 +105,23 @@ void hp9825_optrom_device::device_start()
 {
 }
 
-image_init_result hp9825_optrom_device::call_load()
+std::error_condition hp9825_optrom_device::call_load()
 {
 	LOG("hp9825_optrom: call_load\n");
 	if (!loaded_through_softlist()) {
 		LOG("hp9825_optrom: must be loaded from sw list\n");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	for (const struct optrom_region& reg : region_tab) {
 		auto len = get_software_region_length(reg.m_tag) / 2;
 		if (len != 0 && len != reg.m_size) {
 			LOG("Region %s: wrong size (%u should be %u)\n" , reg.m_tag , len , reg.m_size);
-			return image_init_result::FAIL;
+			return image_error::BADSOFTWARE;
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void hp9825_optrom_device::call_unload()

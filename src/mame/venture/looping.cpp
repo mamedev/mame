@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER(looping_state::speech_enable_w)
 
 WRITE_LINE_MEMBER(looping_state::ballon_enable_w)
 {
-	osd_printf_debug("ballon_enable_w = %d\n", state);
+	logerror("ballon_enable_w = %d\n", state);
 }
 
 

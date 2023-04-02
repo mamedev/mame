@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NAMCO65_H
-#define MAME_MACHINE_NAMCO65_H
+#ifndef MAME_NAMCO_NAMCO65_H
+#define MAME_NAMCO_NAMCO65_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 	int m_mcu_analog_complete;
 };
 
-#endif // MAME_MACHINE_NAMCO65_H
+#endif // MAME_NAMCO_NAMCO65_H

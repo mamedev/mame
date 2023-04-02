@@ -9,11 +9,10 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/dirmenu.h"
 
 #include "ui/ui.h"
-#include "ui/dirmenu.h"
 #include "ui/utils.h"
-#include "ui/optsmenu.h"
 
 #include "emuopts.h"
 #include "fileio.h"
@@ -83,7 +82,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::string  m_searchpath;
 	int const    m_ref;
@@ -115,7 +114,7 @@ menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &c
 //  handle
 //-------------------------------------------------
 
-void menu_remove_folder::handle(event const *ev)
+bool menu_remove_folder::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
@@ -132,13 +131,13 @@ void menu_remove_folder::handle(event const *ev)
 		if (ui().options().exists(f_folders[m_ref].option))
 			ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		else if (machine().options().value(f_folders[m_ref].option) != tmppath)
-		{
 			machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-		}
 
 		reset_parent(reset_options::REMEMBER_REF);
 		stack_pop();
 	}
+
+	return false;
 }
 
 //-------------------------------------------------
@@ -168,11 +167,11 @@ protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
+	virtual bool custom_ui_back() override { return !m_search.empty(); }
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void update_search();
 
@@ -211,86 +210,92 @@ menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_cont
 //  handle
 //-------------------------------------------------
 
-void menu_add_change_folder::handle(event const *ev)
+bool menu_add_change_folder::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-	{
-		if (ev->iptkey == IPT_UI_SELECT)
-		{
-			assert(ev->item);
-			menu_item const &pitem = *ev->item;
+	if (!ev || !ev->itemref)
+		return false;
 
-			// go up to the parent path
-			if (pitem.text() == "..")
+	if (ev->iptkey == IPT_UI_SELECT)
+	{
+		assert(ev->item);
+		menu_item const &pitem = *ev->item;
+
+		// go up to the parent path
+		if (pitem.text() == "..")
+		{
+			size_t const first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
+			size_t const last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
+			m_current_path.erase(last_sep + ((first_sep == last_sep) ? 1 : 0));
+		}
+		else
+		{
+			// if isn't a drive, appends the directory
+			if (pitem.subtext() != "[DRIVE]")
+				util::path_append(m_current_path, pitem.text());
+			else
+				m_current_path = pitem.text();
+		}
+
+		// reset the char buffer also in this case
+		m_search.clear();
+		reset(reset_options::SELECT_FIRST);
+	}
+	else if (ev->iptkey == IPT_UI_PASTE)
+	{
+		if (paste_text(m_search, uchar_is_printable))
+		{
+			update_search();
+			return true;
+		}
+	}
+	else if (ev->iptkey == IPT_SPECIAL)
+	{
+		if (ev->unichar == 0x09)
+		{
+			// Tab key, save current path
+			std::string error_string;
+			if (!m_multipath)
 			{
-				size_t const first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
-				size_t const last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
-				m_current_path.erase(last_sep + ((first_sep == last_sep) ? 1 : 0));
+				if (ui().options().exists(f_folders[m_ref].option))
+					ui().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
+				else if (machine().options().value(f_folders[m_ref].option) != m_current_path)
+					machine().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 			}
 			else
 			{
-				// if isn't a drive, appends the directory
-				if (pitem.subtext() != "[DRIVE]")
-					util::path_append(m_current_path, pitem.text());
-				else
-					m_current_path = pitem.text();
-			}
-
-			// reset the char buffer also in this case
-			m_search.clear();
-			reset(reset_options::SELECT_FIRST);
-		}
-		else if (ev->iptkey == IPT_UI_PASTE)
-		{
-			if (paste_text(m_search, uchar_is_printable))
-				update_search();
-		}
-		else if (ev->iptkey == IPT_SPECIAL)
-		{
-			if (ev->unichar == 0x09)
-			{
-				// Tab key, save current path
-				std::string error_string;
-				if (!m_multipath)
+				m_folders.push_back(m_current_path);
+				std::string tmppath;
+				for (int x = 0; x < m_folders.size(); ++x)
 				{
-					if (ui().options().exists(f_folders[m_ref].option))
-						ui().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-					else if (machine().options().value(f_folders[m_ref].option) != m_current_path)
-						machine().options().set_value(f_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-				}
-				else
-				{
-					m_folders.push_back(m_current_path);
-					std::string tmppath;
-					for (int x = 0; x < m_folders.size(); ++x)
-					{
-						tmppath.append(m_folders[x]);
-						if (x != m_folders.size() - 1)
-							tmppath.append(";");
-					}
-
-					if (ui().options().exists(f_folders[m_ref].option))
-						ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-					else if (machine().options().value(f_folders[m_ref].option) != tmppath)
-						machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
+					tmppath.append(m_folders[x]);
+					if (x != m_folders.size() - 1)
+						tmppath.append(";");
 				}
 
-				reset_parent(reset_options::SELECT_FIRST);
-				stack_pop();
+				if (ui().options().exists(f_folders[m_ref].option))
+					ui().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
+				else if (machine().options().value(f_folders[m_ref].option) != tmppath)
+					machine().options().set_value(f_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 			}
-			else if (input_character(m_search, ev->unichar, uchar_is_printable))
-			{
-				// if it's any other key and we're not maxed out, update
-				update_search();
-			}
+
+			reset_parent(reset_options::SELECT_FIRST);
+			stack_pop();
 		}
-		else if (ev->iptkey == IPT_UI_CANCEL)
+		else if (input_character(m_search, ev->unichar, uchar_is_printable))
 		{
-			// reset the char buffer also in this case
-			m_search.clear();
+			// if it's any other key and we're not maxed out, update
+			update_search();
+			return true;
 		}
 	}
+	else if (ev->iptkey == IPT_UI_CANCEL)
+	{
+		// reset the char buffer also in this case
+		m_search.clear();
+		return true;
+	}
+
+	return false;
 }
 
 //-------------------------------------------------
@@ -451,7 +456,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	bool is_multipath(std::string_view folder) const;
 
@@ -480,9 +485,8 @@ bool menu_display_actual::is_multipath(std::string_view folder) const
 //  handle
 //-------------------------------------------------
 
-void menu_display_actual::handle(event const *ev)
+bool menu_display_actual::handle(event const *ev)
 {
-	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 	{
 		switch ((uintptr_t)ev->itemref)
@@ -496,6 +500,8 @@ void menu_display_actual::handle(event const *ev)
 			break;
 		}
 	}
+
+	return false;
 }
 
 //-------------------------------------------------
@@ -589,11 +595,12 @@ menu_directory::~menu_directory()
 //  handle
 //-------------------------------------------------
 
-void menu_directory::handle(event const *ev)
+bool menu_directory::handle(event const *ev)
 {
-	// process the menu
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 		menu::stack_push<menu_display_actual>(ui(), container(), selected_index());
+
+	return false;
 }
 
 //-------------------------------------------------

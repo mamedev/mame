@@ -45,6 +45,8 @@ Notes/Tidbits:
 #include "speaker.h"
 
 
+namespace {
+
 class scobra_state : public scramble_state
 {
 public:
@@ -1789,6 +1791,9 @@ ROM_START( mimonkeyug ) // this bootleg has significant hardware changes: no aud
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.6l",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1981, stratgyx,   0,        stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami",                             "Strategy X", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, stratgys,   stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", MACHINE_SUPPORTS_SAVE )

@@ -13,6 +13,9 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i86/i186.h"
 
+
+namespace {
+
 class strkzn_state : public driver_device
 {
 public:
@@ -80,5 +83,8 @@ ROM_START( strkzn )
 	ROM_REGION(0x80000, "soundrom", 0) // OKIM6373???
 	ROM_LOAD( "strkznu16", 0x00000, 0x80000, CRC(67f7674b) SHA1(451a26da55315fcaccdc02817521c78acdd8eb8a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1994, strkzn, 0, strkzn, strkzn, strkzn_state, empty_init, ROT0, "Purple Star", "Strike Zone (Purple Star)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -4,8 +4,9 @@
 #include "emu.h"
 #include "kc.h"
 
-#define KC_DEBUG 0
-#define LOG(x) do { if (KC_DEBUG) logerror x; } while (0)
+//#define VERBOSE 0
+#include "logmacro.h"
+
 
 struct kcc_header
 {
@@ -38,10 +39,10 @@ QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 	uint64_t size = image.length();
 
 	if (size == 0)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	std::vector<uint8_t> data(size);
-	image.fread( &data[0], size);
+	image.fread(&data[0], size);
 
 	header = (struct kcc_header *) &data[0];
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
@@ -67,7 +68,7 @@ QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 
 	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -282,7 +283,7 @@ void kc_state::update_0x00000()
 	/* access ram? */
 	if (m_pio_data[0] & (1<<1))
 	{
-		LOG(("ram0 enabled\n"));
+		LOG("ram0 enabled\n");
 
 		/* yes; set address of bank */
 		space.install_rom(0x0000, 0x3fff, m_ram_base);
@@ -291,14 +292,14 @@ void kc_state::update_0x00000()
 		if ((m_pio_data[0] & (1<<3)) == 0)
 		{
 			/* yes */
-			LOG(("ram0 write protected\n"));
+			LOG("ram0 write protected\n");
 
 			/* ram is enabled and write protected */
 			space.unmap_write(0x0000, 0x3fff);
 		}
 		else
 		{
-			LOG(("ram0 write enabled\n"));
+			LOG("ram0 write enabled\n");
 
 			/* ram is enabled and write enabled */
 			space.install_writeonly(0x0000, 0x3fff, m_ram_base);
@@ -306,7 +307,7 @@ void kc_state::update_0x00000()
 	}
 	else
 	{
-		LOG(("Module at 0x0000\n"));
+		LOG("Module at 0x0000\n");
 
 		space.install_read_handler (0x0000, 0x3fff, read8sm_delegate(*this, FUNC(kc_state::expansion_read)), 0);
 		space.install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(kc_state::expansion_write)), 0);
@@ -318,7 +319,7 @@ void kc_state::update_0x04000()
 {
 	address_space &space = m_maincpu->space( AS_PROGRAM );
 
-	LOG(("Module at 0x4000\n"));
+	LOG("Module at 0x4000\n");
 
 	space.install_read_handler (0x4000, 0x7fff, read8sm_delegate(*this, FUNC(kc_state::expansion_4000_r)), 0);
 	space.install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(kc_state::expansion_4000_w)), 0);
@@ -334,14 +335,14 @@ void kc_state::update_0x0c000()
 	if ((m_pio_data[0] & (1<<7)) && memregion("basic") != nullptr)
 	{
 		/* BASIC takes next priority */
-			LOG(("BASIC rom 0x0c000\n"));
+		LOG("BASIC rom 0x0c000\n");
 
 		space.install_rom(0xc000, 0xdfff, memregion("basic")->base());
 		space.unmap_write(0xc000, 0xdfff);
 	}
 	else
 	{
-		LOG(("Module at 0x0c000\n"));
+		LOG("Module at 0x0c000\n");
 
 		space.install_read_handler (0xc000, 0xdfff, read8sm_delegate(*this, FUNC(kc_state::expansion_c000_r)), 0);
 		space.install_write_handler(0xc000, 0xdfff, write8sm_delegate(*this, FUNC(kc_state::expansion_c000_w)), 0);
@@ -356,14 +357,14 @@ void kc_state::update_0x0e000()
 	if (m_pio_data[0] & (1<<0))
 	{
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
-		LOG(("CAOS rom 0x0e000\n"));
+		LOG("CAOS rom 0x0e000\n");
 		/* read will access the rom */
 		space.install_rom(0xe000, 0xffff, memregion("caos")->base() + 0x2000);
 		space.unmap_write(0xe000, 0xffff);
 	}
 	else
 	{
-		LOG(("Module at 0x0e000\n"));
+		LOG("Module at 0x0e000\n");
 
 		space.install_read_handler (0xe000, 0xffff, read8sm_delegate(*this, FUNC(kc_state::expansion_e000_r)), 0);
 		space.install_write_handler(0xe000, 0xffff, write8sm_delegate(*this, FUNC(kc_state::expansion_e000_w)), 0);
@@ -379,13 +380,13 @@ void kc_state::update_0x08000()
 	if (m_pio_data[0] & (1<<2))
 	{
 		/* IRM enabled */
-		LOG(("IRM enabled\n"));
+		LOG("IRM enabled\n");
 
 		space.install_ram(0x8000, 0xbfff, &m_video_ram[0]);
 	}
 	else
 	{
-		LOG(("Module at 0x8000!\n"));
+		LOG("Module at 0x8000!\n");
 
 		space.install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(kc_state::expansion_8000_r)), 0);
 		space.install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(kc_state::expansion_8000_w)), 0);
@@ -401,7 +402,7 @@ void kc85_4_state::update_0x04000()
 	/* access ram? */
 	if (m_port_86_data & (1<<0))
 	{
-		LOG(("RAM4 enabled\n"));
+		LOG("RAM4 enabled\n");
 
 		/* yes */
 		space.install_rom(0x4000, 0x7fff, m_ram_base + 0x4000);
@@ -410,14 +411,14 @@ void kc85_4_state::update_0x04000()
 		if ((m_port_86_data & (1<<1)) == 0)
 		{
 			/* yes */
-			LOG(("ram4 write protected\n"));
+			LOG("ram4 write protected\n");
 
 			/* ram is enabled and write protected */
 			space.nop_write(0x4000, 0x7fff);
 		}
 		else
 		{
-			LOG(("ram4 write enabled\n"));
+			LOG("ram4 write enabled\n");
 
 			/* ram is enabled and write enabled */
 			space.install_writeonly(0x4000, 0x7fff, m_ram_base + 0x4000);
@@ -425,10 +426,10 @@ void kc85_4_state::update_0x04000()
 	}
 	else
 	{
-		LOG(("Module at 0x4000\n"));
+		LOG("Module at 0x4000\n");
 
-		space.install_read_handler (0x4000, 0x7fff, read8sm_delegate(*this, FUNC(kc_state::expansion_4000_r)), 0);
-		space.install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(kc_state::expansion_4000_w)), 0);
+		space.install_read_handler (0x4000, 0x7fff, read8sm_delegate(*this, FUNC(kc85_4_state::expansion_4000_r)), 0);
+		space.install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(kc85_4_state::expansion_4000_w)), 0);
 	}
 
 }
@@ -441,7 +442,7 @@ void kc85_4_state::update_0x0c000()
 	if (m_port_86_data & (1<<7))
 	{
 		/* CAOS rom takes priority */
-		LOG(("CAOS rom 0x0c000\n"));
+		LOG("CAOS rom 0x0c000\n");
 
 		space.install_rom(0xc000, 0xdfff, memregion("caos")->base());
 		space.unmap_write(0xc000, 0xdfff);
@@ -451,7 +452,7 @@ void kc85_4_state::update_0x0c000()
 		if (m_pio_data[0] & (1<<7))
 		{
 			/* BASIC takes next priority */
-			LOG(("BASIC rom 0x0c000\n"));
+			LOG("BASIC rom 0x0c000\n");
 
 			int bank = memregion("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
 
@@ -460,10 +461,10 @@ void kc85_4_state::update_0x0c000()
 		}
 		else
 		{
-			LOG(("Module at 0x0c000\n"));
+			LOG("Module at 0x0c000\n");
 
-			space.install_read_handler (0xc000, 0xdfff, read8sm_delegate(*this, FUNC(kc_state::expansion_c000_r)), 0);
-			space.install_write_handler(0xc000, 0xdfff, write8sm_delegate(*this, FUNC(kc_state::expansion_c000_w)), 0);
+			space.install_read_handler (0xc000, 0xdfff, read8sm_delegate(*this, FUNC(kc85_4_state::expansion_c000_r)), 0);
+			space.install_write_handler(0xc000, 0xdfff, write8sm_delegate(*this, FUNC(kc85_4_state::expansion_c000_w)), 0);
 		}
 	}
 }
@@ -475,7 +476,7 @@ void kc85_4_state::update_0x08000()
 	if (m_pio_data[0] & (1<<2))
 	{
 		/* IRM enabled - has priority over RAM8 enabled */
-		LOG(("IRM enabled\n"));
+		LOG("IRM enabled\n");
 
 		uint8_t* ram_page = &m_video_ram[(BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14)];
 
@@ -484,7 +485,7 @@ void kc85_4_state::update_0x08000()
 	}
 	else if (m_pio_data[1] & (1<<5))
 	{
-		LOG(("RAM8 enabled\n"));
+		LOG("RAM8 enabled\n");
 
 		int ram8_block;
 		uint8_t *mem_ptr;
@@ -511,14 +512,14 @@ void kc85_4_state::update_0x08000()
 		if ((m_pio_data[1] & (1<<6)) == 0)
 		{
 			/* ram8 is enabled and write protected */
-			LOG(("RAM8 write protected\n"));
+			LOG("RAM8 write protected\n");
 
 			space.nop_write(0x8000, 0xa7ff);
 			space.nop_write(0xa800, 0xbfff);
 		}
 		else
 		{
-			LOG(("RAM8 write enabled\n"));
+			LOG("RAM8 write enabled\n");
 
 			/* ram8 is enabled and write enabled */
 			space.install_writeonly(0x8000, 0xa7ff, mem_ptr);
@@ -527,10 +528,10 @@ void kc85_4_state::update_0x08000()
 	}
 	else
 	{
-		LOG(("Module at 0x8000\n"));
+		LOG("Module at 0x8000\n");
 
-		space.install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(kc_state::expansion_8000_r)), 0);
-		space.install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(kc_state::expansion_8000_w)), 0);
+		space.install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(kc85_4_state::expansion_8000_r)), 0);
+		space.install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(kc85_4_state::expansion_8000_w)), 0);
 	}
 }
 
@@ -593,9 +594,27 @@ void kc_state::pio_portb_w(uint8_t data)
 
 	update_0x08000();
 
-	/* 16 speaker levels */
-	m_speaker_level = (data>>1) & 0x0f;
+	// KC 85/2..3: 5-bit DAC
+	m_dac_level = (~data & 0x1f);
+	dac_update();
+}
 
+void kc85_4_state::pio_portb_w(uint8_t data)
+{
+	// reset tone flip-flops
+	if (((m_pio_data[1] & 1) == 1) & ((data & 1) == 0))
+	{
+		m_k0_line = 0;
+		m_k1_line = 0;
+	}
+
+	m_pio_data[1] = data;
+
+	update_0x08000();
+
+	// KC 85/4: 4-bit DAC
+	m_dac_level = (~data & 0x1e)>>1;
+	dac_update();
 	speaker_update();
 }
 
@@ -613,7 +632,7 @@ bit 0: BILD .display screen 0 or 1
 
 void kc85_4_state::kc85_4_84_w(uint8_t data)
 {
-	LOG(("0x84 W: %02x\n", data));
+	LOG("0x84 W: %02x\n", data);
 
 	m_port_84_data = data;
 
@@ -640,7 +659,7 @@ bit 0: ACCESS RAM 4
 
 void kc85_4_state::kc85_4_86_w(uint8_t data)
 {
-	LOG(("0x86 W: %02x\n", data));
+	LOG("0x86 W: %02x\n", data);
 
 	m_port_86_data = data;
 
@@ -676,7 +695,19 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 	if (state)
 	{
 		m_k0_line^=1;
+		dac_update();
+		tapeout_update();
+	}
+}
+
+WRITE_LINE_MEMBER( kc85_3_state::ctc_zc0_callback )
+{
+	if (state)
+	{
+		m_k0_line^=1;
+		dac_update();
 		speaker_update();
+		tapeout_update();
 	}
 }
 
@@ -686,12 +717,12 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 	if (state)
 	{
 		m_k1_line^=1;
-		speaker_update();
+		dac_update();
+		tapeout_update();
 
 		// K1 line is also cassette output
 		m_cassette->output((m_k1_line & 1) ? +1 : -1);
 	}
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
@@ -714,10 +745,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
 	}
 }
 
-void kc_state::speaker_update()
+void kc85_3_state::speaker_update()
 {
-	/* this might not be correct, the range might be logarithmic and not linear! */
-	m_speaker->level_w(m_k0_line ? (m_speaker_level | (m_k1_line ? 0x01 : 0)) : 0);
+	m_speaker->level_w(m_k0_line);
+}
+
+void kc85_4_state::speaker_update()
+{
+	m_speaker->level_w(m_dac_level ? m_k0_line : 0);
+}
+
+void kc_state::dac_update()
+{
+	m_dac->level_w((m_k0_line + m_k1_line) * m_dac_level);
+}
+
+void kc85_4_state::dac_update()
+{
+	m_dac->level_w((m_k0_line + m_k1_line) * m_dac_level);
+}
+
+void kc_state::tapeout_update()
+{
+	m_tapeout_left->level_w(m_k0_line);
+	m_tapeout_right->level_w(m_k1_line);
 }
 
 /* keyboard callback */
@@ -768,4 +819,225 @@ void kc85_4_state::machine_reset()
 
 	m_port_84_data = 0x00;
 	m_port_86_data = 0x00;
+}
+
+
+// Initialise the palette
+void kc_state::kc85_palette(palette_device &palette) const
+{
+	// 3 bit colour value. bit 2->green, bit 1->red, bit 0->blue
+	static constexpr rgb_t kc85_pens[KC85_PALETTE_SIZE] =
+	{
+		// foreground colours, "full" of each component
+		{ 0x00, 0x00, 0x00 },   // black
+		{ 0x00, 0x00, 0xd0 },   // blue
+		{ 0xd0, 0x00, 0x00 },   // red
+		{ 0xd0, 0x00, 0xd0 },   // magenta
+		{ 0x00, 0xd0, 0x00 },   // green
+		{ 0x00, 0xd0, 0xd0 },   // cyan
+		{ 0xd0, 0xd0, 0x00 },   // yellow
+		{ 0xd0, 0xd0, 0xd0 },   // white
+
+		// full of each component + half of another component
+		{ 0x00, 0x00, 0x00 },   // black
+		{ 0x60, 0x00, 0xa0 },   // violet
+		{ 0xa0, 0x60, 0x00 },   // brown
+		{ 0xa0, 0x00, 0x60 },   // red/purple
+		{ 0x00, 0xa0, 0x60 },   // pastel green
+		{ 0x00, 0x60, 0xa0 },   // sky blue
+		{ 0xa0, 0xa0, 0x60 },   // yellow/green
+		{ 0xd0, 0xd0, 0xd0 },   // white
+
+		// background colours are slightly darker than foreground colours
+		{ 0x00, 0x00, 0x00 },   // black
+		{ 0x00, 0x00, 0xa0 },   // dark blue
+		{ 0xa0, 0x00, 0x00 },   // dark red
+		{ 0xa0, 0x00, 0xa0 },   // dark magenta
+		{ 0x00, 0xa0, 0x00 },   // dark green
+		{ 0x00, 0xa0, 0xa0 },   // dark cyan
+		{ 0xa0, 0xa0, 0x00 },   // dark yellow
+		{ 0xa0, 0xa0, 0xa0 }    // dark white (grey)
+	};
+
+	palette.set_pen_colors(0, kc85_pens);
+}
+
+/* set new blink state */
+WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
+{
+	if (state)
+	{
+		m_screen->update_partial(m_screen->vpos());
+		m_kc85_blink_state = !m_kc85_blink_state;
+	}
+}
+
+
+/* draw 8 pixels */
+void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte)
+{
+	if (m_high_resolution)
+	{
+		/* High resolution: 4 colors for block */
+
+		int const pens[4] = {
+				0,    // black
+				2,    // red
+				5,    // cyan
+				7 };  // white
+
+		int px = x;
+
+		for (int a = 0; a < 8; a++)
+		{
+			int pen = pens[((gfx_byte>>7) & 0x07) | ((colour_byte>>6) & 0x02)];
+
+			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
+			{
+				bitmap.pix(y, px) = pen;
+			}
+
+			px++;
+			colour_byte <<= 1;
+			gfx_byte <<= 1;
+		}
+	}
+	else
+	{
+		/* Low resolution: 2 colors for block */
+		/* 16 foreground colours, 8 background colours */
+
+		/* bit 7 = 1: flash between foreground and background colour 0: no flash */
+		/* bit 6: adjusts foreground colours by adding half of another component */
+		/* bit 5,4,3 = foreground colour */
+			/* bit 5: background colour -> Green */
+			/* bit 4: background colour -> Red */
+			/* bit 3: background colour -> Blue */
+		/* bit 2,1,0 = background colour */
+			/* bit 2: background colour -> Green */
+			/* bit 1: background colour -> Red */
+			/* bit 0: background colour -> Blue */
+
+		int background_pen = (colour_byte&7) + 16;
+		int foreground_pen = ((colour_byte>>3) & 0x0f);
+
+		if ((colour_byte & 0x80) && m_kc85_blink_state && (m_pio_data[1] & 0x80))
+		{
+			foreground_pen = background_pen;
+		}
+
+		int const pens[2] = { background_pen, foreground_pen };
+
+		int px = x;
+
+		for (int a = 0; a < 8; a++)
+		{
+			int pen = pens[(gfx_byte >> 7) & 0x01];
+
+			if ((px >= 0) && (px < bitmap.width()) && (y >= 0) && (y < bitmap.height()))
+			{
+				bitmap.pix(y, px) = pen;
+			}
+			px++;
+			gfx_byte <<= 1;
+		}
+	}
+}
+
+
+/***************************************************************************
+ KC85/4 video hardware
+***************************************************************************/
+
+void kc85_4_state::video_start()
+{
+	m_video_ram = make_unique_clear<uint8_t[]>((KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
+	m_display_video_ram = &m_video_ram[0];
+
+	m_kc85_blink_state = 0;
+}
+
+void kc85_4_state::video_control_w(int data)
+{
+	/* calculate address of video ram to display */
+	if (data & 1)
+		m_display_video_ram = &m_video_ram[KC85_4_SCREEN_PIXEL_RAM_SIZE + KC85_4_SCREEN_COLOUR_RAM_SIZE];
+	else
+		m_display_video_ram = &m_video_ram[0];
+
+	m_high_resolution = (data & 0x08) ? 0 : 1;
+}
+
+
+uint32_t kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const pixel_ram = m_display_video_ram;
+	uint8_t const *const colour_ram = pixel_ram + 0x04000;
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = 0; x< (KC85_SCREEN_WIDTH >> 3); x++)
+		{
+			uint16_t const offset = y | (x<<8);
+
+			uint8_t const colour_byte = colour_ram[offset];
+			uint8_t const gfx_byte = pixel_ram[offset];
+
+			video_draw_8_pixels(bitmap, (x<<3), y, colour_byte, gfx_byte);
+		}
+	}
+
+	return 0;
+}
+
+/***************************************************************************
+ KC85/3 video
+***************************************************************************/
+
+void kc_state::video_start()
+{
+	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
+
+	m_kc85_blink_state = 0;
+}
+
+uint32_t kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* colour ram takes up 0x02800 bytes */
+	uint8_t const *const pixel_ram = &m_video_ram[0];
+	uint8_t const *const colour_ram = &m_video_ram[0x2800];
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = 0; x< (KC85_SCREEN_WIDTH >> 3); x++)
+		{
+			int pixel_offset,colour_offset;
+
+			if ((x & 0x020)==0)
+			{
+				pixel_offset = (x & 0x01f) | (((y>>2) & 0x03)<<5) |
+						((y & 0x03)<<7) | (((y>>4) & 0x0f)<<9);
+
+				colour_offset = (x & 0x01f) | (((y>>2) & 0x03f)<<5);
+			}
+			else
+			{
+				/* 1  0  1  0  0  V7 V6 V1  V0 V3 V2 V5 V4 H2 H1 H0 */
+				/* 1  0  1  1  0  0  0  V7  V6 V3 V2 V5 V4 H2 H1 H0 */
+
+				pixel_offset = 0x02000+((x & 0x07) | (((y>>4) & 0x03)<<3) |
+						(((y>>2) & 0x03)<<5) | ((y & 0x03)<<7) | ((y>>6) & 0x03)<<9);
+
+				colour_offset = 0x0800+((x & 0x07) | (((y>>4) & 0x03)<<3) |
+						(((y>>2) & 0x03)<<5) | ((y>>6) & 0x03)<<7);
+			}
+
+			uint8_t const colour_byte = colour_ram[colour_offset];
+			uint8_t const gfx_byte = pixel_ram[pixel_offset];
+
+			video_draw_8_pixels(bitmap,(x<<3),y, colour_byte, gfx_byte);
+		}
+	}
+
+	return 0;
 }

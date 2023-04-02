@@ -10,7 +10,10 @@ All Platforms
 
 * To compile MAME, you need a C++17 compiler and runtime library.  We
   support building with GCC version 7.2 or later and clang version 6 or
-  later.  MAME should run with GNU libstdc++ version 7.2 or later.
+  later.  MAME should run with GNU libstdc++ version 7.2 or later or
+  libc++ version 7 or later.  The initial release of any major version
+  of GCC should be avoided.  For example, if you want to compile MAME
+  with GCC 10, you should use version 10.3 or later.
 
 * Whenever you are changing build parameters, (for example changing
   optimisation settings, or adding tools to the compile list), or system

@@ -85,16 +85,16 @@ const software_list_loader &bitbanger_device::get_software_list_loader() const
     call_load
 -------------------------------------------------*/
 
-image_init_result bitbanger_device::call_load()
+std::error_condition bitbanger_device::call_load()
 {
 	// we don't need to do anything special
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition bitbanger_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	// we don't need to do anything special
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*-------------------------------------------------

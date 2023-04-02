@@ -88,50 +88,35 @@ public:
 		, m_tms9980a(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_tms9918(*this, "tms9918")
 		, m_tms9901_usr(*this, TMS9901_0_TAG)
 		, m_tms9901_sys(*this, TMS9901_1_TAG)
 		, m_tms9902(*this, "tms9902")
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
-	{ }
+	{
+	}
 
-	void tm990_189_v(machine_config &config);
-	void tm990_189(machine_config &config);
+	void tm990_189(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<tms9980a_device> m_tms9980a;
+
 private:
-	virtual void machine_reset() override;
-
-	uint8_t video_vdp_r(offs_t offset);
-	void video_vdp_w(offs_t offset, uint8_t data);
-	uint8_t video_joy_r();
-	void video_joy_w(uint8_t data);
-
 	void external_operation(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(usr9901_led_w) { led_set(N, state); }
 	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
 	uint8_t sys9901_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel2_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel3_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment0_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment1_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment2_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment3_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment4_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment5_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment6_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment7_w);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel_w) { digitsel(N, state); }
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(sys9901_segment_w) { segment_set(N, state); }
 
 	DECLARE_WRITE_LINE_MEMBER(sys9901_dsplytrgr_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_shiftlight_w);
@@ -139,14 +124,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
 	void xmit_callback(uint8_t data);
-	DECLARE_MACHINE_START(tm990_189);
-	DECLARE_MACHINE_START(tm990_189_v);
 
 	emu_timer *m_load_timer = nullptr;
 
-	void tm990_189_cru_map(address_map &map);
-	void tm990_189_memmap(address_map &map);
-	void tm990_189_v_memmap(address_map &map);
+	void tm990_189_cru_map(address_map &map) ATTR_COLD;
+	void tm990_189_memmap(address_map &map) ATTR_COLD;
 
 	void draw_digit(void);
 	void led_set(int number, bool state);
@@ -157,10 +139,8 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_load);
 	void hold_load();
 
-	required_device<tms9980a_device> m_tms9980a;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	optional_device<tms9918_device> m_tms9918;
 
 	required_device<tms9901_device> m_tms9901_usr;
 	required_device<tms9901_device> m_tms9901_sys;
@@ -176,19 +156,50 @@ private:
 	uint8_t m_segment_state[10]{};
 	uint8_t m_old_segment_state[10]{};
 	uint8_t m_LED_state = 0U;
-	emu_timer *m_joy1x_timer = 0;
-	emu_timer *m_joy1y_timer = 0;
-	emu_timer *m_joy2x_timer = 0;
-	emu_timer *m_joy2y_timer = 0;
 	device_image_interface *m_rs232_fp = 0;
 	//uint8_t m_rs232_rts;
+};
+
+
+class tm990189_v_state : public tm990189_state
+{
+public:
+	tm990189_v_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tm990189_state(mconfig, type, tag)
+		, m_tms9918(*this, "tms9918")
+		, m_buttons(*this, "BUTTONS")
+		, m_axes(*this, { "JOY1_X", "JOY1_Y", "JOY2_X", "JOY2_Y" })
+	{
+	}
+
+	void tm990_189_v(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	uint8_t video_vdp_r(offs_t offset);
+	void video_vdp_w(offs_t offset, uint8_t data);
+	uint8_t video_joy_r();
+	void video_joy_w(uint8_t data);
+
+	void tm990_189_v_memmap(address_map &map) ATTR_COLD;
+
+	required_device<tms9918_device> m_tms9918;
+	required_ioport m_buttons;
+	required_ioport_array<4> m_axes;
+
+	emu_timer *m_joy1x_timer = nullptr;
+	emu_timer *m_joy1y_timer = nullptr;
+	emu_timer *m_joy2x_timer = nullptr;
+	emu_timer *m_joy2y_timer = nullptr;
+
 	uint8_t m_bogus_read_save = 0U;
 };
 
 
 #define displayena_duration attotime::from_usec(4500)   /* Can anyone confirm this? 74LS123 connected to C=0.1uF and R=100kOhm */
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189)
+void tm990189_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
@@ -200,9 +211,9 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 	m_load_timer = timer_alloc(FUNC(tm990189_state::clear_load), this);
 }
 
-MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
+void tm990189_v_state::machine_start()
 {
-	MACHINE_START_CALL_MEMBER(tm990_189);
+	tm990189_state::machine_start();
 
 	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -295,26 +306,6 @@ void tm990189_state::led_set(int offset, bool state)
 		m_LED_state &= ~(1 << offset);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led0_w )
-{
-	led_set(0, state);
-}
-
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led1_w )
-{
-	led_set(1, state);
-}
-
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led2_w )
-{
-	led_set(2, state);
-}
-
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
-{
-	led_set(3, state);
-}
-
 WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
 {
 	// TODO: Check this
@@ -368,23 +359,6 @@ void tm990189_state::digitsel(int offset, bool state)
 		m_digitsel &= ~ (1 << offset);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel0_w )
-{
-	digitsel(0, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel1_w )
-{
-	digitsel(1, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel2_w )
-{
-	digitsel(2, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel3_w )
-{
-	digitsel(3, state);
-}
-
 
 void tm990189_state::segment_set(int offset, bool state)
 {
@@ -398,38 +372,6 @@ void tm990189_state::segment_set(int offset, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment0_w )
-{
-	segment_set(0, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment1_w )
-{
-	segment_set(1, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment2_w )
-{
-	segment_set(2, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment3_w )
-{
-	segment_set(3, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment4_w )
-{
-	segment_set(4, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment5_w )
-{
-	segment_set(5, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment6_w )
-{
-	segment_set(6, state);
-}
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment7_w )
-{
-	segment_set(7, state);
-}
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
 {
@@ -480,7 +422,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "serial"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "serl"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -517,11 +459,11 @@ TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)
 	}
 }
 
-image_init_result tm990_189_rs232_image_device::call_load()
+std::error_condition tm990_189_rs232_image_device::call_load()
 {
 	m_tms9902->rcv_dsr(ASSERT_LINE);
 	m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -581,7 +523,7 @@ void tm990189_state::external_operation(offs_t offset, uint8_t data)
     Video Board handling
 */
 
-uint8_t tm990189_state::video_vdp_r(offs_t offset)
+uint8_t tm990189_v_state::video_vdp_r(offs_t offset)
 {
 	int reply = 0;
 
@@ -612,7 +554,7 @@ uint8_t tm990189_state::video_vdp_r(offs_t offset)
 	return reply;
 }
 
-void tm990189_state::video_vdp_w(offs_t offset, uint8_t data)
+void tm990189_v_state::video_vdp_w(offs_t offset, uint8_t data)
 {
 	if (offset & 1)
 	{
@@ -623,9 +565,9 @@ void tm990189_state::video_vdp_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t tm990189_state::video_joy_r()
+uint8_t tm990189_v_state::video_joy_r()
 {
-	uint8_t data = ioport("BUTTONS")->read();
+	uint8_t data = m_buttons->read();
 
 	if (m_joy1x_timer->remaining() < attotime::zero)
 		data |= 0x01;
@@ -642,12 +584,12 @@ uint8_t tm990189_state::video_joy_r()
 	return data;
 }
 
-void tm990189_state::video_joy_w(uint8_t data)
+void tm990189_v_state::video_joy_w(uint8_t data)
 {
-	m_joy1x_timer->reset(attotime::from_usec(ioport("JOY1_X")->read()*28+28));
-	m_joy1y_timer->reset(attotime::from_usec(ioport("JOY1_Y")->read()*28+28));
-	m_joy2x_timer->reset(attotime::from_usec(ioport("JOY2_X")->read()*28+28));
-	m_joy2y_timer->reset(attotime::from_usec(ioport("JOY2_Y")->read()*28+28));
+	m_joy1x_timer->reset(attotime::from_usec(m_axes[0]->read()*28+28));
+	m_joy1y_timer->reset(attotime::from_usec(m_axes[1]->read()*28+28));
+	m_joy2x_timer->reset(attotime::from_usec(m_axes[2]->read()*28+28));
+	m_joy2y_timer->reset(attotime::from_usec(m_axes[3]->read()*28+28));
 }
 
 /*
@@ -661,10 +603,10 @@ static const tms9901_interface usr9901reset_param =
 
     // write handlers
     {
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led0_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led1_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led2_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led3_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led_w<0>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led_w<1>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led_w<2>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, usr9901_led_w<3>),
         DEVCB_NOOP,
         DEVCB_NOOP,
         DEVCB_NOOP,
@@ -695,18 +637,18 @@ static const tms9901_interface sys9901reset_param =
 
     // write handlers
     {
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel0_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel1_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel2_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel3_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment0_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment1_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment2_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment3_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment4_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment5_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment6_w),
-        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment7_w),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel_w<0>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel_w<1>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel_w<2>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_digitsel_w<3>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<0>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<1>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<2>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<3>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<4>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<5>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<6>),
+        DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_segment_w<7>),
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_dsplytrgr_w),
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_shiftlight_w),
         DEVCB_DRIVER_LINE_MEMBER(tm990189_state, sys9901_spkrdrive_w),
@@ -748,23 +690,23 @@ static const tms9901_interface sys9901reset_param =
 
 void tm990189_state::tm990_189_memmap(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();                                 /* RAM */
-	map(0x0800, 0x0fff).rom();                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
-	map(0x1000, 0x2fff).noprw();                                 /* reserved for expansion (RAM and/or tms9918 video controller) */
-	map(0x3000, 0x3fff).rom();                                 /* main ROM - unibug or university basic */
+	map(0x0000, 0x07ff).ram();      // RAM
+	map(0x0800, 0x0fff).rom();      // extra ROM - application programs with unibug, remaining 2kb of program for university basic
+	map(0x1000, 0x2fff).noprw();    // reserved for expansion (RAM and/or tms9918 video controller)
+	map(0x3000, 0x3fff).rom();      // main ROM - unibug or university basic
 }
 
-void tm990189_state::tm990_189_v_memmap(address_map &map)
+void tm990189_v_state::tm990_189_v_memmap(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();                                 /* RAM */
-	map(0x0800, 0x0fff).rom();                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
+	map(0x0000, 0x07ff).ram();                                          // RAM
+	map(0x0800, 0x0fff).rom();                                          // extra ROM - application programs with unibug, remaining 2kb of program for university basic
 
-	map(0x1000, 0x17ff).rom().nopw();     /* video board ROM 1 */
-	map(0x1800, 0x1fff).rom().w(FUNC(tm990189_state::video_joy_w));   /* video board ROM 2 and joystick write port*/
-	map(0x2000, 0x27ff).r(FUNC(tm990189_state::video_vdp_r)).nopw();   /* video board tms9918 read ports (bogus) */
-	map(0x2800, 0x2fff).rw(FUNC(tm990189_state::video_joy_r), FUNC(tm990189_state::video_vdp_w)); /* video board joystick read port and tms9918 write ports */
+	map(0x1000, 0x17ff).rom().nopw();                                   // video board ROM 1
+	map(0x1800, 0x1fff).rom().w(FUNC(tm990189_v_state::video_joy_w));   // video board ROM 2 and joystick write port
+	map(0x2000, 0x27ff).r(FUNC(tm990189_v_state::video_vdp_r)).nopw();  // video board TMS9918 read ports (bogus)
+	map(0x2800, 0x2fff).rw(FUNC(tm990189_v_state::video_joy_r), FUNC(tm990189_v_state::video_vdp_w)); // video board joystick read port and TMS9918 write ports
 
-	map(0x3000, 0x3fff).rom();                                 /* main ROM - unibug or university basic */
+	map(0x3000, 0x3fff).rom();                                          // main ROM - unibug or university basic
 }
 
 /*
@@ -838,8 +780,6 @@ void tm990189_state::tm990_189(machine_config &config)
 	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
-	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
-
 	/* Video hardware */
 	config.set_default_layout(layout_tm990189);
 
@@ -851,26 +791,26 @@ void tm990189_state::tm990_189(machine_config &config)
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
-	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
-	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
-	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
-	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
+	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led_w<0>));
+	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led_w<1>));
+	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led_w<2>));
+	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led_w<3>));
 	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
 	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
-	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
-	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
-	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
-	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
-	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
-	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
-	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
-	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
-	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
-	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
-	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
-	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
+	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel_w<0>));
+	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel_w<1>));
+	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel_w<2>));
+	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel_w<3>));
+	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment_w<0>));
+	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment_w<1>));
+	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment_w<2>));
+	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment_w<3>));
+	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment_w<4>));
+	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment_w<5>));
+	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment_w<6>));
+	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment_w<7>));
 	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
 	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
 	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
@@ -888,65 +828,21 @@ void tm990189_state::tm990_189(machine_config &config)
 	display_timer.set_start_delay(attotime::from_msec(150));
 }
 
-void tm990189_state::tm990_189_v(machine_config &config)
+void tm990189_v_state::tm990_189_v(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
-	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
-	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
-	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
+	tm990_189(config);
 
-	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
+	/* basic machine hardware */
+	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_v_state::tm990_189_v_memmap);
 
 	/* video hardware */
-	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));
-	vdp.set_screen("screen");
-	vdp.set_vram_size(0x4000);
+	TMS9918(config, m_tms9918, XTAL(10'738'635));
+	m_tms9918->set_screen("screen");
+	m_tms9918->set_vram_size(0x4000);
+
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	config.set_default_layout(layout_tm990189v);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
-
-	/* Devices */
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
-	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
-	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
-	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
-	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
-	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
-
-	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
-	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
-	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
-	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
-	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
-	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
-	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
-	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
-	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
-	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
-	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
-	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
-	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
-	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
-	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
-	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
-	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
-	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
-	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
-
-	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
-	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
-	TM990_189_RS232(config, "rs232", 0, m_tms9902);
-
-	timer_device &display_timer(TIMER(config, "display_timer"));
-	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
-	display_timer.set_start_delay(attotime::from_msec(150));
 }
 
 
@@ -1073,6 +969,7 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS           INIT        COMPANY              FULLNAME                                                                FLAGS
-COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
-COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )
+
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS             INIT        COMPANY              FULLNAME                                                                FLAGS
+COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state,   empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
+COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_v_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )

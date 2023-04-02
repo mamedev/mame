@@ -688,18 +688,18 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 	u32 bytes = image.fread(&ch, 1);
 	if (bytes != 1 || ch != 0xA5)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid header");
+		osd_printf_error("%s: Invalid header\n", image.basename());
 		image.message(" Invalid header");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	while ((bytes = image.fread(&ch, 1)) != 0 && ch != 0)
 	{
 		if (i >= (std::size(pgmname) - 1))
 		{
-			image.seterror(image_error::INVALIDIMAGE, "File name too long");
+			osd_printf_error("File name too long\n");
 			image.message(" File name too long");
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 
 		// image.message treats characters with bit 7 as nulls, so replace with question mark
@@ -711,9 +711,9 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 
 	if (image.fread(args, sizeof(args)) != sizeof(args))
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unexpected EOF while getting file size");
+		osd_printf_error("%s: Unexpected EOF while getting file size\n", image.basename());
 		image.message(" Unexpected EOF while getting file size");
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	u16 quick_addr = little_endianize_int16(args[0]);
@@ -722,9 +722,9 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 
 	if (quick_end > 0x7fff)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too large");
+		osd_printf_error("%s: File too large\n", image.basename());
 		image.message(" File too large");
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	/* display a message about the loaded quickload */
@@ -732,19 +732,17 @@ QUICKLOAD_LOAD_MEMBER(homelab_state::quickload_cb)
 
 	for (i = 0; i < quick_length; i++)
 	{
-		int j = (quick_addr + i);
+		unsigned j = (quick_addr + i);
 		if (image.fread(&ch, 1) != 1)
 		{
-			char message[512];
-			snprintf(message, std::size(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			image.seterror(image_error::INVALIDIMAGE, message);
+			osd_printf_error("%s: Unexpected EOF while writing byte to %04X\n", image.basename(), j);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 		space.write_byte(j, ch);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /* Machine driver */

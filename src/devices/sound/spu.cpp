@@ -959,14 +959,17 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-//-------------------------------------------------
-//  static_set_irqf - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
 void spu_device::device_start()
 {
 	m_irq_handler.resolve_safe();
+
+	spu_base_frequency_hz = clock() / 768.0f;
+	generate_linear_rate_table();
+	generate_pos_exp_rate_table();
+	generate_neg_exp_rate_table();
+	generate_decay_rate_table();
+	generate_linear_release_rate_table();
+	generate_exp_release_rate_table();
 
 	voice=new voiceinfo [24];
 	spu_ram=std::make_unique<unsigned char []>(spu_ram_size);
@@ -1100,7 +1103,7 @@ void spu_device::init_stream()
 	rev=new reverb(hz);
 
 	cdda_freq=(unsigned int)((44100.0f/(float)hz)*4096.0f);
-	freq_multiplier=(float)spu_base_frequency_hz/(float)hz;
+	freq_multiplier=spu_base_frequency_hz/(float)hz;
 }
 
 //

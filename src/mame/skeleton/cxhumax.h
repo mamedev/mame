@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Lukasz Markowski
-#ifndef MAME_INCLUDES_CXHUMAX_H
-#define MAME_INCLUDES_CXHUMAX_H
+#ifndef MAME_SKELETON_CXHUMAX_H
+#define MAME_SKELETON_CXHUMAX_H
 
 #pragma once
 
@@ -283,4 +283,4 @@ private:
 #define DRM_BCKGND_REG                  3
 #define DRM_OSD_PTR_REG                 32
 
-#endif // MAME_INCLUDES_CXHUMAX_H
+#endif // MAME_SKELETON_CXHUMAX_H

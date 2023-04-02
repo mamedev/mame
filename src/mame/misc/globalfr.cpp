@@ -21,6 +21,9 @@
 
 /******************************************************************************/
 
+
+namespace {
+
 class globalfr_state : public driver_device
 {
 public:
@@ -198,6 +201,7 @@ ROM_START( gl_hbhcla )
 	ROM_LOAD( "hbrk_hot.p1", 0x0000, 0x080000, CRC(17b4e037) SHA1(394e73109d3f327544db2b8aa37513b3df1ffbf2) )
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************/

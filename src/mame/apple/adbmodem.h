@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_ADBMODEM_H
-#define MAME_MACHINE_ADBMODEM_H
+#ifndef MAME_APPLE_ADBMODEM_H
+#define MAME_APPLE_ADBMODEM_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ADBMODEM, adbmodem_device)
 
-#endif // MAME_MACHINE_ADBMODEM_H
+#endif // MAME_APPLE_ADBMODEM_H

@@ -4,7 +4,7 @@
 /*
 
 Electroplay Sound FX Phasor (hh_pic16.cpp)
-3-bit sound with volume envelope
+3-bit sound (standard) + volume envelope
 
 TODO:
 - transistors should be BC183
@@ -18,6 +18,7 @@ NETLIST_START(sfxphasor)
 {
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
+
 	ANALOG_INPUT(VBATT, 5)
 
 	NET_MODEL("OPENDRAIN FAMILY(TYPE=MOS OVL=0.4 OVH=2.4 ORL=1.0 ORH=1e12)")

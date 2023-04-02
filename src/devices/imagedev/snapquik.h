@@ -13,12 +13,17 @@
 
 #pragma once
 
+#include <string>
+#include <system_error>
+#include <utility>
+
+
 // ======================> snapshot_image_device
 class snapshot_image_device :   public device_t,
 								public device_image_interface
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<std::error_condition (snapshot_image_device &)> load_delegate;
 
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
@@ -32,8 +37,8 @@ public:
 
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
@@ -48,6 +53,12 @@ public:
 	void set_delay(attotime delay) { m_delay = delay; }
 	template <typename... T> void set_load_callback(T &&... args) { m_load.set(std::forward<T>(args)...); }
 
+	template <typename Format, typename... Params> void message(Format &&fmt, Params &&...args)
+	{
+		// format the message
+		show_message(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -58,6 +69,8 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
+
+	void show_message(util::format_argument_pack<char> const &args);
 
 	load_delegate   m_load;             /* loading function */
 	const char *    m_file_extensions;  /* file extensions */
@@ -93,10 +106,10 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image)
+#define SNAPSHOT_LOAD_MEMBER(_name)                 std::error_condition _name(snapshot_image_device &image)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)         SNAPSHOT_LOAD_MEMBER(_name)
 
-#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image)
+#define QUICKLOAD_LOAD_MEMBER(_name)                std::error_condition _name(snapshot_image_device &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
 #endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

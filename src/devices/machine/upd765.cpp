@@ -20,7 +20,7 @@
 #define LOG_LIVE    (1U << 12)  // Live states
 #define LOG_DONE    (1U << 13)  // Command done
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
 
@@ -3290,6 +3290,23 @@ void upd72067_device::auxcmd_w(uint8_t data)
 		break;
 	default:
 		upd72065_device::auxcmd_w(data);
+		break;
+	}
+}
+
+void upd72069_device::auxcmd_w(uint8_t data)
+{
+	switch(data) {
+	case 0x36: // reset
+		soft_reset();
+		break;
+	case 0x1e: // motor on, probably
+		for(unsigned i = 0; i < 4; i++)
+			if(flopi[i].dev)
+				flopi[i].dev->mon_w(!BIT(data, i + 4));
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
 		break;
 	}
 }

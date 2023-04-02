@@ -163,7 +163,7 @@ public:
 
 	void        process_command_list();
 	uint64_t    read_data(uint32_t address);
-	void        disassemble(uint64_t *cmd_buf, char* buffer);
+	std::string disassemble(const uint64_t *cmd_buf);
 
 	void        set_machine(running_machine& machine) { m_machine = &machine; }
 	void        set_n64_periphs(n64_periphs* periphs) { m_n64_periphs = periphs; }

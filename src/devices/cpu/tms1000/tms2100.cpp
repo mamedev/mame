@@ -69,8 +69,8 @@ tms2370_cpu_device::tms2370_cpu_device(const machine_config &mconfig, const char
 void tms2100_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 26).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 26).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -243,6 +243,8 @@ void tms2100_cpu_device::read_opcode()
 
 void tms2100_cpu_device::interrupt()
 {
+	standard_irq_callback(0, m_rom_address);
+
 	// save registers
 	m_pb_save = m_pb;
 	m_cb_save = m_cb;
@@ -264,8 +266,6 @@ void tms2100_cpu_device::interrupt()
 	m_cb = 0;
 	m_status = 1;
 	m_il |= 1;
-
-	standard_irq_callback(0);
 }
 
 

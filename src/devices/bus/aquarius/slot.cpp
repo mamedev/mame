@@ -83,7 +83,7 @@ void aquarius_cartridge_slot_device::device_start()
 //  call_load
 //-------------------------------------------------
 
-image_init_result aquarius_cartridge_slot_device::call_load()
+std::error_condition aquarius_cartridge_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -91,8 +91,8 @@ image_init_result aquarius_cartridge_slot_device::call_load()
 
 		if (size % 0x1000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Invalid ROM size\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size);
@@ -103,7 +103,7 @@ image_init_result aquarius_cartridge_slot_device::call_load()
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 //-------------------------------------------------

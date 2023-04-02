@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
-#ifndef MAME_AUDIO_TRACKFLD_H
-#define MAME_AUDIO_TRACKFLD_H
+#ifndef MAME_KONAMI_TRACKFLD_A_H
+#define MAME_KONAMI_TRACKFLD_A_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(TRACKFLD_AUDIO, trackfld_audio_device)
 
-#endif // MAME_AUDIO_TRACKFLD_H
+#endif // MAME_KONAMI_TRACKFLD_A_H

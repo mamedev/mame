@@ -149,7 +149,7 @@ static const rgb_t amstrad_palette[32] =
 	rgb_t(0x000, 0x060, 0x0ff),             /* sky blue */
 	rgb_t(0x060, 0x000, 0x060),             /* magenta */
 	rgb_t(0x060, 0x0ff, 0x060),             /* pastel green */
-	rgb_t(0x060, 0x0ff, 0x060),             /* lime */
+	rgb_t(0x060, 0x0ff, 0x000),             /* lime */
 	rgb_t(0x060, 0x0ff, 0x0ff),             /* pastel cyan */
 	rgb_t(0x060, 0x000, 0x000),             /* Red */
 	rgb_t(0x060, 0x000, 0x0ff),             /* mauve */
@@ -3251,7 +3251,7 @@ SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
 	/* get file size */
 	if (image.length() < 8)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	std::vector<uint8_t> snapshot(image.length());
 
@@ -3260,11 +3260,11 @@ SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 
 	if (memcmp(&snapshot[0], "MV - SNA", 8))
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	amstrad_handle_snapshot(&snapshot[0]);
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -3306,8 +3306,8 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		logerror("IMG: raw CPC+ cartridge file\n");
 		if (size % 0x4000)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Attempt to load a raw binary with some block smaller than 16kB in size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Attempt to load a raw binary with some block smaller than 16kB in size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 		else
 			image.fread(m_cart->get_rom_base(), size);
@@ -3335,10 +3335,10 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
 
 		// Is RIFF format (*.cpr)
-		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
+		if (strncmp((const char*)(header + 8), "AMS!", 4) != 0)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Not an Amstrad CPC cartridge image (despite RIFF header)");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Not an Amstrad CPC cartridge image (despite RIFF header)\n", image.basename());
+			return image_error::INVALIDIMAGE;
 		}
 
 		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
@@ -3390,5 +3390,5 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

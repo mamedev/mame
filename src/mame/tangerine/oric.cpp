@@ -36,6 +36,7 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "utf8.h"
@@ -43,6 +44,8 @@
 #include "formats/oric_dsk.h"
 #include "formats/oric_tap.h"
 
+
+namespace {
 
 class oric_state : public driver_device
 {
@@ -143,7 +146,8 @@ public:
 		m_hyperbas(*this, "hyperbas"),
 		m_telmon24(*this, "telmon24"),
 		m_joy1(*this, "JOY1"),
-		m_joy2(*this, "JOY2")
+		m_joy2(*this, "JOY2"),
+		m_floppies(*this, "fdc:%d", 0U)
 	{ }
 
 	void via2_a_w(uint8_t data);
@@ -183,7 +187,7 @@ protected:
 	required_ioport m_joy1;
 	required_ioport m_joy2;
 
-	floppy_image_device *m_floppies[4];
+	required_device_array<floppy_connector, 4> m_floppies;
 	uint8_t m_port_314;
 	uint8_t m_via2_a, m_via2_b;
 	bool m_via2_ca2, m_via2_cb2, m_via2_irq;
@@ -432,12 +436,6 @@ void oric_state::machine_reset()
 void telestrat_state::machine_start()
 {
 	machine_start_common();
-	for(u8 i=0; i<4; i++)
-	{
-		char name[32];
-		sprintf(name, "fdc:%d", i);
-		m_floppies[i] = subdevice<floppy_connector>(name)->get_device();
-	}
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = false;
 	m_acia_irq = false;
 
@@ -511,7 +509,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
-	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
+	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3]->get_device();
 	m_fdc->set_floppy(floppy);
 	m_fdc->dden_w(m_port_314 & P_DDEN);
 	if(floppy) {
@@ -845,6 +843,8 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_cassette->set_formats(oric_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("oric1_cass");
+	SOFTWARE_LIST(config, "oric1_cass").set_original("oric1_cass");
 
 	/* via */
 	MOS6522(config, m_via, 12_MHz_XTAL / 12);
@@ -997,6 +997,8 @@ ROM_START(prav8dd)
 //  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
 //  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS

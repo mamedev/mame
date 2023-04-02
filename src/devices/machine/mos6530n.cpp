@@ -764,13 +764,10 @@ void mos6530_device_base::live_run(const attotime &limit)
 
 			LOGTIMER("%s %s timer %02x\n", cur_live.tm.as_string(), name(), cur_live.value);
 
-			if (!cur_live.value) {
-				cur_live.state = IDLE;
-				return;
-			}
-
 			cur_live.tm += cur_live.period;
-			break;
+
+			live_delay(RUNNING_AFTER_INTERRUPT);
+			return;
 		}
 		}
 	}

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
-#ifndef MAME_INCLUDES_CIRCUS_H
-#define MAME_INCLUDES_CIRCUS_H
+#ifndef MAME_EXIDY_CIRCUS_H
+#define MAME_EXIDY_CIRCUS_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ extern const char *const crash_sample_names[];
 extern const char *const ripcord_sample_names[];
 extern const char *const robotbwl_sample_names[];
 
-#endif // MAME_INCLUDES_CIRCUS_H
+#endif // MAME_EXIDY_CIRCUS_H

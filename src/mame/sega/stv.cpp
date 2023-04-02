@@ -437,7 +437,7 @@ void stv_state::init_stv()
     TODO: game doesn't work if not in debugger?
 */
 
-uint32 stv_state::magzun_hef_hack_r()
+uint32_t stv_state::magzun_hef_hack_r()
 {
 	if(m_maincpu->pc()==0x604bf20) return 0x00000001; //HWEF
 
@@ -929,7 +929,7 @@ uint32_t stv_state::decathlt_prot_r(offs_t offset, uint32_t mem_mask)
 		m_5838crypt->debug_helper(m_protbankval);
 	}
 
-	uint32 ret = 0;
+	uint32_t ret = 0;
 	if (mem_mask & 0xffff0000) ret |= (m_5838crypt->data_r()<<16);
 	if (mem_mask & 0x0000ffff) ret |= m_5838crypt->data_r();
 	return ret;
@@ -1330,13 +1330,13 @@ void stv_state::machine_reset()
 	m_vdp2.old_tvmd = -1;
 }
 
-image_init_result stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::error_condition stv_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	uint8_t *ROM;
 	uint32_t size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 
 	slot->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_BIG);
 	ROM = slot->get_rom_base();
@@ -1359,7 +1359,7 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

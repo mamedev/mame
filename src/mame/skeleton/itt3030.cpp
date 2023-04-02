@@ -211,6 +211,9 @@ Beeper Circuit, all ICs shown:
 
 #include "utf8.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL_4.194MHz
 
 //**************************************************************************
@@ -771,6 +774,9 @@ ROM_START( itt3030 )
 	ROM_REGION( 0x0400, "kbdmcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

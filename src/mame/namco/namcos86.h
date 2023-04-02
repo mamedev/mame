@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_NAMCOS86_H
-#define MAME_INCLUDES_NAMCOS86_H
+#ifndef MAME_NAMCO_NAMCOS86_H
+#define MAME_NAMCO_NAMCOS86_H
 
 #pragma once
 
@@ -120,4 +120,4 @@ private:
 	void set_scroll(int layer);
 };
 
-#endif // MAME_INCLUDES_NAMCOS86_H
+#endif // MAME_NAMCO_NAMCOS86_H

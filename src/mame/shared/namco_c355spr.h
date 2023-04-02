@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_NAMCO_C355SPR_H
-#define MAME_VIDEO_NAMCO_C355SPR_H
+#ifndef MAME_SHARED_NAMCO_C355SPR_H
+#define MAME_SHARED_NAMCO_C355SPR_H
 
 #pragma once
 
@@ -163,4 +163,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device)
 
-#endif // MAME_VIDEO_NAMCO_C355SPR_H
+#endif // MAME_SHARED_NAMCO_C355SPR_H

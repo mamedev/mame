@@ -31,6 +31,8 @@
 #include "cardline.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK XTAL(12'000'000)
 
 class cardline_state : public driver_device
@@ -379,5 +381,8 @@ ROM_START( cardline )
 	ROM_LOAD( "82s147.u33",   0x0000, 0x0200, CRC(a3b95911) SHA1(46850ea38950cdccbc2ad91d968218ac964c0eb5) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 199?, cardline, 0, cardline, cardline, cardline_state, empty_init, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

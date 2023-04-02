@@ -182,7 +182,7 @@ DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state::tape_load )
 		paper_tape_address = 0;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void patinho_feio_state::machine_start(){

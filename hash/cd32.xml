@@ -1076,7 +1076,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="frogfd" supported="no">
-		<description>Frog Feast (Demo)</description>
+		<description>Frog Feast (demo)</description>
 		<year>2007</year>
 		<publisher>Rastersoft</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1755,7 +1755,7 @@ license:CC0-1.0
 	<!-- http://redump.org/disc/3366/ -->
 	<!-- Listed as possible bad dump on redump.org -->
 	<software name="suprfrog1" supported="no">
-		<description>Superfrog (Rev 1)</description>
+		<description>Superfrog (rev 1)</description>
 		<year>1999</year>
 		<publisher>Islona</publisher>
 		<info name="barcode" value="5 022358 170384" />

@@ -9,6 +9,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bfmsys83_state : public driver_device
 {
 public:
@@ -65,6 +67,9 @@ ROM_START( b83cops ) // was marked as sys85, but I think this is the sys83 set?
 	ROM_LOAD( "cops.p3", 0xa000, 0x2000, CRC(981d76e4) SHA1(18600f98d20c0d501609bafc78af8cbc366b02c7) )
 	ROM_LOAD( "cops.p4", 0x8000, 0x2000, CRC(ce573b35) SHA1(f2ba22f0d55f882dd91b37e80e4bb14effd9113a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 198?, b83catms, 0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cat & Mouse (Bellfruit) (System 83)",    MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 198?, b83cops,  0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cops & Robbers (Bellfruit) (System 83)", MACHINE_IS_SKELETON_MECHANICAL)

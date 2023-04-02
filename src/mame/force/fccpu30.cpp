@@ -231,6 +231,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 #define DUSCC_CLOCK XTAL(14'745'600) /* Verified */
 
 class cpu30_state : public driver_device
@@ -1038,6 +1041,9 @@ void fga002_device::check_interrupts()()
 void cpu30_state::fga_irq_callback(int)(01)
 void fga002_device::check_interrupts()()
  */
+
+ } // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */

@@ -80,18 +80,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( res_w ) { m_write_res(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "vic1001_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "20,40,60,70,a0,b0,crt"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_irq;

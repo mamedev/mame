@@ -533,15 +533,15 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 		u16 execute_address, start_address, end_address;
 
 		// load the binary into memory
-		if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
-			return image_init_result::FAIL;
+		std::error_condition err = z80bin_load_file(image, space, execute_address, start_address, end_address);
+		if (err)
+			return err;
 
 		// is this file executable?
 		if (execute_address != 0xffff)
 		{
-
 			if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
-				return image_init_result::FAIL;     // can't run a program if the cartridge isn't in
+				return image_error::UNSUPPORTED;     // can't run a program if the cartridge isn't in
 
 			/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
 			1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
@@ -588,9 +588,9 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 		// check size
 		if (image.length() != 0x1001c)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Snapshot must be 65564 bytes");
+			osd_printf_error("%s: Snapshot must be 65564 bytes\n", image.basename());
 			image.message("Snapshot must be 65564 bytes");
-			return image_init_result::FAIL;
+			return image_error::INVALIDLENGTH;
 		}
 
 		/* get the header */
@@ -651,6 +651,6 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			m_maincpu->set_pc(0xe000);  // SNP destroys workspace, so do cold start.
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 

@@ -74,7 +74,7 @@ DEVICE_IMAGE_LOAD_MEMBER(digiblast_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

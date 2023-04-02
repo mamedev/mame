@@ -137,6 +137,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class force68k_state : public driver_device
 {
 public:
@@ -193,7 +196,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 
 	// User EPROM/SRAM slot(s)
-	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(offs_t offset);
 
@@ -507,21 +510,21 @@ void force68k_state::fccpu1_eprom_sockets(machine_config &config)
 /***************************
    Rom loading functions
 ****************************/
-image_init_result force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
+std::error_condition force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 
-	if (size > 0x20000) // Max 128Kb
+	if (size > 0x2'0000) // Max 128Kb
 	{
 		LOG("Cartridge size exceeding max size (128Kb): %d\n", size);
-		image.seterror(image_error::INVALIDIMAGE, "Cartridge size exceeding max size (128Kb)");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Cartridge size exceeding max size (128Kb)\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -727,6 +730,9 @@ ROM_START (fccpu6vb)
 	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */

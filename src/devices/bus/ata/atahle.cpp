@@ -583,10 +583,6 @@ uint16_t ata_hle_device::read_dma()
 
 uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
-	/* logit */
-//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read at %X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask));
-
 	uint16_t result = 0xffff;
 
 	if (device_selected() || m_single_device)
@@ -694,6 +690,10 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 			}
 		}
 	}
+
+	/* logit */
+//  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
+		LOG(("%s:IDE cs0 read %X at %X (err: %X), mem_mask=%X\n", machine().describe_context(), result, offset, m_error, mem_mask));
 
 	/* return the result */
 	return result;
@@ -890,6 +890,7 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
 					m_command = data;
+					m_error = IDE_ERROR_NONE;
 
 					/* implicitly clear interrupts & dmarq here */
 					set_irq(CLEAR_LINE);

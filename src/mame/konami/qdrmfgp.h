@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
-#ifndef MAME_INCLUDES_QDRMFGP_H
-#define MAME_INCLUDES_QDRMFGP_H
+#ifndef MAME_KONAMI_QDRMFGP_H
+#define MAME_KONAMI_QDRMFGP_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 	void qdrmfgp_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_QDRMFGP_H
+#endif // MAME_KONAMI_QDRMFGP_H

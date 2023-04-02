@@ -18,7 +18,6 @@
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_fifo.h"
 #include "machine/i8251.h"
@@ -274,7 +273,7 @@ private:
 	bool m_render_unk = false;
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
-	int16 m_crtc_xoffset = 0, m_crtc_yoffset = 0;
+	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
@@ -342,7 +341,7 @@ protected:
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<u32> m_copro_tgp_program;
 	required_region_ptr<u32> m_copro_tgp_tables;
-	required_device<address_map_bank_device> m_copro_tgp_bank;
+	memory_view m_copro_tgp_bank;
 
 	u32 m_copro_tgp_bank_reg = 0;
 	u32 m_copro_sincos_base = 0;
@@ -373,7 +372,6 @@ protected:
 
 	void copro_tgp_prog_map(address_map &map);
 	void copro_tgp_data_map(address_map &map);
-	void copro_tgp_bank_map(address_map &map);
 	void copro_tgp_io_map(address_map &map);
 	void copro_tgp_rf_map(address_map &map);
 
@@ -660,8 +658,8 @@ public:
 	bitmap_rgb32& destmap() { return m_destmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
-	void set_xoffset(int16 xoffs) { m_xoffs = xoffs; }
-	void set_yoffset(int16 yoffs) { m_yoffs = yoffs; }
+	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
+	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
@@ -859,4 +857,4 @@ struct model2_state::geo_state
 	model2_state *      state = nullptr;
 };
 
-#endif // MAME_INCLUDES_MODEL2_H
+#endif // MAME_SEGA_MODEL2_H

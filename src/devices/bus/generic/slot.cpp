@@ -160,7 +160,7 @@ void generic_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-image_init_result generic_slot_device::call_load()
+std::error_condition generic_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -173,11 +173,11 @@ image_init_result generic_slot_device::call_load()
 			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");
 
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

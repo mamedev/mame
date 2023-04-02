@@ -61,6 +61,8 @@ Due to no input checking, misuse of commands can crash the system.
 #include "sound/spkrdev.h"
 
 
+namespace {
+
 class z1013_state : public driver_device
 {
 public:
@@ -415,9 +417,9 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 	{ }
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Not a Z1013 image");
+		osd_printf_error("%s: Not a Z1013 image\n", image.basename());
 		image.message(" Not a Z1013 image");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
@@ -427,11 +429,11 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Loaded but cannot run");
+		osd_printf_error("%s: Loaded but cannot run\n", image.basename());
 		image.message(" Loaded but cannot run");
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /* F4 Character Displayer */
@@ -565,6 +567,9 @@ ROM_START( z1013k69 )
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 /* Driver */
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
 COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  MACHINE_SUPPORTS_SAVE )

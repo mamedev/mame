@@ -101,8 +101,8 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 
 	if (size != 0x1000 && size != 0x1100 && size != 0x2000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid ROM file size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -114,8 +114,8 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		// TMS1670 MCU
 		if (!image.loaded_through_softlist())
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Can only load TMS1670 type through softwarelist");
-			return image_init_result::FAIL;
+			osd_printf_error("Can only load TMS1670 type through softwarelist\n");
+			return image_error::UNSUPPORTED;
 		}
 
 		memcpy(memregion("tms1k_cpu")->base(), m_cart->get_rom_base(), size);
@@ -125,16 +125,16 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		size = image.get_software_region_length("rom:mpla");
 		if (size != 867)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid MPLA file size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Invalid MPLA file size\n", image.basename());
+			return image_error::BADSOFTWARE;
 		}
 		memcpy(memregion("tms1k_cpu:mpla")->base(), image.get_software_region("rom:mpla"), size);
 
 		size = image.get_software_region_length("rom:opla");
 		if (size != 557)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid OPLA file size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Invalid OPLA file size\n", image.basename());
+			return image_error::BADSOFTWARE;
 		}
 		memcpy(memregion("tms1k_cpu:opla")->base(), image.get_software_region("rom:opla"), size);
 
@@ -154,7 +154,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		m_hmcs40_cpu->set_clock(450000); // from main PCB
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Derrick Renaud
+
 /*************************************************************************
 
-    audio\skydiver.c
+    atari\skydiver_a.cpp
 
 *************************************************************************/
 #include "emu.h"
-#include "skydiver.h"
-#include "sound/discrete.h"
+
+#include "skydiver_a.h"
 
 
 /************************************************************************/
@@ -121,7 +122,7 @@ DISCRETE_SOUND_START(skydiver_discrete)
 	/* waveform.  The original game pot varies from */
 	/* 0-250k, but we are going to limit it because */
 	/* below 50k the frequency is too high.         */
-	/* When triggered it starts at it's highest     */
+	/* When triggered it starts at its highest      */
 	/* frequency, then decays at the rate set by    */
 	/* a 68k resistor and 22uf capacitor.           */
 	/************************************************/

@@ -101,7 +101,7 @@ void c64_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result c64_expansion_slot_device::call_load()
+std::error_condition c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -191,12 +191,12 @@ image_init_result c64_expansion_slot_device::call_load()
 
 		if ((m_card->m_roml_size & (m_card->m_roml_size - 1)) || (m_card->m_romh_size & (m_card->m_romh_size - 1)))
 		{
-			seterror(image_error::INVALIDIMAGE, "ROM size must be power of 2");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: ROM size must be power of 2\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

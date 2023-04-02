@@ -133,6 +133,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/abc800i_dsk.h,FORMATS["ABC800I_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ABC800I_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/abc1600_dsk.h,FORMATS["ABC1600_DSK"] = true
 --------------------------------------------------
 
@@ -536,18 +548,6 @@ if opt_tool(FORMATS, "CCVF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.h",
-	}
-end
-
---------------------------------------------------
---
---@src/lib/formats/cd90_640_dsk.h,FORMATS["CD90_640_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "CD90_640_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.h",
 	}
 end
 
@@ -1184,6 +1184,18 @@ if opt_tool(FORMATS, "JVC_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/jvc_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/jvc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/lw30_dsk.h,FORMATS["LW30_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "LW30_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/lw30_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/lw30_dsk.h",
 	}
 end
 
@@ -2049,6 +2061,18 @@ if opt_tool(FORMATS, "VG5K_CAS") then
 	files {
 		MAME_DIR.. "src/lib/formats/vg5k_cas.cpp",
 		MAME_DIR.. "src/lib/formats/vg5k_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/vgi_dsk.h,FORMATS["VGI_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "VGI_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/vgi_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/vgi_dsk.h",
 	}
 end
 

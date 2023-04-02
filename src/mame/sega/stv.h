@@ -114,7 +114,7 @@ private:
 	uint32_t magzun_rx_hack_r();
 	void hop_ioga_w(offs_t offset, uint8_t data);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }

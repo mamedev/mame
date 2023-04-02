@@ -26,6 +26,8 @@
 #include "softlist.h"
 
 
+namespace {
+
 class vsmilpro_state : public driver_device
 {
 public:
@@ -68,6 +70,9 @@ ROM_START( vsmilpro )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "70004.bin", 0x000000, 0x200000, CRC(b9161eac) SHA1(8d75fdeda8c4e228a0b1efd35011f9f667f9fb23) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

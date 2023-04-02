@@ -23,6 +23,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define KBD_VERBOSE 1
 #define LED_VERBOSE 0
 #define DC305_VERBOSE 0
@@ -42,7 +44,8 @@ public:
 		m_usart(*this, "usart"),
 		m_nvm(*this, "nvm"),
 		m_ledlatch(*this, "ledlatch"),
-		m_prtlsi(*this, "prtlsi")
+		m_prtlsi(*this, "prtlsi"),
+		m_col_array(*this, "COL%X", 0U)
 	{
 	}
 
@@ -76,7 +79,7 @@ private:
 	required_device<ls259_device> m_ledlatch;
 	required_device<dc305_device> m_prtlsi;
 
-	ioport_port* m_col_array[16]{};
+	required_ioport_array<16> m_col_array;
 	uint8_t m_led_7seg_counter = 0;
 	uint8_t m_led_7seg[4]{};
 };
@@ -403,13 +406,6 @@ INPUT_PORTS_END
 
 void decwriter_state::machine_start()
 {
-	char kbdcol[8];
-	// look up all 16 tags 'the slow way' but only once on reset
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(kbdcol,"COL%X", i);
-		m_col_array[i] = ioport(kbdcol);
-	}
 	m_led_7seg_counter = 0;
 	m_led_7seg[0] = m_led_7seg[1] = m_led_7seg[2] = m_led_7seg[3] = 0xF;
 }
@@ -490,6 +486,8 @@ ROM_START( la120 )
 	// there is an optional 3 roms, european and APL (and BOTH) rom which goes from 2000-2fff in e4, all undumped.
 	// there is another romset used on the Bell Teleprinter 1000 (Model LAS12) which I believe is 23-004e4.e6 and 23-086e2.e4
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

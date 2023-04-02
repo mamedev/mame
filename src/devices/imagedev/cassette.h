@@ -58,8 +58,8 @@ public:
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
 
@@ -108,7 +108,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
+	virtual bool use_software_list_file_extension_for_filetype() const noexcept override { return true; }
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
@@ -130,7 +130,7 @@ private:
 	cassette_state                  m_default_state;
 	const char *                    m_interface;
 
-	image_init_result internal_load(bool is_create);
+	std::error_condition internal_load(bool is_create);
 	bool            m_stereo;
 	std::vector<s16> m_samples;
 };

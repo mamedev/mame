@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_VICTOR9K_FDC_H
-#define MAME_MACHINE_VICTOR9K_FDC_H
+#ifndef MAME_ACT_VICTOR9K_FDC_H
+#define MAME_ACT_VICTOR9K_FDC_H
 
 #pragma once
 
@@ -122,10 +122,10 @@ private:
 	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
 	void update_rdy();
 
-	image_init_result load0_cb(floppy_image_device *device);
+	void load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
 
-	image_init_result load1_cb(floppy_image_device *device);
+	void load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
 	uint8_t m_p2;
@@ -226,4 +226,4 @@ private:
 DECLARE_DEVICE_TYPE(VICTOR_9000_FDC, victor_9000_fdc_device)
 
 
-#endif // MAME_MACHINE_VICTOR9K_FDC_H
+#endif // MAME_ACT_VICTOR9K_FDC_H

@@ -5,8 +5,8 @@
     Atari G42 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ATARIG42_H
-#define MAME_INCLUDES_ATARIG42_H
+#ifndef MAME_ATARI_ATARIG42_H
+#define MAME_ATARI_ATARIG42_H
 
 #pragma once
 
@@ -103,4 +103,4 @@ protected:
 	void guardians_sloop_tweak(int offset);
 };
 
-#endif // MAME_INCLUDES_ATARIG42_H
+#endif // MAME_ATARI_ATARIG42_H

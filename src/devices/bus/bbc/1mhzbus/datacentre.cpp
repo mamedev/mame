@@ -328,9 +328,9 @@ QUICKLOAD_LOAD_MEMBER(bbc_datacentre_device::quickload_cb)
 	}
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid filetype, must be SSD, DSD, or IMG");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid filetype, must be SSD, DSD, or IMG\n", image.basename());
+		return image_error::INVALIDIMAGE;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

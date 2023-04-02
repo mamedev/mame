@@ -34,24 +34,24 @@ void hp9845_optrom_device::device_start()
 {
 }
 
-image_init_result hp9845_optrom_device::call_load()
+std::error_condition hp9845_optrom_device::call_load()
 {
 	logerror("hp9845_optrom: call_load\n");
 	if (!loaded_through_softlist()) {
 		logerror("hp9845_optrom: must be loaded from sw list\n");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	const char *base_feature = get_feature("base");
 	if (base_feature == nullptr) {
 		logerror("hp9845_optrom: no 'base' feature\n");
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	offs_t base_addr;
 	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &base_addr) != 1) {
 		logerror("hp9845_optrom: can't parse 'base' feature\n");
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	// Valid BSC values for ROMs on LPU drawer: 0x07 0x0b .... 0x3b
@@ -61,14 +61,14 @@ image_init_result hp9845_optrom_device::call_load()
 	// Base address must be multiple of 0x1000
 	if ((base_addr & ~0x3f7000UL) != 0 || ((base_addr & 0x30000) != 0x10000 && (base_addr & 0x30000) != 0x30000) || base_addr < 0x70000) {
 		logerror("hp9845_optrom: illegal base address (%x)\n" , base_addr);
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	auto length = get_software_region_length("rom") / 2;
 
 	if (length < 0x1000 || length > 0x8000 || (length & 0xfff) != 0 || ((base_addr & 0x7000) + length) > 0x8000) {
 		logerror("hp9845_optrom: illegal region length (%x)\n" , length);
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	offs_t end_addr = base_addr + length - 1;
@@ -83,7 +83,7 @@ image_init_result hp9845_optrom_device::call_load()
 	m_base_addr = base_addr;
 	m_end_addr = end_addr;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void hp9845_optrom_device::call_unload()

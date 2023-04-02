@@ -45,9 +45,9 @@
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
 
-#define LOG_GENERAL (1 << 0U)
-#define LOG_RCV     (1 << 1U)
-#define LOG_XMIT    (1 << 2U)
+#define LOG_GENERAL (1U << 0)
+#define LOG_RCV     (1U << 1)
+#define LOG_XMIT    (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_RCV | LOG_XMIT)
 #include "logmacro.h"
@@ -275,7 +275,6 @@ inline void mc68901_device::timer_input(int index, int value)
 			timer_count(index);
 		}
 
-		m_ti[index] = value;
 		break;
 
 	case TCR_TIMER_PULSE_4:
@@ -294,10 +293,10 @@ inline void mc68901_device::timer_input(int index, int value)
 				take_interrupt(INT_MASK_GPIO[bit]);
 			}
 		}
-
-		m_ti[index] = value;
 		break;
 	}
+
+	m_ti[index] = value;
 }
 
 

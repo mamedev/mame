@@ -57,18 +57,18 @@ void tms0980_cpu_device::ram_144x4(address_map &map)
 void tms0980_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA, segment PLA
-	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 20, 64).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "spla", 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 20, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 4, 8, 16).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_spla, 3, 8, 8).set_format(pla_device::FMT::BERKELEY);
 }
 
 void tms1980_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA, microinstructions PLA, output PLA
-	PLA(config, "ipla", 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 7, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 22, 24).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 7, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 

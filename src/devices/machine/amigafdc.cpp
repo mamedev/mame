@@ -289,25 +289,11 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
 
-							if(!(dsklen & 0x3fff))
+							if(dsklen & 0x3fff)
+								dma_state = DMA_RUNNING_BYTE_0;
+							else
 								dma_done();
-							else if(dsklen & 0x4000) {
-								dskbyt |= 0x2000;
-								cur_live.bit_counter = 0;
-								dma_value = dma_read();
-
-							} else {
-								LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
-								dma_write(dsksync);
-							}
-
-						} else if(dma_state != DMA_IDLE) {
-							LOGSYNC("%s: DSKSYNC on %06x %d\n", this->tag(), dskpt, dma_state);
-							dma_write(dsksync);
-							cur_live.bit_counter = 0;
-
-						} else if(cur_live.bit_counter != 8)
-							cur_live.bit_counter = 0;
+						}
 					}
 
 					dskbyt |= 0x1000;

@@ -836,14 +836,14 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 
 	if (size != 0x2000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported ROM size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_optrom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_optrom->common_load_rom(m_optrom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 uint8_t hx20_state::optrom_r(offs_t offset)

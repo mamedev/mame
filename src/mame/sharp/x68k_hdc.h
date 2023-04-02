@@ -5,8 +5,8 @@
     X68000 Custom SASI HD controller
 
 */
-#ifndef MAME_MACHINE_X68K_HDC_H
-#define MAME_MACHINE_X68K_HDC_H
+#ifndef MAME_SHARP_X68K_HDC_H
+#define MAME_SHARP_X68K_HDC_H
 
 #pragma once
 
@@ -101,7 +101,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }
 	virtual const char *image_type_name() const noexcept override { return "sasihd"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "sasi"; }
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 	void hdc_w(offs_t offset, u16 data);
 	u16 hdc_r(offs_t offset);
@@ -129,4 +129,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device)
 
-#endif // MAME_MACHINE_X68K_HDC_H
+#endif // MAME_SHARP_X68K_HDC_H

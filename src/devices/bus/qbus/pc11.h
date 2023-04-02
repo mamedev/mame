@@ -40,7 +40,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "pdp11_ptap"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,bim,lda"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 	uint16_t read(offs_t offset);

@@ -81,7 +81,7 @@ known chips:
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
   C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/scptchess.cpp
 
- *A86     HD44820  1983, Chess King Pocket Micro
+ *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II
@@ -93,6 +93,7 @@ known chips:
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
  *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
  *A14     HD44868  1985, SciSys Kasparov Plus
+ *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
@@ -107,15 +108,15 @@ ROM source notes when dumped from another title, but confident it's the same:
 - zackman: Tandy Zackman
 
 TODO:
-- cgalaxn discrete sound (alien attacking sound effect)
+- cgalaxn netlist sound for alien attack sweep sound (MAME doesn't support N13T1?)
 - epacman2 booting the game in demo mode, pacman should take the shortest route
   to the upper-left power pill, followed by going to the top-right power pill:
   mcu cycle/interrupt timing related
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
   the 2nd half of the ROM, none of the games access it though and it's impossible
   to execute unless the chip is in testmode.
-- Though very uncommon when compared to games with LED/lamp display, some
-  games may manipulate VFD plate brightness by strobing it longer/shorter,
+- Though very uncommon when compared to games with LED/lamp display, some games
+  may deliberately change VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
 - improve/redo SVG for: bzaxxon, bbtime
@@ -147,6 +148,8 @@ TODO:
 
 #include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
+
+namespace {
 
 class hh_hmcs40_state : public driver_device
 {
@@ -260,8 +263,6 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
@@ -3719,8 +3720,8 @@ static INPUT_PORTS_START( ghalien )
 
 	PORT_START("IN.6") // D6 line D15
 	PORT_CONFNAME( 0x8000, 0x0000, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(      0x0000, "Amateur" )
-	PORT_CONFSETTING(      0x8000, "Professional" )
+	PORT_CONFSETTING(      0x0000, "1" ) // AMA
+	PORT_CONFSETTING(      0x8000, "2" ) // PRO
 INPUT_PORTS_END
 
 void ghalien_state::ghalien(machine_config &config)

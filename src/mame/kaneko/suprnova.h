@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
-#ifndef MAME_INCLUDES_SUPRNOVA_H
-#define MAME_INCLUDES_SUPRNOVA_H
+#ifndef MAME_KANEKO_SUPRNOVA_H
+#define MAME_KANEKO_SUPRNOVA_H
 
 #pragma once
 
@@ -192,4 +192,4 @@ private:
 	void skns_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SUPRNOVA_H
+#endif // MAME_KANEKO_SUPRNOVA_H

@@ -12,20 +12,22 @@
 
 #include "ui/imgcntrl.h"
 
-#include "ui/ui.h"
-#include "ui/filesel.h"
 #include "ui/filecreate.h"
+#include "ui/filesel.h"
 #include "ui/swlist.h"
+#include "ui/ui.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "image.h"
 #include "softlist_dev.h"
-#include "zippath.h"
+
+#include "util/zippath.h"
 
 
 namespace ui {
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -194,7 +196,7 @@ void menu_control_device_image::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_control_device_image::handle(event const *ev)
+bool menu_control_device_image::handle(event const *ev)
 {
 	throw emu_fatalerror("menu_control_device_image::handle: Shouldn't get here!");
 }
@@ -338,7 +340,7 @@ void menu_control_device_image::menu_activated()
 			{
 				if (need_confirm)
 				{
-					menu::stack_push<menu_confirm_save_as>(ui(), container(), &m_create_confirmed);
+					menu::stack_push<menu_confirm_save_as>(ui(), container(), m_create_confirmed);
 					m_state = CREATE_CONFIRM;
 				}
 				else
@@ -368,9 +370,9 @@ void menu_control_device_image::menu_activated()
 	case DO_CREATE:
 		{
 			auto path = util::zippath_combine(m_current_directory, m_current_file);
-			image_init_result err = m_image.create(path, nullptr, nullptr);
-			if (err != image_init_result::PASS)
-				machine().popmessage("Error: %s", m_image.error());
+			std::error_condition err = m_image.create(path, nullptr, nullptr);
+			if (err)
+				machine().popmessage("Error: %s", err.message());
 			stack_pop();
 		}
 		break;

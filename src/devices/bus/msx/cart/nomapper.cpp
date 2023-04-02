@@ -39,76 +39,97 @@ void msx_cart_nomapper_device::install_memory()
 	}
 }
 
-image_init_result msx_cart_nomapper_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_nomapper_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_nomapper_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
 	u8 *rom = cart_rom_region()->base();
 
-	// determine start address, default to 0x4000
-	m_start_address = 0x4000;
-
-	switch (size)
+	// 64KB images fill all pages.
+	if (size == 0x10000)
 	{
-		// 8KB/16KB
-		case 0x2000: case 0x4000:
+		m_start_address = 0;
+	}
+	else if (is_loaded_through_softlist())
+	{
+		const char *start_page_str = get_feature("start_page");
+		if (!start_page_str)
 		{
-			uint16_t start = rom[3] << 8 | rom[2];
-
-			// start address of $0000: call address in the $4000 region: $4000, else $8000
-			if (start == 0)
-			{
-				if ((rom[5] & 0xc0) == 0x40)
-					m_start_address = 0x4000;
-				else
-					m_start_address = 0x8000;
-			}
-
-			// start address in the $8000 region: $8000, else default
-			else if ((start & 0xc000) == 0x8000)
-				m_start_address = 0x8000;
-
-			break;
+			message = "msx_cart_nomapper_device: Feature 'start_page' was not found.";
+			return image_error::BADSOFTWARE;
+		}
+		u32 start_page = strtol(start_page_str, nullptr, 0);
+		if (start_page > 2)
+		{
+			message = "msx_cart_nomapper_device: Invalid value for 'start_page', allowed values are 0, 1, and 2";
+			return image_error::BADSOFTWARE;
 		}
 
-		// 32KB
-		case 0x8000:
-			// take default, check when no "AB" at $0000, but "AB" at $4000
-			if (rom[0] != 'A' && rom[1] != 'B' && rom[0x4000] == 'A' && rom[0x4001] == 'B')
-			{
-				uint16_t start = rom[0x4003] << 8 | rom[0x4002];
+		m_start_address = start_page * 0x4000;
+	}
+	else
+	{
+		// Try to guess the start address from the rom contents.
+		// determine start address, default to 0x4000
+		m_start_address = 0x4000;
 
-				// start address of $0000 and call address in the $4000 region, or start address outside the $8000 region: $0000, else default
-				if ((start == 0 && (rom[0x4005] & 0xc0) == 0x40) || start < 0x8000 || start >= 0xc000)
-					m_start_address = 0;
+		switch (size)
+		{
+			// 8KB/16KB
+			case 0x2000: case 0x4000:
+			{
+				uint16_t start = rom[3] << 8 | rom[2];
+
+				// start address of $0000: call address in the $4000 region: $4000, else $8000
+				if (start == 0)
+				{
+					if ((rom[5] & 0xc0) == 0x40)
+						m_start_address = 0x4000;
+					else
+						m_start_address = 0x8000;
+				}
+
+				// start address in the $8000 region: $8000, else default
+				else if ((start & 0xc000) == 0x8000)
+					m_start_address = 0x8000;
+
+				break;
 			}
 
-			break;
+			// 32KB
+			case 0x8000:
+				// take default, check when no "AB" at $0000, but "AB" at $4000
+				if (rom[0] != 'A' && rom[1] != 'B' && rom[0x4000] == 'A' && rom[0x4001] == 'B')
+				{
+					uint16_t start = rom[0x4003] << 8 | rom[0x4002];
 
-		// 48KB
-		case 0xc000:
-			// "AB" at $0000, but no "AB" at $4000, not "AB": $0000
-			if (rom[0] == 'A' && rom[1] == 'B' && rom[0x4000] != 'A' && rom[0x4001] != 'B')
-				m_start_address = 0x4000;
-			else
-				m_start_address = 0;
+					// start address of $0000 and call address in the $4000 region, or start address outside the $8000 region: $0000, else default
+					if ((start == 0 && (rom[0x4005] & 0xc0) == 0x40) || start < 0x8000 || start >= 0xc000)
+						m_start_address = 0;
+				}
 
-			break;
+				break;
 
-		// 64KB
-		default:
-			m_start_address = 0;
-			break;
+			// 48KB
+			case 0xc000:
+				// "AB" at $0000, but no "AB" at $4000, not "AB": $0000
+				if (rom[0] == 'A' && rom[1] == 'B' && rom[0x4000] != 'A' && rom[0x4001] != 'B')
+					m_start_address = 0x4000;
+				else
+					m_start_address = 0;
+
+				break;
+		}
 	}
 
 	m_end_address = std::min<u32>(m_start_address + size, 0x10000);
 
 	install_memory();
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

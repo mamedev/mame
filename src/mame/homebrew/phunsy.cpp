@@ -27,17 +27,22 @@ Rom banking (in U bank):
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 1
+#include "logmacro.h"
 
-#define LOG 1
+
+namespace {
 
 class phunsy_state : public driver_device
 {
@@ -117,8 +122,7 @@ void phunsy_state::phunsy_data(address_map &map)
 
 void phunsy_state::phunsy_ctrl_w(uint8_t data)
 {
-	if (LOG)
-		logerror("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
+	LOG("%s: phunsy_ctrl_w %02x\n", machine().describe_context(), data);
 
 	// Q-bank
 	membank("bankq")->set_entry(data & 15);
@@ -133,8 +137,7 @@ void phunsy_state::phunsy_ctrl_w(uint8_t data)
 
 void phunsy_state::phunsy_data_w(uint8_t data)
 {
-	if (LOG)
-		logerror("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
+	LOG("%s: phunsy_data_w %02x\n", machine().describe_context(), data);
 
 	m_data_out = data;
 
@@ -160,8 +163,7 @@ uint8_t phunsy_state::phunsy_data_r()
 {
 	uint8_t data = 0xff;
 
-	//if (LOG)
-		//logerror("%s: phunsy_data_r\n", machine().describe_context());
+	//LOG("%s: phunsy_data_r\n", machine().describe_context());
 
 	if ( m_data_out & 0x02 )
 	{
@@ -287,11 +289,12 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 	uint16_t i;
 	uint16_t quick_addr = 0x1800;
 	std::vector<uint8_t> quick_data;
-	image_init_result result = image_init_result::FAIL;
-	int quick_length = image.length();
+	std::error_condition result = image_error::UNSPECIFIED;
+	int const quick_length = image.length();
 	if (quick_length > 0x4000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too long\n", image.basename());
 		image.message(" File too long");
 	}
 	else
@@ -314,7 +317,7 @@ QUICKLOAD_LOAD_MEMBER(phunsy_state::quickload_cb)
 		m_maincpu->set_state_int(S2650_R3, 0x83);
 		m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-		result = image_init_result::PASS;
+		result = std::error_condition();
 	}
 
 	return result;
@@ -396,6 +399,9 @@ ROM_START( phunsy )
 	/* 16 x 16KB RAM banks */
 	ROM_REGION( 0x40000, "ram_4000", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

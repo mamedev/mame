@@ -76,7 +76,7 @@ protected:
 	virtual void device_reset_after_children() override ATTR_COLD;
 
 	// gb_cart_slot_device_base implementation
-	virtual image_init_result load_image_file(util::random_read &file) override ATTR_COLD;
+	virtual std::error_condition load_image_file(util::random_read &file) override ATTR_COLD;
 
 	void allocate_cart_ram(u8 const *basepage) ATTR_COLD;
 };

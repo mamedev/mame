@@ -254,7 +254,7 @@ INPUT_PORTS_END
 
 void prodigy_state::prodigy(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prodigy_state::main_map);
 
@@ -270,12 +270,12 @@ void prodigy_state::prodigy(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0xff);
 	config.set_default_layout(layout_aci_prodigy);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }

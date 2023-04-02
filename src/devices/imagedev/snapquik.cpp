@@ -12,9 +12,10 @@
 #include "snapquik.h"
 
 #include "softlist_dev.h"
+#include "ui/uimain.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device, "snapsot_image", "Snapshot")
+DEFINE_DEVICE_TYPE(SNAPSHOT, snapshot_image_device, "snapshot_image", "Snapshot")
 
 //-------------------------------------------------
 //  snapshot_image_device - constructor
@@ -51,7 +52,7 @@ TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
 {
 	check_for_file();
 
-	/* invoke the load */
+	// invoke the load (FIXME: don't swallow errors)
 	m_load(*this);
 }
 
@@ -70,16 +71,28 @@ void snapshot_image_device::device_start()
 /*-------------------------------------------------
     call_load
 -------------------------------------------------*/
-image_init_result snapshot_image_device::call_load()
+std::error_condition snapshot_image_device::call_load()
 {
 	/* adjust the timer */
 	m_timer->adjust(m_delay, 0);
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 const software_list_loader &snapshot_image_device::get_software_list_loader() const
 {
 	return image_software_list_loader::instance();
+}
+
+
+//-------------------------------------------------
+//  show_message - used to display a message while
+//  loading
+//-------------------------------------------------
+
+void snapshot_image_device::show_message(util::format_argument_pack<char> const &args)
+{
+	// display the popup for a standard amount of time
+	machine().ui().popup_time(5, "%s: %s", basename(), util::string_format(args));
 }
 
 

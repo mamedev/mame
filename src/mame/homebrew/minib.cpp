@@ -36,6 +36,8 @@
 #include "bus/bbc/userport/lcd.h"
 
 
+namespace {
+
 class minib_state : public driver_device
 {
 public:
@@ -163,6 +165,8 @@ ROM_START(minib)
 	ROM_LOAD("gos015.rom", 0x18000, 0x4000, CRC(e35a93df) SHA1(c91286aec2a2e086cb55ca3e0af576132144831f)) // GOS 0.15
 	ROM_LOAD("basic2.rom", 0x14000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281)) // BASIC 2
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY        FULLNAME           FLAGS

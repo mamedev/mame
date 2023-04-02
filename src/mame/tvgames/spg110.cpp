@@ -32,6 +32,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class spg110_game_state : public driver_device
 {
 public:
@@ -565,7 +568,7 @@ DEVICE_IMAGE_LOAD_MEMBER(spg110_sstarkar_game_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -625,6 +628,8 @@ ROM_START( sstarkar )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal BIOS
 ROM_END
+
+} // anonymous namespace
 
 
 // JAKKS Pacific Inc TV games

@@ -929,7 +929,7 @@ uint16_t apollo_ni::read(offs_t offset, uint16_t mem_mask)
 /*-------------------------------------------------
  DEVICE_IMAGE_LOAD( rom )
  -------------------------------------------------*/
-image_init_result apollo_ni::call_load()
+std::error_condition apollo_ni::call_load()
 {
 	CLOG1(("apollo_ni::call_load: %s", filename()));
 
@@ -952,17 +952,17 @@ image_init_result apollo_ni::call_load()
 		{
 			m_node_id = (((data[2] << 8) | data[4]) << 8) | (data[6]);
 			CLOG1(("apollo_ni::call_load: node ID is %x", m_node_id));
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
-	return image_init_result::FAIL;
+	return image_error::UNSPECIFIED;
 }
 
 /*-------------------------------------------------
  DEVICE_IMAGE_CREATE( rom )
  -------------------------------------------------*/
 
-image_init_result apollo_ni::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition apollo_ni::call_create(int format_type, util::option_resolution *format_options)
 {
 	CLOG1(("apollo_ni::call_create:"));
 
@@ -989,10 +989,10 @@ image_init_result apollo_ni::call_create(int format_type, util::option_resolutio
 			fwrite(data, sizeof(data));
 			CLOG(("apollo_ni::call_create: created %s with node ID %x", filename(), node_id));
 			set_node_id(node_id);
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
-	return image_init_result::FAIL;
+	return image_error::UNSPECIFIED;
 }
 
 /*-------------------------------------------------

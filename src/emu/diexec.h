@@ -221,8 +221,7 @@ protected:
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
-	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
-	int standard_irq_callback(int irqline);
+	int standard_irq_callback(int irqline, offs_t pc);
 
 	// debugger hooks
 	bool debugger_enabled() const { return bool(device().machine().debug_flags & DEBUG_FLAG_ENABLED); }
@@ -304,7 +303,9 @@ private:
 
 	// cycle counting and executing
 	profile_type            m_profiler;                 // profiler tag
+protected:  // TODO: decide whether to bring up the wait-state methods
 	int *                   m_icountptr;                // pointer to the icount
+private:
 	int                     m_cycles_running;           // number of cycles we are executing
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
 

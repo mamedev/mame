@@ -38,12 +38,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-constexpr auto DX7CLOCK    = 9'426'500;
-
-constexpr auto LCD_E  = 0x02;
-constexpr auto LCD_RW = 0x04;
-constexpr auto LCD_RS = 0x01;
-
 #define LOG_GENERAL (1U << 0)
 #define LOG_OPS     (1U << 1)
 #define LOG_EGS     (1U << 2)
@@ -52,6 +46,16 @@ constexpr auto LCD_RS = 0x01;
 #define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
+
+namespace {
+
+constexpr auto DX7CLOCK    = 9'426'500;
+
+constexpr auto LCD_E  = 0x02;
+constexpr auto LCD_RW = 0x04;
+constexpr auto LCD_RS = 0x01;
+
 
 class yamaha_dx7_state : public driver_device
 {
@@ -330,5 +334,8 @@ ROM_START(dx7)
 	ROM_REGION(0x0800, "subcpu", 0)
 	ROM_LOAD("hd6805s1p-a33.ic13", 0x0000, 0x800, CRC(ac1d84b3) SHA1(ee0ebb118dd0d282d7c195d3b246a0094b2cb6ad))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1983, dx7, 0, 0, dx7, dx7, yamaha_dx7_state, empty_init, "Yamaha", "DX7 Digital Programmable Algorithm Synthesizer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

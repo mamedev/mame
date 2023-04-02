@@ -40,6 +40,9 @@
 
 #include <algorithm>
 
+
+namespace {
+
 class crospuzl_state : public driver_device
 {
 public:
@@ -367,8 +370,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 //  ROM strings have references to a K9FXX08 device
 //  TODO: use this device, in machine/smartmed.h (has issues with is_busy() emulation)
-//  NAND(config, m_nand, 0);
-//  m_nand->set_nand_type(nand_device::chip::K9F1G08U0B); // TODO: exact flavor
+//  SAMSUNG_K9F1G08U0B(config, m_nand, 0); // TODO: exact flavor
 
 	PCF8583(config, m_rtc, 32.768_kHz_XTAL);
 }
@@ -381,5 +383,8 @@ ROM_START( crospuzl )
 	ROM_LOAD("k9f1g08u0a.riser",  0x00000, 0x8400010, BAD_DUMP CRC(7f3c88c3) SHA1(db3169a7b4caab754e9d911998a2ece13c65ce5b) )
 	ROM_COPY( "flash",            0x20000, 0x00000, 0x20000 )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 200?, crospuzl, 0,        crospuzl, crospuzl, crospuzl_state, empty_init,    ROT0, "<unknown>",           "Cross Puzzle", MACHINE_NOT_WORKING )

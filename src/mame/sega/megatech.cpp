@@ -146,7 +146,7 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
+	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
@@ -749,21 +749,21 @@ void mtech_state::megatech(machine_config &config)
 }
 
 
-image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
+std::error_condition mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
 	uint8_t *ROM;
 	const char  *pcb_name;
 	uint32_t size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	else
 	{
 		if (!strcmp("genesis", pcb_name))
@@ -780,7 +780,7 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 			osd_printf_debug("cart%d is invalid\n", gameno + 1);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 #define MEGATECH_CARTSLOT(_tag, _load) \

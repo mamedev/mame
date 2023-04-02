@@ -11,7 +11,7 @@
 [:mac] ':3f' (08058) BUS ERROR R fefe4:0007e4 (NONX 1 WP 0 TASK 3 FC 1 MAGIC 1)
 
 [:mac] TASK 3 SEGMENT 31 PAGE 13 MEM fe800-fefff 000000-0007ff X W[:mac]  000000-0007ff X W
-[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff    
+[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff
 */
 
 #include "emu.h"
@@ -107,13 +107,13 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_program_config("program", ENDIANNESS_BIG, 8, 21, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_mac_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mac_device::mac_map), this)),
 	m_rom(*this, "boot"),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
 	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
-	m_read_fc(*this),
-	m_write_buserr(*this),
 	m_read_tren(*this),
 	m_write_tren(*this),
+	m_rstbut(0),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
@@ -130,12 +130,11 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 void abc1600_mac_device::device_start()
 {
 	// resolve callbacks
-	m_read_fc.resolve_safe(0);
-	m_write_buserr.resolve_safe();
 	m_read_tren.resolve_all_safe(0xff);
 	m_write_tren.resolve_all_safe();
 
 	// state saving
+	save_item(NAME(m_rstbut));
 	save_item(NAME(m_boote));
 	save_item(NAME(m_magic));
 	save_item(NAME(m_task));
@@ -195,10 +194,13 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
-	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	if (!machine().side_effects_disabled())
+	{
+		m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	}
 
 	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
-		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_read_fc(), m_magic);
+		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_cpu->get_fc(), m_magic);
 
 	return virtual_offset;
 }
@@ -215,7 +217,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 		return m_rom->base()[offset & 0x3fff];
 	}
 
-	uint8_t fc = m_read_fc();
+	uint8_t fc = m_cpu->get_fc();
 	int task = m_task;
 
 	if (FC2)
@@ -248,7 +250,9 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 1);
+			m_cpu->set_buserror_details(offset, 1, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 	}
 
@@ -262,7 +266,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 
 void abc1600_mac_device::write(offs_t offset, uint8_t data)
 {
-	uint8_t fc = m_read_fc();
+	uint8_t fc = m_cpu->get_fc();
 	int task = m_task;
 
 	if (FC2)
@@ -291,14 +295,18 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 0);
+			m_cpu->set_buserror_details(offset, 0, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 		if (!wp)
 		{
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 0);
+			m_cpu->set_buserror_details(offset, 0, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 	}
 
@@ -327,14 +335,17 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_rstbut;
 
 	if (!m_partst)
 	{
 		data = 0x02 | m_cause;
 	}
 
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+	{
+		m_watchdog->watchdog_reset();
+	}
 
 	return data;
 }
@@ -568,7 +579,13 @@ void abc1600_mac_device::page_hi_w(offs_t offset, uint8_t data)
 
 offs_t abc1600_mac_device::get_dma_address(int index, offs_t offset, bool &rw)
 {
-	// A0 = DMA15, A1 = BA1, A2 = BA2
+	/*
+	            BA2 BA1 A15
+	    DMA0     1   1   x
+	    DMA1     1   0   x
+	    DMA2     0   0   x
+	*/
+
 	uint8_t dmamap_addr = index | BIT(offset, 15);
 	uint8_t dmamap = m_dmamap[dmamap_addr];
 

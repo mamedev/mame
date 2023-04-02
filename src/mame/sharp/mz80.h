@@ -5,8 +5,8 @@
  * includes/mz80.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MZ80_H
-#define MAME_INCLUDES_MZ80_H
+#ifndef MAME_SHARP_MZ80_H
+#define MAME_SHARP_MZ80_H
 
 #pragma once
 
@@ -30,6 +30,7 @@ public:
 		, m_p_ram(*this, "p_ram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
+		, m_keyboard(*this, "LINE%d", 0U)
 	{ }
 
 	void mz80kj(machine_config &config);
@@ -69,6 +70,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<10> m_keyboard;
 };
 
 
@@ -77,4 +79,4 @@ private:
 extern const gfx_layout mz80k_charlayout;
 extern const gfx_layout mz80kj_charlayout;
 
-#endif // MAME_INCLUDES_MZ80_H
+#endif // MAME_SHARP_MZ80_H

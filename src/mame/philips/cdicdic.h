@@ -21,8 +21,8 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_CDICDIC_H
-#define MAME_MACHINE_CDICDIC_H
+#ifndef MAME_PHILIPS_CDICDIC_H
+#define MAME_PHILIPS_CDICDIC_H
 
 #pragma once
 
@@ -231,4 +231,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CDI_CDIC, cdicdic_device)
 
-#endif // MAME_MACHINE_CDICDIC_H
+#endif // MAME_PHILIPS_CDICDIC_H

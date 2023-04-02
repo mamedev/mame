@@ -95,23 +95,23 @@ float hv_wd(float i1, float i2, float i3, float i4, float e1, float e2, float e3
 
 vec4 min4(vec4 a, vec4 b, vec4 c, vec4 d)
 {
-    return min(a, min(b, min(c, d)));
+	return min(a, min(b, min(c, d)));
 }
 
 vec4 max4(vec4 a, vec4 b, vec4 c, vec4 d)
 {
-    return max(a, max(b, max(c, d)));
+	return max(a, max(b, max(c, d)));
 }
 
 void main()
 {
 	//Skip pixels on wrong grid
 	vec2 fraction = fract(v_texcoord0 * u_tex_size0.xy / XBR_RES);
- 	if (fraction.x < 0.5 || fraction.y < 0.5)
- 	{
- 		gl_FragColor = texture2D(s0, v_texcoord0);
- 		return;
- 	}
+	if (fraction.x < 0.5 || fraction.y < 0.5)
+	{
+		gl_FragColor = texture2D(s0, v_texcoord0);
+		return;
+	}
 
 	vec2 tex = (floor(v_texcoord0 * u_tex_size0.xy / XBR_RES) + vec2(0.5, 0.5)) * XBR_RES / u_tex_size0.xy;
 

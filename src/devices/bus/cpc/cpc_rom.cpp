@@ -101,7 +101,7 @@ void cpc_rom_image_device::device_start()
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( rom )
 -------------------------------------------------*/
-image_init_result cpc_rom_image_device::call_load()
+std::error_condition cpc_rom_image_device::call_load()
 {
 	device_image_interface* image = this;
 	uint64_t size = image->length();
@@ -117,7 +117,7 @@ image_init_result cpc_rom_image_device::call_load()
 		image->fread(m_base,16384);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

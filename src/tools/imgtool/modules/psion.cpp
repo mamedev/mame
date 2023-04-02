@@ -488,7 +488,7 @@ static imgtoolerr_t datapack_next_enum(imgtool::directory &enumeration, imgtool_
 		return IMGTOOLERR_SUCCESS;
 	}
 	memcpy(ent.filename, pack->pack_index[iter->index].filename, 8);
-	sprintf(ent.attr, "Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
+	snprintf(ent.attr, std::size(ent.attr), "Type: %02x ID: %02x", pack->pack_index[iter->index].type, pack->pack_index[iter->index].id);
 
 	if (pack->pack_index[iter->index].data_rec)
 	{

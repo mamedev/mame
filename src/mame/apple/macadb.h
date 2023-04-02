@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_MACHINE_MACADB_H
-#define MAME_MACHINE_MACADB_H
+#ifndef MAME_APPLE_MACADB_H
+#define MAME_APPLE_MACADB_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACADB, macadb_device)
 
-#endif // MAME_MACHINE_MACADB_H
+#endif // MAME_APPLE_MACADB_H

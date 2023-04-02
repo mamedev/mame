@@ -326,13 +326,6 @@ void amiga_state::update_int6()
 
 void amiga_state::update_irqs()
 {
-	// if the external interrupt line is still active, set the interrupt request bit
-	if (int2_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_PORTS;
-
-	if (int6_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
-
 	int ints = CUSTOM_REG(REG_INTENA) & CUSTOM_REG(REG_INTREQ);
 
 	// master interrupt switch
@@ -354,6 +347,13 @@ void amiga_state::update_irqs()
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 		m_maincpu->set_input_line(6, CLEAR_LINE);
 	}
+
+	// int 2 and 6 are level triggered
+	if (int2_pending())
+		CUSTOM_REG(REG_INTREQ) |= INTENA_PORTS;
+
+	if (int6_pending())
+		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
 }
 
 TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )

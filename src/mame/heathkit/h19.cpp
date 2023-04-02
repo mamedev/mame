@@ -61,6 +61,8 @@ Address   Description
 #include "speaker.h"
 
 
+namespace {
+
 // Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL(12'288'000) / 6)
 #define MC6845_CLOCK (XTAL(12'288'000) /8)
@@ -146,7 +148,7 @@ TIMER_CALLBACK_MEMBER(h19_state::key_click_off)
 
 TIMER_CALLBACK_MEMBER(h19_state::bell_off)
 {
-	m_keyclickactive = false;
+	m_bellactive = false;
 
 	if (!m_keyclickactive && !m_bellactive)
 		m_beep->set_state(0);
@@ -372,6 +374,9 @@ void h19_state::machine_start()
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
+
+	m_keyclickactive = false;
+	m_bellactive = false;
 
 	m_key_click_timer = timer_alloc(FUNC(h19_state::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(h19_state::bell_off), this);
@@ -628,13 +633,15 @@ ROM_START( ultra19 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.bin", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
 
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
-COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1979, h19,     0,      0,      h19,     h19,   h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
 //Super-19 ROM - ATG Systems, Inc - Adv in Sextant Issue 4, Winter 1983. With the magazine lead-time, likely released late 1982.
-COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Super-19 ROM", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, super19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ Super-19 ROM", MACHINE_SUPPORTS_SAVE )
 // Watzman ROM - HUG p/n 885-1121, announced in REMark Issue 33, Oct. 1982
-COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ Watzman ROM",  MACHINE_SUPPORTS_SAVE )
+COMP( 1982, watz19,  h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ Watzman ROM",  MACHINE_SUPPORTS_SAVE )
 // ULTRA ROM - Software Wizardry, Inc., (c) 1983 William G. Parrott, III
-COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Inc", "Heathkit H-19 w/ ULTRA ROM",    MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ultra19, h19,    0,      h19,     h19,   h19_state, empty_init, "Heath Company", "Heathkit H-19 w/ ULTRA ROM",    MACHINE_SUPPORTS_SAVE )
 

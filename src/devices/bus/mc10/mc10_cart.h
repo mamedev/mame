@@ -53,7 +53,7 @@ public:
 	virtual void device_start() override;
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "mc10_cart"; }
@@ -85,7 +85,7 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
-	virtual image_init_result load();
+	virtual std::error_condition load();
 
 protected:
 	void raise_cart_nmi() { m_owning_slot->set_nmi_line(ASSERT_LINE); }

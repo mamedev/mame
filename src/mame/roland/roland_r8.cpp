@@ -118,7 +118,7 @@ protected:
 	void mk1_map(address_map &map);
 	void mk2_map(address_map &map);
 
-	image_init_result pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
+	std::error_condition pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image);
 	void pcmrom_unload(int card_id);
 	void descramble_rom_external(u8* dst, const u8* src);
 
@@ -186,13 +186,13 @@ private:
 };
 
 
-image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image)
+std::error_condition roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image)
 {
 	uint32_t size = pcmcard->common_get_size("rom");
 	if (size > PCMCARD_SIZE)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid size: Only up to 512K is supported\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	pcmcard->rom_alloc(PCMCARD_SIZE, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -215,7 +215,7 @@ image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard
 	descramble_rom_external(&dst[pcm_addr], &src[pcm_addr]);
 	//pcmard_loaded[card_id] = true;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void roland_r8_base_state::pcmrom_unload(int card_id)

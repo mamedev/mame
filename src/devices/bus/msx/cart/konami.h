@@ -26,7 +26,7 @@ class msx_cart_konami_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_konami_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -46,7 +46,7 @@ class msx_cart_konami_scc_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_konami_scc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -71,7 +71,7 @@ class msx_cart_gamemaster2_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_gamemaster2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -94,7 +94,7 @@ class msx_cart_synthesizer_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -110,7 +110,7 @@ private:
 class msx_cart_konami_sound_device : public device_t, public msx_cart_interface
 {
 public:
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	msx_cart_konami_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 min_rambank, u8 max_rambank);
@@ -151,7 +151,7 @@ class msx_cart_konami_sound_snatcher_device : public msx_cart_konami_sound_devic
 public:
 	msx_cart_konami_sound_snatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 };
 
 
@@ -160,7 +160,7 @@ class msx_cart_konami_sound_sdsnatcher_device : public msx_cart_konami_sound_dev
 public:
 	msx_cart_konami_sound_sdsnatcher_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 };
 
 
@@ -176,7 +176,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 private:
 	required_device<vlm5030_device> m_vlm5030;
@@ -200,7 +200,7 @@ protected:
 	virtual void device_start() override { }
 	virtual void device_reset() override;
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 private:
 	void bank_w(u8 data);

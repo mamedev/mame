@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_CIDELSA_H
-#define MAME_INCLUDES_CIDELSA_H
+#ifndef MAME_EFO_CIDELSA_H
+#define MAME_EFO_CIDELSA_H
 
 #pragma once
 
@@ -133,4 +133,4 @@ protected:
 	int m_psg_latch = 0;
 };
 
-#endif // MAME_INCLUDES_CIDELSA_H
+#endif // MAME_EFO_CIDELSA_H

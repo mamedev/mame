@@ -443,28 +443,28 @@ u16 pic17_cpu_device::interrupt_vector()
 	if (BIT(active_ints, 0))
 	{
 		// Interrupt on RA0/INT pin edge
-		standard_irq_callback(0);
+		standard_irq_callback(0, m_pc);
 		m_intsta &= 0xef; // INTF is cleared
 		return 0x0008;
 	}
 	else if (BIT(active_ints, 1))
 	{
 		// Interrupt on TMR0 overflow
-		standard_irq_callback(1);
+		standard_irq_callback(1, m_pc);
 		m_intsta &= 0xdf; // T0IF is cleared
 		return 0x0010;
 	}
 	else if (BIT(active_ints, 2))
 	{
 		// Interrupt on RA1/T0CKI pin edge
-		standard_irq_callback(2);
+		standard_irq_callback(2, m_pc);
 		m_intsta &= 0xbf; // T0CKIF is cleared
 		return 0x0018;
 	}
 	else if (BIT(active_ints, 3))
 	{
 		// Peripheral interrupts (not further distinguished here, and PEIF is *not* cleared)
-		standard_irq_callback(3);
+		standard_irq_callback(3, m_pc);
 		return 0x0020;
 	}
 	else

@@ -37,8 +37,8 @@ protected:
 	int count() { return m_count; }
 
 	int current_index();
-	void previous();
-	void next();
+	bool previous();
+	bool next();
 	std::string current_display_name();
 	uint32_t current_display_flags();
 
@@ -82,7 +82,7 @@ int menu_device_control<DeviceType>::current_index()
 //-------------------------------------------------
 
 template<class DeviceType>
-void menu_device_control<DeviceType>::previous()
+bool menu_device_control<DeviceType>::previous()
 {
 	// left arrow - rotate left through devices
 	if (m_device && (1 < m_count))
@@ -96,6 +96,7 @@ void menu_device_control<DeviceType>::previous()
 		m_device = iter.byindex(index);
 		reset(reset_options::REMEMBER_POSITION);
 	}
+	return false; // triggers an item reset on changes anyway
 }
 
 
@@ -104,7 +105,7 @@ void menu_device_control<DeviceType>::previous()
 //-------------------------------------------------
 
 template<class DeviceType>
-void menu_device_control<DeviceType>::next()
+bool menu_device_control<DeviceType>::next()
 {
 	// right arrow - rotate right through cassette devices
 	if (m_device && (1 < m_count))
@@ -118,6 +119,7 @@ void menu_device_control<DeviceType>::next()
 		m_device = iter.byindex(index);
 		reset(reset_options::REMEMBER_POSITION);
 	}
+	return false; // triggers an item reset on changes anyway
 }
 
 

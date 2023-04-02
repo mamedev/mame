@@ -19,13 +19,14 @@
 
 namespace ui {
 
-void menu_plugin::handle(event const *ev)
+bool menu_plugin::handle(event const *ev)
 {
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref);
+			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref, false);
 	}
+	return false;
 }
 
 menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
@@ -42,33 +43,28 @@ void menu_plugin::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, char *menu)
+void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu)
 {
-	// reset the menu stack
-	menu::stack_reset(mui);
-
 	// add the plugin menu entry
-	menu::stack_push<menu_plugin_opt>(mui, container, menu);
+	menu::stack_push<menu_plugin_opt>(mui, container, menu, true);
 
 	// force the menus on
 	mui.show_menu();
-
-	// make sure MAME is paused
-	mui.machine().pause();
 }
 
 menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu) :
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot) :
 	ui::menu(mui, container),
 	m_menu(menu),
 	m_need_idle(false)
 {
+	set_one_shot(one_shot);
 }
 
-void menu_plugin_opt::handle(event const *ev)
+bool menu_plugin_opt::handle(event const *ev)
 {
 	void *const itemref = ev ? ev->itemref : get_selection_ref();
 	std::string key;
@@ -103,6 +99,9 @@ void menu_plugin_opt::handle(event const *ev)
 		case IPT_UI_CLEAR:
 			key = "clear";
 			break;
+		case IPT_UI_BACK:
+			key = "back";
+			break;
 		case IPT_UI_CANCEL:
 			key = "cancel";
 			break;
@@ -113,16 +112,19 @@ void menu_plugin_opt::handle(event const *ev)
 			break;
 		}
 	}
-	if (!key.empty() || m_need_idle)
-	{
-		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
-		if (result.second)
-			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
-		if (result.first)
-			reset(reset_options::REMEMBER_REF);
-		else if (ev && (ev->iptkey == IPT_UI_CANCEL))
-			stack_pop();
-	}
+
+	if (key.empty() && !m_need_idle)
+		return false;
+
+	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
+	if (result.second)
+		set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
+	if (result.first)
+		reset(reset_options::REMEMBER_REF);
+	else if (ev && (ev->iptkey == IPT_UI_BACK))
+		stack_pop();
+
+	return result.second && !result.first;
 }
 
 void menu_plugin_opt::populate()

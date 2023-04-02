@@ -26,6 +26,9 @@
 #include "machine/z8536.h"
 #include "abc1600_v.h"
 
+
+namespace {
+
 #define MC68010_TAG  "14m"
 #define NS32081_TAG  "06o"
 #define MC68450_TAG  "11m"
@@ -164,5 +167,8 @@ ROM_START( x37 )
 	ROM_LOAD( "pat8038.04n", 0x820, 0x104, CRC(46ff5ce3) SHA1(c4a9025162b623bfcb74ac52f39de25bd53e448b) ) // DS60 PARITY GENERATION/DETECTION CONTROL
 	ROM_LOAD( "pat8039.12h", 0x924, 0x104, CRC(d3f6974f) SHA1(98dc1bac1c822fe7af0edd683acfc2e5c51f0451) ) // DS60 NS32081 FLOATING POINT PROCESSOR INTERFACE
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, x37, 0,      0,      x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

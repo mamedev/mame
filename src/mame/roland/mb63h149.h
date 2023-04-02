@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB63H149_H
-#define MAME_MACHINE_MB63H149_H
+#ifndef MAME_ROLAND_MB63H149_H
+#define MAME_ROLAND_MB63H149_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ public:
 DECLARE_DEVICE_TYPE(MB63H149, mb63h149_device)
 DECLARE_DEVICE_TYPE(MB63H130, mb63h130_device)
 
-#endif // MAME_MACHINE_MB63H149_H
+#endif // MAME_ROLAND_MB63H149_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_GAELCO_DS5002FP_H
-#define MAME_MACHINE_GAELCO_DS5002FP_H
+#ifndef MAME_GAELCO_GAELCO_DS5002FP_H
+#define MAME_GAELCO_GAELCO_DS5002FP_H
 
 #pragma once
 
@@ -34,4 +34,4 @@ private:
 	void hostmem_w(offs_t offset, uint8_t data);
 };
 
-#endif // MAME_MACHINE_GAELCO_DS5002FP_H
+#endif // MAME_GAELCO_GAELCO_DS5002FP_H

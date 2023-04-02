@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+    Undumped cards:
+    - PenCalc
+    - PenMail
+    - Home Finance
+    - PenFriend
+    - WordPro
+-->
+<softwarelist name="pda600" description="Amstrad PenPad PDA 600 PCMCIA cards">
+	<software name="games">
+		<description>Games (Crazy Money, Mosaic and Pagged)</description>
+		<year>199?</year>
+		<publisher>Maddox Games</publisher>
+		<part name="card" interface="pcmcia">
+			<dataarea name="rom" size="0x80000">
+				<rom name="games.bin" size="0x80000" crc="0ec748d8" sha1="fd1c24cde1decf76080b962ee1fdf5bd8c78c673"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamesd">
+		<description>Games Demo (Game 44, Squares and FliView)</description>
+		<year>199?</year>
+		<publisher>Maddox Games</publisher>
+		<part name="card" interface="pcmcia">
+			<dataarea name="rom" size="0x80000">
+				<rom name="games_demo.bin" size="0x80000" crc="e0c5d590" sha1="bc550a00de6b6829d2cb8063b2c5507b631ae03f"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

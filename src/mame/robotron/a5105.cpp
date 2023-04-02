@@ -39,6 +39,8 @@ ToDo:
 #include "formats/a5105_dsk.h"
 
 
+namespace {
+
 class a5105_state : public driver_device
 {
 public:
@@ -651,6 +653,9 @@ ROM_START( a5105 )
 	ROM_LOAD( "k5651_40.rom", 0x0000, 0x2000, CRC(f4ad4739) SHA1(9a7bbe6f0d180dd513c7854f441cee986c8d9765))
 	ROM_LOAD( "k5651_60.rom", 0x2000, 0x2000, CRC(c77dde3f) SHA1(7c16226be6c4c71013e8008fba9d2e9c5640b6a7))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -6,8 +6,8 @@
 #pragma once
 
 // SoftFloat 2 lacks an include guard
-#ifndef softfloat_h
-#define softfloat_h 1
+#ifndef softfloat2_h
+#define softfloat2_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
 #endif
@@ -59,7 +59,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -397,7 +397,7 @@ protected:
 	void register_state_i386_x87_xmm();
 	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
-	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
+	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
 	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
@@ -1359,6 +1359,7 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
+	int x87_ck_over_stack();
 	int x87_check_exceptions(bool store = false);
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);

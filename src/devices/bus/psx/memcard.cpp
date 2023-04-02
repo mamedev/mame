@@ -295,20 +295,20 @@ unsigned char psxcard_device::checksum_data(const unsigned char *buf, const unsi
 	return chk;
 }
 
-image_init_result psxcard_device::call_load()
+std::error_condition psxcard_device::call_load()
 {
 	if(m_disabled)
 	{
 		logerror("psxcard: port disabled\n");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	if(length() != card_size)
-		return image_init_result::FAIL;
-	return image_init_result::PASS;
+		return image_error::INVALIDLENGTH;
+	return std::error_condition();
 }
 
-image_init_result psxcard_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition psxcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	uint8_t block[block_size];
 	int i, ret;
@@ -316,7 +316,7 @@ image_init_result psxcard_device::call_create(int format_type, util::option_reso
 	if(m_disabled)
 	{
 		logerror("psxcard: port disabled\n");
-		return image_init_result::FAIL;
+		return image_error::UNSUPPORTED;
 	}
 
 	memset(block, '\0', block_size);
@@ -324,9 +324,9 @@ image_init_result psxcard_device::call_create(int format_type, util::option_reso
 	{
 		ret = fwrite(block, block_size);
 		if(ret != block_size)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void psxcard_device::do_card()

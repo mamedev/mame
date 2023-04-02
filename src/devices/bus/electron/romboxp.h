@@ -45,7 +45,7 @@ protected:
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
 
 private:
-	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::error_condition load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }

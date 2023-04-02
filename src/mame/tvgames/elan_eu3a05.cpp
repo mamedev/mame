@@ -223,6 +223,9 @@ Set 5043 bit 0 low
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+
+namespace {
+
 class elan_eu3a05_state : public driver_device
 {
 public:
@@ -363,14 +366,14 @@ DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
 
 	if (size != 0x200000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_NATIVE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
@@ -971,6 +974,9 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 	ROM[0x3f8d93] = 0xea;
 	ROM[0x3f8d94] = 0xea;
 }
+
+} // anonymous namespace
+
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 

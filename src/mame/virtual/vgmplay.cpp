@@ -430,6 +430,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 	template<int Index> void upd7759_reset_w(uint8_t data);
+	template<int Index> void upd7759_start_w(uint8_t data);
 	template<int Index> void upd7759_data_w(uint8_t data);
 	template<int Index> DECLARE_WRITE_LINE_MEMBER(upd7759_drq_w);
 	template<int Index> void okim6258_clock_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -2770,7 +2771,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 	else
 	{
@@ -2794,7 +2795,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			{
 				logerror("gzip header but not a gzip file\n");
 				m_file_data.clear();
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 			do
 			{
@@ -2809,7 +2810,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			{
 				logerror("broken gzip file\n");
 				m_file_data.clear();
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 			m_file_data.resize(str.total_out);
 			memcpy(&m_file_data[0], &decomp[0], str.total_out);
@@ -2819,7 +2820,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		{
 			logerror("Not a vgm/vgz file\n");
 			m_file_data.clear();
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 
 		uint32_t version = r32(8);
@@ -2955,8 +2956,6 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		setup_device(*m_upd7759[1], 1, CT_UPD7759, 0x8c, 0x161);
 		m_upd7759_md[0] = r32(0x8c) & 0x80000000 ? 0 : 1;
 		m_upd7759_md[1] = r32(0x8c) & 0x80000000 ? 0 : 1;
-		m_upd7759[0]->md_w(m_upd7759_md[0]);
-		m_upd7759[1]->md_w(m_upd7759_md[1]);
 
 		setup_device(*m_okim6258[0], 0, CT_OKIM6258, 0x90, 0x161);
 		setup_device(*m_okim6258[1], 1, CT_OKIM6258, 0x90, 0x161);
@@ -3071,7 +3070,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 
 		machine().schedule_soft_reset();
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 }
 
@@ -3122,6 +3121,18 @@ void vgmplay_state::upd7759_reset_w(uint8_t data)
 		if (!reset)
 			std::queue<uint8_t>().swap(m_upd7759_slave_data[Index]);
 	}
+}
+
+template<int Index>
+void vgmplay_state::upd7759_start_w(uint8_t data)
+{
+	int start = data != 0;
+
+	// substitute ST with MD when in slave mode
+	if (m_upd7759_md[Index])
+		m_upd7759[Index]->start_w(start);
+	else
+		m_upd7759[Index]->md_w(!start);
 }
 
 template<int Index>
@@ -3392,11 +3403,11 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_MULTIPCM_1 + 4, vgmplay_device::A_MULTIPCM_1 + 7).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_hi_w<1>));
 	map(vgmplay_device::A_MULTIPCM_1 + 8, vgmplay_device::A_MULTIPCM_1 + 11).w("vgmplay", FUNC(vgmplay_device::multipcm_bank_lo_w<1>));
 	map(vgmplay_device::A_UPD7759_0 + 0, vgmplay_device::A_UPD7759_0 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<0>));
-	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[0]->start_w(data != 0); }));
+	map(vgmplay_device::A_UPD7759_0 + 1, vgmplay_device::A_UPD7759_0 + 1).w(FUNC(vgmplay_state::upd7759_start_w<0>));
 	map(vgmplay_device::A_UPD7759_0 + 2, vgmplay_device::A_UPD7759_0 + 2).w(FUNC(vgmplay_state::upd7759_data_w<0>));
 	map(vgmplay_device::A_UPD7759_0 + 3, vgmplay_device::A_UPD7759_0 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<0>));
 	map(vgmplay_device::A_UPD7759_1 + 0, vgmplay_device::A_UPD7759_1 + 0).w(FUNC(vgmplay_state::upd7759_reset_w<1>));
-	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).lw8(NAME([this](uint8_t data) {m_upd7759[1]->start_w(data != 0); }));
+	map(vgmplay_device::A_UPD7759_1 + 1, vgmplay_device::A_UPD7759_1 + 1).w(FUNC(vgmplay_state::upd7759_start_w<1>));
 	map(vgmplay_device::A_UPD7759_1 + 2, vgmplay_device::A_UPD7759_1 + 2).w(FUNC(vgmplay_state::upd7759_data_w<1>));
 	map(vgmplay_device::A_UPD7759_1 + 3, vgmplay_device::A_UPD7759_1 + 3).w("vgmplay", FUNC(vgmplay_device::upd7759_bank_w<1>));
 	map(vgmplay_device::A_OKIM6258_0 + 0x0, vgmplay_device::A_OKIM6258_0 + 0x0).w(m_okim6258[0], FUNC(okim6258_device::ctrl_w));

@@ -89,7 +89,7 @@ void mtx_exp_slot_device::device_start()
 //  call_load
 //-------------------------------------------------
 
-image_init_result mtx_exp_slot_device::call_load()
+std::error_condition mtx_exp_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -97,8 +97,8 @@ image_init_result mtx_exp_slot_device::call_load()
 
 		if (size % 0x2000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported cartridge size\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_card->rom_alloc(size, tag());
@@ -109,7 +109,7 @@ image_init_result mtx_exp_slot_device::call_load()
 			memcpy(m_card->get_rom_base(), get_software_region("rom"), size);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

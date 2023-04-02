@@ -14,7 +14,7 @@
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             std::error_condition _name(device_image_interface &image)
 #define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
 #define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
@@ -149,7 +149,7 @@ class generic_slot_device : public device_t,
 								public device_single_card_slot_interface<device_generic_cart_interface>
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<std::error_condition (device_image_interface &)> load_delegate;
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	virtual ~generic_slot_device();
@@ -164,7 +164,7 @@ public:
 	void set_endian(endianness_t end) { m_endianness = end; }
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual char const *image_interface() const noexcept override { return m_interface; }

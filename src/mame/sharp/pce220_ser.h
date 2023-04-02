@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_MACHINE_PCE220_SER_H
-#define MAME_MACHINE_PCE220_SER_H
+#ifndef MAME_SHARP_PCE220_SER_H
+#define MAME_SHARP_PCE220_SER_H
 
 #pragma once
 
@@ -29,9 +29,9 @@ public:
 	virtual ~pce220_serial_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -88,4 +88,4 @@ DECLARE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device)
 ***************************************************************************/
 #define PCE220SERIAL_TAG        "serial"
 
-#endif // MAME_MACHINE_PCE220_SER_H
+#endif // MAME_SHARP_PCE220_SER_H

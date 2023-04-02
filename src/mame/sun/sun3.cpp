@@ -181,6 +181,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "emu.h"
 
 #include "cpu/m68000/m68020.h"
+#include "machine/am9516.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -233,8 +234,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
-		m_scsibus(*this, "scsibus"),
-		m_scsi(*this, "scsibus:7:ncr5380"),
+		m_sbc(*this, "scsibus:7:sbc"),
+		m_udc(*this, "udc"),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram"),
 		m_type0space(*this, "type0"),
@@ -263,8 +264,8 @@ private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
-	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5380_device> m_scsi;
+	required_device<ncr5380_device> m_sbc;
+	required_device<am9516_device> m_udc;
 
 	optional_shared_ptr<uint32_t> m_p_ram;
 	optional_shared_ptr<uint32_t> m_bw2_vram;
@@ -285,6 +286,8 @@ private:
 	void irqctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t rtc7170_r(offs_t offset);
 	void rtc7170_w(offs_t offset, uint8_t data);
+	uint16_t scsictrl_r();
+	void scsictrl_w(uint16_t data);
 
 	template <unsigned W, unsigned H>
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -302,6 +305,7 @@ private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
+	uint16_t m_scsictrl;
 	uint8_t m_buserr;
 
 	uint32_t m_context;
@@ -329,7 +333,6 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR5380);
 	device.set_option_machine_config("cdrom", sun_cdrom);
 }
 
@@ -789,7 +792,10 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
 	map(0x00120000, 0x00120003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
-	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask32(0xffffffff);
+	map(0x00140000, 0x00140007).rw(m_sbc, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask32(0xffffffff);
+	map(0x00140010, 0x00140011).rw(m_udc, FUNC(am9516_device::data_r), FUNC(am9516_device::data_w));
+	map(0x00140012, 0x00140013).rw(m_udc, FUNC(am9516_device::addr_r), FUNC(am9516_device::addr_w));
+	map(0x00140018, 0x00140019).rw(FUNC(sun3_state::scsictrl_r), FUNC(sun3_state::scsictrl_w));
 	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
@@ -858,6 +864,22 @@ void sun3_state::rtc7170_w(offs_t offset, uint8_t data)
 			m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 		}
 	}
+}
+
+uint16_t sun3_state::scsictrl_r()
+{
+	return m_scsictrl;
+}
+
+void sun3_state::scsictrl_w(uint16_t data)
+{
+	if (BIT(data ^ m_scsictrl, 0))
+	{
+		m_sbc->reset();
+		m_udc->reset();
+	}
+
+	m_scsictrl = (m_scsictrl & 0xff00) | (data & 0x000f);
 }
 
 uint32_t sun3_state::ecc_r(offs_t offset)
@@ -964,6 +986,7 @@ void sun3_state::machine_start()
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
 	std::fill(std::begin(m_parregs), std::end(m_parregs), 0);
+	m_scsictrl = 0;
 }
 
 void sun3_state::machine_reset()
@@ -974,6 +997,8 @@ void sun3_state::machine_reset()
 	m_dvma_enable = 0;
 	m_irqctrl = 0;
 	m_bInBusErr = false;
+
+	scsictrl_w(0);
 }
 
 // The base Sun 3004 CPU board
@@ -1039,7 +1064,9 @@ void sun3_state::sun3(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
+
+	AM9516(config, m_udc, 16_MHz_XTAL / 2);
 }
 
 // Sun 3/60
@@ -1143,7 +1170,9 @@ void sun3_state::sun3_50(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this] (device_t *device) { ncr5380(device); });
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
+
+	AM9516(config, m_udc, 16_MHz_XTAL / 2);
 }
 
 /* ROM definition */

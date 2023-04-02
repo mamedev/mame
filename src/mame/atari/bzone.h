@@ -5,8 +5,8 @@
     Atari Battle Zone hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BZONE_H
-#define MAME_INCLUDES_BZONE_H
+#ifndef MAME_ATARI_BZONE_H
+#define MAME_ATARI_BZONE_H
 
 #pragma once
 
@@ -34,6 +34,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(clock_r);
 	void bzone(machine_config &config);
 	void bradley(machine_config &config);
+	void dsrtwars(machine_config &config);
 
 protected:
 	void bzone_coin_counter_w(offs_t offset, uint8_t data);
@@ -47,6 +48,7 @@ protected:
 	void bzone_audio(machine_config &config);
 	void bzone_map(address_map &map);
 	void bradley_map(address_map &map);
+	void dsrtwars_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -90,4 +92,4 @@ private:
 	uint8_t m_rb_input_select = 0U;
 };
 
-#endif // MAME_INCLUDES_BZONE_H
+#endif // MAME_ATARI_BZONE_H

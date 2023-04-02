@@ -29,40 +29,6 @@ Notes:
 
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
-  * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
-
-ToDo:
-  * Sprite garbage in Beast Busters: Second Nightmare, another irq issue?
-  * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
-    seem to be just an input port but controls program flow too.
-  * Work out the purpose of the interrupts and how many are needed.
-  * Correct game speed (seems too fast).
-
-  2d:
-  * Scroll (base registers?)
-  * ROZ (4th tilemap in fatal fury should be floor [in progress], background should zoom)
-  * Find registers to control tilemap mode (4bpp/8bpp, 8x8, 16x16)
-  * Fix zooming sprites (zoom registers not understood, center versus edge pivot)
-  * Priorities
-  * Is all the bitmap decoding right?
-  * Upgrade to modern video timing.
-
-  3d:
-  * Find where the remainder of the 3d display list information is 'hiding'
-    -- should the 3d 'ram' be treated like a fifo, instead of like RAM (see Dreamcast etc.)
-  * Remaining 3d bits - glowing, etc.
-  * Populate the display buffers
-  * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
-
-  Other:
-  * Translate KL5C80 docs and finish up the implementation
-  * Figure out what IO $54 & $72 are on the communications CPU
-  * Fix sound
-  * Backup ram etc.
-  * Correct cpu speed
-  * How to use the FPGA data ('ROM1')
-
-
 ------------------------------------------------------------------------------
 Hyper NeoGeo 64, SNK 1997-1999
 Hardware info by Guru
@@ -984,23 +950,55 @@ uint32_t hng64_state::hng64_sysregs_r(offs_t offset, uint32_t mem_mask)
 	return m_sysregs[offset];
 }
 
+void hng64_state::raster_irq_pos_w(uint32_t data)
+{
+	m_raster_irq_pos[m_irq_pos_half] = data;
+
+	m_irq_pos_half ^= 1;
+}
+
 void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+		logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
+	int scanline = m_screen->vpos();
 
 	switch(offset*4)
 	{
+		/*
+		case 0x0014:
+		    break;
+		case 0x001c:
+		    break;
+		*/
+		case 0x100c:
+			raster_irq_pos_w(data);
+			break;
+
+		/*
+		case 0x1014:
+		    break;
+		case 0x101c:
+		    break;
+		case 0x106c: // also reads from this one when writing 100c regs
+		    break;
+		case 0x1074:
+		    break;
+		*/
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
+		/*
+		case 0x108c:
+		    break;
+		*/
 		default:
-			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
 	}
 }
 
@@ -1061,13 +1059,15 @@ void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
+// every sprite is 0x20 bytes
+//
 void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
-
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
@@ -1075,6 +1075,7 @@ void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32
 		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_8_15)
 	{
 		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
@@ -1089,19 +1090,20 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
-
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+	//  mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (2nd slash)
 		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_0_15)
 	{
 		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+	//  mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (1st slash)
 		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
@@ -1109,8 +1111,20 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
-	COMBINE_DATA(&m_videoregs[offset]);
+	LOGMASKED(LOG_VREGS, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+
+	uint32_t newval = m_videoregs[offset];
+	COMBINE_DATA(&newval);
+
+	if (newval != m_videoregs[offset])
+	{
+		int vpos = m_screen->vpos();
+
+		if (vpos > 0)
+			m_screen->update_partial(vpos - 1);
+
+		m_videoregs[offset] = newval;
+	}
 }
 
 uint16_t hng64_state::main_sound_comms_r(offs_t offset)
@@ -1185,7 +1199,7 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
 
 	// Mixing
-	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20200000, 0x20203fff).ram().w(FUNC(hng64_state::pal_w)).share("paletteram");
 	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
 	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
 
@@ -1198,10 +1212,11 @@ void hng64_state::hng_map(address_map &map)
 
 	// 3D framebuffer
 	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
-	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
-	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
-	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
-	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbscale_w)).share("fbscale");
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).share("fbscroll");
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).share("fbunk");
+	// as the below registers are used at render time, not mixing time, it's possible the above scroll/scale registers are too
+	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_texture_wrapsize_table_r), FUNC(hng64_state::hng64_texture_wrapsize_table_w)).umask32(0xffffffff);
 
 	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
 	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_fbram2_r), FUNC(hng64_state::hng64_fbram2_w)).share("fbram2");  // 3D Display Buffer B
@@ -1720,19 +1735,49 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 };
 
 static const uint32_t texlayout_xoffset[1024] = { STEP1024(0,8) };
-static const uint32_t texlayout_yoffset[512] = { STEP512(0,8192) };
-static const gfx_layout hng64_texlayout =
+static const uint32_t texlayout_yoffset[1024] = { STEP1024(0,8192) };
+
+template <uint32_t... Values>
+static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...>)
 {
-	1024, 512,
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { ((Values * 4) ^ 4)... };
+	return s_values;
+}
+
+template <uint32_t... Values>
+static auto const &texlayout_yoffset_4(std::integer_sequence<uint32_t, Values...>)
+{
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { (Values * 4096)... };
+	return s_values;
+}
+
+static const gfx_layout hng64_1024x1024x8_texlayout =
+{
+	1024, 1024,
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
-	1024*512*8,
+	1024*1024*8,
 	texlayout_xoffset,
 	texlayout_yoffset
 };
+
+// it appears that 4bpp tiles can only be in the top 1024 part of this as indexing is the same as 8bpp?
+static const gfx_layout hng64_1024x1024x4_texlayout =
+{
+	1024, 2048,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	1024*2048*4,
+	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
+	texlayout_yoffset_4(std::make_integer_sequence<uint32_t, 2048>())
+};
+
 
 static GFXDECODE_START( gfx_hng64 )
 	/* tilemap tiles */
@@ -1745,7 +1790,10 @@ static GFXDECODE_START( gfx_hng64 )
 	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x4_spritelayout, 0x0, 0x100 )
 	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x8_spritelayout, 0x0, 0x10 )
 
-	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
+	/* texture pages (not used by rendering code) */
+	GFXDECODE_ENTRY( "textures0", 0, hng64_1024x1024x4_texlayout, 0x0, 0x100 )
+	GFXDECODE_ENTRY( "textures0", 0, hng64_1024x1024x8_texlayout, 0x0, 0x10 )
+
 GFXDECODE_END
 
 static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
@@ -1772,13 +1820,6 @@ void hng64_state::init_hng64_reorder_gfx()
 
 void hng64_state::init_hng64()
 {
-	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
-	m_com_op_base     = std::make_unique<uint8_t[]>(0x10000);
-
-	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
-	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
-
 	init_hng64_reorder_gfx();
 }
 
@@ -2073,30 +2114,59 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 {
 	int scanline = param;
 
-	switch(scanline)
+	if (!(scanline & 1)) // in reality there are half as many scanlines, as we're running in interlace mode
 	{
-		case 224*2: set_irq(0x0001);  break; // lv 0 vblank irq
-//      case 0*2:   set_irq(0x0002);  break; // lv 1
-//      case 32*2:  set_irq(0x0008);  break; // lv 2
-//      case 64*2:  set_irq(0x0008);  break; // lv 2
-		case 128*2: set_irq(0x0800);  break; // lv 11 network irq?
+		const int scanline_shifted = scanline >> 1;
+
+		switch (scanline_shifted)
+		{
+		case 224: set_irq(0x0001);  break; // lv 0 vblank irq
+//      case 32:  set_irq(0x0008);  break; // lv 2
+//      case 64:  set_irq(0x0008);  break; // lv 2
+		case 240: set_irq(0x0800);  break; // lv 11 network irq?
+
+		default:
+		{
+			// raster / timer irq, used to split tilemaps for fatfurwa floor
+			if (scanline_shifted == m_raster_irq_pos[0]+8)
+				if (scanline_shifted <224)
+					set_irq(0x0002);
+			break;
+		}
+
+		}
 	}
+
 }
 
 void hng64_state::machine_start()
 {
+	/* 1 meg of virtual address space for the com cpu */
+	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
+	m_com_op_base = std::make_unique<uint8_t[]>(0x10000);
+
+	m_soundram = std::make_unique<uint16_t[]>(0x200000 / 2);
+	m_soundram2 = std::make_unique<uint16_t[]>(0x200000 / 2);
+
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
 	m_maincpu->add_fastram(0x00000000, 0x00ffffff, false, m_mainram);
-	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true, m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
+
+	for (int i = 0; i < 0x20; i++)
+	{
+		m_texture_wrapsize_table[i] = 0x08;
+	}
+
+	m_videoregs[0] = 0x00000000;
 
 	m_irq_pending = 0;
 
@@ -2104,13 +2174,65 @@ void hng64_state::machine_start()
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	init_io();
+
+	save_pointer(NAME(m_com_virtual_mem), 0x100000);
+	save_pointer(NAME(m_com_op_base), 0x10000);
+	save_pointer(NAME(m_soundram), 0x200000 / 2);
+	save_pointer(NAME(m_soundram2), 0x200000 / 2);
+
+	save_item(NAME(m_fbcontrol));
+
+	save_item(NAME(m_dma_start));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_len));
+
+	save_item(NAME(m_mcu_en));
+
+	save_item(NAME(m_activeDisplayList));
+	save_item(NAME(m_no_machine_error_code));
+
+	save_item(NAME(m_unk_vreg_toggle));
+	save_item(NAME(m_p1_trig));
+
+	save_item(NAME(m_screen_dis));
+
+	save_item(NAME(m_old_animmask));
+	save_item(NAME(m_old_animbits));
+	save_item(NAME(m_old_tileflags));
+
+	save_item(NAME(m_port7));
+	save_item(NAME(m_port1));
+	save_item(NAME(m_ex_ramaddr));
+	save_item(NAME(m_ex_ramaddr_upper));
+
+	save_item(NAME(m_irq_pending));
+
+	save_item(NAME(m_irq_level));
+
+	save_item(NAME(main_latch));
+	save_item(NAME(sound_latch));
+
+	save_item(NAME(m_irq_pos_half));
+	save_item(NAME(m_raster_irq_pos));
+
+	save_item(NAME(m_texture_wrapsize_table));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 {
 	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
-	m_comhack[0] = m_comhack[0] | 0x0002;
+	// different network IDs give different default colours for the cars in roadedge
+	uint8_t network_id = 0x01;
+
+	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
+	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
+	// if you loop some of the pins on the network connector back, so maybe MAME is just confused about the mode it's
+	// running in.
+	// network_id |= 0x08;
+
+
+	m_comhack[0] = m_comhack[0] | network_id;
 }
 
 
@@ -2131,6 +2253,11 @@ void hng64_state::machine_reset()
 	m_fbcontrol[2] = 0x00;
 	m_fbcontrol[3] = 0x00;
 
+	m_irq_pos_half = 0;
+	m_raster_irq_pos[0] = 0xffffffff;
+	m_raster_irq_pos[1] = 0xffffffff;
+
+	clear3d();
 }
 
 /***********************************************
@@ -2434,6 +2561,9 @@ void hng64_state::hng64(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade0).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade1).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
 	hng64_audio(config);
 	hng64_network(config);
@@ -2551,7 +2681,8 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
 	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
 	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
-	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) ) \
+	ROM_DEFAULT_BIOS( "export" )
 
 ROM_START( hng64 )
 	/* BIOS */
@@ -2561,7 +2692,10 @@ ROM_START( hng64 )
 	ROM_REGION32_BE( 0x2000000, "gameprg", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "scrtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "sprtile", ROMREGION_ERASEFF )
-	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "textures0", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "textures1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "textures2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "textures3", ROMREGION_ERASEFF )
 	ROM_REGION16_BE( 0x0c00000, "verts", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "l7a1045", ROMREGION_ERASEFF ) /* Sound Samples */
 ROM_END
@@ -2588,21 +2722,29 @@ ROM_START( roadedge )
 	ROM_LOAD32_BYTE( "001sp03a.55",0x0000002, 0x400000, CRC(efbbd391) SHA1(7447c481ba6f9ba154d48a4b160dd24157891d35) )
 	ROM_LOAD32_BYTE( "001sp04a.56",0x0000003, 0x400000, CRC(1a0eb173) SHA1(a69b786a9957197d1cc950ab046c57c18ca07ea7) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
 	ROM_LOAD( "001tx01a.1", 0x0000000, 0x400000, CRC(f6539bb9) SHA1(57fc5583d56846be93d6f5784acd20fc149c70a5) )
 	ROM_LOAD( "001tx02a.2", 0x0400000, 0x400000, CRC(f1d139d3) SHA1(f120243f4d55f38b10bf8d1aa861cdc546a24c80) )
 	ROM_LOAD( "001tx03a.3", 0x0800000, 0x400000, CRC(22a375bd) SHA1(d55b62843d952930db110bcf3056a98a04a7adf4) )
 	ROM_LOAD( "001tx04a.4", 0x0c00000, 0x400000, CRC(288a5bd5) SHA1(24e05db681894eb31cdc049cf42c1f9d7347bd0c) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
 	ROM_LOAD( "001tx01a.5", 0x0000000, 0x400000, CRC(f6539bb9) SHA1(57fc5583d56846be93d6f5784acd20fc149c70a5) )
 	ROM_LOAD( "001tx02a.6", 0x0400000, 0x400000, CRC(f1d139d3) SHA1(f120243f4d55f38b10bf8d1aa861cdc546a24c80) )
 	ROM_LOAD( "001tx03a.7", 0x0800000, 0x400000, CRC(22a375bd) SHA1(d55b62843d952930db110bcf3056a98a04a7adf4) )
 	ROM_LOAD( "001tx04a.8", 0x0c00000, 0x400000, CRC(288a5bd5) SHA1(24e05db681894eb31cdc049cf42c1f9d7347bd0c) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
 	ROM_LOAD( "001tx01a.9", 0x0000000, 0x400000, CRC(f6539bb9) SHA1(57fc5583d56846be93d6f5784acd20fc149c70a5) )
 	ROM_LOAD( "001tx02a.10",0x0400000, 0x400000, CRC(f1d139d3) SHA1(f120243f4d55f38b10bf8d1aa861cdc546a24c80) )
 	ROM_LOAD( "001tx03a.11",0x0800000, 0x400000, CRC(22a375bd) SHA1(d55b62843d952930db110bcf3056a98a04a7adf4) )
 	ROM_LOAD( "001tx04a.12",0x0c00000, 0x400000, CRC(288a5bd5) SHA1(24e05db681894eb31cdc049cf42c1f9d7347bd0c) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "001tx01a.13",0x0000000, 0x400000, CRC(f6539bb9) SHA1(57fc5583d56846be93d6f5784acd20fc149c70a5) )
 	ROM_LOAD( "001tx02a.14",0x0400000, 0x400000, CRC(f1d139d3) SHA1(f120243f4d55f38b10bf8d1aa861cdc546a24c80) )
 	ROM_LOAD( "001tx03a.15",0x0800000, 0x400000, CRC(22a375bd) SHA1(d55b62843d952930db110bcf3056a98a04a7adf4) )
@@ -2651,9 +2793,29 @@ ROM_START( sams64 )
 	ROM_LOAD32_BYTE( "002-sp07a.59",0x1000002, 0x400000, CRC(a5049bd7) SHA1(123e32c22f53d6e55ee1d1deb4ab40891004c6fd) )
 	ROM_LOAD32_BYTE( "002-sp08a.60",0x1000003, 0x400000, CRC(c2e57813) SHA1(e7a21df1f94ed959a53da9dc4667863ee77bf676) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
+	ROM_LOAD( "002-tx01a.1", 0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
+	ROM_LOAD( "002-tx02a.2", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
+	ROM_LOAD( "002-tx03a.3", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
+	ROM_LOAD( "002-tx04a.4", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
+	ROM_LOAD( "002-tx01a.5", 0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
+	ROM_LOAD( "002-tx02a.6", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
+	ROM_LOAD( "002-tx03a.7", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
+	ROM_LOAD( "002-tx04a.8", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
+	ROM_LOAD( "002-tx01a.9",  0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
+	ROM_LOAD( "002-tx02a.10", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
+	ROM_LOAD( "002-tx03a.11", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
+	ROM_LOAD( "002-tx04a.12", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "002-tx01a.13", 0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
 	ROM_LOAD( "002-tx02a.14", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
 	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
@@ -2696,9 +2858,29 @@ ROM_START( xrally )
 	ROM_LOAD32_BYTE( "003-sp03a.55",0x0000002, 0x400000, CRC(6fa8dff9) SHA1(500bd128e6568e9491e52676775e9239adc332fe) )
 	ROM_LOAD32_BYTE( "003-sp04a.56",0x0000003, 0x400000, CRC(a98eec07) SHA1(de0c7db56b851daa369f37088bd536933372346f) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x2000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
+	ROM_LOAD( "003-tx01a.1", 0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
+	ROM_LOAD( "003-tx02a.2", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
+	ROM_LOAD( "003-tx03a.3", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
+	ROM_LOAD( "003-tx04a.4", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
+	ROM_LOAD( "003-tx01a.5", 0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
+	ROM_LOAD( "003-tx02a.6", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
+	ROM_LOAD( "003-tx03a.7", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
+	ROM_LOAD( "003-tx04a.8", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
+	ROM_LOAD( "003-tx01a.9",  0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
+	ROM_LOAD( "003-tx02a.10", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
+	ROM_LOAD( "003-tx03a.11", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
+	ROM_LOAD( "003-tx04a.12", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "003-tx01a.13", 0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
 	ROM_LOAD( "003-tx02a.14", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
 	ROM_LOAD( "003-tx03a.15", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
@@ -2744,9 +2926,29 @@ ROM_START( bbust2 )
 	ROM_LOAD32_BYTE( "004-sp07a.59",0x1000002, 0x400000, CRC(bc580b81) SHA1(c668d0524fdc53c6ba2f3e5120f2dee7ce4279bb) )
 	ROM_LOAD32_BYTE( "004-sp08a.60",0x1000003, 0x400000, CRC(d6c69bea) SHA1(24508c0ed0ca135316aec1c8239e8b755070384a) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
+	ROM_LOAD( "004-tx01a.1", 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
+	ROM_LOAD( "004-tx02a.2", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
+	ROM_LOAD( "004-tx03a.3", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
+	ROM_LOAD( "004-tx04a.4", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
+	ROM_LOAD( "004-tx01a.5", 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
+	ROM_LOAD( "004-tx02a.6", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
+	ROM_LOAD( "004-tx03a.7", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
+	ROM_LOAD( "004-tx04a.8", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
+	ROM_LOAD( "004-tx01a.9" , 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
+	ROM_LOAD( "004-tx02a.10", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
+	ROM_LOAD( "004-tx03a.11", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
+	ROM_LOAD( "004-tx04a.12", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "004-tx01a.13", 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
 	ROM_LOAD( "004-tx02a.14", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
 	ROM_LOAD( "004-tx03a.15", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
@@ -2800,21 +3002,29 @@ ROM_START( sams64_2 )
 	ROM_LOAD32_BYTE( "005sp07a.114",0x2000002, 0x400000, CRC(8eb3c173) SHA1(d5763c19a3e2fd93f7784d957e7401c9152c40de) )
 	ROM_LOAD32_BYTE( "005sp08a.118",0x2000003, 0x400000, CRC(05486fbc) SHA1(747d9ae03ce999be4ab697753e93c90ea85b7d44) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
 	ROM_LOAD( "005tx01a.1", 0x0000000, 0x400000, CRC(05a4ceb7) SHA1(2dfc46a70c0a957ed0931a4c4df90c341aafff70) )
 	ROM_LOAD( "005tx02a.2", 0x0400000, 0x400000, CRC(b7094c69) SHA1(aed9a624166f6f1a2eb4e746c61f9f46f1929283) )
 	ROM_LOAD( "005tx03a.3", 0x0800000, 0x400000, CRC(34764891) SHA1(cd6ea663ae28b7f6ac1ede2f9922afbb35b915b4) )
 	ROM_LOAD( "005tx04a.4", 0x0c00000, 0x400000, CRC(6be50882) SHA1(1f99717cfa69076b258a0c52d66be007fd820374) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
 	ROM_LOAD( "005tx01a.5", 0x0000000, 0x400000, CRC(05a4ceb7) SHA1(2dfc46a70c0a957ed0931a4c4df90c341aafff70) )
 	ROM_LOAD( "005tx02a.6", 0x0400000, 0x400000, CRC(b7094c69) SHA1(aed9a624166f6f1a2eb4e746c61f9f46f1929283) )
 	ROM_LOAD( "005tx03a.7", 0x0800000, 0x400000, CRC(34764891) SHA1(cd6ea663ae28b7f6ac1ede2f9922afbb35b915b4) )
 	ROM_LOAD( "005tx04a.8", 0x0c00000, 0x400000, CRC(6be50882) SHA1(1f99717cfa69076b258a0c52d66be007fd820374) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
 	ROM_LOAD( "005tx01a.9", 0x0000000, 0x400000, CRC(05a4ceb7) SHA1(2dfc46a70c0a957ed0931a4c4df90c341aafff70) )
 	ROM_LOAD( "005tx02a.10",0x0400000, 0x400000, CRC(b7094c69) SHA1(aed9a624166f6f1a2eb4e746c61f9f46f1929283) )
 	ROM_LOAD( "005tx03a.11",0x0800000, 0x400000, CRC(34764891) SHA1(cd6ea663ae28b7f6ac1ede2f9922afbb35b915b4) )
 	ROM_LOAD( "005tx04a.12",0x0c00000, 0x400000, CRC(6be50882) SHA1(1f99717cfa69076b258a0c52d66be007fd820374) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "005tx01a.13",0x0000000, 0x400000, CRC(05a4ceb7) SHA1(2dfc46a70c0a957ed0931a4c4df90c341aafff70) )
 	ROM_LOAD( "005tx02a.14",0x0400000, 0x400000, CRC(b7094c69) SHA1(aed9a624166f6f1a2eb4e746c61f9f46f1929283) )
 	ROM_LOAD( "005tx03a.15",0x0800000, 0x400000, CRC(34764891) SHA1(cd6ea663ae28b7f6ac1ede2f9922afbb35b915b4) )
@@ -2868,21 +3078,29 @@ ROM_START( fatfurwa )
 	ROM_LOAD32_BYTE( "006sp07a.114",0x2000002, 0x800000, CRC(cd7baa1b) SHA1(4084f3a73aae623d69bd9de87cecf4a33b628b7f) )
 	ROM_LOAD32_BYTE( "006sp08a.118",0x2000003, 0x800000, CRC(9c3044ac) SHA1(24b28bcc6be51ab3ff59c2894094cd03ec377d84) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
 	ROM_LOAD( "006tx01a.1", 0x0000000, 0x400000, CRC(ab4c1747) SHA1(2c097bd38f1a92c4b6534992f6bf29fd6dc2d265) )
 	ROM_LOAD( "006tx02a.2", 0x0400000, 0x400000, CRC(7854a229) SHA1(dba23c1b793dd0308ac1088c819543fff334a57e) )
 	ROM_LOAD( "006tx03a.3", 0x0800000, 0x400000, CRC(94edfbd1) SHA1(d4004bb1273e6091608856cb4b151e9d81d5ed30) )
 	ROM_LOAD( "006tx04a.4", 0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
 	ROM_LOAD( "006tx01a.5", 0x0000000, 0x400000, CRC(ab4c1747) SHA1(2c097bd38f1a92c4b6534992f6bf29fd6dc2d265) )
 	ROM_LOAD( "006tx02a.6", 0x0400000, 0x400000, CRC(7854a229) SHA1(dba23c1b793dd0308ac1088c819543fff334a57e) )
 	ROM_LOAD( "006tx03a.7", 0x0800000, 0x400000, CRC(94edfbd1) SHA1(d4004bb1273e6091608856cb4b151e9d81d5ed30) )
 	ROM_LOAD( "006tx04a.8", 0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
 	ROM_LOAD( "006tx01a.9", 0x0000000, 0x400000, CRC(ab4c1747) SHA1(2c097bd38f1a92c4b6534992f6bf29fd6dc2d265) )
 	ROM_LOAD( "006tx02a.10",0x0400000, 0x400000, CRC(7854a229) SHA1(dba23c1b793dd0308ac1088c819543fff334a57e) )
 	ROM_LOAD( "006tx03a.11",0x0800000, 0x400000, CRC(94edfbd1) SHA1(d4004bb1273e6091608856cb4b151e9d81d5ed30) )
 	ROM_LOAD( "006tx04a.12",0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "006tx01a.13",0x0000000, 0x400000, CRC(ab4c1747) SHA1(2c097bd38f1a92c4b6534992f6bf29fd6dc2d265) )
 	ROM_LOAD( "006tx02a.14",0x0400000, 0x400000, CRC(7854a229) SHA1(dba23c1b793dd0308ac1088c819543fff334a57e) )
 	ROM_LOAD( "006tx03a.15",0x0800000, 0x400000, CRC(94edfbd1) SHA1(d4004bb1273e6091608856cb4b151e9d81d5ed30) )
@@ -2899,6 +3117,13 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006sd02a.78", 0x0400000, 0x400000, CRC(f7f020c7) SHA1(b72fde4ff6384b80166a3cb67d31bf7afda750bc) )
 	ROM_LOAD( "006sd03a.79", 0x0800000, 0x400000, CRC(1a678084) SHA1(f52efb6145102d289f332d8341d89a5d231ba003) )
 	ROM_LOAD( "006sd04a.80", 0x0c00000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
+
+	/* this game does not initialize EEPROM automatically otherwise (each region requires different defaults) */
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROMX_LOAD( "default_nvram_japan",  0x00000, 0x4000, CRC(1f618d44) SHA1(c007c5f94b28b8c56c8c539d2f82336515c0ed84), ROM_BIOS(0) )
+	ROMX_LOAD( "default_nvram_usa",    0x00000, 0x4000, CRC(f139f4a5) SHA1(6f7e2fc5d902c1499f3c55f9ca2ef7becc49103b), ROM_BIOS(1) )
+	ROMX_LOAD( "default_nvram_others", 0x00000, 0x4000, CRC(bf1c3e4a) SHA1(454c6e5e505293bfdeb87d08e72420bba84c3b7b), ROM_BIOS(2) )
+	ROMX_LOAD( "default_nvram_korea",  0x00000, 0x4000, CRC(e8fb68df) SHA1(3170e7465b93319c0550f35f8906b5bdc5332eec), ROM_BIOS(3) )
 ROM_END
 
 
@@ -2935,21 +3160,29 @@ ROM_START( buriki )
 	ROM_LOAD32_BYTE( "007sp07a.114",0x2000002, 0x400000, CRC(5caa1cc9) SHA1(3e40b10ea3bcf1239d0015da4be869632b805ddd) )
 	ROM_LOAD32_BYTE( "007sp08a.118",0x2000003, 0x400000, CRC(7a158c67) SHA1(d66f4920a513208d45b908a1934d9afb894debf1) )
 
-	/* Textures - 1024x1024x8 pages */
-	ROM_REGION( 0x1000000, "textures", 0 )
-	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	/* Textures
+	   NOTE: same roms are at different positions on the board, repeated a total of 4 times as there are 4 rendering units
+	   We only use the first copy, as the ROMs are always identical
+	*/
+	ROM_REGION( 0x1000000, "textures0", 0 )
 	ROM_LOAD( "007tx01a.1", 0x0000000, 0x400000, CRC(a7774075) SHA1(4f3da9af131a7efb0f0a5180da57c19c65fffb82) )
 	ROM_LOAD( "007tx02a.2", 0x0400000, 0x400000, CRC(bc05d5fd) SHA1(84e3fafcebdeb1e2ffae80785949c973a14055d8) )
 	ROM_LOAD( "007tx03a.3", 0x0800000, 0x400000, CRC(da9484fb) SHA1(f54b669a66400df00bf25436e5fd5c9bf68dbd55) )
 	ROM_LOAD( "007tx04a.4", 0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
+
+	ROM_REGION( 0x1000000, "textures1", 0 )
 	ROM_LOAD( "007tx01a.5", 0x0000000, 0x400000, CRC(a7774075) SHA1(4f3da9af131a7efb0f0a5180da57c19c65fffb82) )
 	ROM_LOAD( "007tx02a.6", 0x0400000, 0x400000, CRC(bc05d5fd) SHA1(84e3fafcebdeb1e2ffae80785949c973a14055d8) )
 	ROM_LOAD( "007tx03a.7", 0x0800000, 0x400000, CRC(da9484fb) SHA1(f54b669a66400df00bf25436e5fd5c9bf68dbd55) )
 	ROM_LOAD( "007tx04a.8", 0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
+
+	ROM_REGION( 0x1000000, "textures2", 0 )
 	ROM_LOAD( "007tx01a.9", 0x0000000, 0x400000, CRC(a7774075) SHA1(4f3da9af131a7efb0f0a5180da57c19c65fffb82) )
 	ROM_LOAD( "007tx02a.10",0x0400000, 0x400000, CRC(bc05d5fd) SHA1(84e3fafcebdeb1e2ffae80785949c973a14055d8) )
 	ROM_LOAD( "007tx03a.11",0x0800000, 0x400000, CRC(da9484fb) SHA1(f54b669a66400df00bf25436e5fd5c9bf68dbd55) )
 	ROM_LOAD( "007tx04a.12",0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
+
+	ROM_REGION( 0x1000000, "textures3", 0 )
 	ROM_LOAD( "007tx01a.13",0x0000000, 0x400000, CRC(a7774075) SHA1(4f3da9af131a7efb0f0a5180da57c19c65fffb82) )
 	ROM_LOAD( "007tx02a.14",0x0400000, 0x400000, CRC(bc05d5fd) SHA1(84e3fafcebdeb1e2ffae80785949c973a14055d8) )
 	ROM_LOAD( "007tx03a.15",0x0800000, 0x400000, CRC(da9484fb) SHA1(f54b669a66400df00bf25436e5fd5c9bf68dbd55) )
@@ -2969,13 +3202,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK",       "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK / ADK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */ // ADK credited in the ending sequence
+GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

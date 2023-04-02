@@ -80,7 +80,7 @@ TIMER_CALLBACK_MEMBER(avivideo_image_device::frame_timer)
 	}
 }
 
-image_init_result avivideo_image_device::call_load()
+std::error_condition avivideo_image_device::call_load()
 {
 	m_frame = new bitmap_argb32;
 	avi_file::error avierr = avi_file::open(filename(), m_avi);
@@ -88,7 +88,7 @@ image_init_result avivideo_image_device::call_load()
 	{
 		delete m_frame;
 		m_frame = nullptr;
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	const avi_file::movie_info &aviinfo = m_avi->get_movie_info();
@@ -97,7 +97,7 @@ image_init_result avivideo_image_device::call_load()
 	m_frame_timer->adjust(frame_time, 0, frame_time);
 	m_frame_count = aviinfo.video_numsamples;
 	m_frame_num = 0;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void avivideo_image_device::call_unload()

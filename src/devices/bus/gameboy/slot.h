@@ -38,7 +38,7 @@ public:
 	template <typename... T> void set_space(T &&... args) { m_space.set_tag(std::forward<T>(args)...); }
 
 	// device_image_interface implementation
-	virtual image_init_result call_load() override ATTR_COLD;
+	virtual std::error_condition call_load() override ATTR_COLD;
 	virtual void call_unload() override ATTR_COLD;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 
@@ -48,7 +48,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
-	virtual image_init_result load_image_file(util::random_read &file) = 0;
+	virtual std::error_condition load_image_file(util::random_read &file) = 0;
 
 	address_space &cart_space() noexcept { return *m_space; }
 
@@ -64,7 +64,7 @@ private:
 class device_gb_cart_interface : public device_interface
 {
 public:
-	virtual image_init_result load(std::string &message) ATTR_COLD = 0;
+	virtual std::error_condition load(std::string &message) ATTR_COLD = 0;
 	virtual void unload() ATTR_COLD;
 
 protected:

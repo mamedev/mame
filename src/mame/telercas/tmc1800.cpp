@@ -771,12 +771,12 @@ QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 
 	if (size > m_ram->size())
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	image.fread( ptr, size);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tmc1800_state::tmc1800(machine_config &config)

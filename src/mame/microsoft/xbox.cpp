@@ -22,6 +22,8 @@
 #include "bitmap.h"
 
 
+namespace {
+
 #define CPU_DIV 64
 
 class xbox_state : public xbox_base_state
@@ -212,6 +214,8 @@ ROM_START( xbox )
 	ROM_LOAD( "xbox-5713.bin", 0x080000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
 	ROM_LOAD( "5838_256k.bin", 0x0C0000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_SUNPLUS_GCM394_H
-#define MAME_INCLUDES_SUNPLUS_GCM394_H
+#ifndef MAME_TVGAMES_SUNPLUS_GCM394_H
+#define MAME_TVGAMES_SUNPLUS_GCM394_H
 
 #pragma once
 
@@ -141,4 +141,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_TVGAMES_SUNPLUS_GCM394_H

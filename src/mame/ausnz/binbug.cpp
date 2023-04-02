@@ -52,6 +52,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class binbug_state : public driver_device
 {
 public:
@@ -181,20 +183,21 @@ QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 	int i;
 	int quick_addr = 0x440;
 	int exec_addr;
-	int quick_length;
 	std::vector<u8> quick_data;
 	int read_;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSPECIFIED;
 
-	quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x0444)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too short\n", image.basename());
 		image.message(" File too short");
 	}
 	else if (quick_length > 0x8000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too long\n", image.basename());
 		image.message(" File too long");
 	}
 	else
@@ -203,12 +206,14 @@ QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+			result = image_error::UNSPECIFIED;
+			osd_printf_error("%s: Cannot read the file\n", image.basename());
 			image.message(" Cannot read the file");
 		}
 		else if (quick_data[0] != 0xc4)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
+			result = image_error::INVALIDIMAGE;
+			osd_printf_error("%s: Invalid header\n", image.basename());
 			image.message(" Invalid header");
 		}
 		else
@@ -217,7 +222,8 @@ QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 
 			if (exec_addr >= quick_length)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
+				result = image_error::INVALIDIMAGE;
+				osd_printf_error("%s: Exec adress beyond end of file\n", image.basename());
 				image.message(" Exec address beyond end of file");
 			}
 			else
@@ -231,7 +237,7 @@ QUICKLOAD_LOAD_MEMBER(binbug_state::quickload_cb)
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = image_init_result::PASS;
+				result = std::error_condition();
 			}
 		}
 	}
@@ -286,6 +292,9 @@ ROM_START( binbug )
 	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "binbug.rom", 0x0000, 0x0400, CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -272,7 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload_cb(device_image_interface &image);
+	std::error_condition quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);

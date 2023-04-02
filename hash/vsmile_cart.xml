@@ -164,7 +164,7 @@ Regular game cartridges
 |   XX   | 80-092061(IT)     | Winnie the Pooh e la caccia al miele                                                           |
 |        | 80-092062(NL)     | Winnie de Poeh - De wonderwereld van Poeh                                                      |
 |   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (rev. 123, labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
-|        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
+|   XX   | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092063-103(UK) | Winnie The Pooh: The Honey Hunt (52-092063-103(UK) on back label)                              |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
 |   XX   | 80-092064(GE)     | Winnie Puuh - Winnie Puuh auf der Honigjagd                                                    |
@@ -355,6 +355,7 @@ Regular game cartridges
 |        |          (FI)     | Puuha-Pete - Peten kiirenes päivä                                                              |
 +========+===================+================================================================================================+
 |        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                                                |
+|   XX   |          (US)     | The Wiggles - It's Wiggle Time! (may be the one above, but no cart pic)                        |
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
@@ -607,8 +608,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Aladdin - Il magico mondo di Aladdin (Italy).bin" size="8388608" crc="4ea0f59a" sha1="0810f65d356b421ac384578daaa7af9406807299" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Aladdin - Il magico mondo di Aladdin (Italy).bin" size="0x800000" crc="4ea0f59a" sha1="0810f65d356b421ac384578daaa7af9406807299" />
 			</dataarea>
 		</part>
 	</software>
@@ -624,8 +625,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092202 - Aladdin - De wonderwereld van Aladdin (NL).bin" size="8388608" crc="44fb6eea" sha1="8a05cadf0ecf6e47c13137ac99dacdf9ee8b0810" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092202 - Aladdin - De wonderwereld van Aladdin (NL).bin" size="0x800000" crc="44fb6eea" sha1="8a05cadf0ecf6e47c13137ac99dacdf9ee8b0810" />
 			</dataarea>
 		</part>
 	</software>
@@ -640,8 +641,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92203- Disney Aladdin - Wonders of the World (UK).bin" size="8388608" crc="244eb37a" sha1="c8131f488e563ef1a7f045ef3601670d02ca404e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92203- Disney Aladdin - Wonders of the World (UK).bin" size="0x800000" crc="244eb37a" sha1="c8131f488e563ef1a7f045ef3601670d02ca404e" />
 			</dataarea>
 		</part>
 	</software>
@@ -657,8 +658,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92204.u1" size="8388608" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92204.u1" size="0x800000" crc="dfa7b720" sha1="c4f7bcbe95c7eb5dfd0dd97f5d496db6ac158ea6" />
 			</dataarea>
 		</part>
 	</software>
@@ -672,8 +673,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92205 - Aladdin (FR).bin" size="8388608" crc="08aa0570" sha1="ba7268cb7ffe858abbb69745dbf2279e0bb8b234" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92205 - Aladdin (FR).bin" size="0x800000" crc="08aa0570" sha1="ba7268cb7ffe858abbb69745dbf2279e0bb8b234" />
 			</dataarea>
 		</part>
 	</software>
@@ -689,8 +690,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092207 - Aladdin - El Maravilloso Mundo de Aladdin (SP).bin" size="8388608" crc="5e01645f" sha1="de4d420a7bfb9a33fbd739a5111e331b7ba6c85a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092207 - Aladdin - El Maravilloso Mundo de Aladdin (SP).bin" size="0x800000" crc="5e01645f" sha1="de4d420a7bfb9a33fbd739a5111e331b7ba6c85a" />
 			</dataarea>
 		</part>
 	</software>
@@ -704,8 +705,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92000-2.bin" size="8388608" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92000-2.bin" size="0x800000" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" />
 			</dataarea>
 		</part>
 	</software>
@@ -719,8 +720,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Alphabet Park Adventure 52-092000-101(US) [ALT].bin" size="8388608" crc="d8583aa2" sha1="5b83f4c7fed4f86182ae3cd2b25ec403d129b81b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Alphabet Park Adventure 52-092000-101(US) [ALT].bin" size="0x800000" crc="d8583aa2" sha1="5b83f4c7fed4f86182ae3cd2b25ec403d129b81b" />
 			</dataarea>
 		</part>
 	</software>
@@ -737,9 +738,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x0800000">
-				<rom name="alphaprkr2.u1" size="0x0400000" crc="4e635c94" sha1="96792d607a94f8fb36dbfff8c68f720c68c742a8" offset="0x0000000" />
-				<rom name="alphaprkr2.u2" size="0x0200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x0400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="alphaprkr2.u1" size="0x400000" offset="0x000000" crc="4e635c94" sha1="96792d607a94f8fb36dbfff8c68f720c68c742a8" />
+				<rom name="alphaprkr2.u2" size="0x200000" offset="0x400000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" />
 			</dataarea>
 		</part>
 	</software>
@@ -755,8 +756,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92000.u1" size="8388608" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92000.u1" size="0x800000" crc="69ef24ff" sha1="82b89bdc5e9050e4152866fc774d3996f9836d65" />
 			</dataarea>
 		</part>
 	</software>
@@ -772,8 +773,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92000.bin" size="8388608" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92000.bin" size="0x800000" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" />
 			</dataarea>
 		</part>
 	</software>
@@ -788,9 +789,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
 			<feature name="u2" value="U2" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin" size="0x400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x000000" />
-				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin"  size="0x400000" offset="0x000000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" />
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" offset="0x400000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,8 +805,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Avventura nel Parco Alfabeto (Italy).bin" size="8388608" crc="e86822d9" sha1="3df6231ac4baa105cffb88bdbd0b7a7766d76c64" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Avventura nel Parco Alfabeto (Italy).bin" size="0x800000" crc="e86822d9" sha1="3df6231ac4baa105cffb88bdbd0b7a7766d76c64" />
 			</dataarea>
 		</part>
 	</software>
@@ -821,8 +822,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092002 - Alfabet Pretpark (NL).bin" size="8388608" crc="fe101ad1" sha1="6af191fbd51aef8c8465b586d2a714a82931cb4c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092002 - Alfabet Pretpark (NL).bin" size="0x800000" crc="fe101ad1" sha1="6af191fbd51aef8c8465b586d2a714a82931cb4c" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,9 +838,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x0800000">
-				<rom name="092003.u1" size="0x0400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x0000000" /> <!-- U1 is the same as U1 on 80-092000(US) -->
-				<rom name="092003.u2" size="0x0200000" crc="60cfb1b4" sha1="f37ad4dd774c26abb998f616ab7ad0adce83359d" offset="0x0400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092003.u1" size="0x400000" offset="0x000000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" /> <!-- U1 is the same as U1 on 80-092000(US) -->
+				<rom name="092003.u2" size="0x200000" offset="0x400000" crc="60cfb1b4" sha1="f37ad4dd774c26abb998f616ab7ad0adce83359d" />
 			</dataarea>
 		</part>
 	</software>
@@ -855,8 +856,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92004.u1" size="8388608" crc="e8808803" sha1="8b88c9d5886b3eba670f5cd2921d73642b2cad89" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92004.u1" size="0x800000" crc="e8808803" sha1="8b88c9d5886b3eba670f5cd2921d73642b2cad89" />
 			</dataarea>
 		</part>
 	</software>
@@ -872,8 +873,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="translucent blue" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092004 - Abenteuer im ABC Park (GER) (Rev 3) (different Cartridge-Color).bin" size="8388608" crc="823aeece" sha1="86f834b61bef6231f4e7d6c7b2f81ef3b99b9532" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092004 - Abenteuer im ABC Park (GER) (Rev 3) (different Cartridge-Color).bin" size="0x800000" crc="823aeece" sha1="86f834b61bef6231f4e7d6c7b2f81ef3b99b9532" />
 			</dataarea>
 		</part>
 	</software>
@@ -889,8 +890,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92005.u1" size="8388608" crc="fe2650d7" sha1="cf07b676ce11f9db6b00ab1fecf8ae6720965cab" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92005.u1" size="0x800000" crc="fe2650d7" sha1="cf07b676ce11f9db6b00ab1fecf8ae6720965cab" />
 			</dataarea>
 		</part>
 	</software>
@@ -906,8 +907,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092007 - Aventuras en el Parque Alfabeto (SP).bin" size="8388608" crc="7bced0b3" sha1="e8de93a1527c52efa69c4b3cf67ca4f4b05954b4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092007 - Aventuras en el Parque Alfabeto (SP).bin" size="0x800000" crc="7bced0b3" sha1="e8de93a1527c52efa69c4b3cf67ca4f4b05954b4" />
 			</dataarea>
 		</part>
 	</software>
@@ -920,8 +921,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Little Mermaid, The - Ariel's Majestic Journey (Europe).bin" size="8388608" crc="1fdb3332" sha1="1385c8bd7a3f30c8a823f3593828a1d30af5204a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Little Mermaid, The - Ariel's Majestic Journey (Europe).bin" size="0x800000" crc="1fdb3332" sha1="1385c8bd7a3f30c8a823f3593828a1d30af5204a" />
 			</dataarea>
 		</part>
 	</software>
@@ -937,8 +938,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92124(3).u1" size="8388608" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92124(3).u1" size="0x800000" crc="fc2d6d64" sha1="3747eb33304bb49a8f9ff912c0e3e07611e078dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -954,8 +955,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92124.u1" size="8388608" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92124.u1" size="0x800000" crc="ce21b7ba" sha1="e992b113f014614db34b81bb22357847cef79a16" />
 			</dataarea>
 		</part>
 	</software>
@@ -971,8 +972,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92125.u1" size="8388608" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92125.u1" size="0x800000" crc="341b2f6c" sha1="a9f6a30037dc814b6cf8e8485ee9778038a20c23" />
 			</dataarea>
 		</part>
 	</software>
@@ -988,8 +989,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092127 - La Sirenita - El Viaje Fantastico de Ariel (SP).bin" size="8388608" crc="785f8c6b" sha1="abba1985e7f5bc3708fe6f34e8e7e4e5b0327f9d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092127 - La Sirenita - El Viaje Fantastico de Ariel (SP).bin" size="0x800000" crc="785f8c6b" sha1="abba1985e7f5bc3708fe6f34e8e7e4e5b0327f9d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1005,8 +1006,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92133.u1" size="8388608" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92133.u1" size="0x800000" crc="182b5973" sha1="7f356a9890c7ea20c81db94f81037355b8cfb2c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1022,8 +1023,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92134.u1" size="8388608" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92134.u1" size="0x800000" crc="e567db85" sha1="ca52eaca6cf1b361fd4b1ae2b2380095c612668d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1034,8 +1035,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="8388608" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="0x800000" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" />
 			</dataarea>
 		</part>
 	</software>
@@ -1051,8 +1052,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092585.u1" size="8388608" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092585.u1" size="0x800000" crc="99d3d704" sha1="5ba4489849a4e49a22a5083750b4e41a565a4cd6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1065,8 +1066,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Batman - Gotham City Rescue (Europe).bin" size="8388608" crc="fde620e9" sha1="81d014800f06bb964f23919fa16f9d14c8189c7d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Batman - Gotham City Rescue (Europe).bin" size="0x800000" crc="fde620e9" sha1="81d014800f06bb964f23919fa16f9d14c8189c7d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1079,8 +1080,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92482 - Batman - De redding van Gotham City (NL).bin" size="8388608" crc="d6df687c" sha1="bb2e86c32fe29207f540622dc68fed14e6d8ff29" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92482 - Batman - De redding van Gotham City (NL).bin" size="0x800000" crc="d6df687c" sha1="bb2e86c32fe29207f540622dc68fed14e6d8ff29" />
 			</dataarea>
 		</part>
 	</software>
@@ -1096,8 +1097,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="8388608" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092484 - Batman - Rettung von Gotham City (GER).bin" size="0x800000" crc="7718f2f2" sha1="4b34dcfae721d82392dc486ac531b7b8def97257" />
 			</dataarea>
 		</part>
 	</software>
@@ -1110,8 +1111,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92485 - Batman (FR).bin" size="8388608" crc="8a550348" sha1="1cbc6f64ff5bd78f8dc760025467c1715c6a11c2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92485 - Batman (FR).bin" size="0x800000" crc="8a550348" sha1="1cbc6f64ff5bd78f8dc760025467c1715c6a11c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1126,8 +1127,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092487 - The Batman - Rescate en Gotham City (SP).bin" size="8388608" crc="5526c511" sha1="f49ed294dd7259bf077423a99b65dbe1c387b35b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092487 - The Batman - Rescate en Gotham City (SP).bin" size="0x800000" crc="5526c511" sha1="f49ed294dd7259bf077423a99b65dbe1c387b35b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1141,8 +1142,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Batman - Gotham City Rescue (CN).bin" size="8388608" crc="1b8f118a" sha1="b921dfe8fdb8694f11b575a18b529e2d9de66160" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Batman - Gotham City Rescue (CN).bin" size="0x800000" crc="1b8f118a" sha1="b921dfe8fdb8694f11b575a18b529e2d9de66160" />
 			</dataarea>
 		</part>
 	</software>
@@ -1156,8 +1157,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Barney - The Land of Make Believe 92380(US).bin" size="8388608" crc="a527a382" sha1="14a5d997ba60807316eede17b7970e1d4537922f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Barney - The Land of Make Believe 92380(US).bin" size="0x800000" crc="a527a382" sha1="14a5d997ba60807316eede17b7970e1d4537922f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1173,8 +1174,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92384.u1" size="8388608" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92384.u1" size="0x800000" crc="a73855fa" sha1="dcc61ecf05bb41779a78196145136c1e9cbfa415" />
 			</dataarea>
 		</part>
 	</software>
@@ -1190,8 +1191,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92400.bin" size="8388608" crc="031c6a38" sha1="0b8e2b17a146d903dd2708c06562787e47d7ec4e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92400.bin" size="0x800000" crc="031c6a38" sha1="0b8e2b17a146d903dd2708c06562787e47d7ec4e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1207,8 +1208,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92300.u1" size="8388608" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92300.u1" size="0x800000" crc="6aea957b" sha1="947008c882733a8284a000c9c4d379e2c213526e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1221,8 +1222,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Bob The Builder - Bob's Busy Day (Europe).bin" size="8388608" crc="15f334a6" sha1="9f03e7547cdd5cd67f74947fb8a086907c6d2337" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Bob The Builder - Bob's Busy Day (Europe).bin" size="0x800000" crc="15f334a6" sha1="9f03e7547cdd5cd67f74947fb8a086907c6d2337" />
 			</dataarea>
 		</part>
 	</software>
@@ -1238,8 +1239,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92304.u1" size="8388608" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92304.u1" size="0x800000" crc="70c83b25" sha1="bebe311cfbeb25e01892b7636f4427ae0e0e4c9e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1255,8 +1256,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092304-104 - Bob der Baumeister - Bobs spannender Arbeitstag (GER).bin" size="8388608" crc="b0623371" sha1="9c5d7cfbdf21495b8a461408a1969f5095d4d914" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092304-104 - Bob der Baumeister - Bobs spannender Arbeitstag (GER).bin" size="0x800000" crc="b0623371" sha1="9c5d7cfbdf21495b8a461408a1969f5095d4d914" />
 			</dataarea>
 		</part>
 	</software>
@@ -1270,8 +1271,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092305 - BobLeBricoleur (FR).bin" size="8388608" crc="608c9a0e" sha1="30ceea73edb0ecea4c1d9ebd29eb8cdeee052a1a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092305 - BobLeBricoleur (FR).bin" size="0x800000" crc="608c9a0e" sha1="30ceea73edb0ecea4c1d9ebd29eb8cdeee052a1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1287,8 +1288,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092307 - Bob y sus Amigos - Un Dia De Trabajo (SP).bin" size="8388608" crc="c39b08f9" sha1="c38a77fc615302a649b6f0668fbcad7f2ade02bd" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092307 - Bob y sus Amigos - Un Dia De Trabajo (SP).bin" size="0x800000" crc="c39b08f9" sha1="c38a77fc615302a649b6f0668fbcad7f2ade02bd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1304,8 +1305,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92313.u1" size="8388608" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92313.u1" size="0x800000" crc="37498231" sha1="2966ba75fc4430ee5d9dc7003d7f7e54e5546382" />
 			</dataarea>
 		</part>
 	</software>
@@ -1321,8 +1322,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92314-100.u1" size="8388608" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92314-100.u1" size="0x800000" crc="ac343df7" sha1="77dafa48ca0e015728c5ead844dd729e87eb6182" />
 			</dataarea>
 		</part>
 	</software>
@@ -1339,9 +1340,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] LOW.bin" size="0x400000" crc="f0f2bd0f" sha1="a27f105fe32c3bfeb0ac4d745faafe1a12859045" offset="0x000000" />
-				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="ffb5790d" sha1="f84a8af1859e8f749856c3293f5d2fb01a7c1449" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] LOW.bin" size="0x400000"  offset="0x000000" crc="f0f2bd0f" sha1="a27f105fe32c3bfeb0ac4d745faafe1a12859045" />
+				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] HIGH.bin" size="0x200000" offset="0x400000" crc="ffb5790d" sha1="f84a8af1859e8f749856c3293f5d2fb01a7c1449" />
 			</dataarea>
 		</part>
 	</software>
@@ -1355,8 +1356,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92185 - LesBisounours (FR).bin" size="8388608" crc="7de5716b" sha1="463fb552790ce25cdd4adecb8218ba3766446efa" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92185 - LesBisounours (FR).bin" size="0x800000" crc="7de5716b" sha1="463fb552790ce25cdd4adecb8218ba3766446efa" />
 			</dataarea>
 		</part>
 	</software>
@@ -1372,8 +1373,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092187 - Osos Amorosos - Una Leccion de Amor (SP).bin" size="8388608" crc="c7d88dcf" sha1="d697798ba94d133d393377192ce36ae5233c99f5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092187 - Osos Amorosos - Una Leccion de Amor (SP).bin" size="0x800000" crc="c7d88dcf" sha1="d697798ba94d133d393377192ce36ae5233c99f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1387,8 +1388,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92660.bin" size="8388608" crc="35ff7474" sha1="2c401f64cf510e40a0def1b47de0031d548e0fe9" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92660.bin" size="0x800000" crc="35ff7474" sha1="2c401f64cf510e40a0def1b47de0031d548e0fe9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1404,8 +1405,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092660.u1" size="0x800000" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1419,8 +1420,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cars - Rev It Up in Radiator Springs 092660(US) [ALT].bin" size="8388608" crc="31c1df9c" sha1="14b028e5911d26eec8644ee19da8825d8386244c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US) [ALT].bin" size="0x800000" crc="31c1df9c" sha1="14b028e5911d26eec8644ee19da8825d8386244c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1434,8 +1435,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cars - Rev It Up in Radiator Springs 092660(US).bin" size="8388608" crc="ed8ee40a" sha1="e111f257447d64ded47a57d80174ced1bca0cb14" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US).bin" size="0x800000" crc="ed8ee40a" sha1="e111f257447d64ded47a57d80174ced1bca0cb14" />
 			</dataarea>
 		</part>
 	</software>
@@ -1448,8 +1449,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cars - Rev it up in Radiator Springs (Europe).bin" size="8388608" crc="fbcf207a" sha1="c25ac103c07a13a369f8d47a8bb5f14c752a6f53" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cars - Rev it up in Radiator Springs (Europe).bin" size="0x800000" crc="fbcf207a" sha1="c25ac103c07a13a369f8d47a8bb5f14c752a6f53" />
 			</dataarea>
 		</part>
 	</software>
@@ -1462,8 +1463,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cars(UK).bin" size="8388608" crc="d88af931" sha1="04dab1eccde66a80fc252b30e91d8718ace5a525" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cars(UK).bin" size="0x800000" crc="d88af931" sha1="04dab1eccde66a80fc252b30e91d8718ace5a525" />
 			</dataarea>
 		</part>
 	</software>
@@ -1479,8 +1480,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92664(2).u1" size="8388608" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92664(2).u1" size="0x800000" crc="6f4c150d" sha1="f6fc136ca18025511a9b12c577860116fdc66c8c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1496,8 +1497,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092665.u1" size="8388608" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092665.u1" size="0x800000" crc="c1f63c2e" sha1="3a6726a0a5dd5543d632dfbf57144da780994ba5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1511,8 +1512,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092665-105 - Cars (FR).bin" size="8388608" crc="155d969f" sha1="4871fb0a95bd2f41f67863091fa22b8fdd3a67e0" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092665-105 - Cars (FR).bin" size="0x800000" crc="155d969f" sha1="4871fb0a95bd2f41f67863091fa22b8fdd3a67e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1528,8 +1529,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092667 - Cars - Acelera el Motor en Radiador Springs (SP).bin" size="8388608" crc="52ebefe2" sha1="12c0545c01e71fd3d192c3456974de3e01be4621" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092667 - Cars - Acelera el Motor en Radiador Springs (SP).bin" size="0x800000" crc="52ebefe2" sha1="12c0545c01e71fd3d192c3456974de3e01be4621" />
 			</dataarea>
 		</part>
 	</software>
@@ -1545,8 +1546,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92673.u1" size="8388608" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92673.u1" size="0x800000" crc="380d5655" sha1="fa70dcfd2793b5ba7bede3b365e245c8fde935d7" />
 			</dataarea>
 		</part>
 	</software>
@@ -1563,8 +1564,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="C92674-1.u1" size="0x800000" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" />
 			</dataarea>
 		</part>
 	</software>
@@ -1578,8 +1579,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cinderella - Cinderella's Magic Wishes 092240-101(US).bin" size="8388608" crc="19e7080d" sha1="5b123f9f6dbc3892d9c7025639b87e70f2656e31" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cinderella - Cinderella's Magic Wishes 092240-101(US).bin" size="0x800000" crc="19e7080d" sha1="5b123f9f6dbc3892d9c7025639b87e70f2656e31" />
 			</dataarea>
 		</part>
 	</software>
@@ -1595,8 +1596,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92240.u1" size="8388608" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92240.u1" size="0x800000" crc="2723728c" sha1="32fd6a5b9718ccc7e10e64046d7ac320cfa47362" />
 			</dataarea>
 		</part>
 	</software>
@@ -1608,8 +1609,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092240(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92240(us).bin" size="0x800000" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" />
 			</dataarea>
 		</part>
 	</software>
@@ -1621,8 +1622,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="52-92251(Ita)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="8388608" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="0x800000" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" />
 			</dataarea>
 		</part>
 	</software>
@@ -1634,8 +1635,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="52-92251(Ita)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy) (Rev 1).bin" size="8388608" crc="18dbc23a" sha1="19e90a8f15f436d983351f3910d9dfa56ec339da" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy) (Rev 1).bin" size="0x800000" crc="18dbc23a" sha1="19e90a8f15f436d983351f3910d9dfa56ec339da" />
 			</dataarea>
 		</part>
 	</software>
@@ -1649,8 +1650,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="80-084602 - Assepoester - De wonderwereld van Assepoester (NL) (2010).bin" size="8388608" crc="84d27007" sha1="1dfc92b3264545affb74c623cbd8704f0981a283" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-084602 - Assepoester - De wonderwereld van Assepoester (NL) (2010).bin" size="0x800000" crc="84d27007" sha1="1dfc92b3264545affb74c623cbd8704f0981a283" />
 			</dataarea>
 		</part>
 	</software>
@@ -1664,8 +1665,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092242-123 - Assepoester - De wonderwereld van Assepoester (NL) (2007).bin" size="8388608" crc="c3e937e4" sha1="19f899f373eb419fa85a4da4e48c011c2447643e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092242-123 - Assepoester - De wonderwereld van Assepoester (NL) (2007).bin" size="0x800000" crc="c3e937e4" sha1="19f899f373eb419fa85a4da4e48c011c2447643e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1681,8 +1682,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92242 - Assepoester - De wonderwereld van Assepoester (NL) (2005).bin" size="8388608" crc="1153e6fa" sha1="f06990cd698fc41b5705dc3ffbd8751f9a6d4654" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92242 - Assepoester - De wonderwereld van Assepoester (NL) (2005).bin" size="0x800000" crc="1153e6fa" sha1="f06990cd698fc41b5705dc3ffbd8751f9a6d4654" />
 			</dataarea>
 		</part>
 	</software>
@@ -1694,8 +1695,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092243(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Cinderella - Cinderella's Magic Wishes (Europe).bin" size="8388608" crc="34bf1ab1" sha1="293ca8314bcc6ceb187998728cfedece3ff07908" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Cinderella - Cinderella's Magic Wishes (Europe).bin" size="0x800000" crc="34bf1ab1" sha1="293ca8314bcc6ceb187998728cfedece3ff07908" />
 			</dataarea>
 		</part>
 	</software>
@@ -1711,8 +1712,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92245.u1" size="8388608" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92245.u1" size="0x800000" crc="7c63221f" sha1="227e1d3b63714e6bf8d0fc0897bab9ffc1721ff5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1726,8 +1727,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092245-105 - Cendrillon (FR).bin" size="8388608" crc="b199c517" sha1="7ae42f873aa0c533c716e6e94d00cbc74002b002" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092245-105 - Cendrillon (FR).bin" size="0x800000" crc="b199c517" sha1="7ae42f873aa0c533c716e6e94d00cbc74002b002" />
 			</dataarea>
 		</part>
 	</software>
@@ -1741,8 +1742,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092245-205 - Cendrillon (FR).bin" size="8388608" crc="d15de2f6" sha1="65b9ea951a7dae2b09b38cd29c1ac18ee5624047" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092245-205 - Cendrillon (FR).bin" size="0x800000" crc="d15de2f6" sha1="65b9ea951a7dae2b09b38cd29c1ac18ee5624047" />
 			</dataarea>
 		</part>
 	</software>
@@ -1758,8 +1759,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092247 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="dbb7b765" sha1="442609ef00cb96b21c854239eb3f815722f644e3" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092247 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="0x800000" crc="dbb7b765" sha1="442609ef00cb96b21c854239eb3f815722f644e3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1775,8 +1776,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092247-122 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="2f53195c" sha1="832e0b78d459df52dcefb152471e8464affdc6f4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092247-122 - Disney Princess - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="0x800000" crc="2f53195c" sha1="832e0b78d459df52dcefb152471e8464affdc6f4" />
 			</dataarea>
 		</part>
 	</software>
@@ -1792,8 +1793,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092247-222 - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="8388608" crc="41be74d6" sha1="bfac64f8a8d9535fd5bea113319c4f8de0242c09" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092247-222 - La Cenicienta - Los suenos magicos de Cenicienta (SP).bin" size="0x800000" crc="41be74d6" sha1="bfac64f8a8d9535fd5bea113319c4f8de0242c09" />
 			</dataarea>
 		</part>
 	</software>
@@ -1809,8 +1810,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092253.u1" size="8388608" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092253.u1" size="0x800000" crc="81edbee0" sha1="cf4bca5a1f28049a40060eead7f10c940574107f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1826,8 +1827,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="50-092244-204 - Cinderella - Lernen im Marchenland (GER).bin" size="8388608" crc="778c4f0e" sha1="fde2e7f898408b84c3fb9c43c0abfac088ce81df" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="50-092244-204 - Cinderella - Lernen im Marchenland (GER).bin" size="0x800000" crc="778c4f0e" sha1="fde2e7f898408b84c3fb9c43c0abfac088ce81df" />
 			</dataarea>
 		</part>
 	</software>
@@ -1843,8 +1844,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92244-1.u1" size="8388608" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92244-1.u1" size="0x800000" crc="7dbe47a2" sha1="d74d24d1d87a456f11a98f822b8c59d155734cea" />
 			</dataarea>
 		</part>
 	</software>
@@ -1860,8 +1861,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92244.u1" size="8388608" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92244.u1" size="0x800000" crc="b08a50f3" sha1="a8e6b8b427115d01d35c27b41385ac5d430484c3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1877,8 +1878,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92254.u1" size="8388608" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92254.u1" size="0x800000" crc="946472af" sha1="9009a81689be949f9a5fbf91a6a1d2398f7e8d90" />
 			</dataarea>
 		</part>
 	</software>
@@ -1892,8 +1893,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92280.bin" size="8388608" crc="034cf357" sha1="9c96af008b161f1bdc4ae9f33da161950dc47011" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92280.bin" size="0x800000" crc="034cf357" sha1="9c96af008b161f1bdc4ae9f33da161950dc47011" />
 			</dataarea>
 		</part>
 	</software>
@@ -1909,8 +1910,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92280.u1" size="8388608" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92280.u1" size="0x800000" crc="225c3133" sha1="97610c09834251d1960dbc67da18dad91e832dba" />
 			</dataarea>
 		</part>
 	</software>
@@ -1924,8 +1925,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="5292282 - Dora's Reparatie Avontuur (NL) (2005).bin" size="8388608" crc="d9a47ec3" sha1="e0a9e7d9cba1d05db08b32aeaf3fa517ce013a50" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="5292282 - Dora's Reparatie Avontuur (NL) (2005).bin" size="0x800000" crc="d9a47ec3" sha1="e0a9e7d9cba1d05db08b32aeaf3fa517ce013a50" />
 			</dataarea>
 		</part>
 	</software>
@@ -1939,8 +1940,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="80-084022 - Dora's Reparatie Avontuur (NL) (2009).bin" size="8388608" crc="0ed6ba5e" sha1="48adad64724a57ee231d01129099e8419b75c083" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-084022 - Dora's Reparatie Avontuur (NL) (2009).bin" size="0x800000" crc="0ed6ba5e" sha1="48adad64724a57ee231d01129099e8419b75c083" />
 			</dataarea>
 		</part>
 	</software>
@@ -1956,8 +1957,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092283-103 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="3a96b71d" sha1="1ad68250dab5be23b634c5528e28ab5198012ee9" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092283-103 - Dora's Fix-it Adventure (UK).bin" size="0x800000" crc="3a96b71d" sha1="1ad68250dab5be23b634c5528e28ab5198012ee9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1974,8 +1975,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92283 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="055e3351" sha1="b9232fd8b9792e1ecd4349924515cc72e27f7af0" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92283 - Dora's Fix-it Adventure (UK).bin" size="0x800000" crc="055e3351" sha1="b9232fd8b9792e1ecd4349924515cc72e27f7af0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1991,8 +1992,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92285.u1" size="8388608" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92285.u1" size="0x800000" crc="5f47e1d5" sha1="046b5ce7669755e8d8a9be9be2684828b1f1dd9d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2006,8 +2007,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092285-105 - Dora (FR).bin" size="8388608" crc="645876b1" sha1="fe6710e69f5e26ec4299301532238654cf2b748c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092285-105 - Dora (FR).bin" size="0x800000" crc="645876b1" sha1="fe6710e69f5e26ec4299301532238654cf2b748c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2023,8 +2024,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092287-222 - Dora La Exploradora - La Aventura arregla-todo de Dora (SP).bin" size="8388608" crc="e46b6ffa" sha1="115b2e6f62ba251f5676c3e4756a5299b008372f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092287-222 - Dora La Exploradora - La Aventura arregla-todo de Dora (SP).bin" size="0x800000" crc="e46b6ffa" sha1="115b2e6f62ba251f5676c3e4756a5299b008372f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2040,8 +2041,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092284-1.u1" size="8388608" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092284-1.u1" size="0x800000" crc="070a72dc" sha1="3ca4820f2b54040d1d111b5ac41003c6e53b9164" />
 			</dataarea>
 		</part>
 	</software>
@@ -2057,8 +2058,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92264.u1" size="8388608" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92264.u1" size="0x800000" crc="906b6496" sha1="8932008fef144d2ad3d056fd24f64264825af8ce" />
 			</dataarea>
 		</part>
 	</software>
@@ -2074,8 +2075,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92265.u1" size="8388608" crc="def351e7" sha1="95d005b6e2bf36add42916025558744ccffc8863" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92265.u1" size="0x800000" crc="def351e7" sha1="95d005b6e2bf36add42916025558744ccffc8863" />
 			</dataarea>
 		</part>
 	</software>
@@ -2091,8 +2092,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092267 - Mundo Elmo - Grandes descubrimientos de Elmo (SP).bin" size="8388608" crc="9cbc133f" sha1="407dfedaf9a42b09633330a7e646529b39b2c673" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092267 - Mundo Elmo - Grandes descubrimientos de Elmo (SP).bin" size="0x800000" crc="9cbc133f" sha1="407dfedaf9a42b09633330a7e646529b39b2c673" />
 			</dataarea>
 		</part>
 	</software>
@@ -2108,8 +2109,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92420.u1" size="8388608" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92420.u1" size="0x800000" crc="e40e46dc" sha1="ac78178cff76ed264589113b73211b1f4cfe6dbf" />
 			</dataarea>
 		</part>
 	</software>
@@ -2125,8 +2126,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="50-092424 - Findet Nemo - Nemos Unterwasserabenteuer (GER).bin" size="8388608" crc="71518458" sha1="a20f59c29391fc2b3ece92b599e42c98d846fdfe" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="50-092424 - Findet Nemo - Nemos Unterwasserabenteuer (GER).bin" size="0x800000" crc="71518458" sha1="a20f59c29391fc2b3ece92b599e42c98d846fdfe" />
 			</dataarea>
 		</part>
 	</software>
@@ -2140,8 +2141,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092425 - Le Monde De Nemo (FR).bin" size="8388608" crc="36486f80" sha1="6b2887136474c8d6a111973582cb8607e657c70d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092425 - Le Monde De Nemo (FR).bin" size="0x800000" crc="36486f80" sha1="6b2887136474c8d6a111973582cb8607e657c70d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2157,8 +2158,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092436 - A Procura de Nemo - Nemo A Descoberta do Oceano (Port).bin" size="8388608" crc="4f9324a4" sha1="5c8f557dce6a94111a9b5064d71e8c88ea23855f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092436 - A Procura de Nemo - Nemo A Descoberta do Oceano (Port).bin" size="0x800000" crc="4f9324a4" sha1="5c8f557dce6a94111a9b5064d71e8c88ea23855f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2174,8 +2175,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92422.u1" size="8388608" crc="1fd88d60" sha1="6274134d0441e55c81268af331176ac3cc2e9cb5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92422.u1" size="0x800000" crc="1fd88d60" sha1="6274134d0441e55c81268af331176ac3cc2e9cb5" />
 			</dataarea>
 		</part>
 	</software>
@@ -2191,8 +2192,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708897-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="M29DW323DB, M29DW323DB" /> <!-- Two M29DW323DB chips -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092427 - Buscando a Nemo - Los Descubrimientos de Nemo (SP).bin" size="8388608" crc="3ffa61f1" sha1="3f48b05018d46addd3de664fc7354eba76594e61" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092427 - Buscando a Nemo - Los Descubrimientos de Nemo (SP).bin" size="0x800000" crc="3ffa61f1" sha1="3f48b05018d46addd3de664fc7354eba76594e61" />
 			</dataarea>
 		</part>
 	</software>
@@ -2208,8 +2209,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92044.u1" size="8388608" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92044.u1" size="0x800000" crc="24988ef6" sha1="7f5d647dc8edf780ea86a43e08e8d2169b19a0ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -2225,8 +2226,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92045.u1" size="8388608" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92045.u1" size="0x800000" crc="c4819e95" sha1="b625a7fb1d078349aee1c4cc18ee6f3917aaa816" />
 			</dataarea>
 		</part>
 	</software>
@@ -2285,8 +2286,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="V.Smile Jammin' Gym Class 91320(US).bin" size="8388608" crc="6d8683b0" sha1="d125996a9d27532f71a99501e136f7e5cc3b59e2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="V.Smile Jammin' Gym Class 91320(US).bin" size="0x800000" crc="6d8683b0" sha1="d125996a9d27532f71a99501e136f7e5cc3b59e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -2302,8 +2303,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="91324.u1" size="8388608" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="91324.u1" size="0x800000" crc="db81c1e1" sha1="fbe3f9ee65b7a692c568dde8986df7a2bba8b133" />
 			</dataarea>
 		</part>
 	</software>
@@ -2317,8 +2318,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="91325 - Vsmile Tapis Multisport (FR).bin" size="8388608" crc="31c55c70" sha1="c7c3abe7b8c634a8b96dac826aea42780012f549" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="91325 - Vsmile Tapis Multisport (FR).bin" size="0x800000" crc="31c55c70" sha1="c7c3abe7b8c634a8b96dac826aea42780012f549" />
 			</dataarea>
 		</part>
 	</software>
@@ -2366,8 +2367,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-6" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92984-3.u1" size="8388608" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92984-3.u1" size="0x800000" crc="8f671aa7" sha1="a6a0a5cd5c5bf14c1b546354bfe9209820955975" />
 			</dataarea>
 		</part>
 	</software>
@@ -2381,8 +2382,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092985 - Les Petits Einsteins (FR).bin" size="8388608" crc="6608d3d1" sha1="023b69ef0939cc8a8879f94498be16f8b2ad4341" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092985 - Les Petits Einsteins (FR).bin" size="0x800000" crc="6608d3d1" sha1="023b69ef0939cc8a8879f94498be16f8b2ad4341" />
 			</dataarea>
 		</part>
 	</software>
@@ -2398,8 +2399,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092987 - Little Einsteins (SP).bin" size="8388608" crc="3e944146" sha1="ae457b8140f6b695390647b80b21ede82a074495" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092987 - Little Einsteins (SP).bin" size="0x800000" crc="3e944146" sha1="ae457b8140f6b695390647b80b21ede82a074495" />
 			</dataarea>
 		</part>
 	</software>
@@ -2413,9 +2414,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="92060" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x0800000">
-				<rom name="vsmile92100.blob1.bin" size="0x0400000" crc="8a2317fb" sha1="44d397ada00f1fedb48622e716189f4a129ff5a7" offset="0x0000000" />
-				<rom name="vsmile92100.blob2.bin" size="0x0200000" crc="dded069c" sha1="29f1f464f9f5c8fa06410d54538b984f3fc52f01" offset="0x0400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92100.blob1.bin" size="0x400000" offset="0x000000" crc="8a2317fb" sha1="44d397ada00f1fedb48622e716189f4a129ff5a7" />
+				<rom name="vsmile92100.blob2.bin" size="0x200000" offset="0x400000" crc="dded069c" sha1="29f1f464f9f5c8fa06410d54538b984f3fc52f01" />
 			</dataarea>
 		</part>
 	</software>
@@ -2432,8 +2433,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92100.u1" size="8388608" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92100.u1" size="0x800000" crc="08af3249" sha1="193d824625040ae9e30d8f5b7b74d7348bf3b7cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2449,8 +2450,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92104(2).u1" size="8388608" crc="f2394e3a" sha1="e39e05400279a1328832c873f811ce432be59d13" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92104(2).u1" size="0x800000" crc="f2394e3a" sha1="e39e05400279a1328832c873f811ce432be59d13" />
 			</dataarea>
 		</part>
 	</software>
@@ -2466,8 +2467,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92105.u1" size="8388608" crc="d756c029" sha1="9fbb3a031498682b05c5950e6e07fd5e83a308ad" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92105.u1" size="0x800000" crc="d756c029" sha1="9fbb3a031498682b05c5950e6e07fd5e83a308ad" />
 			</dataarea>
 		</part>
 	</software>
@@ -2483,8 +2484,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092107 - El Rey Leon - La Gran Aventura de Simba (SP).bin" size="8388608" crc="eefc51d2" sha1="294164e8df7cc5510e0dd9ea658976054fcf9e7e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092107 - El Rey Leon - La Gran Aventura de Simba (SP).bin" size="0x800000" crc="eefc51d2" sha1="294164e8df7cc5510e0dd9ea658976054fcf9e7e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2500,8 +2501,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92113.u1" size="8388608" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92113.u1" size="0x800000" crc="924efa89" sha1="fd111f99ef101d318a66a728927d379559dc0106" />
 			</dataarea>
 		</part>
 	</software>
@@ -2517,8 +2518,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92114.u1" size="8388608" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92114.u1" size="0x800000" crc="e1123089" sha1="058c60342c49844b4855d11ce1219879bfd2b6be" />
 			</dataarea>
 		</part>
 	</software>
@@ -2530,8 +2531,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092113(DK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="8388608" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="0x800000" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" />
 			</dataarea>
 		</part>
 	</software>
@@ -2543,8 +2544,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="52-092963(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="8388608" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="0x800000" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2560,8 +2561,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92964-3.bin" size="8388608" crc="4ef9f7c0" sha1="d60265406e1f1b1f4b86364b3281058feb1a6e1d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92964-3.bin" size="0x800000" crc="4ef9f7c0" sha1="d60265406e1f1b1f4b86364b3281058feb1a6e1d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2575,8 +2576,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092965 - Kung Fu Panda (FR).bin" size="8388608" crc="78a27935" sha1="98a8e09ec7fad004cf8540e33d0994bd1821c1cc" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092965 - Kung Fu Panda (FR).bin" size="0x800000" crc="78a27935" sha1="98a8e09ec7fad004cf8540e33d0994bd1821c1cc" />
 			</dataarea>
 		</part>
 	</software>
@@ -2592,8 +2593,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092967 - Kung Fu Panda - Aventura en el Valle de la Paz (SP).bin" size="8388608" crc="e6d26579" sha1="425e9d0524dcb76461c2d2f733f07633429ca367" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092967 - Kung Fu Panda - Aventura en el Valle de la Paz (SP).bin" size="0x800000" crc="e6d26579" sha1="425e9d0524dcb76461c2d2f733f07633429ca367" />
 			</dataarea>
 		</part>
 	</software>
@@ -2607,8 +2608,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092625 - Bratz (FR).bin" size="8388608" crc="ca0ff497" sha1="69f95c84d31423451aa580f196270e3cabab165b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092625 - Bratz (FR).bin" size="0x800000" crc="ca0ff497" sha1="69f95c84d31423451aa580f196270e3cabab165b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2624,8 +2625,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092627 - Lil Bratz - Amigos, Moda y Diversion (SP).bin" size="8388608" crc="10c1e031" sha1="20ec494294480fbacd1f9ed9a8b21d5bb70541f8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092627 - Lil Bratz - Amigos, Moda y Diversion (SP).bin" size="0x800000" crc="10c1e031" sha1="20ec494294480fbacd1f9ed9a8b21d5bb70541f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -2639,8 +2640,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="Handy Manny 090020(US).bin" size="8388608" crc="b0e9d3e6" sha1="a112803aa273838f1b56ad24cf6b754226025532" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Handy Manny 090020(US).bin" size="0x800000" crc="b0e9d3e6" sha1="a112803aa273838f1b56ad24cf6b754226025532" />
 			</dataarea>
 		</part>
 	</software>
@@ -2656,8 +2657,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90024 OK.u1" size="0x800000" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" />
 			</dataarea>
 		</part>
 	</software>
@@ -2671,8 +2672,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="8388608" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" status="baddump" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="090025 - Manny Et Ses Outils (FR).bin" size="0x800000" crc="48c88e25" sha1="da63116c0822ee862dc6ef166b4c0d83ac6fe91c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2684,8 +2685,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092080(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-092080(us).bin" size="0x800000" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" />
 			</dataarea>
 		</part>
 	</software>
@@ -2698,8 +2699,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Topolino - Le Magiche Avventure di Topolino (Italy).bin" size="8388608" crc="cc2f661d" sha1="20cfd75031ff42d1f446e478edc6ccc78e8df66f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Topolino - Le Magiche Avventure di Topolino (Italy).bin" size="0x800000" crc="cc2f661d" sha1="20cfd75031ff42d1f446e478edc6ccc78e8df66f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2712,8 +2713,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Mickey Mouse - De wonderwereld van Mickey - 2004.bin" size="8388608" crc="aef4d01c" sha1="afa7193a9a97c41ad2a337f8527b53cc1bcb8758" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Mickey Mouse - De wonderwereld van Mickey - 2004.bin" size="0x800000" crc="aef4d01c" sha1="afa7193a9a97c41ad2a337f8527b53cc1bcb8758" />
 			</dataarea>
 		</part>
 	</software>
@@ -2730,9 +2731,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="52-92083.u1" size="0x400000" crc="1036ec3b" sha1="78aae01287a10986e10918db1e5dfaab693c1871" offset="0x000000" />
-				<rom name="52-92083.u2" size="0x200000" crc="d2939ca7" sha1="a674aca956dc3d856e34995dae668911523362ee" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92083.u1" size="0x400000" offset="0x000000" crc="1036ec3b" sha1="78aae01287a10986e10918db1e5dfaab693c1871" />
+				<rom name="52-92083.u2" size="0x200000" offset="0x400000" crc="d2939ca7" sha1="a674aca956dc3d856e34995dae668911523362ee" />
 			</dataarea>
 		</part>
 	</software>
@@ -2748,8 +2749,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92084.u1" size="8388608" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92084.u1" size="0x800000" crc="e50692f3" sha1="5c5a338e0186fdd643441455c778780ef5936042" />
 			</dataarea>
 		</part>
 	</software>
@@ -2763,8 +2764,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092085 - Mickey a la Recherche De Pluto (FR).bin" size="8388608" crc="223f11b1" sha1="a212a6e78d9563aff2850d60299c92e525368bac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092085 - Mickey a la Recherche De Pluto (FR).bin" size="0x800000" crc="223f11b1" sha1="a212a6e78d9563aff2850d60299c92e525368bac" />
 			</dataarea>
 		</part>
 	</software>
@@ -2780,8 +2781,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-C" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092087 - Mickey - La Aventura Magica de Mickey (SP).bin" size="8388608" crc="85e30a67" sha1="4059485db625955c2a9aad1769f5e21da1c24c62" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092087 - Mickey - La Aventura Magica de Mickey (SP).bin" size="0x800000" crc="85e30a67" sha1="4059485db625955c2a9aad1769f5e21da1c24c62" />
 			</dataarea>
 		</part>
 	</software>
@@ -2797,8 +2798,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92094.u1" size="8388608" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92094.u1" size="0x800000" crc="9ec8d52f" sha1="0f6f6cc4a34aacfa4ad97a73f4c5ad04e7bcec40" />
 			</dataarea>
 		</part>
 	</software>
@@ -2814,8 +2815,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92944-3.u1" size="8388608" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92944-3.u1" size="0x800000" crc="11695793" sha1="ea58234636d544dbf6d3f65508fcf5263355636f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2829,8 +2830,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092945 - La Maison De Mickey (FR).bin" size="8388608" crc="157efcc0" sha1="2a712003caaeb69bfa7548a96ef13824dc57f578" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092945 - La Maison De Mickey (FR).bin" size="0x800000" crc="157efcc0" sha1="2a712003caaeb69bfa7548a96ef13824dc57f578" />
 			</dataarea>
 		</part>
 	</software>
@@ -2846,8 +2847,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092947 - La Casa de Mickey Mouse (SP).bin" size="8388608" crc="f0288f80" sha1="6a2fc76c71dc3b2a537a6125d0946b6997c286a7" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092947 - La Casa de Mickey Mouse (SP).bin" size="0x800000" crc="f0288f80" sha1="6a2fc76c71dc3b2a537a6125d0946b6997c286a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2863,8 +2864,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92942.u1" size="8388608" crc="56083a88" sha1="615590ad3fe7c2195dc20a9f8504f5ed8224df20" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92942.u1" size="0x800000" crc="56083a88" sha1="615590ad3fe7c2195dc20a9f8504f5ed8224df20" />
 			</dataarea>
 		</part>
 	</software>
@@ -2880,8 +2881,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92954.u1" size="8388608" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92954.u1" size="0x800000" crc="6d8a99d2" sha1="f929e5c3a2aff21dcf38bbbb6441a95eed744256" />
 			</dataarea>
 		</part>
 	</software>
@@ -2897,8 +2898,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90164 OK.u1" size="0x800000" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2912,8 +2913,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="090165 - MonstresContreAliens (FR).bin" size="8388608" crc="eb7b16b2" sha1="45d32470b2283ea47032e007e4f803f8b5ea6dfa" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="090165 - MonstresContreAliens (FR).bin" size="0x800000" crc="eb7b16b2" sha1="45d32470b2283ea47032e007e4f803f8b5ea6dfa" />
 			</dataarea>
 		</part>
 	</software>
@@ -2929,8 +2930,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-090167 - Monstruos contra Alienigenas (SP).bin" size="8388608" crc="c0ddc952" sha1="61491dc841934cc9468b7e9c8ceaa25353a398b8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-090167 - Monstruos contra Alienigenas (SP).bin" size="0x800000" crc="c0ddc952" sha1="61491dc841934cc9468b7e9c8ceaa25353a398b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -2946,8 +2947,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90144 OK.u1" size="0x800000" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" />
 			</dataarea>
 		</part>
 	</software>
@@ -2963,8 +2964,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-090147 - Dakota y su mascota (SP).bin" size="8388608" crc="c75f4e01" sha1="58b30f0f90d22434764849206f99705e4919c38f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-090147 - Dakota y su mascota (SP).bin" size="0x800000" crc="c75f4e01" sha1="58b30f0f90d22434764849206f99705e4919c38f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2980,8 +2981,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-6" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="A90154.u1" size="0x800000" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" />
 			</dataarea>
 		</part>
 	</software>
@@ -2997,8 +2998,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92540.bin" size="8388608" crc="0510eb62" sha1="bdd30453f89a619f1539647ffc27bb2ac3f6b267" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92540.bin" size="0x800000" crc="0510eb62" sha1="bdd30453f89a619f1539647ffc27bb2ac3f6b267" />
 			</dataarea>
 		</part>
 	</software>
@@ -3011,8 +3012,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Noddy - Detective for a Day (Europe).bin" size="8388608" crc="24a04b1d" sha1="f11c2a4bc5c5eb50ca0231e5e9e1c0da17ef1be7" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Noddy - Detective for a Day (Europe).bin" size="0x800000" crc="24a04b1d" sha1="f11c2a4bc5c5eb50ca0231e5e9e1c0da17ef1be7" />
 			</dataarea>
 		</part>
 	</software>
@@ -3028,8 +3029,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92544-3.u1" size="8388608" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92544-3.u1" size="0x800000" crc="2402b5b4" sha1="98dd09522b3d897dd8db070e08e66fcaebb192a2" />
 			</dataarea>
 		</part>
 	</software>
@@ -3045,8 +3046,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92545.u1" size="8388608" crc="f4825273" sha1="8ef2852687e0a6820b97268e6613450ab164c90d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92545.u1" size="0x800000" crc="f4825273" sha1="8ef2852687e0a6820b97268e6613450ab164c90d" />
 			</dataarea>
 		</part>
 	</software>
@@ -3060,8 +3061,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092545-105 - OuiOui (FR).bin" size="8388608" crc="4b73c776" sha1="470ddae3e26da0b9fe1c6a1670517b3e70c71d91" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092545-105 - OuiOui (FR).bin" size="0x800000" crc="4b73c776" sha1="470ddae3e26da0b9fe1c6a1670517b3e70c71d91" />
 			</dataarea>
 		</part>
 	</software>
@@ -3077,8 +3078,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092556 - Noddy - Detective Por um Dia (Port).bin" size="8388608" crc="c2293d0c" sha1="625c186cb56871c0a8b7e5136cd7302812c81823" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092556 - Noddy - Detective Por um Dia (Port).bin" size="0x800000" crc="c2293d0c" sha1="625c186cb56871c0a8b7e5136cd7302812c81823" />
 			</dataarea>
 		</part>
 	</software>
@@ -3093,8 +3094,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile36800-3.bin" size="8388608" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile36800-3.bin" size="0x800000" crc="7e53c0a1" sha1="68b8d09c933b17e1342ef31cfb283dc5609e990a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3111,8 +3112,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-036804 - Mein erster Mausklick (GER).bin" size="8388608" crc="df4474f0" sha1="d858eb61efe23643a45c10ee1c332344caaed0fd" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-036804 - Mein erster Mausklick (GER).bin" size="0x800000" crc="df4474f0" sha1="d858eb61efe23643a45c10ee1c332344caaed0fd" />
 			</dataarea>
 		</part>
 	</software>
@@ -3127,8 +3128,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="036805 - Mes Premiers Clics (FR).bin" size="8388608" crc="7e2380db" sha1="be870a2a60157022d4849fab22515ae0ab716b68" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="036805 - Mes Premiers Clics (FR).bin" size="0x800000" crc="7e2380db" sha1="be870a2a60157022d4849fab22515ae0ab716b68" />
 			</dataarea>
 		</part>
 	</software>
@@ -3145,8 +3146,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-036822 - V.Smile PC (SP).bin" size="8388608" crc="e08afbf5" sha1="ff5f6b283b552f0130d30a574559bfbfa7332bf1" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-036822 - V.Smile PC (SP).bin" size="0x800000" crc="e08afbf5" sha1="ff5f6b283b552f0130d30a574559bfbfa7332bf1" />
 			</dataarea>
 		</part>
 	</software>
@@ -3160,8 +3161,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Up 090000-001(US).bin" size="8388608" crc="7691b353" sha1="4c73ec99835183b310a69020a86c5a926232729c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Up 090000-001(US).bin" size="0x800000" crc="7691b353" sha1="4c73ec99835183b310a69020a86c5a926232729c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3173,8 +3174,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-090003-003(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Up (Europe).bin" size="0x800000" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" />
 			</dataarea>
 		</part>
 	</software>
@@ -3190,8 +3191,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="90004 ok.u1" size="8388608" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90004 ok.u1" size="0x800000" crc="e1b9c194" sha1="a5547757e566a854c5dc1173565c7de47e4877f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -3205,8 +3206,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="090005-005 - La-Haut (FR).bin" size="8388608" crc="10df22ee" sha1="b12bbf91e3cc9a28cdb960f7a6465d4551184381" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="090005-005 - La-Haut (FR).bin" size="0x800000" crc="10df22ee" sha1="b12bbf91e3cc9a28cdb960f7a6465d4551184381" />
 			</dataarea>
 		</part>
 	</software>
@@ -3222,8 +3223,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-6" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="52-090007-022 - UP (Spain).bin" size="8388608" crc="772929e7" sha1="bf3adb9d3ff28dcc762db6019f492445a3ca0226" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-090007-022 - UP (Spain).bin" size="0x800000" crc="772929e7" sha1="bf3adb9d3ff28dcc762db6019f492445a3ca0226" />
 			</dataarea>
 		</part>
 	</software>
@@ -3239,8 +3240,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92920(2).u1" size="8388608" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92920(2).u1" size="0x800000" crc="bb8271ad" sha1="e59a8da24c08d596e1ef60b6cceb769bdb689ece" />
 			</dataarea>
 		</part>
 	</software>
@@ -3256,8 +3257,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092924 - Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspass (GER).bin" size="8388608" crc="ccaa8438" sha1="33e6c815d669888bdf6d43a4aade97e8a9e693ea" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092924 - Cranium - Freizeit Park - Ein Jahrmarkt voller Spiel- und Lernspass (GER).bin" size="0x800000" crc="ccaa8438" sha1="33e6c815d669888bdf6d43a4aade97e8a9e693ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -3271,8 +3272,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092925 - Cranium Le Parc D Attractions (FR).bin" size="8388608" crc="d805b153" sha1="c17c4eac3e6b2ed974dc6793104fd9e6f3e0243c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092925 - Cranium Le Parc D Attractions (FR).bin" size="0x800000" crc="d805b153" sha1="c17c4eac3e6b2ed974dc6793104fd9e6f3e0243c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3288,8 +3289,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092927 - Cranium - Parque de Atracciones de Cranium (SP).bin" size="8388608" crc="8fd7aff1" sha1="2723f4c72edd087ceb8c306bbb993811ba480fb7" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092927 - Cranium - Parque de Atracciones de Cranium (SP).bin" size="0x800000" crc="8fd7aff1" sha1="2723f4c72edd087ceb8c306bbb993811ba480fb7" />
 			</dataarea>
 		</part>
 	</software>
@@ -3301,8 +3302,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092881(IT)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="8388608" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="0x800000" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" />
 			</dataarea>
 		</part>
 	</software>
@@ -3318,8 +3319,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="50-092882 - Ratatouille - Remy's Nieuwe Recepten (NL).bin" size="8388608" crc="9d43c928" sha1="eea694b1def53bc26badd05eb5bd30e6f17a5a66" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="50-092882 - Ratatouille - Remy's Nieuwe Recepten (NL).bin" size="0x800000" crc="9d43c928" sha1="eea694b1def53bc26badd05eb5bd30e6f17a5a66" />
 			</dataarea>
 		</part>
 	</software>
@@ -3335,8 +3336,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92884.u1" size="8388608" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92884.u1" size="0x800000" crc="d8e36793" sha1="e8d7078726b077d1bf0a13b715de4a03fd93189c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3350,8 +3351,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092885 - Ratatouille (FR).bin" size="8388608" crc="f7b6a151" sha1="d16ae71df4d9fec9ae30962b46fc503dd450a998" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092885 - Ratatouille (FR).bin" size="0x800000" crc="f7b6a151" sha1="d16ae71df4d9fec9ae30962b46fc503dd450a998" />
 			</dataarea>
 		</part>
 	</software>
@@ -3367,8 +3368,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092887 - Ratatouille - Las recetas del Remy (SP).bin" size="8388608" crc="23a058bf" sha1="4e78a949f84c7aa4db38ca48eae76c5f05f0d8fe" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092887 - Ratatouille - Las recetas del Remy (SP).bin" size="0x800000" crc="23a058bf" sha1="4e78a949f84c7aa4db38ca48eae76c5f05f0d8fe" />
 			</dataarea>
 		</part>
 	</software>
@@ -3382,8 +3383,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92160.bin" size="8388608" crc="5d190acf" sha1="68b69330c7d60db82e39f8f0423ea135ad90c783" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92160.bin" size="0x800000" crc="5d190acf" sha1="68b69330c7d60db82e39f8f0423ea135ad90c783" />
 			</dataarea>
 		</part>
 	</software>
@@ -3399,8 +3400,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92160.u1" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92160.u1" size="0x800000" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
 			</dataarea>
 		</part>
 	</software>
@@ -3412,8 +3413,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092161(IT)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Scooby-Doo - Avventura a Funland (Italy).bin" size="0x800000" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" />
 			</dataarea>
 		</part>
 	</software>
@@ -3429,8 +3430,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="52-092162 - Scooby-Doo - Griezelen in het Pretpark (NL).bin" size="8388608" crc="85c19af1" sha1="976286ff9b74d8ab018c885f56914e33dbb50386" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-092162 - Scooby-Doo - Griezelen in het Pretpark (NL).bin" size="0x800000" crc="85c19af1" sha1="976286ff9b74d8ab018c885f56914e33dbb50386" />
 			</dataarea>
 		</part>
 	</software>
@@ -3442,8 +3443,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092163(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Funland Frenzy - 80-92163 (UK).bin" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Scooby-Doo - Funland Frenzy - 80-92163 (UK).bin" size="0x800000" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
 			</dataarea>
 		</part>
 	</software>
@@ -3455,8 +3456,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092163(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 1).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 1).bin" size="0x800000" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
 			</dataarea>
 		</part>
 	</software>
@@ -3468,8 +3469,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092163(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 2).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 2).bin" size="0x800000" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
 			</dataarea>
 		</part>
 	</software>
@@ -3485,8 +3486,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92164.u1" size="8388608" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92164.u1" size="0x800000" crc="97576369" sha1="81d84286a09068d54a4d1051040187a1b89c9d42" />
 			</dataarea>
 		</part>
 	</software>
@@ -3502,8 +3503,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92165.u1" size="8388608" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92165.u1" size="0x800000" crc="ba35c0ac" sha1="9c1525f0da65deeadeef5aa6e43477775804da88" />
 			</dataarea>
 		</part>
 	</software>
@@ -3517,8 +3518,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092165-105 - Scooby Doo (FR).bin" size="8388608" crc="7dece294" sha1="8be50d4cf732b7e56e101647eb39e0ad09fbc51c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092165-105 - Scooby Doo (FR).bin" size="0x800000" crc="7dece294" sha1="8be50d4cf732b7e56e101647eb39e0ad09fbc51c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3534,8 +3535,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092167 - Scooby-Doo - Misterio en el Parque (SP).bin" size="8388608" crc="5e77e160" sha1="51c472ea72939f01ed1f5b212f2de4056315ab88" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092167 - Scooby-Doo - Misterio en el Parque (SP).bin" size="0x800000" crc="5e77e160" sha1="51c472ea72939f01ed1f5b212f2de4056315ab88" />
 			</dataarea>
 		</part>
 	</software>
@@ -3551,8 +3552,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-C" />
 			<feature name="cart_type" value="translucent blue" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092167 (translucent blue) - Scooby-Doo - Misterio En El Parque (SP).bin" size="8388608" crc="e841103a" sha1="421d883d528aca5a398766d642e494f3d235f35c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092167 (translucent blue) - Scooby-Doo - Misterio En El Parque (SP).bin" size="0x800000" crc="e841103a" sha1="421d883d528aca5a398766d642e494f3d235f35c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3568,8 +3569,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092173.u1" size="8388608" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092173.u1" size="0x800000" crc="d24dd55a" sha1="85850a6ec0215442f99d1554ee6af62773c93426" />
 			</dataarea>
 		</part>
 	</software>
@@ -3585,8 +3586,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092174.u1" size="8388608" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092174.u1" size="0x800000" crc="ecec53de" sha1="ad021dae6a8633b66172e3b0ef357b2dd52b021e" />
 			</dataarea>
 		</part>
 	</software>
@@ -3602,8 +3603,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92464.u1" size="8388608" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92464.u1" size="0x800000" crc="064c620c" sha1="d44e8a5507f18e544de707cae4b9a7d309c56fdf" />
 			</dataarea>
 		</part>
 	</software>
@@ -3617,8 +3618,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92465 - Les aventures de imagniares d Ernest et Bart (FR).bin" size="8388608" crc="80da2b1d" sha1="0e16fabbef582893e51503a018d8e6edfe2a3fee" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92465 - Les aventures de imagniares d Ernest et Bart (FR).bin" size="0x800000" crc="80da2b1d" sha1="0e16fabbef582893e51503a018d8e6edfe2a3fee" />
 			</dataarea>
 		</part>
 	</software>
@@ -3634,8 +3635,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092467 - Barrio Sesamo - El Mundo Fantastico de Epi y Blas (SP).bin" size="8388608" crc="619e1530" sha1="f1294726ff035c0c67a9e6845302c11f3ba2ee91" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092467 - Barrio Sesamo - El Mundo Fantastico de Epi y Blas (SP).bin" size="0x800000" crc="619e1530" sha1="f1294726ff035c0c67a9e6845302c11f3ba2ee91" />
 			</dataarea>
 		</part>
 	</software>
@@ -3651,8 +3652,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92860.u1" size="8388608" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92860.u1" size="0x800000" crc="eb84fc96" sha1="20ac2101fd0679e888f31ee38b1ba1358b0932a8" />
 			</dataarea>
 		</part>
 	</software>
@@ -3668,8 +3669,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92860.bin" size="8388608" crc="48b6565b" sha1="25f935bb7fceec387f9cab05251275c0fb1899e0" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92860.bin" size="0x800000" crc="48b6565b" sha1="25f935bb7fceec387f9cab05251275c0fb1899e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3685,8 +3686,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92862.u1" size="8388608" crc="db0e8bc3" sha1="474008f7d6dd9a69fb6db55af3d18020990e1fe5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92862.u1" size="0x800000" crc="db0e8bc3" sha1="474008f7d6dd9a69fb6db55af3d18020990e1fe5" />
 			</dataarea>
 		</part>
 	</software>
@@ -3699,8 +3700,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Shrek the Third - Arthur's School Day Adventure (Europe).bin" size="8388608" crc="7f06555c" sha1="b1082ab883cdb3caf5f87831cbe1a8623b41e88e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Shrek the Third - Arthur's School Day Adventure (Europe).bin" size="0x800000" crc="7f06555c" sha1="b1082ab883cdb3caf5f87831cbe1a8623b41e88e" />
 			</dataarea>
 		</part>
 	</software>
@@ -3716,8 +3717,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92864(2).u1" size="0x800000" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" />
 			</dataarea>
 		</part>
 	</software>
@@ -3731,8 +3732,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="8388608" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092865 - Shrek Le Troisieme (FR).bin" size="0x800000" crc="7cc9922c" sha1="c45ce64db0c5580ce8339ab114b849955e58fed4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3746,8 +3747,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092865-105 - Shrek Le Troisieme (FR).bin" size="8388608" crc="a1380b79" sha1="311d1658e921a99cd3126a1ef0c2d8baa8a84d70" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092865-105 - Shrek Le Troisieme (FR).bin" size="0x800000" crc="a1380b79" sha1="311d1658e921a99cd3126a1ef0c2d8baa8a84d70" />
 			</dataarea>
 		</part>
 	</software>
@@ -3760,8 +3761,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Shrek - Het Verhaal Van Draakje (Netherlands).bin" size="8388608" crc="7936a0d8" sha1="fcd9006d528dbf739eb411fbf673fa61fec09019" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Shrek - Het Verhaal Van Draakje (Netherlands).bin" size="0x800000" crc="7936a0d8" sha1="fcd9006d528dbf739eb411fbf673fa61fec09019" />
 			</dataarea>
 		</part>
 	</software>
@@ -3777,8 +3778,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092604.u1" size="8388608" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092604.u1" size="0x800000" crc="0abbb98b" sha1="7b23e7a5a1f1b5f3a39427b563e06340268db272" />
 			</dataarea>
 		</part>
 	</software>
@@ -3794,8 +3795,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092605.u1" size="8388608" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092605.u1" size="0x800000" crc="31334442" sha1="09022c94ac69e362979148bec9380f36fb6b88be" />
 			</dataarea>
 		</part>
 	</software>
@@ -3811,8 +3812,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092607 - Shrek - El Cuento de la Dragona (SP).bin" size="8388608" crc="4145d0ad" sha1="ab249596bffd661097d51a42e5b582dfe1ec1e07" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092607 - Shrek - El Cuento de la Dragona (SP).bin" size="0x800000" crc="4145d0ad" sha1="ab249596bffd661097d51a42e5b582dfe1ec1e07" />
 			</dataarea>
 		</part>
 	</software>
@@ -3828,8 +3829,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92820.bin" size="8388608" crc="e96f49df" sha1="e06eb8657d179a80ad23e832b46c6e85235b66c8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92820.bin" size="0x800000" crc="e96f49df" sha1="e06eb8657d179a80ad23e832b46c6e85235b66c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -3843,8 +3844,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Football Club (Italy).bin" size="8388608" crc="e1c8ed7a" sha1="b03bf9ac043da77e3e42f12ce92859bd37e410d2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Football Club (Italy).bin" size="0x800000" crc="e1c8ed7a" sha1="b03bf9ac043da77e3e42f12ce92859bd37e410d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -3860,8 +3861,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92824.u1" size="8388608" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92824.u1" size="0x800000" crc="620b9ebb" sha1="e22ff87a03c6cac3186613a9e804dd6d4e3a3dc4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3875,8 +3876,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92825 - Football Challenge (FR).bin" size="8388608" crc="fab25b07" sha1="11364600cb1a55edc4358c236d3b4cc0bf7b6c1a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92825 - Football Challenge (FR).bin" size="0x800000" crc="fab25b07" sha1="11364600cb1a55edc4358c236d3b4cc0bf7b6c1a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3892,8 +3893,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092827 - Campeonato de Futbol (SP).bin" size="8388608" crc="6921c270" sha1="c74875dfadfebe52cc30f6accfe2064bf790d75a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092827 - Campeonato de Futbol (SP).bin" size="0x800000" crc="6921c270" sha1="c74875dfadfebe52cc30f6accfe2064bf790d75a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3907,8 +3908,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Spider-Man and Friends - La Sfida del Dottor Ock (Italy).bin" size="8388608" crc="c38c2d4c" sha1="3c13950386e7e78246162d0e3017e99c29b05fb4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Spider-Man and Friends - La Sfida del Dottor Ock (Italy).bin" size="0x800000" crc="c38c2d4c" sha1="3c13950386e7e78246162d0e3017e99c29b05fb4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3924,8 +3925,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92524.u1" size="8388608" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92524.u1" size="0x800000" crc="eb9e2303" sha1="07ee3fba4e850487c365fd883ac1fb53a25d0028" />
 			</dataarea>
 		</part>
 	</software>
@@ -3939,8 +3940,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92525 - Spiderman Le Defi Du Docteur Ock (FR).bin" size="8388608" crc="ecd7acf1" sha1="c0a46f1d777b31f44f38df36247430a4930e7fd5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92525 - Spiderman Le Defi Du Docteur Ock (FR).bin" size="0x800000" crc="ecd7acf1" sha1="c0a46f1d777b31f44f38df36247430a4930e7fd5" />
 			</dataarea>
 		</part>
 	</software>
@@ -3956,8 +3957,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092527 - Spider-Man y Amigos - La Aventura Del Doctor Octopus (SP).bin" size="8388608" crc="65a86a62" sha1="a5f40505e1adc6bb7485570cdecbba5f8bf5931b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092527 - Spider-Man y Amigos - La Aventura Del Doctor Octopus (SP).bin" size="0x800000" crc="65a86a62" sha1="a5f40505e1adc6bb7485570cdecbba5f8bf5931b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3973,8 +3974,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92140.bin" size="8388608" crc="5cf2c76a" sha1="99b3cc9e9b6ae8459db7054555a81853e732806a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92140.bin" size="0x800000" crc="5cf2c76a" sha1="99b3cc9e9b6ae8459db7054555a81853e732806a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3987,8 +3988,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Spider-Man and Friends - Missioni Segrete (Italy).bin" size="8388608" crc="15af0018" sha1="f29ac0ac8ba68ecc515ead523e246f416e706e0a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Spider-Man and Friends - Missioni Segrete (Italy).bin" size="0x800000" crc="15af0018" sha1="f29ac0ac8ba68ecc515ead523e246f416e706e0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4001,8 +4002,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092142-123 - Spider-Man en Vrienden - Geheime Missies (NL) (2008).bin" size="8388608" crc="af58e0d2" sha1="a7e9228819fcebdc9af6532e62b94ef9c7a6f500" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092142-123 - Spider-Man en Vrienden - Geheime Missies (NL) (2008).bin" size="0x800000" crc="af58e0d2" sha1="a7e9228819fcebdc9af6532e62b94ef9c7a6f500" />
 			</dataarea>
 		</part>
 	</software>
@@ -4016,9 +4017,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x0800000">
-				<rom name="092143.u1" size="0x0400000" crc="987d99d6" sha1="78901c0029d0c4df7f151c7654c86bc43147e4cd" offset="0x0000000" />
-				<rom name="092143.u2" size="0x0200000" crc="3eae10c6" sha1="1124233305e3b28753007c57ef356a2351cbd117" offset="0x0400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092143.u1" size="0x400000" offset="0x000000" crc="987d99d6" sha1="78901c0029d0c4df7f151c7654c86bc43147e4cd" />
+				<rom name="092143.u2" size="0x200000" offset="0x400000" crc="3eae10c6" sha1="1124233305e3b28753007c57ef356a2351cbd117" />
 			</dataarea>
 		</part>
 	</software>
@@ -4031,8 +4032,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92142 - Spider-Man en Vrienden - Geheime Missies (NL) (2005).bin" size="8388608" crc="07714231" sha1="13d854a3794dcbb28b5bd3e524b2c5cd1d81636e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92142 - Spider-Man en Vrienden - Geheime Missies (NL) (2005).bin" size="0x800000" crc="07714231" sha1="13d854a3794dcbb28b5bd3e524b2c5cd1d81636e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4048,8 +4049,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92144.u1" size="8388608" crc="a627298d" sha1="05fd1619c3429283ee462edef7db552b277ed0b0" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92144.u1" size="0x800000" crc="a627298d" sha1="05fd1619c3429283ee462edef7db552b277ed0b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4065,8 +4066,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92145.u1" size="8388608" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92145.u1" size="0x800000" crc="906b0ab6" sha1="da5435366a439afd70ff210c0e655839f66fbef3" />
 			</dataarea>
 		</part>
 	</software>
@@ -4080,8 +4081,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092145-105 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="81bcdabd" sha1="ab284a43d44e7745d1e9ced6794a5a13bff3b09f" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092145-105 - Spiderman Missions Secretes (FR).bin" size="0x800000" crc="81bcdabd" sha1="ab284a43d44e7745d1e9ced6794a5a13bff3b09f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4095,8 +4096,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092145-305 - Spiderman Missions Secretes (FR).bin" size="8388608" crc="922a7274" sha1="a954a9e9aab93fa6bbcd12fb3651fa9937986400" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092145-305 - Spiderman Missions Secretes (FR).bin" size="0x800000" crc="922a7274" sha1="a954a9e9aab93fa6bbcd12fb3651fa9937986400" />
 			</dataarea>
 		</part>
 	</software>
@@ -4112,8 +4113,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092147 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="ffda1d3d" sha1="12c52915d758d50ae221a4dafe1a8f2892219089" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092147 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="0x800000" crc="ffda1d3d" sha1="12c52915d758d50ae221a4dafe1a8f2892219089" />
 			</dataarea>
 		</part>
 	</software>
@@ -4129,8 +4130,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092147-222 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="8388608" crc="a377ece5" sha1="2e4f646780f61121bfc32e171cdcacbb8dbb1e0a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092147-222 - Spider-Man y Amigos - Misiones Secretas (SP).bin" size="0x800000" crc="a377ece5" sha1="2e4f646780f61121bfc32e171cdcacbb8dbb1e0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4146,8 +4147,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92440.u1" size="8388608" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92440.u1" size="0x800000" crc="92afd10b" sha1="22ac256853201a5feaf86dc709ff05ad748d217c" />
 			</dataarea>
 		</part>
 	</software>
@@ -4161,8 +4162,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Spongebob - Un giorno da Spugna (Italy).bin" size="8388608" crc="0f8708f3" sha1="0788e5d434299703ce61559eac32160bf4f51086" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Spongebob - Un giorno da Spugna (Italy).bin" size="0x800000" crc="0f8708f3" sha1="0788e5d434299703ce61559eac32160bf4f51086" />
 			</dataarea>
 		</part>
 	</software>
@@ -4176,8 +4177,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92442 - Spongebob Squarepants - Een Dag uit het Leven van een Spons (NL).bin" size="8388608" crc="7b2ec510" sha1="d446c88dc557df23a51a48b11c8cee42e86ae1ac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92442 - Spongebob Squarepants - Een Dag uit het Leven van een Spons (NL).bin" size="0x800000" crc="7b2ec510" sha1="d446c88dc557df23a51a48b11c8cee42e86ae1ac" />
 			</dataarea>
 		</part>
 	</software>
@@ -4193,8 +4194,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92444.u1" size="8388608" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92444.u1" size="0x800000" crc="49e1dc61" sha1="e55822fa9b2ae0cfba63b7a897aadbee23af5f4d" />
 			</dataarea>
 		</part>
 	</software>
@@ -4210,8 +4211,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92444.u1" size="8388608" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92444.u1" size="0x800000" crc="1bc67f49" sha1="817aa0f13d3934bf3993baaac0185ef49ac825ba" />
 			</dataarea>
 		</part>
 	</software>
@@ -4224,8 +4225,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92445 - BobEponge (FR).bin" size="8388608" crc="0434bd33" sha1="64cd5ef60474da4304966a03e5c3c9a34417642b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92445 - BobEponge (FR).bin" size="0x800000" crc="0434bd33" sha1="64cd5ef60474da4304966a03e5c3c9a34417642b" />
 			</dataarea>
 		</part>
 	</software>
@@ -4241,8 +4242,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092447 - Bob Esponja - Un dia en la vida de una esponja (SP).bin" size="8388608" crc="176d5a11" sha1="e334d4d3b6d75a0a4e1dff9aab7a990de1a2879e" />  <!-- sldh -->
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092447 - Bob Esponja - Un dia en la vida de una esponja (SP).bin" size="0x800000" crc="176d5a11" sha1="e334d4d3b6d75a0a4e1dff9aab7a990de1a2879e" />  <!-- sldh -->
 			</dataarea>
 		</part>
 	</software>
@@ -4258,8 +4259,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92640.bin" size="8388608" crc="993b0a69" sha1="c1865247da17d5e6d276d1b8144c48ef774bb5d3" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92640.bin" size="0x800000" crc="993b0a69" sha1="c1865247da17d5e6d276d1b8144c48ef774bb5d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -4275,8 +4276,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92644.u1" size="8388608" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92644.u1" size="0x800000" crc="4b28aca5" sha1="5ce55940a2357de0df0dcf5d77a69cd9e03a9146" />
 			</dataarea>
 		</part>
 	</software>
@@ -4292,8 +4293,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092642.u1" size="8388608" crc="b7f1a750" sha1="c6e60ef2333250c9e0e41d3a7d04fe4178d9be8a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092642.u1" size="0x800000" crc="b7f1a750" sha1="c6e60ef2333250c9e0e41d3a7d04fe4178d9be8a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4309,8 +4310,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092645.u1" size="8388608" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092645.u1" size="0x800000" crc="0e42dee7" sha1="2aa140b000e702d253ca72e5e54c9087608fe199" />
 			</dataarea>
 		</part>
 	</software>
@@ -4326,8 +4327,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092647 - Superman - El Hombre de Acero (SP).bin" size="8388608" crc="9e461d7f" sha1="76b933694a1eb068e9a681aed2f93df0a6d803b6" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092647 - Superman - El Hombre de Acero (SP).bin" size="0x800000" crc="9e461d7f" sha1="76b933694a1eb068e9a681aed2f93df0a6d803b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -4341,8 +4342,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92340.bin" size="8388608" crc="ff0d3dca" sha1="23a9a05289a9fc858bb7b91a6efad8c1ed54bced" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92340.bin" size="0x800000" crc="ff0d3dca" sha1="23a9a05289a9fc858bb7b91a6efad8c1ed54bced" />
 			</dataarea>
 		</part>
 	</software>
@@ -4356,8 +4357,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Thomas and Friends - Engines Working Together 92340(US).bin" size="8388608" crc="58ba95fa" sha1="c6c4d5350dbbcd7dc458860171828e0273df1d7e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Thomas and Friends - Engines Working Together 92340(US).bin" size="0x800000" crc="58ba95fa" sha1="c6c4d5350dbbcd7dc458860171828e0273df1d7e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4370,8 +4371,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Thomas and Friends - Engines Working Together (Europe).bin" size="8388608" crc="4a96f7ab" sha1="d350bc5477149c284b1d4dc4ae562fb411e06a5e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Thomas and Friends - Engines Working Together (Europe).bin" size="0x800000" crc="4a96f7ab" sha1="d350bc5477149c284b1d4dc4ae562fb411e06a5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4384,8 +4385,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Thomas and Friends - Engines Working Together (Europe) (Rev 1).bin" size="8388608" crc="0d0002f7" sha1="f1124d4e6590d58cf2b4a70e92435b2b4687ae7b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Thomas and Friends - Engines Working Together (Europe) (Rev 1).bin" size="0x800000" crc="0d0002f7" sha1="f1124d4e6590d58cf2b4a70e92435b2b4687ae7b" />
 			</dataarea>
 		</part>
 	</software>
@@ -4401,8 +4402,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="092344-1.u1" size="8388608" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092344-1.u1" size="0x800000" crc="9e9fc42c" sha1="27f7e98c180ee3b51cc2ce4fc19e3f3f5777887a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4416,8 +4417,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092344-104 - Thomas and seine Freunde - Freunde halten zusammen (GER).bin" size="8388608" crc="11a81943" sha1="54c6afbea80c157858c12c6e813a8f88b82f2a92" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092344-104 - Thomas and seine Freunde - Freunde halten zusammen (GER).bin" size="0x800000" crc="11a81943" sha1="54c6afbea80c157858c12c6e813a8f88b82f2a92" />
 			</dataarea>
 		</part>
 	</software>
@@ -4433,8 +4434,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92344-1(3).u1" size="0x800000" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -4448,8 +4449,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92344 - Thomas and seine Freunde - Freunde Halten Zusammen (Germany).bin" size="8388608" crc="5aeb37aa" sha1="0e7f870a2269e7ef0fa1b1fc15eb9b6b89952a06" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92344 - Thomas and seine Freunde - Freunde Halten Zusammen (Germany).bin" size="0x800000" crc="5aeb37aa" sha1="0e7f870a2269e7ef0fa1b1fc15eb9b6b89952a06" />
 			</dataarea>
 		</part>
 	</software>
@@ -4465,8 +4466,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92345.u1" size="8388608" crc="281a7d69" sha1="479a9f9c27a08316ef605d39d3fa2fc1b09bd4ff" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92345.u1" size="0x800000" crc="281a7d69" sha1="479a9f9c27a08316ef605d39d3fa2fc1b09bd4ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -4482,8 +4483,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92354.u1" size="8388608" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92354.u1" size="0x800000" crc="d3dfc103" sha1="fbb4a460504797253a47945ae3bea4e7eda4a388" />
 			</dataarea>
 		</part>
 	</software>
@@ -4497,8 +4498,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Disney Fairies - TinkerBell 090260(US).bin" size="8388608" crc="42a5720e" sha1="a4f11f623bb08c878afb334f202935c0b3a24237" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Disney Fairies - TinkerBell 090260(US).bin" size="0x800000" crc="42a5720e" sha1="a4f11f623bb08c878afb334f202935c0b3a24237" />
 			</dataarea>
 		</part>
 	</software>
@@ -4514,8 +4515,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="90274.u1" size="8388608" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90274.u1" size="0x800000" crc="5ae6dced" sha1="3298bf1fb43173e1c4c2200ddc5a1a6af57d4323" />
 			</dataarea>
 		</part>
 	</software>
@@ -4527,8 +4528,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092220(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92220(us).bin" size="0x800000" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" />
 			</dataarea>
 		</part>
 	</software>
@@ -4543,8 +4544,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="vsmile92220.bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92220.bin" size="0x800000" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4557,8 +4558,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Toy Story 2 - Operazione - Salvataggio di Woody (Italy).bin" size="8388608" crc="2f14862c" sha1="97a969ebc29220f8a0ab5fc8c368c4fbe99bfce4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Toy Story 2 - Operazione - Salvataggio di Woody (Italy).bin" size="0x800000" crc="2f14862c" sha1="97a969ebc29220f8a0ab5fc8c368c4fbe99bfce4" />
 			</dataarea>
 		</part>
 	</software>
@@ -4571,8 +4572,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Toy Story 2 - Operation-Rescue Woody (Europe).bin" size="8388608" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Toy Story 2 - Operation-Rescue Woody (Europe).bin" size="0x800000" crc="57608d88" sha1="c7d59f109da68d1d2299136f6f9a69cbb83a9e5e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4588,8 +4589,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92224-105.u1" size="8388608" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92224-105.u1" size="0x800000" crc="c6fbdb94" sha1="887f1d2acadc6902d386488577654a6786d802a9" />
 			</dataarea>
 		</part>
 	</software>
@@ -4603,8 +4604,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92225 - Toy Story 2 (FR).bin" size="8388608" crc="be47bd65" sha1="391420bab3ec9c5a82bfe6aa4af5ec5e519f21fb" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92225 - Toy Story 2 (FR).bin" size="0x800000" crc="be47bd65" sha1="391420bab3ec9c5a82bfe6aa4af5ec5e519f21fb" />
 			</dataarea>
 		</part>
 	</software>
@@ -4620,8 +4621,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092227 - Toy Story 2 - El Rescate De Woody (SP).bin" size="8388608" crc="83924979" sha1="3aa17cdc3977644a6a4441d3e03b9aeb3e9c96ff" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092227 - Toy Story 2 - El Rescate De Woody (SP).bin" size="0x800000" crc="83924979" sha1="3aa17cdc3977644a6a4441d3e03b9aeb3e9c96ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -4637,8 +4638,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92234.u1" size="8388608" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92234.u1" size="0x800000" crc="a6aa6d6b" sha1="ca576d994441ffaac96e015f5a9309e0326280e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -4653,8 +4654,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Toy Story 3 (Italy).bin" size="8388608" crc="30d59f46" sha1="036ee9f509c3fce6e73fe957fadd01d7fc9ce3fc" status="baddump" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Toy Story 3 (Italy).bin" size="0x800000" crc="30d59f46" sha1="036ee9f509c3fce6e73fe957fadd01d7fc9ce3fc" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4668,8 +4669,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Wall-E (Italy).bin" size="8388608" crc="0dc91ce1" sha1="c4d593ca81065cbe4bba2349807059a4f0697d70" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Wall-E (Italy).bin" size="0x800000" crc="0dc91ce1" sha1="c4d593ca81065cbe4bba2349807059a4f0697d70" />
 			</dataarea>
 		</part>
 	</software>
@@ -4685,8 +4686,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92844-3.u1" size="8388608" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92844-3.u1" size="0x800000" crc="f4be4391" sha1="5e43c9dd4759218578d1a8364540db8bc6bc6416" />
 			</dataarea>
 		</part>
 	</software>
@@ -4700,8 +4701,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092845 - Wall E (FR).bin" size="8388608" crc="b5122dfc" sha1="6b62641082104fa8bde2a40c8969d3b036dcc58e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092845 - Wall E (FR).bin" size="0x800000" crc="b5122dfc" sha1="6b62641082104fa8bde2a40c8969d3b036dcc58e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4717,8 +4718,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092847 - Wall-E (SP).bin" size="8388608" crc="ac1e10fb" sha1="3701ed1b4f37303d476fd21b46c4fa4e1a432e74" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092847 - Wall-E (SP).bin" size="0x800000" crc="ac1e10fb" sha1="3701ed1b4f37303d476fd21b46c4fa4e1a432e74" />
 			</dataarea>
 		</part>
 	</software>
@@ -4732,8 +4733,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="u1" value="U1" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Wall-E_52-092848_CN).bin" size="8388608" crc="7008c01f" sha1="504d2cfab90f63ae95bf6cb2806932ca5009e2ba" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Wall-E_52-092848_CN).bin" size="0x800000" crc="7008c01f" sha1="504d2cfab90f63ae95bf6cb2806932ca5009e2ba" />
 			</dataarea>
 		</part>
 	</software>
@@ -4750,8 +4751,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92854.u1" size="8388608" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92854.u1" size="0x800000" crc="860194d2" sha1="3d5f40a0f523c9b090a826fef45a6bc63a58d519" />
 			</dataarea>
 		</part>
 	</software>
@@ -4766,9 +4767,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="92060" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x0800000">
-				<rom name="vsmile92060.blob1.bin" size="0x0400000" crc="c34fd808" sha1="2800b89068e3c09a66223392e11982dd2193244b" offset="0x0000000" />
-				<rom name="vsmile92060.blob2.bin" size="0x0200000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" offset="0x0400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92060.blob1.bin" size="0x400000" offset="0x000000" crc="c34fd808" sha1="2800b89068e3c09a66223392e11982dd2193244b" />
+				<rom name="vsmile92060.blob2.bin" size="0x200000" offset="0x400000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -4781,8 +4782,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Winnie the Pooh e la caccia al miele (Italy).bin" size="8388608" crc="980520c0" sha1="09d9d6be5f17406ca3f600c432d5066226508802" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Winnie the Pooh e la caccia al miele (Italy).bin" size="0x800000" crc="980520c0" sha1="09d9d6be5f17406ca3f600c432d5066226508802" />
 			</dataarea>
 		</part>
 	</software>
@@ -4798,14 +4799,33 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="52-092062-123 - My Friends Tigger and Pooh - De wonderwereld van Poeh (NL).bin" size="8388608" crc="ecf7bce5" sha1="d045ca2e5e57c8a4efc49dbaba43d9b52d5b7612" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-092062-123 - My Friends Tigger and Pooh - De wonderwereld van Poeh (NL).bin" size="0x800000" crc="ecf7bce5" sha1="d045ca2e5e57c8a4efc49dbaba43d9b52d5b7612" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohuk" cloneof="pooh">
+		<description>Disney's Winnie the Pooh - The Honey Hunt (UK)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092063(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706148" />
+			<feature name="pcb_model" value="706148-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<feature name="u2" value="" />
+			<dataarea name="rom" size="0x0800000">
+				<rom name="vsmile92063.blob1.bin" size="0x0400000" offset="0x0000000" crc="24efb09a" sha1="c67a19edcc521e987fee546f3a0bc4bc0dbcfdb5" />
+				<rom name="vsmile92063.blob2.bin" size="0x0200000" offset="0x0400000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="poohukr103" cloneof="pooh">
-		<description>Disney's Winnie the Pooh - The Honey Hunt (UK)</description>
+		<description>Disney's Winnie the Pooh - The Honey Hunt (UK, rev. 103)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092063-103(UK)" />
@@ -4813,8 +4833,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Winnie the Pooh - The Honey Hunt - 092063-103 (UK).bin" size="8388608" crc="ecb06a3f" sha1="a92f0dd178f8ab73bc4b805440f89e99a13df264" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Winnie the Pooh - The Honey Hunt - 092063-103 (UK).bin" size="0x800000" crc="ecb06a3f" sha1="a92f0dd178f8ab73bc4b805440f89e99a13df264" />
 			</dataarea>
 		</part>
 	</software>
@@ -4830,8 +4850,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92064.u1" size="0x800000" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" />
 			</dataarea>
 		</part>
 	</software>
@@ -4845,8 +4865,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092064 - Winnie the Pooh - Die Honigjagd (GER).bin" size="8388608" crc="2decf812" sha1="9d9116c6b77775c3263f0b8bdfab35e1fea2fc55" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092064 - Winnie the Pooh - Die Honigjagd (GER).bin" size="0x800000" crc="2decf812" sha1="9d9116c6b77775c3263f0b8bdfab35e1fea2fc55" />
 			</dataarea>
 		</part>
 	</software>
@@ -4862,8 +4882,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92064-204(2).u1" size="8388608" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92064-204(2).u1" size="0x800000" crc="081e414d" sha1="e612aee1f62ca260bc0b011a512fd8c207eeb833" />
 			</dataarea>
 		</part>
 	</software>
@@ -4879,8 +4899,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92065.u1" size="8388608" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92065.u1" size="0x800000" crc="7b0bd06c" sha1="0767e07e767a64c0fe56dac7b3cb478bab34b864" />
 			</dataarea>
 		</part>
 	</software>
@@ -4896,8 +4916,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92065-2.u1" size="8388608" crc="07403b58" sha1="1b9625a173d552888a92d032e91504441fca6229" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92065-2.u1" size="0x800000" crc="07403b58" sha1="1b9625a173d552888a92d032e91504441fca6229" />
 			</dataarea>
 		</part>
 	</software>
@@ -4913,8 +4933,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092067 - Winnie the Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="251057ad" sha1="9bfba8782969916bffef451908ea9bc0ec58515b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092067 - Winnie the Pooh - En Busca de la Miel (SP).bin" size="0x800000" crc="251057ad" sha1="9bfba8782969916bffef451908ea9bc0ec58515b" />
 			</dataarea>
 		</part>
 	</software>
@@ -4932,8 +4952,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092067-122 - My Friends Tigger and Pooh - En Busca de la Miel (SP).bin" size="8388608" crc="836353ed" sha1="7d8f5d5f743d40441b714e47a26a611d7fca7f03" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092067-122 - My Friends Tigger and Pooh - En Busca de la Miel (SP).bin" size="0x800000" crc="836353ed" sha1="7d8f5d5f743d40441b714e47a26a611d7fca7f03" />
 			</dataarea>
 		</part>
 	</software>
@@ -4949,8 +4969,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92073.u1" size="8388608" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92073.u1" size="0x800000" crc="f2cf8e50" sha1="9ef7e8a3f03c252970348f2eabc53010c1ee588b" />
 			</dataarea>
 		</part>
 	</software>
@@ -4966,8 +4986,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92074.u1" size="8388608" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92074.u1" size="0x800000" crc="70bde4da" sha1="788a8b471ef97106fbcaeb053cd6aa19c6ac299a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4981,8 +5001,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="The Adventures of Little Red Riding Hood 92020(US).bin" size="8388608" crc="a8f5f312" sha1="043a69b97dbc89cd01fae49f3b7a0d0b4e9443e1" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="The Adventures of Little Red Riding Hood 92020(US).bin" size="0x800000" crc="a8f5f312" sha1="043a69b97dbc89cd01fae49f3b7a0d0b4e9443e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -4998,8 +5018,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92024.u1" size="8388608" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92024.u1" size="0x800000" crc="cdeb71f9" sha1="21d2ecf5bc22fa94a1015de6f670415b6d42a3b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5013,8 +5033,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="92025 - Petit Chaperon Rouge (FR).bin" size="8388608" crc="a22ffa89" sha1="4e2daa67b0617b3ea4a0e05eb2eb5a5550645d20" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92025 - Petit Chaperon Rouge (FR).bin" size="0x800000" crc="a22ffa89" sha1="4e2daa67b0617b3ea4a0e05eb2eb5a5550645d20" />
 			</dataarea>
 		</part>
 	</software>
@@ -5047,8 +5067,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="091444.u1" size="0x800000" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" />
 			</dataarea>
 		</part>
 	</software>
@@ -5063,8 +5083,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="091445 - Vsmile Tip Tap (FR).bin" size="8388608" crc="93a8cc75" sha1="3fc1e93f18782b3f38ec7d97b3c70f8a9358230d" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="091445 - Vsmile Tip Tap (FR).bin" size="0x800000" crc="93a8cc75" sha1="3fc1e93f18782b3f38ec7d97b3c70f8a9358230d" />
 			</dataarea>
 		</part>
 	</software>
@@ -5078,8 +5098,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-091447 - Teclado Interactivo V.Smile (Spain).bin" size="8388608" crc="a7ae2ba8" sha1="ba6b0ad2845090bfc6f50e3c995b25a571d07c87" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-091447 - Teclado Interactivo V.Smile (Spain).bin" size="0x800000" crc="a7ae2ba8" sha1="ba6b0ad2845090bfc6f50e3c995b25a571d07c87" />
 			</dataarea>
 		</part>
 	</software>
@@ -5182,6 +5202,18 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="wiggles">
+		<description>The Wiggles - It's Wiggle Time! (USA)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92502 - Truckie's Rekenrace (NL).bin" size="0x800000" crc="ede4c9b6" sha1="60489c116cb5a121b706739eb7ae73b296ea2484" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wkwheelnl"> <!-- Will be clone of "wkwheel" once found and dumped. -->
 		<description>Truckie's Rekenrace (Netherlands)</description>
 		<year>200?</year>
@@ -5191,8 +5223,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92502 - Truckie's Rekenrace (NL).bin" size="8388608" crc="fd583a59" sha1="1ee9315222193d4380868b82533f22e78e1e8a37" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92502 - Truckie's Rekenrace (NL).bin" size="0x800000" crc="fd583a59" sha1="1ee9315222193d4380868b82533f22e78e1e8a37" />
 			</dataarea>
 		</part>
 	</software>
@@ -5208,8 +5240,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092504 - Flitzers Schlaue Stadtetour (GER).bin" size="8388608" crc="1bdd6066" sha1="1e2a9090c0bfe08c31e750e263bad4a4a1fb2e73" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092504 - Flitzers Schlaue Stadtetour (GER).bin" size="0x800000" crc="1bdd6066" sha1="1e2a9090c0bfe08c31e750e263bad4a4a1fb2e73" />
 			</dataarea>
 		</part>
 	</software>
@@ -5223,8 +5255,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
-			<dataarea name="rom" size="8388608">
-				<rom name="092505 - MissionPilote (FR).bin" size="8388608" crc="81531074" sha1="11631a6e837d3aa7a7bd6c0bcefa8289440a60b8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092505 - MissionPilote (FR).bin" size="0x800000" crc="81531074" sha1="11631a6e837d3aa7a7bd6c0bcefa8289440a60b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -5240,8 +5272,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="8388608" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092507 - Conduccion Divertida (SP).bin" size="0x800000" crc="c52ff5d8" sha1="ce48bb9ea53cbdfa243170217908cc1f4352e4f0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5255,8 +5287,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="Wow Wow Wubbzy 090040(US).bin" size="8388608" crc="62da284f" sha1="1931473d50d8ba2f505a6fd22625810b8d7dbaf6" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Wow Wow Wubbzy 090040(US).bin" size="0x800000" crc="62da284f" sha1="1931473d50d8ba2f505a6fd22625810b8d7dbaf6" />
 			</dataarea>
 		</part>
 	</software>
@@ -5272,8 +5304,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-090224 - Dolphis Wasserabenteuer (GE).bin" size="8388608" crc="3fd78b1b" sha1="eadbc8b2a9bf09f623f27d3b94a1b19643685629" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-090224 - Dolphis Wasserabenteuer (GE).bin" size="0x800000" crc="3fd78b1b" sha1="eadbc8b2a9bf09f623f27d3b94a1b19643685629" />
 			</dataarea>
 		</part>
 	</software>
@@ -5289,8 +5321,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92360-201(4).u1" size="8388608" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92360-201(4).u1" size="0x800000" crc="0b1f8225" sha1="7c2e39428faf40cff2007ae1a3e2f2ae565e5db4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5302,8 +5334,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092360(US)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92360(us).bin" size="0x800000" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" />
 			</dataarea>
 		</part>
 	</software>
@@ -5319,8 +5351,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92364.u1" size="8388608" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92364.u1" size="0x800000" crc="93e9dcf3" sha1="5889e46806d1fa70ac92ec6b2158a339126a26d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -5333,8 +5365,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092363-103(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="0x800000" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -5346,8 +5378,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<info name="serial" value="80-092363(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
-			<dataarea name="rom" size="8388608">
-				<rom name="52-92363(UK) - Zayzoo My Alien Classmate(UK).bin" size="8388608" crc="6ac6206a" sha1="6983b400b869f1193ff0de81af117923a2a5f3f7" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92363(UK) - Zayzoo My Alien Classmate(UK).bin" size="0x800000" crc="6ac6206a" sha1="6983b400b869f1193ff0de81af117923a2a5f3f7" />
 			</dataarea>
 		</part>
 	</software>
@@ -5363,8 +5395,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="92365.u1" size="0x800000" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -5380,8 +5412,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="8388608">
-				<rom name="80-092367 - Zayzoo - Mi Amiga del Espacio (SP).bin" size="8388608" crc="ce601e55" sha1="8b628101b605f4688b580a9e7511c3bfa6f7d5bc" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-092367 - Zayzoo - Mi Amiga del Espacio (SP).bin" size="0x800000" crc="ce601e55" sha1="8b628101b605f4688b580a9e7511c3bfa6f7d5bc" />
 			</dataarea>
 		</part>
 	</software>
@@ -5399,8 +5431,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180"/>
 			<feature name="pcb_model" value="707180-3"/>
 			<feature name="cart_type" value="red" />
-			<dataarea name="rom" size="8388608">
-				<rom name="90-089040 - Dora the Explorer - Dora's Got a Puppy (US) (Smartbook).bin" size="8388608" crc="aabcbb49" sha1="7edc5ba03125b9fef55b4d8f7993b415fb99c639" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90-089040 - Dora the Explorer - Dora's Got a Puppy (US) (Smartbook).bin" size="0x800000" crc="aabcbb49" sha1="7edc5ba03125b9fef55b4d8f7993b415fb99c639" />
 			</dataarea>
 		</part>
 	</software>
@@ -5415,8 +5447,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180"/>
 			<feature name="pcb_model" value="707180-3"/>
 			<feature name="cart_type" value="red" />
-			<dataarea name="rom" size="8388608">
-				<rom name="80-089060 - Scooby-Doo - A Night Of Fright Is No Delight (US).bin" size="8388608" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="80-089060 - Scooby-Doo - A Night Of Fright Is No Delight (US).bin" size="0x800000" crc="4bf757be" sha1="8436b8e1e0cf20c93dbc9d0e887d4a3f28612aac" />
 			</dataarea>
 		</part>
 	</software>
@@ -5429,8 +5461,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="red" />
-			<dataarea name="rom" size="8388608">
-				<rom name="Spider-Man and Friends - Where is Hulk 089000(US).bin" size="8388608" crc="5294d9ac" sha1="2b64cd58aab4474747b2bea0d75d180f9765ec4e" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Spider-Man and Friends - Where is Hulk 089000(US).bin" size="0x800000" crc="5294d9ac" sha1="2b64cd58aab4474747b2bea0d75d180f9765ec4e" />
 			</dataarea>
 		</part>
 	</software>
@@ -5445,8 +5477,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="707180"/>
 			<feature name="pcb_model" value="707180-3"/>
 			<feature name="cart_type" value="red" />
-			<dataarea name="rom" size="8388608">
-				<rom name="90-089020 - Toy Story 2 (US) (Smartbook).bin" size="8388608" crc="4f5e84e0" sha1="7d82f4607b69221a565556e3f63ee3b20b8cd318" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="90-089020 - Toy Story 2 (US) (Smartbook).bin" size="0x800000" crc="4f5e84e0" sha1="7d82f4607b69221a565556e3f63ee3b20b8cd318" />
 			</dataarea>
 		</part>
 	</software>

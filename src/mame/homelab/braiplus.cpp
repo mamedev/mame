@@ -30,6 +30,9 @@ Floppy disk holds 792kb (formatted).
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 
+
+namespace {
+
 class braiplus_state : public driver_device
 {
 public:
@@ -258,5 +261,8 @@ ROM_START( braiplus )
 	ROM_REGION( 0x0800, "chargen", 0 ) // no idea what chargen it uses, using the one from homelab4 for now
 	ROM_LOAD( "hl4.chr",   0x0000, 0x0800, BAD_DUMP CRC(f58ee39b) SHA1(49399c42d60a11b218a225856da86a9f3975a78a))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1988, braiplus, 0, 0, braiplus, braiplus, braiplus_state, empty_init, "Jozsef and Endre Lukacs", "BraiLab Plus", MACHINE_IS_SKELETON )

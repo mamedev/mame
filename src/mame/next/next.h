@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef MAME_INCLUDES_NEXT_H
-#define MAME_INCLUDES_NEXT_H
+#ifndef MAME_NEXT_NEXT_H
+#define MAME_NEXT_NEXT_H
 
 #include "cpu/m68000/m68030.h"
 #include "cpu/m68000/m68040.h"
@@ -209,7 +209,7 @@ private:
 
 	void irq_set(int id, bool raise);
 	void irq_check();
-	const char *dma_name(int slot);
+	std::string dma_name(int slot);
 	void dma_do_ctrl_w(int slot, uint8_t data);
 	void dma_drq_w(int slot, bool state);
 	void dma_read(int slot, uint8_t &val, bool &eof, bool &err);
@@ -219,4 +219,4 @@ private:
 	void dma_end(int slot);
 };
 
-#endif
+#endif // MAME_NEXT_NEXT_H

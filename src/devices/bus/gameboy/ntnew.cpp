@@ -38,7 +38,7 @@ class ntnew_device : public mbc_ram_device_base<mbc_8k_device_base>
 public:
 	ntnew_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -67,13 +67,13 @@ ntnew_device::ntnew_device(
 }
 
 
-image_init_result ntnew_device::load(std::string &message)
+std::error_condition ntnew_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(8);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 	install_rom(*cart_space(), *cart_space(), *cart_space());
 	install_ram(m_view_ram[0]);
@@ -90,7 +90,7 @@ image_init_result ntnew_device::load(std::string &message)
 			write8smo_delegate(*this, FUNC(ntnew_device::bank_switch_ram)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

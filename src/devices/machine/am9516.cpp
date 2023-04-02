@@ -967,7 +967,7 @@ void am9516_device::channel::chain()
 
 	status &= ~(S_CA | S_NAC);
 
-	if (cmh & CMH_SR)
+	if ((status & S_HRQ) || (cmh & CMH_SR))
 		run->adjust(attotime::zero);
 }
 

@@ -271,10 +271,9 @@ int ti99_cartridge_device::get_index_from_tagname()
 	return atoi(mytag+i+1)-1;
 }
 
-image_init_result ti99_cartridge_device::call_load()
+std::error_condition ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
-	// return true = error
 	LOGMASKED(LOG_CHANGE, "Loading %s in slot %s\n", basename());
 
 	if (loaded_through_softlist())
@@ -304,8 +303,7 @@ image_init_result ti99_cartridge_device::call_load()
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());
 			m_rpk.reset();
-			m_err = image_error::INVALIDIMAGE;
-			return image_init_result::FAIL;
+			return err;
 		}
 		m_pcbtype = m_rpk->get_type();
 	}
@@ -367,7 +365,7 @@ image_init_result ti99_cartridge_device::call_load()
 	m_pcb->set_tag(tag());
 	m_slot = get_index_from_tagname();
 	m_connector->insert(m_slot, this);
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void ti99_cartridge_device::call_unload()

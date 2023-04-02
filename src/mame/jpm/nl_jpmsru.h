@@ -1,7 +1,7 @@
 // license:CC0-1.0
 // copyright-holders:SomeRandomGuyIdk
-#ifndef MAME_AUDIO_NL_JPMSRU_H
-#define MAME_AUDIO_NL_JPMSRU_H
+#ifndef MAME_JPM_NL_JPMSRU_H
+#define MAME_JPM_NL_JPMSRU_H
 
 #pragma once
 
@@ -9,4 +9,4 @@
 
 NETLIST_EXTERNAL(jpmsru)
 
-#endif // MAME_AUDIO_NL_JPMSRU_H
+#endif // MAME_JPM_NL_JPMSRU_H

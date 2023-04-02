@@ -5389,15 +5389,43 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="systemm1">
-		<description>System-M1.0 (Germany)</description>
-		<year>1983</year>
+	<software name="systemm1" cloneof="mach5">
+		<description>System-M1.0 (Czech)</description>
+		<year>1993</year>
 		<publisher>Mousesoft</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="system-m1.0 (1993)(mousesoft)(ger).80" size="0x2000" crc="3a218fef" sha1="4fd2b2ef5a88e3423fae6da0eff4aeef27f19d6e"/>
+				<rom name="system-m1.0 (1993)(mousesoft)(cze).80" size="0x2000" crc="3a218fef" sha1="4fd2b2ef5a88e3423fae6da0eff4aeef27f19d6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expc420" cloneof="mach5">
+		<description>Expert C420 (Czech)</description>
+		<year>19??</year>
+		<publisher>Pasoft</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mach5" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="expertc420 (19xx)(pasoft)(cze).80" size="0x2000" crc="c37a1e85" sha1="56766223fd8a177185e7df8963de5ea205f33297"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expc800" cloneof="mach5">
+		<description>Expert C800 (Czech)</description>
+		<year>19??</year>
+		<publisher>Pasoft</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mach5" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="expertc800 (19xx)(pasoft)(cze).80" size="0x2000" crc="6ae205e9" sha1="d01b9fbda75553068b2329f9d9538afcc14e174e"/>
 			</dataarea>
 		</part>
 	</software>

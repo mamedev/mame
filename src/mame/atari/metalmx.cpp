@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
+
 /***************************************************************************
 
     Atari Metal Maniax
@@ -256,10 +257,79 @@ Logic:
 ***************************************************************************/
 
 #include "emu.h"
-#include "metalmx.h"
+
+#include "cage.h"
+
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/tms34010/tms34010.h"
+#include "cpu/dsp32/dsp32.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
+
+class metalmx_state : public driver_device
+{
+public:
+	metalmx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gsp(*this, "gsp"),
+		m_adsp(*this, "adsp"),
+		m_dsp32c(*this, "dsp32c_%u", 1U),
+		m_cage(*this, "cage"),
+		m_adsp_internal_program_ram(*this, "adsp_intprog"),
+		m_gsp_dram(*this, "gsp_dram"),
+		m_gsp_vram(*this, "gsp_vram")
+	{ }
+
+	void init_metalmx();
+	void metalmx(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<m68ec020_device> m_maincpu;
+	required_device<tms34020_device> m_gsp;
+	required_device<adsp2105_device> m_adsp;
+	required_device_array<dsp32c_device, 2> m_dsp32c;
+	required_device<atari_cage_device> m_cage;
+
+	required_shared_ptr<uint32_t> m_adsp_internal_program_ram;
+	required_shared_ptr<uint32_t> m_gsp_dram;
+	required_shared_ptr<uint32_t> m_gsp_vram;
+
+	uint32_t unk_r();
+	uint32_t watchdog_r();
+	void shifter_w(uint32_t data);
+	void motor_w(uint32_t data);
+	void reset_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sound_data_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> void dsp32c_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template<int Chip> uint32_t dsp32c_r(offs_t offset, uint32_t mem_mask = ~0);
+	void host_gsp_w(offs_t offset, uint32_t data);
+	uint32_t host_gsp_r(offs_t offset);
+	uint32_t host_dram_r(offs_t offset);
+	void host_dram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t host_vram_r(offs_t offset);
+	void host_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void timer_w(offs_t offset, uint32_t data);
+	void cage_irq_callback(uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void dsp32c_1_map(address_map &map);
+	void dsp32c_2_map(address_map &map);
+	void gsp_map(address_map &map);
+	void main_map(address_map &map);
+};
 
 
 /*************************************
@@ -281,9 +351,9 @@ void metalmx_state::video_start()
 {
 }
 
-uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t metalmx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* TODO: TMS34020 should take care of this */
+	// TODO: TMS34020 should take care of this
 
 //  uint32_t *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
 	uint32_t const *const src_base = &m_gsp_vram[0];
@@ -389,14 +459,12 @@ void metalmx_state::dsp32c_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 template<int Chip>
 uint32_t metalmx_state::dsp32c_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t data;
-
 	offset <<= 1;
 
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = m_dsp32c[Chip]->pio_r(offset);
+	uint32_t data = m_dsp32c[Chip]->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -481,22 +549,22 @@ void metalmx_state::main_map(address_map &map)
 	map(0x600000, 0x6fffff).rw(FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
 	map(0x700000, 0x7fffff).rw(FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
 	map(0x800000, 0x80001f).rw(FUNC(metalmx_state::dsp32c_r<1>), FUNC(metalmx_state::dsp32c_w<1>));
-	map(0x800020, 0x85ffff).noprw();         /* Unknown */
+	map(0x800020, 0x85ffff).noprw();         // Unknown
 	map(0x880000, 0x88001f).rw(FUNC(metalmx_state::dsp32c_r<0>), FUNC(metalmx_state::dsp32c_w<0>));
 	map(0x980000, 0x9800ff).w(FUNC(metalmx_state::reset_w));
 	map(0xb40000, 0xb40003).rw(FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
-	map(0xf00000, 0xf00003).ram();         /* Network message port */
+	map(0xf00000, 0xf00003).ram();         // Network message port
 	map(0xf02000, 0xf02003).rw(FUNC(metalmx_state::watchdog_r), FUNC(metalmx_state::shifter_w));
 	map(0xf03000, 0xf03003).portr("P1").w(FUNC(metalmx_state::motor_w));
 	map(0xf04000, 0xf04003).portr("P2");
-	map(0xf05000, 0xf05fff).nopw();    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
-	map(0xf19000, 0xf19003).nopw();    /* Network */
+	map(0xf05000, 0xf05fff).nopw();    // Lamps // f06000 = ADC  // f01xxx = ADC
+	map(0xf19000, 0xf19003).nopw();    // Network
 	map(0xf1a000, 0xf1a003).nopw();
 	map(0xf1b000, 0xf1b003).nopw();
-	map(0xf1e000, 0xf1e003).ram();         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
+	map(0xf1e000, 0xf1e003).ram();         // Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG
 	map(0xf20000, 0xf2ffff).w(FUNC(metalmx_state::timer_w));
-	map(0xfc0000, 0xfc1fff).ram();         /* Zero power RAM */
-	map(0xfd0000, 0xffffff).ram();         /* Scratch RAM */
+	map(0xfc0000, 0xfc1fff).ram();         // Zero power RAM
+	map(0xfd0000, 0xffffff).ram();         // Scratch RAM
 }
 
 
@@ -508,7 +576,7 @@ void metalmx_state::main_map(address_map &map)
 
 void metalmx_state::adsp_program_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("adsp_intprog");
+	map(0x0000, 0x03ff).ram().share(m_adsp_internal_program_ram);
 }
 
 void metalmx_state::adsp_data_map(address_map &map)
@@ -527,10 +595,10 @@ void metalmx_state::adsp_data_map(address_map &map)
 
 void metalmx_state::gsp_map(address_map &map)
 {
-	map(0x88800000, 0x8880001f).ram(); /* ? */
-	map(0x88c00000, 0x88c0001f).ram(); /* ? */
-	map(0xff000000, 0xff7fffff).ram().share("gsp_dram");
-	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
+	map(0x88800000, 0x8880001f).ram(); // ?
+	map(0x88c00000, 0x88c0001f).ram(); // ?
+	map(0xff000000, 0xff7fffff).ram().share(m_gsp_dram);
+	map(0xff800000, 0xffffffff).ram().share(m_gsp_vram);
 }
 
 
@@ -545,11 +613,11 @@ void metalmx_state::dsp32c_1_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram();
 	map(0x600000, 0x67ffff).ram();
-	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0x700000, 0x700003).nopw();    // LEDs?
 	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
 	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
-	map(0xc00000, 0xc00003).ram();         /* FIFO? */
-	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+	map(0xc00000, 0xc00003).ram();         // FIFO?
+	map(0xf00000, 0xffffff).ram();         // 3D registers
 }
 
 /*************************************
@@ -563,11 +631,11 @@ void metalmx_state::dsp32c_2_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram();
 	map(0x600000, 0x67ffff).ram();
-	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0x700000, 0x700003).nopw();    // LEDs?
 	map(0xa00000, 0xa00003).r(FUNC(metalmx_state::unk_r));
 	map(0xb00000, 0xb00003).r(FUNC(metalmx_state::unk_r));
-	map(0xc00000, 0xc00003).ram();         /* FIFO? */
-	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+	map(0xc00000, 0xc00003).ram();         // FIFO?
+	map(0xf00000, 0xffffff).ram();         // 3D registers
 }
 
 
@@ -596,7 +664,7 @@ static INPUT_PORTS_START( metalmx )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	/* COINS */
+	// COINS
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -606,7 +674,7 @@ static INPUT_PORTS_START( metalmx )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* AUX */
+	// AUX
 	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -667,17 +735,17 @@ void metalmx_state::metalmx(machine_config &config)
 	m_adsp->set_addrmap(AS_PROGRAM, &metalmx_state::adsp_program_map);
 	m_adsp->set_addrmap(AS_DATA, &metalmx_state::adsp_data_map);
 
-	TMS34020(config, m_gsp, 40000000);         /* Unverified */
+	TMS34020(config, m_gsp, 40'000'000);         // Unverified
 	m_gsp->set_addrmap(AS_PROGRAM, &metalmx_state::gsp_map);
 	m_gsp->set_halt_on_reset(true);
-	m_gsp->set_pixel_clock(4000000);
+	m_gsp->set_pixel_clock(4'000'000);
 	m_gsp->set_pixels_per_clock(2);
 	m_gsp->output_int().set_inputline("maincpu", 4);
 
-	DSP32C(config, m_dsp32c[0], 40000000);      /* Unverified */
+	DSP32C(config, m_dsp32c[0], 40'000'000);      // Unverified
 	m_dsp32c[0]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_1_map);
 
-	DSP32C(config, m_dsp32c[1], 40000000);      /* Unverified */
+	DSP32C(config, m_dsp32c[1], 40'000'000);      // Unverified
 	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -685,7 +753,7 @@ void metalmx_state::metalmx(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 384);
 	screen.set_visarea(0, 511, 0, 383);
-	screen.set_screen_update(FUNC(metalmx_state::screen_update_metalmx));
+	screen.set_screen_update(FUNC(metalmx_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_565);
@@ -830,6 +898,8 @@ ROM_START( metalmx )
 	ROM_LOAD( "103-1114.bin",  0x000, 0x117, CRC(47443136) SHA1(83ea193d9d10d74fed941d5a14dd84c8a03d229f) )
 	ROM_LOAD( "103-1116.bin",  0x000, 0x117, CRC(37edc36c) SHA1(be53131c52e84cb3fe055af5ca4e2f6aa5442ff0) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

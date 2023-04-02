@@ -789,43 +789,66 @@ uint8_t abc806_state::sti_r()
 
 void abc806_state::sto_w(uint8_t data)
 {
-	int level = BIT(data, 7);
+	m_sto->write_bit(data & 0x07, BIT(data, 7));
+}
 
-	switch (data & 0x07)
-	{
-	case 0:
-		// external memory enable
-		LOG("%s EME %u\n", machine().describe_context(), level);
-		m_eme = level;
-		break;
-	case 1:
-		// 40/80 column display
-		m_40 = level;
-		break;
-	case 2:
-		// HRU II address line 8, PROT A0
-		m_hru2_a8 = level;
-		break;
-	case 3:
-		// PROT INI
-		break;
-	case 4:
-		// text display enable
-		m_txoff = level;
-		break;
-	case 5:
-		// RTC chip select
-		m_rtc->cs_w(!level);
-		break;
-	case 6:
-		// RTC clock
-		m_rtc->clk_w(level);
-		break;
-	case 7:
-		// RTC data in, PROT DIN
-		m_rtc->dio_w(level);
-		break;
-	}
+
+//-------------------------------------------------
+//  eme_w - external memory enable
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::eme_w)
+{
+	LOG("%s EME %u\n", machine().describe_context(), state);
+	m_eme = state;
+}
+
+
+//-------------------------------------------------
+//  _40_w - 40/80 column display
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::_40_w)
+{
+	m_40 = state;
+}
+
+
+//-------------------------------------------------
+//  hru2_a8_w - HRU II address line 8, PROT A0
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::hru2_a8_w)
+{
+	m_hru2_a8 = state;
+}
+
+
+//-------------------------------------------------
+//  prot_ini_w - PROT INI
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::prot_ini_w)
+{
+}
+
+
+//-------------------------------------------------
+//  txoff_w - text display enable
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::txoff_w)
+{
+	m_txoff = state;
+}
+
+
+//-------------------------------------------------
+//  prot_din_w - PROT DIN
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::prot_din_w)
+{
 }
 
 
@@ -1935,11 +1958,6 @@ void abc806_state::machine_reset()
 	m_dfd_in = 0;
 
 	m_hrs = 0;
-
-	// clear STO lines
-	for (int i = 0; i < 8; i++) {
-		sto_w(i);
-	}
 }
 
 
@@ -1998,7 +2016,7 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 	space.write_byte(0xff32, comcs & 0xff);
 	space.write_byte(0xff33, comcs >> 8);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -2049,6 +2067,7 @@ void abc800_state::common(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc800_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
@@ -2062,19 +2081,17 @@ void abc800_state::common(machine_config &config)
 	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
 	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
-	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, nullptr));
-	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
-	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
-	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
-
 	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("abc800");
+	SOFTWARE_LIST(config, "flop_list_830").set_original("abc830_flop");
+	SOFTWARE_LIST(config, "flop_list_832").set_original("abc832_flop");
+	SOFTWARE_LIST(config, "flop_list_838").set_original("abc838_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("abc800_hdd");
 
 	// quickload
-	QUICKLOAD(config, "quickload", "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb));
+	QUICKLOAD(config, m_quickload, "bac", attotime::from_seconds(2)).set_load_callback(FUNC(abc800_state::quickload_cb));
+	m_quickload->set_interface("abc800_quik");
 }
 
 
@@ -2096,9 +2113,10 @@ void abc800c_state::abc800c(machine_config &config)
 	// peripheral hardware
 	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
-	kb.set_default_option("abc800");
-	kb.set_fixed(true);
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc800_keyboard_devices, "abc800"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
@@ -2125,9 +2143,10 @@ void abc800m_state::abc800m(machine_config &config)
 	// peripheral hardware
 	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	abc_keyboard_port_device &kb(*subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG));
-	kb.set_default_option("abc800");
-	kb.set_fixed(true);
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc800_keyboard_devices, "abc800"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc830");
 
@@ -2155,7 +2174,10 @@ void abc802_state::abc802(machine_config &config)
 	m_dart->out_dtrb_callback().set(FUNC(abc802_state::lrs_w));
 	m_dart->out_rtsb_callback().set(FUNC(abc802_state::mux80_40_w));
 
-	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc55");
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc55"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc834");
 
@@ -2176,15 +2198,30 @@ void abc806_state::abc806(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc806_state::abc806_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc806_state::abc806_io);
 
+	LS259(config, m_sto); // 74ALS259 @ 13G
+	m_sto->q_out_cb<0>().set(FUNC(abc806_state::eme_w));
+	m_sto->q_out_cb<1>().set(FUNC(abc806_state::_40_w));
+	m_sto->q_out_cb<2>().set(FUNC(abc806_state::hru2_a8_w));
+	m_sto->q_out_cb<3>().set(FUNC(abc806_state::prot_ini_w));
+	m_sto->q_out_cb<4>().set(FUNC(abc806_state::txoff_w));
+	m_sto->q_out_cb<5>().set(m_rtc, FUNC(e0516_device::cs_w)).invert();
+	m_sto->q_out_cb<6>().set(m_rtc, FUNC(e0516_device::clk_w));
+	m_sto->q_out_cb<7>().set(m_rtc, FUNC(e0516_device::dio_w)); // 74LS125A buffer as fake open collector
+	m_sto->q_out_cb<7>().append(FUNC(abc806_state::prot_din_w));
+
 	// video hardware
 	abc806_video(config);
 
 	// peripheral hardware
 	m_dart->out_dtrb_callback().set(FUNC(abc800_state::keydtr_w));
 
-	E0516(config, E0516_TAG, ABC806_X02);
+	E0516(config, m_rtc, ABC806_X02);
+	m_rtc->outsel_rd_cb().set_constant(1);
 
-	subdevice<abc_keyboard_port_device>(ABC_KEYBOARD_PORT_TAG)->set_default_option("abc77");
+	abc_keyboard_port_device &kb(ABC_KEYBOARD_PORT(config, ABC_KEYBOARD_PORT_TAG, abc_keyboard_devices, "abc77"));
+	kb.out_rx_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
+	kb.out_trxc_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+	kb.out_keydown_handler().set(m_dart, FUNC(z80dart_device::dcdb_w));
 
 	subdevice<abcbus_slot_device>(ABCBUS_TAG)->set_default_option("abc832");
 
@@ -2192,7 +2229,7 @@ void abc806_state::abc806(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list2").set_original("abc806");
+	SOFTWARE_LIST(config, "flop_list_806").set_original("abc806_flop");
 }
 
 

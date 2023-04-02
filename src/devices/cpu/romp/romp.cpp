@@ -1004,12 +1004,7 @@ void romp_device::execute_set_input(int irqline, int state)
 	default:
 		// interrupt lines are active low
 		if (!state)
-		{
 			m_reqi |= 1U << irqline;
-
-			// enable debugger interrupt breakpoints
-			standard_irq_callback(irqline);
-		}
 		else
 			m_reqi &= ~(1U << irqline);
 		break;
@@ -1021,8 +1016,9 @@ device_memory_interface::space_config_vector romp_device::memory_space_config() 
 	return space_config_vector { std::make_pair(AS_PROGRAM, &m_mem_config) };
 }
 
-bool romp_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool romp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	return true;
 }
 
@@ -1111,6 +1107,9 @@ void romp_device::interrupt_check()
 	{
 		if (BIT(m_reqi, irl) || BIT(m_scr[IRB], 15 - irl))
 		{
+			// enable debugger interrupt breakpoints
+			standard_irq_callback(irl, m_scr[IAR]);
+
 			LOGMASKED(LOG_INTERRUPT, "interrupt_check taking interrupt request level %d\n", irl);
 			interrupt_enter(irl, m_scr[IAR]);
 

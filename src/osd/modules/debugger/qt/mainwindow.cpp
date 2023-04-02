@@ -375,9 +375,10 @@ void MainWindow::mountImage(bool changedTo)
 			QDir::currentPath(),
 			tr("All files (*.*)"));
 
-	if (img->load(filename.toUtf8().data()) != image_init_result::PASS)
+	std::error_condition err = img->load(filename.toUtf8().data());
+	if (err)
 	{
-		m_machine.debugger().console().printf("Image could not be mounted.\n");
+		m_machine.debugger().console().printf("Image could not be mounted: %s\n", err.message());
 		return;
 	}
 

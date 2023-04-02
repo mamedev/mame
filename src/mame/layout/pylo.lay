@@ -1,0 +1,404 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="white"><rect><color red="0.86" green="0.86" blue="0.88" /></rect></element>
+	<element name="whited"><disk><color red="0.86" green="0.86" blue="0.88" /></disk></element>
+	<element name="grey"><rect><color red="0.6" green="0.6" blue="0.61" /></rect></element>
+
+	<element name="switch_game" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="29" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds x="0.5" y="0.5" width="28" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text state="0x01" string="GAME 1" align="1">
+			<bounds x="2" y="0.5" width="26" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+		<text state="0x02" string="GAME 2" align="1">
+			<bounds x="2" y="0.5" width="26" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+		<text state="0x04" string="GAME 3" align="1">
+			<bounds x="2" y="0.5" width="26" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+
+	<element name="text_p1">
+		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
+		<text string="PLAYER 1"><color red="0.6" green="0.6" blue="0.61" /></text>
+	</element>
+	<element name="text_p2">
+		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
+		<text string="PLAYER 2"><color red="0.6" green="0.6" blue="0.61" /></text>
+	</element>
+	<element name="text_v">
+		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
+		<text string="v"><color red="0.6" green="0.6" blue="0.61" /></text>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.3" green="0.03" blue="0.045" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+	<element name="diskr">
+		<disk>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.8" green="0.15" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="8.4" height="8.4" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</disk>
+	</element>
+
+	<element name="butb" defstate="0">
+		<disk state="0"><color red="0.1" green="0.25" blue="0.85" /></disk>
+		<disk state="1"><color red="0.08" green="0.2" blue="0.68" /></disk>
+	</element>
+
+	<element name="hlb" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color alpha="0" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="but1">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="1">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but2">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="2">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but3">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="3">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but4">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="4">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but5">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="5">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but6">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="6">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but7">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="7">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but8">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="8">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but9">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="9">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but10">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="10">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but11">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="11">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+	<element name="but12">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.6" green="0.6" blue="0.61" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.86" green="0.86" blue="0.88" />
+		</rect>
+		<text string="12">
+			<bounds xc="0" yc="0" width="9" height="9" />
+			<color red="0.1" green="0.25" blue="0.85" />
+		</text>
+	</element>
+
+
+<!-- p1 buttons -->
+
+	<group name="buttons1">
+		<element ref="white"><bounds x="-0.5" y="-0.5" width="18" height="9" /></element>
+
+		<element name="0.7" ref="led"><bounds xc="1" yc="1" width="0.7" height="0.7" /></element>
+		<element name="0.8" ref="led"><bounds xc="4" yc="1" width="0.7" height="0.7" /></element>
+		<element name="0.9" ref="led"><bounds xc="7" yc="1" width="0.7" height="0.7" /></element>
+		<element name="0.10" ref="led"><bounds xc="10" yc="1" width="0.7" height="0.7" /></element>
+		<element name="1.7" ref="led"><bounds xc="13" yc="1" width="0.7" height="0.7" /></element>
+		<element name="1.8" ref="led"><bounds xc="16" yc="1" width="0.7" height="0.7" /></element>
+
+		<element name="1.9" ref="led"><bounds xc="1" yc="5" width="0.7" height="0.7" /></element>
+		<element name="1.10" ref="led"><bounds xc="4" yc="5" width="0.7" height="0.7" /></element>
+		<element name="0.12" ref="led"><bounds xc="7" yc="5" width="0.7" height="0.7" /></element>
+		<element name="1.12" ref="led"><bounds xc="10" yc="5" width="0.7" height="0.7" /></element>
+		<element name="2.12" ref="led"><bounds xc="13" yc="5" width="0.7" height="0.7" /></element>
+		<element name="3.12" ref="led"><bounds xc="16" yc="5" width="0.7" height="0.7" /></element>
+
+		<element ref="but1"><bounds x="0" y="2" width="2" height="2" /></element>
+		<element ref="but2"><bounds x="3" y="2" width="2" height="2" /></element>
+		<element ref="but3"><bounds x="6" y="2" width="2" height="2" /></element>
+		<element ref="but4"><bounds x="9" y="2" width="2" height="2" /></element>
+		<element ref="but5"><bounds x="12" y="2" width="2" height="2" /></element>
+		<element ref="but6"><bounds x="15" y="2" width="2" height="2" /></element>
+
+		<element ref="but7"><bounds x="0" y="6" width="2" height="2" /></element>
+		<element ref="but8"><bounds x="3" y="6" width="2" height="2" /></element>
+		<element ref="but9"><bounds x="6" y="6" width="2" height="2" /></element>
+		<element ref="but10"><bounds x="9" y="6" width="2" height="2" /></element>
+		<element ref="but11"><bounds x="12" y="6" width="2" height="2" /></element>
+		<element ref="but12"><bounds x="15" y="6" width="2" height="2" /></element>
+
+		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds x="0" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="3" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="6" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="9" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds x="12" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="15" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+
+		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="0" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds x="3" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x10"><bounds x="6" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x20"><bounds x="9" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x40"><bounds x="12" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.2" inputmask="0x80"><bounds x="15" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+	</group>
+
+
+<!-- p2 buttons -->
+
+	<group name="buttons2">
+		<element ref="white"><bounds x="-0.5" y="-0.5" width="18" height="9" /></element>
+
+		<element name="2.7" ref="led"><bounds xc="1" yc="1" width="0.7" height="0.7" /></element>
+		<element name="2.8" ref="led"><bounds xc="4" yc="1" width="0.7" height="0.7" /></element>
+		<element name="2.9" ref="led"><bounds xc="7" yc="1" width="0.7" height="0.7" /></element>
+		<element name="2.10" ref="led"><bounds xc="10" yc="1" width="0.7" height="0.7" /></element>
+		<element name="3.7" ref="led"><bounds xc="13" yc="1" width="0.7" height="0.7" /></element>
+		<element name="3.8" ref="led"><bounds xc="16" yc="1" width="0.7" height="0.7" /></element>
+
+		<element name="3.9" ref="led"><bounds xc="1" yc="5" width="0.7" height="0.7" /></element>
+		<element name="3.10" ref="led"><bounds xc="4" yc="5" width="0.7" height="0.7" /></element>
+		<element name="0.11" ref="led"><bounds xc="7" yc="5" width="0.7" height="0.7" /></element>
+		<element name="1.11" ref="led"><bounds xc="10" yc="5" width="0.7" height="0.7" /></element>
+		<element name="2.11" ref="led"><bounds xc="13" yc="5" width="0.7" height="0.7" /></element>
+		<element name="3.11" ref="led"><bounds xc="16" yc="5" width="0.7" height="0.7" /></element>
+
+		<element ref="but1"><bounds x="0" y="2" width="2" height="2" /></element>
+		<element ref="but2"><bounds x="3" y="2" width="2" height="2" /></element>
+		<element ref="but3"><bounds x="6" y="2" width="2" height="2" /></element>
+		<element ref="but4"><bounds x="9" y="2" width="2" height="2" /></element>
+		<element ref="but5"><bounds x="12" y="2" width="2" height="2" /></element>
+		<element ref="but6"><bounds x="15" y="2" width="2" height="2" /></element>
+
+		<element ref="but7"><bounds x="0" y="6" width="2" height="2" /></element>
+		<element ref="but8"><bounds x="3" y="6" width="2" height="2" /></element>
+		<element ref="but9"><bounds x="6" y="6" width="2" height="2" /></element>
+		<element ref="but10"><bounds x="9" y="6" width="2" height="2" /></element>
+		<element ref="but11"><bounds x="12" y="6" width="2" height="2" /></element>
+		<element ref="but12"><bounds x="15" y="6" width="2" height="2" /></element>
+
+		<element ref="hlb" inputtag="IN.3" inputmask="0x10"><bounds x="0" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x20"><bounds x="3" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x40"><bounds x="6" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.3" inputmask="0x80"><bounds x="9" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.4" inputmask="0x10"><bounds x="12" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.4" inputmask="0x20"><bounds x="15" y="2" width="2" height="2" /><color alpha="0.1" /></element>
+
+		<element ref="hlb" inputtag="IN.4" inputmask="0x40"><bounds x="0" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.4" inputmask="0x80"><bounds x="3" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.5" inputmask="0x10"><bounds x="6" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.5" inputmask="0x20"><bounds x="9" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.5" inputmask="0x40"><bounds x="12" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+		<element ref="hlb" inputtag="IN.5" inputmask="0x80"><bounds x="15" y="6" width="2" height="2" /><color alpha="0.1" /></element>
+	</group>
+
+
+<!-- 7seg display -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<group name="digits">
+		<element name="digit3" ref="digit"><bounds x="0" y="0" width="0.75" height="1" /></element>
+		<element name="digit2" ref="digit"><bounds x="1" y="0" width="0.75" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="2" y="0" width="0.75" height="1" /></element>
+		<element name="digit0" ref="digit"><bounds x="3" y="0" width="0.75" height="1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="14.5" right="85.5" top="4.5" bottom="101.5" />
+
+		<element ref="white"><bounds x="0" y="0" width="100" height="110" /></element>
+
+		<element ref="diskr"><bounds xc="28" yc="65" width="24" height="24" /></element>
+		<element ref="diskr"><bounds xc="72" yc="41" width="24" height="24" /></element>
+
+		<element ref="white"><bounds x="8" y="65" width="40" height="20" /></element>
+		<element ref="white"><bounds x="52" y="21" width="40" height="20" /></element>
+		<element ref="whited"><bounds x="26" y="53" width="60" height="40" /></element>
+		<element ref="whited"><bounds x="14" y="13" width="60" height="40" /></element>
+
+		<element ref="butb" inputtag="IN.1" inputmask="0x01"><bounds xc="28" yc="65" width="19" height="19" /></element>
+		<element ref="butb" inputtag="IN.2" inputmask="0x01"><bounds xc="72" yc="41" width="19" height="19" /></element>
+
+		<group ref="buttons1"><bounds x="28" y="79" width="44" height="22" /></group>
+		<group ref="buttons2"><bounds x="28" y="5" width="44" height="22" /><orientation rotate="180" /></group>
+
+		<element ref="grey"><bounds x="0" y="27" width="100" height="0.25" /></element>
+		<element ref="grey"><bounds x="0" y="78.75" width="100" height="0.25" /></element>
+
+		<element ref="black"><bounds x="-5" y="-5.5" width="110" height="10" /></element>
+		<element ref="black"><bounds x="-5" y="101.5" width="110" height="10" /></element>
+		<element ref="black"><bounds x="-5.5" y="-5" width="20" height="120" /></element>
+		<element ref="black"><bounds x="85.5" y="-5" width="20" height="120" /></element>
+
+		<element ref="text_p1"><bounds x="50.5" y="57" width="10" height="2" /></element>
+		<element ref="text_v"><bounds x="50.5" y="59" width="10" height="2" /></element>
+		<element ref="text_p2"><bounds x="39.5" y="47" width="10" height="2" /><orientation rotate="180" /></element>
+		<element ref="text_v"><bounds x="39.5" y="45" width="10" height="2" /><orientation rotate="180" /></element>
+
+		<element ref="switch_game" inputtag="IN.0" inputmask="0x0e" inputraw="yes"><bounds xc="28" y="46.5" width="14.21" height="4.9" /></element>
+
+		<element ref="black"><bounds x="38" y="49" width="24" height="8" /></element>
+		<group ref="digits"><bounds x="40" yc="53" width="20" height="5.75" /><orientation rotate="180" /></group>
+
+	</view>
+</mamelayout>

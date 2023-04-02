@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_FRUITSAMPLES_H
-#define MAME_AUDIO_FRUITSAMPLES_H
+#ifndef MAME_SHARED_FRUITSAMPLES_H
+#define MAME_SHARED_FRUITSAMPLES_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FRUIT_SAMPLES, fruit_samples_device)
 
-#endif // MAME_AUDIO_FRUITSAMPLES_H
+#endif // MAME_SHARED_FRUITSAMPLES_H

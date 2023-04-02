@@ -608,8 +608,9 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 		uint16_t execute_address, start_addr, end_addr;
 
 		/* load the binary into memory */
-		if (z80bin_load_file(image, space, execute_address, start_addr, end_addr) != image_init_result::PASS)
-			return image_init_result::FAIL;
+		std::error_condition err = z80bin_load_file(image, space, execute_address, start_addr, end_addr);
+		if (err)
+			return err;
 
 		/* is this file executable? */
 		if (execute_address != 0xffff)
@@ -627,24 +628,22 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			}
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
-
-	uint16_t i, j;
-	u8 data;
 
 	size_t quickload_size = image.length();
 	if (image.is_filetype("mwb"))
 	{
 		/* mwb files - standard basic files */
-		for (i = 0; i < quickload_size; i++)
+		for (int i = 0; i < quickload_size; i++)
 		{
-			j = 0x8c0 + i;
+			int j = 0x8c0 + i;
 
+			u8 data;
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return image_init_result::FAIL;
+				return image_error::UNSPECIFIED;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -652,7 +651,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return image_init_result::FAIL;
+				return image_error::UNSUPPORTED;
 			}
 		}
 
@@ -664,18 +663,18 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else
-	if (image.is_filetype("com"))
+	else if (image.is_filetype("com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
-		for (i = 0; i < quickload_size; i++)
+		for (int i = 0; i < quickload_size; i++)
 		{
-			j = 0x100 + i;
+			int j = 0x100 + i;
 
+			u8 data;
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return image_init_result::FAIL;
+				return image_error::UNSPECIFIED;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -683,25 +682,25 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return image_init_result::FAIL;
+				return image_error::UNSUPPORTED;
 			}
 		}
 
 		if (autorun)
 			m_maincpu->set_pc(0x100);
 	}
-	else
-	if (image.is_filetype("bee"))
+	else if (image.is_filetype("bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
-		for (i = 0; i < quickload_size; i++)
+		for (int i = 0; i < quickload_size; i++)
 		{
-			j = 0x900 + i;
+			int j = 0x900 + i;
 
+			u8 data;
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return image_init_result::FAIL;
+				return image_error::UNSPECIFIED;
 			}
 
 			if ((j < m_size) || (j > 0xefff))
@@ -709,7 +708,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return image_init_result::FAIL;
+				return image_error::UNSUPPORTED;
 			}
 		}
 
@@ -717,21 +716,21 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			m_maincpu->set_pc(0x900);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 // Index usage: 0 = not used; 1 = net rom; 2-7 = pak roms
-image_init_result mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
+std::error_condition mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
 {
 	u32 size = slot->common_get_size("rom");
 
 	if (pak_index > 1)
 	{
-		// "mbp" roms
+		// "mbp" ROMs
 		if ((size == 0) || (size > 0x4000))
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported ROM size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
@@ -739,13 +738,13 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		slot->rom_alloc(m_pak_extended[pak_index] ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
 		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-		// Validate the rom
-		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		// Validate the ROM
+		logerror("ROM header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
 		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Not a PAK rom");
+			osd_printf_error("%s: Not a PAK rom\n", image.basename());
 			slot->call_unload();
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 	}
 	else
@@ -753,8 +752,8 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		// "mbn" roms
 		if ((size == 0) || (size > 0x2000))
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported ROM size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
 
@@ -762,19 +761,19 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 		// Validate the rom
-		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		logerror("ROM header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
 		if (!image.loaded_through_softlist())  // need to let pascal through without testing
 		{
 			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Not a NET rom");
+				osd_printf_error("%s: Not a NET rom\n", image.basename());
 				slot->call_unload();
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void mbee_state::unload_cart(u8 pak_index)

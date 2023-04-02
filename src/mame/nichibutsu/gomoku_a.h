@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, David Haywood
-#ifndef MAME_AUDIO_GOMOKU_H
-#define MAME_AUDIO_GOMOKU_H
+#ifndef MAME_NICHIBUTSU_GOMOKU_A_H
+#define MAME_NICHIBUTSU_GOMOKU_A_H
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GOMOKU_SOUND, gomoku_sound_device)
 
-#endif // MAME_AUDIO_GOMOKU_H
+#endif // MAME_NICHIBUTSU_GOMOKU_A_H

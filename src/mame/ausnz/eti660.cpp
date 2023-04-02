@@ -47,6 +47,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define CDP1802_TAG     "ic3"
 #define CDP1864_TAG     "ic4"
 #define MC6821_TAG      "ic5"
@@ -318,15 +321,14 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 	int quick_addr = 0x600;
 	int quick_length;
 	std::vector<u8> quick_data;
-	int read_;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSPECIFIED;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
-	read_ = image.fread( &quick_data[0], quick_length);
+	int const read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+		result = image_error::INVALIDIMAGE;
 		image.message(" Cannot read the file");
 	}
 	else
@@ -341,7 +343,7 @@ QUICKLOAD_LOAD_MEMBER(eti660_state::quickload_cb)
 		else
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
 
-		result = image_init_result::PASS;
+		result = std::error_condition();
 	}
 
 	return result;
@@ -406,6 +408,9 @@ ROM_START( eti660 )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME   FLAGS
 COMP( 1981, eti660, 0,      0,      eti660,  eti660, eti660_state, empty_init, "Electronics Today International", "ETI-660 Learners' Microcomputer", MACHINE_SUPPORTS_SAVE )

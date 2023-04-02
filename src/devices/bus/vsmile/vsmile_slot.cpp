@@ -132,15 +132,15 @@ static int vsmile_get_pcb_id(const char *slot)
  call load
  -------------------------------------------------*/
 
-image_init_result vsmile_cart_slot_device::call_load()
+std::error_condition vsmile_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x1000000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 16MB");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Attempted loading a cart larger than 16MB\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size);
@@ -173,10 +173,10 @@ image_init_result vsmile_cart_slot_device::call_load()
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

@@ -80,6 +80,8 @@ ToDo:
 #include "ravens.lh"
 
 
+namespace {
+
 class ravens_base : public driver_device
 {
 public:
@@ -314,20 +316,21 @@ QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 	int i;
 	int quick_addr = 0x900;
 	int exec_addr;
-	int quick_length;
 	std::vector<u8> quick_data;
 	int read_;
-	image_init_result result = image_init_result::FAIL;
+	std::error_condition result = image_error::UNSPECIFIED;
 
-	quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x0900)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too short");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too short\n", image.basename());
 		image.message(" File too short");
 	}
 	else if (quick_length > 0x8000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "File too long");
+		result = image_error::INVALIDLENGTH;
+		osd_printf_error("%s: File too long\n", image.basename());
 		image.message(" File too long");
 	}
 	else
@@ -336,12 +339,13 @@ QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
+			osd_printf_error("%s: Cannot read the file\n", image.basename());
 			image.message(" Cannot read the file");
 		}
 		else if (quick_data[0] != 0xc6)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
+			result = image_error::INVALIDIMAGE;
+			osd_printf_error("%s: Invalid header\n", image.basename());
 			image.message(" Invalid header");
 		}
 		else
@@ -350,7 +354,8 @@ QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 
 			if (exec_addr >= quick_length)
 			{
-				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
+				result = image_error::INVALIDIMAGE;
+				osd_printf_error("%s: Exec address beyond end of file\n", image.basename());
 				image.message(" Exec address beyond end of file");
 			}
 			else
@@ -364,7 +369,7 @@ QUICKLOAD_LOAD_MEMBER(ravens_base::quickload_cb)
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = image_init_result::PASS;
+				result = std::error_condition();
 			}
 		}
 	}
@@ -430,6 +435,9 @@ ROM_START( ravens2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mon_v2.0.bin", 0x0000, 0x0800, CRC(bcd47c58) SHA1(f261a3f128fbedbf59a8b5480758fff4d7f76de1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

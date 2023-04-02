@@ -24,22 +24,21 @@ apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &m
 /*
     Open cylinder image and read RAM
 */
-image_init_result apexc_cylinder_image_device::call_load()
+std::error_condition apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
+	fread(machine().root_device().memshare("maincpu")->ptr(), 0x1000);
 #ifdef LSB_FIRST
-	{   /* fix endianness */
-		uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
+	/* fix endianness */
+	auto const RAM = reinterpret_cast<uint32_t *>(machine().root_device().memshare("maincpu")->ptr());
 
-		for (int i=0; i < 0x0400; i++)
-			RAM[i] = big_endianize_int32(RAM[i]);
-	}
+	for (int i=0; i < 0x0400; i++)
+		RAM[i] = big_endianize_int32(RAM[i]);
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*

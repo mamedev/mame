@@ -16,9 +16,12 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 
 class mc146818_device : public device_t,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -31,13 +34,9 @@ public:
 	// The MC146818 doesn't have century support (some variants do), but when syncing the date & time at startup we can optionally store the century.
 	void set_century_index(int century_index) { assert(!century_count_enabled()); m_century_index = century_index; }
 
-	// The MC146818 doesn't have UTC support, but when syncing the data & time at startup we can use UTC instead of local time.
-	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
-
 	void set_binary(bool binary) { m_binary = binary; }
 	void set_24hrs(bool hour) { m_hour = hour; }
 	void set_epoch(int epoch) { m_epoch = epoch; }
-	void set_binary_year(int bin) { m_binyear = bin; }
 
 	// read/write access
 	uint8_t read(offs_t offset);
@@ -58,6 +57,11 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return m_epoch != 0 || m_century_index >= 0; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	static constexpr unsigned char ALARM_DONTCARE = 0xc0;
 	static constexpr unsigned char HOURS_PM = 0x80;
@@ -132,7 +136,6 @@ protected:
 	// internal helpers
 	int to_ram(int a) const;
 	int from_ram(int a) const;
-	void set_base_datetime();
 	void update_irq();
 	void update_timer();
 	virtual int get_timer_bypass() const;
@@ -167,7 +170,7 @@ protected:
 	devcb_write_line m_write_irq;
 	devcb_write_line m_write_sqw;
 	int m_century_index, m_epoch;
-	bool m_use_utc, m_binary, m_hour, m_binyear;
+	bool m_binary, m_hour;
 	bool m_sqw_state;
 	unsigned m_tuc; // update cycle time
 };
@@ -178,8 +181,26 @@ public:
 	ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class ds1397_device : public mc146818_device
+{
+public:
+	ds1397_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	u8 xram_r(offs_t offset);
+	void xram_w(offs_t offset, u8 data);
+
+protected:
+	virtual int data_size() const override { return 64 + 4096; }
+
+	u8 m_xram_page;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(MC146818, mc146818_device)
 DECLARE_DEVICE_TYPE(DS1287, ds1287_device)
+DECLARE_DEVICE_TYPE(DS1397, ds1397_device)
 
 #endif // MAME_MACHINE_MC146818_H

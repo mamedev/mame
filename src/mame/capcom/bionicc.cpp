@@ -94,6 +94,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -984,6 +986,8 @@ ROM_START( bioniccbl2 ) // only the 4 maincpu ROMs differ, they came from an ori
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

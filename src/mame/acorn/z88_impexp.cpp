@@ -136,7 +136,7 @@ void z88_impexp_device::check_filename(std::string &filename)
 }
 
 
-image_init_result z88_impexp_device::call_load()
+std::error_condition z88_impexp_device::call_load()
 {
 	m_mode = MODE_SEND;
 	m_queue = std::queue<uint8_t>();
@@ -180,7 +180,7 @@ image_init_result z88_impexp_device::call_load()
 	{
 		uint8_t b;
 		if (fread(&b, 1) != 1)
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 
 		// Escape non printable characters
 		if ((b < 0x20 || b >= 0x7f) && b != 0x0a && b != 0x0d && b != 0x09)
@@ -205,15 +205,15 @@ image_init_result z88_impexp_device::call_load()
 	m_queue.push('E');
 	queue();
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
-image_init_result z88_impexp_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition z88_impexp_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_queue = std::queue<uint8_t>();
 	m_mode = MODE_RECV;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

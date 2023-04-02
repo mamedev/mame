@@ -47,6 +47,9 @@
 #include "sound/ymopn.h"
 #include "taitosnd.h"
 
+
+namespace {
+
 class bingowav_state : public driver_device
 {
 public:
@@ -163,6 +166,8 @@ ROM_START( bingowav )
 	ROM_REGION( 0x20000, "ctrlcpu", 0 )
 	ROM_LOAD( "ic1", 0x00000, 0x20000, CRC(d257bbaf) SHA1(9d1414594dc1c1fca256ab5b6039e733bff1414a) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1994, bingowav, 0, bingowav, bingowav, bingowav_state, empty_init, ROT0, "Taito", "Bingo Wave", MACHINE_IS_SKELETON )

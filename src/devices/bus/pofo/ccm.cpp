@@ -68,7 +68,7 @@ void portfolio_memory_card_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-image_init_result portfolio_memory_card_slot_device::call_load()
+std::error_condition portfolio_memory_card_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -78,7 +78,7 @@ image_init_result portfolio_memory_card_slot_device::call_load()
 			load_software_region("rom", m_card->m_rom);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

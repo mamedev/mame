@@ -56,14 +56,14 @@ void mc10_pak_device::device_start()
 //  load - install rom region
 //-------------------------------------------------
 
-image_init_result mc10_pak_device::load()
+std::error_condition mc10_pak_device::load()
 {
 	// if the host has supplied a ROM space, install it
 	memory_region *const romregion(memregion("^rom"));
 	if (romregion)
 		owning_slot().memspace().install_rom(0x5000, 0x5000 + romregion->bytes(), romregion->base());
 	else
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

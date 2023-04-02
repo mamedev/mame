@@ -101,7 +101,7 @@ void PaUtil_DebugPrint( const char *format, ... );
 
 
 #ifdef PA_LOG_API_CALLS
-#define PA_LOGAPI(x) PaUtil_DebugPrint x 
+#define PA_LOGAPI(x) PaUtil_DebugPrint x
 
 #define PA_LOGAPI_ENTER(functionName) PaUtil_DebugPrint( functionName " called.\n" )
 
@@ -110,16 +110,16 @@ void PaUtil_DebugPrint( const char *format, ... );
 #define PA_LOGAPI_EXIT(functionName) PaUtil_DebugPrint( functionName " returned.\n" )
 
 #define PA_LOGAPI_EXIT_PAERROR( functionName, result ) \
-	PaUtil_DebugPrint( functionName " returned:\n" ); \
-	PaUtil_DebugPrint("\tPaError: %d ( %s )\n", result, Pa_GetErrorText( result ) )
+    PaUtil_DebugPrint( functionName " returned:\n" ); \
+    PaUtil_DebugPrint("\tPaError: %d ( %s )\n", result, Pa_GetErrorText( result ) )
 
 #define PA_LOGAPI_EXIT_T( functionName, resultFormatString, result ) \
-	PaUtil_DebugPrint( functionName " returned:\n" ); \
-	PaUtil_DebugPrint("\t" resultFormatString "\n", result )
+    PaUtil_DebugPrint( functionName " returned:\n" ); \
+    PaUtil_DebugPrint("\t" resultFormatString "\n", result )
 
 #define PA_LOGAPI_EXIT_PAERROR_OR_T_RESULT( functionName, positiveResultFormatString, result ) \
-	PaUtil_DebugPrint( functionName " returned:\n" ); \
-	if( result > 0 ) \
+    PaUtil_DebugPrint( functionName " returned:\n" ); \
+    if( result > 0 ) \
         PaUtil_DebugPrint("\t" positiveResultFormatString "\n", result ); \
     else \
         PaUtil_DebugPrint("\tPaError: %d ( %s )\n", result, Pa_GetErrorText( result ) )
@@ -133,7 +133,7 @@ void PaUtil_DebugPrint( const char *format, ... );
 #define PA_LOGAPI_EXIT_PAERROR_OR_T_RESULT( functionName, positiveResultFormatString, result )
 #endif
 
-    
+
 typedef void (*PaUtilLogCallback ) (const char *log);
 
 /**

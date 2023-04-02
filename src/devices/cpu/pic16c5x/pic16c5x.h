@@ -139,11 +139,11 @@ private:
 	int       m_delay_timer;
 	u16       m_temp_config;
 	int       m_rtcc;
-	int       m_count_cycles;
+	u8        m_count_cycles;
 	u8        m_data_mask;
 	u16       m_program_mask;
 	u8        m_status_mask;
-	int       m_inst_cycles;
+	u8        m_inst_cycles;
 
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 7, 0,  0, ENDIANNESS_LITTLE>::specific m_data;

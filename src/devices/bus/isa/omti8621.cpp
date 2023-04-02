@@ -59,7 +59,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "winchester"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "disk"; }
 
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 protected:
 	// device-level overrides
@@ -1469,7 +1469,7 @@ void omti_disk_image_device::device_reset()
    disk image create callback
 -------------------------------------------------*/
 
-image_init_result omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition omti_disk_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	logerror("device_create_omti_disk: creating OMTI Disk with %d blocks\n", m_sector_count);
 
@@ -1481,9 +1481,9 @@ image_init_result omti_disk_image_device::call_create(int format_type, util::opt
 		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
 				< OMTI_DISK_SECTOR_SIZE)
 		{
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

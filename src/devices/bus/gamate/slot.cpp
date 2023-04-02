@@ -125,7 +125,7 @@ static const char *gamate_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result gamate_cart_slot_device::call_load()
+std::error_condition gamate_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -134,8 +134,8 @@ image_init_result gamate_cart_slot_device::call_load()
 
 		if (len > 0x80000)
 		{
-			seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported cartridge size\n", basename());
+			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(len);
@@ -160,10 +160,10 @@ image_init_result gamate_cart_slot_device::call_load()
 				m_type = gamate_get_pcb_id(pcb_name);
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

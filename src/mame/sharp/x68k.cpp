@@ -706,13 +706,19 @@ TIMER_CALLBACK_MEMBER(x68k_state::bus_error)
 
 void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
-	if(m_bus_error)
-		return;
-	else if(!m_maincpu->executing())
+	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
+	if(!m_maincpu->executing())
 	{
 		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
 		return;
 	}
+	if(m_maincpu->type() == M68000) {
+		downcast<m68000_device *>(m_maincpu.target())->trigger_bus_error();
+		return;
+	}
+
+	if(m_bus_error)
+		return;
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;
@@ -722,7 +728,6 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 	cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	m_bus_error_timer->adjust(cpuptr->cycles_to_attotime(16)); // let rmw cycles complete
-	LOGMASKED(LOG_SYS, "%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
 uint16_t x68k_state::rom0_r(offs_t offset, uint16_t mem_mask)
@@ -1082,10 +1087,9 @@ void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 	}
 }
 
-image_init_result x68k_state::floppy_load(floppy_image_device *dev)
+void x68k_state::floppy_load(floppy_image_device *dev)
 {
 	floppy_load_unload(true, dev);
-	return image_init_result::PASS;
 }
 
 void x68k_state::floppy_unload(floppy_image_device *dev)

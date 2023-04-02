@@ -688,7 +688,7 @@ QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 
 	if ((size + chip8_size) > m_ram->size())
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	if (chip8_size > 0)
@@ -700,7 +700,7 @@ QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 	/* load image to RAM */
 	image.fread(ram + chip8_size, size);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

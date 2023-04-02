@@ -60,6 +60,8 @@ E I1     Vectored interrupt error
 #include "formats/pc_dsk.h"
 
 
+namespace {
+
 class m20_state : public driver_device
 {
 public:
@@ -75,7 +77,6 @@ public:
 		m_floppy0(*this, "fd1797:0:5dd"),
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
-		m_p_videoram(*this, "videoram"),
 		m_palette(*this, "palette")
 	{
 	}
@@ -94,7 +95,6 @@ private:
 	required_device<floppy_image_device> m_floppy1;
 	optional_device<m20_8086_device> m_apb;
 
-	required_shared_ptr<uint16_t> m_p_videoram;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
@@ -132,11 +132,12 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 {
 	uint32_t *p = &bitmap.pix(y);
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint16_t *vram = (uint16_t *)m_ram->pointer();
+	uint16_t offset = ((ma | (ra << 1)) << 4);
 
 	for ( int i = 0; i < x_count; i++ )
 	{
-		uint16_t offset = ((ma | (ra << 1)) << 4) + i;
-		uint16_t data = m_p_videoram[ offset ];
+		uint16_t data = vram[ offset + i ];
 
 		for ( int j = 15; j >= 0; j-- )
 		{
@@ -325,14 +326,12 @@ B/W, 128K cards, 3 cards => 512K of memory:
 void m20_state::m20_program_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x30000, 0x33fff).ram().share("videoram");
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
 }
 
 void m20_state::m20_data_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x30000, 0x33fff).ram().share("videoram");
 	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
 }
 
@@ -375,10 +374,10 @@ void m20_state::install_memory()
 	pspace.install_ram(0x28000, 0x2bfff, 0, memptr + 0x1c000);
 	dspace.install_ram(0x28000, 0x2bfff, 0, memptr + 0x1c000);
 	/* <2>c000 empty*/
-	/* <3>0000 (video buffer)
+	/* <3>0000 (video buffer) */
 	pspace.install_ram(0x30000, 0x33fff, 0, memptr + 0x0000);
 	dspace.install_ram(0x30000, 0x33fff, 0, memptr + 0x0000);
-	*/
+
 
 	/* <5>0000 */
 	dspace.install_ram(0x50000, 0x53fff, 0, memptr + 0x8000);
@@ -847,6 +846,9 @@ ROM_START(m44) // TODO: implement different hardware. Split to another driver?
 	ROM_REGION( 0x114, "plds", 0 )
 	ROM_LOAD( "pl46.j09", 0x000, 0x114, NO_DUMP ) // PLD, chip type unknown
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

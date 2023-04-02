@@ -85,17 +85,25 @@ private:
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 	template <model Model, bool Invert, bool Flip>
-	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
+	unsigned get_text_character(uint32_t code, int row);
 
+	template<bool Double>
 	void lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
+	void render_line(uint16_t *out, uint16_t const *in, int startcol, int stopcol, bool monochrome, bool is_80_column);
+
 	bool use_page_2() const;
 
+	bool composite_monitor();
 	bool monochrome_monitor();
 	bool rgb_monitor();
+
+	int composite_color_mode();
+	bool composite_lores_artifacts();
+	bool composite_text_color(bool is_80_column);
+	bool monochrome_dhr_shift();
 	int monochrome_hue();
 
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;

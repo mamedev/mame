@@ -95,7 +95,7 @@ TIMER_CALLBACK_MEMBER(z88cart_slot_device::close_flap)
     call load
 -------------------------------------------------*/
 
-image_init_result z88cart_slot_device::call_load()
+std::error_condition z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -116,7 +116,7 @@ image_init_result z88cart_slot_device::call_load()
 		}
 		else
 		{
-			return image_init_result::FAIL;
+			return image_error::INTERNAL;
 		}
 	}
 
@@ -126,7 +126,7 @@ image_init_result z88cart_slot_device::call_load()
 	// setup the timer to close the flap
 	m_flp_timer->adjust(CLOSE_FLAP_TIME);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

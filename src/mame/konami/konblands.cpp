@@ -26,6 +26,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(18'432'000)
 
 class konblands_state : public driver_device
@@ -327,6 +330,8 @@ ROM_START( kbadlandsh )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "badlands", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, kbadlands,  0,         konblands,  konblands, konblands_state, empty_init, ROT0, "Konami",      "Badlands (Konami, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -103,8 +103,14 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() { return  m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() { return ~m_io_mouse[1]->read(); }));
 	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x00bb, 0x00bb).mirror(0xff00).rw(m_gs, FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
+	map(0x00b3, 0x00b3).mirror(0xff00).rw(m_gs, FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
+	map(0x0033, 0x0033).mirror(0xff00).w(m_gs, FUNC(neogs_device::ctrl_w));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -177,7 +183,7 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
 	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
-	m_line_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
+	m_scanline_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
 }
 
 void tsconf_state::machine_start()
@@ -196,6 +202,10 @@ void tsconf_state::machine_start()
 
 void tsconf_state::machine_reset()
 {
+	m_frame_irq_timer->adjust(attotime::never);
+	m_scanline_irq_timer->adjust(attotime::never);
+	m_int_mask = 0;
+
 	m_bank0_rom.select(0);
 
 	m_glukrs->disable();
@@ -236,6 +246,22 @@ void tsconf_state::machine_reset()
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
 }
 
+INPUT_PORTS_START( tsconf )
+	PORT_INCLUDE( spec_plus )
+
+	PORT_START("mouse_input1")
+	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
+
+	PORT_START("mouse_input2")
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+
+	PORT_START("mouse_input3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+
+INPUT_PORTS_END
+
 void tsconf_state::tsconf(machine_config &config)
 {
 	spectrum_128(config);
@@ -247,6 +273,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tsconf_state::irq_vector));
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 
@@ -275,6 +302,8 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "rspeaker", 0.25)
 		.add_route(2, "rspeaker", 0.50);
 
+	NEOGS(config, m_gs);
+
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
@@ -293,4 +322,4 @@ ROM_START(tsconf)
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)
+COMP( 2011, tsconf, spec128,    0,      tsconf,     tsconf,     tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution: TS-Configuration",   0)

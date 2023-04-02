@@ -34,7 +34,10 @@ enum class image_error : int
 	INTERNAL = 1,
 	UNSUPPORTED,
 	INVALIDIMAGE,
+	INVALIDLENGTH,
 	ALREADYOPEN,
+	NOSOFTWARE,
+	BADSOFTWARE,
 	UNSPECIFIED
 };
 
@@ -61,9 +64,6 @@ private:
 };
 
 
-enum class image_init_result { PASS, FAIL };
-enum class image_verify_result { PASS, FAIL };
-
 // ======================> device_image_interface
 
 // class representing interface-specific live image
@@ -76,8 +76,8 @@ public:
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
 
-	virtual image_init_result call_load() { return image_init_result::PASS; }
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
+	virtual std::error_condition call_load() { return std::error_condition(); }
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) { return std::error_condition(); }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual u32 unhashed_header_length() const noexcept { return 0; }
@@ -97,10 +97,6 @@ public:
 	const image_device_format *device_get_indexed_creatable_format(int index) const noexcept { return (index < m_formatlist.size()) ? m_formatlist.at(index).get() : nullptr;  }
 	const image_device_format *device_get_named_creatable_format(std::string_view format_name) const noexcept;
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
-
-	std::string_view error();
-	void seterror(std::error_condition err, const char *message = nullptr);
-	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() const noexcept { return !m_image_name.empty(); }
 
@@ -176,7 +172,7 @@ public:
 	u8 *get_software_region(std::string_view tag);
 	u32 get_software_region_length(std::string_view tag);
 	const char *get_feature(std::string_view feature_name) const;
-	bool load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr);
+	std::error_condition load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr);
 
 	u32 crc();
 	util::hash_collection& hash() { return m_hash; }
@@ -192,16 +188,16 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	image_init_result load(std::string_view path);
+	std::error_condition load(std::string_view path);
 
 	// loads a softlist item by name
-	image_init_result load_software(std::string_view software_identifier);
+	std::error_condition load_software(std::string_view software_identifier);
 
-	image_init_result finish_load();
+	std::error_condition finish_load();
 	void unload();
-	image_init_result create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
-	image_init_result create(std::string_view path);
-	bool load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
+	std::error_condition create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
+	std::error_condition create(std::string_view path);
+	std::error_condition load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
 	std::error_condition reopen_for_write(std::string_view path);
 
 	void set_user_loadable(bool user_loadable) noexcept { m_user_loadable = user_loadable; }
@@ -217,32 +213,26 @@ protected:
 	virtual void interface_config_complete() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
-	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
+	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }
 
-	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
+	std::error_condition load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);
-	void clear();
-	bool is_loaded() const { return m_file != nullptr; }
+	void clear() noexcept;
+	bool is_loaded() const noexcept { return m_file != nullptr; }
 
 	void set_image_filename(std::string_view filename);
-
-	void clear_error() noexcept;
 
 	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void make_readonly() noexcept { m_readonly = true; }
 
-	bool image_checkhash();
+	std::error_condition image_checkhash();
 
 	const software_part *find_software_item(std::string_view identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
 	std::string software_get_default_slot(std::string_view default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
-
-	// error related info
-	std::error_condition m_err;
-	std::string m_err_message;
 
 private:
 	// variables that are only non-zero when an image is mounted
@@ -260,7 +250,7 @@ private:
 
 	std::vector<u32> determine_open_plan(bool is_create);
 	void update_names();
-	bool load_software_part(std::string_view identifier);
+	std::error_condition load_software_part(std::string_view identifier);
 
 	bool init_phase() const;
 	static std::error_condition run_hash(util::random_read &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);

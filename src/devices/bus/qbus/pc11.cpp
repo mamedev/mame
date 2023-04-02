@@ -136,7 +136,7 @@ void pc11_device::z80daisy_irq_reti()
 }
 
 
-image_init_result pc11_device::call_load()
+std::error_condition pc11_device::call_load()
 {
 	/* reader unit */
 	m_fd = this;
@@ -144,7 +144,7 @@ image_init_result pc11_device::call_load()
 
 	LOG("call_load filename %s is_open %d\n", m_fd->filename(), m_fd->is_open());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void pc11_device::call_unload()

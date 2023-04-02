@@ -62,14 +62,14 @@ protected:
 		auto const actual(m_eprom_image->common_get_size("rom"));
 		if (desired > actual)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported EPROM size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Unsupported EPROM size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 		else
 		{
 			m_eprom_image->rom_alloc(desired, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 			m_eprom_image->common_load_rom(m_eprom_image->get_rom_base(), desired, "rom");
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
 
@@ -79,13 +79,13 @@ protected:
 		auto const actual(m_mcu_image->common_get_size("rom"));
 		if (desired != actual)
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Incorrect internal MCU EPROM size");
-			return image_init_result::FAIL;
+			osd_printf_error("%s: Incorrect internal MCU EPROM size\n", image.basename());
+			return image_error::INVALIDLENGTH;
 		}
 		else
 		{
 			m_mcu_image->common_load_rom(&m_mcu_region[0], actual, "rom");
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
 

@@ -237,6 +237,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "tilemap.h"
 
 
+namespace {
+
 class nmg5_state : public driver_device
 {
 public:
@@ -1570,6 +1572,9 @@ void nmg5_state::init_prot_val_40()
 {
 	m_prot_val = 0x40;
 }
+
+} // anonymous namespace
+
 
 GAME( 1998, nmg5,      0,        nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, nmg5a,     nmg5,     nmg5,     nmg5,      nmg5_state, init_prot_val_10, ROT0, "Yun Sung", "Multi 5 / New Multi Game 5 (set 2, censored)", MACHINE_SUPPORTS_SAVE )

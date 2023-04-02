@@ -287,17 +287,17 @@ SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 
 	if (image.fread(&snapshot_data[0], image.length()) != image.length())
 	{
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	if (strncmp((char *)&snapshot_data[0], "PS01", 4))
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	setup_pss(&snapshot_data[0], image.length());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*******************************************************************************
@@ -327,12 +327,12 @@ QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 
 	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
 	{
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	setup_pp(&quickload_data[0], quickload_size);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u32 primo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

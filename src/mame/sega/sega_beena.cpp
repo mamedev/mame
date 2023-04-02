@@ -90,6 +90,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class sega_beena_state : public driver_device
 {
 public:
@@ -152,8 +154,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sega_beena_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 static INPUT_PORTS_START( sega_beena )
@@ -192,6 +193,8 @@ ROM_START( beena )
 	ROM_REGION32_BE( 0x80000, "bios", 0 )   // SoC internal BIOS
 	ROM_LOAD16_WORD_SWAP( "beenabios.bin", 0x000000, 0x080000, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags

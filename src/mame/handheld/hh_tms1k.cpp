@@ -6,13 +6,13 @@
 This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
-- eva: Chrysler EVA-11 (and EVA-24)
-- microvsn: Milton Bradley Microvision
-- sag: Entex Select-A-Game Machine
-
-(contd.) hh_tms1k child drivers:
-- tispellb: TI Spelling B series gen. 1
-- tispeak: TI Speak & Spell series gen. 1
+- entex/sag.cpp: Entex Select-A-Game Machine (actually most games are on HMCS40)
+- miltonbradley/microvsn.cpp: Milton Bradley Microvision
+- misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
+- ti/snspell.cpp: TI Speak & Spell series gen. 1
+- ti/snspellc.cpp: TI Speak & Spell Compact / Touch & Tell
+- ti/spellb.cpp: TI Spelling B series gen. 1
+- tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
 
 About the approximated MCU frequency everywhere: The RC osc. is not that
 stable on most of these handhelds. When comparing multiple video recordings
@@ -36,6 +36,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 - gpoker: Entex Electronic Poker
 - matchnum: LJN Electronic Concentration
 - palmf31: Toshiba BC-8018B
+- racetime: Bandai FL Grand Prix Champion
 - ti1250: Texas Instruments TI-1200
 - ti25503: Texas Instruments TI-1265
 - ti5100: loose 1979 TMS1073NL chip
@@ -79,7 +80,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP0171   TMS1000   1979, Tomy Soccer
  *MP0220   TMS1000   1980, Tomy Teacher
  @MP0230   TMS1000   1980, Entex Blast It (6015)
- @MP0271   TMS1000   1982, Radio Shack Monkey See
+ @MP0271   TMS1000   1982, Tandy (Radio Shack) Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
  @MP0908   TMS1000   1979, Conic Electronic I.Q.
  *MP0910   TMS1000   1979, Conic Basketball (101-003)
@@ -106,11 +107,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  @MP1228   TMS1100   1980, Entex Musical Marvin (6014)
  @MP1231   TMS1100   1984, Tandy 3 in 1 Sports Arena (model 60-2178)
+ *MP1272   TMS1100   1981, Tandy Computerized Arcade (assumed same as CD7282, not confirmed)
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
- *MP1343   TMS1100   1989, Micronta Vox Clock 3
- *MP1359   TMS1100?  1985, Capsela CRC2000
+ @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
+ *MP1359   TMS1100   1985, Capsela CRC2000
+ *MP1362   TMS1100   1985, Technasonic Weight Talker (have dump)
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
@@ -120,7 +123,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ @MP2787   TMS1070   1980, Bandai Race Time
+ *MP2788   TMS1070   1980, Bandai Flight Time
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
@@ -172,7 +176,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, Microvision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
- *M34137   TMS1100?  1985, Technasonic Weight Talker
+ *M34137   TMS1100   1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -183,7 +187,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
-  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
+  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tiger/k28m2.cpp
  @MP7332   TMS1400   1981, Milton Bradley Dark Tower
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
@@ -196,35 +200,48 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
   inconsistent:
 
  @TMS1007  TMS1000   1976, TSI Speech+ (S14002-A)
- @CD7282SL TMS1100   1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100   1981, Tandy Computerized Arcade (serial is similar to TI Speak & Spell series?)
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "hh_tms1k.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1000c.h"
+#include "cpu/tms1000/tms1100.h"
+#include "cpu/tms1000/tms1400.h"
+#include "cpu/tms1000/tms2100.h"
+#include "cpu/tms1000/tms2400.h"
+#include "cpu/tms1000/tms0970.h"
+#include "cpu/tms1000/tms0980.h"
+#include "cpu/tms1000/tms0270.h"
+#include "cpu/tms1000/tp0320.h"
 #include "machine/clock.h"
 #include "machine/ds8874.h"
 #include "machine/netlist.h"
 #include "machine/timer.h"
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
+#include "machine/tms6100.h"
 #include "sound/beep.h"
 #include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
+#include "sound/spkrdev.h"
+#include "sound/tms5110.h"
 #include "video/hlcd0515.h"
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
+#include "video/pwm.h"
 
 #include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 
+// netlist
 #include "nl_bship.h"
-#include "utf8.h"
 
 // internal artwork
 #include "t7in1ss.lh"
@@ -244,8 +261,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
 #include "comp4.lh" // clickable
+#include "comparc.lh" // clickable
 #include "copycat.lh" // clickable
-#include "copycatm2.lh" // clickable
+#include "copycata.lh" // clickable
 #include "dataman.lh"
 #include "ditto.lh" // clickable
 #include "dxfootb.lh"
@@ -303,7 +321,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "stopthief.lh" // clickable
 #include "subwars.lh"
 #include "t3in1sa.lh"
-#include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
 #include "tc7atc.lh"
@@ -313,17 +330,68 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti1680.lh"
-#include "ti25503.lh"
+#include "ti25502.lh"
 #include "ti30.lh"
 #include "ti5100.lh"
+#include "ti5200.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
+#include "vclock3.lh"
 #include "wizatron.lh"
 #include "xl25.lh" // clickable
 #include "zodiac.lh" // clickable
 
 //#include "hh_tms1k_test.lh" // common test-layout - use external artwork
+
+
+namespace {
+
+class hh_tms1k_state : public driver_device
+{
+public:
+	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0),
+		m_out_power(*this, "power")
+	{ }
+
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_next) { if (newval) switch_change(Sel, param, true); }
+	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<tms1k_base_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<18> m_inputs; // max 18
+	output_finder<> m_out_power; // power state, eg. led
+
+	// misc common
+	u32 m_r = 0U;                        // MCU R-pins data
+	u16 m_o = 0U;                        // MCU O-pins data
+	u32 m_inp_mux = 0U;                  // multiplexed inputs mask
+	bool m_power_on = false;
+
+	u32 m_grid = 0U;                     // VFD/LED current row data
+	u32 m_plate = 0U;                    // VFD/LED current column data
+
+	u8 read_inputs(int columns);
+	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
+	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void power_off();
+	virtual void set_power(bool state);
+	void switch_change(int sel, u32 mask, bool next);
+};
 
 
 // machine_start/reset
@@ -434,8 +502,6 @@ void hh_tms1k_state::set_power(bool state)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
@@ -797,7 +863,7 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.3") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("SEL")
@@ -809,7 +875,7 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.5") // R10
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
@@ -990,6 +1056,121 @@ ROM_START( bcheetah )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Race Time
+  * PCB label: SM-007
+  * TMS1070 MP2787 (die label: 1070B, MP2787)
+  * cyan/red VFD Futaba DM-8Z, 1-bit sound
+
+  known releases:
+  - World: Race Time (model 8007), published by Bandai
+  - Japan: FL Grand Prix Champion (model 16162), published by Bandai
+
+***************************************************************************/
+
+class racetime_state : public hh_tms1k_state
+{
+public:
+	racetime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void racetime(machine_config &config);
+
+private:
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void racetime_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
+void racetime_state::write_r(u32 data)
+{
+	// R7: input mux
+	m_inp_mux = BIT(data, 7);
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+
+	// R0-R8: VFD grid
+	// R9: VFD plate
+	m_grid = data & 0x1ff;
+	m_plate = (m_plate & 0xff) | (data >> 1 & 0x100);
+	update_display();
+}
+
+void racetime_state::write_o(u16 data)
+{
+	// O0-O7: VFD plate
+	m_plate = (m_plate & ~0xff) | data;
+	update_display();
+}
+
+u8 racetime_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(1);
+}
+
+// config
+
+static INPUT_PORTS_START( racetime )
+	PORT_START("IN.0") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+INPUT_PORTS_END
+
+void racetime_state::racetime(machine_config &config)
+{
+	// basic machine hardware
+	TMS1070(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(racetime_state::read_k));
+	m_maincpu->write_r().set(FUNC(racetime_state::write_r));
+	m_maincpu->write_o().set(FUNC(racetime_state::write_o));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(229, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( racetime )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp2787", 0x0000, 0x0400, CRC(38c668b9) SHA1(2181647d4f2385a81355eaf99a40ad82f57ecdc6) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_racetime_output.pla", 0, 406, CRC(21e966b0) SHA1(ce918302d2b462df81b2d0cf2145e2351c98a0c0) )
+
+	ROM_REGION( 221716, "screen", 0)
+	ROM_LOAD( "racetime.svg", 0, 221716, CRC(d3934aed) SHA1(40b1fde191506c884b16b2ee3daaee2c6a4f4f08) )
 ROM_END
 
 
@@ -1218,13 +1399,13 @@ static INPUT_PORTS_START( palmf31 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a" /* √ */)
 
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME(UTF8_SMALL_PI)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME(u8"π")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("RM/CM") // combined function (press twice)
@@ -1233,14 +1414,14 @@ static INPUT_PORTS_START( palmf31 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("RM") // recall memory
 
 	PORT_START("IN.7") // R7
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.8") // R8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("C") // clear (all)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(UTF8_LEFT)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(u8"\u2190" /* ← */)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("CI") // clear indicator
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("CI/C") // combined function (press twice)
 
@@ -1295,7 +1476,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * cyan VFD Futaba 20-ST-22, 2-line 9-digit 7seg + 1 custom
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
@@ -1368,20 +1549,20 @@ static INPUT_PORTS_START( palmmd8 )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SC") // sign change
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("CM") // clear memory
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 
 	PORT_START("IN.4") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a" /* √ */)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 
 	PORT_START("IN.5") // R5
@@ -1450,8 +1631,8 @@ ROM_START( palmmd8 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_palmmd8_output.pla", 0, 406, CRC(55117610) SHA1(fd06060ae5f04b802ae26697935d4a9765e1a7d7) )
 ROM_END
 
 
@@ -2217,7 +2398,7 @@ class h2hbaskb_state : public hh_tms1k_state
 public:
 	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
-		m_cap_empty_timer(*this, "cap_empty")
+		m_cap_discharge(*this, "cap_discharge")
 	{ }
 
 	void h2hbaskb(machine_config &config);
@@ -2227,9 +2408,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<timer_device> m_cap_empty_timer;
-	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap_state = false;
+	required_device<timer_device> m_cap_discharge;
 	attotime m_cap_charge = attotime::zero;
 
 	void update_display();
@@ -2243,17 +2422,10 @@ void h2hbaskb_state::machine_start()
 	hh_tms1k_state::machine_start();
 
 	// register for savestates
-	save_item(NAME(m_cap_state));
 	save_item(NAME(m_cap_charge));
 }
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
-{
-	if (~m_r & 0x200)
-		m_cap_state = false;
-}
 
 void h2hbaskb_state::update_display()
 {
@@ -2276,12 +2448,10 @@ void h2hbaskb_state::write_r(u32 data)
 	// R9: K8 and 15uF cap to V- (used as timer)
 	// rising edge, remember the time
 	if (data & ~m_r & 0x200)
-	{
-		m_cap_state = true;
 		m_cap_charge = machine().time();
-	}
+
 	// falling edge, determine how long K8 should stay up
-	if (~data & m_r & 0x200)
+	else if (~data & m_r & 0x200)
 	{
 		const attotime full = attotime::from_usec(1300); // approx. charge time
 		const int factor = 27; // approx. factor for charge/discharge to logic 0
@@ -2290,7 +2460,7 @@ void h2hbaskb_state::write_r(u32 data)
 		if (charge > full)
 			charge = full;
 
-		m_cap_empty_timer->adjust(charge * factor);
+		m_cap_discharge->adjust(charge * factor);
 	}
 
 	// R0-R7: led select
@@ -2308,7 +2478,8 @@ void h2hbaskb_state::write_o(u16 data)
 u8 h2hbaskb_state::read_k()
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
-	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
+	u8 cap_state = (m_r & 0x200 || m_cap_discharge->enabled()) ? 8 : 0;
+	return (read_inputs(4) & 7) | cap_state;
 }
 
 // config
@@ -2355,7 +2526,7 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
 
-	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
+	TIMER(config, "cap_discharge").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
@@ -2737,8 +2908,8 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge pinout K1 to R connections
@@ -2748,11 +2919,11 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 
 	if (m_pinout == 0)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid cartridge pinout");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid cartridge pinout\n", image.basename());
+		return image_error::BADSOFTWARE;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void quizwizc_state::update_display()
@@ -2932,15 +3103,15 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge pinout R9 to K connections
 	const char *pinout = image.get_feature("pinout");
 	m_pinout = pinout ? strtoul(pinout, nullptr, 0) & 0xf : 0xf;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tc4_state::update_display()
@@ -3126,13 +3297,13 @@ static INPUT_PORTS_START( mrmusical )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("A=")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
@@ -6546,7 +6717,7 @@ ROM_END
   * 1 7seg led, 6 other leds, 1-bit sound
 
   This is a simple educational home computer. Refer to the extensive manual
-  for more information. It was published later in the USA by Tandy(Radio Shack),
+  for more information. It was published later in the USA by Tandy (Radio Shack),
   under their Science Fair series. Another 25 years later, Gakken re-released
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
@@ -7200,13 +7371,13 @@ static INPUT_PORTS_START( astro )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE"/Sun")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷/Sun")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY"/Mercury")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×/Mercury")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
@@ -10449,23 +10620,23 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy Computerized Arcade (model 60-2159 or 60-2159A)
-  * TMS1100 MCU, label CD7282SL
+  Tandy Computerized Arcade (model 60-2159)
+  * PCB label: HP-805 or CDC-805
+  * TMS1100 MCU, label MP1272 or CD7282SL
   * 12 lamps behind buttons, 1-bit sound
 
   known releases:
-  - World: Tandy-12: Computerized Arcade, published by Tandy
-  - World: Computerized Arcade, published by Tandy, Radio Shack brand.
-    This one is model 60-2495 from the mid-90s, perhaps different hardware!
+  - World: Tandy-12: Computerized Arcade, published by Tandy, model 60-2159.
+  - World: Computerized Arcade, Radio Shack brand, also model 60-2159 and same
+    hardware as above. "Tandy-12" on the side of the handheld was changed to
+    "Radio Shack-12", but there's no title prefix on the box.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2159A, COP421 MCU.
+  - World: Computerized Arcade, Radio Shack brand, model 60-2495, hardware unknown.
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
-  This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
-  Takatoku Toys (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of
-  Merlin and Simon. Unlike Merlin and Simon, spin-offs were not as successful in
-  the USA. There were releases with and without the prefix "Tandy-12", I don't
-  know which name was more common. Also not worth noting is that it needed five
-  batteries; four C-cells and a 9-volt.
+  This handheld contains 12 minigames. It looks and plays like Takatoku Toys'
+  Game Robot 9 from 1980 (aka Mego's Fabulous Fred).
 
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
@@ -10476,14 +10647,14 @@ ROM_END
 
 ***************************************************************************/
 
-class tandy12_state : public hh_tms1k_state
+class comparc_state : public hh_tms1k_state
 {
 public:
-	tandy12_state(const machine_config &mconfig, device_type type, const char *tag) :
+	comparc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void tandy12(machine_config &config);
+	void comparc(machine_config &config);
 
 private:
 	void update_display();
@@ -10494,12 +10665,12 @@ private:
 
 // handlers
 
-void tandy12_state::update_display()
+void comparc_state::update_display()
 {
 	m_display->matrix(1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00));
 }
 
-void tandy12_state::write_r(u32 data)
+void comparc_state::write_r(u32 data)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -10512,14 +10683,14 @@ void tandy12_state::write_r(u32 data)
 	update_display();
 }
 
-void tandy12_state::write_o(u16 data)
+void comparc_state::write_o(u16 data)
 {
 	// O0-O7: button lamps 1-8
 	m_o = data;
 	update_display();
 }
 
-u8 tandy12_state::read_k()
+u8 comparc_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -10548,7 +10719,7 @@ u8 tandy12_state::read_k()
          START      SELECT    PLAY-2/HIT-7
 */
 
-static INPUT_PORTS_START( tandy12 )
+static INPUT_PORTS_START( comparc )
 	PORT_START("IN.0") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Button 12")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Button 11")
@@ -10581,7 +10752,7 @@ static INPUT_PORTS_START( tandy12 )
 INPUT_PORTS_END
 
 // output PLA is not decapped, this was made by hand
-static const u16 tandy12_output_pla[0x20] =
+static const u16 comparc_output_pla[0x20] =
 {
 	// these are certain
 	0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40,
@@ -10593,18 +10764,18 @@ static const u16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-void tandy12_state::tandy12(machine_config &config)
+void comparc_state::comparc(machine_config &config)
 {
 	// basic machine hardware
 	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->set_output_pla(tandy12_output_pla);
-	m_maincpu->read_k().set(FUNC(tandy12_state::read_k));
-	m_maincpu->write_r().set(FUNC(tandy12_state::write_r));
-	m_maincpu->write_o().set(FUNC(tandy12_state::write_o));
+	m_maincpu->set_output_pla(comparc_output_pla);
+	m_maincpu->read_k().set(FUNC(comparc_state::read_k));
+	m_maincpu->write_r().set(FUNC(comparc_state::write_r));
+	m_maincpu->write_o().set(FUNC(comparc_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 13);
-	config.set_default_layout(layout_tandy12);
+	config.set_default_layout(layout_comparc);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10614,14 +10785,14 @@ void tandy12_state::tandy12(machine_config &config)
 
 // roms
 
-ROM_START( tandy12 )
+ROM_START( comparc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x0800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
 	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
-	ROM_LOAD( "tms1100_tandy12_output.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_comparc_output.pla", 0, 365, NO_DUMP )
 ROM_END
 
 
@@ -10630,7 +10801,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tandy(Radio Shack division) Monkey See (1982 version)
+  Tandy (Radio Shack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
 
@@ -10705,8 +10876,8 @@ static INPUT_PORTS_START( monkeysee )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
 
@@ -10920,6 +11091,192 @@ ROM_END
 
 /***************************************************************************
 
+  Tandy (Micronta) VoxClock 3 (sold by Radio Shack, model 63-906)
+  * PCB label: VOXCLOCK 3
+  * TMS1100 MP1343 (die label: 1100E, MP1343)
+  * TMS5110AN2L-1 speech chip, 4KB VSM CM72010NL (die label: T0355C, 72010U)
+  * 4-digit 7seg LED display, 6 other LEDs
+
+  Micronta is not a company, but one of the Radio Shack house brands. Schematics
+  are included in the manual, they also mention a CM72005 VSM.
+
+  Spartus AVT from 1982 is nearly the same as VoxClock 3.
+
+***************************************************************************/
+
+class vclock3_state : public hh_tms1k_state
+{
+public:
+	vclock3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_tms5100(*this, "tms5100"),
+		m_tms6100(*this, "tms6100"),
+		m_ac_power(*this, "ac_power")
+	{ }
+
+	void vclock3(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(switch_hz) { m_ac_power->set_clock(newval ? 50 : 60); }
+
+private:
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	required_device<clock_device> m_ac_power;
+
+	void update_display();
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void vclock3_state::update_display()
+{
+	m_display->matrix(m_r, m_o | (m_r << 2 & 0x180));
+}
+
+void vclock3_state::write_r(u32 data)
+{
+	// R0-R4,R8: input mux
+	m_inp_mux = (data & 0x1f) | (data >> 3 & 0x20);
+
+	// R0-R3: select digit
+	// R5,R6: led data
+	m_r = data;
+	update_display();
+
+	// R7: TMS5100 PDC
+	m_tms5100->pdc_w(BIT(data, 7));
+
+	// R10: speaker out
+	m_speaker->level_w(BIT(data, 10));
+}
+
+void vclock3_state::write_o(u16 data)
+{
+	// O0-O3: TMS5100 CTL
+	m_tms5100->ctl_w(data & 0xf);
+
+	// O0-O6: digit segments
+	m_o = data & 0x7f;
+	update_display();
+}
+
+u8 vclock3_state::read_k()
+{
+	// K1-K4: multiplexed inputs
+	u8 data = read_inputs(6) & 7;
+
+	// K4: TMS5100 CTL1
+	// K8: AC power osc
+	data |= m_tms5100->ctl_r() << 2 & 4;
+	data |= (m_inputs[6]->read() & m_ac_power->signal_r()) << 3;
+	return data;
+}
+
+// config
+
+static INPUT_PORTS_START( vclock3 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Snooze / Date")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Alarm 2 On/Off")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Alarm 1 On/Off")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Announce")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Set Alarm 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Set Alarm 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Chime")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Minute Reverse")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Minute Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set Time")
+
+	PORT_START("IN.4") // R4 (factory-set jumpers)
+	PORT_CONFNAME( 0x01, 0x01, "AC Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, vclock3_state, switch_hz, 0)
+	PORT_CONFSETTING( 0x00, "50 Hz" )
+	PORT_CONFSETTING( 0x01, "60 Hz" )
+	PORT_CONFNAME( 0x02, 0x00, "Chime / Announce" )
+	PORT_CONFSETTING(    0x02, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "Recall" )
+	PORT_CONFSETTING(    0x04, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN.5") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Hour Reverse")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Hour Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Set Calendar")
+
+	PORT_START("IN.6")
+	PORT_CONFNAME( 0x01, 0x01, "Power Source" )
+	PORT_CONFSETTING(    0x00, "Battery" )
+	PORT_CONFSETTING(    0x01, "Mains" )
+	PORT_CONFNAME( 0x02, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x02, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
+INPUT_PORTS_END
+
+void vclock3_state::vclock3(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
+	m_maincpu->read_k().set(FUNC(vclock3_state::read_k));
+	m_maincpu->write_r().set(FUNC(vclock3_state::write_r));
+	m_maincpu->write_o().set(FUNC(vclock3_state::write_o));
+
+	CLOCK(config, m_ac_power, 60); // from mains power
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(4, 9);
+	m_display->set_segmask(0xf, 0x7f);
+	m_display->set_segmask(0x1, 0x06); // 1st digit only has segments B,C
+	config.set_default_layout(layout_vclock3);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	TMS5110A(config, m_tms5100, 640000); // approximation - RC osc. R=47K, C=47pF
+	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
+	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
+	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
+	m_tms5100->data().set(m_tms6100, FUNC(tms6100_device::data_line_r));
+	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
+	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	TMS6100(config, m_tms6100, 640000/4);
+
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( vclock3 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1343.u1", 0x0000, 0x0800, CRC(d8fac397) SHA1(65003ec70ae3d45296c08b10aff85ca29c0f573e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_vclock3_output.pla", 0, 365, CRC(e5b0e95b) SHA1(6d624bfefd302fd04c02177081cea9416ba344ee) )
+
+	ROM_REGION( 0x1000, "tms6100", 0 )
+	ROM_LOAD( "cm72010.u3", 0x0000, 0x1000, CRC(2054847c) SHA1(716592f4cd01a9edf16b1061431bd6dc934d9053) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Telesensory Systems, Inc.(TSI) Speech+
   * TMS1000 MCU, label TMS1007NL (die label: 1000B, 1007A)
   * TSI S14001A speech chip, GI S14007-A 2KB maskrom for samples
@@ -11021,8 +11378,8 @@ static INPUT_PORTS_START( speechp )
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.7") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
@@ -11031,7 +11388,7 @@ static INPUT_PORTS_START( speechp )
 
 	PORT_START("IN.8") // R8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a" /* √ */)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.9") // R9
@@ -11087,11 +11444,11 @@ ROM_END
 
 /***************************************************************************
 
-  TI SR-16 (1974, first consumer product with TMS1000 series MCU)
+  Texas Instruments SR-16 (1974, first consumer product with TMS1000 series MCU)
   * TMS1000 MCU label TMS1001NL (die label: 1000, 1001A)
   * 12-digit 7seg LED display
 
-  TI SR-16 II (1975 version)
+  Texas Instruments SR-16 II (1975 version)
   * TMS1000 MCU label TMS1016NL (die label: 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
@@ -11162,13 +11519,13 @@ static INPUT_PORTS_START( tisr16 )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 
@@ -11180,31 +11537,31 @@ static INPUT_PORTS_START( tisr16 )
 
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(u8"Σ")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME(u8"yˣ")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 
 	PORT_START("IN.7") // R7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("IN.8") // R8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("10" UTF8_POW_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("e" UTF8_POW_X)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME(u8"10ˣ")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME(u8"eˣ")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
 	PORT_START("IN.9") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 
@@ -11241,7 +11598,7 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 
 	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
@@ -11253,7 +11610,7 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 
 	PORT_START("IN.6") // R6
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
@@ -11266,27 +11623,27 @@ static INPUT_PORTS_START( tisr16ii )
 
 	PORT_START("IN.8") // R8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("IN.9") // R9
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("e" UTF8_POW_X)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME(u8"eˣ")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(u8"Σ")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
 	PORT_START("IN.10") // R10
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME(u8"yˣ")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(u8"π")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
 void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	m_maincpu->read_k().set(FUNC(tisr16_state::read_k));
 	m_maincpu->write_o().set(FUNC(tisr16_state::write_o));
 	m_maincpu->write_r().set(FUNC(tisr16_state::write_r));
@@ -11327,7 +11684,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1250/TI-1200 (1975 version), Spirit of '76
+  Texas Instruments TI-1250/TI-1200 (1975 version), Spirit of '76
   * TMS0950 MCU label TMC0952NL, K0952 (die label: 0950A 0952)
   * 9-digit 7seg LED display
 
@@ -11413,13 +11770,13 @@ static INPUT_PORTS_START( ti1250 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.4") // O5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("CS") // named either CS(Change Sign) or +/-
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.5") // O7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("MC")
@@ -11437,12 +11794,12 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_MODIFY("IN.4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_END) PORT_NAME("RCL")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(u8"π")
 
 	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
@@ -11490,7 +11847,7 @@ ROM_START( ti1250 )
 	ROM_LOAD( "tms0980_common2_segment.pla", 0, 157, CRC(c03cccd8) SHA1(08bc4b597686a7aa8b2c9f43b85b62747ffd455b) )
 ROM_END
 
-ROM_START( ti125076 )
+ROM_START( ti1250a )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms0972nl_za0348", 0x0000, 0x0400, CRC(6e3f8add) SHA1(a249209e2a92f5016e33b7ad2c6c2660df1df959) )
 
@@ -11524,7 +11881,149 @@ ROM_END
 
 /***************************************************************************
 
-  TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
+  Texas Instruments TI-2550 II, more (see below)
+  * TMS1070 TMS1071NL (die label: 1070A, 1071A)
+  * 9-digit cyan VFD
+
+  This chip was also used in 3rd-party calculators, like Citizen 831RD,
+  Prinztronic M800, Lloyd's E311, Privileg 861MD.
+
+***************************************************************************/
+
+class ti25502_state : public hh_tms1k_state
+{
+public:
+	ti25502_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti25502(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti25502_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ti25502_state::write_r(u32 data)
+{
+	// R0-R6,R9: input mux
+	m_inp_mux = (data & 0x7f) | (data >> 2 & 0x80);
+
+	// R0-R8: select digit
+	m_r = data;
+	update_display();
+}
+
+void ti25502_state::write_o(u16 data)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+u8 ti25502_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(8);
+}
+
+// config
+
+static INPUT_PORTS_START( ti25502 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-") // N/A on TI-2550 II
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
+
+	PORT_START("IN.7") // R9
+	PORT_CONFNAME( 0x0f, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFSETTING(    0x01, "1" ) // N/A on TI-2550 II
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "4" ) // "
+INPUT_PORTS_END
+
+void ti25502_state::ti25502(machine_config &config)
+{
+	// basic machine hardware
+	TMS1070(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pF
+	m_maincpu->read_k().set(FUNC(ti25502_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti25502_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti25502_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_ti25502);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( ti25502 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1071nl", 0x0000, 0x0400, CRC(0f5640c9) SHA1(6e8b54d8ceed8850d1186204ea26b6657add3d48) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti25502_micro.pla", 0, 867, CRC(639cbc13) SHA1(a96152406881bdfc7ddc542cf4b478525c8b0e23) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti25502_output.pla", 0, 406, CRC(c1df3ae6) SHA1(f106caaea1ac4787d8b579f16177dbf2f35b094d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Texas Instruments TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
   * 9-digit cyan VFD
 
@@ -11602,13 +12101,13 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.4") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
@@ -11618,15 +12117,15 @@ static INPUT_PORTS_START( ti25503 )
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
 
 void ti25503_state::ti25503(machine_config &config)
 {
 	// basic machine hardware
-	TMS1040(config, m_maincpu, 250000); // approximation
+	TMS1040(config, m_maincpu, 350000); // approximation
 	m_maincpu->read_k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti25503_state::write_r));
@@ -11634,7 +12133,7 @@ void ti25503_state::ti25503(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
-	config.set_default_layout(layout_ti25503);
+	config.set_default_layout(layout_ti25502);
 
 	// no sound!
 }
@@ -11657,7 +12156,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-5100, more (see below)
+  Texas Instruments TI-5100, more (see below)
   * TMS1070 MCU label TMS1073NL or TMC1073NL (die label: 1070B, 1073)
   * 11-digit 7seg VFD (1 custom digit)
 
@@ -11688,7 +12187,7 @@ private:
 void ti5100_state::update_display()
 {
 	// extra segment on R10
-	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
+	m_display->matrix(m_r, m_o | ((m_r & 0x400) ? 0x180 : 0));
 }
 
 void ti5100_state::write_r(u32 data)
@@ -11716,17 +12215,17 @@ u8 ti5100_state::read_k()
 static INPUT_PORTS_START( ti5100 )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "K" ) // constant mode
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, "DP" ) // display point
-	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFNAME( 0x08, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x00, "F" ) // floating
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // R3
@@ -11736,7 +12235,7 @@ static INPUT_PORTS_START( ti5100 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // clear all?
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("EX")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("GPM")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME(UTF8_CAPITAL_DELTA"%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME(u8"Δ%")
 
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
@@ -11764,28 +12263,28 @@ static INPUT_PORTS_START( ti5100 )
 
 	PORT_START("IN.9") // R9
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R9 0x02
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.10") // R10
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
 
 void ti5100_state::ti5100(machine_config &config)
 {
 	// basic machine hardware
-	TMS1070(config, m_maincpu, 250000); // approximation
+	TMS1070(config, m_maincpu, 350000); // approximation
 	m_maincpu->read_k().set(FUNC(ti5100_state::read_k));
 	m_maincpu->write_o().set(FUNC(ti5100_state::write_o));
 	m_maincpu->write_r().set(FUNC(ti5100_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(11, 9);
-	m_display->set_segmask(0x7ff, 0xff);
+	m_display->set_segmask(0x3ff, 0xff);
 	config.set_default_layout(layout_ti5100);
 
 	// no sound!
@@ -11799,8 +12298,8 @@ ROM_START( ti5100 )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_ti5100_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_ti5100_output.pla", 0, 365, CRC(11f6f0f4) SHA1(f25cf6bd284ab4614746b2e3f98d42d2585e425a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5100_output.pla", 0, 406, CRC(b4a3aa6e) SHA1(812b5483a26ae3aa05661c86841d2d3d163e6c46) )
 ROM_END
 
 
@@ -11809,7 +12308,145 @@ ROM_END
 
 /***************************************************************************
 
-  TMC098x series Majestic-line calculators
+  Texas Instruments TI-5200
+  * TMS1270 MCU label TMS1278NL or TMC1278NL (die label: 1070B, 1278A)
+  * 13-digit 7seg VFD Itron FG139A1 (1 custom digit)
+
+***************************************************************************/
+
+class ti5200_state : public hh_tms1k_state
+{
+public:
+	ti5200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti5200(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti5200_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void ti5200_state::write_r(u32 data)
+{
+	// R0-R5,R9,R12: input mux
+	m_inp_mux = (data & 0x3f) | (data >> 3 & 0x40) | (data >> 5 & 0x80);
+
+	// R0-R12: select digit
+	m_r = data;
+	update_display();
+}
+
+void ti5200_state::write_o(u16 data)
+{
+	// O1-O9: digit segments
+	m_o = bitswap<9>(data,7,8,3,6,5,4,9,2,1);
+	update_display();
+}
+
+u8 ti5200_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(8);
+}
+
+// config
+
+static INPUT_PORTS_START( ti5200 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.6") // R9
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "K" ) // constant
+	PORT_CONFSETTING(    0x00, "C" ) // chain
+
+	PORT_START("IN.7") // R12
+	PORT_CONFNAME( 0x01, 0x00, "Decimal" )
+	PORT_CONFSETTING(    0x01, "S" ) // set DP with number key
+	PORT_CONFSETTING(    0x00, "R" )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ti5200_state::ti5200(machine_config &config)
+{
+	// basic machine hardware
+	TMS1270(config, m_maincpu, 350000); // approximation - RC osc. R=43K, C=68pF
+	m_maincpu->read_k().set(FUNC(ti5200_state::read_k));
+	m_maincpu->write_o().set(FUNC(ti5200_state::write_o));
+	m_maincpu->write_r().set(FUNC(ti5200_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(13, 9);
+	m_display->set_segmask(0xfff, 0xff);
+	config.set_default_layout(layout_ti5200);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( ti5200 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1278nl", 0x0000, 0x0400, CRC(6829f24d) SHA1(d7cf358a26a347d6a2ca4313cb7ffd5082e19885) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti5200_micro.pla", 0, 867, CRC(61bd20fc) SHA1(fbdc87138975e2e10f92f75dcae5ca900f78475a) )
+	ROM_REGION( 406, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1070_ti5200_output.pla", 0, 406, CRC(6f37c393) SHA1(5252a5ac05c65326ee189f859904007e11b0009d) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Texas Instruments TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
   * TMS0980 MCU label TMC0981NL (die label: 0980B-81F)
@@ -11869,14 +12506,14 @@ u8 ti30_state::read_k()
 
 static INPUT_PORTS_START( ti30 )
 	PORT_START("IN.0") // O0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME(u8"yˣ")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_NAME("K")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("log")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("EE" UTF8_DOWN)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME(u8"EE\u2193" /* ↓ */)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)")
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
@@ -11890,8 +12527,8 @@ static INPUT_PORTS_START( ti30 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 
 	PORT_START("IN.3") // O4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME(u8"π")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
@@ -11921,8 +12558,8 @@ static INPUT_PORTS_START( ti30 )
 	PORT_START("IN.7") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
@@ -11935,7 +12572,7 @@ static INPUT_PORTS_START( tiprog )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_NAME("F")
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("OR")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
@@ -11949,7 +12586,7 @@ static INPUT_PORTS_START( tiprog )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 
 	PORT_START("IN.3") // O4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_NAME("1'sC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("b")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A")
@@ -11988,14 +12625,14 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tibusan )
 	// PORT_NAME lists functions under [2nd] as secondaries.
 	PORT_START("IN.0") // O0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("y" UTF8_POW_X"  " UTF8_POW_X"" UTF8_SQUAREROOT"y") // 2nd one implies xth root of y
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%  " UTF8_CAPITAL_DELTA"%")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME(u8"yˣ  ˣ\u221ay" /* √ */) // 2nd one implies xth root of y
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"%  Δ%")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_NAME("SEL")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_NAME("CST")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("MAR")
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("STO  m")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
@@ -12009,15 +12646,15 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 
 	PORT_START("IN.3") // O4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(UTF8_CAPITAL_SIGMA"+  " UTF8_CAPITAL_SIGMA"-")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME(u8"Σ+  Σ-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(  AN-CI\"")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("x<>y  L.R.")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME(u8"x\u2194y  L.R." /* ↔ */)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")  1/x")
 
 	PORT_START("IN.4") // O5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("SUM  x" UTF8_PRIME)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME(u8"SUM  xʹ")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
@@ -12031,7 +12668,7 @@ static INPUT_PORTS_START( tibusan )
 
 	PORT_START("IN.6") // O7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME("EXC  x" UTF8_PRIME)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_NAME(u8"EXC  xʹ")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
@@ -12040,8 +12677,8 @@ static INPUT_PORTS_START( tibusan )
 	PORT_START("IN.7") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²  \u221ax" /* √ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME(u8"ln(x)  eˣ")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
@@ -12113,11 +12750,11 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1000 (1977 version)
+  Texas Instruments TI-1000 (1977 version)
   * TMS1990 MCU label TMC1991NL (die label: 1991-91A)
   * 8-digit 7seg LED display
 
-  TI-1000 (1978 version)
+  Texas Instruments TI-1000 (1978 version)
   * TMS1990 MCU label TMC1992-4NL **not dumped yet
 
 ***************************************************************************/
@@ -12178,14 +12815,14 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.4") // O5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
@@ -12232,7 +12869,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI WIZ-A-TRON
+  Texas Instruments WIZ-A-TRON
   * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12303,13 +12940,13 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.3") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
 
 void wizatron_state::wizatron(machine_config &config)
@@ -12351,7 +12988,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Little Professor (1976 version)
+  Texas Instruments Little Professor (1976 version)
   * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12438,7 +13075,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Little Professor (1978 version)
+  Texas Instruments Little Professor (1978 version)
   * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
@@ -12447,14 +13084,14 @@ ROM_END
 
 ***************************************************************************/
 
-class lilprof78_state : public hh_tms1k_state
+class lilprofa_state : public hh_tms1k_state
 {
 public:
-	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag) :
+	lilprofa_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void lilprof78(machine_config &config);
+	void lilprofa(machine_config &config);
 
 private:
 	void write_o(u16 data);
@@ -12464,7 +13101,7 @@ private:
 
 // handlers
 
-void lilprof78_state::write_r(u32 data)
+void lilprofa_state::write_r(u32 data)
 {
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -12478,7 +13115,7 @@ void lilprof78_state::write_r(u32 data)
 	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
 }
 
-void lilprof78_state::write_o(u16 data)
+void lilprofa_state::write_o(u16 data)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
@@ -12487,7 +13124,7 @@ void lilprof78_state::write_o(u16 data)
 	m_o = data;
 }
 
-u8 lilprof78_state::read_k()
+u8 lilprofa_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -12495,7 +13132,7 @@ u8 lilprof78_state::read_k()
 
 // config
 
-static INPUT_PORTS_START( lilprof78 )
+static INPUT_PORTS_START( lilprofa )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
@@ -12506,13 +13143,13 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.2") // O2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
@@ -12528,13 +13165,13 @@ static INPUT_PORTS_START( lilprof78 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-void lilprof78_state::lilprof78(machine_config &config)
+void lilprofa_state::lilprofa(machine_config &config)
 {
 	// basic machine hardware
 	TMS1990(config, m_maincpu, 250000); // approximation
-	m_maincpu->read_k().set(FUNC(lilprof78_state::read_k));
-	m_maincpu->write_o().set(FUNC(lilprof78_state::write_o));
-	m_maincpu->write_r().set(FUNC(lilprof78_state::write_r));
+	m_maincpu->read_k().set(FUNC(lilprofa_state::read_k));
+	m_maincpu->write_o().set(FUNC(lilprofa_state::write_o));
+	m_maincpu->write_r().set(FUNC(lilprofa_state::write_r));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
@@ -12546,7 +13183,7 @@ void lilprof78_state::lilprof78(machine_config &config)
 
 // roms
 
-ROM_START( lilprof78 )
+ROM_START( lilprofa )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
 
@@ -12555,7 +13192,7 @@ ROM_START( lilprof78 )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0970_common2_micro.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
+	ROM_LOAD( "tms0980_lilprofa_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
 ROM_END
@@ -12566,7 +13203,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI-1680, TI-2550-IV
+  Texas Instruments TI-1680, TI-2550-IV
   * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
   * TMC0999NL 256x4 RAM (die label: 0999B)
   * 9-digit cyan VFD(leftmost digit is custom)
@@ -12647,13 +13284,13 @@ static INPUT_PORTS_START( ti1680 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 
 	PORT_START("IN.2") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 
 	PORT_START("IN.3") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
@@ -12713,7 +13350,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI DataMan
+  Texas Instruments DataMan
   * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
   * 10-digit cyan VFD(3 digits are custom)
 
@@ -12787,13 +13424,13 @@ static INPUT_PORTS_START( dataman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 
 	PORT_START("IN.3") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 
 	PORT_START("IN.4") // R4
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Force Out")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Number Guesser")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Wipe Out")
@@ -12843,7 +13480,7 @@ ROM_END
 
 /***************************************************************************
 
-  TI Math Marvel
+  Texas Instruments Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
   * 9-digit cyan VFD(2 digits are custom), 1-bit sound
 
@@ -13034,13 +13671,13 @@ class tithermos_state : public hh_tms1k_state
 public:
 	tithermos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
-		m_60hz(*this, "ac_line")
+		m_ac_power(*this, "ac_power")
 	{ }
 
 	void tithermos(machine_config &config);
 
 private:
-	required_device<clock_device> m_60hz;
+	required_device<clock_device> m_ac_power;
 
 	void write_r(u32 data);
 	void write_o(u16 data);
@@ -13074,10 +13711,10 @@ u8 tithermos_state::read_k()
 	// when SB/SD/SP is high:
 	if (m_inp_mux & 0x8a)
 	{
-		// K1: 60hz from AC line
+		// K1: 60hz from AC power
 		// K2: battery low?
 		// K8: A/D output (TODO)
-		data |= (m_60hz->signal_r()) ? 1 : 0;
+		data |= m_ac_power->signal_r() ? 1 : 0;
 	}
 
 	return data;
@@ -13102,7 +13739,7 @@ static INPUT_PORTS_START( tithermos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Time Row PM 1")
 
 	PORT_START("IN.3") // SD
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC power osc
 	PORT_CONFNAME( 0x06, 0x04, "System")
 	PORT_CONFSETTING(    0x04, "Heat" )
 	PORT_CONFSETTING(    0x00, "Off" )
@@ -13128,7 +13765,7 @@ static INPUT_PORTS_START( tithermos )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Time / Clock")
 
 	PORT_START("IN.7") // SP
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC line
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // AC power osc
 	PORT_CONFNAME( 0x06, 0x04, "Mode")
 	PORT_CONFSETTING(    0x04, "Constant" )
 	PORT_CONFSETTING(    0x00, "Day/Night" )
@@ -13149,7 +13786,7 @@ void tithermos_state::tithermos(machine_config &config)
 	m_maincpu->write_r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->write_o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60);
+	CLOCK(config, m_ac_power, 60); // from mains power
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -13334,15 +13971,15 @@ DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
-		return image_init_result::FAIL;
+		osd_printf_error("Can only load through softwarelist\n");
+		return image_error::UNSUPPORTED;
 	}
 
 	// get cartridge notch
 	const char *notch = image.get_feature("notch");
 	m_notch = notch ? strtoul(notch, nullptr, 0) & 3 : 0;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void playmaker_state::update_display()
@@ -13712,14 +14349,14 @@ ROM_END
 
 ***************************************************************************/
 
-class copycatm2_state : public hh_tms1k_state
+class copycata_state : public hh_tms1k_state
 {
 public:
-	copycatm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	copycata_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void copycatm2(machine_config &config);
+	void copycata(machine_config &config);
 
 private:
 	void write_r(u32 data);
@@ -13728,13 +14365,13 @@ private:
 
 // handlers
 
-void copycatm2_state::write_r(u32 data)
+void copycata_state::write_r(u32 data)
 {
 	// R1-R4: leds
 	m_display->matrix(1, data >> 1 & 0xf);
 }
 
-void copycatm2_state::write_o(u16 data)
+void copycata_state::write_o(u16 data)
 {
 	// O0,O6: speaker out
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
@@ -13742,7 +14379,7 @@ void copycatm2_state::write_o(u16 data)
 
 // config
 
-static INPUT_PORTS_START( copycatm2 )
+static INPUT_PORTS_START( copycata )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Orange Button")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red Button")
@@ -13750,17 +14387,17 @@ static INPUT_PORTS_START( copycatm2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
 
-void copycatm2_state::copycatm2(machine_config &config)
+void copycata_state::copycata(machine_config &config)
 {
 	// basic machine hardware
 	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_k().set_ioport("IN.0");
-	m_maincpu->write_r().set(FUNC(copycatm2_state::write_r));
-	m_maincpu->write_o().set(FUNC(copycatm2_state::write_o));
+	m_maincpu->write_r().set(FUNC(copycata_state::write_r));
+	m_maincpu->write_o().set(FUNC(copycata_state::write_o));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 4);
-	config.set_default_layout(layout_copycatm2);
+	config.set_default_layout(layout_copycata);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -13772,14 +14409,14 @@ void copycatm2_state::copycatm2(machine_config &config)
 
 // roms
 
-ROM_START( copycatm2 )
+ROM_START( copycata )
 	ROM_REGION( 0x0200, "maincpu", 0 )
 	ROM_LOAD( "mp3005n", 0x0000, 0x0200, CRC(a87649cb) SHA1(14ef7967a80578885f0b905772c3bb417b5b3255) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
+	ROM_LOAD( "tms1000_copycata_micro.pla", 0, 867, CRC(2710d8ef) SHA1(cb7a13bfabedad43790de753844707fe829baed0) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_copycatm2_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
+	ROM_LOAD( "tms1000_copycata_output.pla", 0, 365, CRC(d1999aaf) SHA1(0c27789b349e491d5230f9c75c4741e621f5a14e) )
 ROM_END
 
 
@@ -15115,6 +15752,7 @@ CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   emp
 COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+CONS( 1980, racetime,   0,         0, racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -15203,26 +15841,29 @@ CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    emp
 
 CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tandy12,    0,         0, tandy12,   tandy12,   tandy12_state,   empty_init, "Tandy Corporation", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1981, comparc,    0,         0, comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, vclock3,    0,         0, vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1974, tisr16,     0,         0, tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,   0,         0, tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti125076,   ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti1250a,    ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, ti25502,    0,         0, ti25502,   ti25502,   ti25502_state,   empty_init, "Texas Instruments", "TI-2550 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti5200,     0,         0, ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti1000,     0,         0, ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, wizatron,   0,         0, wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, lilprof,    0,         0, lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1978, lilprof78,  lilprof,   0, lilprof78, lilprof78, lilprof78_state, empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1978, lilprofa,   lilprof,   0, lilprofa,  lilprofa,  lilprofa_state,  empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, ti1680,     0,         0, ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
@@ -15233,7 +15874,7 @@ CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   emp
 CONS( 1980, playmaker,  0,         0, playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, copycata,   copycat,   0, copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
@@ -15243,8 +15884,8 @@ CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   emp
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, slepachi,   0,         0, slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games Corporation", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games Corporation", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

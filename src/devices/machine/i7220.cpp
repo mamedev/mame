@@ -108,13 +108,13 @@ void i7220_device::device_reset()
 	memset(&m_regs, 0, sizeof(m_regs));
 }
 
-image_init_result i7220_device::call_load()
+std::error_condition i7220_device::call_load()
 {
 	if (length() != (m_data_size * I7110_MBM_SIZE))
 	{
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

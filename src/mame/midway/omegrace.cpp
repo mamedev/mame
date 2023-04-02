@@ -7,7 +7,7 @@
     driver by Bernd Wiebelt
 
     Games supported:
-        * Omega Race [2 sets]
+        * Omega Race [3 sets]
         * Delta Race (Omega Race bootleg by Allied Leisure)
 
     Known bugs:
@@ -610,6 +610,25 @@ ROM_START( omegrace2 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
+ROM_START( omegrace3 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	/* ROMs typewritten as O.R. with date 7/27 written by hand in red ink */
+	ROM_LOAD( "omega_1_7-27.m7",            0x0000, 0x1000, CRC(f8539d46) SHA1(bb0c6bc2a84e904d1cb00822052c53c0a8ff1083) )
+	ROM_LOAD( "omega_2_7-27.l7",            0x1000, 0x1000, CRC(9c3edb1a) SHA1(d2487a402586339969070545e4ab24ced2e7243a) )
+	ROM_LOAD( "omega_3_7-27.k7",            0x2000, 0x1000, CRC(6349130d) SHA1(a1ff62044d9e59294f56079e704beeebc65a56aa) )
+	ROM_LOAD( "omega_4_7-27.j7",            0x3000, 0x1000, CRC(0a5ef64a) SHA1(42bcc5d5bfe11af4b26ba7753d83e121eef4b597) )
+
+	ROM_REGION( 0x1000, "vectorrom", 0 )
+	ROM_LOAD( "o.r._vector_i_6-1-81.e1",    0x0000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
+	ROM_LOAD( "o.r._vector_ii_6-1-81.f1",   0x0800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "o.r.r._audio_6-1-81.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
+
+	ROM_REGION( 0x100, "dvg:prom", 0 )
+	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
+ROM_END
+
 ROM_START( deltrace )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "omega.m7",     0x0000, 0x1000, CRC(0424d46e) SHA1(cc1ac6c06ba6f6e8466fa08286a0c70b5335af33) )
@@ -660,4 +679,5 @@ void omegrace_state::init_omegrace()
 
 GAMEL(1981, omegrace,  0,        omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
 GAMEL(1981, omegrace2, omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
+GAMEL(1981, omegrace3, omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "Midway", "Omega Race (set 3, 7/27)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )
 GAMEL(1981, deltrace,  omegrace, omegrace, omegrace, omegrace_state, init_omegrace, ROT0, "bootleg (Allied Leisure)", "Delta Race", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_omegrace )

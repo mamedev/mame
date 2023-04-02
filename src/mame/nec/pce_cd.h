@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
-#ifndef MAME_MACHINE_PCE_CD_H
-#define MAME_MACHINE_PCE_CD_H
+// copyright-holders:Wilbert Pol, Angelo Salese
+#ifndef MAME_NEC_PCE_CD_H
+#define MAME_NEC_PCE_CD_H
 
 #pragma once
 
@@ -91,7 +91,7 @@ private:
 	uint8_t adpcm_address_control_r();
 	void adpcm_address_control_w(uint8_t data);
 	void adpcm_playback_rate_w(uint8_t data);
-	void fade_register_w(uint8_t data);
+	void fader_control_w(uint8_t data);
 
 	uint8_t m_reset_reg = 0;
 	uint8_t m_irq_mask = 0;
@@ -103,7 +103,7 @@ private:
 	uint16_t m_adpcm_latch_address = 0;
 	uint8_t m_adpcm_control = 0;
 	uint8_t m_adpcm_dma_reg = 0;
-	uint8_t m_fade_reg = 0;
+	uint8_t m_fader_ctrl = 0;
 
 	void regs_map(address_map &map);
 	void adpcm_stop(uint8_t irq_flag);
@@ -214,6 +214,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
+	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
 };
 
 
@@ -221,4 +223,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PCE_CD, pce_cd_device)
 
-#endif // MAME_MACHINE_PCE_CD_H
+#endif // MAME_NEC_PCE_CD_H

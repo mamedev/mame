@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_GTIA_H
-#define MAME_VIDEO_GTIA_H
+#ifndef MAME_ATARI_GTIA_H
+#define MAME_ATARI_GTIA_H
 
 #pragma once
 
@@ -190,4 +190,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_GTIA, gtia_device)
 
-#endif // MAME_VIDEO_GTIA_H
+#endif // MAME_ATARI_GTIA_H

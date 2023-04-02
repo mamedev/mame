@@ -5,8 +5,8 @@
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
 ********************************************************************************************************************************/
-#ifndef MAME_INCLUDES_MZ2500_H
-#define MAME_INCLUDES_MZ2500_H
+#ifndef MAME_SHARP_MZ2500_H
+#define MAME_SHARP_MZ2500_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 	void mz2500_bank_window_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MZ2500_H
+#endif // MAME_SHARP_MZ2500_H

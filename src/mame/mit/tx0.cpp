@@ -369,7 +369,7 @@ public:
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
 
@@ -398,8 +398,8 @@ public:
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_load() override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 protected:
@@ -436,7 +436,7 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "printout"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "prin"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -465,7 +465,7 @@ public:
 	// image-level overrides
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -489,7 +489,7 @@ tx0_magtape_image_device::tx0_magtape_image_device(const machine_config &mconfig
 
     unit 0 is reader (read-only), unit 1 is puncher (write-only)
 */
-image_init_result tx0_readtape_image_device::call_load()
+std::error_condition tx0_readtape_image_device::call_load()
 {
 	if (m_tx0)
 	{
@@ -518,7 +518,7 @@ image_init_result tx0_readtape_image_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tx0_readtape_image_device::call_unload()
@@ -630,16 +630,16 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 /*
     timer callback to generate punch completion pulse
 */
-image_init_result tx0_punchtape_image_device::call_load()
+std::error_condition tx0_punchtape_image_device::call_load()
 {
 	/* punch unit */
 	if (m_tx0)
 		m_tx0->m_tape_puncher.fd = this;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result tx0_punchtape_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::error_condition tx0_punchtape_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	return call_load();
 }
@@ -713,13 +713,13 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
 /*
     Open a file for typewriter output
 */
-image_init_result tx0_printer_image_device::call_load()
+std::error_condition tx0_printer_image_device::call_load()
 {
 	/* open file */
 	if (m_tx0)
 		m_tx0->m_typewriter.fd = this;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tx0_printer_image_device::call_unload()
@@ -852,7 +852,7 @@ void tx0_magtape_image_device::device_start()
 /*
     Open a magnetic tape image
 */
-image_init_result tx0_magtape_image_device::call_load()
+std::error_condition tx0_magtape_image_device::call_load()
 {
 	if (m_tx0)
 	{
@@ -871,7 +871,7 @@ image_init_result tx0_magtape_image_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void tx0_magtape_image_device::call_unload()

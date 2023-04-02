@@ -85,7 +85,7 @@ public:
 
 	camera_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -316,13 +316,13 @@ camera_device::camera_device(
 }
 
 
-image_init_result camera_device::load(std::string &message)
+std::error_condition camera_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(6);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !configure_bank_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	install_rom();
 
 	// install memory map control handlers
@@ -357,7 +357,7 @@ image_init_result camera_device::load(std::string &message)
 			&m_threshold[0][0][0]);
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

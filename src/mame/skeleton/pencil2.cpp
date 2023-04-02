@@ -98,6 +98,9 @@ ToDo:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pencil2_state : public driver_device
 {
 public:
@@ -361,6 +364,9 @@ ROM_START( pencil2 )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "mt.u4", 0x0000, 0x2000, CRC(338d7b59) SHA1(2f89985ac06971e00210ff992bf1e30a296d10e7) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

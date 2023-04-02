@@ -503,7 +503,7 @@ QUICKLOAD_LOAD_MEMBER(cosmicos_state::quickload_cb)
 	/* load image to RAM */
 	image.fread(ptr, size);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /* Machine Driver */

@@ -47,6 +47,9 @@
 #include "machine/i8251.h"
 #include "screen.h"
 
+
+namespace {
+
 #define UPD3301_TAG     "upd3301"
 #define I8257_TAG       "i8257"
 #define SCREEN_TAG      "screen"
@@ -585,6 +588,8 @@ ROM_START( olybossd )
 	ROM_REGION( 0x800, UPD3301_TAG, 0)
 	ROM_LOAD( "olympia_boss_graphics_251-461.bin", 0x0000, 0x800, CRC(56149540) SHA1(b2b893bd219308fc98a38528beb7ddae391c7609) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

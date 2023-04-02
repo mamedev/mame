@@ -229,7 +229,7 @@ void nscsi_cdrom_device::scsi_command()
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
-			std::fill_n(scsi_cmdbuf, 36, 0);
+			std::fill_n(scsi_cmdbuf, size, 0);
 
 			if (lun != 0)
 				scsi_cmdbuf[0] = 0x7f;
@@ -249,8 +249,6 @@ void nscsi_cdrom_device::scsi_command()
 				if(scsi_cmdbuf[i] == 0)
 					scsi_cmdbuf[i] = 0x20;
 
-			if(size > 36)
-				size = 36;
 			scsi_data_in(SBUF_MAIN, size);
 			break;
 		}
@@ -714,6 +712,19 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 		return nscsi_full_device::scsi_command_done(command, length);
 	}
 }
+
+enum apple_scsi_command_e : uint8_t {
+	APPLE_READ_TOC         = 0xc1,
+	APPLE_READ_SUB_CHANNEL = 0xc2,
+	APPLE_READ_HEADER      = 0xc3,
+	APPLE_PLAYBACK_STATUS  = 0xc4,
+	APPLE_PAUSE            = 0xc5,
+	APPLE_PLAY_TRACK       = 0xc6,
+	APPLE_PLAY_MSF         = 0xc7,
+	APPLE_PLAY_AUDIO       = 0xc8,
+	APPLE_PLAYBACK_CONTROL = 0xc9
+};
+
 /*
    The Apple II SCSI Card firmware demands that ASC on a failing TEST_UNIT_READY be either 0x28 or 0xb0.
    0x28 is MEDIA_CHANGED, 0xb0 is vendor-specific.  If the drive returns the normal 0x3A for disc-not-present,
@@ -736,8 +747,113 @@ void nscsi_cdrom_apple_device::scsi_command()
 		}
 		break;
 
+	case APPLE_READ_TOC: {
+		u16 size = (scsi_cmdbuf[7] << 7) | scsi_cmdbuf[8];
+		bool msf = false; // TODO: LBAMSF bit from Page Code Eight parameter block
+
+		LOG("command READ TOC (AppleCD), size=%d, msf=%d\n", size, msf);
+
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
+		int pos = 0;
+
+		int start_track = scsi_cmdbuf[5];
+		int end_track = cdrom->get_last_track();
+
+		int tracks;
+		if(start_track == 0)
+			tracks = end_track + 1;
+		else if(start_track <= end_track)
+			tracks = (end_track - start_track) + 2;
+		else if(start_track <= 0xaa)
+			tracks = 1;
+		else
+			tracks = 0;
+
+		int len = 2 + (tracks * 8);
+
+		// the returned TOC DATA LENGTH must be the full amount,
+		// regardless of how much we're able to pass back due to size
+		scsi_cmdbuf[pos++] = (len>>8) & 0xff;
+		scsi_cmdbuf[pos++] = (len & 0xff);
+		scsi_cmdbuf[pos++] = 1;
+		scsi_cmdbuf[pos++] = cdrom->get_last_track();
+
+		if (start_track == 0)
+			start_track = 1;
+
+		for(int i = 0; i < tracks; i++) {
+			int track = start_track + i;
+			int cdrom_track = track - 1;
+			if(i == tracks-1) {
+				track = 0xaa;
+				cdrom_track = 0xaa;
+			}
+
+			scsi_cmdbuf[pos++] = track;
+			scsi_cmdbuf[pos++] = cdrom->get_adr_control(cdrom_track);
+
+			u32 tstart = cdrom->get_track_start(cdrom_track);
+
+			if(msf)
+				tstart = to_msf(tstart+150);
+
+			scsi_cmdbuf[pos++] = (tstart>>24) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart>>16) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart>>8) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart & 0xff);
+		}
+
+		if(pos) {
+			if(pos > size)
+				pos = size;
+
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			// report unit attention condition
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST);
+			break;
+		}
+		break;
+	}
+
+	case APPLE_READ_SUB_CHANNEL:
+	case APPLE_READ_HEADER:
+	case APPLE_PLAYBACK_STATUS:
+	case APPLE_PAUSE:
+	case APPLE_PLAY_TRACK:
+	case APPLE_PLAY_MSF:
+	case APPLE_PLAY_AUDIO:
+	case APPLE_PLAYBACK_CONTROL:
+		// TODO
+		[[fallthrough]];
+
 	default:
 		nscsi_cdrom_device::scsi_command();
 		break;
+	}
+}
+
+bool nscsi_cdrom_apple_device::scsi_command_done(uint8_t command, uint8_t length)
+{
+	switch (command) {
+	case APPLE_READ_TOC:
+	//case APPLE_READ_SUB_CHANNEL:
+	//case APPLE_READ_HEADER:
+	//case APPLE_PLAYBACK_STATUS:
+	//case APPLE_PAUSE:
+	//case APPLE_PLAY_TRACK:
+	//case APPLE_PLAY_MSF:
+	//case APPLE_PLAY_AUDIO:
+	//case APPLE_PLAYBACK_CONTROL:
+		return length == 10;
+
+	default:
+		return nscsi_full_device::scsi_command_done(command, length);
 	}
 }

@@ -37,6 +37,9 @@
 #include "machine/upd765.h"
 #include "wangpckb.h"
 
+
+namespace {
+
 #define I8086_TAG       "i8086"
 #define AM9517A_TAG     "am9517a"
 #define I8259A_TAG      "i8259"
@@ -189,9 +192,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
-	image_init_result on_disk0_load(floppy_image_device *image);
+	void on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);
-	image_init_result on_disk1_load(floppy_image_device *image);
+	void on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
 	void wangpc_io(address_map &map);
@@ -1224,11 +1227,9 @@ void wangpc_state::machine_reset()
 //  on_disk0_change -
 //-------------------------------------------------
 
-image_init_result wangpc_state::on_disk0_load(floppy_image_device *image)
+void wangpc_state::on_disk0_load(floppy_image_device *image)
 {
 	on_disk0_unload(image);
-
-	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk0_unload(floppy_image_device *image)
@@ -1244,11 +1245,9 @@ void wangpc_state::on_disk0_unload(floppy_image_device *image)
 //  on_disk1_change -
 //-------------------------------------------------
 
-image_init_result wangpc_state::on_disk1_load(floppy_image_device *image)
+void wangpc_state::on_disk1_load(floppy_image_device *image)
 {
 	on_disk1_unload(image);
-
-	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk1_unload(floppy_image_device *image)
@@ -1389,6 +1388,7 @@ ROM_START( wangpc )
 	ROM_LOAD16_BYTE( "379-0000 r2.l115", 0x0000, 0x2000, CRC(67b37684) SHA1(70d9f68eb88cc2bc9f53f949cc77411c09a4266e) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

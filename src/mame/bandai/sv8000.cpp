@@ -36,6 +36,9 @@ Looking at the code of the cartridges it seems there is:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class sv8000_state : public driver_device
 {
 public:
@@ -207,14 +210,14 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 
 	if (size != 0x1000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Incorrect or not support cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Incorrect or not supported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -419,6 +422,9 @@ void sv8000_state::sv8000(machine_config &config)
 ROM_START( sv8000 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

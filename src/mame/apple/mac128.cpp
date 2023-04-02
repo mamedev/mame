@@ -115,6 +115,9 @@ Scanline 0 is the start of vblank.
 #include "softlist.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define C7M (15.6672_MHz_XTAL / 2)
 #define C3_7M (15.6672_MHz_XTAL / 4).value()
 
@@ -204,8 +207,6 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
-	void via_sync();
-	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -608,7 +609,7 @@ WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
 
 void mac128_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
@@ -719,36 +720,6 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-void mac128_state::via_sync()
-{
-	// The VIA runs from the E clock of the 68k and uses VPA.
-
-	// That means:
-	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
-
-	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
-
-	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
-	// is synced on that clock, so that's at a multiple of 10 in
-	// absolute time
-
-	// - 4 cycles later E goes down and that's the end of the access,
-
-	// We sync on the start of cycle (so that the via timings go ok)
-	// then on the end on via_sync_end()
-
-	uint64_t cur_cycle = m_maincpu->total_cycles();
-	uint64_t vpa_cycle = cur_cycle+2;
-	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
-	uint64_t m68k_start_cycle = via_start_cycle * 10;
-	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
-}
-
-void mac128_state::via_sync_end()
-{
-	m_maincpu->adjust_icount(-4);
-}
-
 uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
@@ -756,11 +727,7 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	data = m_via->read(offset);
-
-	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -769,11 +736,7 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	m_via->write(offset, (data >> 8) & 0xff);
-
-	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
@@ -1075,7 +1038,7 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1087,7 +1050,7 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1099,7 +1062,7 @@ void mac128_state::macse_map(address_map &map)
 	map(0x900000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xb00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xd00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1531,6 +1494,9 @@ ROM_START( macclasc )
 	// this dump is big endian
 	ROM_LOAD( "341-0813__=c=1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_SUPPORTS_SAVE )

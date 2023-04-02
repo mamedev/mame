@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_COCO_VHD_H
-#define MAME_MACHINE_COCO_VHD_H
+#ifndef MAME_TRS_COCO_VHD_H
+#define MAME_TRS_COCO_VHD_H
 
 #pragma once
 
@@ -34,7 +34,7 @@ public:
 	virtual ~coco_vhd_image_device();
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -70,4 +70,4 @@ DECLARE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device)
 ***************************************************************************/
 
 
-#endif // MAME_MACHINE_COCO_VHD_H
+#endif // MAME_TRS_COCO_VHD_H

@@ -5,8 +5,8 @@
     Gottlieb Exterminator hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EXTERM_H
-#define MAME_INCLUDES_EXTERM_H
+#ifndef MAME_GOTTLIEB_EXTERM_H
+#define MAME_GOTTLIEB_EXTERM_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 	void sound_slave_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_EXTERM_H
+#endif // MAME_GOTTLIEB_EXTERM_H

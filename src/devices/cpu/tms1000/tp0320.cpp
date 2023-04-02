@@ -45,8 +45,8 @@ void tp0320_cpu_device::ram_192x4(address_map &map)
 void tp0320_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA(partial), microinstructions PLA
-	PLA(config, "ipla", 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
 }
 
 

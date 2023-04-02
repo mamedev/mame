@@ -6,8 +6,8 @@ Nichibutsu 1412M2 device emulation
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_NB1412M2_H
-#define MAME_MACHINE_NB1412M2_H
+#ifndef MAME_NICHIBUTSU_NB1412M2_H
+#define MAME_NICHIBUTSU_NB1412M2_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ DECLARE_DEVICE_TYPE(NB1412M2, nb1412m2_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_NB1412M2_H
+#endif // MAME_NICHIBUTSU_NB1412M2_H

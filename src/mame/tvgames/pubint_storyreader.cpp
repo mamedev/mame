@@ -75,6 +75,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pi_storyreader_state : public driver_device
 {
 public:
@@ -120,7 +123,7 @@ DEVICE_IMAGE_LOAD_MEMBER(pi_storyreader_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 static INPUT_PORTS_START( pi_storyreader )
@@ -163,6 +166,9 @@ ROM_START( pi_stry2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.mcu.rom", 0x0000, 0x1000, NO_DUMP ) // unknown type / size
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 

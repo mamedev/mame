@@ -11,7 +11,7 @@ The 1st half is for Z8, 2nd half is for MCS48. A12 is forced high or low.
 
 -->
 
-<softwarelist name="fidel_msc" description="Fidelity MSC Modules">
+<softwarelist name="fidel_msc" description="Fidelity MSC modules">
 
 	<software name="cac">
 		<description>Challenger Advanced Chess</description>

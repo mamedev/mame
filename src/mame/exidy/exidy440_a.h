@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_EXIDY440_H
-#define MAME_AUDIO_EXIDY440_H
+#ifndef MAME_EXIDY_EXIDY440_A_H
+#define MAME_EXIDY_EXIDY440_A_H
 
 #pragma once
 
@@ -118,4 +118,4 @@ private:
 DECLARE_DEVICE_TYPE(EXIDY440, exidy440_sound_device)
 
 
-#endif // MAME_AUDIO_EXIDY440_H
+#endif // MAME_EXIDY_EXIDY440_A_H

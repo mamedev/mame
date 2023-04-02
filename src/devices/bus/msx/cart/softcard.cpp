@@ -14,7 +14,7 @@ This cartridge allows SoftCards to be used on an MSX system.
 #include "softlist_dev.h"
 
 
-DEFINE_DEVICE_TYPE(MSX_CART_SOFTCARD, msx_cart_softcard_device, "msx_cart_softcard", "Electric Softward Astron SoftCard Adaptor")
+DEFINE_DEVICE_TYPE(MSX_CART_SOFTCARD, msx_cart_softcard_device, "msx_cart_softcard", "Electric Software Astron SoftCard Adaptor")
 
 
 msx_cart_softcard_device::msx_cart_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -40,7 +40,7 @@ void msx_cart_softcard_device::device_add_mconfig(machine_config &config)
 	SOFTWARE_LIST(config, "softcard_list").set_original("msx_softcard");
 }
 
-image_init_result msx_cart_softcard_device::call_load()
+std::error_condition msx_cart_softcard_device::call_load()
 {
 	if (m_softcard)
 	{
@@ -50,8 +50,8 @@ image_init_result msx_cart_softcard_device::call_load()
 			// Only 32KB images are supported
 			if (length != 0x8000)
 			{
-				seterror(image_error::UNSPECIFIED, "Invalid file size for a softcard");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Invalid file size for a softcard\n", basename());
+				return image_error::BADSOFTWARE;
 			}
 		}
 		else
@@ -60,26 +60,26 @@ image_init_result msx_cart_softcard_device::call_load()
 			// Only 32KB images are supported
 			if (length != 0x8000)
 			{
-				seterror(image_error::UNSPECIFIED, "Invalid file size for a softcard");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Invalid file size for a softcard\n", basename());
+				return image_error::INVALIDLENGTH;
 			}
 
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
 			{
-				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
-				return image_init_result::FAIL;
+				osd_printf_error("%s: Unable to fully read file\n", basename());
+				return image_error::UNSPECIFIED;
 			}
 		}
 
 		std::string message;
-		image_init_result result = m_softcard->initialize_cartridge(message);
-		if (image_init_result::PASS != result)
-			seterror(image_error::INVALIDIMAGE, message.c_str());
+		std::error_condition result = m_softcard->initialize_cartridge(message);
+		if (result)
+			osd_printf_error("%s: %s\n", basename(), message);
 
 		return result;
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 std::string msx_cart_softcard_device::get_default_card_software(get_default_card_software_hook &hook) const

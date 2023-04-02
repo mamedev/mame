@@ -413,7 +413,7 @@ void mfm_harddisk_device::device_stop()
     because we need the number of cylinders, and for generic drives we get
     them from the CHD.
 */
-image_init_result mfm_harddisk_device::call_load()
+std::error_condition mfm_harddisk_device::call_load()
 {
 	std::error_condition err;
 
@@ -426,8 +426,7 @@ image_init_result mfm_harddisk_device::call_load()
 	{
 		auto io = util::random_read_write_fill(image_core_file(), 0xff);
 		if(!io) {
-			seterror(std::errc::not_enough_memory, nullptr);
-			return image_init_result::FAIL;
+			return std::errc::not_enough_memory;
 		}
 		m_chd = new chd_file;
 		err = m_chd->open(std::move(io), true);
@@ -445,7 +444,7 @@ image_init_result mfm_harddisk_device::call_load()
 		if (m_chd==nullptr)
 		{
 			LOG("m_chd is null\n");
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 
 		// Read the hard disk metadata
@@ -453,7 +452,7 @@ image_init_result mfm_harddisk_device::call_load()
 		if (state)
 		{
 			LOG("Failed to read CHD metadata\n");
-			return image_init_result::FAIL;
+			return state;
 		}
 
 		LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata.c_str());
@@ -466,7 +465,7 @@ image_init_result mfm_harddisk_device::call_load()
 		if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &param.cylinders, &param.heads, &param.sectors_per_track, &param.sector_size) != 4)
 		{
 			LOG("Invalid CHD metadata\n");
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 
 		LOGMASKED(LOG_CONFIG, "CHD image has geometry cyl=%d, head=%d, sect=%d, size=%d\n", param.cylinders, param.heads, param.sectors_per_track, param.sector_size);
@@ -549,9 +548,9 @@ image_init_result mfm_harddisk_device::call_load()
 	else
 	{
 		LOGMASKED(LOG_WARN, "Could not load CHD\n");
-		return image_init_result::FAIL;
+		return err;
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 const char *MFMHD_REC_METADATA_FORMAT = "IL:%d,CSKEW:%d,HSKEW:%d,WPCOM:%d,RWC:%d";

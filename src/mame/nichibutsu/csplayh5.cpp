@@ -40,6 +40,9 @@
 #include "video/v9938.h"
 #include "nichisnd.h"
 
+
+namespace {
+
 #define USE_H8 0
 #define DVD_CLOCK XTAL(27'000'000)
 
@@ -904,11 +907,12 @@ ROM_START( konhaji )
 	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )
 ROM_END
 
+} // anonymous namespace
 
 
 /***************************************************************************
 
-    Game metadatas
+    Game metadata
 
 ***************************************************************************/
 

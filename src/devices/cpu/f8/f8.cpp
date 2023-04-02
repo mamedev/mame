@@ -453,7 +453,7 @@ void f8_cpu_device::ROMC_0F()
 	 * must move the contents of the data bus into the low order
 	 * byte of PC0.
 	 */
-	m_irq_vector = standard_irq_callback(F8_INPUT_LINE_INT_REQ);
+	m_irq_vector = standard_irq_callback(F8_INPUT_LINE_INT_REQ, m_pc0);
 	m_dbus = m_irq_vector & 0x00ff;
 	m_pc1 = m_pc0;
 	m_pc0 = (m_pc0 & 0xff00) | m_dbus;

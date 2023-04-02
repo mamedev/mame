@@ -858,22 +858,18 @@ void cps3_state::decrypt_bios()
 		u32 xormask = cps3_mask(i, m_key1, m_key2);
 		coderegion[i/4] = dword ^ xormask;
 	}
-#if 0
-	/* Dump to file */
-	{
-		FILE *fp;
-		const char *gamename = machine().system().name;
-		char filename[256];
-		sprintf(filename, "%s_bios.dump", gamename);
 
-		fp=fopen(filename, "w+b");
+	// Dump to file
+	if (0)
+	{
+		auto filename = std::string(machine().system().name) + "_bios.dump";
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
-			fwrite(m_decrypted_bios, 0x080000, 1, fp);
+			fwrite(coderegion, codelength, 1, fp);
 			fclose(fp);
 		}
 	}
-#endif
 }
 
 
@@ -2400,24 +2396,6 @@ void cps3_state::copy_from_nvram()
 			flashnum+=2;
 		}
 	}
-
-
-	/*
-	{
-	    FILE *fp;
-	    const char *gamename = machine().system().name;
-	    char filename[256];
-	    sprintf(filename, "%s_bios.dump", gamename);
-
-	    fp=fopen(filename, "w+b");
-	    if (fp)
-	    {
-	        fwrite(rom, 0x080000, 1, fp);
-	        fclose(fp);
-	    }
-	}
-	*/
-
 }
 
 

@@ -64,6 +64,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class big10_state : public driver_device
 {
 public:
@@ -267,6 +269,8 @@ ROM_START( big10 )
 	ROM_LOAD( "2", 0x4000, 0x4000, CRC(b4626a5f) SHA1(a9b3b9575c657748a7f0b60ec2c7411dad0c83c1) )
 	ROM_LOAD( "3", 0x8000, 0x4000, CRC(8d15da74) SHA1(0e114de6fcf79beac800575bfb739e6a6bf35660) )
 ROM_END
+
+} // anonymous namespace
 
 
 /**************************************

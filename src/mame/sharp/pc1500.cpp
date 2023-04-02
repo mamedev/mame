@@ -22,6 +22,8 @@
 #include "pc1500.lh"
 
 
+namespace {
+
 class pc1500_state : public driver_device
 {
 public:
@@ -355,6 +357,9 @@ ROM_START( pc1500 )
 	ROM_REGION( 0x2000, "ce150", ROMREGION_ERASEFF )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY  FULLNAME                FLAGS
 COMP( 198?, pc1500, 0,      0,      pc1500, pc1500, pc1500_state, empty_init, "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

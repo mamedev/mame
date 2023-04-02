@@ -41,6 +41,9 @@ Video: TMS TCP1020AFN-084C
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class drtomy_state : public driver_device
 {
 public:
@@ -382,6 +385,8 @@ ROM_START( drtomy )
 	ROM_COPY( "user1", 0x00000, 0xc0000, 0x20000)
 	ROM_COPY( "user1", 0x60000, 0xe0000, 0x20000)
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1993, drtomy, 0, drtomy, drtomy, drtomy_state, empty_init, ROT0, "Playmark", "Dr. Tomy", MACHINE_SUPPORTS_SAVE )

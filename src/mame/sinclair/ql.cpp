@@ -92,6 +92,8 @@
 #include "utf8.h"
 
 
+namespace {
+
 #define SCREEN_TAG  "screen"
 
 #define M68008_TAG  "ic18"
@@ -1263,6 +1265,7 @@ ROM_START( megaopd )
 ROM_END
 #endif
 
+} // anonymous namespace
 
 
 //**************************************************************************

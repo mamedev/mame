@@ -41,7 +41,7 @@ class floppy_image_device : public device_t,
 							public device_image_interface
 {
 public:
-	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
+	typedef delegate<void (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
@@ -82,15 +82,15 @@ public:
 	const std::vector<const floppy_image_format_t *> &get_formats() const;
 	const std::vector<fs_info> &get_fs() const { return m_fs; }
 	const floppy_image_format_t *get_load_format() const;
-	const floppy_image_format_t *identify(std::string_view filename);
+	std::pair<std::error_condition, const floppy_image_format_t *> identify(std::string_view filename);
 	void set_rpm(float rpm);
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
 	// image-level overrides
-	virtual image_init_result call_load() override;
+	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 	virtual const char *image_interface() const noexcept override = 0;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -461,32 +461,37 @@ class floppy_connector: public device_t,
 						public device_slot_interface
 {
 public:
-	template <typename T>
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, std::function<void (format_registration &fr)> formats, bool fixed = false)
+
+	template <typename T, typename U>
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, U &&formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(fixed);
-		set_formats(formats);
+		set_formats(std::forward<U>(formats));
 	}
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, std::function<void (format_registration &fr)> formats)
+
+	template <typename T>
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, device_type drivetype, bool is_default, T &&formats)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
-		option_add(option, devtype);
+		option_add(option, drivetype);
 		if(is_default)
 			set_default_option(option);
 		set_fixed(false);
-		set_formats(formats);
+		set_formats(std::forward<T>(formats));
 	}
+
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~floppy_connector();
 
-	void set_formats(std::function<void (format_registration &fr)> formats);
-	floppy_image_device *get_device();
+	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 	void enable_sound(bool doit) { m_enable_sound = doit; }
+
+	floppy_image_device *get_device();
 
 protected:
 	virtual void device_start() override;

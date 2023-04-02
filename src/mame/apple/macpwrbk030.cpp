@@ -104,7 +104,11 @@
 
 #include "emu.h"
 
+#include "macadb.h"
 #include "macrtc.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+
 #include "cpu/m68000/m68030.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
@@ -113,19 +117,20 @@
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "mactoolbox.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "sound/asc.h"
-#include "formats/ap_dsk35.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+
+
+namespace {
 
 #define C32M (31.3344_MHz_XTAL)
 #define C15M (C32M/2)
@@ -1188,6 +1193,9 @@ ROM_START(macpd210)
 
 	ROM_REGION(0x1800, "pmu", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1991, macpb140, 0, 0, macpb140, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING)
 COMP(1991, macpb170, macpb140, 0, macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING)

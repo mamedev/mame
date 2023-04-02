@@ -3,18 +3,19 @@
 #include "emu.h"
 #include "z80bin.h"
 
+#include "imagedev/snapquik.h"
+
 /*-------------------------------------------------
     z80bin_load_file - load a z80bin file into
     memory
 -------------------------------------------------*/
 
-image_init_result z80bin_load_file(device_image_interface &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
+std::error_condition z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
 {
 	uint16_t args[3]{};
 	uint16_t i = 0U, j = 0U, size = 0U;
 	uint8_t data = 0U;
 	char pgmname[256]{};
-	char message[512]{};
 
 	image.fseek(7, SEEK_SET);
 
@@ -26,9 +27,9 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 		{
 			if (i >= (std::size(pgmname) - 1))
 			{
-				image.seterror(image_error::INVALIDIMAGE, "File name too long");
+				osd_printf_error("File name too long\n");
 				image.message(" File name too long");
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 
 			pgmname[i] = ch;    /* build program name */
@@ -38,18 +39,18 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 
 	if (bytes == 0)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unexpected EOF while getting file name");
+		osd_printf_error("%s: Unexpected EOF while getting file name\n", image.basename());
 		image.message(" Unexpected EOF while getting file name");
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	pgmname[i] = '\0';  /* terminate string with a null */
 
 	if (image.fread(args, sizeof(args)) != sizeof(args))
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unexpected EOF while getting file size");
+		osd_printf_error("%s: Unexpected EOF while getting file size\n", image.basename());
 		image.message(" Unexpected EOF while getting file size");
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 
 	exec_addr = little_endianize_int16(args[0]);
@@ -66,13 +67,12 @@ image_init_result z80bin_load_file(device_image_interface &image, address_space 
 		j = (start_addr + i) & 0xffff;
 		if (image.fread(&data, 1) != 1)
 		{
-			snprintf(message, std::size(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			image.seterror(image_error::INVALIDIMAGE, message);
+			osd_printf_error("%s: Unexpected EOF while writing byte to %04X\n", image.basename(), j);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 		space.write_byte(j, data);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }

@@ -15,6 +15,8 @@
 #include <sstream>
 
 
+namespace {
+
 class ssem_state : public driver_device
 {
 public:
@@ -554,7 +556,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 	if (image_line.empty())
 	{
 		image.message("No data in line 1");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	sscanf(image_line.c_str(), "%d", &num_lines);  //num_lines = std::stoul(image_line);
@@ -562,7 +564,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 	if (num_lines < 1)
 	{
 		image.message("No data to process");
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	for (u32 i = 0; i < num_lines; i++)
@@ -574,7 +576,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		if (length < 8)
 		{
 			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 		}
 
 		// Isolate and convert 4-digit decimal address
@@ -586,7 +588,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 			if (length < 37)
 			{
 				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-				return image_init_result::FAIL;
+				return image_error::INVALIDIMAGE;
 			}
 
 			// Parse a line such as: 0000:00000110101001000100000100000100
@@ -644,7 +646,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /****************************************************\
@@ -688,6 +690,8 @@ void ssem_state::ssem(machine_config &config)
 ROM_START( ssem )
 	ROM_REGION( 0x80, "maincpu", ROMREGION_ERASE00 )  /* Main Store */
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME

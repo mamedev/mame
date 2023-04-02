@@ -6,8 +6,8 @@
     HAR MadMax hardware
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_DCHEESE_H
-#define MAME_INCLUDES_DCHEESE_H
+#ifndef MAME_MISC_DCHEESE_H
+#define MAME_MISC_DCHEESE_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 	void sound_cpu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DCHEESE_H
+#endif // MAME_MISC_DCHEESE_H

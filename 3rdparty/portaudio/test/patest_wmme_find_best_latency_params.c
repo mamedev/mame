@@ -26,26 +26,27 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
+
+#define  _WIN32_WINNT 0x0501 /* for GetNativeSystemInfo */
 
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
 
-#define  _WIN32_WINNT 0x0501 /* for GetNativeSystemInfo */ 
 #include <windows.h>    /* required when using pa_win_wmme.h */
 #include <mmsystem.h>   /* required when using pa_win_wmme.h */
 
 #include <conio.h>      /* for _getch */
-
+#include <tchar.h>
 
 #include "portaudio.h"
 #include "pa_win_wmme.h"
@@ -62,7 +63,7 @@
 #define CHANNEL_COUNT           (2)
 
 
-/* seach parameters. we test all buffer counts in this range */
+/* search parameters. we test all buffer counts in this range */
 #define MIN_WMME_BUFFER_COUNT        (2)
 #define MAX_WMME_BUFFER_COUNT        (12)
 
@@ -105,13 +106,13 @@ static void printWindowsVersionInfo( FILE *fp )
 
     memset( &osVersionInfoEx, 0, sizeof(OSVERSIONINFOEX) );
     osVersionInfoEx.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    GetVersionEx( &osVersionInfoEx );
+    GetVersionEx( (LPOSVERSIONINFO) &osVersionInfoEx );
 
-    
+
     if( osVersionInfoEx.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ){
         switch( osVersionInfoEx.dwMinorVersion ){
             case 0: osName = "Windows 95"; break;
-            case 10: osName = "Windows 98"; break;  // could also be 98SE (I've seen code discriminate based 
+            case 10: osName = "Windows 98"; break;  // could also be 98SE (I've seen code discriminate based
                                                     // on osInfo.Version.Revision.ToString() == "2222A")
             case 90: osName = "Windows Me"; break;
         }
@@ -137,13 +138,13 @@ static void printWindowsVersionInfo( FILE *fp )
                             }break;
                     }break;
             case 6:switch( osVersionInfoEx.dwMinorVersion ){
-                        case 0: 
+                        case 0:
                             if( osVersionInfoEx.wProductType == VER_NT_WORKSTATION )
                                 osName = "Windows Vista";
                             else
                                 osName = "Windows Server 2008";
                             break;
-                        case 1: 
+                        case 1:
                             if( osVersionInfoEx.wProductType == VER_NT_WORKSTATION )
                                 osName = "Windows 7";
                             else
@@ -171,7 +172,7 @@ static void printWindowsVersionInfo( FILE *fp )
         }
         else if(osVersionInfoEx.wProductType == VER_NT_SERVER)
         {
-            if(osVersionInfoEx.dwMinorVersion == 0) 
+            if(osVersionInfoEx.dwMinorVersion == 0)
             {
                 if((osVersionInfoEx.wSuiteMask & VER_SUITE_DATACENTER) == VER_SUITE_DATACENTER)
                     osProductType = "Datacenter Server"; // Windows 2000 Datacenter Server
@@ -206,8 +207,8 @@ static void printWindowsVersionInfo( FILE *fp )
 
 
     fprintf( fp, "OS name and edition: %s %s\n", osName, osProductType );
-    fprintf( fp, "OS version: %d.%d.%d %S\n", 
-                osVersionInfoEx.dwMajorVersion, osVersionInfoEx.dwMinorVersion, 
+    _ftprintf( fp, TEXT("OS version: %d.%d.%d %s\n"),
+                osVersionInfoEx.dwMajorVersion, osVersionInfoEx.dwMinorVersion,
                 osVersionInfoEx.dwBuildNumber, osVersionInfoEx.szCSDVersion );
     fprintf( fp, "Processor architecture: %s\n", processorArchitecture );
     fprintf( fp, "WoW64 process: %s\n", IsWow64() ? "Yes" : "No" );
@@ -230,7 +231,7 @@ static void printTimeAndDate( FILE *fp )
 typedef struct
 {
     float sine[TABLE_SIZE];
-	double phase;
+    double phase;
     double phaseIncrement;
     volatile int fadeIn;
     volatile int fadeOut;
@@ -257,14 +258,14 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         float x = data->sine[(int)data->phase];
         data->phase += data->phaseIncrement;
         if( data->phase >= TABLE_SIZE ){
-			data->phase -= TABLE_SIZE;
-		}
+            data->phase -= TABLE_SIZE;
+        }
 
         x *= data->amp;
         if( data->fadeIn ){
@@ -276,11 +277,11 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
                 data->amp -= .001;
         }
 
-		for( j = 0; j < CHANNEL_COUNT; ++j ){
+        for( j = 0; j < CHANNEL_COUNT; ++j ){
             *out++ = x;
-		}
-	}
-    
+        }
+    }
+
     if( data->amp > 0 )
         return paContinue;
     else
@@ -292,7 +293,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
 #define NO      0
 
 
-static int playUntilKeyPress( int deviceIndex, float sampleRate, 
+static int playUntilKeyPress( int deviceIndex, float sampleRate,
                              int framesPerUserBuffer, int framesPerWmmeBuffer, int wmmeBufferCount )
 {
     PaStreamParameters outputParameters;
@@ -308,7 +309,7 @@ static int playUntilKeyPress( int deviceIndex, float sampleRate,
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     wmmeStreamInfo.size = sizeof(PaWinMmeStreamInfo);
-    wmmeStreamInfo.hostApiType = paMME; 
+    wmmeStreamInfo.hostApiType = paMME;
     wmmeStreamInfo.version = 1;
     wmmeStreamInfo.flags = paWinMmeUseLowLevelLatencyParameters | paWinMmeDontThrottleOverloadedProcessingThread;
     wmmeStreamInfo.framesPerBuffer = framesPerWmmeBuffer;
@@ -379,7 +380,7 @@ static void usage( int wmmeHostApiIndex )
 }
 
 /*
-    ideas: 
+    ideas:
         o- could be testing with 80% CPU load
         o- could test with different channel counts
 */
@@ -409,15 +410,15 @@ int main(int argc, char* argv[])
     if( argc > 5 )
         usage(wmmeHostApiIndex);
 
-	deviceIndex = wmmeHostApiInfo->defaultOutputDevice;
-	if( argc >= 2 ){
+    deviceIndex = wmmeHostApiInfo->defaultOutputDevice;
+    if( argc >= 2 ){
         deviceIndex = -1;
-		if( sscanf( argv[1], "%d", &deviceIndex ) != 1 )
+        if( sscanf( argv[1], "%d", &deviceIndex ) != 1 )
             usage(wmmeHostApiIndex);
         if( deviceIndex < 0 || deviceIndex >= Pa_GetDeviceCount() || Pa_GetDeviceInfo(deviceIndex)->hostApi != wmmeHostApiIndex ){
             usage(wmmeHostApiIndex);
         }
-	}
+    }
 
     printf( "Using device id %d (%s)\n", deviceIndex, Pa_GetDeviceInfo(deviceIndex)->name );
 
@@ -450,14 +451,14 @@ int main(int argc, char* argv[])
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-	data.phase = 0;
+    data.phase = 0;
 
     resultsFp = fopen( "results.txt", "at" );
     fprintf( resultsFp, "*** WMME smallest working output buffer sizes\n" );
 
     printTimeAndDate( resultsFp );
     printWindowsVersionInfo( resultsFp );
-    
+
     fprintf( resultsFp, "audio device: %s\n", Pa_GetDeviceInfo( deviceIndex )->name );
     fflush( resultsFp );
 
@@ -465,7 +466,7 @@ int main(int argc, char* argv[])
     fprintf( resultsFp, "Buffer count, Smallest working buffer size (frames), Smallest working buffering latency (frames), Smallest working buffering latency (Seconds)\n" );
 
     for( wmmeBufferCount = wmmeMinBufferCount; wmmeBufferCount <= wmmeMaxBufferCount; ++wmmeBufferCount ){
- 
+
         printf( "Test %d of %d\n", (wmmeBufferCount - wmmeMinBufferCount) + 1, (wmmeMaxBufferCount-wmmeMinBufferCount) + 1 );
         printf( "Testing with %d buffers...\n", wmmeBufferCount );
 
@@ -489,7 +490,7 @@ int main(int argc, char* argv[])
             }else{
                 min = mid + 1;
             }
-             
+
         }while( (min <= max) && (testResult == YES || testResult == NO) );
 
         smallestWorkingBufferingLatencyFrames = smallestWorkingBufferSize * (wmmeBufferCount - 1);
@@ -503,16 +504,15 @@ int main(int argc, char* argv[])
 
     fprintf( resultsFp, "###\n" );
     fclose( resultsFp );
-    
+
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;
 }
-

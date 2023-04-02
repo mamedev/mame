@@ -5,8 +5,8 @@
     Wild West C.O.W.boys of Moo Mesa / Bucky O'Hare
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MOO_H
-#define MAME_INCLUDES_MOO_H
+#ifndef MAME_KONAMI_MOO_H
+#define MAME_KONAMI_MOO_H
 
 #pragma once
 
@@ -44,9 +44,13 @@ public:
 		m_k054321(*this, "k054321")
 	{ }
 
-	void bucky(machine_config &config);
-	void moo(machine_config &config);
-	void moobl(machine_config &config);
+	void bucky(machine_config &config) ATTR_COLD;
+	void moo(machine_config &config) ATTR_COLD;
+	void moobl(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -85,8 +89,6 @@ private:
 	void sound_bankswitch_w(uint8_t data);
 	void moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void moobl_oki_bank_w(uint16_t data);
-	DECLARE_MACHINE_START(moo);
-	DECLARE_MACHINE_RESET(moo);
 	DECLARE_VIDEO_START(moo);
 	DECLARE_VIDEO_START(bucky);
 	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -102,4 +104,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MOO_H
+#endif // MAME_KONAMI_MOO_H

@@ -234,13 +234,14 @@ void menu_load_save_state_base::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_load_save_state_base::handle(event const *ev)
+bool menu_load_save_state_base::handle(event const *ev)
 {
 	// process the event
 	if (INPUT_CODE_INVALID != m_slot_selected)
 	{
 		if (!machine().input().code_pressed(m_slot_selected))
 			stack_pop();
+		return false;
 	}
 	else if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
@@ -251,6 +252,7 @@ void menu_load_save_state_base::handle(event const *ev)
 			slot_selected(std::string(entry.file_name()));
 		}
 		stack_pop();
+		return false;
 	}
 	else if (ev && (ev->iptkey == IPT_UI_CLEAR))
 	{
@@ -262,7 +264,12 @@ void menu_load_save_state_base::handle(event const *ev)
 					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
 					m_confirm_delete->visible_name(),
 					ui().get_general_input_setting(IPT_UI_SELECT),
-					ui().get_general_input_setting(IPT_UI_CANCEL));
+					ui().get_general_input_setting(IPT_UI_BACK));
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	else if (!m_confirm_delete)
@@ -275,6 +282,11 @@ void menu_load_save_state_base::handle(event const *ev)
 			m_switch_poller.reset();
 			m_slot_selected = code;
 		}
+		return false;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -396,7 +408,7 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 			m_keys_released = false;
 			reset(reset_options::REMEMBER_POSITION);
 		}
-		else if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+		else if (exclusive_input_pressed(iptkey, IPT_UI_BACK, 0))
 		{
 			// don't delete it - dismiss the prompt
 			m_switch_poller.reset();

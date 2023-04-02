@@ -109,6 +109,9 @@ Small outline design for easy kit retrofitting of existing cabinets.
 #define VERBOSE (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class vp10x_state : public driver_device
 {
 public:
@@ -654,6 +657,9 @@ ROM_START(rhnation)
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY("rhn010104", 0, SHA1(5bc2e5817b29bf42ec483414242795fd76d749d9) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2002,  specfrce,  0,          vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.02.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002,  specfrceo, specfrce,   vp101,  specfrce, vp10x_state, empty_init, ROT0, "ICE/Play Mechanix",    "Special Forces Elite Training (v01.01.01)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

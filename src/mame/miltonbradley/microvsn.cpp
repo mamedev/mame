@@ -191,8 +191,8 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 
 	if (size != 0x400 && size != 0x800)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Invalid ROM file size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -236,7 +236,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		m_tms1100->set_clock(clock);
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void microvision_state::apply_settings()

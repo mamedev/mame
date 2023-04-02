@@ -483,6 +483,8 @@ public:
 class upd72069_device : public upd72065_device {
 public:
 	upd72069_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void auxcmd_w(uint8_t data) override;
 };
 
 class n82077aa_device : public ps2_fdc_device {

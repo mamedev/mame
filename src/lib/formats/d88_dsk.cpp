@@ -37,6 +37,8 @@
 
 #define D88_HEADER_LEN 0x2b0
 
+#define SPOT_DUPLICATES 0
+
 struct d88_tag
 {
 	uint32_t image_size;
@@ -280,14 +282,15 @@ static void d88_get_header(floppy_image_legacy* floppy,uint32_t* size, uint8_t* 
 
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
-#ifdef SPOT_DUPLICATES
+	if(SPOT_DUPLICATES)
+	{
 		// there exist many .d88 files with same data and different headers and
 		// this allows to spot duplicates, making easier to debug softlists.
 		uint32_t temp_size = floppy_image_size(floppy);
-		uint8_t tmp_copy[temp_size - D88_HEADER_LEN];
-		floppy_image_read(floppy,tmp_copy,D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
-		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - D88_HEADER_LEN));
-#endif
+		auto tmp_copy = std::make_unique<uint8_t[]>(temp_size - D88_HEADER_LEN);
+		floppy_image_read(floppy,tmp_copy.get(),D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
+		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy.get(), temp_size - D88_HEADER_LEN));
+	}
 
 	if(prot)
 		*prot = header[0x1a];
@@ -497,6 +500,7 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			uint8_t sect_data[65536];
 			int sdatapos = 0;
 			int sector_count = 1;
+			uint8_t density = 0;
 			for(int i=0; i<sector_count; i++) {
 
 				if (pos + 16 > file_size)
@@ -516,6 +520,8 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					// Support broken vfman converter
 					if(sector_count == 0x1000)
 						sector_count = 0x10;
+
+					density = hs[6];
 				}
 
 				sects[i].track       = hs[0];
@@ -536,7 +542,10 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].data    = nullptr;
 			}
 
-			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			if(density == 0x40)
+				build_pc_track_fm(track, head, image, cell_count / 2, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			else
+				build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 		}
 
 	return true;

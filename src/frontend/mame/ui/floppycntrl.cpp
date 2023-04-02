@@ -14,6 +14,8 @@
 
 #include "zippath.h"
 
+#include <tuple>
+
 
 namespace ui {
 
@@ -38,26 +40,26 @@ menu_control_floppy_image::~menu_control_floppy_image()
 
 void menu_control_floppy_image::do_load_create()
 {
-	if(input_filename.compare("")==0) {
-		image_init_result err = fd.create(output_filename, nullptr, nullptr);
-		if (err != image_init_result::PASS) {
-			machine().popmessage("Error: %s", fd.error());
+	if(input_filename.empty()) {
+		std::error_condition err = fd.create(output_filename, nullptr, nullptr);
+		if (err) {
+			machine().popmessage("Error: %s", err.message());
 			return;
 		}
 		if (create_fs) {
 			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
 			err = fd.finish_load();
-			if (err == image_init_result::PASS) {
+			if (!err) {
 				fs::meta_data meta;
 				fd.init_fs(create_fs, meta);
 			}
 		}
 	} else {
-		image_init_result err = fd.load(input_filename);
-		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
-			err = fd.reopen_for_write(output_filename) ? image_init_result::FAIL : image_init_result::PASS;
-		if (err != image_init_result::PASS) {
-			machine().popmessage("Error: %s", fd.error());
+		std::error_condition err = fd.load(input_filename);
+		if (!err && !output_filename.empty())
+			err = fd.reopen_for_write(output_filename);
+		if (err) {
+			machine().popmessage("Error: %s", err.message());
 			return;
 		}
 	}
@@ -67,12 +69,13 @@ void menu_control_floppy_image::do_load_create()
 
 void menu_control_floppy_image::hook_load(const std::string &filename)
 {
+	std::error_condition err;
 	input_filename = filename;
-	input_format = static_cast<floppy_image_device &>(m_image).identify(filename);
+	std::tie(err, input_format) = static_cast<floppy_image_device &>(m_image).identify(filename);
 
 	if (!input_format)
 	{
-		machine().popmessage("Error: %s\n", m_image.error());
+		machine().popmessage("Error: %s", err.message());
 		stack_pop();
 	}
 	else

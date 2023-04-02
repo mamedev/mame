@@ -30,6 +30,9 @@ Debugging information:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class cfx9850_state : public driver_device
 {
 public:
@@ -317,6 +320,8 @@ ROM_START(cfx9850)
 	ROM_SYSTEM_BIOS(1, "rom2", "rom2, version unknown")
 	ROMX_LOAD("cfx9850b.bin", 0x00000, 0x80000, CRC(cd3c497f) SHA1(1d1aa38205eec7aba3ed6bef7389767e38afe075), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1996, cfx9850, 0, 0, cfx9850, cfx9850, cfx9850_state, empty_init, "Casio", "CFX-9850G", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

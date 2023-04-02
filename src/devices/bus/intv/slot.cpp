@@ -222,7 +222,7 @@ static const char *intv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_init_result intv_cart_slot_device::load_fullpath()
+std::error_condition intv_cart_slot_device::load_fullpath()
 {
 	uint8_t temp;
 	uint8_t num_segments;
@@ -243,13 +243,13 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		// header
 		fread(&temp, 1);
 		if (temp != 0xa8)
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 
 		fread(&num_segments, 1);
 
 		fread(&temp, 1);
 		if (temp != (num_segments ^ 0xff))
-			return image_init_result::FAIL;
+			return image_error::INVALIDIMAGE;
 
 		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
@@ -281,7 +281,7 @@ image_init_result intv_cart_slot_device::load_fullpath()
 		{
 			fread(&temp, 1);
 		}
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
 	else
@@ -372,11 +372,11 @@ image_init_result intv_cart_slot_device::load_fullpath()
 			}
 		}
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 }
 
-image_init_result intv_cart_slot_device::call_load()
+std::error_condition intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -424,11 +424,11 @@ image_init_result intv_cart_slot_device::call_load()
 				m_cart->ram_alloc(get_software_region_length("ram"));
 
 			//printf("Type: %s\n", intv_get_slot(m_type));
-			return image_init_result::PASS;
+			return std::error_condition();
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

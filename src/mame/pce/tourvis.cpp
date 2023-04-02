@@ -265,7 +265,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tourvision_state::cart_load )
 	}
 #endif
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 // Note from system11: This system actually supports 2 players

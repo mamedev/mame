@@ -1,23 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Berger
-/******************************************************************************
+// thanks-to:Berger, Mr. Lars
+/*******************************************************************************
 
 Conchess, a series of modular chess computers by Consumenta Computer.
+
 Hardware development by Loproc (Germany), manufactured at Wallharn Electronics
 (Ireland). The core people involved were Ulf Rathsman for the chess engine,
 and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
 continued by Systemhuset.
 
 TODO:
-- dump/add princhess module
-- dump/add plymate original 2MHz module
-- dump/add concplyv library module (L/L16 don't work, manual says it has its own add-on)
-- concplyv unmapped reads/writes
-- verify irq/beeper for concplyv, though it is probably correct
-- official rom labels for concply5, concply8
+- dump/add original Plymate Amsterdam module
+- dump/add Plymate Glasgow Plus version
+- dump/add concvicp library module (L/L16 don't work, manual says it has its own add-on)
+- concvicp unmapped reads/writes
+- verify irq/beeper for concvicp, though it is probably correct
+- official rom label for concams8
+- is concams8 actually 4MHz?
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Hardware notes:
 
@@ -42,9 +44,8 @@ note: XTAL goes to 4020, 4020 /2 goes to CPU clock, and other dividers to
 IRQ and beeper. On A0, IRQ is active for ~31.2us.
 
 A1(P) + A0(M) (Princhess, aka Glasgow)
-- dual-module, each module has its own 6502 - need verification, more likely
-  2nd module has no CPU (according to the manual, A0 is modified and won't
-  work stand-alone)
+- dual-module, 2nd module has no CPU (according to the manual, A0 is modified and
+  won't work stand-alone)
 
 A2(C) (Plymate, aka Amsterdam)
 - R65C02P4 @ 5.5MHz (11MHz XTAL) (5.5MHz version)
@@ -58,7 +59,7 @@ Library modules:
 - L: small PCB, PCB label: CCL L-2, 8KB EPROM no label
 - L16: 2*8KB EPROM (have no photo of PCB)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -93,10 +94,11 @@ public:
 	{ }
 
 	// machine configs
-	void concstd(machine_config &config);
-	void concply5(machine_config &config);
-	void concply8(machine_config &config);
-	void concplyv(machine_config &config);
+	void conc(machine_config &config);
+	void concgla(machine_config &config);
+	void concams5(machine_config &config);
+	void concams8(machine_config &config);
+	void concvicp(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -128,9 +130,9 @@ void conchess_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void conchess_state::clear_irq()
 {
@@ -139,7 +141,8 @@ void conchess_state::clear_irq()
 
 u8 conchess_state::input_r()
 {
-	clear_irq();
+	if (!machine().side_effects_disabled())
+		clear_irq();
 
 	u8 data = 0;
 
@@ -175,9 +178,9 @@ void conchess_state::sound_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void conchess_state::main_map(address_map &map)
 {
@@ -191,9 +194,9 @@ void conchess_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( conchess )
 	PORT_START("IN.0")
@@ -219,13 +222,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
-void conchess_state::concstd(machine_config &config)
+void conchess_state::conc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 4_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
@@ -237,94 +240,116 @@ void conchess_state::concstd(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "conchess_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("conchess_standard");
+	SOFTWARE_LIST(config, "cart_list").set_original("conchess").set_filter("l");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	config.set_default_layout(layout_conchess);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 4_MHz_XTAL / 0x400);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void conchess_state::concply5(machine_config &config)
+void conchess_state::concgla(machine_config &config)
 {
-	concstd(config);
+	conc(config);
 
-	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 11_MHz_XTAL/2);
+	// basic machine hardware
+	R65C02(config.replace(), m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
+
+	const attotime irq_period = attotime::from_hz(4_MHz_XTAL / 0x2000);
+	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
+
+	subdevice<software_list_device>("cart_list")->set_filter("none");
+
+	// sound hardware
+	BEEP(config.replace(), m_beeper, 4_MHz_XTAL / 0x400);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void conchess_state::concams5(machine_config &config)
+{
+	concgla(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(11_MHz_XTAL/2);
 
 	const attotime irq_period = attotime::from_hz(11_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_plymate");
+	subdevice<software_list_device>("cart_list")->set_filter("l16");
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 11_MHz_XTAL / 0x800);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void conchess_state::concply8(machine_config &config)
+void conchess_state::concams8(machine_config &config)
 {
-	concply5(config);
+	concams5(config);
 
-	/* basic machine hardware */
-	R65C02(config.replace(), m_maincpu, 16_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
+	// basic machine hardware
+	m_maincpu->set_clock(16_MHz_XTAL/2);
 
 	const attotime irq_period = attotime::from_hz(16_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 16_MHz_XTAL / 0x1000);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void conchess_state::concplyv(machine_config &config)
+void conchess_state::concvicp(machine_config &config)
 {
-	concstd(config);
+	concams5(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
-	SOFTWARE_LIST(config.replace(), "cart_list").set_original("conchess_victoria");
+	subdevice<software_list_device>("cart_list")->set_filter("l1024");
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 12.288_MHz_XTAL / 0x1000);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
-ROM_START( concstd )
+ROM_START( conc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("c87011.b3", 0xa000, 0x2000, CRC(915e414c) SHA1(80c94712d1c79fa469576c37b80ab66f77c77cc4) )
 	ROM_LOAD("c87010.b2", 0xc000, 0x2000, CRC(088c8737) SHA1(9f841b3c47de9ef1da8ce98c0a33a919cba873c6) )
 	ROM_LOAD("c87009.b1", 0xe000, 0x2000, CRC(e1c648e2) SHA1(725a6ac1c69f788a7bba0573e5609b55b12899ac) )
 ROM_END
 
-ROM_START( concply5 )
+ROM_START( concgla )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("plymate_5.5mhz.bin", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) )
+	ROM_LOAD("9128c-0133", 0x8000, 0x4000, CRC(a6ac88eb) SHA1(d1fcd990e5196c00210d380e0e04155a5ea19824) ) // GI 9128C
+	ROM_LOAD("9128c-0134", 0xc000, 0x4000, CRC(b694a275) SHA1(e4e49379b4eb45402ca8bb82c20d0169db62ed7a) ) // "
 ROM_END
 
-ROM_START( concply8 )
+ROM_START( concams5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("plymate_8mhz.bin", 0x8000, 0x8000, CRC(85005b73) SHA1(edbc18d07552cab5951d8a6b738b2eacd73331c1) )
+	ROM_LOAD("s5.a1", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) ) // AT27C256
 ROM_END
 
-ROM_START( concplyv )
+ROM_START( concams8 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("amsterdam_8mhz.bin", 0x8000, 0x8000, CRC(85005b73) SHA1(edbc18d07552cab5951d8a6b738b2eacd73331c1) )
+ROM_END
+
+ROM_START( concvicp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("cc8-f.a2", 0x8000, 0x8000, CRC(5b0a1d09) SHA1(07cbc970a8dfbca386396ce5d5cc8ce77ad4ee1b) )
 ROM_END
@@ -333,12 +358,13 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1982, concstd,  0,        0,      concstd,  conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, concply5, 0,        0,      concply5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, concply8, concply5, 0,      concply8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, concplyv, 0,        0,      concplyv, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, conc,     0,        0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, concgla,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, concams5, 0,        0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, concams8, concams5, 0,      concams8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, concvicp, 0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

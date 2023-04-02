@@ -84,6 +84,8 @@ U089 MAX232 Dual EIA Driver/Receiver
 #include "speaker.h"
 
 
+namespace {
+
 class feversoc_state : public driver_device
 {
 public:
@@ -359,5 +361,8 @@ void feversoc_state::init_feversoc()
 	m_maincpu->sh2drc_add_fastram(0x02034000, 0x0203dfff, 0, &m_mainram2[0]);
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
+
+} // anonymous namespace
+
 
 GAME( 2004, feversoc, 0, feversoc, feversoc, feversoc_state, init_feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

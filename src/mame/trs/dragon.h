@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_DRAGON_H
-#define MAME_INCLUDES_DRAGON_H
+#ifndef MAME_TRS_DRAGON_H
+#define MAME_TRS_DRAGON_H
 
 #pragma once
 
@@ -148,4 +148,4 @@ private:
 	required_memory_region m_char_rom;
 };
 
-#endif // MAME_INCLUDES_DRAGON_H
+#endif // MAME_TRS_DRAGON_H

@@ -44,7 +44,7 @@ static int handle_ln_ok(lua_State *L)
     return 1;
 }
 
-static void completion_callback_wrapper(const char *line, linenoiseCompletions *completions, int pos)
+static void completion_callback_wrapper(const char *line, linenoiseCompletions *completions, void *userdata)
 {
     lua_State *L = completion_state;
 
@@ -54,9 +54,8 @@ static void completion_callback_wrapper(const char *line, linenoiseCompletions *
     lua_setmetatable(L, -2);
 
     lua_pushstring(L, line);
-    lua_pushinteger(L, pos);
 
-    lua_pcall(L, 3, 0, 0);
+    lua_pcall(L, 2, 0, 0);
 }
 
 static int l_linenoise(lua_State *L)
@@ -98,14 +97,6 @@ static int l_historyadd(lua_State *L)
     if(! linenoiseHistoryAdd(line)) {
         return handle_ln_error(L);
     }
-
-    return handle_ln_ok(L);
-}
-
-static int l_preloadbuffer(lua_State *L)
-{
-    const char *line = luaL_checkstring(L, 1);
-    linenoisePreloadBuffer(line);
 
     return handle_ln_ok(L);
 }
@@ -153,7 +144,7 @@ static int l_setcompletion(lua_State *L)
 
     lua_pushvalue(L, 1);
     completion_func_ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    linenoiseSetCompletionCallback(completion_callback_wrapper);
+    linenoiseSetCompletionCallback(completion_callback_wrapper, NULL);
 
     return handle_ln_ok(L);
 }
@@ -162,16 +153,9 @@ static int l_addcompletion(lua_State *L)
 {
     linenoiseCompletions *completions = *((linenoiseCompletions **) luaL_checkudata(L, 1, LN_COMPLETION_TYPE));
     const char *entry                 = luaL_checkstring(L, 2);
-    int pos                           = luaL_checkinteger(L, 3);
 
-    linenoiseAddCompletion(completions, (char *) entry, pos);
+    linenoiseAddCompletion(completions, (char *) entry);
 
-    return handle_ln_ok(L);
-}
-
-static int l_refresh(lua_State *L)
-{
-    linenoiseRefresh();
     return handle_ln_ok(L);
 }
 
@@ -198,8 +182,6 @@ luaL_Reg linenoise_funcs[] = {
     { "clearscreen", l_clearscreen },
     { "setcompletion", l_setcompletion},
     { "addcompletion", l_addcompletion },
-    { "preload", l_preloadbuffer },
-    { "refresh", l_refresh },
 
     /* Aliases for more consistent function names */
     { "addhistory", l_historyadd },

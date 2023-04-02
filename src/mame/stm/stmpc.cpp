@@ -6,12 +6,14 @@
 
     All-in-One IBM PC compatible portable computer
 
-    Hardware:
+    Hardware (incomplete):
     - Intel 186 at 8 MHz
     - 256 KB RAM (expandable to 512 KB)
+    - SCN2674B
+    - NEC D8251AC
     - Monochrome LCD display with 80x16 lines (512x128 resolution)
     - External monitor support (RGB, composite)
-    - 2x 5.25" QHD drives
+    - Canon MDD413 dual 5.25" QD drive
     - SCSI interface
     - 2x RS232 port
     - Centronics port
@@ -26,6 +28,8 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/clock.h"
+#include "video/scn2674.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -41,8 +45,9 @@ class stmpc_state : public driver_device
 {
 public:
 	stmpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_avdc(*this, "avdc")
 	{ }
 
 	void stmpc(machine_config &config);
@@ -52,10 +57,14 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<i80186_cpu_device> m_maincpu;
+	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+	void char_map(address_map &map);
+
+	required_device<i80186_cpu_device> m_maincpu;
+	required_device<scn2674_device> m_avdc;
 };
 
 
@@ -65,11 +74,19 @@ private:
 
 void stmpc_state::mem_map(address_map &map)
 {
+	map(0x00000, 0x3ffff).ram();
+	map(0xb8000, 0xbffff).ram();
 	map(0xfc000, 0xfffff).rom().region("maincpu", 0);
 }
 
 void stmpc_state::io_map(address_map &map)
 {
+	map(0x0700, 0x070f).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+}
+
+void stmpc_state::char_map(address_map &map)
+{
+	map(0x0000, 0xffff).nopr();
 }
 
 
@@ -129,6 +146,10 @@ static GFXDECODE_START(chars)
 	GFXDECODE_ENTRY("chargen", 0, char_layout_8x14, 0, 1)
 GFXDECODE_END
 
+SCN2674_DRAW_CHARACTER_MEMBER(stmpc_state::draw_character)
+{
+}
+
 
 //**************************************************************************
 //  MACHINE EMULATION
@@ -156,6 +177,18 @@ void stmpc_state::stmpc(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", "palette", chars);
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_raw(16000000, 1344, 0, 1280, 113, 0, 104);
+	screen.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
+
+	CLOCK(config, "tmrin1", 20000).signal_handler().set(m_maincpu, FUNC(i80186_cpu_device::tmrin1_w)); // FIXME: figure out the actual source of this
+
+	SCN2674(config, m_avdc, 16000000 / 8);
+	m_avdc->set_screen("screen");
+	m_avdc->set_character_width(8);
+	m_avdc->set_addrmap(0, &stmpc_state::char_map);
+	m_avdc->set_display_callback(FUNC(stmpc_state::draw_character));
 }
 
 

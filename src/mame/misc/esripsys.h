@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_ESRIPSYS_H
-#define MAME_INCLUDES_ESRIPSYS_H
+#ifndef MAME_MISC_ESRIPSYS_H
+#define MAME_MISC_ESRIPSYS_H
 
 #pragma once
 
@@ -141,4 +141,4 @@ private:
 	void video_cpu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ESRIPSYS_H
+#endif // MAME_MISC_ESRIPSYS_H

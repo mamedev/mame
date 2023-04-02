@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert, R. Belmont, Brad Hughes
+// copyright-holders:Olivier Galibert, R. Belmont, Brad Hughes, Vas Crabb
 //============================================================
 //
 //  input_sdl.cpp - SDL 2.0 implementation of MAME input routines
@@ -12,34 +12,38 @@
 //============================================================
 
 #include "input_module.h"
+
 #include "modules/osdmodule.h"
 
-#if defined(SDLMAME_SDL2)
+#if defined(OSD_SDL)
 
-// standard sdl header
-#include <SDL2/SDL.h>
-
-// MAME headers
-#include "emu.h"
-#include "uiinput.h"
-#include "strconv.h"
-#include "unicode.h"
-
-// MAMEOS headers
+#include "assignmenthelper.h"
 #include "input_common.h"
-#include "../lib/osdobj_common.h"
-#include "input_sdlcommon.h"
-#include "../../sdl/osdsdl.h"
-#include "../../sdl/window.h"
+
+#include "interface/inputseq.h"
+#include "modules/lib/osdobj_common.h"
+#include "sdl/osdsdl.h"
+
+// emu
+#include "inpttype.h"
+
+// standard SDL header
+#include <SDL2/SDL.h>
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cstddef>
 #include <cstring>
+#include <initializer_list>
 #include <iterator>
+#include <list>
 #include <memory>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <tuple>
+#include <utility>
 
 // winnt.h defines this
 #ifdef DELETE
@@ -47,11 +51,9 @@
 #endif
 
 
-namespace {
+namespace osd {
 
-// FIXME: sdl does not properly report the window for certain OS.
-#define GET_FOCUS_WINDOW(ev) focus_window()
-//#define GET_FOCUS_WINDOW(ev) window_from_id((ev)->windowID)
+namespace {
 
 char const *const CONTROLLER_AXIS_XBOX[]{
 		"LSX",
@@ -268,12 +270,8 @@ struct key_lookup_table
 };
 
 #define KE(x) { SDL_SCANCODE_ ## x, "SDL_SCANCODE_" #x },
-#define KE8(A, B, C, D, E, F, G, H) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G) KE(H)
-#define KE7(A, B, C, D, E, F, G) KE(A) KE(B) KE(C) KE(D) KE(E) KE(F) KE(G)
-#define KE5(A, B, C, D, E) KE(A) KE(B) KE(C) KE(D) KE(E)
-#define KE3(A, B, C) KE(A) KE(B) KE(C)
 
-key_lookup_table sdl_lookup_table[] =
+key_lookup_table const sdl_lookup_table[] =
 {
 	KE(UNKNOWN)
 
@@ -532,46 +530,29 @@ key_lookup_table sdl_lookup_table[] =
 
 	KE(APP1)
 	KE(APP2)
-
-
-	{ -1, "" }
 };
+
 
 //============================================================
 //  lookup_sdl_code
 //============================================================
 
-int lookup_sdl_code(const char *scode)
+int lookup_sdl_code(std::string_view scode)
 {
-	int i = 0;
-
-	while (sdl_lookup_table[i].code >= 0)
-	{
-		if (!std::strcmp(scode, sdl_lookup_table[i].name))
-			return sdl_lookup_table[i].code;
-		i++;
-	}
-	return -1;
+	auto const found = std::find_if(
+			std::begin(sdl_lookup_table),
+			std::end(sdl_lookup_table),
+			[&scode] (auto const &key) { return scode == key.name; });
+	return (std::end(sdl_lookup_table) != found) ? found->code : -1;
 }
+
 
 //============================================================
 //  sdl_device
 //============================================================
 
-class sdl_device : public event_based_device<SDL_Event>
-{
-public:
-	sdl_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class devclass, input_module &module) :
-		event_based_device(machine, std::move(name), std::move(id), devclass, module)
-	{
-	}
+using sdl_device = event_based_device<SDL_Event>;
 
-protected:
-	std::shared_ptr<sdl_window_info> focus_window()
-	{
-		return sdl_event_manager::instance().focus_window();
-	}
-};
 
 //============================================================
 //  sdl_keyboard_device
@@ -580,110 +561,90 @@ protected:
 class sdl_keyboard_device : public sdl_device
 {
 public:
-	// state information for a keyboard
-	struct keyboard_state
+	sdl_keyboard_device(
+			std::string &&name,
+			std::string &&id,
+			input_module &module,
+			keyboard_trans_table const &trans_table) :
+		sdl_device(std::move(name), std::move(id), module),
+		m_trans_table(trans_table),
+		m_keyboard({{0}}),
+		m_capslock_pressed(std::chrono::steady_clock::time_point::min())
 	{
-		int32_t   state[0x3ff];         // must be int32_t!
-		int8_t    oldkey[MAX_KEYS];
-		int8_t    currkey[MAX_KEYS];
-	};
-
-	keyboard_state keyboard;
-
-	sdl_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
-		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
-		keyboard({{0}})
-	{
-		#ifdef __APPLE__
-		m_capslock_hack = false;
-		machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&sdl_keyboard_device::frame_callback, this));
-		#endif
 	}
 
-	#ifdef __APPLE__
-	unsigned m_capslock_hack;
-	void frame_callback()
+	virtual void poll(bool relative_reset) override
 	{
-		if (m_capslock_hack)
-			if (--m_capslock_hack == 0)
-				keyboard.state[SDL_SCANCODE_CAPSLOCK] = 0x00;
-	}
-	#endif
+		sdl_device::poll(relative_reset);
 
-	void process_event(SDL_Event &sdlevent) override
+#ifdef __APPLE__
+		if (m_keyboard.state[SDL_SCANCODE_CAPSLOCK] && (std::chrono::steady_clock::now() > (m_capslock_pressed + std::chrono::milliseconds(30))))
+			m_keyboard.state[SDL_SCANCODE_CAPSLOCK] = 0x00;
+#endif
+	}
+
+	virtual void process_event(SDL_Event const &event) override
 	{
-		switch (sdlevent.type)
+		switch (event.type)
 		{
 		case SDL_KEYDOWN:
+			if (event.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+				m_capslock_pressed = std::chrono::steady_clock::now();
 
-			#ifdef __APPLE__
-			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
-				m_capslock_hack = 2;
-			#endif
-
-			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
-			if (sdlevent.key.keysym.sym < 0x20)
-				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
-			else if (keyboard.state[SDL_SCANCODE_LCTRL] == 0x80 || keyboard.state[SDL_SCANCODE_RCTRL] == 0x80)
-			{
-				// SDL filters out control characters for text input, so they are decoded here
-				if (sdlevent.key.keysym.sym >= 0x40 && sdlevent.key.keysym.sym < 0x7f)
-					machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym & 0x1f);
-				else if (keyboard.state[SDL_SCANCODE_LSHIFT] == 0x80 || keyboard.state[SDL_SCANCODE_RSHIFT] == 0x80)
-				{
-					if (sdlevent.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
-						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1e);
-					else if (sdlevent.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
-						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1f);
-				}
-			}
+			m_keyboard.state[event.key.keysym.scancode] = 0x80;
 			break;
 
 		case SDL_KEYUP:
-			#ifdef __APPLE__
-			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+#ifdef __APPLE__
+			if (event.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
 				break;
-			#endif
+#endif
 
-			keyboard.state[sdlevent.key.keysym.scancode] = 0x00;
-			break;
-
-		case SDL_TEXTINPUT:
-			if (*sdlevent.text.text)
-			{
-				auto window = GET_FOCUS_WINDOW(&event.text);
-				//printf("Focus window is %p - wl %p\n", window, osd_common_t::s_window_list);
-				if (window != nullptr)
-				{
-					auto ptr = sdlevent.text.text;
-					auto len = std::strlen(sdlevent.text.text);
-					while (len)
-					{
-						char32_t ch;
-						auto chlen = uchar_from_utf8(&ch, ptr, len);
-						if (0 > chlen)
-						{
-							ch = 0x0fffd;
-							chlen = 1;
-						}
-						ptr += chlen;
-						len -= chlen;
-						machine().ui_input().push_char_event(window->target(), ch);
-					}
-				}
-			}
+			m_keyboard.state[event.key.keysym.scancode] = 0x00;
 			break;
 		}
 	}
 
-	void reset() override
+	virtual void reset() override
 	{
-		memset(&keyboard.state, 0, sizeof(keyboard.state));
-		#ifdef __APPLE__
-		m_capslock_hack = 0;
-		#endif
+		memset(&m_keyboard.state, 0, sizeof(m_keyboard.state));
+		m_capslock_pressed = std::chrono::steady_clock::time_point::min();
 	}
+
+	virtual void configure(input_device &device) override
+	{
+		// populate it
+		for (int keynum = 0; m_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
+		{
+			input_item_id itemid = m_trans_table[keynum].mame_key;
+
+			// generate the default / modified name
+			char defname[20];
+			snprintf(defname, sizeof(defname) - 1, "%s", m_trans_table[keynum].ui_name);
+
+			device.add_item(
+					defname,
+					std::string_view(),
+					itemid,
+					generic_button_get_state<s32>,
+					&m_keyboard.state[m_trans_table[keynum].sdl_scancode]);
+		}
+	}
+
+private:
+	// state information for a keyboard
+	struct keyboard_state
+	{
+		s32 state[0x3ff];         // must be s32!
+		s8  oldkey[MAX_KEYS];
+		s8  currkey[MAX_KEYS];
+	};
+
+	keyboard_trans_table const &m_trans_table;
+	keyboard_state m_keyboard;
+	std::chrono::steady_clock::time_point m_capslock_pressed;
 };
+
 
 //============================================================
 //  sdl_mouse_device
@@ -691,140 +652,124 @@ public:
 
 class sdl_mouse_device : public sdl_device
 {
-private:
-	const std::chrono::milliseconds double_click_speed = std::chrono::milliseconds(250);
-	std::chrono::system_clock::time_point last_click;
-	int last_x;
-	int last_y;
-
 public:
-	// state information for a mouse
-	struct mouse_state
-	{
-		int32_t lX, lY;
-		int32_t buttons[MAX_BUTTONS];
-	};
-
-	mouse_state mouse;
-
-	sdl_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
-		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
-		last_x(0),
-		last_y(0),
-		mouse({0})
+	sdl_mouse_device(std::string &&name, std::string &&id, input_module &module) :
+		sdl_device(std::move(name), std::move(id), module),
+		m_mouse({0}),
+		m_x(0),
+		m_y(0),
+		m_v(0),
+		m_h(0)
 	{
 	}
 
-	void reset() override
+	virtual void poll(bool relative_reset) override
 	{
-		memset(&mouse, 0, sizeof(mouse));
+		sdl_device::poll(relative_reset);
+		if (relative_reset)
+		{
+			m_mouse.lX = std::exchange(m_x, 0);
+			m_mouse.lY = std::exchange(m_y, 0);
+			m_mouse.lV = std::exchange(m_v, 0);
+			m_mouse.lH = std::exchange(m_h, 0);
+		}
 	}
 
-	void poll() override
+	virtual void reset() override
 	{
-		mouse.lX = 0;
-		mouse.lY = 0;
-		sdl_device::poll();
+		memset(&m_mouse, 0, sizeof(m_mouse));
+		m_x = m_y = m_v = m_h = 0;
 	}
 
-	virtual void process_event(SDL_Event &sdlevent) override
+	virtual void configure(input_device &device) override
 	{
-		switch (sdlevent.type)
+		// add the axes
+		device.add_item(
+				"X",
+				std::string_view(),
+				ITEM_ID_XAXIS,
+				generic_axis_get_state<s32>,
+				&m_mouse.lX);
+		device.add_item(
+				"Y",
+				std::string_view(),
+				ITEM_ID_YAXIS,
+				generic_axis_get_state<s32>,
+				&m_mouse.lY);
+		device.add_item(
+				"Scroll V",
+				std::string_view(),
+				ITEM_ID_ZAXIS,
+				generic_axis_get_state<s32>,
+				&m_mouse.lV);
+		device.add_item(
+				"Scroll H",
+				std::string_view(),
+				ITEM_ID_RZAXIS,
+				generic_axis_get_state<s32>,
+				&m_mouse.lH);
+
+		// add the buttons
+		for (int button = 0; button < 4; button++)
+		{
+			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
+			int const offset = button ^ (((1 == button) || (2 == button)) ? 3 : 0);
+			device.add_item(
+					default_button_name(button),
+					std::string_view(),
+					itemid,
+					generic_button_get_state<s32>,
+					&m_mouse.buttons[offset]);
+		}
+	}
+
+	virtual void process_event(SDL_Event const &event) override
+	{
+		switch (event.type)
 		{
 		case SDL_MOUSEMOTION:
-			mouse.lX += sdlevent.motion.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
-			mouse.lY += sdlevent.motion.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
-
-			{
-				int cx = -1, cy = -1;
-				auto window = GET_FOCUS_WINDOW(&sdlevent.motion);
-
-				if (window != nullptr && window->xy_to_render_target(sdlevent.motion.x, sdlevent.motion.y, &cx, &cy))
-					machine().ui_input().push_mouse_move_event(window->target(), cx, cy);
-			}
+			m_x += event.motion.xrel * input_device::RELATIVE_PER_PIXEL;
+			m_y += event.motion.yrel * input_device::RELATIVE_PER_PIXEL;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
-			mouse.buttons[sdlevent.button.button - 1] = 0x80;
-			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name.c_str());
-			if (sdlevent.button.button == 1)
-			{
-				int cx, cy;
-				auto click = std::chrono::system_clock::now();
-				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
-				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
-				{
-					machine().ui_input().push_mouse_down_event(window->target(), cx, cy);
-
-					// avoid overflow with std::chrono::time_point::min() by adding rather than subtracting
-					if (click < last_click + double_click_speed
-						&& (cx >= last_x - 4 && cx <= last_x + 4)
-						&& (cy >= last_y - 4 && cy <= last_y + 4))
-					{
-						last_click = std::chrono::time_point<std::chrono::system_clock>::min();
-						machine().ui_input().push_mouse_double_click_event(window->target(), cx, cy);
-					}
-					else
-					{
-						last_click = click;
-						last_x = cx;
-						last_y = cy;
-					}
-				}
-			}
-
-			else if (sdlevent.button.button == 3)
-			{
-				int cx, cy;
-				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
-
-				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
-				{
-					machine().ui_input().push_mouse_rdown_event(window->target(), cx, cy);
-				}
-			}
+			m_mouse.buttons[event.button.button - 1] = 0x80;
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			mouse.buttons[sdlevent.button.button - 1] = 0;
-			//printf("But up %d %d %d %d\n", event.button.which, event.button.button, event.button.x, event.button.y);
-
-			if (sdlevent.button.button == 1)
-			{
-				int cx, cy;
-				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
-
-				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
-				{
-					machine().ui_input().push_mouse_up_event(window->target(), cx, cy);
-				}
-			}
-			else if (sdlevent.button.button == 3)
-			{
-				int cx, cy;
-				auto window = GET_FOCUS_WINDOW(&sdlevent.button);
-
-				if (window != nullptr && window->xy_to_render_target(sdlevent.button.x, sdlevent.button.y, &cx, &cy))
-				{
-					machine().ui_input().push_mouse_rup_event(window->target(), cx, cy);
-				}
-			}
+			m_mouse.buttons[event.button.button - 1] = 0;
 			break;
 
 		case SDL_MOUSEWHEEL:
-			auto window = GET_FOCUS_WINDOW(&sdlevent.wheel);
-			if (window != nullptr)
-				machine().ui_input().push_mouse_wheel_event(window->target(), 0, 0, sdlevent.wheel.y, 3);
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+			m_v += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
+#else
+			m_v += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
+#endif
 			break;
 		}
 	}
+
+private:
+	// state information for a mouse
+	struct mouse_state
+	{
+		s32 lX, lY, lV, lH;
+		s32 buttons[MAX_BUTTONS];
+	};
+
+	mouse_state m_mouse;
+	s32 m_x, m_y, m_v, m_h;
 };
+
 
 //============================================================
 //  sdl_joystick_device_base
 //============================================================
 
-class sdl_joystick_device_base : public sdl_device
+class sdl_joystick_device_base : public sdl_device, protected joystick_assignment_helper
 {
 public:
 	std::optional<std::string> const &serial() const { return m_serial; }
@@ -842,12 +787,11 @@ public:
 
 protected:
 	sdl_joystick_device_base(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			char const *serial) :
-		sdl_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
+		sdl_device(std::move(name), std::move(id), module),
 		m_instance(-1)
 	{
 		if (serial)
@@ -872,6 +816,7 @@ private:
 	SDL_JoystickID m_instance;
 };
 
+
 //============================================================
 //  sdl_joystick_device
 //============================================================
@@ -880,14 +825,12 @@ class sdl_joystick_device : public sdl_joystick_device_base
 {
 public:
 	sdl_joystick_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			SDL_Joystick *joy,
 			char const *serial) :
 		sdl_joystick_device_base(
-				machine,
 				std::move(name),
 				std::move(id),
 				module,
@@ -899,32 +842,40 @@ public:
 		set_instance(SDL_JoystickInstanceID(joy));
 	}
 
-	void configure()
+	virtual void configure(input_device &device) override
 	{
+		input_device::assignment_vector assignments;
 		char tempname[32];
 
+		int const axiscount = SDL_JoystickNumAxes(m_joydevice);
+		int const buttoncount = SDL_JoystickNumButtons(m_joydevice);
+		int const hatcount = SDL_JoystickNumHats(m_joydevice);
+		int const ballcount = SDL_JoystickNumBalls(m_joydevice);
+
 		// loop over all axes
-		for (int axis = 0; (axis < MAX_AXES) && (axis < SDL_JoystickNumAxes(m_joydevice)); axis++)
+		input_item_id axisactual[MAX_AXES];
+		for (int axis = 0; (axis < MAX_AXES) && (axis < axiscount); axis++)
 		{
 			input_item_id itemid;
 
 			if (axis < INPUT_MAX_AXIS)
 				itemid = input_item_id(ITEM_ID_XAXIS + axis);
 			else if (axis < (INPUT_MAX_AXIS + INPUT_MAX_ADD_ABSOLUTE))
-				itemid = input_item_id(ITEM_ID_ADD_ABSOLUTE1 - INPUT_MAX_AXIS + axis);
+				itemid = input_item_id(ITEM_ID_ADD_ABSOLUTE1 + axis - INPUT_MAX_AXIS);
 			else
 				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
 			snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
-			device()->add_item(
+			axisactual[axis] = device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
-					generic_axis_get_state<std::int32_t>,
+					generic_axis_get_state<s32>,
 					&m_joystick.axes[axis]);
 		}
 
 		// loop over all buttons
-		for (int button = 0; (button < MAX_BUTTONS) && (button < SDL_JoystickNumButtons(m_joydevice)); button++)
+		for (int button = 0; (button < MAX_BUTTONS) && (button < buttoncount); button++)
 		{
 			input_item_id itemid;
 
@@ -933,57 +884,90 @@ public:
 			if (button < INPUT_MAX_BUTTONS)
 				itemid = input_item_id(ITEM_ID_BUTTON1 + button);
 			else if (button < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
-				itemid = input_item_id(ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + button);
+				itemid = input_item_id(ITEM_ID_ADD_SWITCH1 + button - INPUT_MAX_BUTTONS);
 			else
 				itemid = ITEM_ID_OTHER_SWITCH;
 
-			device()->add_item(
+			input_item_id const actual = device.add_item(
 					default_button_name(button),
+					std::string_view(),
 					itemid,
-					generic_button_get_state<std::int32_t>,
+					generic_button_get_state<s32>,
 					&m_joystick.buttons[button]);
+
+			// there are sixteen action button types
+			if (button < 16)
+			{
+				input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, actual));
+				assignments.emplace_back(ioport_type(IPT_BUTTON1 + button), SEQ_TYPE_STANDARD, seq);
+
+				// assign the first few buttons to UI actions and pedals
+				switch (button)
+				{
+				case 0:
+					assignments.emplace_back(IPT_PEDAL, SEQ_TYPE_INCREMENT, seq);
+					assignments.emplace_back(IPT_UI_SELECT, SEQ_TYPE_STANDARD, seq);
+					break;
+				case 1:
+					assignments.emplace_back(IPT_PEDAL2, SEQ_TYPE_INCREMENT, seq);
+					assignments.emplace_back((3 > buttoncount) ? IPT_UI_CLEAR : IPT_UI_BACK, SEQ_TYPE_STANDARD, seq);
+					break;
+				case 2:
+					assignments.emplace_back(IPT_PEDAL3, SEQ_TYPE_INCREMENT, seq);
+					assignments.emplace_back(IPT_UI_CLEAR, SEQ_TYPE_STANDARD, seq);
+					break;
+				case 3:
+					assignments.emplace_back(IPT_UI_HELP, SEQ_TYPE_STANDARD, seq);
+					break;
+				}
+			}
 		}
 
 		// loop over all hats
-		for (int hat = 0; (hat < MAX_HATS) && (hat < SDL_JoystickNumHats(m_joydevice)); hat++)
+		input_item_id hatactual[MAX_HATS][4];
+		for (int hat = 0; (hat < MAX_HATS) && (hat < hatcount); hat++)
 		{
 			input_item_id itemid;
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Up", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			device()->add_item(
+			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + (4 * hat) : ITEM_ID_OTHER_SWITCH);
+			hatactual[hat][0] = device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
-					generic_button_get_state<std::int32_t>,
+					generic_button_get_state<s32>,
 					&m_joystick.hatsU[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			device()->add_item(
+			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + (4 * hat) : ITEM_ID_OTHER_SWITCH);
+			hatactual[hat][1] = device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
-					generic_button_get_state<std::int32_t>,
+					generic_button_get_state<s32>,
 					&m_joystick.hatsD[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			device()->add_item(
+			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
+			hatactual[hat][2] = device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
-					generic_button_get_state<std::int32_t>,
+					generic_button_get_state<s32>,
 					&m_joystick.hatsL[hat]);
 
 			snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			device()->add_item(
+			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
+			hatactual[hat][3] = device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
-					generic_button_get_state<std::int32_t>,
+					generic_button_get_state<s32>,
 					&m_joystick.hatsR[hat]);
 		}
 
 		// loop over all (track)balls
-		for (int ball = 0; (ball < (MAX_AXES / 2)) && (ball < SDL_JoystickNumBalls(m_joydevice)); ball++)
+		for (int ball = 0; (ball < (MAX_AXES / 2)) && (ball < ballcount); ball++)
 		{
 			int itemid;
 
@@ -993,18 +977,138 @@ public:
 				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
 			snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
-			device()->add_item(
+			input_item_id const xactual = device.add_item(
 					tempname,
+					std::string_view(),
 					input_item_id(itemid),
-					generic_axis_get_state<std::int32_t>,
+					generic_axis_get_state<s32>,
 					&m_joystick.balls[ball * 2]);
 
 			snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
-			device()->add_item(
-					tempname, input_item_id(itemid + 1),
-					generic_axis_get_state<std::int32_t>,
+			input_item_id const yactual = device.add_item(
+					tempname,
+					std::string_view(),
+					input_item_id(itemid + 1),
+					generic_axis_get_state<s32>,
 					&m_joystick.balls[ball * 2 + 1]);
+
+			if (0 == ball)
+			{
+				// assign the first trackball to dial, trackball, mouse and lightgun inputs
+				input_seq const xseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, xactual));
+				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
+				assignments.emplace_back(IPT_DIAL,        SEQ_TYPE_STANDARD, xseq);
+				assignments.emplace_back(IPT_DIAL_V,      SEQ_TYPE_STANDARD, yseq);
+				assignments.emplace_back(IPT_TRACKBALL_X, SEQ_TYPE_STANDARD, xseq);
+				assignments.emplace_back(IPT_TRACKBALL_Y, SEQ_TYPE_STANDARD, yseq);
+				assignments.emplace_back(IPT_LIGHTGUN_X,  SEQ_TYPE_STANDARD, xseq);
+				assignments.emplace_back(IPT_LIGHTGUN_Y,  SEQ_TYPE_STANDARD, yseq);
+				assignments.emplace_back(IPT_MOUSE_X,     SEQ_TYPE_STANDARD, xseq);
+				assignments.emplace_back(IPT_MOUSE_Y,     SEQ_TYPE_STANDARD, yseq);
+				if (2 > axiscount)
+				{
+					// use it for joystick inputs if axes are limited
+					assignments.emplace_back(IPT_AD_STICK_X, SEQ_TYPE_STANDARD, xseq);
+					assignments.emplace_back(IPT_AD_STICK_Y, SEQ_TYPE_STANDARD, yseq);
+				}
+				else
+				{
+					// use for non-centring throttle control
+					assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
+				}
+			}
+			else if ((1 == ball) && (2 > axiscount))
+			{
+				// provide a non-centring throttle control
+				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
+				assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
+			}
 		}
+
+		// set up default assignments for axes and hats
+		add_directional_assignments(
+				assignments,
+				(1 <= axiscount) ? axisactual[0] : ITEM_ID_INVALID, // assume first axis is X
+				(2 <= axiscount) ? axisactual[1] : ITEM_ID_INVALID, // assume second axis is Y
+				(1 <= hatcount) ? hatactual[0][2] : ITEM_ID_INVALID,
+				(1 <= hatcount) ? hatactual[0][3] : ITEM_ID_INVALID,
+				(1 <= hatcount) ? hatactual[0][0] : ITEM_ID_INVALID,
+				(1 <= hatcount) ? hatactual[0][1] : ITEM_ID_INVALID);
+		if (2 <= axiscount)
+		{
+			// put pedals on the last of the second, third or fourth axis
+			input_item_id const pedalitem = axisactual[(std::min)(axiscount, 4) - 1];
+			assignments.emplace_back(
+					IPT_PEDAL,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, pedalitem)));
+			assignments.emplace_back(
+					IPT_PEDAL2,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, pedalitem)));
+		}
+		if (3 <= axiscount)
+		{
+			// assign X/Y to one of the twin sticks
+			assignments.emplace_back(
+					(4 <= axiscount) ? IPT_JOYSTICKLEFT_LEFT : IPT_JOYSTICKRIGHT_LEFT,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, axisactual[0])));
+			assignments.emplace_back(
+					(4 <= axiscount) ? IPT_JOYSTICKLEFT_RIGHT : IPT_JOYSTICKRIGHT_RIGHT,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_RIGHT, axisactual[0])));
+			assignments.emplace_back(
+					(4 <= axiscount) ? IPT_JOYSTICKLEFT_UP : IPT_JOYSTICKRIGHT_UP,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_UP, axisactual[1])));
+			assignments.emplace_back(
+					(4 <= axiscount) ? IPT_JOYSTICKLEFT_DOWN : IPT_JOYSTICKRIGHT_DOWN,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_DOWN, axisactual[1])));
+
+			// use third or fourth axis for Z
+			input_seq const seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axisactual[(std::min)(axiscount, 4) - 1]));
+			assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, seq);
+
+			// use this for focus next/previous to make system selection menu practical to navigate
+			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[2]));
+			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[2]));
+			assignments.emplace_back(IPT_UI_FOCUS_PREV, SEQ_TYPE_STANDARD, upseq);
+			assignments.emplace_back(IPT_UI_FOCUS_NEXT, SEQ_TYPE_STANDARD, downseq);
+			if (4 <= axiscount)
+			{
+				// use for zoom as well if there's another axis to use for previous/next group
+				assignments.emplace_back(IPT_UI_ZOOM_IN, SEQ_TYPE_STANDARD, downseq);
+				assignments.emplace_back(IPT_UI_ZOOM_OUT, SEQ_TYPE_STANDARD, upseq);
+			}
+
+			// use this for twin sticks, too
+			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_LEFT : IPT_JOYSTICKLEFT_UP, SEQ_TYPE_STANDARD, upseq);
+			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_RIGHT : IPT_JOYSTICKLEFT_DOWN, SEQ_TYPE_STANDARD, downseq);
+
+			// put previous/next group on the last of the third or fourth axis
+			input_item_id const groupitem = axisactual[(std::min)(axiscount, 4) - 1];
+			assignments.emplace_back(
+					IPT_UI_PREV_GROUP,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, groupitem)));
+			assignments.emplace_back(
+					IPT_UI_NEXT_GROUP,
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, groupitem)));
+		}
+		if (4 <= axiscount)
+		{
+			// use this for twin sticks
+			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[3]));
+			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[3]));
+			assignments.emplace_back(IPT_JOYSTICKRIGHT_UP, SEQ_TYPE_STANDARD, upseq);
+			assignments.emplace_back(IPT_JOYSTICKRIGHT_DOWN, SEQ_TYPE_STANDARD, downseq);
+		}
+
+		// set default assignments
+		device.set_default_assignments(std::move(assignments));
 	}
 
 	~sdl_joystick_device()
@@ -1026,38 +1130,38 @@ public:
 		memset(&m_joystick, 0, sizeof(m_joystick));
 	}
 
-	virtual void process_event(SDL_Event &sdlevent) override
+	virtual void process_event(SDL_Event const &event) override
 	{
-		switch (sdlevent.type)
+		switch (event.type)
 		{
 		case SDL_JOYAXISMOTION:
-			if (sdlevent.jaxis.axis < MAX_AXES)
-				m_joystick.axes[sdlevent.jaxis.axis] = (sdlevent.jaxis.value * 2);
+			if (event.jaxis.axis < MAX_AXES)
+				m_joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2);
 			break;
 
 		case SDL_JOYBALLMOTION:
-			//printf("Ball %d %d\n", sdlevent.jball.xrel, sdlevent.jball.yrel);
-			if (sdlevent.jball.ball < (MAX_AXES / 2))
+			//printf("Ball %d %d\n", event.jball.xrel, event.jball.yrel);
+			if (event.jball.ball < (MAX_AXES / 2))
 			{
-				m_joystick.balls[sdlevent.jball.ball * 2] = sdlevent.jball.xrel * osd::INPUT_RELATIVE_PER_PIXEL;
-				m_joystick.balls[sdlevent.jball.ball * 2 + 1] = sdlevent.jball.yrel * osd::INPUT_RELATIVE_PER_PIXEL;
+				m_joystick.balls[event.jball.ball * 2] = event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
+				m_joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
 			}
 			break;
 
 		case SDL_JOYHATMOTION:
-			if (sdlevent.jhat.hat < MAX_HATS)
+			if (event.jhat.hat < MAX_HATS)
 			{
-				m_joystick.hatsU[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_UP) ? 0x80 : 0;
-				m_joystick.hatsD[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_DOWN) ? 0x80 : 0;
-				m_joystick.hatsL[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_LEFT) ? 0x80 : 0;
-				m_joystick.hatsR[sdlevent.jhat.hat] = (sdlevent.jhat.value & SDL_HAT_RIGHT) ? 0x80 : 0;
+				m_joystick.hatsU[event.jhat.hat] = (event.jhat.value & SDL_HAT_UP) ? 0x80 : 0;
+				m_joystick.hatsD[event.jhat.hat] = (event.jhat.value & SDL_HAT_DOWN) ? 0x80 : 0;
+				m_joystick.hatsL[event.jhat.hat] = (event.jhat.value & SDL_HAT_LEFT) ? 0x80 : 0;
+				m_joystick.hatsR[event.jhat.hat] = (event.jhat.value & SDL_HAT_RIGHT) ? 0x80 : 0;
 			}
 			break;
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			if (sdlevent.jbutton.button < MAX_BUTTONS)
-				m_joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
+			if (event.jbutton.button < MAX_BUTTONS)
+				m_joystick.buttons[event.jbutton.button] = (event.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
 			break;
 
 		case SDL_JOYDEVICEREMOVED:
@@ -1099,10 +1203,10 @@ protected:
 	// state information for a joystick
 	struct sdl_joystick_state
 	{
-		int32_t axes[MAX_AXES];
-		int32_t buttons[MAX_BUTTONS];
-		int32_t hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-		int32_t balls[MAX_AXES];
+		s32 axes[MAX_AXES];
+		s32 buttons[MAX_BUTTONS];
+		s32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
+		s32 balls[MAX_AXES];
 	};
 
 	sdl_joystick_state m_joystick;
@@ -1111,6 +1215,7 @@ private:
 	SDL_Joystick *m_joydevice;
 	SDL_Haptic *m_hapdevice;
 };
+
 
 //============================================================
 //  sdl_sixaxis_joystick_device
@@ -1121,32 +1226,33 @@ class sdl_sixaxis_joystick_device : public sdl_joystick_device
 public:
 	using sdl_joystick_device::sdl_joystick_device;
 
-	virtual void process_event(SDL_Event &sdlevent) override
+	virtual void process_event(SDL_Event const &event) override
 	{
-		switch (sdlevent.type)
+		switch (event.type)
 		{
 		case SDL_JOYAXISMOTION:
 			{
-				int const axis = sdlevent.jaxis.axis;
+				int const axis = event.jaxis.axis;
 				if (axis <= 3)
 				{
-					m_joystick.axes[sdlevent.jaxis.axis] = (sdlevent.jaxis.value * 2);
+					m_joystick.axes[event.jaxis.axis] = (event.jaxis.value * 2);
 				}
 				else
 				{
-					int const magic = (sdlevent.jaxis.value / 2) + 16384;
-					m_joystick.axes[sdlevent.jaxis.axis] = magic;
+					int const magic = (event.jaxis.value / 2) + 16384;
+					m_joystick.axes[event.jaxis.axis] = magic;
 				}
 			}
 			break;
 
 		default:
 			// Call the base for other events
-			sdl_joystick_device::process_event(sdlevent);
+			sdl_joystick_device::process_event(event);
 			break;
 		}
 	}
 };
+
 
 //============================================================
 //  sdl_game_controller_device
@@ -1156,14 +1262,12 @@ class sdl_game_controller_device : public sdl_joystick_device_base
 {
 public:
 	sdl_game_controller_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			SDL_GameController *ctrl,
 			char const *serial) :
 		sdl_joystick_device_base(
-				machine,
 				std::move(name),
 				std::move(id),
 				module,
@@ -1183,11 +1287,15 @@ public:
 		}
 	}
 
-	void configure()
+	virtual void configure(input_device &device) override
 	{
+		input_device::assignment_vector assignments;
 		char const *const *axisnames = CONTROLLER_AXIS_XBOX;
 		char const *const *buttonnames = CONTROLLER_BUTTON_XBOX360;
 		bool digitaltriggers = false;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		bool avoidpaddles = false;
+#endif
 #if SDL_VERSION_ATLEAST(2, 0, 12)
 		auto const ctrltype = SDL_GameControllerGetType(m_ctrldevice);
 		switch (ctrltype)
@@ -1250,6 +1358,7 @@ public:
 			axisnames = CONTROLLER_AXIS_SWITCH;
 			buttonnames = CONTROLLER_BUTTON_SWITCH;
 			digitaltriggers = true;
+			avoidpaddles = true;
 			break;
 #endif
 		default: // default to Xbox 360 names
@@ -1258,8 +1367,25 @@ public:
 		}
 #endif
 
+		// keep track of item numbers as we add controls
+		std::pair<input_item_id, input_item_id> axisitems[SDL_CONTROLLER_AXIS_MAX];
+		input_item_id buttonitems[SDL_CONTROLLER_BUTTON_MAX];
+		std::tuple<input_item_id, SDL_GameControllerButton, SDL_GameControllerAxis> numberedbuttons[16];
+		std::fill(
+				std::begin(axisitems),
+				std::end(axisitems),
+				std::make_pair(ITEM_ID_INVALID, ITEM_ID_INVALID));
+		std::fill(
+				std::begin(buttonitems),
+				std::end(buttonitems),
+				ITEM_ID_INVALID);
+		std::fill(
+				std::begin(numberedbuttons),
+				std::end(numberedbuttons),
+				std::make_tuple(ITEM_ID_INVALID, SDL_CONTROLLER_BUTTON_INVALID, SDL_CONTROLLER_AXIS_INVALID));
+
 		// add axes
-		std::tuple<SDL_GameControllerAxis, input_item_id, bool> axes[]{
+		std::tuple<SDL_GameControllerAxis, input_item_id, bool> const axes[]{
 				{ SDL_CONTROLLER_AXIS_LEFTX,        ITEM_ID_XAXIS,   false },
 				{ SDL_CONTROLLER_AXIS_LEFTY,        ITEM_ID_YAXIS,   false },
 				{ SDL_CONTROLLER_AXIS_RIGHTX,       ITEM_ID_ZAXIS,   false },
@@ -1290,42 +1416,45 @@ public:
 			}
 			if (avail)
 			{
-				device()->add_item(
+				axisitems[axis].first = device.add_item(
 						axisnames[axis],
+						std::string_view(),
 						item,
-						generic_axis_get_state<std::int32_t>,
+						generic_axis_get_state<s32>,
 						&m_controller.axes[axis]);
 			}
 		}
 
 		// add automatically numbered buttons
-		std::pair<SDL_GameControllerButton, SDL_GameControllerAxis> numberedbuttons[]{
-				{ SDL_CONTROLLER_BUTTON_A,             SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_B,             SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_X,             SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_Y,             SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_LEFTSHOULDER,  SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERLEFT },
-				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERRIGHT },
-				{ SDL_CONTROLLER_BUTTON_LEFTSTICK,     SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_RIGHTSTICK,    SDL_CONTROLLER_AXIS_INVALID },
+		std::tuple<SDL_GameControllerButton, SDL_GameControllerAxis, bool> const generalbuttons[]{
+				{ SDL_CONTROLLER_BUTTON_A,             SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_B,             SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_X,             SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_Y,             SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_LEFTSHOULDER,  SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERLEFT,  true },
+				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERRIGHT, true },
+				{ SDL_CONTROLLER_BUTTON_LEFTSTICK,     SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_RIGHTSTICK,    SDL_CONTROLLER_AXIS_INVALID,      true },
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-				{ SDL_CONTROLLER_BUTTON_PADDLE1,       SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_PADDLE2,       SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_PADDLE3,       SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_PADDLE4,       SDL_CONTROLLER_AXIS_INVALID },
+				{ SDL_CONTROLLER_BUTTON_PADDLE1,       SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_PADDLE2,       SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_PADDLE3,       SDL_CONTROLLER_AXIS_INVALID,      true },
+				{ SDL_CONTROLLER_BUTTON_PADDLE4,       SDL_CONTROLLER_AXIS_INVALID,      true },
 #endif
-				{ SDL_CONTROLLER_BUTTON_GUIDE,         SDL_CONTROLLER_AXIS_INVALID },
+				{ SDL_CONTROLLER_BUTTON_GUIDE,         SDL_CONTROLLER_AXIS_INVALID,      false },
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-				{ SDL_CONTROLLER_BUTTON_MISC1,         SDL_CONTROLLER_AXIS_INVALID },
-				{ SDL_CONTROLLER_BUTTON_TOUCHPAD,      SDL_CONTROLLER_AXIS_INVALID },
+				{ SDL_CONTROLLER_BUTTON_MISC1,         SDL_CONTROLLER_AXIS_INVALID,      false },
+				{ SDL_CONTROLLER_BUTTON_TOUCHPAD,      SDL_CONTROLLER_AXIS_INVALID,      false },
 #endif
 				};
 		input_item_id button_item = ITEM_ID_BUTTON1;
-		for (auto [button, axis] : numberedbuttons)
+		unsigned buttoncount = 0;
+		for (auto [button, axis, field] : generalbuttons)
 		{
 			bool avail = true;
+			input_item_id actual = ITEM_ID_INVALID;
 			if (SDL_CONTROLLER_BUTTON_INVALID != button)
 			{
 #if SDL_VERSION_ATLEAST(2, 0, 14)
@@ -1345,11 +1474,14 @@ public:
 				}
 				if (avail)
 				{
-					device()->add_item(
+					actual = buttonitems[button] = device.add_item(
 							buttonnames[button],
+							std::string_view(),
 							button_item++,
-							generic_button_get_state<std::int32_t>,
+							generic_button_get_state<s32>,
 							&m_controller.buttons[button]);
+					if (field && (std::size(numberedbuttons) > buttoncount))
+						std::get<1>(numberedbuttons[buttoncount]) = button;
 				}
 			}
 			else
@@ -1373,20 +1505,30 @@ public:
 				}
 				if (avail)
 				{
-					device()->add_item(
+					actual = axisitems[axis].second = device.add_item(
 							axisnames[axis],
+							std::string_view(),
 							button_item++,
 							[] (void *device_internal, void *item_internal) -> int
 							{
-								return (*reinterpret_cast<int32_t const *>(item_internal) <= -16'384) ? 1 : 0;
+								return (*reinterpret_cast<s32 const *>(item_internal) <= -16'384) ? 1 : 0;
 							},
 							&m_controller.axes[axis]);
+					if (field && (std::size(numberedbuttons) > buttoncount))
+						std::get<2>(numberedbuttons[buttoncount]) = axis;
 				}
+			}
+
+			// add default button assignments
+			if (field && avail && (std::size(numberedbuttons) > buttoncount))
+			{
+				std::get<0>(numberedbuttons[buttoncount]) = actual;
+				add_button_assignment(assignments, ioport_type(IPT_BUTTON1 + buttoncount++), { actual });
 			}
 		}
 
 		// add buttons with fixed item IDs
-		std::pair<SDL_GameControllerButton, input_item_id> fixedbuttons[]{
+		std::pair<SDL_GameControllerButton, input_item_id> const fixedbuttons[]{
 				{ SDL_CONTROLLER_BUTTON_BACK,       ITEM_ID_SELECT },
 				{ SDL_CONTROLLER_BUTTON_START,      ITEM_ID_START },
 				{ SDL_CONTROLLER_BUTTON_DPAD_UP,    ITEM_ID_HAT1UP },
@@ -1413,13 +1555,318 @@ public:
 			}
 			if (avail)
 			{
-				device()->add_item(
+				buttonitems[button] = device.add_item(
 						buttonnames[button],
+						std::string_view(),
 						item,
-						generic_button_get_state<std::int32_t>,
+						generic_button_get_state<s32>,
 						&m_controller.buttons[button]);
 			}
 		}
+
+		// try to get a "complete" joystick for primary movement controls
+		input_item_id diraxis[2][2];
+		choose_primary_stick(
+				diraxis,
+				axisitems[SDL_CONTROLLER_AXIS_LEFTX].first,
+				axisitems[SDL_CONTROLLER_AXIS_LEFTY].first,
+				axisitems[SDL_CONTROLLER_AXIS_RIGHTX].first,
+				axisitems[SDL_CONTROLLER_AXIS_RIGHTY].first);
+
+		// now set up controls using the primary joystick
+		add_directional_assignments(
+				assignments,
+				diraxis[0][0],
+				diraxis[0][1],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_LEFT],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_RIGHT],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_UP],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_DOWN]);
+
+		// assign a secondary stick axis to joystick Z if available
+		bool const zaxis = add_assignment(
+				assignments,
+				IPT_AD_STICK_Z,
+				SEQ_TYPE_STANDARD,
+				ITEM_CLASS_ABSOLUTE,
+				ITEM_MODIFIER_NONE,
+				{ diraxis[1][1], diraxis[1][0] });
+		if (!zaxis)
+		{
+			// if both triggers are present, combine them, or failing that, fall back to a pair of buttons
+			if ((ITEM_ID_INVALID != axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first) && (ITEM_ID_INVALID != axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
+			{
+				assignments.emplace_back(
+						IPT_AD_STICK_Z,
+						SEQ_TYPE_STANDARD,
+						input_seq(
+								make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first),
+								make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_REVERSE, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first)));
+			}
+			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, buttonitems[SDL_CONTROLLER_BUTTON_LEFTSHOULDER], buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER]))
+			{
+				// took shoulder buttons
+			}
+			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].second, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].second))
+			{
+				// took trigger buttons
+			}
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
+			{
+				// took P1/P2
+			}
+			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE3], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE4]))
+			{
+				// took P3/P4
+			}
+#endif
+		}
+
+		// prefer trigger axes for pedals, otherwise take half axes and buttons
+		unsigned pedalbutton = 0;
+		if (!add_assignment(assignments, IPT_PEDAL, SEQ_TYPE_STANDARD, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, { axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first }))
+		{
+			add_assignment(
+					assignments,
+					IPT_PEDAL,
+					SEQ_TYPE_STANDARD,
+					ITEM_CLASS_ABSOLUTE,
+					ITEM_MODIFIER_NEG,
+					{ diraxis[1][1], diraxis[0][1] });
+			bool const incbutton = add_assignment(
+					assignments,
+					IPT_PEDAL,
+					SEQ_TYPE_INCREMENT,
+					ITEM_CLASS_SWITCH,
+					ITEM_MODIFIER_NONE,
+					{ axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].second, buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] });
+			if (!incbutton)
+			{
+				if (add_assignment(assignments, IPT_PEDAL, SEQ_TYPE_INCREMENT, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, { std::get<0>(numberedbuttons[pedalbutton]) }))
+					++pedalbutton;
+			}
+		}
+		if (!add_assignment(assignments, IPT_PEDAL2, SEQ_TYPE_STANDARD, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, { axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first }))
+		{
+			add_assignment(
+					assignments,
+					IPT_PEDAL2,
+					SEQ_TYPE_STANDARD,
+					ITEM_CLASS_ABSOLUTE,
+					ITEM_MODIFIER_POS,
+					{ diraxis[1][1], diraxis[0][1] });
+			bool const incbutton = add_assignment(
+					assignments,
+					IPT_PEDAL2,
+					SEQ_TYPE_INCREMENT,
+					ITEM_CLASS_SWITCH,
+					ITEM_MODIFIER_NONE,
+					{ axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].second, buttonitems[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] });
+			if (!incbutton)
+			{
+				if (add_assignment(assignments, IPT_PEDAL2, SEQ_TYPE_INCREMENT, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, { std::get<0>(numberedbuttons[pedalbutton]) }))
+					++pedalbutton;
+			}
+		}
+		add_assignment(assignments, IPT_PEDAL3, SEQ_TYPE_INCREMENT, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, { std::get<0>(numberedbuttons[pedalbutton]) });
+
+		// potentially use thumb sticks and/or D-pad and A/B/X/Y diamond for twin sticks
+		add_twin_stick_assignments(
+				assignments,
+				axisitems[SDL_CONTROLLER_AXIS_LEFTX].first,
+				axisitems[SDL_CONTROLLER_AXIS_LEFTY].first,
+				axisitems[SDL_CONTROLLER_AXIS_RIGHTX].first,
+				axisitems[SDL_CONTROLLER_AXIS_RIGHTY].first,
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_LEFT],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_RIGHT],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_UP],
+				buttonitems[SDL_CONTROLLER_BUTTON_DPAD_DOWN],
+				buttonitems[SDL_CONTROLLER_BUTTON_X],
+				buttonitems[SDL_CONTROLLER_BUTTON_B],
+				buttonitems[SDL_CONTROLLER_BUTTON_Y],
+				buttonitems[SDL_CONTROLLER_BUTTON_A]);
+
+		// add assignments for buttons with fixed functions
+		add_button_assignment(assignments, IPT_SELECT,  { buttonitems[SDL_CONTROLLER_BUTTON_BACK] });
+		add_button_assignment(assignments, IPT_START,   { buttonitems[SDL_CONTROLLER_BUTTON_START] });
+		add_button_assignment(assignments, IPT_UI_MENU, { buttonitems[SDL_CONTROLLER_BUTTON_GUIDE] });
+
+		// the first button is always UI select
+		if (add_button_assignment(assignments, IPT_UI_SELECT, { std::get<0>(numberedbuttons[0]) }))
+		{
+			if (SDL_CONTROLLER_BUTTON_INVALID != std::get<1>(numberedbuttons[0]))
+				buttonitems[std::get<1>(numberedbuttons[0])] = ITEM_ID_INVALID;
+			if (SDL_CONTROLLER_AXIS_INVALID != std::get<2>(numberedbuttons[0]))
+				axisitems[std::get<2>(numberedbuttons[0])].second = ITEM_ID_INVALID;
+		}
+
+		// try to get a matching pair of buttons for previous/next group
+		if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].second, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].second))
+		{
+			// took digital triggers
+		}
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
+		{
+			// took upper paddles
+		}
+#endif
+		else if (consume_trigger_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
+		{
+			// took analog triggers
+		}
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE3], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE4]))
+		{
+			// took lower paddles
+		}
+#endif
+		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, diraxis[1][1]))
+		{
+			// took secondary Y
+		}
+		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, diraxis[1][0]))
+		{
+			// took secondary X
+		}
+
+		// try to get a matching pair of buttons for page up/down
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
+		{
+			// took upper paddles
+		}
+		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE3], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE4]))
+		{
+			// took lower paddles
+		}
+		else
+#endif
+		if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
+		{
+			// took analog triggers
+		}
+		else if (consume_axis_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, diraxis[1][1]))
+		{
+			// took secondary Y
+		}
+
+		// try to assign X button to UI clear
+		if (add_button_assignment(assignments, IPT_UI_CLEAR, { buttonitems[SDL_CONTROLLER_BUTTON_X] }))
+		{
+			buttonitems[SDL_CONTROLLER_BUTTON_X] = ITEM_ID_INVALID;
+		}
+		else
+		{
+			// otherwise try to find an unassigned button
+			for (auto [item, button, axis] : numberedbuttons)
+			{
+				if ((SDL_CONTROLLER_BUTTON_INVALID != button) && (ITEM_ID_INVALID != buttonitems[button]))
+				{
+					add_button_assignment(assignments, IPT_UI_CLEAR, { item });
+					buttonitems[button] = ITEM_ID_INVALID;
+					break;
+				}
+				else if ((SDL_CONTROLLER_AXIS_INVALID != axis) && (ITEM_ID_INVALID != axisitems[axis].second))
+				{
+					add_button_assignment(assignments, IPT_UI_CLEAR, { item });
+					axisitems[axis].second = ITEM_ID_INVALID;
+					break;
+				}
+			}
+		}
+
+		// try to assign B button to UI back
+		if (add_button_assignment(assignments, IPT_UI_BACK, { buttonitems[SDL_CONTROLLER_BUTTON_B] }))
+		{
+			buttonitems[SDL_CONTROLLER_BUTTON_X] = ITEM_ID_INVALID;
+		}
+		else
+		{
+			// otherwise try to find an unassigned button
+			for (auto [item, button, axis] : numberedbuttons)
+			{
+				if ((SDL_CONTROLLER_BUTTON_INVALID != button) && (ITEM_ID_INVALID != buttonitems[button]))
+				{
+					add_button_assignment(assignments, IPT_UI_CLEAR, { item });
+					buttonitems[button] = ITEM_ID_INVALID;
+					break;
+				}
+				else if ((SDL_CONTROLLER_AXIS_INVALID != axis) && (ITEM_ID_INVALID != axisitems[axis].second))
+				{
+					add_button_assignment(assignments, IPT_UI_CLEAR, { item });
+					axisitems[axis].second = ITEM_ID_INVALID;
+					break;
+				}
+			}
+		}
+
+		// try to assign Y button to UI help
+		if (add_button_assignment(assignments, IPT_UI_HELP, { buttonitems[SDL_CONTROLLER_BUTTON_Y] }))
+		{
+			buttonitems[SDL_CONTROLLER_BUTTON_Y] = ITEM_ID_INVALID;
+		}
+		else
+		{
+			// otherwise try to find an unassigned button
+			for (auto [item, button, axis] : numberedbuttons)
+			{
+				if ((SDL_CONTROLLER_BUTTON_INVALID != button) && (ITEM_ID_INVALID != buttonitems[button]))
+				{
+					add_button_assignment(assignments, IPT_UI_HELP, { item });
+					buttonitems[button] = ITEM_ID_INVALID;
+					break;
+				}
+				else if ((SDL_CONTROLLER_AXIS_INVALID != axis) && (ITEM_ID_INVALID != axisitems[axis].second))
+				{
+					add_button_assignment(assignments, IPT_UI_HELP, { item });
+					axisitems[axis].second = ITEM_ID_INVALID;
+					break;
+				}
+			}
+		}
+
+		// put focus previous/next on the shoulder buttons if available - this can be overloaded with zoom
+		if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, buttonitems[SDL_CONTROLLER_BUTTON_LEFTSHOULDER], buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER]))
+		{
+			// took shoulder buttons
+		}
+		else if (add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, diraxis[1][0]))
+		{
+			// took secondary X
+		}
+		else if (add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, diraxis[1][1]))
+		{
+			// took secondary Y
+		}
+
+		// put zoom on the secondary stick if available, or fall back to shoulder buttons
+		if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, diraxis[1][0]))
+		{
+			// took secondary X
+			if (axisitems[SDL_CONTROLLER_AXIS_LEFTX].first == diraxis[1][0])
+				add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { buttonitems[SDL_CONTROLLER_BUTTON_LEFTSTICK] });
+			else if (axisitems[SDL_CONTROLLER_AXIS_RIGHTX].first == diraxis[1][0])
+				add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSTICK] });
+			diraxis[1][0] = ITEM_ID_INVALID;
+		}
+		else if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_IN, IPT_UI_ZOOM_OUT, diraxis[1][1]))
+		{
+			// took secondary Y
+			if (axisitems[SDL_CONTROLLER_AXIS_LEFTY].first == diraxis[1][1])
+				add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { buttonitems[SDL_CONTROLLER_BUTTON_LEFTSTICK] });
+			else if (axisitems[SDL_CONTROLLER_AXIS_RIGHTY].first == diraxis[1][1])
+				add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSTICK] });
+			diraxis[1][1] = ITEM_ID_INVALID;
+		}
+		else if (consume_button_pair(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, buttonitems[SDL_CONTROLLER_BUTTON_LEFTSHOULDER], buttonitems[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER]))
+		{
+			// took shoulder buttons
+		}
+
+		// set default assignments
+		device.set_default_assignments(std::move(assignments));
 	}
 
 	virtual void reset() override
@@ -1427,29 +1874,29 @@ public:
 		memset(&m_controller, 0, sizeof(m_controller));
 	}
 
-	virtual void process_event(SDL_Event &sdlevent) override
+	virtual void process_event(SDL_Event const &event) override
 	{
-		switch (sdlevent.type)
+		switch (event.type)
 		{
 		case SDL_CONTROLLERAXISMOTION:
-			if (sdlevent.caxis.axis < SDL_CONTROLLER_AXIS_MAX)
+			if (event.caxis.axis < SDL_CONTROLLER_AXIS_MAX)
 			{
-				switch (sdlevent.caxis.axis)
+				switch (event.caxis.axis)
 				{
 				case SDL_CONTROLLER_AXIS_TRIGGERLEFT: // MAME wants negative values for triggers
 				case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-					m_controller.axes[sdlevent.caxis.axis] = -normalize_absolute_axis(sdlevent.caxis.value, -32'767, 32'767);
+					m_controller.axes[event.caxis.axis] = -normalize_absolute_axis(event.caxis.value, -32'767, 32'767);
 					break;
 				default:
-					m_controller.axes[sdlevent.caxis.axis] = normalize_absolute_axis(sdlevent.caxis.value, -32'767, 32'767);
+					m_controller.axes[event.caxis.axis] = normalize_absolute_axis(event.caxis.value, -32'767, 32'767);
 				}
 			}
 			break;
 
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
-			if (sdlevent.cbutton.button < SDL_CONTROLLER_BUTTON_MAX)
-				m_controller.buttons[sdlevent.cbutton.button] = (sdlevent.cbutton.state == SDL_PRESSED) ? 0x80 : 0x00;
+			if (event.cbutton.button < SDL_CONTROLLER_BUTTON_MAX)
+				m_controller.buttons[event.cbutton.button] = (event.cbutton.state == SDL_PRESSED) ? 0x80 : 0x00;
 			break;
 
 		case SDL_CONTROLLERDEVICEREMOVED:
@@ -1480,123 +1927,96 @@ private:
 	// state information for a game controller
 	struct sdl_controller_state
 	{
-		int32_t axes[SDL_CONTROLLER_AXIS_MAX];
-		int32_t buttons[SDL_CONTROLLER_BUTTON_MAX];
+		s32 axes[SDL_CONTROLLER_AXIS_MAX];
+		s32 buttons[SDL_CONTROLLER_BUTTON_MAX];
 	};
 
 	sdl_controller_state m_controller;
 	SDL_GameController *m_ctrldevice;
 };
 
+
 //============================================================
 //  sdl_input_module
 //============================================================
 
-class sdl_input_module : public input_module_base, public sdl_event_subscriber
+template <typename Info>
+class sdl_input_module :
+		public input_module_impl<Info, sdl_osd_interface>,
+		protected sdl_event_manager::subscriber
 {
 public:
-	sdl_input_module(char const *type, char const *name) : input_module_base(type, name)
+	sdl_input_module(char const *type, char const *name) :
+		input_module_impl<Info, sdl_osd_interface>(type, name)
 	{
 	}
 
-	void input_init(running_machine &machine) override
-	{
-		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		{
-			osd_printf_warning("Debug Build: Disabling input grab for -debug\n");
-			set_mouse_enabled(false);
-		}
-	}
-
-	void exit() override
+	virtual void exit() override
 	{
 		// unsubscribe for events
-		sdl_event_manager::instance().unsubscribe(this);
+		unsubscribe();
 
-		input_module_base::exit();
+		input_module_impl<Info, sdl_osd_interface>::exit();
 	}
 
-	void before_poll(running_machine& machine) override
+protected:
+	virtual void handle_event(SDL_Event const &event) override
 	{
-		// Tell the event manager to process events and push them to the devices
-		sdl_event_manager::instance().process_events(machine);
-	}
-
-	bool should_poll_devices(running_machine& machine) override
-	{
-		return sdl_event_manager::instance().has_focus() && input_enabled();
-	}
-
-	void handle_event(SDL_Event &sdlevent) override
-	{
-		// By default dispatch event to every device
-		devicelist().for_each_device(
-				[&sdlevent](auto device) {
-					downcast<sdl_device*>(device)->queue_events(&sdlevent, 1);
-				});
+		// dispatch event to every device by default
+		this->devicelist().for_each_device(
+				[&event] (auto &device) { device.queue_events(&event, 1); });
 	}
 };
+
 
 //============================================================
 //  sdl_keyboard_module
 //============================================================
 
-class sdl_keyboard_module : public sdl_input_module
+class sdl_keyboard_module : public sdl_input_module<sdl_keyboard_device>
 {
-	keyboard_trans_table * m_key_trans_table;
 public:
 	sdl_keyboard_module() :
-		sdl_input_module(OSD_KEYBOARDINPUT_PROVIDER, "sdl"),
+		sdl_input_module<sdl_keyboard_device>(OSD_KEYBOARDINPUT_PROVIDER, "sdl"),
 		m_key_trans_table(nullptr)
 	{
 	}
 
-	void input_init(running_machine &machine) override
+	virtual void input_init(running_machine &machine) override
 	{
-		sdl_input_module::input_init(machine);
+		sdl_input_module<sdl_keyboard_device>::input_init(machine);
 
 		static int const event_types[] = {
 				int(SDL_KEYDOWN),
-				int(SDL_KEYUP),
-				int(SDL_TEXTINPUT) };
+				int(SDL_KEYUP) };
 
-		sdl_event_manager::instance().subscribe(event_types, this);
+		subscribe(osd(), event_types);
 
 		// Read our keymap and store a pointer to our table
-		m_key_trans_table = sdlinput_read_keymap(machine);
-
-		keyboard_trans_table& local_table = *m_key_trans_table;
+		m_key_trans_table = sdlinput_read_keymap();
 
 		osd_printf_verbose("Keyboard: Start initialization\n");
 
 		// SDL only has 1 keyboard add it now
-		auto &devinfo = devicelist().create_device<sdl_keyboard_device>(machine, "System keyboard", "System keyboard", *this);
-
-		// populate it
-		for (int keynum = 0; local_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
-		{
-			input_item_id itemid = local_table[keynum].mame_key;
-
-			// generate the default / modified name
-			char defname[20];
-			snprintf(defname, sizeof(defname) - 1, "%s", local_table[keynum].ui_name);
-
-			devinfo.device()->add_item(defname, itemid, generic_button_get_state<std::int32_t>, &devinfo.keyboard.state[local_table[keynum].sdl_scancode]);
-		}
+		auto &devinfo = create_device<sdl_keyboard_device>(
+				DEVICE_CLASS_KEYBOARD,
+				"System keyboard",
+				"System keyboard",
+				*m_key_trans_table);
 
 		osd_printf_verbose("Keyboard: Registered %s\n", devinfo.name());
 		osd_printf_verbose("Keyboard: End initialization\n");
 	}
 
 private:
-	keyboard_trans_table *sdlinput_read_keymap(running_machine &machine)
+	keyboard_trans_table *sdlinput_read_keymap()
 	{
 		keyboard_trans_table &default_table = keyboard_trans_table::instance();
 
-		if (!machine.options().bool_value(SDLOPTION_KEYMAP))
+		if (!options()->bool_value(SDLOPTION_KEYMAP))
 			return &default_table;
 
-		const char *const keymap_filename = downcast<sdl_options &>(machine.options()).keymap_file();
+		const char *const keymap_filename = dynamic_cast<sdl_options const &>(*options()).keymap_file();
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 		FILE *const keymap_file = fopen(keymap_filename, "r");
@@ -1667,18 +2087,20 @@ private:
 		return m_custom_table.get();
 	}
 
+	keyboard_trans_table *m_key_trans_table;
 	std::unique_ptr<keyboard_trans_table> m_custom_table;
 	std::list<std::string> m_ui_names;
 };
+
 
 //============================================================
 //  sdl_mouse_module
 //============================================================
 
-class sdl_mouse_module : public sdl_input_module
+class sdl_mouse_module : public sdl_input_module<sdl_mouse_device>
 {
 public:
-	sdl_mouse_module() : sdl_input_module(OSD_MOUSEINPUT_PROVIDER, "sdl")
+	sdl_mouse_module() : sdl_input_module<sdl_mouse_device>(OSD_MOUSEINPUT_PROVIDER, "sdl")
 	{
 	}
 
@@ -1692,22 +2114,15 @@ public:
 				int(SDL_MOUSEBUTTONUP),
 				int(SDL_MOUSEWHEEL) };
 
-		sdl_event_manager::instance().subscribe(event_types, this);
+		subscribe(osd(), event_types);
 
 		osd_printf_verbose("Mouse: Start initialization\n");
 
 		// SDL currently only supports one mouse
-		auto &devinfo = devicelist().create_device<sdl_mouse_device>(machine, "System mouse", "System mouse", *this);
-
-		// add the axes
-		devinfo.device()->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo.mouse.lX);
-		devinfo.device()->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo.mouse.lY);
-
-		for (int button = 0; button < 4; button++)
-		{
-			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
-			devinfo.device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo.mouse.buttons[button]);
-		}
+		auto &devinfo = create_device<sdl_mouse_device>(
+				DEVICE_CLASS_MOUSE,
+				"System mouse",
+				"System mouse");
 
 		osd_printf_verbose("Mouse: Registered %s\n", devinfo.name());
 		osd_printf_verbose("Mouse: End initialization\n");
@@ -1719,11 +2134,11 @@ public:
 //  sdl_joystick_module_base
 //============================================================
 
-class sdl_joystick_module_base : public sdl_input_module
+class sdl_joystick_module_base : public sdl_input_module<sdl_joystick_device_base>
 {
 protected:
 	sdl_joystick_module_base(char const *name) :
-		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER, name),
+		sdl_input_module<sdl_joystick_device_base>(OSD_JOYSTICKINPUT_PROVIDER, name),
 		m_initialized_joystick(false),
 		m_initialized_haptic(false)
 	{
@@ -1770,7 +2185,7 @@ protected:
 		}
 	}
 
-	sdl_joystick_device *create_joystick_device(running_machine &machine, int index, bool sixaxis)
+	sdl_joystick_device *create_joystick_device(int index, bool sixaxis)
 	{
 		// open the joystick device
 		SDL_Joystick *const joy = SDL_JoystickOpen(index);
@@ -1794,11 +2209,6 @@ protected:
 		if (serial)
 			id.append(1, '-').append(serial);
 
-		// instantiate device
-		sdl_joystick_device &devinfo = sixaxis
-				? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial)
-				: devicelist().create_device<sdl_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial);
-
 		// print some diagnostic info
 		osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
 				name ? name : "<nullptr>",
@@ -1812,15 +2222,19 @@ protected:
 				SDL_JoystickNumButtons(joy),
 				SDL_JoystickNumHats(joy),
 				SDL_JoystickNumBalls(joy));
+		if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
+			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+
+		// instantiate device
+		sdl_joystick_device &devinfo = sixaxis
+				? create_device<sdl_sixaxis_joystick_device>(DEVICE_CLASS_JOYSTICK, name ? name : guid_str, guid_str, joy, serial)
+				: create_device<sdl_joystick_device>(DEVICE_CLASS_JOYSTICK, name ? name : guid_str, guid_str, joy, serial);
+
 		if (devinfo.has_haptic())
 			osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
 		else
 			osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
-		if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
-			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
 
-		// let it add controls
-		devinfo.configure();
 		return &devinfo;
 	}
 
@@ -1844,19 +2258,17 @@ protected:
 				devicelist().end(),
 				[&guid_str, &serial] (auto const &device)
 				{
-					auto &devinfo = downcast<sdl_joystick_device_base &>(*device);
-					return devinfo.reconnect_match(guid_str, serial);
+					return device->reconnect_match(guid_str, serial);
 				});
 		return (devicelist().end() != target_device) ? target_device->get() : nullptr;
 	}
 
 	sdl_joystick_device_base *find_joystick(SDL_JoystickID instance)
 	{
-		for (auto &ptr : devicelist())
+		for (auto &device : devicelist())
 		{
-			sdl_joystick_device_base *const device = downcast<sdl_joystick_device_base *>(ptr.get());
 			if (device->is_instance(instance))
-				return device;
+				return device.get();
 		}
 		return nullptr;
 	}
@@ -1887,10 +2299,10 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		auto &sdlopts = downcast<sdl_options const &>(*options());
+		auto &sdlopts = dynamic_cast<sdl_options const &>(*options());
 		bool const sixaxis_mode = sdlopts.sixaxis();
 
-		if (!machine.options().debug() && sdlopts.background_input())
+		if (!sdlopts.debug() && sdlopts.background_input())
 			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
@@ -1902,7 +2314,7 @@ public:
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
-			create_joystick_device(machine, physical_stick, sixaxis_mode);
+			create_joystick_device(physical_stick, sixaxis_mode);
 
 		static int const event_types[] = {
 				int(SDL_JOYAXISMOTION),
@@ -1912,19 +2324,19 @@ public:
 				int(SDL_JOYBUTTONUP),
 				int(SDL_JOYDEVICEADDED),
 				int(SDL_JOYDEVICEREMOVED) };
-		sdl_event_manager::instance().subscribe(event_types, this);
+		subscribe(osd(), event_types);
 
 		osd_printf_verbose("Joystick: End initialization\n");
 	}
 
-	virtual void handle_event(SDL_Event &sdlevent) override
+	virtual void handle_event(SDL_Event const &event) override
 	{
-		if (SDL_JOYDEVICEADDED == sdlevent.type)
+		if (SDL_JOYDEVICEADDED == event.type)
 		{
-			SDL_Joystick *const joy = SDL_JoystickOpen(sdlevent.jdevice.which);
+			SDL_Joystick *const joy = SDL_JoystickOpen(event.jdevice.which);
 			if (!joy)
 			{
-				osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", sdlevent.jdevice.which, SDL_GetError());
+				osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", event.jdevice.which, SDL_GetError());
 			}
 			else
 			{
@@ -1936,7 +2348,7 @@ public:
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
-					auto &devinfo = downcast<sdl_joystick_device &>(*target_device);
+					auto &devinfo = dynamic_cast<sdl_joystick_device &>(*target_device);
 					devinfo.attach_device(joy);
 				}
 				else
@@ -1947,7 +2359,7 @@ public:
 		}
 		else
 		{
-			dispatch_joystick_event(sdlevent);
+			dispatch_joystick_event(event);
 		}
 	}
 };
@@ -1968,7 +2380,7 @@ public:
 
 	virtual void exit() override
 	{
-		sdl_input_module::exit();
+		sdl_joystick_module_base::exit();
 
 		if (m_initialized_game_controller)
 			SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
@@ -1978,10 +2390,10 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		auto &sdlopts = downcast<sdl_options const &>(*options());
+		auto &sdlopts = dynamic_cast<sdl_options const &>(*options());
 		bool const sixaxis_mode = sdlopts.sixaxis();
 
-		if (!machine.options().debug() && sdlopts.background_input())
+		if (!sdlopts.debug() && sdlopts.background_input())
 			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
@@ -2023,9 +2435,9 @@ public:
 
 			// fall back to joystick API if necessary
 			if (!ctrl)
-				create_joystick_device(machine, physical_stick, sixaxis_mode);
+				create_joystick_device(physical_stick, sixaxis_mode);
 			else
-				create_game_controller_device(machine, physical_stick, ctrl);
+				create_game_controller_device(physical_stick, ctrl);
 		}
 
 		static int const joy_event_types[] = {
@@ -2050,22 +2462,22 @@ public:
 				int(SDL_CONTROLLERDEVICEADDED),
 				int(SDL_CONTROLLERDEVICEREMOVED) };
 		if (m_initialized_game_controller)
-			sdl_event_manager::instance().subscribe(event_types, this);
+			subscribe(osd(), event_types);
 		else
-			sdl_event_manager::instance().subscribe(joy_event_types, this);
+			subscribe(osd(), joy_event_types);
 
 		osd_printf_verbose("Game Controller: End initialization\n");
 	}
 
-	virtual void handle_event(SDL_Event &sdlevent) override
+	virtual void handle_event(SDL_Event const &event) override
 	{
-		switch (sdlevent.type)
+		switch (event.type)
 		{
 		case SDL_JOYDEVICEADDED:
 			{
 				// make sure this isn't an event for a reconnected game controller
-				auto const controller = find_joystick(SDL_JoystickGetDeviceInstanceID(sdlevent.jdevice.which));
-				if (find_joystick(SDL_JoystickGetDeviceInstanceID(sdlevent.jdevice.which)))
+				auto const controller = find_joystick(SDL_JoystickGetDeviceInstanceID(event.jdevice.which));
+				if (find_joystick(SDL_JoystickGetDeviceInstanceID(event.jdevice.which)))
 				{
 					osd_printf_verbose(
 							"Game Controller: Got SDL joystick added event for reconnected game controller %s [ID %s]\n",
@@ -2074,10 +2486,10 @@ public:
 					break;
 				}
 
-				SDL_Joystick *const joy = SDL_JoystickOpen(sdlevent.jdevice.which);
+				SDL_Joystick *const joy = SDL_JoystickOpen(event.jdevice.which);
 				if (!joy)
 				{
-					osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", sdlevent.jdevice.which, SDL_GetError());
+					osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", event.jdevice.which, SDL_GetError());
 					break;
 				}
 
@@ -2107,14 +2519,14 @@ public:
 		case SDL_CONTROLLERDEVICEADDED:
 			if (m_initialized_game_controller)
 			{
-				SDL_GameController *const ctrl = SDL_GameControllerOpen(sdlevent.cdevice.which);
+				SDL_GameController *const ctrl = SDL_GameControllerOpen(event.cdevice.which);
 				if (!ctrl)
 				{
-					osd_printf_error("Game Controller: Could not open SDL game controller %d: %s.\n", sdlevent.cdevice.which, SDL_GetError());
+					osd_printf_error("Game Controller: Could not open SDL game controller %d: %s.\n", event.cdevice.which, SDL_GetError());
 					break;
 				}
 
-				SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(sdlevent.cdevice.which);
+				SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(event.cdevice.which);
 				char const *serial = nullptr;
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 				serial = SDL_GameControllerGetSerial(ctrl);
@@ -2137,12 +2549,12 @@ public:
 			break;
 
 		default:
-			dispatch_joystick_event(sdlevent);
+			dispatch_joystick_event(event);
 		}
 	}
 
 private:
-	sdl_game_controller_device *create_game_controller_device(running_machine &machine, int index, SDL_GameController *ctrl)
+	sdl_game_controller_device *create_game_controller_device(int index, SDL_GameController *ctrl)
 	{
 		// get basic info
 		char const *const name = SDL_GameControllerName(ctrl);
@@ -2157,15 +2569,6 @@ private:
 		std::string id(guid_str);
 		if (serial)
 			id.append(1, '-').append(serial);
-
-		// instantiate device
-		sdl_game_controller_device &devinfo = devicelist().create_device<sdl_game_controller_device>(
-				machine,
-				name ? name : guid_str,
-				guid_str,
-				*this,
-				ctrl,
-				serial);
 
 		// print some diagnostic info
 		osd_printf_verbose("Game Controller: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
@@ -2186,8 +2589,13 @@ private:
 			osd_printf_verbose("Game Controller:   ...  no mapping\n");
 		}
 
-		// let it add controls
-		devinfo.configure();
+		// instantiate device
+		sdl_game_controller_device &devinfo = create_device<sdl_game_controller_device>(
+				DEVICE_CLASS_JOYSTICK,
+				name ? name : guid_str,
+				guid_str,
+				ctrl,
+				serial);
 		return &devinfo;
 	}
 
@@ -2196,18 +2604,28 @@ private:
 
 } // anonymous namespace
 
+} // namespace osd
+
+
 #else // defined(SDLMAME_SDL2)
 
-#include "input_module.h"
+namespace osd {
+
+namespace {
 
 MODULE_NOT_SUPPORTED(sdl_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "sdl")
 MODULE_NOT_SUPPORTED(sdl_mouse_module, OSD_MOUSEINPUT_PROVIDER, "sdl")
 MODULE_NOT_SUPPORTED(sdl_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "sdljoy")
 MODULE_NOT_SUPPORTED(sdl_game_controller_module, OSD_JOYSTICKINPUT_PROVIDER, "sdlgame")
 
+} // anonymous namespace
+
+} // namespace osd
+
 #endif // defined(SDLMAME_SDL2)
 
-MODULE_DEFINITION(KEYBOARDINPUT_SDL, sdl_keyboard_module)
-MODULE_DEFINITION(MOUSEINPUT_SDL, sdl_mouse_module)
-MODULE_DEFINITION(JOYSTICKINPUT_SDLJOY, sdl_joystick_module)
-MODULE_DEFINITION(JOYSTICKINPUT_SDLGAME, sdl_game_controller_module)
+
+MODULE_DEFINITION(KEYBOARDINPUT_SDL, osd::sdl_keyboard_module)
+MODULE_DEFINITION(MOUSEINPUT_SDL, osd::sdl_mouse_module)
+MODULE_DEFINITION(JOYSTICKINPUT_SDLJOY, osd::sdl_joystick_module)
+MODULE_DEFINITION(JOYSTICKINPUT_SDLGAME, osd::sdl_game_controller_module)

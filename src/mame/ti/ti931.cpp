@@ -15,6 +15,9 @@
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class ti931_state : public driver_device
 {
 public:
@@ -139,6 +142,9 @@ ROM_START(ti931)
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD("2229199-2_xu1.bin", 0x0000, 0x0800, CRC(f76bb2bb) SHA1(57ec0392a2b5798eef43f0408347402c2941cee1)) // 01/29/85 CTE
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, ti931, 0, 0, ti931, ti931, ti931_state, empty_init, "Texas Instruments", "Model 931 Video Display Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 

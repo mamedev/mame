@@ -11,6 +11,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class icanguit_state : public spg2xx_game_state
 {
 public:
@@ -431,14 +433,14 @@ DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 
 	if (size < 0x800000)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
+		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -501,6 +503,8 @@ ROM_START( icanpian )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM, requires a cartridge
 ROM_END
+
+} // anonymous namespace
 
 
 // Fisher-Price games

@@ -16,6 +16,7 @@
 
 #include "bml3bus.h"
 #include "imagedev/floppy.h"
+#include "machine/input_merger.h"
 #include "machine/wd_fdc.h"
 
 
@@ -43,13 +44,11 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER(bml3_wd17xx_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 	required_device<mb8866_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<input_merger_device> m_nmigate;
 
 	uint8_t *m_rom;
 };

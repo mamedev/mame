@@ -79,10 +79,10 @@ void microdrive_image_device::device_start()
 	m_comms_out = 0;
 }
 
-image_init_result microdrive_image_device::call_load()
+std::error_condition microdrive_image_device::call_load()
 {
 	if (length() != MDV_IMAGE_LENGTH)
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 
 	// huh
 	for (int i = 0; i < MDV_IMAGE_LENGTH / 2; i++)
@@ -94,7 +94,7 @@ image_init_result microdrive_image_device::call_load()
 	m_bit_offset = 0;
 	m_byte_offset = 0;
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void microdrive_image_device::call_unload()

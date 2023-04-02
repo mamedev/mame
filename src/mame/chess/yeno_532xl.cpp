@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Lars Hjorth
+// thanks-to:Mr. Lars
 /******************************************************************************
 
 Yeno 532 XL
