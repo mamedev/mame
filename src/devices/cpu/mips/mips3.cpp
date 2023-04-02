@@ -243,7 +243,7 @@ void mips3_device::generate_exception(int exception, int backup)
 
     if (exception != 0)
     {
-        fprintf(stderr, "Exception: PC=%08X, PPC=%08X\n", m_core->pc, m_ppc);
+        fprintf(stderr, "Exception type %d: PC=%08X, PPC=%08X\n", exception, m_core->pc, m_ppc);
         machine().debug_break();
     }
 */
@@ -1159,6 +1159,12 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 	return true;
 }
 
+bool r4650_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	target_space = &space(spacenum);
+	return true;
+}
+
 std::unique_ptr<util::disasm_interface> mips3_device::create_disassembler()
 {
 	return std::make_unique<mips3_disassembler>();
@@ -1517,6 +1523,178 @@ inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t
 	}
 }
 
+inline bool r4650_device::RBYTE(offs_t address, uint32_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_byte)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_byte)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RHALF(offs_t address, uint32_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_word)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_word)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RWORD(offs_t address, uint32_t *result, bool insn)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_dword)(*m_program, address);
+		return true;
+	}
+
+	static const uint32_t BASE_INDICES[2] = { COP0_R4650_DBase, COP0_R4650_IBase };
+	static const uint32_t BOUND_INDICES[2] = { COP0_R4650_DBound, COP0_R4650_IBound };
+	const uint32_t base = m_core->cpr[0][BASE_INDICES[insn]];
+	const uint32_t bound = m_core->cpr[0][BOUND_INDICES[insn]];
+	if ((address & 0xfffff000) > bound)
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_dword)(*m_program, address + base);
+	return true;
+}
+
+inline bool r4650_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_dword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_dword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase], mem_mask);
+	return true;
+}
+
+inline bool r4650_device::RDOUBLE(offs_t address, uint64_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_qword)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_qword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_qword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_qword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase], mem_mask);
+	return true;
+}
+
+inline void r4650_device::WBYTE(offs_t address, uint8_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_byte)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_byte)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WHALF(offs_t address, uint16_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_word)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_word)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WWORD(offs_t address, uint32_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_dword)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_dword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_dword_masked)(*m_program, address, data, mem_mask);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_dword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
+}
+
+inline void r4650_device::WDOUBLE(offs_t address, uint64_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_qword)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_qword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_qword_masked)(*m_program, address, data, mem_mask);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_qword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
+}
+
 inline void r5900le_device::WBYTE(offs_t address, uint8_t data)
 {
 	if (address >= 0x70000000 && address < 0x70004000) (*m_memory.write_byte)(*m_program, address, data);
@@ -1711,6 +1889,32 @@ uint64_t mips3_device::get_cop0_reg(int idx)
 			return 47;
 	}
 	return m_core->cpr[0][idx];
+}
+
+void r4650_device::set_cop0_reg(int idx, uint64_t val)
+{
+	switch (idx)
+	{
+		case COP0_R4650_IBase:
+			m_core->cpr[0][idx] = val;
+			printf("R4650 IBase: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
+			break;
+		case COP0_R4650_IBound:
+			m_core->cpr[0][idx] = val;
+			printf("R4650 IBound: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
+			break;
+		case COP0_R4650_DBase:
+			m_core->cpr[0][idx] = val;
+			printf("R4650 DBase: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
+			break;
+		case COP0_R4650_DBound:
+			m_core->cpr[0][idx] = val;
+			printf("R4650 DBound: %08x%08x\n", (uint32_t)(val >> 32), (uint32_t)val);
+			break;
+		default:
+			mips3_device::set_cop0_reg(idx, val);
+			break;
+	}
 }
 
 void mips3_device::set_cop0_reg(int idx, uint64_t val)
