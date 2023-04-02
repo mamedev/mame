@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // ----------------------------------------------------------------------------
-// Copyright 2011-2022 Arm Limited
+// Copyright 2011-2023 Arm Limited
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -137,7 +137,7 @@ static constexpr unsigned int TUNE_MAX_TRIAL_CANDIDATES { 8 };
  *
  * This can be dynamically reduced by the compression quality preset.
  */
-static constexpr unsigned int TUNE_MAX_PARTITIIONING_CANDIDATES { 32 };
+static constexpr unsigned int TUNE_MAX_PARTITIONING_CANDIDATES { 32 };
 
 /**
  * @brief The maximum quant level using full angular endpoint search method.
@@ -154,9 +154,11 @@ static constexpr unsigned int TUNE_MAX_PARTITIIONING_CANDIDATES { 32 };
  */
 static constexpr unsigned int TUNE_MAX_ANGULAR_QUANT { 7 }; /* QUANT_12 */
 
-
 static_assert((BLOCK_MAX_TEXELS % ASTCENC_SIMD_WIDTH) == 0,
               "BLOCK_MAX_TEXELS must be multiple of ASTCENC_SIMD_WIDTH");
+
+static_assert(BLOCK_MAX_TEXELS <= 216,
+              "BLOCK_MAX_TEXELS must not be greater than 216");
 
 static_assert((BLOCK_MAX_WEIGHTS % ASTCENC_SIMD_WIDTH) == 0,
               "BLOCK_MAX_WEIGHTS must be multiple of ASTCENC_SIMD_WIDTH");
@@ -291,11 +293,13 @@ struct partition_lines3
 	/** @brief Post-processed line for correlated chroma, passing though the origin. */
 	processed_line3 samec_pline;
 
-	/** @brief The length of the line for uncorrelated chroma. */
-	float uncor_line_len;
-
-	/** @brief The length of the line for correlated chroma. */
-	float samec_line_len;
+	/**
+	 * @brief The length of the line for uncorrelated chroma.
+	 *
+	 * This is used for both the uncorrelated and same chroma lines - they are normally very similar
+	 * and only used for the relative ranking of partitionings against one another.
+	 */
+	float line_length;
 };
 
 /**
@@ -317,8 +321,8 @@ struct partition_info
 	/**
 	 * @brief The number of texels in each partition.
 	 *
-	 * Note that some seeds result in zero texels assigned to a partition are valid, but are skipped
-	 * by this compressor as there is no point spending bits encoding an unused color endpoint.
+	 * Note that some seeds result in zero texels assigned to a partition. These are valid, but are
+	 * skipped by this compressor as there is no point spending bits encoding an unused endpoints.
 	 */
 	uint8_t partition_texel_count[BLOCK_MAX_PARTITIONS];
 
@@ -360,38 +364,50 @@ struct decimation_info
 	/** @brief The number of stored weights in the Z dimension. */
 	uint8_t weight_z;
 
-	/** @brief The number of stored weights that contribute to each texel, between 1 and 4. */
+	/**
+	 * @brief The number of weights that contribute to each texel.
+	 * Value is between 1 and 4.
+	 */
 	uint8_t texel_weight_count[BLOCK_MAX_TEXELS];
 
-	/** @brief The weight index of the N weights that need to be interpolated for each texel. */
-	uint8_t texel_weights_4t[4][BLOCK_MAX_TEXELS];
+	/**
+	 * @brief The weight index of the N weights that are interpolated for each texel.
+	 * Stored transposed to improve vectorization.
+	 */
+	uint8_t texel_weights_tr[4][BLOCK_MAX_TEXELS];
 
-	/** @brief The bilinear interpolation weighting of the N input weights for each texel, between 0 and 16. */
-	uint8_t texel_weights_int_4t[4][BLOCK_MAX_TEXELS];
+	/**
+	 * @brief The bilinear contribution of the N weights that are interpolated for each texel.
+	 * Value is between 0 and 16, stored transposed to improve vectorization.
+	 */
+	uint8_t texel_weight_contribs_int_tr[4][BLOCK_MAX_TEXELS];
 
-	/** @brief The bilinear interpolation weighting of the N input weights for each texel, between 0 and 1. */
-	alignas(ASTCENC_VECALIGN) float texel_weights_float_4t[4][BLOCK_MAX_TEXELS];
+	/**
+	 * @brief The bilinear contribution of the N weights that are interpolated for each texel.
+	 * Value is between 0 and 1, stored transposed to improve vectorization.
+	 */
+	alignas(ASTCENC_VECALIGN) float texel_weight_contribs_float_tr[4][BLOCK_MAX_TEXELS];
 
 	/** @brief The number of texels that each stored weight contributes to. */
 	uint8_t weight_texel_count[BLOCK_MAX_WEIGHTS];
 
-	/** @brief The list of weights that contribute to each texel. */
-	uint8_t weight_texel[BLOCK_MAX_TEXELS][BLOCK_MAX_WEIGHTS];
-
-	/** @brief The list of weight indices that contribute to each texel. */
-	alignas(ASTCENC_VECALIGN) float weights_flt[BLOCK_MAX_TEXELS][BLOCK_MAX_WEIGHTS];
+	/**
+	 * @brief The list of texels that use a specific weight index.
+	 * Stored transposed to improve vectorization.
+	 */
+	uint8_t weight_texels_tr[BLOCK_MAX_TEXELS][BLOCK_MAX_WEIGHTS];
 
 	/**
-	 * @brief Folded structure for faster access:
-	 *     texel_weights_texel[i][j][.] = texel_weights[.][weight_texel[i][j]]
+	 * @brief The bilinear contribution to the N texels that use each weight.
+	 * Value is between 0 and 1, stored transposed to improve vectorization.
 	 */
-	uint8_t texel_weights_texel[BLOCK_MAX_WEIGHTS][BLOCK_MAX_TEXELS][4];
+	alignas(ASTCENC_VECALIGN) float weights_texel_contribs_tr[BLOCK_MAX_TEXELS][BLOCK_MAX_WEIGHTS];
 
 	/**
-	 * @brief Folded structure for faster access:
-	 *     texel_weights_float_texel[i][j][.] = texel_weights_float[.][weight_texel[i][j]]
+	 * @brief The bilinear contribution to the Nth texel that uses each weight.
+	 * Value is between 0 and 1, stored transposed to improve vectorization.
 	 */
-	float texel_weights_float_texel[BLOCK_MAX_WEIGHTS][BLOCK_MAX_TEXELS][4];
+	float texel_contrib_for_weight[BLOCK_MAX_TEXELS][BLOCK_MAX_WEIGHTS];
 };
 
 /**
@@ -441,23 +457,23 @@ struct decimation_mode
 	 *
 	 * Bit 0 = QUANT_2, Bit 1 = QUANT_3, etc.
 	 */
-	uint16_t refprec_1_plane;
+	uint16_t refprec_1plane;
 
 	/**
 	 * @brief Bitvector indicating weight quant methods used by active 2 plane block modes.
 	 *
 	 * Bit 0 = QUANT_2, Bit 1 = QUANT_3, etc.
 	 */
-	uint16_t refprec_2_planes;
+	uint16_t refprec_2planes;
 
 	/**
 	 * @brief Set a 1 plane weight quant as active.
 	 *
 	 * @param weight_quant   The quant method to set.
 	 */
-	void set_ref_1_plane(quant_method weight_quant)
+	void set_ref_1plane(quant_method weight_quant)
 	{
-		refprec_1_plane |= (1 << weight_quant);
+		refprec_1plane |= (1 << weight_quant);
 	}
 
 	/**
@@ -465,10 +481,10 @@ struct decimation_mode
 	 *
 	 * @param max_weight_quant   The max quant method to test.
 	 */
-	bool is_ref_1_plane(quant_method max_weight_quant) const
+	bool is_ref_1plane(quant_method max_weight_quant) const
 	{
 		uint16_t mask = static_cast<uint16_t>((1 << (max_weight_quant + 1)) - 1);
-		return (refprec_1_plane & mask) != 0;
+		return (refprec_1plane & mask) != 0;
 	}
 
 	/**
@@ -476,9 +492,9 @@ struct decimation_mode
 	 *
 	 * @param weight_quant   The quant method to set.
 	 */
-	void set_ref_2_plane(quant_method weight_quant)
+	void set_ref_2plane(quant_method weight_quant)
 	{
-		refprec_2_planes |= static_cast<uint16_t>(1 << weight_quant);
+		refprec_2planes |= static_cast<uint16_t>(1 << weight_quant);
 	}
 
 	/**
@@ -486,10 +502,10 @@ struct decimation_mode
 	 *
 	 * @param max_weight_quant   The max quant method to test.
 	 */
-	bool is_ref_2_plane(quant_method max_weight_quant) const
+	bool is_ref_2plane(quant_method max_weight_quant) const
 	{
 		uint16_t mask = static_cast<uint16_t>((1 << (max_weight_quant + 1)) - 1);
-		return (refprec_2_planes & mask) != 0;
+		return (refprec_2planes & mask) != 0;
 	}
 };
 
@@ -1322,9 +1338,14 @@ bool is_legal_3d_block_size(
  * Converts unquant value in 0-255 range into quant value in 0-255 range.
  * No BISE scrambling is applied at this stage.
  *
- * Indexed by [quant_mode - 4][data_value].
+ * The BISE encoding results in ties where available quant<256> values are
+ * equidistant the available quant<BISE> values. This table stores two values
+ * for each input - one for use with a negative residual, and one for use with
+ * a positive residual.
+ *
+ * Indexed by [quant_mode - 4][data_value * 2 + residual].
  */
-extern const uint8_t color_unquant_to_uquant_tables[17][256];
+extern const uint8_t color_unquant_to_uquant_tables[17][512];
 
 /**
  * @brief The precomputed table for packing quantized color values.
@@ -1514,8 +1535,7 @@ void compute_error_squared_rgb(
  * @param      blk             The image block color data to be compressed.
  * @param      uncor_plines    Processed uncorrelated partition lines for each partition.
  * @param      samec_plines    Processed same chroma partition lines for each partition.
- * @param[out] uncor_lengths   The length of each components deviation from the line.
- * @param[out] samec_lengths   The length of each components deviation from the line.
+ * @param[out] line_lengths    The length of each components deviation from the line.
  * @param[out] uncor_error     The cumulative error for using the uncorrelated line.
  * @param[out] samec_error     The cumulative error for using the same chroma line.
  */
@@ -1524,8 +1544,7 @@ void compute_error_squared_rgba(
 	const image_block& blk,
 	const processed_line4 uncor_plines[BLOCK_MAX_PARTITIONS],
 	const processed_line4 samec_plines[BLOCK_MAX_PARTITIONS],
-	float uncor_lengths[BLOCK_MAX_PARTITIONS],
-	float samec_lengths[BLOCK_MAX_PARTITIONS],
+	float line_lengths[BLOCK_MAX_PARTITIONS],
 	float& uncor_error,
 	float& samec_error);
 
@@ -1551,7 +1570,7 @@ unsigned int find_best_partition_candidates(
 	const image_block& blk,
 	unsigned int partition_count,
 	unsigned int partition_search_limit,
-	unsigned int best_partitions[TUNE_MAX_PARTITIIONING_CANDIDATES],
+	unsigned int best_partitions[TUNE_MAX_PARTITIONING_CANDIDATES],
 	unsigned int requested_candidates);
 
 /* ============================================================================
@@ -2106,34 +2125,6 @@ void physical_to_symbolic(
 /* ============================================================================
 Platform-specific functions.
 ============================================================================ */
-/**
- * @brief Run-time detection if the host CPU supports the POPCNT extension.
- *
- * @return @c true if supported, @c false if not.
- */
-bool cpu_supports_popcnt();
-
-/**
- * @brief Run-time detection if the host CPU supports F16C extension.
- *
- * @return @c true if supported, @c false if not.
- */
-bool cpu_supports_f16c();
-
-/**
- * @brief Run-time detection if the host CPU supports SSE 4.1 extension.
- *
- * @return @c true if supported, @c false if not.
- */
-bool cpu_supports_sse41();
-
-/**
- * @brief Run-time detection if the host CPU supports AVX 2 extension.
- *
- * @return @c true if supported, @c false if not.
- */
-bool cpu_supports_avx2();
-
 /**
  * @brief Allocate an aligned memory buffer.
  *
