@@ -326,7 +326,7 @@ u16 wantgman_state::input_r()
 	return read_inputs(6) & 0x8000;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( wantgman )
 	PORT_START("IN.0") // D1 line D15
@@ -347,6 +347,8 @@ static INPUT_PORTS_START( wantgman )
 	PORT_START("IN.5") // D6 line D15
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Demo")
 INPUT_PORTS_END
+
+// config
 
 void wantgman_state::wantgman(machine_config &config)
 {
@@ -441,7 +443,7 @@ u8 bambball_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bambball )
 	PORT_START("IN.0") // D7 port R0x
@@ -469,6 +471,8 @@ static INPUT_PORTS_START( bambball )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void bambball_state::bambball(machine_config &config)
 {
@@ -568,7 +572,7 @@ u8 bmboxing_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -616,6 +620,8 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bmboxing_state::bmboxing(machine_config &config)
 {
@@ -726,7 +732,7 @@ void bfriskyt_state::update_int1()
 	set_interrupt(1, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bfriskyt )
 	PORT_START("IN.0") // D11 INT1
@@ -747,6 +753,8 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_START("IN.5") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void bfriskyt_state::bfriskyt(machine_config &config)
 {
@@ -849,7 +857,7 @@ u16 packmon_state::input_r()
 	return read_inputs(5) & 0x20;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( packmon )
 	PORT_START("IN.0") // D11 line D5
@@ -867,6 +875,8 @@ static INPUT_PORTS_START( packmon )
 	PORT_START("IN.4") // D15 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
+
+// config
 
 void packmon_state::packmon(machine_config &config)
 {
@@ -973,7 +983,7 @@ void bzaxxon_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bzaxxon )
 	PORT_START("IN.0") // D7 INT1
@@ -995,6 +1005,8 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0xfff7, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bzaxxon_state::bzaxxon(machine_config &config)
 {
@@ -1105,7 +1117,7 @@ void zackman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( zackman )
 	PORT_START("IN.0") // D11 INT0
@@ -1123,6 +1135,8 @@ static INPUT_PORTS_START( zackman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void zackman_state::zackman(machine_config &config)
 {
@@ -1231,7 +1245,7 @@ void bpengo_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bpengo )
 	PORT_START("IN.0") // D12 INT0
@@ -1255,6 +1269,8 @@ static INPUT_PORTS_START( bpengo )
 	PORT_CONFSETTING(      0x0800, DEF_STR( On ) )
 	PORT_BIT( 0xf7ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bpengo_state::bpengo(machine_config &config)
 {
@@ -1364,7 +1380,7 @@ void bbtime_state::update_int0()
 	set_interrupt(0, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bbtime )
 	PORT_START("IN.0") // D10 INT0
@@ -1385,6 +1401,8 @@ static INPUT_PORTS_START( bbtime )
 	PORT_START("IN.5") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void bbtime_state::bbtime(machine_config &config)
 {
@@ -1473,7 +1491,7 @@ void ktparman_state::grid_w(u16 data)
 	plate_w(4, data & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktparman )
 	PORT_START("IN.0") // port D
@@ -1485,6 +1503,8 @@ static INPUT_PORTS_START( ktparman )
 	PORT_START("IN.1") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void ktparman_state::ktparman(machine_config &config)
 {
@@ -1568,7 +1588,7 @@ void bdoramon_state::grid_w(u16 data)
 	plate_w(4, data & 0xf);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bdoramon )
 	PORT_START("IN.0") // INT0
@@ -1589,6 +1609,8 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void bdoramon_state::bdoramon(machine_config &config)
 {
@@ -1686,7 +1708,7 @@ u16 tkjmaru_state::input_r()
 	return read_inputs(4) | m_inputs[4]->read();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkjmaru )
 	PORT_START("IN.0") // D4 line D3
@@ -1707,6 +1729,8 @@ static INPUT_PORTS_START( tkjmaru )
 	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
 	PORT_CONFSETTING(     0x200, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void tkjmaru_state::tkjmaru(machine_config &config)
 {
@@ -1790,7 +1814,7 @@ void bultrman_state::grid_w(u16 data)
 	plate_w(4, data & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bultrman )
 	PORT_START("IN.0") // INT0
@@ -1804,6 +1828,8 @@ static INPUT_PORTS_START( bultrman )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bultrman_state::bultrman(machine_config &config)
 {
@@ -1913,7 +1939,7 @@ void ggdman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ggdman )
 	PORT_START("IN.0") // D6 INT0
@@ -1931,6 +1957,8 @@ static INPUT_PORTS_START( ggdman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void ggdman_state::ggdman(machine_config &config)
 {
@@ -2017,7 +2045,7 @@ void machiman_state::grid_w(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( machiman )
 	PORT_START("IN.0") // INT0
@@ -2028,6 +2056,8 @@ static INPUT_PORTS_START( machiman )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
+
+// config
 
 void machiman_state::machiman(machine_config &config)
 {
@@ -2168,7 +2198,7 @@ void pairmtch_state::speaker_w(u16 data)
 	m_maincpu->set_input_line(0, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pairmtch )
 	PORT_START("IN.0") // D10 port R4x
@@ -2198,6 +2228,8 @@ static INPUT_PORTS_START( pairmtch )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x86bf, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void pairmtch_state::pairmtch(machine_config &config)
 {
@@ -2306,7 +2338,7 @@ u16 alnattck_state::input_r()
 	return read_inputs(7) & 0x20;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.0") // D7 line D5
@@ -2332,6 +2364,8 @@ static INPUT_PORTS_START( alnattck )
 	PORT_START("IN.6") // D13 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
+
+// config
 
 void alnattck_state::alnattck(machine_config &config)
 {
@@ -2458,7 +2492,7 @@ void cdkong_state::grid_w(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cdkong )
 	PORT_START("IN.0") // INT0
@@ -2471,6 +2505,8 @@ static INPUT_PORTS_START( cdkong )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cdkong_state::cdkong(machine_config &config)
 {
@@ -2596,7 +2632,7 @@ u8 cgalaxn_state::input_r()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cgalaxn )
 	PORT_START("IN.0") // R10 port R0x
@@ -2617,6 +2653,8 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void cgalaxn_state::cgalaxn(machine_config &config)
 {
@@ -2726,7 +2764,7 @@ u8 cpacman_state::input_r()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
@@ -2747,6 +2785,8 @@ static INPUT_PORTS_START( cpacman )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 INPUT_PORTS_END
+
+// config
 
 void cpacman_state::cpacman(machine_config &config)
 {
@@ -2863,7 +2903,7 @@ u8 cmspacmn_state::input_r()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
@@ -2884,6 +2924,8 @@ static INPUT_PORTS_START( cmspacmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 INPUT_PORTS_END
+
+// config
 
 void cmspacmn_state::cmspacmn(machine_config &config)
 {
@@ -2989,7 +3031,7 @@ u8 egalaxn2_state::input_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( egalaxn2 )
 	PORT_START("IN.0") // D1 port R0x
@@ -3020,6 +3062,8 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
+
+// config
 
 void egalaxn2_state::egalaxn2(machine_config &config)
 {
@@ -3085,7 +3129,7 @@ public:
 
 // handlers are identical to Galaxian 2, so we can use those
 
-// config
+// inputs
 
 static INPUT_PORTS_START( epacman2 )
 	PORT_START("IN.0") // D1 port R0x
@@ -3116,6 +3160,8 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void epacman2_state::epacman2(machine_config &config)
 {
@@ -3215,7 +3261,7 @@ u16 einvader2_state::input_r()
 	return read_inputs(3) << 13;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( einvader2 )
 	PORT_START("IN.0") // D3
@@ -3238,6 +3284,8 @@ static INPUT_PORTS_START( einvader2 )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 INPUT_PORTS_END
+
+// config
 
 void einvader2_state::einvader2(machine_config &config)
 {
@@ -3410,7 +3458,7 @@ u8 eturtles_state::cop_ack_r()
 	return m_d & 1;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( eturtles )
 	PORT_START("IN.0") // D1 INT0/1
@@ -3444,6 +3492,8 @@ static INPUT_PORTS_START( eturtles )
 	PORT_START("IN.6")
 	PORT_ADJUSTER(50, "Game Speed") PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, game_speed, 0)
 INPUT_PORTS_END
+
+// config
 
 void eturtles_state::eturtles(machine_config &config)
 {
@@ -3549,7 +3599,7 @@ void estargte_state::cop_vol_w(u8 data)
 	m_volume->flt_volume_set_volume(((data & 7) | 8) / 15.0);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( estargte )
 	PORT_INCLUDE( eturtles )
@@ -3582,6 +3632,8 @@ static INPUT_PORTS_START( estargte )
 	PORT_MODIFY("IN.5") // D6 INT0/1
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void estargte_state::estargte(machine_config &config)
 {
@@ -3697,7 +3749,7 @@ u16 ghalien_state::input_r()
 	return read_inputs(7) & 0x8000;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ghalien )
 	PORT_START("IN.0") // D0 line D15
@@ -3723,6 +3775,8 @@ static INPUT_PORTS_START( ghalien )
 	PORT_CONFSETTING(      0x0000, "1" ) // AMA
 	PORT_CONFSETTING(      0x8000, "2" ) // PRO
 INPUT_PORTS_END
+
+// config
 
 void ghalien_state::ghalien(machine_config &config)
 {
@@ -3831,7 +3885,7 @@ void gckong_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gckong )
 	PORT_START("IN.0") // D5 INT1
@@ -3855,6 +3909,8 @@ static INPUT_PORTS_START( gckong )
 	PORT_CONFSETTING(      0x0010, "B" )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gckong_state::gckong(machine_config &config)
 {
@@ -3969,7 +4025,7 @@ void gscobra_state::update_int0()
 	set_interrupt(0, read_inputs(6));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gscobra )
 	PORT_START("IN.0") // D10 INT0
@@ -3990,6 +4046,8 @@ static INPUT_PORTS_START( gscobra )
 	PORT_START("IN.5") // D15 INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
 INPUT_PORTS_END
+
+// config
 
 void gscobra_state::gscobra(machine_config &config)
 {
@@ -4106,7 +4164,7 @@ void gdefender_state::update_int1()
 	set_interrupt(1, read_inputs(4) & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gdefender )
 	PORT_START("IN.0") // D11 INT1/D1
@@ -4125,6 +4183,8 @@ static INPUT_PORTS_START( gdefender )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdefender_state, input_changed, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gdefender_state::gdefender(machine_config &config)
 {
@@ -4229,7 +4289,7 @@ void gdigdug_state::update_int1()
 	set_interrupt(1, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gdigdug )
 	PORT_START("IN.0") // D11 INT1
@@ -4250,6 +4310,8 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_START("IN.5") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void gdigdug_state::gdigdug(machine_config &config)
 {
@@ -4360,7 +4422,7 @@ u8 mwcbaseb_state::input_r()
 	return read_inputs(7);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -4422,6 +4484,8 @@ static INPUT_PORTS_START( mwcbaseb ) // P1 = left/visitor, P2 = right/home
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
 INPUT_PORTS_END
+
+// config
 
 void mwcbaseb_state::mwcbaseb(machine_config &config)
 {
@@ -4542,7 +4606,7 @@ void msthawk_state::update_int0()
 	set_interrupt(0, read_inputs(6));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( msthawk )
 	PORT_START("IN.0") // D10 INT0
@@ -4566,6 +4630,8 @@ static INPUT_PORTS_START( msthawk )
 	PORT_START("IN.6") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1) PORT_NAME("Fire")
 INPUT_PORTS_END
+
+// config
 
 void msthawk_state::msthawk(machine_config &config)
 {
@@ -4653,7 +4719,7 @@ void pbqbert_state::grid_w(u16 data)
 	plate_w(7, data >> 8 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pbqbert )
 	PORT_START("IN.0") // port D
@@ -4663,6 +4729,8 @@ static INPUT_PORTS_START( pbqbert )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) // down-left
 	PORT_BIT( 0xe1ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void pbqbert_state::pbqbert(machine_config &config)
 {
@@ -4759,7 +4827,7 @@ void puckimon_state::plate_w(u16 data)
 
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( puckimon )
 	PORT_START("IN.0") // port R0x
@@ -4768,6 +4836,8 @@ static INPUT_PORTS_START( puckimon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
+
+// config
 
 void puckimon_state::puckimon(machine_config &config)
 {
@@ -4872,7 +4942,7 @@ void tmtron_state::update_int1()
 	set_interrupt(1, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.0") // D12 INT1
@@ -4890,6 +4960,8 @@ static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.4") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void tmtron_state::tmtron(machine_config &config)
 {
@@ -5002,7 +5074,7 @@ void kingman_state::update_int0()
 	set_interrupt(0, read_inputs(4));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kingman )
 	PORT_START("IN.0") // D12 INT0
@@ -5020,6 +5092,8 @@ static INPUT_PORTS_START( kingman )
 	PORT_START("IN.4") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, 1)
 INPUT_PORTS_END
+
+// config
 
 void kingman_state::kingman(machine_config &config)
 {
@@ -5127,7 +5201,7 @@ void bombman_state::update_int0()
 	set_interrupt(0, read_inputs(5));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bombman )
 	PORT_START("IN.0") // D11 INT0
@@ -5145,6 +5219,8 @@ static INPUT_PORTS_START( bombman )
 	PORT_START("IN.4") // D15 INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, bombman_state, input_changed, 0)
 INPUT_PORTS_END
+
+// config
 
 void bombman_state::bombman(machine_config &config)
 {
@@ -5232,7 +5308,7 @@ void vinvader_state::grid_w(u16 data)
 	plate_w(3 + 1, data >> 4 & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( vinvader )
 	PORT_START("IN.0") // port R0x
@@ -5247,6 +5323,8 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void vinvader_state::vinvader(machine_config &config)
 {

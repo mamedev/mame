@@ -30,7 +30,6 @@
         * Graphical Glitches caused by incorrect timing?
           - Some raster effects are imperfect (off by a couple of lines)
         * 68000 waitstates on ROM region access, determined by jumpers on cart
-          (garou train stage 3 background bug is probably related to this)
         * AES Input clock is incorrect (24.167829MHz for NTSC systems, PAL is same?)
         * PAL region AES behavior is not verified
 

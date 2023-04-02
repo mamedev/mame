@@ -2125,14 +2125,14 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
-GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
 
 // MEM(N)
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING ) // broken decrypter?
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

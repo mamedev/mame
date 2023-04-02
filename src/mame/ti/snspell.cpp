@@ -121,6 +121,27 @@ Italian:
 
 ================================================================================
 
+Speak & Math:
+
+Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
+- MCU: CD2704, label CD2704B-N2L (die label: TMC0270F, 2704B) - 2nd revision?(mid-1982)
+- TMS51xx: CD2801
+- VSM(1/2): 16KB CD2392
+- VSM(2/2): 16KB CD2393
+- VFD: Futaba 9SY -02Z 7E
+- notes: As with the Speak & Spell, the voice actor was a radio announcer.
+  However, the phrase "is greater than or less than" had to be added by one
+  of the TI employees in a hurry, the day before a demo. Apparently QA
+  never found out and it ended up in the final product.
+
+Speak & Math (US), 1984
+- MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
+- TMS51xx: CD2801
+- VSM(1/2): 16KB CD2381
+- VSM(2/2): 4KB CD2614
+
+================================================================================
+
 Speak & Read:
 
 Speak & Read (US), 1980
@@ -141,27 +162,6 @@ English:
 - On the Track: VSM: 16KB CD3538
 - The Third Circle: VSM: 16KB CD3539
 - The Millionth Knight: VSM: 16KB CD3540
-
-================================================================================
-
-Speak & Math:
-
-Speak & Math (US), 1980 (renamed to "Speak & Maths" in UK, but is the same product)
-- MCU: CD2704, label CD2704B-N2L (die label: TMC0270F, 2704B) - 2nd revision?(mid-1982)
-- TMS51xx: CD2801
-- VSM(1/2): 16KB CD2392
-- VSM(2/2): 16KB CD2393
-- VFD: Futaba 9SY -02Z 7E
-- notes: As with the Speak & Spell, the voice actor was a radio announcer.
-  However, the phrase "is greater than or less than" had to be added by one
-  of the TI employees in a hurry, the day before a demo. Apparently QA
-  never found out and it ended up in the final product.
-
-Speak & Math (US), 1984
-- MCU: CD2708, label CD2708N2L (die label: TMC0270F, 2708A)
-- TMS51xx: CD2801
-- VSM(1/2): 16KB CD2381
-- VSM(2/2): 4KB CD2614
 
 ================================================================================
 
@@ -820,18 +820,6 @@ void snspell_state::snspellsp(machine_config &config)
 }
 
 
-void snspell_state::snread(machine_config &config)
-{
-	sns_cd2801(config);
-
-	config.set_default_layout(layout_snread);
-
-	// cartridge
-	m_cart->set_interface("snread");
-	m_softlist->set_original("snread");
-}
-
-
 void snspell_state::snmath(machine_config &config)
 {
 	sns_cd2801(config);
@@ -844,6 +832,18 @@ void snspell_state::snmath(machine_config &config)
 	// no cartridge
 	config.device_remove("cartslot");
 	config.device_remove("cart_list");
+}
+
+
+void snspell_state::snread(machine_config &config)
+{
+	sns_cd2801(config);
+
+	config.set_default_layout(layout_snread);
+
+	// cartridge
+	m_cart->set_interface("snread");
+	m_softlist->set_original("snread");
 }
 
 

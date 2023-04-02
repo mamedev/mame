@@ -17,12 +17,21 @@ adds moving obstacles. The 3rd game in the series, Space Micon Kit, adds a 2nd
 row of bricks.
 
 Hardware notes:
+
+Micon-Kit (1/2):
+- 2 PCBs: one with CPU and video hardware, one with RAM, ROM, PPI
 - NEC D8080A-C, 18.432MHz XTAL, NEC uPB8224C (/9 divider)
 - NEC uPB8228C, NEC D8255C
 - 4KB ROM (4*MB8518), 256 bytes RAM (2*D2111AL-4)
 - 4KB VRAM (32*MB8102), 1bpp video with color overlay
 - video timing: 10MHz XTAL, h/v: ?
 - beeper
+
+Space Micon Kit:
+- PCB label: OKAYA ELECTRIC IND.CO.,LTD., SHIN NIHON KIKAKU
+- 5KB ROM (room for 8KB), 1KB RAM (2*TMM314APL)
+- 4KB VRAM (8*TMM314APL)
+- same CPU/divider/PPI but Mitsubishi brand, rest is same as above
 
 TODO:
 - correct video timing, maybe 10MHz / 2 / (262*320)
@@ -302,11 +311,11 @@ ROM_END
 
 ROM_START( smiconk )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "1.1a",         0x000000, 0x000400, CRC(927dfbb8) SHA1(a73e7352ddcc3409701a9037ac32868c1a2592bd) )
-	ROM_LOAD( "2.1b",         0x000400, 0x000400, CRC(1d0f1474) SHA1(2ead9a60ef1770f8704fff951caba31ad06a38c7) )
-	ROM_LOAD( "3.1c",         0x000800, 0x000400, CRC(b89cb388) SHA1(6ec6af0c4e809e8b0b9544eb7007a3e483f921f2) )
-	ROM_LOAD( "4.1d",         0x000c00, 0x000400, CRC(a5897e6e) SHA1(5ecc65bfbecb6e1b10d272693309be827fdb3ef7) )
-	ROM_LOAD( "5.1e",         0x001000, 0x000400, CRC(98db7810) SHA1(32d6b828bb22145ae1b4e70d6f69baba1d5aad6b) )
+	ROM_LOAD( "1.1a", 0x0000, 0x0400, CRC(927dfbb8) SHA1(a73e7352ddcc3409701a9037ac32868c1a2592bd) )
+	ROM_LOAD( "2.1b", 0x0400, 0x0400, CRC(1d0f1474) SHA1(2ead9a60ef1770f8704fff951caba31ad06a38c7) )
+	ROM_LOAD( "3.1c", 0x0800, 0x0400, CRC(b89cb388) SHA1(6ec6af0c4e809e8b0b9544eb7007a3e483f921f2) )
+	ROM_LOAD( "4.1d", 0x0c00, 0x0400, CRC(a5897e6e) SHA1(5ecc65bfbecb6e1b10d272693309be827fdb3ef7) )
+	ROM_LOAD( "5.1e", 0x1000, 0x0400, CRC(98db7810) SHA1(32d6b828bb22145ae1b4e70d6f69baba1d5aad6b) )
 ROM_END
 
 } // anonymous namespace
@@ -319,4 +328,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
 GAMEL(1978, micon2,  0,      micon2,  micon2,  miconkit_state, empty_init, ROT90,  "SNK", "Micon-Kit Part II", MACHINE_SUPPORTS_SAVE, layout_micon2 )
-GAMEL(1978, smiconk, 0,      smiconk, smiconk, miconkit_state, empty_init, ROT90,  "SNK", "Space Micon Kit", MACHINE_SUPPORTS_SAVE, layout_micon2 )
+GAME (1978, smiconk, 0,      smiconk, smiconk, miconkit_state, empty_init, ROT90,  "SNK", "Space Micon Kit", MACHINE_SUPPORTS_SAVE ) // no color overlay

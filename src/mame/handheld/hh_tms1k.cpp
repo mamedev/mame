@@ -113,7 +113,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
  *MP1359   TMS1100   1985, Capsela CRC2000
- *MP1362   TMS1100   1985, Technasonic Weight Talker (have dump)
+ @MP1362   TMS1100   1985, Technasonic Weight Talker
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
  @MP1801   TMS1700   1981, Tiger Ditto/Tandy Pocket Repeat (model 60-2152)
@@ -129,7 +129,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
- *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
+ @MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1978, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3228   TMS1000   1979, Texas Instruments OEM melody chip
@@ -214,15 +214,13 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cpu/tms1000/tms1000c.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"
-#include "cpu/tms1000/tms2100.h"
 #include "cpu/tms1000/tms2400.h"
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
-#include "cpu/tms1000/tms0270.h"
-#include "cpu/tms1000/tp0320.h"
 #include "machine/clock.h"
 #include "machine/ds8874.h"
 #include "machine/netlist.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
@@ -291,6 +289,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "horseran.lh"
+#include "litelrn.lh" // clickable
 #include "liveafb.lh"
 #include "lostreas.lh" // clickable
 #include "matchnum.lh" // clickable
@@ -570,7 +569,7 @@ u8 matchnum_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( matchnum )
 	PORT_START("IN.0") // R3
@@ -610,6 +609,8 @@ static INPUT_PORTS_START( matchnum )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Square 1")
 INPUT_PORTS_END
+
+// config
 
 void matchnum_state::matchnum(machine_config &config)
 {
@@ -712,7 +713,7 @@ u8 arrball_state::read_k()
 	return read_inputs(1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( arrball )
 	PORT_START("IN.0") // R8
@@ -723,6 +724,8 @@ static INPUT_PORTS_START( arrball )
 	PORT_CONFSETTING(    0x00, "Slow" )
 	PORT_CONFSETTING(    0x08, "Fast" )
 INPUT_PORTS_END
+
+// config
 
 void arrball_state::arrball(machine_config &config)
 {
@@ -835,7 +838,7 @@ u8 mathmagi_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -883,6 +886,8 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 // output PLA is not decapped, this was made by hand
 static const u16 mathmagi_output_pla[0x20] =
@@ -1003,7 +1008,7 @@ u8 bcheetah_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bcheetah )
 	PORT_START("IN.0") // R0
@@ -1032,6 +1037,8 @@ static INPUT_PORTS_START( bcheetah )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 INPUT_PORTS_END
+
+// config
 
 void bcheetah_state::bcheetah(machine_config &config)
 {
@@ -1126,7 +1133,7 @@ u8 racetime_state::read_k()
 	return read_inputs(1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( racetime )
 	PORT_START("IN.0") // R7
@@ -1135,6 +1142,8 @@ static INPUT_PORTS_START( racetime )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void racetime_state::racetime(machine_config &config)
 {
@@ -1234,7 +1243,7 @@ u8 tc7atc_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tc7atc )
 	PORT_START("IN.0") // R0
@@ -1267,6 +1276,8 @@ static INPUT_PORTS_START( tc7atc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("40%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_NAME("80%")
 INPUT_PORTS_END
+
+// config
 
 void tc7atc_state::tc7atc(machine_config &config)
 {
@@ -1368,7 +1379,7 @@ u8 palmf31_state::read_k()
 	return data;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( palmf31 )
 	PORT_START("IN.0") // R0
@@ -1438,6 +1449,8 @@ static INPUT_PORTS_START( palmf31 )
 	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
 	PORT_CONFSETTING(     0x100, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void palmf31_state::palmf31(machine_config &config)
 {
@@ -1532,7 +1545,7 @@ u8 palmmd8_state::read_k()
 	return read_inputs(11);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( palmmd8 )
 	PORT_START("IN.0") // R0
@@ -1606,6 +1619,8 @@ static INPUT_PORTS_START( palmmd8 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void palmmd8_state::palmmd8(machine_config &config)
 {
@@ -1749,7 +1764,7 @@ u8 cchime_state::read_k()
 	return inp;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cchime )
 	PORT_START("IN.0") // R0-R7
@@ -1779,6 +1794,8 @@ static INPUT_PORTS_START( cchime )
 	PORT_START("IN.4")
 	PORT_ADJUSTER(50, "Tone Knob")
 INPUT_PORTS_END
+
+// config
 
 void cchime_state::cchime(machine_config &config)
 {
@@ -1883,7 +1900,7 @@ u8 amaztron_state::read_k()
 	return k & 0xf;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( amaztron )
 	PORT_START("IN.0") // R0
@@ -1926,6 +1943,8 @@ static INPUT_PORTS_START( amaztron )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Game Start")
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void amaztron_state::amaztron(machine_config &config)
 {
@@ -2023,7 +2042,7 @@ u8 zodiac_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 /* The physical button layout and labels are like this:
 
@@ -2082,6 +2101,8 @@ static INPUT_PORTS_START( zodiac )
 	PORT_CONFSETTING(    0x00, "Answer" )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void zodiac_state::zodiac(machine_config &config)
 {
@@ -2187,7 +2208,7 @@ u8 cqback_state::read_k()
 	return read_rotated_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cqback )
 	PORT_START("IN.0") // K1
@@ -2211,6 +2232,8 @@ static INPUT_PORTS_START( cqback )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) ) // TP1-TP2
 INPUT_PORTS_END
+
+// config
 
 void cqback_state::cqback(machine_config &config)
 {
@@ -2313,7 +2336,7 @@ u8 h2hfootb_state::read_k()
 	return read_rotated_inputs(9);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( h2hfootb )
 	PORT_START("IN.0") // K1
@@ -2341,6 +2364,8 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void h2hfootb_state::h2hfootb(machine_config &config)
 {
@@ -2482,7 +2507,7 @@ u8 h2hbaskb_state::read_k()
 	return (read_inputs(4) & 7) | cap_state;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( h2hbaskb )
 	PORT_START("IN.0") // R0
@@ -2517,6 +2542,8 @@ static INPUT_PORTS_START( h2hhockey )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Right")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Goalie Left")
 INPUT_PORTS_END
+
+// config
 
 void h2hbaskb_state::h2hbaskb(machine_config &config)
 {
@@ -2654,7 +2681,7 @@ u8 h2hbaseb_state::read_k()
 	return m_inputs[4]->read() | read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( h2hbaseb )
 	PORT_START("IN.0") // R4
@@ -2684,6 +2711,8 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
+
+// config
 
 void h2hbaseb_state::h2hbaseb(machine_config &config)
 {
@@ -2780,7 +2809,7 @@ u8 h2hboxing_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( h2hboxing )
 	PORT_START("IN.0") // R0
@@ -2811,6 +2840,8 @@ static INPUT_PORTS_START( h2hboxing )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Punch")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Block")
 INPUT_PORTS_END
+
+// config
 
 void h2hboxing_state::h2hboxing(machine_config &config)
 {
@@ -2961,7 +2992,7 @@ u8 quizwizc_state::read_k()
 	return read_inputs(6) | ((m_r & m_pinout) ? 1 : 0);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( quizwizc )
 	PORT_START("IN.0") // R0
@@ -3000,6 +3031,8 @@ static INPUT_PORTS_START( quizwizc )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void quizwizc_state::quizwizc(machine_config &config)
 {
@@ -3149,7 +3182,7 @@ u8 tc4_state::read_k()
 	return read_inputs(6) | ((m_r & 0x200) ? m_pinout : 0);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tc4 )
 	PORT_START("IN.0") // R0
@@ -3188,6 +3221,8 @@ static INPUT_PORTS_START( tc4 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Pass/Shoot Button 2") // middle
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D/K Button")
 INPUT_PORTS_END
+
+// config
 
 void tc4_state::tc4(machine_config &config)
 {
@@ -3234,8 +3269,160 @@ ROM_END
 
 /***************************************************************************
 
+  Concept 2000 Lite 'n Learn (model 554)
+  * PCB label: CONCEPT 2000, SEC 554
+  * TMS1000NLL MP3207 (die label: 1000C, MP3207)
+  * 10 LEDs, 1-bit sound with volume decay
+
+  Two versions are known, one with the tone knob, and one without. The MCU
+  is the same for both.
+
+***************************************************************************/
+
+class litelrn_state : public hh_tms1k_state
+{
+public:
+	litelrn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_volume(*this, "volume")
+	{ }
+
+	void litelrn(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<filter_volume_device> m_volume;
+
+	void write_o(u16 data);
+	void write_r(u32 data);
+	u8 read_k();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+};
+
+void litelrn_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(litelrn_state::speaker_decay_sim)
+{
+	m_volume->flt_volume_set_volume(m_speaker_volume);
+
+	// volume decays when speaker is off, rate is determined by tone knob
+	m_speaker_volume /= 1.002 + (double)(u8)m_inputs[2]->read() * 0.0035; // approximation
+}
+
+void litelrn_state::write_r(u32 data)
+{
+	// R0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// R1-R10: input mux, leds
+	m_inp_mux = data >> 1;
+	m_display->matrix(1, data >> 1);
+}
+
+void litelrn_state::write_o(u16 data)
+{
+	// O0: trigger speaker on
+	if (~data & m_o & 1)
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+
+	// O2: select mode switch
+	// other: N/C
+	m_o = data;
+}
+
+u8 litelrn_state::read_k()
+{
+	// K1: multiplexed inputs
+	u8 data = read_rotated_inputs(10, 1);
+
+	// K4,K8: mode switch
+	if (m_o & 4)
+		data |= m_inputs[1]->read() & 0xc;
+
+	return data;
+}
+
+// inputs
+
+static INPUT_PORTS_START( litelrn )
+	PORT_START("IN.0") // K1
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("10")
+
+	PORT_START("IN.1") // O2
+	PORT_CONFNAME( 0x0c, 0x04, "Mode" )
+	PORT_CONFSETTING(    0x00, "Learn" )
+	PORT_CONFSETTING(    0x0c, "Auto" )
+	PORT_CONFSETTING(    0x04, "Manual" )
+
+	PORT_START("IN.2")
+	PORT_CONFNAME( 0x03, 0x00, "Tone" )
+	PORT_CONFSETTING(    0x00, "Organ" )
+	PORT_CONFSETTING(    0x01, "Harpsichord" )
+	PORT_CONFSETTING(    0x03, "Banjo" )
+INPUT_PORTS_END
+
+// config
+
+void litelrn_state::litelrn(machine_config &config)
+{
+	// basic machine hardware
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
+	m_maincpu->read_k().set(FUNC(litelrn_state::read_k));
+	m_maincpu->write_o().set(FUNC(litelrn_state::write_o));
+	m_maincpu->write_r().set(FUNC(litelrn_state::write_r));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(1, 10);
+	m_display->set_bri_levels(0.25);
+	config.set_default_layout(layout_litelrn);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(litelrn_state::speaker_decay_sim), attotime::from_msec(1));
+}
+
+// roms
+
+ROM_START( litelrn )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3207", 0x0000, 0x0400, CRC(9fd7bc0b) SHA1(0dd2903bb33833e85103a1d012fda449d92722af) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_litelrn_output.pla", 0, 365, CRC(393d859e) SHA1(2d224a8dee621ee598001ebdac3e57cae52c93e1) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Concept 2000 Mr. Mus-I-Cal (model 560)
-  * PCB label: CONCEPT 2000 ITE 556
+  * PCB label: CONCEPT 2000, ITE 556
   * TMS1000NLL MP3206 (die label: 1000C, MP3206)
   * 9-digit 7seg LED display(one custom digit), 1-bit sound
 
@@ -3252,7 +3439,7 @@ public:
 
 	void mrmusical(machine_config &config);
 
-protected:
+private:
 	void update_display();
 	void write_o(u16 data);
 	void write_r(u32 data);
@@ -3290,7 +3477,7 @@ u8 mrmusical_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mrmusical )
 	PORT_START("IN.0") // R0
@@ -3334,10 +3521,12 @@ static INPUT_PORTS_START( mrmusical )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// config
+
 void mrmusical_state::mrmusical(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=33K, C=100pF
+	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=33K, C=100pF
 	m_maincpu->read_k().set(FUNC(mrmusical_state::read_k));
 	m_maincpu->write_o().set(FUNC(mrmusical_state::write_o));
 	m_maincpu->write_r().set(FUNC(mrmusical_state::write_r));
@@ -3438,7 +3627,7 @@ u8 cnbaskb_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cnbaskb )
 	PORT_START("IN.0") // R0
@@ -3458,6 +3647,8 @@ static INPUT_PORTS_START( cnbaskb )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cnbaskb_state::cnbaskb(machine_config &config)
 {
@@ -3563,7 +3754,7 @@ u8 cmsport_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cmsport )
 	PORT_START("IN.0") // R0
@@ -3587,6 +3778,8 @@ static INPUT_PORTS_START( cmsport )
 	PORT_CONFSETTING(    0x00, "1" ) // amateur
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
+
+// config
 
 void cmsport_state::cmsport(machine_config &config)
 {
@@ -3709,7 +3902,7 @@ u8 cnfball_state::read_k()
 	return read_inputs(2) | (m_r << 3 & 8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cnfball )
 	PORT_START("IN.0") // R9
@@ -3726,6 +3919,8 @@ static INPUT_PORTS_START( cnfball )
 	PORT_CONFSETTING(    0x08, "1" ) // college
 	PORT_CONFSETTING(    0x00, "2" ) // professional
 INPUT_PORTS_END
+
+// config
 
 void cnfball_state::cnfball(machine_config &config)
 {
@@ -3837,7 +4032,7 @@ u8 cnfball2_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cnfball2 )
 	PORT_START("IN.0") // R8
@@ -3862,6 +4057,8 @@ static INPUT_PORTS_START( cnfball2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cnfball2_state::cnfball2(machine_config &config)
 {
@@ -3968,7 +4165,7 @@ u8 eleciq_state::read_k()
 	return read_inputs(7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( eleciq )
 	PORT_START("IN.0") // R1
@@ -4013,6 +4210,8 @@ static INPUT_PORTS_START( eleciq )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void eleciq_state::eleciq(machine_config &config)
 {
@@ -4104,7 +4303,7 @@ u8 qfire_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( qfire )
 	PORT_START("IN.0") // R1
@@ -4129,6 +4328,8 @@ static INPUT_PORTS_START( qfire )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lightsensor 3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // lightgun trigger, also turns on lightgun lamp
 INPUT_PORTS_END
+
+// config
 
 void qfire_state::qfire(machine_config &config)
 {
@@ -4227,7 +4428,7 @@ u8 esoccer_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( esoccer )
 	PORT_START("IN.0") // R0
@@ -4249,6 +4450,8 @@ static INPUT_PORTS_START( esoccer )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 INPUT_PORTS_END
+
+// config
 
 void esoccer_state::esoccer(machine_config &config)
 {
@@ -4368,7 +4571,7 @@ u8 ebball_state::read_k()
 	return m_inputs[5]->read() | read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
@@ -4399,6 +4602,8 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
+
+// config
 
 void ebball_state::ebball(machine_config &config)
 {
@@ -4512,7 +4717,7 @@ u8 ebball2_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ebball2 )
 	PORT_START("IN.0") // R3
@@ -4537,6 +4742,8 @@ static INPUT_PORTS_START( ebball2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void ebball2_state::ebball2(machine_config &config)
 {
@@ -4681,7 +4888,7 @@ u8 ebball3_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -4721,6 +4928,8 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_CONFSETTING(    0x00, "1" ) // AM
 	PORT_CONFSETTING(    0x01, "2" ) // PRO
 INPUT_PORTS_END
+
+// config
 
 void ebball3_state::ebball3(machine_config &config)
 {
@@ -4831,7 +5040,7 @@ u8 esbattle_state::read_k()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( esbattle )
 	PORT_START("IN.0") // R0
@@ -4848,6 +5057,8 @@ static INPUT_PORTS_START( esbattle )
 	PORT_CONFSETTING(    0x08, "1" ) // Auto
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
+
+// config
 
 void esbattle_state::esbattle(machine_config &config)
 {
@@ -4942,7 +5153,7 @@ u8 blastit_state::read_k()
 	return read_inputs(1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( blastit )
 	PORT_START("IN.0") // R3
@@ -4953,6 +5164,8 @@ static INPUT_PORTS_START( blastit )
 	PORT_CONFSETTING(    0x08, "1" ) // AM
 	PORT_CONFSETTING(    0x00, "2" ) // PRO
 INPUT_PORTS_END
+
+// config
 
 void blastit_state::blastit(machine_config &config)
 {
@@ -5061,7 +5274,7 @@ void einvader_state::write_o(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( einvader )
 	PORT_START("IN.0")
@@ -5072,6 +5285,8 @@ static INPUT_PORTS_START( einvader )
 	PORT_CONFSETTING(    0x00, "1" ) // amateur
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
+
+// config
 
 void einvader_state::einvader(machine_config &config)
 {
@@ -5176,7 +5391,7 @@ u8 efootb4_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( efootb4 )
 	PORT_START("IN.0") // R0
@@ -5213,6 +5428,8 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Status")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void efootb4_state::efootb4(machine_config &config)
 {
@@ -5327,7 +5544,7 @@ u8 ebaskb2_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ebaskb2 )
 	PORT_START("IN.0") // R6
@@ -5357,6 +5574,8 @@ static INPUT_PORTS_START( ebaskb2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void ebaskb2_state::ebaskb2(machine_config &config)
 {
@@ -5497,7 +5716,7 @@ u8 raisedvl_state::read_k()
 	return read_inputs(2) & 0xf;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( raisedvl )
 	PORT_START("IN.0") // R0
@@ -5513,6 +5732,8 @@ static INPUT_PORTS_START( raisedvl )
 	PORT_CONFSETTING(    0x11, "3" )
 	PORT_CONFSETTING(    0x21, "4" )
 INPUT_PORTS_END
+
+// config
 
 void raisedvl_state::raisedvl(machine_config &config)
 {
@@ -5666,7 +5887,7 @@ u8 mmarvin_state::read_k()
 	return (read_inputs(4) & 7) | (m_speed_timer->enabled() ? 0 : 8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mmarvin )
 	PORT_START("IN.0") // R2
@@ -5695,6 +5916,8 @@ static INPUT_PORTS_START( mmarvin )
 	PORT_START("IN.5")
 	PORT_ADJUSTER(50, "Tone Knob")
 INPUT_PORTS_END
+
+// config
 
 void mmarvin_state::mmarvin(machine_config &config)
 {
@@ -5818,7 +6041,7 @@ u8 f2pbball_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( f2pbball )
 	PORT_START("IN.0") // R4
@@ -5844,6 +6067,8 @@ static INPUT_PORTS_START( f2pbball )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void f2pbball_state::f2pbball(machine_config &config)
 {
@@ -5965,7 +6190,7 @@ u8 f3in1_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( f3in1 )
 	PORT_START("IN.0") // R0
@@ -5996,6 +6221,8 @@ static INPUT_PORTS_START( f3in1 )
 	PORT_CONFSETTING(    0x00, "1" ) // REG
 	PORT_CONFSETTING(    0x01, "2" ) // PROF
 INPUT_PORTS_END
+
+// config
 
 void f3in1_state::f3in1(machine_config &config)
 {
@@ -6100,7 +6327,7 @@ u8 gpoker_state::read_k()
 	return read_inputs(7);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -6152,6 +6379,8 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 INPUT_PORTS_END
+
+// config
 
 void gpoker_state::gpoker(machine_config &config)
 {
@@ -6223,7 +6452,7 @@ void gjackpot_state::write_r(u32 data)
 	m_inp_mux = (data & 0x3f) | (data >> 4 & 0x40);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
   (note: on dual-function buttons, upper label=Gin, lower label=Black Jack)
@@ -6281,6 +6510,8 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_CONFSETTING(    0x02, "Black Jack" )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gjackpot_state::gjackpot(machine_config &config)
 {
@@ -6380,7 +6611,7 @@ u8 ginv_state::read_k()
 	return m_inputs[2]->read() | read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ginv )
 	PORT_START("IN.0") // R9
@@ -6399,6 +6630,8 @@ static INPUT_PORTS_START( ginv )
 	PORT_START("IN.2") // K8
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
+
+// config
 
 void ginv_state::ginv(machine_config &config)
 {
@@ -6506,7 +6739,7 @@ u8 ginv1000_state::read_k()
 	return m_inputs[2]->read() | read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ginv1000 )
 	PORT_START("IN.0") // R8
@@ -6524,6 +6757,8 @@ static INPUT_PORTS_START( ginv1000 )
 	PORT_START("IN.2") // K8
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
+
+// config
 
 void ginv1000_state::ginv1000(machine_config &config)
 {
@@ -6645,7 +6880,7 @@ u8 ginv2000_state::read_k()
 	return m_inputs[2]->read() | read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ginv2000 )
 	PORT_START("IN.0") // R11
@@ -6662,6 +6897,8 @@ static INPUT_PORTS_START( ginv2000 )
 	PORT_START("IN.2") // K8
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
+
+// config
 
 void ginv2000_state::ginv2000(machine_config &config)
 {
@@ -6784,7 +7021,7 @@ u8 fxmcr165_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -6825,6 +7062,8 @@ static INPUT_PORTS_START( fxmcr165 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Increment")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Address Set")
 INPUT_PORTS_END
+
+// config
 
 void fxmcr165_state::fxmcr165(machine_config &config)
 {
@@ -6918,7 +7157,7 @@ u8 elecdet_state::read_k()
 	return m_inputs[4]->read() | read_inputs(4);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -6966,6 +7205,8 @@ static INPUT_PORTS_START( elecdet )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("End Turn")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
+
+// config
 
 void elecdet_state::elecdet(machine_config &config)
 {
@@ -7071,7 +7312,7 @@ u8 starwbc_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -7114,6 +7355,8 @@ static INPUT_PORTS_START( starwbc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
 INPUT_PORTS_END
+
+// config
 
 void starwbc_state::starwbc(machine_config &config)
 {
@@ -7231,7 +7474,7 @@ u8 liveafb_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( liveafb )
 	PORT_START("IN.0") // R0
@@ -7263,6 +7506,8 @@ static INPUT_PORTS_START( liveafb )
 	PORT_START("ROLLER")
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
+
+// config
 
 void liveafb_state::liveafb(machine_config &config)
 {
@@ -7365,7 +7610,7 @@ u8 astro_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( astro )
 	PORT_START("IN.0") // R0
@@ -7415,10 +7660,12 @@ static INPUT_PORTS_START( astro )
 	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
+// config
+
 void astro_state::astro(machine_config &config)
 {
 	// basic machine hardware
-	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
+	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=33pF
 	m_maincpu->read_k().set(FUNC(astro_state::read_k));
 	m_maincpu->write_r().set(FUNC(astro_state::write_r));
 	m_maincpu->write_o().set(FUNC(astro_state::write_o));
@@ -7541,7 +7788,7 @@ u8 elecbowl_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( elecbowl )
 	PORT_START("IN.0") // R5
@@ -7568,6 +7815,8 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) // 2 players sw?
 INPUT_PORTS_END
+
+// config
 
 // output PLA is not decapped, this was made by hand
 static const u16 elecbowl_output_pla[0x20] =
@@ -7683,7 +7932,7 @@ u8 horseran_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -7745,6 +7994,8 @@ static INPUT_PORTS_START( horseran )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 INPUT_PORTS_END
+
+// config
 
 void horseran_state::horseran(machine_config &config)
 {
@@ -7829,7 +8080,7 @@ u8 mdndclab_state::read_k()
 	return read_inputs(18);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mdndclab )
 	PORT_START("IN.0") // O0
@@ -7941,6 +8192,8 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dragon Attacks / Dragon Wakes")
 INPUT_PORTS_END
 
+// config
+
 void mdndclab_state::mdndclab(machine_config &config)
 {
 	// basic machine hardware
@@ -8035,7 +8288,7 @@ u8 comp4_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( comp4 )
 	PORT_START("IN.0") // O1
@@ -8056,6 +8309,8 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
+
+// config
 
 void comp4_state::comp4(machine_config &config)
 {
@@ -8156,7 +8411,7 @@ u8 bship_state::read_k()
 	return m_inputs[11]->read() | read_inputs(11);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bship )
 	PORT_START("IN.0") // R0
@@ -8231,6 +8486,8 @@ static INPUT_PORTS_START( bship )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Memory")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
 INPUT_PORTS_END
+
+// config
 
 void bship_state::bship(machine_config &config)
 {
@@ -8351,8 +8608,6 @@ u8 bshipb_state::read_k()
 
 // config
 
-// buttons are same as bship set
-
 void bshipb_state::bshipb(machine_config &config)
 {
 	// basic machine hardware
@@ -8456,7 +8711,7 @@ u8 simon_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( simon )
 	PORT_START("IN.0") // R0
@@ -8491,6 +8746,8 @@ static INPUT_PORTS_START( simon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f)
 INPUT_PORTS_END
+
+// config
 
 void simon_state::simon(machine_config &config)
 {
@@ -8605,7 +8862,7 @@ u8 ssimon_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ssimon )
 	PORT_START("IN.0") // R0
@@ -8660,6 +8917,8 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<6>, 0x03)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<6>, 0x03)
 INPUT_PORTS_END
+
+// config
 
 void ssimon_state::ssimon(machine_config &config)
 {
@@ -8766,7 +9025,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 {
 	// the last gear in the gearbox has 12 evenly spaced holes, it is located
 	// between an IR emitter and receiver
-	static const int speed = 17;
+	const int speed = 17;
 	if (m_gearbox_pos >= speed)
 		m_gearbox_pos = -speed;
 
@@ -8821,7 +9080,7 @@ u8 bigtrak_state::read_k()
 	return read_inputs(7) | (sensor_state() ? 8 : 0);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -8877,6 +9136,8 @@ static INPUT_PORTS_START( bigtrak )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Input Port")
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bigtrak_state::bigtrak(machine_config &config)
 {
@@ -9085,7 +9346,7 @@ u8 mbdtower_state::read_k()
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -9124,6 +9385,8 @@ static INPUT_PORTS_START( mbdtower )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Haggle")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Tomb/Ruin")
 INPUT_PORTS_END
+
+// config
 
 void mbdtower_state::mbdtower(machine_config &config)
 {
@@ -9215,7 +9478,7 @@ u8 arcmania_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -9250,6 +9513,8 @@ static INPUT_PORTS_START( arcmania )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("Orange Button 3") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void arcmania_state::arcmania(machine_config &config)
 {
@@ -9338,7 +9603,7 @@ u8 cnsector_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -9384,6 +9649,8 @@ static INPUT_PORTS_START( cnsector )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Teach Mode")
 INPUT_PORTS_END
+
+// config
 
 void cnsector_state::cnsector(machine_config &config)
 {
@@ -9489,7 +9756,7 @@ u8 merlin_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( merlin )
 	PORT_START("IN.0") // O0
@@ -9516,6 +9783,8 @@ static INPUT_PORTS_START( merlin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Hit Me")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("New Game")
 INPUT_PORTS_END
+
+// config
 
 void merlin_state::merlin(machine_config &config)
 {
@@ -9587,7 +9856,7 @@ public:
 
 // handlers: uses the ones in merlin_state
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mmerlin )
 	PORT_INCLUDE( merlin )
@@ -9595,6 +9864,8 @@ static INPUT_PORTS_START( mmerlin )
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Score") // instead of Hit Me
 INPUT_PORTS_END
+
+// config
 
 void mmerlin_state::mmerlin(machine_config &config)
 {
@@ -9672,7 +9943,7 @@ u8 pbmastm_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pbmastm )
 	PORT_START("IN.0") // O0
@@ -9711,6 +9982,8 @@ static INPUT_PORTS_START( pbmastm )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Check")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void pbmastm_state::pbmastm(machine_config &config)
 {
@@ -9798,7 +10071,7 @@ u8 stopthief_state::read_k()
 	return m_inputs[2]->read() | read_inputs(2);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -9832,6 +10105,8 @@ static INPUT_PORTS_START( stopthief )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
+
+// config
 
 void stopthief_state::stopthief(machine_config &config)
 {
@@ -9957,7 +10232,7 @@ u8 bankshot_state::read_k()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
   (note: remember that you can rotate the display in MAME)
@@ -9984,6 +10259,8 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Ball Over")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void bankshot_state::bankshot(machine_config &config)
 {
@@ -10102,7 +10379,7 @@ u8 splitsec_state::read_k()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
@@ -10117,6 +10394,8 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void splitsec_state::splitsec(machine_config &config)
 {
@@ -10204,7 +10483,7 @@ u8 lostreas_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
   (note: Canadian version differs slightly to accomodoate dual-language)
@@ -10244,6 +10523,8 @@ static INPUT_PORTS_START( lostreas )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Air")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Up")
 INPUT_PORTS_END
+
+// config
 
 void lostreas_state::lostreas(machine_config &config)
 {
@@ -10347,7 +10628,7 @@ u8 alphie_state::read_k()
 	return read_rotated_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( alphie )
 	PORT_START("IN.0") // K1
@@ -10384,6 +10665,8 @@ static INPUT_PORTS_START( alphie )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_prev<3>, 0x0f) PORT_NAME("Activity Selector Left")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, switch_next<3>, 0x0f) PORT_NAME("Activity Selector Right")
 INPUT_PORTS_END
+
+// config
 
 // output PLA is guessed
 static const u16 alphie_output_pla[0x20] =
@@ -10493,7 +10776,7 @@ u8 tcfball_state::read_k()
 	return read_inputs(3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tcfball )
 	PORT_START("IN.0") // R5
@@ -10514,6 +10797,8 @@ static INPUT_PORTS_START( tcfball )
 	PORT_CONFSETTING(    0x00, "1" ) // college
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
+
+// config
 
 void tcfball_state::tcfball(machine_config &config)
 {
@@ -10579,7 +10864,7 @@ public:
 
 // handlers: uses the ones in tcfball_state
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tcfballa )
 	PORT_INCLUDE( tcfball )
@@ -10588,6 +10873,8 @@ static INPUT_PORTS_START( tcfballa )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Display")
 INPUT_PORTS_END
+
+// config
 
 void tcfballa_state::tcfballa(machine_config &config)
 {
@@ -10696,7 +10983,7 @@ u8 comparc_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -10750,6 +11037,8 @@ static INPUT_PORTS_START( comparc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Button 6")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Button 5")
 INPUT_PORTS_END
+
+// config
 
 // output PLA is not decapped, this was made by hand
 static const u16 comparc_output_pla[0x20] =
@@ -10854,7 +11143,7 @@ u8 monkeysee_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( monkeysee )
 	PORT_START("IN.0") // R0
@@ -10887,6 +11176,8 @@ static INPUT_PORTS_START( monkeysee )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 INPUT_PORTS_END
+
+// config
 
 void monkeysee_state::monkeysee(machine_config &config)
 {
@@ -10991,7 +11282,7 @@ u8 t3in1sa_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -11052,6 +11343,8 @@ static INPUT_PORTS_START( t3in1sa )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass / Shoot")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Team-Mate")
 INPUT_PORTS_END
+
+// config
 
 void t3in1sa_state::t3in1sa(machine_config &config)
 {
@@ -11175,7 +11468,26 @@ u8 vclock3_state::read_k()
 	return data;
 }
 
-// config
+// inputs
+
+/* physical button layout and labels are like this:
+
+    [  ]       [  ]       [  ]       [  ]
+  CALENDAR-SET-TIME       CHIME    ANNOUNCE
+
+    [  ]       [  ]       [  ]       [  ]
+  HOUR FWD↑   MIN FWD↑   SET ALARM 1-ON/OFF
+
+    [  ]       [  ]       [  ]       [  ]
+  HOUR REV↓   MIN REV↓   SET ALARM 2-ON/OFF
+
+    [  ]       ---------------    LOW[  ]HIGH
+  SENTINEL     LOW VOLUME HIGH      DIMMER
+
+     CALENDAR
+  [             ]                [      ]
+    SNOOZE/DATE                    TIME
+*/
 
 static INPUT_PORTS_START( vclock3 )
 	PORT_START("IN.0") // R0
@@ -11223,6 +11535,8 @@ static INPUT_PORTS_START( vclock3 )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
+// config
+
 void vclock3_state::vclock3(machine_config &config)
 {
 	// basic machine hardware
@@ -11269,6 +11583,237 @@ ROM_START( vclock3 )
 
 	ROM_REGION( 0x1000, "tms6100", 0 )
 	ROM_LOAD( "cm72010.u3", 0x0000, 0x1000, CRC(2054847c) SHA1(716592f4cd01a9edf16b1061431bd6dc934d9053) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Technasonic Weight Talker
+  * PCB label: BHP_8338A8
+  * TMS1100 MP1362 (no decap)
+  * TMS5110AN2L-1 speech chip, 16KB VSM CM62088N2L
+  * CD40114BE (4x16 RAM, battery-backed)
+
+  There's also an older version (BHP_8338A2 PCB, M34137N2, CM62074). It can
+  be identified by the missing (unpopulated) language switch.
+
+  It has a normal mechanical scale hidden from view, with a quadrature
+  encoder. In MAME, it's simulated with a dial control. Turn it left to
+  increase pressure, right to decrease. After around 0.5s of inactivity,
+  it will tell your 'weight'.
+
+***************************************************************************/
+
+class wtalker_state : public hh_tms1k_state
+{
+public:
+	wtalker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_nvram(*this, "nvram", 0x10, ENDIANNESS_BIG),
+		m_tms5100(*this, "tms5100"),
+		m_tms6100(*this, "tms6100")
+	{ }
+
+	void wtalker(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(sensor_r) { return m_dial & 1; }
+	DECLARE_CUSTOM_INPUT_MEMBER(pulse_r) { return (m_pulse > machine().time()) ? 1 : 0; }
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	memory_share_creator<u8> m_nvram;
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+
+	void write_r(u32 data);
+	void write_o(u16 data);
+	u8 read_k();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(sense_weight);
+
+	attotime m_pulse;
+	u8 m_dial = 0;
+	u8 m_ram_address = 0;
+};
+
+void wtalker_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	save_item(NAME(m_pulse));
+	save_item(NAME(m_dial));
+	save_item(NAME(m_ram_address));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(wtalker_state::sense_weight)
+{
+	const u8 mask = 3;
+	u8 inp = m_inputs[7]->read() & mask;
+
+	// short pulse on rising edge or falling edge, depending on direction
+	if (inp != m_dial && BIT(mask + inp - m_dial, 1) != BIT(inp, 0))
+		m_pulse = machine().time() + attotime::from_usec(250);
+
+	m_dial = inp;
+}
+
+void wtalker_state::write_r(u32 data)
+{
+	// R2,R3,R9: input mux part
+	m_inp_mux = (m_inp_mux & 7) | (data << 1 & 0x18) | (data >> 4 & 0x20);
+
+	// R8: TMS5100 PDC
+	m_tms5100->pdc_w(BIT(data, 8));
+
+	// R10: power off on rising edge
+	if (data & ~m_r & 0x400)
+		power_off();
+
+	// R0: RAM ME
+	// R1: RAM WE
+	// R4-R7: RAM D-A
+
+	// latch RAM address
+	if (data & ~m_r & 1)
+		m_ram_address = bitswap<4>(data,4,5,6,7);
+
+	// write RAM
+	if ((data & 3) == 3 && (m_r & 3) != 3)
+		m_nvram[m_ram_address] = m_o & 0xf;
+
+	m_r = data;
+}
+
+void wtalker_state::write_o(u16 data)
+{
+	// O4-O6: input mux part
+	// O7: N/C
+	m_inp_mux = (m_inp_mux & ~7) | (data >> 4 & 7);
+
+	// O0-O3: TMS5100 CTL, RAM data
+	m_tms5100->ctl_w(data & 0xf);
+	m_o = data;
+}
+
+u8 wtalker_state::read_k()
+{
+	// K2-K8: multiplexed inputs
+	u8 data = read_inputs(6) << 1 & 0xe;
+
+	// read RAM (complemented)
+	if ((m_r & 3) == 1)
+		data |= ~m_nvram[m_ram_address] & 0xf;
+
+	// K1: TMS5100 CTL1
+	data |= m_tms5100->ctl_r() & 1;
+	return data;
+}
+
+// inputs
+
+static INPUT_PORTS_START( wtalker )
+	PORT_START("IN.0") // O4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+
+	PORT_START("IN.1") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Guest")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.2") // O6
+	PORT_CONFNAME( 0x01, 0x01, "Memory")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x02, 0x00, "Weight Unit")
+	PORT_CONFSETTING(    0x02, "Kilogram" )
+	PORT_CONFSETTING(    0x00, "Pound" )
+	PORT_CONFNAME( 0x04, 0x00, "Shutdown Message")
+	PORT_CONFSETTING(    0x04, "Good Bye" ) PORT_CONDITION("IN.5", 0x02, NOTEQUALS, 0x02)
+	PORT_CONFSETTING(    0x00, "Have a Nice Day" ) PORT_CONDITION("IN.5", 0x02, NOTEQUALS, 0x02)
+	PORT_CONFSETTING(    0x04, "Auf Wiedersehen" ) PORT_CONDITION("IN.5", 0x02, EQUALS, 0x02)
+	PORT_CONFSETTING(    0x00, "Guten Tag" ) PORT_CONDITION("IN.5", 0x02, EQUALS, 0x02)
+
+	PORT_START("IN.3") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wtalker_state, sensor_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wtalker_state, pulse_r)
+
+	PORT_START("IN.4") // R3
+	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x01, "Low" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Language ) ) // unpopulated switch
+	PORT_CONFSETTING(    0x00, DEF_STR( English ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( German ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+
+	PORT_START("IN.7")
+	PORT_BIT( 0x03, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+// config
+
+void wtalker_state::wtalker(machine_config &config)
+{
+	// basic machine hardware
+	TMS1100(config, m_maincpu, 550000); // approximation - RC osc. R=36K, C=33pF
+	m_maincpu->read_k().set(FUNC(wtalker_state::read_k));
+	m_maincpu->write_r().set(FUNC(wtalker_state::write_r));
+	m_maincpu->write_o().set(FUNC(wtalker_state::write_o));
+
+	TIMER(config, "sense_weight").configure_periodic(FUNC(wtalker_state::sense_weight), attotime::from_usec(1));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// no visual feedback!
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	TMS5110A(config, m_tms5100, 640000); // approximation - trimpot
+	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
+	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
+	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
+	m_tms5100->data().set(m_tms6100, FUNC(tms6100_device::data_line_r));
+	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
+	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	TMS6100(config, m_tms6100, 640000/4);
+}
+
+// roms
+
+ROM_START( wtalker )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1362", 0x0000, 0x0800, CRC(99247fad) SHA1(30e48f235f821491643554c9e58a72459cf1d834) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
+	ROM_REGION( 365, "maincpu:opla", ROMREGION_ERASE00 )
+	ROM_LOAD( "tms1100_wtalker_output.pla", 0, 365, NO_DUMP )
+
+	ROM_REGION16_LE( 0x40, "maincpu:opla_b", ROMREGION_ERASE00 ) // verified, electronic dump
+	ROM_LOAD16_BYTE( "tms1100_wtalker_output.bin", 0, 0x20, CRC(fb51ad7c) SHA1(5972665fbc154ebb18e4eb2663c6088643651489) )
+
+	ROM_REGION( 0x4000, "tms6100", 0 )
+	ROM_LOAD( "cm62088", 0x0000, 0x4000, CRC(0c7a6d26) SHA1(2dbdc54019d02531adbd3c7515a8995710a4267c) )
 ROM_END
 
 
@@ -11343,7 +11888,7 @@ u8 speechp_state::read_k()
 	return m_inputs[10]->read() | (read_inputs(10) & 7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( speechp )
 	PORT_START("IN.0") // R0
@@ -11403,6 +11948,8 @@ static INPUT_PORTS_START( speechp )
 	PORT_CONFSETTING(    0x08, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
+
+// config
 
 void speechp_state::speechp(machine_config &config)
 {
@@ -11502,7 +12049,7 @@ u8 tisr16_state::read_k()
 	return read_inputs(11);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tisr16 )
 	PORT_START("IN.0") // R0
@@ -11640,6 +12187,8 @@ static INPUT_PORTS_START( tisr16ii )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
+// config
+
 void tisr16_state::tisr16(machine_config &config)
 {
 	// basic machine hardware
@@ -11745,7 +12294,7 @@ u8 ti1250_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti1250 )
 	PORT_START("IN.0") // O1
@@ -11802,6 +12351,8 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221ax" /* √ */)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
+
+// config
 
 void ti1250_state::ti1250(machine_config &config)
 {
@@ -11936,7 +12487,7 @@ u8 ti25502_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti25502 )
 	PORT_START("IN.0") // R0
@@ -11988,6 +12539,8 @@ static INPUT_PORTS_START( ti25502 )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_CONFSETTING(    0x04, "4" ) // "
 INPUT_PORTS_END
+
+// config
 
 void ti25502_state::ti25502(machine_config &config)
 {
@@ -12076,7 +12629,7 @@ u8 ti25503_state::read_k()
 	return read_inputs(7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti25503 )
 	PORT_START("IN.0") // R0
@@ -12121,6 +12674,8 @@ static INPUT_PORTS_START( ti25503 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"x²")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 INPUT_PORTS_END
+
+// config
 
 void ti25503_state::ti25503(machine_config &config)
 {
@@ -12210,7 +12765,7 @@ u8 ti5100_state::read_k()
 	return read_inputs(11);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti5100 )
 	PORT_START("IN.0") // R0
@@ -12273,6 +12828,8 @@ static INPUT_PORTS_START( ti5100 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
+
+// config
 
 void ti5100_state::ti5100(machine_config &config)
 {
@@ -12360,7 +12917,7 @@ u8 ti5200_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti5200 )
 	PORT_START("IN.0") // R0
@@ -12411,6 +12968,8 @@ static INPUT_PORTS_START( ti5200 )
 	PORT_CONFSETTING(    0x00, "R" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void ti5200_state::ti5200(machine_config &config)
 {
@@ -12502,7 +13061,7 @@ u8 ti30_state::read_k()
 	return m_inputs[7]->read() | read_inputs(7);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti30 )
 	PORT_START("IN.0") // O0
@@ -12682,6 +13241,8 @@ static INPUT_PORTS_START( tibusan )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
+// config
+
 void ti30_state::ti30(machine_config &config)
 {
 	// basic machine hardware
@@ -12796,7 +13357,7 @@ u8 ti1000_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti1000 )
 	PORT_START("IN.0") // O0
@@ -12830,6 +13391,8 @@ static INPUT_PORTS_START( ti1000 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
+
+// config
 
 void ti1000_state::ti1000(machine_config &config)
 {
@@ -12921,7 +13484,7 @@ u8 wizatron_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( wizatron )
 	PORT_START("IN.0") // O1
@@ -12948,6 +13511,8 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
+
+// config
 
 void wizatron_state::wizatron(machine_config &config)
 {
@@ -13027,7 +13592,7 @@ u8 lilprof_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lilprof )
 	PORT_INCLUDE( wizatron )
@@ -13043,6 +13608,8 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
+
+// config
 
 void lilprof_state::lilprof(machine_config &config)
 {
@@ -13130,7 +13697,7 @@ u8 lilprofa_state::read_k()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lilprofa )
 	PORT_START("IN.0") // O0
@@ -13164,6 +13731,8 @@ static INPUT_PORTS_START( lilprofa )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
+
+// config
 
 void lilprofa_state::lilprofa(machine_config &config)
 {
@@ -13271,7 +13840,7 @@ u8 ti1680_state::read_k()
 	return read_inputs(6) | m_ram->do_r();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ti1680 )
 	PORT_START("IN.0") // R3
@@ -13310,6 +13879,8 @@ static INPUT_PORTS_START( ti1680 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
+
+// config
 
 void ti1680_state::ti1680(machine_config &config)
 {
@@ -13402,7 +13973,7 @@ u8 dataman_state::read_k()
 	return m_inputs[5]->read() | read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( dataman )
 	PORT_START("IN.0") // R0
@@ -13442,6 +14013,8 @@ static INPUT_PORTS_START( dataman )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
+
+// config
 
 void dataman_state::dataman(machine_config &config)
 {
@@ -13512,7 +14085,7 @@ void mathmarv_state::write_r(u32 data)
 	dataman_state::write_r(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mathmarv )
 	PORT_INCLUDE( dataman )
@@ -13527,6 +14100,8 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
+
+// config
 
 void mathmarv_state::mathmarv(machine_config &config)
 {
@@ -13612,7 +14187,7 @@ u8 timaze_state::read_k()
 	return read_inputs(1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( timaze )
 	PORT_START("IN.0") // R0
@@ -13621,6 +14196,8 @@ static INPUT_PORTS_START( timaze )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void timaze_state::timaze(machine_config &config)
 {
@@ -13720,7 +14297,7 @@ u8 tithermos_state::read_k()
 	return data;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tithermos )
 	PORT_START("IN.0") // SA
@@ -13777,6 +14354,8 @@ static INPUT_PORTS_START( tithermos )
 	PORT_CONFSETTING(    0x00, "On" )
 	PORT_CONFSETTING(    0x01, "Auto" ) // same output as heat/cool
 INPUT_PORTS_END
+
+// config
 
 void tithermos_state::tithermos(machine_config &config)
 {
@@ -13870,7 +14449,7 @@ void subwars_state::write_o(u16 data)
 	m_speaker->level_w(BIT(data, 7));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( subwars )
 	PORT_START("IN.0")
@@ -13879,6 +14458,8 @@ static INPUT_PORTS_START( subwars )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void subwars_state::subwars(machine_config &config)
 {
@@ -14014,7 +14595,7 @@ u8 playmaker_state::read_k()
 	return read_inputs(3) | ((m_inp_mux & 8) ? m_notch : 0);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( playmaker )
 	PORT_START("IN.0") // R0
@@ -14035,6 +14616,8 @@ static INPUT_PORTS_START( playmaker )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Shoot / P1 Skill")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pass / P2 Skill")
 INPUT_PORTS_END
+
+// config
 
 void playmaker_state::playmaker(machine_config &config)
 {
@@ -14147,7 +14730,7 @@ u8 dxfootb_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( dxfootb )
 	PORT_START("IN.0") // R3
@@ -14173,6 +14756,8 @@ static INPUT_PORTS_START( dxfootb )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 INPUT_PORTS_END
+
+// config
 
 void dxfootb_state::dxfootb(machine_config &config)
 {
@@ -14265,7 +14850,7 @@ u8 copycat_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( copycat )
 	PORT_START("IN.0") // R4
@@ -14294,6 +14879,8 @@ static INPUT_PORTS_START( copycat )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Replay")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void copycat_state::copycat(machine_config &config)
 {
@@ -14377,7 +14964,7 @@ void copycata_state::write_o(u16 data)
 	m_speaker->level_w((data & 1) | (data >> 5 & 2));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( copycata )
 	PORT_START("IN.0")
@@ -14386,6 +14973,8 @@ static INPUT_PORTS_START( copycata )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
+
+// config
 
 void copycata_state::copycata(machine_config &config)
 {
@@ -14464,7 +15053,7 @@ void ditto_state::write_o(u16 data)
 	m_speaker->level_w(data >> 5 & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ditto )
 	PORT_START("IN.0")
@@ -14473,6 +15062,8 @@ static INPUT_PORTS_START( ditto )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Orange Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
 INPUT_PORTS_END
+
+// config
 
 void ditto_state::ditto(machine_config &config)
 {
@@ -14576,7 +15167,7 @@ u8 t7in1ss_state::read_k()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( t7in1ss )
 	PORT_START("IN.0") // R0
@@ -14604,6 +15195,8 @@ static INPUT_PORTS_START( t7in1ss )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void t7in1ss_state::t7in1ss(machine_config &config)
 {
@@ -14778,7 +15371,7 @@ u8 tbreakup_state::read_k()
 	return (m_inputs[2]->read() & 4) | (read_inputs(2) & 8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbreakup )
 	PORT_START("IN.0") // R7 K8
@@ -14797,6 +15390,8 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x00, "Pro 1" )
 	PORT_CONFSETTING(    0x01, "Pro 2" )
 INPUT_PORTS_END
+
+// config
 
 void tbreakup_state::tbreakup(machine_config &config)
 {
@@ -14927,7 +15522,7 @@ u8 phpball_state::read_k()
 	return m_inputs[1]->read() | read_inputs(1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( phpball )
 	PORT_START("IN.0") // R9
@@ -14939,6 +15534,8 @@ static INPUT_PORTS_START( phpball )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void phpball_state::phpball(machine_config &config)
 {
@@ -15040,7 +15637,7 @@ u8 tdracula_state::read_k()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tdracula )
 	PORT_START("IN.0") // R20
@@ -15059,6 +15656,8 @@ static INPUT_PORTS_START( tdracula )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 INPUT_PORTS_END
+
+// config
 
 void tdracula_state::tdracula(machine_config &config)
 {
@@ -15175,7 +15774,7 @@ void slepachi_state::write_o(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( slepachi )
 	PORT_START("IN.0") // K
@@ -15192,6 +15791,8 @@ static INPUT_PORTS_START( slepachi )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
+
+// config
 
 void slepachi_state::slepachi(machine_config &config)
 {
@@ -15318,7 +15919,7 @@ u8 scruiser_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( scruiser )
 	PORT_START("IN.0") // R0
@@ -15360,6 +15961,8 @@ static INPUT_PORTS_START( scruiser )
 	PORT_CONFSETTING(    0x08, "Fast" ) // F
 	PORT_CONFSETTING(    0x00, "Slow" ) // S
 INPUT_PORTS_END
+
+// config
 
 void scruiser_state::scruiser(machine_config &config)
 {
@@ -15476,7 +16079,7 @@ u8 ssports4_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ssports4 )
 	PORT_START("IN.0") // R0
@@ -15520,6 +16123,8 @@ static INPUT_PORTS_START( ssports4 )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void ssports4_state::ssports4(machine_config &config)
 {
@@ -15641,7 +16246,7 @@ u8 xl25_state::read_k()
 	return read_inputs(10);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( xl25 )
 	PORT_START("IN.0") // R0
@@ -15704,6 +16309,8 @@ static INPUT_PORTS_START( xl25 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_NAME("Sound") PORT_CHANGED_MEMBER(DEVICE_SELF, xl25_state, k4_button, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void xl25_state::xl25(machine_config &config)
 {
@@ -15771,6 +16378,7 @@ CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, emp
 CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
 CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
+CONS( 1978, litelrn,    0,         0, litelrn,   litelrn,   litelrn_state,   empty_init, "Concept 2000", "Lite 'n Learn: Electronic Organ", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 COMP( 1978, mrmusical,  0,         0, mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
@@ -15845,6 +16453,8 @@ CONS( 1981, comparc,    0,         0, comparc,   comparc,   comparc_state,   emp
 CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1984, vclock3,    0,         0, vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1985, wtalker,    0,         0, wtalker,   wtalker,   wtalker_state,   empty_init, "Technasonic", "Weight Talker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 
 COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
