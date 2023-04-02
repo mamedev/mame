@@ -115,9 +115,9 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y);
-	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, int hsync_data, int dv);
+	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data);
 	virtual offs_t get_videoram_addr();
-	virtual u8 read_videoram(offs_t offset);
+	virtual u8 read_videoram(offs_t offset) { return m_video_ram[offset]; }
 
 	virtual u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
@@ -176,15 +176,15 @@ protected:
 	// video state
 	bitmap_rgb32 m_bitmap;
 	u8 m_latch = 0;
-	int m_blink = 0;
+	bool m_blink = 0;
 	int m_c = 0;
 	int m_r = 0;
-	int m_mode = 0;
+	bool m_mode = 0;
 
 	// cassette state
 	bool m_motor;
-	int m_tape_in;
-	int m_tape_in_latch;
+	bool m_tape_in;
+	bool m_tape_in_latch;
 
 	// timers
 	emu_timer *m_scanline_timer = nullptr;
@@ -219,7 +219,7 @@ protected:
 
 	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
 	virtual offs_t get_videoram_addr() override;
-	virtual u8 read_videoram(offs_t offset) override;
+	virtual u8 read_videoram(offs_t offset) override { return m_char_ram[offset]; };
 
 	void set_screen_params(void);
 

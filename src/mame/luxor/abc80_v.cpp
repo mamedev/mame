@@ -50,8 +50,8 @@ uint8_t tkn80_state::in4_r()
 
 void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 {
-	uint8_t vsync_data = m_vsync_prom->base()[y];
-	int dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
+	u8 vsync_data = m_vsync_prom->base()[y];
+	bool dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
 
 	if (!(vsync_data & ABC80_K2_FRAME_RESET))
 	{
@@ -61,7 +61,7 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 
 	for (int sx = 0; sx < 64; sx++)
 	{
-		uint8_t hsync_data = m_hsync_prom->base()[sx];
+		u8 hsync_data = m_hsync_prom->base()[sx];
 
 		if (hsync_data & ABC80_K5_LINE_END)
 		{
@@ -90,8 +90,8 @@ void abc80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 
 void tkn80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 {
-	uint8_t vsync_data = m_vsync_prom->base()[y];
-	int dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
+	u8 vsync_data = m_vsync_prom->base()[y];
+	bool dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
 
 	if (!(vsync_data & ABC80_K2_FRAME_RESET))
 	{
@@ -102,7 +102,7 @@ void tkn80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 	int cols = m_80 ? 128 : 64;
 	for (int sx = 0; sx < cols; sx++)
 	{
-		uint8_t hsync_data = m_hsync_prom->base()[m_80 ? (sx / 2) : sx];
+		u8 hsync_data = m_hsync_prom->base()[m_80 ? (sx / 2) : sx];
 
 		if (hsync_data & ABC80_K5_LINE_END)
 		{
@@ -131,22 +131,22 @@ void tkn80_state::draw_scanline(bitmap_rgb32 &bitmap, int y)
 	}
 }
 
-void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, int dv, int hsync_data)
+void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data)
 {
-	uint8_t l = m_line_prom->base()[y];
-	int dh = (hsync_data & ABC80_K5_DH) ? 1 : 0;
-	uint8_t data = 0;
+	u8 l = m_line_prom->base()[y];
+	bool dh = (hsync_data & ABC80_K5_DH) ? 1 : 0;
+	u8 data = 0;
 
-	uint16_t videoram_addr = get_videoram_addr();
-	uint8_t videoram_data = m_latch;
-	uint8_t attr_addr = ((dh & dv) << 7) | (videoram_data & 0x7f);
-	uint8_t attr_data = m_attr_prom->base()[attr_addr];
+	u16 videoram_addr = get_videoram_addr();
+	u8 videoram_data = m_latch;
+	u8 attr_addr = ((dh & dv) << 7) | (videoram_data & 0x7f);
+	u8 attr_data = m_attr_prom->base()[attr_addr];
 
-	int blank = (attr_data & ABC80_J3_BLANK) ? 1 : 0;
-	int j = (attr_data & ABC80_J3_TEXT) ? 1 : 0;
-	int k = (attr_data & ABC80_J3_GRAPHICS) ? 1 : 0;
-	int versal = (attr_data & ABC80_J3_VERSAL) ? 1 : 0;
-	int cursor = (videoram_data & ABC80_CHAR_CURSOR) ? 1 : 0;
+	bool blank = (attr_data & ABC80_J3_BLANK) ? 1 : 0;
+	bool j = (attr_data & ABC80_J3_TEXT) ? 1 : 0;
+	bool k = (attr_data & ABC80_J3_GRAPHICS) ? 1 : 0;
+	bool versal = (attr_data & ABC80_J3_VERSAL) ? 1 : 0;
+	bool cursor = (videoram_data & ABC80_CHAR_CURSOR) ? 1 : 0;
 
 	if (!j && k) m_mode = 0;
 	if (j && !k) m_mode = 1;
@@ -155,16 +155,16 @@ void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, int dv, in
 	if (m_mode & versal)
 	{
 		// graphics mode
-		int r0 = 1, r1 = 1, r2 = 1;
+		bool r0 = 1, r1 = 1, r2 = 1;
 
 		if (l < 3) r0 = 0; else if (l < 7) r1 = 0; else r2 = 0;
 
-		int c0 = BIT(videoram_data, 0) || r0;
-		int c1 = BIT(videoram_data, 1) || r0;
-		int c2 = BIT(videoram_data, 2) || r1;
-		int c3 = BIT(videoram_data, 3) || r1;
-		int c4 = BIT(videoram_data, 4) || r2;
-		int c5 = BIT(videoram_data, 6) || r2;
+		bool c0 = BIT(videoram_data, 0) || r0;
+		bool c1 = BIT(videoram_data, 1) || r0;
+		bool c2 = BIT(videoram_data, 2) || r1;
+		bool c3 = BIT(videoram_data, 3) || r1;
+		bool c4 = BIT(videoram_data, 4) || r2;
+		bool c5 = BIT(videoram_data, 6) || r2;
 
 		if (c0 && c2 && c4) data |= 0xe0;
 		if (c1 && c3 && c5) data |= 0x1c;
@@ -178,7 +178,7 @@ void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, int dv, in
 	// shift out pixels
 	for (int bit = 0; bit < 6; bit++)
 	{
-		int color = BIT(data, 7);
+		bool color = BIT(data, 7);
 		int x = (sx * 6) + bit;
 
 		color ^= (cursor & m_blink);
@@ -201,7 +201,7 @@ offs_t abc80_state::get_videoram_addr()
 		A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
 		R2 R1 R0 xx xx xx xx C2 C1 C0
 
-		A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
+		         A6 A5 A4 A3 = 00 C5 C4 C3 + R4 R3 R4 R3
 
 	*/
 
@@ -252,16 +252,6 @@ offs_t tkn80_state::get_videoram_addr()
 
 		return 0x400 | ((m_r & 0x07) << 7) | (s << 3) | (m_c & 0x07);
 	}
-}
-
-u8 abc80_state::read_videoram(offs_t offset)
-{
-	return m_video_ram[offset];
-}
-
-u8 tkn80_state::read_videoram(offs_t offset)
-{
-	return m_char_ram[offset];
 }
 
 
