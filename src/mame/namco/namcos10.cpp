@@ -417,8 +417,12 @@ try all permutations of 0-15 bit swaps which will take much longer or manually w
 
 
 Known issues:
-- Opening the operator menu sometimes can crash Mr. Driller 2
-- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal
+- mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
+- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
+- knpuzzle: bad dumps? where are the encrypted program blocks?
+- gjspace: bad dump? first program block is at 0x3fe even though the redirect table says 0x3ff and works if decrypted, but I can't find what should've been at 0x3fe
+- mrdrilrg: bad dump? program code block isn't where expected. mrdrilrga looks good though
+
 
 User data note:
 - the games store settings / rankings / bookkeeping data in the first NAND ROM - at 0x4200 for MEM(N) and 0x40000 for MEM(M), the ROMs used should be defaulted where possible
@@ -726,7 +730,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 
 void namcos10_state::namcos10_map_inner(address_map &map)
 {
-	// ram? stores block index to offset lookup table
+	// ram?
+	// Contains the NAND block table with redirected blocks generated
+	// based on the invalid block table found at the beginning of a game's first NAND
 	map(0xf500000, 0xf5fffff).ram().share("share3");
 
 	map(0xfb60000, 0xfb60003).noprw(); // ?
@@ -1103,16 +1109,15 @@ uint16_t namcos10_memn_state::nand_data_r()
 	if (m_decrypter.found() && m_decrypter->is_active())
 		return m_decrypter->decrypt(data);
 
-	// There should never be scrambled data beyond 0x3ec
-	// Only the first device's beginning blocks are treated specially and can't contain scrambled data
-	// because it's guaranteed to always have important NAND layout information + EEP data
-	if ((BIT(m_nand_address, 8, 16) >> 5) < 0x3ec
-		&& (m_nand_device_idx != 0 || (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) >= 0x0a)))
-	{
-		data = m_unscrambler(data ^ 0xaaaa);
-	}
+	// Block 0 is guaranteed to always be good according to the NAND datasheet, and it seems to always contain the bad block redirect table
+	// Block 1 appears to always be used by games as the EEPROM data block
+	// Dumped ROMs always have block 1 as plaintext so data doesn't appear scrambled when writing to block 1
+	// So treat only block 0 and block 1 as special blocks for now
+	// TODO: Is there a more reliable way to detect when data should be unscrambled? (m_ctrl_reg?)
+	if (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) < 2)
+		return data;
 
-	return data;
+	return m_unscrambler(data ^ 0xaaaa);
 }
 
 void namcos10_memn_state::nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
