@@ -227,6 +227,7 @@ Game          Revision     Sticker      KEYCUS   ROMs Populated
 ------------------------------------------------------------------------------------
 Mr Driller 2  DR21/VER.A3  DR21 Ver.A   KC001A   DR21VERA.1A, DR21MA1.1D, DR21MA2.2D
 Mr Driller 2  DR22/VER.A3  DR22 Ver.A   KC001A   DR22VERA.1A, DR21MA1.1D, DR21MA2.2D
+Mr Driller 2  DR23/VER.A3  DR23 Ver.A   KC001A   DR23VERA.1A (no label?), DR21MA1.1D, DR21MA2.2D
 
       Note
       1. The ROM PCB has locations for 4x 64MBit program ROMs, but only 1A is populated.
@@ -1766,6 +1767,18 @@ static INPUT_PORTS_START( nflclsfb )
 INPUT_PORTS_END
 
 // MEM(M)
+ROM_START( mrdrilr2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x800000, "nand", 0 )
+	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
+
+	ROM_REGION( 0x2000000, "data", 0 )
+	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
+	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
+ROM_END
+
 ROM_START( mrdrilr2j )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -1778,12 +1791,12 @@ ROM_START( mrdrilr2j )
 	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
 ROM_END
 
-ROM_START( mrdrilr2 )
+ROM_START( mrdrilr2u )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
+	ROM_LOAD( "dr23vera.1a", 0x000000, 0x800000, CRC(5f32b6fb) SHA1(ecb94d8317946f278a2cb0bc55abea2b89fa2e71) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -2132,6 +2145,7 @@ ROM_END
 // MEM(M)
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
 GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
+GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", 0 )
 
 // MEM(N)
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
