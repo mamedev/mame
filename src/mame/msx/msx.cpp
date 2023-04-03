@@ -586,7 +586,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region
 	// sound hardware
 	SPEAKER(config, m_speaker).front_center();
 	DAC_1BIT(config, m_dac, 0);
-	m_dac->add_route(ALL_OUTPUTS, m_speaker, 0.2);
+	m_dac->add_route(ALL_OUTPUTS, m_speaker, 0.1);
 
 	if (ay8910_type == SND_AY8910)
 		AY8910(config, m_ay8910, m_main_xtal / m_cpu_xtal_divider / 2);
@@ -597,7 +597,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region
 	m_ay8910->port_b_read_callback().set(FUNC(msx2_base_state::psg_port_b_r));
 	m_ay8910->port_a_write_callback().set(FUNC(msx2_base_state::psg_port_a_w));
 	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
-	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.9);
+	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
@@ -750,7 +750,7 @@ WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
 
 void msx2_base_state::msx_ym2413(machine_config &config)
 {
-	YM2413(config, "ym2413", m_main_xtal / m_cpu_xtal_divider).add_route(ALL_OUTPUTS, m_speaker, 0.9);
+	YM2413(config, "ym2413", m_main_xtal / m_cpu_xtal_divider).add_route(ALL_OUTPUTS, m_speaker, 0.8);
 }
 
 void msx2_base_state::msx2_64kb_vram(machine_config &config)

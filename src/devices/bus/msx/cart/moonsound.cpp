@@ -43,12 +43,12 @@ void msx_cart_moonsound_device::device_add_mconfig(machine_config &config)
 	YMF278B(config, m_ymf278b, 33.8688_MHz_XTAL);
 	m_ymf278b->set_addrmap(0, &msx_cart_moonsound_device::ymf278b_map);
 	m_ymf278b->irq_handler().set(FUNC(msx_cart_moonsound_device::irq_w));
-	m_ymf278b->add_route(0, "lspeaker", 1.0);
-	m_ymf278b->add_route(1, "rspeaker", 1.0);
-	m_ymf278b->add_route(2, "lspeaker", 0.8);
-	m_ymf278b->add_route(3, "rspeaker", 0.8);
-	m_ymf278b->add_route(4, "lspeaker", 1.0);
-	m_ymf278b->add_route(5, "rspeaker", 1.0);
+	m_ymf278b->add_route(0, "lspeaker", 0.5);
+	m_ymf278b->add_route(1, "rspeaker", 0.5);
+	m_ymf278b->add_route(2, "lspeaker", 0.4);
+	m_ymf278b->add_route(3, "rspeaker", 0.4);
+	m_ymf278b->add_route(4, "lspeaker", 0.5);
+	m_ymf278b->add_route(5, "rspeaker", 0.5);
 }
 
 ROM_START(msx_cart_moonsound)

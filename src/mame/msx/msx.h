@@ -323,7 +323,7 @@ private:
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
-		device.add_route(ALL_OUTPUTS, m_speaker, 0.9);
+		device.add_route(ALL_OUTPUTS, m_speaker, 1.0);
 		return device;
 	}
 	template <int N, typename T, typename U, typename V>
