@@ -27,7 +27,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/powerpc/ppc.h"
+#include "machine/mv6436x.h"
+#include "machine/pci.h"
+#include "machine/vt8231_isa.h"
 
 
 namespace {
@@ -42,7 +46,8 @@ class pegasos2_state : public driver_device
 public:
 	pegasos2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_syscon(*this, "syscon")
 	{
 	}
 
@@ -53,7 +58,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
+	required_device<mv64361_device> m_syscon;
 
 	void mem_map(address_map &map);
 };
@@ -94,10 +100,39 @@ void pegasos2_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
+static DEVICE_INPUT_DEFAULTS_START( com1_defaults )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 void pegasos2_state::pegasos2(machine_config &config)
 {
 	PPC604(config, m_maincpu, 100000000); // wrong cpu/clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &pegasos2_state::mem_map);
+
+	MV64361(config, m_syscon, 0, m_maincpu);
+
+	PCI_ROOT(config, "pci0", 0);
+	MV64361_PCI_HOST(config, "pci0:00.0", 0, m_maincpu, 0);
+
+	PCI_ROOT(config, "pci1", 0);
+	MV64361_PCI_HOST(config, "pci1:00.0", 0, m_maincpu, 1);
+	vt8231_isa_device &isa(VT8231_ISA(config, "pci1:0c.0", 0));
+	isa.com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
+	isa.com1_dtr_cb().set("com1", FUNC(rs232_port_device::write_dtr));
+	isa.com1_rts_cb().set("com1", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, "terminal"));
+	com1.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(com1_defaults));
+	com1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(com1_defaults));
+	com1.rxd_handler().set("pci1:0c.0", FUNC(vt8231_isa_device::com1_rxd_w));
+	com1.dcd_handler().set("pci1:0c.0", FUNC(vt8231_isa_device::com1_dcd_w));
+	com1.dsr_handler().set("pci1:0c.0", FUNC(vt8231_isa_device::com1_dsr_w));
+	com1.ri_handler().set("pci1:0c.0", FUNC(vt8231_isa_device::com1_ri_w));
+	com1.cts_handler().set("pci1:0c.0", FUNC(vt8231_isa_device::com1_cts_w));
 }
 
 

@@ -2792,6 +2792,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
 		MAME_DIR .. "src/devices/machine/mpc106.cpp",
 		MAME_DIR .. "src/devices/machine/mpc106.h",
+		MAME_DIR .. "src/devices/machine/mv6436x.cpp",
+		MAME_DIR .. "src/devices/machine/mv6436x.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
 		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
@@ -2816,6 +2818,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
+		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
+		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
 	}
 end
 
