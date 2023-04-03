@@ -272,8 +272,10 @@ void miconkit_state::micon2(machine_config &config)
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(miconkit_state::paddle_r));
 	m_ppi->out_pb_callback().set(FUNC(miconkit_state::sound_w));
+	m_ppi->tri_pb_callback().set_constant(0);
 	m_ppi->out_pc_callback().set(FUNC(miconkit_state::select_w));
 	m_ppi->in_pc_callback().set(FUNC(miconkit_state::vblank_r));
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

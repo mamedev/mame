@@ -3316,7 +3316,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(litelrn_state::speaker_decay_sim)
 	m_volume->flt_volume_set_volume(m_speaker_volume);
 
 	// volume decays when speaker is off, rate is determined by tone knob
-	m_speaker_volume /= 1.002 + (double)(u8)m_inputs[2]->read() * 0.0035; // approximation
+	const double div[3] = { 1.002, 1.004, 1.008 }; // approximation
+	m_speaker_volume /= div[m_inputs[2]->read() % 3];
 }
 
 void litelrn_state::write_r(u32 data)
@@ -3377,7 +3378,7 @@ static INPUT_PORTS_START( litelrn )
 	PORT_CONFNAME( 0x03, 0x00, "Tone" )
 	PORT_CONFSETTING(    0x00, "Organ" )
 	PORT_CONFSETTING(    0x01, "Harpsichord" )
-	PORT_CONFSETTING(    0x03, "Banjo" )
+	PORT_CONFSETTING(    0x02, "Banjo" )
 INPUT_PORTS_END
 
 // config

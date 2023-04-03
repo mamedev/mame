@@ -276,7 +276,7 @@ void diablo_state::diablo68k(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz

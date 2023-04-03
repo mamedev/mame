@@ -195,9 +195,13 @@ void m68000_device::device_start()
 	save_item(NAME(m_au));
 	save_item(NAME(m_at));
 	save_item(NAME(m_aob));
-	save_item(NAME(m_sp));
 	save_item(NAME(m_dt));
 	save_item(NAME(m_int_vector));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_bcount));
+	save_item(NAME(m_count_before_instruction_step));
+	save_item(NAME(m_t));
+	save_item(NAME(m_movems));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_dbin));
@@ -206,27 +210,28 @@ void m68000_device::device_start()
 	save_item(NAME(m_irc));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_ird));
-	save_item(NAME(m_irdi));
 	save_item(NAME(m_ftu));
 	save_item(NAME(m_aluo));
 	save_item(NAME(m_alue));
-	save_item(NAME(m_dcr));
-	save_item(NAME(m_movems));
+	save_item(NAME(m_alub));
 	save_item(NAME(m_movemr));
+	save_item(NAME(m_irdi));
+	save_item(NAME(m_base_ssw));
+	save_item(NAME(m_ssw));
+	save_item(NAME(m_dcr));
+
 	save_item(NAME(m_virq_state));
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_int_level));
 	save_item(NAME(m_int_next_state));
-	save_item(NAME(m_next_state));
-	save_item(NAME(m_inst_state));
-	save_item(NAME(m_inst_substate));
-	save_item(NAME(m_count_before_instruction_step));
-	save_item(NAME(m_bcount));
-	save_item(NAME(m_t));
-	save_item(NAME(m_post_run));
-	save_item(NAME(m_post_run_cycles));
 	save_item(NAME(m_nmi_uses_generic));
 	save_item(NAME(m_last_vpa_time));
+
+	save_item(NAME(m_inst_state));
+	save_item(NAME(m_inst_substate));
+	save_item(NAME(m_next_state));
+	save_item(NAME(m_post_run));
+	save_item(NAME(m_post_run_cycles));
 
 	memset(m_da, 0, sizeof(m_da));
 	m_ipc = 0;
@@ -234,8 +239,13 @@ void m68000_device::device_start()
 	m_au = 0;
 	m_at = 0;
 	m_aob = 0;
-	m_sp = 0;
 	m_dt = 0;
+	m_int_vector = 0;
+	m_sp = 0;
+	m_bcount = 0;
+	m_count_before_instruction_step = 0;
+	m_t = 0;
+	m_movems = 0;
 	m_isr = 0;
 	m_sr = 0;
 	m_dbin = 0;
@@ -244,25 +254,28 @@ void m68000_device::device_start()
 	m_irc = 0;
 	m_ir = 0;
 	m_ird = 0;
-	m_irdi = 0;
 	m_ftu = 0;
 	m_aluo = 0;
 	m_alue = 0;
-	m_dcr = 0;
+	m_alub = 0;
 	m_movemr = 0;
-	m_movems = 0;
+	m_irdi = 0;
+	m_base_ssw = 0;
+	m_ssw = 0;
+	m_dcr = 0;
+
 	m_virq_state = 0;
 	m_nmi_pending = 0;
 	m_int_level = 0;
 	m_int_next_state = 0;
-	m_next_state = 0;
-	m_inst_state = 0;
-	m_inst_substate = 0;
-	m_count_before_instruction_step = 0;
-	m_bcount = 0;
-	m_t = 0;
 	m_nmi_uses_generic = false;
 	m_last_vpa_time = 0;
+
+	m_inst_state = 0;
+	m_inst_substate = 0;
+	m_next_state = 0;
+	m_post_run = 0;
+	m_post_run_cycles = 0;
 
 	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
 	state_add(STATE_GENPC,     "rPC", m_pc);
