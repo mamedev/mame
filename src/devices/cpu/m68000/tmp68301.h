@@ -102,7 +102,7 @@ protected:
 	void ieir_w(u8 data);
 	u8 interrupt_callback();
 	void interrupt_update();
-	void interrupt_internal_trigger(int id);
+	void interrupt_internal_trigger(int vector);
 	std::tuple<u32, u8, u32> interrupt_get_current() const;
 
 	// Parallel interface
@@ -244,12 +244,29 @@ protected:
 	void scr_w(u8 data);
 
 	// 16-bit timer
+	enum {
+		TCR_CK  = 14,
+		TCR_P   = 10,
+		TCR_T   = 8,
+		TCR_N1  = 0x0080,
+		TCR_RP  = 0x0040,
+		TCR_MR  = 4,
+		TCR_INT = 0x0004,
+		TCR_CS  = 0x0002,
+		TCR_TS  = 0x0001
+	};
+
+	u64 m_timer_next_event[3], m_timer_last_sync[3];
 	u16 m_tcr[3], m_tmcr1[3], m_tmcr2[3], m_tctr[3];
 
 	static const int timer_source_id[3][2];
 	static const char *const timer_source_names[3][4];
 	static const int timer_divider[16];
-		
+
+	void timer_update(int ch);
+	void timer_sync(int ch);
+	void timer_predict(int ch);
+	
 	void tcr_w(int ch, u16 data, u16 mem_mask);
 	void tmcr1_w(int ch, u16 data, u16 mem_mask);
 	void tmcr2_w(int ch, u16 data, u16 mem_mask);

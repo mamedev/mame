@@ -166,6 +166,7 @@ protected:
 	u32 m_int_level;
 	u32 m_int_next_state;
 	bool m_nmi_uses_generic;
+	bool m_disable_interrupt_callback;
 	u64 m_last_vpa_time;
 
 	// Current instruction state and substate

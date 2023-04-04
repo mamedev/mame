@@ -40,10 +40,20 @@ void tmp68301_device::internal_update(uint64_t current_time)
 		if(m_serial_rx_next_event[i] && current_time >= m_serial_rx_next_event[i])
 			serial_rx_update(i);
 
-		if(m_serial_tx_next_event[i] && m_serial_tx_next_event[i] < event_time)
+		if(m_serial_tx_next_event[i] && (!event_time || m_serial_tx_next_event[i] < event_time))
 			event_time = m_serial_tx_next_event[i];
-		if(m_serial_rx_next_event[i] && m_serial_rx_next_event[i] < event_time)
+		if(m_serial_rx_next_event[i] && (!event_time || m_serial_rx_next_event[i] < event_time))
 			event_time = m_serial_rx_next_event[i];
+	}
+
+	// Timers
+	for(int i=0; i != 3; i++) {
+		// Calling update changes the next event time
+		if(m_timer_next_event[i] && current_time >= m_timer_next_event[i])
+			timer_update(i);
+
+		if(m_timer_next_event[i] && (!event_time || m_timer_next_event[i] < event_time))
+			event_time = m_timer_next_event[i];
 	}
 
 	recompute_bcount(event_time);    
@@ -104,6 +114,8 @@ void tmp68301_device::device_start()
 	save_item(NAME(m_tmcr1));
 	save_item(NAME(m_tmcr2));
 	save_item(NAME(m_tctr));
+	save_item(NAME(m_timer_next_event));
+	save_item(NAME(m_timer_last_sync));
 }
 
 void tmp68301_device::device_reset()
@@ -159,11 +171,14 @@ void tmp68301_device::device_reset()
 		m_serial_rx_line[i] = 0;
 	}
 
-	m_tcr[0] = 0x0052;
-	m_tcr[1] = m_tcr[2] = 0x0012;
-	m_tmcr1[0] = m_tmcr1[1] = m_tmcr1[2] = 0x0000;
-	m_tmcr2[0] = m_tmcr2[1] = m_tmcr2[2] = 0x0000;
-	m_tctr[0] = m_tctr[1] = m_tctr[2] = 0x0000;
+	for(int i=0; i != 3; i++) {
+		m_tcr[i] = i ? 0x0012 : 0x0052;
+		m_tmcr1[i] = 0x0000;
+		m_tmcr2[i] = 0x0000;
+		m_tctr[i] = 0x0000;
+		m_timer_next_event[i] = 0;
+		m_timer_last_sync[i] = 0;
+	}
 }
 
 void tmp68301_device::internal_map(address_map &map)
@@ -579,6 +594,8 @@ u8 tmp68301_device::interrupt_callback()
 {
 	auto [level, vector, slot] = interrupt_get_current();
 	logerror("interrupt callback ipr=%03x imr=%03x (%x, %02x, %d)\n", m_ipr, m_imr, level, vector, slot);
+	if(slot < 3)
+		standard_irq_callback(slot, m_pc);
 	if(vector != 0x1f) {
 		m_isr |= 1 << slot;
 		if(slot >= 3 || !(m_icr[slot] & 0x08))
@@ -1114,7 +1131,7 @@ const char *const tmp68301_device::timer_source_names[3][4] = {
 	{ "internal", "external", "ch0", "ch1" }
 };
 
-const int tmp68301_device::timer_divider[16] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 256, 256, 256, 256, 256, 256, 256 };
+const int tmp68301_device::timer_divider[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8 };
 
 u16 tmp68301_device::tcr0_r() { return m_tcr[0]; }
 u16 tmp68301_device::tcr1_r() { return m_tcr[1]; }
@@ -1124,9 +1141,9 @@ u16 tmp68301_device::tmcr11_r() { return m_tmcr1[1]; }
 u16 tmp68301_device::tmcr12_r() { return m_tmcr2[1]; }
 u16 tmp68301_device::tmcr21_r() { return m_tmcr1[2]; }
 u16 tmp68301_device::tmcr22_r() { return m_tmcr2[2]; }
-u16 tmp68301_device::tctr0_r() { return m_tctr[0]; }
-u16 tmp68301_device::tctr1_r() { return m_tctr[1]; }
-u16 tmp68301_device::tctr2_r() { return m_tctr[2]; }
+u16 tmp68301_device::tctr0_r() { timer_sync(0); return m_tctr[0]; }
+u16 tmp68301_device::tctr1_r() { timer_sync(1); return m_tctr[1]; }
+u16 tmp68301_device::tctr2_r() { timer_sync(2); return m_tctr[2]; }
 
 void tmp68301_device::tcr0_w(offs_t, u16 data, u16 mem_mask) { tcr_w(0, data, mem_mask); }
 void tmp68301_device::tcr1_w(offs_t, u16 data, u16 mem_mask) { tcr_w(1, data, mem_mask); }
@@ -1146,6 +1163,8 @@ void tmp68301_device::tctr2_w(offs_t, u16 data, u16 mem_mask) { tctr_w(2, data, 
 
 void tmp68301_device::tcr_w(int ch, u16 data, u16 mem_mask)
 {
+	timer_sync(ch);
+
 	static const char *const count_mode[4] = { "normal", "?", "start", "wait" };
 	static const char *const max_mode[4] = { "?", "1", "2", "1&2" };
 	u16 old = m_tmcr1[ch];
@@ -1159,48 +1178,140 @@ void tmp68301_device::tcr_w(int ch, u16 data, u16 mem_mask)
 	if(ch == 0)
 		logerror("timer %d clk=%s div=%d mode=%s repeat=%s intr=%s %s%s\n",
 				 ch,
-				 timer_source_names[ch][(m_tcr[ch] >> 14) & 3],
-				 timer_divider[(m_tcr[ch] >> 10) & 15],
-				 count_mode[(m_tcr[ch] >> 8) & 3],
-				 m_tcr[ch] & 0x0080 ? "on" : "off",
-				 m_tcr[ch] & 0x0004 ? "on" : "off",
-				 m_tcr[ch] & 0x0002 ? "stopped" : "running",
-				 m_tcr[ch] & 0x0001 ? "" : " clear");
+				 timer_source_names[ch][(m_tcr[ch] >> TCR_CK) & 3],
+				 1 << timer_divider[(m_tcr[ch] >> TCR_P) & 15],
+				 count_mode[(m_tcr[ch] >> TCR_T) & 3],
+				 m_tcr[ch] & TCR_N1 ? "on" : "off",
+				 m_tcr[ch] & TCR_INT ? "on" : "off",
+				 m_tcr[ch] & TCR_CS ? "stopped" : "running",
+				 m_tcr[ch] & TCR_TS ? "" : " clear");
 	else
 		logerror("timer %d clk=%s div=%d mode=%s repeat=%s output=%s max=%s intr=%s %s%s\n",
 				 ch,
-				 timer_source_names[ch][(m_tcr[ch] >> 14) & 3],
-				 timer_divider[(m_tcr[ch] >> 10) & 15],
-				 count_mode[(m_tcr[ch] >> 8) & 3],
-				 m_tcr[ch] & 0x0080 ? "on" : "off",
-				 m_tcr[ch] & 0x0040 ? "invert" : "pulse",
-				 max_mode[(m_tcr[ch] >> 4) & 3],
-				 m_tcr[ch] & 0x0004 ? "on" : "off",
-				 m_tcr[ch] & 0x0002 ? "stopped" : "running",
-				 m_tcr[ch] & 0x0001 ? "" : " clear");
+				 timer_source_names[ch][(m_tcr[ch] >> TCR_CK) & 3],
+				 1 << timer_divider[(m_tcr[ch] >> TCR_P) & 15],
+				 count_mode[(m_tcr[ch] >> TCR_T) & 3],
+				 m_tcr[ch] & TCR_N1 ? "on" : "off",
+				 m_tcr[ch] & TCR_RP ? "invert" : "pulse",
+				 max_mode[(m_tcr[ch] >> TCR_MR) & 3],
+				 m_tcr[ch] & TCR_INT ? "on" : "off",
+				 m_tcr[ch] & TCR_CS ? "stopped" : "running",
+				 m_tcr[ch] & TCR_TS ? "" : " clear");
+
+	timer_predict(ch);
 }
 
 void tmp68301_device::tmcr1_w(int ch, u16 data, u16 mem_mask)
 {
+	timer_sync(ch);
 	u16 old = m_tmcr1[ch];
 	COMBINE_DATA(&m_tmcr1[ch]);
 	if(m_tmcr1[ch] == old)
 		return;
 	logerror("timer %d max 1 %04x\n", ch, m_tmcr1[ch]);
+	timer_predict(ch);
 }
 
 void tmp68301_device::tmcr2_w(int ch, u16 data, u16 mem_mask)
 {
+	timer_sync(ch);
 	u16 old = m_tmcr2[ch];
 	COMBINE_DATA(&m_tmcr2[ch]);
 	if(m_tmcr2[ch] == old)
 		return;
 	logerror("timer %d max 2 %04x\n", ch, m_tmcr2[ch]);
+	timer_predict(ch);
 }
 
 void tmp68301_device::tctr_w(int ch, u16 data, u16 mem_mask)
 {
+	timer_sync(ch);
 	logerror("timer %d counter reset\n", ch);
+	if(ch)
+		m_tctr[ch] = 0;
+	timer_predict(ch);
 }
 
+void tmp68301_device::timer_update(int ch)
+{
+	timer_sync(ch);
+	timer_predict(ch);
+}
 
+void tmp68301_device::timer_sync(int ch)
+{
+	if(!(m_tcr[ch] & TCR_TS)) {
+		m_tctr[ch] = 0;
+		return;
+	}
+
+	if(m_tcr[ch] & TCR_CS)
+		return;
+
+	u32 div = timer_divider[(m_tcr[ch] >> TCR_P) & 15];
+	u64 ctime = total_cycles();
+	// Don't fold the shifts, the computation would be incorrect
+	u32 ntctr = m_tctr[ch] + ((ctime >> div) - (m_timer_last_sync[ch] >> div));
+	
+	u32 maxmode = (m_tcr[ch] >> TCR_MR) & 3;
+	if(maxmode == 1 || maxmode == 2) {
+		u32 max = (maxmode == 1) ? m_tmcr1[ch] : m_tmcr2[ch];
+		if(max == 0)
+			max = 0x10000;
+		if(m_tctr[ch] >= max) {
+			if(ntctr >= 0x10000)
+				ntctr -= 0x10000;
+			else
+				max = 0x10000;
+		}
+		if(ntctr >= max) {
+			if(m_tcr[ch] & TCR_INT)
+				interrupt_internal_trigger(4 + ch);
+			ntctr = ntctr % max;
+		}
+	}
+	m_tctr[ch] = ntctr;
+	m_timer_last_sync[ch] = ctime;
+}
+
+void tmp68301_device::timer_predict(int ch)
+{
+	if(!(m_tcr[ch] & TCR_TS))
+		m_tctr[ch] = 0;
+
+	if((m_tcr[ch] & (TCR_INT|TCR_CS|TCR_TS)) != (TCR_INT|TCR_TS)) {
+		m_timer_next_event[ch] = 0;
+		return;
+	}
+
+	u32 maxmode = (m_tcr[ch] >> TCR_MR) & 3;
+
+	if(maxmode == 0) {
+		logerror("timer %d no max selected ?\n", ch);
+		return;
+	}
+
+	if(maxmode == 3) {
+		logerror("timer %d alternating max mode unsupported\n", ch);
+		return;
+	}
+	
+	if((m_tcr[ch] & TCR_N1) == 0) {
+		// Need to add a flag to say "counter done" to make it work, reset on mode change.
+		logerror("timer %d single-shot mode unsupported\n");
+		return;
+	}
+
+	if(((m_tcr[ch] >> TCR_CK) & 3) != 0) {
+		logerror("timer %d source %s unsupported\n", ch, timer_source_names[ch][(m_tcr[ch] >> TCR_CK) & 3]);
+		return;
+	}
+
+	s32 delta = ((maxmode == 1) ? m_tmcr1[ch] : m_tmcr2[ch]) - m_tctr[ch];
+	if(delta <= 0)
+		delta += 0x10000;
+	u32 div = timer_divider[(m_tcr[ch] >> TCR_P) & 15];
+	u64 ctime = total_cycles();
+	m_timer_next_event[ch] = (((ctime >> div) + delta) << div);
+	recompute_bcount(ctime);
+}

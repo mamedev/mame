@@ -28,6 +28,7 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 	  m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(m68000_device::default_autovectors_map), this))
 {
 	m_mmu = nullptr;
+	m_disable_interrupt_callback = false;
 }
 
 void m68000_device::abort_access(u32 reason)
@@ -444,12 +445,14 @@ void m68000_device::start_interrupt_vector_lookup()
 	// flag for berr -> spurious
 
 	int level = m_next_state >> 24;
-	if(m_interrupt_mixer)
-		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
-	else {
-		for(int i=0; i<3; i++)
-			if(level & (1<<i))
-				standard_irq_callback(i, m_pc);
+	if(!m_disable_interrupt_callback) {
+		if(m_interrupt_mixer)
+			standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level, m_pc);
+		else {
+			for(int i=0; i<3; i++)
+				if(level & (1<<i))
+					standard_irq_callback(i, m_pc);
+		}
 	}
 
 	// Clear the nmi flag
@@ -468,6 +471,7 @@ void m68000_device::end_interrupt_vector_lookup()
 m68000_mcu_device::m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	m68000_device(mconfig, type, tag, owner, clock)
 {
+	m_disable_interrupt_callback = true;
 }
 
 void m68000_mcu_device::execute_run()
@@ -564,5 +568,4 @@ void m68000_mcu_device::set_current_interrupt_level(u32 level)
 		m_nmi_pending = true;
 
 	update_interrupt();
-
 }
