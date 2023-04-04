@@ -533,10 +533,10 @@ void i8x9x_device::internal_update(u64 current_time)
 		}
 	}
 
-	if(ad_done && ad_done < event_time)
+	if(ad_done && (!event_time || ad_done < event_time))
 		event_time = ad_done;
 
-	if(serial_send_timer && serial_send_timer < event_time)
+	if(serial_send_timer && (!event_time || serial_send_timer < event_time))
 		event_time = serial_send_timer;
 
 	recompute_bcount(event_time);
