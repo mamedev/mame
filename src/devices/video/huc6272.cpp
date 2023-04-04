@@ -617,7 +617,6 @@ template <unsigned N> void huc6272_device::adpcm_end_address_w(offs_t offset, u3
 template <unsigned N> void huc6272_device::adpcm_imm_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_adpcm.imm[N] = (data * 64) & 0x3ffff;
-
 }
 
 // TODO: verify me
