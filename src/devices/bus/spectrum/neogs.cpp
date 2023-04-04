@@ -58,24 +58,25 @@ class neogs_device : public device_t, public device_zxbus_card_interface
 {
 public:
 	neogs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ZXBUS_NEOGS, tag, owner, clock)
-	, device_zxbus_card_interface(mconfig, *this)
-	, m_maincpu(*this, "maincpu")
-	, m_ram(*this, RAM_TAG)
-	, m_bank_rom(*this, "bank_rom")
-	, m_bank_ram(*this, "bank_ram")
-	, m_view(*this, "view")
-	, m_dac(*this, "dac%u", 0U)
-{ };
+		: device_t(mconfig, ZXBUS_NEOGS, tag, owner, clock)
+		, device_zxbus_card_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, "maincpu")
+		, m_bank_rom(*this, "bank_rom")
+		, m_bank_ram(*this, "bank_ram")
+		, m_view(*this, "view")
+		, m_dac(*this, "dac%u", 0U)
+	{ }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	void device_start() override;
 	void device_reset() override;
 	const tiny_rom_entry *device_rom_region() const override;
-	void neogsmap(address_map &map);
-
 	void device_add_mconfig(machine_config &config) override;
+
+	void neogsmap(address_map &map);
 
 	INTERRUPT_GEN_MEMBER(irq0_line_assert);
 
@@ -85,6 +86,7 @@ protected:
 
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_rom;
 	memory_bank_creator m_bank_rom;
 	memory_bank_creator m_bank_ram;
 	memory_view m_view;
@@ -94,10 +96,10 @@ private:
 	template <u8 Bank> u8 ram_bank_r(offs_t offset);
 	template <u8 Bank> void ram_bank_w(offs_t offset, u8 data);
 
-	u8 status_r() { return m_status; };
-	void command_w(u8 data) { m_status |= 0x01; m_command_in = data; };
-	u8 data_r() { m_status &= ~0x80; return m_data_out; };
-	void data_w(u8 data) { m_status |= 0x80; m_data_in = data; };
+	u8 status_r() { return m_status; }
+	void command_w(u8 data) { m_status |= 0x01; m_command_in = data; }
+	u8 data_r() { m_status &= ~0x80; return m_data_out; }
+	void data_w(u8 data) { m_status |= 0x80; m_data_in = data; }
 	void ctrl_w(u8 data);
 
 	u8 m_data_in;
@@ -123,7 +125,7 @@ void neogs_device::update_config()
 	}
 	else
 	{
-		m_bank_rom->set_entry(m_mpag % (memregion("maincpu")->bytes() / 0x8000));
+		m_bank_rom->set_entry(m_mpag % (m_rom.bytes() / 0x8000));
 		m_view.disable();
 	}
 
@@ -235,22 +237,22 @@ void neogs_device::device_start()
 	if (!m_ram->started())
         throw device_missing_dependencies();
 
-	memory_region *rom = memregion("maincpu");
-	m_bank_rom->configure_entries(0, rom->bytes() / 0x8000,  rom->base(), 0x8000);
+	m_bank_rom->configure_entries(0, m_rom.bytes() / 0x8000,  &m_rom[0], 0x8000);
 	m_bank_ram->configure_entries(0, m_ram->size() / 0x8000, m_ram->pointer(), 0x8000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_tap(0x6000, 0x7fff, "dac_w", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			const u8 chanel = BIT(offset, 8, BIT(m_gscfg0, 2) ? 3 : 2); // 8CHANS
-			const u8 sample = data ^ (m_gscfg0 & 0x80); // INV7B
-			const s16 out = (sample - 0x80) * (m_vol[chanel] << 2);
-			m_dac[chanel]->data_w(out);
-			if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
-				;
-		}
-	});
+	m_maincpu->space(AS_PROGRAM).install_read_tap(0x6000, 0x7fff, "dac_w",
+			[this](offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					const u8 chanel = BIT(offset, 8, BIT(m_gscfg0, 2) ? 3 : 2); // 8CHANS
+					const u8 sample = data ^ (m_gscfg0 & 0x80); // INV7B
+					const s16 out = (sample - 0x80) * (m_vol[chanel] << 2);
+					m_dac[chanel]->data_w(out);
+					if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
+						;
+				}
+			});
 
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 }
