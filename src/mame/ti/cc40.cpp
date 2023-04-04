@@ -191,7 +191,7 @@ private:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)

@@ -11,6 +11,12 @@
 
 #pragma once
 
+#include "ng_memcard.h"
+#include "neogeo_spr.h"
+
+#include "bus/neogeo/slot.h"
+#include "bus/neogeo/carts.h"
+#include "bus/neogeo_ctrl/ctrl.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"
@@ -18,12 +24,6 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
-#include "ng_memcard.h"
-#include "neogeo_spr.h"
-
-#include "bus/neogeo/slot.h"
-#include "bus/neogeo/carts.h"
-#include "bus/neogeo_ctrl/ctrl.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -72,7 +72,7 @@ protected:
 		, m_audionmi(*this, "audionmi")
 	{ }
 
-	uint16_t memcard_r(offs_t offset);
+	uint16_t memcard_r(offs_t offset, uint16_t data);
 	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
@@ -106,6 +106,7 @@ protected:
 
 	void neogeo_base(machine_config &config);
 	void neogeo_stereo(machine_config &config);
+	void neogeo_memcard(machine_config &config);
 
 	void base_main_map(address_map &map);
 	void audio_io_map(address_map &map);

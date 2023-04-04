@@ -309,7 +309,7 @@ void snspellc_state::power_off()
 
 DEVICE_IMAGE_LOAD_MEMBER(snspellc_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > 0x4000)
 	{

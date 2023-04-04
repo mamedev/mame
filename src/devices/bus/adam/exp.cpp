@@ -81,11 +81,9 @@ std::error_condition adam_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const size = length();
 
 			fread(m_card->m_rom, size);
 		}

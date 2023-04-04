@@ -156,7 +156,7 @@ void electron_ap5_device::write(offs_t offset, uint8_t data, int infc, int infd,
 
 std::error_condition electron_ap5_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
@@ -169,8 +169,9 @@ std::error_condition electron_ap5_device::load_rom(device_image_interface &image
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
 	// mirror 8K ROMs
-	uint8_t *crt = slot->get_rom_base();
-	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+	uint8_t *const crt = slot->get_rom_base();
+	if (size <= 0x2000)
+		memcpy(crt + 0x2000, crt, 0x2000);
 
 	return std::error_condition();
 }

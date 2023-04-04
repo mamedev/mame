@@ -1059,18 +1059,15 @@ CUSTOM_INPUT_MEMBER(neogeo_base_state::get_memcard_status)
 }
 
 
-uint16_t neogeo_base_state::memcard_r(offs_t offset)
+uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	uint16_t ret;
-
-	if (m_memcard->present())
-		ret = m_memcard->read(offset) | 0xff00;
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		return m_memcard->read(offset);
 	else
-		ret = 0xffff;
-
-	return ret;
+		return 0xffff;
 }
 
 
@@ -1078,11 +1075,9 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	if (ACCESSING_BITS_0_7)
-	{
-		if (m_memcard->present())
-			m_memcard->write(offset, data);
-	}
+	// memory card enabled by /UDS
+	if (ACCESSING_BITS_8_15 && m_memcard->present())
+		m_memcard->write(offset, data);
 }
 
 /*************************************
@@ -1584,9 +1579,9 @@ void ngarcade_base_state::machine_start()
 
 	if (m_memcard)
 	{
-		main_program_space.unmap_readwrite(0x800000, 0x800fff);
-		main_program_space.install_read_handler(0x800000, 0x800fff, read16sm_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
-		main_program_space.install_write_handler(0x800000, 0x800fff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
+		main_program_space.unmap_readwrite(0x800000, 0xbfffff);
+		main_program_space.install_read_handler(0x800000, 0xbfffff, read16s_delegate(*this, FUNC(ngarcade_base_state::memcard_r)));
+		main_program_space.install_write_handler(0x800000, 0xbfffff, write16s_delegate(*this, FUNC(ngarcade_base_state::memcard_w)));
 	}
 
 	// enable rtc and serial mode
@@ -1711,7 +1706,7 @@ void neogeo_base_state::base_main_map(address_map &map)
 	map(0x360000, 0x37ffff).r(FUNC(neogeo_base_state::unmapped_r));
 	map(0x380000, 0x3800ff).mirror(0x01ff00).w(FUNC(neogeo_base_state::io_control_w)).umask16(0x00ff);
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(FUNC(neogeo_base_state::unmapped_r));
-	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
+	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w(m_systemlatch, FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
 	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(FUNC(neogeo_base_state::video_register_r));
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(FUNC(neogeo_base_state::video_register_w));
 	map(0x3e0000, 0x3fffff).r(FUNC(neogeo_base_state::unmapped_r));
@@ -1761,7 +1756,7 @@ void aes_state::aes_main_map(address_map &map)
 	map(0x000000, 0x00007f).r(FUNC(aes_state::banked_vectors_r));
 	map(0x100000, 0x10ffff).mirror(0x0f0000).ram();
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
-	map(0x800000, 0x800fff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
+	map(0x800000, 0xbfffff).rw(FUNC(aes_state::memcard_r), FUNC(aes_state::memcard_w));
 	map(0xc00000, 0xc1ffff).mirror(0x0e0000).rom().region("mainbios", 0);
 	map(0xd00000, 0xffffff).r(FUNC(aes_state::unmapped_r));
 }
@@ -1931,7 +1926,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	m_systemlatch->q_out_cb<1>().set(FUNC(neogeo_base_state::set_use_cart_vectors));
 	m_systemlatch->q_out_cb<2>().set_nop(); // memory card 1: write enable/disable
 	m_systemlatch->q_out_cb<3>().set_nop(); // memory card 2: write disable/enable
-	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal (what does it mean?)
+	m_systemlatch->q_out_cb<4>().set_nop(); // memory card: register select enable/set to normal
 	m_systemlatch->q_out_cb<7>().set(FUNC(neogeo_base_state::set_palette_bank));
 
 	/* video hardware */
@@ -1973,6 +1968,16 @@ void neogeo_base_state::neogeo_stereo(machine_config &config)
 }
 
 
+void neogeo_base_state::neogeo_memcard(machine_config &config)
+{
+	NG_MEMCARD(config, m_memcard, 0);
+
+	m_systemlatch->q_out_cb<2>().set(m_memcard, FUNC(ng_memcard_device::lock1_w));
+	m_systemlatch->q_out_cb<3>().set(m_memcard, FUNC(ng_memcard_device::unlock2_w));
+	m_systemlatch->q_out_cb<4>().set(m_memcard, FUNC(ng_memcard_device::regsel_w));
+}
+
+
 void ngarcade_base_state::neogeo_arcade(machine_config &config)
 {
 	neogeo_base(config);
@@ -2010,8 +2015,7 @@ void mvs_led_state::mv1(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2054,8 +2058,7 @@ void mvs_led_el_state::mv2f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2071,8 +2074,7 @@ void mvs_led_el_state::mv4f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2088,8 +2090,7 @@ void mvs_led_el_state::mv6f(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
@@ -2105,8 +2106,7 @@ void mvs_led_state::mv1_fixed(machine_config &config)
 {
 	neogeo_arcade(config);
 	neogeo_stereo(config);
-
-	NG_MEMCARD(config, m_memcard, 0);
+	neogeo_memcard(config);
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
@@ -2147,10 +2147,9 @@ void aes_state::aes_ntsc(machine_config &config)
 {
 	neogeo_base(config);
 	neogeo_stereo(config);
+	neogeo_memcard(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &aes_state::aes_main_map);
-
-	NG_MEMCARD(config, m_memcard, 0);
 
 	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, nullptr);
 

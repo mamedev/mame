@@ -77,7 +77,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "coco_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing to $C000-$FFEF

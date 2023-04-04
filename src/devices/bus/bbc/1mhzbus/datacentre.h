@@ -33,7 +33,7 @@ public:
 	template<int Drive> DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// optional information overrides

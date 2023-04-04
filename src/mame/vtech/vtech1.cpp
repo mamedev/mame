@@ -173,11 +173,11 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
 	pgmname[16] = '\0';
 
 	// get start and end addresses
-	uint16_t start = pick_integer_le(header, 22, 2);
-	uint16_t end = start + image.length() - sizeof(header);
-	uint16_t size = end - start;
+	uint16_t const start = pick_integer_le(header, 22, 2);
+	uint16_t const end = start + image.length() - sizeof(header);
+	uint16_t const size = end - start;
 
-	// write it to ram
+	// write it to RAM
 	auto buf = std::make_unique<uint8_t []>(size);
 	if (image.fread(buf.get(), size) != size)
 	{

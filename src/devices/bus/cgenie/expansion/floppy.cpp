@@ -177,7 +177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
 
 DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device::socket_load )
 {
-	uint32_t size = m_socket->common_get_size("rom");
+	uint32_t const size = m_socket->common_get_size("rom");
 
 	if (size > 0x1000)
 	{

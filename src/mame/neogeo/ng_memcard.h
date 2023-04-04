@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    NEOGEO Memory card functions.
+    Neo Geo Memory card functions
 
 *********************************************************************/
 #ifndef MAME_NEOGEO_NG_MEMCARD_H
@@ -12,8 +12,6 @@
 
 #include "imagedev/memcard.h"
 
-
-// ======================> ng_memcard_device
 
 class ng_memcard_device : public device_t, public device_memcard_image_interface
 {
@@ -30,8 +28,13 @@ public:
 	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 	// bus interface
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	uint16_t read(offs_t offset);
+	void write(offs_t offset, uint16_t data);
+
+	// control lines
+	DECLARE_WRITE_LINE_MEMBER(lock1_w);
+	DECLARE_WRITE_LINE_MEMBER(unlock2_w);
+	DECLARE_WRITE_LINE_MEMBER(regsel_w);
 
 	bool present() { return is_loaded(); }
 
@@ -41,6 +44,9 @@ protected:
 
 private:
 	uint8_t m_memcard_data[0x800];
+	uint8_t m_lock1;
+	uint8_t m_unlock2;
+	uint8_t m_regsel;
 };
 
 

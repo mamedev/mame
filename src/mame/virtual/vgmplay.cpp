@@ -2823,7 +2823,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			return image_error::INVALIDIMAGE;
 		}
 
-		uint32_t version = r32(8);
+		uint32_t const version = r32(8);
 		logerror("File version %x.%02x\n", version >> 8, version & 0xff);
 
 		uint32_t data_start = version >= 0x150 ? r32(0x34) + 0x34 : 0x40;
@@ -2835,52 +2835,58 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 		else if (volbyte > 0xc1)
 			volbyte -= 0x100;
 
-		float volume = version >= 0x160 && data_start >= 0x7d ? powf(2.0f, float(volbyte) / float(0x20)) : 1.0f;
+		float const volume = version >= 0x160 && data_start >= 0x7d ? powf(2.0f, float(volbyte) / float(0x20)) : 1.0f;
 
-		uint32_t extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
-		uint32_t header_size = extra_header_start ? extra_header_start : data_start;
+		uint32_t const extra_header_start = version >= 0x170 && data_start >= 0xc0 && r32(0xbc) ? r32(0xbc) + 0xbc : 0;
+		uint32_t const header_size = extra_header_start ? extra_header_start : data_start;
 
-		uint32_t extra_header_size = extra_header_start ? r32(extra_header_start) : 0;
-		uint32_t chip_clock_start = extra_header_size >= 4 && r32(extra_header_start + 4) ? r32(extra_header_start + 4) + extra_header_start + 4: 0;
-		uint32_t chip_volume_start = extra_header_size >= 8 && r32(extra_header_start + 8) ? r32(extra_header_start + 8) + extra_header_start + 8 : 0;
+		uint32_t const extra_header_size = extra_header_start ? r32(extra_header_start) : 0;
+		uint32_t const chip_clock_start = extra_header_size >= 4 && r32(extra_header_start + 4) ? r32(extra_header_start + 4) + extra_header_start + 4: 0;
+		uint32_t const chip_volume_start = extra_header_size >= 8 && r32(extra_header_start + 8) ? r32(extra_header_start + 8) + extra_header_start + 8 : 0;
 
 		if (chip_volume_start != 0)
 			osd_printf_warning("Warning: file has unsupported chip volumes\n");
 
-		const auto&& setup_device([&](device_t &device, int chip_num, vgm_chip chip_type, uint32_t offset, uint32_t min_version = 0)
-		{
-			uint32_t c = 0;
-			float chip_volume = volume;
-			bool has_2chip = false;
+		const auto setup_device(
+				[this, version, volume, header_size, chip_clock_start, chip_volume_start] (
+						device_t &device,
+						int chip_num,
+						vgm_chip chip_type,
+						uint32_t offset,
+						uint32_t min_version = 0)
+				{
+					uint32_t c = 0;
+					float chip_volume = volume;
+					bool has_2chip = false;
 
-			if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
-			{
-				c =  r32(offset);
-				has_2chip = (c & 0x40000000) != 0;
-
-				if (chip_clock_start && chip_num != 0)
-					for (auto i(0); i < r8(chip_clock_start); i++)
+					if (min_version <= version && offset + 4 <= header_size && (chip_num == 0 || (r32(offset) & 0x40000000) != 0))
 					{
-						if (r8(chip_clock_start + 1 + (i * 5)) == chip_type)
-						{
-							c = r32(chip_clock_start + 2 + (i * 5));
-							break;
-						}
+						c =  r32(offset);
+						has_2chip = (c & 0x40000000) != 0;
+
+						if (chip_clock_start && chip_num != 0)
+							for (auto i(0); i < r8(chip_clock_start); i++)
+							{
+								if (r8(chip_clock_start + 1 + (i * 5)) == chip_type)
+								{
+									c = r32(chip_clock_start + 2 + (i * 5));
+									break;
+								}
+							}
 					}
-			}
 
-			if (has_2chip)
-			{
-				chip_volume /= 2.0f;
-			}
-			device.set_unscaled_clock(c & ~0xc0000000);
-			if (device.unscaled_clock() != 0)
-				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
-			else
-				dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, 0);
+					if (has_2chip)
+					{
+						chip_volume /= 2.0f;
+					}
+					device.set_unscaled_clock(c & ~0xc0000000);
+					if (device.unscaled_clock() != 0)
+						dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, chip_volume);
+					else
+						dynamic_cast<device_sound_interface *>(&device)->set_output_gain(ALL_OUTPUTS, 0);
 
-			return (c & 0x80000000) != 0;
-		});
+					return (c & 0x80000000) != 0;
+				});
 
 		// Parse clocks
 		if (setup_device(*m_sn76489[0], 0, CT_SN76489, 0x0c) ||

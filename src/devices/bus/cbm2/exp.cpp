@@ -85,13 +85,11 @@ void cbm2_expansion_slot_device::device_start()
 
 std::error_condition cbm2_expansion_slot_device::call_load()
 {
-	size_t size;
-
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const size = length();
 
 			if (is_filetype("20"))
 			{

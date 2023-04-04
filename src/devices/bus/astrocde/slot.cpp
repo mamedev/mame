@@ -138,7 +138,7 @@ std::error_condition astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size);
 
 		if (!loaded_through_softlist())
@@ -163,8 +163,6 @@ std::error_condition astrocade_cart_slot_device::call_load()
 		}
 
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();

@@ -30,14 +30,13 @@ void vtech2_state::init_laser()
 	init_waitstates();
 
 	uint8_t *gfx = memregion("gfx2")->base();
-	int i;
 
 	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
 	m_laser_fdc_bits = 8;
 	m_laser_drive = -1;
 	m_cart_size = 0;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	m_laser_latch = -1;

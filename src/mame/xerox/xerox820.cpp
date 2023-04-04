@@ -378,10 +378,10 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 
 QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
-	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-
 	if (image.length() >= 0xfd00)
 		return image_error::INVALIDLENGTH;
+
+	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
 
 	m_view.select(0);
 
