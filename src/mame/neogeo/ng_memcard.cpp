@@ -2,16 +2,14 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    ng_memcard.c
-
     NEOGEO Memory card functions.
 
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-
 #include "ng_memcard.h"
+
+#include "emuopts.h"
 
 
 // device type definition
@@ -44,12 +42,12 @@ void ng_memcard_device::device_start()
 
 std::error_condition ng_memcard_device::call_load()
 {
-	if(length() != 0x800)
+	if (length() != 0x800)
 		return image_error::INVALIDLENGTH;
 
 	fseek(0, SEEK_SET);
 	size_t ret = fread(m_memcard_data, 0x800);
-	if(ret != 0x800)
+	if (ret != 0x800)
 		return image_error::UNSPECIFIED;
 
 	return std::error_condition();
@@ -65,8 +63,8 @@ std::error_condition ng_memcard_device::call_create(int format_type, util::optio
 {
 	memset(m_memcard_data, 0, 0x800);
 
-	size_t ret = fwrite(m_memcard_data, 0x800);
-	if(ret != 0x800)
+	size_t const ret = fwrite(m_memcard_data, 0x800);
+	if (ret != 0x800)
 		return image_error::UNSPECIFIED;
 
 	return std::error_condition();

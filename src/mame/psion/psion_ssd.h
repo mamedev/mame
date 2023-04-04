@@ -33,14 +33,14 @@ public:
 	void  data_w(uint16_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_resolve_objects() override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 

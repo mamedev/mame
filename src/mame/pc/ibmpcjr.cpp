@@ -468,9 +468,9 @@ std::error_condition pcjr_state::load_cart(device_image_interface &image, generi
 				osd_printf_error("%s: Invalid header size\n", image.basename());
 				return image_error::INVALIDIMAGE;
 		}
-		if (size - header_size == 0xa000)
+		if ((size - header_size) == 0xa000)
 		{
-			// alloc 64K for the imagic carts, so to handle the necessary mirroring
+			// alloc 64K for the imagic carts, so as to handle the necessary mirroring
 			size += 0x6000;
 			imagic_hack = true;
 		}

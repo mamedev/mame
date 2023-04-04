@@ -209,9 +209,9 @@ void tvgogo_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size > 0x800000)
+	if (size > 0x80'0000)
 	{
 		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
 		return image_error::INVALIDLENGTH;

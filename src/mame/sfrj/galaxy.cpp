@@ -196,7 +196,7 @@ void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
 
 SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 {
-	uint32_t snapshot_size = image.length();
+	uint32_t const snapshot_size = image.length();
 	switch (snapshot_size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:

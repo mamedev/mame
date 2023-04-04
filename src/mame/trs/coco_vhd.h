@@ -33,7 +33,7 @@ public:
 	coco_vhd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~coco_vhd_image_device();
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }

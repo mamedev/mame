@@ -120,7 +120,7 @@ void k28m2_state::power_off()
 
 DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > 0x4000)
 	{
@@ -128,7 +128,7 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 		return image_error::INVALIDLENGTH;
 	}
 
-	u8 *base = memregion("tms6100")->base() + 0x8000;
+	u8 *const base = memregion("tms6100")->base() + 0x8000;
 	m_cart->common_load_rom(base, size, "rom");
 
 	return std::error_condition();

@@ -301,8 +301,8 @@ QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 	uint16_t addr, size;
 	uint8_t ident, *RAM = memregion("maincpu")->base();
 
-	image.fread(buff, sizeof (buff));
-	if (memcmp(buff, magic, sizeof (buff)))
+	image.fread(buff, sizeof(buff));
+	if (memcmp(buff, magic, sizeof(buff)))
 	{
 		logerror("mekd2 rom load: magic '%s' not found\n", magic);
 		return image_error::INVALIDIMAGE;

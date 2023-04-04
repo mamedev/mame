@@ -20,17 +20,19 @@
 **************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "softlist_dev.h"
 #include "sound/beep.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "softlist_dev.h"
-#include "imagedev/snapquik.h"
 #include "speaker.h"
 
 

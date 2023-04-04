@@ -965,7 +965,7 @@ DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];
-	uint32_t size = image.length();
+	uint32_t const size = image.length();
 
 	if (size != 0x20f40)
 		return image_error::INVALIDLENGTH;

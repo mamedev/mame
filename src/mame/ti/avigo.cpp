@@ -697,7 +697,7 @@ QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 	int app_page;
 
 	// german and spanish language are 4 pages bigger than other
-	if ( strcmp( systemname, "avigo_de" ) == 0 || strcmp( systemname, "avigo_es" ) == 0 )
+	if (strcmp( systemname, "avigo_de" ) == 0 || strcmp( systemname, "avigo_es" ) == 0)
 		first_app_page += 4;
 
 	// search the first empty page

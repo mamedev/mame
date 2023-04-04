@@ -364,7 +364,7 @@ void snspell_state::power_off()
 
 DEVICE_IMAGE_LOAD_MEMBER(snspell_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > m_cart_max_size)
 	{

@@ -259,7 +259,7 @@ QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 	int i;
 	std::error_condition result = image_error::UNSPECIFIED;
 
-	int quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length < 0x1500)
 	{
 		result = image_error::INVALIDLENGTH;

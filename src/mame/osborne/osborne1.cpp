@@ -116,6 +116,8 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -128,7 +130,8 @@ public:
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_rom_view(*this, "bank_0000"),
-		m_vram(*this, "vram", 0x2000, ENDIANNESS_LITTLE),
+		m_main_ram(*this, "mainram"),
+		m_attr_ram(*this, "attrram"),
 		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_pia0(*this, "pia_0"),
@@ -143,7 +146,7 @@ public:
 		m_keyb_row(*this, { "ROW0", "ROW1", "ROW3", "ROW4", "ROW5", "ROW2", "ROW6", "ROW7" }),
 		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
-		m_bank_fxxx(*this, "bank_fxxx"),
+		m_vram_view(*this, "bank_fxxx"),
 		m_p_chargen(*this, "chargen"),
 		m_video_timer(nullptr),
 		m_tilemap(nullptr),
@@ -169,6 +172,7 @@ protected:
 	u8 bank2_peripherals_r(offs_t offset);
 	void bank2_peripherals_w(offs_t offset, u8 data);
 	void videoram_w(offs_t offset, u8 data);
+	void attrram_w(offs_t offset, u8 data);
 	u8 opcode_r(offs_t offset);
 	void bankswitch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(irqack_w);
@@ -179,7 +183,8 @@ protected:
 	template <int Width, unsigned Scale> void draw_rows(uint16_t col, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	memory_view                             m_rom_view;
-	memory_share_creator<u8>                m_vram;
+	required_shared_ptr<u8>                 m_main_ram;
+	required_shared_ptr<u8>                 m_attr_ram;
 	required_device<screen_device>          m_screen;
 	required_device<z80_device>             m_maincpu;
 	required_device<pia6821_device>         m_pia0;
@@ -205,7 +210,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	bool set_rom_mode(u8 value);
-	bool set_bit_9(u8 value);
 	void update_irq();
 	void update_acia_rxc_txc();
 
@@ -225,7 +229,7 @@ private:
 	required_ioport             m_cnf;
 
 	// pieces of memory
-	required_memory_bank        m_bank_fxxx;
+	memory_view                 m_vram_view;
 	required_region_ptr<u8>     m_p_chargen;
 
 	// configuration (reloaded on reset)
@@ -237,7 +241,6 @@ private:
 	u8              m_ub4a_q;
 	u8              m_ub6a_q;
 	u8              m_rom_mode;
-	u8              m_bit_9;
 
 	// onboard video state
 	u8              m_scroll_x;
@@ -369,12 +372,14 @@ void osborne1sp_state::bank2_peripherals_w(offs_t offset, u8 data)
 
 void osborne1_state::videoram_w(offs_t offset, u8 data)
 {
+	m_main_ram[0xf000 | offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void osborne1_state::attrram_w(offs_t offset, u8 data)
+{
 	// Attribute RAM is only one bit wide - low seven bits are discarded and read back high
-	if (m_bit_9)
-		data |= 0x7f;
-	else
-		m_tilemap->mark_tile_dirty(offset);
-	reinterpret_cast<u8 *>(m_bank_fxxx->base())[offset] = data;
+	m_attr_ram[offset] = data | 0x7f;
 }
 
 u8 osborne1_state::opcode_r(offs_t offset)
@@ -411,10 +416,10 @@ void osborne1_state::bankswitch_w(offs_t offset, u8 data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	case 0x02:
-		set_bit_9(1);
+		m_vram_view.select(0);
 		break;
 	case 0x03:
-		set_bit_9(0);
+		m_vram_view.disable();
 		break;
 	}
 }
@@ -535,8 +540,6 @@ INPUT_CHANGED_MEMBER( osborne1_state::reset_key )
 
 void osborne1_state::machine_start()
 {
-	m_bank_fxxx->configure_entries(0, 2, &m_vram[0], 0x1000);
-
 	m_video_timer = timer_alloc(FUNC(osborne1_state::video_callback), this);
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
@@ -554,7 +557,6 @@ void osborne1_state::machine_start()
 	save_item(NAME(m_ub4a_q));
 	save_item(NAME(m_ub6a_q));
 	save_item(NAME(m_rom_mode));
-	save_item(NAME(m_bit_9));
 
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
@@ -593,9 +595,8 @@ void osborne1_state::machine_reset()
 
 	// Initialise memory configuration
 	m_rom_mode = 0;
-	m_bit_9 = 1;
 	set_rom_mode(1);
-	set_bit_9(0);
+	m_vram_view.disable();
 
 	// Reset serial state
 	m_acia_irq_state = 0;
@@ -603,8 +604,8 @@ void osborne1_state::machine_reset()
 	update_acia_rxc_txc();
 
 	// The low bits of attribute RAM are not physically present and hence always read high
-	for (unsigned i = 0; i < 0x1000; i++)
-		m_vram[0x1000 + i] |= 0x7f;
+	for (u8 &b : m_attr_ram)
+		b |= 0x7f;
 }
 
 void osborne1_state::video_start()
@@ -639,25 +640,22 @@ inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const 
 			m_scroll_y = m_pia1->b_output() & 0x1f;
 
 		// Draw a line of the display
-		u8 const ra(y % 10);
-		uint16_t *p(&bitmap.pix(y));
-		uint16_t const row(((m_scroll_y + (y / 10)) << 7) & 0x0f80);
+		u8 const ra = y % 10;
+		uint16_t *p = &bitmap.pix(y);
+		uint16_t const row = ((m_scroll_y + (y / 10)) << 7) & 0x0f80;
 
 		for (uint16_t x = 0; Width > x; ++x)
 		{
-			uint16_t const offs(row | ((col + x) & 0x7f));
-			u8 const chr(m_vram[offs]);
-			u8 const clr((m_vram[0x1000 + offs] & 0x80) ? 2 : 1);
+			uint16_t const offs = row | ((col + x) & 0x7f);
+			u8 const chr = m_main_ram[0xf000 | offs];
+			u8 const clr = BIT(m_attr_ram[offs], 7) ? 2 : 1;
 
-			u8 const gfx(((chr & 0x80) && (ra == 9)) ? 0xff : m_p_chargen[(ra << 7) | (chr & 0x7f)]);
+			bool const underline = BIT(chr, 7) && (ra == 9);
+			u8 const gfx = underline ? 0xff : m_p_chargen[(ra << 7) | (chr & 0x7f)];
 
 			// Display a scanline of a character
 			for (unsigned b = 0; 8 > b; ++b)
-			{
-				uint16_t const pixel(BIT(gfx, 7 - b) ? clr : 0);
-				for (unsigned i = 0; Scale > i; ++i)
-					*p++ = pixel;
-			}
+				p = std::fill_n(p, Scale, BIT(gfx, 7 - b) ? clr : 0);
 		}
 	}
 }
@@ -700,8 +698,8 @@ uint32_t osborne1sp_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
-	int const y(m_screen->vpos());
-	u8 const ra(y % 10);
+	int const y = m_screen->vpos();
+	u8 const ra = y % 10;
 
 	// The beeper is gated so it's active four out of every ten scanlines
 	m_beep_state = (ra & 0x04) ? 1 : 0;
@@ -721,7 +719,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)
 TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
 {
 	// The gfxdecode and tilemap aren't actually used for drawing, they just look nice in the graphics viewer
-	tileinfo.set(0, m_vram[tile_index] & 0x7f, 0, 0);
+	tileinfo.set(0, m_main_ram[0xf000 | tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -734,20 +732,6 @@ bool osborne1_state::set_rom_mode(u8 value)
 			m_rom_view.select(0);
 		else
 			m_rom_view.disable();
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool osborne1_state::set_bit_9(u8 value)
-{
-	if (value != m_bit_9)
-	{
-		m_bit_9 = value;
-		m_bank_fxxx->set_entry(m_bit_9);
 		return true;
 	}
 	else
@@ -786,8 +770,8 @@ MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
 	for (u8 x = 0; x < x_count; ++x)
 	{
 		uint16_t const offset = base | ((ma + x) & 0x7f);
-		u8 const chr = m_vram[offset];
-		u8 const clr = BIT(m_vram[0x1000 | offset], 7) ? 2 : 1;
+		u8 const chr = m_main_ram[0xf000 | offset];
+		u8 const clr = BIT(m_attr_ram[offset], 7) ? 2 : 1;
 
 		u8 const gfx = ((chr & 0x80) && (ra == 9)) ? 0xff : m_p_nuevo[(ra << 7) | (chr & 0x7f)];
 
@@ -803,12 +787,15 @@ MC6845_ON_UPDATE_ADDR_CHANGED(osborne1nv_state::crtc_update_addr_changed)
 
 void osborne1_state::osborne1_mem(address_map &map)
 {
-	map(0x0000, 0xefff).ram();
-	map(0xf000, 0xffff).bankr(m_bank_fxxx).w(FUNC(osborne1_state::videoram_w));
+	map(0x0000, 0xffff).ram().share(m_main_ram);
+	map(0xf000, 0xffff).w(FUNC(osborne1_state::videoram_w));
 
 	map(0x0000, 0x3fff).view(m_rom_view);
 	m_rom_view[0](0x0000, 0x0fff).mirror(0x1000).rom().region("maincpu", 0).unmapw();
 	m_rom_view[0](0x2000, 0x2fff).mirror(0x1000).rw(FUNC(osborne1_state::bank2_peripherals_r), FUNC(osborne1_state::bank2_peripherals_w));
+
+	map(0xf000, 0xffff).view(m_vram_view);
+	m_vram_view[0](0xf000, 0xffff).ram().w(FUNC(osborne1_state::attrram_w)).share(m_attr_ram);
 }
 
 void osborne1sp_state::osborne1sp_mem(address_map &map)

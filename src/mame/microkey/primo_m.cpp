@@ -322,7 +322,7 @@ void primo_state::setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 
 QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 {
-	size_t quickload_size = image.length();
+	size_t const quickload_size = image.length();
 	std::vector<uint8_t> quickload_data(quickload_size);
 
 	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)

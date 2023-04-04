@@ -60,8 +60,8 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 	device_single_card_slot_interface<device_mc10cart_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
 	m_nmi_callback(*this),
-	m_cart(nullptr),
-	m_memspace(*this, finder_base::DUMMY_TAG, -1)
+	m_memspace(*this, finder_base::DUMMY_TAG, -1),
+	m_cart(nullptr)
 {
 }
 

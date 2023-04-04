@@ -57,7 +57,7 @@ public:
 	virtual char const *image_interface() const noexcept override { return "monon_color_cart"; }
 	virtual char const *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	uint8_t read()
@@ -84,7 +84,7 @@ public:
 protected:
 	mononcol_cartslot_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_mononcol_cart_interface *m_cart;

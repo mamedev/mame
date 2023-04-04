@@ -69,7 +69,7 @@ private:
 	void update_palette(uint8_t pal);
 
 	void update_memory();
-	void setup_snapshot(uint8_t * data);
+	void setup_snapshot(uint8_t *data);
 	void dump_registers();
 	std::error_condition verify_snapshot(const uint8_t * data, uint32_t size);
 

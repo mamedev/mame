@@ -2,8 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    ng_memcard.h
-
     NEOGEO Memory card functions.
 
 *********************************************************************/
@@ -38,7 +36,7 @@ public:
 	bool present() { return is_loaded(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

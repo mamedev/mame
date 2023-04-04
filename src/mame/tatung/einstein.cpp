@@ -845,12 +845,12 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	if (image.length() >= 0xfd00)
 		return image_error::INVALIDLENGTH;
 
-	/* disable rom */
+	// disable ROM
 	m_rom_enabled = 0;
 	m_bank1->set_entry(m_rom_enabled);
 
-	/* load image */
-	uint16_t quickload_size = image.length();
+	// load image
+	uint16_t const quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -860,7 +860,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* start program */
+	// start program
 	m_maincpu->set_pc(0x100);
 
 	return std::error_condition();

@@ -629,7 +629,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	if ( ! size || size > 0x10000)
 	{

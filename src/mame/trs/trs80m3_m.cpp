@@ -675,12 +675,12 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 
 	while (!image.image_feof())
 	{
-		image.fread( &type, 1);
-		image.fread( &length, 1);
+		image.fread(&type, 1);
+		image.fread(&length, 1);
 
 		switch (type)
 		{
-			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
+		case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
 			{
 				length -= 2;
 				u16 block_length = length ? length : 256;
@@ -693,11 +693,11 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 					image.message("Attempting to write outside of RAM");
 					return image_error::INVALIDIMAGE;
 				}
-				image.fread( ptr, block_length);
+				image.fread(ptr, block_length);
 			}
 			break;
 
-			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
+		case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
 				image.fread( &addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
@@ -717,7 +717,7 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 			break;
 
 		default:
-			image.fread( &data, length);
+			image.fread(&data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
 			image.message("Unsupported or invalid block type");
 			return image_error::INVALIDIMAGE;

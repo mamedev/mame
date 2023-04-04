@@ -242,24 +242,20 @@ void thomson_state::thom_irq_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 {
-	int i,j;
-	uint8_t* pos = &m_cart_rom[0];
 	offs_t size;
-	char name[129];
-
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
@@ -267,9 +263,10 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 		return image_error::INVALIDLENGTH;
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread( pos, size ) != size )
+		if (image.fread(pos, size) != size)
 		{
 			osd_printf_error("%s: Read error\n", image.basename());
 			return image_error::UNSPECIFIED;
@@ -280,14 +277,16 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
-	for ( i = 0; i < size && pos[i] != ' '; i++ );
-	for ( i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
+	// extract name
+	int i,j;
+	char name[129];
+	for (i = 0; i < size && pos[i] != ' '; i++);
+	for (i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
 		name[j] = pos[i+j];
 	name[j] = 0;
 
-	/* sanitize name */
-	for ( i = 0; name[i]; i++)
+	// sanitize name
+	for (i = 0; name[i]; i++)
 	{
 		if ( name[i] < ' ' || name[i] >= 127 )
 			name[i] = '?';
@@ -1067,24 +1066,22 @@ void mo5_state::mo5_gatearray_w(offs_t offset, uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 {
-	uint8_t* pos = &m_cart_rom[0];
 	uint64_t size, i;
 	int j;
-	char name[129];
 
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size > 32 && size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size > 32 && size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
@@ -1092,9 +1089,10 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 		return image_error::INVALIDLENGTH;
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread(pos, size ) != size )
+		if (image.fread(pos, size) != size)
 		{
 			osd_printf_error("Read error\n");
 			return image_error::UNSPECIFIED;
@@ -1105,14 +1103,15 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
+	// extract name
 	i = size - 32;
-	while ( i < size && !pos[i] ) i++;
-	for ( j = 0; i < size && pos[i] >= 0x20; j++, i++)
+	char name[129];
+	while (i < size && !pos[i]) i++;
+	for (j = 0; i < size && pos[i] >= 0x20; j++, i++)
 		name[j] = pos[i];
 	name[j] = 0;
 
-	/* sanitize name */
+	// sanitize name
 	for ( j = 0; name[j]; j++)
 	{
 		if ( name[j] < ' ' || name[j] >= 127 ) name[j] = '?';

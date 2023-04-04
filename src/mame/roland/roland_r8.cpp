@@ -188,7 +188,7 @@ private:
 
 std::error_condition roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image)
 {
-	uint32_t size = pcmcard->common_get_size("rom");
+	uint32_t const size = pcmcard->common_get_size("rom");
 	if (size > PCMCARD_SIZE)
 	{
 		osd_printf_error("%s: Invalid size: Only up to 512K is supported\n", image.basename());
@@ -197,7 +197,7 @@ std::error_condition roland_r8_base_state::pcmrom_load(generic_slot_device *pcmc
 
 	pcmcard->rom_alloc(PCMCARD_SIZE, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	pcmcard->common_load_rom(pcmcard->get_rom_base(), size, "rom");
-	u8* base = pcmcard->get_rom_base();
+	u8 *base = pcmcard->get_rom_base();
 	if (size < PCMCARD_SIZE)
 	{
 		uint32_t mirror = (1 << (31 - count_leading_zeros_32(size)));
@@ -208,8 +208,8 @@ std::error_condition roland_r8_base_state::pcmrom_load(generic_slot_device *pcmc
 	}
 
 	offs_t pcm_addr = PCMCARD_OFFSETS[card_id];
-	u8 *src = static_cast<u8 *>(memregion("pcmorg")->base());
-	u8 *dst = static_cast<u8 *>(memregion("pcm")->base());
+	u8 *src = reinterpret_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[pcm_addr], base, PCMCARD_SIZE);
 	// descramble PCM card ROM
 	descramble_rom_external(&dst[pcm_addr], &src[pcm_addr]);
@@ -220,8 +220,8 @@ std::error_condition roland_r8_base_state::pcmrom_load(generic_slot_device *pcmc
 
 void roland_r8_base_state::pcmrom_unload(int card_id)
 {
-	u8 *src = static_cast<u8 *>(memregion("pcmorg")->base());
-	u8 *dst = static_cast<u8 *>(memregion("pcm")->base());
+	u8 *src = reinterpret_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = reinterpret_cast<u8 *>(memregion("pcm")->base());
 	offs_t pcm_addr = PCMCARD_OFFSETS[card_id];
 	memset(&src[pcm_addr], 0xff, PCMCARD_SIZE);
 	memset(&dst[pcm_addr], 0xff, PCMCARD_SIZE);

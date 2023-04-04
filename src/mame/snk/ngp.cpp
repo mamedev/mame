@@ -755,7 +755,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size != 0x8000 && size != 0x80000 && size != 0x100000 && size != 0x200000 && size != 0x400000)
+	if (size != 0x8000 && size != 0x8'0000 && size != 0x10'0000 && size != 0x20'0000 && size != 0x40'0000)
 	{
 		osd_printf_error("Unsupported cartridge size\n");
 		return image_error::INVALIDLENGTH;
