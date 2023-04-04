@@ -276,8 +276,8 @@ void tsconf_state::tsconf(machine_config &config)
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, "neogs", false);
-	//ZXBUS_SLOT(config, "zxbus:2", 0, "zxbus", zxbus_cards, nullptr, false);
+	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, "neogs");
+	//ZXBUS_SLOT(config, "zxbus2", 0, "zxbus", zxbus_cards, nullptr);
 
 	m_ram->set_default_size("4096K");
 

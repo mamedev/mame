@@ -199,7 +199,6 @@ void neogs_device::device_start()
 		}
 	});
 
-	set_zxbus_device();
 	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 }
 
