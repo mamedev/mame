@@ -44,21 +44,6 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 
-	// Clocks
-	static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
-
-	// Standard H19 used a 2.048 MHz clock
-	static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
-	static constexpr XTAL MC6845_CLOCK = MASTER_CLOCK / 8;
-	static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
-
-	// Beep Frequency is 1 KHz
-	static constexpr XTAL H19_BEEP_FRQ = (H19_CLOCK / 2048);
-
-	// Capacitor value in pF
-	static constexpr uint32_t H19_KEY_DEBOUNCE_CAPACITOR = 5000;
-
-
 private:
 
 	void key_click_w(uint8_t data);
@@ -133,7 +118,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)

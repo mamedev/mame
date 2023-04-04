@@ -52,10 +52,20 @@
 
 #include "tlb.h"
 
+// Clocks
+static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
+
+// Standard H19 used a 2.048 MHz clock
+static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
+static constexpr XTAL MC6845_CLOCK = MASTER_CLOCK / 8;
+static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
+
+// Beep Frequency is 1 KHz
+static constexpr XTAL H19_BEEP_FRQ = (H19_CLOCK / 2048);
+
 // Capacitor value in pF
 static constexpr uint32_t H19_KEY_DEBOUNCE_CAPACITOR = 5000;
 #define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
-
 
 DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
@@ -734,9 +744,7 @@ void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
 {
 	heath_tlb_device::device_add_mconfig(config);
 
-	Z80(config.replace(), m_maincpu, H19_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_ultra_tlb_device::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &heath_ultra_tlb_device::io_map);
 }
 
 void heath_ultra_tlb_device::mem_map(address_map &map)
@@ -748,11 +756,6 @@ void heath_ultra_tlb_device::mem_map(address_map &map)
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
 	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
 
-}
-
-void heath_ultra_tlb_device::io_map(address_map &map)
-{
-	heath_tlb_device::io_map(map);
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
