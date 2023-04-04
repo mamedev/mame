@@ -258,6 +258,7 @@ static INPUT_PORTS_START(smiconk)
 INPUT_PORTS_END
 
 
+
 /******************************************************************************
     Machine Configs
 ******************************************************************************/
@@ -298,6 +299,8 @@ void miconkit_state::smiconk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &miconkit_state::smiconk_main_map);
 	m_maincpu->set_addrmap(AS_IO, &miconkit_state::smiconk_io_map);
 }
+
+
 
 /******************************************************************************
     ROM Definitions
