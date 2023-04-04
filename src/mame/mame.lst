@@ -38368,9 +38368,9 @@ indy500to                       // 1995.07 Indy 500 Twin (Revision A)
 lastbrnx                        // 1996.06 Last Bronx (Export, Revision A)
 lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
-manxtt                          // 1995.11 Manx T.T. DX (Revision D)
-manxtta                         // 1995.?? Manx T.T. (Revision A)
-manxttc                         // 1995.11 Manx T.T. (Revision C)
+manxtt                          // 1995.11 Manx T.T. DX/Twin (Revision D)
+manxttc                         // 1995.11 Manx T.T. DX/Twin(Revision C)
+manxttdx                        // 1995.?? Manx T.T. DX (Revision A)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
