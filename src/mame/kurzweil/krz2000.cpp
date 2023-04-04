@@ -31,11 +31,10 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/m6502/m3745x.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/ncr5380.h"
-#include "machine/tmp68301.h"
 #include "machine/upd765.h"
 #include "video/t6963c.h"
 

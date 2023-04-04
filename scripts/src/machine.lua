@@ -3510,18 +3510,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/tmp68301.h,MACHINES["TMP68301"] = true
----------------------------------------------------
-
-if (MACHINES["TMP68301"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/tmp68301.cpp",
-		MAME_DIR .. "src/devices/machine/tmp68301.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/tms1024.h,MACHINES["TMS1024"] = true
 ---------------------------------------------------
 

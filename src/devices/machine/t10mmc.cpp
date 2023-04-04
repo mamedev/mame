@@ -555,7 +555,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SBC_CMD_READ_10:
 	case T10SBC_CMD_READ_12:
-		//m_device->logerror("T10MMC: read %x dataLength, \n", dataLength);
+		//m_device->logerror("T10MMC: read %x dataLength lba=%x\n", dataLength, m_lba);
 		if ((m_cdrom) && (m_blocks))
 		{
 			while (dataLength > 0)
@@ -820,6 +820,17 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				data[19] = 0;
 				data[20] = 0;
 				data[21] = 0;
+				break;
+
+			case 0x0d: // CD page
+				data[1] = 0x06;
+				data[0] = 0x0d;
+				data[2] = 0;
+				data[3] = 0;
+				data[4] = 0;
+				data[5] = 60;
+				data[6] = 0;
+				data[7] = 75;
 				break;
 
 			default:
