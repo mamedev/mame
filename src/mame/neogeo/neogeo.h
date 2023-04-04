@@ -66,8 +66,6 @@ protected:
 		, m_edge(*this, "edge")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
-		, m_use_cart_vectors(0)
-		, m_use_cart_audio(0)
 		, m_slots(*this, "cslot%u", 1U)
 		, m_audionmi(*this, "audionmi")
 	{ }
@@ -158,8 +156,9 @@ protected:
 	uint8_t      m_vblank_level = 0;
 	uint8_t      m_raster_level = 0;
 
-	int m_use_cart_vectors = 0;
-	int m_use_cart_audio = 0;
+	uint8_t      m_use_cart_vectors = 0;
+	uint8_t      m_use_cart_audio = 0;
+	uint8_t      m_card_bank = 0;
 
 	void set_slot_idx(int slot);
 

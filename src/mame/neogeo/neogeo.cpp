@@ -925,15 +925,20 @@ CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 
 void neogeo_base_state::io_control_w(offs_t offset, uint8_t data)
 {
-	if ((offset & 0x38) == 0x00) // TODO: the mask is supposedly less restrictive on AES?
+	switch (offset & 0x38) // TODO: the mask is supposedly less restrictive on AES?
 	{
+	case 0x00:
 		if (m_ctrl1) m_ctrl1->write_ctrlsel(data & 0x07);
 		if (m_ctrl2) m_ctrl2->write_ctrlsel((data >> 3) & 0x07);
 		if (m_edge) m_edge->write_ctrlsel(data & 0x3f); // FIXME: only MV-1B and MV-1C have this output
-	}
-	else
-	{
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		break;
+
+	case 0x08:
+		m_card_bank = data & 0x07;
+		break;
+
+	default:
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -942,6 +947,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 	switch (offset & 0x78)
 	{
 	case 0x00:
+	case 0x08:
 		neogeo_base_state::io_control_w(offset, data);
 		break;
 
@@ -960,7 +966,7 @@ void ngarcade_base_state::io_control_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", m_maincpu->pc(), offset, data);
+		logerror("%s: Unmapped I/O control write.  Offset: %02x  Data: %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -1065,7 +1071,7 @@ uint16_t neogeo_base_state::memcard_r(offs_t offset, uint16_t mem_mask)
 
 	// memory card enabled by /UDS
 	if (ACCESSING_BITS_8_15 && m_memcard->present())
-		return m_memcard->read(offset);
+		return m_memcard->read((offs_t(m_card_bank) << 21) | offset);
 	else
 		return 0xffff;
 }
@@ -1077,7 +1083,7 @@ void neogeo_base_state::memcard_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 	// memory card enabled by /UDS
 	if (ACCESSING_BITS_8_15 && m_memcard->present())
-		m_memcard->write(offset, data);
+		m_memcard->write((offs_t(m_card_bank) << 21) | offset, data);
 }
 
 /*************************************
@@ -1559,6 +1565,7 @@ void neogeo_base_state::machine_start()
 	save_item(NAME(m_bank_base));
 	save_item(NAME(m_use_cart_vectors));
 	save_item(NAME(m_use_cart_audio));
+	save_item(NAME(m_card_bank));
 }
 
 void ngarcade_base_state::machine_start()
