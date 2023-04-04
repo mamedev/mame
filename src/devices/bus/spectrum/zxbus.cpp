@@ -75,5 +75,5 @@ void device_zxbus_card_interface::interface_pre_start()
 
 void zxbus_cards(device_slot_interface &device)
 {
-	device.option_add("neogs", NEOGS);
+	device.option_add("neogs", ZXBUS_NEOGS);
 }
