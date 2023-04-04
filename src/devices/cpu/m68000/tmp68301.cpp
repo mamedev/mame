@@ -577,14 +577,12 @@ void tmp68301_device::interrupt_update()
 {
 	auto [level, vector, slot] = interrupt_get_current();
 	set_current_interrupt_level(level);
-	if(level != 0)
-		machine().debug_break();
-	logerror("interrupt update ipr=%03x imr=%03x state=%08x (%x, %02x, %2d)\n", m_ipr, m_imr, m_interrupt_state, level, vector, slot);
+	//	logerror("interrupt update ipr=%03x imr=%03x state=%08x (%x, %02x, %2d)\n", m_ipr, m_imr, m_interrupt_state, level, vector, slot);
 }
 
 void tmp68301_device::interrupt_internal_trigger(int vector)
 {
-	logerror("interrupt internal trigger %02x\n", vector);
+	//	logerror("interrupt internal trigger %02x\n", vector);
 	m_interrupt_state |= 1 << vector;
 	m_ipr |= 1 << interrupt_vector_to_slot[vector];
 	interrupt_update();
@@ -593,7 +591,7 @@ void tmp68301_device::interrupt_internal_trigger(int vector)
 u8 tmp68301_device::interrupt_callback()
 {
 	auto [level, vector, slot] = interrupt_get_current();
-	logerror("interrupt callback ipr=%03x imr=%03x (%x, %02x, %d)\n", m_ipr, m_imr, level, vector, slot);
+	//	logerror("interrupt callback ipr=%03x imr=%03x (%x, %02x, %d)\n", m_ipr, m_imr, level, vector, slot);
 	if(slot < 3)
 		standard_irq_callback(slot, m_pc);
 	if(vector != 0x1f) {
