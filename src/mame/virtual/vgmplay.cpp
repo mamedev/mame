@@ -2848,7 +2848,7 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 			osd_printf_warning("Warning: file has unsupported chip volumes\n");
 
 		const auto setup_device(
-				[this, version, volume, header_size, chip_clock_start, chip_volume_start] (
+				[this, version, volume, header_size, chip_clock_start] (
 						device_t &device,
 						int chip_num,
 						vgm_chip chip_type,

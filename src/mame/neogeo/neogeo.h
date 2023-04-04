@@ -72,7 +72,7 @@ protected:
 		, m_audionmi(*this, "audionmi")
 	{ }
 
-	uint16_t memcard_r(offs_t offset, uint16_t data);
+	uint16_t memcard_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
