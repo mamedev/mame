@@ -213,21 +213,12 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 		uint8_t num_shifts = (m_control & 0xe0) >> 5;
 		uint8_t divisor = 1 << num_shifts;
 		attotime period = attotime::from_hz(clock() / divisor) / 2;
-		// This delay should be the next falling clock.
-		// That's complicated to get, as it's derived from the master
-		// clock. The CPU uses this same clock, so writes will come at
-		// a specific pace.
-		// Instead, just approximate a quarter cycle.
-		// Xevious is very sensitive to this. It will bootloop if it
-		// isn't correct.
-		attotime delay = attotime::from_hz(clock()) / 4; // average of one clock
-		if (!m_next_timer_state)
-		{
-			// NMI is asserted, wait one additional clock to start
-			m_nmi_timer->adjust(delay + attotime::from_hz(clock() / divisor), 0, period);
-		} else {
-			m_nmi_timer->adjust(delay, 0, period);
-		}
+
+		// Delay to the next falling clock edge
+		attotime now = machine().time();
+		u64 total_ticks = now.as_ticks(clock());
+		attotime delay = attotime::from_ticks(total_ticks + 1, clock()) - now;
+		m_nmi_timer->adjust(delay, 0, period);
 	}
 }
 
