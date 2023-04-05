@@ -102,12 +102,11 @@
 TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 {
 	// This timer runs at twice the clock, since we do work on both the
-	// rising and falling edge.
-	//
-	// During reads, the first NMI pulse is supressed to give the chip a
-	// cycle to write.
+	// rising and falling edges.
+	// m_timer_state == true is the falling clock edge
+	m_timer_state = !m_timer_state;
 
-	if (m_next_timer_state)
+	if (m_timer_state)
 	{
 		m_rw[0](0, BIT(m_control, 4));
 		m_rw[1](0, BIT(m_control, 4));
@@ -115,7 +114,11 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 		m_rw[3](0, BIT(m_control, 4));
 	}
 
-	if (m_next_timer_state && !m_read_stretch)
+	// During reads, the first NMI pulse is supressed to give the chip a
+	// cycle to write.
+
+
+	if (m_timer_state && !m_read_stretch)
 	{
 		set_nmi(ASSERT_LINE);
 	}
@@ -125,12 +128,10 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 	}
 	m_read_stretch = false;
 
-	m_chipsel[0](0, BIT(m_control, 0) && m_next_timer_state);
-	m_chipsel[1](0, BIT(m_control, 1) && m_next_timer_state);
-	m_chipsel[2](0, BIT(m_control, 2) && m_next_timer_state);
-	m_chipsel[3](0, BIT(m_control, 3) && m_next_timer_state);
-
-	m_next_timer_state = !m_next_timer_state;
+	m_chipsel[0](0, BIT(m_control, 0) && m_timer_state);
+	m_chipsel[1](0, BIT(m_control, 1) && m_timer_state);
+	m_chipsel[2](0, BIT(m_control, 2) && m_timer_state);
+	m_chipsel[3](0, BIT(m_control, 3) && m_timer_state);
 }
 
 uint8_t namco_06xx_device::data_r(offs_t offset)
@@ -164,6 +165,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::write_sync )
 		logerror("%s: 06XX '%s' write in read mode %02x\n",machine().describe_context(),tag(),m_control);
 		return;
 	}
+
 	if (BIT(m_control, 0)) m_write[0](0, param);
 	if (BIT(m_control, 1)) m_write[1](0, param);
 	if (BIT(m_control, 2)) m_write[2](0, param);
@@ -188,8 +190,9 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 	// The upper 3 control bits are the clock divider.
 	if ((m_control & 0xe0) == 0)
 	{
+		// If the divider is zero, stop the timer.
 		m_nmi_timer->adjust(attotime::never);
-		m_next_timer_state = true;
+		m_timer_state = false;
 		set_nmi(CLEAR_LINE);
 		m_chipsel[0](0, CLEAR_LINE);
 		m_chipsel[1](0, CLEAR_LINE);
@@ -205,7 +208,9 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 		{
 			set_nmi(CLEAR_LINE);
 			m_read_stretch = true;
-		} else {
+		}
+		else
+		{
 			m_read_stretch = false;
 		}
 
@@ -237,7 +242,7 @@ DEFINE_DEVICE_TYPE(NAMCO_06XX, namco_06xx_device, "namco06", "Namco 06xx")
 namco_06xx_device::namco_06xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_06XX, tag, owner, clock)
 	, m_control(0)
-	, m_next_timer_state(false)
+	, m_timer_state(false)
 	, m_read_stretch(false)
 	, m_nmicpu(*this, finder_base::DUMMY_TAG)
 	, m_chipsel(*this)
@@ -262,7 +267,7 @@ void namco_06xx_device::device_start()
 	m_nmi_timer = timer_alloc(FUNC(namco_06xx_device::nmi_generate), this);
 
 	save_item(NAME(m_control));
-	save_item(NAME(m_next_timer_state));
+	save_item(NAME(m_timer_state));
 	save_item(NAME(m_read_stretch));
 }
 

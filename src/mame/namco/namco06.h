@@ -39,7 +39,7 @@ private:
 	// internal state
 	emu_timer *m_nmi_timer = nullptr;
 	uint8_t m_control;
-	bool m_next_timer_state;
+	bool m_timer_state;
 	bool m_read_stretch;
 
 	required_device<cpu_device> m_nmicpu;
