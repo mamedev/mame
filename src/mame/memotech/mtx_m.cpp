@@ -418,7 +418,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtx_state::extrom_load )
 ***************************************************************************/
 
 // this only works for some of the files, nothing which tries to load
-// more data from tape. todo: tapes which autorun after loading
+// more data from tape. TODO: tapes which autorun after loading
 SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 {
 	uint64_t length = image.length();
@@ -486,7 +486,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 
 QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 {
-	uint64_t length = image.length();
+	uint64_t const length = image.length();
 
 	if (length < 4)
 	{
@@ -507,8 +507,8 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 		return image_error::UNSPECIFIED;
 	}
 
-	uint16_t code_base = pick_integer_le(data.get(), 0, 2);
-	uint16_t code_length = pick_integer_le(data.get(), 2, 2);
+	uint16_t const code_base = pick_integer_le(data.get(), 0, 2);
+	uint16_t const code_length = pick_integer_le(data.get(), 2, 2);
 
 	if (length < code_length)
 	{

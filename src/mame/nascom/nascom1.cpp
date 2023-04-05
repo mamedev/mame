@@ -363,9 +363,9 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 
 std::error_condition nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
 {
-	// loading directly from file
 	if (!image.loaded_through_softlist())
 	{
+		// loading directly from file
 		if (slot->length() > 0x1000)
 		{
 			osd_printf_error("%s: Unsupported file size\n", image.basename());
@@ -386,13 +386,12 @@ std::error_condition nascom2_state::load_cart(device_image_interface &image, gen
 			break;
 		}
 	}
-
-	// loading from software list. this supports multiple regions to load to
 	else
 	{
-		uint8_t *region_b000 = image.get_software_region("b000");
-		uint8_t *region_c000 = image.get_software_region("c000");
-		uint8_t *region_d000 = image.get_software_region("d000");
+		// loading from software list. this supports multiple regions to load to
+		uint8_t *const region_b000 = image.get_software_region("b000");
+		uint8_t *const region_c000 = image.get_software_region("c000");
+		uint8_t *const region_d000 = image.get_software_region("d000");
 
 		if (region_b000 != nullptr)
 		{

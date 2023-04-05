@@ -296,7 +296,7 @@ void beta_state::riot_pb_w(uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 {
-	uint32_t size = m_eprom->common_get_size("rom");
+	uint32_t const size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
 	{

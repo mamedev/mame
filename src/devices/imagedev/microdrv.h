@@ -39,7 +39,7 @@ public:
 
 	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
@@ -58,7 +58,7 @@ public:
 	DECLARE_READ_LINE_MEMBER ( data2_r );
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(bit_timer);

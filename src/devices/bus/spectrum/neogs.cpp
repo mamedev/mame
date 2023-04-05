@@ -2,7 +2,7 @@
 // copyright-holders:Andrei I. Holub
 /*******************************************************************************************
 
-    Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
+	Sound card NeoGS appropriate for playing trackers (MOD) and compressed (MP3) music on
 Spectrum-compatible computers with ZXBUS slot.
 
 Hardware:
@@ -19,12 +19,11 @@ Hardware:
 - Parallel working (NeoGS play music independently from ZX).
 
 Refs:
-    http://nedopc.com/gs/ngs_eng.php
-    https://github.com/psbhlw/gs-firmware
-    https://8bit.yarek.pl/interface/zx.generalsound/index.html
+	http://nedopc.com/gs/ngs_eng.php
+	https://github.com/psbhlw/gs-firmware
+	https://8bit.yarek.pl/interface/zx.generalsound/index.html
 
 TODO:
-- ZXBUS
 - SPI
 - DMA
 - MP3
@@ -34,10 +33,15 @@ TODO:
 #include "emu.h"
 #include "neogs.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/ram.h"
+#include "sound/dac.h"
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(NEOGS, neogs_device, "neogs", "NeoGS / General Sound")
+namespace bus::spectrum::zxbus {
+
+namespace {
 
 ROM_START( neogs )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -50,6 +54,64 @@ ROM_START( neogs )
 	ROMX_LOAD( "testrom_muchkin.rom", 0x0000, 0x80000, CRC(8ab10a88) SHA1(cff3ca96489e517568146a00412107259360d01e), ROM_BIOS(1))
 ROM_END
 
+class neogs_device : public device_t, public device_zxbus_card_interface
+{
+public:
+	neogs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, ZXBUS_NEOGS, tag, owner, clock)
+		, device_zxbus_card_interface(mconfig, *this)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, "maincpu")
+		, m_bank_rom(*this, "bank_rom")
+		, m_bank_ram(*this, "bank_ram")
+		, m_view(*this, "view")
+		, m_dac(*this, "dac%u", 0U)
+	{ }
+
+protected:
+	// device_t implementation
+	void device_start() override;
+	void device_reset() override;
+	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override;
+
+	void neogsmap(address_map &map);
+
+	INTERRUPT_GEN_MEMBER(irq0_line_assert);
+
+	void map_memory(address_map &map);
+	void map_io(address_map &map);
+	void update_config();
+
+	required_device<z80_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_rom;
+	memory_bank_creator m_bank_rom;
+	memory_bank_creator m_bank_ram;
+	memory_view m_view;
+	required_device_array<dac_word_interface, 8> m_dac;
+
+private:
+	template <u8 Bank> u8 ram_bank_r(offs_t offset);
+	template <u8 Bank> void ram_bank_w(offs_t offset, u8 data);
+
+	u8 status_r() { return m_status; }
+	void command_w(u8 data) { m_status |= 0x01; m_command_in = data; }
+	u8 data_r() { m_status &= ~0x80; return m_data_out; }
+	void data_w(u8 data) { m_status |= 0x80; m_data_in = data; }
+	void ctrl_w(u8 data);
+
+	u8 m_data_in;
+	u8 m_data_out;
+	u8 m_command_in;
+	u8 m_status;
+
+	u8 m_mpag;
+	u8 m_mpagx;
+	u8 m_gscfg0;
+	u8 m_vol[8];
+};
 
 void neogs_device::update_config()
 {
@@ -63,7 +125,7 @@ void neogs_device::update_config()
 	}
 	else
 	{
-		m_bank_rom->set_entry(m_mpag % (memregion("maincpu")->bytes() / 0x8000));
+		m_bank_rom->set_entry(m_mpag % (m_rom.bytes() / 0x8000));
 		m_view.disable();
 	}
 
@@ -163,27 +225,36 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 	return ROM_NAME( neogs );
 }
 
+void neogs_device::neogsmap(address_map &map)
+{
+	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::status_r), FUNC(neogs_device::command_w));
+	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::data_r), FUNC(neogs_device::data_w));
+	map(0x0033, 0x0033).mirror(0xff00).w(FUNC(neogs_device::ctrl_w));
+}
+
 void neogs_device::device_start()
 {
 	if (!m_ram->started())
-		throw device_missing_dependencies();
+        throw device_missing_dependencies();
 
-	memory_region *rom = memregion("maincpu");
-	m_bank_rom->configure_entries(0, rom->bytes() / 0x8000,  rom->base(), 0x8000);
+	m_bank_rom->configure_entries(0, m_rom.bytes() / 0x8000,  &m_rom[0], 0x8000);
 	m_bank_ram->configure_entries(0, m_ram->size() / 0x8000, m_ram->pointer(), 0x8000);
 
-	m_maincpu->space(AS_PROGRAM).install_read_tap(0x6000, 0x7fff, "dac_w", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			const u8 chanel = BIT(offset, 8, BIT(m_gscfg0, 2) ? 3 : 2); // 8CHANS
-			const u8 sample = data ^ (m_gscfg0 & 0x80); // INV7B
-			const s16 out = (sample - 0x80) * (m_vol[chanel] << 2);
-			m_dac[chanel]->data_w(out);
-			if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
-				;
-		}
-	});
+	m_maincpu->space(AS_PROGRAM).install_read_tap(0x6000, 0x7fff, "dac_w",
+			[this](offs_t offset, u8 &data, u8 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					const u8 chanel = BIT(offset, 8, BIT(m_gscfg0, 2) ? 3 : 2); // 8CHANS
+					const u8 sample = data ^ (m_gscfg0 & 0x80); // INV7B
+					const s16 out = (sample - 0x80) * (m_vol[chanel] << 2);
+					m_dac[chanel]->data_w(out);
+					if (BIT(m_gscfg0, 2) && BIT(m_gscfg0, 6)) // PAN4CH
+						;
+				}
+			});
+
+	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 }
 
 void neogs_device::device_reset()
@@ -193,3 +264,10 @@ void neogs_device::device_reset()
 	m_mpag = 0;
 	update_config();
 }
+
+} // anonymous namespace
+
+} // namespace bus::spectrum::zxbus
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ZXBUS_NEOGS, device_zxbus_card_interface, bus::spectrum::zxbus::neogs_device, "neogs", "NeoGS / General Sound")

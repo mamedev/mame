@@ -139,7 +139,7 @@ void acorn_8k_device::device_reset()
 
 std::error_condition acorn_8k_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	// socket accepts 2K and 4K ROM only
 	if (size != 0x0800 && size != 0x1000)

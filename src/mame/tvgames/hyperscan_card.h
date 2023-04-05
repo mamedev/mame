@@ -22,7 +22,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -30,7 +30,6 @@ protected:
 	virtual const char *image_interface() const noexcept override { return "hyperscan_card"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 private:

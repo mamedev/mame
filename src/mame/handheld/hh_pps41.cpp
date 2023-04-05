@@ -181,7 +181,7 @@ void ftri1_state::write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ftri1 )
 	PORT_START("IN.0")
@@ -199,6 +199,8 @@ static INPUT_PORTS_START( ftri1 )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pps41_state, reset_button, 0) PORT_CODE(KEYCODE_F1) PORT_NAME("Game Reset")
 INPUT_PORTS_END
+
+// config
 
 void ftri1_state::ftri1(machine_config &config)
 {
@@ -298,7 +300,7 @@ u8 mastmind_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mastmind )
 	PORT_START("IN.0") // DIO0
@@ -325,6 +327,8 @@ static INPUT_PORTS_START( mastmind )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
 INPUT_PORTS_END
+
+// config
 
 void mastmind_state::mastmind(machine_config &config)
 {
@@ -445,7 +449,7 @@ void dunksunk_state::write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( dunksunk )
 	PORT_START("IN.0") // PI
@@ -469,6 +473,8 @@ static INPUT_PORTS_START( dunksunk )
 	PORT_CONFSETTING(    0x01, "Basketball" )
 	PORT_CONFSETTING(    0x00, "Submarine Chase" )
 INPUT_PORTS_END
+
+// config
 
 void dunksunk_state::dunksunk(machine_config &config)
 {
@@ -579,7 +585,7 @@ u8 memoquiz_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( memoquiz )
 	PORT_START("IN.0") // DIO0
@@ -612,6 +618,8 @@ static INPUT_PORTS_START( memoquiz )
 	PORT_CONFSETTING(    0x02, "4" ) // INT1, GND when closed, pulled to Vdd when open
 	PORT_CONFSETTING(    0x00, "5" )
 INPUT_PORTS_END
+
+// config
 
 void memoquiz_state::memoquiz(machine_config &config)
 {
@@ -700,7 +708,7 @@ void mfootb2_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mfootb2 )
 	PORT_START("IN.0") // PI
@@ -718,6 +726,8 @@ static INPUT_PORTS_START( mfootb2 )
 	PORT_CONFSETTING(     0x000, "1" ) // PRO 1
 	PORT_CONFSETTING(     0x400, "2" ) // PRO 2
 INPUT_PORTS_END
+
+// config
 
 void mfootb2_state::mfootb2(machine_config &config)
 {
@@ -820,7 +830,7 @@ void brainbaf_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( brainbaf )
 	PORT_START("IN.0") // DIO0
@@ -883,6 +893,8 @@ static INPUT_PORTS_START( brainbaf )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CODE(KEYCODE_F11) PORT_NAME("Stop") // both STOP keys
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10) PORT_NAME("Score")
 INPUT_PORTS_END
+
+// config
 
 void brainbaf_state::brainbaf(machine_config &config)
 {
@@ -986,7 +998,7 @@ void horocomp_state::write_spk(u8 data)
 	m_speaker->level_w(data);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -1061,6 +1073,8 @@ static INPUT_PORTS_START( horocomp )
 	PORT_CONFSETTING(    0x08, "C" ) // compatibility
 	PORT_CONFSETTING(    0x00, "P" ) // personal
 INPUT_PORTS_END
+
+// config
 
 void horocomp_state::horocomp(machine_config &config)
 {
@@ -1195,7 +1209,7 @@ void mwcfootb_state::sub_write_r(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -1245,6 +1259,8 @@ static INPUT_PORTS_START( mwcfootb ) // P1 = left/home, P2 = right/visitor
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY PORT_NAME("P1 Down/3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY PORT_NAME("P1 Up/1")
 INPUT_PORTS_END
+
+// config
 
 void mwcfootb_state::mwcfootb(machine_config &config)
 {
@@ -1364,7 +1380,7 @@ u8 scrabsen_state::read_p()
 	return ~read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( scrabsen )
 	PORT_START("IN.0") // DIO0
@@ -1417,6 +1433,8 @@ static INPUT_PORTS_START( scrabsen )
 	PORT_CONFSETTING(    0x01, "1" ) // single
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END
+
+// config
 
 void scrabsen_state::scrabsen(machine_config &config)
 {
@@ -1517,7 +1535,7 @@ u8 rdqa_state::read_p()
 	return ~read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rdqa )
 	PORT_START("IN.0") // DIO0
@@ -1553,6 +1571,8 @@ static INPUT_PORTS_START( rdqa )
 	PORT_CONFSETTING(    0x01, "1" ) // single
 	PORT_CONFSETTING(    0x00, "2" ) // double
 INPUT_PORTS_END
+
+// config
 
 void rdqa_state::rdqa(machine_config &config)
 {

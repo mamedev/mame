@@ -87,7 +87,7 @@ std::error_condition aquarius_cartridge_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size % 0x1000)
 		{

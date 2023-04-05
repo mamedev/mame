@@ -36,11 +36,11 @@ license:CC0-1.0
 			<color red="0.1" green="0.1" blue="0.1" />
 		</rect>
 		<rect state="0">
-			<bounds xc="0" yc="0" width="9" height="9" />
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
 			<color red="0.9" green="0.65" blue="0.3" />
 		</rect>
 		<rect state="1">
-			<bounds xc="0" yc="0" width="9" height="9" />
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
 			<color red="0.77" green="0.55" blue="0.26" />
 		</rect>
 	</element>
@@ -50,11 +50,11 @@ license:CC0-1.0
 			<color red="0.1" green="0.1" blue="0.1" />
 		</rect>
 		<rect state="0">
-			<bounds xc="0" yc="0" width="9" height="9" />
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
 			<color red="0.25" green="0.25" blue="0.26" />
 		</rect>
 		<rect state="1">
-			<bounds xc="0" yc="0" width="9" height="9" />
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
 			<color red="0.42" green="0.42" blue="0.44" />
 		</rect>
 	</element>

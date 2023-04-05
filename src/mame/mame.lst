@@ -18345,6 +18345,7 @@ streakng                        // [1980] Shoei
 streaknga                       // [1980] Shoei
 strfbomb                        // bootleg
 superbon                        // bootleg
+superbona                       // bootleg
 superg                          // hack
 supergs                         // Silver Systems hack
 supergx                         // [1980] Nichibutsu
@@ -18897,6 +18898,7 @@ h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
 lilprofa                        // Texas Instruments
+litelrn                         // Concept 2000
 liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -18957,6 +18959,7 @@ tisr16ii                        // Texas Instruments
 tithermos                       // Texas Instruments
 vclock3                         // Tandy Corporation
 wizatron                        // Texas Instruments
+wtalker                         // Technasonic
 xl25                            // Vulcan
 zodiac                          // Coleco
 
@@ -32403,6 +32406,7 @@ knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver
 konotako                        // 2003.?? Kono e Tako (10021 Ver.A)
 mrdrilr2                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
 mrdrilr2j                       // 2000.07 Mr Driller 2 (DR21 Ver.A)
+mrdrilr2u                       // 2000.?? Mr Driller 2 (DR23 Ver.A)
 mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
 mrdrilrga                       // 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
@@ -38364,9 +38368,9 @@ indy500to                       // 1995.07 Indy 500 Twin (Revision A)
 lastbrnx                        // 1996.06 Last Bronx (Export, Revision A)
 lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
-manxtt                          // 1995.11 Manx T.T. DX (Revision D)
-manxtta                         // 1995.?? Manx T.T. (Revision A)
-manxttc                         // 1995.11 Manx T.T. (Revision C)
+manxtt                          // 1995.11 Manx T.T. DX/Twin (Revision D)
+manxttc                         // 1995.11 Manx T.T. DX/Twin(Revision C)
+manxttdx                        // 1995.?? Manx T.T. DX (Revision A)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
@@ -41411,6 +41415,7 @@ mechattu1                       // A8002 'MA' (c) 1989
 
 @source:snk/miconkit.cpp
 micon2
+smiconk
 
 @source:snk/munchmo.cpp
 joyfulr                         // A2001      (c) 1983

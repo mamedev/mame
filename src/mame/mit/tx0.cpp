@@ -366,7 +366,7 @@ public:
 	// construction/destruction
 	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual std::error_condition call_load() override;
@@ -374,7 +374,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -395,7 +395,7 @@ public:
 	// construction/destruction
 	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual std::error_condition call_load() override;
@@ -403,7 +403,7 @@ public:
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -426,7 +426,7 @@ public:
 	// construction/destruction
 	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -440,7 +440,7 @@ public:
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override { }
 
 private:
@@ -462,14 +462,14 @@ public:
 	// construction/destruction
 	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

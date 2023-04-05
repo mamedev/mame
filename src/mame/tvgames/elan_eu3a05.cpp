@@ -362,9 +362,9 @@ void elan_eu3a05_buzztime_state::machine_start()
 
 DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if (size != 0x200000)
+	if (size != 0x20'0000)
 	{
 		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
 		return image_error::INVALIDLENGTH;

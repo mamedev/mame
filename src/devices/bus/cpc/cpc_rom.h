@@ -36,7 +36,7 @@ public:
 	uint8_t* base() { return m_base.get(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

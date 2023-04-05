@@ -129,10 +129,9 @@ std::error_condition gamate_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
-		if (len > 0x80000)
+		if (len > 0x8'0000)
 		{
 			osd_printf_error("%s: Unsupported cartridge size\n", basename());
 			return image_error::INVALIDLENGTH;
@@ -140,7 +139,7 @@ std::error_condition gamate_cart_slot_device::call_load()
 
 		m_cart->rom_alloc(len);
 
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -159,8 +158,6 @@ std::error_condition gamate_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = gamate_get_pcb_id(pcb_name);
 		}
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();

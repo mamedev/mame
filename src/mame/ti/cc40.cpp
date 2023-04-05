@@ -191,7 +191,7 @@ private:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
@@ -415,7 +415,7 @@ void cc40_state::cc40_map(address_map &map)
 	map(0x0111, 0x0111).rw(FUNC(cc40_state::power_r), FUNC(cc40_state::power_w));
 	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
 	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
-	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
+	map(0x0114, 0x0114).noprw(); // d1: Hexbus handshake
 	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w));
 	map(0x0116, 0x0116).portr("BATTERY");
 	map(0x0119, 0x0119).rw(FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));

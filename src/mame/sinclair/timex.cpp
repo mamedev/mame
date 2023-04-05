@@ -600,7 +600,6 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 	if (!image.loaded_through_softlist())
 	{
-		int chunks_in_file = 0;
 		std::vector<uint8_t> header;
 		header.resize(9);
 
@@ -616,6 +615,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		// check header
 		image.fread(&header[0], 9);
 
+		int chunks_in_file = 0;
 		for (int i = 0; i < 8; i++)
 			if (header[i + 1] & 0x02) chunks_in_file++;
 

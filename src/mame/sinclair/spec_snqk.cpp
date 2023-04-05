@@ -28,15 +28,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/uimain.h"
-#include "cpu/z80/z80.h"
-#include "spectrum.h"
-#include "spec128.h"
-#include "timex.h"
-#include "specpls3.h"
-#include "sound/ay8910.h"
 #include "spec_snqk.h"
+
+#include "specpls3.h"
+#include "spec128.h"
+#include "spectrum.h"
+#include "timex.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+
+#include "ui/uimain.h"
+
 #include "corestr.h"
+
 
 #define EXEC_NA "N/A"
 
@@ -2476,10 +2481,9 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
  *******************************************************************/
 void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
 {
-	int i;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	for (i = 0; i < quicksize; i++)
+	for (int i = 0; i < quicksize; i++)
 		space.write_byte(i + BASE_RAM, quickdata[i]);
 
 	log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
@@ -2513,19 +2517,16 @@ void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
  *******************************************************************/
 void spectrum_state::setup_raw(uint8_t *quickdata, uint32_t quicksize)
 {
-	int i;
-	uint8_t data;
-	uint16_t start, len;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
-	len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
+	uint16_t const start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
+	uint16_t const len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
 
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 		space.write_byte(i + start, quickdata[i + RAW_HDR]);
 
 	// Set border color
-	data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+	uint8_t const data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
 	m_port_fe_data = (m_port_fe_data & 0xf8) | data;
 	border_update(data);
 	logerror("Border color:%02X\n", data);

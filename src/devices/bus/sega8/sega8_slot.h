@@ -116,7 +116,7 @@ public:
 	sega8_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sega8_cart_slot_device();
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
@@ -124,7 +124,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -152,12 +152,12 @@ public:
 protected:
 	sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card = false);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;
 	bool const m_is_card;
-	device_sega8_cart_interface*       m_cart;
+	device_sega8_cart_interface *m_cart;
 };
 
 // ======================> sega8_card_slot_device

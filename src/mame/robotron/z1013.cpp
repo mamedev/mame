@@ -405,32 +405,27 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 */
 
 	std::vector<uint8_t> data(image.length());
-	uint16_t startaddr,endaddr,runaddr;
-
 	image.fread(&data[0], image.length());
 
-	startaddr = data[0] + data[1]*256;
-	endaddr   = data[2] + data[3]*256;
-	runaddr   = data[4] + data[5]*256;
+	uint16_t const startaddr = data[0] + data[1]*256;
+	uint16_t const endaddr   = data[2] + data[3]*256;
+	uint16_t const runaddr   = data[4] + data[5]*256;
 
-	if ((data[13]==data[14]) && (data[14]==data[15]))
-	{ }
-	else
+	if ((data[13] != data[14]) || (data[14] != data[15]))
 	{
 		osd_printf_error("%s: Not a Z1013 image\n", image.basename());
 		image.message(" Not a Z1013 image");
 		return image_error::INVALIDIMAGE;
 	}
 
-	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
-			&data[0x20], endaddr - startaddr + 1);
+	memcpy(m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr), &data[0x20], endaddr - startaddr + 1);
 
 	if (runaddr)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		osd_printf_error("%s: Loaded but cannot run\n", image.basename());
-		image.message(" Loaded but cannot run");
+		osd_printf_error("%s: Loaded but cannot run due to zero entry point\n", image.basename());
+		image.message(" Loaded but cannot run due to zero entry point");
 	}
 
 	return std::error_condition();

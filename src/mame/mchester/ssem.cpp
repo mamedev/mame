@@ -615,26 +615,19 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 			if (buffer == "num")
 				word = unsigned_value;
-			else
-			if (buffer == "jmp")
+			else if (buffer == "jmp")
 				word = 0x00000000 | unsigned_value ;
-			else
-			if (buffer == "jrp")
+			else if (buffer == "jrp")
 				word = 0x00040000 | unsigned_value;
-			else
-			if (buffer == "ldn")
+			else if (buffer == "ldn")
 				word = 0x00020000 | unsigned_value;
-			else
-			if (buffer == "sto")
+			else if (buffer == "sto")
 				word = 0x00060000 | unsigned_value;
-			else
-			if (buffer == "sub")
+			else if (buffer == "sub")
 				word = 0x00010000 | unsigned_value;
-			else
-			if (buffer == "cmp")
+			else if (buffer == "cmp")
 				word = 0x00030000 | unsigned_value;
-			else
-			if (buffer == "stp")
+			else if (buffer == "stp")
 				word = 0x00070000 | unsigned_value;
 			else
 				logerror("Unknown opcode (%s) in line %d\n",buffer,i+2);

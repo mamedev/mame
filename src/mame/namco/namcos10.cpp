@@ -227,6 +227,7 @@ Game          Revision     Sticker      KEYCUS   ROMs Populated
 ------------------------------------------------------------------------------------
 Mr Driller 2  DR21/VER.A3  DR21 Ver.A   KC001A   DR21VERA.1A, DR21MA1.1D, DR21MA2.2D
 Mr Driller 2  DR22/VER.A3  DR22 Ver.A   KC001A   DR22VERA.1A, DR21MA1.1D, DR21MA2.2D
+Mr Driller 2  DR23/VER.A3  DR23 Ver.A   KC001A   DR23VERA.1A (no label?), DR21MA1.1D, DR21MA2.2D
 
       Note
       1. The ROM PCB has locations for 4x 64MBit program ROMs, but only 1A is populated.
@@ -417,8 +418,12 @@ try all permutations of 0-15 bit swaps which will take much longer or manually w
 
 
 Known issues:
-- Opening the operator menu sometimes can crash Mr. Driller 2
-- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal
+- mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
+- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
+- knpuzzle: bad dumps? where are the encrypted program blocks?
+- gjspace: bad dump? first program block is at 0x3fe even though the redirect table says 0x3ff and works if decrypted, but I can't find what should've been at 0x3fe
+- mrdrilrg: bad dump? program code block isn't where expected. mrdrilrga looks good though
+
 
 User data note:
 - the games store settings / rankings / bookkeeping data in the first NAND ROM - at 0x4200 for MEM(N) and 0x40000 for MEM(M), the ROMs used should be defaulted where possible
@@ -726,7 +731,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 
 void namcos10_state::namcos10_map_inner(address_map &map)
 {
-	// ram? stores block index to offset lookup table
+	// ram?
+	// Contains the NAND block table with redirected blocks generated
+	// based on the invalid block table found at the beginning of a game's first NAND
 	map(0xf500000, 0xf5fffff).ram().share("share3");
 
 	map(0xfb60000, 0xfb60003).noprw(); // ?
@@ -1103,16 +1110,15 @@ uint16_t namcos10_memn_state::nand_data_r()
 	if (m_decrypter.found() && m_decrypter->is_active())
 		return m_decrypter->decrypt(data);
 
-	// There should never be scrambled data beyond 0x3ec
-	// Only the first device's beginning blocks are treated specially and can't contain scrambled data
-	// because it's guaranteed to always have important NAND layout information + EEP data
-	if ((BIT(m_nand_address, 8, 16) >> 5) < 0x3ec
-		&& (m_nand_device_idx != 0 || (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) >= 0x0a)))
-	{
-		data = m_unscrambler(data ^ 0xaaaa);
-	}
+	// Block 0 is guaranteed to always be good according to the NAND datasheet, and it seems to always contain the bad block redirect table
+	// Block 1 appears to always be used by games as the EEPROM data block
+	// Dumped ROMs always have block 1 as plaintext so data doesn't appear scrambled when writing to block 1
+	// So treat only block 0 and block 1 as special blocks for now
+	// TODO: Is there a more reliable way to detect when data should be unscrambled? (m_ctrl_reg?)
+	if (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) < 2)
+		return data;
 
-	return data;
+	return m_unscrambler(data ^ 0xaaaa);
 }
 
 void namcos10_memn_state::nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1761,6 +1767,18 @@ static INPUT_PORTS_START( nflclsfb )
 INPUT_PORTS_END
 
 // MEM(M)
+ROM_START( mrdrilr2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x800000, "nand", 0 )
+	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
+
+	ROM_REGION( 0x2000000, "data", 0 )
+	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
+	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
+ROM_END
+
 ROM_START( mrdrilr2j )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -1773,12 +1791,12 @@ ROM_START( mrdrilr2j )
 	ROM_LOAD( "dr21ma2.2d", 0x1000000, 0x1000000, CRC(702556ff) SHA1(c95defd5fd6a9b406fc8d8f28ecfab732ef1ff42) )
 ROM_END
 
-ROM_START( mrdrilr2 )
+ROM_START( mrdrilr2u )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x800000, "nand", 0 )
-	ROM_LOAD( "dr22vera.1a", 0x000000, 0x800000, CRC(140eafb6) SHA1(b68f901ff18d052bc21bb548159dcbc7dd731e5c) )
+	ROM_LOAD( "dr23vera.1a", 0x000000, 0x800000, CRC(5f32b6fb) SHA1(ecb94d8317946f278a2cb0bc55abea2b89fa2e71) )
 
 	ROM_REGION( 0x2000000, "data", 0 )
 	ROM_LOAD( "dr21ma1.1d", 0x0000000, 0x1000000, CRC(26dc6f55) SHA1(a9cedf547fa7a4d5850b9b3b867d46e577a035e0) )
@@ -2125,14 +2143,15 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
-GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,      mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
+GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", 0 )
 
 // MEM(N)
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING ) // broken decrypter?
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

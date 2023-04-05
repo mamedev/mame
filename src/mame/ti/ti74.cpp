@@ -144,7 +144,7 @@ private:
 
 DEVICE_IMAGE_LOAD_MEMBER(ti74_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	// max size is 32KB
 	if (size > 0x8000)

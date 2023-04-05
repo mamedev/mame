@@ -698,7 +698,7 @@ void alphatro_state::machine_reset()
 
 std::error_condition alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	uint32_t size = slot->common_get_size("rom");
+	uint32_t const size = slot->common_get_size("rom");
 
 	if ((size != 0x4000) && (size != 0x2000))
 	{

@@ -309,13 +309,13 @@ INPUT_CHANGED_MEMBER(bbc_datacentre_device::import_nvrest)
 template<int Drive>
 QUICKLOAD_LOAD_MEMBER(bbc_datacentre_device::quickload_cb)
 {
-	/* simulate *IMPORT from USB to RAMFS */
+	// simulate *IMPORT from USB to RAMFS
 	if (image.is_filetype("ssd") || image.is_filetype("img") || image.is_filetype("dsd"))
 	{
-		uint32_t ram_addr = (Drive * 0x40000) | 0x1000;
+		uint32_t const ram_addr = (Drive * 0x40000) | 0x1000;
 		offs_t offset = 0;
 
-		/* import tracks */
+		// import tracks
 		for (int i = 0; i < 80; i++)
 		{
 			image.fread(m_ram.get() + ram_addr + offset, 0xa00);

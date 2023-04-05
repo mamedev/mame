@@ -141,7 +141,7 @@ std::error_condition crvision_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x4800)
 		{
@@ -192,9 +192,7 @@ std::error_condition crvision_cart_slot_device::call_load()
 				m_type = crvision_get_pcb_id(pcb_name);
 		}
 
-		printf("Type: %s\n", crvision_get_slot(m_type));
-
-		return std::error_condition();
+		logerror("Type: %s\n", crvision_get_slot(m_type));
 	}
 
 	return std::error_condition();

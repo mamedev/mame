@@ -305,7 +305,7 @@ void ufombs_state::speaker_w(u8 data)
 	m_speaker->level_w(data & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ufombs )
 	PORT_START("IN.0") // port A
@@ -321,6 +321,8 @@ static INPUT_PORTS_START( ufombs )
 	PORT_CONFSETTING(    0x04, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void ufombs_state::ufombs(machine_config &config)
 {
@@ -439,7 +441,7 @@ u8 ssfball_state::input_b_r()
 	return m_inputs[2]->read() | read_inputs(2);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -475,6 +477,8 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pass")
 INPUT_PORTS_END
+
+// config
 
 void ssfball_state::ssfball(machine_config &config)
 {
@@ -599,7 +603,7 @@ u8 bmsoccer_state::input_a_r()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bmsoccer )
 	PORT_START("IN.0") // C0 port A
@@ -623,6 +627,8 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Display/Banana Shoot")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
+
+// config
 
 void bmsoccer_state::bmsoccer(machine_config &config)
 {
@@ -726,7 +732,7 @@ void bmsafari_state::speaker_w(u8 data)
 	m_speaker->level_w(data & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bmsafari )
 	PORT_START("IN.0") // port A
@@ -742,6 +748,8 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void bmsafari_state::bmsafari(machine_config &config)
 {
@@ -854,7 +862,7 @@ u8 splasfgt_state::input_b_r()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -902,6 +910,8 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void splasfgt_state::splasfgt(machine_config &config)
 {
@@ -1021,7 +1031,7 @@ u8 bgunf_state::input_r()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bgunf )
 	PORT_START("IN.0") // G0 port A
@@ -1043,6 +1053,8 @@ static INPUT_PORTS_START( bgunf )
 	PORT_CONFSETTING(    0x04, "Auto 3" )
 	PORT_CONFSETTING(    0x08, "Manual" )
 INPUT_PORTS_END
+
+// config
 
 void bgunf_state::bgunf(machine_config &config)
 {
@@ -1145,7 +1157,7 @@ void bgalaxn_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bgalaxn )
 	PORT_START("IN.0") // port A
@@ -1161,6 +1173,8 @@ static INPUT_PORTS_START( bgalaxn )
 	PORT_START("IN.1") // INT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, 0)
 INPUT_PORTS_END
+
+// config
 
 void bgalaxn_state::bgalaxn(machine_config &config)
 {
@@ -1261,7 +1275,7 @@ void bcclimbr_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bcclimbr )
 	PORT_START("IN.0") // port A
@@ -1278,6 +1292,8 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
+
+// config
 
 void bcclimbr_state::bcclimbr(machine_config &config)
 {
@@ -1380,7 +1396,7 @@ u8 tactix_state::input_r()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tactix )
 	PORT_START("IN.0") // C0 port A
@@ -1413,6 +1429,8 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Comp Turn")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void tactix_state::tactix(machine_config &config)
 {
@@ -1520,7 +1538,7 @@ u8 ctntune_state::input_r()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ctntune )
 	PORT_START("IN.0") // C0 port A
@@ -1555,6 +1573,8 @@ static INPUT_PORTS_START( ctntune )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, ctntune_state, start_button, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void ctntune_state::ctntune(machine_config &config)
 {
@@ -1645,7 +1665,7 @@ void invspace_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( invspace )
 	PORT_START("IN.0") // port A
@@ -1659,6 +1679,8 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void invspace_state::invspace(machine_config &config)
 {
@@ -1757,7 +1779,7 @@ void efball_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( efball )
 	PORT_START("IN.0") // port A
@@ -1782,6 +1804,8 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Kick Return")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Kick")
 INPUT_PORTS_END
+
+// config
 
 void efball_state::efball(machine_config &config)
 {
@@ -1877,7 +1901,7 @@ void galaxy2_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( galaxy2 )
 	PORT_START("IN.0") // port A
@@ -1891,6 +1915,8 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void galaxy2_state::galaxy2(machine_config &config)
 {
@@ -2015,7 +2041,7 @@ void astrocmd_state::plate_w(offs_t offset, u8 data)
 		update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( astrocmd )
 	PORT_START("IN.0") // port A
@@ -2030,6 +2056,8 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
+
+// config
 
 void astrocmd_state::astrocmd(machine_config &config)
 {
@@ -2129,7 +2157,7 @@ void edracula_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( edracula )
 	PORT_START("IN.0") // port A
@@ -2144,6 +2172,8 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
+
+// config
 
 void edracula_state::edracula(machine_config &config)
 {
@@ -2230,7 +2260,7 @@ void mcompgin_state::lcd_w(u8 data)
 	m_lcd->clock_w(data >> 1 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mcompgin )
 	PORT_START("IN.0") // port A
@@ -2244,6 +2274,8 @@ static INPUT_PORTS_START( mcompgin )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Score")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void mcompgin_state::mcompgin(machine_config &config)
 {
@@ -2334,7 +2366,7 @@ void mvbfree_state::speaker_w(u8 data)
 	m_speaker->level_w(data & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mvbfree )
 	PORT_START("IN.0") // port A
@@ -2350,6 +2382,8 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
+
+// config
 
 void mvbfree_state::mvbfree(machine_config &config)
 {
@@ -2449,7 +2483,7 @@ u8 grobot9_state::input_r()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( grobot9 )
 	PORT_START("IN.0") // C0 port A
@@ -2479,6 +2513,8 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_START("IN.4") // INT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, 0) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
+
+// config
 
 void grobot9_state::grobot9(machine_config &config)
 {
@@ -2570,7 +2606,7 @@ void tccombat_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tccombat )
 	PORT_START("IN.0") // port A
@@ -2581,6 +2617,8 @@ static INPUT_PORTS_START( tccombat )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
+
+// config
 
 void tccombat_state::tccombat(machine_config &config)
 {
@@ -2714,7 +2752,7 @@ u8 tmtennis_state::input_r(offs_t offset)
 	return ~read_inputs(2) >> (offset*4);
 }
 
-// config
+// inputs
 
 /* Pro-Tennis physical button layout and labels are like this:
 
@@ -2752,6 +2790,8 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P2 Button 3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
+
+// config
 
 void tmtennis_state::tmtennis(machine_config &config)
 {
@@ -2857,7 +2897,7 @@ void tmpacman_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmpacman )
 	PORT_START("IN.0") // port A
@@ -2872,6 +2912,8 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_CONFSETTING(    0x01, "2" ) // PRO
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void tmpacman_state::tmpacman(machine_config &config)
 {
@@ -2972,7 +3014,7 @@ void tmscramb_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmscramb )
 	PORT_START("IN.0") // port A
@@ -2986,6 +3028,8 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void tmscramb_state::tmscramb(machine_config &config)
 {
@@ -3085,7 +3129,7 @@ void tcaveman_state::plate_w(offs_t offset, u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tcaveman )
 	PORT_START("IN.0") // port A
@@ -3096,6 +3140,8 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x00, "1" ) // AMA
 	PORT_CONFSETTING(    0x08, "2" ) // PRO
 INPUT_PORTS_END
+
+// config
 
 void tcaveman_state::tcaveman(machine_config &config)
 {
@@ -3203,7 +3249,7 @@ u8 alnchase_state::input_r()
 	return read_inputs(2);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -3241,6 +3287,8 @@ static INPUT_PORTS_START( alnchase )
 	PORT_CONFSETTING(    0x02, "2" ) // PRO
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void alnchase_state::alnchase(machine_config &config)
 {

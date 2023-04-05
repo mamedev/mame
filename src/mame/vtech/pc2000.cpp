@@ -901,7 +901,7 @@ GFXDECODE_END
 
 DEVICE_IMAGE_LOAD_MEMBER( pc2000_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	// we always allocate a 0x40000 region, even if most carts span only 0x20000,
 	// because the bankswitch code accesses up to 16 x 16K banks...

@@ -1918,6 +1918,7 @@ end
 --@src/devices/cpu/m68000/scc68070.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/fscpu32.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/mcf5206e.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/tmp68301.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if CPUS["M680X0"] then
@@ -1961,6 +1962,8 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.h",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.h",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.cpp",
 	}
 end
 

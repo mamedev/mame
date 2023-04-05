@@ -223,7 +223,7 @@ void elf2_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(elf2_state::quickload_cb)
 {
-	int size = image.length();
+	int const size = image.length();
 
 	if (size > m_ram->size())
 	{

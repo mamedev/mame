@@ -31,7 +31,7 @@ public:
 	electron_plus2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// optional information overrides

@@ -34,7 +34,7 @@ public:
 	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual std::error_condition call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
@@ -48,7 +48,7 @@ public:
 	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;

@@ -386,16 +386,16 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 
 	while (!image.image_feof())
 	{
-		image.fread( &type, 1);
-		image.fread( &length, 1);
+		image.fread(&type, 1);
+		image.fread(&length, 1);
 
 		switch (type)
 		{
-			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
+		case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
 			{
 				length -= 2;
 				u16 block_length = length ? length : 256;
-				image.fread( &addr, 2);
+				image.fread(&addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
 				ptr = program.get_write_ptr(address);
@@ -408,9 +408,9 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 			}
 			break;
 
-			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
+		case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
-				image.fread( &addr, 2);
+				image.fread(&addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD transfer address %04x\n", address);
 				m_maincpu->set_state_int(Z80_PC, address);
@@ -418,17 +418,17 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 			return std::error_condition();
 
 		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
-			image.fread( &data, length);
+			image.fread(&data, length);
 			if (LOG) logerror("/CMD load module header '%s'\n", data);
 			break;
 
 		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info
-			image.fread( &data, length);
+			image.fread(&data, length);
 			if (LOG) logerror("/CMD copyright block '%s'\n", data);
 			break;
 
 		default:
-			image.fread( &data, length);
+			image.fread(&data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
 			image.message("Unsupported or invalid block type");
 			return image_error::INVALIDIMAGE;

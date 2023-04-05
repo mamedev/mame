@@ -68,7 +68,7 @@ public:
 
 	virtual ~jakks_gamekey_slot_device();
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override { }
 
@@ -76,7 +76,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "jakks_gamekey"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,u1"; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
@@ -92,11 +92,11 @@ public:
 	bool has_cart() { return m_cart ? true : false; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	int m_type;
-	device_jakks_gamekey_interface*       m_cart;
+	device_jakks_gamekey_interface *m_cart;
 };
 
 // device type definition

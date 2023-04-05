@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
 
+/*
+ * The MB89351 and MB89352 are both based on the MB87030, with the main
+ * programmer-visible difference being an interrupt-driven option for the
+ * program transfer mode.
+*/
+
 #include "emu.h"
 #include "mb87030.h"
 
@@ -9,9 +15,23 @@
 
 
 DEFINE_DEVICE_TYPE(MB87030, mb87030_device, "mb87030", "Fujitsu MB87030 SCSI controller")
+DEFINE_DEVICE_TYPE(MB89351, mb89351_device, "mb89351", "Fujitsu MB89351 SCSI controller")
+DEFINE_DEVICE_TYPE(MB89352, mb89352_device, "mb89352", "Fujitsu MB89352 SCSI controller")
+
+ALLOW_SAVE_TYPE(mb87030_device::State)
 
 mb87030_device::mb87030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	mb87030_device(mconfig, MB87030, tag, owner, clock)
+{
+}
+
+mb89351_device::mb89351_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mb87030_device(mconfig, MB89351, tag, owner, clock)
+{
+}
+
+mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mb87030_device(mconfig, MB89352, tag, owner, clock)
 {
 
 }
@@ -20,7 +40,8 @@ mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, 
 	nscsi_device(mconfig, type, tag, owner, clock),
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_irq_handler(*this),
-	m_dreq_handler(*this)
+	m_dreq_handler(*this),
+	m_irq_state(false)
 {
 
 }
@@ -43,6 +64,22 @@ void mb87030_device::map(address_map &map)
 	map(0x0d, 0x0d).rw(FUNC(mb87030_device::tcm_r), FUNC(mb87030_device::tcm_w));
 	map(0x0e, 0x0e).rw(FUNC(mb87030_device::tcl_r), FUNC(mb87030_device::tcl_w));
 	map(0x0f, 0x0f).rw(FUNC(mb87030_device::exbf_r), FUNC(mb87030_device::exbf_w));
+}
+
+void mb89351_device::map(address_map &map)
+{
+	mb87030_device::map(map);
+
+	map(0x03, 0x03).unmaprw(); // no TMOD
+	map(0x0f, 0x0f).unmaprw(); // no EXBF
+}
+
+void mb89352_device::map(address_map &map)
+{
+	mb87030_device::map(map);
+
+	map(0x03, 0x03).unmaprw(); // no TMOD
+	map(0x0f, 0x0f).unmaprw(); // no EXBF
 }
 
 void mb87030_device::device_reset()
@@ -149,6 +186,7 @@ TIMER_CALLBACK_MEMBER(mb87030_device::delay_timeout)
 
 void mb87030_device::scsi_command_complete()
 {
+	LOG("%s\n", __FUNCTION__);
 	m_ints |= INTS_COMMAND_COMPLETE;
 	m_ssts &= ~(SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
 	update_ints();
@@ -157,6 +195,7 @@ void mb87030_device::scsi_command_complete()
 
 void mb87030_device::scsi_disconnect_timeout()
 {
+	LOG("%s\n", __FUNCTION__);
 	scsi_set_ctrl(0, S_ALL);
 	scsi_bus->data_w(scsi_refid, 0);
 	m_ints = INTS_SPC_TIMEOUT;
@@ -288,7 +327,6 @@ void mb87030_device::step(bool timeout)
 
 	case State::SelectionAssertSEL:
 		scsi_bus->data_w(scsi_refid, m_temp);
-		scsi_set_ctrl(0, S_SEL); //XXX: needed?
 		scsi_set_ctrl(S_SEL | (m_send_atn_during_selection ? S_ATN : 0), S_ATN|S_SEL|S_BSY);
 		scsi_bus->ctrl_wait(scsi_refid, S_BSY, S_BSY);
 		update_state(State::SelectionWaitBSY, 0, m_tc / 8);
@@ -307,16 +345,24 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::Selection:
+		// avoid duplicate command completion caused by deassertion of SEL
+		if (!(ctrl & S_SEL))
+			break;
+
 		LOG("selection success\n");
 		scsi_set_ctrl(0, S_SEL);
-		m_ssts |= SSTS_INIT_CONNECTED|SSTS_XFER_IN_PROGRESS;
-		m_ssts &= ~(SSTS_TARG_CONNECTED|SSTS_SPC_BUSY);
+		m_ssts |= SSTS_INIT_CONNECTED;
+		m_ssts &= ~SSTS_TARG_CONNECTED;
 		update_ssts();
 		scsi_command_complete();
 		break;
 
 	case State::TransferWaitReq:
 		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
+			// transfer command completes only when fifo is empty
+			if (!m_fifo.empty())
+				break;
+
 			LOG("TransferWaitReq: tc == 0\n");
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_command_complete();
@@ -328,6 +374,7 @@ void mb87030_device::step(bool timeout)
 			m_ints |= INTS_SERVICE_REQUIRED;
 			m_ssts &= ~SSTS_SPC_BUSY;
 			update_ints();
+			update_state(State::Idle);
 			break;
 		}
 
@@ -352,7 +399,14 @@ void mb87030_device::step(bool timeout)
 		if (!m_tc || m_fifo.full())
 			break;
 
-		m_bus_data = data;
+		LOG("pushing read data: %02X\n", data);
+		m_fifo.enqueue(data);
+
+		if (m_sdgc & SDGC_XFER_ENABLE) {
+			m_serr |= SERR_XFER_OUT;
+			update_ints();
+		}
+
 		update_state(State::TransferSendAck, 10);
 		break;
 
@@ -371,13 +425,19 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferSendData:
+		if (m_tc && m_fifo.empty() && (m_sdgc & SDGC_XFER_ENABLE)) {
+			m_serr |= SERR_XFER_OUT;
+			update_ints();
+			break;
+		}
+
 		if (m_tc && !m_fifo.empty()) {
-			scsi_bus->data_w(scsi_refid, m_fifo.peek());
+			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
 
-		if (!m_tc  && (m_scmd & SCMD_TERM_MODE)) {
+		if (!m_tc && (m_scmd & SCMD_TERM_MODE)) {
 			scsi_bus->data_w(scsi_refid, m_temp);
 			update_state(State::TransferSendAck, 10);
 			break;
@@ -415,17 +475,15 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferDeassertACK:
 		m_tc--;
-		if (!m_dma_transfer) {
-			if (!(ctrl & S_INP)) {
-				m_fifo.dequeue();
-			} else {
-				LOG("pushing read data: %02X\n", m_bus_data);
-				m_fifo.enqueue(m_bus_data);
-			}
-		}
 		update_state(State::TransferWaitReq, 10);
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-		scsi_set_ctrl(0, S_ACK);
+
+		// deassert ATN after last byte of message out phase
+		if (!m_tc && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT && m_send_atn_during_selection)
+			scsi_set_ctrl(0, S_ATN|S_ACK);
+		// deassert ACK except for last byte of message in phase
+		else if (m_tc || (ctrl & S_PHASE_MASK) != S_PHASE_MSG_IN)
+			scsi_set_ctrl(0, S_ACK);
 		break;
 
 	}
@@ -461,12 +519,13 @@ void mb87030_device::device_start()
 	save_item(NAME(m_scsi_phase));
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
-	save_item(NAME(m_bus_data));
-//  save_item(NAME(m_state));
+	save_item(NAME(m_state));
+	save_item(NAME(m_irq_state));
 }
 
 void mb87030_device::scsi_ctrl_changed()
 {
+	LOG("%s: %02x\n", __FUNCTION__, scsi_bus->ctrl_r());
 	if (m_delay_timer->remaining() == attotime::never)
 		step(false);
 }
@@ -498,13 +557,18 @@ void mb87030_device::update_ssts()
 
 void mb87030_device::update_ints()
 {
-	LOG("%s: %s\n", __FUNCTION__, (m_ints && (m_sctl & 1)) ? "true" : "false");
-	m_irq_handler(m_ints && (m_sctl & 1));// || (m_ints & INTS_DISCONNECTED));
+	bool const irq_state = (m_sctl & 1) && (m_ints || (m_serr & SERR_XFER_OUT));
+
+	if (irq_state != m_irq_state) {
+		m_irq_state = irq_state;
+		LOG("%s: %s\n", __FUNCTION__, m_irq_state ? "true" : "false");
+		m_irq_handler(m_irq_state);
+	}
 }
 
 uint8_t mb87030_device::bdid_r()
 {
-	LOG("%s %02X\n", __FUNCTION__, (1 << m_bdid));
+	LOG("%s: %02X\n", __FUNCTION__, (1 << m_bdid));
 	return 1 << m_bdid;
 }
 
@@ -652,8 +716,11 @@ uint8_t mb87030_device::psns_r()
 void mb87030_device::sdgc_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
+	if (type() == MB87030)
+		data &= ~SDGC_XFER_ENABLE;
 	m_sdgc = data;
 	scsi_ctrl_changed();
+	update_ints();
 }
 
 uint8_t mb87030_device::ssts_r()
@@ -692,10 +759,17 @@ uint8_t mb87030_device::mbc_r()
 
 uint8_t mb87030_device::dreg_r()
 {
-	step(false);
 	if (!m_fifo.empty())
 			m_dreg = m_fifo.dequeue();
 	LOG("%s: %02X\n", __FUNCTION__, m_dreg);
+
+	if (m_serr & SERR_XFER_OUT) {
+		m_serr &= ~SERR_XFER_OUT;
+		update_ints();
+	}
+
+	step(false);
+
 	return m_dreg;
 }
 
@@ -705,6 +779,12 @@ void mb87030_device::dreg_w(uint8_t data)
 	m_dreg = data;
 	if (!m_fifo.full())
 		m_fifo.enqueue(data);
+
+	if (m_serr & SERR_XFER_OUT) {
+		m_serr &= ~SERR_XFER_OUT;
+		update_ints();
+	}
+
 	step(false);
 }
 

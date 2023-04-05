@@ -97,7 +97,7 @@ public:
 	// construction/destruction
 	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }
 	virtual const char *image_type_name() const noexcept override { return "sasihd"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "sasi"; }
@@ -107,7 +107,7 @@ public:
 	u16 hdc_r(offs_t offset);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

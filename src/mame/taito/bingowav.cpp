@@ -40,10 +40,9 @@
 
 #include "emu.h"
 #include "speaker.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "cpu/z80/z80.h"
 #include "machine/te7750.h"
-#include "machine/tmp68301.h"
 #include "sound/ymopn.h"
 #include "taitosnd.h"
 

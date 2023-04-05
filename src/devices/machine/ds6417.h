@@ -3,8 +3,8 @@
 
 // Only known to be used by the Tandy VIS
 
-#ifndef MAME_MACHINE_DS6417_H_
-#define MAME_MACHINE_DS6417_H_
+#ifndef MAME_MACHINE_DS6417_H
+#define MAME_MACHINE_DS6417_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DS6417, ds6417_device)
 
-#endif /* MAME_MACHINE_DS6417_H_ */
+#endif // MAME_MACHINE_DS6417_H

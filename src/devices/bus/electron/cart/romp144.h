@@ -26,13 +26,13 @@ public:
 	electron_romp144_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	// electron_cart_interface overrides
+	// electron_cart_interface implementation
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
