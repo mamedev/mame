@@ -33,7 +33,9 @@
 #include "emu.h"
 #include "video/huc6272.h"
 
+#define VERBOSE (LOG_GENERAL)
 
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -122,7 +124,6 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5c, 0x5c).w(FUNC(huc6272_device::adpcm_start_address_w<1>));
 	map(0x5d, 0x5d).w(FUNC(huc6272_device::adpcm_end_address_w<1>));
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
-
 }
 
 //**************************************************************************
@@ -181,17 +182,14 @@ void huc6272_device::device_start()
 	save_item(NAME(m_kram_page_w));
 	save_item(NAME(m_page_setting));
 
-	for (int bg = 0; bg < 4; bg++)
-	{
-		save_item(NAME(m_bg[bg].bat_address), bg);
-		save_item(NAME(m_bg[bg].cg_address), bg);
-		save_item(NAME(m_bg[bg].mode), bg);
-		save_item(NAME(m_bg[bg].height), bg);
-		save_item(NAME(m_bg[bg].width), bg);
-		save_item(NAME(m_bg[bg].xscroll), bg);
-		save_item(NAME(m_bg[bg].yscroll), bg);
-		save_item(NAME(m_bg[bg].priority), bg);
-	}
+	save_item(STRUCT_MEMBER(m_bg, bat_address));
+	save_item(STRUCT_MEMBER(m_bg, cg_address));
+	save_item(STRUCT_MEMBER(m_bg, mode));
+	save_item(STRUCT_MEMBER(m_bg, height));
+	save_item(STRUCT_MEMBER(m_bg, width));
+	save_item(STRUCT_MEMBER(m_bg, xscroll));
+	save_item(STRUCT_MEMBER(m_bg, yscroll));
+	save_item(STRUCT_MEMBER(m_bg, priority));
 
 	save_item(NAME(m_bg0sub.bat_address));
 	save_item(NAME(m_bg0sub.cg_address));
@@ -364,6 +362,7 @@ void huc6272_device::scsi_bus_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_15)
 	{
 		// TODO: bits 7-0: SCSI DMA trigger?
+		LOG("SCSI DMA trigger %04x & %08x\n", data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -397,7 +396,7 @@ void huc6272_device::kram_write_address_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_kram_write_reg);
 	m_kram_addr_w = (m_kram_write_reg & 0x0003ffff);
 	m_kram_inc_w =  (m_kram_write_reg & 0x0ffc0000) >> 18;
-	m_kram_page_w = (m_kram_write_reg & 0x80000000) >> 31;
+	m_kram_page_w = BIT(m_kram_write_reg, 31);
 }
 
 u32 huc6272_device::kram_read_data_r(offs_t offset)
@@ -438,21 +437,22 @@ void huc6272_device::kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_page_setting);
 }
 
-//
-// xxxx ---- ---- ---- BG3 mode setting
-// ---- xxxx ---- ---- BG2 mode setting
-// ---- ---- xxxx ---- BG1 mode setting
-// ---- ---- ---- xxxx BG0 mode setting
-//
-// 0001 - 4 color palette
-// 0010 - 16 color palette
-// 0011 - 256 color palette
-// 0100 - 64k color
-// 0101 - 16M color
-// 1001 - 4 color palette block mode
-// 1010 - 16 color palette block mode
-// 1011 - 256 color palette block mode
-// others - unused/invalid
+/*
+ * xxxx ---- ---- ---- BG3 mode setting
+ * ---- xxxx ---- ---- BG2 mode setting
+ * ---- ---- xxxx ---- BG1 mode setting
+ * ---- ---- ---- xxxx BG0 mode setting
+ *
+ * 0001 - 4 color palette
+ * 0010 - 16 color palette
+ * 0011 - 256 color palette
+ * 0100 - 64k color
+ * 0101 - 16M color
+ * 1001 - 4 color palette block mode
+ * 1010 - 16 color palette block mode
+ * 1011 - 256 color palette block mode
+ * others - unused/invalid
+ */
 void huc6272_device::bg_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
@@ -478,6 +478,7 @@ void huc6272_device::bg_mode_w(offs_t offset, u32 data, u32 mem_mask)
  * ---- ---- ---- -001 farthest back
  * ---- ---- ---- -100 farthest forward
  * ---- ---- ---- -1xx <prohibited>
+ * NB: there's another priority reg in '6261, is above layer vs. layer priority?
  */
 void huc6272_device::bg_priority_w(offs_t offset, u32 data, u32 mem_mask)
 {
@@ -597,9 +598,12 @@ u32 huc6272_device::adpcm_status_r(offs_t offset)
 {
 	u32 res = m_adpcm.status;
 
-	m_adpcm.status = 0;
-	m_adpcm.interrupt = 0;
-	interrupt_update();
+	if (!machine().side_effects_disabled())
+	{
+		m_adpcm.status = 0;
+		m_adpcm.interrupt = 0;
+		interrupt_update();
+	}
 	return res;
 }
 
