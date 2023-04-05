@@ -592,7 +592,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[this, dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] () -> R
+							[dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] () -> R
 							{
 								auto status(invoke_direct(cbfunc));
 								if (status.valid())
