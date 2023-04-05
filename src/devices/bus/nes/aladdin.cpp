@@ -97,12 +97,11 @@ std::error_condition nes_aladdin_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM = m_cart->get_cart_base();
-		uint32_t size;
-
+		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
 			return image_error::INTERNAL;
 
+		uint32_t size;
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20010 && length() != 0x40010)
@@ -114,19 +113,17 @@ std::error_condition nes_aladdin_slot_device::call_load()
 			memcpy(ROM, temp + 0x10, size);
 
 			// double check that iNES files are really mapper 71 or 232
-			{
-				uint8_t mapper = (temp[6] & 0xf0) >> 4;
-				mapper |= temp[7] & 0xf0;
-				if (mapper != 71 && mapper != 232)
-					return image_error::INVALIDIMAGE;
-			}
+			uint8_t mapper = (temp[6] & 0xf0) >> 4;
+			mapper |= temp[7] & 0xf0;
+			if (mapper != 71 && mapper != 232)
+				return image_error::INVALIDIMAGE;
 		}
 		else
 		{
-			if (get_software_region_length("rom") != 0x20000 && get_software_region_length("rom") != 0x40000)
+			size = get_software_region_length("rom");
+			if (size != 0x2'0000 && size != 0x4'0000)
 				return image_error::BADSOFTWARE;
 
-			size = get_software_region_length("rom");
 			memcpy(ROM, get_software_region("rom"), size);
 		}
 

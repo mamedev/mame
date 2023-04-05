@@ -592,26 +592,35 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 			else if (cb.is<sol::protected_function>())
 			{
 				(self.*setter)(delegate<R ()>(
-							[this, dflt, desc, cbfunc = cb.as<sol::protected_function>()] () -> R
+							[this, dflt, desc, cbfunc = sol::protected_function(m_lua_state, cb)] () -> R
 							{
-								if constexpr (std::is_same_v<R, void>)
+								auto status(invoke_direct(cbfunc));
+								if (status.valid())
 								{
-									(void)dflt;
-									(void)desc;
-									invoke(cbfunc);
-								}
-								else
-								{
-									auto result(invoke(cbfunc).get<std::optional<R> >());
-									if (result)
+									if constexpr (std::is_same_v<R, void>)
 									{
-										return *result;
+										std::ignore = dflt;
 									}
 									else
 									{
-										osd_printf_error("[LUA ERROR] invalid return from %s callback\n", desc);
-										return dflt();
+										auto result(status.get<std::optional<R> >());
+										if (result)
+										{
+											return *result;
+										}
+										else
+										{
+											osd_printf_error("[LUA ERROR] invalid return from %s callback\n", desc);
+											return dflt();
+										}
 									}
+								}
+								else
+								{
+									sol::error err(status);
+									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
+									if constexpr (!std::is_same_v<R, void>)
+										return dflt();
 								}
 							}));
 			}

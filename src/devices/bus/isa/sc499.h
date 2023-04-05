@@ -13,7 +13,8 @@
 
 #pragma once
 
-#include "bus/isa/isa.h"
+#include "isa.h"
+
 #include "imagedev/magtape.h"
 
 
@@ -29,7 +30,7 @@ public:
 	// construction/destruction
 	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
@@ -44,8 +45,8 @@ public:
 	uint64_t tapelen() { return m_ctape_data.size(); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override { }
+	// device_t implementation
+	virtual void device_start() override;
 
 	std::vector<uint8_t> m_ctape_data;
 };

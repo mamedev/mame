@@ -40,7 +40,7 @@ public:
 	// construction/destruction
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -91,8 +91,7 @@ void nubus_image_device::messimg_disk_image_device::device_start()
 
 std::error_condition nubus_image_device::messimg_disk_image_device::call_load()
 {
-	fseek(0, SEEK_END);
-	m_size = uint32_t(ftell());
+	m_size = length();
 	if (m_size > (256*1024*1024))
 	{
 		osd_printf_error("Mac image too large: must be 256MB or less!\n");
@@ -100,8 +99,12 @@ std::error_condition nubus_image_device::messimg_disk_image_device::call_load()
 		return image_error::INVALIDLENGTH;
 	}
 
+	m_data.reset(new (std::nothrow) uint8_t [m_size]);
+	if (!m_data)
+		return std::errc::not_enough_memory;
+
 	fseek(0, SEEK_SET);
-	fread(m_data, m_size);
+	fread(m_data.get(), m_size);
 	m_ejected = false;
 
 	return std::error_condition();

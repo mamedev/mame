@@ -131,6 +131,13 @@ public:
 		return cr(std::forward<Params>(args)...);
 	}
 
+	template <typename Func, typename... Params>
+	static auto invoke_direct(Func &&func, Params&&... args)
+	{
+		auto profile = g_profiler.start(PROFILER_LUA);
+		return func(std::forward<Params>(args)...);
+	}
+
 private:
 	template <typename T, size_t Size> class enum_parser;
 

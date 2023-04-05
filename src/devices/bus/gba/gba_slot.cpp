@@ -621,16 +621,15 @@ std::error_condition gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		if (size > 0x4000000)
+		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		if (size > 0x400'0000)
 		{
 			osd_printf_error("%s: Attempted loading a cart larger than 64MB\n", basename());
 			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (uint8_t *)m_cart->get_rom_base();
+		uint8_t *const ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 		{
@@ -670,9 +669,9 @@ std::error_condition gba_cart_slot_device::call_load()
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
 		}
-		if (size == 0x4000000)
+		if (size == 0x400'0000)
 		{
-			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x2000000);
+			memcpy(m_cart->get_romhlp_base(), ROM, 0x2000000);
 			for (uint32_t i = 0; i < 16; i++)
 			{
 				memcpy((uint8_t *)m_cart->get_romhlp_base() + i * 0x1000, ROM + 0x200, 0x1000);
@@ -682,8 +681,6 @@ std::error_condition gba_cart_slot_device::call_load()
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();

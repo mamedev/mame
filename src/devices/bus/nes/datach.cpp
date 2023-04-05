@@ -96,8 +96,7 @@ std::error_condition nes_datach_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM = m_cart->get_cart_base();
-
+		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
 			return image_error::INTERNAL;
 

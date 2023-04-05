@@ -1320,3 +1320,7 @@ void sc499_ctape_image_device::call_unload()
 	//    fwrite(m_ctape_data, m_ctape_data.size);
 	//}
 }
+
+void sc499_ctape_image_device::device_start()
+{
+}

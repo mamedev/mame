@@ -46,7 +46,7 @@ std::error_condition msx_cart_softcard_device::call_load()
 	{
 		if (loaded_through_softlist())
 		{
-			u32 length = get_software_region_length("rom");
+			u32 const length = get_software_region_length("rom");
 			// Only 32KB images are supported
 			if (length != 0x8000)
 			{
@@ -56,7 +56,7 @@ std::error_condition msx_cart_softcard_device::call_load()
 		}
 		else
 		{
-			u32 length = this->length();
+			u32 const length = this->length();
 			// Only 32KB images are supported
 			if (length != 0x8000)
 			{

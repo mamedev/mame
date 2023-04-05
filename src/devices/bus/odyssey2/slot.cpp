@@ -152,7 +152,7 @@ std::error_condition o2_cart_slot_device::call_load()
 		}
 		else
 		{
-			u32 size = length();
+			u32 const size = length();
 			fread(m_cart->m_rom, size);
 
 			m_cart->m_rom_size = size;

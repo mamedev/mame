@@ -303,8 +303,6 @@ std::error_condition neogeo_cart_slot_device::call_load()
 			// SPEED UP WORKAROUND: to speed up sprite drawing routine, let us store the sprite data in
 			// a different format (we then always access such alt format for drawing)
 			m_cart->optimize_sprites(m_cart->get_sprites_base(), m_cart->get_sprites_size());
-
-			return std::error_condition();
 		}
 	}
 

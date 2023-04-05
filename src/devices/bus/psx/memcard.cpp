@@ -310,19 +310,17 @@ std::error_condition psxcard_device::call_load()
 
 std::error_condition psxcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	uint8_t block[block_size];
-	int i, ret;
-
 	if(m_disabled)
 	{
 		logerror("psxcard: port disabled\n");
 		return image_error::UNSUPPORTED;
 	}
 
+	uint8_t block[block_size];
 	memset(block, '\0', block_size);
-	for(i = 0; i < (card_size/block_size); i++)
+	for(int i = 0; i < (card_size/block_size); i++)
 	{
-		ret = fwrite(block, block_size);
+		auto const ret = fwrite(block, block_size);
 		if(ret != block_size)
 			return image_error::UNSPECIFIED;
 	}

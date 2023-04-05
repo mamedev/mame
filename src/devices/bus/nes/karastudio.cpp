@@ -100,8 +100,7 @@ std::error_condition nes_kstudio_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM = m_cart->get_cart_base();
-
+		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
 			return image_error::INTERNAL;
 
@@ -111,7 +110,7 @@ std::error_condition nes_kstudio_slot_device::call_load()
 			if (length() != 0x20000)
 				return image_error::INVALIDLENGTH;
 
-			fread(&ROM, 0x20000);
+			fread(ROM, 0x20000);
 		}
 		else
 		{

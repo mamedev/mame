@@ -27,7 +27,7 @@ public:
 protected:
 	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 };
 

@@ -320,11 +320,10 @@ std::error_condition kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
-		uint8_t *cart_base = m_cart->get_cart_base();
-
-		if (cart_base != nullptr)
+		uint8_t *const cart_base = m_cart->get_cart_base();
+		if (cart_base)
 		{
+			offs_t read_length;
 			if (!loaded_through_softlist())
 			{
 				read_length = length();

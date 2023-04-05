@@ -53,7 +53,7 @@ public:
 	// construction/destruction
 	omti_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "awd"; }
 	virtual const char *image_type_name() const noexcept override { return "winchester"; }
@@ -62,7 +62,7 @@ public:
 	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -1478,11 +1478,8 @@ std::error_condition omti_disk_image_device::call_create(int format_type, util::
 
 	for (int x = 0; x < m_sector_count; x++)
 	{
-		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE)
-				< OMTI_DISK_SECTOR_SIZE)
-		{
+		if (fwrite(sectordata, OMTI_DISK_SECTOR_SIZE) < OMTI_DISK_SECTOR_SIZE)
 			return image_error::UNSPECIFIED;
-		}
 	}
 
 	return std::error_condition();

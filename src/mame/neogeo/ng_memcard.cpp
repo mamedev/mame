@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /*********************************************************************
 
-    Neo Geo Memory card functions.
+    Neo Geo Memory card functions
 
     JEIDA V3 SRAM cards.  The BIOS supports 8-bit and 16-bit cards,
     in 2KiB, 4KiB, 6KiB, 8KiB, 10KiB, 14KiB and 16KiB capacities.

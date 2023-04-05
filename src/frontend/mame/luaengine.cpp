@@ -715,7 +715,7 @@ void lua_engine::initialize()
  * emu.unpause() - unpause emulation
  * emu.step() - advance one frame
  * emu.keypost(keys) - post keys to natural keyboard
- * emu.wait(len) - wait for len within coroutine
+ * emu.wait(duration, ...) - wait for duration within coroutine
  * emu.lang_translate(str) - get translation for str if available
  * emu.subst_env(str) - substitute environment variables with values for str (semantics are OS-specific)
  *
@@ -822,45 +822,48 @@ void lua_engine::initialize()
 			return sol::make_object(s, driver_list::driver(i));
 		};
 	emu["wait"] = sol::yielding(
-			[this] (sol::this_state s, sol::object arg)
+			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
 			{
-				attotime duration;
-				if (!arg)
+				attotime delay;
+				if (!duration)
 				{
 					luaL_error(s, "waiting duration expected");
 				}
-				else if (arg.is<attotime>())
+				else if (duration.is<attotime>())
 				{
-					duration = arg.as<attotime>();
+					delay = duration.as<attotime>();
 				}
 				else
 				{
-					auto seconds = arg.as<std::optional<double> >();
+					auto seconds = duration.as<std::optional<double> >();
 					if (!seconds)
 						luaL_error(s, "waiting duration must be attotime or number");
-					duration = attotime::from_double(*seconds);
+					delay = attotime::from_double(*seconds);
 				}
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
-				machine().scheduler().timer_set(duration, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
+				machine().scheduler().timer_set(delay, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_update"] = sol::yielding(
-			[this] (sol::this_state s)
+			[this] (sol::this_state s, sol::variadic_args args)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["wait_next_frame"] = sol::yielding(
-			[this] (sol::this_state s)
+			[this] (sol::this_state s, sol::variadic_args args)
 			{
 				int const ret = lua_pushthread(s);
 				if (ret == 1)
 					luaL_error(s, "cannot wait from outside coroutine");
 				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
 			});
 	emu["lang_translate"] = sol::overload(
 			static_cast<char const *(*)(char const *)>(&lang_translate),
