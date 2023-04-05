@@ -64,7 +64,7 @@ std::error_condition gb_cart_slot_device_base::call_load()
 	if (result)
 	{
 		if (result == image_error::BADSOFTWARE && !loaded_through_softlist())
-			result = image_error::INVALIDLENGTH;
+			result = image_error::INVALIDIMAGE;
 		osd_printf_error("%s: %s\n", basename(), message);
 	}
 	return result;
