@@ -762,7 +762,7 @@ void mc88100_device::execute(u32 const inst)
 			if (!(m_cr[PSR] & PSR_SFD1))
 			{
 				if (m_r[S2])
-					m_r[D] = s32(m_r[S1]) / s32(m_r[S2]);
+					m_r[D] = m_r[S1] / m_r[S2];
 				else
 					exception(E_INT_DIVIDE);
 			}
@@ -1223,6 +1223,8 @@ void mc88100_device::set_cr(unsigned const cr, u32 const data)
 
 	case PSR:
 	case EPSR:
+		if (data & PSR_BO)
+			fatalerror("mc88100: little-endian mode not emulated (%s)\n", machine().describe_context());
 		m_cr[cr] = (m_cr[cr] & ~PSR_MASK) | (data & PSR_MASK);
 		break;
 
