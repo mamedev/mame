@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "notifier.h"
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -166,22 +168,39 @@ private:
 
 	std::vector<std::string> m_menu;
 
+	emu_timer *m_timer;
+
+	// machine event notifiers
+	util::notifier<> m_reset_notifier;
+	util::notifier<> m_stop_notifier;
+	util::notifier<> m_pause_notifier;
+	util::notifier<> m_resume_notifier;
+	util::notifier<> m_frame_notifier;
+	util::notifier<> m_presave_notifier;
+	util::notifier<> m_postload_notifier;
+
+	// deferred coroutines
+	std::vector<std::pair<attotime, int> > m_waiting_tasks;
 	std::vector<int> m_update_tasks;
 	std::vector<int> m_frame_tasks;
 
+	template <typename... T>
+	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
 	template <typename R, typename T, typename D>
 	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
 	void on_machine_prestart();
-	void on_machine_start();
+	void on_machine_reset();
 	void on_machine_stop();
 	void on_machine_pause();
 	void on_machine_resume();
 	void on_machine_frame();
+	void on_machine_presave();
+	void on_machine_postload();
 
-	void resume(int nparam);
+	void resume(s32 param);
 	void register_function(sol::function func, const char *id);
 	template <typename T> size_t enumerate_functions(const char *id, T &&callback);
 	bool execute_function(const char *id);

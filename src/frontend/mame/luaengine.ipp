@@ -575,6 +575,32 @@ private:
 
 
 //-------------------------------------------------
+//  make_notifier_adder - make a function for
+//  subscribing to a notifier
+//-------------------------------------------------
+
+template <typename... T>
+auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char *desc)
+{
+	return
+		[this, &notifier, desc] (sol::protected_function cb)
+		{
+			return notifier.subscribe(
+					delegate<void (T...)>(
+							[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
+							{
+								auto status = invoke(cbfunc, args...);
+								if (!status.valid())
+								{
+									sol::error err(status);
+									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
+								}
+							}));
+		};
+}
+
+
+//-------------------------------------------------
 //  make_simple_callback_setter - make a callback
 //  setter for simple cases
 //-------------------------------------------------

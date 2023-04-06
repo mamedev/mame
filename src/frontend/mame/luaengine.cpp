@@ -29,8 +29,8 @@
 #include "uiinput.h"
 
 #include "corestr.h"
-#include "notifier.h"
 
+#include <algorithm>
 #include <condition_variable>
 #include <cstring>
 #include <mutex>
@@ -78,8 +78,7 @@ public:
 		m_state["package"]["preload"]["zlib"] = &luaopen_zlib;
 		m_state["package"]["preload"]["lfs"] = &luaopen_lfs;
 		m_state["package"]["preload"]["linenoise"] = &luaopen_linenoise;
-		m_state.set_function(
-				"yield",
+		m_state.set_function("yield",
 				[this] ()
 				{
 					std::unique_lock<std::mutex> yield_lock(m_guard);
@@ -195,6 +194,31 @@ struct plugin_options_plugins
 
 	plugin_options &options;
 };
+
+
+template <typename T>
+void resume_tasks(lua_State *L, T &&tasks, bool status)
+{
+	for (int ref : tasks)
+	{
+		lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+		lua_State *const thread = lua_tothread(L, -1);
+		lua_pop(L, 1);
+		lua_pushboolean(thread, status ? 1 : 0);
+		int nresults = 0;
+		int const stat = lua_resume(thread, nullptr, 1, &nresults);
+		if ((stat != LUA_OK) && (stat != LUA_YIELD))
+		{
+			osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(thread, -1));
+			lua_pop(thread, 1);
+		}
+		else
+		{
+			lua_pop(thread, nresults);
+		}
+		luaL_unref(L, LUA_REGISTRYINDEX, ref);
+	}
+}
 
 } // anonymous namespace
 
@@ -440,8 +464,10 @@ static std::string process_snapshot_filename(running_machine &machine, const cha
 //-------------------------------------------------
 
 lua_engine::lua_engine()
+	: m_lua_state(nullptr)
+	, m_machine(nullptr)
+	, m_timer(nullptr)
 {
-	m_machine = nullptr;
 	m_lua_state = luaL_newstate();  // create state
 	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
 
@@ -599,13 +625,25 @@ void lua_engine::on_machine_prestart()
 	execute_function("LUA_ON_PRESTART");
 }
 
-void lua_engine::on_machine_start()
+void lua_engine::on_machine_reset()
 {
+	m_reset_notifier();
 	execute_function("LUA_ON_START");
 }
 
 void lua_engine::on_machine_stop()
 {
+	// clear waiting tasks
+	m_timer = nullptr;
+	std::vector<int> expired;
+	expired.reserve(m_waiting_tasks.size());
+	for (auto const &waiting : m_waiting_tasks)
+		expired.emplace_back(waiting.second);
+	m_waiting_tasks.clear();
+	resume_tasks(m_lua_state, expired, false);
+	expired.clear();
+
+	m_stop_notifier();
 	execute_function("LUA_ON_STOP");
 }
 
@@ -616,11 +654,13 @@ void lua_engine::on_machine_before_load_settings()
 
 void lua_engine::on_machine_pause()
 {
+	m_pause_notifier();
 	execute_function("LUA_ON_PAUSE");
 }
 
 void lua_engine::on_machine_resume()
 {
+	m_resume_notifier();
 	execute_function("LUA_ON_RESUME");
 }
 
@@ -631,7 +671,29 @@ void lua_engine::on_machine_frame()
 	for (int ref : tasks)
 		resume(ref);
 
+	m_frame_notifier();
+
 	execute_function("LUA_ON_FRAME");
+}
+
+void lua_engine::on_machine_presave()
+{
+	m_presave_notifier();
+}
+
+void lua_engine::on_machine_postload()
+{
+	// clear waiting tasks
+	m_timer->reset();
+	std::vector<int> expired;
+	expired.reserve(m_waiting_tasks.size());
+	for (auto const &waiting : m_waiting_tasks)
+		expired.emplace_back(waiting.second);
+	m_waiting_tasks.clear();
+	resume_tasks(m_lua_state, expired, false);
+	expired.clear();
+
+	m_postload_notifier();
 }
 
 void lua_engine::on_sound_update()
@@ -670,11 +732,15 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 void lua_engine::attach_notifiers()
 {
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_reset, this));
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
 	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&lua_engine::on_machine_pause, this));
 	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&lua_engine::on_machine_resume, this));
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&lua_engine::on_machine_frame, this));
+	machine().save().register_presave(save_prepost_delegate(FUNC(lua_engine::on_machine_presave), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(lua_engine::on_machine_postload), this));
+
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lua_engine::resume), this));
 }
 
 //-------------------------------------------------
@@ -715,9 +781,6 @@ void lua_engine::initialize()
  * emu.unpause() - unpause emulation
  * emu.step() - advance one frame
  * emu.keypost(keys) - post keys to natural keyboard
- * emu.wait(duration, ...) - wait for duration within coroutine
- * emu.lang_translate(str) - get translation for str if available
- * emu.subst_env(str) - substitute environment variables with values for str (semantics are OS-specific)
  *
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_start(callback) - register callback after reset
@@ -734,12 +797,6 @@ void lua_engine::initialize()
  * emu.register_before_load_settings(callback) - register callback to be run before settings are loaded
  * emu.show_menu(menu_name) - show menu by name and pause the machine
  *
- * emu.print_verbose(str) - log message at verbose level
- * emu.print_error(str) - log message at error level
- * emu.print_warning(str) - log message at error level
- * emu.print_info(str) - log message at info level
- * emu.print_debug(str) - log message at debug level
- *
  * emu.device_enumerator(dev) - get device enumerator starting at arbitrary point in tree
  * emu.screen_enumerator(dev) - get screen device enumerator starting at arbitrary point in tree
  * emu.image_enumerator(dev) - get image interface enumerator starting at arbitrary point in tree
@@ -747,6 +804,79 @@ void lua_engine::initialize()
  */
 
 	sol::table emu = sol().create_named_table("emu");
+	emu["wait"] = sol::yielding(
+			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
+			{
+				attotime delay;
+				if (!duration)
+				{
+					luaL_error(s, "waiting duration expected");
+				}
+				else if (duration.is<attotime>())
+				{
+					delay = duration.as<attotime>();
+				}
+				else
+				{
+					auto seconds = duration.as<std::optional<double> >();
+					if (!seconds)
+						luaL_error(s, "waiting duration must be attotime or number");
+					delay = attotime::from_double(*seconds);
+				}
+				attotime const expiry = machine().time() + delay;
+
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
+
+				auto const pos = std::upper_bound(
+						m_waiting_tasks.begin(),
+						m_waiting_tasks.end(),
+						expiry,
+						[] (auto const &a, auto const &b) { return a < b.first; });
+				if (m_waiting_tasks.begin() == pos)
+					m_timer->reset(delay);
+				m_waiting_tasks.emplace(pos, expiry, ref);
+
+				return sol::variadic_results(args.begin(), args.end());
+			});
+	emu["wait_next_update"] = sol::yielding(
+			[this] (sol::this_state s, sol::variadic_args args)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
+			});
+	emu["wait_next_frame"] = sol::yielding(
+			[this] (sol::this_state s, sol::variadic_args args)
+			{
+				int const ret = lua_pushthread(s);
+				if (ret == 1)
+					luaL_error(s, "cannot wait from outside coroutine");
+				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
+				return sol::variadic_results(args.begin(), args.end());
+			});
+	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_reset_notifier, "machine reset"));
+	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_stop_notifier, "machine stop"));
+	emu.set_function("add_machine_pause_notifier", make_notifier_adder(m_pause_notifier, "machine pause"));
+	emu.set_function("add_machine_resume_notifier", make_notifier_adder(m_resume_notifier, "machine resume"));
+	emu.set_function("add_machine_frame_notifier", make_notifier_adder(m_frame_notifier, "machine frame"));
+	emu.set_function("add_machine_pre_save_notifier", make_notifier_adder(m_presave_notifier, "machine pre-save"));
+	emu.set_function("add_machine_post_load_notifier", make_notifier_adder(m_postload_notifier, "machine post-load"));
+	emu.set_function("print_error", [] (const char *str) { osd_printf_error("%s\n", str); });
+	emu.set_function("print_warning", [] (const char *str) { osd_printf_warning("%s\n", str); });
+	emu.set_function("print_info", [] (const char *str) { osd_printf_info("%s\n", str); });
+	emu.set_function("print_verbose", [] (const char *str) { osd_printf_verbose("%s\n", str); });
+	emu.set_function("print_debug", [] (const char *str) { osd_printf_debug("%s\n", str); });
+	emu["lang_translate"] = sol::overload(
+			static_cast<char const *(*)(char const *)>(&lang_translate),
+			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
+	emu.set_function("subst_env", &osd_subst_env);
+
+	// TODO: stuff below here needs to be rationalised
 	emu["app_name"] = &emulator_info::get_appname_lower;
 	emu["app_version"] = &emulator_info::get_bare_build_version;
 	emu["gamename"] = [this] () { return machine().system().type.fullname(); };
@@ -774,11 +904,11 @@ void lua_engine::initialize()
 			machine().resume();
 		};
 	emu["register_prestart"] = [this] (sol::function func) { register_function(func, "LUA_ON_PRESTART"); };
-	emu["register_start"] = [this] (sol::function func) { register_function(func, "LUA_ON_START"); };
-	emu["register_stop"] = [this] (sol::function func) { register_function(func, "LUA_ON_STOP"); };
-	emu["register_pause"] = [this] (sol::function func) { register_function(func, "LUA_ON_PAUSE"); };
-	emu["register_resume"] = [this] (sol::function func) { register_function(func, "LUA_ON_RESUME"); };
-	emu["register_frame"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME"); };
+	emu["register_start"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_start is deprecated - please use emu.add_machine_reset_notifier\n"); register_function(func, "LUA_ON_START"); };
+	emu["register_stop"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_stop is deprecated - please use emu.add_machine_stop_notifier\n"); register_function(func, "LUA_ON_STOP"); };
+	emu["register_pause"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_pause is deprecated - please use emu.add_machine_pause_notifier\n"); register_function(func, "LUA_ON_PAUSE"); };
+	emu["register_resume"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_resume is deprecated - please use emu.add_machine_resume_notifier\n"); register_function(func, "LUA_ON_RESUME"); };
+	emu["register_frame"] = [this] (sol::function func) { osd_printf_warning("[LUA] emu.register_frame is deprecated - please use emu.add_machine_frame_notifier\n"); register_function(func, "LUA_ON_FRAME"); };
 	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };
 	emu["register_periodic"] = [this] (sol::function func) { register_function(func, "LUA_ON_PERIODIC"); };
@@ -806,11 +936,6 @@ void lua_engine::initialize()
 			std::string field = "cb_" + name;
 			sol().registry()[field] = cb;
 		};
-	emu["print_verbose"] = [] (const char *str) { osd_printf_verbose("%s\n", str); };
-	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
-	emu["print_warning"] = [] (const char *str) { osd_printf_warning("%s\n", str); };
-	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
-	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
 	emu["osd_ticks"] = &osd_ticks;
 	emu["osd_ticks_per_second"] = &osd_ticks_per_second;
 	emu["driver_find"] =
@@ -821,55 +946,7 @@ void lua_engine::initialize()
 				return sol::lua_nil;
 			return sol::make_object(s, driver_list::driver(i));
 		};
-	emu["wait"] = sol::yielding(
-			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
-			{
-				attotime delay;
-				if (!duration)
-				{
-					luaL_error(s, "waiting duration expected");
-				}
-				else if (duration.is<attotime>())
-				{
-					delay = duration.as<attotime>();
-				}
-				else
-				{
-					auto seconds = duration.as<std::optional<double> >();
-					if (!seconds)
-						luaL_error(s, "waiting duration must be attotime or number");
-					delay = attotime::from_double(*seconds);
-				}
-				int const ret = lua_pushthread(s);
-				if (ret == 1)
-					luaL_error(s, "cannot wait from outside coroutine");
-				int const ref = luaL_ref(s, LUA_REGISTRYINDEX);
-				machine().scheduler().timer_set(delay, timer_expired_delegate(FUNC(lua_engine::resume), this), ref);
-				return sol::variadic_results(args.begin(), args.end());
-			});
-	emu["wait_next_update"] = sol::yielding(
-			[this] (sol::this_state s, sol::variadic_args args)
-			{
-				int const ret = lua_pushthread(s);
-				if (ret == 1)
-					luaL_error(s, "cannot wait from outside coroutine");
-				m_update_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
-				return sol::variadic_results(args.begin(), args.end());
-			});
-	emu["wait_next_frame"] = sol::yielding(
-			[this] (sol::this_state s, sol::variadic_args args)
-			{
-				int const ret = lua_pushthread(s);
-				if (ret == 1)
-					luaL_error(s, "cannot wait from outside coroutine");
-				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
-				return sol::variadic_results(args.begin(), args.end());
-			});
-	emu["lang_translate"] = sol::overload(
-			static_cast<char const *(*)(char const *)>(&lang_translate),
-			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
-	emu.set_function("subst_env", &osd_subst_env);
 	emu["device_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<device_enumerator>(dev, maxdepth); });
@@ -2050,23 +2127,21 @@ void lua_engine::close()
 	}
 }
 
-void lua_engine::resume(int nparam)
+void lua_engine::resume(s32 param)
 {
-	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
-	lua_State *L = lua_tothread(m_lua_state, -1);
-	lua_pop(m_lua_state, 1);
-	int nresults = 0;
-	int stat = lua_resume(L, nullptr, 0, &nresults);
-	if ((stat != LUA_OK) && (stat != LUA_YIELD))
-	{
-		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
-	else
-	{
-		lua_pop(L, nresults);
-	}
-	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
+	attotime const now = machine().time();
+	auto const pos = std::find_if(
+			m_waiting_tasks.begin(),
+			m_waiting_tasks.end(),
+			[&now] (auto const &x) { return now < x.first; });
+	std::vector<int> expired;
+	expired.reserve(std::distance(m_waiting_tasks.begin(), pos));
+	for (auto it = m_waiting_tasks.begin(); pos != it; ++it)
+		expired.emplace_back(it->second);
+	m_waiting_tasks.erase(m_waiting_tasks.begin(), pos);
+	if (!m_waiting_tasks.empty())
+		m_timer->reset(m_waiting_tasks.begin()->first - now);
+	resume_tasks(m_lua_state, expired, true);
 }
 
 //-------------------------------------------------
