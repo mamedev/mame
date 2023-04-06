@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+#include "emu.h"
 #include "tmp68301.h"
 
 // Not implemented, for lack of test cases:
