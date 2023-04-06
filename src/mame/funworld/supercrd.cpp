@@ -450,7 +450,7 @@ static INPUT_PORTS_START( supercrd )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_8) PORT_NAME("Remote Credits (Service)")
-NPUT_PORTS_END
+INPUT_PORTS_END
 
 
 /*************************
