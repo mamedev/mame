@@ -205,6 +205,8 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
 	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
 	m_maincpu->out_eop_cb().set("tc", FUNC(input_merger_device::in_w<0>));
+	m_maincpu->in_ior_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
+	m_maincpu->out_iow_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
 	m_maincpu->out_dack_cb<1>().set("tc", FUNC(input_merger_device::in_w<1>));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
