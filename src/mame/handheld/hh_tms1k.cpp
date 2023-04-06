@@ -3277,6 +3277,10 @@ ROM_END
   Two versions are known, one with the tone knob, and one without. The MCU
   is the same for both.
 
+  Electronic Jukebox (model 552) has the exact same MCU as well, it's on a
+  much smaller PCB. It doesn't have the tone knob either. They removed the
+  LEDs and learn mode.
+
 ***************************************************************************/
 
 class litelrn_state : public hh_tms1k_state
@@ -11391,8 +11395,12 @@ ROM_END
   * TMS5110AN2L-1 speech chip, 4KB VSM CM72010NL (die label: T0355C, 72010U)
   * 4-digit 7seg LED display, 6 other LEDs
 
-  Micronta is not a company, but one of the Radio Shack house brands. Schematics
-  are included in the manual, they also mention a CM72005 VSM.
+  Even though it has a 60 Hz inputline, it doesn't use it to sync the clock.
+  Instead, it relies on the MCU frequency, which is not very accurate when
+  using a simple R/C osc.
+
+  Micronta is not a company, but one of the Radio Shack house brands.
+  Schematics are included in the manual, they also mention a CM72005 VSM.
 
   Spartus AVT from 1982 is nearly the same as VoxClock 3.
 
@@ -11512,9 +11520,9 @@ static INPUT_PORTS_START( vclock3 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set Time")
 
 	PORT_START("IN.4") // R4 (factory-set jumpers)
-	PORT_CONFNAME( 0x01, 0x01, "AC Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, vclock3_state, switch_hz, 0)
-	PORT_CONFSETTING( 0x00, "50 Hz" )
-	PORT_CONFSETTING( 0x01, "60 Hz" )
+	PORT_CONFNAME( 0x01, 0x00, "AC Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, vclock3_state, switch_hz, 0)
+	PORT_CONFSETTING(    0x01, "50 Hz" )
+	PORT_CONFSETTING(    0x00, "60 Hz" )
 	PORT_CONFNAME( 0x02, 0x00, "Chime / Announce" )
 	PORT_CONFSETTING(    0x02, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -16316,7 +16324,7 @@ INPUT_PORTS_END
 void xl25_state::xl25(machine_config &config)
 {
 	// basic machine hardware
-	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
+	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
 	m_maincpu->read_k().set(FUNC(xl25_state::read_k));
 	m_maincpu->write_r().set(FUNC(xl25_state::write_r));
 	m_maincpu->write_o().set(FUNC(xl25_state::write_o));

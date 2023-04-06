@@ -2,8 +2,7 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1700, TMS1730,
-  and second source Motorola MC141000, MC141200.
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1270, TMS1700, TMS1730
 
 TMS1000
 - 64x4bit RAM array at the bottom-left
@@ -14,6 +13,10 @@ TMS1000
 - 30-term microinstructions PLA(mpla) at the top half, to the right of the midline, supporting 16 microinstructions
 - 20-term output PLA(opla) at the top-left
 - the ALU is between the opla and mpla
+
+TODO:
+- add Motorola MC141000/MC141200 when needed, they are CMOS MCUs based on
+  TMS1000/TMS1200 but not 100% the same
 
 */
 
@@ -30,9 +33,6 @@ DEFINE_DEVICE_TYPE(TMS1200,  tms1200_cpu_device,  "tms1200",  "Texas Instruments
 DEFINE_DEVICE_TYPE(TMS1270,  tms1270_cpu_device,  "tms1270",  "Texas Instruments TMS1270") // high voltage version, 10 O pins (output PLA order is O9,O8,O0-O7)
 DEFINE_DEVICE_TYPE(TMS1700,  tms1700_cpu_device,  "tms1700",  "Texas Instruments TMS1700") // 28-pin DIP, RAM/ROM size halved, 9 R pins
 DEFINE_DEVICE_TYPE(TMS1730,  tms1730_cpu_device,  "tms1730",  "Texas Instruments TMS1730") // 20-pin DIP, same die as TMS1700, package has less pins: 6 R pins, 5 O pins (output PLA is still 8-bit, O1,O3,O5 unused)
-
-DEFINE_DEVICE_TYPE(MC141000, mc141000_cpu_device, "mc141000", "Motorola MC141000") // CMOS, pin-compatible with TMS1000(reverse polarity)
-DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "Motorola MC141200") // CMOS, 40-pin DIP, 16 R pins
 
 
 tms1000_cpu_device::tms1000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -69,14 +69,6 @@ tms1700_cpu_device::tms1700_cpu_device(const machine_config &mconfig, const char
 
 tms1730_cpu_device::tms1730_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms1000_cpu_device(mconfig, TMS1730, tag, owner, clock, 8, 9, 6, 8, 2, 1, 10, address_map_constructor(FUNC(tms1730_cpu_device::rom_9bitm), this), 6, address_map_constructor(FUNC(tms1730_cpu_device::ram_32x4), this))
-{ }
-
-mc141000_cpu_device::mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, MC141000, tag, owner, clock, 8, 11, 6, 8, 2, 1, 10, address_map_constructor(FUNC(mc141000_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(mc141000_cpu_device::ram_6bit), this))
-{ }
-
-mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1000_cpu_device(mconfig, MC141200, tag, owner, clock, 8, 16, 6, 8, 2, 1, 10, address_map_constructor(FUNC(mc141200_cpu_device::rom_10bit), this), 6, address_map_constructor(FUNC(mc141200_cpu_device::ram_6bit), this))
 { }
 
 
@@ -138,7 +130,7 @@ void tms1000_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
-	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u32));
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(u64));
 	m_micro_decode.resize(0x100);
 	memset(&m_micro_decode[0], 0, 0x100*sizeof(u32));
 

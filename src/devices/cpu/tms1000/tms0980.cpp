@@ -121,7 +121,7 @@ void tms0980_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x200);
-	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u32));
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u64));
 	m_micro_decode.resize(0x200);
 	memset(&m_micro_decode[0], 0, 0x200*sizeof(u32));
 

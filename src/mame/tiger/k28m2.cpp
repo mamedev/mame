@@ -14,7 +14,7 @@ Hardware notes:
 - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
 - TMS51xx: TMS5110A
 - VSM: 16KB CM62084
-- LCD: SMOS SMC1112 MCU to 8*14-seg display
+- LCD: SMOS SMC1112 MCU under epoxy (die label: SMC1112 D2N0), 8*14-seg display
 - module slot (not compatible with the 1981 version(s))
 
 TODO:
