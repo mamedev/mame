@@ -11,9 +11,16 @@
 #ifndef MAME_DEVICES_IMAGEDEV_HARDDRIV_H
 #define MAME_DEVICES_IMAGEDEV_HARDDRIV_H
 
+#include "softlist_dev.h"
+
 #include "chd.h"
 #include "harddisk.h"
-#include "softlist_dev.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,7 +34,7 @@ protected:
 	// construction/destruction
 	harddisk_image_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
@@ -57,7 +64,7 @@ public:
 	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual std::error_condition call_load() override;
 	virtual std::error_condition call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
@@ -68,12 +75,12 @@ public:
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
-	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
+	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle.get(); }
 
 protected:
 	harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -84,9 +91,9 @@ protected:
 	std::error_condition internal_load_hd();
 
 	chd_file        *m_chd;
-	chd_file        m_origchd;              /* handle to the original CHD */
-	chd_file        m_diffchd;              /* handle to the diff CHD */
-	hard_disk_file  *m_hard_disk_handle;
+	chd_file        m_origchd;              // handle to the original CHD
+	chd_file        m_diffchd;              // handle to the diff CHD
+	std::unique_ptr<hard_disk_file> m_hard_disk_handle;
 
 	load_delegate   m_device_image_load;
 	unload_delegate m_device_image_unload;

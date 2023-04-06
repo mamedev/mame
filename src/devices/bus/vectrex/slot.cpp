@@ -140,8 +140,7 @@ std::error_condition vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		uint8_t *ROM;
+		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x10000)
 		{
@@ -150,7 +149,7 @@ std::error_condition vectrex_cart_slot_device::call_load()
 		}
 
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size);
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, size);

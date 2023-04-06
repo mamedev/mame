@@ -219,9 +219,8 @@ std::error_condition smartmedia_image_device::smartmedia_format_2()
 std::error_condition smartmedia_image_device::call_load()
 {
 	std::error_condition result;
-	uint64_t position;
 	// try format 1
-	position = ftell();
+	uint64_t const position = ftell();
 	result = smartmedia_format_1();
 	if (result)
 	{

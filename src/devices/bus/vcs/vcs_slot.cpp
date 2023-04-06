@@ -226,7 +226,7 @@ std::error_condition vcs_cart_slot_device::call_load()
 		}
 
 		m_cart->rom_alloc(len, tag());
-		uint8_t *ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (loaded_through_softlist())
 		{
@@ -310,8 +310,6 @@ std::error_condition vcs_cart_slot_device::call_load()
 			m_cart->setup_addon_ptr((uint8_t *)m_cart->get_rom_base() + 0x2000);
 
 		m_cart->install_memory_handlers(m_address_space.target());
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();

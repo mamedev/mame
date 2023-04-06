@@ -90,11 +90,9 @@ std::error_condition vic10_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
-		size_t size;
-
 		if (!loaded_through_softlist())
 		{
-			size = length();
+			size_t const size = length();
 
 			if (is_filetype("80"))
 			{

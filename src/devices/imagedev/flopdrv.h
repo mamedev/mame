@@ -165,7 +165,7 @@ private:
 protected:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 

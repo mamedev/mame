@@ -20,7 +20,9 @@
 
 #include "formats/mfm_hd.h"
 
+#include <string>
 #include <system_error>
+#include <utility>
 
 
 class mfm_harddisk_device;
@@ -262,7 +264,7 @@ private:
 	mfmhd_enc_t m_encoding;
 	int m_spinupms;
 	int m_cachesize;
-	mfmhd_image_format_t* m_format;
+	mfmhd_image_format_t *m_format;
 };
 
 DECLARE_DEVICE_TYPE(MFM_HD_CONNECTOR, mfm_harddisk_connector)

@@ -14,7 +14,8 @@ local exports = {
 
 local hiscore = exports
 
-local hiscore_plugin_path = ""
+local hiscore_plugin_path
+local reset_subscription, frame_subscription, stop_subscription
 
 function hiscore.set_folder(path)
 	hiscore_plugin_path = path
@@ -328,7 +329,7 @@ function hiscore.startplugin()
 		scores_have_been_read = false;
 	end
 
-	emu.register_start(function()
+	reset_subscription = emu.add_machine_reset_notifier(function ()
 		found_hiscore_entry = false
 		mem_check_passed = false
 		scores_have_been_read = false;
@@ -354,18 +355,18 @@ function hiscore.startplugin()
 		end
 	end)
 
-	emu.register_frame(function()
+	frame_subscription = emu.add_machine_frame_notifier(function ()
 		if found_hiscore_entry then
 			tick()
 		end
 	end)
 
-	emu.register_stop(function()
+	stop_subscription = emu.add_machine_stop_notifier(function ()
 		reset()
 		save_config()
 	end)
 
-	emu.register_prestart(function()
+	emu.register_prestart(function ()
 		reset()
 	end)
 

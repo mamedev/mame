@@ -36,7 +36,7 @@ public:
 	virtual void call_unload() override;
 
 	// Because nand_device is a NVRAM device now, stub these to make it not do anything (read only)
-	virtual void nvram_default() override {};
+	virtual void nvram_default() override { }
 	virtual bool nvram_read(util::read_stream &file) override { return true; };
 	virtual bool nvram_write(util::write_stream &file) override { return false; };
 

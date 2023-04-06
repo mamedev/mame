@@ -136,15 +136,15 @@ std::error_condition vsmile_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		if (size > 0x1000000)
+		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		if (size > 0x100'0000)
 		{
 			osd_printf_error("%s: Attempted loading a cart larger than 16MB\n", basename());
 			return image_error::INVALIDLENGTH;
 		}
 
 		m_cart->rom_alloc(size);
-		uint8_t *rom = (uint8_t *)m_cart->get_rom_base();
+		uint8_t *const rom = (uint8_t *)m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 		{
@@ -164,16 +164,10 @@ std::error_condition vsmile_cart_slot_device::call_load()
 		}
 
 		if (m_type == VSMILE_NVRAM)
-		{
-			m_cart->nvram_alloc(0x200000);
-		}
+			m_cart->nvram_alloc(0x20'0000);
 
 		if (m_cart->get_nvram_size())
-		{
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
-		}
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();

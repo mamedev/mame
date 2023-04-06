@@ -13,8 +13,14 @@
 
 #pragma once
 
-#include "bitmap.h"
 #include "aviio.h"
+#include "bitmap.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -51,7 +57,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(frame_timer);
 
 private:
-	bitmap_argb32 *m_frame;
+	std::unique_ptr<bitmap_argb32> m_frame;
 	avi_file::ptr m_avi;
 
 	emu_timer *m_frame_timer;

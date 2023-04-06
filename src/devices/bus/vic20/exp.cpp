@@ -109,7 +109,7 @@ std::error_condition vic20_expansion_slot_device::call_load()
 				// read the header
 				uint8_t header[2];
 				fread(&header, 2);
-				uint16_t address = (header[1] << 8) | header[0];
+				uint16_t const address = (header[1] << 8) | header[0];
 
 				switch (address)
 				{

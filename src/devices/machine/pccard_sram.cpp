@@ -280,7 +280,7 @@ std::error_condition pccard_centennial_sram_device::call_create(int format_type,
 	// clear ram
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
 
-	// initialize eeprom data from default data
+	// initialize EEPROM data from default data
 	std::copy_n(m_eeprom_default->base(), m_eeprom.length(), &m_eeprom[0]);
 
 	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())

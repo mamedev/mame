@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(WAFADRIVE_IMAGE, wafadrive_image_device, "wafadrive_image", "Sinclair Wafadrive Image")
 
 //-------------------------------------------------
-//  microdrive_image_device - constructor
+//  wafadrive_image_device - constructor
 //-------------------------------------------------
 
 wafadrive_image_device::wafadrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -29,7 +29,7 @@ wafadrive_image_device::wafadrive_image_device(const machine_config &mconfig, co
 }
 
 //-------------------------------------------------
-//  microdrive_image_device - destructor
+//  wafadrive_image_device - destructor
 //-------------------------------------------------
 
 wafadrive_image_device::~wafadrive_image_device()

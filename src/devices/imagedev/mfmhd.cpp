@@ -425,10 +425,10 @@ std::error_condition mfm_harddisk_device::call_load()
 	else
 	{
 		auto io = util::random_read_write_fill(image_core_file(), 0xff);
-		if(!io) {
+		if (!io)
 			return std::errc::not_enough_memory;
-		}
-		m_chd = new chd_file;
+
+		m_chd = new chd_file; // FIXME: this is never deleted
 		err = m_chd->open(std::move(io), true);
 	}
 
@@ -441,7 +441,7 @@ std::error_condition mfm_harddisk_device::call_load()
 	{
 		std::string metadata;
 
-		if (m_chd==nullptr)
+		if (!m_chd)
 		{
 			LOG("m_chd is null\n");
 			return image_error::UNSPECIFIED;
@@ -472,6 +472,7 @@ std::error_condition mfm_harddisk_device::call_load()
 
 		if (m_max_cylinders != 0 && (param.cylinders != m_max_cylinders || param.heads != m_max_heads))
 		{
+			// TODO: does this really need to be a fatal error?
 			throw emu_fatalerror("Image geometry does not fit this kind of hard drive: drive=(%d,%d), image=(%d,%d)", m_max_cylinders, m_max_heads, param.cylinders, param.heads);
 		}
 
@@ -484,13 +485,9 @@ std::error_condition mfm_harddisk_device::call_load()
 
 		state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 0, metadata);
 		if (state)
-		{
 			LOGMASKED(LOG_WARN, "Failed to read CHD sector arrangement/recording specs, applying defaults\n");
-		}
 		else
-		{
 			sscanf(metadata.c_str(), MFMHD_REC_METADATA_FORMAT, &param.interleave, &param.cylskew, &param.headskew, &param.write_precomp_cylinder, &param.reduced_wcurr_cylinder);
-		}
 
 		if (!param.sane_rec())
 		{
@@ -498,18 +495,17 @@ std::error_condition mfm_harddisk_device::call_load()
 			param.reset_rec();
 		}
 		else
-			LOGMASKED(LOG_CONFIG, "MFM HD rec specs: interleave=%d, cylskew=%d, headskew=%d, wpcom=%d, rwc=%d\n",
-				param.interleave, param.cylskew, param.headskew, param.write_precomp_cylinder, param.reduced_wcurr_cylinder);
+		{
+			LOGMASKED(LOG_CONFIG,
+					"MFM HD rec specs: interleave=%d, cylskew=%d, headskew=%d, wpcom=%d, rwc=%d\n",
+					param.interleave, param.cylskew, param.headskew, param.write_precomp_cylinder, param.reduced_wcurr_cylinder);
+		}
 
 		state = m_chd->read_metadata(MFM_HARD_DISK_METADATA_TAG, 1, metadata);
 		if (state)
-		{
 			LOGMASKED(LOG_WARN, "Failed to read CHD track gap specs, applying defaults\n");
-		}
 		else
-		{
 			sscanf(metadata.c_str(), MFMHD_GAP_METADATA_FORMAT, &param.gap1, &param.gap2, &param.gap3, &param.sync, &param.headerlen, &param.ecctype);
-		}
 
 		if (!param.sane_gap())
 		{
@@ -517,8 +513,11 @@ std::error_condition mfm_harddisk_device::call_load()
 			param.reset_gap();
 		}
 		else
-			LOGMASKED(LOG_CONFIG, "MFM HD gap specs: gap1=%d, gap2=%d, gap3=%d, sync=%d, headerlen=%d, ecctype=%d\n",
-				param.gap1, param.gap2, param.gap3, param.sync, param.headerlen, param.ecctype);
+		{
+			LOGMASKED(LOG_CONFIG,
+					"MFM HD gap specs: gap1=%d, gap2=%d, gap3=%d, sync=%d, headerlen=%d, ecctype=%d\n",
+					param.gap1, param.gap2, param.gap3, param.sync, param.headerlen, param.ecctype);
+		}
 
 		m_format->set_layout_params(param);
 

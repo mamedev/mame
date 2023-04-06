@@ -49,16 +49,16 @@ INPUT_PORTS_END
 -------------------------------------------------*/
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIIN, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_midi(),
-		m_config(*this, "CFG"),
-		m_timer(nullptr),
-		m_input_cb(*this),
-		m_xmit_read(0),
-		m_xmit_write(0),
-		m_tx_busy(false)
+	: device_t(mconfig, MIDIIN, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_serial_interface(mconfig, *this)
+	, m_midi()
+	, m_config(*this, "CFG")
+	, m_timer(nullptr)
+	, m_input_cb(*this)
+	, m_xmit_read(0)
+	, m_xmit_write(0)
+	, m_tx_busy(false)
 {
 }
 

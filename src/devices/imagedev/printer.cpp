@@ -78,11 +78,11 @@ std::error_condition printer_image_device::call_create(int format_type, util::op
 -------------------------------------------------*/
 std::error_condition printer_image_device::call_load()
 {
-	/* send notify that the printer is now online */
+	// send notify that the printer is now online
 	if (!m_online_cb.isnull())
 		m_online_cb(true);
 
-	/* we don't need to do anything special */
+	// we don't need to do anything special
 	return std::error_condition();
 }
 

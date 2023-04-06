@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "flopdrv.h"
+
 #include "softlist_dev.h"
 
 #include "formats/imageutl.h"
@@ -22,9 +23,9 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define VERBOSE     0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     CONSTANTS
@@ -255,7 +256,7 @@ int legacy_floppy_image_device::floppy_drive_get_flag_state(int flag)
 
 void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 {
-	LOG(("seek from: %d delta: %d\n",m_current_track, signed_tracks));
+	LOG("seek from: %d delta: %d\n", m_current_track, signed_tracks);
 
 	/* update position */
 	m_current_track+=signed_tracks;

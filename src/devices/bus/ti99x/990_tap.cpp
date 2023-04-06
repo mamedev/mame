@@ -895,14 +895,14 @@ public:
 	// construction/destruction
 	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual std::error_condition call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

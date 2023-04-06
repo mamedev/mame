@@ -13,6 +13,8 @@ local history_file = "console_history"
 
 local history_fullpath = nil
 
+local reset_subscription, stop_subscription
+
 function console.startplugin()
 	local conth = emu.thread()
 	local ln_started = false
@@ -220,16 +222,18 @@ function console.startplugin()
 		return table.concat(result, '\001')
 	end
 
-	emu.register_start(function()
+	reset_subscription = emu.add_machine_reset_notifier(function ()
 		if not consolebuf and manager.machine.debugger then
 			consolebuf = manager.machine.debugger.consolelog
 			lastindex = 0
 		end
 	end)
 
-	emu.register_stop(function() consolebuf = nil end)
+	stop_subscription = emu.add_machine_stop_notifier(function ()
+		consolebuf = nil
+	end)
 
-	emu.register_periodic(function()
+	emu.register_periodic(function ()
 		if stopped then
 			return
 		end

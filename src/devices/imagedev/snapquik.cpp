@@ -64,7 +64,7 @@ void snapshot_image_device::device_start()
 {
 	m_load.resolve();
 
-	/* allocate a timer */
+	// allocate a timer
 	m_timer = timer_alloc(FUNC(snapshot_image_device::process_snapshot_or_quickload), this);
 }
 
@@ -73,7 +73,7 @@ void snapshot_image_device::device_start()
 -------------------------------------------------*/
 std::error_condition snapshot_image_device::call_load()
 {
-	/* adjust the timer */
+	// adjust the timer
 	m_timer->adjust(m_delay, 0);
 	return std::error_condition();
 }

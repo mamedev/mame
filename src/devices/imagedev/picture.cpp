@@ -70,8 +70,5 @@ std::error_condition picture_image_device::call_load()
 
 void picture_image_device::call_unload()
 {
-	if (m_picture.valid())
-	{
-		m_picture.reset();
-	}
+	m_picture.reset();
 }

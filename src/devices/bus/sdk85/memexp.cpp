@@ -24,11 +24,11 @@ sdk85_romexp_device::sdk85_romexp_device(const machine_config &mconfig, const ch
 
 std::error_condition sdk85_romexp_device::call_load()
 {
-	if (get_card_device() != nullptr)
+	if (get_card_device())
 	{
-		u32 size = loaded_through_softlist() ? get_software_region_length("rom") : length();
-		u8 *base = get_card_device()->get_rom_base(size);
-		if (base == nullptr)
+		u32 const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
+		u8 *const base = get_card_device()->get_rom_base(size);
+		if (!base)
 			return image_error::INTERNAL;
 
 		if (loaded_through_softlist())

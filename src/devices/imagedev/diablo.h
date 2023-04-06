@@ -9,8 +9,15 @@
 
 #pragma once
 
-#include "harddriv.h"
 #include "softlist_dev.h"
+
+#include "harddriv.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 #define DIABLO_TAG(id) "diablo"#id
 
@@ -45,7 +52,7 @@ public:
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
-	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
+	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle.get(); }
 
 protected:
 	// device_t implementation
@@ -59,9 +66,9 @@ protected:
 	std::error_condition internal_load_dsk();
 
 	chd_file        *m_chd;
-	chd_file        m_origchd;              /* handle to the original CHD */
-	chd_file        m_diffchd;              /* handle to the diff CHD */
-	hard_disk_file  *m_hard_disk_handle;
+	chd_file        m_origchd;              // handle to the original CHD
+	chd_file        m_diffchd;              // handle to the diff CHD
+	std::unique_ptr<hard_disk_file> m_hard_disk_handle;
 
 	load_delegate   m_device_image_load;
 	unload_delegate m_device_image_unload;

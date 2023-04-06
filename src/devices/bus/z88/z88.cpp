@@ -99,24 +99,19 @@ std::error_condition z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *cart_base = m_cart->get_cart_base();
+		uint8_t *const cart_base = m_cart->get_cart_base();
+		if (!cart_base)
+			return image_error::INTERNAL;
 
-		if (cart_base != nullptr)
+		if (!loaded_through_softlist())
 		{
-			if (!loaded_through_softlist())
-			{
-				offs_t read_length = length();
-				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
-			}
-			else
-			{
-				offs_t read_length = get_software_region_length("rom");
-				memcpy(cart_base + (m_cart->get_cart_size() - read_length), get_software_region("rom"), read_length);
-			}
+			offs_t read_length = length();
+			fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
 		}
 		else
 		{
-			return image_error::INTERNAL;
+			offs_t read_length = get_software_region_length("rom");
+			memcpy(cart_base + (m_cart->get_cart_size() - read_length), get_software_region("rom"), read_length);
 		}
 	}
 

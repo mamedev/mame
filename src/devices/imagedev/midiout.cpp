@@ -23,10 +23,10 @@ DEFINE_DEVICE_TYPE(MIDIOUT, midiout_device, "midiout", "MIDI Out image device")
 -------------------------------------------------*/
 
 midiout_device::midiout_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIOUT, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this),
-		m_midi()
+	: device_t(mconfig, MIDIOUT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_serial_interface(mconfig, *this)
+	, m_midi()
 {
 }
 

@@ -151,9 +151,8 @@ std::error_condition scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint8_t *ROM;
-		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		bool has_ram = loaded_through_softlist() && get_software_region("ram");
+		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		bool const has_ram = loaded_through_softlist() && get_software_region("ram");
 
 		if (len > 0x20000)
 		{
@@ -165,7 +164,7 @@ std::error_condition scv_cart_slot_device::call_load()
 		if (has_ram)
 			m_cart->ram_alloc(get_software_region_length("ram"));
 
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, len);
@@ -189,8 +188,6 @@ std::error_condition scv_cart_slot_device::call_load()
 			m_type = SCV_128K_RAM;
 
 		//printf("Type: %s\n", scv_get_slot(m_type));
-
-		return std::error_condition();
 	}
 
 	return std::error_condition();
