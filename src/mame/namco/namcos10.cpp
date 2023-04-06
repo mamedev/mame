@@ -271,30 +271,31 @@ This PCB is used on:
                                                     MEM PCB
 Game                                                Sticker       KEYCUS   ROMs Populated       CD            Notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A
-Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
-Gekitoride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
-Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!     KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
-Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
-Kono Tako                                           10021 Ver.A   KC034A   8E, 8D               N/A
-Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
-Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
-NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
-Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A
-Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
-Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
-Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
-unknown medal (?) game                              MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
-unknown medal (?) game                              peeled off    KC039A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Ball Pom Line                                                         peeled off    KC039A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Gamshara                                                              10021 Ver.A   KC020A   8E, 8D               N/A
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja                   GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Gekitoride-Jong Space                                                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
+Gunbalina                                                             GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!                       KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
+Knock Down 2001                                                       KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
+Kono Tako                                                             10021 Ver.A   KC034A   8E, 8D               N/A
+Kotoba no Puzzle Mojipittan                                           KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
+Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five MTA1  STMPR0A KC048A?  8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+Mr Driller G                                                          DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
+NFL Classic Football                                                  NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
+Pacman Ball                                                           PMB2  Ver.A   KC026A   8E, 8D               N/A
+Panicuru Panekuru                                                     PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
+Point Blank 3                                                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
+Puzz Ball                                                             PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Sekai Kaseki Hakken                                                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Star Trigon                                                           STT1  Ver.A   KC019A   8E, 8D               N/A
+Taiko no Tatsujin 2                                                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
+Taiko no Tatsujin 3                                                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                                                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                                                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                                                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Utyuu Daisakusen Chocovader Contactee                                 CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+unknown medal (?) game                                                MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 
       Notes:
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -407,6 +408,16 @@ logic and other small support parts are populated.
 This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) (and on Knock Down 2001) but not
 earlier TK games, so it appears to be optional or is only used by the later TK51 and TK61 games.
 
+
+System10 EXFINAL PCB 8906962603 (8906962703)
+--------------------
+32kBx8-bit SRAM
+Altera MAX EPM3128 CPLD labelled S10XFN1A
+R4543 RTC and 3V coin battery
+40MHz OSC
+TMC 'EC-NET' TM20070A Network Controller
+SMSC COM20022I 10Mbps ARCNET Controller
+
 -----------
 
 Note about the bit scramble order:
@@ -417,12 +428,38 @@ so you can try every permutation of 0-7 bit swaps separately very quickly (<1 se
 try all permutations of 0-15 bit swaps which will take much longer or manually work through it.
 
 
+Dumping notes (DUMP VERIFIERS PLEASE READ):
+The following does not apply to MEM(M) boards.
+
+If you are marking a dump as bad because of bad blocks in the dump then please understand how to read the invalid block table and check
+if the block wasn't already intentionally avoided, or if the block isn't already redirected in the invalid block table.
+Do not mark dumps bad just because they have bad blocks. Bad blocks are expected and were taken into consideration when programming the chips.
+
+These chips are programmed with data that's tailored to the individual chips on the board to avoid bad blocks. If you are redumping a game then
+please redump all of the chips and not just any that are marked BAD_DUMP in MAME or else you may run into an issue where the data is not in the
+expected block order.
+
+As per the datasheet, the NAND chips used have only a guarantee of 1004 usable blocks out of the 1024, with the 1st block also guaranteed to be good.
+The 1st block of the first ROM (8e) will contain a table at the top of that remaps blocks to other blocks and is read in by the BIOS and game.
+All games seem to assume that blocks 0 (invalid block table), 1 (EEPROM data section) and 2-9 (BIOS data) are good.
+
+The invalid block table is a table of entries with two 16-bit big endian fields for the bad block index and the new redirected block index.
+The invalid block table uses the upper 4 bits of the bad block index value as target the device ID. So if you see a value of 2010 03fe then
+it means nand2's block 0x10 needs to be redirected to block 0x3fe. Namco seems to have reserved the blocks after 0x3ec as recovery blocks,
+so redirected bad blocks will go into the > 0x3ec region at the end of the NAND. The recovery blocks are used in reverse order starting
+from 0x3ff and goes down for every recovery block used. 0001 03ff -> 0002 03fe -> 0003 03fd, etc. The invalid block table ends when ffff ffff is found.
+New redirected block indexes do not *have* to start at 0x3ff because Namco intentionally avoided using bad blocks at the very end of the NAND chips.
+For example, if the first entry says 0001 03fe instead of the normal 0001 03fff then they intentionally avoided using the last block on the NAND most
+likely because it was bad.
+
+You can see the block lookup table in any game by looking at 0x1f500000 in memory. Each NAND device has 0x3ec entries, so you can look up a specific
+block for a specific device using: 0x1f500000 + 2 * (0x3ec * device_id + block_idx)
+
 Known issues:
 - mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
-- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
 - knpuzzle: bad dumps? where are the encrypted program blocks?
-- gjspace: bad dump? first program block is at 0x3fe even though the redirect table says 0x3ff and works if decrypted, but I can't find what should've been at 0x3fe
-- mrdrilrg: bad dump? program code block isn't where expected. mrdrilrga looks good though
+- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
+- ballpom: Needs MGEXIO emulation to boot. Make a cheat to force the byte at memory location 8007af02 to be 0 to make the game boot past the MGEXIO error.
 
 
 User data note:
@@ -565,43 +602,49 @@ public:
 	void namcos10_mgexio(machine_config &config);
 	void namcos10_exfinalio(machine_config &config);
 
-	void ns10_konotako(machine_config &config);
-	void ns10_knpuzzle(machine_config &config);
+	void ns10_ballpom(machine_config &config);
 	void ns10_chocovdr(machine_config &config);
-	void ns10_startrgn(machine_config &config);
-	void ns10_gjspace(machine_config &config);
-	void ns10_nflclsfb(machine_config &config);
 	void ns10_gamshara(machine_config &config);
-	void ns10_mrdrilrg(machine_config &config);
-	void ns10_kd2001(machine_config &config);
-	void ns10_ptblank3(machine_config &config);
-	void ns10_panikuru(machine_config &config);
-	void ns10_puzzball(machine_config &config);
-	void ns10_pacmball(machine_config &config);
-	void ns10_sekaikh(machine_config &config);
-	void ns10_taiko6(machine_config &config);
-	void ns10_keroro(machine_config &config);
 	void ns10_gegemdb(machine_config &config);
+	void ns10_gjspace(machine_config &config);
+	void ns10_kd2001(machine_config &config);
+	void ns10_keroro(machine_config &config);
+	void ns10_knpuzzle(machine_config &config);
+	void ns10_konotako(machine_config &config);
+	void ns10_medalnt2(machine_config &config);
+	void ns10_mrdrilrg(machine_config &config);
+	void ns10_nflclsfb(machine_config &config);
+	void ns10_pacmball(machine_config &config);
+	void ns10_panikuru(machine_config &config);
+	void ns10_ptblank3(machine_config &config);
+	void ns10_puzzball(machine_config &config);
+	void ns10_sekaikh(machine_config &config);
+	void ns10_startrgn(machine_config &config);
+	void ns10_taiko4(machine_config &config);
+	void ns10_taiko5(machine_config &config);
+	void ns10_taiko6(machine_config &config);
 	void ns10_unks10md(machine_config &config);
-	void ns10_unks10md2(machine_config &config);
 
-	void init_knpuzzle();
-	void init_panikuru();
-	void init_startrgn();
-	void init_gunbalina();
-	void init_nflclsfb();
-	void init_gjspace();
-	void init_gamshara();
-	void init_mrdrilrg();
+	void init_ballpom();
 	void init_chocovdr();
-	void init_konotako();
-	void init_taiko6();
-	void init_puzzball();
-	void init_pacmball();
-	void init_sekaikh();
+	void init_gamshara();
+	void init_gjspace();
+	void init_gunbalina();
 	void init_keroro();
+	void init_knpuzzle();
+	void init_konotako();
+	void init_medalnt2();
+	void init_mrdrilrg();
+	void init_nflclsfb();
+	void init_pacmball();
+	void init_panikuru();
+	void init_puzzball();
+	void init_sekaikh();
+	void init_startrgn();
+	void init_taiko4();
+	void init_taiko5();
+	void init_taiko6();
 	void init_unks10md();
-	void init_unks10md2();
 
 protected:
 	virtual void machine_start() override;
@@ -744,16 +787,23 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 	map(0xfba000a, 0xfba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
 
 	// TODO: Expansion I/O board registers (EXIO, etc)
-	// 0x1fe06000-1fe0ffff appears to be a memory space? 0xa000 bytes from the ROM is copied here. sub CPU program?
-	// 0x1fe0c65c = JVS data gets written here (e0 ff 03 f0 d9, etc)
-	// 0x1fe0c066 = status reg?
-	// 0x1fe0ca7c = JVS responses get read from here
-	// 0x1fe0c080 = must respond with 0 and then the packet length to read x + 3 bytes from JVS response???
-	// 0x1fe0cea2 = needs to return 0 for exio to be seen as available
-	// 0x1fe0ce9c, 0x1fe0ce9e, 0x1fe0cea0, 0x1fe0ceb2 = cmd sent to exio
-	// 0x1fe18000 = set to 0 before reading/writing, set to 1 when done. Lock?
-	// 0x1fe28000 = sub CPU boot status flag, if 2 is not set then won't read response from sub CPU
-	// 0x1fe10000, 0x1fe20000, 0x1fe30000 are registers relating to the sub CPU
+	// nflclsfb: The uploaded EXIO code seems to be be based to 0x3000 and the PC seems to be 0x3067 based on analysis.
+	// There appears to be directly shared memory between the sub CPU and main CPU.
+	// For example, 0x1fe0c066 from the main CPU appears to be the same as 0x6033 in the sub CPU's memory space.
+	// MGEXIO also appears to be have its registers in the 0x1fe00000 range
+	// map(0xfe06000, 0xfe0ffff).rw(FUNC(namcos10_state::exio_ram_r), FUNC(namcos10_state::exio_ram_w)); // seems to map directly to what the EXIO can read
+	// these are possibly related to the TMP95C061 ports
+	// map(0xfe10000, 0xfe10001).noprw(); // write only. 2 is written before uploading program code, 3 is written when program code is finished uploading
+	// map(0xfe18000, 0xfe18001).noprw(); // read/write. set to 0 before reading/writing, set to 1 when done. Lock?
+	// map(0xfe20000, 0xfe20001).noprw(); // read/write
+	// map(0xfe28000, 0xfe28001).noprw(); // read only. CPU boot status flag bit 0? bit 1 unknown
+	// map(0xfe30000, 0xfe30001).noprw(); // write only
+	// map(0xfe40000, 0xfe40001).noprw(); // write only
+	// map(0xfe48000, 0xfe48001).noprw(); // write only
+	// map(0xfe50000, 0xfe50001).noprw(); // read only
+	// map(0xfe58000, 0xfe58001).noprw(); // read only
+	// map(0xfec0000, 0xfec0001).noprw(); // write only
+	// map(0xfec8000, 0xfec8001).noprw(); // write only
 }
 
 void namcos10_state::namcos10_map(address_map &map)
@@ -1245,39 +1295,9 @@ void namcos10_memn_state::memn_driver_init()
 	nand_copy(nand_base, (uint16_t *)(bios + 0x0020000), 0x120, 0x1f00);
 }
 
-void namcos10_memn_state::init_gjspace()
+void namcos10_memn_state::init_ballpom()
 {
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0x8, 0xa, 0x6, 0x5, 0x7, 0xe, 0x4, 0xf, 0xd, 0x9, 0x1, 0x0, 0x2, 0xb, 0xc, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_mrdrilrg()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_knpuzzle()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_startrgn()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gamshara()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gunbalina()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
 	memn_driver_init();
 }
 
@@ -1287,45 +1307,21 @@ void namcos10_memn_state::init_chocovdr()
 	memn_driver_init();
 }
 
-void namcos10_memn_state::init_panikuru()
+void namcos10_memn_state::init_gamshara()
 {
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x1, 0x0, 0x3, 0x2); };
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
 	memn_driver_init();
 }
 
-void namcos10_memn_state::init_nflclsfb()
+void namcos10_memn_state::init_gjspace()
 {
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0x8, 0xa, 0x6, 0x5, 0x7, 0xe, 0x4, 0xf, 0xd, 0x9, 0x1, 0x0, 0x2, 0xb, 0xc, 0x3); };
 	memn_driver_init();
 }
 
-void namcos10_memn_state::init_konotako()
+void namcos10_memn_state::init_gunbalina()
 {
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0x8, 0x9, 0xb, 0xa, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko6()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_puzzball()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x7, 0x6, 0x1, 0x0, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_pacmball()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0xb, 0xa, 0x9, 0x4, 0x5, 0x7, 0x6, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_sekaikh()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
 	memn_driver_init();
 }
 
@@ -1335,16 +1331,101 @@ void namcos10_memn_state::init_keroro()
 	memn_driver_init();
 }
 
+void namcos10_memn_state::init_knpuzzle()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_konotako()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0x8, 0x9, 0xb, 0xa, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_medalnt2()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0xa, 0x8, 0xb, 0x9, 0x4, 0x7, 0x6, 0x5, 0x1, 0x3, 0x0, 0x2); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_mrdrilrg()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_nflclsfb()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_pacmball()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0xb, 0xa, 0x9, 0x4, 0x5, 0x7, 0x6, 0x0, 0x3, 0x2, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_panikuru()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x1, 0x0, 0x3, 0x2); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_puzzball()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x7, 0x6, 0x1, 0x0, 0x2, 0x3); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_sekaikh()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_startrgn()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_taiko4()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0x8, 0xb, 0xa, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_taiko5()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_taiko6()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
+	memn_driver_init();
+}
+
 void namcos10_memn_state::init_unks10md()
 {
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
 	memn_driver_init();
 }
 
-void namcos10_memn_state::init_unks10md2()
+void namcos10_memn_state::ns10_ballpom(machine_config &config)
 {
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
+	namcos10_memn_base(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 2; i++) {
+		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
 }
 
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
@@ -1373,6 +1454,21 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 	}
 }
 
+void namcos10_memn_state::ns10_gegemdb(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exio(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 2; i++) {
+		// Uses a larger NAND chip than any of the others
+		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
 void namcos10_memn_state::ns10_gjspace(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -1382,6 +1478,36 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 
 	for (int i = 0; i < 4; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memn_state::ns10_kd2001(machine_config &config)
+{
+	namcos10_memn_base(config);
+
+	// TODO: Also has a "pdrive" ROM? What's that for?
+
+	/* decrypter device (CPLD in hardware?) */
+	// KD2001_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 2; i++) {
+		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memn_state::ns10_keroro(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exio(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	// KERORO_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 2; i++) {
+		// Uses a larger NAND chip than any of the others
+		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1412,29 +1538,15 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 	}
 }
 
-void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
-{
-	namcos10_memn_base(config);
-	namcos10_exio(config);
-
-	/* decrypter device (CPLD in hardware?) */
-	NFLCLSFB_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 4; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
-}
-
-void namcos10_memn_state::ns10_startrgn(machine_config &config)
+void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 {
 	namcos10_memn_base(config);
 
 	/* decrypter device (CPLD in hardware?) */
-	STARTRGN_DECRYPTER(config, m_decrypter, 0);
+	// MEDALNT2_DECRYPTER(config, m_decrypter, 0);
 
 	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1452,27 +1564,26 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 	}
 }
 
-void namcos10_memn_state::ns10_kd2001(machine_config &config)
+void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 {
 	namcos10_memn_base(config);
-
-	// TODO: Also has a "pdrive" ROM? What's that for?
+	namcos10_exio(config);
 
 	/* decrypter device (CPLD in hardware?) */
-	// KD2001_DECRYPTER(config, m_decrypter, 0);
+	NFLCLSFB_DECRYPTER(config, m_decrypter, 0);
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 4; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
 
-void namcos10_memn_state::ns10_ptblank3(machine_config &config)
+void namcos10_memn_state::ns10_pacmball(machine_config &config)
 {
 	namcos10_memn_base(config);
 
 	/* decrypter device (CPLD in hardware?) */
-	// PTBLANK3_DECRYPTER(config, m_decrypter, 0);
+	// PACMBALL_DECRYPTER(config, m_decrypter, 0);
 
 	for (int i = 0; i < 2; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
@@ -1493,12 +1604,12 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 	}
 }
 
-void namcos10_memn_state::ns10_puzzball(machine_config &config)
+void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 {
 	namcos10_memn_base(config);
 
 	/* decrypter device (CPLD in hardware?) */
-	// PUZZBALL_DECRYPTER(config, m_decrypter, 0);
+	// PTBLANK3_DECRYPTER(config, m_decrypter, 0);
 
 	for (int i = 0; i < 2; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
@@ -1506,12 +1617,12 @@ void namcos10_memn_state::ns10_puzzball(machine_config &config)
 	}
 }
 
-void namcos10_memn_state::ns10_pacmball(machine_config &config)
+void namcos10_memn_state::ns10_puzzball(machine_config &config)
 {
 	namcos10_memn_base(config);
 
 	/* decrypter device (CPLD in hardware?) */
-	// PACMBALL_DECRYPTER(config, m_decrypter, 0);
+	// PUZZBALL_DECRYPTER(config, m_decrypter, 0);
 
 	for (int i = 0; i < 2; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
@@ -1533,6 +1644,47 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	}
 }
 
+void namcos10_memn_state::ns10_startrgn(machine_config &config)
+{
+	namcos10_memn_base(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	STARTRGN_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 2; i++) {
+		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memn_state::ns10_taiko4(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exfinalio(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	// TAIKO4_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 3; i++) {
+		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memn_state::ns10_taiko5(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exfinalio(config);
+
+	/* decrypter device (CPLD in hardware?) */
+	// TAIKO5_DECRYPTER(config, m_decrypter, 0);
+
+	for (int i = 0; i < 3; i++) {
+		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
 void namcos10_memn_state::ns10_taiko6(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -1543,36 +1695,6 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 
 	for (int i = 0; i < 3; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
-}
-
-void namcos10_memn_state::ns10_keroro(machine_config &config)
-{
-	namcos10_memn_base(config);
-	namcos10_exio(config);
-
-	/* decrypter device (CPLD in hardware?) */
-	// KERORO_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		// Uses a larger NAND chip than any of the others
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
-}
-
-void namcos10_memn_state::ns10_gegemdb(machine_config &config)
-{
-	namcos10_memn_base(config);
-	namcos10_exio(config);
-
-	/* decrypter device (CPLD in hardware?) */
-	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		// Uses a larger NAND chip than any of the others
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1589,20 +1711,6 @@ void namcos10_memn_state::ns10_unks10md(machine_config &config)
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
-
-void namcos10_memn_state::ns10_unks10md2(machine_config &config)
-{
-	namcos10_memn_base(config);
-
-	/* decrypter device (CPLD in hardware?) */
-	// UNKS10MD2_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // MEM(P3)
@@ -1805,120 +1913,15 @@ ROM_END
 
 
 // MEM(N)
-ROM_START( gjspace )
+ROM_START( ballpom )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "10011a_0.bin", 0x0000000, 0x1080000, CRC(df862033) SHA1(4141357ed315adb4de636d7bf752354e953e8cbf) )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(f31cec39) SHA1(509209f7bec6384fa1e7f2d32110d1ceaed83826) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "10011a_1.bin", 0x0000000, 0x1080000, CRC(734c7ac0) SHA1(2f325236a4e4f2dba886682e9a7e8e243b5fbb3d) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "10011a_2.bin", 0x0000000, 0x1080000, CRC(3bbbc0b7) SHA1(ad02ec2e5f401f0f5d40a413038649ebd25d5343) )
-
-	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
-	ROM_LOAD( "10011a_3.bin", 0x0000000, 0x1080000, CRC(fb0de5ca) SHA1(50a462a52ff4a0bc112b9d89f2b2d032c60cf59c) )
-ROM_END
-
-ROM_START( mrdrilrg )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "drg1a_0.bin", 0x0000000, 0x1080000, CRC(e0801878) SHA1(fbb771c1e76e0690f6dffed2287eb470b561ec20) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "drg1a_1.bin", 0x0000000, 0x1080000, CRC(4d8cde73) SHA1(62a5fab8be8fd0a6bfeb101020d4cf58866a757c) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "drg1a_2.bin", 0x0000000, 0x1080000, CRC(ccfabf7b) SHA1(0cbd91ce8abd6efca5d427b52279ce265f685aa9) )
-ROM_END
-
-ROM_START( mrdrilrga )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(def72bcd) SHA1(e243b7ef23b2b00612c185e01493cd01be51f154) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(c87b5e86) SHA1(b034210da30e1f2f7d04f77e00bf7724437e2024) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(e0a9339f) SHA1(4284e7233876cfaf8021440d78ccc8c70d00cc00) )
-ROM_END
-
-ROM_START( knpuzzle )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "kpm1a_0.bin", 0x0000000, 0x1080000, CRC(b2947eb8) SHA1(fa941bf3598bb25d2c8f0a93154e32bf78a6507c) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "kpm1a_1.bin", 0x0000000, 0x1080000, CRC(f3aa855a) SHA1(87b94e22db4bc4169324bbff93c4ea19c1d99b40) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "kpm1a_2.bin", 0x0000000, 0x1080000, CRC(b297cc8d) SHA1(c3494e7a8a0b4e0c8c40b99121373effbfe848eb) )
-ROM_END
-
-ROM_START( startrgn )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "stt1a_0.bin", 0x0000000, 0x1080000, CRC(1e090644) SHA1(a7a293e2bd9eea2eb64a492a47272d9d9ee2c724) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "stt1a_1.bin", 0x0000000, 0x1080000, CRC(aa527694) SHA1(a25dcbeca58a1443070848b3487a24d51d41a34b) )
-ROM_END
-
-ROM_START( gamshara )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "10021a_e.8e", 0x0000000, 0x1080000, CRC(684ab324) SHA1(95c2e0a04c4f33039535fc451c5559d239b8fbc6) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
-ROM_END
-
-ROM_START( gamsharaj )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "10021a.8e", 0x0000000, 0x1080000, CRC(6c0361fc) SHA1(7debf1f2e6bed31d59fb224a78a17a94fc573785) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
-ROM_END
-
-ROM_START( ptblank3 )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	// protection issues preventing the last NAND block to be dumped
-	ROM_LOAD("gnn2a.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(31b39221) SHA1(7fcb14aaa26c531928a6cd704e746d0e3ae3e031))
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "gnn2a.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
-ROM_END
-
-ROM_START( gunbalina )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	// protection issues preventing the last NAND block to be dumped
-	ROM_LOAD( "gnn1a.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "gnn1a.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(66041249) SHA1(16e21f5874aa53306921664073e79b814c954cd8) )
 ROM_END
 
 ROM_START( chocovdr )
@@ -1941,91 +1944,70 @@ ROM_START( chocovdr )
 	ROM_LOAD( "4.6e", 0x0000000, 0x1080000, CRC(1ed957dd) SHA1(bc8ce9f249fe496c130c6fe67b2260c4d0734ab9) )
 ROM_END
 
-ROM_START( panikuru )
+ROM_START( gamshara )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(3aa66da4) SHA1(3f6ff164981e2c1825766c775442608fbf86d702) )
+	ROM_LOAD( "10021a_e.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(684ab324) SHA1(95c2e0a04c4f33039535fc451c5559d239b8fbc6) )
 
+	// Needs the proper matching ROM from the same board
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(18e5135d) SHA1(a7b1533a1df71be5498718e301d1c9c548551fb4) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(cd3b25e0) SHA1(39dfebc59e71b8f1c28e718ee71032620f11440c) )
+	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
 
-ROM_START( nflclsfb )
+ROM_START( gamsharaj )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b08d4270) SHA1(5f5dc1c2862292a9e597f6a21c0f9db2e5796ded) )
+	ROM_LOAD( "10021a.8e", 0x0000000, 0x1080000, CRC(6c0361fc) SHA1(7debf1f2e6bed31d59fb224a78a17a94fc573785) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(d3f519d8) SHA1(60d5f2fafd700e39245bed17e3cc6d608cc2c088) )
+	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
+ROM_END
+
+ROM_START( gegemdb )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	// gym1.8e appears to be interleaved, none of the other larger NAND chip dumps look like this. Highly suspected to be a bad dump.
+	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
+	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, BAD_DUMP CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+
+	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
+	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, BAD_DUMP CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+
+	ROM_REGION( 0x8000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
+ROM_END
+
+ROM_START( gjspace )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "10011.8e", 0x0000000, 0x1080000, CRC(c581bca7) SHA1(3042fa8383b9f18509768feb08b400ac194831b0) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "10011.8d", 0x0000000, 0x1080000, CRC(7fb4a3fe) SHA1(677ba88af00d448c72a89af145acc9a9d85c3d76) )
 
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(0c65fdc2) SHA1(fa5d41a7b10ae8f8d312b61cc6d34408123bda97) )
+	ROM_LOAD( "10011.7e", 0x0000000, 0x1080000, CRC(31bfc843) SHA1(398017d1a4e26d63feef395fdfac56d6c9f0ed99) )
 
 	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
-	ROM_LOAD( "3.7d", 0x0000000, 0x1080000, CRC(0a4e601d) SHA1(9c302a0b5aaf7046390982e62092b867c3a534a5) )
+	ROM_LOAD( "10011.7d", 0x0000000, 0x1080000, CRC(15d83649) SHA1(8ecbf6e294182459fbe2cc098e2406767851c911) )
 ROM_END
 
-ROM_START( konotako )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION16_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(63d23a0c) SHA1(31b54119f20827ff13ecf0cd87803a5e27eaafe7) )
-
-	ROM_REGION16_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(bdbed53c) SHA1(5773069c43642e6f334cee185a6fb6908eedcf4a) )
-ROM_END
-
-ROM_START( sekaikh )
+ROM_START( gunbalina )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b0cc4a4f) SHA1(41974931901090811e07f18c04e2af853c308f88) )
+	ROM_LOAD( "gnn1a.8e", 0x0000000, 0x1080000, CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(65c4a8b4) SHA1(c7fefc32604bb47519a05cdb6c8b0f50034e0efd) )
-
-	ROM_REGION( 0x8000, "mgexio", 0 )
-	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
-ROM_END
-
-ROM_START( sekaikha )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(e32c36ac) SHA1(d762723b6ecf65c8cb7c85c25d9a1fbbcdcfd27a) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(7cb38ece) SHA1(e21fbc9ff09ca51e1857e32318b95107ae4b3f0b) )
-
-	ROM_REGION( 0x8000, "mgexio", 0 )
-	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
-ROM_END
-
-ROM_START( taiko6 )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(a87352c9) SHA1(1816fabecfaa140da2cd46334701c3e2fb93258e) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(e89aa7a3) SHA1(c34d693f4715ce930dbd105eda1ffc8379991c22) )
-
-	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "k9f2808u0c.7e", 0x0000000, 0x1080000, CRC(098920ef) SHA1(06a689d8abb8454ed62dda92d93a8f5d756a6166) )
-
-	DISK_REGION("cd")
-	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
+	ROM_LOAD( "gnn1a.8d", 0x0000000, 0x1080000, CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
 ROM_END
 
 ROM_START( kd2001 )
@@ -2053,19 +2035,71 @@ ROM_START( keroro )
 	ROM_LOAD( "krg1.8d", 0x0000000, 0x2100000, CRC(879a87b7) SHA1(fcef8eb9423b4825bf27fbfe8cae6d4018cb534f) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 ROM_END
 
-ROM_START( gegemdb )
+ROM_START( knpuzzle )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	// gym1.8e appears to be interleaved, none of the other larger NAND chip dumps look like this. Highly suspected to be a bad dump.
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "kpm1a_0.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(b2947eb8) SHA1(fa941bf3598bb25d2c8f0a93154e32bf78a6507c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "kpm1a_1.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(f3aa855a) SHA1(87b94e22db4bc4169324bbff93c4ea19c1d99b40) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "kpm1a_2.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(b297cc8d) SHA1(c3494e7a8a0b4e0c8c40b99121373effbfe848eb) )
+ROM_END
+
+ROM_START( konotako )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(63d23a0c) SHA1(31b54119f20827ff13ecf0cd87803a5e27eaafe7) )
+
+	ROM_REGION16_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(bdbed53c) SHA1(5773069c43642e6f334cee185a6fb6908eedcf4a) )
+ROM_END
+
+ROM_START( medalnt2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
 	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
-	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, BAD_DUMP CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "mta1001_stmpr0a_0.8e", 0x0000000, 0x2100000, CRC(074b305a) SHA1(772799ebba96104a191db236dd45257cdef6c5f2) )
 
 	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
-	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "mta1001_stmpr0a_1.8d", 0x0000000, 0x2100000, CRC(7ca5fdc0) SHA1(5920fa753b190dc87f775567fa9fb9bccb6f7a95) )
+ROM_END
 
-	ROM_REGION( 0x8000, "nvram", 0 )
-	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
+ROM_START( mrdrilrg )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(def72bcd) SHA1(e243b7ef23b2b00612c185e01493cd01be51f154) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(c87b5e86) SHA1(b034210da30e1f2f7d04f77e00bf7724437e2024) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(e0a9339f) SHA1(4284e7233876cfaf8021440d78ccc8c70d00cc00) )
+ROM_END
+
+ROM_START( nflclsfb )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b08d4270) SHA1(5f5dc1c2862292a9e597f6a21c0f9db2e5796ded) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(d3f519d8) SHA1(60d5f2fafd700e39245bed17e3cc6d608cc2c088) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(0c65fdc2) SHA1(fa5d41a7b10ae8f8d312b61cc6d34408123bda97) )
+
+	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
+	ROM_LOAD( "3.7d", 0x0000000, 0x1080000, CRC(0a4e601d) SHA1(9c302a0b5aaf7046390982e62092b867c3a534a5) )
 ROM_END
 
 ROM_START( pacmball )
@@ -2079,15 +2113,130 @@ ROM_START( pacmball )
 	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
 ROM_END
 
+ROM_START( panikuru )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(3aa66da4) SHA1(3f6ff164981e2c1825766c775442608fbf86d702) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(18e5135d) SHA1(a7b1533a1df71be5498718e301d1c9c548551fb4) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "2.7e", 0x0000000, 0x1080000, CRC(cd3b25e0) SHA1(39dfebc59e71b8f1c28e718ee71032620f11440c) )
+ROM_END
+
+ROM_START( ptblank3 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "gnn2a.8e", 0x0000000, 0x1080000, CRC(31b39221) SHA1(7fcb14aaa26c531928a6cd704e746d0e3ae3e031) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "gnn2a.8d", 0x0000000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
+ROM_END
+
 ROM_START( puzzball )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(ca6642a7) SHA1(550891c80feaf2c1b262f420cf90946419319640) )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(0d9bac12) SHA1(f386fca5e5dd65995bb0bb04688222e0962fffd0) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(b13f6f45) SHA1(66917476de5417596a9d3b9169ea74d93f3037fe) )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(0002794e) SHA1(44b6bcea835d3dbb6b2e85ba3ea4404e1400c4f5) )
+ROM_END
+
+ROM_START( startrgn )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "stt1a_0.bin", 0x0000000, 0x1080000, CRC(1e090644) SHA1(a7a293e2bd9eea2eb64a492a47272d9d9ee2c724) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "stt1a_1.bin", 0x0000000, 0x1080000, CRC(aa527694) SHA1(a25dcbeca58a1443070848b3487a24d51d41a34b) )
+ROM_END
+
+ROM_START( sekaikh )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b0cc4a4f) SHA1(41974931901090811e07f18c04e2af853c308f88) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(65c4a8b4) SHA1(c7fefc32604bb47519a05cdb6c8b0f50034e0efd) )
+
+	ROM_REGION( 0x8000, "mgexio", 0 )
+	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
+ROM_END
+
+ROM_START( sekaikha )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(e32c36ac) SHA1(d762723b6ecf65c8cb7c85c25d9a1fbbcdcfd27a) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(7cb38ece) SHA1(e21fbc9ff09ca51e1857e32318b95107ae4b3f0b) )
+
+	ROM_REGION( 0x8000, "mgexio", 0 )
+	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
+ROM_END
+
+ROM_START( taiko4 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tk41vera_0.8e", 0x0000000, 0x1080000, CRC(6cd09cd2) SHA1(f3869570ff42f316d85416306fcc0a25957caa7d) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tk41vera_1.8d", 0x0000000, 0x1080000, CRC(0d1731d8) SHA1(b1e30fd2a4f1034325b9745f8c371d918413d03c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tk41vera_2.7e", 0x0000000, 0x1080000, CRC(6fc63af0) SHA1(78bac0a11497d5cdfba17fb0ff4d6916349df527) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-4", 0, NO_DUMP )
+ROM_END
+
+ROM_START( taiko5 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tk51vera_0.8e", 0x0000000, 0x1080000, CRC(3562152e) SHA1(2372b44726bcd9bed7760bb18f7f8fde6c24af82) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tk51vera_1.8d", 0x0000000, 0x1080000, CRC(63ffbcaa) SHA1(8cdef91605d76e1f9b8a72e0bce793f3e7da31e7) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tk51vera_2.7e", 0x0000000, 0x1080000, CRC(1f419247) SHA1(93e624107b614bd30b18f6bac0422e64ad467742) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-5", 0, NO_DUMP )
+ROM_END
+
+ROM_START( taiko6 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tk61vera_0.8e", 0x0000000, 0x1080000, CRC(186ae8f3) SHA1(e164570db63112ab667fa248ea6a5a14603e2821) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tk61vera_1.8d", 0x0000000, 0x1080000, CRC(288fb1aa) SHA1(0ff6b608f2540cd993a443b0d2c74567e9af5b10) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tk61vera_2.7e", 0x0000000, 0x1080000, CRC(550bb6a1) SHA1(466ff7d5a8a06cdddbb1976ca05ccfd34c0851fd) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
 ROM_END
 
 
@@ -2097,22 +2246,22 @@ ROM_START( g13jnc )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "glt1_ver.a.0", 0x0000000, 0x1080000, CRC(e60f78d3) SHA1(5c876ac7366b5c46b5229a6b6f694ad222f36195) )
+	ROM_LOAD( "glt1vera_0.2j", 0x0000000, 0x1080000, CRC(e1a46a14) SHA1(2f65d95f91e9c0d04dea77060a0b2a3a744797d6) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "glt1_ver.a.1", 0x0000000, 0x1080000, CRC(c3f31dd9) SHA1(05e6d39f33191979bcc00a585b64904a077000dc) )
+	ROM_LOAD( "glt1vera_1.1j", 0x0000000, 0x1080000, CRC(5ec552da) SHA1(d23f73ae4694c581d3827afac7f62bc6ce83eb30) )
 
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "glt1_ver.a.2", 0x0000000, 0x1080000, CRC(e464e03a) SHA1(751f6bd753dacbb881fb47bc1b146ef59245bd10) )
+	ROM_LOAD( "glt1vera_2.2h", 0x0000000, 0x1080000, CRC(0835d6ed) SHA1(5dc4e734aad91e9ab722d11c57eff11e0a100657) )
 
 	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
-	ROM_LOAD( "glt1_ver.a.3", 0x0000000, 0x1080000, CRC(f7486979) SHA1(a44c33ae7004e79fe66c6d2cba3d11671ce2582c) )
+	ROM_LOAD( "glt1vera_3.1h", 0x0000000, 0x1080000, CRC(f7486979) SHA1(a44c33ae7004e79fe66c6d2cba3d11671ce2582c) )
 
 	ROM_REGION32_LE( 0x1080000, "nand4", 0 )
-	ROM_LOAD( "glt1_ver.a.4", 0x0000000, 0x1080000, CRC(e39969b4) SHA1(3348839c0cc4a4bcaa7803ef22981420c527e1a4) )
+	ROM_LOAD( "glt1vera_4.2f", 0x0000000, 0x1080000, CRC(e60b526a) SHA1(3599af2ebb894833d1233cd76d35644fc95a647b) )
 
 	ROM_REGION32_LE( 0x1080000, "nand5", 0 )
-	ROM_LOAD( "glt1_ver.a.5", 0x0000000, 0x1080000, CRC(a82800b4) SHA1(ce4cc479acdf7ac5a7237d07422ea3ee580d899a) )
+	ROM_LOAD( "glt1vera_5.1f", 0x0000000, 0x1080000, CRC(0cb2df20) SHA1(b0e10b6d00f3cc20103177faca0c14d98b10994d) )
 ROM_END
 
 
@@ -2128,17 +2277,6 @@ ROM_START( unks10md )
 	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
 ROM_END
 
-ROM_START( unks10md2 )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(53b3e255) SHA1(6e5a3addb859023d8c7e53237acf9f028c85f57b) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(a0ad9504) SHA1(43e9e83b0340dd2e0f28ff9ccd3667db4e70951a) )
-ROM_END
-
 } // Anonymous namespace
 
 
@@ -2149,31 +2287,33 @@ GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, 
 
 // MEM(N)
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ""
-GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING ) // broken decrypter?
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, mrdrilrga, mrdrilrg, ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", 0 )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
-GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0)
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", 0 )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
+GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0 )
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0 )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0)
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-
+GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_CONTROLS ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+
+GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10, namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
 GAME( 2001, g13jnc,    0,        ns10_g13jnc,    namcos10, namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // Unknown
 GAME( 200?, unks10md,  0,        ns10_unks10md,  namcos10, namcos10_memn_state, init_unks10md,  ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2005, unks10md2, 0,        ns10_unks10md2, namcos10, namcos10_memn_state, init_unks10md2, ROT0, "Namco", "unknown Namco System 10 medal game (unknown code)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode
