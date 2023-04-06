@@ -35,10 +35,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_common_ram(*this, "common")
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "fdc:0")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_vdp(*this, "vdp")
 		, m_wave(*this, "wave")
 		, m_keyscan(*this, "keyscan")
+		, m_floppy_select(0)
 	{
 	}
 
@@ -56,10 +57,12 @@ protected:
 	required_device<i8x9x_device> m_maincpu;
 	required_memory_bank m_common_ram;
 	required_device<wd_fdc_digital_device_base> m_fdc;
-	required_device<floppy_connector> m_floppy;
+	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<tms3556_device> m_vdp;
 	required_device<sa16_base_device> m_wave;
 	optional_device<mb63h149_device> m_keyscan;
+
+	u8 m_floppy_select;
 };
 
 class roland_s50_state : public roland_s50_base_state
@@ -77,8 +80,10 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void p2_w(u8 data);
+	void floppy_select_w(u8 data);
 
 private:
 	void ioga_out_w(u8 data);
@@ -141,6 +146,7 @@ protected:
 private:
 	u8 psram_bank_r();
 	void psram_bank_w(u8 data);
+	void floppy_select_w(u8 data);
 	u8 unknown_status_r();
 
 	void w30_mem_map(address_map &map);
@@ -159,12 +165,14 @@ private:
 
 void roland_s50_state::machine_start()
 {
-	m_fdc->set_floppy(m_floppy->get_device());
+	floppy_select_w(0);
 	m_fdc->dden_w(0);
 
 	m_sram_bank->configure_entries(0, 4, &m_sram[0], 0x4000);
 	m_sram_bank->set_entry(0);
 	m_common_ram->set_base(&m_sram[0]);
+
+	save_item(NAME(m_floppy_select));
 }
 
 void roland_s550_state::machine_start()
@@ -175,9 +183,13 @@ void roland_s550_state::machine_start()
 	m_lowram_bank->set_entry(0);
 }
 
+void roland_s50_state::machine_reset()
+{
+	floppy_select_w(0);
+}
+
 void roland_w30_state::machine_start()
 {
-	m_fdc->set_floppy(m_floppy->get_device());
 	m_fdc->dden_w(0);
 
 	m_psram1_bank->configure_entries(0, 8, &m_psram[0x10000 / 2], 0x2000);
@@ -185,10 +197,12 @@ void roland_w30_state::machine_start()
 	m_common_ram->set_base(&m_psram[0]);
 
 	save_item(NAME(m_psram_bank));
+	save_item(NAME(m_floppy_select));
 }
 
 void roland_w30_state::machine_reset()
 {
+	floppy_select_w(0);
 	psram_bank_w(0);
 }
 
@@ -232,7 +246,51 @@ void roland_w30_state::psram_bank_w(u8 data)
 
 u8 roland_s50_base_state::floppy_status_r()
 {
-	return 1 | m_fdc->intrq_r() << 2 | m_fdc->drq_r() << 3;
+	floppy_image_device *floppy = nullptr;
+	if (BIT(m_floppy_select, 2))
+		floppy = m_floppy[0]->get_device();
+	else if (BIT(m_floppy_select, 3))
+		floppy = m_floppy[1]->get_device();
+
+	u8 status = m_fdc->intrq_r() << 2 | m_fdc->drq_r() << 3;
+	if (floppy)
+	{
+		if (!floppy->ready_r())
+			status |= 1;
+		if (!floppy->dskchg_r())
+			status |= 2;
+	}
+	return status;
+}
+
+void roland_s50_state::floppy_select_w(u8 data)
+{
+	floppy_image_device *floppy = nullptr;
+	if (BIT(data, 6))
+		floppy = m_floppy[0]->get_device();
+	else if (BIT(data, 7))
+		floppy = m_floppy[1]->get_device();
+
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+		floppy->ss_w(BIT(data, 4));
+
+	m_floppy_select = data >> 4;
+}
+
+void roland_w30_state::floppy_select_w(u8 data)
+{
+	floppy_image_device *floppy = nullptr;
+	if (BIT(data, 2))
+		floppy = m_floppy[0]->get_device();
+	else if (BIT(data, 3))
+		floppy = m_floppy[1]->get_device();
+
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+		floppy->ss_w(BIT(data, 0));
+
+	m_floppy_select = data;
 }
 
 u8 roland_s50_base_state::floppy_unknown_r()
@@ -263,7 +321,7 @@ void roland_s50_state::mem_map(address_map &map)
 	map(0x8000, 0xbfff).bankrw(m_sram_bank);
 	map(0xc000, 0xffff).view(m_io_view);
 	m_io_view[0](0xc000, 0xc000).w(FUNC(roland_s50_state::ioga_out_w));
-	m_io_view[0](0xc200, 0xc200).r(FUNC(roland_s50_state::floppy_status_r));
+	m_io_view[0](0xc200, 0xc200).rw(FUNC(roland_s50_state::floppy_status_r), FUNC(roland_s50_state::floppy_select_w));
 	m_io_view[0](0xc300, 0xc300).r(FUNC(roland_s50_state::floppy_unknown_r));
 	m_io_view[0](0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	m_io_view[0](0xd200, 0xd200).r(m_vdp, FUNC(tms3556_device::vram_r));
@@ -282,7 +340,7 @@ void roland_s550_state::mem_map(address_map &map)
 	map(0x4000, 0x7fff).bankrw(m_common_ram);
 	map(0x8000, 0xbfff).bankrw(m_sram_bank);
 	map(0xc000, 0xffff).view(m_io_view);
-	m_io_view[0](0xc200, 0xc200).r(FUNC(roland_s550_state::floppy_status_r));
+	m_io_view[0](0xc200, 0xc200).rw(FUNC(roland_s550_state::floppy_status_r), FUNC(roland_s550_state::floppy_select_w));
 	m_io_view[0](0xc300, 0xc300).r(FUNC(roland_s550_state::floppy_unknown_r));
 	m_io_view[0](0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	m_io_view[0](0xd000, 0xd000).r(m_vdp, FUNC(tms3556_device::vram_r));
@@ -306,7 +364,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0x8000, 0xbfff).view(m_bank2_view);
 	m_bank2_view[0](0x8000, 0xbfff).rom().region("program", 0);
 	m_bank2_view[1](0x8000, 0xbfff).bankrw(m_psram2_bank);
-	map(0xc200, 0xc200).r(FUNC(roland_w30_state::floppy_status_r));
+	map(0xc200, 0xc200).rw(FUNC(roland_w30_state::floppy_status_r), FUNC(roland_w30_state::floppy_select_w));
 	map(0xc600, 0xc600).rw(FUNC(roland_w30_state::psram_bank_r), FUNC(roland_w30_state::psram_bank_w));
 	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
@@ -371,7 +429,8 @@ void roland_s50_state::s50(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
 
 	// Floppy unit: FDD4261A0K or FDD4251G0K
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
 
@@ -402,6 +461,7 @@ void roland_s550_state::s550(machine_config &config)
 	s50(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s550_state::mem_map);
+	m_fdc->intrq_wr_callback().set_nop();
 
 	//UPD7537(config.device_replace(), "fipcpu", 400_kHz_XTAL);
 
@@ -439,7 +499,8 @@ void roland_w30_state::w30(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: FX-354 (307F1JC)
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// SCSI controller on main board, by option (KW-30)
 	NSCSI_BUS(config, "scsi");
@@ -470,7 +531,8 @@ void roland_w30_state::s330(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: ND-362S-A
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// LCD unit: DM1620-5BL7 (MW-5F)
 
