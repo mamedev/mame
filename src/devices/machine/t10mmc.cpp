@@ -562,7 +562,8 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			{
 				if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 				{
-					m_device->logerror("T10MMC: CD read error!\n");
+					m_device->logerror("T10MMC: CD read error! (%08x)\n", m_lba);
+					return;
 				}
 
 				//m_device->logerror("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
