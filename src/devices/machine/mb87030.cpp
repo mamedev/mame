@@ -68,18 +68,42 @@ void mb87030_device::map(address_map &map)
 
 void mb89351_device::map(address_map &map)
 {
-	mb87030_device::map(map);
-
-	map(0x03, 0x03).unmaprw(); // no TMOD
-	map(0x0f, 0x0f).unmaprw(); // no EXBF
+	map(0x00, 0x00).rw(FUNC(mb89351_device::bdid_r), FUNC(mb89351_device::bdid_w));
+	map(0x01, 0x01).rw(FUNC(mb89351_device::sctl_r), FUNC(mb89351_device::sctl_w));
+	map(0x02, 0x02).rw(FUNC(mb89351_device::scmd_r), FUNC(mb89351_device::scmd_w));
+	// no TMOD
+	map(0x04, 0x04).rw(FUNC(mb89351_device::ints_r), FUNC(mb89351_device::ints_w));
+	map(0x05, 0x05).rw(FUNC(mb89351_device::psns_r), FUNC(mb89351_device::sdgc_w));
+	map(0x06, 0x06).r(FUNC(mb89351_device::ssts_r));
+	map(0x07, 0x07).r(FUNC(mb89351_device::serr_r));
+	map(0x08, 0x08).rw(FUNC(mb89351_device::pctl_r), FUNC(mb89351_device::pctl_w));
+	map(0x09, 0x09).r(FUNC(mb89351_device::mbc_r));
+	map(0x0a, 0x0a).rw(FUNC(mb89351_device::dreg_r), FUNC(mb89351_device::dreg_w));
+	map(0x0b, 0x0b).rw(FUNC(mb89351_device::temp_r), FUNC(mb89351_device::temp_w));
+	map(0x0c, 0x0c).rw(FUNC(mb89351_device::tch_r), FUNC(mb89351_device::tch_w));
+	map(0x0d, 0x0d).rw(FUNC(mb89351_device::tcm_r), FUNC(mb89351_device::tcm_w));
+	map(0x0e, 0x0e).rw(FUNC(mb89351_device::tcl_r), FUNC(mb89351_device::tcl_w));
+	// no EXBF
 }
 
 void mb89352_device::map(address_map &map)
 {
-	mb87030_device::map(map);
-
-	map(0x03, 0x03).unmaprw(); // no TMOD
-	map(0x0f, 0x0f).unmaprw(); // no EXBF
+	map(0x00, 0x00).rw(FUNC(mb89352_device::bdid_r), FUNC(mb89352_device::bdid_w));
+	map(0x01, 0x01).rw(FUNC(mb89352_device::sctl_r), FUNC(mb89352_device::sctl_w));
+	map(0x02, 0x02).rw(FUNC(mb89352_device::scmd_r), FUNC(mb89352_device::scmd_w));
+	// no TMOD
+	map(0x04, 0x04).rw(FUNC(mb89352_device::ints_r), FUNC(mb89352_device::ints_w));
+	map(0x05, 0x05).rw(FUNC(mb89352_device::psns_r), FUNC(mb89352_device::sdgc_w));
+	map(0x06, 0x06).r(FUNC(mb89352_device::ssts_r));
+	map(0x07, 0x07).r(FUNC(mb89352_device::serr_r));
+	map(0x08, 0x08).rw(FUNC(mb89352_device::pctl_r), FUNC(mb89352_device::pctl_w));
+	map(0x09, 0x09).r(FUNC(mb89352_device::mbc_r));
+	map(0x0a, 0x0a).rw(FUNC(mb89352_device::dreg_r), FUNC(mb89352_device::dreg_w));
+	map(0x0b, 0x0b).rw(FUNC(mb89352_device::temp_r), FUNC(mb89352_device::temp_w));
+	map(0x0c, 0x0c).rw(FUNC(mb89352_device::tch_r), FUNC(mb89352_device::tch_w));
+	map(0x0d, 0x0d).rw(FUNC(mb89352_device::tcm_r), FUNC(mb89352_device::tcm_w));
+	map(0x0e, 0x0e).rw(FUNC(mb89352_device::tcl_r), FUNC(mb89352_device::tcl_w));
+	// no EXBF
 }
 
 void mb87030_device::device_reset()
@@ -122,10 +146,10 @@ auto mb87030_device::get_state_name(State state) const
 		return "ArbitrationWait";
 	case State::ArbitrationAssertSEL:
 		return "ArbitrationAssertSEL";
-	case State::ArbitrationDeAssertBSY:
-		return "ArbitrationDeAssertBSY";
 	case State::SelectionWaitBusFree:
 		return "SelectionWaitBusFree";
+	case State::SelectionAssertID:
+		return "SelectionAssertID";
 	case State::SelectionWaitBSY:
 		return "SelectionWaitBSY";
 	case State::SelectionAssertSEL:
@@ -189,16 +213,6 @@ void mb87030_device::scsi_command_complete()
 	LOG("%s\n", __FUNCTION__);
 	m_ints |= INTS_COMMAND_COMPLETE;
 	m_ssts &= ~(SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
-	update_ints();
-	update_state(State::Idle);
-}
-
-void mb87030_device::scsi_disconnect_timeout()
-{
-	LOG("%s\n", __FUNCTION__);
-	scsi_set_ctrl(0, S_ALL);
-	scsi_bus->data_w(scsi_refid, 0);
-	m_ints = INTS_SPC_TIMEOUT;
 	update_ints();
 	update_state(State::Idle);
 }
@@ -272,7 +286,8 @@ void mb87030_device::step(bool timeout)
 		return;
 	}
 
-	if ((m_ssts & SSTS_INIT_CONNECTED) && !(ctrl & S_BSY)) {
+	// FIXME: bus free and disconnected interrupt logic is not correct
+	if ((m_ssts & SSTS_INIT_CONNECTED) && !(ctrl & S_BSY) && (m_state != State::SelectionAssertID) && (m_state != State::SelectionAssertSEL) && (m_state != State::SelectionWaitBSY)) {
 		LOG("SCSI disconnect\n");
 		scsi_disconnect();
 		scsi_set_ctrl(0, S_ALL);
@@ -289,12 +304,12 @@ void mb87030_device::step(bool timeout)
 	case State::ArbitrationWaitBusFree:
 		if (!(ctrl & (S_BSY|S_SEL)))
 			update_state(State::ArbitrationAssertBSY, 1);
-
 		break;
+
 	case State::ArbitrationAssertBSY:
 		scsi_set_ctrl(S_BSY, S_BSY);
 		scsi_bus->data_w(scsi_refid, (1 << m_bdid));
-		update_state(State::ArbitrationWait, 1);
+		update_state(State::ArbitrationWait, 32);
 		break;
 
 	case State::ArbitrationWait:
@@ -302,7 +317,10 @@ void mb87030_device::step(bool timeout)
 			LOG("check %d\n", id);
 			if (data & id) {
 				LOG("arbitration lost, winner %d\n", id);
-				scsi_disconnect_timeout();
+				scsi_set_ctrl(0, S_BSY);
+				scsi_bus->data_w(scsi_refid, 0);
+				m_ssts &= ~SSTS_SPC_BUSY;
+				update_state(State::Idle);
 				break;
 			}
 		}
@@ -312,36 +330,39 @@ void mb87030_device::step(bool timeout)
 
 	case State::ArbitrationAssertSEL:
 		scsi_set_ctrl(S_SEL, S_SEL);
-		update_state(State::ArbitrationDeAssertBSY, 1);
-		break;
-
-	case State::ArbitrationDeAssertBSY:
-		scsi_set_ctrl(0, S_BSY);
-		update_state(State::SelectionAssertSEL, 1);
+		update_state(State::SelectionAssertID, 10);
 		break;
 
 	case State::SelectionWaitBusFree:
 		if (!(ctrl & (S_BSY|S_SEL)))
-			update_state(State::SelectionAssertSEL, 10);
+			update_state(State::SelectionAssertID, 10);
+		break;
+
+	case State::SelectionAssertID:
+		m_ssts |= SSTS_INIT_CONNECTED;
+		m_ssts &= ~SSTS_TARG_CONNECTED;
+		scsi_bus->data_w(scsi_refid, m_temp);
+		update_state(State::SelectionAssertSEL, 10);
 		break;
 
 	case State::SelectionAssertSEL:
-		scsi_bus->data_w(scsi_refid, m_temp);
+		// deassert BSY for arbitrating systems, assert SEL for non-arbitrating systems
 		scsi_set_ctrl(S_SEL | (m_send_atn_during_selection ? S_ATN : 0), S_ATN|S_SEL|S_BSY);
 		scsi_bus->ctrl_wait(scsi_refid, S_BSY, S_BSY);
-		update_state(State::SelectionWaitBSY, 0, m_tc / 8);
+		update_state(State::SelectionWaitBSY, 0, ((m_tc & ~0xff) + 15) * 2);
 		break;
 
 	case State::SelectionWaitBSY:
-		if (timeout) {
+		if (timeout || (m_ints & INTS_SPC_TIMEOUT)) {
 			LOG("select timeout\n");
-			scsi_disconnect_timeout();
+			m_tc = 0;
+			m_ints = INTS_SPC_TIMEOUT;
+			update_ints();
 			break;
 		}
 		m_timer->reset();
 		if ((ctrl & (S_REQ|S_BSY|S_MSG|S_CTL|S_INP)) == S_BSY)
 			update_state(State::Selection, 1);
-
 		break;
 
 	case State::Selection:
@@ -351,9 +372,6 @@ void mb87030_device::step(bool timeout)
 
 		LOG("selection success\n");
 		scsi_set_ctrl(0, S_SEL);
-		m_ssts |= SSTS_INIT_CONNECTED;
-		m_ssts &= ~SSTS_TARG_CONNECTED;
-		update_ssts();
 		scsi_command_complete();
 		break;
 
@@ -605,10 +623,16 @@ void mb87030_device::scmd_w(uint8_t data)
 	switch (m_scmd & SCMD_CMD_MASK) {
 	case SCMD_CMD_BUS_RELEASE:
 		LOG("%s: Bus release\n", __FUNCTION__);
+		m_send_atn_during_selection = false;
+		if (m_state == State::SelectionWaitBusFree) {
+			m_ssts &= ~(SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED|SSTS_SPC_BUSY|SSTS_XFER_IN_PROGRESS);
+			update_state(State::Idle);
+		}
 		break;
 
 	case SCMD_CMD_SELECT:
 		LOG("%s: Select\n", __FUNCTION__);
+		m_ssts |= SSTS_SPC_BUSY;
 		if (m_sctl & SCTL_ARBITRATION_ENABLE)
 			update_state(State::ArbitrationWaitBusFree, 10);
 		else
@@ -694,6 +718,18 @@ uint8_t mb87030_device::ints_r()
 void mb87030_device::ints_w(uint8_t data)
 {
 	LOG("%s: %02X\n", __FUNCTION__, data);
+	if (m_state == State::SelectionWaitBSY && (m_ints & data & INTS_SPC_TIMEOUT)) {
+		if (!m_tc) {
+			// terminate selection/reselection
+			m_ssts &= ~(SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED|SSTS_SPC_BUSY);
+			scsi_set_ctrl(0, S_ALL);
+			scsi_bus->data_w(scsi_refid, 0);
+			update_state(State::Idle);
+		} else {
+			// restart selection/reselection
+			update_state(State::SelectionAssertID, 1);
+		}
+	}
 	m_ints &= ~(data);
 	update_ints();
 }

@@ -153,8 +153,8 @@ private:
 		ArbitrationAssertBSY,
 		ArbitrationWait,
 		ArbitrationAssertSEL,
-		ArbitrationDeAssertBSY,
 		SelectionWaitBusFree,
+		SelectionAssertID,
 		SelectionAssertSEL,
 		SelectionWaitBSY,
 		Selection,
@@ -174,7 +174,6 @@ private:
 	void update_ssts();
 	void update_ints();
 
-	void scsi_disconnect_timeout();
 	void scsi_command_complete();
 	void scsi_disconnect();
 	void update_state(mb87030_device::State new_state, int delay = 0, int timeout = 0);
