@@ -180,7 +180,7 @@ void roland_w30_state::machine_start()
 	m_fdc->set_floppy(m_floppy->get_device());
 	m_fdc->dden_w(0);
 
-	m_psram1_bank->configure_entries(0, 8, &m_psram[0x10000], 0x2000);
+	m_psram1_bank->configure_entries(0, 8, &m_psram[0x10000 / 2], 0x2000);
 	m_psram2_bank->configure_entries(0, 4, &m_psram[0], 0x4000);
 	m_common_ram->set_base(&m_psram[0]);
 
