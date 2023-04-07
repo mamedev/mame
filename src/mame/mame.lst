@@ -43763,6 +43763,7 @@ wardnerjb                       // bootleg
 
 @source:tomy/tomy_princ.cpp
 princ                           // Tomy Prin-C (Japan)
+princnt                         // Tomy Prin-C (without touch-pad)
 
 @source:tomy/tutor.cpp
 pyuuta                          // 1982 Tomy Pyuuta
@@ -45030,6 +45031,7 @@ prestige                        // PreComputer Prestige Elite
 snotec                          // Bandai Super Note Club (Japan)
 snotecex                        // Bandai Super Note Club EX (Japan)
 snotecu                         // Bandai Super Note Club U (Japan)
+snotecug                        // Bandai Super Note Club U girlish (Japan)
 
 @source:vtech/socrates.cpp
 iqunlimz                        // 1991 IQ Unlimited (Z80)
