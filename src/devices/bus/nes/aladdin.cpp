@@ -93,19 +93,19 @@ uint8_t nes_aladdin_slot_device::read(offs_t offset)
 }
 
 // 128K for Dizzy The Adventurer, 256K for the others
-std::error_condition nes_aladdin_slot_device::call_load()
+std::pair<std::error_condition, std::string> nes_aladdin_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint8_t *const ROM = m_cart->get_cart_base();
 		if (!ROM)
-			return image_error::INTERNAL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 
 		uint32_t size;
 		if (!loaded_through_softlist())
 		{
 			if (length() != 0x20010 && length() != 0x40010)
-				return image_error::INVALIDLENGTH;
+				return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 			uint8_t temp[0x40010];
 			size = length() - 0x10;
@@ -116,13 +116,17 @@ std::error_condition nes_aladdin_slot_device::call_load()
 			uint8_t mapper = (temp[6] & 0xf0) >> 4;
 			mapper |= temp[7] & 0xf0;
 			if (mapper != 71 && mapper != 232)
-				return image_error::INVALIDIMAGE;
+			{
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						util::string_format("Unsupported iNES mapper %u (must be 71 or 232)", mapper));
+			}
 		}
 		else
 		{
 			size = get_software_region_length("rom");
 			if (size != 0x2'0000 && size != 0x4'0000)
-				return image_error::BADSOFTWARE;
+				return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 128K or 256K)");
 
 			memcpy(ROM, get_software_region("rom"), size);
 		}
@@ -130,7 +134,7 @@ std::error_condition nes_aladdin_slot_device::call_load()
 		m_cart->set_cart_size(size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

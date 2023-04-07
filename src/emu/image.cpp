@@ -51,27 +51,23 @@ image_manager::image_manager(running_machine &machine)
 		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			std::error_condition result = image_error::UNSPECIFIED;
+			std::pair<std::error_condition, std::string> result(image_error::UNSPECIFIED, std::string());
 
 			// try as a softlist
 			if (software_name_parse(startup_image))
 				result = image.load_software(startup_image);
 
 			// failing that, try as an image
-			if (result)
+			if (result.first)
 				result = image.load(startup_image);
 
 			// failing that, try creating it (if appropriate)
-			if (result && image.support_command_line_image_creation())
+			if (result.first && image.support_command_line_image_creation())
 				result = image.create(startup_image);
 
 			// did the image load fail?
-			if (result)
+			if (result.first)
 			{
-				// retrieve image error message
-				std::string image_err = std::string(result.message());
-				std::string startup_image_name = startup_image;
-
 				// unload the bad image
 				image.unload();
 
@@ -80,11 +76,18 @@ image_manager::image_manager(running_machine &machine)
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
 
-				throw emu_fatalerror(EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
+				// retrieve image error message
+				throw emu_fatalerror(EMU_ERR_DEVICE,
+						!result.second.empty()
+							? "Device %1$s load (-%2$s %3$s) failed: %4$s (%5$s:%6$d %7$s)"
+							: "Device %1$s load (-%2$s %3$s) failed: %7$s (%5$s:%6$d)",
 						image.device().name(),
 						image.instance_name(),
-						startup_image_name,
-						image_err);
+						startup_image,
+						result.second,
+						result.first.category().name(),
+						result.first.value(),
+						result.first.message());
 			}
 		}
 	}
@@ -243,13 +246,14 @@ void image_manager::postdevice_init()
 	/* make sure that any required devices have been allocated */
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 	{
-		std::error_condition result = image.finish_load();
+		auto [result, image_err] = image.finish_load();
 
 		/* did the image load fail? */
 		if (result)
 		{
 			/* retrieve image error message */
-			std::string image_err = std::string(result.message());
+			if (image_err.empty())
+				image_err = result.message();
 
 			/* unload all images */
 			unload_all();

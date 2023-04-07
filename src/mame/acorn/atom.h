@@ -100,7 +100,7 @@ protected:
 	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
 
-	std::error_condition load_cart(device_image_interface &image, generic_slot_device &slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device &slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void atom_mem(address_map &map);

@@ -85,7 +85,7 @@ void ql_rom_cartridge_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-std::error_condition ql_rom_cartridge_slot_device::call_load()
+std::pair<std::error_condition, std::string> ql_rom_cartridge_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -99,7 +99,7 @@ std::error_condition ql_rom_cartridge_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

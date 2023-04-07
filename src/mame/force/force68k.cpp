@@ -196,7 +196,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
 
 	// User EPROM/SRAM slot(s)
-	std::error_condition force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(offs_t offset);
 
@@ -510,21 +510,21 @@ void force68k_state::fccpu1_eprom_sockets(machine_config &config)
 /***************************
    Rom loading functions
 ****************************/
-std::error_condition force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 
 	if (size > 0x2'0000) // Max 128Kb
 	{
-		LOG("Cartridge size exceeding max size (128Kb): %d\n", size);
-		osd_printf_error("%s: Cartridge size exceeding max size (128Kb)\n", image.basename());
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Cartridge size %d exceeds max size (128K)", size));
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -123,15 +123,12 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > 0x4000)
-	{
-		osd_printf_error("%s: Invalid file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid image file size (must be no more than 16K)");
 
 	u8 *const base = memregion("tms6100")->base() + 0x8000;
 	m_cart->common_load_rom(base, size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

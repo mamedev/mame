@@ -843,7 +843,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	// disable ROM
 	m_rom_enabled = 0;
@@ -856,14 +856,14 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 		uint8_t data;
 
 		if (image.fread(&data, 1) != 1)
-			return image_error::UNSPECIFIED;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i + 0x100, data);
 	}
 
 	// start program
 	m_maincpu->set_pc(0x100);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -968,20 +968,20 @@ DEVICE_IMAGE_LOAD_MEMBER(pockstat_state::flash_load)
 	uint32_t const size = image.length();
 
 	if (size != 0x20f40)
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	image.fread(cart_id, 0xf40);
 
 	for (int i = 0; i < strlen(gme_id); i++)
 	{
 		if (cart_id[i] != gme_id[i])
-			return image_error::INVALIDIMAGE;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 	}
 
 	m_cart->rom_alloc(0x20000, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	image.fread(m_cart->get_rom_base(), 0x20000);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pockstat_state::pockstat(machine_config &config)

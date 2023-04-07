@@ -617,16 +617,13 @@ static const char *gba_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition gba_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x400'0000)
-		{
-			osd_printf_error("%s: Attempted loading a cart larger than 64MB\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges larger than 64MB are not supported");
 
 		m_cart->rom_alloc(size, tag());
 		uint8_t *const ROM = (uint8_t *)m_cart->get_rom_base();
@@ -683,7 +680,7 @@ std::error_condition gba_cart_slot_device::call_load()
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

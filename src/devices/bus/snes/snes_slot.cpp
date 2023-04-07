@@ -649,7 +649,7 @@ static int snes_find_addon_chip(const uint8_t *buffer, uint32_t start_offs, uint
  -------------------------------------------------*/
 
 
-std::error_condition base_sns_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> base_sns_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -725,7 +725,7 @@ std::error_condition base_sns_cart_slot_device::call_load()
 		internal_header_logging(ROM, len);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

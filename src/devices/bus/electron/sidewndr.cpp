@@ -167,16 +167,13 @@ void electron_sidewndr_device::expbus_w(offs_t offset, uint8_t data)
 //  IMPLEMENTATION
 //**************************************************************************
 
-std::error_condition electron_sidewndr_device::load_rom(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> electron_sidewndr_device::load_rom(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t const size = slot->common_get_size("rom");
 
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
-	{
-		osd_printf_error("%s: Invalid size: Only 8K/16K is supported\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size: Only 8K/16K is supported");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
@@ -186,5 +183,5 @@ std::error_condition electron_sidewndr_device::load_rom(device_image_interface &
 	if (size <= 0x2000)
 		memcpy(crt + 0x2000, crt, 0x2000);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

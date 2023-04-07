@@ -86,7 +86,7 @@ void vic10_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-std::error_condition vic10_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> vic10_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -137,7 +137,7 @@ std::error_condition vic10_expansion_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -92,7 +92,7 @@ void vic20_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-std::error_condition vic20_expansion_slot_device::call_load()
+std::pair<std::error_condition, std::string> vic20_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -119,7 +119,7 @@ std::error_condition vic20_expansion_slot_device::call_load()
 				case 0x7000: fread(m_card->m_blk3, 0x2000, 0x1000); break;
 				case 0xa000: fread(m_card->m_blk5, 0x2000); break;
 				case 0xb000: fread(m_card->m_blk5, 0x2000, 0x1000); break;
-				default: return image_error::INVALIDIMAGE;
+				default: return std::make_pair(image_error::INVALIDIMAGE, "Unsupported address in CRT file header");
 				}
 			}
 		}
@@ -132,7 +132,7 @@ std::error_condition vic20_expansion_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

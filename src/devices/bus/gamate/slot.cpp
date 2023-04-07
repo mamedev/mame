@@ -125,17 +125,14 @@ static const char *gamate_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition gamate_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> gamate_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (len > 0x8'0000)
-		{
-			osd_printf_error("%s: Unsupported cartridge size\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 512K)");
 
 		m_cart->rom_alloc(len);
 
@@ -160,7 +157,7 @@ std::error_condition gamate_cart_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -259,18 +259,16 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		osd_printf_error("%s: Invalid cartridge size %u\n", image.basename(), size);
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
 	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
 		if (image.fread(pos, size) != size)
-		{
-			osd_printf_error("%s: Read error\n", image.basename());
-			return image_error::UNSPECIFIED;
-		}
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
@@ -294,7 +292,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, m_thom_cart_nb_banks, size ));
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -1085,18 +1083,16 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		osd_printf_error("Invalid cartridge size %d\n", size);
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
 	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
 		if (image.fread(pos, size) != size)
-		{
-			osd_printf_error("Read error\n");
-			return image_error::UNSPECIFIED;
-		}
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
@@ -1119,7 +1115,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

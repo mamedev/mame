@@ -124,7 +124,7 @@ DEVICE_IMAGE_LOAD_MEMBER(lk3000_state::cart_load)
 	// extra ram (optional)
 	m_has_ram = image.get_feature("ram") != nullptr;
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 template <int N>

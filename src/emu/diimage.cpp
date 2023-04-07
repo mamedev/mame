@@ -656,9 +656,9 @@ std::error_condition device_image_interface::load_software(software_list_device 
 //  load_internal - core image loading
 //-------------------------------------------------
 
-std::error_condition device_image_interface::load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args)
+std::pair<std::error_condition, std::string> device_image_interface::load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args)
 {
-	std::error_condition err;
+	std::pair<std::error_condition, std::string> err;
 
 	// first unload the image
 	unload();
@@ -678,15 +678,15 @@ std::error_condition device_image_interface::load_internal(std::string_view path
 		for (auto iter = open_plan.cbegin(); !m_file && iter != open_plan.cend(); iter++)
 		{
 			// open the file
-			err = load_image_by_path(*iter, path);
-			if (err && (err != std::errc::no_such_file_or_directory) && (err != std::errc::permission_denied))
+			err.first = load_image_by_path(*iter, path);
+			if (err.first && (err.first != std::errc::no_such_file_or_directory) && (err.first != std::errc::permission_denied))
 				goto done;
 		}
 
 		// did we fail to find the file?
 		if (!m_file)
 		{
-			err = std::errc::no_such_file_or_directory;
+			err.first = std::errc::no_such_file_or_directory;
 			goto done;
 		}
 	}
@@ -699,15 +699,17 @@ std::error_condition device_image_interface::load_internal(std::string_view path
 		err = finish_load();
 
 done:
-	if (err)
+	if (err.first)
 	{
-		if (!init_phase())
-		{
-			if (device().machine().phase() == machine_phase::RUNNING)
-				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, err.message());
-			else
-				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, err.message());
-		}
+		osd_printf_error(
+				!err.second.empty()
+					? (is_create ? "Unable to create image '%1$s': %2$s (%3$s:%4$d %5$s)\n" : "Unable to load image '%1$s': %2$s (%3$s:%4$d %5$s)\n")
+					: (is_create ? "Unable to create image '%1$s': %5$s (%3$s:%4$d)\n" : "Unable to load image '%1$s': %5$s (%3$s:%4$d)\n"),
+				path,
+				err.second,
+				err.first.category().name(),
+				err.first.value(),
+				err.first.message());
 		clear();
 	}
 	return err;
@@ -718,13 +720,13 @@ done:
 //  load - load an image into MAME
 //-------------------------------------------------
 
-std::error_condition device_image_interface::load(std::string_view path)
+std::pair<std::error_condition, std::string> device_image_interface::load(std::string_view path)
 {
 	// is this a reset on load item?
 	if (is_reset_on_load() && !init_phase())
 	{
 		reset_and_load(path);
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
 	return load_internal(path, false, 0, nullptr);
@@ -735,13 +737,13 @@ std::error_condition device_image_interface::load(std::string_view path)
 //  load_software - loads a softlist item by name
 //-------------------------------------------------
 
-std::error_condition device_image_interface::load_software(std::string_view software_identifier)
+std::pair<std::error_condition, std::string> device_image_interface::load_software(std::string_view software_identifier)
 {
 	// Is this a software part that forces a reset and we're at runtime?  If so, get this loaded through reset_and_load
 	if (is_reset_on_load() && !init_phase())
 	{
 		reset_and_load(software_identifier);
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
 	// Prepare to load
@@ -753,7 +755,7 @@ std::error_condition device_image_interface::load_software(std::string_view soft
 	if (err)
 	{
 		m_is_loading = false;
-		return err;
+		return std::make_pair(err, std::string());
 	}
 
 	// set up softlist stuff
@@ -763,9 +765,10 @@ std::error_condition device_image_interface::load_software(std::string_view soft
 	m_image_name = m_full_software_name;
 	m_basename = m_full_software_name;
 	m_basename_noext = m_full_software_name;
-	m_filetype = use_software_list_file_extension_for_filetype() && m_mame_file != nullptr
-		? std::string(core_filename_extract_extension(m_mame_file->filename(), true))
-		: "";
+	if (use_software_list_file_extension_for_filetype() && m_mame_file)
+		m_filetype = core_filename_extract_extension(m_mame_file->filename(), true);
+	else
+		m_filetype.clear();
 
 	// Copy some image information when we have been loaded through a software list
 	software_info &swinfo = m_software_part_ptr->info();
@@ -784,7 +787,7 @@ std::error_condition device_image_interface::load_software(std::string_view soft
 	if (!init_phase())
 		return finish_load();
 	else
-		return std::error_condition();
+		return make_pair(std::error_condition(), std::string());
 }
 
 
@@ -793,25 +796,20 @@ std::error_condition device_image_interface::load_software(std::string_view soft
 //  from core
 //-------------------------------------------------
 
-std::error_condition device_image_interface::finish_load()
+std::pair<std::error_condition, std::string> device_image_interface::finish_load()
 {
-	std::error_condition err;
+	std::pair<std::error_condition, std::string> err;
 
 	if (m_is_loading)
 	{
-		err = image_checkhash();
+		err.first = image_checkhash();
 
-		if (!err)
+		if (!err.first)
 		{
 			if (m_created)
-			{
 				err = call_create(m_create_format, m_create_args);
-			}
 			else
-			{
-				// using device load
-				err = call_load();
-			}
+				err = call_load(); // using device load
 		}
 	}
 	m_is_loading = false;
@@ -825,7 +823,7 @@ std::error_condition device_image_interface::finish_load()
 //  create - create a image
 //-------------------------------------------------
 
-std::error_condition device_image_interface::create(std::string_view path)
+std::pair<std::error_condition, std::string> device_image_interface::create(std::string_view path)
 {
 	return create(path, nullptr, nullptr);
 }
@@ -835,13 +833,14 @@ std::error_condition device_image_interface::create(std::string_view path)
 //  create - create a image
 //-------------------------------------------------
 
-std::error_condition device_image_interface::create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args)
+std::pair<std::error_condition, std::string> device_image_interface::create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args)
 {
 	int format_index = 0;
 	int cnt = 0;
 	for (auto &format : m_formatlist)
 	{
-		if (create_format == format.get()) {
+		if (create_format == format.get())
+		{
 			format_index = cnt;
 			break;
 		}

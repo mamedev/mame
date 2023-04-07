@@ -186,11 +186,11 @@ void psxcd_device::device_reset()
 	curpos.w = 0;
 }
 
-std::error_condition psxcd_device::call_load()
+std::pair<std::error_condition, std::string> psxcd_device::call_load()
 {
-	std::error_condition ret = cdrom_image_device::call_load();
+	auto ret = cdrom_image_device::call_load();
 	open = true;
-	if (!ret)
+	if (!ret.first)
 		add_system_event(EVENT_CHANGE_DISK, m_sysclock, nullptr); // 1 sec to spin up the disk
 	return ret;
 }

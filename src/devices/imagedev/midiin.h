@@ -37,7 +37,7 @@ public:
 	auto input_callback() { return m_input_cb.bind(); }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	// image device

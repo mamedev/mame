@@ -32,13 +32,13 @@ void msx_slot_cartridge_base_device::device_start()
 }
 
 
-std::error_condition msx_slot_cartridge_base_device::call_load()
+std::pair<std::error_condition, std::string> msx_slot_cartridge_base_device::call_load()
 {
 	if (m_cartridge)
 	{
 		if (!loaded_through_softlist())
 		{
-			u32 length = this->length();
+			u32 const length = this->length();
 
 			// determine how much space to allocate
 			u32 length_aligned = 0x10000;
@@ -59,26 +59,18 @@ std::error_condition msx_slot_cartridge_base_device::call_load()
 
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length_aligned, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
-			{
-				osd_printf_error("%s: Unable to fully read file\n", basename());
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unable to fully read file");
 		}
 
 		std::string message;
 		std::error_condition result = m_cartridge->initialize_cartridge(message);
 		if (result)
-		{
-			osd_printf_error("%s: %s\n", basename(), message);
-			return result;
-		}
+			return std::make_pair(result, message);
 
 		if (m_cartridge->cart_sram_region())
-		{
 			battery_load(m_cartridge->cart_sram_region()->base(), m_cartridge->cart_sram_region()->bytes(), 0x00);
-		}
 	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -80,14 +80,14 @@ TIMER_CALLBACK_MEMBER(avivideo_image_device::frame_timer)
 	}
 }
 
-std::error_condition avivideo_image_device::call_load()
+std::pair<std::error_condition, std::string> avivideo_image_device::call_load()
 {
 	m_frame.reset(new bitmap_argb32);
 	avi_file::error avierr = avi_file::open(filename(), m_avi);
 	if (avierr != avi_file::error::NONE)
 	{
 		m_frame.reset();
-		return image_error::UNSPECIFIED;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
 	const avi_file::movie_info &aviinfo = m_avi->get_movie_info();
@@ -96,7 +96,7 @@ std::error_condition avivideo_image_device::call_load()
 	m_frame_timer->adjust(frame_time, 0, frame_time);
 	m_frame_count = aviinfo.video_numsamples;
 	m_frame_num = 0;
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void avivideo_image_device::call_unload()

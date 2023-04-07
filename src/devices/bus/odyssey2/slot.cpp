@@ -130,7 +130,7 @@ static const char *o2_get_slot(int type)
  call load
 -------------------------------------------------*/
 
-std::error_condition o2_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> o2_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -166,11 +166,11 @@ std::error_condition o2_cart_slot_device::call_load()
 		if (m_cart->get_rom_size() > 0)
 		{
 			m_cart->cart_init();
-			return std::error_condition();
+			return std::make_pair(std::error_condition(), std::string());
 		}
 	}
 
-	return image_error::UNSPECIFIED;
+	return std::make_pair(image_error::UNSPECIFIED, std::string());
 }
 
 

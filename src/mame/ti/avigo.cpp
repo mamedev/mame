@@ -732,11 +732,10 @@ QUICKLOAD_LOAD_MEMBER(avigo_state::quickload_cb)
 		// reset the CPU for allow at the Avigo OS to recognize the installed app
 		m_warm_start = 1;
 		m_maincpu->reset();
-
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
-	return image_error::INVALIDLENGTH;
+	return std::make_pair(image_error::INVALIDLENGTH, std::string());
 }
 
 void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)

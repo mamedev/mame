@@ -27,6 +27,7 @@
 
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
@@ -37,6 +38,7 @@
 #include "machine/timer.h"
 #include "imagedev/snapquik.h"
 #include "sound/beep.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -740,7 +742,7 @@ QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	img_start = strlen((const char*)&data[0]) + 5;
 	img_start += 0xa0;  //skip the icon (40x32 pixel)
@@ -748,7 +750,7 @@ QUICKLOAD_LOAD_MEMBER(rex6000_state::quickload_rex6000)
 	for (uint32_t i=0; i<image.length() - img_start ;i++)
 		m_flash0b->write_raw(i, data[img_start + i]);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 int oz750_state::oz_wzd_extract_tag(const std::vector<uint8_t> &data, const char *tag, char *dest_buf)
@@ -796,7 +798,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 
 	oz_wzd_extract_tag(data, "<DATA TYPE>", data_type);
 	if (strcmp(data_type, "MY PROGRAMS"))
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	oz_wzd_extract_tag(data, "<TITLE>", app_name);
 	oz_wzd_extract_tag(data, "<DATA>", file_name);
@@ -806,7 +808,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 	uint32_t img_start = oz_wzd_extract_tag(data, "<BIN>", nullptr);
 
 	if (img_start == 0)
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	uint16_t icon_size = data[img_start++];
 
@@ -846,7 +848,7 @@ QUICKLOAD_LOAD_MEMBER(oz750_state::quickload_oz750)
 	for (int i=img_start; i<image.length(); i++)
 		flash->write_byte(pos++, data[i]);                      // data
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

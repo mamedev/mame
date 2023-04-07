@@ -26,7 +26,7 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	void write(offs_t offset, uint8_t data);

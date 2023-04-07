@@ -725,7 +725,7 @@ void nes_cart_slot_device::pcb_reset()
 #include "nes_ines.hxx"
 
 
-std::error_condition nes_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -740,34 +740,27 @@ std::error_condition nes_cart_slot_device::call_load()
 			if ((magic[0] == 'N') && (magic[1] == 'E') && (magic[2] == 'S'))    // If header starts with 'NES' it is iNES
 			{
 				if (length() <= 0x10)
-				{
-					osd_printf_error("%s only contains the iNES header and no data.\n", filename());
-					return image_error::INVALIDLENGTH;
-				}
+					return std::make_pair(image_error::INVALIDLENGTH, "File contains iNES header with no data");
 
 				call_load_ines();
 			}
 			else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) // If header starts with 'UNIF' it is UNIF
 			{
 				if (length() <= 0x20)
-				{
-					osd_printf_error("%s only contains the UNIF header and no data.\n", filename());
-					return image_error::INVALIDLENGTH;
-				}
+					return std::make_pair(image_error::INVALIDLENGTH, "File contains UNIF header with no data");
 
 				call_load_unif();
 			}
 			else
 			{
-				osd_printf_error("%s is NOT a file in either iNES or UNIF format.\n", filename());
-				return image_error::INVALIDIMAGE;
+				return std::make_pair(image_error::INVALIDIMAGE, "File is not an iNES or UNIF cartridge image");
 			}
 		}
 		else
 			call_load_pcb();
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -309,7 +309,7 @@ static const char *md_get_slot(int type)
  -------------------------------------------------*/
 
 
-std::error_condition base_md_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> base_md_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -344,10 +344,10 @@ std::error_condition base_md_cart_slot_device::call_load()
 			file_logging((uint8_t *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}
 
-		return res;
+		return std::make_pair(res, std::string());
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

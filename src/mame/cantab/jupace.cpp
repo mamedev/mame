@@ -172,15 +172,11 @@ private:
 
 SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
+	if (m_ram->size() < 16*1024)
+		return std::make_pair(image_error::UNSUPPORTED, "At least 16KB RAM expansion required");
+
 	u16 ace_index=0x2000;
 	bool done = false;
-
-	if (m_ram->size() < 16*1024)
-	{
-		osd_printf_error("%s: At least 16KB RAM expansion required\n", image.basename());
-		image.message("At least 16KB RAM expansion required");
-		return image_error::UNSUPPORTED;
-	}
 
 	logerror("Loading file %s.\r\n", image.filename());
 	std::vector<uint8_t> RAM(0x10000);
@@ -215,11 +211,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 	logerror("Decoded %X bytes.\r\n", ace_index-0x2000);
 
 	if (!done)
-	{
-		osd_printf_error("%s: EOF marker not found\n", image.basename());
-		image.message("EOF marker not found");
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid snapshot file: EOF marker not found");
 
 	// patch CPU registers
 	// Some games do not follow the standard, and have rubbish in the CPU area. So,
@@ -258,7 +250,7 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 //**************************************************************************

@@ -39,7 +39,7 @@ QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 	uint64_t size = image.length();
 
 	if (size == 0)
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	std::vector<uint8_t> data(size);
 	image.fread(&data[0], size);
@@ -68,7 +68,7 @@ QUICKLOAD_LOAD_MEMBER(kc_state::quickload_cb)
 
 	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

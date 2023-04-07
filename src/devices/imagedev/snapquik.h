@@ -23,7 +23,7 @@ class snapshot_image_device :   public device_t,
 								public device_image_interface
 {
 public:
-	typedef device_delegate<std::error_condition (snapshot_image_device &)> load_delegate;
+	typedef device_delegate<std::pair<std::error_condition, std::string> (snapshot_image_device &)> load_delegate;
 
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
@@ -38,7 +38,7 @@ public:
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return false; }
@@ -106,10 +106,10 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define SNAPSHOT_LOAD_MEMBER(_name)                 std::error_condition _name(snapshot_image_device &image)
+#define SNAPSHOT_LOAD_MEMBER(_name)                 std::pair<std::error_condition, std::string> _name(snapshot_image_device &image)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)         SNAPSHOT_LOAD_MEMBER(_name)
 
-#define QUICKLOAD_LOAD_MEMBER(_name)                std::error_condition _name(snapshot_image_device &image)
+#define QUICKLOAD_LOAD_MEMBER(_name)                std::pair<std::error_condition, std::string> _name(snapshot_image_device &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
 #endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

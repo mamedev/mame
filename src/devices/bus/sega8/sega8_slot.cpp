@@ -390,17 +390,14 @@ void sega8_cart_slot_device::setup_ram()
 	}
 }
 
-std::error_condition sega8_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> sega8_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (m_is_card && len > 0x8000)
-		{
-			osd_printf_error("%s: Attempted loading a card larger than 32KB\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Sega Card images must be no larger than 32K");
 
 		// check for header
 		uint32_t offset = 0;
@@ -456,7 +453,7 @@ std::error_condition sega8_cart_slot_device::call_load()
 		internal_header_logging(ROM + offset, len, m_cart->get_ram_size());
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

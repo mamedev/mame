@@ -83,17 +83,14 @@ void aquarius_cartridge_slot_device::device_start()
 //  call_load
 //-------------------------------------------------
 
-std::error_condition aquarius_cartridge_slot_device::call_load()
+std::pair<std::error_condition, std::string> aquarius_cartridge_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size % 0x1000)
-		{
-			osd_printf_error("%s: Invalid ROM size\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM size (must be a multiple of 4K)");
 
 		m_cart->rom_alloc(size);
 
@@ -103,7 +100,7 @@ std::error_condition aquarius_cartridge_slot_device::call_load()
 			memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 //-------------------------------------------------

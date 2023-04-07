@@ -43,9 +43,9 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "port"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "p"; }
 
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	uint32_t port_size() const { return m_port_size; }
 	bool port_write() const { return m_port_write; }

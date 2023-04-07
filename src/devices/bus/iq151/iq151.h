@@ -109,7 +109,7 @@ public:
 	auto out_drq_callback() { return m_out_drq_cb.bind(); }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "iq151_cart"; }

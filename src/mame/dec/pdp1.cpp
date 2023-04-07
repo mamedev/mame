@@ -696,7 +696,7 @@ void pdp1_cylinder_image_device::device_start()
 /*
     Open a perforated tape image
 */
-std::error_condition pdp1_readtape_image_device::call_load()
+std::pair<std::error_condition, std::string> pdp1_readtape_image_device::call_load()
 {
 	// start motor
 	m_motor_on = 1;
@@ -718,7 +718,7 @@ std::error_condition pdp1_readtape_image_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pdp1_readtape_image_device::call_unload()
@@ -908,9 +908,9 @@ void pdp1_readtape_image_device::iot_rrb(int op2, int nac, int mb, int &io, int 
 }
 
 
-std::error_condition pdp1_punchtape_image_device::call_load()
+std::pair<std::error_condition, std::string> pdp1_punchtape_image_device::call_load()
 {
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pdp1_punchtape_image_device::call_unload()
@@ -1008,11 +1008,11 @@ void pdp1_punchtape_image_device::iot_ppb(int op2, int nac, int mb, int &io, int
 /*
     Open a file for typewriter output
 */
-std::error_condition pdp1_typewriter_device::call_load()
+std::pair<std::error_condition, std::string> pdp1_typewriter_device::call_load()
 {
 	m_st_tyo(1);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pdp1_typewriter_device::call_unload()
@@ -1326,9 +1326,9 @@ void pdp1_cylinder_image_device::parallel_drum_init()
 /*
     Open a file for drum
 */
-std::error_condition pdp1_cylinder_image_device::call_load()
+std::pair<std::error_condition, std::string> pdp1_cylinder_image_device::call_load()
 {
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pdp1_cylinder_image_device::call_unload()

@@ -42,8 +42,8 @@ public:
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
-	virtual std::error_condition call_create(int create_format, util::option_resolution *create_args) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
 	virtual bool image_is_chd_type() const noexcept override { return true; }

@@ -92,7 +92,7 @@ void diablo_image_device::device_stop()
 	m_hard_disk_handle.reset();
 }
 
-std::error_condition diablo_image_device::call_load()
+std::pair<std::error_condition, std::string> diablo_image_device::call_load()
 {
 	std::error_condition our_result;
 
@@ -103,11 +103,11 @@ std::error_condition diablo_image_device::call_load()
 		/* Let the override do some additional work/checks */
 		our_result = m_device_image_load(*this);
 	}
-	return our_result;
+	return std::make_pair(our_result, std::string());
 
 }
 
-std::error_condition diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
+std::pair<std::error_condition, std::string> diablo_image_device::call_create(int create_format, util::option_resolution *create_args)
 {
 	if (!create_args)
 		throw emu_fatalerror("diablo_image_device::call_create: Expected create_args to not be nullptr");
@@ -127,16 +127,16 @@ std::error_condition diablo_image_device::call_create(int create_format, util::o
 	if (!err)
 		m_origchd.create(std::move(proxy), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
 	if (err)
-		return err;
+		return std::make_pair(err, std::string());
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize));
 	m_origchd.close();
 
 	if (err)
-		return err;
+		return std::make_pair(err, std::string());
 
-	return internal_load_dsk();
+	return std::make_pair(internal_load_dsk(), std::string());
 }
 
 void diablo_image_device::call_unload()

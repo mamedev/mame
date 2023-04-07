@@ -41,25 +41,27 @@ menu_control_floppy_image::~menu_control_floppy_image()
 void menu_control_floppy_image::do_load_create()
 {
 	if(input_filename.empty()) {
-		std::error_condition err = fd.create(output_filename, nullptr, nullptr);
+		auto [err, message] = fd.create(output_filename, nullptr, nullptr);
 		if (err) {
-			machine().popmessage("Error: %s", err.message());
+			machine().popmessage(_("Error creating floppy image: %1$s"), !message.empty() ? message : err.message());
 			return;
 		}
 		if (create_fs) {
 			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
-			err = fd.finish_load();
+			err = fd.finish_load().first;
 			if (!err) {
 				fs::meta_data meta;
 				fd.init_fs(create_fs, meta);
 			}
 		}
 	} else {
-		std::error_condition err = fd.load(input_filename);
-		if (!err && !output_filename.empty())
+		auto [err, message] = fd.load(input_filename);
+		if (!err && !output_filename.empty()) {
+			message.clear();
 			err = fd.reopen_for_write(output_filename);
+		}
 		if (err) {
-			machine().popmessage("Error: %s", err.message());
+			machine().popmessage(_("Error opening floppy image: %1$s"), !message.empty() ? message : err.message());
 			return;
 		}
 	}

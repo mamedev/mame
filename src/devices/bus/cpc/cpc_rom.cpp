@@ -101,7 +101,7 @@ void cpc_rom_image_device::device_start()
 /*-------------------------------------------------
     DEVICE_IMAGE_LOAD( rom )
 -------------------------------------------------*/
-std::error_condition cpc_rom_image_device::call_load()
+std::pair<std::error_condition, std::string> cpc_rom_image_device::call_load()
 {
 	uint64_t const size = length();
 
@@ -116,7 +116,7 @@ std::error_condition cpc_rom_image_device::call_load()
 		fread(m_base, 16384);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

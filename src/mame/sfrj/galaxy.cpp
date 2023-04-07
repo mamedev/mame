@@ -203,7 +203,9 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 		case GALAXY_SNAPSHOT_V2_SIZE:
 			break;
 		default:
-			return image_error::INVALIDLENGTH;
+			return std::make_pair(
+					image_error::INVALIDLENGTH,
+					util::string_format("Unsupported image size (must be %u or %u bytes)", GALAXY_SNAPSHOT_V1_SIZE, GALAXY_SNAPSHOT_V2_SIZE));
 	}
 
 	std::vector<uint8_t> snapshot_data(snapshot_size);
@@ -211,7 +213,7 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 
 	setup_snapshot(&snapshot_data[0], snapshot_size);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************

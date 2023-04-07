@@ -165,7 +165,7 @@ TIMER_CALLBACK_MEMBER(midiin_device::midi_update)
     call_load
 -------------------------------------------------*/
 
-std::error_condition midiin_device::call_load()
+std::pair<std::error_condition, std::string> midiin_device::call_load()
 {
 	// attempt to load if it's a real file
 	std::error_condition err = load_image_by_path(OPEN_FLAG_READ, filename());
@@ -178,9 +178,9 @@ std::error_condition midiin_device::call_load()
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
-			return std::error_condition();
+			return std::make_pair(std::error_condition(), std::string());
 		}
-		return image_error::UNSPECIFIED;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 	else
 	{
@@ -189,11 +189,11 @@ std::error_condition midiin_device::call_load()
 		if (!m_midi->open_input(filename()))
 		{
 			m_midi.reset();
-			return image_error::UNSPECIFIED;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		}
 
 		m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
 }
 

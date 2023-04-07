@@ -41,7 +41,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	std::error_condition load_rom(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom0_load) { return load_rom(image, m_rom[0]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[1]); }
 

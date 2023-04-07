@@ -554,18 +554,12 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 	std::string image_line = read_line(image);
 	if (image_line.empty())
-	{
-		image.message("No data in line 1");
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid image file: no data in line 1");
 
 	sscanf(image_line.c_str(), "%d", &num_lines);  //num_lines = std::stoul(image_line);
 
 	if (num_lines < 1)
-	{
-		image.message("No data to process");
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid image file: no data to process");
 
 	for (u32 i = 0; i < num_lines; i++)
 	{
@@ -575,8 +569,9 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 
 		if (length < 8)
 		{
-			image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-			return image_error::INVALIDIMAGE;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Bad data (%s) in line %d", image_line, i + 2));
 		}
 
 		// Isolate and convert 4-digit decimal address
@@ -587,8 +582,9 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		{
 			if (length < 37)
 			{
-				image.message("Bad data (%s) in line %d",image_line.c_str(),i+2);
-				return image_error::INVALIDIMAGE;
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						util::string_format("Bad data (%s) in line %d", image_line, i + 2));
 			}
 
 			// Parse a line such as: 0000:00000110101001000100000100000100
@@ -639,7 +635,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state::quickload_cb)
 		space.write_byte((line << 2) + 3, BIT(word, 0,  8));
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /****************************************************\

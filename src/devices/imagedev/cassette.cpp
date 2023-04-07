@@ -248,14 +248,14 @@ const software_list_loader &cassette_image_device::get_software_list_loader() co
 	return image_software_list_loader::instance();
 }
 
-std::error_condition cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_load(true);
+	return std::make_pair(internal_load(true), std::string());
 }
 
-std::error_condition cassette_image_device::call_load()
+std::pair<std::error_condition, std::string> cassette_image_device::call_load()
 {
-	return internal_load(false);
+	return std::make_pair(internal_load(false), std::string());
 }
 
 std::error_condition cassette_image_device::internal_load(bool is_create)

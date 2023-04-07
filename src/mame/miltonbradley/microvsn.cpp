@@ -190,10 +190,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x400 && size != 0x800)
-	{
-		osd_printf_error("%s: Invalid ROM file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 1K or 2K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -236,7 +233,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		m_tms1100->set_clock(clock);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void microvision_state::apply_settings()

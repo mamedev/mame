@@ -31,6 +31,7 @@
 */
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
@@ -299,15 +300,12 @@ DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 	uint32_t const size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
-	{
-		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2K cartridges are supported)");
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)

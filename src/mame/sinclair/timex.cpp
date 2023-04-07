@@ -604,10 +604,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		header.resize(9);
 
 		if (size % 0x2000 != 9)
-		{
-			osd_printf_error("%s: File corrupted\n", image.basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge data size (must be a multiple of 8K)");
 
 		m_dock->rom_alloc(0x10000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		u8* DOCK = m_dock->get_rom_base();
@@ -621,8 +618,9 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
-			osd_printf_error("%s: File corrupted\n", image.basename());
-			return image_error::INVALIDIMAGE;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Chunks in header (%d) do not match data size (%d)", chunks_in_file, (size - 0x09) / 0x2000));
 		}
 
 		switch (header[0])
@@ -645,8 +643,9 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 				break;
 
 			default:
-				osd_printf_error("%s: Cart type not supported\n", image.basename());
-				return image_error::INVALIDIMAGE;
+				return std::make_pair(
+						image_error::INVALIDIMAGE,
+						util::string_format("Cartridge type 0x%02X not supported", header[0]));
 		}
 
 		logerror ("Cart loaded [Chunks %02x]\n", m_ram_chunks);
@@ -657,7 +656,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 		memcpy(m_dock->get_rom_base(), image.get_software_region("rom"), size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

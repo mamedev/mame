@@ -104,7 +104,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(kansas_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 
 	void alphatro_io(address_map &map);
@@ -696,15 +696,12 @@ void alphatro_state::machine_reset()
 	m_bicom_en = 0;
 }
 
-std::error_condition alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> alphatro_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
 	uint32_t const size = slot->common_get_size("rom");
 
 	if ((size != 0x4000) && (size != 0x2000))
-	{
-		osd_printf_error("%s: Invalid size, must be 8 or 16 K\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid cartridge size (must be 8K or 16K)");
 
 	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 
@@ -717,7 +714,7 @@ std::error_condition alphatro_state::load_cart(device_image_interface &image, ge
 		slot->common_load_rom(slot->get_rom_base()+0x2000, size, "rom");
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void alphatro_state::alphatro_palette(palette_device &palette) const

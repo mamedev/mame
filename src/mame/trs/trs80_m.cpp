@@ -401,8 +401,9 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 				ptr = program.get_write_ptr(address);
 				if (!ptr)
 				{
-					image.message("Attempting to write outside of RAM");
-					return image_error::INVALIDIMAGE;
+					return std::make_pair(
+							image_error::INVALIDIMAGE,
+							util::string_format("Object code block at address %04x is outside RAM", address));
 				}
 				image.fread( ptr, block_length);
 			}
@@ -415,7 +416,7 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 				if (LOG) logerror("/CMD transfer address %04x\n", address);
 				m_maincpu->set_state_int(Z80_PC, address);
 			}
-			return std::error_condition();
+			return std::make_pair(std::error_condition(), std::string());
 
 		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
 			image.fread(&data, length);
@@ -430,10 +431,11 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 		default:
 			image.fread(&data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
-			image.message("Unsupported or invalid block type");
-			return image_error::INVALIDIMAGE;
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Unsupported or invalid block type %u", type));
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

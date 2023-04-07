@@ -132,16 +132,13 @@ static int vsmile_get_pcb_id(const char *slot)
  call load
  -------------------------------------------------*/
 
-std::error_condition vsmile_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> vsmile_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t const size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x100'0000)
-		{
-			osd_printf_error("%s: Attempted loading a cart larger than 16MB\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges larger than 16MB are not supported");
 
 		m_cart->rom_alloc(size);
 		uint8_t *const rom = (uint8_t *)m_cart->get_rom_base();
@@ -160,7 +157,7 @@ std::error_condition vsmile_cart_slot_device::call_load()
 			if (pcb_name)
 				m_type = vsmile_get_pcb_id(pcb_name);
 
-			osd_printf_info("V.Smile: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
+			osd_printf_verbose("V.Smile: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
 		if (m_type == VSMILE_NVRAM)
@@ -170,7 +167,7 @@ std::error_condition vsmile_cart_slot_device::call_load()
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

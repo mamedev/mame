@@ -263,6 +263,7 @@ private:
 	void handle_stylus_press(int column);
 	void recompute_lcd_params();
 	void handle_input_press(uint16_t mux_data);
+	std::pair<std::error_condition, std::string> common_load(device_image_interface &image, generic_slot_device *slot);
 
 	uint8_t *m_p_ram = nullptr;
 	uint8_t *m_cart_ptr = nullptr;
@@ -284,7 +285,6 @@ private:
 	gamecom_sound_t m_sound;
 	bitmap_ind16 m_bitmap;
 
-	std::error_condition common_load(device_image_interface &image, generic_slot_device *slot);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<sm8500_cpu_device> m_maincpu;

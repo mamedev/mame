@@ -210,7 +210,7 @@ static const char *pce_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition pce_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -264,7 +264,7 @@ std::error_condition pce_cart_slot_device::call_load()
 			m_cart->ram_alloc(0x30000);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

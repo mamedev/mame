@@ -28,7 +28,6 @@ class mc10cart_slot_device final : public device_t,
 								public device_cartrom_image_interface
 {
 public:
-
 	// construction/destruction
 	template <typename T>
 	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
@@ -50,7 +49,7 @@ public:
 	address_space &memspace() const { return *m_memspace; }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "mc10_cart"; }
@@ -84,7 +83,7 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
-	virtual std::error_condition load();
+	virtual std::pair<std::error_condition, std::string> load();
 
 protected:
 	void raise_cart_nmi() { m_owning_slot->set_nmi_line(ASSERT_LINE); }

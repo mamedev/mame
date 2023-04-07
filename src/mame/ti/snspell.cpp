@@ -368,12 +368,13 @@ DEVICE_IMAGE_LOAD_MEMBER(snspell_state::cart_load)
 
 	if (size > m_cart_max_size)
 	{
-		osd_printf_error("%s: Invalid file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid file size (must be no more than %u bytes)", m_cart_max_size));
 	}
 
 	m_cart->common_load_rom(m_cart_base, size, "rom");
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void snspell_state::init_snspell()

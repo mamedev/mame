@@ -683,7 +683,7 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	space.write_byte(HEAD + 1, head >> 8);
 	if (LOG) logerror("HEAD %04x\n",address);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

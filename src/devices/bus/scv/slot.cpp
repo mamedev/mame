@@ -147,7 +147,7 @@ static const char *scv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition scv_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> scv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -155,10 +155,7 @@ std::error_condition scv_cart_slot_device::call_load()
 		bool const has_ram = loaded_through_softlist() && get_software_region("ram");
 
 		if (len > 0x20000)
-		{
-			osd_printf_error("%s: Unsupported cartridge size\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no more than 128K)");
 
 		m_cart->rom_alloc(len);
 		if (has_ram)
@@ -190,7 +187,7 @@ std::error_condition scv_cart_slot_device::call_load()
 		//printf("Type: %s\n", scv_get_slot(m_type));
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

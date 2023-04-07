@@ -1121,7 +1121,7 @@ void gb_cart_slot_device::device_reset_after_children()
 }
 
 
-std::error_condition gb_cart_slot_device::load_image_file(util::random_read &file)
+std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_file(util::random_read &file)
 {
 	using namespace bus::gameboy;
 
@@ -1138,19 +1138,10 @@ std::error_condition gb_cart_slot_device::load_image_file(util::random_read &fil
 		// try reading the GBX footer into temporary space before more checks
 		std::unique_ptr<u8 []> const footer(new (std::nothrow) u8 [gbxtrailer.size]);
 		if (!footer)
-		{
-			osd_printf_error("%s: Error allocating memory to read GBX file footer\n", basename());
-			return std::errc::not_enough_memory;
-		}
+			return std::make_pair(std::errc::not_enough_memory, "Error allocating memory to read GBX file footer");
 		std::error_condition const err = file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual);
 		if (err || (gbxtrailer.size != actual))
-		{
-			osd_printf_error("%s: Error reading GBX file footer\n", basename());
-			if (err)
-				return err;
-			else
-				return std::errc::io_error;
-		}
+			return std::make_pair(err ? err : std::errc::io_error, "Error reading GBX file footer");
 		if (1 != gbxtrailer.ver_maj)
 		{
 			// some unsupported GBX version - assume footer immediately follows ROM
@@ -1252,13 +1243,7 @@ std::error_condition gb_cart_slot_device::load_image_file(util::random_read &fil
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
 		std::error_condition const err = file.read_at(offset, romregion->base(), len, actual);
 		if (err || (len != actual))
-		{
-			osd_printf_error("%s: Error reading ROM data from cartridge file\n", basename());
-			if (err)
-				return err;
-			else
-				return std::errc::io_error;
-		}
+			return std::make_pair(err ? err : std::errc::io_error, "Error reading ROM data from cartridge file");
 
 		// allocate cartridge RAM based on header if necessary
 		if (proberam)
@@ -1272,7 +1257,7 @@ std::error_condition gb_cart_slot_device::load_image_file(util::random_read &fil
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

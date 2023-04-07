@@ -378,7 +378,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 		mempak_format(m_rcp_periphs->m_save_data.mempak[1]);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 MACHINE_START_MEMBER(n64_mess_state,n64dd)

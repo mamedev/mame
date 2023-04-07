@@ -134,7 +134,7 @@ static const char *astrocade_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition astrocade_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -165,7 +165,7 @@ std::error_condition astrocade_cart_slot_device::call_load()
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

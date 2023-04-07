@@ -124,10 +124,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	if (image.is_filetype("sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
-		{
-			logerror("Invalid .SNA file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNA file size");
+
 		setup_sna(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sp"))
@@ -135,38 +133,29 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
 			if (snapshot_size != SP_OLD_SIZE)
-			{
-				logerror("Invalid .SP file size.\n");
-				return image_error::INVALIDLENGTH;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SP file size");
 		}
 		setup_sp(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("ach"))
 	{
 		if (snapshot_size != ACH_SIZE)
-		{
-			logerror("Invalid .ACH file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .ACH file size");
+
 		setup_ach(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("prg"))
 	{
 		if (snapshot_size != PRG_SIZE)
-		{
-			logerror("Invalid .PRG file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .PRG file size");
+
 		setup_prg(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("plusd"))
 	{
 		if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
-		{
-			logerror("Invalid .PLUSD file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .PLUSD file size");
+
 		setup_plusd(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sem"))
@@ -176,57 +165,44 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
-			{
-				logerror("Invalid .SEM file size.\n");
-				return image_error::INVALIDLENGTH;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SEM file size");
 		}
 		setup_sem(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sit"))
 	{
 		if (snapshot_size != SIT_SIZE)
-		{
-			logerror("Invalid .SIT file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SIT file size");
+
 		setup_sit(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("zx"))
 	{
 		if (snapshot_size != ZX_SIZE)
-		{
-			logerror("Invalid .ZX file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .ZX file size");
+
 		setup_zx(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("snp"))
 	{
 		if (snapshot_size != SNP_SIZE)
-		{
-			logerror("Invalid .SNP file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNP file size");
+
 		setup_snp(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("snx"))
 	{
 		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
-		{
-			logerror("Invalid .SNX file header.\n");
-			return image_error::INVALIDIMAGE;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
+
 		setup_snx(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("frz"))
 	{
 		if (snapshot_size != FRZ_SIZE)
-		{
-			logerror("Invalid .FRZ file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .FRZ file size");
+
 		setup_frz(&snapshot_data[0], snapshot_size);
 	}
 	else
@@ -234,7 +210,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		setup_z80(&snapshot_data[0], snapshot_size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*******************************************************************
@@ -2431,23 +2407,19 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 	if (image.is_filetype("scr"))
 	{
 		if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
-		{
-			logerror("Invalid .SCR file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SCR file size.");
+
 		setup_scr(&quickload_data[0], quickload_size);
 	}
 	else if (image.is_filetype("raw"))
 	{
 		if (quickload_size != RAW_SIZE)
-		{
-			logerror("Invalid .RAW file size.\n");
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .RAW file size.");
+
 		setup_raw(&quickload_data[0], quickload_size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*******************************************************************

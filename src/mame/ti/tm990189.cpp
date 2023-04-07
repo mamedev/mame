@@ -412,7 +412,7 @@ public:
 
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -422,11 +422,11 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "serial"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "serl"; }
 
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(rs232_input_tick);
@@ -459,11 +459,11 @@ TIMER_CALLBACK_MEMBER(tm990_189_rs232_image_device::rs232_input_tick)
 	}
 }
 
-std::error_condition tm990_189_rs232_image_device::call_load()
+std::pair<std::error_condition, std::string> tm990_189_rs232_image_device::call_load()
 {
 	m_tms9902->rcv_dsr(ASSERT_LINE);
 	m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

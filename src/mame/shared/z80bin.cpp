@@ -5,12 +5,13 @@
 
 #include "imagedev/snapquik.h"
 
+
 /*-------------------------------------------------
     z80bin_load_file - load a z80bin file into
     memory
 -------------------------------------------------*/
 
-std::error_condition z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
+std::pair<std::error_condition, std::string> z80bin_load_file(snapshot_image_device &image, address_space &space, uint16_t &exec_addr, uint16_t &start_addr, uint16_t &end_addr)
 {
 	uint16_t args[3]{};
 	uint16_t i, size = 0U;
@@ -27,11 +28,7 @@ std::error_condition z80bin_load_file(snapshot_image_device &image, address_spac
 		if (ch != '\0')
 		{
 			if (i >= (std::size(pgmname) - 1))
-			{
-				osd_printf_error("File name too long\n");
-				image.message(" File name too long");
-				return image_error::INVALIDIMAGE;
-			}
+				return std::make_pair(image_error::INVALIDIMAGE, "Program file name too long");
 
 			pgmname[i] = ch;    // build program name
 			i++;
@@ -39,20 +36,12 @@ std::error_condition z80bin_load_file(snapshot_image_device &image, address_spac
 	}
 
 	if (bytes == 0)
-	{
-		osd_printf_error("%s: Unexpected EOF while getting file name\n", image.basename());
-		image.message(" Unexpected EOF while getting file name");
-		return image_error::UNSPECIFIED;
-	}
+		return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF while reading program file name");
 
 	pgmname[i] = '\0';  // terminate string with a NUL
 
 	if (image.fread(args, sizeof(args)) != sizeof(args))
-	{
-		osd_printf_error("%s: Unexpected EOF while getting file size\n", image.basename());
-		image.message(" Unexpected EOF while getting file size");
-		return image_error::UNSPECIFIED;
-	}
+		return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF while reading program file size");
 
 	exec_addr = little_endianize_int16(args[0]);
 	start_addr = little_endianize_int16(args[1]);
@@ -68,12 +57,12 @@ std::error_condition z80bin_load_file(snapshot_image_device &image, address_spac
 		uint16_t const j = (start_addr + i) & 0xffff;
 		if (image.fread(&data, 1) != 1)
 		{
-			osd_printf_error("%s: Unexpected EOF while writing byte to %04X\n", image.basename(), j);
-			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return image_error::UNSPECIFIED;
+			return std::make_pair(
+					image_error::UNSPECIFIED,
+					util::string_format("Unexpected EOF while reading program byte %04X", j));
 		}
 		space.write_byte(j, data);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
