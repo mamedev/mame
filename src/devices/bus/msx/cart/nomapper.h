@@ -19,7 +19,7 @@ public:
 	// device-level overrides
 	virtual void device_start() override { }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 private:
 	uint32_t m_start_address;

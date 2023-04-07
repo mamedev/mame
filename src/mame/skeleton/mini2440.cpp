@@ -8,8 +8,8 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2440.h"
-#include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -43,7 +43,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f1g08u0b_device> m_nand;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport m_penx;
@@ -200,7 +200,6 @@ INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 
 void mini2440_state::machine_start()
 {
-	m_nand->set_data_ptr(memregion("nand")->base());
 }
 
 void mini2440_state::machine_reset()
@@ -260,8 +259,7 @@ void mini2440_state::mini2440(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
+	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 

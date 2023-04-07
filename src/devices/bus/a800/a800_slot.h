@@ -124,7 +124,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 	int identify_cart_type(const uint8_t *header) const;
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	bool has_cart() { return m_cart != nullptr; }
@@ -141,7 +141,7 @@ public:
 protected:
 	//a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_resolve_objects() override;
 	virtual space_config_vector memory_space_config() const override;
@@ -219,7 +219,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 	int identify_cart_type(const uint8_t *header) const;
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	u8 read_cart(offs_t offset);

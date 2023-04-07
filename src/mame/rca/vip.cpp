@@ -688,7 +688,9 @@ QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 
 	if ((size + chip8_size) > m_ram->size())
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("%u-byte interpreter and %u-byte program are too large for %u-byte RAM", chip8_size, size, m_ram->size()));
 	}
 
 	if (chip8_size > 0)
@@ -700,7 +702,7 @@ QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 	/* load image to RAM */
 	image.fread(ram + chip8_size, size);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

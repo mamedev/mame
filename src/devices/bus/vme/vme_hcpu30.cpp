@@ -175,7 +175,7 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	M68020(config, m_maincpu, 16670000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_hcpu30_card_device::hcpu30_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_hcpu30_card_device::cpu_space_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	// FIXME: functional test expects dtr->dcd, rts->cts connections on both ports and tx->rx connection on port B
 	DUSCC68562(config, m_dusccterm, DUSCC_CLOCK);

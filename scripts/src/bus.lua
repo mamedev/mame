@@ -4532,6 +4532,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
+---------------------------------------------------
+
+if (BUSES["ZXBUS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/uts_kbd/uts_kbd.h,BUSES["UTS_KBD"] = true
 ---------------------------------------------------
 
@@ -5210,6 +5224,8 @@ if (BUSES["NABU"]~=null) then
 		MAME_DIR .. "src/devices/bus/nabupc/hdd.h",
 		MAME_DIR .. "src/devices/bus/nabupc/option.cpp",
 		MAME_DIR .. "src/devices/bus/nabupc/option.h",
+		MAME_DIR .. "src/devices/bus/nabupc/rs232.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/rs232.h",
 	}
 end
 

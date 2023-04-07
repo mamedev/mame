@@ -325,7 +325,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bataille">
-		<description>Bataille Des Couleurs, La</description>
+		<description>La Bataille Des Couleurs</description>
 		<year>1983</year>
 		<publisher>P &amp; A Jablonka</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -380,7 +380,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bossthe">
-		<description>Boss, The</description>
+		<description>The Boss</description>
 		<year>19??</year>
 		<publisher>Peaksoft</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -655,7 +655,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="citemaudite">
-		<description>Cite Maudite, La</description>
+		<description>La Cite Maudite</description>
 		<year>1984</year>
 		<publisher>Ere Informatique</publisher>
 		<part name="cass" interface="oric1_cass">
@@ -810,11 +810,14 @@ license:CC0-1.0
 
 	<software name="crossbomber">
 		<description>Cross Bomber</description>
-		<year>2021</year>
+		<year>2022</year>
 		<publisher>Fabrizio Caruso</publisher>
 		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="6412">
+			<dataarea name="cass" size="6684">
+				<!-- originally released version seems to have disappeared off the Internet
 				<rom name="Cross Bomber (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="6412" crc="5915840a" sha1="ab594aa3f6913c836956854374eafe243e4b457c"/>
+				-->
+				<rom name="Cross Bomber (2022-07-20)(Caruso, Fabrizio)[48K].tap" size="6684" crc="952b37c8" sha1="8298e07d262181611ab7286719830f5d66d670b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -859,17 +862,6 @@ license:CC0-1.0
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="19190">
 				<rom name="Cross Shoot (2021-05-13)(Caruso, Fabrizio)[48K].tap" size="19190" crc="b8ba95d0" sha1="67f632ad5b1c5439f8f461c31d66308d6bfc00c8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crossshoot1" cloneof="crossshoot">
-		<description>Cross Shoot (alt)</description>
-		<year>2020</year>
-		<publisher>Fabrizio Caruso</publisher>
-		<part name="cass" interface="oric1_cass">
-			<dataarea name="cass" size="19190">
-				<rom name="Cross Shoot (2020-07-03)(Caruso, Fabrizio)[48K].tap" size="19190" crc="b8ba95d0" sha1="67f632ad5b1c5439f8f461c31d66308d6bfc00c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1007,7 +999,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="diamantm">
-		<description>Diamant de l'île Maudite, Le</description>
+		<description>Le Diamant de l'île Maudite</description>
 		<year>1984</year>
 		<publisher>Loriciels</publisher>
 		<part name="cass1" interface="oric1_cass">
@@ -1693,7 +1685,7 @@ license:CC0-1.0
 		<publisher>Ocean</publisher>
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="24026">
-				<rom name="Hunchback (UK) (1983) [a2].tap " size="24026" crc="33327eef" sha1="0a8df6827b979be41686d903eedf773644a7ceea"/>
+				<rom name="Hunchback (UK) (1983) [a2].tap" size="24026" crc="33327eef" sha1="0a8df6827b979be41686d903eedf773644a7ceea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3180,7 +3172,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sceptre">
-		<description>Sceptre d'Anubis, Le</description>
+		<description>Le Sceptre d'Anubis</description>
 		<year>1984</year>
 		<publisher>Micro Programmes 5</publisher>
 		<part name="cass" interface="oric1_cass">

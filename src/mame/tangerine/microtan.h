@@ -79,9 +79,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pulse_nmi);
 
-	image_verify_result verify_snapshot(uint8_t *data, int size);
-	image_init_result parse_intel_hex(uint8_t *snapshot_buff, char *src);
-	image_init_result parse_zillion_hex(uint8_t *snapshot_buff, char *src);
+	std::error_condition verify_snapshot(const uint8_t *data, int size);
+	std::error_condition parse_intel_hex(uint8_t *snapshot_buff, const char *src);
+	std::error_condition parse_zillion_hex(uint8_t *snapshot_buff, const char *src);
 	void set_cpu_regs(const uint8_t *snapshot_buff, int base);
 	void snapshot_copy(uint8_t *snapshot_buff, int snapshot_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);

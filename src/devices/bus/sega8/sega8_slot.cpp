@@ -264,16 +264,18 @@ static const char *sega8_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-image_verify_result sega8_cart_slot_device::verify_cart( uint8_t *magic, int size )
+std::error_condition sega8_cart_slot_device::verify_cart( const uint8_t *magic, int size )
 {
-	image_verify_result retval(image_verify_result::FAIL);
+	std::error_condition retval;
 
 	// Verify the file is a valid image - check $7ff0 for "TMR SEGA"
 	if (size >= 0x8000)
 	{
-		if (!strncmp((char*)&magic[0x7ff0], "TMR SEGA", 8))
-			retval = image_verify_result::PASS;
+		if (strncmp((const char*)&magic[0x7ff0], "TMR SEGA", 8))
+			retval = image_error::INVALIDIMAGE;
 	}
+	else
+		retval = image_error::INVALIDLENGTH;
 
 	return retval;
 }
@@ -388,33 +390,29 @@ void sega8_cart_slot_device::setup_ram()
 	}
 }
 
-image_init_result sega8_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> sega8_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		uint32_t len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-		uint32_t offset = 0;
-		uint8_t *ROM;
 
 		if (m_is_card && len > 0x8000)
-		{
-			seterror(image_error::INVALIDIMAGE, "Attempted loading a card larger than 32KB");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Sega Card images must be no larger than 32K");
 
 		// check for header
+		uint32_t offset = 0;
 		if ((len % 0x4000) == 512)
 		{
 			offset = 512;
 			len -= 512;
 		}
 
-		// make sure that we only get complete (0x4000) rom banks
+		// make sure that we only get complete (0x4000) ROM banks
 		if (len & 0x3fff)
 			len = ((len >> 14) + 1) << 14;
 
 		m_cart->rom_alloc(len);
-		ROM = m_cart->get_rom_base();
+		uint8_t *const ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 		{
@@ -424,8 +422,8 @@ image_init_result sega8_cart_slot_device::call_load()
 		else
 			memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
 
-		/* check the image */
-		if (verify_cart(ROM, len) != image_verify_result::PASS)
+		// check the image
+		if (verify_cart(ROM, len))
 			logerror("Warning loading image: verify_cart failed\n");
 
 		if (loaded_through_softlist())
@@ -453,11 +451,9 @@ image_init_result sega8_cart_slot_device::call_load()
 		//printf("Type: %s\n", sega8_get_slot(type));
 
 		internal_header_logging(ROM + offset, len, m_cart->get_ram_size());
-
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

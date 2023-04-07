@@ -22,6 +22,7 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
+#include "video/sn74s262.h"
 #include "emupal.h"
 
 #define ABC80_HTOTAL    384
@@ -61,6 +62,7 @@
 #define CASSETTE_TAG        "cassette"
 #define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
+#define SN74S263_TAG        "h2"
 
 class abc80_state : public driver_device
 {
@@ -72,14 +74,14 @@ public:
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
 		m_bus(*this, "bus"),
-		m_kb(*this, ABC80_KEYBOARD_TAG),
+		m_kb(*this, KEYBOARD_TAG),
+		m_rocg(*this, SN74S263_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
 		m_palette(*this, "palette"),
 		m_screen(*this, SCREEN_TAG),
 		m_rom(*this, Z80_TAG),
 		m_mmu_rom(*this, "mmu"),
-		m_char_rom(*this, "chargen"),
 		m_hsync_prom(*this, "hsync"),
 		m_vsync_prom(*this, "vsync"),
 		m_line_prom(*this, "line"),
@@ -90,6 +92,7 @@ public:
 		m_tape_in_latch(1)
 	{ }
 
+	void abc80_common(machine_config &config);
 	void abc80(machine_config &config);
 	void abc80_video(machine_config &config);
 
@@ -111,10 +114,13 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data);
+	virtual offs_t get_videoram_addr();
+	virtual u8 read_videoram(offs_t offset) { return m_video_ram[offset]; }
 
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER( vco_voltage_w );
 
@@ -149,13 +155,13 @@ protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
+	required_device<sn74s262_device> m_rocg;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
-	required_memory_region m_char_rom;
 	required_memory_region m_hsync_prom;
 	required_memory_region m_vsync_prom;
 	required_memory_region m_line_prom;
@@ -170,15 +176,15 @@ protected:
 	// video state
 	bitmap_rgb32 m_bitmap;
 	u8 m_latch = 0;
-	int m_blink = 0;
+	bool m_blink = 0;
 	int m_c = 0;
 	int m_r = 0;
-	int m_mode = 0;
+	bool m_mode = 0;
 
 	// cassette state
 	bool m_motor;
-	int m_tape_in;
-	int m_tape_in_latch;
+	bool m_tape_in;
+	bool m_tape_in_latch;
 
 	// timers
 	emu_timer *m_scanline_timer = nullptr;
@@ -188,5 +194,51 @@ protected:
 	emu_timer *m_vsync_off_timer = nullptr;
 	emu_timer *m_keyboard_clear_timer = nullptr;
 };
+
+
+// ======================> tkn80_state
+
+class tkn80_state : public abc80_state
+{
+public:
+	tkn80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc80_state(mconfig, type, tag),
+		m_rom_e(*this, "tkn80"),
+		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
+		m_config(*this, "CONFIG"),
+		m_80(true)
+	{ }
+
+	void tkn80(machine_config &config);
+	void tkn80_video(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_reset() override;
+
+	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
+	virtual offs_t get_videoram_addr() override;
+	virtual u8 read_videoram(offs_t offset) override { return m_char_ram[offset]; };
+
+	void set_screen_params(void);
+
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
+
+	uint8_t in3_r();
+	uint8_t in4_r();
+
+	void tkn80_io(address_map &map);
+
+	required_memory_region m_rom_e;
+	memory_share_creator<uint8_t> m_char_ram;
+	required_ioport m_config;
+
+	bool m_80;
+	offs_t m_rom_offset;
+};
+
+
 
 #endif // MAME_LUXOR_ABC80_H

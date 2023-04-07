@@ -19,25 +19,25 @@ void msx_cart_superloderunner_device::device_start()
 	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(msx_cart_superloderunner_device::bank_w)));
 }
 
-image_init_result msx_cart_superloderunner_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_superloderunner_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_superloderunner_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x20000)
 	{
 		message = "msx_cart_superloderunner_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_rombank->configure_entries(0, 8, cart_rom_region()->base(), 0x4000);
 
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_superloderunner_device::bank_w(u8 data)

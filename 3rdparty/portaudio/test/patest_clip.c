@@ -1,9 +1,9 @@
 /** @file patest_clip.c
-	@ingroup test_src
-	@brief Play a sine wave for several seconds at an amplitude 
-	that would require clipping.
+    @ingroup test_src
+    @brief Play a sine wave for several seconds at an amplitude
+    that would require clipping.
 
-	@author Phil Burk  http://www.softsynth.com
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -33,13 +33,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -132,10 +132,10 @@ int main(void)
     fflush(stdout);
     err = PlaySine( &data, paClipOff, 1.1f );
     if( err < 0 ) goto error;
-    
+
     return 0;
 error:
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return 1;
@@ -149,20 +149,20 @@ PaError PlaySine( paTestData *data, unsigned long flags, float amplitude )
 
     data->left_phase = data->right_phase = 0;
     data->amplitude = amplitude;
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
     outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
-    
+
     err = Pa_OpenStream(
               &stream,
               NULL, /* no input */
@@ -182,7 +182,7 @@ PaError PlaySine( paTestData *data, unsigned long flags, float amplitude )
 
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
-    
+
     Pa_Terminate();
     return paNoError;
 error:

@@ -84,7 +84,7 @@ bool mcd_isa_device::read_sector(bool first)
 		if(m_cdrom_handle->get_track_type(m_cdrom_handle->get_track(lba)) == cdrom_file::CD_TRACK_AUDIO)
 		{
 			m_cdda->stop_audio();
-			m_cdda->set_cdrom(m_cdrom_handle);
+			m_cdda->set_cdrom(get_cdrom_file());
 			m_cdda->start_audio(lba, m_readcount);
 			return true;
 		}

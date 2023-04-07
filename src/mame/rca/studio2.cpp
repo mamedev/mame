@@ -605,26 +605,17 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			uint8_t blocks;
 
 			if (image.length() < 0x200)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Invalid ROM file");
-				return image_init_result::FAIL;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .ST2 ROM file (must be at least 512 bytes)");
 
 			image.fread(&header, 0x100);
 
 			// validate
 			if (strncmp((const char *)header, "RCA2", 4))
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Not an .ST2 file");
-				return image_init_result::FAIL;
-			}
+				return std::make_pair(image_error::INVALIDIMAGE, "Not an .ST2 ROM file (missing header signature)");
 
 			blocks = header[4];
 			if ((blocks < 2) || (blocks > 11))
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Invalid .ST2 file");
-				return image_init_result::FAIL;
-			}
+				return std::make_pair(image_error::INVALIDIMAGE, "Invalid .ST2 ROM file (must be 2 to 11 blocks)");
 
 			if (image.length() != (blocks << 8))
 				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X\n",blocks<<8,image.length());
@@ -655,12 +646,9 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 		{
 			size = image.length();
 			if (size > 0x400)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-				return image_init_result::FAIL;
-			}
-			else
-				image.fread(m_cart->get_rom_base(), size);
+				return std::make_pair(image_error::INVALIDIMAGE, "Unsupported cartridge size (must be not more than 1K)");
+
+			image.fread(m_cart->get_rom_base(), size);
 		}
 	}
 	else
@@ -675,7 +663,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

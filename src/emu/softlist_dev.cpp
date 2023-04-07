@@ -50,9 +50,9 @@ image_software_list_loader image_software_list_loader::s_instance;
 //  false_software_list_loader::load_software
 //-------------------------------------------------
 
-bool false_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
+std::error_condition false_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
-	return false;
+	return image_error::UNSUPPORTED;
 }
 
 
@@ -60,10 +60,10 @@ bool false_software_list_loader::load_software(device_image_interface &image, so
 //  rom_software_list_loader::load_software
 //-------------------------------------------------
 
-bool rom_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
+std::error_condition rom_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
 	swlist.machine().rom_load().load_software_part_region(image.device(), swlist, swname, start_entry);
-	return true;
+	return std::error_condition();
 }
 
 
@@ -71,7 +71,7 @@ bool rom_software_list_loader::load_software(device_image_interface &image, soft
 //  image_software_list_loader::load_software
 //-------------------------------------------------
 
-bool image_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
+std::error_condition image_software_list_loader::load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const
 {
 	return image.load_software(swlist, swname, start_entry);
 }

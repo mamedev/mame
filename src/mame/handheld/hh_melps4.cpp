@@ -182,7 +182,7 @@ u16 cfrogger_state::input_r()
 	return (m_inputs[2]->read() & 8) | (read_inputs(2) & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cfrogger )
 	PORT_START("IN.0") // F0 port K0,K1
@@ -201,6 +201,8 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void cfrogger_state::cfrogger(machine_config &config)
 {
@@ -307,7 +309,7 @@ u16 gjungler_state::input_r()
 	return (m_inputs[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gjungler )
 	PORT_START("IN.0") // G0 port K0,K1
@@ -327,6 +329,8 @@ static INPUT_PORTS_START( gjungler )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void gjungler_state::gjungler(machine_config &config)
 {

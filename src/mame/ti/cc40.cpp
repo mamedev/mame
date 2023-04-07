@@ -191,19 +191,16 @@ private:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
-	if (size > 0x20000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
-	}
+	if (size > 0x2'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid file size (must be no more than 128K)");
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x2'0000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -415,7 +412,7 @@ void cc40_state::cc40_map(address_map &map)
 	map(0x0111, 0x0111).rw(FUNC(cc40_state::power_r), FUNC(cc40_state::power_w));
 	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
 	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
-	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
+	map(0x0114, 0x0114).noprw(); // d1: Hexbus handshake
 	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w));
 	map(0x0116, 0x0116).portr("BATTERY");
 	map(0x0119, 0x0119).rw(FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));

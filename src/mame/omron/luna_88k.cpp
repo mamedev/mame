@@ -5,13 +5,14 @@
  * Omron Luna 88K and 88K² systems.
  *
  * Sources:
+ *  - Tetsuya Isaki's nono Luna emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *  - OpenBSD source code
- *  - Tetsuya Isaki's nono LUNA emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *
  * TODO:
  *  - scsi controller
  *  - xp i/o controller
  *  - lance memory
+ *  - crt controller
  *  - slotify graphics
  *  - expansion slots
  *  - abort/power switches
@@ -19,7 +20,6 @@
  *
  * WIP:
  *  - scsi probe/boot hangs
- *  - doesn't boot to graphics
  */
 
 /*
@@ -73,6 +73,8 @@
 
 #include "emu.h"
 
+#include "luna_kbd.h"
+
 #include "cpu/m88000/m88000.h"
 #include "cpu/z180/hd647180x.h"
 
@@ -80,18 +82,18 @@
 #include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/mc146818.h"
 #include "machine/mc88200.h"
+#include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/z80sio.h"
 #include "video/bt45x.h"
 #include "video/hd44780.h"
 
 // busses and connectors
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -116,17 +118,19 @@ public:
 		, m_sio(*this, "sio")
 		, m_pio(*this, "pio%u", 0U)
 		, m_serial(*this, "serial%u", 0U)
-		, m_spc(*this, "spc%u", 0U)
+		, m_spc(*this, "scsi%u:7:spc", 0U)
 		, m_net(*this, "net%u", 0U)
+		, m_fzrom(*this, "fzrom")
 		, m_ramdac(*this, "ramdac")
 		, m_vram(*this, "vram", 0x20'0000, ENDIANNESS_BIG)
 		, m_lcdc(*this, "lcdc")
 		, m_eprom(*this, "eprom")
-		, m_iop_ram(*this, "iop_ram")
+		, m_3port_ram(*this, "3port_ram")
 		, m_boot(*this, "boot")
 		, m_sw(*this, "SW%u", 1U)
 		, m_irq_state(false)
 		, m_irq_active{}
+		, m_nram(nullptr)
 	{
 	}
 
@@ -161,6 +165,9 @@ private:
 
 	void irq_check();
 
+	u16 net_r(offs_t offset) { return m_nram[offset >> 1]; }
+	void net_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_nram[offset >> 1]); }
+
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_cmmu;
 	required_device<ram_device> m_ram;
@@ -171,13 +178,14 @@ private:
 	required_device_array<rs232_port_device, 2> m_serial;
 	required_device_array<mb89352_device, 2> m_spc;
 	required_device_array<am7990_device, 2> m_net;
+	required_region_ptr<u8> m_fzrom;
 
 	required_device<bt458_device> m_ramdac;
 	memory_share_creator<u32> m_vram;
 	required_device<ks0066_f00_device> m_lcdc;
 
 	required_region_ptr<u32> m_eprom;
-	required_shared_ptr<u8> m_iop_ram;
+	required_shared_ptr<u32> m_3port_ram;
 	memory_view m_boot;
 
 	required_ioport_array<2> m_sw;
@@ -191,6 +199,9 @@ private:
 	bool m_irq_state;
 	u8 m_irq_active[4];
 	u8 m_irq_mask[4];
+
+	util::endian_cast<u32, u16, util::endianness::big> m_nram;
+	u8 m_fzrom_addr;
 };
 
 void luna_88k_state::init()
@@ -210,6 +221,7 @@ void luna_88k_state::init()
 
 void luna_88k_state::machine_start()
 {
+	m_nram = util::big_endian_cast<u16>(m_3port_ram.target());
 }
 
 void luna_88k_state::machine_reset()
@@ -250,7 +262,7 @@ void luna_88k_state::cpu_map(address_map &map)
 	map(0x4900'0000, 0x4900'000f).rw(m_pio[0], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff000000);
 	map(0x4d00'0000, 0x4d00'000f).rw(m_pio[1], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff000000);
 	map(0x5100'0000, 0x5100'000f).rw(m_sio, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask32(0xff000000);
-	// 0x6100'0000 tas register
+	//map(0x6100'0000, 0x6100'0003); // tas register
 	map(0x6300'0000, 0x6300'0003).nopr(); // power switch?
 	map(0x6300'0000, 0x6300'000f).lw32([this](offs_t offset, u32 data) { irq(offset, 6, 0); }, "sysclk_clr");
 	map(0x6500'0000, 0x6500'000f).rw(FUNC(luna_88k_state::irq_ctl_r), FUNC(luna_88k_state::irq_ctl_w));
@@ -260,16 +272,15 @@ void luna_88k_state::cpu_map(address_map &map)
 	map(0x6b00'0000, 0x6b00'000f).lr32([this](offs_t offset) { irq(offset, 1, 0); return 0xffffffff; }, "softint_clr");
 	// 0x6d00'0000 reset cpu 0-3, all
 
-	// 3 port ram
-	map(0x7100'0000, 0x7100'ffff).lrw8(
-		[this](offs_t offset) { return m_iop_ram[offset]; }, "iop_ram_r",
-		[this](offs_t offset, u8 data) { m_iop_ram[offset] = data; }, "iop_ram_w");
-	map(0x7101'0000, 0x7101'ffff).ram().share("net");
+	map(0x7100'0000, 0x7101'ffff).ram().share("3port_ram");
 
 	// 0x8100'0000 ext board A
 	// 0x8300'0000 ext board B
 	// 0x9000'0000 pc-98 ext board
 	// 0x9100'0000 pc-9801 irq 4
+	//map(0x8000'0000, 0x9fff'ffff).noprw();
+	map(0x8000'0000, 0x9fff'ffff).lr32([this]() { m_cmmu[1]->bus_error_w(1); return 0; }, "bus_error");
+
 	// 0xa100'0000 mask rom 0x400000
 
 	//map(0xb100'0000, 0xb100'ffff); // rfcnt (pad,vert_loc,pad,horiz_loc)
@@ -300,20 +311,40 @@ void luna_88k_state::cpu_map(address_map &map)
 	// 0xd100'0000 crtc-ii
 	// 0xd180'0000 bitmap board identify rom
 
-	map(0xe100'0000, 0xe100'003f).rw(m_spc[0], FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0xff000000);
-	map(0xe100'0040, 0xe100'007f).rw(m_spc[1], FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask32(0xff000000);
+	map(0xe100'0000, 0xe100'003f).m(m_spc[0], FUNC(mb89352_device::map)).umask32(0xff000000);
+	map(0xe100'0040, 0xe100'007f).m(m_spc[1], FUNC(mb89352_device::map)).umask32(0xff000000);
+
 	map(0xf100'0000, 0xf100'0007).rw(m_net[0], FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff0000);
+
+	map(0xf100'0008, 0xf100'0009).lrw16(
+		[this]()
+		{
+			u8 const data = m_fzrom[m_fzrom_addr >> 1];
+
+			return BIT(m_fzrom_addr, 0) ? BIT(data, 0, 4) : BIT(data, 4, 4);
+		}, "fzrom_r",
+		[this](u16 data) { m_fzrom_addr = data; }, "fzrom_w");
 	map(0xf100'0010, 0xf100'0017).rw(m_net[1], FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff0000);
 }
 
 void luna_88k_state::iop_map_mem(address_map &map)
 {
-	map(0x0'0000, 0x0'ffff).ram().share("iop_ram");
+	//map(0x0'0000, 0x0'ffff).ram().share("iop_ram");
 }
 
 void luna_88k_state::iop_map_pio(address_map &map)
 {
 	map(0x0049, 0x0049).nopr();
+}
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", LUNA_KEYBOARD);
 }
 
 void luna_88k_state::luna88k2(machine_config &config)
@@ -345,7 +376,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_sio->out_int_callback().set(&luna_88k_state::irq<0, 5>, "irq0,5");
 
 	// RS-232C-A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_sio->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
@@ -353,7 +384,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_serial[0]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsa_w));
 
 	// keyboard/mouse
-	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
+	RS232_PORT(config, m_serial[1], keyboard_devices, "keyboard");
 	m_sio->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
@@ -420,31 +451,55 @@ void luna_88k_state::luna88k2(machine_config &config)
 	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_f00_device::rs_w)).bit(6);
 	m_pio[1]->out_pc_callback().append(m_lcdc, FUNC(ks0066_f00_device::e_w)).bit(7);
 
-	scsi_port_device &scsi0(SCSI_PORT(config, "scsi0"));
-	scsi0.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-
-	SCSI_PORT(config, "scsi1");
-
 	input_merger_any_high_device &spc_irq(INPUT_MERGER_ANY_HIGH(config, "spc_irq"));
 	spc_irq.output_handler().set(&luna_88k_state::irq<0, 3>, "irq0,3");
 
-	MB89352A(config, m_spc[0], 0);
-	m_spc[0]->irq_cb().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
-	m_spc[0]->drq_cb().set(spc_irq, FUNC(input_merger_any_high_device::in_w<2>));
-	m_spc[0]->set_scsi_port("scsi0");
+	NSCSI_BUS(config, "scsi0");
+	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spc", MB89352).machine_config(
+		[&spc_irq](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-	MB89352A(config, m_spc[1], 0);
-	m_spc[0]->irq_cb().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
-	m_spc[1]->set_scsi_port("scsi1");
+			spc.set_clock(8_MHz_XTAL);
+			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
+		});
 
-	input_merger_any_high_device &net_irq(INPUT_MERGER_ANY_HIGH(config, "net_irq"));
+	NSCSI_BUS(config, "scsi1");
+	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spc", MB89352).machine_config(
+		[&spc_irq](device_t *device)
+		{
+			mb89352_device &spc = downcast<mb89352_device &>(*device);
+
+			spc.set_clock(8_MHz_XTAL);
+			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
+		});
+
+	input_merger_any_low_device &net_irq(INPUT_MERGER_ANY_LOW(config, "net_irq"));
 	net_irq.output_handler().set(&luna_88k_state::irq<0, 4>, "irq0,4");
 
 	AM7990(config, m_net[0], 40_MHz_XTAL / 4);
-	m_net[0]->intr_out().set(net_irq, FUNC(input_merger_any_high_device::in_w<0>));
+	m_net[0]->intr_out().set(net_irq, FUNC(input_merger_any_low_device::in_w<0>));
+	m_net[0]->dma_in().set(FUNC(luna_88k_state::net_r));
+	m_net[0]->dma_out().set(FUNC(luna_88k_state::net_w));
 
 	AM7990(config, m_net[1], 40_MHz_XTAL / 4);
-	m_net[1]->intr_out().set(net_irq, FUNC(input_merger_any_high_device::in_w<1>));
+	m_net[1]->intr_out().set(net_irq, FUNC(input_merger_any_low_device::in_w<1>));
+	m_net[1]->dma_in().set(FUNC(luna_88k_state::net_r));
+	m_net[1]->dma_out().set(FUNC(luna_88k_state::net_w));
 
 	// TODO: crt timing control by HD6445CP4
 	screen_device &crt(SCREEN(config, "crt", SCREEN_TYPE_RASTER));
@@ -471,16 +526,17 @@ u32 luna_88k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	{
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
 		{
-			u32 const plane0 = m_vram[0 * 0x1'0000 + (x >> 5)];
-			u32 const plane1 = m_vram[1 * 0x1'0000 + (x >> 5)];
-			u32 const plane2 = m_vram[2 * 0x1'0000 + (x >> 5)];
-			u32 const plane3 = m_vram[3 * 0x1'0000 + (x >> 5)];
-			u32 const plane4 = m_vram[4 * 0x1'0000 + (x >> 5)];
-			u32 const plane5 = m_vram[5 * 0x1'0000 + (x >> 5)];
-			u32 const plane6 = m_vram[6 * 0x1'0000 + (x >> 5)];
-			u32 const plane7 = m_vram[7 * 0x1'0000 + (x >> 5)];
+			unsigned const offset = (y * 64) + (x >> 5);
 
-			// TODO: verify pixel order
+			u32 const plane0 = m_vram[0 * 0x1'0000 + offset];
+			u32 const plane1 = m_vram[1 * 0x1'0000 + offset];
+			u32 const plane2 = m_vram[2 * 0x1'0000 + offset];
+			u32 const plane3 = m_vram[3 * 0x1'0000 + offset];
+			u32 const plane4 = m_vram[4 * 0x1'0000 + offset];
+			u32 const plane5 = m_vram[5 * 0x1'0000 + offset];
+			u32 const plane6 = m_vram[6 * 0x1'0000 + offset];
+			u32 const plane7 = m_vram[7 * 0x1'0000 + offset];
+
 			for (unsigned p = 0; p < 32; p++)
 			{
 				u8 const index
@@ -627,7 +683,7 @@ static INPUT_PORTS_START(luna88k)
 	PORT_DIPNAME(0x80, 0x00, "Start") PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(0x00, "Autoboot")
 	PORT_DIPSETTING(0x80, "Monitor")
-	PORT_DIPNAME(0x40, 0x00, "Console") PORT_DIPLOCATION("SW1:!2")
+	PORT_DIPNAME(0x40, 0x40, "Console") PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(0x00, "Serial")
 	PORT_DIPSETTING(0x40, "Graphics")
 	PORT_DIPNAME(0x20, 0x00, "SW1#3") PORT_DIPLOCATION("SW1:!3")
@@ -645,7 +701,7 @@ static INPUT_PORTS_START(luna88k)
 	PORT_DIPNAME(0x02, 0x00, "SW1#7") PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x02, DEF_STR(On))
-	PORT_DIPNAME(0x01, 0x00, "Mode") PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME(0x01, 0x01, "Mode") PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(0x00, "Diagnostic")
 	PORT_DIPSETTING(0x01, "Normal")
 
@@ -685,15 +741,41 @@ ROM_START(luna88k2)
 	ROM_LOAD32_WORD_SWAP("7187__high__1.37.bin", 0x00000, 0x20000, CRC(a7515231) SHA1(86b3e42a8df6fa33cf68f372f4053b240c8cc4e2)) // HN27C1024HCC-85
 	ROM_LOAD32_WORD_SWAP("7187__low__1.37.bin",  0x00002, 0x20000, CRC(8e65ea4a) SHA1(288300c71c0e92f114cb84fa293a4839d2e181a6)) // HN27C1024HCC-85
 
-	// FIXME: this holds an actual machine serial number
+	/*
+	 * This PROM contains machine and board revision identifiers stored in the
+	 * top 4 bits of each byte. The low 4 bits read back (from software) as 0x7
+	 * or 0xf reflecting the parity of the data bits or some other side-effect.
+	 * The content decodes to two nul-terminated ASCII strings and a checkum:
+	 *
+	 *   MNAME=LUNA88K+
+	 *   BDVER=A
+	 */
 	ROM_REGION32_BE(0x400, "fuserom", ROMREGION_ERASEFF)
-	ROM_LOAD32_BYTE("fuserom.bin", 0x000, 0x100, CRC(780e4617) SHA1(f939cad237b3b4317cf6093e9b56661cdf60455e))
+	ROM_LOAD32_BYTE("sn82s129n.bin", 0x000, 0x100, CRC(780e4617) SHA1(f939cad237b3b4317cf6093e9b56661cdf60455e))
 
 	ROM_REGION(0x4000, "iop", 0)
 	ROM_LOAD("hd647180x.ic13", 0x0000, 0x4000, NO_DUMP) // HD647180X0FS6
+
+	/*
+	 * This PROM is installed on the network card and holds the MAC identifiers
+	 * for up to two channels. Each identifier is encoded as ASCII characters
+	 * in the following form:
+	 *
+	 *   ETHERx00000Ayyyyyyzz
+	 *
+	 * Where:
+	 *   x is a channel number ('0' or '1')
+	 *   y is the station number portion of the MAC
+	 *   z is the cumulative XOR of the preceding even/odd bytes
+	 *
+	 * This hash matches content hand-crafted to assign ficticious station
+	 * addresses to two channels.
+	 */
+	ROM_REGION(0x80, "fzrom", 0)
+	ROM_LOAD("82s129.ic18", 0x00, 0x80, CRC(ff83b526) SHA1(0f583efcfe1955edcff7fbb8d1e36328848aac1f))
 ROM_END
 
 } // anonymous namespace
 
 /*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME     FLAGS */
-COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", "Luna 88K²", MACHINE_IS_SKELETON)
+COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", "Luna 88K²", MACHINE_NOT_WORKING)

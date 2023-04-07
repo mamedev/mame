@@ -747,19 +747,19 @@ void lua_engine::initialize_render(sol::table &emu)
 				&layout_view::set_prepare_items_callback,
 				nullptr,
 				"set_prepare_items_callback",
-				nullptr);
+				"prepare items");
 	layout_view_type["set_preload_callback"] =
 		make_simple_callback_setter<void>(
 				&layout_view::set_preload_callback,
 				nullptr,
 				"set_preload_callback",
-				nullptr);
+				"preload");
 	layout_view_type["set_recomputed_callback"] =
 		make_simple_callback_setter<void>(
 				&layout_view::set_recomputed_callback,
 				nullptr,
 				"set_recomputed_callback",
-				nullptr);
+				"recomputed");
 	layout_view_type["items"] = sol::property([] (layout_view &v) { return layout_view_items(v); });
 	layout_view_type["name"] = sol::property(&layout_view::name);
 	layout_view_type["unqualified_name"] = sol::property(&layout_view::unqualified_name);
@@ -857,7 +857,7 @@ void lua_engine::initialize_render(sol::table &emu)
 				&layout_file::set_resolve_tags_callback,
 				nullptr,
 				"set_resolve_tags_callback",
-				nullptr);
+				"resolve tags");
 	layout_file_type["device"] = sol::property(&layout_file::device);
 	layout_file_type["views"] = sol::property([] (layout_file &f) { return layout_file_views(f); });
 

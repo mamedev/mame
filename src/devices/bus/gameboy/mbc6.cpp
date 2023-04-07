@@ -78,7 +78,7 @@ public:
 
 	mbc6_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 	virtual void unload() override ATTR_COLD;
 
 protected:
@@ -137,12 +137,12 @@ mbc6_device::mbc6_device(
 }
 
 
-image_init_result mbc6_device::load(std::string &message)
+std::error_condition mbc6_device::load(std::string &message)
 {
 	// first check that ROM/RAM regions are supportable
 	set_bank_bits_rom(7);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// install views for ROM/flash and RAM
 	cart_space()->install_view(0x4000, 0x5fff, m_view_rom_low);
@@ -187,7 +187,7 @@ image_init_result mbc6_device::load(std::string &message)
 			write8sm_delegate(*this, FUNC(mbc6_device::write_flash<1>)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

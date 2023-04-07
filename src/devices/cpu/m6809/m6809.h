@@ -279,6 +279,7 @@ private:
 	// other state
 	uint32_t                      m_state;
 	bool                        m_cond;
+	bool                        m_free_run;
 
 	// incidentals
 	int                         m_clock_divider;

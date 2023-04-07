@@ -69,7 +69,7 @@ class gbck003_device : public flat_ram_device_base<mbc_dual_uniform_device_base>
 public:
 	gbck003_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -113,12 +113,12 @@ gbck003_device::gbck003_device(
 }
 
 
-image_init_result gbck003_device::load(std::string &message)
+std::error_condition gbck003_device::load(std::string &message)
 {
 	// set up ROM/RAM
 	set_bank_bits_rom(9);
 	if (!check_rom(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	install_rom();
 	install_ram();
 
@@ -141,7 +141,7 @@ image_init_result gbck003_device::load(std::string &message)
 	set_bank_rom_high(1);
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

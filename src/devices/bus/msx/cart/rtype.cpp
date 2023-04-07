@@ -13,18 +13,18 @@ msx_cart_rtype_device::msx_cart_rtype_device(const machine_config &mconfig, cons
 {
 }
 
-image_init_result msx_cart_rtype_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_rtype_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_rtype_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x80000 && cart_rom_region()->bytes() != 0x60000)
 	{
 		message = "msx_cart_rtype_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_rombank->configure_entries(0, 24, cart_rom_region()->base(), 0x4000);
@@ -33,7 +33,7 @@ image_init_result msx_cart_rtype_device::initialize_cartridge(std::string &messa
 	page(1)->install_write_handler(0x7000, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_rtype_device::bank_w)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_rtype_device::bank_w(u8 data)

@@ -24,7 +24,7 @@ license:CC0-1.0
 	*eM9    - evio Selection 03               (translucent red)
 	*eM10   - Anime Special - Pocket Monsters (yellow)
 	 eM11   - Anime Mix 2
-	 eM12   - I Love Classic 2
+	*eM12   - I Love Classic 2                (brown)
 	 eM13   - Concerto Selection
 	 eM14   - Disney Special 1
 	*eM15   - evio Selection 04               (translucent red)
@@ -162,6 +162,19 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="evio_em10.bin" size="0x080000" crc="573d49ef" sha1="e2d528a2aa149d8ccbadf0c75ed5f75ca0e6bf9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="em12" supported="no">
+		<description>I Love Classic 2</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アイラブクラッシク2"/>
+		<info name="serial" value="eM12"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em12.bin" size="0x080000" crc="b8e2f986" sha1="62a341fd775a27317f6bf1630d55c15db262ab60"/>
 			</dataarea>
 		</part>
 	</software>

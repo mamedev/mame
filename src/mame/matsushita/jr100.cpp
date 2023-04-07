@@ -341,19 +341,19 @@ QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xffff)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	read_ = image.fread(buf, quick_length);
 	if (read_ != quick_length)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	if (buf[0]!=0x50 || buf[1]!=0x52 || buf[2]!=0x4F || buf[3]!=0x47)
 		// this is not PRG
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	int pos = 4;
 	if (readByLittleEndian(buf,pos)!=1)
 		// not version 1 of PRG file
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	pos += 4;
 	uint32_t len =readByLittleEndian(buf,pos); pos+= 4;
@@ -380,7 +380,7 @@ QUICKLOAD_LOAD_MEMBER(jr100_state::quickload_cb)
 		m_ram[13] = ((end_address + 3) & 0xFF);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void jr100_state::jr100(machine_config &config)

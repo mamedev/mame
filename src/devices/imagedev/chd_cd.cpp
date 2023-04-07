@@ -27,11 +27,11 @@ cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char
 }
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type,  tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		m_cdrom_handle(nullptr),
-		m_extension_list(nullptr),
-		m_interface(nullptr)
+	: device_t(mconfig, type,  tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, m_cdrom_handle()
+	, m_extension_list(nullptr)
+	, m_interface(nullptr)
 {
 }
 //-------------------------------------------------
@@ -62,32 +62,26 @@ void cdrom_image_device::device_config_complete()
 void cdrom_image_device::device_start()
 {
 	// try to locate the CHD from a DISK_REGION
-	chd_file *chd = machine().rom_load().get_disk_handle(owner()->tag() );
-	if( chd != nullptr )
-	{
-		m_cdrom_handle = new cdrom_file( chd );
-	}
+	chd_file *chd = machine().rom_load().get_disk_handle(owner()->tag());
+	if (chd)
+		m_cdrom_handle.reset(new cdrom_file(chd));
 	else
-	{
-		m_cdrom_handle = nullptr;
-	}
+		m_cdrom_handle.reset();
 }
 
 void cdrom_image_device::device_stop()
 {
-	if (m_cdrom_handle)
-		delete m_cdrom_handle;
-	if( m_self_chd.opened() )
+	m_cdrom_handle.reset();
+	if (m_self_chd.opened())
 		m_self_chd.close();
 }
 
-image_init_result cdrom_image_device::call_load()
+std::pair<std::error_condition, std::string> cdrom_image_device::call_load()
 {
 	std::error_condition err;
 	chd_file *chd = nullptr;
 
-	if (m_cdrom_handle)
-		delete m_cdrom_handle;
+	m_cdrom_handle.reset();
 
 	if (!loaded_through_softlist()) {
 		if (is_filetype("chd") && is_loaded()) {
@@ -103,30 +97,27 @@ image_init_result cdrom_image_device::call_load()
 		chd = device().machine().rom_load().get_disk_handle(device().subtag("cdrom").c_str());
 	}
 
-	/* open the CHD file */
-	if (chd) {
-		m_cdrom_handle = new cdrom_file(chd);
-	} else {
-		m_cdrom_handle = new cdrom_file(filename());
-	}
+	// open the CHD file
+	if (chd)
+		m_cdrom_handle.reset(new cdrom_file(chd));
+	else
+		m_cdrom_handle.reset(new cdrom_file(filename()));
+
 	if (!m_cdrom_handle)
 		goto error;
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 
 error:
 	if (chd && chd == &m_self_chd)
 		m_self_chd.close();
-	if (err)
-		seterror(err, nullptr);
-	return image_init_result::FAIL;
+	return std::make_pair(err ? err : image_error::UNSPECIFIED, std::string());
 }
 
 void cdrom_image_device::call_unload()
 {
 	assert(m_cdrom_handle);
-	delete m_cdrom_handle;
-	m_cdrom_handle = nullptr;
-	if( m_self_chd.opened() )
+	m_cdrom_handle.reset();
+	if (m_self_chd.opened())
 		m_self_chd.close();
 }

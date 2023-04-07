@@ -19,16 +19,16 @@ class hp9845_optrom_device : public device_t,
 							 public device_rom_image_interface
 {
 public:
-		// construction/destruction
+	// construction/destruction
 	hp9845_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp9845_optrom_device();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_rom_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }

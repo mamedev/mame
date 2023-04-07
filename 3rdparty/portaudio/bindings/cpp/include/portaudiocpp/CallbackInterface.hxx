@@ -9,34 +9,34 @@
 
 namespace portaudio
 {
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
-	//////
-	/// @brief Interface for an object that's callable as a PortAudioCpp callback object (ie that implements the 
-	/// paCallbackFun method).
-	//////
-	class CallbackInterface
-	{
-	public:
-		virtual ~CallbackInterface() {}
+    //////
+    /// @brief Interface for an object that's callable as a PortAudioCpp callback object (ie that implements the
+    /// paCallbackFun method).
+    //////
+    class CallbackInterface
+    {
+    public:
+        virtual ~CallbackInterface() {}
 
-		virtual int paCallbackFun(const void *inputBuffer, void *outputBuffer, unsigned long numFrames, 
-			const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags) = 0;
-	};
+        virtual int paCallbackFun(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
+            const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags) = 0;
+    };
 
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
-	namespace impl
-	{
-		extern "C"
-		{
-			int callbackInterfaceToPaCallbackAdapter(const void *inputBuffer, void *outputBuffer, unsigned long numFrames, 
-				const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, 
-				void *userData);
-		} // extern "C"
-	}
+    namespace impl
+    {
+        extern "C"
+        {
+            int callbackInterfaceToPaCallbackAdapter(const void *inputBuffer, void *outputBuffer, unsigned long numFrames,
+                const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
+                void *userData);
+        } // extern "C"
+    }
 
-	// -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
 
 } // namespace portaudio
 

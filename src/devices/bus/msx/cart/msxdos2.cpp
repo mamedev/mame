@@ -35,7 +35,7 @@ protected:
 
 	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 	void bank_w(u8 data);
 
@@ -50,36 +50,36 @@ void msx_cart_msxdos2_base_device::device_reset()
 	m_rombank->set_entry(0);
 }
 
-image_init_result msx_cart_msxdos2_base_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_msxdos2_base_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_msxdos2: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x10000)
 	{
 		message = "msx_cart_msxdos2: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	const char *bank_address_str = get_feature("bank_address");
 	if (!bank_address_str)
 	{
 		message = "msx_cart_msxdos2: Feature 'bank_address' was not found.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 	m_bank_address = strtol(bank_address_str, nullptr, 0);
 	if (m_bank_address < 0x4000 || m_bank_address > 0x7fff)
 	{
 		message = "msx_cart_msxdos2: bank_address must be between 0x4000 and 0x7fff.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), PAGE_SIZE);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_msxdos2_base_device::bank_w(u8 data)
@@ -103,7 +103,7 @@ public:
 		, m_bank_mask(0)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;
@@ -129,17 +129,17 @@ void msx_cart_msxdos2j_device::device_start()
 	save_item(NAME(m_secondary_slot));
 }
 
-image_init_result msx_cart_msxdos2j_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = msx_cart_msxdos2_base_device::initialize_cartridge(message);
-	if (result != image_init_result::PASS)
+	std::error_condition result = msx_cart_msxdos2_base_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	u32 ram_size = cart_ram_region() ? cart_ram_region()->bytes() : 0;
 	if (ram_size > 256 * PAGE_SIZE || (ram_size & (PAGE_SIZE - 1)) != 0)
 	{
 		message = "msx_cart_msxdos2: Region 'ram' size must be a multiple of 0x4000 and at most 0x400000.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	page(0)->install_view(0x0000, 0x3fff, m_view_page0);
@@ -187,7 +187,7 @@ image_init_result msx_cart_msxdos2j_device::initialize_cartridge(std::string &me
 		io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ this->mm_bank_w<3>(data); });
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u8 msx_cart_msxdos2j_device::secondary_slot_r()
@@ -219,19 +219,19 @@ public:
 		: msx_cart_msxdos2_base_device(mconfig, MSX_CART_MSXDOS2E, tag, owner, clock)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 };
 
-image_init_result msx_cart_msxdos2e_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_msxdos2e_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = msx_cart_msxdos2_base_device::initialize_cartridge(message);
-	if (result != image_init_result::PASS)
+	std::error_condition result = msx_cart_msxdos2_base_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank);
 	page(1)->install_write_handler(m_bank_address, m_bank_address, write8smo_delegate(*this, FUNC(msx_cart_msxdos2e_device::bank_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 } // anonymous namespace

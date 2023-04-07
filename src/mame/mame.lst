@@ -1824,7 +1824,7 @@ klaxj4                          // 136075           (c) 1989 (Japan)
 
 @source:atari/liberatr.cpp
 liberatr                        // 136012           (c) 1982
-liberatr2                       // 136012           (c) 1982
+liberatrp                       // 136012           (c) 1982
 
 @source:atari/lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -18345,6 +18345,7 @@ streakng                        // [1980] Shoei
 streaknga                       // [1980] Shoei
 strfbomb                        // bootleg
 superbon                        // bootleg
+superbona                       // bootleg
 superg                          // hack
 supergs                         // Silver Systems hack
 supergx                         // [1980] Nichibutsu
@@ -18897,6 +18898,7 @@ h2hhockey                       // Coleco
 horseran                        // Mattel
 lilprof                         // Texas Instruments
 lilprofa                        // Texas Instruments
+litelrn                         // Concept 2000
 liveafb                         // Kenner
 lostreas                        // Parker Bros
 matchnum                        // A-One LSI
@@ -18944,16 +18946,20 @@ ti1250                          // Texas Instruments
 ti1250a                         // Texas Instruments
 ti1270                          // Texas Instruments
 ti1680                          // Texas Instruments
+ti25502                         // Texas Instruments
 ti25503                         // Texas Instruments
 ti30                            // Texas Instruments
 ti5100                          // Texas Instruments
+ti5200                          // Texas Instruments
 tibusan                         // Texas Instruments
 timaze                          // Texas Instruments
 tiprog                          // Texas Instruments
 tisr16                          // Texas Instruments
 tisr16ii                        // Texas Instruments
 tithermos                       // Texas Instruments
+vclock3                         // Tandy Corporation
 wizatron                        // Texas Instruments
+wtalker                         // Technasonic
 xl25                            // Vulcan
 zodiac                          // Coleco
 
@@ -19011,33 +19017,6 @@ talkingfb
 
 @source:handheld/teammate.cpp
 teammate
-
-@source:handheld/tispeak.cpp
-lanteach                        //
-lantrans                        //
-lantransp                       //
-snmath                          //
-snmatha                         //
-snmathp                         //
-snread                          //
-snspell                         //
-snspellc                        //
-snspellca                       //
-snspellfr                       //
-snspellit                       //
-snspelljp                       //
-snspellp                        //
-snspellsp                       //
-snspellua                       //
-snspellub                       //
-snspelluk                       //
-snspelluka                      //
-snwrite                         //
-tntell                          //
-tntellfr                        //
-tntellp                         //
-tntelluk                        //
-vocaid                          //
 
 @source:handheld/wildfire.cpp
 wildfire                        // Parker Bros
@@ -20820,6 +20799,7 @@ gallopm72                       // (c) 1991 (Japan)
 hharry                          // (c) 1990 (World)
 hharryu                         // (c) 1990 Irem America (US)
 hharryb                         // bootleg
+hharryb2                        // bootleg
 imgfight                        // (c) 1988 (World)
 imgfightj                       // (c) 1988 (Japan)
 imgfightjb                      // bootleg
@@ -24395,7 +24375,7 @@ tandy102                        //
 tandy200                        //
 trsm100                         //
 
-@source:leapfrog/leapfrog_iquest.cpp
+@source:leapfrog/iquest.cpp
 iquest
 ttwistfb
 ttwistbq
@@ -24404,19 +24384,19 @@ ttwistsp
 ttwistvc
 turboex
 
-@source:leapfrog/leapfrog_leappad.cpp
+@source:leapfrog/leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
 mfleappad                       // (c) 2002 LeapFrog
 ltleappad                       // (c) 2005 LeapFrog
-
-@source:leapfrog/leapfrog_leapster_explorer.cpp
-leapexpr
 
 @source:leapfrog/leapster.cpp
 leapster                        //
 leapster2                       //
 leapsterlmx                     //
 leapstertv                      //
+
+@source:leapfrog/leapster_explorer.cpp
+leapexpr
 
 @source:learsiegler/adm11.cpp
 adm12                           //
@@ -24438,6 +24418,7 @@ octopus                         //
 
 @source:luxor/abc80.cpp
 abc80                           //
+tkn80                           //
 
 @source:luxor/abc80x.cpp
 abc800c                         //
@@ -28025,6 +28006,8 @@ draw88pkr                       // 1988, BTE, Inc.
 amhbattl
 docchift
 mmhammer
+shpchamp
+zenponta
 
 @source:misc/anes.cpp
 sanma                           // 2001, ANES
@@ -32411,20 +32394,21 @@ valkyrie                        // (c) 1989 (Japan)
 
 @source:namco/namcos10.cpp
 chocovdr                        // 2002.10 Uchuu Daisakusen : Chocovader Contactee
+g13jnc                          // 2001.?? Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
 gamsharaj                       // 2002.08 Gamshara (10021 Ver.A)
 gegemdb                         // 2007.?? Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A)
 gjspace                         // 2001.12 Gekitoride-Jong Space (10011 Ver.A)
-g13jnc                          // 2001.?? Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
-keroro                          // 2006.?? Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
 kd2001                          // 2001.1? Knock Down 2001 (KD11 Ver.B)
+keroro                          // 2006.?? Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
-konotako                        // 2003.?? Kono Tako (10021 Ver.A)
-mrdrilr2                        // 2000.07 Mr Driller 2 (DR21 Ver.A)
+konotako                        // 2003.?? Kono e Tako (10021 Ver.A)
+mrdrilr2                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
+mrdrilr2j                       // 2000.07 Mr Driller 2 (DR21 Ver.A)
+mrdrilr2u                       // 2000.?? Mr Driller 2 (DR23 Ver.A)
 mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
 mrdrilrga                       // 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
-mrdrlr2a                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
 pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
@@ -32696,6 +32680,9 @@ skykids                         // (c) 1985
 
 @source:namco/sweetland.cpp
 sweetlnd                        //
+
+@source:namco/sweetland4.cpp
+sweetld4                        //
 
 @source:namco/tankbatt.cpp
 tankbatt                        // (c) 1980 Namco
@@ -35684,6 +35671,7 @@ ctcheese                        //
 detest                          //
 frankst                         //
 frankstg                        //
+franksti                        //
 gnr_200                         //
 gnr_300                         //
 gnr_300d                        //
@@ -35742,7 +35730,9 @@ tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
 tomy_102                        //
+tomy_102be                      //
 tomy_300h                       //
+tomy_301g                       //
 tomy_400                        //
 trek_110                        //
 trek_110_a027                   //
@@ -37390,6 +37380,7 @@ tom_13                          //
 tom_14h                         //
 ts_la2                          //
 ts_la4                          //
+ts_lf4                          //
 ts_lf6                          //
 ts_lh6                          //
 ts_lm6                          //
@@ -38377,9 +38368,9 @@ indy500to                       // 1995.07 Indy 500 Twin (Revision A)
 lastbrnx                        // 1996.06 Last Bronx (Export, Revision A)
 lastbrnxj                       // 1996.06 Last Bronx (Japan, Revision A)
 lastbrnxu                       // 1996.06 Last Bronx (USA, Revision A)
-manxtt                          // 1995.11 Manx T.T. DX (Revision D)
-manxtta                         // 1995.?? Manx T.T. (Revision A)
-manxttc                         // 1995.11 Manx T.T. (Revision C)
+manxtt                          // 1995.11 Manx T.T. DX/Twin (Revision D)
+manxttc                         // 1995.11 Manx T.T. DX/Twin(Revision C)
+manxttdx                        // 1995.?? Manx T.T. DX (Revision A)
 motoraid                        // 1997.10 Motor Raid Twin
 motoraiddx                      // 1997.10 Motor Raid DX
 overrev                         // 1997.09 Over Rev (Revision A)
@@ -38784,6 +38775,9 @@ wccf2chk                        // 2004.?? World Club Champion Football Serie A 
 wccf310j                        // 2005.06 World Club Champion Football European Clubs 2004-2005
 wccf322e                        // 2005.11 World Club Champion Football European Clubs 2004-2005 Ver.3.22
 wccf331e                        // 2005.06 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf331j                        // 2005.12 World Club Champion Football European Clubs 2004-2005 Ver.1.1
+wccf341j                        // 2006.02 World Club Champion Football European Clubs 2004-2005 Ver.1.2
+wccf400j                        // 2006.07 World Club Champion Football European Clubs 2005-2006
 wccf420e                        // 2006.08 World Club Champion Football European Clubs 2005-2006
 wldkicks                        // 2000.03 World Kicks (World, WK2 Ver.A)
 wldkicksj                       // 2000.03 World Kicks (Japan, WK1 Ver.A)
@@ -41146,6 +41140,9 @@ palestra
 @source:skeleton/pdt3100.cpp
 pdt3100                         //
 
+@source:skeleton/pegasos2.cpp
+pegasos2                        //
+
 @source:skeleton/pencil2.cpp
 pencil2                         //
 
@@ -41418,6 +41415,7 @@ mechattu1                       // A8002 'MA' (c) 1989
 
 @source:snk/miconkit.cpp
 micon2
+smiconk
 
 @source:snk/munchmo.cpp
 joyfulr                         // A2001      (c) 1983
@@ -43012,6 +43010,9 @@ rltennisa                       // (c) 1993 TCH
 @source:tch/speedspn.cpp
 speedspn                        // (c) 1994
 
+@source:tch/topdrive.cpp
+topdrive                        // (c) 1995
+
 @source:tch/wheelfir.cpp
 wheelfir                        // (c) 199? TCH
 
@@ -43461,6 +43462,36 @@ exl100                          //
 geneve                          // 1987 Myarc Geneve 9640
 genmod                          // 1990 Myarc / Ron G. Walters Geneve 9640 Mod
 
+@source:ti/snspell.cpp
+lanteach                        //
+lantrans                        //
+lantransp                       //
+snmath                          //
+snmatha                         //
+snmathp                         //
+snread                          //
+snspell                         //
+snspellfr                       //
+snspellit                       //
+snspelljp                       //
+snspellp                        //
+snspellsp                       //
+snspellua                       //
+snspellub                       //
+snspelluk                       //
+snspelluka                      //
+
+@source:ti/snspellc.cpp
+mathsmag                        //
+snspellc                        //
+snspellca                       //
+snwrite                         //
+tntell                          //
+tntellfr                        //
+tntellp                         //
+tntelluk                        //
+vocaid                          //
+
 @source:ti/spellb.cpp
 letterlf                        //
 letterlg                        //
@@ -43732,6 +43763,7 @@ wardnerjb                       // bootleg
 
 @source:tomy/tomy_princ.cpp
 princ                           // Tomy Prin-C (Japan)
+princnt                         // Tomy Prin-C (without touch-pad)
 
 @source:tomy/tutor.cpp
 pyuuta                          // 1982 Tomy Pyuuta
@@ -43820,7 +43852,6 @@ t4426                           // Terco 4426 CNC programming station
 
 @source:trs/coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
-coco3dw1                        // Coco 3 with HDB-DOS
 coco3h                          // Hacked Color Computer 3 (6309)
 coco3p                          // Color Computer 3 (PAL)
 msm3                            // ILCE / SEP Micro-SEP Model 3
@@ -45000,6 +45031,7 @@ prestige                        // PreComputer Prestige Elite
 snotec                          // Bandai Super Note Club (Japan)
 snotecex                        // Bandai Super Note Club EX (Japan)
 snotecu                         // Bandai Super Note Club U (Japan)
+snotecug                        // Bandai Super Note Club U girlish (Japan)
 
 @source:vtech/socrates.cpp
 iqunlimz                        // 1991 IQ Unlimited (Z80)

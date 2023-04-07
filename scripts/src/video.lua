@@ -899,6 +899,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/sn74s262.h,VIDEOS["SN74S262"] = true
+--------------------------------------------------
+
+if (VIDEOS["SN74S262"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sn74s262.cpp",
+		MAME_DIR .. "src/devices/video/sn74s262.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pwm.h,VIDEOS["PWM_DISPLAY"] = true
 --------------------------------------------------
 if (VIDEOS["PWM_DISPLAY"]~=null) then

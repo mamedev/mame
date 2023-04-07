@@ -32,6 +32,9 @@ Advantech AIMB-256 is a single board PCB with:
 - 10 USB ports
 - DIO
 - PCI1 connector
+There's another version of "Santa Fe Golden" that uses a "SBC81870" industrial
+PC motherboard (Pentium M, Intel 855GME+ICH4, Winbond W83627HG-AW, Intel 855GME),
+but it came with a different image on the Compact Flash (currently undumped).
 
 PCB coinage (monedero-billetero-hopper) R.F. 53452303
   PIC18F448-I/P

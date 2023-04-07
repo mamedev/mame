@@ -28,13 +28,17 @@ protected:
 	enum e_mnemonics
 	{
 		zILL = 0,
-		zAC0AC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH, zCALL, zCCLA,
-		zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN, zDAN, zDMAN, zDMEA, zDNAA,
-		zDYN, zIA, zIMAC, zIYC, zKNEZ, zLDP, zLDX2, zLDX3, zLDX4, zMNEA, zMNEZ,
-		zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR, zSAL, zSAMAN, zSBIT,
-		zSBL, zSEAC, zSETR, zTAC, zTADM, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
-		zTAX, zTAY, zTBIT, zTCA, zTCMIY, zTCY, zTDO, zTKA, zTKM, zTMA,
-		zTMY, zTPC, zTRA, zTXA, zTYA, zXDA, zXMA, zYMCY, zYNEA, zYNEC
+		zAC0AC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH,
+		zCALL, zCCLA, zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN,
+		zDAN, zDMAN, zDMEA, zDNAA, zDYN, zHALT,
+		zIA, zIMAC, zINTDIS, zINTEN, zINTRTN, zIYC,
+		zKNEZ, zLDP, zLDX2, zLDX3, zLDX4, zMNEA, zMNEZ,
+		zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR,
+		zSAL, zSAMAN, zSBIT, zSBL, zSEAC, zSELIN, zSETR,
+		zTAC, zTADM, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
+		zTASR, zTAX, zTAY, zTBIT, zTCA, zTCMIY, zTCY, zTDO, zTKA,
+		zTKM, zTMA, zTMSET, zTMY, zTPC, zTRA, zTSG, zTXA, zTYA,
+		zXDA, zXMA, zYMCY, zYNEA, zYNEC
 	};
 
 	static const char *const s_mnemonic[];
@@ -106,6 +110,16 @@ public:
 
 private:
 	static const u8 tms2400_mnemonic[256];
+};
+
+class smc1102_disassembler : public tms1100_disassembler
+{
+public:
+	smc1102_disassembler();
+	virtual ~smc1102_disassembler() = default;
+
+private:
+	static const u8 smc1102_mnemonic[256];
 };
 
 class tms0980_disassembler : public tms1000_base_disassembler

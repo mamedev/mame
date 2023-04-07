@@ -12,39 +12,58 @@
     - csplayh1: inputs doesn't work at all, slower than the others too.
       Probably not a DVD but CD rom game?
 
+
     DVD Notes:
+    - Testing currently requires converting the data to cd mode 1
+      format (extracthd, rename to .iso, createcd) then change the
+      checksum.  This will be fixed and the checksums changed to
+      something different again, so don't do the intermediate step
+      yet
+
     - TMP68301 communicates with h8 via their respective internal serial comms
-    - First command is a "?P<CR>", which, according to the Pioneer V5000 protocol manual
-      is an Active Mode request. Manual is at:
-      http://www.pioneerelectronics.com/ephox/StaticFiles/Manuals/Business/Pio%20V5000-RS232%20-%20CPM.pdf
-      After returning a correct status code, tmp68301 sends "FSDVD04.MPG00001<CR>" to serial, probably tries
-      to playback the file ...
+
+    - TMP sends "?P", h8 answers "P01", TMP tends "?S", h8 answers "NG", games says the dvd drive has a problem
+
     - h8 board components:
       H8/3002
       MN7100 8-bit channel data acquisition system
       Fujitsu MD0208
       Heatsinked chip (TBD)
       IDE and RS232c ports
-      xtal 27 MHz
+      xtal 27 MHz, 12.288MHz
+
+    H8 ports directions:
+      8: fe /5 ---ooooi
+      9: c3 /6 --iiiioo
+      a: ff /8 oooooooo
+      b: 3f /8 iioooooo
 
 ***********************************************************************************************************/
 
 #include "emu.h"
 #include "bus/ata/atadev.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/ataintf.h"
 #include "cpu/h8/h83002.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "machine/nvram.h"
-#include "machine/tmp68301.h"
-#include "machine/idectrl.h"
 #include "machine/timer.h"
 #include "video/v9938.h"
 #include "nichisnd.h"
 
+class hrdvd_ata_controller_device : public abstract_ata_interface_device
+{
+public:
+	hrdvd_ata_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-namespace {
+	uint16_t dma_read();
+	void dma_write(uint16_t data);
 
-#define USE_H8 0
-#define DVD_CLOCK XTAL(27'000'000)
+	uint16_t read(offs_t offset, uint16_t mem_mask);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask);
+};
+
+DEFINE_DEVICE_TYPE(HRDVD_ATA_CONTROLLER_DEVICE, hrdvd_ata_controller_device, "hrdvd_atactrl", "High Rate DVD ATA controller device")
 
 class csplayh5_state : public driver_device
 {
@@ -52,53 +71,44 @@ public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_ata(*this, "ata"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<tmp68301_device> m_maincpu;
+	required_device<h83002_device> m_subcpu;
+	required_device<hrdvd_ata_controller_device> m_ata;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
 
 	uint16_t m_mux_data;
 
+	uint8_t m_p5, m_pa, m_pb;
+
+	uint16_t pb_r();
+	void pb_w(uint16_t data);
+	void pa_w(uint16_t data);
+
+	uint8_t cs0_r(offs_t offset);
+	void cs0_w(offs_t offset, uint8_t data);
+
+	uint8_t sec_r();
+	void sec_w(uint8_t data);
+	void sec2_w(uint8_t data);
+	void sec3_w(uint8_t data);
+
 	uint16_t csplayh5_mux_r();
 	void csplayh5_mux_w(uint16_t data);
 	void tmp68301_parallel_port_w(uint16_t data);
 
-	#if USE_H8
-	uint16_t test_r();
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
-	#endif
-
-	void init_csplayh1();
-
-	void init_aimode();
-	void init_bikiniko();
-	void init_csplayh5();
-	void init_csplayh6();
-	void init_csplayh7();
-	void init_fuudol();
-	void init_junai();
-	void init_junai2();
-	void init_konhaji();
-	void init_mjgalpri();
-	void init_mjmania();
-	void init_mogitate();
-	void init_nichisel();
-	void init_nuretemi();
-	void init_pokoachu();
-	void init_renaimj();
-	void init_sengomjk();
-	void init_thenanpa();
-	void init_torarech();
-	void init_tsuwaku();
+	DECLARE_WRITE_LINE_MEMBER(ata_irq);
+	DECLARE_WRITE_LINE_MEMBER(ata_drq);
 
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
-	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
 	void csplayh5(machine_config &config);
@@ -107,9 +117,52 @@ public:
 	void csplayh5_sub_map(address_map &map);
 };
 
+// Some kind of device a table is sent to
+uint8_t csplayh5_state::sec_r()
+{
+	// Bit 3 means ready for upload
+	return 0x08;
+}
 
+void csplayh5_state::sec_w(uint8_t data)
+{
+	// Table is 0xe00 bytes at offset 0x1000 of the h8 rom
+}
 
+void csplayh5_state::sec2_w(uint8_t data)
+{
+	// Table is 0x1000 bytes at offset 0x1e00 of the h8 rom
+}
 
+void csplayh5_state::sec3_w(uint8_t data)
+{
+	// Another table, partially hardcoded, partially generated
+}
+
+uint16_t csplayh5_state::pb_r()
+{
+	return m_pb;
+}
+
+void csplayh5_state::pb_w(uint16_t data)
+{
+	m_pb = (m_pb & 0xc0) | (data & 0x3f);
+	logerror("pb %02x\n", data);
+}
+
+void csplayh5_state::pa_w(uint16_t data)
+{
+	if((m_pa & 0x80) && !(data & 0x80))
+		logerror("bit %c\n", data & 0x40 ? '1' : '0');
+	if(m_pa & 0x20)
+		logerror("bit reset\n");
+	m_pa = data;
+	logerror("pa %02x %c%c%c\n",
+			 data,
+			 data & 0x80 ? 'c' : '-',
+			 data & 0x40 ? 'd' : '-',
+			 data & 0x20 ? '#' : '-');
+}
 
 uint16_t csplayh5_state::csplayh5_mux_r()
 {
@@ -129,6 +182,46 @@ void csplayh5_state::csplayh5_mux_w(uint16_t data)
 	m_mux_data = (~data & 0x1f);
 }
 
+hrdvd_ata_controller_device::hrdvd_ata_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	abstract_ata_interface_device(mconfig, HRDVD_ATA_CONTROLLER_DEVICE, tag, owner, clock)
+{
+}
+
+uint16_t hrdvd_ata_controller_device::dma_read()
+{
+	write_dmack(1);
+	uint16_t r = swapendian_int16(read_dma());
+	write_dmack(0);
+	return r;
+}
+
+void hrdvd_ata_controller_device::dma_write(uint16_t data)
+{
+	write_dmack(1);
+	write_dma(swapendian_int16(data));
+	write_dmack(0);
+}
+
+uint16_t hrdvd_ata_controller_device::read(offs_t offset, uint16_t mem_mask)
+{
+	if(mem_mask == 0xffff)
+		return swapendian_int16(internal_read_cs0(offset * 2, 0xffff));
+	else if(ACCESSING_BITS_0_7)
+		return internal_read_cs0(offset * 2 + 1, 0xff);
+	else
+		return internal_read_cs0(offset * 2, 0xff) << 8;
+}
+
+void hrdvd_ata_controller_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if(mem_mask == 0xffff)
+		internal_write_cs0(offset * 2, swapendian_int16(data), 0xffff);
+	else if(ACCESSING_BITS_0_7)
+		internal_write_cs0(offset * 2 + 1, data, 0xff);
+	else
+		internal_write_cs0(offset * 2, data >> 8, 0xff);
+}
+
 void csplayh5_state::csplayh5_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -142,25 +235,18 @@ void csplayh5_state::csplayh5_map(address_map &map)
 
 	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
-	map(0xc00000, 0xc7ffff).ram().share("nvram").mirror(0x380000); // work RAM
-}
-
-#if USE_H8
-uint16_t csplayh5_state::test_r()
-{
-	return machine().rand();
+	map(0xe80000, 0xefffff).ram(); // work RAM
 }
 
 void csplayh5_state::csplayh5_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	map(0x02000a, 0x02000b).r(FUNC(csplayh5_state::test_r));
-//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
-
-	map(0x040018, 0x040019).r(FUNC(csplayh5_state::test_r));
-	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w)); // correct?
-	map(0x040036, 0x040037).r(FUNC(csplayh5_state::test_r));
+	map(0x020008, 0x020008).w (FUNC(csplayh5_state::sec3_w));
+	map(0x02000a, 0x02000a).rw(FUNC(csplayh5_state::sec_r), FUNC(csplayh5_state::sec_w));
+	map(0x02000e, 0x02000e).w (FUNC(csplayh5_state::sec2_w));
+	map(0x040018, 0x040019).rw(m_ata, FUNC(hrdvd_ata_controller_device::dma_read), FUNC(hrdvd_ata_controller_device::dma_write));
+	map(0x040028, 0x04002f).rw(m_ata, FUNC(hrdvd_ata_controller_device::read), FUNC(hrdvd_ata_controller_device::write));
 
 	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
 }
@@ -168,9 +254,11 @@ void csplayh5_state::csplayh5_sub_map(address_map &map)
 
 void csplayh5_state::csplayh5_sub_io_map(address_map &map)
 {
-	map(0x0a, 0x0b).r(FUNC(csplayh5_state::test_r));
+	map(h8_device::PORT_A, h8_device::PORT_A).w (FUNC(csplayh5_state::pa_w));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(csplayh5_state::pb_r), FUNC(csplayh5_state::pb_w));
+//	map(h8_device::PORT_6, h8_device::PORT_6).noprw();
+//	map(h8_device::PORT_A, h8_device::PORT_A).nopw();
 }
-#endif
 
 
 static INPUT_PORTS_START( csplayh5 )
@@ -322,28 +410,21 @@ INPUT_PORTS_END
 
 void csplayh5_state::machine_reset()
 {
+	m_p5 = 0;
+	m_pa = 0;
+	m_pb = 0;	
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
+WRITE_LINE_MEMBER(csplayh5_state::ata_irq)
 {
-	int scanline = param;
-
-	if(scanline == 212*2)
-		m_maincpu->external_interrupt_0();
+	//	logerror("ata irq %d\n", state);
 }
 
-WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
+WRITE_LINE_MEMBER(csplayh5_state::ata_drq)
 {
-	/* this is not used as the v9938 interrupt callbacks are broken
-	   interrupts seem to be fired quite randomly */
+	//	logerror("ata drq %d\n", state);
+	m_pb = (m_pb & 0x7f) | (state ? 0x00 : 0x80);
 }
-
-#if USE_H8
-WRITE_LINE_MEMBER(csplayh5_state::ide_irq)
-{
-	printf("h8 ide alive %d\n",state);
-}
-#endif
 
 void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 {
@@ -352,88 +433,44 @@ void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 	    ---- x--- enable DVD sound? Used by aimode at very least
 	*/
 
-	if(data & ~0x48)
-		printf("%04x\n",data);
+	logerror("tmp: %02x\n", data);
 }
 
+static void atapi_devs(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 void csplayh5_state::csplayh5(machine_config &config)
 {
 	/* basic machine hardware */
-	TMP68301(config, m_maincpu, 16000000); /* TMP68301-16 */
+	TMP68301(config, m_maincpu, 12.288_MHz_XTAL); /* TMP68301-16 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
-	m_maincpu->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
+	m_maincpu->parallel_w_cb().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(csplayh5_state::csplayh5_irq), "screen", 0, 1);
+	H83002(config, m_subcpu, 27_MHz_XTAL/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &csplayh5_state::csplayh5_sub_io_map);
 
-#if USE_H8
-	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */
-	subcpu.set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_sub_map);
-	subcpu.set_addrmap(AS_IO, &csplayh5_state::csplayh5_sub_io_map);
+	m_maincpu->tx0_handler().set(*m_subcpu->subdevice<h8_sci_device>("sci0"), FUNC(h8_sci_device::rx_w));
+	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(m_maincpu, FUNC(tmp68301_device::rx0_w));
 
-	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
-	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
-#endif
+	HRDVD_ATA_CONTROLLER_DEVICE(config, m_ata).options(atapi_devs, "cdrom", nullptr, true); // dvd
+	m_ata->irq_handler().set(FUNC(csplayh5_state::ata_irq));
+	m_ata->dmarq_handler().set(FUNC(csplayh5_state::ata_drq));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
-	v9958.int_cb().set(FUNC(csplayh5_state::csplayh5_vdp0_interrupt));
+	v9958.int_cb().set_inputline(m_maincpu, 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	NICHISND(config, m_nichisnd, 0);
 }
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
-
-void csplayh5_state::general_init(int patchaddress, int patchvalue)
-{
-	#if !USE_H8
-	uint16_t *MAINROM = (uint16_t *)m_region_maincpu->base();
-	/* patch DVD comms check */
-	MAINROM[patchaddress] = patchvalue;
-	#endif
-
-	//uint8_t *SNDROM = m_region_:nichisnd:audiorom->base();
-
-	/* initialize sound rom bank */
-	//soundbank_w(0);
-
-	/* patch sound program */
-	//SNDROM[0x0213] = 0x00;          // DI -> NOP
-
-}
-
-void csplayh5_state::init_csplayh1()  { general_init(0x6880/2, 0x6020); }
-
-void csplayh5_state::init_aimode()    { general_init(0x9cda/2, 0x6018); }
-void csplayh5_state::init_bikiniko()  { general_init(0x585c/2, 0x6018); }
-void csplayh5_state::init_csplayh5()  { general_init(0x4cb4/2, 0x6018); }
-void csplayh5_state::init_csplayh6()  { general_init(0x5976/2, 0x6018); }
-void csplayh5_state::init_csplayh7()  { general_init(0x7a20/2, 0x6018); }
-void csplayh5_state::init_fuudol()    { general_init(0x9166/2, 0x6018); }
-void csplayh5_state::init_junai()     { general_init(0x679c/2, 0x6018); }
-void csplayh5_state::init_junai2()    { general_init(0x6588/2, 0x6018); }
-void csplayh5_state::init_konhaji()   { general_init(0x9200/2, 0x6018); }
-void csplayh5_state::init_mjgalpri()  { general_init(0x5396/2, 0x6018); }
-void csplayh5_state::init_mjmania()   { general_init(0x6b96/2, 0x6018); }
-void csplayh5_state::init_mogitate()  { general_init(0x6ab4/2, 0x6018); }
-void csplayh5_state::init_nichisel()  { general_init(0x9cd6/2, 0x6018); }
-void csplayh5_state::init_nuretemi()  { general_init(0x8de2/2, 0x6018); }
-void csplayh5_state::init_pokoachu()  { general_init(0x7b1e/2, 0x6018); }
-void csplayh5_state::init_renaimj()   { general_init(0x568c/2, 0x6018); }
-void csplayh5_state::init_sengomjk()  { general_init(0x5226/2, 0x6018); }
-void csplayh5_state::init_thenanpa()  { general_init(0x69ec/2, 0x6018); }
-void csplayh5_state::init_torarech()  { general_init(0x9384/2, 0x6018); }
-void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
 
 
 /*
@@ -463,7 +500,7 @@ ROM_START( nichidvd )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 ROM_END
 
 // TODO: this surely uses a different subboard
@@ -482,7 +519,7 @@ ROM_START( csplayh1 )
 	ROM_LOAD16_BYTE( "4.bin", 0x000001, 0x080000, CRC(2e63ee15) SHA1(78fefbc277234458212cded997d393bd8b82cf76) )
 	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "csplayh1", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -506,7 +543,7 @@ ROM_START( mjgalpri )
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(4c92a523) SHA1(51da73fdfdfccdc070fa8a13163e031438b50876) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(30f356af4e08567273a88758bb0ddd3544eea228) )
 ROM_END
 
@@ -524,7 +561,7 @@ ROM_START( sengomjk )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(20791a5a) SHA1(03c38e9b8e60b0dded7504b2725210df5405110c) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(1ed72387) SHA1(7e2b8ce49561d6fd79dcf0d427569e5f6ef8dc67) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(d3502496526e62a877f12dccc27b32ae33d3704d) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
@@ -546,8 +583,9 @@ ROM_START( junai )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(4182dc30) SHA1(89601c62b74aff3d65b075d4b5cd1eb2ccf4e386) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "junai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
+//	DISK_IMAGE_READONLY( "junai", 0, SHA1(282cc528ff175ac55f1545481ca1c40377cf9347) )
 ROM_END
 
 ROM_START( csplayh5 )
@@ -565,7 +603,7 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(113d7e96) SHA1(f3fb9c719544417a6a018b82f07c65bf73de21ff) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
@@ -584,7 +622,7 @@ ROM_START( junai2 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(5b37c8dd) SHA1(8de5e2f92721c6679c6506850a442cafff89653f) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "junai2", 0, SHA1(dc9633a101f20f03fd9b4414c10274d2539fb7c2) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -606,7 +644,7 @@ ROM_START( mogitate )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(ea655990) SHA1(7f59cfab21e8858625e82a9501acc943b07f799c) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(4c910b86) SHA1(48007f03f4e445b9de15531afe821c1b18fccae1) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8006", 0, SHA1(aa911e46e791d89ce4fed4a32b4b0637ba3a9920) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
@@ -627,7 +665,7 @@ ROM_START( mjmania )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(37dde764) SHA1(0530b63d8e682cdf01128057fdc3a8c23262afc9) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(dea4a2d2) SHA1(0118eb1330c9da8fead99f64fc015fd343fed79b) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "mjmania", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -649,7 +687,7 @@ ROM_START( renaimj )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(6d1c9efd) SHA1(c9ea9d6e6d34db5635fc55d41e7bb54a41948d27) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8008", 0, SHA1(49c92cb9b08ee7773f3d93fce0bbecc3c0ae654d) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
@@ -671,7 +709,7 @@ ROM_START( bikiniko )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(1e2e1cf3) SHA1(f71b5dedf4f897644d519e412651152d0d81edb8) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
 ROM_END
 
@@ -690,7 +728,7 @@ ROM_START( csplayh6 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(858e0604) SHA1(64c23bc06898188798937770129697b3c4b547d6) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8010", 0, SHA1(01e247fe1b86bbfe743e09a625432874f881a9a0) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
@@ -711,7 +749,7 @@ ROM_START( thenanpa )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(ee6b88c4) SHA1(64ae66a24f1639801c7bdda7faa0d604bb97ceb1) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(ce987845) SHA1(2f7dca32a79ad6afbc55ca1d492b582f952688ff) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "thenanpa", 0,  SHA1(72bf8c75189e877508c5a64d5591738d23ed7e96) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -732,7 +770,7 @@ ROM_START( pokoachu )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(843c288e) SHA1(2741b9da83fd35c7472b8c67bc02313a1c5e4e25) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(6920a9b8) SHA1(0a4cb9e2a0d871aed60c1293b7cac4bf79a9446c) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8012", 0, SHA1(06c611f110377f5d02bbde1ab1d43d3623772b7b) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
@@ -753,7 +791,7 @@ ROM_START( csplayh7 )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(1d67ca95) SHA1(9b45045b6fa67308bade324f91c21010aa8d121e) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(b4f5f990) SHA1(88cccae04f89fef43d88f4e82b65de3de946e9af) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "csplayh7", 0, SHA1(f81e772745b0c62b17d91bd294993e49fe8da4d9) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -774,7 +812,7 @@ ROM_START( aimode )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(4a9863cf) SHA1(ccf08befe773fb94fa78423ed19b6b8d255ca3a7) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(893aac1a) SHA1(14dd3f07363858c2be3a9400793f720b1f5baf1a) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8014", 0, SHA1(c5ad9bd66f0930e1c477126301286e38f077c164) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
@@ -795,7 +833,7 @@ ROM_START( fuudol )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(5c9e8665) SHA1(2a1b040e5c72d4400d4b5c467c75ae99e9bb01e2) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(fdd79d8f) SHA1(f8bb82afaa28affb04b83270eb407129f1c7e611) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "fuudol", 0, SHA1(fabab43543ed14da4fe7c63a2a2cc4e68936938a) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -816,7 +854,7 @@ ROM_START( nuretemi )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -837,7 +875,7 @@ ROM_START( tsuwaku )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(00657ca3) SHA1(a02bb8a177f3915ddf0bf97fd69426a3a28061a5) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(edf56c94) SHA1(76d95a45aced3ad8bfe8a561f355731f4f99603e) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8017", 0, SHA1(6c86985574d53f990c4eec573d7fa84782cb9c4c) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
@@ -858,7 +896,7 @@ ROM_START( torarech )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(cbbbab5c) SHA1(ab8ae64b1f2acfab55ba7cbb173f3036a46001e6) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(18412fd8) SHA1(6907ce2739549519e1f3dcee2186f6add219a3c2) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8018", 0, SHA1(cf8758bb2caaba6377b354694123ddec71a4f8e1) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
@@ -879,7 +917,7 @@ ROM_START( nichisel )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(5ab63481) SHA1(fc81fbdd1df496813fc0d80bcab6d0434b75d311) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(50085861) SHA1(b8f99a66a743c9bf66ef307fe4b581586e293fe5) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb80sp", 0, SHA1(48eb9f8adba0ea5f59cfcbdee61c29b4af84ac97) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
@@ -900,14 +938,12 @@ ROM_START( konhaji )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(88f31da7) SHA1(dc76532fa3261b3b238a42e2ca8f270f2b2ea1fa) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(35893109) SHA1(6a55bd147a75913af59bc355abf010e1b75063bf) )
 
-	DISK_REGION( "ide:0:hdd:image" )
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(f59ac1587009d7d15618549dc60cbd24c263a95f) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )
 ROM_END
-
-} // anonymous namespace
 
 
 /***************************************************************************
@@ -917,35 +953,35 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan", "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Sphinx/AV Japan/Astro System Japan", "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                         "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
-/* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just",                           "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
-/* 02 */ GAME( 1998, sengomjk, nichidvd, csplayh5, csplayh5, csplayh5_state, init_sengomjk, ROT0, "Nichibutsu/Just&Just",                           "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
-/* 03 */ GAME( 1998, junai,    nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai,    ROT0, "Nichibutsu/eic",                                 "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh5, ROT0, "Nichibutsu",                                     "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
-/* 05 */ GAME( 1998, junai2,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_junai2,   ROT0, "Nichibutsu/eic",                                 "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
-/* 06 */ GAME( 1998, mogitate, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mogitate, ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
+/* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Just&Just",                           "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )
+/* 02 */ GAME( 1998, sengomjk, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Just&Just",                           "Sengoku Mahjong Kurenai Otome-tai (Japan)", MACHINE_NOT_WORKING )
+/* 03 */ GAME( 1998, junai,    nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",                                 "Junai - Manatsu no First Kiss (Japan)", MACHINE_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu",                                     "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", MACHINE_NOT_WORKING )
+/* 05 */ GAME( 1998, junai2,   nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",                                 "Junai 2 - White Love Story (Japan)", MACHINE_NOT_WORKING )
+/* 06 */ GAME( 1998, mogitate, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Just&Just/NVS/Astro System/AV Japan", "Mahjong Mogitate (Japan)", MACHINE_NOT_WORKING )
 
 // 1999
-/* 07 */ GAME( 1999, mjmania,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjmania,  ROT0, "Sphinx/Just&Just",            "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
-/* 08 */ GAME( 1999, renaimj,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_renaimj,  ROT0, "Nichibutsu/eic",              "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
-/* 09 */ GAME( 1999, bikiniko, nichidvd, csplayh5, csplayh5, csplayh5_state, init_bikiniko, ROT0, "Nichibutsu/eic",              "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
-/* 10 */ GAME( 1999, csplayh6, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh6, ROT0, "Nichibutsu/eic",              "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
-/* 11 */ GAME( 1999, thenanpa, nichidvd, csplayh5, csplayh5, csplayh5_state, init_thenanpa, ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
-/* 12 */ GAME( 1999, pokoachu, nichidvd, csplayh5, csplayh5, csplayh5_state, init_pokoachu, ROT0, "Nichibutsu/eic",              "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
-/* 13 */ GAME( 1999, csplayh7, nichidvd, csplayh5, csplayh5, csplayh5_state, init_csplayh7, ROT0, "Nichibutsu/eic",              "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
-/* 14 */ GAME( 1999, aimode,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_aimode,   ROT0, "Nichibutsu/eic",              "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,  nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Sphinx/Just&Just",            "Mahjong Mania - Kairakukan e Youkoso (Japan)", MACHINE_NOT_WORKING )
+/* 08 */ GAME( 1999, renaimj,  nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "Renai Mahjong Idol Gakuen (Japan)", MACHINE_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", MACHINE_NOT_WORKING )
+/* 10 */ GAME( 1999, csplayh6, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "Mahjong Hanafuda Cosplay Tengoku 6 - Junai-hen (Japan)", MACHINE_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", MACHINE_NOT_WORKING )
+/* 12 */ GAME( 1999, pokoachu, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "PokoaPoka Onsen de CHU - Bijin 3 Shimai ni Kiotsukete! (Japan)", MACHINE_NOT_WORKING )
+/* 13 */ GAME( 1999, csplayh7, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "Cosplay Tengoku 7 - Super Kogal Ranking (Japan)", MACHINE_NOT_WORKING )
+/* 14 */ GAME( 1999, aimode,   nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",              "Ai-mode - Pet Shiiku (Japan)", MACHINE_NOT_WORKING )
 
 // 2000
-/* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, init_fuudol,   ROT0, "Nichibutsu/eic",                    "Fuudol (Japan)", MACHINE_NOT_WORKING )
-/* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nuretemi, ROT0, "Nichibutsu/Love Factory",           "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
-/* 17 */ GAME( 2000, tsuwaku,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_tsuwaku,  ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, init_torarech, ROT0, "Nichibutsu/Love Factory/M Friend",  "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
-/* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, init_nichisel, ROT0, "Nichibutsu",                        "DVD Select (Japan)", MACHINE_NOT_WORKING )
+/* 15 */ GAME( 2000, fuudol,   nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/eic",                    "Fuudol (Japan)", MACHINE_NOT_WORKING )
+/* 16 */ GAME( 2000, nuretemi, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Love Factory",           "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
+/* 17 */ GAME( 2000, tsuwaku,  nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
+/* 18 */ GAME( 2000, torarech, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Love Factory/M Friend",  "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
+/* sp */ GAME( 2000, nichisel, nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu",                        "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
-/* 19 */ GAME( 2001, konhaji,  nichidvd, csplayh5, csplayh5, csplayh5_state, init_konhaji,  ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
+/* 19 */ GAME( 2001, konhaji,  nichidvd, csplayh5, csplayh5, csplayh5_state, empty_init, ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
 /* 20 */ // Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

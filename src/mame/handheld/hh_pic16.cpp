@@ -281,7 +281,7 @@ void touchme_state::write_c(u8 data)
 	update_speaker();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( touchme )
 	PORT_START("IN.0") // B0 port A
@@ -303,6 +303,8 @@ static INPUT_PORTS_START( touchme )
 	PORT_CONFSETTING(    0x04^0x07, "3" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void touchme_state::touchme(machine_config &config)
 {
@@ -400,7 +402,7 @@ void pabball_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( pabball )
 	PORT_START("IN.0") // port A
@@ -419,6 +421,8 @@ static INPUT_PORTS_START( pabball )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
+
+// config
 
 void pabball_state::pabball(machine_config &config)
 {
@@ -521,7 +525,7 @@ u8 sfxphasor_state::read_c()
 	return lo | hi << 4;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( sfxphasor )
 	PORT_START("IN.0") // C4 port C
@@ -556,6 +560,8 @@ static INPUT_PORTS_START( sfxphasor )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On / Sounds") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
 INPUT_PORTS_END
+
+// config
 
 void sfxphasor_state::sfxphasor(machine_config &config)
 {
@@ -640,7 +646,7 @@ void melodym_state::write_c(u8 data)
 	m_speaker->level_w(~data >> 7 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( melodym )
 	PORT_START("IN.0") // B2 port C
@@ -684,6 +690,8 @@ static INPUT_PORTS_START( melodym )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Pro")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Note")
 INPUT_PORTS_END
+
+// config
 
 void melodym_state::melodym(machine_config &config)
 {
@@ -779,7 +787,7 @@ void maniac_state::write_c(u8 data)
 	update_speaker();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
@@ -788,6 +796,8 @@ static INPUT_PORTS_START( maniac )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 INPUT_PORTS_END
+
+// config
 
 void maniac_state::maniac(machine_config &config)
 {
@@ -928,7 +938,7 @@ void flash_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( flash )
 	PORT_START("IN.0") // port A
@@ -945,6 +955,8 @@ static INPUT_PORTS_START( flash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
 INPUT_PORTS_END
+
+// config
 
 void flash_state::flash(machine_config &config)
 {
@@ -1064,7 +1076,7 @@ void matchme_state::write_c(u8 data)
 	m_maincpu->set_input_line(PIC16C5x_RTCC, data >> 7 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( matchme )
 	PORT_START("IN.0") // C4 port C
@@ -1106,6 +1118,8 @@ static INPUT_PORTS_START( matchme )
 	PORT_CONFSETTING(    0x02, "Manual" )
 	PORT_CONFSETTING(    0x00, "Auto" )
 INPUT_PORTS_END
+
+// config
 
 void matchme_state::matchme(machine_config &config)
 {
@@ -1205,7 +1219,7 @@ void drdunk_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( drdunk )
 	PORT_START("IN.0") // B0 port A3
@@ -1228,6 +1242,8 @@ static INPUT_PORTS_START( drdunk )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void drdunk_state::drdunk(machine_config &config)
 {
@@ -1356,7 +1372,7 @@ void leboom_state::write_c(u8 data)
 	speaker_update();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( leboom )
 	PORT_START("IN.0") // B0 port A
@@ -1395,6 +1411,8 @@ static INPUT_PORTS_START( leboom )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Blue Button 7")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Blue Button 8")
 INPUT_PORTS_END
+
+// config
 
 void leboom_state::leboom(machine_config &config)
 {
@@ -1501,7 +1519,7 @@ void rockpin_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rockpin )
 	PORT_START("IN.0") // port A
@@ -1510,6 +1528,8 @@ static INPUT_PORTS_START( rockpin )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Ball")
 INPUT_PORTS_END
+
+// config
 
 void rockpin_state::rockpin(machine_config &config)
 {
@@ -1616,7 +1636,7 @@ void hccbaskb_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( hccbaskb )
 	PORT_START("IN.0") // B0 port A3
@@ -1639,6 +1659,8 @@ static INPUT_PORTS_START( hccbaskb )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void hccbaskb_state::hccbaskb(machine_config &config)
 {
@@ -1741,7 +1763,7 @@ void ttfball_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttfball )
 	PORT_START("IN.0") // B0 port A3
@@ -1766,6 +1788,8 @@ static INPUT_PORTS_START( ttfball )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void ttfball_state::ttfball(machine_config &config)
 {
@@ -1846,7 +1870,7 @@ void ttfballa_state::write_c(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttfballa )
 	PORT_START("IN.0") // B0 port A3
@@ -1871,6 +1895,8 @@ static INPUT_PORTS_START( ttfballa )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void ttfballa_state::ttfballa(machine_config &config)
 {
@@ -1960,7 +1986,7 @@ void uspbball_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( uspbball )
 	PORT_START("IN.0") // port A
@@ -1978,6 +2004,8 @@ static INPUT_PORTS_START( uspbball )
 	PORT_CONFSETTING(    0x80, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void uspbball_state::uspbball(machine_config &config)
 {
@@ -2089,7 +2117,7 @@ void us2pfball_state::write_d(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( us2pfball )
 	PORT_START("IN.0") // B0 port A low
@@ -2122,6 +2150,8 @@ static INPUT_PORTS_START( us2pfball )
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Status/Score") // S
 INPUT_PORTS_END
+
+// config
 
 void us2pfball_state::us2pfball(machine_config &config)
 {

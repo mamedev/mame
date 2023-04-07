@@ -1,9 +1,9 @@
 /** @file patest_out_underflow.c
-	@ingroup test_src
-	@brief Count output underflows (using paOutputUnderflow flag) 
-	under overloaded and normal conditions.
-	@author Ross Bencina <rossb@audiomulch.com>
-	@author Phil Burk <philburk@softsynth.com>
+    @ingroup test_src
+    @brief Count output underflows (using paOutputUnderflow flag)
+    under overloaded and normal conditions.
+    @author Ross Bencina <rossb@audiomulch.com>
+    @author Phil Burk <philburk@softsynth.com>
 */
 /*
  * $Id$
@@ -33,13 +33,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -134,11 +134,11 @@ int main(void)
 
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
-    
+
     outputParameters.device = Pa_GetDefaultOutputDevice();  /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 1;                      /* mono output */
     outputParameters.sampleFormat = paFloat32;              /* 32 bit floating point output */
@@ -154,7 +154,7 @@ int main(void)
               FRAMES_PER_BUFFER,
               paClipOff,    /* we won't output out of range samples so don't bother clipping them */
               patestCallback,
-              &data );    
+              &data );
     if( err != paNoError ) goto error;
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
@@ -163,12 +163,12 @@ int main(void)
 
     /* Determine number of sines required to get to 50% */
     do
-    {        
+    {
         Pa_Sleep( 100 );
 
         load = Pa_GetStreamCpuLoad( stream );
         printf("sineCount = %d, CPU load = %f\n", data.sineCount, load );
-		
+
         if( load < 0.3 )
         {
             data.sineCount += 10;
@@ -198,7 +198,7 @@ int main(void)
         load = Pa_GetStreamCpuLoad( stream );
         printf("STRESSING: sineCount = %d, CPU load = %f\n", sineCount, load );
     }
-    
+
     printf("Counting underflows for 2 seconds.\n");
     data.countUnderflows = 1;
     Pa_Sleep( 2000 );
@@ -220,14 +220,14 @@ int main(void)
     Pa_Sleep( 5000 );
 
     safeUnderflowCount = data.outputUnderflowCount;
-    
+
     printf("Stop stream.\n");
     err = Pa_StopStream( stream );
     if( err != paNoError ) goto error;
-    
+
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
-    
+
     Pa_Terminate();
 
     printf("suggestedLatency = %f\n", suggestedLatency);
@@ -244,7 +244,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

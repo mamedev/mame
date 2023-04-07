@@ -45,8 +45,8 @@ void tp0320_cpu_device::ram_192x4(address_map &map)
 void tp0320_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// main opcodes PLA(partial), microinstructions PLA
-	PLA(config, "ipla", 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_ipla, 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
 }
 
 
@@ -58,12 +58,12 @@ std::unique_ptr<util::disasm_interface> tp0320_cpu_device::create_disassembler()
 
 
 // device_reset
-u32 tp0320_cpu_device::decode_micro(u8 sel)
+u32 tp0320_cpu_device::decode_micro(offs_t offset)
 {
 	u32 decode = 0;
 
-	sel = bitswap<8>(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	u32 mask = m_mpla->read(sel);
+	offset = bitswap<6>(offset,0,1,2,3,4,5); // lines are reversed
+	u32 mask = m_mpla->read(offset);
 	mask ^= 0x0bff0; // invert active-negative
 
 	//                                                 _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____

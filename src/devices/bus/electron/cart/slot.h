@@ -136,8 +136,8 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_writeable() const noexcept override { return true; }
@@ -145,7 +145,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "electron_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
-	// slot interface overrides
+	// device_image_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
@@ -160,7 +160,7 @@ public:
 protected:
 	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 	device_electron_cart_interface *m_cart;

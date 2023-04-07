@@ -173,30 +173,44 @@ void menu_file_manager::populate()
 
 bool menu_file_manager::handle(event const *ev)
 {
-	if (!ev || !ev->itemref || (ev->iptkey != IPT_UI_SELECT))
-		return false;
+	bool result = false;
 
-	if ((uintptr_t)ev->itemref == 1)
+	if (ev)
 	{
-		machine().schedule_hard_reset();
-	}
-	else
-	{
-		selected_device = (device_image_interface *) ev->itemref;
-		if (selected_device)
+		if ((uintptr_t)ev->itemref == 1)
 		{
-			floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
-			if (floppy_device)
-				menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
-			else
-				menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+			if (selected_device)
+			{
+				selected_device = nullptr;
+				result = true;
+			}
 
-			// reset the existing menu
-			reset(reset_options::REMEMBER_POSITION);
+			if (IPT_UI_SELECT == ev->iptkey)
+				machine().schedule_hard_reset();
+		}
+		else
+		{
+			if (ev->itemref != selected_device)
+			{
+				selected_device = (device_image_interface *)ev->itemref;
+				result = true;
+			}
+
+			if (selected_device && (IPT_UI_SELECT == ev->iptkey))
+			{
+				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
+				if (floppy_device)
+					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
+				else
+					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
+
+				// reset the existing menu
+				reset(reset_options::REMEMBER_POSITION);
+			}
 		}
 	}
 
-	return false;
+	return result;
 }
 
 // force file manager menu

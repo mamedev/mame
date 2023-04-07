@@ -46,21 +46,21 @@ void msx_cart_kanji_device::device_start()
 	save_item(NAME(m_kanji_address));
 }
 
-image_init_result msx_cart_kanji_device::validate_kanji_regions(std::string &message)
+std::error_condition msx_cart_kanji_device::validate_kanji_regions(std::string &message)
 {
 	if (!cart_kanji_region())
 	{
 		message = "msx_cart_kanji_device: Required region 'kanji' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_kanji_region()->bytes() != 0x20000)
 	{
 		message = "msx_cart_kanji_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_kanji_device::install_kanji_handlers()
@@ -72,15 +72,15 @@ void msx_cart_kanji_device::install_kanji_handlers()
 	io_space().install_read_handler(0xd9, 0xd9, read8sm_delegate(*this, FUNC(msx_cart_kanji_device::kanji_r)));
 }
 
-image_init_result msx_cart_kanji_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_kanji_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = validate_kanji_regions(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = validate_kanji_regions(message);
+	if (result)
 		return result;
 
 	install_kanji_handlers();
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 u8 msx_cart_kanji_device::kanji_r(offs_t offset)
@@ -138,16 +138,16 @@ void msx_cart_msxwrite_device::device_reset()
 		install_kanji_handlers();
 }
 
-image_init_result msx_cart_msxwrite_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_msxwrite_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = validate_kanji_regions(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = validate_kanji_regions(message);
+	if (result)
 		return result;
 
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_msxwrite_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -156,7 +156,7 @@ image_init_result msx_cart_msxwrite_device::initialize_cartridge(std::string &me
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_msxwrite_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -171,7 +171,7 @@ image_init_result msx_cart_msxwrite_device::initialize_cartridge(std::string &me
 	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>

@@ -64,7 +64,7 @@ public:
 
 	huc1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
@@ -91,13 +91,13 @@ huc1_device::huc1_device(
 }
 
 
-image_init_result huc1_device::load(std::string &message)
+std::error_condition huc1_device::load(std::string &message)
 {
 	// check for valid ROM/RAM regions
 	set_bank_bits_rom(2, 6);
 	set_bank_bits_ram(2);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// if that checked out, install memory
 	install_rom();
@@ -124,7 +124,7 @@ image_init_result huc1_device::load(std::string &message)
 			write8smo_delegate(*this, FUNC(huc1_device::write_ir)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
