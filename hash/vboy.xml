@@ -59,12 +59,11 @@ Runs way too fast
 		</part>
 	</software>
 
-	<software name="galactic" supported="no">
+	<software name="galactic" supported="partial">
 		<description>Galactic Pinball (Japan, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-I/O access (regression)
 Ball goes out of bounds sometimes on gameplay (verify)
 ]]></notes>
 		<info name="developer" value="Intelligent Systems"/>
@@ -230,13 +229,10 @@ Gameplay [VIP] flickers too much, framebuffer?
 		</part>
 	</software>
 
-	<software name="panicbom" supported="no">
+	<software name="panicbom" supported="partial">
 		<description>Panic Bomber (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<notes><![CDATA[
-I/O access for sound (regression)
-]]></notes>
 		<info name="developer" value="Raizing"/>
 		<info name="serial" value="VUE-VH2E-USA"/>
 		<info name="release" value="199512xx"/>
@@ -375,13 +371,10 @@ Verify player KO graphics
 		</part>
 	</software>
 
-	<software name="tobidase" cloneof="panicbom" supported="no">
+	<software name="tobidase" cloneof="panicbom" supported="partial">
 		<description>Tobidase! Panibon (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
-		<notes><![CDATA[
-I/O access for sound (regression)
-]]></notes>
 		<info name="developer" value="Raizing"/>
 		<info name="serial" value="VUE-VH2J-JPN"/>
 		<info name="release" value="19950721"/>
@@ -432,13 +425,10 @@ Missing GFXs for gender select in name entry
 		</part>
 	</software>
 
-	<software name="vforce" supported="no">
+	<software name="vforce" supported="partial">
 		<description>Vertical Force (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<notes><![CDATA[
-I/O access (regression)
-]]></notes>
 		<info name="developer" value="Hudson"/>
 		<info name="serial" value="VUE-VH3E-USA"/>
 		<info name="release" value="19951201"/>
@@ -449,13 +439,10 @@ I/O access (regression)
 		</part>
 	</software>
 
-	<software name="vforcej" cloneof="vforce" supported="no">
+	<software name="vforcej" cloneof="vforce" supported="partial">
 		<description>Vertical Force (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
-		<notes><![CDATA[
-I/O access (regression)
-]]></notes>
 		<info name="developer" value="Hudson"/>
 		<info name="serial" value="VUE-VH3J-JPN"/>
 		<info name="release" value="19950812"/>
