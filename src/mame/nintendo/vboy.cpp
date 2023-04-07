@@ -2,27 +2,17 @@
 // copyright-holders:Angelo Salese, Miodrag Milanovic
 /***************************************************************************
 
-    Nintendo Virtual Boy
+Nintendo Virtual Boy
 
-    driver by Miodrag Milanovic & Angelo Salese
+References:
+- http://www.goliathindustries.com/vb/
+- http://www.vr32.de/modules/dokuwiki/doku.php?
 
-    Great info at http://www.goliathindustries.com/vb/
-    and http://www.vr32.de/modules/dokuwiki/doku.php?
-
-    TODO:
-    - sound is way incomplete
-    - various timing issues (irq & events aren't known)
-    - 3dtetris: missing gfxs on gameplay (writes to framebuffer)
-    - boundh: game is way too fast
-    - galactic: ball goes out of bounds sometimes?
-    - golf: missing gfxs on gameplay (writes to framebuffer)
-    - marioten: title screen logo is misplaced if Mario completes his animation
-    - nesterfb: once that you hit the pins, animation phase takes a while to start
-    - redalarm: gameplay doesn't work
-    - spaceinv: Taito logo only if you press the button, framebuffer?
-    - spaceinv: missing shots
-    - vlab: doesn't boot (irq issue?)
-    - wariolnd: brightness gets suddently darker during intro.
+TODO:
+- complete VIP implementation (framebuffer plus other details);
+- various timing issues (irq & events aren't known);
+- sound;
+- Better 2d/3d layout options for accessibility;
 
 ****************************************************************************/
 
