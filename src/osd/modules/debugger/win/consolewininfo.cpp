@@ -126,7 +126,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 
 	// create file dialog
 	Microsoft::WRL::ComPtr<IFileDialog> dialog;
-	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(dialog.GetAddressOf()));
+	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog));
 
 	// set file types
 	if (SUCCEEDED(hr))
@@ -159,7 +159,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 			// FIXME: strip off archive names - opening a file inside an archive decompresses it to a temporary location
 			std::wstring wfull = osd::text::to_wstring(full);
 			Microsoft::WRL::ComPtr<IShellItem> item;
-			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(item.GetAddressOf()))))
+			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(&item))))
 			{
 				//dialog->SetFolder(item); disabled until
 			}
@@ -176,7 +176,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 	if (SUCCEEDED(hr))
 	{
 		Microsoft::WRL::ComPtr<IShellItem> result;
-		hr = dialog->GetResult(result.GetAddressOf());
+		hr = dialog->GetResult(&result);
 		if (SUCCEEDED(hr))
 		{
 			PWSTR selection = nullptr;
