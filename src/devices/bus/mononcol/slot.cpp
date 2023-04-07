@@ -62,23 +62,17 @@ void mononcol_cartslot_device::device_start()
  call load
  -------------------------------------------------*/
 
-std::error_condition mononcol_cartslot_device::call_load()
+std::pair<std::error_condition, std::string> mononcol_cartslot_device::call_load()
 {
 	if (m_cart)
 	{
 		memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
 		if (loaded_through_softlist() && !romregion)
-		{
-			osd_printf_error("%s: Software list item has no 'rom' data area\n", basename());
-			return image_error::BADSOFTWARE;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Software list item has no 'rom' data area");
 
 		const u32 len = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (!len || ((len - 1) & len))
-		{
-			osd_printf_error("%s: Cartridge ROM size is not a power of 2\n", basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridge ROM size is not a power of 2");
 
 		if (!loaded_through_softlist())
 		{
@@ -86,15 +80,12 @@ std::error_condition mononcol_cartslot_device::call_load()
 			romregion = machine().memory().region_alloc(subtag("rom"), len, 4, ENDIANNESS_LITTLE);
 			const u32 cnt = fread(romregion->base(), len);
 			if (cnt != len)
-			{
-				osd_printf_error("%s: Error reading cartridge file\n", basename());
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
 		}
 
 		m_cart->set_spi_region(romregion->base(), romregion->bytes());
 	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

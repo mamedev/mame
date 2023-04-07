@@ -51,7 +51,7 @@ class msx_slot_cartridge_base_device : public device_t
 public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "msx_cart"; }

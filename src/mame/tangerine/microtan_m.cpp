@@ -456,18 +456,18 @@ SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 {
 	uint64_t snapshot_len = image.length();
 	if (snapshot_len < 4 || snapshot_len >= 66000)
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	auto snapshot_buff = std::make_unique<uint8_t []>(snapshot_len);
 	if (image.fread(snapshot_buff.get(), snapshot_len) != snapshot_len)
-		return image_error::UNSPECIFIED;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	std::error_condition err = verify_snapshot(snapshot_buff.get(), snapshot_len);
 	if (err)
-		return err;
+		return std::make_pair(err, std::string());
 
 	snapshot_copy(snapshot_buff.get(), snapshot_len);
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
@@ -487,5 +487,5 @@ QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
 		rc = parse_zillion_hex(&snapshot_buff[0], &buff[0]);
 	if (!rc)
 		snapshot_copy(&snapshot_buff[0], snapshot_size);
-	return rc;
+	return std::make_pair(rc, std::string());
 }

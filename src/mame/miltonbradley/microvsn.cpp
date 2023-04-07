@@ -86,7 +86,7 @@ private:
 	required_ioport m_paddle;
 	required_ioport m_conf;
 
-	u32 tms1100_decode_micro(offs_t offset);
+	u32 tms1100_micro_pla(offs_t offset);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void apply_settings(void);
 
@@ -134,7 +134,7 @@ void microvision_state::machine_start()
     Cartridge Init
 ******************************************************************************/
 
-static const u16 microvision_output_pla[2][0x20] =
+static const u16 tms1100_output_pla[2][0x20] =
 {
 	// default TMS1100 O output PLA
 	// verified for: blckbstr, pinball
@@ -155,34 +155,38 @@ static const u16 microvision_output_pla[2][0x20] =
 	}
 };
 
-u32 microvision_state::tms1100_decode_micro(offs_t offset)
+u32 microvision_state::tms1100_micro_pla(offs_t offset)
 {
 	// default TMS1100 microinstructions PLA - this should work for all games
 	// verified for: blckbstr, bowling, pinball, vegasslt
-	static const u16 micro[0x80] =
+
+	// TCY, YNEC, TMCIY, AxAAC
+	static const u16 micro1[4] = { 0x0108, 0x9080, 0x8068, 0x0136 };
+
+	// 0x20, 0x30, 0x00
+	static const u16 micro2[0x30] =
 	{
-		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
-		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
-		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 		0x000a, 0x0404, 0x0408, 0x8004, 0xa019, 0xa038, 0x2004, 0x2000,
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400,
-		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
-		0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108, 0x0108,
-		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
-		0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080, 0x9080,
-		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
-		0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068, 0x8068,
-		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136,
-		0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0136, 0x0134
+
+		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
+		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
 	};
 
-	if (offset >= 0x80 || micro[offset] == 0)
-		return 0x8fa3;
-	else
-		return micro[offset];
+	u16 data = 0;
+
+	if (offset >= 0x40 && offset < 0x80)
+	{
+		data = micro1[offset >> 4 & 3];
+		if (offset == 0x7f) data ^= 2;
+	}
+	else if (offset < 0x40 && (offset & 0xf0) != 0x10)
+		data = micro2[offset ^ 0x20];
+
+	return (data == 0) ? 0x8fa3 : data;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
@@ -190,10 +194,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x400 && size != 0x800)
-	{
-		osd_printf_error("%s: Invalid ROM file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 1K or 2K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -236,7 +237,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state::cart_load)
 		m_tms1100->set_clock(clock);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void microvision_state::apply_settings()
@@ -247,7 +248,7 @@ void microvision_state::apply_settings()
 	m_button_mask = (conf & 1) ? m_butmask_auto : 0xfff;
 
 	u8 pla = ((conf & 0x18) == 0x10) ? m_pla_auto : (conf >> 3 & 1);
-	m_tms1100->set_output_pla(microvision_output_pla[pla]);
+	m_tms1100->set_output_pla(tms1100_output_pla[pla]);
 
 	m_paddle_on = ((conf & 6) == 4) ? m_paddle_auto : bool(conf & 2);
 }
@@ -446,8 +447,8 @@ void microvision_state::microvision(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1100(config, m_tms1100, 0);
-	m_tms1100->set_output_pla(microvision_output_pla[0]);
-	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_decode_micro));
+	m_tms1100->set_output_pla(tms1100_output_pla[0]);
+	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_micro_pla));
 	m_tms1100->read_k().set(FUNC(microvision_state::tms1100_k_r));
 	m_tms1100->write_o().set(FUNC(microvision_state::tms1100_o_w));
 	m_tms1100->write_r().set(FUNC(microvision_state::tms1100_r_w));

@@ -404,18 +404,28 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 0020 up   - Program to load
 */
 
+	if (image.length() < 0x20)
+		return std::make_pair(image_error::INVALIDIMAGE, "File too short to contain Z1013 image header");
+
 	std::vector<uint8_t> data(image.length());
 	image.fread(&data[0], image.length());
+	if ((data[13] != data[14]) || (data[14] != data[15]))
+		return std::make_pair(image_error::INVALIDIMAGE, "Not a Z1013 image");
 
 	uint16_t const startaddr = data[0] + data[1]*256;
 	uint16_t const endaddr   = data[2] + data[3]*256;
 	uint16_t const runaddr   = data[4] + data[5]*256;
-
-	if ((data[13] != data[14]) || (data[14] != data[15]))
+	if (endaddr < startaddr)
 	{
-		osd_printf_error("%s: Not a Z1013 image\n", image.basename());
-		image.message(" Not a Z1013 image");
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("End address 0x%04X is less than start address 0x%04X", endaddr, startaddr));
+	}
+	else if ((endaddr - startaddr + 1) > (data.size() - 0x20))
+	{
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("File too short to contain %u-byte program", endaddr - startaddr + 1));
 	}
 
 	memcpy(m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr), &data[0x20], endaddr - startaddr + 1);
@@ -428,7 +438,7 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 		image.message(" Loaded but cannot run due to zero entry point");
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* F4 Character Displayer */

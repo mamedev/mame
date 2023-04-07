@@ -211,12 +211,12 @@ void network_adapter::postload()
 	}
 }
 
-std::error_condition network_adapter::call_load()
+std::pair<std::error_condition, std::string> network_adapter::call_load()
 {
 	if (is_filetype("pak")) {
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	return image_error::INVALIDIMAGE;
+	return std::make_pair(image_error::INVALIDIMAGE, std::string());
 }
 
 //**************************************************************************

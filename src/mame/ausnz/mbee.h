@@ -125,7 +125,7 @@ private:
 	void premium_palette(palette_device &palette) const;
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
-	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, u8);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, u8);
 	void unload_cart(u8);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	template <u8 T> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak_load) { return load_cart(image, m_pak[T], T); }

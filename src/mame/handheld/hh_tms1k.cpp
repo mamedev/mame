@@ -2938,10 +2938,7 @@ void quizwizc_state::machine_start()
 DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
-	{
-		osd_printf_error("Can only load through softwarelist\n");
-		return image_error::UNSUPPORTED;
-	}
+		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list");
 
 	// get cartridge pinout K1 to R connections
 	const char *pinout = image.get_feature("pinout");
@@ -2949,12 +2946,9 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
 
 	if (m_pinout == 0)
-	{
-		osd_printf_error("%s: Invalid cartridge pinout\n", image.basename());
-		return image_error::BADSOFTWARE;
-	}
+		return std::make_pair(image_error::BADSOFTWARE, "Invalid cartridge pinout\n");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void quizwizc_state::update_display()
@@ -3135,16 +3129,13 @@ void tc4_state::machine_start()
 DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
-	{
-		osd_printf_error("Can only load through softwarelist\n");
-		return image_error::UNSUPPORTED;
-	}
+		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list\n");
 
 	// get cartridge pinout R9 to K connections
 	const char *pinout = image.get_feature("pinout");
 	m_pinout = pinout ? strtoul(pinout, nullptr, 0) & 0xf : 0xf;
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tc4_state::update_display()
@@ -14560,16 +14551,13 @@ void playmaker_state::machine_start()
 DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
-	{
-		osd_printf_error("Can only load through softwarelist\n");
-		return image_error::UNSUPPORTED;
-	}
+		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list\n");
 
 	// get cartridge notch
 	const char *notch = image.get_feature("notch");
 	m_notch = notch ? strtoul(notch, nullptr, 0) & 3 : 0;
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void playmaker_state::update_display()

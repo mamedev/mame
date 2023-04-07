@@ -135,7 +135,7 @@ void sat_cart_slot_device::device_start()
  -------------------------------------------------*/
 
 
-std::error_condition sat_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -170,7 +170,7 @@ std::error_condition sat_cart_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

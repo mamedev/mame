@@ -271,24 +271,17 @@ void lviv_state::dump_registers()
 	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(i8080_cpu_device::I8085_HL));
 }
 
-std::error_condition lviv_state::verify_snapshot(const uint8_t * data, uint32_t size)
+std::pair<std::error_condition, std::string> lviv_state::verify_snapshot(const uint8_t * data, uint32_t size)
 {
-	const char* tag = "LVOV/DUMP/2.0/";
-
-	if (strncmp(tag, (const char*)data, strlen(tag)))
-	{
-		logerror("Not a Lviv snapshot\n");
-		return image_error::INVALIDIMAGE;
-	}
-
 	if (size != LVIV_SNAPSHOT_SIZE)
-	{
-		logerror ("Incomplete snapshot file\n");
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Incorrect snapshot file length");
+
+	char const *const tag = "LVOV/DUMP/2.0/";
+	if (strncmp(tag, (const char*)data, strlen(tag)))
+		return std::make_pair(image_error::INVALIDIMAGE, "Not a Lviv snapshot");
 
 	logerror("returning ID_OK\n");
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
@@ -297,8 +290,8 @@ SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 
 	image.fread(&snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	std::error_condition err = verify_snapshot(&snapshot_data[0], image.length());
-	if (err)
+	auto err = verify_snapshot(&snapshot_data[0], image.length());
+	if (err.first)
 		return err;
 
 	setup_snapshot(&snapshot_data[0]);
@@ -306,5 +299,5 @@ SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 	dump_registers();
 
 	logerror("Snapshot file loaded\n");
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

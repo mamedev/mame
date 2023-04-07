@@ -631,16 +631,13 @@ DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
 	uint32_t const size = m_cart->common_get_size("rom");
 
-	if ( ! size || size > 0x10000)
-	{
-		osd_printf_error("%s: Unsupported cartridge size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+	if (!size || size > 0x1'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be more than 64K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )

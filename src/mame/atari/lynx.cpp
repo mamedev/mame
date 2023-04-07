@@ -153,15 +153,12 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 {
 	u8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	if (image.fread( header, sizeof(header)) != sizeof(header))
-		return image_error::UNSPECIFIED;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	/* Check the image */
-	std::error_condition err = verify_cart((const char*)header, LYNX_QUICKLOAD);
-	if (err)
-	{
-		osd_printf_error("%s: Not a valid Lynx file\n", image.basename());
+	auto err = verify_cart((const char*)header, LYNX_QUICKLOAD);
+	if (err.first)
 		return err;
-	}
 
 	uint16_t const start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
 	uint16_t const length = (header[5] | (header[4]<<8)) - 10;
@@ -169,10 +166,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 	std::vector<u8> data;
 	data.resize(length);
 	if (image.fread(&data[0], length) != length)
-	{
-		osd_printf_error("%s: Invalid length in file header\n", image.basename());
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid length in file header");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (int i = 0; i < length; i++)
@@ -186,7 +180,7 @@ QUICKLOAD_LOAD_MEMBER(lynx_state::quickload_cb)
 
 	m_maincpu->set_pc(start);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************

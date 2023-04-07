@@ -45,7 +45,7 @@ public:
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "aquarius_cart"; }

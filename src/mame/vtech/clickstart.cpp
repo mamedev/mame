@@ -201,7 +201,7 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state::cart_load)
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_CALLBACK_MEMBER(clickstart_state::handle_uart_tx)

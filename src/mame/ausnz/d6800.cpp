@@ -346,11 +346,7 @@ QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 
 	u32 const quick_length = image.length();
 	if (quick_length > 0xe00)
-	{
-		osd_printf_error("%s: File exceeds 3854 bytes\n", image.basename());
-		image.message(" File exceeds 3584 bytes");
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "File exceeds 3584 bytes");
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (u32 i = 0; i < quick_length; i++)
@@ -370,7 +366,7 @@ QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 	// Start the quickload
 	m_maincpu->set_pc(exec_addr);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void d6800_state::d6800(machine_config &config)

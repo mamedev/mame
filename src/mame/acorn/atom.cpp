@@ -187,7 +187,7 @@ QUICKLOAD_LOAD_MEMBER(atom_state::quickload_cb)
 	else
 		m_maincpu->set_state_int(M6502_PC, run_address);   // if not basic, autostart program (set_pc doesn't work)
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************
@@ -679,20 +679,17 @@ void atomeb_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-std::error_condition atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
+std::pair<std::error_condition, std::string> atom_state::load_cart(device_image_interface &image, generic_slot_device &slot)
 {
 	uint32_t size = slot.common_get_size("rom");
 
 	if (size > 0x1000)
-	{
-		osd_printf_error("%s: Unsupported ROM size\n", image.basename());
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported ROM size (must be no larger than 4K)");
 
 	slot.rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot.common_load_rom(slot.get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static void atom_floppies(device_slot_interface &device)

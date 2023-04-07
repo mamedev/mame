@@ -229,7 +229,7 @@ TIMER_CALLBACK_MEMBER(pce220_serial_device::receive_tick)
     DEVICE_IMAGE_LOAD( pce220_serial )
 -------------------------------------------------*/
 
-std::error_condition pce220_serial_device::call_load()
+std::pair<std::error_condition, std::string> pce220_serial_device::call_load()
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
@@ -238,21 +238,21 @@ std::error_condition pce220_serial_device::call_load()
 	//read the first byte
 	fread(&m_current_byte, 1);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------
     DEVICE_IMAGE_CREATE( pce220_serial )
 -------------------------------------------------*/
 
-std::error_condition pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> pce220_serial_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	m_state = SIO_WAIT;
 	m_bytes_count = 0;
 	m_current_byte = 0;
 	m_receive_timer->adjust(attotime::from_hz(SIO_BAUD_RATE), 0, attotime::from_hz(SIO_BAUD_RATE));
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

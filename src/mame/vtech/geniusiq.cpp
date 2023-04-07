@@ -692,7 +692,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state::cart_load)
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state::cart_unload)

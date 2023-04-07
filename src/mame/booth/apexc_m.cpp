@@ -24,7 +24,7 @@ apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &m
 /*
     Open cylinder image and read RAM
 */
-std::error_condition apexc_cylinder_image_device::call_load()
+std::pair<std::error_condition, std::string> apexc_cylinder_image_device::call_load()
 {
 	/* load RAM contents */
 	m_writable = !is_readonly();
@@ -38,7 +38,7 @@ std::error_condition apexc_cylinder_image_device::call_load()
 		RAM[i] = big_endianize_int32(RAM[i]);
 #endif
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*

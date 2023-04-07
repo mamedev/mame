@@ -101,7 +101,7 @@ public:
 	// Head select
 	void            headsel_w(int head) { m_current_head = head & 0x0f; }
 
-	std::error_condition call_load() override;
+	std::pair<std::error_condition, std::string> call_load() override;
 	void            call_unload() override;
 
 	// Tells us the time when the track ends (next index pulse). Needed by the controller.

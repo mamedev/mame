@@ -728,12 +728,12 @@ const software_list_loader &legacy_floppy_image_device::get_software_list_loader
 	return image_software_list_loader::instance();
 }
 
-std::error_condition legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_floppy_device_load(true, format_type, format_options);
+	return std::make_pair(internal_floppy_device_load(true, format_type, format_options), std::string());
 }
 
-std::error_condition legacy_floppy_image_device::call_load()
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_load()
 {
 	std::error_condition retVal = internal_floppy_device_load(false, -1, nullptr);
 
@@ -751,7 +751,7 @@ std::error_condition legacy_floppy_image_device::call_load()
 
 	m_wpt_timer->adjust(attotime::from_msec(250), next_wpt);
 
-	return retVal;
+	return std::make_pair(retVal, std::string());
 }
 
 void legacy_floppy_image_device::call_unload()

@@ -53,15 +53,14 @@ DEVICE_IMAGE_LOAD_MEMBER( vtech2_state::cart_load )
 
 	if (m_cart_size > 0x10000)
 	{
-		osd_printf_error("%s: Cartridge bigger than 64k\n", image.basename());
 		m_cart_size = 0;
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, "Cartridge bigger than 64k");
 	}
 
 	m_cart->rom_alloc(m_cart_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), m_cart_size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void vtech2_state::machine_reset()

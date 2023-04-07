@@ -150,7 +150,7 @@ static const char *ws_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition ws_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> ws_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -202,7 +202,7 @@ std::error_condition ws_cart_slot_device::call_load()
 		internal_header_logging(ROM, ((size >> 16) - 1) << 16, size);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------

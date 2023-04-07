@@ -316,7 +316,7 @@ kccart_slot_device::~kccart_slot_device()
     call load
 -------------------------------------------------*/
 
-std::error_condition kccart_slot_device::call_load()
+std::pair<std::error_condition, std::string> kccart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -336,10 +336,10 @@ std::error_condition kccart_slot_device::call_load()
 			}
 		}
 		else
-			return image_error::INTERNAL;
+			return std::make_pair(image_error::INTERNAL, std::string());
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*-------------------------------------------------

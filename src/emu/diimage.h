@@ -76,8 +76,8 @@ public:
 	device_image_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_image_interface();
 
-	virtual std::error_condition call_load() { return std::error_condition(); }
-	virtual std::error_condition call_create(int format_type, util::option_resolution *format_options) { return std::error_condition(); }
+	virtual std::pair<std::error_condition, std::string> call_load() { return std::make_pair(std::error_condition(), std::string()); }
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) { return std::make_pair(std::error_condition(), std::string()); }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
 	virtual u32 unhashed_header_length() const noexcept { return 0; }
@@ -188,15 +188,15 @@ public:
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
 	// loads an image file
-	std::error_condition load(std::string_view path);
+	std::pair<std::error_condition, std::string> load(std::string_view path);
 
 	// loads a softlist item by name
-	std::error_condition load_software(std::string_view software_identifier);
+	std::pair<std::error_condition, std::string> load_software(std::string_view software_identifier);
 
-	std::error_condition finish_load();
+	std::pair<std::error_condition, std::string> finish_load();
 	void unload();
-	std::error_condition create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
-	std::error_condition create(std::string_view path);
+	std::pair<std::error_condition, std::string> create(std::string_view path, const image_device_format *create_format, util::option_resolution *create_args);
+	std::pair<std::error_condition, std::string> create(std::string_view path);
 	std::error_condition load_software(software_list_device &swlist, std::string_view swname, const rom_entry *entry);
 	std::error_condition reopen_for_write(std::string_view path);
 
@@ -215,7 +215,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }
 
-	std::error_condition load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
+	std::pair<std::error_condition, std::string> load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);
 	void clear() noexcept;
 	bool is_loaded() const noexcept { return m_file != nullptr; }

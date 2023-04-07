@@ -41,9 +41,9 @@ void wafadrive_image_device::device_start()
 {
 }
 
-std::error_condition wafadrive_image_device::call_load()
+std::pair<std::error_condition, std::string> wafadrive_image_device::call_load()
 {
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void wafadrive_image_device::call_unload()

@@ -36,7 +36,7 @@ public:
 	virtual ~avivideo_image_device();
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }

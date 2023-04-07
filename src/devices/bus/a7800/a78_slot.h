@@ -101,7 +101,7 @@ public:
 	virtual ~a78_cart_slot_device();
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -129,7 +129,7 @@ private:
 	// device_t implementation
 	virtual void device_start() override;
 
-	std::error_condition verify_header(const char *header);
+	std::pair<std::error_condition, std::string> verify_header(const char *header);
 	int validate_header(int head, bool log) const;
 	void internal_header_logging(uint8_t *header, uint32_t len);
 

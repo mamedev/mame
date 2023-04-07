@@ -2016,7 +2016,7 @@ QUICKLOAD_LOAD_MEMBER(abc800_state::quickload_cb)
 	space.write_byte(0xff32, comcs & 0xff);
 	space.write_byte(0xff33, comcs >> 8);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

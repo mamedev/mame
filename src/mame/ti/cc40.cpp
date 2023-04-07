@@ -194,16 +194,13 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 	u32 const size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
-	if (size > 0x20000)
-	{
-		osd_printf_error("%s: Invalid file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+	if (size > 0x2'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid file size (must be no more than 128K)");
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
+	m_cart->rom_alloc(0x2'0000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

@@ -328,9 +328,8 @@ QUICKLOAD_LOAD_MEMBER(bbc_datacentre_device::quickload_cb)
 	}
 	else
 	{
-		osd_printf_error("%s: Invalid filetype, must be SSD, DSD, or IMG\n", image.basename());
-		return image_error::INVALIDIMAGE;
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported file type, must be SSD, DSD, or IMG");
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

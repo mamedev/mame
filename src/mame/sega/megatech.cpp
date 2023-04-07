@@ -146,7 +146,7 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
@@ -749,21 +749,21 @@ void mtech_state::megatech(machine_config &config)
 }
 
 
-std::error_condition mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
+std::pair<std::error_condition, std::string> mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
 	uint8_t *ROM;
 	const char  *pcb_name;
 	uint32_t size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_error::UNSUPPORTED;
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
-		return image_error::BADSOFTWARE;
+		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'pcb_type' feature");
 	else
 	{
 		if (!strcmp("genesis", pcb_name))
@@ -777,10 +777,14 @@ std::error_condition mtech_state::load_cart(device_image_interface &image, gener
 			m_cart_is_genesis[gameno] = 0;
 		}
 		else
-			osd_printf_debug("cart%d is invalid\n", gameno + 1);
+		{
+			return std::make_pair(
+					image_error::BADSOFTWARE,
+					util::string_format("Software item has invalid 'pcb_type' feature '%s' (must be 'genesis' or 'sms')", pcb_name));
+		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 #define MEGATECH_CARTSLOT(_tag, _load) \

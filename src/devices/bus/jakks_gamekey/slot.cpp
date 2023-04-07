@@ -125,7 +125,7 @@ static const char *jakks_gamekey_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition jakks_gamekey_slot_device::call_load()
+std::pair<std::error_condition, std::string> jakks_gamekey_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -154,7 +154,7 @@ std::error_condition jakks_gamekey_slot_device::call_load()
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

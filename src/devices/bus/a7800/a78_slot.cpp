@@ -332,7 +332,7 @@ static const char *a78_get_slot(int type)
 	return "a78_rom";
 }
 
-std::error_condition a78_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> a78_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -368,8 +368,8 @@ std::error_condition a78_cart_slot_device::call_load()
 			char head[128];
 			fread(head, 128);
 
-			std::error_condition err = verify_header(head);
-			if (err)
+			auto err = verify_header(head);
+			if (err.first)
 				return err;
 
 			len = (head[49] << 24) | (head[50] << 16) | (head[51] << 8) | head[52];
@@ -464,7 +464,7 @@ std::error_condition a78_cart_slot_device::call_load()
 
 		//printf("Type: %s\n", a78_get_slot(m_type));
 	}
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -485,18 +485,15 @@ void a78_cart_slot_device::call_unload()
  has an admissible header
  -------------------------------------------------*/
 
-std::error_condition a78_cart_slot_device::verify_header(const char *header)
+std::pair<std::error_condition, std::string> a78_cart_slot_device::verify_header(const char *header)
 {
 	const char *magic = "ATARI7800";
 
 	if (strncmp(magic, header + 1, 9))
-	{
-		osd_printf_error("%s: Not a valid A7800 image\n", basename());
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Not a valid A7800 image");
 
 	logerror("returning ID_OK\n");
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

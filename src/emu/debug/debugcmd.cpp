@@ -3991,11 +3991,19 @@ void debugger_commands::execute_mount(const std::vector<std::string_view> &param
 	{
 		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
-			std::error_condition err = img.load(params[1]);
-			if (err)
-				m_console.printf("Unable to mount file %s on %s: %s\n", params[1], params[0], err.message());
-			else
+			auto [err, msg] = img.load(params[1]);
+			if (!err)
+			{
 				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
+			}
+			else
+			{
+				m_console.printf(
+						"Unable to mount file %s on %s: %s\n",
+						params[1],
+						params[0],
+						!msg.empty() ? msg : err.message());
+			}
 			return;
 		}
 	}

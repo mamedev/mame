@@ -3251,7 +3251,7 @@ SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 {
 	/* get file size */
 	if (image.length() < 8)
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	std::vector<uint8_t> snapshot(image.length());
 
@@ -3259,12 +3259,10 @@ SNAPSHOT_LOAD_MEMBER(amstrad_state::snapshot_cb)
 	image.fread(&snapshot[0], image.length());
 
 	if (memcmp(&snapshot[0], "MV - SNA", 8))
-	{
-		return image_error::INVALIDIMAGE;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	amstrad_handle_snapshot(&snapshot[0]);
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -3305,12 +3303,9 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		// not an RIFF format file, assume raw binary (*.bin)
 		logerror("IMG: raw CPC+ cartridge file\n");
 		if (size % 0x4000)
-		{
-			osd_printf_error("%s: Attempt to load a raw binary with some block smaller than 16kB in size\n", image.basename());
-			return image_error::INVALIDLENGTH;
-		}
-		else
-			image.fread(m_cart->get_rom_base(), size);
+			return std::make_pair(image_error::INVALIDLENGTH, "Attempt to load a raw binary with some block smaller than 16kB in size");
+
+		image.fread(m_cart->get_rom_base(), size);
 	}
 	else
 	{
@@ -3336,10 +3331,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 
 		// Is RIFF format (*.cpr)
 		if (strncmp((const char*)(header + 8), "AMS!", 4) != 0)
-		{
-			osd_printf_error("%s: Not an Amstrad CPC cartridge image (despite RIFF header)\n", image.basename());
-			return image_error::INVALIDIMAGE;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "Not an Amstrad CPC cartridge image (despite RIFF header)");
 
 		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
 		bytes_to_read -= 4;  // account for AMS! header
@@ -3390,5 +3382,5 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

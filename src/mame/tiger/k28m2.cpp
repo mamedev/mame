@@ -14,7 +14,7 @@ Hardware notes:
 - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
 - TMS51xx: TMS5110A
 - VSM: 16KB CM62084
-- LCD: SMOS SMC1112 MCU under epoxy (die label: SMC1112 D2N0), 8*14-seg display
+- LCD: SMC1112 MCU under epoxy (die label: SMC1112 D2N0), 8*14-seg display
 - module slot (not compatible with the 1981 version(s))
 
 TODO:
@@ -27,6 +27,7 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "cpu/tms1000/smc1102.h"
 #include "cpu/tms1000/tms1400.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
@@ -46,6 +47,7 @@ public:
 	k28m2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
 		m_cart(*this, "cartslot"),
@@ -63,6 +65,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<tms1400_cpu_device> m_maincpu;
+	required_device<smc1112_cpu_device> m_subcpu;
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
@@ -123,15 +126,12 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > 0x4000)
-	{
-		osd_printf_error("%s: Invalid file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid image file size (must be no more than 16K)");
 
 	u8 *const base = memregion("tms6100")->base() + 0x8000;
 	m_cart->common_load_rom(base, size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -259,6 +259,8 @@ void k28m2_state::k28m2(machine_config &config)
 	m_maincpu->write_o().set(FUNC(k28m2_state::write_o));
 	m_maincpu->write_r().set(FUNC(k28m2_state::write_r));
 
+	SMC1112(config, m_subcpu, 32.768_kHz_XTAL);
+
 	config.set_default_layout(layout_k28m2);
 
 	// sound hardware
@@ -294,6 +296,9 @@ ROM_START( k28m2 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_k28m2_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
+
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD( "smc1112_d2n0", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
 	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )

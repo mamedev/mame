@@ -137,7 +137,7 @@ public:
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_writeable() const noexcept override { return true; }

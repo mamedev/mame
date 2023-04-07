@@ -100,10 +100,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x1000 && size != 0x1100 && size != 0x2000)
-	{
-		osd_printf_error("%s: Invalid ROM file size\n", image.basename());
-		return image_error::INVALIDLENGTH;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM file size (must be 4096, 4352 or 8192 bytes)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -113,10 +110,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 	{
 		// TMS1670 MCU
 		if (!image.loaded_through_softlist())
-		{
-			osd_printf_error("Can only load TMS1670 type through softwarelist\n");
-			return image_error::UNSUPPORTED;
-		}
+			return std::make_pair(image_error::UNSUPPORTED, "Can only load TMS1670 type through software list");
 
 		memcpy(memregion("tms1k_cpu")->base(), m_cart->get_rom_base(), size);
 		m_tms1k_cpu->set_clock(375000); // approximation - RC osc. R=47K, C=47pF
@@ -124,18 +118,14 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		// init PLAs
 		size = image.get_software_region_length("rom:mpla");
 		if (size != 867)
-		{
-			osd_printf_error("%s: Invalid MPLA file size\n", image.basename());
-			return image_error::BADSOFTWARE;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Invalid MPLA data area size (must be 867 bytes)");
+
 		memcpy(memregion("tms1k_cpu:mpla")->base(), image.get_software_region("rom:mpla"), size);
 
 		size = image.get_software_region_length("rom:opla");
 		if (size != 557)
-		{
-			osd_printf_error("%s: Invalid OPLA file size\n", image.basename());
-			return image_error::BADSOFTWARE;
-		}
+			return std::make_pair(image_error::BADSOFTWARE, "Invalid OPLA data area size (must be 557 bytes)");
+
 		memcpy(memregion("tms1k_cpu:opla")->base(), image.get_software_region("rom:opla"), size);
 
 		subdevice<pla_device>("tms1k_cpu:mpla")->reinit();
@@ -154,7 +144,7 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 		m_hmcs40_cpu->set_clock(450000); // from main PCB
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

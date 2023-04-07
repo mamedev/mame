@@ -898,7 +898,7 @@ public:
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 protected:
@@ -935,12 +935,12 @@ int ti990_tape_image_device::tape_get_id()
 /*
     Open a tape image
 */
-std::error_condition ti990_tape_image_device::call_load()
+std::pair<std::error_condition, std::string> ti990_tape_image_device::call_load()
 {
 	tap_990_device* tpc = downcast<tap_990_device*>(owner());
 	tpc->set_tape(tape_get_id(), this, true, false, is_readonly());
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*

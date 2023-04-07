@@ -48,23 +48,33 @@ void intel_imm6_76_device::device_start()
 }
 
 
-std::error_condition intel_imm6_76_device::call_load()
+std::pair<std::error_condition, std::string> intel_imm6_76_device::call_load()
 {
 	if (length() != std::size(m_data))
-		return image_error::INVALIDLENGTH;
+	{
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Incorrect PROM image length (must be %u bytes)", std::size(m_data)));
+	}
 	else if (fread(m_data, std::size(m_data)) != std::size(m_data))
-		return image_error::UNSPECIFIED;
+	{
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
+	}
 	else
-		return std::error_condition();
+	{
+		return std::make_pair(std::error_condition(), std::string());
+	}
 }
 
-std::error_condition intel_imm6_76_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> intel_imm6_76_device::call_create(
+		int format_type,
+		util::option_resolution *format_options)
 {
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
 	if (fwrite(m_data, std::size(m_data)) != std::size(m_data))
-		return image_error::UNSPECIFIED;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	else
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 }
 
 void intel_imm6_76_device::call_unload()

@@ -770,13 +770,13 @@ QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 
 	if (size > m_ram->size()) // FIXME: comparing size to RAM size, but loading to ROM - seems incorrect
 	{
-		return image_error::INVALIDLENGTH;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
 	uint8_t *const ptr = m_rom->base();
 	image.fread(ptr, size);
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void tmc1800_state::tmc1800(machine_config &config)

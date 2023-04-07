@@ -27,9 +27,9 @@ public:
 	virtual ~datapack_device();
 
 	// device_image_interface implementation
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual std::error_condition call_create(int format_type, util::option_resolution *create_args) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *create_args) override;
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "psion_pack"; }

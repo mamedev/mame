@@ -89,7 +89,7 @@ private:
 	void pcjx_port_1ff_w(uint8_t data);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	std::error_condition load_cart(device_image_interface &image, generic_slot_device *slot);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
@@ -446,7 +446,9 @@ uint8_t pcjr_state::pcjx_port_1ff_r()
 	return 0x60; // expansion?
 }
 
-std::error_condition pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+std::pair<std::error_condition, std::string> pcjr_state::load_cart(
+		device_image_interface &image,
+		generic_slot_device *slot)
 {
 	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
@@ -465,8 +467,7 @@ std::error_condition pcjr_state::load_cart(device_image_interface &image, generi
 				header_size = 0x200;
 				break;
 			default:
-				osd_printf_error("%s: Invalid header size\n", image.basename());
-				return image_error::INVALIDIMAGE;
+				return std::make_pair(image_error::INVALIDIMAGE, "Invalid header length (must be 128 bytes or 512 bytes)");
 		}
 		if ((size - header_size) == 0xa000)
 		{
@@ -497,7 +498,8 @@ std::error_condition pcjr_state::load_cart(device_image_interface &image, generi
 		memcpy(ROM + 0x4000, ROM, 0x2000);
 		memcpy(ROM + 0x2000, ROM, 0x2000);
 	}
-	return std::error_condition();
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

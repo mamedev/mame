@@ -608,8 +608,8 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 		uint16_t execute_address, start_addr, end_addr;
 
 		/* load the binary into memory */
-		std::error_condition err = z80bin_load_file(image, space, execute_address, start_addr, end_addr);
-		if (err)
+		auto err = z80bin_load_file(image, space, execute_address, start_addr, end_addr);
+		if (err.first)
 			return err;
 
 		/* is this file executable? */
@@ -628,7 +628,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 			}
 		}
 
-		return std::error_condition();
+		return std::make_pair(std::error_condition(), std::string());
 	}
 
 	size_t quickload_size = image.length();
@@ -641,18 +641,12 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 
 			u8 data;
 			if (image.fread(&data, 1) != 1)
-			{
-				image.message("Unexpected EOF");
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF");
 
 			if ((j < m_size) || (j > 0xefff))
 				space.write_byte(j, data);
 			else
-			{
-				image.message("Not enough memory in this microbee");
-				return image_error::UNSUPPORTED;
-			}
+				return std::make_pair(image_error::UNSUPPORTED, "Not enough memory in this microbee");
 		}
 
 		if (autorun)
@@ -672,18 +666,12 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 
 			u8 data;
 			if (image.fread(&data, 1) != 1)
-			{
-				image.message("Unexpected EOF");
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF");
 
 			if ((j < m_size) || (j > 0xefff))
 				space.write_byte(j, data);
 			else
-			{
-				image.message("Not enough memory in this microbee");
-				return image_error::UNSUPPORTED;
-			}
+				return std::make_pair(image_error::UNSUPPORTED, "Not enough memory in this microbee");
 		}
 
 		if (autorun)
@@ -698,29 +686,23 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 
 			u8 data;
 			if (image.fread(&data, 1) != 1)
-			{
-				image.message("Unexpected EOF");
-				return image_error::UNSPECIFIED;
-			}
+				return std::make_pair(image_error::UNSPECIFIED, "Unexpected EOF");
 
 			if ((j < m_size) || (j > 0xefff))
 				space.write_byte(j, data);
 			else
-			{
-				image.message("Not enough memory in this microbee");
-				return image_error::UNSUPPORTED;
-			}
+				return std::make_pair(image_error::UNSUPPORTED, "Not enough memory in this microbee");
 		}
 
 		if (autorun)
 			m_maincpu->set_pc(0x900);
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // Index usage: 0 = not used; 1 = net rom; 2-7 = pak roms
-std::error_condition mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
+std::pair<std::error_condition, std::string> mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
 {
 	u32 size = slot->common_get_size("rom");
 
@@ -728,10 +710,7 @@ std::error_condition mbee_state::load_cart(device_image_interface &image, generi
 	{
 		// "mbp" ROMs
 		if ((size == 0) || (size > 0x4000))
-		{
-			osd_printf_error("%s: Unsupported ROM size\n", image.basename());
-			return image_error::INVALIDLENGTH;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be no larger than 16K)");
 
 		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
 
@@ -742,9 +721,8 @@ std::error_condition mbee_state::load_cart(device_image_interface &image, generi
 		logerror("ROM header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
 		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
 		{
-			osd_printf_error("%s: Not a PAK rom\n", image.basename());
 			slot->call_unload();
-			return image_error::INVALIDIMAGE;
+			return std::make_pair(image_error::INVALIDIMAGE, "Not a PAK ROM");
 		}
 	}
 	else
@@ -752,8 +730,7 @@ std::error_condition mbee_state::load_cart(device_image_interface &image, generi
 		// "mbn" roms
 		if ((size == 0) || (size > 0x2000))
 		{
-			osd_printf_error("%s: Unsupported ROM size\n", image.basename());
-			return image_error::INVALIDLENGTH;
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be no larger than 8K)");
 		}
 		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
 
@@ -766,14 +743,13 @@ std::error_condition mbee_state::load_cart(device_image_interface &image, generi
 		{
 			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
 			{
-				osd_printf_error("%s: Not a NET rom\n", image.basename());
 				slot->call_unload();
-				return image_error::INVALIDIMAGE;
+				return std::make_pair(image_error::INVALIDIMAGE, "Not a NET ROM");
 			}
 		}
 	}
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void mbee_state::unload_cart(u8 pak_index)

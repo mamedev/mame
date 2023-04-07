@@ -2499,6 +2499,7 @@ end
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tp0320.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/smc1102.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
 if CPUS["TMS1000"] then
@@ -2525,6 +2526,8 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.h",
 	}
 end
 

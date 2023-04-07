@@ -1831,11 +1831,41 @@ void lua_engine::initialize()
 
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
-	image_type["load"] = &device_image_interface::load;
-	image_type["load_software"] = static_cast<std::error_condition (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
-	image_type["unload"] = &device_image_interface::unload;
-	image_type["create"] = static_cast<std::error_condition (device_image_interface::*)(std::string_view)>(&device_image_interface::create);
-	image_type["display"] = &device_image_interface::call_display;
+	image_type.set_function("load",
+			[] (device_image_interface &di, sol::this_state s, std::string_view path) -> sol::object
+			{
+				auto [err, message] = di.load(path);
+				if (!err)
+					return sol::lua_nil;
+				else if (!message.empty())
+					return sol::make_object(s, message);
+				else
+					return sol::make_object(s, err.message());
+			});
+	image_type.set_function("load_software",
+			[] (device_image_interface &di, sol::this_state s, std::string_view identifier) -> sol::object
+			{
+				auto [err, message] = di.load_software(identifier);
+				if (!err)
+					return sol::lua_nil;
+				else if (!message.empty())
+					return sol::make_object(s, message);
+				else
+					return sol::make_object(s, err.message());
+			});
+	image_type.set_function("unload", &device_image_interface::unload);
+	image_type.set_function("create",
+			[] (device_image_interface &di, sol::this_state s, std::string_view path) -> sol::object
+			{
+				auto [err, message] = di.create(path);
+				if (!err)
+					return sol::lua_nil;
+				else if (!message.empty())
+					return sol::make_object(s, message);
+				else
+					return sol::make_object(s, err.message());
+			});
+	image_type.set_function("display", &device_image_interface::call_display);
 	image_type["is_readable"] = sol::property(&device_image_interface::is_readable);
 	image_type["is_writeable"] = sol::property(&device_image_interface::is_writeable);
 	image_type["is_creatable"] = sol::property(&device_image_interface::is_creatable);

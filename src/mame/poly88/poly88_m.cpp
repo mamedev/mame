@@ -310,5 +310,5 @@ SNAPSHOT_LOAD_MEMBER(poly88_state::snapshot_cb)
 		pos+=recordLen;
 	}
 	m_usart->reset();
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }

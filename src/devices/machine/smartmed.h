@@ -32,7 +32,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "sm_memc"; }
 	virtual const char *file_extensions() const noexcept override { return "smc"; }
 
-	virtual std::error_condition call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	// Because nand_device is a NVRAM device now, stub these to make it not do anything (read only)

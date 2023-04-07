@@ -508,7 +508,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state::cart_load )
 	m_cart_rom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart_rom->common_load_rom(m_cart_rom->get_rom_base(), size, "rom");
 
-	return std::error_condition();
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
