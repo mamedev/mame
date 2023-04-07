@@ -587,15 +587,15 @@ auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char 
 		{
 			return notifier.subscribe(
 					delegate<void (T...)>(
-							[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
+						[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
+						{
+							auto status = invoke(cbfunc, args...);
+							if (!status.valid())
 							{
-								auto status = invoke(cbfunc, args...);
-								if (!status.valid())
-								{
-									sol::error err(status);
-									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
-								}
-							}));
+								sol::error err(status);
+								osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
+							}
+						}));
 		};
 }
 

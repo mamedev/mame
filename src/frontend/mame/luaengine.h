@@ -141,6 +141,17 @@ public:
 	}
 
 private:
+	struct notifiers
+	{
+		util::notifier<> on_reset;
+		util::notifier<> on_stop;
+		util::notifier<> on_pause;
+		util::notifier<> on_resume;
+		util::notifier<> on_frame;
+		util::notifier<> on_presave;
+		util::notifier<> on_postload;
+	};
+
 	template <typename T, size_t Size> class enum_parser;
 
 	class buffer_helper;
@@ -152,15 +163,6 @@ private:
 	class symbol_table_wrapper;
 	class expression_wrapper;
 
-	struct save_item {
-		void *base;
-		unsigned int size;
-		unsigned int count;
-		unsigned int valcount;
-		unsigned int blockcount;
-		unsigned int stride;
-	};
-
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
@@ -171,13 +173,7 @@ private:
 	emu_timer *m_timer;
 
 	// machine event notifiers
-	util::notifier<> m_reset_notifier;
-	util::notifier<> m_stop_notifier;
-	util::notifier<> m_pause_notifier;
-	util::notifier<> m_resume_notifier;
-	util::notifier<> m_frame_notifier;
-	util::notifier<> m_presave_notifier;
-	util::notifier<> m_postload_notifier;
+	std::optional<notifiers> m_notifiers;
 
 	// deferred coroutines
 	std::vector<std::pair<attotime, int> > m_waiting_tasks;

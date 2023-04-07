@@ -60,6 +60,16 @@ struct lua_engine::devenum
 
 namespace {
 
+struct save_item
+{
+	void *base;
+	unsigned int size;
+	unsigned int count;
+	unsigned int valcount;
+	unsigned int blockcount;
+	unsigned int stride;
+};
+
 struct thread_context
 {
 private:
@@ -470,6 +480,7 @@ lua_engine::lua_engine()
 {
 	m_lua_state = luaL_newstate();  // create state
 	m_sol_state = std::make_unique<sol::state_view>(m_lua_state); // create sol view
+	m_notifiers.emplace();
 
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  // stop collector during initialization
@@ -627,7 +638,7 @@ void lua_engine::on_machine_prestart()
 
 void lua_engine::on_machine_reset()
 {
-	m_reset_notifier();
+	m_notifiers->on_reset();
 	execute_function("LUA_ON_START");
 }
 
@@ -643,7 +654,7 @@ void lua_engine::on_machine_stop()
 	resume_tasks(m_lua_state, expired, false);
 	expired.clear();
 
-	m_stop_notifier();
+	m_notifiers->on_stop();
 	execute_function("LUA_ON_STOP");
 }
 
@@ -654,13 +665,13 @@ void lua_engine::on_machine_before_load_settings()
 
 void lua_engine::on_machine_pause()
 {
-	m_pause_notifier();
+	m_notifiers->on_pause();
 	execute_function("LUA_ON_PAUSE");
 }
 
 void lua_engine::on_machine_resume()
 {
-	m_resume_notifier();
+	m_notifiers->on_resume();
 	execute_function("LUA_ON_RESUME");
 }
 
@@ -671,14 +682,14 @@ void lua_engine::on_machine_frame()
 	for (int ref : tasks)
 		resume(ref);
 
-	m_frame_notifier();
+	m_notifiers->on_frame();
 
 	execute_function("LUA_ON_FRAME");
 }
 
 void lua_engine::on_machine_presave()
 {
-	m_presave_notifier();
+	m_notifiers->on_presave();
 }
 
 void lua_engine::on_machine_postload()
@@ -693,7 +704,7 @@ void lua_engine::on_machine_postload()
 	resume_tasks(m_lua_state, expired, false);
 	expired.clear();
 
-	m_postload_notifier();
+	m_notifiers->on_postload();
 }
 
 void lua_engine::on_sound_update()
@@ -859,13 +870,13 @@ void lua_engine::initialize()
 				m_frame_tasks.emplace_back(luaL_ref(s, LUA_REGISTRYINDEX));
 				return sol::variadic_results(args.begin(), args.end());
 			});
-	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_reset_notifier, "machine reset"));
-	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_stop_notifier, "machine stop"));
-	emu.set_function("add_machine_pause_notifier", make_notifier_adder(m_pause_notifier, "machine pause"));
-	emu.set_function("add_machine_resume_notifier", make_notifier_adder(m_resume_notifier, "machine resume"));
-	emu.set_function("add_machine_frame_notifier", make_notifier_adder(m_frame_notifier, "machine frame"));
-	emu.set_function("add_machine_pre_save_notifier", make_notifier_adder(m_presave_notifier, "machine pre-save"));
-	emu.set_function("add_machine_post_load_notifier", make_notifier_adder(m_postload_notifier, "machine post-load"));
+	emu.set_function("add_machine_reset_notifier", make_notifier_adder(m_notifiers->on_reset, "machine reset"));
+	emu.set_function("add_machine_stop_notifier", make_notifier_adder(m_notifiers->on_stop, "machine stop"));
+	emu.set_function("add_machine_pause_notifier", make_notifier_adder(m_notifiers->on_pause, "machine pause"));
+	emu.set_function("add_machine_resume_notifier", make_notifier_adder(m_notifiers->on_resume, "machine resume"));
+	emu.set_function("add_machine_frame_notifier", make_notifier_adder(m_notifiers->on_frame, "machine frame"));
+	emu.set_function("add_machine_pre_save_notifier", make_notifier_adder(m_notifiers->on_presave, "machine pre-save"));
+	emu.set_function("add_machine_post_load_notifier", make_notifier_adder(m_notifiers->on_postload, "machine post-load"));
 	emu.set_function("print_error", [] (const char *str) { osd_printf_error("%s\n", str); });
 	emu.set_function("print_warning", [] (const char *str) { osd_printf_warning("%s\n", str); });
 	emu.set_function("print_info", [] (const char *str) { osd_printf_info("%s\n", str); });
@@ -2115,6 +2126,7 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
+	m_notifiers.reset();
 	m_menu.clear();
 	m_update_tasks.clear();
 	m_frame_tasks.clear();
