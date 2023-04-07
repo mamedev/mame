@@ -12,12 +12,13 @@
 
 #include "spec128.h"
 
+#include "glukrs.h"
+#include "tsconfdma.h"
+
 #include "beta_m.h"
 #include "bus/spectrum/zxbus.h"
-#include "glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "tsconfdma.h"
 
 #include "tilemap.h"
 
