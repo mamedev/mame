@@ -4,7 +4,7 @@
 
   TMS1000 family - TMS0980, TMS1980
 
-TMS0980
+TMS0980 die notes:
 - 144x4bit RAM array at the bottom-left (128+16, set up as 8x18x4)
 - 2048x9bit ROM array at the bottom-left
 - main instructions PLAs at the top half, to the right of the midline
@@ -32,12 +32,12 @@ DEFINE_DEVICE_TYPE(TMS0980, tms0980_cpu_device, "tms0980", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TMS1980") // 28-pin DIP, 7 O pins, 10 R pins, high voltage
 
 
-tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0980_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0980_cpu_device::ram_144x4), this))
-{ }
-
 tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms0970_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms0980_cpu_device::tms0980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms0980_cpu_device(mconfig, TMS0980, tag, owner, clock, 8 /* o pins */, 9 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 1 /* stack levels */, 11 /* rom width */, address_map_constructor(FUNC(tms0980_cpu_device::rom_11bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms0980_cpu_device::ram_144x4), this))
 { }
 
 tms1980_cpu_device::tms1980_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -80,10 +80,10 @@ std::unique_ptr<util::disasm_interface> tms0980_cpu_device::create_disassembler(
 
 
 // device_reset
-u32 tms0980_cpu_device::decode_fixed(u16 op)
+u32 tms0980_cpu_device::decode_fixed(offs_t offset)
 {
 	u32 decode = 0;
-	u32 mask = m_ipla->read(op);
+	u32 mask = m_ipla->read(offset);
 
 	// 1 line per PLA row, no OR-mask
 	const u32 id[15] = { F_LDP, F_SBL, F_OFF, F_RBIT, F_SAL, F_XDA, F_REAC, F_SETR, F_RETN, F_SBIT, F_TDO, F_COMX8, F_COMX, F_LDX, F_SEAC };
@@ -95,11 +95,11 @@ u32 tms0980_cpu_device::decode_fixed(u16 op)
 	return decode;
 }
 
-u32 tms0980_cpu_device::decode_micro(u8 sel)
+u32 tms0980_cpu_device::decode_micro(offs_t offset)
 {
 	u32 decode = 0;
-	sel = bitswap<8>(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	u32 mask = m_mpla->read(sel);
+	offset = bitswap<6>(offset,0,1,2,3,4,5); // lines are reversed
+	u32 mask = m_mpla->read(offset);
 	mask ^= 0x43fc3; // invert active-negative
 
 	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR

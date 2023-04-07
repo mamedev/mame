@@ -150,7 +150,7 @@ protected:
 	virtual void write_r_output(u32 data) { m_write_r(data & m_r_mask); }
 	virtual u8 read_k_input() { return m_read_k() & 0xf; }
 	virtual void set_cki_bus();
-	virtual void dynamic_output() { ; } // not used by default
+	virtual void dynamic_output() { } // not used by default
 	virtual void read_opcode();
 
 	virtual void op_br();
@@ -171,20 +171,20 @@ protected:
 	virtual void op_comc();
 	virtual void op_tpc();
 
-	virtual void op_tax() { ; }
-	virtual void op_txa() { ; }
-	virtual void op_tra() { ; }
-	virtual void op_tac() { ; }
-	virtual void op_tca() { ; }
-	virtual void op_tadm() { ; }
-	virtual void op_tma() { ; }
+	virtual void op_tax() { }
+	virtual void op_txa() { }
+	virtual void op_tra() { }
+	virtual void op_tac() { }
+	virtual void op_tca() { }
+	virtual void op_tadm() { }
+	virtual void op_tma() { }
 
-	virtual void op_xda() { ; }
-	virtual void op_off() { ; }
-	virtual void op_seac() { ; }
-	virtual void op_reac() { ; }
-	virtual void op_sal() { ; }
-	virtual void op_sbl() { ; }
+	virtual void op_xda() { }
+	virtual void op_off() { }
+	virtual void op_seac() { }
+	virtual void op_reac() { }
+	virtual void op_sal() { }
+	virtual void op_sbl() { }
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
