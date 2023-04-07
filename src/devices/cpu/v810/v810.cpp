@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Tomasz Slanina
+// copyright-holders: Tomasz Slanina, Angelo Salese
 /******************************************************************
  NEC V810 (upd70732) core
   Tomasz Slanina
   Angelo Salese
 
  Change Log
+ - 07/04/2023 - Update opcode timings (Angelo Salese)
  - 23/08/2012 - Implemented remaining BSU opcodes (Angelo Salese)
  - 21/08/2012 - Fixed SET.F behaviour (Angelo Salese)
  - 20/08/2012 - Fixed a sign bug with CVT.WS opcode (Angelo Salese)
@@ -18,12 +19,22 @@
 
 
  TODO:
-    - CY flag in few floating point opcodes
-        (all floating point opcodes are NOT tested!)
-  - traps/interrupts/exceptions
-  - bitstring opcodes currently makes the emulation to drop to 0%
-  - pipeline timing
-  - missing opcodes : trap, caxi
+  - Verify floating point opcodes (single precision IEEE-754 standard)
+  - CY flag in few floating point opcodes;
+  - split maskable interrupt lines into separate entities;
+  - implement trap opcode;
+  - implement halt opcode;
+  - implement double exception behaviour;
+  - implement NP fatal exception;
+  - implement floating point exceptions;
+  - verify and improve bitstring opcodes;
+  - cache handling;
+  - external bus timing (on load/store opcodes):
+  \- 3 cycles for ROM
+  \- 2 cycles for RAM
+  \- 1 cycle for cache
+  - pipeline;
+  - implement caxi opcode;
 
 ******************************************************************/
 
@@ -33,7 +44,6 @@
 
 #define clkIF 3
 #define clkMEM 3
-// TODO: temp, as a reminder to recheck in document
 #define clkIRQ 14
 
 DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "NEC V810")
@@ -187,6 +197,7 @@ uint32_t v810_device::GETREG(uint32_t reg)
 uint32_t v810_device::opUNDEF(uint32_t op)
 {
 	logerror("V810: Unknown opcode %x @ %x",op,PC-2);
+	machine().debug_break();
 	return clkIF;
 }
 
@@ -334,35 +345,34 @@ uint32_t v810_device::opSETFi(uint32_t op)   // setf imm5,r2
 
 		case 7: //ble
 			res=GET_Z||(GET_S^GET_OV);
-		break;
+			break;
 
 		case 8: //bnv
 			res=!GET_OV;
-		break;
+			break;
 
 		case 9: //bnl
 			res=!GET_CY;
-		break;
+			break;
 
 		case 10: //bne
 			res=!GET_Z;
-		break;
+			break;
 
 		case 11: //bh
 			res=!(GET_Z||GET_CY);
-		break;
+			break;
 
 		case 12: //bp
 			res=!GET_S;
-		break;
+			break;
 
 		case 13: //nop
-
 			break;
 
 		case 14: //bge
 			res=!(GET_OV^GET_S);
-		break;
+			break;
 
 		case 15: //bgt
 			res=!(GET_Z||(GET_OV^GET_S));
@@ -626,7 +636,9 @@ uint32_t v810_device::opDI(uint32_t op)
 
 uint32_t v810_device::opTRAP(uint32_t op)
 {
-	printf("V810: TRAP @ %X\n",PC-2);
+	logerror("V810: TRAP @ %X\n", PC - 2);
+	machine().debug_break();
+	// TODO: assume same as irq time
 	return clkIRQ;
 }
 
@@ -644,7 +656,8 @@ uint32_t v810_device::opRETI(uint32_t op)
 
 uint32_t v810_device::opHALT(uint32_t op)
 {
-	printf("V810: HALT @ %X\n",PC-2);
+	logerror("V810: HALT @ %X\n",PC-2);
+	machine().debug_break();
 	return 1;
 }
 
@@ -719,7 +732,7 @@ uint32_t v810_device::opB(uint32_t op)
 	}
 	if(doBranch)
 	{
-		PC=PC-2+(D9(op)&~1);
+		PC = PC - 2 + (D9(op) &~1);
 		return 3;
 	}
 	return 1;
