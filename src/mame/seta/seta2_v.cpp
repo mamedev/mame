@@ -781,7 +781,7 @@ TIMER_CALLBACK_MEMBER(seta2_state::raster_timer_done)
 	{
 		if (m_rasterenabled & 1)
 		{
-			tmp68301->external_interrupt_1();
+			tmp68301->set_input_line(1, HOLD_LINE);
 			logerror("external int (vpos is %d)\n", m_screen->vpos());
 			m_screen->update_partial(m_screen->vpos() - 1);
 		}

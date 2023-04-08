@@ -1466,6 +1466,10 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 		m_msm->reset_w(1);
 	}
 
+	// TODO: gulliver really starts an ADPCM play with bit 5 rather than 6
+	// Is it a doc mistake and is actually reversed?
+	m_msm_repeat = BIT(data, 5);
+
 	if ((data & 0x40) && ((m_adpcm_control & 0x40) == 0)) // ADPCM play
 	{
 		m_msm_start_addr = (m_adpcm_read_ptr);
@@ -1482,9 +1486,16 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 		// used by bbros to cancel an in-flight sample
 		adpcm_stop(0);
 		m_msm->reset_w(1);
+
+		// addfam wants to irq ack here
+		// https://mametesters.org/view.php?id=7261
+		if(!(m_msm_repeat))
+		{
+			set_irq_line(PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE);
+			set_irq_line(PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE);
+		}
 	}
 
-	m_msm_repeat = BIT(data, 5);
 
 	if (data & 0x10) // ADPCM set length
 	{

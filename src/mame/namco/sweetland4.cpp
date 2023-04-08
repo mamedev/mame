@@ -10,6 +10,7 @@ Main components:
 1x H8/3007 5B4 HD6413007F20
 1x RTC 72423 A EPSON E220E
 1x Oki M9810B
+1x 14.7456 OSC near the H8
 1x HRD051R5 DC/DC converter
 2x MTB011 High Output Interface Driver ICs
 1x 4-dip bank
@@ -24,7 +25,10 @@ Sweet Land 4 video: https://www.youtube.com/watch?v=Zj8_RRGlCI4
 #include "cpu/h8/h83006.h"
 #include "machine/msm6242.h"
 #include "sound/okim9810.h"
+//#include "video/hd44780.h"
 
+//#include "emupal.h"
+//#include "screen.h"
 #include "speaker.h"
 
 
@@ -42,15 +46,27 @@ public:
 
 private:
 	required_device<h83007_device> m_maincpu;
+	//required_device<hd44780_device> m_lcdc;
+
+	void lcdc_w(u8 data);
 
 	void program_map(address_map &map);
 	void io_map(address_map &map);
 };
 
 
+void sweetland4_state::lcdc_w(u8 data)
+{
+	//m_lcdc->db_w(data << 4);
+	//m_lcdc->rs_w(BIT(data, 7));
+	//m_lcdc->e_w(BIT(data, 5));
+}
+
 void sweetland4_state::program_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x200000, 0x20000f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
+	map(0x40000f, 0x40000f).w(FUNC(sweetland4_state::lcdc_w));
 }
 
 void sweetland4_state::io_map(address_map &map)
@@ -97,7 +113,7 @@ INPUT_PORTS_END
 
 void sweetland4_state::sweetland4(machine_config &config)
 {
-	H83007(config, m_maincpu, 16'000'000); // no evident XTAL on PCB
+	H83007(config, m_maincpu, 14.7456_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sweetland4_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &sweetland4_state::io_map);
 
@@ -123,4 +139,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4, 0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 2004, sweetld4, 0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -843,27 +843,27 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	/* disable rom */
+	// disable ROM
 	m_rom_enabled = 0;
 	m_bank1->set_entry(m_rom_enabled);
 
-	/* load image */
-	uint16_t quickload_size = image.length();
+	// load image
+	uint16_t const quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
 
 		if (image.fread(&data, 1) != 1)
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::UNSPECIFIED, std::string());
 		prog_space.write_byte(i + 0x100, data);
 	}
 
-	/* start program */
+	// start program
 	m_maincpu->set_pc(0x100);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

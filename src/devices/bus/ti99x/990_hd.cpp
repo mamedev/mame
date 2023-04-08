@@ -162,7 +162,7 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-image_init_result ti990_hdc_device::load_hd(device_image_interface &image)
+std::error_condition ti990_hdc_device::load_hd(device_image_interface &image)
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
@@ -206,7 +206,7 @@ image_init_result ti990_hdc_device::load_hd(device_image_interface &image)
 			d->format = format_mame;    /* don't care */
 			d->wp = 1;
 			d->unsafe = 1;
-			return image_init_result::FAIL;
+			return image_error::UNSPECIFIED;
 		}
 
 		d->cylinders = get_UINT32BE(custom_header.cylinders);
@@ -221,7 +221,7 @@ image_init_result ti990_hdc_device::load_hd(device_image_interface &image)
 		d->hd_handle = nullptr;
 		d->wp = 1;
 		d->unsafe = 1;
-		return image_init_result::FAIL;
+		return image_error::INVALIDIMAGE;
 	}
 
 	/* tell whether the image is writable */
@@ -231,7 +231,7 @@ image_init_result ti990_hdc_device::load_hd(device_image_interface &image)
 	/* set attention line */
 	m_w[0] |= (0x80 >> id);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 /*

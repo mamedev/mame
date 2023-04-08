@@ -16587,7 +16587,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<rom name="NBA Jam - Tournament Edition (USA) (Track 8).bin" size="58595376" crc="7665b527" sha1="8874a5c46722997a88e91e0c292d2491576b359d"/>
 		<rom name="NBA Jam - Tournament Edition (USA) (Track 9).bin" size="17393040" crc="d316f6c5" sha1="15403ef37d5d8426f8c1fcfdd3c836814e932f99"/>
 		-->
-		<description>NBA Jam - Tournament Edition (USA)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SLUS-00002"/>

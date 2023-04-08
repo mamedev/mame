@@ -135,7 +135,7 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::SOUND | feature::COMMS; }
 
 	huc3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
-	virtual image_init_result load(std::string &message) override ATTR_COLD;
+	virtual std::error_condition load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -263,7 +263,7 @@ huc3_device::huc3_device(
 }
 
 
-image_init_result huc3_device::load(std::string &message)
+std::error_condition huc3_device::load(std::string &message)
 {
 	// check for backup battery
 	if (loaded_through_softlist())
@@ -304,7 +304,7 @@ image_init_result huc3_device::load(std::string &message)
 	set_bank_bits_rom(2, 7);
 	set_bank_bits_ram(2);
 	if (!check_rom(message) || !check_ram(message))
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 
 	// if that checked out, install memory
 	cart_space()->install_view(0xa000, 0xbfff, m_view_io);
@@ -343,7 +343,7 @@ image_init_result huc3_device::load(std::string &message)
 			write8smo_delegate(*this, FUNC(huc3_device::write_ir)));
 
 	// all good
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 

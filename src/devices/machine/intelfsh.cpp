@@ -38,7 +38,9 @@ enum
 	FM_ERASEAMD4,   // part 4 of AMD erase sequence
 	FM_BYTEPROGRAM,
 	FM_BANKSELECT,
-	FM_WRITEPAGEATMEL
+	FM_WRITEPAGEATMEL,
+	FM_WRITEBUFFER1, // part 1 of write to buffer sequence
+	FM_WRITEBUFFER2, // part 2 of write to buffer sequence
 };
 
 
@@ -117,6 +119,7 @@ DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_l
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
 DEFINE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device,    "spansion_s29gl064s",    "Spansion / Cypress S29GL064S Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
+DEFINE_DEVICE_TYPE(INTEL_28F640J5,        intel_28f640j5_device,        "intel_28f640j5",        "Intel 28F640J5 Flash")
 
 DEFINE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device,          "sst_39vf400a",          "SST 39VF400A Flash")
 
@@ -286,6 +289,8 @@ intel_28f320j5_device::intel_28f320j5_device(const machine_config &mconfig, cons
 //  m_sector_is_4k = true; 128kb?
 }
 
+intel_28f640j5_device::intel_28f640j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, INTEL_28F640J5, tag, owner, clock, 0x800000, MFG_INTEL, 0x15) { }
 
 sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, SST_39VF400A, tag, owner, clock, 0x80000, MFG_SST, 0xd6) { m_sector_is_4k = true; }
@@ -415,7 +420,11 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		break;
 	case FM_READSTATUS:
+	case FM_WRITEBUFFER2:
 		data = m_status;
+		break;
+	case FM_WRITEBUFFER1:
+		data = 0x80; // extended status register for write buffer flag
 		break;
 	case FM_READAMDID3:
 		if ((m_maker_id == MFG_FUJITSU && m_device_id == 0x35) || (m_maker_id == MFG_AMD && m_device_id == 0x3b))
@@ -566,6 +575,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			{
 				m_flash_mode = FM_READAMDID1;
 			}
+			break;
+		case 0xe8:
+			// Write to buffer (Intel StrataFlash series)
+			if ( m_maker_id == MFG_INTEL && m_device_id >= 0x14 && m_device_id <= 0x16 )
+				m_flash_mode = FM_WRITEBUFFER1;
+			else
+				logerror( "Unknown flash mode byte %x\n", data & 0xff );
 			break;
 		default:
 			logerror( "Unknown flash mode byte %x\n", data & 0xff );
@@ -982,7 +998,68 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			logerror( "unexpected %08x=%02x in FM_SETMASTER:\n", address, data & 0xff );
 			break;
 		}
-		m_flash_mode = FM_NORMAL;
+		m_flash_mode = FM_READSTATUS;
+		break;
+	case FM_WRITEBUFFER1:
+		// Datasheets don't specify what happens when the word count is outside of
+		// the valid range so clamp and pray
+		if ( m_bits == 16 )
+			m_write_buffer_count = std::min<uint32_t>(data, 0xf) + 1;
+		else
+			m_write_buffer_count = std::min<uint32_t>(data, 0x1f) + 1;
+
+		m_status = 0x80;
+		m_flash_mode = FM_WRITEBUFFER2;
+		m_byte_count = 0;
+		break;
+	case FM_WRITEBUFFER2:
+		{
+			if ( m_byte_count < m_write_buffer_count )
+			{
+				if ( m_byte_count == 0 )
+					m_write_buffer_start_address = address;
+
+				if ( address >= m_write_buffer_start_address + m_write_buffer_count )
+				{
+					// All subsequent addresses must lie within the start address plus the count
+					// Set error bits and abort
+					m_status = (1 << 4) | (1 << 5);
+					m_flash_mode = FM_READSTATUS;
+				}
+				else
+				{
+					if ( m_bits == 8 )
+					{
+						m_write_buffer[m_byte_count] = data;
+					}
+					else
+					{
+						m_write_buffer[m_byte_count * 2] = data >> 8;
+						m_write_buffer[m_byte_count * 2 + 1] = data;
+					}
+
+					m_byte_count++;
+				}
+			}
+			else
+			{
+				if ( ( data & 0xff ) == 0xd0 )
+				{
+					// Confirmation byte received, commit buffered data
+					uint32_t base = m_write_buffer_start_address * ((m_bits == 16) ? 2 : 1);
+					uint32_t len = m_write_buffer_count * ((m_bits == 16) ? 2 : 1);
+					memcpy(&m_data[base], m_write_buffer, len);
+					m_status = 0x80;
+				}
+				else
+				{
+					// Invalid Command/Sequence, set error bits and abort
+					m_status = (1 << 4) | (1 << 5);
+				}
+
+				m_flash_mode = FM_READSTATUS;
+			}
+		}
 		break;
 	case FM_BANKSELECT:
 		m_bank = data & 0xff;

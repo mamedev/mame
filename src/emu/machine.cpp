@@ -124,7 +124,10 @@ std::string running_machine::describe_context() const
 		}
 	}
 
-	return std::string("(no context)");
+	if (m_current_phase == machine_phase::RESET)
+		return std::string("(reset phase)");
+	else
+		return std::string("(no context)");
 }
 
 

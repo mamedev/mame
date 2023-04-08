@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cartridge.h"
+
 #include "arc.h"
 #include "ascii.h"
 #include "beepack.h"
@@ -30,8 +31,8 @@
 #include "slotexpander.h"
 #include "slotoptions.h"
 #include "softcard.h"
-#include "superloderunner.h"
 #include "super_swangi.h"
+#include "superloderunner.h"
 #include "yamaha_ucn01.h"
 
 #include "bus/msx/slot/cartridge.h"

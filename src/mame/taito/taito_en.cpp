@@ -117,7 +117,7 @@ void taito_en_device::en_sound_map(address_map &map)
 	map(0xc00000, 0xc1ffff).bankr("cpubank1");
 	map(0xc20000, 0xc3ffff).bankr("cpubank2");
 	map(0xc40000, 0xc7ffff).bankr("cpubank3");
-	map(0xff0000, 0xffffff).ram().share("osram");  // mirror
+	map(0xff0000, 0xffffff).ram().share("osram"); // mirror
 }
 
 void taito_en_device::fc7_map(address_map &map)
@@ -212,6 +212,7 @@ void taito_en_device::duart_output(uint8_t data)
 		}
 	}
 }
+
 
 //-------------------------------------------------
 // device_add_mconfig - add device configuration

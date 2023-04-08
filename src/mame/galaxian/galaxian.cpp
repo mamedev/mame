@@ -730,6 +730,7 @@ TODO:
 - scprpng  : fix read/writes at/to unmapped/wrong memory
 - scorpion : check whether konami filters are used
 - explorer : check whether konami filters are used
+- superbon : needs correct color PROM
 
 ***************************************************************************/
 
@@ -15782,7 +15783,7 @@ ROM_START( spdcoin )
 ROM_END
 
 
-ROM_START( superbon )
+ROM_START( superbon ) // has no copyright and 'rent this space' in GFX
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2d.cpu",       0x0000, 0x1000, CRC(60c0ba18) SHA1(6ad09e01dd3c86c8d9c465916227c9b00f38e025) )
 	ROM_LOAD( "2e.cpu",       0x1000, 0x1000, CRC(ddcf44bf) SHA1(b862622f4aa8af6da568b4f82ef043359ece530f) )
@@ -15800,14 +15801,36 @@ ROM_START( superbon )
 	ROM_LOAD( "5f.cpu",       0x0000, 0x0800, CRC(5b9d4686) SHA1(c7814aefaccab9c8a3a0b015447d366cd2e43c3a) )
 	ROM_LOAD( "5h.cpu",       0x0800, 0x0800, CRC(58c29927) SHA1(b88515d9c3108d2ad59f30fed5d74877b1636280) )
 
-	/* The conversion instructions do not mention color proms:
-	   http://www.arcadeflyers.com/?page=flyer&db=videodb&id=5353&image=2
+	/* The conversion instructions do not mention color PROMs:
+	   https://flyers.arcade-museum.com/?page=thumbs&db=videodb&id=5353
 	   However, pages may be missing. In addition, it is mentioned that the
 	   conversion kit may be used for Scramble, Amidar and Frogger as well.
-	   They all have different color proms. We use the prom from Super Cobra
+	   They all have different color PROMs. We use the PROM from Super Cobra
 	   for now and mark it as bad dump until we have more information. */
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
+ROM_END
+
+ROM_START( superbona ) // MU-1A + MU-2A PCBs. Has 'Video Village @ 84' copyright and 'Video Village' in GFX
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2c",       0x0000, 0x1000, CRC(5a8f69b5) SHA1(7c8b29731cf04f25f71c9a1d5b02b0298d78cf46) )
+	ROM_LOAD( "2e",       0x1000, 0x1000, CRC(5a126243) SHA1(4c3e560dee0722108770902c1e10e556263c554c) )
+	ROM_LOAD( "2f",       0x2000, 0x1000, CRC(bb66c2d5) SHA1(cbb7f4279ae48460790cb8abf976b978ae6a1a25) )
+	ROM_LOAD( "2h",       0x3000, 0x1000, CRC(74f4f04d) SHA1(d51c5d2c21453ee0dab60253c3124b6112d1f859) )
+	ROM_LOAD( "2j",       0x4000, 0x1000, CRC(78effb08) SHA1(64f211b34c2f37c25a36200b393f145b39ae67b5) )
+	ROM_LOAD( "2l",       0x5000, 0x1000, CRC(e9dcecbd) SHA1(ec61cec2b66c041872a2ca29cf724a89c73fc9a3) )
+	ROM_LOAD( "2m",       0x6000, 0x1000, CRC(3ed0337e) SHA1(975b93aee851867e335614419aa6db16fbf8063f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5c",       0x0000, 0x0800, CRC(b899be2a) SHA1(9b343a682531255104db61177a43ad933c3af34e) )
+	ROM_LOAD( "5d",       0x0800, 0x0800, CRC(f2ebd14c) SHA1(470811078d761714064d03e7dddb42a2ed1ed217) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5f",       0x0000, 0x0800, CRC(d26f3fdc) SHA1(a2bf8de5260e85b4dccd29784b1b414f953e4350) )
+	ROM_LOAD( "5h",       0x0800, 0x0800, CRC(08e093ee) SHA1(3171f0c8423413bb9e562dba85b10163e24684e0) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, BAD_DUMP CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) ) // PROM is present but not dumped. Using Scramble's for now.
 ROM_END
 
 ROM_START( jungsub )
@@ -16410,7 +16433,8 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion, encrypted)",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, superbona,   superbon, scobra,     superbon,   galaxian_state, init_scobra,     ROT90,  "Video Village", "Agent Super Bond (Super Cobra conversion, not encrypted)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
 // Namennayo - single player reference: https://www.nicovideo.jp/watch/sm16782405
 GAME( 1982, namenayo,    0,        namenayo,   namenayo,   namenayo_state, init_namenayo,   ROT0,   "Cat's", "Namennayo (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 /** @file paex_write_sine_nonint.c
-	@ingroup examples_src
-	@brief Play a non-interleaved sine wave using the blocking API (Pa_WriteStream())
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup examples_src
+    @brief Play a non-interleaved sine wave using the blocking API (Pa_WriteStream())
+    @author Ross Bencina <rossb@audiomulch.com>
     @author Phil Burk <philburk@softsynth.com>
 */
 /*
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -63,11 +63,11 @@ int main(void)
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    
-	float leftBuffer[FRAMES_PER_BUFFER];
+
+    float leftBuffer[FRAMES_PER_BUFFER];
     float rightBuffer[FRAMES_PER_BUFFER];
     void *buffers[2]; /* points to both non-interleaved buffers. */
-	
+
     float sine[TABLE_SIZE]; /* sine wavetable */
     int left_phase = 0;
     int right_phase = 0;
@@ -76,23 +76,23 @@ int main(void)
     int i, j, k;
     int bufferCount;
 
-    
+
     printf("PortAudio Test: output sine wave NON-INTERLEAVED. SR = %d, BufSize = %d\n", SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
+
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
     {
         sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-    
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
     outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      goto error;
+        fprintf(stderr,"Error: No default output device.\n");
+        goto error;
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paFloat32 | paNonInterleaved; /* 32 bit floating point output NON-INTERLEAVED */
@@ -112,11 +112,11 @@ int main(void)
 
 
     printf( "Play 3 times, higher each time.\n" );
-    
-	/* Set up array of buffer pointers for Pa_WriteStream */
-	buffers[0] = leftBuffer;
-	buffers[1] = rightBuffer;
-	
+
+    /* Set up array of buffer pointers for Pa_WriteStream */
+    buffers[0] = leftBuffer;
+    buffers[1] = rightBuffer;
+
     for( k=0; k < 3; ++k )
     {
         err = Pa_StartStream( stream );
@@ -140,7 +140,7 @@ int main(void)
 
             err = Pa_WriteStream( stream, buffers, FRAMES_PER_BUFFER );
             if( err != paNoError ) goto error;
-        }   
+        }
 
         err = Pa_StopStream( stream );
         if( err != paNoError ) goto error;
@@ -156,11 +156,11 @@ int main(void)
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

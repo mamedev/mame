@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200
+  TMS1000 family - TMS1000, TMS1070, TMS1040, TMS1200, TMS1270, TMS1700, TMS1730
 
 */
 
@@ -76,7 +76,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual u32 decode_micro(u8 sel);
+	virtual u32 decode_micro(offs_t offset);
 };
 
 class tms1040_cpu_device : public tms1000_cpu_device
@@ -124,19 +124,6 @@ public:
 };
 
 
-class mc141000_cpu_device : public tms1000_cpu_device
-{
-public:
-	mc141000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class mc141200_cpu_device : public tms1000_cpu_device
-{
-public:
-	mc141200_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-
 DECLARE_DEVICE_TYPE(TMS1000, tms1000_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1040, tms1040_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1070, tms1070_cpu_device)
@@ -144,7 +131,5 @@ DECLARE_DEVICE_TYPE(TMS1200, tms1200_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1270, tms1270_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1700, tms1700_cpu_device)
 DECLARE_DEVICE_TYPE(TMS1730, tms1730_cpu_device)
-DECLARE_DEVICE_TYPE(MC141000, mc141000_cpu_device)
-DECLARE_DEVICE_TYPE(MC141200, mc141200_cpu_device)
 
 #endif // MAME_CPU_TMS1000_TMS1000_H

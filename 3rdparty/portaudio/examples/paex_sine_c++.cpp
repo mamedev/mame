@@ -1,7 +1,7 @@
 /** @file paex_sine.c
-	@ingroup examples_src
-	@brief Play a sine wave for several seconds.
-	@author Ross Bencina <rossb@audiomulch.com>
+    @ingroup examples_src
+    @brief Play a sine wave for several seconds.
+    @author Ross Bencina <rossb@audiomulch.com>
     @author Phil Burk <philburk@softsynth.com>
 */
 /*
@@ -32,13 +32,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 #include <stdio.h>
@@ -189,7 +189,7 @@ private:
         PaStreamCallbackFlags statusFlags,
         void *userData )
     {
-        /* Here we cast userData to Sine* type so we can call the instance method paCallbackMethod, we can do that since 
+        /* Here we cast userData to Sine* type so we can call the instance method paCallbackMethod, we can do that since
            we called Pa_OpenStream with 'this' for userData */
         return ((Sine*)userData)->paCallbackMethod(inputBuffer, outputBuffer,
             framesPerBuffer,
@@ -247,7 +247,7 @@ int main(void)
     Sine sine;
 
     printf("PortAudio Test: output sine wave. SR = %d, BufSize = %d\n", SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
+
     ScopedPaHandler paInit;
     if( paInit.result() != paNoError ) goto error;
 
@@ -268,7 +268,7 @@ int main(void)
     return paNoError;
 
 error:
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", paInit.result() );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( paInit.result() ) );
     return 1;

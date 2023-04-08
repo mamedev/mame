@@ -13,8 +13,15 @@
 
 #pragma once
 
-#include "cdrom.h"
 #include "softlist_dev.h"
+
+#include "cdrom.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -32,8 +39,8 @@ public:
 
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -46,12 +53,12 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "cdrm"; }
 
 	// specific implementation
-	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }
+	cdrom_file *get_cdrom_file() { return m_cdrom_handle.get(); }
 
 protected:
 	cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -60,7 +67,7 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	chd_file    m_self_chd;
-	cdrom_file  *m_cdrom_handle;
+	std::unique_ptr<cdrom_file> m_cdrom_handle;
 	const char  *m_extension_list;
 	const char  *m_interface;
 };

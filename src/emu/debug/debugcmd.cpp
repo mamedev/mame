@@ -3778,21 +3778,22 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 	address_space *space;
 	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
+	address &= space->logaddrmask();
 
 	// do the translation first
 	for (int intention = device_memory_interface::TR_READ; intention <= device_memory_interface::TR_FETCH; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		offs_t taddress = address & space->addrmask();
+		offs_t taddress = address;
 		address_space *tspace;
 		if (space->device().memory().translate(space->spacenum(), intention, taddress, tspace))
 		{
 			std::string mapname = tspace->get_handler_string((intention == device_memory_interface::TR_WRITE) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
-					"%7s: %0*X logical == %0*X physical -> %s\n",
+					"%7s: %0*X logical %s == %0*X physical %s -> %s\n",
 					intnames[intention & 3],
-					tspace->logaddrchars(), address,
-					tspace->addrchars(), taddress,
+					space->logaddrchars(), address, space->name(),
+					tspace->addrchars(), taddress, tspace->name(),
 					mapname);
 		}
 		else
@@ -3990,10 +3991,19 @@ void debugger_commands::execute_mount(const std::vector<std::string_view> &param
 	{
 		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
-			if (img.load(params[1]) != image_init_result::PASS)
-				m_console.printf("Unable to mount file %s on %s\n", params[1], params[0]);
-			else
+			auto [err, msg] = img.load(params[1]);
+			if (!err)
+			{
 				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
+			}
+			else
+			{
+				m_console.printf(
+						"Unable to mount file %s on %s: %s\n",
+						params[1],
+						params[0],
+						!msg.empty() ? msg : err.message());
+			}
 			return;
 		}
 	}

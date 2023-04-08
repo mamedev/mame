@@ -636,4 +636,3 @@ DECLARE_INTERFACE_(IKsTopology,IUnknown)
 #endif
 
 #endif /* __KSPROXY__ */
-
