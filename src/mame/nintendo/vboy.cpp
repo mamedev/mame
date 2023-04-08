@@ -611,11 +611,18 @@ void vboy_state::timer_control_w(offs_t offset, u8 data)
 			{
 				m_maintimer->adjust(attotime::from_hz(10000));
 			}
-
 		}
 	}
+	else
+	{
+		m_maintimer->adjust(attotime::never);
+		// hyperfgt writes 0x18 -> 0x1c -> 0x19 in irq service,
+		// implying that a 1 -> 0 transition will ack as well
+		m_maincpu->set_input_line(1, CLEAR_LINE);
+	}
 
-	m_regs.tcr = (data & 0xfd) | (0xe4) | (m_regs.tcr & 2);   // according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+	m_regs.tcr = (data & 0xfd) | (0xe4) | (m_regs.tcr & 2);
 	if(data & 4)
 		m_regs.tcr &= 0xfd;
 }
