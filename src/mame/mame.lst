@@ -14795,6 +14795,10 @@ ax145                           // Brother AX-145 (c) 198? Brother Industries, L
 @source:brother/lw30.cpp
 lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
 
+@source:brother/lw350.cpp
+lw350                           // Brother LW-350 (c) 1995 Brother Industries, Ltd.
+lw450                           // Brother LW-450 (c) 1992 Brother Industries, Ltd.
+
 @source:brother/lw700i.cpp
 lw700i                          // (c) 1995 Brother
 
