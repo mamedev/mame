@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina, Angelo Salese
 /******************************************************************
- NEC V810 (upd70732) core
+ NEC V810 (μpd70732) core
   Tomasz Slanina
   Angelo Salese
 
@@ -20,12 +20,13 @@
 
  TODO:
   - Verify floating point opcodes (single precision IEEE-754 standard)
-  - CY flag in few floating point opcodes;
-  - split maskable interrupt lines into separate entities;
+  - CY flag in floating point opcodes that supports them;
+  - Subclass NVC (vboy CPU), few extra opcodes plus onchip peripherals ($0200'0000 area);
   - implement trap opcode;
   - implement halt opcode;
   - implement double exception behaviour;
   - implement NP fatal exception;
+  - implement NMI;
   - implement floating point exceptions;
   - verify and improve bitstring opcodes;
   - cache handling;
@@ -180,6 +181,7 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 
 
 
+// r0 is literally a "register zero", reading returns 0, writing is ignored.
 void v810_device::SETREG(uint32_t reg,uint32_t val)
 {
 	if(reg)
@@ -1306,13 +1308,11 @@ void v810_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 	space(has_space(AS_IO) ? AS_IO : AS_PROGRAM).specific(m_io);
 
-	m_irq_line = 0;
-	m_irq_state = CLEAR_LINE;
+	m_irq_state = 0;
 	m_nmi_line = CLEAR_LINE;
 	memset(m_reg, 0x00, sizeof(m_reg));
 
 	save_item(NAME(m_reg));
-	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_PPC));
@@ -1396,53 +1396,75 @@ void v810_device::device_reset()
 	ECR   = 0x0000fff0;
 }
 
-// TODO: unsafe on different irq levels asserted at same time
-// TODO: sketchy, lacks fatal & double exceptions
-void v810_device::take_interrupt()
+// TODO: remaining exception types
+void v810_device::check_interrupts()
 {
-	EIPC = PC;
-	EIPSW = PSW;
+	if (m_irq_state == 0)
+		return;
 
-	PC = 0xfffffe00 | (m_irq_line << 4);
-	ECR = 0xfe00 | (m_irq_line << 4);
+	if (GET_NP || GET_EP || GET_ID)
+		return;
 
-	uint8_t num = m_irq_line + 1;
-	if (num==0x10) num=0x0f;
+	for (u16 irq_line = 15; irq_line >= (PSW & 0xF0000) >> 16; irq_line --)
+	{
+		if (!((1 << irq_line) & m_irq_state))
+			continue;
 
-	PSW &= 0xfff0ffff; // clear interrupt level
-	SET_EP(1);
-	SET_ID(1);
-	PSW |= num << 16;
+		standard_irq_callback(irq_line, PC);
 
-	m_icount -= clkIRQ;
+		EIPC = PC;
+		EIPSW = PSW;
+
+		PC = 0xfffffe00 | (irq_line << 4);
+		ECR = 0xfe00 | (irq_line << 4);
+
+		uint8_t num = irq_line + 1;
+		if (num == 0x10) num = 0x0f;
+
+		// clear interrupt level
+		PSW &= 0xfff0ffff;
+		SET_EP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PSW |= num << 16;
+
+		m_icount -= clkIRQ;
+		return;
+	}
 }
 
 void v810_device::execute_run()
 {
-	if (m_irq_state != CLEAR_LINE) {
-		if (!(GET_NP | GET_EP | GET_ID)) {
-			if (m_irq_line >=((PSW & 0xF0000) >> 16)) {
-				take_interrupt();
-			}
-		}
-	}
-	while(m_icount>0)
-	{
-		uint32_t op;
+	// TODO: move in execution body
+	// (breaks pcfx boot)
+	check_interrupts();
 
-		m_PPC=PC;
+	do
+	{
+		m_PPC = PC;
 		debugger_instruction_hook(PC);
-		op=R_OP(PC);
-		PC+=2;
-		int cnt;
-		cnt = (this->*s_OpCodeTable[op>>10])(op);
-		m_icount-= cnt;
-	}
+		uint32_t op = R_OP(PC);
+		PC += 2;
+
+		int cnt = (this->*s_OpCodeTable[op>>10])(op);
+		m_icount -= cnt;
+
+	} while(m_icount > 0);
 }
 
 
-void v810_device::execute_set_input( int irqline, int state)
+// TODO: logically connects to /INTV0-/INTV3 pins
+// v810 just exposes an INT and 4 V(ector?) lines.
+// - on pcfx there's an unknown chip irq priority/mask dispatcher;
+// - on vboy it's implied in the NVC specs with a laconic "Interrupt Encoder".
+//   It's also 5 possible lines, which wouldn't work bitwise;
+void v810_device::execute_set_input( int irqline, int state )
 {
-	m_irq_state = state;
-	m_irq_line = irqline;
+	if (state == HOLD_LINE)
+		throw emu_fatalerror("V810: using HOLD_LINE is unsupported by the core");
+	u16 mask = 1 << irqline;
+	if (state == ASSERT_LINE)
+		m_irq_state |= mask;
+	else
+		m_irq_state &= ~mask;
 }
