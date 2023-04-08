@@ -44,6 +44,7 @@ TODO:
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
@@ -134,8 +135,6 @@ protected:
 	void map_mem(address_map &map);
 	void map_fetch(address_map &map);
 	u8 m1_r(offs_t offset);
-	bool cs0_r(u16 addr);
-	bool cs1_r(u16 addr);
 
 	void init_taps();
 
@@ -182,7 +181,8 @@ private:
 	u8 dcp_r(offs_t offset);
 	void dcp_w(offs_t offset, u8 data);
 
-	u8 cs_r(offs_t offset);
+	u8 bootstrap_r(offs_t offset);
+	void bootstrap_w(offs_t offset, u8 data);
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
@@ -280,13 +280,6 @@ private:
 
 void sprinter_state::update_memory()
 {
-	if (m_conf_loading && m_starting)
-	{
-		m_bank_view0.disable();
-		m_bank_view3.disable();
-		return;
-	}
-
 	const bool pre_rom = m_rom_sys || m_cash_on;
 	const bool pre_cash = !m_cash_on;
 	if (!pre_rom && pre_cash)
@@ -954,7 +947,7 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 		m_acc_cnt = data;
 		LOGACCEL("Accel buffer: %d\n", m_acc_cnt);
 	}
-	else if (m_pages[offset >> 14] & BANK_RAM_MASK) // block ops RAM only
+	else if (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK) // block ops RAM only
 	{
 		const u16 acc_cnt = m_acc_cnt ? m_acc_cnt : 256;
 		if (m_acc_dir == FILL)
@@ -1046,72 +1039,45 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
-bool sprinter_state::cs0_r(u16 addr)
+u8 sprinter_state::bootstrap_r(offs_t offset)
 {
-	bool cs0 = m_maincpu->cs0_r() & 1;
-	if (!cs0)
-	{
-		const u8 at = BIT(addr, 12, 4);
-		cs0 = ((m_maincpu->csbr_r() & 0x0f) >= at) && (at >= 0);
-	}
-
-	return cs0;
+	const u16 addr = offset & 0xffff;
+	return m_conf_loading
+		? m_fastram[addr]
+		: m_program.read_byte(0x10000 | addr);
 }
 
-bool sprinter_state::cs1_r(u16 addr)
+void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 {
-	bool cs1 = m_maincpu->cs1_r() & 1;
-	if (!cs1)
+	if (m_conf_loading)
 	{
-		const u8 at = BIT(addr, 12, 4);
-		cs1 = ((m_maincpu->csbr_r() >> 4) >= at) && (at > (m_maincpu->csbr_r() & 0x0f));
+		m_conf_loading = 0;
+		m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram (which is Game Config)
+		m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
+		machine().schedule_soft_reset();
 	}
-
-	return cs1;
-}
-
-u8 sprinter_state::cs_r(offs_t offset)
-{
-	u8 data = 0xff;
-	if (cs0_r(offset))
-		data = m_rom->as_u8((0x0c << 14) + offset);
-	else if (cs1_r(offset))
-		data = m_fastram.target()[offset];
-
-	return data;
+	else
+		m_program.write_byte(0x10000 | u16(offset), data);
 }
 
 u8 sprinter_state::ram_r(offs_t offset)
 {
-	if (m_conf_loading && m_starting)
-		return cs_r(offset);
-	else
-	{
-		const u8 bank = offset >> 14;
-		return ((m_pages[bank] & 0xf0) == 0x50)
-			? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
-			: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
-	}
+	const u8 bank = BIT(offset, 14, 2);
+	return ((m_pages[bank] & 0xf0) == 0x50)
+		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
+		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
 }
 
 void sprinter_state::ram_w(offs_t offset, u8 data)
 {
-	if (m_conf_loading && m_starting)
-	{
-		m_conf_loading = 0;
-		m_ram_pages[0x2e] = cs1_r(0x1000) ? 0x41 : 0x00;
-		m_conf = cs1_r(0x1000);
-		machine().schedule_soft_reset();
-		return;
-	}
-	else if (m_skip_write)
+	if (m_skip_write)
 	{
 		m_skip_write = false;
 		return;
 	}
 	do_cpu_wait();
 
-	const u8 bank = offset >> 14;
+	const u8 bank = BIT(offset, 14, 2);
 	const u8 page = m_pages[bank] & 0xff;
 	if ((bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
 		machine().schedule_soft_reset();
@@ -1234,41 +1200,42 @@ u8 sprinter_state::m1_r(offs_t offset)
 void sprinter_state::map_fetch(address_map &map)
 {
 	// Overlap with previous because we want real addresses on the 3e00-3fff range
-	map(0x0000, 0x3fff).lr8(NAME([this](u16 offset)
+	map(0x0000, 0x3fff).mirror(0x10000).lr8(NAME([this](offs_t offset)
 	{
-		return m1_r(offset);
+		return m1_r(offset + 0x10000);
 	}));
-	map(0x3d00, 0x3dff).lr8(NAME([this](u16 offset)
+	map(0x3d00, 0x3dff).mirror(0x10000).lr8(NAME([this](offs_t offset)
 	{
 		if (!machine().side_effects_disabled() && m_dos && BIT(m_pn, 4))
 		{
 			m_dos = 0;
 			update_memory();
 		}
-		return m1_r(offset + 0x3d00);
+		return m1_r(offset + 0x13d00);
 	}));
-	map(0x4000, 0xffff).lr8(NAME([this](u16 offset)
+	map(0x4000, 0xffff).mirror(0x10000).lr8(NAME([this](offs_t offset)
 	{
 		if (!machine().side_effects_disabled() && !m_dos)
 		{
 			m_dos = 1;
 			update_memory();
 		}
-		return m1_r(offset + 0x4000);
+		return m1_r(offset + 0x14000);
 	}));
 }
 
 void sprinter_state::map_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(sprinter_state::ram_r), FUNC(sprinter_state::ram_w));
+	map(0x00000, 0x3ffff).rw(FUNC(sprinter_state::bootstrap_r), FUNC(sprinter_state::bootstrap_w));  // bootstrap
+	map(0x10000, 0x1ffff).rw(FUNC(sprinter_state::ram_r), FUNC(sprinter_state::ram_w));
 
-	map(0x0000, 0x3fff).view(m_bank_view0);
-	m_bank_view0[0](0x0000, 0x3fff).nopw(); // RAM RO
-	m_bank_view0[1](0x0000, 0x3fff).nopw().bankr(m_bank_rom[0]);
-	m_bank_view0[2](0x0000, 0x3fff).bankrw(m_bank0_fastram);
+	map(0x10000, 0x13fff).view(m_bank_view0);
+	m_bank_view0[0](0x10000, 0x13fff).nopw(); // RAM RO
+	m_bank_view0[1](0x10000, 0x13fff).nopw().bankr(m_bank_rom[0]);
+	m_bank_view0[2](0x10000, 0x13fff).bankrw(m_bank0_fastram);
 
-	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).rw(FUNC(sprinter_state::isa_r), FUNC(sprinter_state::isa_w)); // ISA
+	map(0x1c000, 0x1ffff).view(m_bank_view3);
+	m_bank_view3[0](0x1c000, 0x1ffff).rw(FUNC(sprinter_state::isa_r), FUNC(sprinter_state::isa_w)); // ISA
 }
 
 void sprinter_state::map_io(address_map &map)
@@ -1280,19 +1247,19 @@ void sprinter_state::map_io(address_map &map)
 void sprinter_state::init_taps()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
-	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
+	prg.install_read_tap(0x10000, 0x1ffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		if (!machine().side_effects_disabled())
 		{
-			if (!(m_pages[offset >> 14] & (BANK_FASTRAM_MASK | BANK_ISA_MASK))) // ROM+RAM
+			if (!(m_pages[BIT(offset, 14, 2)] & (BANK_FASTRAM_MASK | BANK_ISA_MASK))) // ROM+RAM
 				do_cpu_wait();
 			if(!m_z80_m1 && ACC_ENA && (m_acc_dir != OFF))
 				accel_r_tap(offset, data);
 		}
 	});
-	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
+	prg.install_write_tap(0x10000, 0x1ffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!(m_pages[offset >> 14] & 0xff00)) // ROM only, RAM(w) applies waits manually
+		if (!(m_pages[BIT(offset, 14, 2)] & 0xff00)) // ROM only, RAM(w) applies waits manually
 			do_cpu_wait();
 		if (!m_z80_m1 && ACC_ENA && (m_acc_dir != OFF))
 			accel_w_tap(offset, data);
@@ -1406,7 +1373,14 @@ void sprinter_state::machine_reset()
 	m_kbd_data_cnt = 0;
 	m_turbo_hard = 1;
 
-	update_memory();
+	if (m_conf_loading)
+	{
+		m_bank_rom[0]->set_entry(0x0c);
+		m_bank_view0.select(1);
+		m_bank_view3.disable();
+	}
+	else
+		update_memory();
 }
 
 static const gfx_layout sprinter_charlayout =
@@ -1712,12 +1686,13 @@ void sprinter_state::sprinter(machine_config &config)
 
 	ISA8(config, m_isa[0], 0);
 	m_isa[0]->set_custom_spaces();
+	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
+	zxbus.set_iospace(m_isa[0], isa8_device::AS_ISA_IO);
+	ZXBUS_SLOT(config, "zxbus2isa", 0, "zxbus", zxbus_cards, nullptr);
+
 	ISA8(config, m_isa[1], 0);
 	m_isa[1]->set_custom_spaces();
-
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace("isa0", isa8_device::AS_ISA_IO);
-	ZXBUS_SLOT(config, "zxbus:1", 0, "zxbus", zxbus_cards, "neogs", false);
+	ISA8_SLOT(config, "isa8", 0, m_isa[1], pc_isa8_cards, nullptr, false);
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));

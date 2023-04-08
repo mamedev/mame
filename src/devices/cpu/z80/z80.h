@@ -59,6 +59,7 @@ protected:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+	virtual u32 tranlsate_memory_address(u16 address) { return address; }
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
