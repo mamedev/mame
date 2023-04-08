@@ -6,6 +6,8 @@
 
     TODO:
     - Use NSCSI instead of legacy one;
+    \- SEL acknowledges with 0x84, bit 7 controller type is unknown at this time
+       (bit 2 should select the CD drive);
     - Convert base mapping to address_map;
     - Convert I/O to space address, and make it honor mem_mask;
     - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
@@ -70,7 +72,7 @@ void huc6272_device::amap(address_map &map)
 void huc6272_device::io_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(huc6272_device::scsi_data_r), FUNC(huc6272_device::scsi_data_w));
-	map(0x01, 0x01).w(FUNC(huc6272_device::scsi_initiate_cmd_w));
+	map(0x01, 0x01).rw(FUNC(huc6272_device::scsi_cmd_status_r), FUNC(huc6272_device::scsi_initiate_cmd_w));
 //  map(0x02, 0x02) SCSI DMA mode
 	map(0x03, 0x03).w(FUNC(huc6272_device::scsi_target_cmd_w));
 	map(0x05, 0x05).rw(FUNC(huc6272_device::scsi_bus_r), FUNC(huc6272_device::scsi_bus_w));
@@ -135,22 +137,23 @@ void huc6272_device::io_map(address_map &map)
 //-------------------------------------------------
 
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HUC6272, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		m_huc6271(*this, finder_base::DUMMY_TAG),
-		m_cdda_l(*this, "cdda_l"),
-		m_cdda_r(*this, "cdda_r"),
-		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
-		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this)),
-		m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this)),
-		m_microprg_ram(*this, "microprg_ram"),
-		m_kram_page0(*this, "kram_page0"),
-		m_kram_page1(*this, "kram_page1"),
-		m_scsibus(*this, "scsi"),
-		m_scsi_data_in(*this, "scsi_data_in"),
-		m_scsi_data_out(*this, "scsi_data_out"),
-		m_scsi_ctrl_in(*this, "scsi_ctrl_in"),
-		m_irq_changed_cb(*this)
+	: device_t(mconfig, HUC6272, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_huc6271(*this, finder_base::DUMMY_TAG)
+	, m_cdda_l(*this, "cdda_l")
+	, m_cdda_r(*this, "cdda_r")
+	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
+	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this)),
+	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
+	, m_microprg_ram(*this, "microprg_ram")
+	, m_kram_page0(*this, "kram_page0")
+	, m_kram_page1(*this, "kram_page1")
+	, m_scsibus(*this, "scsi")
+	, m_scsi_data_in(*this, "scsi_data_in")
+	, m_scsi_data_out(*this, "scsi_data_out")
+	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
+	, m_scsi_cmd_in(*this, "scsi_cmd_in")
+	, m_irq_changed_cb(*this)
 {
 }
 
@@ -332,6 +335,11 @@ u32 huc6272_device::scsi_data_r(offs_t offset)
 void huc6272_device::scsi_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_scsi_data_out->write(data & 0xff);
+}
+
+u32 huc6272_device::scsi_cmd_status_r(offs_t offset)
+{
+	return m_scsi_cmd_in->read() & 0xff;
 }
 
 void huc6272_device::scsi_initiate_cmd_w(offs_t offset, u32 data, u32 mem_mask)
@@ -731,9 +739,16 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
 	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
 
+	scsibus.rst_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit7));
+	scsibus.ack_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit4));
+	scsibus.sel_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit2));
+	scsibus.atn_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit1));
+	scsibus.bsy_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit0));
+
 	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
 	scsibus.set_output_latch(scsiout);
 
+	INPUT_BUFFER(config, "scsi_cmd_in");
 	INPUT_BUFFER(config, "scsi_ctrl_in");
 	INPUT_BUFFER(config, "scsi_data_in");
 

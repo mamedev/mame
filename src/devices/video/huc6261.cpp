@@ -293,14 +293,14 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 			break;
 
 		case 0x01:
-			logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register );
+			//logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register );
 			switch( m_register )
 			{
 				/* Control register */
 				// -x-- ---- ---- ---- Enable HuC6271: 0 - disabled, 1 - enabled
 				// --x- ---- ---- ---- Enable HuC6272 BG3: 0 - disabled, 1 - enabled
 				// ---x ---- ---- ---- Enable HuC6272 BG2: 0 - disabled, 1 - enabled
-				// ---- x--- ---- ---- Enable Huc6272 BG1: 0 - disabled, 1 - enabled
+				// ---- x--- ---- ---- Enable HuC6272 BG1: 0 - disabled, 1 - enabled
 				// ---- -x-- ---- ---- Enable HuC6272 BG0: 0 - disabled, 1 - enabled
 				// ---- --x- ---- ---- Enable HuC6270 SPR: 0 - disabled, 1 - enabled
 				// ---- ---x ---- ---- Enable HuC6270 BG: 0 - disabled, 1 - enabled
