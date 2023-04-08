@@ -1052,15 +1052,15 @@ uint32_t v810_device::opCVTW(uint32_t op)
 
 uint32_t v810_device::opMPYHW(uint32_t op)
 {
-	int val1=(GETREG(GET1) & 0xffff);
-	int val2=(GETREG(GET2) & 0xffff);
-	SET_OV(0);
-	val2*=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,val2);
-	// TODO: unknown
-	return 18;
+	s16 val1 = (s16)GETREG(GET1);
+	s16 val2 = (s16)GETREG(GET2);
+	s32 result = (s32)(val1 * val2);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((result == 0) ? 1 : 0);
+	//SET_S((result < 0) ? 1 : 0);
+	SETREG(GET2,result);
+	return 9;
 }
 
 uint32_t v810_device::opXB(uint32_t op)
