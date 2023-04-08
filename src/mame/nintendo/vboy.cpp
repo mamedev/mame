@@ -1241,13 +1241,13 @@ void vboy_state::vboy(machine_config &config)
 	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */
-	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_LCD));
 	lscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	lscreen.set_screen_update(FUNC(vboy_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	/* Right screen */
-	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_LCD));
 	rscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	rscreen.set_screen_update(FUNC(vboy_state::screen_update_right));
 	rscreen.set_palette(m_palette);
