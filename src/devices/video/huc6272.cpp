@@ -11,9 +11,7 @@
     - Convert base mapping to address_map;
     - Convert I/O to space address, and make it honor mem_mask;
     - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
-      \- Crashes if CD-ROM is in, on unhandled command 0x28 "Read(10)".
-         Tries to LBA with 0xffff'ff7a and 0 after failing a custom mode sense,
-         prior TOC tests makes even less sense, CPU core bug?
+      \- Fails detection of PC-FX discs, detects as normal audio CDs;
       \- During POST it tries an unhandled 0x44 "Read Header";
       \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
          and PC-8801-31 (interface);
@@ -143,7 +141,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_cdda_l(*this, "cdda_l")
 	, m_cdda_r(*this, "cdda_r")
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
-	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this)),
+	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
 	, m_microprg_ram(*this, "microprg_ram")
 	, m_kram_page0(*this, "kram_page0")

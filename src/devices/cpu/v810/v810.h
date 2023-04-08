@@ -113,7 +113,7 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	uint32_t m_reg[65];
+	uint32_t m_reg[65]{};
 	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;

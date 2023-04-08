@@ -1389,11 +1389,11 @@ void v810_device::state_string_export(const device_state_entry &entry, std::stri
 
 void v810_device::device_reset()
 {
-	int i;
-	for(i=0;i<64;i++)   m_reg[i]=0;
+	// everything else is "Undefind" (sic)
+	m_reg[0] = 0;
 	PC = 0xfffffff0;
-	PSW = 0x1000;
-	ECR   = 0x0000fff0;
+	PSW = 0x00008000;
+	ECR = 0x0000fff0;
 }
 
 // TODO: remaining exception types
