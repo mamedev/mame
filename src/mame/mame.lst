@@ -23314,6 +23314,9 @@ gijoej                          // GX069 (c) 1991 (Japan)
 gijoeu                          // GX069 (c) 1991 (US)
 gijoeua                         // GX069 (c) 1991 (US)
 
+@source:konami/goldenregion.cpp
+glregion
+
 @source:konami/gradius3.cpp
 gradius3                        // GX945 (c) 1989 (World)
 gradius3a                       // GX945 (c) 1989 (Asia)
