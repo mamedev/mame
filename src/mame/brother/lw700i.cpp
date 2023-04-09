@@ -297,7 +297,7 @@ void lw700i_state::lw700i(machine_config &config)
 	HD63266F(config, m_fdc, XTAL(16'000'000));
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ4);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ2); // dreq2 is not connected in the hd83003
-	m_fdc->inp_rd_callback().set([this](){ return !m_floppy->get_device()->dskchg_r(); });
+	m_fdc->inp_rd_callback().set([this](){ return m_floppy->get_device()->dskchg_r(); });
 	FLOPPY_CONNECTOR(config, m_floppy, lw700i_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 }
 
