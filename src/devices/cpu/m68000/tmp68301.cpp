@@ -63,7 +63,7 @@ void tmp68301_device::internal_update(uint64_t current_time)
 void tmp68301_device::device_start()
 {
 	m68000_mcu_device::device_start();
-	m_parallel_r_cb.resolve_safe(0);
+	m_parallel_r_cb.resolve_safe(0xffff);
 	m_parallel_w_cb.resolve_safe();
 
 	for(auto &tx : m_tx_cb)
