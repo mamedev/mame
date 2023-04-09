@@ -95,7 +95,6 @@ namespace {
 #define RAM1        m_ram_pages[0xe9 - 0xc0]
 #define RAM2        m_ram_pages[0xea - 0xc0]
 
-
 class sprinter_state : public spectrum_128_state
 {
 public:
@@ -191,8 +190,8 @@ private:
 	void isa_w(offs_t offset, u8 data);
 
 	void accel_control_r(u8 data);
-	void accel_r_tap(offs_t offset, u8 &data);
-	void accel_w_tap(offs_t offset, u8 &data);
+	void accel_r_tap(u16 offset, u8 &data);
+	void accel_w_tap(u16 offset, u8 &data);
 	u8 &accel_buffer(u8 idx);
 	void update_accel_buffer(u8 idx, u8 data);
 
@@ -900,7 +899,7 @@ void sprinter_state::accel_control_r(u8 data)
 	m_prf_d = is_prefix;
 }
 
-void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
+void sprinter_state::accel_r_tap(u16 offset, u8 &data)
 {
 	const std::string_view m{(m_fn_acc == MODE_AND) ? "&" : (m_fn_acc == MODE_OR) ? "|" : (m_fn_acc == MODE_XOR) ? "^" : ""};
 	if (m_acc_dir == SET_BUFFER)
@@ -940,7 +939,7 @@ void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 	}
 }
 
-void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
+void sprinter_state::accel_w_tap(u16 offset, u8 &data)
 {
 	if (m_acc_dir == SET_BUFFER)
 	{
