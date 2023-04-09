@@ -334,13 +334,13 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 {
 //  auto profile3 = g_profiler.start(PROFILER_USER3);
 
-	for(int y=0;y<=h;y++)
+	for(int y = 0; y <= h; y++)
 	{
-		float h_skw = (int16_t)READ_BGMAP(param_base + (y*8+0)) / 8.0;
-		float prlx = (int16_t)READ_BGMAP(param_base + (y*8+1)) / 8.0;
-		float v_skw = (int16_t)READ_BGMAP(param_base + (y*8+2)) / 8.0;
-		float h_scl = (int16_t)READ_BGMAP(param_base + (y*8+3)) / 512.0;
-		float v_scl = (int16_t)READ_BGMAP(param_base + (y*8+4)) / 512.0;
+		float h_skw = (int16_t)READ_BGMAP(param_base + (y * 8 + 0)) / 8.0;
+		float prlx = (int16_t)READ_BGMAP(param_base + (y * 8 + 1)) / 8.0;
+		float v_skw = (int16_t)READ_BGMAP(param_base + (y * 8 + 2)) / 8.0;
+		float h_scl = (int16_t)READ_BGMAP(param_base + (y * 8 + 3)) / 512.0;
+		float v_scl = (int16_t)READ_BGMAP(param_base + (y * 8 + 4)) / 512.0;
 
 		h_skw += right ? -prlx : prlx;
 
@@ -351,7 +351,10 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int16_t x1 = (x+gx);
 			int pix = 0;
 
-			x1 += right ? -gp : gp;
+			x1 += (right ? -gp : gp);
+			// clamp for spaceinv gameplay shots
+			// (sets GPs with out of bounds GP values, cfr. $3da40/$3daa0 0xc*** world entries)
+			x1 &= 0x1ff;
 
 			src_x = (int32_t)((h_skw) + (h_scl * x));
 			src_y = (int32_t)((v_skw) + (v_scl * x));
@@ -780,13 +783,13 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 
 			//printf("%d\n",row_num);
 
-			res =  m_vip_io.XPSTTS & 0x00f3; // empty ^^'
+			res =  m_vip_io.XPSTTS & 0x00f3;
 			res |= m_drawfb << 2;
 
 			if(m_row_num < 224/8)
 			{
 				res |= 0x8000;
-				res |= m_row_num<<8;
+				res |= m_row_num << 8;
 			}
 
 			return res;
