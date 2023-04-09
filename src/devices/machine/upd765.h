@@ -282,6 +282,7 @@ protected:
 		C_VERSION,
 		C_SLEEP,
 		C_ABORT,
+		C_SPECIFY2,
 
 		C_INVALID,
 		C_INCOMPLETE

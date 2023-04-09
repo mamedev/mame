@@ -3352,9 +3352,15 @@ void hd63266f_device::abort_w(u8 data)
 
 int hd63266f_device::check_command()
 {
-	switch(command[0] & 0x1f) {
+	switch(command[0]) {
 		case 0x0e:
 			return C_SLEEP;
+		case 0x0b:
+		case 0x2b:
+			return command_pos == 4 ? C_SPECIFY            : C_INCOMPLETE;
+		case 0x4b:
+		case 0x6b:
+			return command_pos == 7 ? C_SPECIFY2           : C_INCOMPLETE;
 	}
 	return upd765_family_device::check_command();
 }
@@ -3369,6 +3375,12 @@ void hd63266f_device::execute_command(int cmd)
 			main_phase = PHASE_CMD;
 			motor_state = 0;
 			LOGCOMMAND("sleep\n");
+			break;
+		case C_SPECIFY2:
+			spec = (command[1] << 8) | command[2];
+			LOGCOMMAND("command specify2 %02x %02x: step_rate=%d ms, head_unload=%d ms, head_load=%d ms, non_dma=%s\n",
+				command[1], command[2], 16-(command[1]>>4), (command[1]&0x0f)<<4, command[2]&0xfe, ((command[2]&1)==1)? "true":"false");
+			main_phase = PHASE_CMD;
 			break;
 		case C_SENSE_DRIVE_STATUS:
 			upd765_family_device::execute_command(cmd);
