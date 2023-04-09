@@ -359,6 +359,7 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
+	void fambowl(machine_config &config);
 
 private:
 	void rom8_w(offs_t offset, uint16_t data);
@@ -552,6 +553,10 @@ void namcos11_state::c76_map(address_map &map)
 	map(0x280000, 0x2fffff).rom().region("c76", 0);
 	map(0x300000, 0x300001).nopw();
 	map(0x301000, 0x301001).nopw();
+	// fambowl needs something here.  It has to contain bytes with bit 7 set or the C76 hangs.
+	// This lets it run enough to get into test mode, but the C76 crashes once you get in.
+	// Setting this to the C76 data ROM crashes even before that.
+	map(0x510000, 0x51ffff).lr8([]() { return 0x80; }, "unknown");
 }
 
 uint16_t namcos11_state::c76_speedup_r()
@@ -720,6 +725,13 @@ void namcos11_state::pocketrc(machine_config &config)
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	KEYCUS_C432(config, "keycus", 0);
+}
+
+void namcos11_state::fambowl(machine_config &config)
+{
+	coh110(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C432(config, "keycus", 0);   // no keycus is actually present, but the driver isn't ready for that
 }
 
 void namcos11_state::starswep(machine_config &config)
@@ -1850,6 +1862,26 @@ ROM_START( xevi3dgj )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
+ROM_START( fambowl )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD( "fb1_vera.1j",  0x000000, 0x200000, CRC(1a3c7317) SHA1(1535a41aa5e6e5c5f83b647895cfdd231e47728a) )
+	ROM_LOAD( "fb1_vera.1l",  0x200000, 0x200000, CRC(63393cbc) SHA1(51051a032da52ae1bda7f2b4431bea56750aab96) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "fb1_rom0l.ic5", 0x000000, 0x400000, CRC(0bb1dee3) SHA1(3feaa50a64aecba89ca0ca209069fde45a09a2ed) )
+	ROM_LOAD16_BYTE( "fb1_rom0u.ic6", 0x000001, 0x400000, CRC(e735b2eb) SHA1(f3b1088f38d32195b0cf839b3dff35142bc5cccc) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "fb1_spr0.ic5", 0x000000, 0x080000, CRC(4325439f) SHA1(0ce62c1d2f6adc3b3102f403e9d594b8a071829f) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "fb1_wave0a.8k", 0x000000, 0x400000, CRC(ef45939f) SHA1(8bad6d008c10b8d9920dbff25006e9c25e8db925) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+
+	ROM_REGION( 0x40000, "iomcu", 0)    // H8/3002 on sensor board. Connects to main PCB with 3 wires: Vcc, GND, and data.
+	ROM_LOAD( "fb1_vera.7e",  0x000000, 0x040000, CRC(452794c4) SHA1(cc128e368d5fab2e891bc4daf877e4348a095946) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -1887,6 +1919,7 @@ GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, empty_
 GAME( 1996, danceyesu,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 0 ) // Oct 30 1996  17:36:39
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              0 ) // Sep  4 1996  11:50:49
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_init, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_NODEVICE_LAN )
+GAME( 1997, fambowl,    0,        fambowl,    namcos11,   namcos11_state, empty_init, ROT90,"Namco",         "Family Bowl (Ver 1.00)",                       MACHINE_NOT_WORKING )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               0 )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               0 )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
