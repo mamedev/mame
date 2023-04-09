@@ -376,15 +376,21 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 /*
-x--- ---- ---- ---- [0] LON
--x-- ---- ---- ----     RON
---xx ---- ---- ----     BGM type
----- xx-- ---- ----     SCX
----- --xx ---- ----     SCY
----- ---- x--- ----     OVR
----- ---- -x-- ----     END
----- ---- --00 ----
----- ---- ---- xxxx     BGMAP_BASE
+ * $3d800 World list
+ *
+ * x--- ---- ---- ---- [0] LON enabled for left screen
+ * -x-- ---- ---- ----     RON enabled for right screen
+ * --xx ---- ---- ----     BGM type
+ * --00 ---- ---- ----     Normal
+ * --01 ---- ---- ----     Hi-Bias
+ * --10 ---- ---- ----     Affine
+ * --11 ---- ---- ----     OAM
+ * ---- xx-- ---- ----     SCX
+ * ---- --xx ---- ----     SCY
+ * ---- ---- x--- ----     OVR enable overdraw char
+ * ---- ---- -x-- ----     END marker for end of list processing
+ * ---- ---- --00 ----
+ * ---- ---- ---- xxxx     BGMAP_BASE
 */
 
 uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt)
@@ -685,8 +691,10 @@ void vboy_state::vip_map(address_map &map)
 }
 
 // TODO: verify against real HW
-// - brightness presumably isn't a linear algorithm
-// - REST needs to be taken into account (needs a working example)
+// - LED brightness doesn't scale well with regular raster pen color.
+//   These BRTx values are the "time" where the LED stays on.
+// - REST needs to be taken into account (nothing sets it up so far)
+// - vfishing draws selection accents in main menu with BRTA signal (currently almost invisible);
 void vboy_state::set_brightness()
 {
 	int a,b,c;
@@ -834,8 +842,9 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 
 void vboy_state::vip_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// wariolnd end boss has these writes
 	if(mem_mask != 0xffff)
-		printf("%04x %02x\n",mem_mask,offset*2);
+		logerror("Warning: register %04x write with non-word access %02x & %04x\n",offset*2, data, mem_mask);
 
 	switch(offset << 1) {
 		/*
