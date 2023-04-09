@@ -479,7 +479,6 @@ void mbc6_device::install_ram()
 				nvrambytes ? nvrambytes : rambytes,
 				PAGE_RAM_SIZE - 1,
 				0,
-				0,
 				0xa000,
 				[this, base = nvrambase ? nvrambase : rambase] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{

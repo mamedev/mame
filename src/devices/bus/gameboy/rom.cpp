@@ -330,7 +330,6 @@ public:
 				bytes,
 				0x7fff,
 				0,
-				0,
 				0x0000,
 				[this, base = &romregion->as_u8()] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{
