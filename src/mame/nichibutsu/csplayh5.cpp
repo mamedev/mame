@@ -14,12 +14,6 @@
 
 
     DVD Notes:
-    - Testing currently requires converting the data to cd mode 1
-      format (extracthd, rename to .iso, createcd) then change the
-      checksum.  This will be fixed and the checksums changed to
-      something different again, so don't do the intermediate step
-      yet
-
     - TMP68301 communicates with h8 via their respective internal serial comms
 
     - TMP sends "?P", h8 answers "P01", TMP tends "?S", h8 answers "NG", games says the dvd drive has a problem
@@ -438,7 +432,7 @@ void csplayh5_state::tmp68301_parallel_port_w(uint16_t data)
 
 static void atapi_devs(device_slot_interface &device)
 {
-	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 }
 
 void csplayh5_state::csplayh5(machine_config &config)
@@ -455,7 +449,7 @@ void csplayh5_state::csplayh5(machine_config &config)
 	m_maincpu->tx0_handler().set(*m_subcpu->subdevice<h8_sci_device>("sci0"), FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(m_maincpu, FUNC(tmp68301_device::rx0_w));
 
-	HRDVD_ATA_CONTROLLER_DEVICE(config, m_ata).options(atapi_devs, "cdrom", nullptr, true); // dvd
+	HRDVD_ATA_CONTROLLER_DEVICE(config, m_ata).options(atapi_devs, "dvdrom", nullptr, true);
 	m_ata->irq_handler().set(FUNC(csplayh5_state::ata_irq));
 	m_ata->dmarq_handler().set(FUNC(csplayh5_state::ata_drq));
 
@@ -500,7 +494,7 @@ ROM_START( nichidvd )
 
 	ROM_REGION16_BE( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 
-	DISK_REGION( "ata:0:cdrom" )
+	DISK_REGION( "ata:0:dvdrom" )
 ROM_END
 
 // TODO: this surely uses a different subboard
@@ -519,7 +513,7 @@ ROM_START( csplayh1 )
 	ROM_LOAD16_BYTE( "4.bin", 0x000001, 0x080000, CRC(2e63ee15) SHA1(78fefbc277234458212cded997d393bd8b82cf76) )
 	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
 
-	DISK_REGION( "ata:0:cdrom" )
+	DISK_REGION( "ata:0:dvdrom" )
 	DISK_IMAGE_READONLY( "csplayh1", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
@@ -543,8 +537,8 @@ ROM_START( mjgalpri )
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(4c92a523) SHA1(51da73fdfdfccdc070fa8a13163e031438b50876) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(30f356af4e08567273a88758bb0ddd3544eea228) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8001", 0, SHA1(7860688f8152ba7fdaeef5fec9eeb8e85c90b9a5) )
 ROM_END
 
 ROM_START( sengomjk )
@@ -561,8 +555,8 @@ ROM_START( sengomjk )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(20791a5a) SHA1(03c38e9b8e60b0dded7504b2725210df5405110c) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(1ed72387) SHA1(7e2b8ce49561d6fd79dcf0d427569e5f6ef8dc67) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(d3502496526e62a877f12dccc27b32ae33d3704d) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8002", 0, SHA1(0fac6bbe52bc7ed56ce786ed0690f7e150fc4f3e) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )
@@ -583,9 +577,8 @@ ROM_START( junai )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(4182dc30) SHA1(89601c62b74aff3d65b075d4b5cd1eb2ccf4e386) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "junai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
-//  DISK_IMAGE_READONLY( "junai", 0, SHA1(282cc528ff175ac55f1545481ca1c40377cf9347) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "junai", 0, SHA1(098925d09cfdd2c970edf40054b36423f6e71a42) )
 ROM_END
 
 ROM_START( csplayh5 )
@@ -603,8 +596,8 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(113d7e96) SHA1(f3fb9c719544417a6a018b82f07c65bf73de21ff) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "csplayh5", 0, SHA1(30a5262529196d2bf6608114781ccf20ab284e37) )
 ROM_END
 
 ROM_START( junai2 )
@@ -622,8 +615,8 @@ ROM_START( junai2 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(5b37c8dd) SHA1(8de5e2f92721c6679c6506850a442cafff89653f) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "junai2", 0, SHA1(dc9633a101f20f03fd9b4414c10274d2539fb7c2) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "junai2", 0, SHA1(ec11caa96833b80324e68f0345b000d702eaf6cb) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(01c2895a) SHA1(782166a60fa14d5faa5a92629f7ca65a878ad7fe) )
@@ -644,8 +637,8 @@ ROM_START( mogitate )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(ea655990) SHA1(7f59cfab21e8858625e82a9501acc943b07f799c) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(4c910b86) SHA1(48007f03f4e445b9de15531afe821c1b18fccae1) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8006", 0, SHA1(aa911e46e791d89ce4fed4a32b4b0637ba3a9920) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8006", 0, SHA1(334c37710affc852bec750721280488530b3d1e0) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
@@ -665,8 +658,8 @@ ROM_START( mjmania )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(37dde764) SHA1(0530b63d8e682cdf01128057fdc3a8c23262afc9) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(dea4a2d2) SHA1(0118eb1330c9da8fead99f64fc015fd343fed79b) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "mjmania", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "mjmania", 0, SHA1(777668854058b1586f599d266d1cea55c35aa30d) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563) SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
@@ -687,8 +680,8 @@ ROM_START( renaimj )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(6d1c9efd) SHA1(c9ea9d6e6d34db5635fc55d41e7bb54a41948d27) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8008", 0, SHA1(49c92cb9b08ee7773f3d93fce0bbecc3c0ae654d) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8008", 0, SHA1(8dd445030e287f9e4380277d2163c4163182ab51) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal18v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) )
@@ -709,8 +702,8 @@ ROM_START( bikiniko )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(1e2e1cf3) SHA1(f71b5dedf4f897644d519e412651152d0d81edb8) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "bikiniko", 0, SHA1(cac9a6c7fe86751c968cd15f7b779edbc14d5f0b) )
 ROM_END
 
 ROM_START( csplayh6 )
@@ -728,8 +721,8 @@ ROM_START( csplayh6 )
 	ROM_LOAD16_BYTE( "4.ic41",   0x00000, 0x80000, CRC(858e0604) SHA1(64c23bc06898188798937770129697b3c4b547d6) )
 	// 0x100000 - 0x3fffff empty sockets
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8010", 0, SHA1(01e247fe1b86bbfe743e09a625432874f881a9a0) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8010", 0, SHA1(5c3fab40d0cce94e80f2bdd533569d5507496ad4) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "palce16v8h.020_bad", 0x000000, 0x040000, BAD_DUMP CRC(2aec4e37) SHA1(79d64394c0f6f2c5e17ae9fc62eaa279da466ccd) )
@@ -749,8 +742,8 @@ ROM_START( thenanpa )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(ee6b88c4) SHA1(64ae66a24f1639801c7bdda7faa0d604bb97ceb1) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(ce987845) SHA1(2f7dca32a79ad6afbc55ca1d492b582f952688ff) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "thenanpa", 0,  SHA1(72bf8c75189e877508c5a64d5591738d23ed7e96) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "thenanpa", 0,  SHA1(730848295802b8596929ffd22b81712ec4ea30a6) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(daffd0ac)SHA1(cbeff914163d425a9cb30fe8d62f91fca281b11f) )
@@ -770,8 +763,8 @@ ROM_START( pokoachu )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(843c288e) SHA1(2741b9da83fd35c7472b8c67bc02313a1c5e4e25) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(6920a9b8) SHA1(0a4cb9e2a0d871aed60c1293b7cac4bf79a9446c) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8012", 0, SHA1(06c611f110377f5d02bbde1ab1d43d3623772b7b) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8012", 0, SHA1(be6450351d6da4c96cbff353d587980a2728e306) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
@@ -791,8 +784,8 @@ ROM_START( csplayh7 )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(1d67ca95) SHA1(9b45045b6fa67308bade324f91c21010aa8d121e) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(b4f5f990) SHA1(88cccae04f89fef43d88f4e82b65de3de946e9af) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "csplayh7", 0, SHA1(f81e772745b0c62b17d91bd294993e49fe8da4d9) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "csplayh7", 0, SHA1(be6450351d6da4c96cbff353d587980a2728e306) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "mjdvd12.gal16v8b.ic8.bin", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563)SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
@@ -812,8 +805,8 @@ ROM_START( aimode )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(4a9863cf) SHA1(ccf08befe773fb94fa78423ed19b6b8d255ca3a7) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(893aac1a) SHA1(14dd3f07363858c2be3a9400793f720b1f5baf1a) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8014", 0, SHA1(c5ad9bd66f0930e1c477126301286e38f077c164) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8014", 0, SHA1(f2aea46961630328d82ffc221c4b817b20fa9f5c) )
 
 	ROM_REGION( 0x40000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.020", 0x000000, 0x040000, CRC(0a32a144) SHA1(f3b4a1174adbb2f7b7500adeafa20142f6a16d08) )
@@ -833,8 +826,8 @@ ROM_START( fuudol )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(5c9e8665) SHA1(2a1b040e5c72d4400d4b5c467c75ae99e9bb01e2) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(fdd79d8f) SHA1(f8bb82afaa28affb04b83270eb407129f1c7e611) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "fuudol", 0, SHA1(fabab43543ed14da4fe7c63a2a2cc4e68936938a) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "fuudol", 0, SHA1(d6b5af48775304caa1d98878dc8dc154c975720e) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
@@ -854,8 +847,8 @@ ROM_START( nuretemi )
 	ROM_LOAD16_BYTE( "3.ic40", 0x000001, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
 	ROM_LOAD16_BYTE( "4.ic41", 0x000000, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(76c7257e6c98e9dd8c594489c3104b2d032a9099) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(865de327) SHA1(a97374ee765443d9da6919d0e226108c062f7942) )
@@ -875,8 +868,8 @@ ROM_START( tsuwaku )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(00657ca3) SHA1(a02bb8a177f3915ddf0bf97fd69426a3a28061a5) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(edf56c94) SHA1(76d95a45aced3ad8bfe8a561f355731f4f99603e) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8017", 0, SHA1(6c86985574d53f990c4eec573d7fa84782cb9c4c) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8017", 0, SHA1(0db86e6157b4bd402f0c41d0d69c1a80d2156b27) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8h.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
@@ -896,8 +889,8 @@ ROM_START( torarech )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(cbbbab5c) SHA1(ab8ae64b1f2acfab55ba7cbb173f3036a46001e6) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(18412fd8) SHA1(6907ce2739549519e1f3dcee2186f6add219a3c2) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8018", 0, SHA1(cf8758bb2caaba6377b354694123ddec71a4f8e1) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8018", 0, SHA1(b6cf54735bf6fded2ffb17e6fac84ae9a86ccaf2) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "palce16v8h.020", 0x000000, 0xbb2, BAD_DUMP CRC(c8e8605a) SHA1(02e43d9de73256e5c73d6f99834a23cef321d56b) )
@@ -917,8 +910,8 @@ ROM_START( nichisel )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(5ab63481) SHA1(fc81fbdd1df496813fc0d80bcab6d0434b75d311) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(50085861) SHA1(b8f99a66a743c9bf66ef307fe4b581586e293fe5) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb80sp", 0, SHA1(48eb9f8adba0ea5f59cfcbdee61c29b4af84ac97) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb80sp", 0, SHA1(3bf53fef4b002bfd8515e4133f636e1c9b031931) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "palce16v8h.020", 0x000000, 0x040000, CRC(228b98fb) SHA1(53b57a09610425a5bb9d0ffe0f68dce2d9ab3bf6) )
@@ -938,8 +931,8 @@ ROM_START( konhaji )
 	ROM_LOAD16_BYTE( "3.ic40",            0x000001, 0x080000, CRC(88f31da7) SHA1(dc76532fa3261b3b238a42e2ca8f270f2b2ea1fa) )
 	ROM_LOAD16_BYTE( "4.ic41",            0x000000, 0x080000, CRC(35893109) SHA1(6a55bd147a75913af59bc355abf010e1b75063bf) )
 
-	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(f59ac1587009d7d15618549dc60cbd24c263a95f) )
+	DISK_REGION( "ata:0:dvdrom" )
+	DISK_IMAGE_READONLY( "nb8019", 0, SHA1(a7b6dc0374b374b02e4a4eaf706330f961ebb563) )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.bin", 0x000000, 0x000117, CRC(9f0dec43) SHA1(d836e564da496c3049e16f025daf362cced413d4) )

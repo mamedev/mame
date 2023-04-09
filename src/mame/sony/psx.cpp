@@ -15,7 +15,7 @@
 #include "bus/psx/parallel.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/psx/psx.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
 #include "psxcd.h"
 #include "machine/ram.h"

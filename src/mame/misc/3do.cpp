@@ -98,7 +98,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 #include "cpu/arm/arm.h"
 #include "cpu/arm7/arm7.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 
 
 #define X2_CLOCK_PAL    59000000

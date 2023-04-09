@@ -48,7 +48,7 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/ram.h"
 #include "sound/cdda.h"
 

@@ -107,11 +107,11 @@ void harddisk_image_device::device_start()
 
 	m_chd = nullptr;
 
-	// try to locate the CHD from a DISK_REGION
-	chd_file *handle = machine().rom_load().get_disk_handle(tag());
-	if (handle)
-		m_hard_disk_handle.reset(new hard_disk_file(handle));
-	else
+	if (has_preset_images()) {
+		set_image_tag();
+		set_user_loadable(false);
+		setup_current_preset_image();
+	} else
 		m_hard_disk_handle.reset();
 }
 
@@ -164,6 +164,12 @@ std::pair<std::error_condition, std::string> harddisk_image_device::call_create(
 		return std::make_pair(err, std::string());
 
 	return std::make_pair(internal_load_hd(), std::string());
+}
+
+void harddisk_image_device::setup_current_preset_image()
+{
+	chd_file *chd = current_preset_image_chd();
+	m_hard_disk_handle.reset(new hard_disk_file(chd));
 }
 
 void harddisk_image_device::call_unload()
@@ -227,6 +233,12 @@ static std::error_condition open_disk_diff(emu_options &options, const char *nam
 
 std::error_condition harddisk_image_device::internal_load_hd()
 {
+	if (has_preset_images())
+	{
+		setup_current_preset_image();
+		return std::error_condition();
+	}
+
 	std::error_condition err;
 	m_chd = nullptr;
 	uint8_t header[64];
@@ -325,3 +337,40 @@ std::error_condition harddisk_image_device::internal_load_hd()
 	else
 		return image_error::UNSPECIFIED;
 }
+
+const hard_disk_file::info &harddisk_image_device::get_info() const
+{
+	return m_hard_disk_handle->get_info();
+}
+
+bool harddisk_image_device::read(uint32_t lbasector, void *buffer)
+{
+	return m_hard_disk_handle->read(lbasector, buffer);
+}
+
+bool harddisk_image_device::write(uint32_t lbasector, const void *buffer)
+{
+	return m_hard_disk_handle->write(lbasector, buffer);
+}
+
+
+bool harddisk_image_device::set_block_size(uint32_t blocksize)
+{
+	return m_hard_disk_handle->set_block_size(blocksize);
+}
+
+std::error_condition harddisk_image_device::get_inquiry_data(std::vector<uint8_t> &data) const
+{
+	return m_hard_disk_handle->get_inquiry_data(data);
+}
+
+std::error_condition harddisk_image_device::get_cis_data(std::vector<uint8_t> &data) const
+{
+	return m_hard_disk_handle->get_cis_data(data);
+}
+
+std::error_condition harddisk_image_device::get_disk_key_data(std::vector<uint8_t> &data) const
+{
+	return m_hard_disk_handle->get_disk_key_data(data);
+}
+

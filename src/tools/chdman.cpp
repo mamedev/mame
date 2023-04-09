@@ -70,6 +70,7 @@ const int MODE_GDI = 2;
 #define COMMAND_CREATE_RAW "createraw"
 #define COMMAND_CREATE_HD "createhd"
 #define COMMAND_CREATE_CD "createcd"
+#define COMMAND_CREATE_DVD "createdvd"
 #define COMMAND_CREATE_LD "createld"
 #define COMMAND_EXTRACT_RAW "extractraw"
 #define COMMAND_EXTRACT_HD "extracthd"
@@ -124,6 +125,7 @@ static void do_verify(parameters_map &params);
 static void do_create_raw(parameters_map &params);
 static void do_create_hd(parameters_map &params);
 static void do_create_cd(parameters_map &params);
+static void do_create_dvd(parameters_map &params);
 static void do_create_ld(parameters_map &params);
 static void do_copy(parameters_map &params);
 static void do_extract_raw(parameters_map &params);
@@ -695,6 +697,16 @@ static const command_description s_commands[] =
 			OPTION_OUTPUT_FORCE,
 			REQUIRED OPTION_INPUT,
 			OPTION_HUNK_SIZE,
+			OPTION_COMPRESSION,
+			OPTION_NUMPROCESSORS
+		}
+	},
+	{ COMMAND_CREATE_DVD, do_create_dvd, ": create a DVD CHD from the input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_PARENT,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
 			OPTION_COMPRESSION,
 			OPTION_NUMPROCESSORS
 		}
@@ -2055,6 +2067,88 @@ static void do_create_cd(parameters_map &params)
 	catch (...)
 	{
 		delete chd;
+		// delete the output file
+		auto output_chd_str = params.find(OPTION_OUTPUT);
+		if (output_chd_str != params.end())
+			osd_file::remove(*output_chd_str->second);
+		throw;
+	}
+}
+
+
+//-------------------------------------------------
+//  do_create_dvd - create a new compressed dvd
+//  image from a raw file
+//-------------------------------------------------
+
+static void do_create_dvd(parameters_map &params)
+{
+	// process input file
+	util::core_file::ptr input_file;
+	auto input_file_str = params.find(OPTION_INPUT);
+	if (input_file_str != params.end())
+	{
+		std::error_condition const filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *input_file_str->second, filerr.message());
+	}
+
+	// process output CHD
+	chd_file output_parent;
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
+
+	// process input start/end
+	uint64_t filesize = 0;
+	input_file->length(filesize); // FIXME: check error return
+
+	// process compression
+	chd_codec_type compression[4];
+	memcpy(compression, s_default_hd_compression, sizeof(compression)); // No reason to be different than HD for compression
+	if (!input_file)
+		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
+	parse_compression(params, compression);
+
+	// process numprocessors
+	parse_numprocessors(params);
+
+	// validate the size
+	if (filesize % 2048 != 0)
+		report_error(1, "Data size is not divisible by 2048");
+
+	uint32_t totalsectors = filesize / 2048;
+
+	// print some info
+	printf("Output CHD:   %s\n", output_chd_str->c_str());
+	if (output_parent.opened())
+		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
+	printf("Input file:   %s\n", input_file_str->second->c_str());
+	printf("Compression:  %s\n", compression_string(compression).c_str());
+	printf("Logical size: %s\n", big_int_string(uint64_t(totalsectors) * 2048).c_str());
+
+	// catch errors so we can close & delete the output file
+	try
+	{
+		// create the new dvd
+		std::unique_ptr<chd_file_compressor> chd;
+		chd.reset(new chd_rawfile_compressor(*input_file, 0, filesize));
+		std::error_condition err;
+		if (output_parent.opened())
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, compression, output_parent);
+		else
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * 2048, 2048, 2048, compression);
+		if (err)
+			report_error(1, "Error creating CHD file (%s): %s", output_chd_str, err.message());
+
+		// add the standard dvd type tag
+		err = chd->write_metadata(DVD_METADATA_TAG, 0, "");
+		if (err)
+			report_error(1, "Error adding dvd metadata: %s", err.message());
+
+		// compress it generically
+		compress_common(*chd);
+	}
+	catch (...)
+	{
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())

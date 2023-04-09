@@ -64,7 +64,7 @@ uint16_t isbc_215g_device::read_sector()
 	uint16_t wps = 64 << ((m_idcompare[0] >> 4) & 3);
 	harddisk_image_device *drive = (m_drive ? m_hdd1 : m_hdd0);
 	if(!m_secoffset)
-		drive->get_hard_disk_file()->read(m_lba[m_drive], m_sector);
+		drive->read(m_lba[m_drive], m_sector);
 	if(m_secoffset >= wps)
 		return 0;
 	return m_sector[m_secoffset++];
@@ -79,7 +79,7 @@ bool isbc_215g_device::write_sector(uint16_t data)
 	m_sector[m_secoffset++] = data;
 	if(m_secoffset == wps)
 	{
-		drive->get_hard_disk_file()->write(m_lba[m_drive], m_sector);
+		drive->write(m_lba[m_drive], m_sector);
 		return true;
 	}
 	return false;
@@ -386,12 +386,12 @@ const tiny_rom_entry *isbc_215g_device::device_rom_region() const
 
 void isbc_215g_device::device_reset()
 {
-	if(m_hdd0->get_hard_disk_file())
-		m_geom[0] = &m_hdd0->get_hard_disk_file()->get_info();
+	if(m_hdd0->exists())
+		m_geom[0] = &m_hdd0->get_info();
 	else
 		m_geom[0] = nullptr;
-	if(m_hdd1->get_hard_disk_file())
-		m_geom[1] = &m_hdd1->get_hard_disk_file()->get_info();
+	if(m_hdd1->exists())
+		m_geom[1] = &m_hdd1->get_info();
 	else
 		m_geom[1] = nullptr;
 

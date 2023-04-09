@@ -8,8 +8,10 @@
 #define T10MMC_GET_EVENT_STATUS_NOTIFICATION 0x4a
 
 // device type definition
-DEFINE_DEVICE_TYPE(ATAPI_CDROM,       atapi_cdrom_device,       "cdrom",       "ATAPI CD-ROM")
-DEFINE_DEVICE_TYPE(ATAPI_FIXED_CDROM, atapi_fixed_cdrom_device, "cdrom_fixed", "ATAPI fixed CD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_CDROM,        atapi_cdrom_device,        "cdrom",        "ATAPI CD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_FIXED_CDROM,  atapi_fixed_cdrom_device,  "cdrom_fixed",  "ATAPI fixed CD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_DVDROM,       atapi_dvdrom_device,       "dvdrom",       "ATAPI CD/DVD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_FIXED_DVDROM, atapi_fixed_dvdrom_device, "dvdrom_fixed", "ATAPI fixed CD/DVD-ROM")
 
 atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_cdrom_device(mconfig, ATAPI_CDROM, tag, owner, clock)
@@ -24,6 +26,16 @@ atapi_cdrom_device::atapi_cdrom_device(const machine_config &mconfig, device_typ
 
 atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_cdrom_device(mconfig, ATAPI_FIXED_CDROM, tag, owner, clock)
+{
+}
+
+atapi_dvdrom_device::atapi_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, ATAPI_DVDROM, tag, owner, clock)
+{
+}
+
+atapi_fixed_dvdrom_device::atapi_fixed_dvdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, ATAPI_FIXED_DVDROM, tag, owner, clock)
 {
 }
 
@@ -88,21 +100,36 @@ void atapi_cdrom_device::device_reset()
 {
 	atapi_hle_device::device_reset();
 	m_media_change = true;
+	m_sequence_counter = m_image->sequence_counter();
 }
 
 void atapi_fixed_cdrom_device::device_reset()
 {
 	atapi_hle_device::device_reset();
-	m_cdrom = m_image->get_cdrom_file();
 	m_media_change = false;
+	m_sequence_counter = m_image->sequence_counter();
+}
+
+void atapi_dvdrom_device::device_reset()
+{
+	atapi_hle_device::device_reset();
+	m_media_change = true;
+	m_sequence_counter = m_image->sequence_counter();
+}
+
+void atapi_fixed_dvdrom_device::device_reset()
+{
+	atapi_hle_device::device_reset();
+	m_media_change = false;
+	m_sequence_counter = m_image->sequence_counter();
 }
 
 void atapi_cdrom_device::process_buffer()
 {
-	if(m_cdrom != m_image->get_cdrom_file())
+	if(	m_sequence_counter != m_image->sequence_counter() )
 	{
 		m_media_change = true;
-		SetDevice(m_image->get_cdrom_file());
+		m_sequence_counter = m_image->sequence_counter();
 	}
 	atapi_hle_device::process_buffer();
 }
@@ -129,7 +156,7 @@ void atapi_cdrom_device::ExecCommand()
 		case T10MMC_CMD_PAUSE_RESUME:
 		case T10MMC_CMD_PLAY_AUDIO_12:
 		case T10SBC_CMD_READ_12:
-			if(!m_cdrom)
+			if(!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_sense_key = SCSI_SENSE_KEY_MEDIUM_ERROR;

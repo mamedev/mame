@@ -375,6 +375,7 @@ struct IBUTTON
 static void firebeat_ata_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 	device.option_add("hdd", IDE_HARDDISK);
 }
 
@@ -1540,10 +1541,10 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 {
 	firebeat_spu_base(config);
 
-	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
+	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "dvdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_popn_state::spu_ata_interrupt));
 	m_spuata->dmarq_handler().set(FUNC(firebeat_popn_state::spu_ata_dmarq));
-	m_spuata->slot(0).set_option_machine_config("cdrom", dvdrom_config);
+	m_spuata->slot(0).set_option_machine_config("dvdrom", dvdrom_config);
 	m_spuata->slot(0).set_fixed(true);
 
 	// 500 hz works best for pop'n music.
@@ -2375,7 +2376,7 @@ ROM_START( popn4 )
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
-	DISK_IMAGE( "gq986jaa02", 0, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
+	DISK_IMAGE( "gq986jaa02", 0, SHA1(c34ac216b3e0bef1d1813119469364c6403feaa4) )
 
 	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
 	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(4a5c946c) SHA1(9de6085d45c39ba91934cea3abaa37e1203888c7))

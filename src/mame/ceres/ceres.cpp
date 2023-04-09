@@ -81,7 +81,7 @@ public:
 	void wfc_w(offs_t offset, u8 data);
 	u8 wfc_r(offs_t offset);
 	void wfc_command(u8 command);
-	int get_lbasector(hard_disk_file *hdf);
+	int get_lbasector(harddisk_image_device *hdf);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
@@ -191,7 +191,7 @@ void ceres1_state::wfc_command(u8 command)
 	m_wfc_status &= ~WFC_S_ERR;
 	m_wfc_error = 0;
 
-	hard_disk_file *hdf = m_hdd[(m_wfc_sdh >> 3) & 3]->get_hard_disk_file();
+	harddisk_image_device *hdf = m_hdd[(m_wfc_sdh >> 3) & 3];
 
 	switch (command >> 4)
 	{
@@ -227,7 +227,7 @@ void ceres1_state::wfc_command(u8 command)
 	m_icu->ireq3_w(1);
 }
 
-int ceres1_state::get_lbasector(hard_disk_file *hdf)
+int ceres1_state::get_lbasector(harddisk_image_device *hdf)
 {
 	const auto &info = hdf->get_info();
 
