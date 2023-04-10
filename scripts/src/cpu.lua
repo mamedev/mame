@@ -2864,6 +2864,7 @@ end
 --------------------------------------------------
 -- Sharp LR35902 (Game Boy CPU)
 --@src/devices/cpu/lr35902/lr35902.h,CPUS["LR35902"] = true
+--@src/devices/cpu/lr35902/lr35902d.h,CPUS["LR35902"] = true
 --------------------------------------------------
 
 if CPUS["LR35902"] then
