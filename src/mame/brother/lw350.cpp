@@ -571,7 +571,7 @@ public:
 		speaker(*this, "beeper"),
 		io_kbrow(*this, "kbrow.%u", 0),
 		rom(*this, "maincpu"),
-		rombank(*this, "rom")
+		rombank(*this, "dictionary")
 	{ }
 
 	void lw450(machine_config& config);

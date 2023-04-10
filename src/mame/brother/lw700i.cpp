@@ -284,7 +284,7 @@ void lw700i_state::lw700i(machine_config &config)
 	H83003(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lw700i_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &lw700i_state::io_map);
-	m_maincpu->tend0().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
+	m_maincpu->tend2().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
