@@ -181,7 +181,7 @@ using ws_delay_delegate = device_delegate<u32 (offs_t)>;
 
 namespace emu::detail {
 
-// TODO: replace with std::void_t when we move to C++17
+// TODO: work out why this doesn't work with clang and/or libc++ void_t but works with this C++14 work-alike
 template <typename... T> struct void_wrapper { using type = void; };
 template <typename... T> using void_t = typename void_wrapper<T...>::type;
 
@@ -247,15 +247,6 @@ template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write3
 template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { using type = write64smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
 template <typename T> using rw_delegate_type_t = typename rw_delegate_type<T>::type;
 template <typename T> using rw_delegate_device_class_t = typename rw_delegate_type<T>::device_class;
-
-
-template <typename T>
-inline rw_delegate_type_t<T> make_delegate(device_t &base, char const *tag, T &&func, char const *name)
-{ return rw_delegate_type_t<T>(base, tag, std::forward<T>(func), name); }
-
-template <typename T>
-inline rw_delegate_type_t<T> make_delegate(rw_delegate_device_class_t<T> &object, T &&func, char const *name)
-{ return rw_delegate_type_t<T>(object, std::forward<T>(func), name); }
 
 
 template <typename L>
@@ -505,6 +496,19 @@ private:
 };
 
 } // namespace emu::detail
+
+
+namespace emu {
+
+template <typename T>
+inline detail::rw_delegate_type_t<T> rw_delegate(device_t &base, char const *tag, T &&func, char const *name)
+{ return detail::rw_delegate_type_t<T>(base, tag, std::forward<T>(func), name); }
+
+template <typename T>
+inline detail::rw_delegate_type_t<T> rw_delegate(detail::rw_delegate_device_class_t<T> &object, T &&func, char const *name)
+{ return detail::rw_delegate_type_t<T>(object, std::forward<T>(func), name); }
+
+} // namespace emu
 
 
 // ======================> memory_units_descritor forwards declaration
