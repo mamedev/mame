@@ -443,14 +443,69 @@ inline std::enable_if_t<std::is_constructible<write64smo_delegate, device_t &, L
 { return write64smo_delegate(owner, std::forward<L>(l), name); }
 
 
+// =====================-> delegate -> Width
+
+template <typename Delegate> struct handler_width;
+template <typename Delegate> inline constexpr int handler_width_v = handler_width<Delegate>::value;
+template <> struct handler_width<read8_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read8m_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read8s_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read8sm_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read8mo_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read8smo_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8m_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8s_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8sm_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8mo_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<write8smo_delegate> { static inline constexpr int value = 0; };
+template <> struct handler_width<read16_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read16m_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read16s_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read16sm_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read16mo_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read16smo_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16m_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16s_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16sm_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16mo_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<write16smo_delegate> { static inline constexpr int value = 1; };
+template <> struct handler_width<read32_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read32m_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read32s_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read32sm_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read32mo_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read32smo_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32m_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32s_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32sm_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32mo_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<write32smo_delegate> { static inline constexpr int value = 2; };
+template <> struct handler_width<read64_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<read64m_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<read64s_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<read64sm_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<read64mo_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<read64smo_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64m_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64s_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64sm_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64mo_delegate> { static inline constexpr int value = 3; };
+template <> struct handler_width<write64smo_delegate> { static inline constexpr int value = 3; };
+
+
 
 // =====================-> Width -> types
 
-template<int Width> struct handler_entry_size {};
-template<> struct handler_entry_size<0> { using uX = u8;  };
-template<> struct handler_entry_size<1> { using uX = u16; };
-template<> struct handler_entry_size<2> { using uX = u32; };
-template<> struct handler_entry_size<3> { using uX = u64; };
+template <int Width> struct handler_entry_size;
+template <int Width> using handler_entry_size_t = typename handler_entry_size<Width>::type;
+template<> struct handler_entry_size<0> { using type = u8;  };
+template<> struct handler_entry_size<1> { using type = u16; };
+template<> struct handler_entry_size<2> { using type = u32; };
+template<> struct handler_entry_size<3> { using type = u64; };
 
 // =====================-> Address segmentation for the search tree
 
@@ -611,7 +666,7 @@ protected:
 template<int Width, int AddrShift> class handler_entry_read : public handler_entry
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
@@ -686,7 +741,7 @@ public:
 template<int Width, int AddrShift> class handler_entry_write : public handler_entry
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
@@ -787,10 +842,10 @@ constexpr offs_t memory_offset_to_byte(offs_t offset, int AddrShift) { return Ad
 // ======================> generic read/write decomposition routines
 
 // generic direct read
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename T> typename emu::detail::handler_entry_size<TargetWidth>::uX  memory_read_generic(T rop, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename T> emu::detail::handler_entry_size_t<TargetWidth>  memory_read_generic(T rop, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using TargetType = typename emu::detail::handler_entry_size<TargetWidth>::uX;
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using TargetType = emu::detail::handler_entry_size_t<TargetWidth>;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -921,9 +976,9 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 }
 
 // generic direct write
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename T> void memory_write_generic(T wop, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX data, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename T> void memory_write_generic(T wop, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> data, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -1045,10 +1100,10 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 }
 
 // generic direct read with flags
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> std::pair<typename emu::detail::handler_entry_size<TargetWidth>::uX, u16>  memory_read_generic_flags(TF ropf, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> std::pair<emu::detail::handler_entry_size_t<TargetWidth>, u16>  memory_read_generic_flags(TF ropf, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using TargetType = typename emu::detail::handler_entry_size<TargetWidth>::uX;
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using TargetType = emu::detail::handler_entry_size_t<TargetWidth>;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -1184,9 +1239,9 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 }
 
 // generic direct write with flags
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 memory_write_generic_flags(TF wopf, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX data, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 memory_write_generic_flags(TF wopf, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> data, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -1315,9 +1370,9 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 
 //##############################################
 // generic direct read flags lookup
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 lookup_memory_read_generic_flags(TF lropf, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 lookup_memory_read_generic_flags(TF lropf, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -1448,9 +1503,9 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 }
 
 // generic direct write flags lookup
-template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 lookup_memory_write_generic_flags(TF lwopf, offs_t address, typename emu::detail::handler_entry_size<TargetWidth>::uX mask)
+template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Aligned, typename TF> u16 lookup_memory_write_generic_flags(TF lwopf, offs_t address, emu::detail::handler_entry_size_t<TargetWidth> mask)
 {
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 
 	constexpr u32 TARGET_BYTES = 1 << TargetWidth;
 	constexpr u32 TARGET_BITS = 8 * TARGET_BYTES;
@@ -1580,41 +1635,41 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 
 // ======================> Direct dispatching
 
-template<int Level, int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX dispatch_read(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> dispatch_read(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->read(offset, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift> void dispatch_write(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> void dispatch_write(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->write(offset, data, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> dispatch_read_flags(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> dispatch_read_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->read_flags(offset, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift> u16 dispatch_write_flags(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> u16 dispatch_write_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->write_flags(offset, data, mem_mask);
 }
 
-template<int Level, int Width, int AddrShift> u16 dispatch_lookup_read_flags(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> u16 dispatch_lookup_read_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->lookup_flags(offset, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift> u16 dispatch_lookup_write_flags(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> u16 dispatch_lookup_write_flags(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->lookup_flags(offset, mem_mask);
@@ -1622,14 +1677,14 @@ template<int Level, int Width, int AddrShift> u16 dispatch_lookup_write_flags(of
 
 
 
-template<int Level, int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX dispatch_read_interruptible(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> dispatch_read_interruptible(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->read_interruptible(offset, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift> void dispatch_write_interruptible(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
+template<int Level, int Width, int AddrShift> void dispatch_write_interruptible(offs_t mask, offs_t offset, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->write_interruptible(offset, data, mem_mask);
@@ -1646,7 +1701,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> class memory_
 {
 	friend class ::address_space;
 
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
@@ -1808,7 +1863,7 @@ template<int Width, int AddrShift, endianness_t Endian> class memory_access_cach
 {
 	friend class ::address_space;
 
-	using NativeType = typename emu::detail::handler_entry_size<Width>::uX;
+	using NativeType = emu::detail::handler_entry_size_t<Width>;
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? (1 << (Width + AddrShift)) - 1 : 0;
 
@@ -2791,9 +2846,9 @@ private:
 
 
 template<int Width, int AddrShift, endianness_t Endian>
-typename emu::detail::handler_entry_size<Width>::uX
+emu::detail::handler_entry_size_t<Width>
 emu::detail::memory_access_cache<Width, AddrShift, Endian>::
-read_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX mask)
+read_native(offs_t address, emu::detail::handler_entry_size_t<Width> mask)
 {
 	address &= m_addrmask;
 	check_address_r(address);
@@ -2802,7 +2857,7 @@ read_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX 
 
 template<int Width, int AddrShift, endianness_t Endian>
 void emu::detail::memory_access_cache<Width, AddrShift, Endian>::
-write_native(offs_t address, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mask)
+write_native(offs_t address, emu::detail::handler_entry_size_t<Width> data, emu::detail::handler_entry_size_t<Width> mask)
 {
 	address &= m_addrmask;
 	check_address_w(address);

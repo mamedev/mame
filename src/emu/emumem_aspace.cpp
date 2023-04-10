@@ -49,58 +49,7 @@ template <typename Format, typename... Params> static void VPRINTF(Format &&, Pa
 //  CONSTANTS
 //**************************************************************************
 
-namespace {
-
-template <typename Delegate> struct handler_width;
-template <> struct handler_width<read8_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read8m_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read8s_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read8sm_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read8mo_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read8smo_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8m_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8s_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8sm_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8mo_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<write8smo_delegate> { static constexpr int value = 0; };
-template <> struct handler_width<read16_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read16m_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read16s_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read16sm_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read16mo_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read16smo_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16m_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16s_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16sm_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16mo_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<write16smo_delegate> { static constexpr int value = 1; };
-template <> struct handler_width<read32_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read32m_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read32s_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read32sm_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read32mo_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read32smo_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32m_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32s_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32sm_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32mo_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<write32smo_delegate> { static constexpr int value = 2; };
-template <> struct handler_width<read64_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<read64m_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<read64s_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<read64sm_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<read64mo_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<read64smo_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64m_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64s_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64sm_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64mo_delegate> { static constexpr int value = 3; };
-template <> struct handler_width<write64smo_delegate> { static constexpr int value = 3; };
-} // anonymous namespace
+using emu::detail::handler_width_v;
 
 
 //**************************************************************************
@@ -113,7 +62,7 @@ template <> struct handler_width<write64smo_delegate> { static constexpr int val
 template<int Level, int Width, int AddrShift, endianness_t Endian>
 class address_space_specific : public address_space
 {
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 	using NativeType = uX;
 	using this_type = address_space_specific<Level, Width, AddrShift, Endian>;
 
@@ -527,7 +476,7 @@ private:
 			osd_printf_error("Binding error while installing read handler %s for range 0x%X-0x%X mask 0x%X mirror 0x%X select 0x%X umask 0x%X\n", handler_r.name(), addrstart, addrend, addrmask, addrmirror, addrselect, unitmask);
 			throw;
 		}
-		install_read_handler_helper<handler_width<READ>::value>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_r);
+		install_read_handler_helper<handler_width_v<READ> >(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_r);
 	}
 
 	template<typename WRITE>
@@ -538,13 +487,13 @@ private:
 			osd_printf_error("Binding error while installing write handler %s for range 0x%X-0x%X mask 0x%X mirror 0x%X select 0x%X umask 0x%X\n", handler_w.name(), addrstart, addrend, addrmask, addrmirror, addrselect, unitmask);
 			throw;
 		}
-		install_write_handler_helper<handler_width<WRITE>::value>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_w);
+		install_write_handler_helper<handler_width_v<WRITE> >(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_w);
 	}
 
 	template<typename READ, typename WRITE>
 	void install_readwrite_handler_impl(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, u16 flags, READ &handler_r, WRITE &handler_w)
 	{
-		static_assert(handler_width<READ>::value == handler_width<WRITE>::value, "handler widths do not match");
+		static_assert(handler_width_v<READ> == handler_width_v<WRITE>, "handler widths do not match");
 		try { handler_r.resolve(); }
 		catch (const binding_type_exception &) {
 			osd_printf_error("Binding error while installing read handler %s for range 0x%X-0x%X mask 0x%X mirror 0x%X select 0x%X umask 0x%X\n", handler_r.name(), addrstart, addrend, addrmask, addrmirror, addrselect, unitmask);
@@ -555,7 +504,7 @@ private:
 			osd_printf_error("Binding error while installing write handler %s for range 0x%X-0x%X mask 0x%X mirror 0x%X select 0x%X umask 0x%X\n", handler_w.name(), addrstart, addrend, addrmask, addrmirror, addrselect, unitmask);
 			throw;
 		}
-		install_readwrite_handler_helper<handler_width<READ>::value>(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_r, handler_w);
+		install_readwrite_handler_helper<handler_width_v<READ> >(addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, flags, handler_r, handler_w);
 	}
 
 	template<int AccessWidth, typename READ>
