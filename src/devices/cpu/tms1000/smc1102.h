@@ -53,6 +53,20 @@ protected:
 	virtual u32 decode_micro(offs_t offset) override;
 
 	virtual void write_o_reg(u8 index) override { } // no O pins
+
+	virtual void op_setr() override { tms1k_base_device::op_setr(); } // no anomaly with MSB of X register
+	virtual void op_rstr() override { tms1k_base_device::op_rstr(); } // "
+
+	virtual void op_extra() override;
+
+private:
+	void op_halt();
+	void op_intdis();
+	void op_inten();
+	void op_selin();
+	void op_tasr();
+	void op_tmset();
+	void op_tsg();
 };
 
 class smc1112_cpu_device : public smc1102_cpu_device

@@ -173,6 +173,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
  @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
+ *M34033   TMS1100   1982, Spartus Electronic Talking Clock (1411-61)
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, Microvision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania

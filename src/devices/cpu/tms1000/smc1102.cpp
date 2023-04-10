@@ -7,7 +7,7 @@
 SMC1102 is a CMOS MCU based on TMS1100, keeping the same ALU and opcode mnemonics.
 They added a timer, interrupts, and a built-in LCD controller.
 
-In the USA, it was marketed by S-MOS Systems, an affiliate of the Seiko Group.
+In the USA, it was marketed by S-MOS Systems, an affiliate of Seiko Group.
 
 SMC1112 die notes (SMC1102 is assumed to be the same):
 - 128x4 RAM array at top-left
@@ -18,7 +18,10 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 - no output PLA
 
 TODO:
-- x
+- row(pc) order is unknown
+- each opcode is 4 cycles instead of 6
+- does it have CL (call latch)
+- everything else
 
 */
 
@@ -60,10 +63,111 @@ void smc1102_cpu_device::device_start()
 
 u32 smc1102_cpu_device::decode_micro(offs_t offset)
 {
-	return 0;
+	// TCY, YNEC, TCMIY
+	static const u16 micro1[3] = { 0x0402, 0x1204, 0x1032 };
+
+	// 0x20, 0x30, 0x00, 0x70
+	static const u16 micro2[0x40] =
+	{
+		0x0102, 0x0801, 0x0802, 0x1001, 0x306a, 0x303a, 0x2021, 0x2020,
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+
+		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+		0x0e04, 0x0e04, 0x0e04, 0x0e04, 0x0899, 0x0099, 0x0819, 0x0804,
+
+		0x0904, 0x0898, 0x1104, 0x2821, 0x104a, 0x101a, 0x0909, 0x0849,
+		0x0401, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0404, 0x0000,
+
+		0x0519, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0519,
+		0x0000, 0x0519, 0x0519, 0x0000, 0x0000, 0x0000, 0x0519, 0x0419,
+	};
+
+	u16 mask = 0;
+
+	if (offset >= 0x40 && offset < 0x70)
+		mask = micro1[offset >> 4 & 3];
+	else if (offset < 0x80 && (offset & 0xf0) != 0x10)
+		mask = micro2[((offset ^ 0x20) | (offset >> 1 & 0x20)) & 0x3f];
+
+	// does not have M_MTN or M_STSL
+	const u32 md[14] = { M_AUTA, M_AUTY, M_NE, M_C8, M_CIN, M_CKM, M_15TN, M_NATN, M_ATN, M_CKN, M_CKP, M_MTP, M_YTP, M_STO };
+	u32 decode = 0;
+
+	for (int bit = 0; bit < 14; bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
 }
 
 void smc1102_cpu_device::device_reset()
 {
 	tms1100_cpu_device::device_reset();
+
+	// changed/added fixed instructions (mostly handled in op_extra)
+	m_fixed_decode[0x0a] = F_EXTRA;
+	m_fixed_decode[0x71] = F_EXTRA;
+	m_fixed_decode[0x74] = F_EXTRA;
+	m_fixed_decode[0x75] = F_EXTRA;
+	m_fixed_decode[0x76] = F_RETN;
+	m_fixed_decode[0x78] = F_EXTRA;
+	m_fixed_decode[0x7b] = F_EXTRA;
+
+	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA;
+	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA;
+}
+
+
+// opcode deviations
+void smc1102_cpu_device::op_tasr()
+{
+	// TASR: transfer A to LCD S/R
+}
+
+void smc1102_cpu_device::op_tsg()
+{
+	// TSG: transfer LCD S/R to RAM
+}
+
+void smc1102_cpu_device::op_intdis()
+{
+	// INTDIS: disable interrupt
+}
+
+void smc1102_cpu_device::op_inten()
+{
+	// INTEN: enable interrupt after next instruction
+}
+
+void smc1102_cpu_device::op_selin()
+{
+	// SELIN: select interrupt
+}
+
+void smc1102_cpu_device::op_tmset()
+{
+	// TMSET: transfer A to timer latch
+}
+
+void smc1102_cpu_device::op_halt()
+{
+	// HALT: stop CPU
+}
+
+void smc1102_cpu_device::op_extra()
+{
+	switch (m_opcode)
+	{
+		case 0x0a: op_tasr(); break;
+		case 0x71: op_halt(); break;
+		case 0x74: op_inten(); break;
+		case 0x75: op_intdis(); break;
+		case 0x78: op_selin(); break;
+		case 0x7b: op_tmset(); break;
+
+		case 0x72: case 0x73: case 0x7c: case 0x7d:
+			op_tsg(); break;
+
+		default: break;
+	}
 }
