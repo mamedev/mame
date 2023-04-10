@@ -84,9 +84,9 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 			m_ctrl = data;
 		break;
 		default:{
-			uint8_t per = (0x3f - (data & 0x3f));
+			uint8_t per = ~data & 0x3f;
 
-			if((per == 0) &&  (m_voice[offset].period != per) ){
+			if((per == 0) &&  (m_voice[offset].period != 0) ){
 				//flip output once and stall there!
 				m_voice[offset].val = !m_voice[offset].val;
 			}
@@ -102,21 +102,20 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 
 
 /*
-	plgDavid's audio implementation/analysis notes:
+  plgDavid's audio implementation/analysis notes:
 
-	Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
-	then by the value of the 6bit period registers.
-	This creates a surprisingly accurate pitch range.
+  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
+  then by the value of the 6bit period registers.
+  This creates a surprisingly accurate pitch range.
+  Note: the register periods are inverted.
 
-	Note: the register periods are inverted.
+  plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms 
+  to strenghten the emulation. 
 
-	plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms 
-	to strenghten the emulation. 
-	
-	Quite a few things were uncovered overall, but for audio specifically:
-	1)Audio mix/mux control ($FB, case 0x03) was ignored
-	2)lidnariq's tracing of my PCB scans showed that all three sound outputs are mixed using different volumes:
-	  square1 via i/o$F8 is -6dB, square2 via i/o$F9 is -3dB, defining square3 via i/o$FA as 0dB
+  Quite a few things were uncovered overall, but for audio specifically:
+  1)Audio mix/mux control ($FB, case 0x03) was ignored
+  2)lidnariq's tracing of my PCB scans showed that all three sound outputs are mixed using different volumes:
+  square1 via i/o$F8 is -6dB, square2 via i/o$F9 is -3dB, defining square3 via i/o$FA as 0dB
 */
 
 void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -126,30 +125,36 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	//Each channel has a different volume via resistor mixing which correspond to -6dB, -3dB, 0dB drops
 	static const int volumes[3] = {0x1000, 0x1800, 0x2000};
 
-	for (int index = 0; index < buffer.samples(); index++){
+	for (int index = 0; index < buffer.samples(); index++)
+	{
 		s32 sum = 0;
 
 		//First caltulate all vals
-		for (int i = 0; i < 3; i++){
+		for (int i = 0; i < 3; i++)
+		{
 			m_voice[i].count++;
 			
-			if( (m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period) ){
+			if( (m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period) )
+			{
 				m_voice[i].count = 0;
 				m_voice[i].val = !m_voice[i].val;
 			}
 		}
 
 		//Then mix channels according to m_ctrl
-		if((m_ctrl & 2) != 0){
+		if((m_ctrl & 2) != 0)
+		{
 
 			//ch0 and ch1
-			if((m_ctrl & 1) ){
+			if((m_ctrl & 1) )
+			{
 				auto xor01 = (m_voice[0].val ^ m_voice[1].val) & 1;
 				auto xor12 = (m_voice[1].val ^ m_voice[2].val) & 1;
 				sum += (xor01 * volumes[0]);
 				sum += (xor12 * volumes[1]);
 			}
-			else{				
+			else
+			{				
 				sum += (m_voice[0].val * volumes[0]);
 				sum += (m_voice[1].val * volumes[1]);
 			}
