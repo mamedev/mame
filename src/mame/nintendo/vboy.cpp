@@ -206,33 +206,6 @@ void vboy_state::video_start()
 	m_bgmap = make_unique_clear<uint16_t[]>(0x20000 >> 1);
 }
 
-void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
-{
-	for (uint8_t yi = 0; yi < 8; yi++)
-	{
-		uint16_t const data = READ_FONT(code * 8 + yi);
-
-		for (uint8_t xi = 0; xi < 8; xi++)
-		{
-			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
-
-			if (dat)
-			{
-				uint16_t const res_x = x + xi;
-				uint16_t const res_y = y + yi;
-
-				if (cliprect.contains(res_x, res_y))
-				{
-					uint8_t const col = (pal >> (dat * 2)) & 3;
-
-					bitmap.pix((res_y), (res_x)) = m_palette->pen(col);
-				}
-			}
-		}
-	}
-}
-
-
 
 void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 {
@@ -257,6 +230,7 @@ inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 	int const y = ypos >>3;
 	int const x = xpos >>3;
 
+	// TODO: hyperfgt backgrounds fails page offsets beyond 512 / 512 pixels
 	uint8_t const stepx = (x & 0x1c0) >> 6;
 	uint8_t const stepy = ((y & 0x1c0) >> 6) * (stepx+1);
 	uint16_t const val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
@@ -354,7 +328,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			x1 += (right ? -gp : gp);
 			// clamp for spaceinv gameplay shots
 			// (sets GPs with out of bounds GP values, cfr. $3da40/$3daa0 0xc*** world entries)
-			x1 &= 0x1ff;
+			x1 &= 0x1fff;
 
 			src_x = (int32_t)((h_skw) + (h_scl * x));
 			src_y = (int32_t)((v_skw) + (v_scl * x));
@@ -371,6 +345,32 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			if(pix != -1)
 				if (cliprect.contains(x1, y1))
 					bitmap.pix(y1, x1) = m_palette->pen(pix & 3);
+		}
+	}
+}
+
+void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
+{
+	for (uint8_t yi = 0; yi < 8; yi++)
+	{
+		uint16_t const data = READ_FONT(code * 8 + yi);
+
+		for (uint8_t xi = 0; xi < 8; xi++)
+		{
+			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
+
+			if (dat)
+			{
+				uint16_t const res_x = x + xi;
+				uint16_t const res_y = y + yi;
+
+				if (cliprect.contains(res_x, res_y))
+				{
+					uint8_t const col = (pal >> (dat * 2)) & 3;
+
+					bitmap.pix((res_y), (res_x)) = m_palette->pen(col);
+				}
+			}
 		}
 	}
 }
