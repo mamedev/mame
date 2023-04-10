@@ -79,20 +79,22 @@ void pv1000_sound_device::device_start()
 void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
-	switch(offset){
-		case 0x03:
-			m_ctrl = data;
-		break;
-		default:{
-			uint8_t per = ~data & 0x3f;
+	switch(offset)
+	{
+	case 0x03:
+		m_ctrl = data;
+	break;
+	default:
+	{
+		uint8_t per = ~data & 0x3f;
 
-			if((per == 0) &&  (m_voice[offset].period != 0) ){
-				//flip output once and stall there!
-				m_voice[offset].val = !m_voice[offset].val;
-			}
+		if((per == 0) &&  (m_voice[offset].period != 0) ){
+			//flip output once and stall there!
+			m_voice[offset].val = !m_voice[offset].val;
+		}
 
-			m_voice[offset].period = per;
-		}break;
+		m_voice[offset].period = per;
+	}break;
 	}
 }
 
@@ -144,7 +146,6 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		//Then mix channels according to m_ctrl
 		if((m_ctrl & 2) != 0)
 		{
-
 			//ch0 and ch1
 			if((m_ctrl & 1) )
 			{
