@@ -88,7 +88,8 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 	{
 		uint8_t per = ~data & 0x3f;
 
-		if((per == 0) &&  (m_voice[offset].period != 0) ){
+		if((per == 0) &&  (m_voice[offset].period != 0) )
+		{
 			//flip output once and stall there!
 			m_voice[offset].val = !m_voice[offset].val;
 		}
