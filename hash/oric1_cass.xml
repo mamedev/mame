@@ -90,7 +90,7 @@ license:CC0-1.0
 		<description>A View to a Kill - The Computer Game</description>
 		<year>1985</year>
 		<publisher>Domark</publisher>
-		<info name="alt_title" value="007 ""A View to a Kill"" - The computer game"/>
+		<info name="alt_title" value="007 'A View to a Kill' - The computer game"/>
 		<info name="language" value="English" />
 		<info name="region" value="UK" />
 		<part name="cass" interface="oric1_cass">
@@ -104,7 +104,7 @@ license:CC0-1.0
 		<description>Dangereusement Votre! - Le Jeu sur Micro-Ordinateur</description>
 		<year>1985</year>
 		<publisher>Domark, ERE Informatique</publisher>
-		<info name="alt_title" value="007 ""Dangereusement Votre"" - Le jeu sur ordinateur"/>
+		<info name="alt_title" value="007 'Dangereusement Votre' - Le jeu sur ordinateur"/>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
 		<part name="cass" interface="oric1_cass">
