@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -38,11 +40,12 @@ private:
 	// internal state
 	struct
 	{
-		uint32_t  count = 0;
+		uint32_t  count  = 0;
 		uint16_t  period = 0;
-		uint8_t   val = 0;
-	}       m_voice[4];
+		uint8_t   val    = 1; //boot state of all channels
+	} m_voice[3];
 
+	uint8_t m_ctrl = 0;
 	sound_stream    *m_sh_channel = nullptr;
 };
 
@@ -62,25 +65,35 @@ void pv1000_sound_device::device_start()
 {
 	m_sh_channel = stream_alloc(0, 1, clock() / 1024);
 
-	save_item(NAME(m_voice[0].count));
-	save_item(NAME(m_voice[0].period));
-	save_item(NAME(m_voice[0].val));
-	save_item(NAME(m_voice[1].count));
-	save_item(NAME(m_voice[1].period));
-	save_item(NAME(m_voice[1].val));
-	save_item(NAME(m_voice[2].count));
-	save_item(NAME(m_voice[2].period));
-	save_item(NAME(m_voice[2].val));
-	// are these ever used?
-	save_item(NAME(m_voice[3].count));
-	save_item(NAME(m_voice[3].period));
-	save_item(NAME(m_voice[3].val));
+	save_item(STRUCT_MEMBER(m_voice, count));
+	save_item(STRUCT_MEMBER(m_voice, period));
+	save_item(STRUCT_MEMBER(m_voice, val));
+
+	save_item(NAME(m_ctrl));
 }
 
 void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
-	m_voice[offset].period = data;
+	switch (offset)
+	{
+	case 0x03:
+		m_ctrl = data;
+		break;
+	default:
+		{
+			const uint8_t per = ~data & 0x3f;
+
+			if ((per == 0) &&  (m_voice[offset].period != 0))
+			{
+				// flip output once and stall there!
+				m_voice[offset].val = !m_voice[offset].val;
+			}
+
+			m_voice[offset].period = per;
+		}
+		break;
+	}
 }
 
 //-------------------------------------------------
@@ -89,40 +102,67 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 
 
 /*
- plgDavid's audio implementation/analysis notes:
+  plgDavid's audio implementation/analysis notes:
 
- Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
- then by the value of the 6bit period registers.
- This creates a surprisingly accurate pitch range.
+  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
+  then by the value of the 6bit period registers.
+  This creates a surprisingly accurate pitch range.
+  Note: the register periods are inverted.
 
- Note: the register periods are inverted.
- */
+  plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms
+  to strenghten the emulation.
+
+  Quite a few things were uncovered overall, but for audio specifically:
+  1)Audio mix/mux control ($FB, case 0x03) was ignored
+  2)lidnariq's tracing of my PCB scans showed that all three sound outputs are mixed using different volumes:
+  square1 via i/o$F8 is -6dB, square2 via i/o$F9 is -3dB, defining square3 via i/o$FA as 0dB
+*/
 
 void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &buffer = outputs[0];
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	//Each channel has a different volume via resistor mixing which correspond to -6dB, -3dB, 0dB drops
+	static const int volumes[3] = {0x1000, 0x1800, 0x2000};
+
+	for (int index = 0; index < buffer.samples(); index++)
 	{
 		s32 sum = 0;
 
+		// First caltulate all vals
 		for (int i = 0; i < 3; i++)
 		{
-			uint32_t per = (0x3f - (m_voice[i].period & 0x3f));
-
-			if (per != 0)   //OFF!
-				sum += m_voice[i].val * 8192;
-
 			m_voice[i].count++;
 
-			if (m_voice[i].count >= per)
+			if ((m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period))
 			{
 				m_voice[i].count = 0;
 				m_voice[i].val = !m_voice[i].val;
 			}
 		}
 
-		buffer.put_int(sampindex, sum, 32768);
+		// Then mix channels according to m_ctrl
+		if (BIT(m_ctrl, 1))
+		{
+			// ch0 and ch1
+			if (BIT(m_ctrl, 0))
+			{
+				const auto xor01 = BIT(m_voice[0].val ^ m_voice[1].val, 0);
+				const auto xor12 = BIT(m_voice[1].val ^ m_voice[2].val, 0);
+				sum += xor01 * volumes[0];
+				sum += xor12 * volumes[1];
+			}
+			else
+			{
+				sum += m_voice[0].val * volumes[0];
+				sum += m_voice[1].val * volumes[1];
+			}
+
+			// ch3 is unaffected by m_ctrl bit 1
+			sum += m_voice[2].val * volumes[2];
+		}
+
+		buffer.put_int(index, sum, 32768);
 	}
 }
 
@@ -212,12 +252,9 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 	case 0x00:
 	case 0x01:
 	case 0x02:
+	case 0x03:
 		//logerror("io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
 		m_sound->voice_w(offset, data);
-	break;
-
-	case 0x03:
-		//currently unknown use
 	break;
 
 	case 0x05:
@@ -305,8 +342,8 @@ DEVICE_IMAGE_LOAD_MEMBER( pv1000_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size != 0x2000 && size != 0x4000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K or 16K)");
+	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K, 16K or 32K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
