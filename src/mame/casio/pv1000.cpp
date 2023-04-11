@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -63,15 +65,9 @@ void pv1000_sound_device::device_start()
 {
 	m_sh_channel = stream_alloc(0, 1, clock() / 1024);
 
-	save_item(NAME(m_voice[0].count));
-	save_item(NAME(m_voice[0].period));
-	save_item(NAME(m_voice[0].val));
-	save_item(NAME(m_voice[1].count));
-	save_item(NAME(m_voice[1].period));
-	save_item(NAME(m_voice[1].val));
-	save_item(NAME(m_voice[2].count));
-	save_item(NAME(m_voice[2].period));
-	save_item(NAME(m_voice[2].val));
+	save_item(STRUCT_MEMBER(m_voice, count));
+	save_item(STRUCT_MEMBER(m_voice, period));
+	save_item(STRUCT_MEMBER(m_voice, val));
 
 	save_item(NAME(m_ctrl));
 }
@@ -79,23 +75,24 @@ void pv1000_sound_device::device_start()
 void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
-	switch(offset)
+	switch (offset)
 	{
 	case 0x03:
 		m_ctrl = data;
-	break;
+		break;
 	default:
-	{
-		uint8_t per = ~data & 0x3f;
-
-		if((per == 0) &&  (m_voice[offset].period != 0) )
 		{
-			//flip output once and stall there!
-			m_voice[offset].val = !m_voice[offset].val;
-		}
+			const uint8_t per = ~data & 0x3f;
 
-		m_voice[offset].period = per;
-	}break;
+			if ((per == 0) &&  (m_voice[offset].period != 0))
+			{
+				// flip output once and stall there!
+				m_voice[offset].val = !m_voice[offset].val;
+			}
+
+			m_voice[offset].period = per;
+		}
+		break;
 	}
 }
 
@@ -112,8 +109,8 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
   This creates a surprisingly accurate pitch range.
   Note: the register periods are inverted.
 
-  plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms 
-  to strenghten the emulation. 
+  plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms
+  to strenghten the emulation.
 
   Quite a few things were uncovered overall, but for audio specifically:
   1)Audio mix/mux control ($FB, case 0x03) was ignored
@@ -132,37 +129,37 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	{
 		s32 sum = 0;
 
-		//First caltulate all vals
+		// First caltulate all vals
 		for (int i = 0; i < 3; i++)
 		{
 			m_voice[i].count++;
-			
-			if( (m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period) )
+
+			if ((m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period))
 			{
 				m_voice[i].count = 0;
 				m_voice[i].val = !m_voice[i].val;
 			}
 		}
 
-		//Then mix channels according to m_ctrl
-		if((m_ctrl & 2) != 0)
+		// Then mix channels according to m_ctrl
+		if (BIT(m_ctrl, 1))
 		{
-			//ch0 and ch1
-			if((m_ctrl & 1) )
+			// ch0 and ch1
+			if (BIT(m_ctrl, 0))
 			{
-				auto xor01 = (m_voice[0].val ^ m_voice[1].val) & 1;
-				auto xor12 = (m_voice[1].val ^ m_voice[2].val) & 1;
-				sum += (xor01 * volumes[0]);
-				sum += (xor12 * volumes[1]);
+				const auto xor01 = BIT(m_voice[0].val ^ m_voice[1].val, 0);
+				const auto xor12 = BIT(m_voice[1].val ^ m_voice[2].val, 0);
+				sum += xor01 * volumes[0];
+				sum += xor12 * volumes[1];
 			}
 			else
-			{				
-				sum += (m_voice[0].val * volumes[0]);
-				sum += (m_voice[1].val * volumes[1]);
+			{
+				sum += m_voice[0].val * volumes[0];
+				sum += m_voice[1].val * volumes[1];
 			}
 
-			//ch3 is unaffected by m_ctrl bit 1
-			sum += (m_voice[2].val * volumes[2]);			
+			// ch3 is unaffected by m_ctrl bit 1
+			sum += m_voice[2].val * volumes[2];
 		}
 
 		buffer.put_int(index, sum, 32768);
