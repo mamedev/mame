@@ -32441,7 +32441,7 @@ danceyesu                       // 1996.10 Dancing Eyes (US, DC3/VER.C)
 danceyesj                       // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
 dunkmnia                        // 1996.05 Dunk Mania (World, DM2/VER.C)
 dunkmniajc                      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
-fambowl							// 1997.?? Family Bowl (Ver. 1.00)
+fambowl                         // 1997.?? Family Bowl (Ver. 1.00)
 gunbarla                        // 1999.?? Gunbarl (Japan, GNB1/VER.A)
 myangel3                        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
 pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
@@ -44867,7 +44867,8 @@ crshrace2a                      // (c) 1993 Video System Co.
 f1gp                            // (c) 1991 Video System Co.
 f1gp2                           // (c) 1992 Video System Co.
 f1gpa                           // (c) 1991 Video System Co.
-f1gpb                           // bootleg
+f1gpb                           // (c) 1991 Video System Co.
+f1gpbl                          // bootleg
 
 @source:vsystem/fromanc2.cpp
 fromanc2                        // (c) 1995 Video System Co. (Japan)
