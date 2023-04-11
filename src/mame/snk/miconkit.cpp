@@ -50,6 +50,7 @@ TODO:
 #include "speaker.h"
 
 #include "micon2.lh"
+#include "smiconk.lh"
 
 
 namespace {
@@ -333,4 +334,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
 GAMEL(1978, micon2,  0,      micon2,  micon2,  miconkit_state, empty_init, ROT90,  "SNK", "Micon-Kit Part II", MACHINE_SUPPORTS_SAVE, layout_micon2 )
-GAME (1978, smiconk, 0,      smiconk, smiconk, miconkit_state, empty_init, ROT90,  "SNK", "Space Micon Kit", MACHINE_SUPPORTS_SAVE ) // no color overlay
+GAMEL(1978, smiconk, 0,      smiconk, smiconk, miconkit_state, empty_init, ROT90,  "SNK", "Space Micon Kit", MACHINE_SUPPORTS_SAVE, layout_smiconk )
