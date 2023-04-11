@@ -1834,6 +1834,13 @@ static INPUT_PORTS_START( gamshara )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff0000, IP_ACTIVE_LOW, IPT_UNUSED ) // Disable P1 and P2 4-6 buttons
 
+	PORT_MODIFY("SYSTEM")
+	// NOTE: this uses 7 bits, only the exact value of 0x6e gives World region, the rest give Japan
+	//       currently we only allow for values 0x7f and 0x6e to be selected
+	//       it is unknown if the later 'gamshara' set will work in the same way or default to English
+	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Region ) )
+	PORT_DIPSETTING(0x7f, DEF_STR( Japan ) ) // JPN
+	PORT_DIPSETTING(0x6e, DEF_STR( World ) ) // ETC
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( startrgn )
@@ -1850,6 +1857,10 @@ static INPUT_PORTS_START( konotako )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x1fff4040, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Region ) )
+	PORT_DIPSETTING(0x00, "Export (Cristaltec license)")
+	PORT_DIPSETTING(0x01, DEF_STR( Japan ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nflclsfb )
@@ -2356,8 +2367,8 @@ GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, 
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 10021 Ver.A)", 0 )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", 0 )
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0 )
