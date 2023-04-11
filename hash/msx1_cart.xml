@@ -13062,7 +13062,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="chima">
-		<description>Youkai Tantei Chima Chima (Japan)</description>
+		<description>Youkai Tantei Chimachima (Japan)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -13076,7 +13076,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="chimaa">
-		<description>Youkai Tantei Chima Chima (Japan, alt)</description>
+		<description>Youkai Tantei Chimachima (Japan, alt)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -13091,9 +13091,10 @@ kept for now until finding out what those bytes affect...
 
 	<!-- No photographic proof of a physical release. -->
 	<software name="chimak" cloneof="chima">
-		<description>Youkai Tantei Chima Chima (Korea)</description>
+		<description>Yogoetamjeong (Korea)</description>
 		<year>19??</year>
 		<publisher>Topia</publisher>
+		<info name="alt_title" value="요괴탐정"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
