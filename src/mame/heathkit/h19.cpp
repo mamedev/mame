@@ -5,7 +5,7 @@
   Heathkit H19
 
     A smart terminal designed and manufactured by Heath Company. This
-		is identical to the Zenith Data Systems Z-19.
+        is identical to the Zenith Data Systems Z-19.
 
 ****************************************************************************/
 

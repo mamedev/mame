@@ -28,15 +28,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "k053246_k053247_k055673.h"
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
+#include "konami_helper.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "k053246_k053247_k055673.h"
-#include "k054156_k054157_k056832.h"
-#include "k055555.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

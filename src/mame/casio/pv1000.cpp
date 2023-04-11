@@ -122,7 +122,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 {
 	auto &buffer = outputs[0];
 
-	//Each channel has a different volume via resistor mixing which correspond to -6dB, -3dB, 0dB drops
+	// Each channel has a different volume via resistor mixing which correspond to -6dB, -3dB, 0dB drops
 	static const int volumes[3] = {0x1000, 0x1800, 0x2000};
 
 	for (int index = 0; index < buffer.samples(); index++)

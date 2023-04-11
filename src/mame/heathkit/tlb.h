@@ -45,7 +45,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
-
 	void key_click_w(uint8_t data);
 	void bell_w(uint8_t data);
 	uint8_t kbd_key_r();

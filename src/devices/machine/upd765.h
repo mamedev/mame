@@ -598,17 +598,19 @@ private:
 
 class hd63266f_device : public upd765_family_device {
 public:
-	hd63266f_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	hd63266f_device(const machine_config &mconfig, const char *tag, device_t* owner, uint32_t clock);
 
-	virtual void map(address_map& map) override;
+	virtual void map(address_map &map) override;
 	auto inp_rd_callback() { return inp_cb.bind(); } // this is really the ts signal
 
 	void rate_w(u8 state) { state ? set_rate(500000) : set_rate(250000); }
 	void abort_w(u8 data);
 	u8 extstat_r();
+
 protected:
 	virtual void soft_reset() override;
 	virtual void device_start() override;
+
 private:
 	virtual int check_command() override;
 	virtual void execute_command(int cmd) override;

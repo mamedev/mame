@@ -16,11 +16,11 @@
 #include "emu.h"
 
 #include "cpu/h8/h83003.h"
+#include "imagedev/floppy.h"
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
-#include "imagedev/floppy.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -34,31 +34,34 @@ class lw700i_state : public driver_device
 {
 public:
 	lw700i_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_mainram(*this, "mainram"),
-			m_screen(*this, "screen"),
-			m_fdc(*this, "fdc"),
-			m_floppy(*this, "fdc:1"),
-			m_keyboard(*this, "X%u", 0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mainram(*this, "mainram")
+		, m_screen(*this, "screen")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:1")
+		, m_keyboard(*this, "X%u", 0)
 	{ }
 
-	void lw700i(machine_config &config);
+	void lw700i(machine_config &config) ATTR_COLD;
 
+protected:
+	// driver_device implementation
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
 	uint8_t p7_r();
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
 
-private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<h83003_device> m_maincpu;
@@ -67,9 +70,6 @@ private:
 	required_device<hd63266f_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_ioport_array<9> m_keyboard;
-
-	// driver_device overrides
-	virtual void video_start() override;
 
 	uint8_t m_keyrow = 0;
 };

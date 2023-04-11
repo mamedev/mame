@@ -6,7 +6,7 @@
 
     The board used in the H19 smart terminal designed and manufactured
     by Heath Company. (and the identical Z19 sold by Zenith Data Systems)
-		This board is also used the Heath's H89 / H88, and ZDS's Z-89 and Z-90.
+        This board is also used the Heath's H89 / H88, and ZDS's Z-89 and Z-90.
 
     The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
     mask-programmed keyboard controller. The output of this passes

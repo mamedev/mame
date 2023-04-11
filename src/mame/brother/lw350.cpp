@@ -2,15 +2,20 @@
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
+
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
+#include "imagedev/floppy.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
 #include "debug/debugcpu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 #include "util/utf8.h"
 
 // command line parameters:
@@ -23,7 +28,7 @@ Brother LW-350
 
 Hardware:
 
-#4 
+#4
 Hitachi HG62F33R63FH
 US0021-A
 CMOS Gate Array
@@ -76,14 +81,13 @@ see https://github.com/BartmanAbyss/brother-hardware/tree/master/2G%20-%20Brothe
 
 ***************************************************************************/
 
-#include "machine/upd765.h"
-#include "imagedev/floppy.h"
+namespace {
 
 class lw350_state : public driver_device
 {
 public:
-	lw350_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lw350_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		screen(*this, "screen"),
 		floppy(*this, "fdc:0"),
@@ -94,13 +98,13 @@ public:
 		vram(*this, "vram")
 	{ }
 
-	void lw350(machine_config& config);
+	void lw350(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -144,7 +148,7 @@ private:
 	}
 	uint8_t io_b8_r() {
 		// keyboard matrix
- 		if(io_b8 <= 8)
+		if(io_b8 <= 8)
 			return io_kbrow[io_b8]->read();
 
 		switch(io_b8) {
@@ -185,7 +189,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(io_90_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-	void map_program(address_map& map) {
+	void map_program(address_map &map) ATTR_COLD {
 		map(0x00000, 0x01fff).rom();
 		map(0x02000, 0x05fff).ram();
 		map(0x06000, 0x3ffff).rom();
@@ -197,7 +201,7 @@ private:
 		map(0x76000, 0x7ffff).ram();
 	}
 
-	void map_io(address_map& map) {
+	void map_io(address_map &map) ATTR_COLD {
 		map.global_mask(0xff);
 		map(0x00, 0x3f).noprw(); // Z180 internal registers
 		map(0x70, 0x70).w(FUNC(lw350_state::io_70_w));
@@ -370,16 +374,16 @@ void lw350_state::machine_start()
 	// ROM patches
 
 	// force jump to self-test menu
-//	rom[0x280f2] = 0x20;
-//	rom[0x280f2+1] = 0x05;
+//  rom[0x280f2] = 0x20;
+//  rom[0x280f2+1] = 0x05;
 
 	// force jump to lcd-test menu
-//	rom[0x280f2] = 0x2c;
-//	rom[0x280f2+1] = 0x05;
+//  rom[0x280f2] = 0x2c;
+//  rom[0x280f2+1] = 0x05;
 
 	// force jump to self-print menu
-//	rom[0x280f2] = 0x32;
-//	rom[0x280f2 + 1] = 0x05;
+//  rom[0x280f2] = 0x32;
+//  rom[0x280f2 + 1] = 0x05;
 
 	// set initial mode
 	//rom[0x29a12] = 0x0a;
@@ -421,12 +425,12 @@ static void lw350_floppies(device_slot_interface& device) {
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-void lw350_state::lw350(machine_config& config) {
+void lw350_state::lw350(machine_config &config) {
 	// basic machine hardware
 	HD64180RP(config, maincpu, 16'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw350_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw350_state::map_io);
-	maincpu->tend0_wr_callback().set([this](int state){ fdc->tc_w((fdc_drq && state) ? 1 : 0); });
+	maincpu->tend0_wr_callback().set([this] (int state) { fdc->tc_w((fdc_drq && state) ? 1 : 0); });
 	maincpu->rts0_wr_callback().set(fdc, FUNC(hd63266f_device::rate_w));
 	TIMER(config, "1khz").configure_periodic(FUNC(lw350_state::int1_timer_callback), attotime::from_hz(1000));
 
@@ -439,10 +443,10 @@ void lw350_state::lw350(machine_config& config) {
 	screen->set_size(480, 128);
 
 	HD63266F(config, fdc, XTAL(16'000'000));
-	fdc->drq_wr_callback().set([this](int state){ fdc_drq = state; maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, state); });
+	fdc->drq_wr_callback().set([this] (int state) { fdc_drq = state; maincpu->set_input_line(Z180_INPUT_LINE_DREQ0, state); });
 	fdc->set_ready_line_connected(false);
 	fdc->set_select_lines_connected(false);
-	fdc->inp_rd_callback().set([this](){ return floppy->get_device()->dskchg_r(); });
+	fdc->inp_rd_callback().set([this] () { return floppy->get_device()->dskchg_r(); });
 
 	FLOPPY_CONNECTOR(config, floppy, lw350_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
@@ -559,8 +563,8 @@ constexpr int MDA_CLOCK = 16'257'000;
 class lw450_state : public driver_device
 {
 public:
-	lw450_state(const machine_config& mconfig, device_type type, const char* tag)
-		: driver_device(mconfig, type, tag),
+	lw450_state(const machine_config &mconfig, device_type type, const char* tag) :
+		driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		screen(*this, "screen"),
 		palette(*this, "palette"),
@@ -574,13 +578,13 @@ public:
 		rombank(*this, "dictionary")
 	{ }
 
-	void lw450(machine_config& config);
+	void lw450(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
-	void video_start() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -646,15 +650,15 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-	void map_program(address_map& map);
-	void map_io(address_map& map);
+	void map_program(address_map& map) ATTR_COLD;
+	void map_io(address_map& map) ATTR_COLD;
 };
 
 void lw450_state::video_start()
 {
 }
 
-void lw450_state::map_program(address_map& map)
+void lw450_state::map_program(address_map &map)
 {
 	map(0x00000, 0x01fff).rom();
 	map(0x02000, 0x05fff).ram();
@@ -668,7 +672,7 @@ void lw450_state::map_program(address_map& map)
 	// font @ FC000-FD000 pitch 16
 }
 
-void lw450_state::map_io(address_map& map)
+void lw450_state::map_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).noprw(); // Z180 internal registers
@@ -700,8 +704,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw450_state::int1_timer_callback)
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(lw450_state::crtc_vsync) 
-{ 
+WRITE_LINE_MEMBER(lw450_state::crtc_vsync)
+{
 	if(state) {
 		framecnt++;
 	}
@@ -732,14 +736,14 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 
 	// based on LW-450 CRT Test Menu
 	enum attrs {
-		underline			= 0b00000001,
-		extended_charset	= 0b00000100,
-		bold				= 0b00001000,
-		reverse				= 0b00010000,
+		underline           = 0b00000001,
+		extended_charset    = 0b00000100,
+		bold                = 0b00001000,
+		reverse             = 0b00010000,
 		blink               = 0b10000000,
 	};
 
-	const rgb_t *palette = this->palette->palette()->entry_list_raw();
+	rgb_t const *const palette = this->palette->palette()->entry_list_raw();
 	uint32_t* p = &bitmap.pix(y);
 	uint16_t chr_base = ra;
 
@@ -838,10 +842,10 @@ void lw450_state::machine_reset()
 static const gfx_layout pc_16_charlayout {
 	8, 16,                  // 8 x 16 characters
 	256,                    // 256 characters
-	1,						// 1 bits per pixel
+	1,                      // 1 bits per pixel
 	{ 0 },                  // no bitplanes
 	{ 0, 1, 2, 3, 4, 5, 6, 7 }, // x offsets
-	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8 }, 	// y offsets
+	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8, 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8 },   // y offsets
 	16*8                 // every char takes 2 x 8 bytes
 };
 
@@ -849,7 +853,7 @@ static GFXDECODE_START( gfx_lw450 )
 	GFXDECODE_RAM("vram", 0x4000, pc_16_charlayout, 0, 1)
 GFXDECODE_END
 
-void lw450_state::lw450(machine_config& config) {
+void lw450_state::lw450(machine_config &config) {
 	// basic machine hardware
 	Z80180(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw450_state::map_program);
@@ -894,7 +898,7 @@ void lw450_state::lw450(machine_config& config) {
 ROM_START( lw350 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD("uc6273-a-lwb6", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
-//	ROM_LOAD("patched", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
+//  ROM_LOAD("patched", 0x00000, 0x80000, CRC(5E85D1EC) SHA1(4ca68186fc70f30ccac95429604c88db4f0c34d2))
 ROM_END
 
 ROM_START( lw450 )
@@ -904,6 +908,8 @@ ROM_START( lw450 )
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 ROM_END
 
-//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME          FLAGS
-COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "Brother LW-350", MACHINE_NODEVICE_PRINTER )
-COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "Brother LW-450", MACHINE_NODEVICE_PRINTER )
+} // anonymous namespace
+
+//    YEAR  NAME  PARENT COMPAT   MACHINE INPUT  CLASS           INIT              COMPANY         FULLNAME  FLAGS
+COMP( 1995, lw350,  0,   0,       lw350,  lw350, lw350_state,    empty_init,       "Brother",      "LW-350", MACHINE_NODEVICE_PRINTER )
+COMP( 1992, lw450,  0,   0,       lw450,  lw350, lw450_state,    empty_init,       "Brother",      "LW-450", MACHINE_NODEVICE_PRINTER )
