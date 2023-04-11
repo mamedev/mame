@@ -146,9 +146,9 @@ std::error_condition tama5_device::load(std::string &message)
 	install_rom();
 
 	// install I/O
-	cart_space()->install_read_handler(0xa000, 0xa000, 0x0000, 0x1fff, 0x0000, read8mo_delegate(*this, FUNC(tama5_device::data_r)));
-	cart_space()->install_write_handler(0xa000, 0xa000, 0x0000, 0x1ffe, 0x0000, write8smo_delegate(*this, FUNC(tama5_device::data_w)));
-	cart_space()->install_write_handler(0xa001, 0xa001, 0x0000, 0x1ffe, 0x0000, write8smo_delegate(*this, FUNC(tama5_device::command_w)));
+	cart_space()->install_read_handler(0xa000, 0xa000, 0x0000, 0x1fff, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::data_r)));
+	cart_space()->install_write_handler(0xa000, 0xa000, 0x0000, 0x1ffe, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::data_w)));
+	cart_space()->install_write_handler(0xa001, 0xa001, 0x0000, 0x1ffe, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::command_w)));
 
 	// all good
 	return std::error_condition();

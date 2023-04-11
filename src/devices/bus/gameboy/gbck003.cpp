@@ -125,16 +125,16 @@ std::error_condition gbck003_device::load(std::string &message)
 	// install bank switch handlers
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_switch_inner)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_switch_inner)));
 	cart_space()->install_write_handler(
 			0x7b00, 0x7b00,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_switch_outer)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_switch_outer)));
 	cart_space()->install_write_handler(
 			0x7b01, 0x7b01,
-			write8smo_delegate(*this, FUNC(gbck003_device::bank_set_mux)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::bank_set_mux)));
 	cart_space()->install_write_handler(
 			0x7b02, 0x7b02,
-			write8smo_delegate(*this, FUNC(gbck003_device::exit_config_mode)));
+			emu::rw_delegate(*this, FUNC(gbck003_device::exit_config_mode)));
 
 	// set initial power-on state
 	set_bank_rom_low(0);
