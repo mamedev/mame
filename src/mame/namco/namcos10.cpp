@@ -602,8 +602,13 @@ public:
 	void namcos10_mgexio(machine_config &config);
 	void namcos10_exfinalio(machine_config &config);
 
+	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
+	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
+
 	void ns10_ballpom(machine_config &config);
 	void ns10_chocovdr(machine_config &config);
+	void ns10_gahaha(machine_config &config);
+	void ns10_gahaha2(machine_config &config);
 	void ns10_gamshara(machine_config &config);
 	void ns10_gegemdb(machine_config &config);
 	void ns10_gjspace(machine_config &config);
@@ -620,6 +625,8 @@ public:
 	void ns10_puzzball(machine_config &config);
 	void ns10_sekaikh(machine_config &config);
 	void ns10_startrgn(machine_config &config);
+	void ns10_taiko2(machine_config &config);
+	void ns10_taiko3(machine_config &config);
 	void ns10_taiko4(machine_config &config);
 	void ns10_taiko5(machine_config &config);
 	void ns10_taiko6(machine_config &config);
@@ -627,6 +634,8 @@ public:
 
 	void init_ballpom();
 	void init_chocovdr();
+	void init_gahaha();
+	void init_gahaha2();
 	void init_gamshara();
 	void init_gjspace();
 	void init_gunbalina();
@@ -641,6 +650,8 @@ public:
 	void init_puzzball();
 	void init_sekaikh();
 	void init_startrgn();
+	void init_taiko2();
+	void init_taiko3();
 	void init_taiko4();
 	void init_taiko5();
 	void init_taiko6();
@@ -1307,6 +1318,18 @@ void namcos10_memn_state::init_chocovdr()
 	memn_driver_init();
 }
 
+void namcos10_memn_state::init_gahaha()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xe, 0xc, 0xf, 0xa, 0x8, 0xb, 0x9, 0x6, 0x7, 0x4, 0x5, 0x0, 0x3, 0x2, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_gahaha2()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
+	memn_driver_init();
+}
+
 void namcos10_memn_state::init_gamshara()
 {
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
@@ -1391,6 +1414,18 @@ void namcos10_memn_state::init_startrgn()
 	memn_driver_init();
 }
 
+void namcos10_memn_state::init_taiko2()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xe, 0xf, 0x9, 0x8, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x2, 0x3, 0x0, 0x1); };
+	memn_driver_init();
+}
+
+void namcos10_memn_state::init_taiko3()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
+	memn_driver_init();
+}
+
 void namcos10_memn_state::init_taiko4()
 {
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0x8, 0xb, 0xa, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
@@ -1415,301 +1450,265 @@ void namcos10_memn_state::init_unks10md()
 	memn_driver_init();
 }
 
-void namcos10_memn_state::ns10_ballpom(machine_config &config)
+void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int nand_count)
 {
-	namcos10_memn_base(config);
-
-	/* decrypter device (CPLD in hardware?) */
-	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < nand_count; i++) {
 		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
+}
+
+void namcos10_memn_state::namcos10_nand_k9f5608u0d(machine_config &config, int nand_count)
+{
+	for (int i = 0; i < nand_count; i++) {
+		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memn_state::ns10_ballpom(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	/* decrypter device (CPLD in hardware?) */
+	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 5);
 
 	/* decrypter device (CPLD in hardware?) */
 	CHOCOVDR_DECRYPTER(config, m_decrypter, 0);
+}
 
-	for (int i = 0; i < 5; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
+void namcos10_memn_state::ns10_gahaha(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	/* decrypter device (CPLD in hardware?) */
+	// GAHAHA_DECRYPTER(config, m_decrypter, 0);
+}
+
+void namcos10_memn_state::ns10_gahaha2(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	/* decrypter device (CPLD in hardware?) */
+	// GAHAHA2_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_gamshara(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	GAMSHARA_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_gegemdb(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exio(config);
+	namcos10_nand_k9f5608u0d(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		// Uses a larger NAND chip than any of the others
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_gjspace(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 4);
 
 	/* decrypter device (CPLD in hardware?) */
 	GJSPACE_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 4; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_kd2001(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	// TODO: Also has a "pdrive" ROM? What's that for?
 
 	/* decrypter device (CPLD in hardware?) */
 	// KD2001_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_keroro(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exio(config);
+	namcos10_nand_k9f5608u0d(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// KERORO_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		// Uses a larger NAND chip than any of the others
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	KNPUZZLE_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_konotako(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	KONOTAKO_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f5608u0d(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// MEDALNT2_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	// MRDRILRG_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exio(config);
+	namcos10_nand_k9f2808u0b(config, 4);
 
 	/* decrypter device (CPLD in hardware?) */
 	NFLCLSFB_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 4; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_pacmball(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// PACMBALL_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_panikuru(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	// PANIKURU_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// PTBLANK3_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_puzzball(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// PUZZBALL_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// SEKAIKH_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	STARTRGN_DECRYPTER(config, m_decrypter, 0);
+}
 
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
+void namcos10_memn_state::ns10_taiko2(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exfinalio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	/* decrypter device (CPLD in hardware?) */
+	// TAIKO2_DECRYPTER(config, m_decrypter, 0);
+}
+
+void namcos10_memn_state::ns10_taiko3(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_exfinalio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
+
+	/* decrypter device (CPLD in hardware?) */
+	// TAIKO3_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_taiko4(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exfinalio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	// TAIKO4_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_taiko5(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exfinalio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	// TAIKO5_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_taiko6(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_exfinalio(config);
+	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
 	// TAIKO6_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 3; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 void namcos10_memn_state::ns10_unks10md(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
 	// UNKS10MD_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 2; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1942,6 +1941,34 @@ ROM_START( chocovdr )
 
 	ROM_REGION32_LE( 0x1080000, "nand4", 0 )
 	ROM_LOAD( "4.6e", 0x0000000, 0x1080000, CRC(1ed957dd) SHA1(bc8ce9f249fe496c130c6fe67b2260c4d0734ab9) )
+ROM_END
+
+ROM_START( gahaha )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "gid2vera_0.8e", 0x0000000, 0x1080000, CRC(02fc878c) SHA1(4d883d0136f541f02657e0a64c73d6fa240c6db7) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "gid2vera_1.8d", 0x0000000, 0x1080000, CRC(102932a7) SHA1(01133986c64d7290019706e4373006a5af04c105) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "gid2vera_2.7e", 0x0000000, 0x1080000, CRC(df8ec017) SHA1(59f9cdad77d452af25c35913e1daca6b561074c2) )
+ROM_END
+
+ROM_START( gahaha2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "gis1vera_0.8e", 0x0000000, 0x1080000, CRC(52737932) SHA1(6272ee005617a3ef2b7d39bd8b1fcc581faceba2) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "gis1vera_1.8d", 0x0000000, 0x1080000, CRC(eeb680ac) SHA1(9737cd9db600ec10bea53a6473cfff57cb1c1aec) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "gis1vera_2.7e", 0x0000000, 0x1080000, CRC(d22c9ee1) SHA1(e0a7da2843e0a43eacb2bd8c8f088c6b7433fc1a) )
 ROM_END
 
 ROM_START( gamshara )
@@ -2188,6 +2215,40 @@ ROM_START( sekaikha )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( taiko2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tk21verc_0.8e", 0x0000000, 0x1080000, CRC(12d6c187) SHA1(5f3d15fbd53c30320aa8c004ea555bba1d31016f) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tk21verc_1.8d", 0x0000000, 0x1080000, CRC(e294f460) SHA1(a22d553215d7e109c03af8bd0edb962fdcede5dc) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tk21verc_2.7e", 0x0000000, 0x1080000, CRC(f1dbe387) SHA1(8ae5f3b659acec150d89af2a14fc2dec8c3b1643) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-21", 0, SHA1(b5a87206f37d1e3f688e1b921c4c5ccd0004a104) )
+ROM_END
+
+ROM_START( taiko3 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "tk31vera_0.8e", 0x0000000, 0x1080000, CRC(6ee822f1) SHA1(02817db16e20062de36c7e7c9497950636c55e7c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "tk31vera_1.8d", 0x0000000, 0x1080000, CRC(384c9692) SHA1(f40602522de18b8b2dd14254221279905df6b38a) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "tk31vera_2.7e", 0x0000000, 0x1080000, CRC(904c09ee) SHA1(a81b70661e3f07a4e8f7cb5c2be6c2c526ce27c3) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-3", 0, NO_DUMP )
+ROM_END
+
 ROM_START( taiko4 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -2202,7 +2263,7 @@ ROM_START( taiko4 )
 	ROM_LOAD( "tk41vera_2.7e", 0x0000000, 0x1080000, CRC(6fc63af0) SHA1(78bac0a11497d5cdfba17fb0ff4d6916349df527) )
 
 	DISK_REGION("cd")
-	DISK_IMAGE_READONLY( "tk-4", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "tk-41", 0, SHA1(83ebf17a38a0aff259c8f63cf05e3df819c9e399) )
 ROM_END
 
 ROM_START( taiko5 )
@@ -2286,8 +2347,10 @@ GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, 
 GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", 0 )
 
 // MEM(N)
+GAME( 2000, gahaha,    0,        ns10_gahaha,    namcos10, namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", 0 )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
@@ -2308,6 +2371,8 @@ GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, 
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
+GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10, namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10, namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10, namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
