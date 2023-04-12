@@ -11,8 +11,8 @@
     - 4 MHz XTAL (next to CPU)
     - 3x 2764 (next to CPU)
     - 6x TMM2016AP-10 or D446C-2 (2k)
-    - SCN2674B
-    - SCB2675B
+    - SCN2674B C4N40
+    - SCB2675B C5N40
     - 2x 2732A (next to CRT controller)
     - 2x S68B10P (128 byte SRAM)
     - M5L8253P-5
@@ -32,12 +32,17 @@
     - Expansion slot
 
     TODO:
-    - Everything
+    - Fix CRT controller hookup
+	- Keyboard
 
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8251.h"
+#include "machine/pit8253.h"
+#include "video/scn2674.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -54,7 +59,16 @@ class freedom220_state : public driver_device
 public:
 	freedom220_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_avdc(*this, "avdc"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_usart(*this, "usart%u", 0U),
+		m_chargen(*this, "chargen"),
+		m_translate(*this, "translate"),
+		m_charram(*this, "charram%u", 0U),
+		m_attrram(*this, "attrram%u", 0U),
+		m_nmi_enabled(false)
 	{ }
 
 	void freedom220(machine_config &config);
@@ -65,9 +79,27 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
+	required_device<scn2674_device> m_avdc;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device_array<i8251_device, 3> m_usart;
+	required_region_ptr<uint8_t> m_chargen;
+	required_region_ptr<uint8_t> m_translate;
+	required_shared_ptr_array<uint8_t, 2> m_charram;
+	required_shared_ptr_array<uint8_t, 2> m_attrram;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
+
+	void row_buffer_map(address_map &map);
+	uint8_t mbc_char_r(offs_t offset);
+	uint8_t mbc_attr_r(offs_t offset);
+	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
+
+	void nmi_control_w(uint8_t data);
+	void nmi_w(int state);
+
+	bool m_nmi_enabled;
 };
 
 
@@ -78,16 +110,65 @@ private:
 void freedom220_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x87ff).ram().share(m_charram[0]);
+	map(0x8800, 0x8fff).ram().share(m_attrram[0]);
+	map(0x9000, 0x97ff).ram().share(m_charram[1]);
+	map(0x9800, 0x9fff).ram().share(m_attrram[1]);
+	map(0xa000, 0xafff).ram();
 }
 
 void freedom220_state::io_map(address_map &map)
 {
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0x20, 0x23).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x40, 0x41).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x60, 0x61).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x80, 0x81).rw(m_usart[2], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x81, 0x81).lr8(NAME([] () { return 0x01; })); // hack
+	map(0xa0, 0xa0).w(FUNC(freedom220_state::nmi_control_w));
 }
 
 
 //**************************************************************************
 //  VIDEO EMULATION
 //**************************************************************************
+
+void freedom220_state::row_buffer_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).ram();
+}
+
+uint8_t freedom220_state::mbc_char_r(offs_t offset)
+{
+	logerror("read char offset %04x\n", offset);
+	return m_charram[0][offset & 0x7ff];
+}
+
+uint8_t freedom220_state::mbc_attr_r(offs_t offset)
+{
+	logerror("read attr offset %04x\n", offset);
+	return m_attrram[0][offset & 0x7ff];
+}
+
+SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
+{
+	// translation table
+	const int table = 0; // 0-f
+	charcode = m_translate[(table << 8) | charcode];
+
+	uint8_t data = m_chargen[charcode << 4 | linecount];
+	const pen_t *const pen = m_palette->pens();
+
+	// foreground/background colors
+	rgb_t fg = pen[1];
+	rgb_t bg = pen[0];
+
+	// draw 8 pixels of the character
+	for (int i = 0; i < 8; i++)
+		bitmap.pix(y, x + i) = BIT(data, 7 - i) ? fg : bg;
+}
 
 static const gfx_layout char_layout =
 {
@@ -109,12 +190,29 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+void freedom220_state::nmi_control_w(uint8_t data)
+{
+	logerror("nmi_control_w: %02x\n", data);
+
+	// unknown if a simple write is enough
+	m_nmi_enabled = true;
+}
+
+void freedom220_state::nmi_w(int state)
+{
+	if (state && m_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
 void freedom220_state::machine_start()
 {
+	// register for save states
+	save_item(NAME(m_nmi_enabled));
 }
 
 void freedom220_state::machine_reset()
 {
+	m_nmi_enabled = false;
 }
 
 
@@ -128,9 +226,49 @@ void freedom220_state::freedom220(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &freedom220_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &freedom220_state::io_map);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_raw(16000000, 768, 0, 640, 321, 0, 300); // clock unverified
+	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
+	
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	GFXDECODE(config, "gfxdecode", "palette", chars);
+	GFXDECODE(config, "gfxdecode", m_palette, chars);
+
+	SCN2674(config, m_avdc, 16000000 / 8); // clock unverified
+	//m_avdc->intr_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // ?
+	m_avdc->set_screen(m_screen);
+	m_avdc->set_character_width(8); // unverified
+	m_avdc->set_addrmap(0, &freedom220_state::row_buffer_map);
+	m_avdc->set_addrmap(1, &freedom220_state::row_buffer_map);
+	m_avdc->set_display_callback(FUNC(freedom220_state::draw_character));
+	m_avdc->breq_callback().set(FUNC(freedom220_state::nmi_w));
+	m_avdc->mbc_char_callback().set(FUNC(freedom220_state::mbc_char_r));
+	m_avdc->mbc_attr_callback().set(FUNC(freedom220_state::mbc_attr_r));
+
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(18.432_MHz_XTAL / 10);
+	pit.set_clk<1>(18.432_MHz_XTAL / 10);
+	pit.set_clk<2>(18.432_MHz_XTAL / 10);
+	pit.out_handler<0>().set(m_usart[2], FUNC(i8251_device::write_txc));
+	pit.out_handler<0>().append(m_usart[2], FUNC(i8251_device::write_rxc));
+	pit.out_handler<1>().set(m_usart[1], FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append(m_usart[1], FUNC(i8251_device::write_rxc));
+	pit.out_handler<2>().set(m_usart[0], FUNC(i8251_device::write_txc));
+	pit.out_handler<2>().append(m_usart[0], FUNC(i8251_device::write_rxc));
+
+	I8251(config, m_usart[0], 0); // unknown clock
+	m_usart[0]->rxrdy_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // ?
+	m_usart[0]->txd_handler().set("mainport", FUNC(rs232_port_device::write_txd));
+	m_usart[0]->rts_handler().set("mainport", FUNC(rs232_port_device::write_rts));
+
+	I8251(config, m_usart[1], 0); // unknown clock
+
+	I8251(config, m_usart[2], 0); // unknown clock
+
+	rs232_port_device &mainport(RS232_PORT(config, "mainport", default_rs232_devices, nullptr));
+	mainport.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
+	mainport.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 }
 
 
@@ -147,7 +285,7 @@ ROM_START( free220 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("g022010__d64e.bin", 0x0000, 0x1000, CRC(a4482adc) SHA1(98479f6396743da6cf23909ff5a0097e9f021e3b))
 
-	ROM_REGION(0x1000, "unk", 0)
+	ROM_REGION(0x1000, "translate", 0)
 	ROM_LOAD("t022010__61f0.bin", 0x0000, 0x1000, CRC(00461116) SHA1(79a53a557ea4386b3e85a312731c6c0763ab46cc))
 
 	ROM_REGION(0x800, "keyboard", 0)
@@ -163,4 +301,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME       FLAGS
-COMP( 1984, free220, 0,      0,      freedom220, 0,     freedom220_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IS_SKELETON )
+COMP( 1984, free220, 0,      0,      freedom220, 0,     freedom220_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
