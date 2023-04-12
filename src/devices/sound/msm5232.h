@@ -13,6 +13,8 @@ public:
 	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
+	void set_envelope_generator_resistances(double attack, double decay_rrf, double decay_rrs);
+	void set_envelope_generator_resistances_by_capacitance(double capacitance);
 	auto gate() { return m_gate_handler_cb.bind(); }
 
 	void write(offs_t offset, uint8_t data);
@@ -87,9 +89,13 @@ private:
 	int     m_rate;       /* sample rate in Hz */
 
 	double  m_external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
+	double	m_envelope_generator_resistance_attack;
+	double	m_envelope_generator_resistance_decay_rrf;
+	double	m_envelope_generator_resistance_decay_rrs;
 	devcb_write_line m_gate_handler_cb;/* callback called when the GATE output pin changes state */
 
 	void init_tables();
+	void init_rate_tables();
 	void init_voice(int i);
 	void gate_update();
 	void init(int clock, int rate);

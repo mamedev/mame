@@ -5,6 +5,9 @@
 
 #define CLOCK_RATE_DIVIDER 16
 
+#define R51 1400    /* charge resistance */
+#define R52 28750   /* discharge resistance */
+
 /*
     OKI MSM5232RS
     8 channel tone generator
@@ -17,6 +20,7 @@ msm5232_device::msm5232_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_noise_cnt(0), m_noise_step(0), m_noise_rng(0), m_noise_clocks(0), m_UpdateStep(0), m_control1(0), m_control2(0), m_gate(0), m_chip_clock(0), m_rate(0)
+	, m_envelope_generator_resistance_attack(R51), m_envelope_generator_resistance_decay_rrf(R52), m_envelope_generator_resistance_decay_rrs(R52*6.25)
 	, m_gate_handler_cb(*this)
 {
 }
@@ -137,6 +141,7 @@ void msm5232_device::set_capacitors(double cap1, double cap2, double cap3, doubl
 	m_external_capacity[7] = cap8;
 }
 
+
 /* Default chip clock is 2119040 Hz */
 /* At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21 */
 
@@ -209,8 +214,8 @@ static FILE *sample[9];
  */
 
 
-#define R51 1400    /* charge resistance */
-#define R52 28750   /* discharge resistance */
+//#define R51 1400    /* charge resistance */
+//#define R52 28750   /* discharge resistance */
 
 #if 0
 /*
@@ -224,6 +229,23 @@ static FILE *sample[9];
 #endif
 
 
+void msm5232_device::set_envelope_generator_resistances(double attack, double decay_rrf, double decay_rrs)
+{
+	m_envelope_generator_resistance_attack = attack;
+	m_envelope_generator_resistance_decay_rrf = decay_rrf;
+	m_envelope_generator_resistance_decay_rrs = decay_rrs;
+	init_rate_tables();
+}
+
+void msm5232_device::set_envelope_generator_resistances_by_capacitance(double capacitance)
+{
+	const double time_constant = capacitance * log( 1-0.9 ) ;
+	set_envelope_generator_resistances(
+			-0.002 / time_constant
+		,	-0.040 / time_constant
+		,	-0.250 / time_constant
+		);
+}
 
 
 void msm5232_device::init_tables()
@@ -268,20 +290,7 @@ void msm5232_device::init_tables()
 }
 #endif
 
-
-	for (i=0; i<8; i++)
-	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_ar_tbl[i]   = ((1<<i) / clockscale) * (double)R51;
-	}
-
-	for (i=0; i<8; i++)
-	{
-		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_dr_tbl[i]   = (     (1<<i) / clockscale) * (double)R52;
-		m_dr_tbl[i+8] = (6.25*(1<<i) / clockscale) * (double)R52;
-	}
-
+	init_rate_tables();
 
 #ifdef SAVE_SAMPLE
 	sample[8]=fopen("sampsum.pcm","wb");
@@ -298,6 +307,21 @@ void msm5232_device::init_tables()
 #endif
 }
 
+void msm5232_device::init_rate_tables()
+{
+	for (int i=0; i<8; i++)
+	{
+		double clockscale = (double)m_chip_clock / 2119040.0;
+		m_ar_tbl[i]   = ((1<<i) / clockscale) * m_envelope_generator_resistance_attack;
+	}
+
+	for (int i=0; i<8; i++)
+	{
+		double clockscale = (double)m_chip_clock / 2119040.0;
+		m_dr_tbl[i]   = ((1<<i) / clockscale) * m_envelope_generator_resistance_decay_rrf;
+		m_dr_tbl[i+8] = ((1<<i) / clockscale) * m_envelope_generator_resistance_decay_rrs;
+	}
+}
 
 void msm5232_device::init_voice(int i)
 {
