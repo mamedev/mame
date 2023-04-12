@@ -1289,6 +1289,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds2430a.h,MACHINES["DS2430A"] = true
+---------------------------------------------------
+
+if (MACHINES["DS2430A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds2430a.cpp",
+		MAME_DIR .. "src/devices/machine/ds2430a.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds6417.h,MACHINES["DS6417"] = true
 ---------------------------------------------------
 
