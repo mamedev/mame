@@ -457,7 +457,6 @@ block for a specific device using: 0x1f500000 + 2 * (0x3ec * device_id + block_i
 
 Known issues:
 - mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
-- knpuzzle: bad dumps? where are the encrypted program blocks?
 - nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
 - ballpom: Needs MGEXIO emulation to boot. Make a cheat to force the byte at memory location 8007af02 to be 0 to make the game boot past the MGEXIO error.
 
@@ -625,6 +624,7 @@ public:
 	void ns10_puzzball(machine_config &config);
 	void ns10_sekaikh(machine_config &config);
 	void ns10_startrgn(machine_config &config);
+	void ns10_sugorotic(machine_config &config);
 	void ns10_taiko2(machine_config &config);
 	void ns10_taiko3(machine_config &config);
 	void ns10_taiko4(machine_config &config);
@@ -650,6 +650,7 @@ public:
 	void init_puzzball();
 	void init_sekaikh();
 	void init_startrgn();
+	void init_sugorotic();
 	void init_taiko2();
 	void init_taiko3();
 	void init_taiko4();
@@ -661,9 +662,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void namcos10_memn_map(address_map &map);
+
 private:
 	void namcos10_memn_map_inner(address_map &map);
-	void namcos10_memn_map(address_map &map);
 
 	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
 	void memn_driver_init();
@@ -690,12 +692,11 @@ private:
 	uint32_t m_nand_address;
 };
 
-class namcos10_memp3_state : public namcos10_state
+class namcos10_memp3_state : public namcos10_memn_state
 {
 public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos10_state(mconfig, type, tag)
-		, m_nand(*this, "nand%u", 0U)
+		: namcos10_memn_state(mconfig, type, tag)
 		, m_memp3_mcu(*this, "memp3_mcu")
 	{ }
 
@@ -709,7 +710,6 @@ private:
 	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
 	void memp3_driver_init();
 
-	optional_device_array<nand_device, 16> m_nand;
 	optional_device<tmp95c061_device> m_memp3_mcu;
 };
 
@@ -1119,6 +1119,7 @@ uint16_t namcos10_memn_state::nand_rnb_r()
 void namcos10_memn_state::crypto_switch_w(uint16_t data)
 {
 	logerror("%s: crypto_switch_w: %04x\n", machine().describe_context(), data);
+
 	if (!m_decrypter.found())
 		return;
 
@@ -1414,6 +1415,12 @@ void namcos10_memn_state::init_startrgn()
 	memn_driver_init();
 }
 
+void namcos10_memn_state::init_sugorotic()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x2, 0x3); };
+	memn_driver_init();
+}
+
 void namcos10_memn_state::init_taiko2()
 {
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xe, 0xf, 0x9, 0x8, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x2, 0x3, 0x0, 0x1); };
@@ -1652,6 +1659,16 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 	STARTRGN_DECRYPTER(config, m_decrypter, 0);
 }
 
+void namcos10_memn_state::ns10_sugorotic(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	/* decrypter device (CPLD in hardware?) */
+	// SUGOROTIC_DECRYPTER(config, m_decrypter, 0);
+}
+
 void namcos10_memn_state::ns10_taiko2(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -1741,6 +1758,8 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 {
 	namcos10_base(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::namcos10_memn_map);
+
 	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400)).set_disable(); // not hooked up
 	// LC82310 16.9344MHz
 }
@@ -1754,14 +1773,10 @@ void namcos10_memp3_state::init_g13jnc()
 void namcos10_memp3_state::ns10_g13jnc(machine_config &config)
 {
 	namcos10_memp3_base(config);
+	namcos10_nand_k9f2808u0b(config, 6);
 
 	/* decrypter device (CPLD in hardware?) */
 	// G13JNC_DECRYPTER(config, m_decrypter, 0);
-
-	for (int i = 0; i < 6; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
-		// m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2078,13 +2093,13 @@ ROM_START( knpuzzle )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "kpm1a_0.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(b2947eb8) SHA1(fa941bf3598bb25d2c8f0a93154e32bf78a6507c) )
+	ROM_LOAD( "kpm1vera_0.8e", 0x0000000, 0x1080000, CRC(4b4255da) SHA1(c8ec575e53596a167a07db97076fd69e6646d0f5) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "kpm1a_1.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(f3aa855a) SHA1(87b94e22db4bc4169324bbff93c4ea19c1d99b40) )
+	ROM_LOAD( "kpm1vera_1.8d", 0x0000000, 0x1080000, CRC(644595a6) SHA1(4b60008ca5cac894a815fe6aaa980296a83f673f) )
 
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "kpm1a_2.bin", 0x0000000, 0x1080000, BAD_DUMP CRC(b297cc8d) SHA1(c3494e7a8a0b4e0c8c40b99121373effbfe848eb) )
+	ROM_LOAD( "kpm1vera_2.7e", 0x0000000, 0x1080000, CRC(6bf164e5) SHA1(b4a2e6eb18c09220b0c8ec80159d13d0e439a559) )
 ROM_END
 
 ROM_START( konotako )
@@ -2187,17 +2202,6 @@ ROM_START( puzzball )
 	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(0002794e) SHA1(44b6bcea835d3dbb6b2e85ba3ea4404e1400c4f5) )
 ROM_END
 
-ROM_START( startrgn )
-	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
-	ROM_FILL( 0x0000000, 0x400000, 0x55 )
-
-	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "stt1a_0.bin", 0x0000000, 0x1080000, CRC(1e090644) SHA1(a7a293e2bd9eea2eb64a492a47272d9d9ee2c724) )
-
-	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "stt1a_1.bin", 0x0000000, 0x1080000, CRC(aa527694) SHA1(a25dcbeca58a1443070848b3487a24d51d41a34b) )
-ROM_END
-
 ROM_START( sekaikh )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -2224,6 +2228,28 @@ ROM_START( sekaikha )
 
 	ROM_REGION( 0x8000, "mgexio", 0 )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
+ROM_END
+
+ROM_START( startrgn )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "stt1a_0.bin", 0x0000000, 0x1080000, CRC(1e090644) SHA1(a7a293e2bd9eea2eb64a492a47272d9d9ee2c724) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "stt1a_1.bin", 0x0000000, 0x1080000, CRC(aa527694) SHA1(a25dcbeca58a1443070848b3487a24d51d41a34b) )
+ROM_END
+
+ROM_START( sugorotic )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "stj1verc_0.8e", 0x0000000, 0x1080000, CRC(a994fc8f) SHA1(58ea3f7576e07ade0be71058705baf7ec348e55b) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "stj1verc_1.8d", 0x0000000, 0x1080000, CRC(a7a20960) SHA1(72bc89637f966fe23a84c34346be3cdc20d712e5) )
 ROM_END
 
 ROM_START( taiko2 )
@@ -2364,7 +2390,7 @@ GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, 
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", 0 )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_NOT_WORKING )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
@@ -2372,6 +2398,7 @@ GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, 
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0 )
+GAME( 2002, sugorotic, 0,        ns10_sugorotic, namcos10, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0 )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
