@@ -356,12 +356,12 @@ void virtual_memory_allocation::do_free(void *start, std::size_t size)
 
 bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access)
 {
-	DWORD p, o;
+	DWORD p;
 	if (access & EXECUTE)
 		p = (access & WRITE) ? PAGE_EXECUTE_READWRITE : (access & READ) ? PAGE_EXECUTE_READ : PAGE_EXECUTE;
 	else
 		p = (access & WRITE) ? PAGE_READWRITE : (access & READ) ? PAGE_READONLY : PAGE_NOACCESS;
-	return VirtualProtect(start, size, p, &o) != 0;
+	return VirtualAlloc(start, size, MEM_COMMIT, p) != nullptr;
 }
 
 

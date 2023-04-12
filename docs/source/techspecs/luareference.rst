@@ -3209,6 +3209,10 @@ emu.bitmap_argb32(source, [x0, y0, x1, y1])
     The source bitmap must be owned by the Lua script and must use the ARGB
     format.  Raises an error if coordinates are specified representing a
     rectangle not fully contained within the source bitmap’s clipping rectangle.
+emu.bitmap_argb32.load(data)
+    Creates an ARGB format bitmap from data in PNG, JPEG (JFIF/EXIF) or
+    Microsoft DIB (BMP) format.  Raises an error if the data invalid or not a
+    supported format.
 
 Methods
 ^^^^^^^

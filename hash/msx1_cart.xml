@@ -13091,10 +13091,10 @@ kept for now until finding out what those bytes affect...
 
 	<!-- No photographic proof of a physical release. -->
 	<software name="chimak" cloneof="chima">
-		<description>Yogoetamjeong (Korea)</description>
+		<description>Yogoetamjeong Chimagun Chimachima (Korea)</description>
 		<year>19??</year>
 		<publisher>Topia</publisher>
-		<info name="alt_title" value="요괴탐정"/>
+		<info name="alt_title" value="요괴탐정 치마군 Chimachima"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
