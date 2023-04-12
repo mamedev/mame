@@ -540,6 +540,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "315_5296.h"
+#include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
 #include "speaker.h"
@@ -2527,7 +2528,12 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("cdrom", NSCSI_CDROM).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
