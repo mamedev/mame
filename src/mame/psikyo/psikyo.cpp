@@ -1174,11 +1174,7 @@ void psikyo_state::s1945(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.9229);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.3181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 223);  // Approximately 59.923Hz, 39 HSync pulses in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1753,6 +1749,12 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 223
+          - Vertical Back/Front Porch: 16 lines each
+          - VSync pulse: 7 lines
 Chips:  PS2001B
         PS3103
         PS3204
