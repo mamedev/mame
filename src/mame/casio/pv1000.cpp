@@ -20,8 +20,7 @@
 
 // PV-1000 Sound device
 
-class pv1000_sound_device : public device_t,
-									public device_sound_interface
+class pv1000_sound_device : public device_t, public device_sound_interface
 {
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -36,24 +35,23 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-
 	// internal state
 	struct
 	{
 		uint32_t  count  = 0;
 		uint16_t  period = 0;
-		uint8_t   val    = 1; //boot state of all channels
+		uint8_t   val    = 1; // boot state of all channels
 	} m_voice[3];
 
 	uint8_t m_ctrl = 0;
-	sound_stream    *m_sh_channel = nullptr;
+	sound_stream *m_sh_channel = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PV1000, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PV1000, tag, owner, clock),
+	device_sound_interface(mconfig, *this)
 {
 }
 
@@ -84,7 +82,7 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 		{
 			const uint8_t per = ~data & 0x3f;
 
-			if ((per == 0) &&  (m_voice[offset].period != 0))
+			if ((per == 0) && (m_voice[offset].period != 0))
 			{
 				// flip output once and stall there!
 				m_voice[offset].val = !m_voice[offset].val;
@@ -96,10 +94,10 @@ void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 	}
 }
 
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
-
 
 /*
   plgDavid's audio implementation/analysis notes:
@@ -129,7 +127,7 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 	{
 		s32 sum = 0;
 
-		// First caltulate all vals
+		// First calculate all vals
 		for (int i = 0; i < 3; i++)
 		{
 			m_voice[i].count++;
@@ -147,8 +145,8 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 			// ch0 and ch1
 			if (BIT(m_ctrl, 0))
 			{
-				const auto xor01 = BIT(m_voice[0].val ^ m_voice[1].val, 0);
-				const auto xor12 = BIT(m_voice[1].val ^ m_voice[2].val, 0);
+				const int xor01 = BIT(m_voice[0].val ^ m_voice[1].val, 0);
+				const int xor12 = BIT(m_voice[1].val ^ m_voice[2].val, 0);
 				sum += xor01 * volumes[0];
 				sum += xor12 * volumes[1];
 			}
@@ -169,7 +167,6 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 // PV-1000 System
 
-
 class pv1000_state : public driver_device
 {
 public:
@@ -186,15 +183,19 @@ public:
 
 	void pv1000(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
-	uint8_t   m_io_regs[8]{};
-	uint8_t   m_fd_data = 0;
+	uint8_t m_io_regs[8]{};
+	uint8_t m_fd_data = 0;
 
-	emu_timer       *m_irq_on_timer = nullptr;
-	emu_timer       *m_irq_off_timer = nullptr;
+	emu_timer *m_irq_on_timer = nullptr;
+	emu_timer *m_irq_off_timer = nullptr;
 	uint8_t m_pcg_bank = 0;
 	uint8_t m_force_pattern = 0;
 	uint8_t m_fd_buffer_flag = 0;
@@ -207,12 +208,10 @@ private:
 	required_device<pv1000_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -238,9 +237,9 @@ void pv1000_state::pv1000_io(address_map &map)
 
 void pv1000_state::gfxram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *gfxram = memregion( "gfxram" )->base();
+	uint8_t *gfxram = memregion("gfxram")->base();
 
-	gfxram[ offset ] = data;
+	gfxram[offset] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
@@ -277,9 +276,9 @@ uint8_t pv1000_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_regs[offset];
 
-//  logerror("io_r offset=%02x\n", offset );
+//  logerror("io_r offset=%02x\n", offset);
 
-	switch ( offset )
+	switch (offset)
 	{
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
@@ -312,25 +311,25 @@ uint8_t pv1000_state::io_r(offs_t offset)
 
 
 static INPUT_PORTS_START( pv1000 )
-	PORT_START( "IN0" )
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
 
-	PORT_START( "IN1" )
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 
-	PORT_START( "IN2" )
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
 
-	PORT_START( "IN3" )
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -338,7 +337,7 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pv1000_state::cart_load )
+DEVICE_IMAGE_LOAD_MEMBER(pv1000_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -360,17 +359,17 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 	{
 		for (int x = 2; x < 30; x++) // left-right most columns are definitely masked by the border color
 		{
-			uint16_t tile = m_p_videoram[ y * 32 + x ];
+			uint16_t tile = m_p_videoram[y * 32 + x];
 
 			if (tile < 0xe0 || m_force_pattern)
 			{
-				tile += ( m_pcg_bank << 8);
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				tile += (m_pcg_bank << 8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 			}
 			else
 			{
 				tile -= 0xe0;
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 			}
 		}
 	}
@@ -391,21 +390,21 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 		m_fd_buffer_flag |= 1; /* TODO: exact timing of this */
 
 	/* Set IRQ line and schedule release of IRQ line */
-	m_maincpu->set_input_line(0, ASSERT_LINE );
-	m_irq_off_timer->adjust( m_screen->time_until_pos(vpos, 380/2 ) );
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_screen->time_until_pos(vpos, 380/2));
 
 	/* Schedule next IRQ trigger */
-	if ( vpos >= 255 )
+	if (vpos >= 255)
 	{
 		next_vpos = 195;
 	}
-	m_irq_on_timer->adjust( m_screen->time_until_pos(next_vpos, 0 ) );
+	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 0));
 }
 
 
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE );
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
