@@ -62,7 +62,7 @@ class msx2_state : public msx2_base_state
 {
 public:
 	msx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx2_base_state(mconfig, type, tag)
+		: msx2_base_state(mconfig, type, tag, 21.477272_MHz_XTAL, 6)
 	{
 	}
 

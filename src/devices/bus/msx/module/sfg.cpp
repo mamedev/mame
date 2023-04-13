@@ -48,7 +48,7 @@ void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ym2151_device &ym2151(YM2151(config, m_ym2151, XTAL(3'579'545)));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	ym2151_device &ym2151(YM2151(config, m_ym2151, DERIVED_CLOCK(1, 1)));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
 	ym2151.irq_handler().set(FUNC(msx_cart_sfg_device::ym2151_irq_w));
 	ym2151.add_route(0, "lspeaker", 0.80);
 	ym2151.add_route(1, "rspeaker", 0.80);
@@ -69,7 +69,7 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 {
 	msx_cart_sfg_device::device_add_mconfig(config);
 
-	ym2164_device &ym2164(YM2164(config.replace(), m_ym2151, XTAL(3'579'545)));
+	ym2164_device &ym2164(YM2164(config.replace(), m_ym2151, DERIVED_CLOCK(1, 1)));
 	ym2164.irq_handler().set(FUNC(msx_cart_sfg05_device::ym2151_irq_w));
 	ym2164.add_route(0, "lspeaker", 0.80);
 	ym2164.add_route(1, "rspeaker", 0.80);

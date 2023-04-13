@@ -9,6 +9,7 @@ msx_slot_cartridge_base_device::msx_slot_cartridge_base_device(const machine_con
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_slot_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, msx_internal_slot_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_cartridge(nullptr)
@@ -114,6 +115,11 @@ address_space &msx_cart_interface::io_space() const
 cpu_device &msx_cart_interface::maincpu() const
 {
 	return m_exp->maincpu();
+}
+
+device_mixer_interface &msx_cart_interface::soundin() const
+{
+	return *m_exp;
 }
 
 void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
