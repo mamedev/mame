@@ -76,14 +76,18 @@ private:
 };
 
 template<int Slot>
-void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
+void msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 {
-	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], 0);
+	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], DERIVED_CLOCK(1, 1));
 	m_cartslot[Slot]->option_reset();
 	msx_cart(*m_cartslot[Slot], true);
 	m_cartslot[Slot]->set_default_option(nullptr);
 	m_cartslot[Slot]->set_fixed(false);
 	m_cartslot[Slot]->irq_handler().set(m_irq_out, FUNC(input_merger_device::in_w<Slot>));
+	if (parent_slot())
+	{
+		m_cartslot[Slot]->add_route(ALL_OUTPUTS, soundin(), 1.0);
+	}
 }
 
 void msx_cart_slotexpander_device::device_add_mconfig(machine_config &mconfig)
