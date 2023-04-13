@@ -616,8 +616,9 @@ block for a specific device using: 0x1f500000 + 2 * (0x3ec * device_id + block_i
 
 Known issues:
 - mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
-- nflclsfb: confirmed working but boots to a black screen. internal error says "namcoS10Sio0Init error :no EXIO!!!", making the check pass lets the game boot like normal (patch the instruction at 8001428c to 10000006)
-- ballpom: Needs MGEXIO emulation to boot. Make a cheat to force the byte at memory location 8007af02 to be 0 to make the game boot past the MGEXIO error.
+- nflclsfb: Needs additional I/O for trackball
+- ballpom: Needs additional I/O devices
+- g13jnc: Needs MP3 decoder emulation
 
 
 User data note:
@@ -626,6 +627,7 @@ User data note:
 
 #include "emu.h"
 
+#include "namcos10_exio.h"
 #include "ns10crypt.h"
 
 #include "cpu/psx/psx.h"
@@ -652,9 +654,21 @@ public:
 		, m_decrypter(*this, "decrypter")
 		, m_io_update_interrupt(*this)
 		, m_io_system(*this, "SYSTEM")
+		, m_exio(*this, "exio")
+		, m_analog(*this, "ANALOG%u", 1U)
 	{ }
 
 	void namcos10_base(machine_config &config);
+
+	void namcos10_exio(machine_config &config);
+	void namcos10_mgexio(machine_config &config);
+	void namcos10_exfinalio(machine_config &config);
+
+	void namcos10_map_exio_inner(address_map &map);
+	void namcos10_map_exio(address_map &map);
+
+	void namcos10_map_mgexio_inner(address_map &map);
+	void namcos10_map_mgexio(address_map &map);
 
 	void namcos10_map_inner(address_map &map);
 	void namcos10_map(address_map &map);
@@ -670,6 +684,7 @@ protected:
 	optional_device<ns10_decrypter_device> m_decrypter; // not every game has a decrypter implemented yet, so optional for now
 
 	unscramble_func m_unscrambler;
+	std::function<void()> m_psx_remapper;
 
 private:
 	enum : int8_t {
@@ -682,8 +697,8 @@ private:
 	uint16_t control_r(offs_t offset);
 	void control_w(offs_t offset, uint16_t data);
 
-	uint16_t sprot_r();
-	void sprot_w(uint16_t data);
+	uint16_t exio_ident_r();
+	void exio_ident_w(uint16_t data);
 
 	uint16_t i2c_clock_r();
 	void i2c_clock_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -692,6 +707,7 @@ private:
 	void i2c_update();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
+	TIMER_CALLBACK_MEMBER(psx_remap_tick);
 
 	devcb_write_line m_io_update_interrupt;
 
@@ -700,10 +716,18 @@ private:
 	uint8_t m_i2c_byte;
 	int32_t m_i2c_bit;
 
-	int32_t m_sprot_bit;
-	uint32_t m_sprot_byte;
+	int32_t m_exio_ident_bit;
+	uint32_t m_exio_ident_byte;
 
 	required_ioport m_io_system;
+
+	emu_timer *m_psx_remap_timer;
+
+	optional_device<namcos10_exio_base_device> m_exio;
+
+	// Game-specific data
+	optional_ioport_array<8> m_analog;
+	uint32_t m_exio_analog_idx;
 };
 
 class namcos10_memm_state : public namcos10_state
@@ -750,15 +774,10 @@ public:
 	namcos10_memn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_state(mconfig, type, tag)
 		, m_nand(*this, "nand%u", 0U)
-		, m_exio_mcu(*this, "exio_mcu")
 	{ }
 
 	void namcos10_memn_base(machine_config &config);
 	void namcos10_memn(machine_config &config);
-
-	void namcos10_exio(machine_config &config);
-	void namcos10_mgexio(machine_config &config);
-	void namcos10_exfinalio(machine_config &config);
 
 	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
 	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
@@ -816,18 +835,21 @@ public:
 	void init_taiko5();
 	void init_taiko6();
 	void init_unks10md();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void namcos10_memn_map(address_map &map);
 
+	void memn_driver_init();
+
+	void pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+	void pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
+
 private:
 	void namcos10_memn_map_inner(address_map &map);
 
 	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
-	void memn_driver_init();
 
 	void crypto_switch_w(uint16_t data);
 	uint16_t ctrl_reg_r(offs_t offset);
@@ -843,7 +865,6 @@ private:
 	void nand_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	optional_device_array<nand_device, 16> m_nand;
-	optional_device<tmp95c061_device> m_exio_mcu;
 
 	uint32_t m_ctrl_reg;
 	uint32_t m_nand_device_idx;
@@ -857,6 +878,8 @@ public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_memn_state(mconfig, type, tag)
 		, m_memp3_mcu(*this, "memp3_mcu")
+		, m_mcu_ram(*this, "mcu_ram")
+		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
 	{ }
 
 	void namcos10_memp3_base(machine_config &config);
@@ -865,25 +888,50 @@ public:
 
 	void init_g13jnc();
 
-private:
-	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
-	void memp3_driver_init();
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	optional_device<tmp95c061_device> m_memp3_mcu;
+private:
+	void namcos10_memp3_map_inner(address_map &map);
+	void namcos10_memp3_map(address_map &map);
+	void mcu_map(address_map &map);
+
+	void firmware_write_w(uint16_t data);
+
+	void ram_bank_w(uint16_t data);
+
+	uint16_t unk_status1_r();
+	uint16_t unk_status2_r();
+
+	uint16_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint16_t data);
+
+	uint16_t analog_io_r(offs_t offset);
+
+	required_device<tmp95c061_device> m_memp3_mcu;
+	required_shared_ptr<uint16_t> m_mcu_ram;
+	optional_ioport_array<4> m_p3_analog;
+
+	uint16_t m_mcu_bank;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
+TIMER_CALLBACK_MEMBER(namcos10_state::psx_remap_tick)
+{
+	if (!m_psx_remapper)
+		return;
+
+	m_psx_remapper();
+}
 
 void namcos10_state::namcos10_base(machine_config &config)
 {
 	/* basic machine hardware */
 	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
 	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M"); // ->set_default_size("4M"); 2 IS41LV16100s
-	// The bios first configures the ROM window as 80000-big, then
-	// switches to 400000.  If berr is active, the first configuration
-	// wipes all handlers after 1fc80000, which kills the system
-	// afterwards
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
 	/* video hardware */
 	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
@@ -907,6 +955,18 @@ void namcos10_state::namcos10_base(machine_config &config)
 
 void namcos10_state::machine_start()
 {
+	m_psx_remap_timer = timer_alloc(FUNC(namcos10_state::psx_remap_tick), this);
+	m_psx_remap_timer->adjust(attotime::never);
+
+	m_maincpu->space(AS_PROGRAM).install_write_tap(
+		0x1f801010, 0x1f801013,
+		"rom_configure_tap_w",
+		[this] (offs_t offset, u32 &data, u32 mem_mask) {
+			// reinstall memory map after rom_config_w finishes with update_rom_config
+			m_psx_remap_timer->adjust(attotime::zero);
+		}
+	);
+
 	save_item(NAME(m_i2c_dev_clock));
 	save_item(NAME(m_i2c_dev_data));
 	save_item(NAME(m_i2c_host_clock));
@@ -916,8 +976,8 @@ void namcos10_state::machine_start()
 	save_item(NAME(m_i2cp_mode));
 	save_item(NAME(m_i2c_byte));
 	save_item(NAME(m_i2c_bit));
-	save_item(NAME(m_sprot_bit));
-	save_item(NAME(m_sprot_byte));
+	save_item(NAME(m_exio_ident_bit));
+	save_item(NAME(m_exio_ident_byte));
 }
 
 void namcos10_state::machine_reset()
@@ -928,8 +988,12 @@ void namcos10_state::machine_reset()
 	m_i2cp_mode = I2CP_IDLE;
 	m_i2c_byte = 0x00;
 	m_i2c_bit = 0;
-	m_sprot_bit = 0;
-	m_sprot_byte = 0;
+
+	m_exio_ident_bit = 0;
+	m_exio_ident_byte = 0;
+	m_exio_analog_idx = 0;
+
+	m_psx_remap_timer->adjust(attotime::zero); // update_rom_config is called on device_reset
 }
 
 void namcos10_state::device_resolve_objects()
@@ -942,6 +1006,76 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 	m_io_update_interrupt(1);
 }
 
+void namcos10_state::namcos10_exio(machine_config &config)
+{
+	NAMCOS10_EXIO(config, m_exio, XTAL(22'118'400));
+
+	auto m_exio_cpu = subdevice<tmp95c061_device>("exio:exio_mcu");
+	m_exio_cpu->port7_write().set([this] (uint8_t data) {
+		m_exio_analog_idx = data;
+	});
+	m_exio_cpu->an_read<0>().set([this] () {
+		return m_analog[(m_exio_analog_idx & 3) * 2].read_safe(0);
+	});
+	m_exio_cpu->an_read<1>().set([this] () {
+		return m_analog[(m_exio_analog_idx & 3) * 2 + 1].read_safe(0);
+	});
+
+	m_psx_remapper = [this] () {
+		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_exio);
+	};
+}
+
+void namcos10_state::namcos10_mgexio(machine_config &config)
+{
+	NAMCOS10_MGEXIO(config, m_exio, XTAL(22'118'400));
+
+	m_psx_remapper = [this] () {
+		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_mgexio);
+	};
+}
+
+void namcos10_state::namcos10_exfinalio(machine_config &config)
+{
+}
+
+void namcos10_state::namcos10_map_exio_inner(address_map &map)
+{
+	// TODO: Figure out what the commented out registers are actually used for
+	map(0x06000, 0x0ffff).rw(m_exio, FUNC(namcos10_exio_device::ram_r), FUNC(namcos10_exio_device::ram_w));
+	map(0x10000, 0x10003).w(m_exio, FUNC(namcos10_exio_device::ctrl_w));
+	// map(0x18000, 0x18003).noprw();
+	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_exio_device::cpu_status_r));
+	// map(0x30000, 0x30003).nopw();
+	// map(0x40000, 0x40003).nopw();
+	// map(0x48000, 0x48003).nopw();
+	map(0x50000, 0x50003).portr("EXIO_IN1");
+	map(0x58000, 0x58003).portr("EXIO_IN2");
+	// map(0xc0000, 0xc0003).nopw();
+	// map(0xc8000, 0xc8003).nopw();
+}
+
+void namcos10_state::namcos10_map_exio(address_map &map)
+{
+	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+}
+
+void namcos10_state::namcos10_map_mgexio_inner(address_map &map)
+{
+	map(0x00000, 0x0ffff).rw(m_exio, FUNC(namcos10_mgexio_device::ram_r), FUNC(namcos10_mgexio_device::ram_w));
+	map(0x10000, 0x10003).nopr().w(m_exio, FUNC(namcos10_mgexio_device::ctrl_w));
+	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_mgexio_device::cpu_status_r));
+}
+
+void namcos10_state::namcos10_map_mgexio(address_map &map)
+{
+	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+}
+
 void namcos10_state::namcos10_map_inner(address_map &map)
 {
 	// ram?
@@ -951,36 +1085,17 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 
 	map(0xfb60000, 0xfb60003).noprw(); // ?
 	map(0xfba0000, 0xfba001f).rw(FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
-	map(0xfba0002, 0xfba0003).rw(FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
+	map(0xfba0002, 0xfba0003).rw(FUNC(namcos10_state::exio_ident_r), FUNC(namcos10_state::exio_ident_w));
 	map(0xfba0004, 0xfba0007).portr("IN1");
 	map(0xfba0008, 0xfba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
 	map(0xfba000a, 0xfba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
-
-	// TODO: Expansion I/O board registers (EXIO, etc)
-	// nflclsfb: The uploaded EXIO code seems to be be based to 0x3000 and the PC seems to be 0x3067 based on analysis.
-	// There appears to be directly shared memory between the sub CPU and main CPU.
-	// For example, 0x1fe0c066 from the main CPU appears to be the same as 0x6033 in the sub CPU's memory space.
-	// MGEXIO also appears to be have its registers in the 0x1fe00000 range
-	// map(0xfe06000, 0xfe0ffff).rw(FUNC(namcos10_state::exio_ram_r), FUNC(namcos10_state::exio_ram_w)); // seems to map directly to what the EXIO can read
-	// these are possibly related to the TMP95C061 ports
-	// map(0xfe10000, 0xfe10001).noprw(); // write only. 2 is written before uploading program code, 3 is written when program code is finished uploading
-	// map(0xfe18000, 0xfe18001).noprw(); // read/write. set to 0 before reading/writing, set to 1 when done. Lock?
-	// map(0xfe20000, 0xfe20001).noprw(); // read/write
-	// map(0xfe28000, 0xfe28001).noprw(); // read only. CPU boot status flag bit 0? bit 1 unknown
-	// map(0xfe30000, 0xfe30001).noprw(); // write only
-	// map(0xfe40000, 0xfe40001).noprw(); // write only
-	// map(0xfe48000, 0xfe48001).noprw(); // write only
-	// map(0xfe50000, 0xfe50001).noprw(); // read only
-	// map(0xfe58000, 0xfe58001).noprw(); // read only
-	// map(0xfec0000, 0xfec0001).noprw(); // write only
-	// map(0xfec8000, 0xfec8001).noprw(); // write only
 }
 
 void namcos10_state::namcos10_map(address_map &map)
 {
-	map(0x10000000, 0x1fffffff).m(FUNC(namcos10_memm_state::namcos10_map_inner));
-	map(0x90000000, 0x9fffffff).m(FUNC(namcos10_memm_state::namcos10_map_inner));
-	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_memm_state::namcos10_map_inner));
+	map(0x10000000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_inner));
+	map(0x90000000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_inner));
+	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_inner));
 }
 
 uint16_t namcos10_state::control_r(offs_t offset)
@@ -1006,34 +1121,32 @@ void namcos10_state::control_w(offs_t offset, uint16_t data)
 	// logerror("%s: control_w %d, %04x\n", machine().describe_context(), offset, data);
 }
 
-void namcos10_state::sprot_w(uint16_t data)
+void namcos10_state::exio_ident_w(uint16_t data)
 {
-	logerror("%s: sprot_w %04x\n", machine().describe_context(), data);
-	m_sprot_bit = 7;
-	m_sprot_byte = 0;
+	logerror("%s: exio_ident_w %04x\n", machine().describe_context(), data);
+	m_exio_ident_bit = 7;
+	m_exio_ident_byte = 0;
 }
 
-uint16_t namcos10_state::sprot_r()
+uint16_t namcos10_state::exio_ident_r()
 {
-	// Seems to be some kind of system configuration read in as a response to the i2c commands sent?
-	// If line 3 has 0x30/0x31 then it will try to initialize the sub CPU for EXIO causing games to hang (waiting for 0x1fe18000 to return 0?).
-	// I/O will also try to poll 0x1fe50000 and 0x1fe58000.
-	// line 3 must return 0x31 to enable JVS for nflclsfb to run
+	// 0x23 = DEV PCB (mentioned in ballpom)
+	// 0x24 = DEV PCB (mentioned in ballpom)
+	// 0x30 = EXIO PCB, has CPU and I/O
+	// 0x31 = EXIO PCB, has CPU and I/O (different pinout from 0x30, but some games like nflclsfb support both layouts)
+	// 0x32 = EXIO PCB, has no CPU but has I/O
+	// 0x33 = MGEXIO PCB
+	// 0xff = disabled
+	const uint8_t resp = m_exio ? m_exio->ident_code() : 0xff;
 
-	const static uint8_t prot[0x40] = {
-		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
-		0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51,
-		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
-	};
-	uint16_t res = m_sprot_byte >= 0x20 ? 0x3 :
-		(((prot[m_sprot_byte     ] >> m_sprot_bit) & 1) ? 1 : 0) |
-		(((prot[m_sprot_byte+0x20] >> m_sprot_bit) & 1) ? 2 : 0);
+	uint16_t res = m_exio_ident_byte >= 0x20 ? 0x3 :
+		(((resp >> m_exio_ident_bit) & 1) ? 1 : 0) |
+		(((resp >> m_exio_ident_bit) & 1) ? 2 : 0);
 
-	m_sprot_bit--;
-	if(m_sprot_bit == -1) {
-		m_sprot_bit = 7;
-		m_sprot_byte++;
+	m_exio_ident_bit--;
+	if(m_exio_ident_bit == -1) {
+		m_exio_ident_bit = 7;
+		m_exio_ident_byte++;
 	}
 	return res;
 }
@@ -1270,6 +1383,20 @@ void namcos10_memm_state::ns10_mrdrilr2(machine_config &config)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // MEM(N)
 
+void namcos10_memn_state::pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
+{
+	// Are DMA writes ever performed?
+	logerror("%s: pio_dma_write: unhandled DMA write %08x %08x\n", machine().describe_context(), n_address, n_size);
+}
+
+void namcos10_memn_state::pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
+{
+	uint16_t *ptr = reinterpret_cast<uint16_t*>(&p_n_psxram[n_address / 4]);
+	for (int32_t i = 0; i < n_size * 2; i++) {
+		ptr[i] = nand_data_r();
+	}
+}
+
 uint16_t namcos10_memn_state::nand_rnb_r()
 {
 	return m_nand_rnb_state[m_nand_device_idx];
@@ -1377,22 +1504,9 @@ void namcos10_memn_state::namcos10_memn_base(machine_config &config)
 {
 	namcos10_base(config);
 
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos10_memn_state::pio_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&namcos10_memn_state::pio_dma_write, this));
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memn_state::namcos10_memn_map);
-}
-
-void namcos10_memn_state::namcos10_exio(machine_config &config)
-{
-	TMP95C061(config, m_exio_mcu, XTAL(22'118'400)).set_disable(); // not hooked up
-}
-
-void namcos10_memn_state::namcos10_mgexio(machine_config &config)
-{
-	TMP95C061(config, m_exio_mcu, XTAL(22'118'400)).set_disable(); // not hooked up
-}
-
-void namcos10_memn_state::namcos10_exfinalio(machine_config &config)
-{
-	TMP95C061(config, m_exio_mcu, XTAL(22'118'400)).set_disable(); // not hooked up
 }
 
 void namcos10_memn_state::machine_start()
@@ -1635,6 +1749,7 @@ void namcos10_memn_state::namcos10_nand_k9f5608u0d(machine_config &config, int n
 void namcos10_memn_state::ns10_ballpom(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1653,6 +1768,7 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 void namcos10_memn_state::ns10_gahaha(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1662,6 +1778,7 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1766,6 +1883,7 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 void namcos10_memn_state::ns10_pacmball(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1831,7 +1949,7 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 void namcos10_memn_state::ns10_taiko2(machine_config &config)
 {
 	namcos10_memn_base(config);
-	namcos10_exfinalio(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1841,7 +1959,7 @@ void namcos10_memn_state::ns10_taiko2(machine_config &config)
 void namcos10_memn_state::ns10_taiko3(machine_config &config)
 {
 	namcos10_memn_base(config);
-	namcos10_exfinalio(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1851,7 +1969,7 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 void namcos10_memn_state::ns10_taiko4(machine_config &config)
 {
 	namcos10_memn_base(config);
-	namcos10_exfinalio(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1871,7 +1989,7 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 void namcos10_memn_state::ns10_taiko6(machine_config &config)
 {
 	namcos10_memn_base(config);
-	namcos10_exfinalio(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
@@ -1890,43 +2008,109 @@ void namcos10_memn_state::ns10_unks10md(machine_config &config)
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // MEM(P3)
 
-void namcos10_memp3_state::nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t start_page, int len)
+void namcos10_memp3_state::firmware_write_w(uint16_t data)
 {
-	for (int page = start_page; page < start_page + len; page++)
-	{
-		int address = page * 0x210;
-
-		for (int i = 0; i < 0x200; i += 2) {
-			uint16_t data = nand_base[address + i + 1] | (nand_base[address + i] << 8);
-			*dst = m_unscrambler(data ^ 0xaaaa);
-			dst++;
-		}
+	if (data == 1) {
+		// This should happen in the device itself but it would require calling device_reset on the MCU
+		auto pc = ((m_mcu_ram[0x7fff02 / 2] << 16) | m_mcu_ram[0x7fff00 / 2]) & 0xffffff;
+		m_memp3_mcu->set_state_int(TLCS900_PC, pc);
+		m_memp3_mcu->resume(SUSPEND_REASON_HALT);
 	}
 }
 
-void namcos10_memp3_state::memp3_driver_init()
+void namcos10_memp3_state::ram_bank_w(uint16_t data)
 {
-	uint8_t *bios = (uint8_t *)memregion("maincpu:rom")->base();
-	uint8_t *nand_base = (uint8_t *)memregion("nand0")->base();
+	m_mcu_bank = data;
+}
 
-	nand_copy(nand_base, (uint16_t *)bios, 0x40, 0xe0);
-	nand_copy(nand_base, (uint16_t *)(bios + 0x0020000), 0x120, 0x1f00);
+uint16_t namcos10_memp3_state::unk_status1_r()
+{
+	// Can't upload CPU program unless this is 1
+	return 1;
+}
+
+uint16_t namcos10_memp3_state::ram_r(offs_t offset)
+{
+	return m_mcu_ram[m_mcu_bank * 0x10000 + offset];
+}
+
+void namcos10_memp3_state::ram_w(offs_t offset, uint16_t data)
+{
+	m_mcu_ram[m_mcu_bank * 0x10000 + offset] = data;
+}
+
+uint16_t namcos10_memp3_state::unk_status2_r()
+{
+	// Some kind of status flag.
+	// Game code loops until this is non-zero before writing to data to f30000c/320000.
+	// Possibly related to MP3 decoder?
+	return 1;
+}
+
+uint16_t namcos10_memp3_state::analog_io_r(offs_t offset)
+{
+	return m_p3_analog[offset].read_safe(0);
+}
+
+void namcos10_memp3_state::namcos10_memp3_map_inner(address_map &map)
+{
+	map(0xf300000, 0xf300001).w(FUNC(namcos10_memp3_state::firmware_write_w));
+	// 1f300004 unk
+	map(0xf300006, 0xf300007).r(FUNC(namcos10_memp3_state::unk_status2_r));
+	map(0xf30000c, 0xf30000d).w(FUNC(namcos10_memp3_state::ram_bank_w));
+	map(0xf30000e, 0xf30000f).r(FUNC(namcos10_memp3_state::unk_status1_r));
+	map(0xf320000, 0xf33ffff).rw(FUNC(namcos10_memp3_state::ram_r), FUNC(namcos10_memp3_state::ram_w));
+	map(0xf33fff0, 0xf33fff7).r(FUNC(namcos10_memp3_state::analog_io_r));
+}
+
+void namcos10_memp3_state::namcos10_memp3_map(address_map &map)
+{
+	namcos10_memn_map(map);
+
+	map(0x10000000, 0x1fffffff).m(FUNC(namcos10_memp3_state::namcos10_memp3_map_inner));
+	map(0x90000000, 0x9fffffff).m(FUNC(namcos10_memp3_state::namcos10_memp3_map_inner));
+	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_memp3_state::namcos10_memp3_map_inner));
+}
+
+void namcos10_memp3_state::mcu_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).ram().mirror(0x800000).share(m_mcu_ram);
 }
 
 void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 {
 	namcos10_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::namcos10_memn_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos10_memp3_state::pio_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&namcos10_memp3_state::pio_dma_read, this));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::namcos10_memp3_map);
 
-	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400)).set_disable(); // not hooked up
+	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400));
+	m_memp3_mcu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::mcu_map);
+
 	// LC82310 16.9344MHz
+}
+
+void namcos10_memp3_state::machine_start()
+{
+	namcos10_memn_state::machine_start();
+
+	save_item(NAME(m_mcu_bank));
+}
+
+void namcos10_memp3_state::machine_reset()
+{
+	namcos10_memn_state::machine_reset();
+
+	m_mcu_bank = 0;
+
+	m_memp3_mcu->suspend(SUSPEND_REASON_HALT, 1);
 }
 
 void namcos10_memp3_state::init_g13jnc()
 {
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x7, 0x4, 0x5, 0x1, 0x3, 0x0, 0x2); };
-	memp3_driver_init();
+	memn_driver_init();
 }
 
 void namcos10_memp3_state::ns10_g13jnc(machine_config &config)
@@ -1985,6 +2169,12 @@ static INPUT_PORTS_START( namcos10 )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Test SW
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
+	PORT_START("EXIO_IN1")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXIO_IN2")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mrdrilr2 )
@@ -2041,20 +2231,145 @@ static INPUT_PORTS_START( nflclsfb )
 	PORT_INCLUDE(namcos10)
 
 	// TODO: Trackball (EXIO)
-	// TODO: IN1 controls, can't find all inputs
-	// 0x00000080 right side decide
-	// 0x00000008 select up
-	// 0x00000004 select down
-	// 0x00000002 left side choose l
-	// 0x00000001 left side choose r
-	// 0x00000010 enter
-	// 0x00000020 start 1p
-	// 0x00000040 start 2p
-	// 0x00008000 left side decide
-	// 0x00000200 left side choose r
-	// 0x00000100 right side choose r
-	// 0x00002000 start 3p
-	// 0x00004000 start 4p
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fff1c00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Right Side Choose L")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Left Side Choose L")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Enter")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("1P Start")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(2) PORT_NAME("2P Start")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Left Side Decide")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Side Choose R")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Side Choose R")
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(3) PORT_NAME("3P Start")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(4) PORT_NAME("4P Start")
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Right Side Decide")
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+
+	PORT_MODIFY("EXIO_IN1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("1P PASS 1")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("2P PASS 1")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("3P PASS 1")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("4P PASS 1")
+
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("1P PASS 2")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("2P PASS 2")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("3P PASS 2")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("4P PASS 2")
+
+	PORT_MODIFY("EXIO_IN2")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gahaha )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fff7c60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Enter")
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+
+	PORT_START("ANALOG1")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P1 Left X") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
+
+	PORT_START("ANALOG2")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P1 Left Y") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
+
+	PORT_START("ANALOG3")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P1 Right X") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
+
+	PORT_START("ANALOG4")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P1 Right Y") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
+
+	PORT_START("ANALOG5")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P2 Left X") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
+
+	PORT_START("ANALOG6")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P2 Left Y") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
+
+	PORT_START("ANALOG7")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P2 Right X") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
+
+	PORT_START("ANALOG8")
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P2 Right Y") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sekaikh )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fffffe3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gjspace )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( g13jnc )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x071f0043, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down Select")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up Select")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Trigger")
+
+	// If the player is 10cm or closer then this will be on.
+	// For playability, make it so that the player has to explicity toggle the scope
+	// to be off to simulate stepping away from the scope instead of always having to
+	// hold the scope sensor button
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scope Sensor")
+
+	PORT_MODIFY("SYSTEM")
+	// No idea what DIPSW 1 (0x80) is doing but it causes the game to freeze
+	PORT_DIPNAME( 0x01, 0x01, "Show Crosshair" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(0x00, DEF_STR( On ))
+
+	PORT_START("P3_ANALOG1")
+	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1) PORT_REVERSE
+
+	PORT_START("P3_ANALOG2")
+	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -2319,10 +2634,10 @@ ROM_START( pacmball )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(7b6f814d) SHA1(728167866d9350150b5fd9ebcf8fe7280efedb91) )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(7b6f814d) SHA1(728167866d9350150b5fd9ebcf8fe7280efedb91) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(f79d7199) SHA1(4ef9b758ee778e12f7fef717e063597299fb8219) )
 ROM_END
 
 ROM_START( panikuru )
@@ -2371,7 +2686,7 @@ ROM_START( sekaikh )
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(65c4a8b4) SHA1(c7fefc32604bb47519a05cdb6c8b0f50034e0efd) )
 
-	ROM_REGION( 0x8000, "mgexio", 0 )
+	ROM_REGION16_BE( 0x8000, "exio:nvram", 0 )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
@@ -2385,7 +2700,7 @@ ROM_START( sekaikha )
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(7cb38ece) SHA1(e21fbc9ff09ca51e1857e32318b95107ae4b3f0b) )
 
-	ROM_REGION( 0x8000, "mgexio", 0 )
+	ROM_REGION16_BE( 0x8000, "exio:nvram", 0 )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
@@ -2538,44 +2853,44 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", 0 )
-GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", 0 )
-GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", 0 )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    namcos10, namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_NOT_WORKING )
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gjspace,   0,        ns10_gjspace,   namcos10, namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", 0 )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,   namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,  namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", 0 )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", 0 )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
-GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", 0 )
-GAME( 2002, sugorotic, 0,        ns10_sugorotic, namcos10, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0 )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
-GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING )
-GAME( 2004, sekaikh,   0,        ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING )
-GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING )
-GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
-GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
-GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
+GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotic, 0,        ns10_sugorotic, namcos10, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikh,   0,        ns10_sekaikh,   sekaikh,  namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
+GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10, namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10, namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10, namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10, namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10, namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10, namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
-GAME( 2001, g13jnc,    0,        ns10_g13jnc,    namcos10, namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING )
+GAME( 2001, g13jnc,    0,        ns10_g13jnc,    g13jnc,   namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )
 
 // Unknown
-GAME( 200?, unks10md,  0,        ns10_unks10md,  namcos10, namcos10_memn_state, init_unks10md,  ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 200?, unks10md,  0,        ns10_unks10md,  namcos10, namcos10_memn_state, init_unks10md,  ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

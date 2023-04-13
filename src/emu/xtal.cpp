@@ -241,6 +241,7 @@ const double XTAL::known_xtals[] = {
 	 14'742'800, /* 14.7428_MHz_XTAL       ADM 23 */
 	 14'745'000, /* 14.745_MHz_XTAL        Synertek KTM-3 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
+	 14'746'000, /* 14.746_MHz_XTAL        Namco System 10 MGEXIO */
 	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
 	 14'976'000, /* 14.976_MHz_XTAL        CIT-101 80-column display clock */
