@@ -272,9 +272,9 @@ msx_cart_synthesizer_device::msx_cart_synthesizer_device(const machine_config &m
 
 void msx_cart_synthesizer_device::device_add_mconfig(machine_config &config)
 {
-	DAC_8BIT_R2R(config, m_dac, 0);
+	DAC_8BIT_R2R(config, m_dac, 0); // unknown DAC
 	if (parent_slot())
-		m_dac->add_route(ALL_OUTPUTS, soundin(), 0.3, AUTO_ALLOC_INPUT, 0); // unknown DAC
+		m_dac->add_route(ALL_OUTPUTS, soundin(), 0.3, AUTO_ALLOC_INPUT, 0);
 }
 
 image_init_result msx_cart_synthesizer_device::initialize_cartridge(std::string &message)
