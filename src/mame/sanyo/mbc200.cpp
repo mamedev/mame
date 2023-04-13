@@ -40,6 +40,7 @@ TODO:
            a MEMORY ERROR. CP/M now loads.
 
 2016-07-16 Added keyboard and sound.
+2023-04-13 Floppy drive selection fix
 
 ****************************************************************************/
 
@@ -78,10 +79,7 @@ public:
 		, m_beep(*this, "beeper")
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
+		, m_floppy(*this, "fdc:%u", 0)
 	{ }
 
 	void mbc200(machine_config &config);
@@ -116,10 +114,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mb8876_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 };
 
 
@@ -146,13 +141,9 @@ void mbc200_state::pm_portb_w(u8 data)
 
 	// The BIOS supports up tp 4 drives, (2 internal + 2 external)
 	// E: and F: are virtual swaps of A: and B:
-	switch ((data & 0x70)>>4)
-	{
-	case 0: floppy = m_floppy0->get_device(); break;
-	case 1: floppy = m_floppy1->get_device(); break;
-	case 2: floppy = m_floppy2->get_device(); break;
-	case 3: floppy = m_floppy3->get_device(); break;
-	}
+	u8 tmp = (data & 0x70)>>4;
+	if (tmp < 4)
+		floppy = m_floppy[tmp]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -360,10 +351,11 @@ void mbc200_state::mbc200(machine_config &config)
 	I8251(config, "uart2", 0); // INS8251A
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
-	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	
+	FLOPPY_CONNECTOR(config,  m_floppy[0], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config,  m_floppy[1], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config,  m_floppy[2], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config,  m_floppy[3], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
