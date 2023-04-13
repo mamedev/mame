@@ -41,7 +41,7 @@ const tiny_rom_entry *msx_cart_easispeech_device::device_rom_region() const
 
 void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 {
-	SP0256(config, m_speech, DERIVED_CLOCK(1, 1)); // frequency unknown, assuming the system clock is used.
+	SP0256(config, m_speech, 3120000); // frequency unknown (R/C osc)
 	if (parent_slot())
 		m_speech->add_route(ALL_OUTPUTS, soundin(), 1.0);
 }

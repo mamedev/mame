@@ -114,10 +114,8 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 		m_rw[3](0, BIT(m_control, 4));
 	}
 
-	// During reads, the first NMI pulse is supressed to give the chip a
+	// During reads, the first NMI pulse is suppressed to give the chip a
 	// cycle to write.
-
-
 	if (m_timer_state && !m_read_stretch)
 	{
 		set_nmi(ASSERT_LINE);
@@ -213,7 +211,6 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 		{
 			m_read_stretch = false;
 		}
-
 
 		uint8_t num_shifts = (m_control & 0xe0) >> 5;
 		uint8_t divisor = 1 << num_shifts;
