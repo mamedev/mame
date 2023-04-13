@@ -125,7 +125,7 @@ void mbc200_state::main_mem(address_map &map)
 
 void mbc200_state::p1_portc_w(u8 data)
 {
-	m_speaker->level_w(BIT(data,4)); // used by beep command in basic
+	m_speaker->level_w(BIT(data, 4)); // used by beep command in basic
 }
 
 void mbc200_state::pm_porta_w(u8 data)
@@ -137,13 +137,12 @@ void mbc200_state::pm_porta_w(u8 data)
 
 void mbc200_state::pm_portb_w(u8 data)
 {
-	floppy_image_device *floppy = nullptr;
-
 	// The BIOS supports up tp 4 drives, (2 internal + 2 external)
 	// E: and F: are virtual swaps of A: and B:
-	u8 tmp = (data & 0x70)>>4;
-	if (tmp < 4)
-		floppy = m_floppy[tmp]->get_device();
+	u8 const drivenum = (data & 0x70) >> 4;
+	floppy_image_device *floppy = nullptr;
+	if (drivenum < 4)
+		floppy = m_floppy[drivenum]->get_device();
 
 	m_fdc->set_floppy(floppy);
 

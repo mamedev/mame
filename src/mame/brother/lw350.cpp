@@ -193,9 +193,9 @@ private:
 		map(0x00000, 0x01fff).rom();
 		map(0x02000, 0x05fff).ram();
 		map(0x06000, 0x3ffff).rom();
-		map(0x40000, 0x5ffff).bankr("rom");
+		map(0x40000, 0x5ffff).bankr(rombank);
 		map(0x60000, 0x617ff).ram();
-		map(0x61800, 0x63fff).ram().share("vram");
+		map(0x61800, 0x63fff).ram().share(vram);
 		map(0x64000, 0x71fff).ram();
 		map(0x72000, 0x75fff).rom().region("maincpu", 0x2000); // => ROM 0x02000-0x05fff
 		map(0x76000, 0x7ffff).ram();
@@ -209,8 +209,9 @@ private:
 
 		// floppy
 		map(0x78, 0x78).rw(fdc, FUNC(upd765a_device::msr_r), FUNC(hd63266f_device::abort_w));
-		map(0x79, 0x79).lrw8([this](){ return (fdc_drq ? fdc->dma_r() : fdc->fifo_r()); }, "fdc_r",
-				[this](u8 data) { fdc_drq ? fdc->dma_w(data) : fdc->fifo_w(data); }, "fdc_w");
+		map(0x79, 0x79).lrw8(
+				[this] () { return (fdc_drq ? fdc->dma_r() : fdc->fifo_r()); }, "fdc_r",
+				[this] (u8 data) { fdc_drq ? fdc->dma_w(data) : fdc->fifo_w(data); }, "fdc_w");
 		map(0x7a, 0x7a).r(fdc, FUNC(hd63266f_device::extstat_r));
 		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
 		map(0x90, 0x90).r(FUNC(lw350_state::io_90_r));
@@ -663,11 +664,11 @@ void lw450_state::map_program(address_map &map)
 	map(0x00000, 0x01fff).rom();
 	map(0x02000, 0x05fff).ram();
 	map(0x06000, 0x3ffff).rom();
-	map(0x40000, 0x5ffff).bankr("dictionary");
+	map(0x40000, 0x5ffff).bankr(rombank);
 	map(0x62000, 0x71fff).ram(); // D-RAM UPPER/LOWER
 	map(0x72000, 0x75fff).r(FUNC(lw450_state::rom72000_r)); // => ROM 0x02000-0x05fff
 	map(0x78000, 0x7ffff).ram(); // PS-RAM
-	map(0xf8000, 0xfffff).ram().share("vram"); // VRAM
+	map(0xf8000, 0xfffff).ram().share(vram); // VRAM
 	// text vram @ F8000-F8C80 (2*80 bytes/line)
 	// font @ FC000-FD000 pitch 16
 }

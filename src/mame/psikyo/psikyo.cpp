@@ -1174,7 +1174,7 @@ void psikyo_state::s1945(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(14.3181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 223);  // Approximately 59.923Hz, 39 HSync pulses in VBlank
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 223);  // Approximately 59.923Hz, 39 HSync pulses in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 

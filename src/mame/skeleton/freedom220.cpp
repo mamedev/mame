@@ -90,6 +90,9 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_charram;
 	required_shared_ptr_array<uint8_t, 2> m_attrram;
 
+	uint8_t m_current_line;
+	bool m_nmi_enabled;
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -101,9 +104,7 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void nmi_control_w(uint8_t data);
-
-	uint8_t m_current_line;
-	bool m_nmi_enabled;
+	void nmi_w(int state);
 };
 
 

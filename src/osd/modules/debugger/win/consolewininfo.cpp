@@ -556,9 +556,11 @@ void consolewin_info::open_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileOpenDialog,
 			true,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.load(selection);
+				auto [err, message] = device.load(selection);
+				if (err)
+					machine().debugger().console().printf("Error mounting image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 
@@ -570,9 +572,11 @@ void consolewin_info::create_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileSaveDialog,
 			false,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				auto [err, message] = device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				if (err)
+					machine().debugger().console().printf("Error creating image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 
