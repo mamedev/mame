@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "msm5232.h"
 
-#define CLOCK_RATE_DIVIDER 16
+constexpr int CLOCK_RATE_DIVIDER = 16;
 
-#define R51 1400    /* charge resistance */
-#define R52 28750   /* discharge resistance */
+constexpr int R51 = 1400;    /* charge resistance */
+constexpr int R52 = 28750;   /* discharge resistance */
 
 /*
     OKI MSM5232RS
@@ -212,10 +212,6 @@ static FILE *sample[9];
  * external capacitor is discharged through R52
  * in approx. 5*28750 * 0.39e-6
  */
-
-
-//#define R51 1400    /* charge resistance */
-//#define R52 28750   /* discharge resistance */
 
 #if 0
 /*
