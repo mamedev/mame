@@ -24417,6 +24417,12 @@ adm31                           //
 @source:learsiegler/adm36.cpp
 adm36                           //
 
+@source:liberty/freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
+@source:liberty/freedom220.cpp
+free220                         // (c) 1984 Liberty Electronics
+
 @source:lsi/m3.cpp
 m3                              //
 
@@ -40923,12 +40929,6 @@ fc100                           //
 
 @source:skeleton/fk1.cpp
 fk1                             //
-
-@source:skeleton/freedom120.cpp
-free120                         // (c) 1993 Liberty Electronics
-
-@source:skeleton/freedom220.cpp
-free220                         // (c) 1984 Liberty Electronics
 
 @source:skeleton/fs3216.cpp
 fs3216                          //
