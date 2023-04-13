@@ -39,17 +39,18 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "video/scn2674.h"
+
 #include "emupal.h"
 #include "screen.h"
 
 
 namespace {
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -104,7 +105,6 @@ private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void nmi_control_w(uint8_t data);
-	void nmi_w(int state);
 };
 
 
