@@ -32,8 +32,9 @@
     - Expansion slot
 
     TODO:
-    - Fix CRT controller hookup
-	- Keyboard
+    - Verify CRT controller hookup
+    - Cursor
+    - Keyboard
 
 ****************************************************************************/
 
@@ -68,6 +69,7 @@ public:
 		m_translate(*this, "translate"),
 		m_charram(*this, "charram%u", 0U),
 		m_attrram(*this, "attrram%u", 0U),
+		m_current_line(0),
 		m_nmi_enabled(false)
 	{ }
 
@@ -94,11 +96,13 @@ private:
 	void row_buffer_map(address_map &map);
 	uint8_t mbc_char_r(offs_t offset);
 	uint8_t mbc_attr_r(offs_t offset);
+	void avdc_intr_w(int state);
+	void avdc_breq_w(int state);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void nmi_control_w(uint8_t data);
-	void nmi_w(int state);
 
+	uint8_t m_current_line;
 	bool m_nmi_enabled;
 };
 
@@ -142,27 +146,66 @@ void freedom220_state::row_buffer_map(address_map &map)
 
 uint8_t freedom220_state::mbc_char_r(offs_t offset)
 {
-	logerror("read char offset %04x\n", offset);
-	return m_charram[0][offset & 0x7ff];
+	if (offset >= 0x800)
+		logerror("%d read char offset %04x\n", m_current_line, offset);
+
+	return m_charram[0][(m_current_line * 0x50 + offset) & 0x7ff];
 }
 
 uint8_t freedom220_state::mbc_attr_r(offs_t offset)
 {
-	logerror("read attr offset %04x\n", offset);
-	return m_attrram[0][offset & 0x7ff];
+	return m_attrram[0][(m_current_line * 0x50 + offset) & 0x7ff];
+}
+
+void freedom220_state::avdc_intr_w(int state)
+{
+	if (state && m_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+void freedom220_state::avdc_breq_w(int state)
+{
+	if (state)
+	{
+		if (m_screen->vblank())
+			m_current_line = 0;
+		else
+			m_current_line++;
+	}
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
 {
+	// 765-----  unknown
+	// ---4----  normal/bold
+	// ----3---  underline
+	// -----2--  invert
+	// ------1-  blink
+	// -------0  unknown
+
+	const pen_t *const pen = m_palette->pens();
+
 	// translation table
 	const int table = 0; // 0-f
 	charcode = m_translate[(table << 8) | charcode];
 
 	uint8_t data = m_chargen[charcode << 4 | linecount];
-	const pen_t *const pen = m_palette->pens();
+
+	if (ul && (BIT(attrcode, 3)))
+		data = 0xff;
+
+	if (blink && (BIT(attrcode, 1)))
+		data = 0x00;
+
+	if (BIT(attrcode, 2))
+		data = ~data;
+
+	// TODO
+	if (0 && cursor)
+		data = ~data;
 
 	// foreground/background colors
-	rgb_t fg = pen[1];
+	rgb_t fg = BIT(attrcode, 4) ? pen[1] : pen[2];
 	rgb_t bg = pen[0];
 
 	// draw 8 pixels of the character
@@ -198,15 +241,10 @@ void freedom220_state::nmi_control_w(uint8_t data)
 	m_nmi_enabled = true;
 }
 
-void freedom220_state::nmi_w(int state)
-{
-	if (state && m_nmi_enabled)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 void freedom220_state::machine_start()
 {
 	// register for save states
+	save_item(NAME(m_current_line));
 	save_item(NAME(m_nmi_enabled));
 }
 
@@ -230,19 +268,19 @@ void freedom220_state::freedom220(machine_config &config)
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16000000, 768, 0, 640, 321, 0, 300); // clock unverified
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
-	
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
 	SCN2674(config, m_avdc, 16000000 / 8); // clock unverified
-	//m_avdc->intr_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // ?
+	m_avdc->intr_callback().set(FUNC(freedom220_state::avdc_intr_w));
+	m_avdc->breq_callback().set(FUNC(freedom220_state::avdc_breq_w));
 	m_avdc->set_screen(m_screen);
 	m_avdc->set_character_width(8); // unverified
 	m_avdc->set_addrmap(0, &freedom220_state::row_buffer_map);
 	m_avdc->set_addrmap(1, &freedom220_state::row_buffer_map);
 	m_avdc->set_display_callback(FUNC(freedom220_state::draw_character));
-	m_avdc->breq_callback().set(FUNC(freedom220_state::nmi_w));
 	m_avdc->mbc_char_callback().set(FUNC(freedom220_state::mbc_char_r));
 	m_avdc->mbc_attr_callback().set(FUNC(freedom220_state::mbc_attr_r));
 
