@@ -43,7 +43,7 @@ void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 {
 	SP0256(config, m_speech, DERIVED_CLOCK(1, 1)); // frequency unknown, assuming the system clock is used.
 	if (parent_slot())
-		m_speech->add_route(ALL_OUTPUTS, soundin(), 1.0, AUTO_ALLOC_INPUT, 0);
+		m_speech->add_route(ALL_OUTPUTS, soundin(), 1.0);
 }
 
 image_init_result msx_cart_easispeech_device::initialize_cartridge(std::string &message)
