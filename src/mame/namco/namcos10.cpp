@@ -1656,7 +1656,7 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
-	// GAHAHA_DECRYPTER(config, m_decrypter, 0);
+	GAHAHA_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_gahaha2(machine_config &config)
@@ -1769,7 +1769,7 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
-	// PACMBALL_DECRYPTER(config, m_decrypter, 0);
+	PACMBALL_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_panikuru(machine_config &config)
@@ -1806,7 +1806,7 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
-	// SEKAIKH_DECRYPTER(config, m_decrypter, 0);
+	SEKAIKH_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
@@ -1935,7 +1935,7 @@ void namcos10_memp3_state::ns10_g13jnc(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 6);
 
 	/* decrypter device (CPLD in hardware?) */
-	// G13JNC_DECRYPTER(config, m_decrypter, 0);
+	G13JNC_DECRYPTER(config, m_decrypter, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2543,7 +2543,7 @@ GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, 
 GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", 0 )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    namcos10, namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, gahaha,    0,        ns10_gahaha,    namcos10, namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_NOT_WORKING )
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
@@ -2560,10 +2560,10 @@ GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, 
 GAME( 2002, sugorotic, 0,        ns10_sugorotic, namcos10, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", 0 )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING )
-GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, sekaikh,   0,        ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_CONTROLS ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
+GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING )
+GAME( 2004, sekaikh,   0,        ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING )
+GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING )
+GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
@@ -2575,7 +2575,7 @@ GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, 
 GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
-GAME( 2001, g13jnc,    0,        ns10_g13jnc,    namcos10, namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, g13jnc,    0,        ns10_g13jnc,    namcos10, namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING )
 
 // Unknown
 GAME( 200?, unks10md,  0,        ns10_unks10md,  namcos10, namcos10_memn_state, init_unks10md,  ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
