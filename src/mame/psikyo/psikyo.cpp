@@ -30,8 +30,7 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 To Do:
 
 - All games uses PORT_VBLANK and legacy screen parameters (which is already
-  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
-  or 59.90 Hz).
+  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30).
   The most blunt examples of something being wrong with timings are with
   Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
   doesn't sport anything like that.
@@ -1623,7 +1622,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
