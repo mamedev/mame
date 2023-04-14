@@ -1752,9 +1752,8 @@ OSC:    16.000MHz
 SYNCS:  HSync 15.700kHz, VSync 59.923Hz
         HSync most likely derived from 14.3181MHz OSC (divided by 912)
         262 lines per frame consisting of:
-          - Visible lines: 223
-          - Vertical Back/Front Porch: 16 lines each
-          - VSync pulse: 7 lines
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 Chips:  PS2001B
         PS3103
         PS3204
