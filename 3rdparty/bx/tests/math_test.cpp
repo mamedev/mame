@@ -268,6 +268,15 @@ void mtxCheck(const float* _a, const float* _b)
 	}
 }
 
+TEST_CASE("vec3", "")
+{
+	bx::Vec3 normalized = bx::normalize({0.0f, 1.0f, 0.0f});
+	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.0f) );
+
+	float length = bx::length(normalized);
+	REQUIRE(bx::isEqual(length, 1.0f, 0.0f) );
+}
+
 TEST_CASE("quaternion", "")
 {
 	float mtxQ[16];
