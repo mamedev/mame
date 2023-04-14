@@ -18,10 +18,10 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 - no output PLA
 
 TODO:
-- row(pc) order is unknown
 - each opcode is 4 cycles instead of 6
-- does it have CL (call latch)
-- everything else
+- LCD refresh timing is unknown
+- add timer
+- add halt opcode
 
 */
 
@@ -36,7 +36,8 @@ DEFINE_DEVICE_TYPE(SMC1112, smc1112_cpu_device, "smc1112", "Suwa Seikosha SMC111
 
 
 smc1102_cpu_device::smc1102_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
-	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map),
+	m_write_segs(*this)
 { }
 
 smc1102_cpu_device::smc1102_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -59,6 +60,58 @@ std::unique_ptr<util::disasm_interface> smc1102_cpu_device::create_disassembler(
 void smc1102_cpu_device::device_start()
 {
 	tms1100_cpu_device::device_start();
+
+	m_write_segs.resolve_safe();
+
+	// zerofill
+	memset(m_lcd_ram, 0, sizeof(m_lcd_ram));
+	m_lcd_sr = 0;
+	m_inten = false;
+	m_selin = 0;
+	m_k_line = false;
+
+	memset(m_stack, 0, sizeof(m_stack));
+	m_sp = 0;
+	m_pb_stack = 0;
+	m_cb_stack = 0;
+	m_x_stack = 0;
+	m_y_stack = 0;
+	m_s_stack = 0;
+
+	// register for savestates
+	save_item(NAME(m_lcd_ram));
+	save_item(NAME(m_lcd_sr));
+	save_item(NAME(m_inten));
+	save_item(NAME(m_selin));
+	save_item(NAME(m_k_line));
+
+	save_item(NAME(m_stack));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_pb_stack));
+	save_item(NAME(m_cb_stack));
+	save_item(NAME(m_x_stack));
+	save_item(NAME(m_y_stack));
+	save_item(NAME(m_s_stack));
+}
+
+void smc1102_cpu_device::device_reset()
+{
+	tms1100_cpu_device::device_reset();
+
+	m_inten = false;
+	m_selin = 0;
+
+	// changed/added fixed instructions (mostly handled in op_extra)
+	m_fixed_decode[0x0a] = F_EXTRA;
+	m_fixed_decode[0x71] = F_EXTRA;
+	m_fixed_decode[0x74] = F_EXTRA;
+	m_fixed_decode[0x75] = F_EXTRA;
+	m_fixed_decode[0x76] = F_RETN;
+	m_fixed_decode[0x78] = F_EXTRA;
+	m_fixed_decode[0x7b] = F_EXTRA;
+
+	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA;
+	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA;
 }
 
 u32 smc1102_cpu_device::decode_micro(offs_t offset)
@@ -100,48 +153,127 @@ u32 smc1102_cpu_device::decode_micro(offs_t offset)
 	return decode;
 }
 
-void smc1102_cpu_device::device_reset()
+
+// interrupt/timer
+void smc1102_cpu_device::execute_set_input(int line, int state)
 {
-	tms1100_cpu_device::device_reset();
+	switch (line)
+	{
+		case SMC1102_INPUT_LINE_K:
+			m_k_line = bool(state);
+			break;
 
-	// changed/added fixed instructions (mostly handled in op_extra)
-	m_fixed_decode[0x0a] = F_EXTRA;
-	m_fixed_decode[0x71] = F_EXTRA;
-	m_fixed_decode[0x74] = F_EXTRA;
-	m_fixed_decode[0x75] = F_EXTRA;
-	m_fixed_decode[0x76] = F_RETN;
-	m_fixed_decode[0x78] = F_EXTRA;
-	m_fixed_decode[0x7b] = F_EXTRA;
+		default:
+			break;
+	}
+}
 
-	m_fixed_decode[0x72] = m_fixed_decode[0x73] = F_EXTRA;
-	m_fixed_decode[0x7c] = m_fixed_decode[0x7d] = F_EXTRA;
+void smc1102_cpu_device::read_opcode()
+{
+	// return from interrupt
+	if (m_opcode == 0x76)
+	{
+		// restore registers
+		m_pb = m_pb_stack;
+		m_cb = m_cb_stack;
+		m_x = m_x_stack;
+		m_y = m_y_stack;
+		m_status = m_s_stack;
+	}
+
+	// check interrupts (blocked after INTEN)
+	if (m_inten && m_opcode != 0x74)
+	{
+		bool taken = (m_selin & 2) ? false : m_k_line;
+
+		if (taken)
+		{
+			interrupt();
+			return;
+		}
+	}
+
+	tms1100_cpu_device::read_opcode();
+}
+
+void smc1102_cpu_device::interrupt()
+{
+	standard_irq_callback(0, m_rom_address);
+
+	// save registers
+	m_pb_stack = m_pb;
+	m_cb_stack = m_cb;
+	m_x_stack = m_x;
+	m_y_stack = m_y;
+	m_s_stack = m_status;
+
+	// insert CALL to 0 on page 14
+	m_opcode = 0xc0;
+	m_c4 = 0;
+	m_fixed = m_fixed_decode[m_opcode];
+	m_micro = m_micro_decode[m_opcode];
+
+	m_pb = 0xe;
+	m_cb = 0;
+	m_status = 1;
+	m_inten = false;
 }
 
 
 // opcode deviations
+void smc1102_cpu_device::op_call()
+{
+	// CALL: call subroutine
+	if (!m_status)
+		return;
+
+	m_stack[m_sp] = m_ca << 10 | m_pa << 6 | m_pc;
+	m_sp = (m_sp + 1) % m_stack_levels;
+
+	m_pc = m_opcode & m_pc_mask;
+	m_pa = m_pb;
+	m_ca = m_cb;
+}
+
+void smc1102_cpu_device::op_retn()
+{
+	// RETN: return from subroutine
+	m_sp = (m_stack_levels + m_sp - 1) % m_stack_levels;
+
+	m_pc = m_stack[m_sp] & m_pc_mask;
+	m_pa = m_pb = m_stack[m_sp] >> 6 & 0xf;
+	m_ca = m_stack[m_sp] >> 10 & 1; // not CB
+}
+
 void smc1102_cpu_device::op_tasr()
 {
 	// TASR: transfer A to LCD S/R
+	m_lcd_sr = m_lcd_sr << 4 | m_a;
 }
 
 void smc1102_cpu_device::op_tsg()
 {
 	// TSG: transfer LCD S/R to RAM
+	m_lcd_ram[m_opcode & 3] = m_lcd_sr;
+	m_write_segs(m_opcode & 3, m_lcd_sr);
 }
 
 void smc1102_cpu_device::op_intdis()
 {
 	// INTDIS: disable interrupt
+	m_inten = false;
 }
 
 void smc1102_cpu_device::op_inten()
 {
 	// INTEN: enable interrupt after next instruction
+	m_inten = true;
 }
 
 void smc1102_cpu_device::op_selin()
 {
 	// SELIN: select interrupt
+	m_selin = m_a & 3;
 }
 
 void smc1102_cpu_device::op_tmset()

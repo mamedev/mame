@@ -13,6 +13,11 @@
 
 #include "tms1100.h"
 
+enum
+{
+	SMC1102_INPUT_LINE_K = 0
+};
+
 
 // pinout reference (brief)
 
@@ -40,26 +45,36 @@ class smc1102_cpu_device : public tms1100_cpu_device
 public:
 	smc1102_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// LCD segment outputs: COM pins in offset, D pins in data
+	auto write_segs() { return m_write_segs.bind(); }
+
 protected:
 	smc1102_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map);
 
 	// overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
 	virtual void device_add_mconfig(machine_config &config) override { }
+
+	virtual u32 execute_input_lines() const noexcept override { return 1; }
+	virtual void execute_set_input(int line, int state) override;
+
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 decode_micro(offs_t offset) override;
 
+	virtual void read_opcode() override;
+	void interrupt();
 	virtual void write_o_reg(u8 index) override { } // no O pins
+
+	virtual void op_extra() override;
+	virtual void op_retn() override;
+	virtual void op_call() override;
 
 	virtual void op_setr() override { tms1k_base_device::op_setr(); } // no anomaly with MSB of X register
 	virtual void op_rstr() override { tms1k_base_device::op_rstr(); } // "
 
-	virtual void op_extra() override;
-
-private:
+	// extra opcodes
 	void op_halt();
 	void op_intdis();
 	void op_inten();
@@ -67,6 +82,24 @@ private:
 	void op_tasr();
 	void op_tmset();
 	void op_tsg();
+
+	devcb_write32 m_write_segs;
+
+	// internal state
+	u32 m_lcd_ram[4];
+	u32 m_lcd_sr;
+	bool m_inten;
+	u8 m_selin;
+	bool m_k_line;
+
+	// stack
+	u16 m_stack[4];
+	u8 m_sp;
+	u8 m_pb_stack;
+	u8 m_cb_stack;
+	u8 m_x_stack;
+	u8 m_y_stack;
+	u8 m_s_stack;
 };
 
 class smc1112_cpu_device : public smc1102_cpu_device

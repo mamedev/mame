@@ -110,21 +110,6 @@ std::unique_ptr<util::disasm_interface> tms1000_cpu_device::create_disassembler(
 
 
 // device_reset
-u32 tms1000_cpu_device::decode_micro(offs_t offset)
-{
-	//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
-	const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
-	u16 mask = m_mpla->read(offset);
-	mask ^= 0x3fc8; // invert active-negative
-	u32 decode = 0;
-
-	for (int bit = 0; bit < 16; bit++)
-		if (mask & (1 << bit))
-			decode |= md[bit];
-
-	return decode;
-}
-
 void tms1000_cpu_device::device_reset()
 {
 	// common reset
@@ -155,4 +140,19 @@ void tms1000_cpu_device::device_reset()
 
 	for (int i = 0x80; i < 0xc0; i++) m_fixed_decode[i] = F_BR;
 	for (int i = 0xc0; i < 0x100; i++) m_fixed_decode[i] = F_CALL;
+}
+
+u32 tms1000_cpu_device::decode_micro(offs_t offset)
+{
+	//                                           _____              _____  ______  _____  ______  _____  _____  _____  _____
+	const u32 md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
+	u16 mask = m_mpla->read(offset);
+	mask ^= 0x3fc8; // invert active-negative
+	u32 decode = 0;
+
+	for (int bit = 0; bit < 16; bit++)
+		if (mask & (1 << bit))
+			decode |= md[bit];
+
+	return decode;
 }
