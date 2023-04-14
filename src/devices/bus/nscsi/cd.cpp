@@ -77,7 +77,7 @@ nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_full_device(mconfig, type, tag, owner, clock)
 	, cdrom(nullptr)
-	, cdda(nullptr)
+	, cdda(*this, "cdda")
 	, bytes_per_block(bytes_per_sector)
 	, lba(0)
 	, cur_sector(0)
@@ -88,8 +88,6 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_typ
 void nscsi_cdrom_device::device_start()
 {
 	nscsi_full_device::device_start();
-
-	cdda = subdevice<cdda_device>("cdda");
 
 	save_item(NAME(sector_buffer));
 	save_item(NAME(lba));

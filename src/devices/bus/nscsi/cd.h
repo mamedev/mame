@@ -42,7 +42,8 @@ protected:
 	static int to_msf(int frame);
 
 	cdrom_file *cdrom;
-	cdda_device *cdda;
+
+	required_device<cdda_device> cdda;
 
 private:
 	static constexpr uint32_t bytes_per_sector = 2048;
