@@ -68,8 +68,8 @@ void msx_cart_kanji_device::install_kanji_handlers()
 	m_kanji_mask = cart_kanji_region()->bytes() - 1;
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd8, 0xd9, write8sm_delegate(*this, FUNC(msx_cart_kanji_device::kanji_w)));
-	io_space().install_read_handler(0xd9, 0xd9, read8sm_delegate(*this, FUNC(msx_cart_kanji_device::kanji_r)));
+	io_space().install_write_handler(0xd8, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_kanji_device::kanji_w)));
+	io_space().install_read_handler(0xd9, 0xd9, emu::rw_delegate(*this, FUNC(msx_cart_kanji_device::kanji_r)));
 }
 
 std::error_condition msx_cart_kanji_device::initialize_cartridge(std::string &message)
@@ -167,8 +167,8 @@ std::error_condition msx_cart_msxwrite_device::initialize_cartridge(std::string 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
 	// The rom writes to 6fff and 7fff for banking, unknown whether
 	// other locations also trigger banking.
-	page(1)->install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<0>)));
-	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_msxwrite_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
 	return std::error_condition();

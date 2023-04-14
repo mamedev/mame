@@ -93,8 +93,8 @@ void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &confi
 void msx_cart_msx_audio_hxmu900_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(*m_y8950, FUNC(y8950_device::write)));
-	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(*m_y8950, FUNC(y8950_device::read)));
+	io_space().install_write_handler(0xc0, 0xc1, emu::rw_delegate(*m_y8950, FUNC(y8950_device::write)));
+	io_space().install_read_handler(0xc0, 0xc1, emu::rw_delegate(*m_y8950, FUNC(y8950_device::read)));
 }
 
 std::error_condition msx_cart_msx_audio_hxmu900_device::initialize_cartridge(std::string &message)
@@ -189,10 +189,10 @@ WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205_device::midi_in)
 void msx_cart_msx_audio_nms1205_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(*m_y8950, FUNC(y8950_device::write)));
-	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(*m_y8950, FUNC(y8950_device::read)));
-	io_space().install_write_handler(0x00, 0x01, write8sm_delegate(*m_acia6850, FUNC(acia6850_device::write)));
-	io_space().install_read_handler(0x04, 0x05, read8sm_delegate(*m_acia6850, FUNC(acia6850_device::read)));
+	io_space().install_write_handler(0xc0, 0xc1, emu::rw_delegate(*m_y8950, FUNC(y8950_device::write)));
+	io_space().install_read_handler(0xc0, 0xc1, emu::rw_delegate(*m_y8950, FUNC(y8950_device::read)));
+	io_space().install_write_handler(0x00, 0x01, emu::rw_delegate(*m_acia6850, FUNC(acia6850_device::write)));
+	io_space().install_read_handler(0x04, 0x05, emu::rw_delegate(*m_acia6850, FUNC(acia6850_device::read)));
 }
 
 std::error_condition msx_cart_msx_audio_nms1205_device::initialize_cartridge(std::string &message)
@@ -272,8 +272,8 @@ const tiny_rom_entry *msx_cart_msx_audio_fsca1_device::device_rom_region() const
 void msx_cart_msx_audio_fsca1_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc3, write8sm_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_y8950)));
-	io_space().install_read_handler(0xc0, 0xc3, read8sm_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::read_y8950)));
+	io_space().install_write_handler(0xc0, 0xc3, emu::rw_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_y8950)));
+	io_space().install_read_handler(0xc0, 0xc3, emu::rw_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::read_y8950)));
 	save_item(NAME(m_7fff));
 }
 
@@ -311,8 +311,8 @@ std::error_condition msx_cart_msx_audio_fsca1_device::initialize_cartridge(std::
 	m_view1[0].install_read_bank(0x4000, 0x7ffd, m_rombank[1]);
 	m_view1[0].install_ram(0x7000, 0x7ffd, cart_sram_region()->base());
 	m_view1[1].install_read_bank(0x4000, 0x7ffd, m_rombank[1]);
-	page(1)->install_write_handler(0x7ffe, 0x7ffe, write8smo_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::bank_w)));
-	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_7fff)));
+	page(1)->install_write_handler(0x7ffe, 0x7ffe, emu::rw_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::bank_w)));
+	page(1)->install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_7fff)));
 
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[0]);
 	page(3)->install_read_bank(0xc000, 0xffff, m_rombank[1]);

@@ -48,10 +48,10 @@ std::error_condition msx_cart_ascii8_device::initialize_cartridge(std::string &m
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<0>)));
-	page(1)->install_write_handler(0x6800, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<1>)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<2>)));
-	page(1)->install_write_handler(0x7800, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<0>)));
+	page(1)->install_write_handler(0x6800, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<1>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<2>)));
+	page(1)->install_write_handler(0x7800, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 
@@ -103,8 +103,8 @@ std::error_condition msx_cart_ascii16_device::initialize_cartridge(std::string &
 		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
 	return std::error_condition();
@@ -176,7 +176,7 @@ std::error_condition msx_cart_ascii8_sram_device::initialize_cartridge(std::stri
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ascii8_sram_device::mapper_write)));
+	page(1)->install_write_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_sram_device::mapper_write)));
 	page(2)->install_view(0x8000, 0x9fff, m_view2);
 	m_view2[0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	m_view2[1].install_ram(0x8000, 0x9fff, cart_sram_region()->base());
@@ -268,8 +268,8 @@ std::error_condition msx_cart_ascii16_sram_device::initialize_cartridge(std::str
 		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_6000)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_7000)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_6000)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_7000)));
 	page(2)->install_view(0x8000, 0xbfff, m_view);
 	m_view[0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, cart_sram_region()->base());

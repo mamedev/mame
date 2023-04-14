@@ -53,10 +53,10 @@ std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &mess
 	page(1)->install_rom(0x4000, 0x7fff, flash + 0x4000);
 	page(2)->install_rom(0x8000, 0xbfff, flash + 0x8000);
 	page(3)->install_rom(0xc000, 0xffff, flash + 0xc000);
-	page(0)->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
-	page(1)->install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
-	page(2)->install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
-	page(3)->install_write_handler(0xc000, 0xffff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
+	page(0)->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
+	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
+	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
+	page(3)->install_write_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
 
 	return std::error_condition();
 }
