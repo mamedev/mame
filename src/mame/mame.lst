@@ -38914,7 +38914,10 @@ transfrm                        // 834-5803 (c) 1986
 
 @source:sega/segafruit.cpp
 m3001
+m3004
 m4001
+m4002
+m5001
 
 @source:sega/segag80r.cpp
 005                             // (c) 1981
