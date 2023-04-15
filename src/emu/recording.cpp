@@ -195,7 +195,7 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	info.audio_samplerate = machine.sample_rate();
 
 	// compute the frame time
-	set_frame_period(attotime::from_ticks(info.video_sampletime, info.video_timescale);
+	set_frame_period(attotime::from_ticks(info.video_sampletime, info.video_timescale));
 
 	// create the file
 	avi_file::error avierr = avi_file::create(fullpath, info, m_avi_file);
