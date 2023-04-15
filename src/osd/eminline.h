@@ -554,7 +554,7 @@ constexpr uint64_t rotr_64(uint64_t val, int shift)
 -------------------------------------------------*/
 
 #ifndef get_profile_ticks
-inline int64_t get_profile_ticks()
+inline int64_t get_profile_ticks() noexcept
 {
 	return osd_ticks();
 }

@@ -230,7 +230,7 @@ void omar_state::omar(machine_config &config)
 
 ROM_START( omar )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("lom1ar279", 0x0000, 0x0800, CRC(e1bcee50) SHA1(658d6d8a0af3c1672610c651fea7d0289e4703f7) )
+	ROM_LOAD("lom1ar279", 0x0000, 0x0800, CRC(e1bcee50) SHA1(658d6d8a0af3c1672610c651fea7d0289e4703f7) ) // 3870X-0245
 ROM_END
 
 } // anonymous namespace

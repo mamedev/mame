@@ -133,6 +133,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/abc800i_dsk.h,FORMATS["ABC800I_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ABC800I_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/abc800i_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/abc1600_dsk.h,FORMATS["ABC1600_DSK"] = true
 --------------------------------------------------
 
@@ -536,18 +548,6 @@ if opt_tool(FORMATS, "CCVF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ccvf_dsk.h",
-	}
-end
-
---------------------------------------------------
---
---@src/lib/formats/cd90_640_dsk.h,FORMATS["CD90_640_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "CD90_640_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/cd90_640_dsk.h",
 	}
 end
 
@@ -1189,6 +1189,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/lw30_dsk.h,FORMATS["LW30_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "LW30_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/lw30_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/lw30_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/os9_dsk.h,FORMATS["OS9_DSK"] = true
 --------------------------------------------------
 
@@ -1689,6 +1701,18 @@ if opt_tool(FORMATS, "RK_CAS") then
 	files {
 		MAME_DIR.. "src/lib/formats/rk_cas.cpp",
 		MAME_DIR.. "src/lib/formats/rk_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/roland_dsk.h,FORMATS["ROLAND_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "ROLAND_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/roland_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/roland_dsk.h",
 	}
 end
 

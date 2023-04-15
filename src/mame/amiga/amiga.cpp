@@ -1624,6 +1624,8 @@ static void amiga_floppies(device_slot_interface &device)
 
 static void pcmcia_devices(device_slot_interface &device)
 {
+	device.option_add("melcard_1m", PCCARD_SRAM_MITSUBISHI_1M);
+	device.option_add("sram_1m", PCCARD_SRAM_CENTENNIAL_1M);
 	device.option_add("sram_2m", PCCARD_SRAM_CENTENNIAL_2M);
 	device.option_add("sram_4m", PCCARD_SRAM_CENTENNIAL_4M);
 }

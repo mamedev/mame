@@ -243,7 +243,7 @@ void mips3_device::generate_exception(int exception, int backup)
 
     if (exception != 0)
     {
-        fprintf(stderr, "Exception: PC=%08X, PPC=%08X\n", m_core->pc, m_ppc);
+        fprintf(stderr, "Exception type %d: PC=%08X, PPC=%08X\n", exception, m_core->pc, m_ppc);
         machine().debug_break();
     }
 */
@@ -1123,11 +1123,11 @@ void mips3_device::device_reset()
 	}
 
 	/* load the fixed TLB range */
-	vtlb_load(2 * m_tlbentries + 0, (0xa0000000 - 0x80000000) >> MIPS3_MIN_PAGE_SHIFT, 0x80000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
-	vtlb_load(2 * m_tlbentries + 1, (0xc0000000 - 0xa0000000) >> MIPS3_MIN_PAGE_SHIFT, 0xa0000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
+	vtlb_load(2 * m_tlbentries + 0, (0xa0000000 - 0x80000000) >> MIPS3_MIN_PAGE_SHIFT, 0x80000000, 0x00000000 | READ_ALLOWED | WRITE_ALLOWED | FETCH_ALLOWED | FLAG_VALID);
+	vtlb_load(2 * m_tlbentries + 1, (0xc0000000 - 0xa0000000) >> MIPS3_MIN_PAGE_SHIFT, 0xa0000000, 0x00000000 | READ_ALLOWED | WRITE_ALLOWED | FETCH_ALLOWED | FLAG_VALID);
 	// TX4925 on-board peripherals pass-through
 	if (m_flavor == MIPS3_TYPE_TX4925)
-		vtlb_load(2 * m_tlbentries + 2, (0xff200000 - 0xff1f0000) >> MIPS3_MIN_PAGE_SHIFT, 0xff1f0000, 0xff1f0000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
+		vtlb_load(2 * m_tlbentries + 2, (0xff200000 - 0xff1f0000) >> MIPS3_MIN_PAGE_SHIFT, 0xff1f0000, 0xff1f0000 | READ_ALLOWED | WRITE_ALLOWED | FETCH_ALLOWED | FLAG_VALID);
 	m_tlb_seed = 0;
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
@@ -1143,17 +1143,25 @@ void mips3_device::device_reset()
 }
 
 
-bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
+
 	/* only applies to the program address space */
 	if (spacenum == AS_PROGRAM)
 	{
 		const vtlb_entry *table = vtlb_table();
 		vtlb_entry entry = table[address >> MIPS3_MIN_PAGE_SHIFT];
-		if ((entry & (1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK)))) == 0)
+		if ((entry & (1 << intention)) == 0)
 			return false;
 		address = (entry & ~MIPS3_MIN_PAGE_MASK) | (address & MIPS3_MIN_PAGE_MASK);
 	}
+	return true;
+}
+
+bool r4650_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	target_space = &space(spacenum);
 	return true;
 }
 
@@ -1176,7 +1184,7 @@ std::unique_ptr<util::disasm_interface> r5900le_device::create_disassembler()
 inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1192,7 +1200,7 @@ inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1209,7 +1217,7 @@ inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1225,7 +1233,7 @@ inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1242,7 +1250,7 @@ inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1258,7 +1266,7 @@ inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1275,13 +1283,13 @@ inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 inline bool mips3_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		*result = (*m_memory.read_dword_masked)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1298,13 +1306,13 @@ inline bool mips3_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 inline bool mips3_device::RDOUBLE(offs_t address, uint64_t *result)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		*result = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1321,13 +1329,13 @@ inline bool mips3_device::RDOUBLE(offs_t address, uint64_t *result)
 inline bool mips3_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		*result = (*m_memory.read_qword_masked)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1344,7 +1352,7 @@ inline bool mips3_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint6
 inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1360,11 +1368,11 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1378,7 +1386,7 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 inline void mips3_device::WHALF(offs_t address, uint16_t data)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1394,11 +1402,11 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1412,7 +1420,7 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 inline void mips3_device::WWORD(offs_t address, uint32_t data)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -1428,11 +1436,11 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1446,17 +1454,17 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 inline void mips3_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		(*m_memory.write_dword_masked)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1470,17 +1478,17 @@ inline void mips3_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t m
 inline void mips3_device::WDOUBLE(offs_t address, uint64_t data)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), data);
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1494,17 +1502,17 @@ inline void mips3_device::WDOUBLE(offs_t address, uint64_t data)
 inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
 {
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		(*m_memory.write_qword_masked)(*m_program, (tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1513,6 +1521,178 @@ inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t
 			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
 		}
 	}
+}
+
+inline bool r4650_device::RBYTE(offs_t address, uint32_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_byte)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_byte)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RHALF(offs_t address, uint32_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_word)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_word)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RWORD(offs_t address, uint32_t *result, bool insn)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_dword)(*m_program, address);
+		return true;
+	}
+
+	static const uint32_t BASE_INDICES[2] = { COP0_R4650_DBase, COP0_R4650_IBase };
+	static const uint32_t BOUND_INDICES[2] = { COP0_R4650_DBound, COP0_R4650_IBound };
+	const uint32_t base = m_core->cpr[0][BASE_INDICES[insn]];
+	const uint32_t bound = m_core->cpr[0][BOUND_INDICES[insn]];
+	if ((address & 0xfffff000) > bound)
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_dword)(*m_program, address + base);
+	return true;
+}
+
+inline bool r4650_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_dword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_dword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase], mem_mask);
+	return true;
+}
+
+inline bool r4650_device::RDOUBLE(offs_t address, uint64_t *result)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_qword)(*m_program, address);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_qword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase]);
+	return true;
+}
+
+inline bool r4650_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+	{
+		*result = (*m_memory.read_qword_masked)(*m_program, address, mem_mask);
+		return true;
+	}
+
+	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+	{
+		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		*result = 0;
+		return false;
+	}
+	*result = (*m_memory.read_qword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBase], mem_mask);
+	return true;
+}
+
+inline void r4650_device::WBYTE(offs_t address, uint8_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_byte)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_byte)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WHALF(offs_t address, uint16_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_word)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_word)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WWORD(offs_t address, uint32_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_dword)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_dword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_dword_masked)(*m_program, address, data, mem_mask);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_dword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
+}
+
+inline void r4650_device::WDOUBLE(offs_t address, uint64_t data)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_qword)(*m_program, address, data);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_qword)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data);
+}
+
+inline void r4650_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
+{
+	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
+		(*m_memory.write_qword_masked)(*m_program, address, data, mem_mask);
+	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
+		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	else
+		(*m_memory.write_qword_masked)(*m_program, address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
 }
 
 inline void r5900le_device::WBYTE(offs_t address, uint8_t data)
@@ -1560,18 +1740,18 @@ inline void r5900le_device::WQUAD(offs_t address, uint64_t data_hi, uint64_t dat
 	}
 
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_WRITE_ALLOWED)
+	if (tlbval & WRITE_ALLOWED)
 	{
 		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff), data_lo);
 		(*m_memory.write_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff), data_hi);
 	}
 	else
 	{
-		if(tlbval & VTLB_READ_ALLOWED)
+		if(tlbval & READ_ALLOWED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBMOD, address);
 		}
-		else if(tlbval & VTLB_FLAG_FIXED)
+		else if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE, address);
 		}
@@ -1650,14 +1830,14 @@ inline bool r5900le_device::RQUAD(offs_t address, uint64_t *result_hi, uint64_t 
 	}
 
 	const uint32_t tlbval = vtlb_table()[address >> 12];
-	if (tlbval & VTLB_READ_ALLOWED)
+	if (tlbval & READ_ALLOWED)
 	{
 		*result_lo = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | (address & 0xfff));
 		*result_hi = (*m_memory.read_qword)(*m_program, (tlbval & ~0xfff) | ((address + 8) & 0xfff));
 	}
 	else
 	{
-		if(tlbval & VTLB_FLAG_FIXED)
+		if(tlbval & FLAG_FIXED)
 		{
 			generate_tlb_exception(EXCEPTION_TLBLOAD, address);
 		}
@@ -1709,6 +1889,22 @@ uint64_t mips3_device::get_cop0_reg(int idx)
 			return 47;
 	}
 	return m_core->cpr[0][idx];
+}
+
+void r4650_device::set_cop0_reg(int idx, uint64_t val)
+{
+	switch (idx)
+	{
+		case COP0_R4650_IBase:
+		case COP0_R4650_IBound:
+		case COP0_R4650_DBase:
+		case COP0_R4650_DBound:
+			m_core->cpr[0][idx] = val;
+			break;
+		default:
+			mips3_device::set_cop0_reg(idx, val);
+			break;
+	}
 }
 
 void mips3_device::set_cop0_reg(int idx, uint64_t val)

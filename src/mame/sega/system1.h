@@ -28,7 +28,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
-		m_sn(*this, "sn%u", 1U), 
+		m_sn(*this, "sn%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -72,7 +72,7 @@ public:
 	void sys1piox_315_5135(machine_config &config);
 	void sys2rowxboot(machine_config &config);
 	void sys1piox_315_5102(machine_config &config);
-	void sys1piosx_315_spat(machine_config &config);
+	void sys1piosx_315_5096(machine_config &config);
 	void sys2x(machine_config &config);
 	void sys1piox_315_5051(machine_config &config);
 	void sys1piox_315_5098(machine_config &config);

@@ -19,7 +19,7 @@
 
 /* verify that the <rpcndr.h> version is high enough to compile this file*/
 #ifndef __REQUIRED_RPCNDR_H_VERSION__
-#define __REQUIRED_RPCNDR_H_VERSION__ 500
+#define __REQUIRED_RPCNDR_H_VERSION__ 475
 #endif
 
 /* verify that the <rpcsal.h> version is high enough to compile this file*/
@@ -93,7 +93,7 @@ typedef interface IChannelAudioVolume IChannelAudioVolume;
 /* header files for imported files */
 #include "wtypes.h"
 #include "unknwn.h"
-#include "audiosessiontypes.h"
+#include "AudioSessionTypes.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -1130,6 +1130,7 @@ EXTERN_C const IID IID_IChannelAudioVolume;
 /* interface __MIDL_itf_audioclient_0000_0007 */
 /* [local] */ 
 
+#define FACILITY_AUDCLNT 0x889
 #define AUDCLNT_ERR(n) MAKE_HRESULT(SEVERITY_ERROR, FACILITY_AUDCLNT, n)
 #define AUDCLNT_SUCCESS(n) MAKE_SCODE(SEVERITY_SUCCESS, FACILITY_AUDCLNT, n)
 #define AUDCLNT_E_NOT_INITIALIZED            AUDCLNT_ERR(0x001)

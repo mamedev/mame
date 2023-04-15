@@ -179,7 +179,7 @@ uint8_t st_kbd_device::port4_r()
 {
 	//  bit     description
 	//  0-3     JOY 0 or mouse XB/XA/YA/YB
-	//	4-7     JOY 1
+	//  4-7     JOY 1
 
 	if(m_joy_disabled)
 		return 0xff;

@@ -1,82 +1,61 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Angelo Salese
-/************************************************************
+/**************************************************************************************************
 
 PC Engine CD HW notes:
 
 TODO:
-- Dragon Ball Z: ADPCM dies after the first upload;
-- Dragon Slayer - The Legend of Heroes: black screen; (actually timing/raster irq)
-- Mirai Shonen Conan: dies at new game selection; (actually timing/raster irq)
-- Snatcher: black screen after Konami logo, tries set up CD-DA
-            while transferring data? (fixed)
-- Steam Heart's: needs transfer ready irq to get past the
-                 gameplay hang, don't know exactly when it should fire
-- Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
-- Unsafe on debugger access;
+- Rewrite SCSI to honor actual nscsi_device;
+- Remove legacy CD drive implementation and merge with PC-8801 and PC-FX
+  \- cfr. src/devices/bus/pc8801/pc8801_31.cpp
+- Split into slot options, particularly Arcade Card shouldn't really be tied together
+  thru a Machine Configuration option;
+- verify CD read timing for edge cases marked in pcecd.xml with [SCSI];
+- ADPCM half events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled.
+  \- In dbz, they will effectively send an half irq, game enables full irq mask and xfer done,
+     neither is sent back, more stuff requiring SCSI rewrite first?
+- Implement Game Express slot option;
+- BRAM is unsafe on prolonged use of pcecd.xml games, verify
+  \- tend to corrupt itself when 8 saves are already in (madoum x4, draculax, gulliver, ...);
+- Unsafe on debugger access, recheck once conversion to SCSI bus is done;
+- Audio CD player pregap don't work properly
+  \- overflows into next track for a bit with standard 2 secs discs;
+- Audio CD player rewind/fast forward don't work properly
+  \- never go past 1 minute mark, underflows;
+- Fader feature is sketchy and unchecked against real HW;
 
-=============================================================
-
-CD Interface Register 0x00 - CDC status
-x--- ---- busy signal
--x-- ---- request signal
----x ---- cd signal
----- x--- i/o signal
-
-CD Interface Register 0x03 - BRAM lock / CD status
--x-- ---- acknowledge signal
---x- ---- done signal
----x ---- bram signal
----- x--- ADPCM 2
----- -x-- ADPCM 1
----- --x- CDDA left/right speaker select
-
-CD Interface Register 0x05 - CD-DA Volume low 8-bit port
-
-CD Interface Register 0x06 - CD-DA Volume high 8-bit port
-
-CD Interface Register 0x07 - BRAM unlock / CD status
-x--- ---- Enables BRAM
-
-CD Interface Register 0x0c - ADPCM status
-x--- ---- ADPCM is reading data
----- x--- ADPCM playback (0) stopped (1) currently playing
----- -x-- pending ADPCM data write
----- ---x ADPCM playback (1) stopped (0) currently playing
-
-CD Interface Register 0x0d - ADPCM address control
-x--- ---- ADPCM reset
--x-- ---- ADPCM play
---x- ---- ADPCM repeat
----x ---- ADPCM set length
----- x--- ADPCM set read address
----- --xx ADPCM set write address
-(note: some games reads bit 5 and wants it to be low otherwise they hangs, surely NOT an ADPCM repeat flag read because it doesn't make sense)
-
-CD Interface Register 0x0e - ADPCM playback rate
-
-CD Interface Register 0x0f - ADPCM fade in/out register
----- xxxx command setting:
-0x00 ADPCM/CD-DA Fade-in
-0x01 CD-DA fade-in
-0x08 CD-DA fade-out (short) ADPCM fade-in
-0x09 CD-DA fade-out (long)
-0x0a ADPCM fade-out (long)
-0x0c CD-DA fade-out (short) ADPCM fade-in
-0x0d CD-DA fade-out (short)
-0x0e ADPCM fade-out (short)
-
-*************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "coreutil.h"
 #include "pce_cd.h"
 
+#define LOG_CMD            (1U <<  1)
+#define LOG_CDDA           (1U <<  2)
+#define LOG_SCSI           (1U <<  3)
+#define LOG_FADER          (1U <<  4)
+#define LOG_IRQ            (1U <<  5)
+#define LOG_SCSIXFER       (1U <<  6) // single byte transfers, verbose
+
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
+#define LOGSCSI(...)        LOGMASKED(LOG_SCSI, __VA_ARGS__)
+#define LOGFADER(...)       LOGMASKED(LOG_FADER, __VA_ARGS__)
+#define LOGIRQ(...)         LOGMASKED(LOG_IRQ, __VA_ARGS__)
+#define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
+
+// 0xdd subchannel read is special and very verbose when it happens, treat differently
+#define LIVE_SUBQ_VIEW    0
+#define LIVE_ADPCM_VIEW   0
 
 #define PCE_CD_CLOCK    9216000
 
 
-// TODO: it's actually a common interface with PC-8801, find actual number part
+// TODO: correct name, split into incremental HuCard slot devices
 DEFINE_DEVICE_TYPE(PCE_CD, pce_cd_device, "pcecd", "PCE CD Add-on")
 
 // registers 9, e and f are known to be write only
@@ -96,7 +75,7 @@ void pce_cd_device::regs_map(address_map &map)
 	map(0x0c, 0x0c).r(FUNC(pce_cd_device::adpcm_status_r));
 	map(0x0d, 0x0d).rw(FUNC(pce_cd_device::adpcm_address_control_r), FUNC(pce_cd_device::adpcm_address_control_w));
 	map(0x0e, 0x0e).w(FUNC(pce_cd_device::adpcm_playback_rate_w));
-	map(0x0f, 0x0f).w(FUNC(pce_cd_device::fade_register_w));
+	map(0x0f, 0x0f).w(FUNC(pce_cd_device::fader_control_w));
 }
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -230,7 +209,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_adpcm_status));
 	save_item(NAME(m_adpcm_latch_address));
 	save_item(NAME(m_adpcm_control));
-	save_item(NAME(m_fade_reg));
+	save_item(NAME(m_fader_ctrl));
 	save_item(NAME(m_adpcm_dma_reg));
 }
 
@@ -277,7 +256,10 @@ void pce_cd_device::late_setup()
 
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const uint8_t init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
+	// 0xa0 looks a dev left-over ...
+//  static const uint8_t init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
+	// ... 0x88 is the actual value that cdsys/scdsys init thru format.
+	static const uint8_t init[8] = { 'H', 'U', 'B', 'M', 0x00, 0x88, 0x10, 0x80 };
 
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
@@ -297,6 +279,7 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 
 	CDDA(config, m_cdda);
+	m_cdda->audio_end_cb().set(FUNC(pce_cd_device::cdda_end_mark_cb));
 	m_cdda->add_route(0, "^lspeaker", 1.00);
 	m_cdda->add_route(1, "^rspeaker", 1.00);
 }
@@ -331,10 +314,19 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 {
 	uint8_t msm_data;
 
-	//  popmessage("%08x %08x %08x %02x %02x",m_msm_start_addr,m_msm_end_addr,m_msm_half_addr,m_adpcm_status,m_adpcm_control);
-
 	if (m_msm_idle)
 		return;
+
+	if (LIVE_ADPCM_VIEW)
+	{
+		popmessage("start %08x end %08x half %08x status %02x control %02x"
+			, m_msm_start_addr
+			, m_msm_end_addr
+			, m_msm_half_addr
+			, m_adpcm_status
+			, m_adpcm_control
+		);
+	}
 
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
@@ -369,7 +361,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 
 void pce_cd_device::reply_status_byte(uint8_t status)
 {
-	logerror("Setting CD in reply_status_byte\n");
+	LOGSCSI("Setting CD in reply_status_byte\n");
 	m_scsi_CD = m_scsi_IO = m_scsi_REQ = 1;
 	m_scsi_MSG = 0;
 	m_message_after_status = 1;
@@ -388,15 +380,15 @@ void pce_cd_device::reply_status_byte(uint8_t status)
 /* 0x00 - TEST UNIT READY */
 void pce_cd_device::test_unit_ready()
 {
-	logerror("test unit ready\n");
+	LOGCMD("0x00 TEST UNIT READY: status send ");
 	if (m_cd_file)
 	{
-		logerror("Sending STATUS_OK status\n");
+		LOGCMD("STATUS_OK\n");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
 	else
 	{
-		logerror("Sending CHECK_CONDITION status\n");
+		LOGCMD("CHECK_CONDITION\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 	}
 }
@@ -406,7 +398,7 @@ void pce_cd_device::read_6()
 {
 	uint32_t frame = ((m_command_buffer[1] & 0x1f) << 16) | (m_command_buffer[2] << 8) | m_command_buffer[3];
 	uint32_t frame_count = m_command_buffer[4];
-	printf("%08x %08x\n",frame,frame_count);
+	LOGCMD("0x08 READ(6): frame: %08x size: %08x\n", frame, frame_count);
 
 	/* Check for presence of a CD */
 	if (!m_cd_file)
@@ -427,8 +419,9 @@ void pce_cd_device::read_6()
 
 	if (frame_count == 0)
 	{
-		/* Star Breaker uses this */
-		popmessage("Read Sector frame count == 0, contact MESSdev");
+		// starbrkr uses this (cannot reproduce)
+		// Should supposedly bump to max size (frame_count = 256)
+		popmessage("Read Sector frame count == 0");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
 	else
@@ -436,14 +429,16 @@ void pce_cd_device::read_6()
 		m_data_timer->adjust(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND), 0, attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND));
 	}
 
-	/* TODO: correct place? */
+	// TODO: timing likely not right
 	set_irq_line(PCE_CD_IRQ_TRANSFER_READY, ASSERT_LINE);
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
 void pce_cd_device::nec_set_audio_start_position()
 {
-	uint32_t  frame = 0;
+	uint32_t frame = 0;
+	const uint8_t mode = m_command_buffer[9] & 0xc0;
+	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 
 	if (!m_cd_file)
 	{
@@ -452,31 +447,41 @@ void pce_cd_device::nec_set_audio_start_position()
 		return;
 	}
 
-	switch (m_command_buffer[9] & 0xC0)
+	switch (mode)
 	{
 		case 0x00:
-			popmessage("CD-DA set start mode 0x00, contact MESSdev");
+			popmessage("CD-DA set start mode 0x00");
 			frame = (m_command_buffer[3] << 16) | (m_command_buffer[4] << 8) | m_command_buffer[5];
 			break;
 		case 0x40:
 		{
-			uint8_t m,s,f;
-
-			m = bcd_2_dec(m_command_buffer[2]);
-			s = bcd_2_dec(m_command_buffer[3]);
-			f = bcd_2_dec(m_command_buffer[4]);
-
+			const u8 m = bcd_2_dec(m_command_buffer[2]);
+			const u8 s = bcd_2_dec(m_command_buffer[3]);
+			const u8 f = bcd_2_dec(m_command_buffer[4]);
 			frame = f + 75 * (s + m * 60);
+
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
-			// (I guess it wants the TOC to have the real start sector for data tracks and the start of the pregap for audio?)
-			frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+			// default to 2 secs if that isn't provided
+			// cfr. draculax in-game, fzone2 / fzone2j / ddragon2 intro etc.
+			// TODO: is this a global issue and INDEX 01 with no explicit pregap is always 2 seconds in INDEX 00 like in the aforementioned examples?
+			frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		case 0x80:
-			frame = m_toc->tracks[ bcd_2_dec(m_command_buffer[2]) - 1 ].logframeofs;
+		{
+			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
+			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
+			// Not right for emeraldd, breaks intro lip sync
+			//frame -= std::max(pregap, (u32)150);
 			break;
+		}
 		default:
-			popmessage("CD-DA set start mode 0xc0, contact MESSdev");
+			popmessage("CD-DA set start mode 0xc0");
 			//assert(nullptr == nec_set_audio_start_position);
 			break;
 	}
@@ -495,32 +500,63 @@ void pce_cd_device::nec_set_audio_start_position()
 //  }
 //  else
 	{
-		if (m_command_buffer[1] & 0x03)
+		const u8 play_mode = m_command_buffer[1] & 0x03;
+		LOGCMD("Play mode = %d\n", play_mode);
+		if (play_mode)
 		{
-			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_last_frame; //get the end of the CD
+			// Required by audio CD player
+			// (will keep skipping tracks over and over, never sends an audio end command)
+			m_cdda_status = PCE_CD_CDDA_PLAYING;
+			m_end_frame = m_last_frame;
+
+			LOGCDDA("Audio start (end of CD) current %d end %d\n", m_current_frame, m_end_frame);
+
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_cdda_play_mode = (m_command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
-			m_end_mark =  (m_command_buffer[1] & 0x02) ? 1 : 0;
+			m_cdda_play_mode = (play_mode & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
+			m_end_mark = (play_mode & 0x02) ? 1 : 0;
 		}
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs + m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes; //get the end of THIS track
-			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_end_mark = 0;
+			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs
+						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
+
+			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
+			// Several places definitely don't want this to start redbook,
+			// it's done later with 0xd9 command.
+			// - fzone2 / fzone2j
+			// - draculax (stage 2' pre-boss)
+			// - manhole (fires this during Sunsoft logo but expects playback on successive
+			//            credit sequence instead)
+			//if (m_end_frame > m_current_frame)
+			//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+
+			// These ones additionally wants a CDDA pause issued:
+			// - audio CD player ("fade out" button trigger, otherwise will playback the
+			//                    very next track at the end of the sequence)
+			// - ppersia (picking up sword in stage 1, cancels then restarts redbook BGM)
+			m_cdda->pause_audio(1);
 			m_cdda_play_mode = 3;
+			m_end_mark = 0;
+
+			// snatcher requires that the irq is sent here
+			// otherwise it will hang on title screen
+			set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 		}
 	}
 
 	reply_status_byte(SCSI_STATUS_OK);
-	set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	// Definitely not here, breaks jleagt94, iganin, macr2036 "press RUN button" prompt
+	// (expects to fire an irq at the end of redbook playback thru end_mark = 2 for proper attract mode)
+	//set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
 void pce_cd_device::nec_set_audio_stop_position()
 {
-	uint32_t  frame = 0;
+	uint32_t frame = 0;
+	const uint8_t mode = m_command_buffer[9] & 0xc0;
+	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
 	if (!m_cd_file)
 	{
@@ -529,53 +565,70 @@ void pce_cd_device::nec_set_audio_stop_position()
 		return;
 	}
 
-	switch (m_command_buffer[9] & 0xC0)
+
+	switch (mode)
 	{
 		case 0x00:
-			popmessage("CD-DA set end mode 0x00, contact MESSdev");
+			// tadaima
+			popmessage("CD-DA set end mode 0x00");
 			frame = (m_command_buffer[3] << 16) | (m_command_buffer[4] << 8) | m_command_buffer[5];
 			break;
 		case 0x40:
 		{
-			uint8_t m,s,f;
-
-			m = bcd_2_dec(m_command_buffer[2]);
-			s = bcd_2_dec(m_command_buffer[3]);
-			f = bcd_2_dec(m_command_buffer[4]);
+			const u8 m = bcd_2_dec(m_command_buffer[2]);
+			const u8 s = bcd_2_dec(m_command_buffer[3]);
+			const u8 f = bcd_2_dec(m_command_buffer[4]);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 
 			frame = f + 75 * (s + m * 60);
-			//      if (frame >= 525) // TODO: seven seconds gap? O_o
-			//          frame -= 525;
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
+			frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		case 0x80:
-			frame = m_toc->tracks[ bcd_2_dec(m_command_buffer[2]) - 1 ].logframeofs;
+		{
+			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			// NB: crazyhos uses this command with track = 1 on pre-title screen intro.
+			// It's not supposed to playback anything according to real HW refs.
+			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
+
+			LOGCMD("TRACK=%d (raw %02x pregap = %d frame = %d)\n"
+				, track_number
+				, m_command_buffer[2]
+				, pregap
+				, frame
+			);
+			//frame -= std::max(pregap, (u32)150);
 			break;
+		}
 		default:
-			popmessage("CD-DA set end mode 0xc0, contact MESSdev");
+			popmessage("CD-DA set end mode 0xc0");
 			//assert(nullptr == nec_set_audio_start_position);
 			break;
 	}
 
 	m_end_frame = frame;
 	m_cdda_play_mode = m_command_buffer[1] & 0x03;
+	LOGCMD("Play mode = %d\n", m_cdda_play_mode);
 
 	if (m_cdda_play_mode)
 	{
 		if (m_cdda_status == PCE_CD_CDDA_PAUSED)
 		{
+			LOGCDDA("Audio unpause\n");
 			m_cdda->pause_audio(0);
 		}
-		else
-		{
-			//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
-			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_end_mark = 1;
-		}
+
+		LOGCDDA("Audio end current %d end %d\n", m_current_frame, m_end_frame);
+		//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
+		m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+		m_end_mark = 1;
 		m_cdda_status = PCE_CD_CDDA_PLAYING;
 	}
 	else
 	{
+		LOGCDDA("Audio stop\n");
 		m_cdda_status = PCE_CD_CDDA_OFF;
 		m_cdda->stop_audio();
 		m_end_frame = m_last_frame;
@@ -584,7 +637,8 @@ void pce_cd_device::nec_set_audio_stop_position()
 	}
 
 	reply_status_byte(SCSI_STATUS_OK);
-	set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	// as above
+	//set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xDA - PAUSE (NEC) */
@@ -597,15 +651,19 @@ void pce_cd_device::nec_pause()
 		return;
 	}
 
+	LOGCMD("0xda PAUSE (NEC)\n");
+
 	/* If there was no cdda playing, throw an error */
 	if (m_cdda_status == PCE_CD_CDDA_OFF)
 	{
+		LOG("Issued SCSI_CHECK_CONDITION in 0xda!\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
 	m_cdda_status = PCE_CD_CDDA_PAUSED;
 	m_current_frame = m_cdda->get_audio_lba();
+	LOGCDDA("Audio pause on %d LBA\n", m_current_frame);
 	m_cdda->pause_audio(1);
 	reply_status_byte(SCSI_STATUS_OK);
 }
@@ -615,6 +673,7 @@ void pce_cd_device::nec_get_subq()
 {
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
 	uint32_t msf_abs, msf_rel, track, frame;
+	//LOGCMD("0xdd READ SUBCHANNEL Q (NEC) %d\n", m_cdda_status);
 
 	if (!m_cd_file)
 	{
@@ -645,14 +704,30 @@ void pce_cd_device::nec_get_subq()
 	msf_rel = cdrom_file::lba_to_msf_alt(frame - m_cd_file->get_track_start(track));
 
 	m_data_buffer[1] = 0x01 | ((m_cd_file->get_track_type(m_cd_file->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
-	m_data_buffer[2] = dec_2_bcd(track+1);       /* track */
-	m_data_buffer[3] = 1;                          /* index */
-	m_data_buffer[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);/* M (relative) */
-	m_data_buffer[5] = dec_2_bcd((msf_rel >> 8) & 0xFF); /* S (relative) */
-	m_data_buffer[6] = dec_2_bcd(msf_rel & 0xFF);          /* F (relative) */
-	m_data_buffer[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);/* M (absolute) */
-	m_data_buffer[8] = dec_2_bcd((msf_abs >> 8) & 0xFF); /* S (absolute) */
-	m_data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);          /* F (absolute) */
+	// track
+	m_data_buffer[2] = dec_2_bcd(track+1);
+	// index
+	m_data_buffer[3] = 1;
+	// MSF (relative)
+	m_data_buffer[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
+	m_data_buffer[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
+	m_data_buffer[6] = dec_2_bcd(msf_rel & 0xFF);
+	// MSF (absolute)
+	m_data_buffer[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
+	m_data_buffer[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
+	m_data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);
+	if(LIVE_SUBQ_VIEW)
+	{
+		const std::vector<std::string> status_types = {"standby", "play", "pause"};
+		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
+			, status_types[m_cdda_status]
+			, m_data_buffer[1]
+			, track + 1
+			, 1
+			, msf_rel
+			, msf_abs
+		);
+	}
 	m_data_buffer_size = 10;
 
 	m_data_buffer_index = 0;
@@ -665,7 +740,7 @@ void pce_cd_device::nec_get_subq()
 void pce_cd_device::nec_get_dir_info()
 {
 	uint32_t frame, msf, track = 0;
-	logerror("nec get dir info\n");
+	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
 	if (!m_cd_file)
 	{
@@ -677,41 +752,52 @@ void pce_cd_device::nec_get_dir_info()
 
 	switch (m_command_buffer[1])
 	{
-		case 0x00:      /* Get first and last track numbers */
+		case 0x00:
 			m_data_buffer[0] = dec_2_bcd(1);
 			m_data_buffer[1] = dec_2_bcd(toc.numtrks);
+			LOGCMD("Get first and last track numbers => 1-%2d\n", m_data_buffer[1]);
 			m_data_buffer_size = 2;
 			break;
-		case 0x01:      /* Get total disk size in MSF format */
+		case 0x01:
 			frame = toc.tracks[toc.numtrks-1].logframeofs;
 			frame += toc.tracks[toc.numtrks-1].frames;
 			msf = cdrom_file::lba_to_msf(frame + 150);
+			LOGCMD("Get total disk size in MSF format => %06x\n", msf);
 
-			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
-			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
-			m_data_buffer[2] = msf & 0xFF;             /* F */
+			// M
+			m_data_buffer[0] = (msf >> 16) & 0xFF;
+			// S
+			m_data_buffer[1] = (msf >> 8) & 0xFF;
+			// F
+			m_data_buffer[2] = msf & 0xFF;
 			m_data_buffer_size = 3;
 			break;
-		case 0x02:      /* Get track information */
+		case 0x02:
 			if (m_command_buffer[2] == 0xAA)
 			{
 				frame = toc.tracks[toc.numtrks-1].logframeofs;
 				frame += toc.tracks[toc.numtrks-1].frames;
+				LOGCMD("Get lead-out => %06x\n", frame);
 				m_data_buffer[3] = 0x04;   /* correct? */
-			} else
+			}
+			else
 			{
 				track = std::max(bcd_2_dec(m_command_buffer[2]), 1U);
 				frame = toc.tracks[track-1].logframeofs;
+				LOGCMD("Get track info track = %d, frame = %d\n", track, frame);
 				m_data_buffer[3] = (toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
-			logerror("track = %d, frame = %d\n", track, frame);
 			msf = cdrom_file::lba_to_msf(frame + 150);
-			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
-			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
-			m_data_buffer[2] = msf & 0xFF;             /* F */
+			// M
+			m_data_buffer[0] = (msf >> 16) & 0xFF;
+			// S
+			m_data_buffer[1] = (msf >> 8) & 0xFF;
+			// F
+			m_data_buffer[2] = msf & 0xFF;
 			m_data_buffer_size = 4;
 			break;
 		default:
+			popmessage("DIR INFO unemulated %02x", m_command_buffer[1]);
 //          assert(pce_cd_nec_get_dir_info == nullptr);  // Not implemented yet
 			break;
 	}
@@ -749,7 +835,7 @@ void pce_cd_device::handle_data_output()
 	if (m_scsi_REQ && m_scsi_ACK)
 	{
 		/* Command byte received */
-		logerror("Command byte $%02X received\n", m_cdc_data);
+		LOGSCSI("Command byte $%02X received\n", m_cdc_data);
 
 		/* Check for buffer overflow */
 		assert(m_command_buffer_index < PCE_CD_COMMAND_BUFFER_SIZE);
@@ -763,16 +849,16 @@ void pce_cd_device::handle_data_output()
 	{
 		int i = 0;
 
-		logerror("Check if command done\n");
+		LOGSCSI("Check if command done\n");
 
 		for(i = 0; m_command_buffer[0] > pce_cd_commands[i].command_byte; i++);
 
 		/* Check for unknown commands */
 		if (m_command_buffer[0] != pce_cd_commands[i].command_byte)
 		{
-			logerror("Unrecognized command: %02X\n", m_command_buffer[0]);
+			LOGSCSI("Unrecognized command: %02X\n", m_command_buffer[0]);
 			if (m_command_buffer[0] == 0x03)
-				popmessage("CD command 0x03 issued (Request Sense), contact MESSdev");
+				popmessage("CD command 0x03 issued (Request Sense)");
 		}
 		assert(m_command_buffer[0] == pce_cd_commands[i].command_byte);
 
@@ -789,6 +875,44 @@ void pce_cd_device::handle_data_output()
 	}
 }
 
+WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
+{
+	if (state != ASSERT_LINE)
+		return;
+
+	LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
+
+	// handle end playback event
+	if (m_end_mark == 1)
+	{
+		switch (m_cdda_play_mode & 3)
+		{
+			case 1:
+			{
+				// TODO: should seek rather than be instant
+				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame);
+				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+				m_end_mark = 1;
+				break;
+			}
+			case 2:
+				LOGCDDA(" - IRQ when finished\n");
+				set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+				m_end_mark = 0;
+				break;
+			case 3:
+				LOGCDDA(" - Play without repeat\n");
+				// fzone2 / fzone2j wants a STOP thru SUBQ command during intro
+				m_cdda_status = PCE_CD_CDDA_OFF;
+				m_cdda->stop_audio();
+				m_end_mark = 0;
+				break;
+		}
+	}
+	else
+		LOGCDDA(" - No end mark encountered, check me\n");
+}
+
 void pce_cd_device::handle_data_input()
 {
 	if (m_scsi_CD)
@@ -796,7 +920,7 @@ void pce_cd_device::handle_data_input()
 		/* Command / Status byte */
 		if (m_scsi_REQ && m_scsi_ACK)
 		{
-			logerror("status sent\n");
+			LOGSCSI("status sent\n");
 			m_scsi_REQ = 0;
 			m_status_sent = 1;
 		}
@@ -806,7 +930,7 @@ void pce_cd_device::handle_data_input()
 			m_status_sent = 0;
 			if (m_message_after_status)
 			{
-				logerror("message after status\n");
+				LOGSCSI("message after status\n");
 				m_message_after_status = 0;
 				m_scsi_MSG = m_scsi_REQ = 1;
 				m_cdc_data = 0;
@@ -835,7 +959,7 @@ void pce_cd_device::handle_data_input()
 			}
 			else
 			{
-				logerror("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
+				LOGSCSIXFER("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
 				m_cdc_data = m_data_buffer[m_data_buffer_index];
 				m_data_buffer_index++;
 				m_scsi_REQ = 1;
@@ -873,7 +997,7 @@ void pce_cd_device::update()
 	{
 		if (m_scsi_RST)
 		{
-			logerror("Performing CD reset\n");
+			LOGSCSI("Performing CD reset\n");
 			/* Reset internal data */
 			m_scsi_BSY = m_scsi_SEL = m_scsi_CD = m_scsi_IO = 0;
 			m_scsi_MSG = m_scsi_REQ = m_scsi_ATN = 0;
@@ -889,7 +1013,7 @@ void pce_cd_device::update()
 	/* Check if bus can be freed */
 	if (! m_scsi_SEL && ! m_scsi_BSY && m_selected)
 	{
-		logerror("freeing bus\n");
+		LOGSCSI("freeing bus\n");
 		m_selected = 0;
 		m_scsi_CD = m_scsi_MSG = m_scsi_IO = m_scsi_REQ = 0;
 		set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, CLEAR_LINE);
@@ -901,7 +1025,7 @@ void pce_cd_device::update()
 		if (! m_selected)
 		{
 			m_selected = 1;
-			logerror("Setting CD in device selection\n");
+			LOGSCSI("Setting CD in device selection\n");
 			m_scsi_BSY = m_scsi_REQ = m_scsi_CD = 1;
 			m_scsi_MSG = m_scsi_IO = 0;
 		}
@@ -943,17 +1067,6 @@ void pce_cd_device::update()
 			}
 		}
 	}
-
-	/* FIXME: presumably CD-DA needs an irq interface for this */
-	if (m_cdda->audio_ended() && m_end_mark == 1)
-	{
-		switch (m_cdda_play_mode & 3)
-		{
-			case 1: m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame); m_end_mark = 1; break; //play with repeat
-			case 2: set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE); m_end_mark = 0; break; //irq when finished
-			case 3: m_end_mark = 0; break; //play without repeat
-		}
-	}
 }
 
 void pce_cd_device::set_irq_line(int num, int state)
@@ -965,7 +1078,11 @@ void pce_cd_device::set_irq_line(int num, int state)
 
 	if (m_irq_mask & m_irq_status & 0x7c)
 	{
-		//printf("IRQ PEND = %02x MASK = %02x IRQ ENABLE %02X\n",m_irq_mask & m_irq_status & 0x7c,m_irq_mask & 0x7c,m_irq_status & 0x7c);
+		LOGIRQ("IRQ: PEND = %02x MASK = %02x STATUS %02x\n"
+			, m_irq_mask & m_irq_status & 0x7c
+			, m_irq_mask & 0x7c
+			, m_irq_status & 0x7c
+		);
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	}
 	else
@@ -979,14 +1096,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	if (m_data_buffer_index == m_data_buffer_size)
 	{
 		/* Read next data sector */
-		logerror("read sector %d\n", m_current_frame);
+		LOGSCSI("read sector %d\n", m_current_frame);
 		if (! m_cd_file->read_data(m_current_frame, m_data_buffer.get(), cdrom_file::CD_TRACK_MODE1))
 		{
-			logerror("Mode1 CD read failed for frame #%d\n", m_current_frame);
+			LOGSCSI("Mode1 CD read failed for frame #%d\n", m_current_frame);
 		}
 		else
 		{
-			logerror("Successfully read mode1 frame #%d\n", m_current_frame);
+			LOGSCSI("Successfully read mode1 frame #%d\n", m_current_frame);
 		}
 
 		m_data_buffer_index = 0;
@@ -999,7 +1116,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 		if (m_current_frame == m_end_frame)
 		{
 			/* We are done, disable the timer */
-			logerror("Last frame read from CD\n");
+			LOGSCSI("Last frame read from CD\n");
 			m_data_transferred = 1;
 			// data transfer is done, issue a pause
 			m_cdda_status = PCE_CD_CDDA_PAUSED;
@@ -1113,11 +1230,15 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
  *
  */
 
-// CD Interface Register 0x00 - CDC status
-// x--- ---- busy signal
-// -x-- ---- request signal
-// ---x ---- cd signal
-// ---- x--- i/o signal
+/*
+ * CD Interface Register 0x00 - CDC status
+ *
+ * x--- ---- busy signal
+ * -x-- ---- request signal
+ * ---x ---- cd signal
+ * ---- x--- i/o signal
+ *
+ */
 uint8_t pce_cd_device::cdc_status_r()
 {
 	uint8_t res = (m_cdc_status & 7);
@@ -1137,11 +1258,14 @@ void pce_cd_device::cdc_status_w(uint8_t data)
 	m_scsi_SEL = 0;
 	m_adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 	/* any write here clears CD transfer irqs */
+	LOGIRQ("IRQ: CD clear & ~0x70\n");
 	set_irq_line(0x70, CLEAR_LINE);
 	m_cdc_status = data;
 }
 
-// CD Interface Register 0x01 - CDC command / status / data
+/*
+ * CD Interface Register 0x01 - CDC command / status / data
+ */
 uint8_t pce_cd_device::cdc_data_r()
 {
 	return m_cdc_data;
@@ -1153,13 +1277,16 @@ void pce_cd_device::cdc_data_w(uint8_t data)
 }
 
 
-// CD Interface Register 0x02 - IRQ Mask and CD control
-// x--- ---- to SCSI ACK
-// -x-- ---- transfer ready irq
-// --x- ---- transfer done irq
-// ---x ---- BRAM irq?
-// ---- x--- ADPCM FULL irq
-// ---- -x-- ADPCM HALF irq
+/*
+ * CD Interface Register 0x02 - IRQ Mask and CD control
+ *
+ * x--- ---- to SCSI ACK
+ * -x-- ---- transfer ready irq
+ * --x- ---- transfer done irq
+ * ---x ---- BRAM irq?
+ * ---- x--- ADPCM FULL irq
+ * ---- -x-- ADPCM HALF irq
+ */
 uint8_t pce_cd_device::irq_mask_r()
 {
 	return m_irq_mask;
@@ -1168,17 +1295,22 @@ uint8_t pce_cd_device::irq_mask_r()
 void pce_cd_device::irq_mask_w(uint8_t data)
 {
 	m_scsi_ACK = data & 0x80;
+	if (data & 0x7c)
+		LOGIRQ("IRQ: mask %02x (%02x)\n", m_irq_mask & 0x7c, m_irq_status);
 	m_irq_mask = data;
 	set_irq_line(0, 0);
 }
 
-// CD Interface Register 0x03 - BRAM lock / CD status (read only)
-// -x-- ---- acknowledge signal
-// --x- ---- done signal
-// ---x ---- bram signal
-// ---- x--- ADPCM 2
-// ---- -x-- ADPCM 1
-// ---- --x- CDDA left/right speaker select
+/*
+ * CD Interface Register 0x03 - BRAM lock / CD status (read only)
+ *
+ * -x-- ---- CD acknowledge signal
+ * --x- ---- CD done signal
+ * ---x ---- bram signal (?)
+ * ---- x--- ADPCM 2
+ * ---- -x-- ADPCM 1
+ * ---- --x- CDDA left/right speaker select
+ */
 uint8_t pce_cd_device::irq_status_r()
 {
 	uint8_t res = m_irq_status & 0x6e;
@@ -1190,8 +1322,11 @@ uint8_t pce_cd_device::irq_status_r()
 	return res;
 }
 
-// CD Interface Register 0x04 - CD reset
-// ---- --x- to SCSI RST
+/*
+ * CD Interface Register 0x04 - CD reset
+ *
+ * ---- --x- to SCSI RST
+ */
 uint8_t pce_cd_device::cdc_reset_r()
 {
 	return m_reset_reg;
@@ -1203,18 +1338,24 @@ void pce_cd_device::cdc_reset_w(uint8_t data)
 	m_reset_reg = data;
 }
 
-// CD Interface Register 0x05 - CD-DA Volume low 8-bit port
-// CD Interface Register 0x06 - CD-DA Volume high 8-bit port
-// TODO: port 5 also converts?
+/*
+ * CD Interface Register 0x05 - CD-DA Volume low 8-bit port
+ * CD Interface Register 0x06 - CD-DA Volume high 8-bit port
+ */
 uint8_t pce_cd_device::cdda_data_r(offs_t offset)
 {
-	uint8_t port_shift = offset ? 0 : 8;
+	// TODO: port 5 also converts?
+	uint8_t port_shift = offset ? 8 : 0;
 
-	return ((m_cdda->get_channel_volume(m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
+	// TODO: clamp over channel output_gain (audio CD player "fade out")
+	return (m_cdda->get_channel_sample((m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
 }
 
-// CD Interface Register 0x07 - BRAM unlock / CD status
-// x--- ---- Enables BRAM
+/*
+ * CD Interface Register 0x07 - BRAM unlock / CD status
+ *
+ * x--- ---- Enables BRAM
+ */
 uint8_t pce_cd_device::bram_status_r()
 {
 	uint8_t res = (m_bram_locked ? (m_bram_status & 0x7f) : (m_bram_status | 0x80));
@@ -1228,7 +1369,9 @@ void pce_cd_device::bram_unlock_w(uint8_t data)
 	m_bram_status = data;
 }
 
-// CD Interface Register 0x08 - CD data (R) / ADPCM address low (W)
+/*
+ * CD Interface Register 0x08 - CD data (R) / ADPCM address low (W)
+ */
 uint8_t pce_cd_device::cd_data_r()
 {
 	return get_cd_data_byte();
@@ -1239,13 +1382,17 @@ void pce_cd_device::adpcm_address_lo_w(uint8_t data)
 	m_adpcm_latch_address = (data & 0xff) | (m_adpcm_latch_address & 0xff00);
 }
 
-// CD Interface Register 0x09 - ADPCM address high (W)
+/*
+ * CD Interface Register 0x09 - ADPCM address high (W)
+ */
 void pce_cd_device::adpcm_address_hi_w(uint8_t data)
 {
 	m_adpcm_latch_address = (data << 8) | (m_adpcm_latch_address & 0xff);
 }
 
-// CD interface Register 0x0a - ADPCM RAM data port
+/*
+ * CD interface Register 0x0a - ADPCM RAM data port
+ */
 uint8_t pce_cd_device::adpcm_data_r()
 {
 	return get_adpcm_ram_byte();
@@ -1256,7 +1403,9 @@ void pce_cd_device::adpcm_data_w(uint8_t data)
 	set_adpcm_ram_byte(data);
 }
 
-// CD interface Register 0x0b - ADPCM DMA control
+/*
+ * CD interface Register 0x0b - ADPCM DMA control
+ */
 uint8_t pce_cd_device::adpcm_dma_control_r()
 {
 	return m_adpcm_dma_reg;
@@ -1272,27 +1421,33 @@ void pce_cd_device::adpcm_dma_control_w(uint8_t data)
 	m_adpcm_dma_reg = data;
 }
 
-// CD Interface Register 0x0c - ADPCM status
-// x--- ---- ADPCM is reading data
-// ---- x--- ADPCM playback (0) stopped (1) currently playing
-// ---- -x-- pending ADPCM data write
-// ---- ---x ADPCM playback (1) stopped (0) currently playing
+/*
+ * CD Interface Register 0x0c - ADPCM status
+ *
+ * x--- ---- ADPCM is reading data
+ * ---- x--- ADPCM playback (0) stopped (1) currently playing
+ * ---- -x-- pending ADPCM data write
+ * ---- ---x ADPCM playback (1) stopped (0) currently playing
+ */
 uint8_t pce_cd_device::adpcm_status_r()
 {
 	return m_adpcm_status;
 }
 
-// CD Interface Register 0x0d - ADPCM address control
-// x--- ---- ADPCM reset
-// -x-- ---- ADPCM play
-// --x- ---- ADPCM repeat
-// ---x ---- ADPCM set length
-// ---- x--- ADPCM set read address
-// ---- --xx ADPCM set write address
-// TODO: some games read bit 5 and want it to be low otherwise they hang,
-//       how that can cope with "repeat"?
+/*
+ * CD Interface Register 0x0d - ADPCM address control
+ *
+ * x--- ---- ADPCM reset
+ * -x-- ---- ADPCM play   - may be reversed
+ * --x- ---- ADPCM repeat /
+ * ---x ---- ADPCM set length
+ * ---- x--- ADPCM set read address
+ * ---- --xx ADPCM set write address
+ */
 uint8_t pce_cd_device::adpcm_address_control_r()
 {
+	// TODO: some games read bit 5 and want it to be low otherwise they hang
+	// how that can cope with "repeat"?
 	return m_adpcm_control;
 }
 
@@ -1311,6 +1466,10 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 		m_msm->reset_w(1);
 	}
 
+	// TODO: gulliver really starts an ADPCM play with bit 5 rather than 6
+	// Is it a doc mistake and is actually reversed?
+	m_msm_repeat = BIT(data, 5);
+
 	if ((data & 0x40) && ((m_adpcm_control & 0x40) == 0)) // ADPCM play
 	{
 		m_msm_start_addr = (m_adpcm_read_ptr);
@@ -1324,23 +1483,30 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 	}
 	else if ((data & 0x40) == 0)
 	{
-		/* used by Buster Bros to cancel an in-flight sample */
+		// used by bbros to cancel an in-flight sample
 		adpcm_stop(0);
 		m_msm->reset_w(1);
+
+		// addfam wants to irq ack here
+		// https://mametesters.org/view.php?id=7261
+		if(!(m_msm_repeat))
+		{
+			set_irq_line(PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE);
+			set_irq_line(PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE);
+		}
 	}
 
-	m_msm_repeat = BIT(data, 5);
 
-	if (data & 0x10) //ADPCM set length
+	if (data & 0x10) // ADPCM set length
 	{
 		m_adpcm_length = m_adpcm_latch_address;
 	}
-	if (data & 0x08) //ADPCM set read address
+	if (data & 0x08) // ADPCM set read address
 	{
 		m_adpcm_read_ptr = m_adpcm_latch_address;
 		m_adpcm_read_buf = 2;
 	}
-	if ((data & 0x02) == 0x02) //ADPCM set write address
+	if ((data & 0x02) == 0x02) // ADPCM set write address
 	{
 		m_adpcm_write_ptr = m_adpcm_latch_address;
 		m_adpcm_write_buf = data & 1;
@@ -1349,31 +1515,41 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 	m_adpcm_control = data;
 }
 
-// CD Interface Register 0x0e - ADPCM playback rate
+/*
+ * CD Interface Register 0x0e - ADPCM playback rate
+ */
 void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
 {
 	m_adpcm_clock_divider = 0x10 - (data & 0x0f);
 	m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
-// CD Interface Register 0x0f - ADPCM fade in/out register
-// ---- xxxx command setting:
-// 0x00 ADPCM/CD-DA Fade-in
-// 0x01 CD-DA fade-in
-// 0x08 CD-DA fade-out (short) ADPCM fade-in
-// 0x09 CD-DA fade-out (long)
-// 0x0a ADPCM fade-out (long)
-// 0x0c CD-DA fade-out (short) ADPCM fade-in
-// 0x0d CD-DA fade-out (short)
-// 0x0e ADPCM fade-out (short)
-void pce_cd_device::fade_register_w(uint8_t data)
+/*
+ * CD Interface Register 0x0f - CD-DA/ADPCM fader in/out register
+ *
+ * ---- xxxx command setting:
+ * 0x00 ADPCM/CD-DA fade-in
+ * 0x01 CD-DA fade-in
+ * 0x08 CD-DA fade-out (short) ADPCM fade-in
+ * 0x09 CD-DA fade-out (long)
+ * 0x0a ADPCM fade-out (long)
+ * 0x0c CD-DA fade-out (short) ADPCM fade-in
+ * 0x0d CD-DA fade-out (short)
+ * 0x0e ADPCM fade-out (short)
+ */
+void pce_cd_device::fader_control_w(uint8_t data)
 {
+	if (data & 0xf0)
+		LOG("fader_control_w with upper bits set! %02x\n", data);
+
 	// TODO: timers needs HW tests
-	if (m_fade_reg != data)
+	if (m_fader_ctrl != data)
 	{
+		LOGFADER("Fader %01x ", data & 0xf);
 		switch (data & 0xf)
 		{
-			case 0x00: //CD-DA / ADPCM enable (100 msecs)
+			case 0x00:
+				LOGFADER("ADPCM/CD-DA enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_adpcm_volume = 0.0;
@@ -1381,12 +1557,16 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadeout_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x01: //CD-DA enable (100 msecs)
+
+			case 0x01:
+				LOGFADER("CD-DA enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_cdda_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x08: //CD-DA short (1500 msecs) fade out / ADPCM enable
+
+			case 0x08:
+				LOGFADER("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1394,17 +1574,23 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadein_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x09: //CD-DA long (5000 msecs) fade out
+
+			case 0x09:
+				LOGFADER("CD-DA long (5000 msecs) fade out\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0a: //ADPCM long (5000 msecs) fade out
+
+			case 0x0a:
+				LOGFADER("ADPCM long (5000 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0c: //CD-DA short (1500 msecs) fade out / ADPCM enable
+
+			case 0x0c:
+				LOGFADER("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1412,22 +1598,27 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadein_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x0d: //CD-DA short (1500 msecs) fade out
+
+			case 0x0d:
+				LOGFADER("CD-DA short (1500 msecs) fade out\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0e: //ADPCM short (1500 msecs) fade out
+
+			case 0x0e:
+				LOGFADER("ADPCM short (1500 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
+
 			default:
-				popmessage("CD-DA / ADPCM Fade effect mode %02x, contact MESSdev",data & 0x0f);
+				popmessage("CD-DA / ADPCM Fade effect mode %02x",data & 0x0f);
 				break;
 		}
 	}
-	m_fade_reg = data;
+	m_fader_ctrl = data;
 }
 
 TIMER_CALLBACK_MEMBER(pce_cd_device::clear_ack)
@@ -1509,10 +1700,12 @@ void pce_cd_device::intf_w(offs_t offset, uint8_t data)
 }
 
 /*
+ *
+ * PC Engine Arcade Card emulation
+ *
+ */
 
-PC Engine Arcade Card emulation
 
-*/
 
 uint8_t pce_cd_device::acard_r(offs_t offset)
 {

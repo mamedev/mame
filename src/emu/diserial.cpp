@@ -10,9 +10,9 @@
 #include "emu.h"
 #include "diserial.h"
 
-#define LOG_SETUP  (1 << 1U)
-#define LOG_TX     (1 << 2U)
-#define LOG_RX     (1 << 3U)
+#define LOG_SETUP  (1U << 1)
+#define LOG_TX     (1U << 2)
+#define LOG_RX     (1U << 3)
 #define VERBOSE    (0)
 
 #define LOG_OUTPUT_FUNC device().logerror

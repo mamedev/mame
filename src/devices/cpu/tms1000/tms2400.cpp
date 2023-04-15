@@ -20,24 +20,25 @@ DEFINE_DEVICE_TYPE(TMS2600, tms2600_cpu_device, "tms2600", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS2670, tms2670_cpu_device, "tms2670", "Texas Instruments TMS2670") // high voltage version, 1 R pin removed for Vpp
 
 
-tms2400_cpu_device::tms2400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2400_cpu_device(mconfig, TMS2400, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 4 /* x width */, 4 /* stack levels */, 12 /* rom width */, address_map_constructor(FUNC(tms2400_cpu_device::rom_12bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms2400_cpu_device::ram_8bit), this))
-{ }
-
 tms2400_cpu_device::tms2400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms2100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms2400_cpu_device::tms2400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms2400_cpu_device(mconfig, TMS2400, tag, owner, clock, 8 /* o pins */, 7 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 4 /* x width */, 4 /* stack levels */, 12 /* rom width */, address_map_constructor(FUNC(tms2400_cpu_device::rom_12bit), this), 8 /* ram width */, address_map_constructor(FUNC(tms2400_cpu_device::ram_8bit), this))
 { }
 
 tms2470_cpu_device::tms2470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	tms2400_cpu_device(mconfig, TMS2470, tag, owner, clock, 8, 6, 6, 8, 4, 4, 12, address_map_constructor(FUNC(tms2470_cpu_device::rom_12bit), this), 8, address_map_constructor(FUNC(tms2470_cpu_device::ram_8bit), this))
 { }
 
-tms2600_cpu_device::tms2600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms2600_cpu_device(mconfig, TMS2600, tag, owner, clock, 8, 15, 6, 8, 4, 4, 12, address_map_constructor(FUNC(tms2600_cpu_device::rom_12bit), this), 8, address_map_constructor(FUNC(tms2600_cpu_device::ram_8bit), this))
-{ }
 
 tms2600_cpu_device::tms2600_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms2400_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms2600_cpu_device::tms2600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms2600_cpu_device(mconfig, TMS2600, tag, owner, clock, 8, 15, 6, 8, 4, 4, 12, address_map_constructor(FUNC(tms2600_cpu_device::rom_12bit), this), 8, address_map_constructor(FUNC(tms2600_cpu_device::ram_8bit), this))
 { }
 
 tms2670_cpu_device::tms2670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

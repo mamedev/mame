@@ -2551,10 +2551,10 @@ void system1_state::sys1piosx_315_5099(machine_config &config)
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
 
-void system1_state::sys1piosx_315_spat(machine_config &config)
+void system1_state::sys1piosx_315_5096(machine_config &config)
 {
 	sys1pios(config);
-	segacrpt_z80_device &z80(SEGA_315_SPAT(config.replace(), m_maincpu, MASTER_CLOCK));
+	segacrpt_z80_device &z80(SEGA_315_5096(config.replace(), m_maincpu, MASTER_CLOCK));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(":decrypted_opcodes");
 }
@@ -5710,9 +5710,9 @@ GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, e
 GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, empty_init,        ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, empty_init,        ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1piosx_315_5096,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5096)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssanchan,   spatter,  sys1piosx_315_5096,spatter,   system1_state, empty_init,        ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5096)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, empty_init,        ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )

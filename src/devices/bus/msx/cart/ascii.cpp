@@ -24,12 +24,12 @@ void msx_cart_ascii8_device::device_reset()
 		m_rombank[i]->set_entry(0);
 }
 
-image_init_result msx_cart_ascii8_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ascii8_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ascii8_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -38,7 +38,7 @@ image_init_result msx_cart_ascii8_device::initialize_cartridge(std::string &mess
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_ascii8_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -48,14 +48,14 @@ image_init_result msx_cart_ascii8_device::initialize_cartridge(std::string &mess
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<0>)));
-	page(1)->install_write_handler(0x6800, 0x6fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<1>)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<2>)));
-	page(1)->install_write_handler(0x7800, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<0>)));
+	page(1)->install_write_handler(0x6800, 0x6fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<1>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<2>)));
+	page(1)->install_write_handler(0x7800, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_device::bank_w<3>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>
@@ -80,12 +80,12 @@ void msx_cart_ascii16_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-image_init_result msx_cart_ascii16_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ascii16_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ascii16_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -94,7 +94,7 @@ image_init_result msx_cart_ascii16_device::initialize_cartridge(std::string &mes
 	if (size > 256 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_ascii16_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	m_bank_mask = banks - 1;
@@ -103,11 +103,11 @@ image_init_result msx_cart_ascii16_device::initialize_cartridge(std::string &mes
 		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<0>)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_device::bank_w<1>)));
 	page(2)->install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 template <int Bank>
@@ -139,18 +139,18 @@ void msx_cart_ascii8_sram_device::device_reset()
 	m_view3.select(0);
 }
 
-image_init_result msx_cart_ascii8_sram_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ascii8_sram_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ascii8_sram_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_sram_region())
 	{
 		message = "msx_cart_ascii8_sram_device: Required region 'sram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -159,13 +159,13 @@ image_init_result msx_cart_ascii8_sram_device::initialize_cartridge(std::string 
 	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_ascii8_sram_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (cart_sram_region()->bytes() < 0x2000)
 	{
 		message = "msx_cart_ascii8_sram_device: Region 'sram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	m_bank_mask = banks - 1;
@@ -176,7 +176,7 @@ image_init_result msx_cart_ascii8_sram_device::initialize_cartridge(std::string 
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[1]);
-	page(1)->install_write_handler(0x6000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ascii8_sram_device::mapper_write)));
+	page(1)->install_write_handler(0x6000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ascii8_sram_device::mapper_write)));
 	page(2)->install_view(0x8000, 0x9fff, m_view2);
 	m_view2[0].install_read_bank(0x8000, 0x9fff, m_rombank[2]);
 	m_view2[1].install_ram(0x8000, 0x9fff, cart_sram_region()->base());
@@ -184,7 +184,7 @@ image_init_result msx_cart_ascii8_sram_device::initialize_cartridge(std::string 
 	m_view3[0].install_read_bank(0xa000, 0xbfff, m_rombank[3]);
 	m_view3[1].install_ram(0xa000, 0xbfff, cart_sram_region()->base());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_ascii8_sram_device::mapper_write(offs_t offset, u8 data)
@@ -232,18 +232,18 @@ void msx_cart_ascii16_sram_device::device_reset()
 	m_rombank[1]->set_entry(0);
 }
 
-image_init_result msx_cart_ascii16_sram_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_ascii16_sram_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ascii16_sram_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (!cart_sram_region())
 	{
 		message = "msx_cart_ascii16_sram_device: Required region 'sram' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	const u32 size = cart_rom_region()->bytes();
@@ -252,13 +252,13 @@ image_init_result msx_cart_ascii16_sram_device::initialize_cartridge(std::string
 	if (size > 128 * BANK_SIZE || size != banks * BANK_SIZE || (~(banks - 1) % banks))
 	{
 		message = "msx_cart_ascii16_sram_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	if (cart_sram_region()->bytes() < 0x800)
 	{
 		message = "msx_cart_ascii16_sram_device: Region 'sram' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::BADSOFTWARE;
 	}
 
 	m_bank_mask = banks - 1;
@@ -268,13 +268,13 @@ image_init_result msx_cart_ascii16_sram_device::initialize_cartridge(std::string
 		m_rombank[i]->configure_entries(0, banks, cart_rom_region()->base(), BANK_SIZE);
 
 	page(1)->install_read_bank(0x4000, 0x7fff, m_rombank[0]);
-	page(1)->install_write_handler(0x6000, 0x67ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_6000)));
-	page(1)->install_write_handler(0x7000, 0x77ff, write8smo_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_7000)));
+	page(1)->install_write_handler(0x6000, 0x67ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_6000)));
+	page(1)->install_write_handler(0x7000, 0x77ff, emu::rw_delegate(*this, FUNC(msx_cart_ascii16_sram_device::mapper_write_7000)));
 	page(2)->install_view(0x8000, 0xbfff, m_view);
 	m_view[0].install_read_bank(0x8000, 0xbfff, m_rombank[1]);
 	m_view[1].install_ram(0x8000, 0x87ff, 0x3800, cart_sram_region()->base());
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_ascii16_sram_device::mapper_write_6000(u8 data)

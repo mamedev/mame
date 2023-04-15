@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -18,8 +20,7 @@
 
 // PV-1000 Sound device
 
-class pv1000_sound_device : public device_t,
-									public device_sound_interface
+class pv1000_sound_device : public device_t, public device_sound_interface
 {
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -34,23 +35,23 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-
 	// internal state
 	struct
 	{
-		uint32_t  count = 0;
+		uint32_t  count  = 0;
 		uint16_t  period = 0;
-		uint8_t   val = 0;
-	}       m_voice[4];
+		uint8_t   val    = 1; // boot state of all channels
+	} m_voice[3];
 
-	sound_stream    *m_sh_channel = nullptr;
+	uint8_t m_ctrl = 0;
+	sound_stream *m_sh_channel = nullptr;
 };
 
 DEFINE_DEVICE_TYPE(PV1000, pv1000_sound_device, "pv1000_sound", "NEC D65010G031")
 
-pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PV1000, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
+pv1000_sound_device::pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, PV1000, tag, owner, clock),
+	device_sound_interface(mconfig, *this)
 {
 }
 
@@ -62,73 +63,109 @@ void pv1000_sound_device::device_start()
 {
 	m_sh_channel = stream_alloc(0, 1, clock() / 1024);
 
-	save_item(NAME(m_voice[0].count));
-	save_item(NAME(m_voice[0].period));
-	save_item(NAME(m_voice[0].val));
-	save_item(NAME(m_voice[1].count));
-	save_item(NAME(m_voice[1].period));
-	save_item(NAME(m_voice[1].val));
-	save_item(NAME(m_voice[2].count));
-	save_item(NAME(m_voice[2].period));
-	save_item(NAME(m_voice[2].val));
-	// are these ever used?
-	save_item(NAME(m_voice[3].count));
-	save_item(NAME(m_voice[3].period));
-	save_item(NAME(m_voice[3].val));
+	save_item(STRUCT_MEMBER(m_voice, count));
+	save_item(STRUCT_MEMBER(m_voice, period));
+	save_item(STRUCT_MEMBER(m_voice, val));
+
+	save_item(NAME(m_ctrl));
 }
 
 void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
-	m_voice[offset].period = data;
+	switch (offset)
+	{
+	case 0x03:
+		m_ctrl = data;
+		break;
+	default:
+		{
+			const uint8_t per = ~data & 0x3f;
+
+			if ((per == 0) && (m_voice[offset].period != 0))
+			{
+				// flip output once and stall there!
+				m_voice[offset].val = !m_voice[offset].val;
+			}
+
+			m_voice[offset].period = per;
+		}
+		break;
+	}
 }
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-
 /*
- plgDavid's audio implementation/analysis notes:
+  plgDavid's audio implementation/analysis notes:
 
- Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
- then by the value of the 6bit period registers.
- This creates a surprisingly accurate pitch range.
+  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
+  then by the value of the 6bit period registers.
+  This creates a surprisingly accurate pitch range.
+  Note: the register periods are inverted.
 
- Note: the register periods are inverted.
- */
+  plgDavid 2023 update: lidnariq (NESDEV) took a fondness to the system and gave me a bunch of test roms
+  to strenghten the emulation.
+
+  Quite a few things were uncovered overall, but for audio specifically:
+  1)Audio mix/mux control ($FB, case 0x03) was ignored
+  2)lidnariq's tracing of my PCB scans showed that all three sound outputs are mixed using different volumes:
+  square1 via i/o$F8 is -6dB, square2 via i/o$F9 is -3dB, defining square3 via i/o$FA as 0dB
+*/
 
 void pv1000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	auto &buffer = outputs[0];
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	// Each channel has a different volume via resistor mixing which correspond to -6dB, -3dB, 0dB drops
+	static const int volumes[3] = {0x1000, 0x1800, 0x2000};
+
+	for (int index = 0; index < buffer.samples(); index++)
 	{
 		s32 sum = 0;
 
+		// First calculate all vals
 		for (int i = 0; i < 3; i++)
 		{
-			uint32_t per = (0x3f - (m_voice[i].period & 0x3f));
-
-			if (per != 0)   //OFF!
-				sum += m_voice[i].val * 8192;
-
 			m_voice[i].count++;
 
-			if (m_voice[i].count >= per)
+			if ((m_voice[i].period > 0) && (m_voice[i].count >= m_voice[i].period))
 			{
 				m_voice[i].count = 0;
 				m_voice[i].val = !m_voice[i].val;
 			}
 		}
 
-		buffer.put_int(sampindex, sum, 32768);
+		// Then mix channels according to m_ctrl
+		if (BIT(m_ctrl, 1))
+		{
+			// ch0 and ch1
+			if (BIT(m_ctrl, 0))
+			{
+				const int xor01 = BIT(m_voice[0].val ^ m_voice[1].val, 0);
+				const int xor12 = BIT(m_voice[1].val ^ m_voice[2].val, 0);
+				sum += xor01 * volumes[0];
+				sum += xor12 * volumes[1];
+			}
+			else
+			{
+				sum += m_voice[0].val * volumes[0];
+				sum += m_voice[1].val * volumes[1];
+			}
+
+			// ch3 is unaffected by m_ctrl bit 1
+			sum += m_voice[2].val * volumes[2];
+		}
+
+		buffer.put_int(index, sum, 32768);
 	}
 }
 
 
 // PV-1000 System
-
 
 class pv1000_state : public driver_device
 {
@@ -146,15 +183,19 @@ public:
 
 	void pv1000(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void gfxram_w(offs_t offset, uint8_t data);
-	uint8_t   m_io_regs[8]{};
-	uint8_t   m_fd_data = 0;
+	uint8_t m_io_regs[8]{};
+	uint8_t m_fd_data = 0;
 
-	emu_timer       *m_irq_on_timer = nullptr;
-	emu_timer       *m_irq_off_timer = nullptr;
+	emu_timer *m_irq_on_timer = nullptr;
+	emu_timer *m_irq_off_timer = nullptr;
 	uint8_t m_pcg_bank = 0;
 	uint8_t m_force_pattern = 0;
 	uint8_t m_fd_buffer_flag = 0;
@@ -167,12 +208,10 @@ private:
 	required_device<pv1000_sound_device> m_sound;
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -198,9 +237,9 @@ void pv1000_state::pv1000_io(address_map &map)
 
 void pv1000_state::gfxram_w(offs_t offset, uint8_t data)
 {
-	uint8_t *gfxram = memregion( "gfxram" )->base();
+	uint8_t *gfxram = memregion("gfxram")->base();
 
-	gfxram[ offset ] = data;
+	gfxram[offset] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
@@ -212,12 +251,9 @@ void pv1000_state::io_w(offs_t offset, uint8_t data)
 	case 0x00:
 	case 0x01:
 	case 0x02:
+	case 0x03:
 		//logerror("io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
 		m_sound->voice_w(offset, data);
-	break;
-
-	case 0x03:
-		//currently unknown use
 	break;
 
 	case 0x05:
@@ -240,9 +276,9 @@ uint8_t pv1000_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_regs[offset];
 
-//  logerror("io_r offset=%02x\n", offset );
+//  logerror("io_r offset=%02x\n", offset);
 
-	switch ( offset )
+	switch (offset)
 	{
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
@@ -275,25 +311,25 @@ uint8_t pv1000_state::io_r(offs_t offset)
 
 
 static INPUT_PORTS_START( pv1000 )
-	PORT_START( "IN0" )
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
 
-	PORT_START( "IN1" )
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 
-	PORT_START( "IN2" )
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
 
-	PORT_START( "IN3" )
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -301,44 +337,39 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pv1000_state::cart_load )
+DEVICE_IMAGE_LOAD_MEMBER(pv1000_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size != 0x2000 && size != 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K, 16K or 32K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
 uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	bitmap.fill(m_border_col); // TODO: might be either black or colored by this register
 
-	for ( y = 0; y < 24; y++ )
+	for (int y = 0; y < 24; y++)
 	{
-		for ( x = 2; x < 30; x++ ) // left-right most columns are definitely masked by the border color
+		for (int x = 2; x < 30; x++) // left-right most columns are definitely masked by the border color
 		{
-			uint16_t tile = m_p_videoram[ y * 32 + x ];
+			uint16_t tile = m_p_videoram[y * 32 + x];
 
-			if ( tile < 0xe0 || m_force_pattern )
+			if (tile < 0xe0 || m_force_pattern)
 			{
-				tile += ( m_pcg_bank << 8);
-				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				tile += (m_pcg_bank << 8);
+				m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 			}
 			else
 			{
 				tile -= 0xe0;
-				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8 );
+				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, tile, 0, 0, 0, x*8, y*8);
 			}
 		}
 	}
@@ -359,21 +390,21 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 		m_fd_buffer_flag |= 1; /* TODO: exact timing of this */
 
 	/* Set IRQ line and schedule release of IRQ line */
-	m_maincpu->set_input_line(0, ASSERT_LINE );
-	m_irq_off_timer->adjust( m_screen->time_until_pos(vpos, 380/2 ) );
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_irq_off_timer->adjust(m_screen->time_until_pos(vpos, 380/2));
 
 	/* Schedule next IRQ trigger */
-	if ( vpos >= 255 )
+	if (vpos >= 255)
 	{
 		next_vpos = 195;
 	}
-	m_irq_on_timer->adjust( m_screen->time_until_pos(next_vpos, 0 ) );
+	m_irq_on_timer->adjust(m_screen->time_until_pos(next_vpos, 0));
 }
 
 
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE );
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

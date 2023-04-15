@@ -100,12 +100,12 @@ public:
 	~palette_client();
 
 	// getters
-	palette_client *next() const { return m_next; }
-	palette_t &palette() const { return m_palette; }
-	const uint32_t *dirty_list(uint32_t &mindirty, uint32_t &maxdirty);
+	palette_client *next() const noexcept { return m_next; }
+	palette_t &palette() const noexcept { return m_palette; }
+	const uint32_t *dirty_list(uint32_t &mindirty, uint32_t &maxdirty) noexcept;
 
 	// dirty marking
-	void mark_dirty(uint32_t index) { m_live->mark_dirty(index); }
+	void mark_dirty(uint32_t index) noexcept { m_live->mark_dirty(index); }
 
 private:
 	// internal object to track dirty states
@@ -116,10 +116,10 @@ private:
 		dirty_state();
 
 		// operations
-		const uint32_t *dirty_list(uint32_t &mindirty, uint32_t &maxdirty);
+		const uint32_t *dirty_list(uint32_t &mindirty, uint32_t &maxdirty) noexcept;
 		void resize(uint32_t colors);
-		void mark_dirty(uint32_t index);
-		void reset();
+		void mark_dirty(uint32_t index) noexcept;
+		void reset() noexcept;
 
 	private:
 		// internal state
@@ -149,15 +149,15 @@ public:
 	static palette_t *alloc(uint32_t numcolors, uint32_t numgroups = 1);
 
 	// reference counting
-	void ref() { m_refcount++; }
-	void deref();
+	void ref() noexcept { m_refcount++; }
+	void deref() noexcept;
 
 	// getters
-	int num_colors() const { return m_numcolors; }
-	int num_groups() const { return m_numgroups; }
-	int max_index() const { return m_numcolors * m_numgroups + 2; }
-	uint32_t black_entry() const { return m_numcolors * m_numgroups + 0; }
-	uint32_t white_entry() const { return m_numcolors * m_numgroups + 1; }
+	int num_colors() const noexcept { return m_numcolors; }
+	int num_groups() const noexcept { return m_numgroups; }
+	int max_index() const noexcept { return m_numcolors * m_numgroups + 2; }
+	uint32_t black_entry() const noexcept { return m_numcolors * m_numgroups + 0; }
+	uint32_t white_entry() const noexcept { return m_numcolors * m_numgroups + 1; }
 
 	// overall adjustments
 	void set_brightness(float brightness);
@@ -165,9 +165,9 @@ public:
 	void set_gamma(float gamma);
 
 	// entry getters
-	rgb_t entry_color(uint32_t index) const { return (index < m_numcolors) ? m_entry_color[index] : rgb_t::black(); }
-	rgb_t entry_adjusted_color(uint32_t index) const { return (index < m_numcolors * m_numgroups) ? m_adjusted_color[index] : rgb_t::black(); }
-	float entry_contrast(uint32_t index) const { return (index < m_numcolors) ? m_entry_contrast[index] : 1.0f; }
+	rgb_t entry_color(uint32_t index) const noexcept { return (index < m_numcolors) ? m_entry_color[index] : rgb_t::black(); }
+	rgb_t entry_adjusted_color(uint32_t index) const noexcept { return (index < m_numcolors * m_numgroups) ? m_adjusted_color[index] : rgb_t::black(); }
+	float entry_contrast(uint32_t index) const noexcept { return (index < m_numcolors) ? m_entry_contrast[index] : 1.0f; }
 
 	// entry setters
 	void entry_set_color(uint32_t index, rgb_t rgb);
@@ -177,9 +177,9 @@ public:
 	void entry_set_contrast(uint32_t index, float contrast);
 
 	// entry list getters
-	const rgb_t *entry_list_raw() const { return &m_entry_color[0]; }
-	const rgb_t *entry_list_adjusted() const { return &m_adjusted_color[0]; }
-	const rgb_t *entry_list_adjusted_rgb15() const { return &m_adjusted_rgb15[0]; }
+	const rgb_t *entry_list_raw() const noexcept { return &m_entry_color[0]; }
+	const rgb_t *entry_list_adjusted() const noexcept { return &m_adjusted_color[0]; }
+	const rgb_t *entry_list_adjusted_rgb15() const noexcept { return &m_adjusted_rgb15[0]; }
 
 	// group adjustments
 	void group_set_brightness(uint32_t group, float brightness);
@@ -198,14 +198,14 @@ private:
 	void update_adjusted_color(uint32_t group, uint32_t index);
 
 	// internal state
-	uint32_t          m_refcount;                   // reference count on the palette
-	uint32_t          m_numcolors;                  // number of colors in the palette
-	uint32_t          m_numgroups;                  // number of groups in the palette
+	uint32_t           m_refcount;              // reference count on the palette
+	uint32_t           m_numcolors;             // number of colors in the palette
+	uint32_t           m_numgroups;             // number of groups in the palette
 
-	float           m_brightness;                 // overall brightness value
-	float           m_contrast;                   // overall contrast value
-	float           m_gamma;                      // overall gamma value
-	uint8_t           m_gamma_map[256];             // gamma map
+	float              m_brightness;            // overall brightness value
+	float              m_contrast;              // overall contrast value
+	float              m_gamma;                 // overall gamma value
+	uint8_t            m_gamma_map[256];        // gamma map
 
 	std::vector<rgb_t> m_entry_color;           // array of raw colors
 	std::vector<float> m_entry_contrast;        // contrast value for each entry

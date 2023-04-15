@@ -21,6 +21,11 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
+// devices without attribute memory
+DEFINE_DEVICE_TYPE(PCCARD_SRAM_MITSUBISHI_1M, pccard_mitsubishi_mf31m1_lycat01_device, "mitsubishi_mf31m1_lycat01", "Mitsubishi Melcard 1 MB SRAM")
+
+// devices with attribute memory
+DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_1M, pccard_centennial_sl01m_15_11194_device, "centennial_sl01m_15_11194", "Centennial 1 MB SRAM")
 DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_2M, pccard_centennial_sl02m_15_11194_device, "centennial_sl02m_15_11194", "Centennial 2 MB SRAM")
 DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_device, "centennial_sl04m_15_11194", "Centennial 4 MB SRAM")
 
@@ -30,15 +35,15 @@ DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_d
 
 static INPUT_PORTS_START( card )
 	PORT_START("switches")
-	PORT_DIPNAME(0x01, 0x00, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_1_w)
-	PORT_DIPSETTING(   0x01, DEF_STR(Yes))
-	PORT_DIPSETTING(   0x00, DEF_STR(No))
-	PORT_DIPNAME(0x02, 0x00, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_2_w)
-	PORT_DIPSETTING(   0x02, DEF_STR(Yes))
-	PORT_DIPSETTING(   0x00, DEF_STR(No))
-	PORT_DIPNAME(0x04, 0x04, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
-	PORT_DIPSETTING(   0x04, DEF_STR(No))
-	PORT_DIPSETTING(   0x00, DEF_STR(Yes))
+	PORT_CONFNAME(0x01, 0x00, "Battery Failed") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_1_w)
+	PORT_CONFSETTING(   0x01, DEF_STR(Yes))
+	PORT_CONFSETTING(   0x00, DEF_STR(No))
+	PORT_CONFNAME(0x02, 0x00, "Battery Low")    PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, battery_voltage_2_w)
+	PORT_CONFSETTING(   0x02, DEF_STR(Yes))
+	PORT_CONFSETTING(   0x00, DEF_STR(No))
+	PORT_CONFNAME(0x04, 0x04, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
+	PORT_CONFSETTING(   0x04, DEF_STR(No))
+	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
 INPUT_PORTS_END
 
 ioport_constructor pccard_sram_device::device_input_ports() const
@@ -131,7 +136,7 @@ uint16_t pccard_sram_device::read_reg(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
-	if (m_card_detect)
+	if (has_configured_map(1) && m_card_detect)
 		data = space(1).read_word(offset * 2, mem_mask);
 
 	LOGMASKED(LOG_ATTRIBUTE, "attribute memory r: %06x = %04x & %04x\n", offset, data, mem_mask);
@@ -143,7 +148,7 @@ void pccard_sram_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	LOGMASKED(LOG_ATTRIBUTE, "attribute memory w: %06x = %04x & %04x\n", offset, data, mem_mask);
 
-	if (m_card_detect && BIT(m_switches->read(), 2))
+	if (has_configured_map(1) && m_card_detect && BIT(m_switches->read(), 2))
 		space(1).write_word(offset * 2, data & 0x00ff, mem_mask);
 }
 
@@ -156,8 +161,79 @@ void pccard_sram_device::card_inserted(bool state)
 
 /***************************************************************************
 
+    Mitsubishi Melcard
+
+    MF31M1-LYCAT01: 8/16-bit Data Bus Static RAM Card
+
+***************************************************************************/
+
+pccard_mitsubishi_sram_device::pccard_mitsubishi_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	pccard_sram_device(mconfig, type, tag, owner, clock),
+	m_sram(*this, "sram")
+{
+}
+
+std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call_load()
+{
+	card_inserted(false);
+
+	if (length() != m_sram.bytes())
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	if (fread(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
+
+	card_inserted(true);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+std::pair<std::error_condition, std::string> pccard_mitsubishi_sram_device::call_create(int format_type, util::option_resolution *format_options)
+{
+	card_inserted(false);
+
+	// clear ram
+	std::fill_n(&m_sram[0], m_sram.length(), 0);
+
+	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
+
+	card_inserted(true);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+void pccard_mitsubishi_sram_device::call_unload()
+{
+	if (m_card_detect && !is_readonly())
+	{
+		fseek(0, SEEK_SET);
+		fwrite(&m_sram[0], m_sram.bytes());
+	}
+
+	std::fill_n(&m_sram[0], m_sram.length(), 0);
+
+	card_inserted(false);
+}
+
+pccard_mitsubishi_mf31m1_lycat01_device::pccard_mitsubishi_mf31m1_lycat01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pccard_mitsubishi_sram_device(mconfig, PCCARD_SRAM_MITSUBISHI_1M, tag, owner, clock)
+{
+	m_memory_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16, 20, 0, address_map_constructor(FUNC(pccard_mitsubishi_mf31m1_lycat01_device::memory_map), this));
+	m_attribute_space_config = address_space_config("attribute", ENDIANNESS_LITTLE, 16, 14, 0);
+}
+
+void pccard_mitsubishi_mf31m1_lycat01_device::memory_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sram");
+}
+
+
+/***************************************************************************
+
     Centennial SRAM
 
+    SL01M-15-11194: 1 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
     SL02M-15-11194: 2 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
     SL04M-15-11194: 4 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
 
@@ -179,43 +255,43 @@ pccard_centennial_sram_device::pccard_centennial_sram_device(const machine_confi
 {
 }
 
-image_init_result pccard_centennial_sram_device::call_load()
+std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call_load()
 {
 	card_inserted(false);
 
 	if (length() != m_sram.bytes() + m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	if (fread(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	if (fread(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
-image_init_result pccard_centennial_sram_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> pccard_centennial_sram_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	card_inserted(false);
 
 	// clear ram
 	std::fill_n(&m_sram[0], m_sram.length(), 0);
 
-	// initialize eeprom data from default data
+	// initialize EEPROM data from default data
 	std::copy_n(m_eeprom_default->base(), m_eeprom.length(), &m_eeprom[0]);
 
 	if (fwrite(&m_sram[0], m_sram.bytes()) != m_sram.bytes())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	if (fwrite(&m_eeprom[0], m_eeprom.bytes()) != m_eeprom.bytes())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
 	card_inserted(true);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void pccard_centennial_sram_device::call_unload()
@@ -231,6 +307,33 @@ void pccard_centennial_sram_device::call_unload()
 	std::fill_n(&m_eeprom[0], m_eeprom.length(), 0);
 
 	card_inserted(false);
+}
+
+pccard_centennial_sl01m_15_11194_device::pccard_centennial_sl01m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pccard_centennial_sram_device(mconfig, PCCARD_SRAM_CENTENNIAL_1M, tag, owner, clock)
+{
+	m_memory_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16, 20, 0, address_map_constructor(FUNC(pccard_centennial_sl01m_15_11194_device::memory_map), this));
+	m_attribute_space_config = address_space_config("attribute", ENDIANNESS_LITTLE, 16, 14, 0, address_map_constructor(FUNC(pccard_centennial_sl01m_15_11194_device::attribute_map), this));
+}
+
+void pccard_centennial_sl01m_15_11194_device::memory_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sram");
+}
+
+void pccard_centennial_sl01m_15_11194_device::attribute_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram().share("eeprom");
+}
+
+ROM_START( eeprom_01 )
+	ROM_REGION(0x2000, "eeprom", 0)
+	ROM_LOAD("eeprom.bin", 0x0000, 0x2000, BAD_DUMP CRC(2caacff3) SHA1(8141459dccf63a64f4bdf4e2171b0884f2cc390d))
+ROM_END
+
+const tiny_rom_entry *pccard_centennial_sl01m_15_11194_device::device_rom_region() const
+{
+	return ROM_NAME( eeprom_01 );
 }
 
 pccard_centennial_sl02m_15_11194_device::pccard_centennial_sl02m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

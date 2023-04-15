@@ -12,7 +12,7 @@
 #pragma once
 
 #include "x68kexp.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 
 class x68k_scsiext_device : public device_t,
 							public device_x68k_expansion_card_interface
@@ -20,9 +20,6 @@ class x68k_scsiext_device : public device_t,
 public:
 	// construction/destruction
 	x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	uint8_t register_r(offs_t offset);
-	void register_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -40,8 +37,8 @@ private:
 
 	x68k_expansion_slot_device *m_slot;
 
-	required_device<scsi_port_device> m_scsibus;
 	required_device<mb89352_device> m_spc;
+	required_region_ptr<u8> m_rom;
 };
 
 // device type definition

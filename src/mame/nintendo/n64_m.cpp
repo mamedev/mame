@@ -964,17 +964,15 @@ void n64_periphs::dp_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_n64->rdp()->set_status(status & ~DP_STATUS_START_VALID);
 				m_n64->rdp()->set_current(m_n64->rdp()->get_start());
 				m_n64->rdp()->set_end(data & ~7);
-				g_profiler.start(PROFILER_USER1);
+				auto profile = g_profiler.start(PROFILER_USER1);
 				m_n64->rdp()->process_command_list();
-				g_profiler.stop();
 				break;
 			}
 			else
 			{
 				m_n64->rdp()->set_end(data & ~7);
-				g_profiler.start(PROFILER_USER1);
+				auto profile = g_profiler.start(PROFILER_USER1);
 				m_n64->rdp()->process_command_list();
-				g_profiler.stop();
 				break;
 			}
 

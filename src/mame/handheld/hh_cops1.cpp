@@ -218,7 +218,7 @@ u8 mbaskb_state::read_f()
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mbaskb )
 	PORT_START("IN.0") // port K
@@ -242,6 +242,8 @@ static INPUT_PORTS_START( mhockeya )
 	PORT_MODIFY("IN.2") // F2
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // tied high to select Hockey
 INPUT_PORTS_END
+
+// config
 
 void mbaskb_state::mbaskb(machine_config &config)
 {
@@ -417,7 +419,7 @@ int qkracerm_state::read_si()
 	return 0;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( qkracerm )
 	PORT_START("IN.0") // DS8874 OUT 4 port K
@@ -450,6 +452,8 @@ static INPUT_PORTS_START( qkracerm )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
+
+// config
 
 void qkracerm_state::qkracerm(machine_config &config)
 {
@@ -565,7 +569,7 @@ u8 qkspeller_state::read_k()
 	return read_inputs(8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( qkspeller )
 	PORT_START("IN.0") // Sa port K
@@ -632,6 +636,8 @@ static INPUT_PORTS_START( qkspeller )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void qkspeller_state::qkspeller(machine_config &config)
 {
@@ -756,7 +762,7 @@ u8 cambrp_state::read_k()
 	return read_inputs(6);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( cambrp )
 	PORT_START("IN.0") // DS8874 OUT 3 port K
@@ -793,6 +799,8 @@ static INPUT_PORTS_START( cambrp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / rcl / MEx")
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void cambrp_state::cambrp(machine_config &config)
 {

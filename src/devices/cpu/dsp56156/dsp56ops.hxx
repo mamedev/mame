@@ -23,8 +23,8 @@ TODO:
 */
 
 #define LOG_OUTPUT_FUNC cpustate->device->logerror
-#define LOG_UNIMPLEMENTED   (1 << 1U)
-#define LOG_CHECKS          (1 << 2U)
+#define LOG_UNIMPLEMENTED   (1U << 1)
+#define LOG_CHECKS          (1U << 2)
 
 #define VERBOSE (0)
 #include "logmacro.h"

@@ -1466,9 +1466,6 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     if upd_ssw:
         code.append(["update_ssw"])
 
-    if wait_bus_finish:
-        code.append(["bus_end"])
-
     if drop_critical:
         code.append(["drop_critical"])
 
@@ -1644,9 +1641,6 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
         
     
     # T4
-    if to_irc:
-        code_to_sort.append(["=", R.irc, R.edb])
-
     if au_clk_en:
 #        code.append(["i", "// auc=%s dbl=%s dbh=%s (%d %d) abl=%s abh=%s ftuc=%x" % (au_cntrl, dbl, dbh, dbl_dbd, dbl_dbh, abl, abh, nanox(nano, 39, 4))])
         if au_cntrl == 0:
@@ -1683,14 +1677,6 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             else:
                 code_to_sort.append(["=", R.aul, "-1/2", maybe_merge(dbh, dbl), "ry"])
 
-    if to_dbin:
-        if no_high_byte:
-            code_to_sort.append(["=8", R.dbin, R.edb])
-        elif no_low_byte:
-            code_to_sort.append(["=8h", R.dbin, R.edb])
-        else:
-            code_to_sort.append(["=", R.dbin, R.edb])
-
     if alu_op:
         if ftu_to_ccr or no_ccr_en or not (alu_info & (ALUInfo.init|ALUInfo.finish)):
             alu_mask = 0
@@ -1724,6 +1710,20 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
             code_to_sort.append(["alu", alu_op, alu_mask, alu_info, ["c", 0], ["c", 0]])
 
     sort_and_append(code_to_sort, code)
+
+    if wait_bus_finish:
+        code.append(["bus_end"])
+
+    if to_irc:
+        code.append(["=", R.irc, R.edb])
+
+    if to_dbin:
+        if no_high_byte:
+            code.append(["=8", R.dbin, R.edb])
+        elif no_low_byte:
+            code.append(["=8h", R.dbin, R.edb])
+        else:
+            code.append(["=", R.dbin, R.edb])
 
     if const_to_ftu:
         code.append(["i", "set_ftu_const();"])

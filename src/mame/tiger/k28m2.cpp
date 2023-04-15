@@ -4,21 +4,21 @@
 /*******************************************************************************
 
 Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
-- Coleco: Talking Teacher
+- Coleco: Talking Teacher (model 8100)
 - Sears: Talkatron: Learning Computer
 
 1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
 keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
 
 Hardware notes:
+- PCB label: 201223A (main), REV0 ET828D (LCD)
 - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
-- TMS51xx: TMS5110A
+- TMS51xx: TMS5110ANL
 - VSM: 16KB CM62084
-- LCD: SMOS SMC1112 MCU to 8*14-seg display
+- LCD: SMC1112 MCU under epoxy (die label: SMC1112 D2N0), 8*14-seg display
 - module slot (not compatible with the 1981 version(s))
 
 TODO:
-- emulate LCD
 - dump/add module #5
 
 *******************************************************************************/
@@ -27,6 +27,7 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "cpu/tms1000/smc1102.h"
 #include "cpu/tms1000/tms1400.h"
 #include "machine/tms6100.h"
 #include "sound/tms5110.h"
@@ -46,10 +47,12 @@ public:
 	k28m2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
 		m_cart(*this, "cartslot"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void k28m2(machine_config &config);
@@ -63,29 +66,38 @@ protected:
 private:
 	// devices/pointers
 	required_device<tms1400_cpu_device> m_maincpu;
+	required_device<smc1112_cpu_device> m_subcpu;
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
+	output_finder<8> m_digits;
 
+	void power_off();
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
+	u8 sub_read_k();
+	void write_segs(offs_t offset, u32 data);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-	void power_off();
 
 	bool m_power_on = false;
 	u16 m_inp_mux = 0;
 	u32 m_r = 0;
+	u32 m_digit_data[4] = { };
 };
 
 void k28m2_state::machine_start()
 {
+	m_digits.resolve();
+
 	// register for savestates
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_r));
+	save_item(NAME(m_digit_data));
 }
 
 
@@ -98,6 +110,7 @@ void k28m2_state::machine_reset()
 {
 	m_power_on = true;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(k28m2_state::power_on)
@@ -110,6 +123,11 @@ void k28m2_state::power_off()
 {
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	// clear display
+	for (int i = 0; i < 8; i++)
+		m_digits[i] = 0;
 }
 
 
@@ -120,18 +138,15 @@ void k28m2_state::power_off()
 
 DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 {
-	u32 size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	if (size > 0x4000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid image file size (must be no more than 16K)");
 
-	u8 *base = memregion("tms6100")->base() + 0x8000;
+	u8 *const base = memregion("tms6100")->base() + 0x4000;
 	m_cart->common_load_rom(base, size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -139,6 +154,8 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+// maincpu side
 
 void k28m2_state::write_r(u32 data)
 {
@@ -152,8 +169,8 @@ void k28m2_state::write_r(u32 data)
 	// R5: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
-	// R7-R10: LCD data
-	//TODO..
+	// R7-R10: subcpu K interrupt
+	m_subcpu->set_input_line(SMC1102_INPUT_LINE_K, (data & 0x780) ? ASSERT_LINE : CLEAR_LINE);
 
 	// R6: power-off request, on falling edge
 	if (~data & m_r & 0x40)
@@ -179,6 +196,30 @@ u8 k28m2_state::read_k()
 
 	// and TMS5100 CTL (also tied to R1234)
 	return data | m_tms5100->ctl_r() | (m_r & 0xf);
+}
+
+
+// subcpu side
+
+void k28m2_state::write_segs(offs_t offset, u32 data)
+{
+	m_digit_data[offset & 3] = data;
+
+	for (int d = 0; d < 8; d++)
+	{
+		// 4 segments per common
+		u16 segs = 0;
+		for (int i = 0; i < 4; i++)
+			segs = segs << 4 | (m_digit_data[i] >> (d * 4) & 0xf);
+
+		m_digits[d] = bitswap<14>(segs,6,10,13,1,5,9,11,8,12,4,2,7,15,14);
+	}
+}
+
+u8 k28m2_state::sub_read_k()
+{
+	// K: maincpu R7-R10
+	return m_r >> 7 & 0xf;
 }
 
 
@@ -259,6 +300,12 @@ void k28m2_state::k28m2(machine_config &config)
 	m_maincpu->write_o().set(FUNC(k28m2_state::write_o));
 	m_maincpu->write_r().set(FUNC(k28m2_state::write_r));
 
+	SMC1112(config, m_subcpu, 32.768_kHz_XTAL);
+	m_subcpu->read_k().set(FUNC(k28m2_state::sub_read_k));
+	m_subcpu->write_segs().set(FUNC(k28m2_state::write_segs));
+
+	config.set_perfect_quantum(m_subcpu);
+
 	config.set_default_layout(layout_k28m2);
 
 	// sound hardware
@@ -288,15 +335,18 @@ void k28m2_state::k28m2(machine_config &config)
 
 ROM_START( k28m2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(08d15ab6) SHA1(5b0f6c53e6732a362c4bb25d966d4072fdd33db8) )
+	ROM_LOAD( "mp7324", 0x0000, 0x1000, CRC(8d304cf2) SHA1(d649b6477ea8634b3a3ba34dde7e5e913855801f) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 557, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1400_k28m2_output.pla", 0, 557, CRC(3a5c7005) SHA1(3fe5819c138a90e7fc12817415f2622ca81b40b2) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
-	ROM_LOAD( "cm62084.vsm", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD( "smc1112_d2n0", 0x0000, 0x0800, CRC(e985fd67) SHA1(a0b0280920bf0ac02a1aaf02d534dddbae829433) )
+
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
+	ROM_LOAD( "cm62084", 0x0000, 0x4000, CRC(cd1376f7) SHA1(96fa484c392c451599bc083b8376cad9c998df7d) )
 ROM_END
 
 } // anonymous namespace
@@ -307,5 +357,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1985, k28m2,  0,       0, k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1985, k28m2,  0,      0,      k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

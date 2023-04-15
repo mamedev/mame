@@ -12,12 +12,13 @@
 
 #include "spec128.h"
 
-#include "beta_m.h"
-
 #include "glukrs.h"
+#include "tsconfdma.h"
+
+#include "beta_m.h"
+#include "bus/spectrum/zxbus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "tsconfdma.h"
 
 #include "tilemap.h"
 
@@ -29,6 +30,7 @@ public:
 		: spectrum_128_state(mconfig, type, tag),
 		  m_bank0_rom(*this, "bank0_rom"),
 		  m_keyboard(*this, "pc_keyboard"),
+		  m_io_mouse(*this, "mouse_input%u", 1U),
 		  m_beta(*this, BETA_DISK_TAG),
 		  m_dma(*this, "dma"),
 		  m_sdcard(*this, "sdcard"),
@@ -50,7 +52,6 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	TIMER_CALLBACK_MEMBER(irq_on) override;
 	TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
@@ -196,6 +197,7 @@ private:
 	memory_view m_bank0_rom;
 
 	required_device<at_keyboard_device> m_keyboard;
+	required_ioport_array<3> m_io_mouse;
 
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;

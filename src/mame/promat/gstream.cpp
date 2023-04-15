@@ -586,141 +586,136 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 	const pen_t *rgb = m_palette->pens(); // 16 bit BGR
 
 	// render
+	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 
-	do {
-		g_profiler.start(PROFILER_DRAWGFX);
-		do {
-			int32_t destendx, destendy;
-			int32_t srcx, srcy;
-			int32_t dy;
+	int32_t destendx, destendy;
+	int32_t srcx, srcy;
+	int32_t dy;
 
-			assert(dest.valid());
-			assert(gfx != nullptr);
-			assert(dest.cliprect().contains(cliprect));
-			assert(code < gfx->elements());
+	assert(dest.valid());
+	assert(gfx != nullptr);
+	assert(dest.cliprect().contains(cliprect));
+	assert(code < gfx->elements());
 
-			/* ignore empty/invalid cliprects */
-			if (cliprect.empty())
-				break;
+	/* ignore empty/invalid cliprects */
+	if (cliprect.empty())
+		return;
 
-			/* compute final pixel in X and exit if we are entirely clipped */
-			destendx = destx + gfx->width() - 1;
-			if (destx > cliprect.max_x || destendx < cliprect.min_x)
-				break;
+	/* compute final pixel in X and exit if we are entirely clipped */
+	destendx = destx + gfx->width() - 1;
+	if (destx > cliprect.max_x || destendx < cliprect.min_x)
+		return;
 
-			/* apply left clip */
-			srcx = 0;
-			if (destx < cliprect.min_x)
+	/* apply left clip */
+	srcx = 0;
+	if (destx < cliprect.min_x)
+	{
+		srcx = cliprect.min_x - destx;
+		destx = cliprect.min_x;
+	}
+
+	/* apply right clip */
+	if (destendx > cliprect.max_x)
+		destendx = cliprect.max_x;
+
+	/* compute final pixel in Y and exit if we are entirely clipped */
+	destendy = desty + gfx->height() - 1;
+	if (desty > cliprect.max_y || destendy < cliprect.min_y)
+		return;
+
+	/* apply top clip */
+	srcy = 0;
+	if (desty < cliprect.min_y)
+	{
+		srcy = cliprect.min_y - desty;
+		desty = cliprect.min_y;
+	}
+
+	/* apply bottom clip */
+	if (destendy > cliprect.max_y)
+		destendy = cliprect.max_y;
+
+	/* apply X flipping */
+	if (flipx)
+		srcx = gfx->width() - 1 - srcx;
+
+	/* apply Y flipping */
+	dy = gfx->rowbytes();
+	if (flipy)
+	{
+		srcy = gfx->height() - 1 - srcy;
+		dy = -dy;
+	}
+
+	/* fetch the source data */
+	const uint8_t *srcdata = gfx->get_data(code);
+	const uint8_t *srcdata2 = gfx2->get_data(code);
+
+	/* compute how many blocks of 4 pixels we have */
+	uint32_t leftovers = (destendx + 1 - destx);
+
+	/* adjust srcdata to point to the first source pixel of the row */
+	srcdata += srcy * gfx->rowbytes() + srcx;
+	srcdata2 += srcy * gfx->rowbytes() + srcx;
+
+	/* non-flipped 16bpp case */
+	if (!flipx)
+	{
+		/* iterate over pixels in Y */
+		for (int32_t cury = desty; cury <= destendy; cury++)
+		{
+			uint32_t *destptr = &dest.pix(cury, destx);
+			const uint8_t *srcptr = srcdata;
+			const uint8_t *srcptr2 = srcdata2;
+			srcdata += dy;
+			srcdata2 += dy;
+
+			/* iterate over leftover pixels */
+			for (int32_t curx = 0; curx < leftovers; curx++)
 			{
-				srcx = cliprect.min_x - destx;
-				destx = cliprect.min_x;
+				uint32_t srcdata = (srcptr[0]);
+				uint32_t srcdata2 = (srcptr2[0]);
+
+				uint16_t full = (srcdata | (srcdata2 << 8));
+				if (full != 0)
+					destptr[0] = rgb[full];
+
+				srcptr++;
+				srcptr2++;
+				destptr++;
 			}
+		}
+	}
 
-			/* apply right clip */
-			if (destendx > cliprect.max_x)
-				destendx = cliprect.max_x;
+	/* flipped 16bpp case */
+	else
+	{
+		/* iterate over pixels in Y */
+		for (int32_t cury = desty; cury <= destendy; cury++)
+		{
+			uint32_t *destptr = &dest.pix(cury, destx);
+			const uint8_t *srcptr = srcdata;
+			const uint8_t *srcptr2 = srcdata2;
 
-			/* compute final pixel in Y and exit if we are entirely clipped */
-			destendy = desty + gfx->height() - 1;
-			if (desty > cliprect.max_y || destendy < cliprect.min_y)
-				break;
+			srcdata += dy;
+			srcdata2 += dy;
 
-			/* apply top clip */
-			srcy = 0;
-			if (desty < cliprect.min_y)
+			/* iterate over leftover pixels */
+			for (int32_t curx = 0; curx < leftovers; curx++)
 			{
-				srcy = cliprect.min_y - desty;
-				desty = cliprect.min_y;
+				uint32_t srcdata = (srcptr[0]);
+				uint32_t srcdata2 = (srcptr2[0]);
+
+				uint16_t full = (srcdata | (srcdata2 << 8));
+				if (full != 0)
+					destptr[0] = rgb[full];
+
+				srcptr--;
+				srcptr2--;
+				destptr++;
 			}
-
-			/* apply bottom clip */
-			if (destendy > cliprect.max_y)
-				destendy = cliprect.max_y;
-
-			/* apply X flipping */
-			if (flipx)
-				srcx = gfx->width() - 1 - srcx;
-
-			/* apply Y flipping */
-			dy = gfx->rowbytes();
-			if (flipy)
-			{
-				srcy = gfx->height() - 1 - srcy;
-				dy = -dy;
-			}
-
-			/* fetch the source data */
-			const uint8_t *srcdata = gfx->get_data(code);
-			const uint8_t *srcdata2 = gfx2->get_data(code);
-
-			/* compute how many blocks of 4 pixels we have */
-			uint32_t leftovers = (destendx + 1 - destx);
-
-			/* adjust srcdata to point to the first source pixel of the row */
-			srcdata += srcy * gfx->rowbytes() + srcx;
-			srcdata2 += srcy * gfx->rowbytes() + srcx;
-
-			/* non-flipped 16bpp case */
-			if (!flipx)
-			{
-				/* iterate over pixels in Y */
-				for (int32_t cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (int32_t curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr++;
-						srcptr2++;
-						destptr++;
-					}
-				}
-			}
-
-			/* flipped 16bpp case */
-			else
-			{
-				/* iterate over pixels in Y */
-				for (int32_t cury = desty; cury <= destendy; cury++)
-				{
-					uint32_t *destptr = &dest.pix(cury, destx);
-					const uint8_t *srcptr = srcdata;
-					const uint8_t *srcptr2 = srcdata2;
-
-					srcdata += dy;
-					srcdata2 += dy;
-
-					/* iterate over leftover pixels */
-					for (int32_t curx = 0; curx < leftovers; curx++)
-					{
-						uint32_t srcdata = (srcptr[0]);
-						uint32_t srcdata2 = (srcptr2[0]);
-
-						uint16_t full = (srcdata | (srcdata2 << 8));
-						if (full != 0)
-							destptr[0] = rgb[full];
-
-						srcptr--;
-						srcptr2--;
-						destptr++;
-					}
-				}
-			}
-		} while (0);
-		g_profiler.stop();
-	} while (0);
+		}
+	}
 }
 
 void gstream_state::draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram )

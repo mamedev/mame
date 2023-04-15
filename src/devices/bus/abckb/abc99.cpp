@@ -43,8 +43,8 @@ Notes:
 
     TODO:
 
-	- watchdog clock
-	- output leds
+    - watchdog clock
+    - output leds
 
 */
 

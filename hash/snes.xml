@@ -19996,7 +19996,7 @@ more investigation needed...
 	</software>
 
 	<software name="nbajamte">
-		<description>NBA Jam - Tournament Edition (Europe)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Europe)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNSP-AJTP-EUR" />
@@ -50534,7 +50534,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamtej" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (Japan)</description>
+		<description>NBA Jam T.E. - Tournament Edition (Japan)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SHVC-AJTJ-JPN" />
@@ -50551,7 +50551,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamteup" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (USA, prototype)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50563,7 +50563,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamteu" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (USA)</description>
+		<description>NBA Jam T.E. - Tournament Edition (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="199502xx" />

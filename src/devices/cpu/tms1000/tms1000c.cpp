@@ -35,16 +35,16 @@ tms1000c_cpu_device::tms1000c_cpu_device(const machine_config &mconfig, const ch
 void tms1000c_cpu_device::device_add_mconfig(machine_config &config)
 {
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 32).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_mpla, 8, 16, 32).set_format(pla_device::FMT::BERKELEY);
+	PLA(config, m_opla, 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
 }
 
 
 // microinstructions decode (different order, no active-negative)
-u32 tms1000c_cpu_device::decode_micro(u8 sel)
+u32 tms1000c_cpu_device::decode_micro(offs_t offset)
 {
 	const u32 md[16] = { M_AUTY, M_AUTA, M_STSL, M_NE, M_C8, M_CIN, M_CKP, M_YTP, M_MTP, M_NATN, M_CKN, M_MTN, M_ATN, M_15TN, M_CKM, M_STO };
-	u16 mask = m_mpla->read(sel);
+	u16 mask = m_mpla->read(offset);
 	u32 decode = 0;
 
 	for (int bit = 0; bit < 16; bit++)

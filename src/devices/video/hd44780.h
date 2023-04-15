@@ -70,10 +70,10 @@ protected:
 	{
 		CHARSET_HD44780_A00,
 		CHARSET_SED1278_0B,
+		CHARSET_KS0066_F00,
 		CHARSET_KS0066_F05 /*,
 		CHARSET_HD44780_A01,
 		CHARSET_HD44780_A02,
-		CHARSET_KS0066_F00,
 		CHARSET_KS0066_F03,
 		CHARSET_KS0066_F04,
 		CHARSET_KS0066_F06,
@@ -149,6 +149,15 @@ public:
 	sed1278_0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+// ======================> ks0066_f00_device
+
+class ks0066_f00_device : public hd44780_device
+{
+public:
+	// construction/destruction
+	ks0066_f00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // ======================> ks0066_f05_device
 
 class ks0066_f05_device :  public hd44780_device
@@ -161,6 +170,7 @@ public:
 // device type definition
 DECLARE_DEVICE_TYPE(HD44780,    hd44780_device)
 DECLARE_DEVICE_TYPE(SED1278_0B, sed1278_0b_device)
+DECLARE_DEVICE_TYPE(KS0066_F00, ks0066_f00_device)
 DECLARE_DEVICE_TYPE(KS0066_F05, ks0066_f05_device)
 
 #endif // MAME_VIDEO_HD44780_H

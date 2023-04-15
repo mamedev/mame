@@ -74,7 +74,7 @@ void hng64_state::dl_upload_w(uint32_t data)
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
@@ -84,7 +84,6 @@ g_profiler.start(PROFILER_USER1);
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
 	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200*8));
-g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
@@ -568,13 +567,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
 			//                            a = blend this sprite (blend might use 'lighting' level as alpha?)
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
-			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
-			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
-			//                            X = horizontal subtexture
-			//                            * = broken banners in xrally
-			//                            Y = vertical subtexture
-			//                            # = broken banners in xrally
-			//                            u = unknown, set late on 2nd race+3rd race in xrally
+			// [2] S?hh hhhh hvvv vvvv    S = use texture offsets in lower bits
+			//                            ? = unknown, sometimes used on objects further way, then flipped off, maybe precision related / texturing sampling mode?
+			//                            h = horizontal offset into texture
+			//                            v = vertical offset into texture
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
 			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..

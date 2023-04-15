@@ -9,8 +9,15 @@
 
 #pragma once
 
-#include "harddriv.h"
 #include "softlist_dev.h"
+
+#include "harddriv.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 #define DIABLO_TAG(id) "diablo"#id
 
@@ -23,7 +30,7 @@
 class diablo_image_device : public harddisk_image_base_device
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<std::error_condition (device_image_interface &)> load_delegate;
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	// construction/destruction
@@ -34,9 +41,9 @@ public:
 	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int create_format, util::option_resolution *create_args) override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int create_format, util::option_resolution *create_args) override;
 	virtual void call_unload() override;
 
 	virtual bool image_is_chd_type() const noexcept override { return true; }
@@ -45,10 +52,10 @@ public:
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
-	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
+	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle.get(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
@@ -56,12 +63,12 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	image_init_result internal_load_dsk();
+	std::error_condition internal_load_dsk();
 
 	chd_file        *m_chd;
-	chd_file        m_origchd;              /* handle to the original CHD */
-	chd_file        m_diffchd;              /* handle to the diff CHD */
-	hard_disk_file  *m_hard_disk_handle;
+	chd_file        m_origchd;              // handle to the original CHD
+	chd_file        m_diffchd;              // handle to the diff CHD
+	std::unique_ptr<hard_disk_file> m_hard_disk_handle;
 
 	load_delegate   m_device_image_load;
 	unload_delegate m_device_image_unload;

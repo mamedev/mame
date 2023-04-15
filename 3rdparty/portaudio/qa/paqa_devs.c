@@ -1,15 +1,16 @@
 /** @file paqa_devs.c
-	@ingroup qa_src
+    @ingroup qa_src
     @brief Self Testing Quality Assurance app for PortAudio
- 	Try to open each device and run through all the
- 	possible configurations. This test does not verify
-    that the configuration works well. It just verifies
-    that it does not crash. It requires a human to listen to
-    the outputs.
+    Try to open devices and run through all possible configurations.
+    By default, open only the default devices. Command line options support
+    opening every device, or all input devices, or all output devices.
+    This test does not verify that the configuration works well.
+    It just verifies that it does not crash. It requires a human to
+    listen to the sine wave outputs.
 
-	@author Phil Burk  http://www.softsynth.com
-    
-    Pieter adapted to V19 API. Test now relies heavily on 
+    @author Phil Burk  http://www.softsynth.com
+
+    Pieter adapted to V19 API. Test now relies heavily on
     Pa_IsFormatSupported(). Uses same 'standard' sample rates
     as in test pa_devs.c.
 */
@@ -41,25 +42,32 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include "portaudio.h"
 #include "pa_trace.h"
 
 /****************************************** Definitions ***********/
-#define MODE_INPUT      (0)
-#define MODE_OUTPUT     (1)
-#define MAX_TEST_CHANNELS  4
+#define MODE_INPUT         (0)
+#define MODE_OUTPUT        (1)
+#define MAX_TEST_CHANNELS  (4)
+#define LOWEST_FREQUENCY   (300.0)
+#define LOWEST_SAMPLE_RATE (8000.0)
+#define PHASE_INCREMENT    (2.0 * M_PI * LOWEST_FREQUENCY / LOWEST_SAMPLE_RATE)
+#define SINE_AMPLITUDE     (0.2)
 
 typedef struct PaQaData
 {
@@ -67,13 +75,13 @@ typedef struct PaQaData
     int            numChannels;
     int            bytesPerSample;
     int            mode;
-    short          sawPhase;
+    float          phase;
     PaSampleFormat format;
 }
 PaQaData;
 
 /****************************************** Prototypes ***********/
-static void TestDevices( int mode );
+static void TestDevices( int mode, int allDevices );
 static void TestFormats( int mode, PaDeviceIndex deviceID, double sampleRate,
                          int numChannels );
 static int TestAdvance( int mode, PaDeviceIndex deviceID, double sampleRate,
@@ -100,12 +108,20 @@ static int gNumFailed = 0;
         } \
         else { \
             printf("ERROR - 0x%x - %s for %s\n", result, \
-                   ((result == 0) ? "-" : Pa_GetErrorText(result)), \
-                   #_exp ); \
+                    ((result == 0) ? "-" : Pa_GetErrorText(result)), \
+                    #_exp ); \
             gNumFailed++; \
             goto error; \
         } \
     } while(0)
+
+static float NextSineSample( PaQaData *data )
+{
+    float phase = data->phase + PHASE_INCREMENT;
+    if( phase > M_PI ) phase -= (float) (2.0 * M_PI);
+    data->phase = phase;
+    return sinf(phase) * SINE_AMPLITUDE;
+}
 
 /*******************************************************************/
 /* This routine will be called by the PortAudio engine when audio is needed.
@@ -118,27 +134,26 @@ static int QaCallback( const void *inputBuffer, void *outputBuffer,
                        PaStreamCallbackFlags statusFlags,
                        void *userData )
 {
-    unsigned long  i;
-    short          phase;
+    unsigned long frameIndex;
+    unsigned long channelIndex;
+    float sample;
     PaQaData *data = (PaQaData *) userData;
     (void) inputBuffer;
 
-    /* Play simple sawtooth wave. */
+    /* Play simple sine wave. */
     if( data->mode == MODE_OUTPUT )
     {
-        phase = data->sawPhase;
         switch( data->format )
         {
         case paFloat32:
             {
                 float *out =  (float *) outputBuffer;
-                for( i=0; i<framesPerBuffer; i++ )
+                for( frameIndex = 0; frameIndex < framesPerBuffer; frameIndex++ )
                 {
-                    phase += 0x123;
-                    *out++ = (float) (phase * (1.0 / 32768.0));
-                    if( data->numChannels == 2 )
+                    sample = NextSineSample( data );
+                    for( channelIndex = 0; channelIndex < data->numChannels; channelIndex++ )
                     {
-                        *out++ = (float) (phase * (1.0 / 32768.0));
+                        *out++ = sample;
                     }
                 }
             }
@@ -147,28 +162,26 @@ static int QaCallback( const void *inputBuffer, void *outputBuffer,
         case paInt32:
             {
                 int *out =  (int *) outputBuffer;
-                for( i=0; i<framesPerBuffer; i++ )
+                for( frameIndex = 0; frameIndex < framesPerBuffer; frameIndex++ )
                 {
-                    phase += 0x123;
-                    *out++ = ((int) phase ) << 16;
-                    if( data->numChannels == 2 )
+                    sample = NextSineSample( data );
+                    for( channelIndex = 0; channelIndex < data->numChannels; channelIndex++ )
                     {
-                        *out++ = ((int) phase ) << 16;
+                        *out++ = ((int)(sample * 0x00800000)) << 8;
                     }
                 }
             }
             break;
-                
+
         case paInt16:
             {
                 short *out =  (short *) outputBuffer;
-                for( i=0; i<framesPerBuffer; i++ )
+                for( frameIndex = 0; frameIndex < framesPerBuffer; frameIndex++ )
                 {
-                    phase += 0x123;
-                    *out++ = phase;
-                    if( data->numChannels == 2 )
+                    sample = NextSineSample( data );
+                    for( channelIndex = 0; channelIndex < data->numChannels; channelIndex++ )
                     {
-                        *out++ = phase;
+                        *out++ = (short)(sample * 32767);
                     }
                 }
             }
@@ -178,14 +191,10 @@ static int QaCallback( const void *inputBuffer, void *outputBuffer,
             {
                 unsigned char *out =  (unsigned char *) outputBuffer;
                 unsigned long numBytes = framesPerBuffer * data->numChannels * data->bytesPerSample;
-                for( i=0; i<numBytes; i++ )
-                {
-                    *out++ = 0;
-                }
+                memset(out, 0, numBytes);
             }
             break;
         }
-        data->sawPhase = phase;
     }
     /* Are we through yet? */
     if( data->framesLeft > framesPerBuffer )
@@ -203,15 +212,78 @@ static int QaCallback( const void *inputBuffer, void *outputBuffer,
 }
 
 /*******************************************************************/
-int main(void);
-int main(void)
+static void usage( const char *name )
 {
+    printf("%s [-a]\n", name);
+    printf("  -a - Test ALL devices, otherwise just the default devices.\n");
+    printf("  -i - Test INPUT only.\n");
+    printf("  -o - Test OUTPUT only.\n");
+    printf("  -? - Help\n");
+}
+
+/*******************************************************************/
+int main( int argc, char **argv );
+int main( int argc, char **argv )
+{
+    int     i;
     PaError result;
+    int     allDevices = 0;
+    int     testOutput = 1;
+    int     testInput = 1;
+    char   *executableName = argv[0];
+
+    /* Parse command line parameters. */
+    i = 1;
+    while( i<argc )
+    {
+        char *arg = argv[i];
+        if( arg[0] == '-' )
+        {
+            switch(arg[1])
+            {
+                case 'a':
+                    allDevices = 1;
+                    break;
+                case 'i':
+                    testOutput = 0;
+                    break;
+                case 'o':
+                    testInput = 0;
+                    break;
+
+                default:
+                    printf("Illegal option: %s\n", arg);
+                case '?':
+                    usage( executableName );
+                    exit(1);
+                    break;
+            }
+        }
+        else
+        {
+            printf("Illegal argument: %s\n", arg);
+            usage( executableName );
+            return 1;
+
+        }
+        i += 1;
+    }
+
+    EXPECT(sizeof(short) == 2); /* The callback assumes we have 16-bit shorts. */
+    EXPECT(sizeof(int) == 4); /* The callback assumes we have 32-bit ints. */
     EXPECT( ((result=Pa_Initialize()) == 0) );
-    printf("Test OUTPUT ---------------\n");
-    TestDevices( MODE_OUTPUT );
-    printf("Test INPUT ---------------\n");
-    TestDevices( MODE_INPUT );
+
+    if( testOutput )
+    {
+        printf("\n---- Test OUTPUT ---------------\n");
+        TestDevices( MODE_OUTPUT, allDevices );
+    }
+    if( testInput )
+    {
+        printf("\n---- Test INPUT ---------------\n");
+        TestDevices( MODE_INPUT, allDevices );
+    }
+
 error:
     Pa_Terminate();
     printf("QA Report: %d passed, %d failed.\n", gNumPassed, gNumFailed );
@@ -220,10 +292,11 @@ error:
 
 /*******************************************************************
 * Try each output device, through its full range of capabilities. */
-static void TestDevices( int mode )
+static void TestDevices( int mode, int allDevices )
 {
     int id, jc, i;
     int maxChannels;
+    int isDefault;
     const PaDeviceInfo *pdi;
     static double standardSampleRates[] = {  8000.0,  9600.0, 11025.0, 12000.0,
                                             16000.0,          22050.0, 24000.0,
@@ -234,16 +307,24 @@ static void TestDevices( int mode )
     for( id=0; id<numDevices; id++ )            /* Iterate through all devices. */
     {
         pdi = Pa_GetDeviceInfo( id );
-        /* Try 1 to maxChannels on each device. */
-        maxChannels = (( mode == MODE_INPUT ) ? pdi->maxInputChannels : pdi->maxOutputChannels);
+
+        if( mode == MODE_INPUT ) {
+            maxChannels = pdi->maxInputChannels;
+            isDefault = ( id == Pa_GetDefaultInputDevice());
+        } else {
+            maxChannels = pdi->maxOutputChannels;
+            isDefault = ( id == Pa_GetDefaultOutputDevice());
+        }
         if( maxChannels > MAX_TEST_CHANNELS )
             maxChannels = MAX_TEST_CHANNELS;
-        
+
+        if (!allDevices && !isDefault) continue; // skip this device
+
         for( jc=1; jc<=maxChannels; jc++ )
         {
-            printf("\n========================================================================\n");
+            printf("\n===========================================================\n");
             printf("            Device = %s\n", pdi->name );
-            printf("========================================================================\n");
+            printf("===========================================================\n");
             /* Try each standard sample rate. */
             for( i=0; standardSampleRates[i] > 0; i++ )
             {
@@ -273,7 +354,7 @@ static int TestAdvance( int mode, PaDeviceIndex deviceID, double sampleRate,
     PaQaData myData;
     #define FRAMES_PER_BUFFER  (64)
     const int kNumSeconds = 100;
-    
+
     /* Setup data for synthesis thread. */
     myData.framesLeft = (unsigned long) (sampleRate * kNumSeconds);
     myData.numChannels = numChannels;
@@ -299,32 +380,35 @@ static int TestAdvance( int mode, PaDeviceIndex deviceID, double sampleRate,
         inputParameters.device       = deviceID;
         inputParameters.channelCount = numChannels;
         inputParameters.sampleFormat = format;
-        inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
+        inputParameters.suggestedLatency =
+                Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
         inputParameters.hostApiSpecificStreamInfo = NULL;
         ipp = &inputParameters;
     }
     else
     {
-	   ipp = NULL;
-	}
-	
+        ipp = NULL;
+    }
+
     if( mode == MODE_OUTPUT )
     {
         outputParameters.device       = deviceID;
         outputParameters.channelCount = numChannels;
         outputParameters.sampleFormat = format;
-        outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
+        outputParameters.suggestedLatency =
+                Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
         outputParameters.hostApiSpecificStreamInfo = NULL;
         opp = &outputParameters;
     }
     else
     {
-		opp = NULL;
-	}
-	
+        opp = NULL;
+    }
+
     if(paFormatIsSupported == Pa_IsFormatSupported( ipp, opp, sampleRate ))
     {
-        printf("------ TestAdvance: %s, device = %d, rate = %g, numChannels = %d, format = %lu -------\n",
+        printf("------ TestAdvance: %s, device = %d, rate = %g"
+               ", numChannels = %d, format = %lu -------\n",
                 ( mode == MODE_INPUT ) ? "INPUT" : "OUTPUT",
                 deviceID, sampleRate, numChannels, (unsigned long)format);
         EXPECT( ((result = Pa_OpenStream( &stream,
@@ -353,7 +437,7 @@ static int TestAdvance( int mode, PaDeviceIndex deviceID, double sampleRate,
             oldStamp = Pa_GetStreamTime(stream);
             Pa_Sleep(msec);
             newStamp = Pa_GetStreamTime(stream);
-            printf("oldStamp = %9.6f, newStamp = %9.6f\n", oldStamp, newStamp ); /**/
+            printf("oldStamp  = %9.6f, newStamp = %9.6f\n", oldStamp, newStamp ); /**/
             EXPECT( (oldStamp < newStamp) );
             /* Check to make sure callback is decrementing framesLeft. */
             oldFrames = myData.framesLeft;

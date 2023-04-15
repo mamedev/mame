@@ -152,7 +152,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
 
@@ -343,8 +343,7 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 		else
 		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file format");
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INVALIDIMAGE, "Unsupported file format");
 		}
 		dummy = 0x00;
 		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
@@ -353,7 +352,7 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -361,16 +360,16 @@ SNAPSHOT_LOAD_MEMBER(nascom_state::snapshot_cb)
 //  SOCKETS
 //**************************************************************************
 
-image_init_result nascom2_state::load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id)
+std::pair<std::error_condition, std::string> nascom2_state::load_cart(
+		device_image_interface &image,
+		generic_slot_device *slot,
+		int slot_id)
 {
-	// loading directly from file
 	if (!image.loaded_through_softlist())
 	{
+		// loading directly from file
 		if (slot->length() > 0x1000)
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Unsupported file size");
-			return image_init_result::FAIL;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Unsupported image file size (must be no more than 4K)");
 
 		slot->rom_alloc(slot->length(), GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 		slot->fread(slot->get_rom_base(), slot->length());
@@ -386,13 +385,12 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 			break;
 		}
 	}
-
-	// loading from software list. this supports multiple regions to load to
 	else
 	{
-		uint8_t *region_b000 = image.get_software_region("b000");
-		uint8_t *region_c000 = image.get_software_region("c000");
-		uint8_t *region_d000 = image.get_software_region("d000");
+		// loading from software list. this supports multiple regions to load to
+		uint8_t *const region_b000 = image.get_software_region("b000");
+		uint8_t *const region_c000 = image.get_software_region("c000");
+		uint8_t *const region_d000 = image.get_software_region("d000");
 
 		if (region_b000 != nullptr)
 		{
@@ -413,7 +411,7 @@ image_init_result nascom2_state::load_cart(device_image_interface &image, generi
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

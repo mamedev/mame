@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

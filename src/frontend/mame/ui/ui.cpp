@@ -163,6 +163,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_font()
 	, m_handler_callback()
 	, m_handler_callback_type(ui_callback_type::GENERAL)
+	, m_ui_active(true)
 	, m_single_step(false)
 	, m_showfps(false)
 	, m_showfps_end(0)
@@ -335,6 +336,7 @@ void mame_ui_manager::config_save(config_type cfg_type, util::xml::data_node *pa
 void mame_ui_manager::initialize(running_machine &machine)
 {
 	m_machine_info = std::make_unique<ui::machine_info>(machine);
+	set_ui_active(!machine_info().has_keyboard() || machine.options().ui_active());
 
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
@@ -1241,8 +1243,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// determine if we should disable the rest of the UI
-	bool has_keyboard = machine_info().has_keyboard();
-	bool ui_disabled = (has_keyboard && !machine().ui_active());
+	bool const has_keyboard = machine_info().has_keyboard();
+	bool const ui_disabled = !ui_active();
 
 	// is ScrLk UI toggling applicable here?
 	if (has_keyboard)
@@ -1251,11 +1253,11 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		if (machine().ui_input().pressed(IPT_UI_TOGGLE_UI))
 		{
 			// toggle the UI
-			machine().set_ui_active(!machine().ui_active());
+			set_ui_active(!ui_active());
 
 			// display a popup indicating the new status
 			std::string const name = get_general_input_setting(IPT_UI_TOGGLE_UI);
-			if (machine().ui_active())
+			if (ui_active())
 				popup_time(2, _("UI controls enabled\nUse %1$s to toggle"), name);
 			else
 				popup_time(2, _("UI controls disabled\nUse %1$s to toggle"), name);

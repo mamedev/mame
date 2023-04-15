@@ -160,24 +160,25 @@ void generic_slot_device::device_start()
  call load
  -------------------------------------------------*/
 
-image_init_result generic_slot_device::call_load()
+std::pair<std::error_condition, std::string> generic_slot_device::call_load()
 {
-	if (m_cart)
+	if (!m_cart)
 	{
-		if (!m_device_image_load.isnull())
-			return m_device_image_load(*this);
-		else
-		{
-			u32 len = common_get_size("rom");
-
-			rom_alloc(len, m_width, m_endianness);
-			common_load_rom(get_rom_base(), len, "rom");
-
-			return image_init_result::PASS;
-		}
+		return std::make_pair(std::error_condition(), std::string());
 	}
+	else if (!m_device_image_load.isnull())
+	{
+		return m_device_image_load(*this);
+	}
+	else
+	{
+		u32 const len = common_get_size("rom");
 
-	return image_init_result::PASS;
+		rom_alloc(len, m_width, m_endianness);
+		common_load_rom(get_rom_base(), len, "rom");
+
+		return std::make_pair(std::error_condition(), std::string());
+	}
 }
 
 

@@ -787,6 +787,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mos8563.h,VIDEOS["MOS8563"] = true
+--------------------------------------------------
+
+if (VIDEOS["MOS8563"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mos8563.cpp",
+		MAME_DIR .. "src/devices/video/mos8563.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga.h,VIDEOS["PC_VGA"] = true
 --------------------------------------------------
 
@@ -882,6 +894,18 @@ if (VIDEOS["SAA5240"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/saa5240.cpp",
 		MAME_DIR .. "src/devices/video/saa5240.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sn74s262.h,VIDEOS["SN74S262"] = true
+--------------------------------------------------
+
+if (VIDEOS["SN74S262"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/sn74s262.cpp",
+		MAME_DIR .. "src/devices/video/sn74s262.h",
 	}
 end
 

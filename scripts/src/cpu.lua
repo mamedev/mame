@@ -1918,6 +1918,7 @@ end
 --@src/devices/cpu/m68000/scc68070.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/fscpu32.h,CPUS["M680X0"] = true
 --@src/devices/cpu/m68000/mcf5206e.h,CPUS["M680X0"] = true
+--@src/devices/cpu/m68000/tmp68301.h,CPUS["M680X0"] = true
 --------------------------------------------------
 
 if CPUS["M680X0"] then
@@ -1961,6 +1962,8 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/fscpu32.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.h",
 		MAME_DIR .. "src/devices/cpu/m68000/mcf5206e.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.h",
+		MAME_DIR .. "src/devices/cpu/m68000/tmp68301.cpp",
 	}
 end
 
@@ -2496,6 +2499,7 @@ end
 --@src/devices/cpu/tms1000/tms0980.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms0270.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tp0320.h,CPUS["TMS1000"] = true
+--@src/devices/cpu/tms1000/smc1102.h,CPUS["TMS1000"] = true
 --------------------------------------------------
 
 if CPUS["TMS1000"] then
@@ -2522,6 +2526,8 @@ if CPUS["TMS1000"] then
 		MAME_DIR .. "src/devices/cpu/tms1000/tms0270.h",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.cpp",
 		MAME_DIR .. "src/devices/cpu/tms1000/tp0320.h",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.cpp",
+		MAME_DIR .. "src/devices/cpu/tms1000/smc1102.h",
 	}
 end
 
@@ -2858,6 +2864,7 @@ end
 --------------------------------------------------
 -- Sharp LR35902 (Game Boy CPU)
 --@src/devices/cpu/lr35902/lr35902.h,CPUS["LR35902"] = true
+--@src/devices/cpu/lr35902/lr35902d.h,CPUS["LR35902"] = true
 --------------------------------------------------
 
 if CPUS["LR35902"] then

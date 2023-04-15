@@ -36,22 +36,22 @@ public:
 	// construction/destruction
 	pc11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual const char *image_interface() const noexcept override { return "pdp11_ptap"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,bim,lda"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// device_z80daisy_interface overrides
+	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
@@ -81,4 +81,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DEC_PC11, pc11_device)
 
-#endif
+#endif // MAME_BUS_QBUS_PC11_H

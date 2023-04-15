@@ -90,7 +90,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device, "abc80kb", "ABC-80 Keyboard")
+DEFINE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device, "abc80kb", "ABC 80 Keyboard")
 
 
 //-------------------------------------------------
@@ -99,7 +99,10 @@ DEFINE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device, "abc80kb", "ABC-80 Key
 
 ROM_START( abc80_keyboard )
 	ROM_REGION( 0x400, I8048_TAG, 0 )
-	ROM_LOAD( "053.z5", 0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "30293b-013.z6", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x200, "prom", 0 )
+	ROM_LOAD( "053.z5", 0x000, 0x200, CRC(add80359) SHA1(f88be4918bfd6230b73335c6a75a3010d33b2caa) )
 ROM_END
 
 
@@ -114,10 +117,20 @@ const tiny_rom_entry *abc80_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc80_keyboard_io )
+//  ADDRESS_MAP( keyboard_mem )
 //-------------------------------------------------
 
-void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
+void abc80_keyboard_device::keyboard_mem(address_map &map)
+{
+	map(0x000, 0x3ff).rom().region(I8048_TAG, 0);
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( keyboard_io )
+//-------------------------------------------------
+
+void abc80_keyboard_device::keyboard_io(address_map &map)
 {
 }
 
@@ -129,7 +142,8 @@ void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
 void abc80_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	I8048(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_IO, &abc80_keyboard_device::abc80_keyboard_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_keyboard_device::keyboard_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc80_keyboard_device::keyboard_io);
 	m_maincpu->set_disable();
 }
 
@@ -138,7 +152,7 @@ void abc80_keyboard_device::device_add_mconfig(machine_config &config)
 //  INPUT_PORTS( abc80_keyboard )
 //-------------------------------------------------
 
-INPUT_PORTS_START( abc80_keyboard )
+static INPUT_PORTS_START( abc80_keyboard )
 INPUT_PORTS_END
 
 

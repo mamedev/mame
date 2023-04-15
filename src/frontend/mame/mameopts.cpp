@@ -58,24 +58,6 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 		else
 			parse_one_ini(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
 
-		switch (cursystem->flags & machine_flags::MASK_TYPE)
-		{
-		case machine_flags::TYPE_ARCADE:
-			parse_one_ini(options, "arcade", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-			break;
-		case machine_flags::TYPE_CONSOLE:
-			parse_one_ini(options ,"console", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-			break;
-		case machine_flags::TYPE_COMPUTER:
-			parse_one_ini(options, "computer", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-			break;
-		case machine_flags::TYPE_OTHER:
-			parse_one_ini(options, "othersys", OPTION_PRIORITY_SYSTYPE_INI, &error_stream);
-			break;
-		default:
-			break;
-		}
-
 		machine_config config(*cursystem, options);
 		for (const screen_device &device : screen_device_enumerator(config.root_device()))
 		{

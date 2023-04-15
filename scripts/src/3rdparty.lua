@@ -1553,6 +1553,10 @@ project "portaudio"
 				"-Wno-unused-but-set-variable",
 				"-Wno-maybe-uninitialized",
 				"-Wno-sometimes-uninitialized",
+				"-Wno-incompatible-pointer-types-discards-qualifiers",
+				"-Wno-pointer-sign",
+				"-Wno-switch",
+				"-Wno-macro-redefined"
 			}
 		else
 			buildoptions_c {
@@ -1605,11 +1609,6 @@ project "portaudio"
 		}
 		includedirs {
 			MAME_DIR .. "3rdparty/portaudio/src/os/win",
-		}
-
-		configuration { "mingw*" }
-		includedirs {
-			MAME_DIR .. "3rdparty/portaudio/src/hostapi/wasapi/mingw-include",
 		}
 
 		configuration { }

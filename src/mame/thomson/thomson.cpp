@@ -98,7 +98,6 @@
 #include "speaker.h"
 
 #include "formats/basicdsk.h"
-#include "formats/cd90_640_dsk.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
 

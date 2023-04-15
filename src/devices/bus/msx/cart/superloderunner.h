@@ -16,7 +16,7 @@ class msx_cart_superloderunner_device : public device_t, public msx_cart_interfa
 public:
 	msx_cart_superloderunner_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides

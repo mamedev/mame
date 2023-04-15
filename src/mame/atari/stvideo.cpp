@@ -202,7 +202,7 @@ phase 3
 
 
 phase 1:
-	left border on ste?
+    left border on ste?
 
 [:video] [454400  28400 13309964  112/420 000/221 s:h- de:-v- 50Hz] glue sync
 [:video] [454399  28399 13309963  111/420 000/222 s:-- de:-v- 71Hz] glue sync
@@ -210,7 +210,7 @@ phase 1:
 [:video] [454431  28401 13309965  113/420 002/222 s:-- de:-v- 50Hz] glue sync
 [:video] [454431  28401 13309965  113/420 002/222 s:-- de:-v- 50Hz] res = 0 (0)
 
-	+2 on ws1/ws3 but not on ws2/ws4.  move, exg, move.  test at hdec=16
+    +2 on ws1/ws3 but not on ws2/ws4.  move, exg, move.  test at hdec=16
 
 [:video] [454575  28410 13309974  122/420 011/222 s:-- de:-v- 60Hz] glue sync
 [:video] [454575  28410 13309974  122/420 011/222 s:-- de:-v- 60Hz] sync = 0 (1)
@@ -219,7 +219,7 @@ phase 1:
 [:video] [454656  28416 13309980  128/420 017/222 s:-- de:-v- 50Hz] glue sync
 [:video] [454656  28416 13309980  000/421 017/222 s:-- de:-v- 50Hz] hde 1
 
-	screen stop on ws2, test at hdec=44
+    screen stop on ws2, test at hdec=44
 
 [:video] [455087  28442 13310006  026/421 043/222 s:-- de:hvd 71Hz] glue sync
 [:video] [455087  28442 13310006  026/421 043/222 s:-- de:hvd 71Hz] res = 2 (2)
@@ -230,7 +230,7 @@ phase 1:
 [:video] [455119  28444 13310008  028/421 045/222 s:-- de:-v- 50Hz] glue sync
 [:video] [455119  28444 13310008  028/421 045/222 s:-- de:-v- 50Hz] res = 0 (0)
 
-	right border is still active, test at hdec=97
+    right border is still active, test at hdec=97
 
 [:video] [455927  28495 13310059  079/421 096/222 s:-- de:-v- 71Hz] glue sync
 [:video] [455927  28495 13310059  079/421 096/222 s:-- de:-v- 71Hz] res = 2 (2)
@@ -240,7 +240,7 @@ phase 1:
 
 -> detect as ws2
 
-	phase ?
+    phase ?
 
 [:video] [454407  28400 53239859 53239860  112/420 001/222 s:-- de:-v- 71Hz] glue sync
 [:video] [454407  28400 53239859 53239860  112/420 001/222 s:-- de:-v- 71Hz] res = 2 (2)
@@ -482,7 +482,7 @@ void st_video_device::de_set(bool level)
 		m_load_end = (now & ~15) + 16 + 8;
 
 	if(v)
-		logerror("%s de %d lc=%d le=%d delta=%d\n", context(now), m_de, m_load_current/4, m_load_end/4, m_load_current - now);	
+		logerror("%s de %d lc=%d le=%d delta=%d\n", context(now), m_de, m_load_current/4, m_load_end/4, m_load_current - now);
 }
 
 TIMER_CALLBACK_MEMBER(st_video_device::de_event)
@@ -548,7 +548,7 @@ void st_video_device::shifter_handle_load()
 
 		if(v)
 			logerror("%s load rd=%x adr=%06x\n", context(m_shifter_update_time), m_rdelay, m_adr_live);
-	}	
+	}
 
 	if(m_reload) {
 		if(v)
@@ -602,7 +602,7 @@ void st_video_device::shifter_sync(u64 now)
 			x += 2;
 			m_shifter_update_time += 4;
 		}
-				
+
 		break;
 	}
 
@@ -631,7 +631,7 @@ void st_video_device::shifter_sync(u64 now)
 			x += 1;
 			m_shifter_update_time += 2;
 		}
-				
+
 		break;
 	}
 
@@ -653,7 +653,7 @@ void st_video_device::shifter_sync(u64 now)
 			x += 1;
 			m_shifter_update_time += 1;
 		}
-				
+
 		break;
 	}
 	}
@@ -872,7 +872,7 @@ void st_video_device::glue_determine_next_event()
 		logerror("%s next hsc %d hdec %d targetting %d.%d\n", context(), hsc_next, hdec_next, gt >> 1, gt & 1);
 	}
 
-	next_event(((glue_tick + delta) << 3) + m_phase->read() - 32);	
+	next_event(((glue_tick + delta) << 3) + m_phase->read() - 32);
 }
 
 TIMER_CALLBACK_MEMBER(st_video_device::timer_event)
@@ -917,12 +917,12 @@ u8 st_video_device::adr_live_l_r()
 {
 	shifter_sync();
 	logerror("%s adr %06x - %06x\n", context(), m_adr_base, m_adr_live);
- 	u32 pc = machine().root_device().subdevice<cpu_device>("m68000")->pcbase();
- 	if(pc == 0x8644)
- 		v = false; // level 16
- 	if(pc == 0x84f0)
- 		v = false; // main menu
-	//	v = true;
+	u32 pc = machine().root_device().subdevice<cpu_device>("m68000")->pcbase();
+	if(pc == 0x8644)
+		v = false; // level 16
+	if(pc == 0x84f0)
+		v = false; // main menu
+	//  v = true;
 	return m_adr_live;
 }
 

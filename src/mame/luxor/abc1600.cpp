@@ -36,20 +36,20 @@
 
     TODO:
 
-	- systest1600 failures
-		- CIO timer
-		- RTC (seconds advance too slowly)
-		- DMA
-	- bootpar writes console bauds without high order byte (9600=>128)
+    - systest1600 failures
+        - CIO timer
+        - RTC (seconds advance too slowly)
+        - DMA
+    - bootpar writes console bauds without high order byte (9600=>128)
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
-	- crashes after reset
+    - crashes after reset
     - CIO
         - optimize timers!
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
-		[:] SCC write 000003
-		[:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
+        [:] SCC write 000003
+        [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
 
 */
 

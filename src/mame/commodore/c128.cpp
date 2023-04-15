@@ -31,8 +31,8 @@
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
-#include "video/mc6845.h"
 #include "video/mos6566.h"
+#include "video/mos8563.h"
 
 #define M8502_TAG       "u6"
 #define MOS8563_TAG     "u22"
@@ -191,6 +191,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb6 ) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_user_pb7 ) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
 
+	void update_cia1_flag();
+	DECLARE_WRITE_LINE_MEMBER( cass_rd_w ) { m_cass_rd = state; update_cia1_flag(); }
+
 	// memory state
 	int m_z80en;
 	int m_loram;
@@ -221,6 +224,7 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
+
 	void softlists(machine_config &config, const char *filter);
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
@@ -1461,6 +1465,11 @@ void c128_state::cpu_w(uint8_t data)
 //  CBM_IEC_INTERFACE( cbm_iec_intf )
 //-------------------------------------------------
 
+void c128_state::update_cia1_flag()
+{
+	m_cia1->flag_w(m_cass_rd & m_iec_srq);
+}
+
 inline void c128_state::update_iec()
 {
 	int fsdir = m_mmu->fsdir_r();
@@ -1478,9 +1487,7 @@ inline void c128_state::update_iec()
 	m_iec->host_data_w(data_out);
 
 	// fast serial clock in
-	int srq_in = m_iec->srq_r();
-
-	m_cia1->cnt_w(fsdir || srq_in);
+	m_cia1->cnt_w(fsdir || m_iec_srq);
 
 	// fast serial clock out
 	int srq_out = 1;
@@ -1492,7 +1499,9 @@ inline void c128_state::update_iec()
 
 WRITE_LINE_MEMBER( c128_state::iec_srq_w )
 {
+	m_iec_srq = state;
 	update_iec();
+	update_cia1_flag();
 }
 
 WRITE_LINE_MEMBER( c128_state::iec_data_w )
@@ -1593,8 +1602,12 @@ void c128_state::machine_start()
 	save_item(NAME(m_sp1));
 	save_item(NAME(m_iec_data_out));
 	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_cass_rd));
+	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
+	save_item(NAME(m_user_pa2));
+	save_item(NAME(m_user_pb));
 }
 
 
@@ -1733,7 +1746,7 @@ void c128_state::ntsc(machine_config &config)
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(m_cia2, FUNC(mos6526_device::flag_w));
+	m_cassette->read_handler().set(FUNC(c128_state::cass_rd_w));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(m_vic, FUNC(mos8564_device::lp_w));
@@ -1912,10 +1925,10 @@ void c128_state::pal(machine_config &config)
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(m_cia2, FUNC(mos6526_device::flag_w));
+	m_cassette->read_handler().set(FUNC(c128_state::cass_rd_w));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(MOS8566_TAG, FUNC(mos8566_device::lp_w));
+	m_joy1->trigger_wr_callback().set(m_vic, FUNC(mos8566_device::lp_w));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)*2/4.5/8, c64_expansion_cards, nullptr);

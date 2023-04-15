@@ -27,7 +27,7 @@
 // ======================> abc77_device
 
 class abc77_device : public device_t,
-                     public abc_keyboard_interface
+					 public abc_keyboard_interface
 {
 public:
 	// construction/destruction

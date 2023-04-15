@@ -294,8 +294,8 @@ ToDo:
 
 #undef DEBUG_TEST_W
 
-#define LOG_VIA0 (1 << 1U)
-#define LOG_VIA1 (1 << 2U)
+#define LOG_VIA0 (1U << 1)
+#define LOG_VIA1 (1U << 2)
 
 //#define VERBOSE (LOG_VIA0 | LOG_VIA1)
 #include "logmacro.h"
