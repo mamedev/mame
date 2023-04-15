@@ -5154,6 +5154,8 @@ if (MACHINES["PCCARD_SRAM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
 		MAME_DIR .. "src/devices/machine/pccard_sram.h",
+	}
+end
 
 ---------------------------------------------------
 --
