@@ -37,13 +37,13 @@ std::error_condition msx_cart_dooly_device::initialize_cartridge(std::string &me
 
 	page(1)->install_view(0x4000, 0x7fff, m_view1);
 	m_view1[0].install_rom(0x4000, 0x7fff, cart_rom_region()->base());
-	m_view1[1].install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page1_r)));
+	m_view1[1].install_read_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page1_r)));
 	page(2)->install_view(0x8000, 0xbfff, m_view2);
 	m_view2[0].install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
-	m_view2[1].install_read_handler(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page2_r)));
+	m_view2[1].install_read_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_dooly_device::mode4_page2_r)));
 
-	page(1)->install_write_handler(0x4000, 0x7fff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
-	page(2)->install_write_handler(0x8000, 0xbfff, write8smo_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
+	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
+	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_dooly_device::prot_w)));
 
 	return std::error_condition();
 }

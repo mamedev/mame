@@ -19,8 +19,8 @@ void msx_cart_arc_device::device_start()
 	save_item(NAME(m_7f));
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0x7f, 0x7f, write8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_w)));
-	io_space().install_read_handler(0x7f, 0x7f, read8smo_delegate(*this, FUNC(msx_cart_arc_device::io_7f_r)));
+	io_space().install_write_handler(0x7f, 0x7f, emu::rw_delegate(*this, FUNC(msx_cart_arc_device::io_7f_w)));
+	io_space().install_read_handler(0x7f, 0x7f, emu::rw_delegate(*this, FUNC(msx_cart_arc_device::io_7f_r)));
 }
 
 void msx_cart_arc_device::device_reset()
