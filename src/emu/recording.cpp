@@ -179,8 +179,8 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 0x7FFF'FFF8; // biggest int multiple of 60, for screenless machines
-	info.video_sampletime = screen() ? screen()->frame_period().as_ticks(info.video_timescale) : 0x0222'2222;
+	info.video_timescale = 0x3FFF'FFFC; // multiple of 60, for screenless machines
+	info.video_sampletime = screen() ? screen()->frame_period().as_ticks(info.video_timescale) : 0x0111'1111;
 	info.video_numsamples = 0;
 	info.video_width = width;
 	info.video_height = height;
