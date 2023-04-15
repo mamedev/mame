@@ -13,13 +13,16 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Drum Master                                                     (C) Namco, 2001
-*Drum Master 2                                                   (C) Namco, 2001
-*Drum Master 3                                                   (C) Namco, 2002
-*Drum Master 4                                                   (C) Namco, 2003
-*Drum Master 5                                                   (C) Namco, 2003
-*Drum Master 6                                                   (C) Namco, 2004
-*Drum Master 7                                                   (C) Namco, 2005
+*Aim For Cash (AFC2 Ver.A)                                       (C) Namco, 2004
+Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)    (C) Namco, 2005
+*Dice ROM                                                        (C) Namco, 2004
+*Dokidoki! Flower                                                (C) Namco, 2004
+***Drum Master                                                   (C) Namco, 2001
+***Drum Master 2                                                 (C) Namco, 2001
+***Drum Master 3                                                 (C) Namco, 2002
+***Drum Master 4                                                 (C) Namco, 2003
+***Drum Master 5                                                 (C) Namco, 2003
+***Drum Master 6                                                 (C) Namco, 2004
 GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
 GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
 Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
@@ -27,66 +30,73 @@ Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A) (C) Namco, 2
 Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
 Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)                        (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
-*Hard Puncher Hajime no Ippo 2 Ouja e no Chousen                 (C) Namco/Taito, 2002
+*Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
+*Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J) (C) Namco/Taito, 2002
 *Honne Hakkenki                                                  (C) Namco, 2001
 Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu! (KRG1 Ver.A)     (C) Namco, 2006
-**Knock Down 2001                                                (C) Namco, 2001
+**Knock Down 2001 / KO2001 (KD11 Ver.B)                          (C) Namco, 2001
+Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)   (C) Mitchell 2003
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
-*Kurukuru Food                                                   (C) Namco, 2002
+Medal no Tatsujin ((MTL1 SPR0B)                                  (C) Namco, 2005
+Medal no Tatsujin 2 (MTA1001 STMPR0A)                            (C) Namco, 2007
 Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
+Mr Driller 2 (DR23 Ver.A)                                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
 NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
 Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
 Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
-*Photo Battle                                                    (C) Namco, 2001
+*Peter The Shepherd                                              (C) Namco, 2003
+*Photo Battle (PBT1 Ver.B)                                       (C) Namco, 2001
 Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
 Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
-*Ren-ai Quiz High School Angel                                   (C) Namco, 2002
-Seishun Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
+*Puzz Cube                                                       (C) Namco, 2005
+Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
-Shamisen Brothers                                                (C) Kato/Konami, 2003
+*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
+*Slot no Oujisama / Slot Prince (SLO1 Ver.A),(SLO1 Ver.B)        (C) Namco, 2002
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
-*Taiko no Tatsujin                                               (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C)                                 (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A)                                 (C) Namco, 2002
-Taiko no Tatsujin 4 (TK41 Ver.A)                                 (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A)                                 (C) Namco, 2003
-Taiko no Tatsujin 6 (TK61 Ver.A)                                 (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
+Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
+*Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C & CDROM TK21-A)                  (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A & *CDROM)                        (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A & *CDROM)                        (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A & *CDROM)         (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
-Unknown medal (?) game (MTL1 SPR0B)                              (C) ?,     200?
-Unknown medal (?) game (peeled off sticker)                      (C) ?,     2005
 
-* - denotes not dumped yet.
+* - denotes not dumped yet. If a game code is listed a PCB has been seen.
 ** - denotes incomplete dump.
+*** - World region title, probably doesn't exist.
 
-The Namco System 10 system comprises 2 or 3 PCB's....
-MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all sound circuitry, program & video RAM,
+The Namco System 10 system is basically a PSOne on an arcade board with added protection.
+Namco System 10 has 2 or 3 PCBs....
+MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all sound circuitry, program RAM & video RAM,
            controller/input logic and video output circuitry. Basically everything except the ROMs.
-           There are three known revisions of this PCB so far. The differences seem very minor. The 2nd and 3rd revision
+           There are four known revisions of this PCB so far. The differences seem very minor. The 2nd, 3rd and 4th revisions
            have an updated CPLD revision.
-           The 3rd revision has an updated model Sony chip. The only other _noticeable_ difference is some component
+           The 3rd and 4th revisions have some updated model Sony chips. The only other _noticeable_ difference is some component
            shuffling in the sound amplification section to accommodate two extra 1000uF capacitors and one 470uF capacitor
            has been replaced by a 1000uF capacitor. Everything else, including all the PLDs appears to be identical.
            Note there are no ROMs on the Main PCB and also no custom Namco chips on System10, which seem to have been
            phased out. Instead, they have been replaced by (custom programmed) CPLDs, probably due to cost-cutting
            measures within the company, or to reduce the cost of System10 to an entry-level no-frills development platform.
-MEM PCB  - There are three known revisions of this PCB (so far). They're mostly identical except for the type/number of ROMs
+MEM PCB  - There are four known revisions of this PCB (so far). Three Namco boards are mostly identical except for the type/number of ROMs
            used and the contents of the CPLD.  The 2nd revision also has a RAM chip on it. The 3rd revision has some extra
-           hardware present to decode MP3 data.
+           hardware present to decode MP3 data which comes from the ROMs or an external CDROM.
+           The 4th type is manufactured by Taito and is completely different. Taito uses their PCB numbering system.
            Each game has a multi-letter code assigned to it which is printed on a small sticker and placed on the top side
            of the MEM PCB.
-           This code is then proceeded by a number (only '1' & '2' seen so far), then 'Ver.' then A/B/C/D/E (only 'A' seen so far)
-           which denotes the software revision, and in some cases a sub-revision such as 1 or 2 (usually only listed in the
-           test mode).
+           This code is then proceeded by a number (only '1' & '2' seen so far), then 'Ver.' then A/B/C which denotes
+           the software revision, and in some cases a sub-revision such as 1 or 2 (usually only shown in the test mode).
            The first 1 denotes a Japanese version. Other numbers denote a World version.
            For World versions, only the main program changes, the rest of the (graphics) ROMs use the Japanese version ROMs.
            If the version sticker has a red dot it means nothing as several identical versions of the same games exist with and
            without the red dot. A similar red dot has also been seen on Namco System 246 security carts and means nothing.
            Speculation about a red dot on a sticker is pointless and has no impact on the dumps or the emulation.
            Any System 10 MEM PCB can be swapped to run on any System 10 Main PCB regardless of the main board revision.
-           The high scores are stored on the MEM PCB (probably inside the main program EEPROMs/FlashROMs).
+           The high scores are stored on the MEM PCB (inside the main program flashROM or block 1 of the first NAND chip).
            There are no "alt" versions with the same code, this simply means the game was dumped without first resetting the
            high score records and coinage/play statistics info to factory defaults.
            Also, on all System 10 games, there is a sticker with a serial number on it and the program ROMs also contain
@@ -106,7 +116,10 @@ Revision 2
 SYSTEM10 MAIN PCB 8906960104 (8906970104)
 
 Revision 3
-SYSTEM10 MAIN PCB 8906962400 (8906972400)
+SYSTEM10 MAIN(B) PCB 8906962400 (8906972400)
+
+Revision 4
+SYSTEM10 MAIN(C) PCB 8906962503 (8906972503)
   |----------------------------------------------------------|
   |   LA4705    VR1                     J201                 |
   |                           |----------------------|       |
@@ -142,9 +155,10 @@ SYSTEM10 MAIN PCB 8906962400 (8906972400)
 Notes:
 ------
       CXD8606BQ   : SONY CXD8606BQ Central Processing Unit / GTE     (QFP208)
-                     - replaced by CXD8606CQ on Revision 3 Main PCB
+                     - replaced by CXD8606CQ on Revision 3 & 4 Main PCB
       CXD8561CQ   : SONY CXD8561CQ Graphics Processor Unit           (QFP208)
       CXD2938Q    : SONY CXD2938Q  Sound Processor Unit              (QFP208)
+                     - replaced with CXD2941R on Revision 4 Main PCB
       CXD1178Q    : SONY CXD1178Q  8-bit RGB 3-channel D/A converter (QFP48)
       CXA2067AS   : SONY CXA2067AS TV/Video circuit RGB Pre-Driver   (SDIP30)
       CY37128VP160: CYPRESS CY37128VP160 Complex Programmable Logic Device (TQFP160, stamped 'S10MA1')
@@ -161,8 +175,9 @@ Notes:
       BA3121      : Rohm BA3121 Dual Channel Ground Isolation Amplifier & Noise Eliminator (SOIC8)
       JRC3414     : New Japan Radio Co. Ltd. JRC3414 Single-Supply Dual High Current Operational Amplifier (x2, SOIC8)
       DSW1        : 8 position DIP switch
-      JP4         : 2 position jumper, set to NC, alt. position labelled SYNC (Note: changing the jumper position has no visual effect)
-      J1          : 40 Pin IDC connector for a flat 40-wire cable, used for games that have a DVDROM Drive
+      JP4         : 2 position jumper, set to NC, alt. position labelled SYNC (Note: changing the jumper position
+                    switches the game between interlaced and non-interlaced mode)
+      J1          : 40 Pin IDC connector for a flat 40-wire cable, used for games that have a CDROM/DVDROM drive
       J4          : 10 pin header for extra controls etc  \ (note: custom Namco 48 pin edge connector is not on System10 PCBs)
       J5          : 4 pin header for stereo sound out     /
       J10         : 4 pin header for audio input from ROM board type 3. This audio is mixed with the other main board audio.
@@ -177,16 +192,16 @@ Additional Notes:
                 1. In test mode (Display Test) the screen can be set to interlace or non-interlace mode. The graphics in
                    interlace mode are visually much smoother with noticeable screen flickering. Non-interlace modes gives
                    a much blockier graphic display (i.e. lower resolution) but without screen flickering.
-                2. There is no dedicated highscore/options EEPROM present on the PCB, the game stores it's settings on the
-                   game board (probably in the program EEPROMs/FlashROMs).
+                2. There is no dedicated highscore/options EEPROM present on the PCB. The game stores the settings on the
+                   MEM PCB in the program flashROM or block 1 of the first NAND ROM.
 
 ROM Daughterboard PCBs
 ----------------------
 This PCB holds all the ROMs.
 There are three known types of ROM daughterboards used on S10 games (so far).
 All of the PCBs are the same size (approx 5" x 5") containing one custom connector surface-mounted to the underside of
-the PCB, some mask ROMs/flash ROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
-chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROMless Microcontroller.
+the PCB, some mask/flash/NAND ROMs, a CPLD (the customary Namco 'KEYCUS' chip but doing de-scrambling/decryption too). On the
+2nd type a RAM chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROM-less Microcontroller.
 
 ********
 *Type 1*
@@ -216,8 +231,8 @@ System10 MEM(M) PCB 8906961000 (8906970700)
 |-------------------------------------|
 Notes:
       CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
-      1A - 5A     : Intel Flash DA28F640J5 64MBit Flash EEPROM (SSOP56)
-      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit mask ROM (TSOP48) (see note 3)
+      1A - 5A     : Intel Flash DA28F640J5 64Mbit Flash EEPROM (SSOP56)
+      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128Mbit mask ROM (TSOP48) (see note 3)
       J1          : 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
@@ -227,11 +242,11 @@ Game          Revision     Sticker      KEYCUS   ROMs Populated
 ------------------------------------------------------------------------------------
 Mr Driller 2  DR21/VER.A3  DR21 Ver.A   KC001A   DR21VERA.1A, DR21MA1.1D, DR21MA2.2D
 Mr Driller 2  DR22/VER.A3  DR22 Ver.A   KC001A   DR22VERA.1A, DR21MA1.1D, DR21MA2.2D
-Mr Driller 2  DR23/VER.A3  DR23 Ver.A   KC001A   DR23VERA.1A (no label?), DR21MA1.1D, DR21MA2.2D
+Mr Driller 2  DR23/VER.A3  DR23 Ver.A   KC001A   DR23VERA.1A, DR21MA1.1D, DR21MA2.2D
 
       Note
-      1. The ROM PCB has locations for 4x 64MBit program ROMs, but only 1A is populated.
-      2. The ROM PCB has locations for 14x 128MBit GFX ROMs (Total capacity = 2048MBits) but only 1D and 2D are populated.
+      1. The ROM PCB has locations for 4x 64Mbit program ROMs, but only 1A is populated.
+      2. The ROM PCB has locations for 14x 128Mbit GFX ROMs (Total capacity = 2048Mbits) but only 1D and 2D are populated.
       3. These ROMs are only 18mm long, dumping them requires a special custom adapter
 
 ********
@@ -263,45 +278,53 @@ System10 MEM(N) PCB 8906961402 (8906971402)
 Notes:
       CY37256VP208: Cypress CY37256VP208 Complex Programmable Logic Device (TQFP208)
       CY7C1019    : Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static Ram (SOJ32)
-      1D - 8E     : Samsung Electronics K9F2808U0B-YCBO 128MBit NAND Flash EEPROM (TSOP48)
+      1D - 8E     : Samsung Electronics K9F2808U0B-YCBO 64Mbit or K9F5608U0D 128Mbit NAND flash ROM (TSOP48)
       J1          : 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
 
-                                                    MEM PCB
-Game                                                Sticker       KEYCUS   ROMs Populated       CD            Notes
+     (some names shortened, check GAME line)        MEM PCB
+Game (at end of driver for full title      )        Sticker       KEYCUS   ROMs Populated       CD            Notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Ball Pom Line                                                         peeled off    KC039A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
-Gamshara                                                              10021 Ver.A   KC020A   8E, 8D               N/A
-Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja                   GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
-Gekitoride-Jong Space                                                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
-Gunbalina                                                             GNN1  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!                       KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960200) PCB
-Knock Down 2001                                                       KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
-Kono Tako                                                             10021 Ver.A   KC034A   8E, 8D               N/A
-Kotoba no Puzzle Mojipittan                                           KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A
-Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five MTA1  STMPR0A KC048A?  8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
-Mr Driller G                                                          DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
-NFL Classic Football                                                  NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A
-Pacman Ball                                                           PMB2  Ver.A   KC026A   8E, 8D               N/A
-Panicuru Panekuru                                                     PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
-Point Blank 3                                                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
-Puzz Ball                                                             PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Sekai Kaseki Hakken                                                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
-Star Trigon                                                           STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko no Tatsujin 2                                                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko no Tatsujin 3                                                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko no Tatsujin 4                                                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko no Tatsujin 5                                                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko no Tatsujin 6                                                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
-Utyuu Daisakusen Chocovader Contactee                                 CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
-unknown medal (?) game                                                MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+Ball Pom Line                                       missing       KC039A   8E, 8D               N/A           also has a Namco S10 MGEX10 8681960201 PCB
+GAHAHA Ippatsudou                                   GID2  Ver.A   KC005A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB
+GAHAHA Ippatsudou 2                                 GIS1  Ver.A   KC008A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB
+Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A
+Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
+Gekitoride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A
+Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 not populated
+Keroro Gunsō Chikyū Shinryaku Shirei Dearimasu!     KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
+Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
+Kono e Tako                                         10021 Ver.A   KC034A   8E, 8D               N/A           RAN Ver.A in test mode, all seem to be re-programmed Gamshara PCB
+Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB
+Medal no Tatsujin                                   MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+Medal no Tatsujin 2                                 MTA1  STMPR0A KC048A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A
+NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A           also has a Namco System10 EXIO PCB
+Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A
+Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A
+Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A
+Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A
+Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker on top
+Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
+
+Other games verified to use this PCB but NOT DUMPED (move into list above when dumped)
+Shamisen Brothers                                   KT-SB2Ver.A   KC038A   8E                   not dumped
+Photo Battle                                        PBT1  Ver.B   KC006A   1D-8E (16)           N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 not populated
+Slot no Oujisama/Slot Prince (Ver.A & Ver.B seen)   SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 
       Notes:
-      1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
+      1. The ROM PCB has locations for 16x 128Mbit FlashROMs (Total capacity = 2048Mbits) but usually only a few are populated.
       2. All of the Taiko no Tatsujin games require a CDROM disc. The game will not show anything on screen
          if the CD drive & disc is not present and working. The disc contains binary data.
-      3. Some kind of block locking or protection issues in the NAND FlashROM prevents the last NAND block being dumped.
+
 
 ********
 *Type 3*
@@ -337,7 +360,7 @@ Notes:
       K6R1008        : Samsung Electronics K6R1008V1C-JC15 128k x8-bit 3.3V High Speed CMOS Static Ram (SOJ32)
       HY57V641620    : Hyundai HY57V641620 4 Banks x1M x16-bit Synchronous DRAM (TSOP54 Type II)
       0-15           : Samsung Electronics K9F2808U0A-YCBO 16Mx8-bit (128M-bit) NAND Flash ROM (TSOP48)
-                       Note! These ROMs also hold data for high scores and play time and coin history.
+                       Note! These ROMs also hold data for high scores, play time and coin history.
                        They must be reset to factory defaults before dumping so the dump is clean.
       LC82310        : Sanyo LC82310 MP3 decoder IC (QFP64)
       3414           : New Japan Radio Co. Ltd. JRC3414 Single-Supply Dual High Current Operational Amplifier (SOIC8)
@@ -350,21 +373,62 @@ Notes:
                        This connector is probably for extra controls
       L              : LED (SMD 0603)
 
-      Note
-      1. The ROM PCB has locations for 16x Flash ROMs (Total capacity = 2048M-bits) but usually only a few are populated.
+      Notes:
+      1. The ROM PCB has locations for 16x Flash ROMs (Total capacity = 2048Mbits) but usually only a few are populated.
+      2. This board outputs audio that is mixed into the normal audio via main board connector J10 and IC BA3121.
 
 This PCB is used on:
 
                                    MEM PCB
-Game                               Sticker      KEYCUS   ROMs Populated
------------------------------------------------------------------------------------------------------
-Golgo 13 Juusei no Chinkonka       GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5
-Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
-Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   0, 1, 2, 3, 4, 5, 6, 7
+Game                               Sticker      KEYCUS   ROMs Populated                                 CD           Notes
+------------------------------------------------------------------------------------------------------------------------------------------
+Golgo 13 Juusei no Chinkonka       GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5                               N/A
+Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13   N/A
+Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   0, 1, 2, 3, 4, 5, 6, 7                         not dumped   Game uses several JAMMA PL1 & PL2 buttons for controls.
 
 
-Expansion Daughterboard PCB
----------------------------
+Type 4
+TAITO CORPORATION
+SYSTEM10 MEM/IO PCB
+|-------------------------------------|
+|                                     |
+|                    |---------|      |
+|                    |         |      |
+|                    |CY37256  |      |
+|    IC6     IC10    |VP208    |      |
+|                    |         |    J1|
+|    IC5     IC9     |---------|      |
+|                                     |
+|    IC4     IC8                      |
+|                                     |
+|                     CY7C1019        |
+|                                     |
+|                                     |
+|                                     |
+|                                     |
+|                                  CN2|
+|                                     |
+|                                     |
+|                      PAL20V8        |
+|                                     |
+|-------------------------------------|
+Notes:
+      CY37256VP208 - Cypress CY37256VP208 Complex Programmable Logic Device (TQFP208)
+          CY7C1019 - Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static Ram (SOJ32)
+          IC4-IC10 - Samsung Electronics K9F2808U0B-YCBO 64Mbit or Toshiba NAND flash ROM (TSOP48)
+           PAL20V8 - marked F06-02
+                J1 - 10-pin header for programming the CPLD via JTAG
+               CN2 - 10-pin connector for controls
+
+This PCB is used on..
+Hajime no Ippo Hard Puncher   - CPLD marked F06-01
+Hajime no Ippo Hard Puncher 2 - sticker HAZIMENO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-02
+
+
+Expansion Daughterboards
+------------------------
+
+Type 1:
 This PCB provides input/output capabilities for JVS hook-ups and allows extra controls to be connected.
 There is actually only one PCB design but there are several variations where some of the connectors and
 ICs are not populated if the game does not need that capability. However the PCB contains all the
@@ -372,10 +436,11 @@ locations/pads/holes etc to mount those parts. In most cases seen so far this PC
 games (e.g. Point Blank 3) it is required for proper game play.
 
 System10 EXIO PCB 8906960602 (8906970602)
-|--------------------------------------------------------|
-|         J4         J5                  J3       J2     |
-|                                       ADM485  MC14052  |-|
-|     LT1181A                                              |
+System10 EXIO(G) PCB 8906960602 (8906970602) sticker: 8906961602 (for lightgun games)
+      |--------------------------------------------------|
+      |   J4         J5                  J3       J2     |
+      |                                 ADM485  MC14052  |-|
+|-----|LT1181A                                             |
 |                                             VHCT245      |
 |                  CY37128VP100               VHCT245      |
 |J6                                  VHCT245  VHCT245    J1|
@@ -388,10 +453,12 @@ System10 EXIO PCB 8906960602 (8906970602)
 |--------------------------------------------------------|
 Notes:
       TMP95C061    : Toshiba TMP95C061 TLCS-900 Series CMOS 16-bit Microcontroller; No internal ROM or RAM (QFP100)
+                      - not populated on EXIO(G) PCB.
       CY37128VP160 : CY37128VP100 Cypress Complex Programmable Logic Device, marked 'S10XIO1A' or 'S10XIO1B' or 'S10XIO1C' (TQFP100)
       VHC*         : Common 3.3v logic chips
       ADM485       : Analog Devices ADM485 Low Power EIA RS485 transceiver (SOIC8)
       61C256       : ISSI IS61C256AH-15J 32k x8-bit SRAM (SOJ28)
+                      - not populated on EXIO(G) PCB.
       LT1181A      : Linear Technology LT1181A or Analog Devices ADM202EARW Low Power 5V RS232 Dual Driver/Receiver (SOIC16W)
       MC14052      : OnSemi MC14052 Analog DP4T Multiplexers/Demultiplexer (SOIC16)
       L            : LED (SMD 0603)
@@ -403,20 +470,112 @@ Notes:
       J7           : 6 pin header for programming the CPLDs via JTAG
       J8           : 2 pin header for connection of gun. Pin 1:Player 1 Gun Opto. Pin2:Player 2 Gun Opto
 
-This PCB is required by Point Blank 3 since it controls the gun opto signal. Only the CPLD and J8 and some minor
+This PCB is required by Point Blank 3 since it controls the lightgun opto signal. Only the CPLD and J8 and some minor
 logic and other small support parts are populated.
-This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) (and on Knock Down 2001) but not
-earlier TK games, so it appears to be optional or is only used by the later TK51 and TK61 games.
+This PCB has been found almost fully populated (minus J6) on some Taiko no Tatsujin games (TK51/TK61) and on Knock Down 2001) but not
+earlier TK games, so it appears to be optional or is only used by the later TK51 and TK61 games or the earlier TK PCB was missing that board.
 
 
-System10 EXFINAL PCB 8906962603 (8906962703)
---------------------
-32kBx8-bit SRAM
-Altera MAX EPM3128 CPLD labelled S10XFN1A
-R4543 RTC and 3V coin battery
-40MHz OSC
-TMC 'EC-NET' TM20070A Network Controller
-SMSC COM20022I 10Mbps ARCNET Controller
+Type 2:
+System10 EXFINAL PCB 8906962703 (8906972703)
+      |----------------------------------------------------|
+      |          LLLLLLLL     J3                           |
+      |                                                    |
+|-----|             40MHz                                  |
+|J4                       EPM3128                          |
+|                        (S10XFN1A)                        |
+|J5     JP1                                                |
+|                                            M62023        |
+|     COM20022I                           R4543            |
+|J6               CY62256                                  |
+|       ADM485                                             |
+|J8  J7     TMC20070A                                      |
+| JP2  JP3                                    BATT         |
+|----------------------------------------------------------|
+Notes:
+      CY62256 - 32kBx8-bit SRAM
+      EPM3128 - Altera MAX EPM3128 CPLD labelled S10XFN1A
+        R4543 - R4543 RTC
+         BATT - 3V coin battery
+            L - LED (SMD 0603)
+    TMC20070A - TMC 'EC-NET' TMC20070A Network Controller
+    COM20022I - SMSC COM20022I 10Mbps ARCNET Controller
+           J3 - 6 pin connector for JTAG
+           J4 - 3.5mm Audio Jack
+           J5 - HD15 DSUB connector (video out?)
+           J6 - Optical Network Jacks
+        J7/J8 - 3 pin connector
+          JP1 - Jumper marked 30m/10m
+      JP2/JP3 - Jumper marked Non/Term
+
+This PCB is essentially a network board.
+This PCB was found on Medal no Tatsujin and Medal no Tatsujin 2.
+
+
+Type 3:
+System10 EXUSB PCB 8906962601 (8906972601)
+      |----------------------------------------------------|
+      | J7                 J6                LLLL     J5   |
+      |                                                    |
+|-----|   TR2 TR4 TR6 TR8 TR10 TR12 TR14 TR16  USBN9604-28M|
+|         TR1 TR3 TR5 TR7 TR9  TR11 TR13 TR15            L |
+|                                                          |
+|                                              EPM3128     |
+|   TD62083                                   (S10EXU1A)   |
+|                    TLP283-4                         48MHz|
+| J1                        TLP283-4                       |
+|                                                          |
+|   TD62083                                              J4|
+|                          J2        J3         SW1        |
+|----------------------------------------------------------|
+Notes:
+       J1 - Multi-pin connector
+       J2 - Multi-pin connector
+       J3 - 6-pin JTAG connector
+       J4 - HD15 DSUB connector
+       J5 - USB type B connector
+       J6 - Multi-pin connector
+       J7 - 6 pin Power Input connector
+      TR* - D1718 Transistor
+        L - LED (SMD 0603)
+ USBN9604 - National/TI USBN9604-28M USB controller
+  EPM3128 - Altera MAX EPM3128 CPLD labelled S10EXU1A
+ TLP283-4 - Toshiba TLP283-4 Optocoupler
+  TD62083 - Toshiba 8-channel Darlington Sink Driver
+      SW1 - 4-position DIP switch
+
+Usage of this PCB is unknown but likely it is used on any game that drives motors
+such as coin pushers etc.
+
+
+Type 4:
+S10 MGEXIO PCB 8681960201 (8681970201)
+      |----------------------------------------------------|
+      | TR11  TR13  TR15  TR17  TR19             J8        |
+      |   TR12  TR14  TR16  TR18  TR20                     |
+|-----|                                                    |
+|                             L    EPM3128                 |
+|                                     14.??MHz             |
+|J3           J4            J5                      M48Z35Y|
+|                                   H8/3007                |
+|                                                          |
+|                                                          |
+|                                                   MB3771 |
+|       TR1   TR3   TR5   TR7   TR9      L                 |
+|  J2     TR2   TR4   TR6   TR8   TR10   L  SW1         J6 |
+|----------------------------------------------------------|
+Notes:
+       J2 - 4-pin connector
+   J3/4/5 - Multi-pin connector
+       J6 - 4-pin connector
+       J8 - 6-pin JTAG connector
+      TR* - D1718 Transistor
+        L - LED (SMD 0603)
+  EPM3128 - Altera MAX EPM3128 CPLD labelled PZB1DR0
+      SW1 - 2-position DIP switch
+  M48Z35Y - ST Microelectronics M48Z35Y 32kBx8-bit NVRAM
+  H8/3007 - Hitachi H8/3007 Microcontroller (2kB internal RAM, no internal ROM)
+   MB3771 - Fujitsu MB3771 System Reset IC
 
 -----------
 
