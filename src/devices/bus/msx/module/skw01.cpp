@@ -8,9 +8,9 @@ Word processor side slot module with Kanij ROM, 2KB SRAM, and a
 printer port.
 The PCB is labeled YMX-YWP.
 
-- This module runs unstable on the cx5m128 driver. Is that also the case
-  on real units? The instability is mostly visible when pressing F1, causing
-  the system to reset, hang, or display a screen with random data.
+- This module runs unstable on the cx5m128 driver.
+  The instability is mostly visible when pressing F1, causing the system
+  to reset, hang, or display a screen with random data.
 
 **************************************************************************/
 
@@ -76,7 +76,7 @@ void msx_cart_skw01_device::device_add_mconfig(machine_config &config)
 {
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	// printer
+	// printer port
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit1));
 
@@ -111,19 +111,19 @@ void msx_cart_skw01_device::device_start()
 
 	page(0)->install_rom(0x0000, 0x3fff, m_region_rom->base());
 	page(1)->install_rom(0x4000, 0x7fff, m_region_rom->base() + 0x4000);
-	page(1)->install_readwrite_handler(0x7fc0, 0x7fc0, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<0>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<0>)));
-	page(1)->install_readwrite_handler(0x7fc1, 0x7fc1, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<0>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<0>)));
-	page(1)->install_readwrite_handler(0x7fc2, 0x7fc2, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<1>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<1>)));
-	page(1)->install_readwrite_handler(0x7fc3, 0x7fc3, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<1>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<1>)));
-	page(1)->install_readwrite_handler(0x7fc4, 0x7fc4, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<2>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<2>)));
-	page(1)->install_readwrite_handler(0x7fc5, 0x7fc5, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<2>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<2>)));
-	page(1)->install_readwrite_handler(0x7fc6, 0x7fc6, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<3>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<3>)));
-	page(1)->install_readwrite_handler(0x7fc7, 0x7fc7, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::data_r<3>)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<3>)));
-	page(1)->install_write_handler(0x7fc8, 0x7fc8, write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<4>)));
-	page(1)->install_write_handler(0x7fc9, 0x7fc9, write8smo_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<4>)));
-	page(1)->install_readwrite_handler(0x7fca, 0x7fcb, read8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_r)), write8smo_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_w)));
-	page(1)->install_readwrite_handler(0x7fcc, 0x7fcc, read8smo_delegate(*m_cent_status_in, FUNC(input_buffer_device::read)), write8smo_delegate(*m_cent_ctrl_out, FUNC(output_latch_device::write)));
-	page(1)->install_write_handler(0x7fce, 0x7fce, write8smo_delegate(*m_cent_data_out, FUNC(output_latch_device::write)));
+	page(1)->install_readwrite_handler(0x7fc0, 0x7fc0, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<0>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<0>)));
+	page(1)->install_readwrite_handler(0x7fc1, 0x7fc1, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::data_r<0>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<0>)));
+	page(1)->install_readwrite_handler(0x7fc2, 0x7fc2, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<1>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<1>)));
+	page(1)->install_readwrite_handler(0x7fc3, 0x7fc3, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::data_r<1>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<1>)));
+	page(1)->install_readwrite_handler(0x7fc4, 0x7fc4, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<2>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<2>)));
+	page(1)->install_readwrite_handler(0x7fc5, 0x7fc5, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::data_r<2>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<2>)));
+	page(1)->install_readwrite_handler(0x7fc6, 0x7fc6, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::ready_r<3>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<3>)));
+	page(1)->install_readwrite_handler(0x7fc7, 0x7fc7, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::data_r<3>)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<3>)));
+	page(1)->install_write_handler(0x7fc8, 0x7fc8, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_lo_w<4>)));
+	page(1)->install_write_handler(0x7fc9, 0x7fc9, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::addr_hi_w<4>)));
+	page(1)->install_readwrite_handler(0x7fca, 0x7fcb, emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_r)), emu::rw_delegate(*this, FUNC(msx_cart_skw01_device::dictsram_w)));
+	page(1)->install_readwrite_handler(0x7fcc, 0x7fcc, emu::rw_delegate(*m_cent_status_in, FUNC(input_buffer_device::read)), emu::rw_delegate(*m_cent_ctrl_out, FUNC(output_latch_device::write)));
+	page(1)->install_write_handler(0x7fce, 0x7fce, emu::rw_delegate(*m_cent_data_out, FUNC(output_latch_device::write)));
 }
 
 template<int Bank>
@@ -141,7 +141,7 @@ void msx_cart_skw01_device::addr_hi_w(u8 data)
 template<int Bank>
 u8 msx_cart_skw01_device::ready_r() const
 {
-	// Unknown what the delays can be
+	// Unknown what the delay should be
 	// 0 - Not ready
 	// 1 - Data ready to read
 	return 1;
