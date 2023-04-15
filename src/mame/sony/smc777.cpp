@@ -66,8 +66,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_beeper(*this, "beeper")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -125,8 +124,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beeper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -472,7 +470,7 @@ void smc777_state::fdc1_select_w(uint8_t data)
 	// x--- ---- SIDE1: [SMC-70] side select
 	// ---- --x- EXDS: [SMC-70] external drive select (0=internal, 1=external)
 	// ---- ---x DS01: select floppy drive
-	floppy = (data & 1 ? m_floppy1 : m_floppy0)->get_device();
+	floppy = m_floppy[data & 1]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -1136,8 +1134,8 @@ void smc777_state::smc777(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));

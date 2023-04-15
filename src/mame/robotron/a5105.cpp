@@ -52,10 +52,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
 		, m_fdc(*this, "upd765a")
-		, m_floppy0(*this, "upd765a:0")
-		, m_floppy1(*this, "upd765a:1")
-		, m_floppy2(*this, "upd765a:2")
-		, m_floppy3(*this, "upd765a:3")
+		, m_floppy(*this, "upd765a:%u", 0U)
 		, m_video_ram(*this, "video_ram")
 		, m_ram(*this, RAM_TAG)
 		, m_gfxdecode(*this, "gfxdecode")
@@ -101,10 +98,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -370,10 +364,8 @@ void a5105_state::a5105_memsel_w(uint8_t data)
 
 void a5105_state::a5105_upd765_w(uint8_t data)
 {
-	m_floppy0->get_device()->mon_w(!BIT(data,0));
-	m_floppy1->get_device()->mon_w(!BIT(data,1));
-	m_floppy2->get_device()->mon_w(!BIT(data,2));
-	m_floppy3->get_device()->mon_w(!BIT(data,3));
+	for (int n = 0; n < 4; n++)
+		m_floppy[n]->get_device()->mon_w(!BIT(data,n));
 
 	m_fdc->tc_w(BIT(data, 4));
 }
