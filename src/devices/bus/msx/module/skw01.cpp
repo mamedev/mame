@@ -8,6 +8,9 @@ Word processor side slot module with Kanij ROM, 2KB SRAM, and a
 printer port.
 The PCB is labeled YMX-YWP.
 
+The software can be started from Basic by entering the command "CALL JWP"
+or "_JWP".
+
 - This module runs unstable on the cx5m128 driver.
   The instability is mostly visible when pressing F1, causing the system
   to reset, hang, or display a screen with random data.
