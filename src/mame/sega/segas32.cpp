@@ -2499,13 +2499,13 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
 {
-	printf("%02x IRQ\n",state);
+	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 {
-	printf("%02x DRQ\n",state);
+	//printf("%02x DRQ\n",state);
 }
 
 void segas32_state::system32_cd_map(address_map &map)
@@ -2545,7 +2545,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 		{
 			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(8000000);
+			spc.set_clock(8_MHz_XTAL);
 			spc.out_irq_callback().set(*this, FUNC(segas32_cd_state::scsi_irq_w));
 			spc.out_dreq_callback().set(*this, FUNC(segas32_cd_state::scsi_drq_w));
 		});
