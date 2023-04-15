@@ -97,9 +97,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "simpsons.h"
-#include "konamipt.h"
 
+#include "k052109.h"
+#include "k053251.h"
+#include "k053246_k053247_k055673.h"
+#include "konamipt.h"
+#include "konami_helper.h"
+
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
@@ -107,6 +112,308 @@ Notes:
 #include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
+
+
+namespace {
+
+class simpsons_state : public driver_device
+{
+public:
+	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_palette_view(*this, "palette_view"),
+		m_video_view(*this, "video_view"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k052109(*this, "k052109"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251")
+	{ }
+
+	void simpsons(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void bank0000_map(address_map &map);
+	void bank2000_map(address_map &map);
+	void main_map(address_map &map);
+	void z80_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_end);
+
+	/* memory pointers */
+	std::unique_ptr<uint16_t[]>   m_spriteram;
+
+	/* video-related */
+	int        m_sprite_colorbase = 0;
+	int        m_layer_colorbase[3]{};
+	int        m_layerpri[3]{};
+	emu_timer *m_dma_start_timer;
+	emu_timer *m_dma_end_timer;
+
+	/* misc */
+	int        m_firq_enabled = 0;
+	emu_timer *m_nmi_blocked;
+
+	/* views */
+	memory_view m_palette_view;
+	memory_view m_video_view;
+
+	/* devices */
+	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k052109_device> m_k052109;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	void z80_bankswitch_w(uint8_t data);
+	void z80_arm_nmi_w(uint8_t data);
+	void eeprom_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
+	uint8_t sound_interrupt_r();
+	uint8_t k052109_r(offs_t offset);
+	void k052109_w(offs_t offset, uint8_t data);
+	uint8_t k053247_r(offs_t offset);
+	void k053247_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	void video_bank_select(int bank);
+	void object_dma();
+	void z80_nmi_w(int state);
+	K052109_CB_MEMBER(tile_callback);
+	void banking_callback(u8 data);
+	K053246_CB_MEMBER(sprite_callback);
+};
+
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(simpsons_state::tile_callback)
+{
+	*code |= ((*color & 0x3f) << 8) | (bank << 14);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+}
+
+
+/***************************************************************************
+
+  Callbacks for the K053247
+
+***************************************************************************/
+
+K053246_CB_MEMBER(simpsons_state::sprite_callback)
+{
+	int pri = (*color & 0x0f80) >> 6;   /* ??????? */
+
+	if (pri <= m_layerpri[2])
+		*priority_mask = 0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority_mask = 0xf0;
+	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
+		*priority_mask = 0xf0 | 0xcc;
+	else
+		*priority_mask = 0xf0 | 0xcc | 0xaa;
+
+	*color = m_sprite_colorbase + (*color & 0x001f);
+}
+
+
+/***************************************************************************
+
+  Extra video banking
+
+***************************************************************************/
+
+uint8_t simpsons_state::k052109_r(offs_t offset)
+{
+	return m_k052109->read(offset + 0x2000);
+}
+
+void simpsons_state::k052109_w(offs_t offset, uint8_t data)
+{
+	m_k052109->write(offset + 0x2000, data);
+}
+
+uint8_t simpsons_state::k053247_r(offs_t offset)
+{
+	int offs = offset >> 1;
+
+	if (offset & 1)
+		return(m_spriteram[offs] & 0xff);
+	else
+		return(m_spriteram[offs] >> 8);
+}
+
+void simpsons_state::k053247_w(offs_t offset, uint8_t data)
+{
+	int offs = offset >> 1;
+
+	if (offset & 1)
+		m_spriteram[offs] = (m_spriteram[offs] & 0xff00) | data;
+	else
+		m_spriteram[offs] = (m_spriteram[offs] & 0x00ff) | (data << 8);
+}
+
+void simpsons_state::video_bank_select( int bank )
+{
+	if(bank & 1)
+		m_palette_view.select(0);
+	else
+		m_palette_view.disable();
+	m_video_view.select((bank >> 1) & 1);
+}
+
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t simpsons_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int layer[3], bg_colorbase;
+
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	m_k052109->tilemap_update();
+
+	layer[0] = 0;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
+	layer[1] = 1;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
+	layer[2] = 2;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+
+	konami_sortlayers3(layer, m_layerpri);
+
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(16 * bg_colorbase, cliprect);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
+
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
+	return 0;
+}
+
+
+
+/***************************************************************************
+
+  EEPROM
+
+***************************************************************************/
+
+void simpsons_state::eeprom_w(uint8_t data)
+{
+	if (data == 0xff)
+		return;
+
+	ioport("EEPROMOUT")->write(data, 0xff);
+
+	video_bank_select(data & 0x03);
+
+	m_firq_enabled = data & 0x04;
+	if (!m_firq_enabled)
+		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, CLEAR_LINE);
+}
+
+/***************************************************************************
+
+  Coin Counters, Sound Interface
+
+***************************************************************************/
+
+void simpsons_state::coin_counter_w(uint8_t data)
+{
+	/* bit 0,1 coin counters */
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	/* bit 2 selects mono or stereo sound */
+	/* bit 3 = enable char ROM reading through the video RAM */
+	m_k052109->set_rmrd_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	/* bit 4 = INIT (unknown) */
+	/* bit 5 = enable sprite ROM reading */
+	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint8_t simpsons_state::sound_interrupt_r()
+{
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+
+	return 0x00;
+}
+
+
+/***************************************************************************
+
+  Banking, initialization
+
+***************************************************************************/
+
+void simpsons_state::banking_callback(u8 data)
+{
+	membank("bank1")->set_entry(data & 0x3f);
+}
+
+void simpsons_state::machine_start()
+{
+	m_spriteram = make_unique_clear<uint16_t[]>(0x1000 / 2);
+
+	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x2000);
+
+	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0);
+	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
+
+	save_item(NAME(m_firq_enabled));
+	save_item(NAME(m_sprite_colorbase));
+	save_item(NAME(m_layer_colorbase));
+	save_item(NAME(m_layerpri));
+	save_pointer(NAME(m_spriteram), 0x1000 / 2);
+
+	m_dma_start_timer = timer_alloc(FUNC(simpsons_state::dma_start), this);
+	m_dma_end_timer = timer_alloc(FUNC(simpsons_state::dma_end), this);
+	m_nmi_blocked = timer_alloc(timer_expired_delegate());
+}
+
+void simpsons_state::machine_reset()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		m_layerpri[i] = 0;
+		m_layer_colorbase[i] = 0;
+	}
+
+	m_sprite_colorbase = 0;
+	m_firq_enabled = 0;
+
+	/* init the default banks */
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
+	video_bank_select(0);
+
+	m_dma_start_timer->adjust(attotime::never);
+	m_dma_end_timer->adjust(attotime::never);
+
+	// Z80 _NMI goes low at same time as reset
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 
 
 /***************************************************************************
@@ -637,6 +944,8 @@ ROM_START( simpsons2pj ) /* Japan 2 Player */
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "simpsons2pj.12c.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
+
+} // anonymous namespace
 
 
 

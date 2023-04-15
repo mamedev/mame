@@ -66,20 +66,291 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 */
 
 #include "emu.h"
-#include "djmain.h"
+
+#include "k054156_k054157_k056832.h"
+#include "k055555.h"
+#include "konami_helper.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/m68000/m68020.h"
 #include "sound/k054539.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
+namespace {
 
 #define DISABLE_VB_INT  (!(m_v_ctrl & 0x8000))
+#define NUM_SPRITES (0x800 / 16)
+#define NUM_LAYERS  2
 
+class djmain_state : public driver_device
+{
+public:
+	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_obj_ram(*this, "obj_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_k056832(*this, "k056832")
+		, m_k055555(*this, "k055555")
+		, m_ata(*this, "ata")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_turntable(*this, "TT%u", 1U)
+		, m_sndram(*this, "sndram")
+		, m_leds(*this, "led%u", 0U)
+	{
+	}
+
+	void djmainj(machine_config &config);
+	void djmainu(machine_config &config);
+	void djmaina(machine_config &config);
+
+	void init_bm7thmix();
+	void init_bm6thmix();
+	void init_hmcompmx();
+	void init_bmfinal();
+	void init_hmcompm2();
+	void init_bm5thmix();
+	void init_bm4thmix();
+	void init_bs4thmix();
+	void init_beatmania();
+	void init_bmdct();
+	void init_bmcompm2();
+	void init_bmcorerm();
+	void init_bmclubmx();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	void sndram_bank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t sndram_r(offs_t offset, uint32_t mem_mask = ~0);
+	void sndram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t obj_ctrl_r(offs_t offset);
+	void obj_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t obj_rom_r(offs_t offset, uint32_t mem_mask = ~0);
+	void v_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t v_rom_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint8_t inp1_r(offs_t offset);
+	uint8_t inp2_r(offs_t offset);
+	uint32_t turntable_r(offs_t offset, uint32_t mem_mask = ~0);
+	void turntable_select_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void light_ctrl_1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void light_ctrl_2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknown590000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknown802000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void unknownc02000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vb_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	K056832_CB_MEMBER(tile_callback);
+	void k054539_map(address_map &map);
+	void maincpu_djmain(address_map &map);
+	void maincpu_djmaina(address_map &map);
+	void maincpu_djmainj(address_map &map);
+	void maincpu_djmainu(address_map &map);
+
+	required_shared_ptr<uint32_t> m_obj_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k055555_device> m_k055555;
+	required_device<ata_interface_device> m_ata;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_ioport_array<2> m_turntable;
+	required_shared_ptr<uint8_t> m_sndram;
+	output_finder<3> m_leds;
+
+	int m_sndram_bank = 0;
+	int m_turntable_select = 0;
+	uint8_t m_turntable_last_pos[2]{};
+	uint16_t m_turntable_pos[2]{};
+	uint8_t m_pending_vb_int = 0U;
+	uint16_t m_v_ctrl = 0U;
+	uint32_t m_obj_regs[0xa0/4]{};
+	const uint8_t *m_ata_user_password = nullptr;
+	const uint8_t *m_ata_master_password = nullptr;
+};
+
+
+void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int offs, pri_code;
+	int sortedlist[NUM_SPRITES];
+
+	m_gfxdecode->gfx(0)->set_colorbase(m_k055555->K055555_read_register(K55_PALBASE_SUB2) * 0x400);
+
+	for (offs = 0; offs < NUM_SPRITES; offs++)
+		sortedlist[offs] = -1;
+
+	/* prebuild a sorted table */
+	for (offs = 0; offs < NUM_SPRITES * 4; offs += 4)
+	{
+		if (m_obj_ram[offs] & 0x00008000)
+		{
+			if (m_obj_ram[offs] & 0x80000000)
+				continue;
+
+			pri_code = m_obj_ram[offs] & (NUM_SPRITES - 1);
+			sortedlist[pri_code] = offs;
+		}
+	}
+
+	for (pri_code = NUM_SPRITES - 1; pri_code >= 0; pri_code--)
+	{
+		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+		static const int sizetab[4] =  { 1, 2, 4, 8 };
+		int x, y;
+		int ox, oy;
+		int flipx, flipy;
+		int xscale, yscale;
+		int code;
+		int color;
+		int size;
+
+		offs = sortedlist[pri_code];
+		if (offs == -1) continue;
+
+		code = m_obj_ram[offs] >> 16;
+		flipx = (m_obj_ram[offs] >> 10) & 1;
+		flipy = (m_obj_ram[offs] >> 11) & 1;
+		size = sizetab[(m_obj_ram[offs] >> 8) & 3];
+
+		ox = (int16_t)(m_obj_ram[offs + 1] & 0xffff);
+		oy = (int16_t)(m_obj_ram[offs + 1] >> 16);
+
+		xscale = m_obj_ram[offs + 2] >> 16;
+		yscale = m_obj_ram[offs + 2] & 0xffff;
+
+		if (!xscale || !yscale)
+			continue;
+
+		xscale = (0x40 << 16) / xscale;
+		yscale = (0x40 << 16) / yscale;
+		ox -= (size * xscale) >> 13;
+		oy -= (size * yscale) >> 13;
+
+		color = (m_obj_ram[offs + 3] >> 16) & 15;
+
+		for (x = 0; x < size; x++)
+			for (y = 0; y < size; y++)
+			{
+				int c = code;
+
+				if (flipx)
+					c += xoffset[size - x - 1];
+				else
+					c += xoffset[x];
+
+				if (flipy)
+					c += yoffset[size - y - 1];
+				else
+					c += yoffset[y];
+
+				if (xscale != 0x10000 || yscale != 0x10000)
+				{
+					int sx = ox + ((x * xscale + (1 << 11)) >> 12);
+					int sy = oy + ((y * yscale + (1 << 11)) >> 12);
+					int zw = ox + (((x + 1) * xscale + (1 << 11)) >> 12) - sx;
+					int zh = oy + (((y + 1) * yscale + (1 << 11)) >> 12) - sy;
+
+
+								m_gfxdecode->gfx(0)->zoom_transpen(bitmap,
+								cliprect,
+								c,
+								color,
+								flipx,
+								flipy,
+								sx,
+								sy,
+								(zw << 16) / 16,
+								(zh << 16) / 16,
+								0);
+				}
+				else
+				{
+					int sx = ox + (x << 4);
+					int sy = oy + (y << 4);
+
+
+							m_gfxdecode->gfx(0)->transpen(bitmap,
+							cliprect,
+							c,
+							color,
+							flipx,
+							flipy,
+							sx,
+							sy,
+							0);
+				}
+			}
+	}
+}
+
+
+K056832_CB_MEMBER(djmain_state::tile_callback)
+{
+}
+
+void djmain_state::video_start()
+{
+	m_k056832->set_layer_offs(0, -92, -27);
+	// m_k056832->set_layer_offs(1, -87, -27);
+	m_k056832->set_layer_offs(1, -88, -27);
+}
+
+uint32_t djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+	int pri[NUM_LAYERS + 1];
+	int order[NUM_LAYERS + 1];
+	int i, j;
+
+	for (i = 0; i < NUM_LAYERS; i++)
+		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
+	pri[i] = m_k055555->K055555_read_register(K55_PRIINP_10);
+
+	for (i = 0; i < NUM_LAYERS + 1; i++)
+		order[i] = i;
+
+	for (i = 0; i < NUM_LAYERS; i++)
+		for (j = i + 1; j < NUM_LAYERS + 1; j++)
+			if (pri[order[i]] > pri[order[j]])
+			{
+				int temp = order[i];
+
+				order[i] = order[j];
+				order[j] = temp;
+			}
+
+	bitmap.fill(m_palette->pen(0), cliprect);
+
+	for (i = 0; i < NUM_LAYERS + 1; i++)
+	{
+		int layer = order[i];
+
+		if (layer == NUM_LAYERS)
+		{
+			if (enables & K55_INP_SUB2)
+				draw_sprites(bitmap, cliprect);
+		}
+		else
+		{
+			if (enables & (K55_INP_VRAM_A << layer))
+				m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, layer, 0, 1 << i);
+		}
+	}
+	return 0;
+}
 
 
 /*************************************
@@ -2272,6 +2543,8 @@ void djmain_state::init_bmfinal()
 	m_ata_user_password = bmfinal_user_password;
 }
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -2313,6 +2586,3 @@ GAME( 1999, popnstex, 0,        djmainj, popnstex,  djmain_state, init_beatmania
 
 // for reference, these sets have not been verified
 //GAME( 1998, bm3rdmxb, bm3rdmix, djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
-
-
-

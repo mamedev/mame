@@ -21,33 +21,132 @@
    - sound volume mixing, handtune with set_gain() with m_k054539 devices.
      Also notice that "volume" in sound options is for k054539_1 (SFX)
 
-   Change Log:
-
-   (AT070703)
-   drivers\rungun.cpp (this file)
-     - mem maps, device settings, component communications, I/O's, sound...etc.
-
-   video\rungun.cpp
-     - general clean-up, clipping, alignment
-
-   video\konamiic.cpp
-     - missing sprites and priority
-
-
 *************************************************************************/
 
 #include "emu.h"
-#include "rungun.h"
+
+#include "k053246_k053247_k055673.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/k053252.h"
+#include "machine/k054321.h"
 #include "sound/k054539.h"
+#include "video/k053936.h"
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "rungun_dual.lh"
 
+
+namespace {
+
+class rungun_state : public driver_device
+{
+public:
+	rungun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_k054539_1(*this, "k054539_1"),
+		m_k054539_2(*this, "k054539_2"),
+		m_k053936(*this, "k053936"),
+		m_k055673(*this, "k055673"),
+		m_k053252(*this, "k053252"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_palette2(*this, "palette2"),
+		m_screen(*this, "screen"),
+		m_k054321(*this, "k054321"),
+		m_sysreg(*this, "sysreg")
+	{ }
+
+	void rng(machine_config &config);
+	void rng_dual(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<k054539_device> m_k054539_1;
+	required_device<k054539_device> m_k054539_2;
+	required_device<k053936_device> m_k053936;
+	required_device<k055673_device> m_k055673;
+	required_device<k053252_device> m_k053252;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette2;
+	required_device<screen_device> m_screen;
+	required_device<k054321_device> m_k054321;
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_sysreg;
+
+	/* video-related */
+	tilemap_t   *m_ttl_tilemap[2]{};
+	tilemap_t   *m_936_tilemap[2]{};
+	std::unique_ptr<uint16_t[]> m_psac2_vram;
+	std::unique_ptr<uint16_t[]>    m_ttl_vram;
+	std::unique_ptr<uint16_t[]>   m_pal_ram;
+	uint8_t       m_current_display_bank = 0;
+	int         m_ttl_gfx_index = 0;
+	int         m_sprite_colorbase = 0;
+
+	uint8_t       *m_roz_rom = nullptr;
+	uint8_t       m_roz_rombase = 0;
+
+	/* sound */
+	uint8_t       m_sound_ctrl = 0;
+	uint8_t       m_sound_status = 0;
+	uint8_t       m_sound_nmi_clk = 0;
+
+	bool        m_video_priority_mode = false;
+	std::unique_ptr<uint16_t[]> m_banked_ram;
+	bool        m_single_screen_mode = false;
+	uint8_t       m_video_mux_bank = 0;
+
+	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
+	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_status_w(uint8_t data);
+	void sound_ctrl_w(uint8_t data);
+	uint16_t ttl_ram_r(offs_t offset);
+	void ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t psac2_videoram_r(offs_t offset);
+	void psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t k53936_rom_r(offs_t offset);
+	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
+	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
+	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	uint16_t palette_read(offs_t offset);
+	void palette_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+
+	K055673_CB_MEMBER(sprite_callback);
+
+	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
+	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
+	void   sprite_dma_trigger(void);
+
+	INTERRUPT_GEN_MEMBER(rng_interrupt);
+
+	void rungun_map(address_map &map);
+	void rungun_sound_map(address_map &map);
+};
 
 
 uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
@@ -199,6 +298,168 @@ void rungun_state::rungun_map(address_map &map)
 	map(0x700000, 0x7007ff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));          // PSAC "Line RAM"
 	map(0x740000, 0x741fff).rw(FUNC(rungun_state::ttl_ram_r), FUNC(rungun_state::ttl_ram_w));     // text plane RAM
 	map(0x7c0000, 0x7c0001).nopw();                                    // watchdog
+}
+
+
+/**********************************************************************************/
+
+/* TTL text plane stuff */
+TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
+{
+	uint32_t const base_addr = uintptr_t(tilemap.user_data());
+	auto const lvram = util::little_endian_cast<uint8_t const>(m_ttl_vram.get()) + base_addr;
+
+	int const attr = (lvram[tile_index << 2] & 0xf0) >> 4;
+	int const code = ((lvram[tile_index << 2] & 0x0f) << 8) | lvram[(tile_index << 2) + 2];
+
+	tileinfo.set(m_ttl_gfx_index, code, attr, 0);
+}
+
+K055673_CB_MEMBER(rungun_state::sprite_callback)
+{
+	*color = m_sprite_colorbase | (*color & 0x001f);
+}
+
+uint16_t rungun_state::ttl_ram_r(offs_t offset)
+{
+	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
+}
+
+void rungun_state::ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
+	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
+}
+
+/* 53936 (PSAC2) rotation/zoom plane */
+uint16_t rungun_state::psac2_videoram_r(offs_t offset)
+{
+	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
+}
+
+void rungun_state::psac2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
+	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
+{
+	uint32_t base_addr = (uintptr_t)tilemap.user_data();
+	int tileno, colour, flipx;
+
+	tileno = m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0x3fff;
+	flipx = (m_psac2_vram[tile_index * 2 + 1 + base_addr] & 0xc000) >> 14;
+	colour = 0x10 + (m_psac2_vram[tile_index * 2 + base_addr] & 0x000f);
+
+	tileinfo.set(0, tileno, colour, TILE_FLIPYX(flipx));
+}
+
+
+void rungun_state::video_start()
+{
+	static const gfx_layout charlayout =
+	{
+		8, 8,   // 8x8
+		4096,   // # of tiles
+		4,      // 4bpp
+		{ 0, 1, 2, 3 }, // plane offsets
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 }, // X offsets
+		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 }, // Y offsets
+		8*8*4
+	};
+
+	int gfx_index;
+
+	m_ttl_vram = std::make_unique<uint16_t[]>(0x1000*2);
+	m_psac2_vram = std::make_unique<uint16_t[]>(0x80000*2);
+
+	/* find first empty slot to decode gfx */
+	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
+		if (m_gfxdecode->gfx(gfx_index) == nullptr)
+			break;
+
+	assert(gfx_index != MAX_GFX_ELEMENTS);
+
+	// decode the ttl layer's gfx
+	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("gfx3")->base(), 0, m_palette->entries() / 16, 0));
+	m_ttl_gfx_index = gfx_index;
+
+	// create the tilemaps
+	for(uint32_t screen_num = 0;screen_num < 2;screen_num++)
+	{
+		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
+		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
+
+		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_rng_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
+		m_936_tilemap[screen_num]->set_transparent_pen(0);
+
+	}
+	m_sprite_colorbase = 0x20;
+
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_left_temp);
+	m_screen->register_screen_bitmap(m_rng_dual_demultiplex_right_temp);
+}
+
+uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
+	m_current_display_bank = m_screen->frame_number() & 1;
+	if(m_single_screen_mode == true)
+		m_current_display_bank = 0;
+
+	if(m_video_priority_mode == false)
+	{
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
+		m_k055673->k053247_sprites_draw(bitmap, cliprect);
+	}
+	else
+	{
+		m_k055673->k053247_sprites_draw(bitmap, cliprect);
+		m_k053936->zoom_draw(screen, bitmap, cliprect, m_936_tilemap[m_current_display_bank], 0, 0, 1);
+	}
+
+	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// the 60hz signal gets split between 2 screens
+uint32_t rungun_state::screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int m_current_display_bank = m_screen->frame_number() & 1;
+
+	if (!m_current_display_bank)
+		screen_update_rng(screen, m_rng_dual_demultiplex_left_temp, cliprect);
+	else
+		screen_update_rng(screen, m_rng_dual_demultiplex_right_temp, cliprect);
+
+	copybitmap( bitmap, m_rng_dual_demultiplex_left_temp, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+// this depends upon the first screen being updated, and the bitmap being copied to the temp bitmap
+uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	copybitmap( bitmap, m_rng_dual_demultiplex_right_temp, 0, 0, 0, 0, cliprect);
+	return 0;
+}
+
+void rungun_state::sprite_dma_trigger(void)
+{
+	uint32_t src_address;
+
+	if(m_single_screen_mode == true)
+		src_address = 1*0x2000;
+	else
+		src_address = m_current_display_bank*0x2000;
+
+	// TODO: size could be programmable somehow.
+	for(int i=0;i<0x1000;i+=2)
+		m_k055673->k053247_word_w(i/2, m_banked_ram[(i + src_address) /2]);
 }
 
 
@@ -933,6 +1194,8 @@ ROM_START( rungunud ) // dual cabinet setup ONLY
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "rungunu.nv", 0x0000, 0x080, CRC(d501f579) SHA1(9e01d9a6a8cdc782dd2a92fbf2295e8df732f892) )
 ROM_END
+
+} // anonymous namespace
 
 
 // these sets operate as single screen / dual screen depending on if you have the video de-multiplexer plugged in, and the dipswitch set to 1 or 2 monitors

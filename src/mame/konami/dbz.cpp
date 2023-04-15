@@ -53,14 +53,241 @@ Notes:
 */
 
 #include "emu.h"
-#include "dbz.h"
+
+#include "k053246_k053247_k055673.h"
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/k053252.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+#include "video/k053936.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+namespace {
+
+class dbz_state : public driver_device
+{
+public:
+	dbz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_bg1_videoram(*this, "bg1_videoram"),
+		m_bg2_videoram(*this, "bg2_videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
+		m_k056832(*this, "k056832"),
+		m_k053936_1(*this, "k053936_1"),
+		m_k053936_2(*this, "k053936_2"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_dsw2(*this, "DSW2")
+	{ }
+
+	void dbz(machine_config &config);
+	void dbz2bl(machine_config &config);
+
+	void init_dbza();
+	void init_dbz();
+	void init_dbz2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_bg1_videoram;
+	required_shared_ptr<uint16_t> m_bg2_videoram;
+
+	/* video-related */
+	tilemap_t    *m_bg1_tilemap = nullptr;
+	tilemap_t    *m_bg2_tilemap = nullptr;
+	int          m_layer_colorbase[6]{};
+	int          m_layerpri[5]{};
+	int          m_sprite_colorbase = 0;
+
+	/* misc */
+	int           m_control = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
+	required_device<k056832_device> m_k056832;
+	required_device<k053936_device> m_k053936_1;
+	required_device<k053936_device> m_k053936_2;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_ioport m_dsw2;
+
+	void dbzcontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dbz_sound_cause_nmi(uint16_t data);
+	void dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
+	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
+	uint32_t screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
+	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
+	void dbz_map(address_map &map);
+	void dbz2bl_map(address_map &map);
+	void dbz_sound_io_map(address_map &map);
+	void dbz_sound_map(address_map &map);
+};
+
+
+K056832_CB_MEMBER(dbz_state::tile_callback)
+{
+	*color = (m_layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
+}
+
+K053246_CB_MEMBER(dbz_state::sprite_callback)
+{
+	int pri = (*color & 0x3c0) >> 5;
+
+	if (pri <= m_layerpri[3])
+		*priority_mask = 0xff00;
+	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
+		*priority_mask = 0xfff0;
+	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
+		*priority_mask = 0xfffc;
+	else
+		*priority_mask = 0xfffe;
+
+	*color = (m_sprite_colorbase << 1) + (*color & 0x1f);
+}
+
+/* Background Tilemaps */
+
+void dbz_state::dbz_bg2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg2_videoram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
+{
+	int tileno, colour, flag;
+
+	tileno = m_bg2_videoram[tile_index * 2 + 1] & 0x7fff;
+	colour = (m_bg2_videoram[tile_index * 2] & 0x000f);
+	flag = (m_bg2_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
+
+	tileinfo.set(0, tileno, colour + (m_layer_colorbase[5] << 1), flag);
+}
+
+void dbz_state::dbz_bg1_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_bg1_videoram[offset]);
+	m_bg1_tilemap->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
+{
+	int tileno, colour, flag;
+
+	tileno = m_bg1_videoram[tile_index * 2 + 1] & 0x7fff;
+	colour = (m_bg1_videoram[tile_index * 2] & 0x000f);
+	flag = (m_bg1_videoram[tile_index * 2] & 0x0080) ? TILE_FLIPX : 0;
+
+	tileinfo.set(1, tileno, colour + (m_layer_colorbase[4] << 1), flag);
+}
+
+void dbz_state::video_start()
+{
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dbz_state::get_dbz_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+
+	m_bg1_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
+
+	if (!strcmp(machine().system().name, "dbz"))
+		m_k056832->set_layer_offs(0, -34, -16);
+	else
+		m_k056832->set_layer_offs(0, -35, -16);
+
+	m_k056832->set_layer_offs(1, -31, -16);
+	m_k056832->set_layer_offs(3, -31, -16); //?
+}
+
+uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const int K053251_CI[6] = { k053251_device::CI3, k053251_device::CI4, k053251_device::CI4, k053251_device::CI4, k053251_device::CI2, k053251_device::CI1 };
+	int layer[5], plane, new_colorbase;
+
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+
+	for (plane = 0; plane < 6; plane++)
+	{
+		new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+		if (m_layer_colorbase[plane] != new_colorbase)
+		{
+			m_layer_colorbase[plane] = new_colorbase;
+			if (plane <= 3)
+				m_k056832->mark_plane_dirty( plane);
+			else if (plane == 4)
+				m_bg1_tilemap->mark_all_dirty();
+			else if (plane == 5)
+				m_bg2_tilemap->mark_all_dirty();
+		}
+	}
+
+	//layers priority
+
+	layer[0] = 0;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
+	layer[1] = 1;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
+	layer[2] = 3;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI0);
+	layer[3] = 4;
+	m_layerpri[3] = m_k053251->get_priority(k053251_device::CI2);
+	layer[4] = 5;
+	m_layerpri[4] = m_k053251->get_priority(k053251_device::CI1);
+
+	konami_sortlayers5(layer, m_layerpri);
+
+	screen.priority().fill(0, cliprect);
+
+	for (plane = 0; plane < 5; plane++)
+	{
+		int flag, pri;
+
+		if (plane == 0)
+		{
+			flag = TILEMAP_DRAW_OPAQUE;
+			pri = 0;
+		}
+		else
+		{
+			flag = 0;
+			pri = 1 << (plane - 1);
+		}
+
+		if(layer[plane] == 4)
+			m_k053936_2->zoom_draw(screen, bitmap, cliprect, m_bg1_tilemap, flag, pri, 1);
+		else if(layer[plane] == 5)
+			m_k053936_1->zoom_draw(screen, bitmap, cliprect, m_bg2_tilemap, flag, pri, 1);
+		else
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[plane], flag, pri);
+	}
+
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+	return 0;
+}
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
@@ -625,6 +852,8 @@ void dbz_state::init_dbz2()
 	ROM[0xae6/2] = 0x4e71;    /* 0x6600 - bne     $af8 */
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
+
+} // anonymous namespace
 
 GAME( 1993, dbz,    0,    dbz,    dbz,  dbz_state, init_dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
 GAME( 1993, dbza,   dbz,  dbz,    dbza, dbz_state, init_dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
