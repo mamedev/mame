@@ -44,7 +44,7 @@ std::error_condition msx_cart_majutsushi_device::initialize_cartridge(std::strin
 	page(0)->install_rom(0x0000, 0x1fff, cart_rom_region()->base());
 	page(0)->install_read_bank(0x2000, 0x3fff, m_rombank[0]);
 	page(1)->install_rom(0x4000, 0x5fff, cart_rom_region()->base());
-	page(1)->install_write_handler(0x5000, 0x5000, 0, 0x0fff, 0, write8smo_delegate(m_dac, FUNC(dac_8bit_r2r_device::write)));
+	page(1)->install_write_handler(0x5000, 0x5000, 0, 0x0fff, 0, emu::rw_delegate(m_dac, FUNC(dac_8bit_r2r_device::write)));
 	page(1)->install_read_bank(0x6000, 0x7fff, m_rombank[0]);
 	page(1)->install_write_handler(0x6000, 0x6000, 0, 0x1fff, 0, emu::rw_delegate(*this, FUNC(msx_cart_majutsushi_device::bank_w<0>)));
 	page(1)->install_write_handler(0x6000, 0x6000, 0, 0x1fff, 0, emu::rw_delegate(*this, FUNC(msx_cart_majutsushi_device::bank_w<0>)));

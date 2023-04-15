@@ -155,9 +155,9 @@ void msx_slot_rs232_device::device_start()
 	msx_slot_rs232_base_device::device_start();
 
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
-	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_device::status_r)), write8sm_delegate(*this, FUNC(msx_slot_rs232_device::irq_mask_w)));
-	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
+	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_device::status_r)), emu::rw_delegate(*this, FUNC(msx_slot_rs232_device::irq_mask_w)));
+	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
 u8 msx_slot_rs232_device::status_r(offs_t offset)
@@ -208,9 +208,9 @@ void msx_slot_rs232_mitsubishi_device::device_start()
 	msx_slot_rs232_base_device::device_start();
 
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
-	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_mitsubishi_device::status_r)), write8sm_delegate(*this, FUNC(msx_slot_rs232_mitsubishi_device::irq_mask_w)));
-	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
+	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_mitsubishi_device::status_r)), emu::rw_delegate(*this, FUNC(msx_slot_rs232_mitsubishi_device::irq_mask_w)));
+	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
 u8 msx_slot_rs232_mitsubishi_device::status_r(offs_t offset)
@@ -319,9 +319,9 @@ void msx_slot_rs232_svi738_device::device_start()
 	msx_slot_rs232_base_device::device_start();
 
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
+	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
 	io_space().install_read_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_svi738_device::status_r)));
-	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
 u8 msx_slot_rs232_svi738_device::status_r(offs_t offset)
@@ -368,9 +368,9 @@ void msx_slot_rs232_toshiba_device::device_start()
 	msx_slot_rs232_base_device::device_start();
 
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
-	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_device::status_r)), write8sm_delegate(*this, FUNC(msx_slot_rs232_toshiba_device::irq_mask_w)));
-	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
+	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_device::status_r)), emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_device::irq_mask_w)));
+	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 }
 
 u8 msx_slot_rs232_toshiba_device::status_r(offs_t offset)
@@ -452,9 +452,9 @@ void msx_slot_rs232_toshiba_hx3x_device::device_start()
 	}
 
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), write8sm_delegate(*m_i8251, FUNC(i8251_device::write)));
-	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::status_r)), write8sm_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::irq_mask_w)));
-	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), write8sm_delegate(*m_i8253, FUNC(pit8253_device::write)));
+	io_space().install_readwrite_handler(0x80, 0x81, emu::rw_delegate(*m_i8251, FUNC(i8251_device::read)), emu::rw_delegate(*m_i8251, FUNC(i8251_device::write)));
+	io_space().install_readwrite_handler(0x82, 0x82, emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::status_r)), emu::rw_delegate(*this, FUNC(msx_slot_rs232_toshiba_hx3x_device::irq_mask_w)));
+	io_space().install_readwrite_handler(0x84, 0x87, emu::rw_delegate(*m_i8253, FUNC(pit8253_device::read)), emu::rw_delegate(*m_i8253, FUNC(pit8253_device::write)));
 
 	m_sram.resize(SRAM_SIZE);
 	m_nvram->set_base(m_sram.data(), SRAM_SIZE);

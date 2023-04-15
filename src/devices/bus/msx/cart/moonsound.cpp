@@ -65,7 +65,7 @@ void msx_cart_moonsound_device::device_start()
 {
 	// Install IO read/write handlers
 	io_space().install_readwrite_handler(0x7e, 0x7f, emu::rw_delegate(*this, FUNC(msx_cart_moonsound_device::read_ymf278b_pcm)), emu::rw_delegate(*this, FUNC(msx_cart_moonsound_device::write_ymf278b_pcm)));
-	io_space().install_readwrite_handler(0xc4, 0xc7, read8sm_delegate(m_ymf278b, FUNC(ymf278b_device::read)), write8sm_delegate(m_ymf278b, FUNC(ymf278b_device::write)));
+	io_space().install_readwrite_handler(0xc4, 0xc7, emu::rw_delegate(m_ymf278b, FUNC(ymf278b_device::read)), emu::rw_delegate(m_ymf278b, FUNC(ymf278b_device::write)));
 	io_space().install_read_handler(0xc0, 0xc0, emu::rw_delegate(*this, FUNC(msx_cart_moonsound_device::read_c0)));
 }
 
