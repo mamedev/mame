@@ -345,6 +345,8 @@ static int fd_read(struct current *current)
                         return SPECIAL_PAGE_UP;
                      case VK_NEXT:
                         return SPECIAL_PAGE_DOWN;
+                     case VK_RETURN:
+                        return k->uChar.UnicodeChar;
                     }
                 }
                 /* Note that control characters are already translated in AsciiChar */
