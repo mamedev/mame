@@ -39,6 +39,7 @@ void ultraman_state::main_map(address_map &map)
 	map(0x1c0004, 0x1c0005).portr("P2");
 	map(0x1c0006, 0x1c0007).portr("DSW1");
 	map(0x1c0008, 0x1c0009).portr("DSW2");
+	map(0x1c0011, 0x1c0011).lw8(NAME([this] (uint8_t data) { m_k051960->set_shadow_inv(BIT(data, 7)); }));
 	map(0x1c0018, 0x1c0019).w(FUNC(ultraman_state::ultraman_gfxctrl_w));   /* counters + gfx ctrl */
 	map(0x1c0021, 0x1c0021).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0029, 0x1c0029).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
