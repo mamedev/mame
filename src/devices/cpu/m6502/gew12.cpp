@@ -25,7 +25,7 @@ gew12_device::gew12_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-void gew12_device::device_add_mconfig(machine_config& config)
+void gew12_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: PCM
 
@@ -73,7 +73,7 @@ void gew12_device::device_reset()
 }
 
 
-void gew12_device::internal_map(address_map& map)
+void gew12_device::internal_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 

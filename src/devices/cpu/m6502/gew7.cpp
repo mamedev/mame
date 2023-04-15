@@ -47,7 +47,7 @@ ymw282f_device::ymw282f_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void gew7_device::device_add_mconfig(machine_config& config)
+void gew7_device::device_add_mconfig(machine_config &config)
 {
 	GEW7_PCM(config, m_pcm, DERIVED_CLOCK(1, 1));
 	m_pcm->set_device_rom_tag(m_rom);
@@ -89,7 +89,7 @@ void gew7_device::device_reset()
 }
 
 
-void gew7_device::internal_map(address_map& map)
+void gew7_device::internal_map(address_map &map)
 {
 	map(0x0000, 0x005f).rw(m_pcm, FUNC(gew7_pcm_device::read), FUNC(gew7_pcm_device::write));
 	map(0x0060, 0x00ff).mirror(0x0100).ram();

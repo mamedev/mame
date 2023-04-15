@@ -15,10 +15,10 @@
 
 class gew12_device : public m65c02_device, public device_mixer_interface {
 public:
-	gew12_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<offs_t i> auto port_in_cb() { return m_in_cb[i].bind(); }
-	template<offs_t i> auto port_out_cb() { return m_out_cb[i].bind(); }
+	template<offs_t Num> auto port_in_cb() { return m_in_cb[Num].bind(); }
+	template<offs_t Num> auto port_out_cb() { return m_out_cb[Num].bind(); }
 
 	u8 irq_stat_r();
 	void irq_en_w(u8 data);
@@ -33,7 +33,7 @@ public:
 	void port_ddr_w(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -54,7 +54,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
-	void internal_map(address_map& map);
+	void internal_map(address_map &map);
 
 	u8 m_irq_pending, m_irq_enable;
 
