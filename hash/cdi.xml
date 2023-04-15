@@ -10924,7 +10924,7 @@ license:CC0-1.0
 		<rom name="Golgo 13 (Japan).bin" size="555483600" crc="dc016ec2" md5="9c12718d43129e23d525f7c24d55a5d0"/>
 		<rom name="Golgo 13 (Japan).cue" size="80" crc="90d6fe73" md5="41e1511f1b4a836a829a3d1472769932"/>
 		-->
-		<description>Golgo 13 (Japan)</description>
+		<description>CD-i Golgo 13 (Japan)</description>
 		<year>1992</year>
 		<publisher>Japan Interactive Media</publisher>
 		<info name="serial" value="PCIM-00018" />
