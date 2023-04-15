@@ -693,6 +693,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>21: Two One (Japan)</description> <!-- 21: Two One - Shokai Genteiban -->
 		<year>2001</year>
 		<publisher>Princess Soft</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="T-46503M, T-46504M"/>
 		<info name="release" value="20011227"/>
 		<info name="alt_title" value="21 -Two One-, 21 -Two One- 初回限定版"/>
@@ -2106,6 +2109,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Atsumare! Guru Guru Onsen (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Ugly sample scratches coming from [AICA]
+]]></notes>
 		<info name="serial" value="HDR-0015"/>
 		<info name="release" value="19990923"/>
 		<info name="alt_title" value="あつまれ!ぐるぐる温泉"/>
@@ -2126,6 +2132,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Atsumare! Guru Guru Onsen BB (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Ugly sample scratches coming from [AICA]
+]]></notes>
 		<info name="serial" value="HDR-0121"/>
 		<!-- Disc ID: 673-02170 -->
 		<!-- Obi ID: 673-02171 -->
@@ -2402,6 +2411,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Bass Rush Dream: EcoGear PowerWorm Championship (Japan)</description>
 		<year>2000</year>
 		<publisher>Visco</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="T-5801M"/>
 		<info name="release" value="20001221"/>
 		<info name="alt_title" value="バスラッシュドリーム　〜エコギア パワーワームチャンピオンシップ〜"/>
@@ -3460,6 +3472,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Buggy Heat (Japan)</description>
 		<year>1999</year>
 		<publisher>CRI</publisher>
+		<notes><![CDATA[
+Crashes during FMV with [drc]
+[AICA] sound crackling during gameplay
+]]></notes>
 		<info name="serial" value="T-6801M"/>
 		<info name="release" value="19990708"/>
 		<info name="alt_title" value="バギーヒート"/>
@@ -4003,6 +4019,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Capcom Taisen Fan Disc (Japan)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Hangs on ADX logo with [drc]
+]]></notes>
 		<info name="serial" value="610-8086"/>
 		<info name="alt_title" value="CAPCOM対戦ファンディスク"/>
 		<part interface="cdrom" name="cdrom">
@@ -4151,6 +4170,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Carrier (Japan)</description>
 		<year>2000</year>
 		<publisher>Jaleco</publisher>
+		<notes><![CDATA[
+Crashes after ADX logo with [drc]
+]]></notes>
 		<info name="serial" value="T-5701M"/>
 		<info name="release" value="20000224"/>
 		<info name="alt_title" value="キャリアー"/>
@@ -4720,6 +4742,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Chou Hatsumei Boy Kanipan: Bousou Robot no Nazo!? (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
+]]></notes>
 		<info name="serial" value="HDR-0021"/>
 		<info name="release" value="19990708"/>
 		<info name="alt_title" value="超発明BOYカニパン 〜暴走ロボトの謎!?〜"/>
@@ -5513,6 +5538,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Cosmic Smash (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Crashes at "Produced by Sega"
+]]></notes>
 		<info name="serial" value="HDR-0176"/>
 		<info name="release" value="20010913"/>
 		<info name="alt_title" value="コズミックスマッシュ"/>
@@ -5734,6 +5762,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Culdcept II (Japan)</description>
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
+		<notes><![CDATA[
+Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
+]]></notes>
 		<info name="serial" value="T-43903M"/>
 		<info name="release" value="20010712"/>
 		<info name="alt_title" value="カルドセプト セカンド, Culdcept Second (Box)"/>
@@ -7259,6 +7290,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Denpa Shounen-teki Kenshou Seikatsu Soft: Nasubi no Heya (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+Test case for [PVR] flickerfree feature
+]]></notes>
 		<info name="serial" value="T-14305M"/>
 		<info name="release" value="19990722"/>
 		<info name="alt_title" value="電波少年的懸賞生活ソフト なすびの部屋"/>
@@ -7991,6 +8025,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Doguu Senki: Haou (Japan)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
+		<notes><![CDATA[
+Hardlocks MAME if left idle on title screen with [drc]
+]]></notes>
 		<info name="serial" value="T-9101M"/>
 		<info name="release" value="20000810"/>
 		<info name="alt_title" value="ドグウ戦記 覇王"/>
@@ -9336,6 +9373,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dream Passport Ver. 1.01 (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
+]]></notes>
 		<info name="serial" value="610-7055"/>
 		<info name="alt_title" value="ドリームパスポート"/>
 		<info name="ring_code" value="610-7055-0001A 2MB7"/>
@@ -9357,6 +9397,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dream Passport (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
+]]></notes>
 		<info name="serial" value="610-7000"/>
 		<info name="release" value="19981127"/>
 		<info name="alt_title" value="ドリームパスポート"/>
@@ -9950,6 +9993,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dreamcast Express Vol. 1 (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[AICA] sound crackling during FMVs playback
+]]></notes>
 		<info name="serial" value="610-7110-01"/>
 		<info name="release" value="199902xx"/>
 		<info name="alt_title" value="ドリームキャスト エクスプレス Vol. 1"/>
@@ -10131,6 +10177,11 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dreamcast Express Vol. 6 (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Eternal Arcadia:
+Samba de Amigo:
+Rent a Hero No. 1: opening "renta no tamasii" web browser will have JavaScript undefined for dates, [SH4] FPU core bug?
+]]></notes>
 		<info name="serial" value="610-7110-06"/>
 		<info name="alt_title" value="ドリームキャスト エクスプレス Vol. 6"/>
 		<part interface="cdrom" name="cdrom1">
@@ -10162,6 +10213,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Dreamcast Express Vol. 7 (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+"Soft trial special:
+Giant Gram 2000:
+F355: crashes during loading [drc]
+Napple Tale:
+Sega Marine Fishing:
+18 Wheeler:
+]]></notes>
 		<info name="serial" value="610-7110-07"/>
 		<info name="alt_title" value="ドリームキャスト エクスプレス Vol. 7"/>
 		<info name="ring_code" value="610-7110-0483 1 (Special Disk), 610-7110-0484 1 (Trial &amp; Movie Disk)"/>
@@ -11037,6 +11096,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Ecco the Dolphin: Defender of the Future (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Heavy [PVR] texture issues
+]]></notes>
 		<info name="serial" value="HDR-0103"/>
 		<info name="release" value="20010125"/>
 		<info name="alt_title" value="エコー ザ ドルフィン　ディフェンダー オブ ザ フューチャー"/>
@@ -11449,6 +11511,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Eldorado Gate Vol. 4 (Japan)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timing?
+]]></notes>
 		<info name="serial" value="T-1226M"/>
 		<info name="release" value="20010412"/>
 		<info name="alt_title" value="エルドラドゲート 第4巻"/>
@@ -11710,6 +11775,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Ganbare! Nippon! Olympics 2000 (Japan)</description>
 		<year>2000</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Hardlocks MAME after event "how to play" with [drc]
+]]></notes>
 		<info name="serial" value="T-9511M"/>
 		<info name="release" value="20000831"/>
 		<info name="alt_title" value="がんばれ！ ニッポン！ オリンピック2000"/>
@@ -13159,6 +13227,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>First Kiss Story II: Anata ga Iru kara (Japan)</description>
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
+		<notes><![CDATA[
+Hangs at "Produced by Sega", [gdrom] reads LBA=$afd8 and $afdc (same as culdcept2?)
+]]></notes>
 		<info name="serial" value="T-46305M"/>
 		<!-- JASRAC ID: V-021068 -->
 		<!-- Disc Serial: T-46304M/T-46305M -->
@@ -13210,6 +13281,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>First Kiss Story II: Anata ga Iru kara - Tokubetsu Genteiban (Japan)</description>
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
+		<notes><![CDATA[
+Hangs at "Produced by Sega", [gdrom] reads LBA=$afd8 and $afdc (same as culdcept2?)
+]]></notes>
 		<info name="serial" value="T-46304M"/>
 		<!-- JASRAC ID: V-021068 -->
 		<!-- Disc Serial: T-46304M/T-46305M -->
@@ -13314,6 +13388,11 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Super Speed Racing (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PVR] safety cars in attract mode have ugly renders
+Black screen on title, [PVR] wrong ROP?
+Checkered flag is blackened on main menu [PVR]
+]]></notes>
 		<info name="serial" value="HDR-0013"/>
 		<info name="release" value="19990325"/>
 		<info name="alt_title" value="スーパースピード・レーシング"/>
@@ -13517,6 +13596,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Frame Gride - Test Operation Disc (Japan)</description>
 		<year>1999</year>
 		<publisher>From Software</publisher>
+		<notes><![CDATA[
+Corrupted [PVR] render ingame when selecting a map location, bump mapping
+]]></notes>
 		<info name="serial" value="610-7123"/>
 		<info name="alt_title" value="フレームグライド 体験版"/>
 		<part interface="cdrom" name="cdrom">
@@ -14876,6 +14958,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Golf Shiyou yo (Japan, rev. A)</description>
 		<year>1999</year>
 		<publisher>Bottom Up</publisher>
+		<notes><![CDATA[
+Hangs on FMV with [drc]
+]]></notes>
 		<info name="serial" value="T-40901M"/>
 		<info name="alt_title" value="ゴルフしようよ"/>
 		<part interface="cdrom" name="cdrom">
@@ -15185,6 +15270,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<rom name="track02.raw" size="1735776" md5="299599274bf003e5c440277e9300ebb3" sha1="9ab25eafdde07ca5c709d45f875b3124387835bd"/>
 		<rom name="track03.iso" size="1032499200" md5="17075f506b14aab7c5132b1ba34c0038" sha1="f15beeb19a8bbcafbcd7c2374c7f060714783dd2"/>
 		-->
+		<!-- "Auto-demo" -->
 		<description>Grandia II - Tentou-you (Japan, demo)</description>
 		<year>2000</year>
 		<publisher>Game Arts</publisher>
@@ -15362,6 +15448,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Guilty Gear X (Japan)</description>
 		<year>2000</year>
 		<publisher>Sammy</publisher>
+		<notes><![CDATA[
+[PVR] tester for bare polygons wrong normals (in training)
+]]></notes>
 		<info name="serial" value="T-2402M"/>
 		<info name="release" value="20001214"/>
 		<info name="alt_title" value="ギルティギア ゼクス"/>
@@ -15548,6 +15637,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Gundam Battle Online - Trial Edition (Japan)</description>
 		<year>2001</year>
 		<publisher>Bandai</publisher>
+		<notes><![CDATA[
+Hardlocks MAME after character and team setup with [drc]
+]]></notes>
 		<info name="alt_title" value="ガンダム バトル オンライン TRIAL EDITION"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
@@ -15631,6 +15723,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="610-7160"/>
 		<info name="release" value="199911xx"/>
 		<info name="alt_title" value="機動戦士ガンダム外伝 コロニーの落ちた地で… プレミアムディスク"/>
+		<!-- TODO: verify if it works with an USA save file -->
+		<!-- (generally DC saves crosses over regions) -->
+		<info name="usage" value="Data disk for Gundam Side Story 0079" />
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundam side story 0079 rise from the ashes - premium disc (jpn)" sha1="9b1bc8aff4b75295cc2062e088a4731bb0ed0f56"/>
@@ -16611,6 +16706,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Idol Janshi o Tsukucchaou (Japan)</description>
 		<year>1999</year>
 		<publisher>Jaleco</publisher>
+		<notes><![CDATA[
+Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
+FMV draws [PVR] black pixels instead of transparent color
+]]></notes>
 		<info name="serial" value="T-5703M"/>
 		<info name="release" value="19990923"/>
 		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡"/>
@@ -17008,6 +17107,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Interlude (Japan)</description>
 		<year>2003</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Crashes on FMV with [drc]
+]]></notes>
 		<info name="serial" value="T-20127M"/>
 		<info name="release" value="20030424"/>
 		<info name="alt_title" value="インタールード"/>
@@ -17228,6 +17330,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Jahmong (Japan)</description>
 		<year>2000</year>
 		<publisher>Visit</publisher>
+		<notes><![CDATA[
+Black screen after initial screen loading with [drc]
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-43401M"/>
 		<info name="release" value="20000831"/>
 		<info name="alt_title" value="ジャーマン"/>
@@ -17685,6 +17791,10 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Jojo no Kimyou na Bouken: Mirai e no Isan for Matching Service (Japan)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Ugly [PVR] framebuffer screen masking
+Pausing game overlay hides too much [PVR]
+]]></notes>
 		<info name="serial" value="T-1231M"/>
 		<info name="release" value="20001026"/>
 		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 for Matching Service"/>
@@ -18614,6 +18724,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>L.O.L.: Lack of Love (Japan)</description>
 		<year>2000</year>
 		<publisher>ASCII</publisher>
+		<notes><![CDATA[
+Crashes on [drc] after pressing begin button
+]]></notes>
 		<info name="serial" value="T-2106M"/>
 		<info name="release" value="20001102"/>
 		<info name="alt_title" value="エル・オー・エル"/>
@@ -18769,6 +18882,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Le Mans 24 Hours (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Hangs after (skipped) FMV, keeps stuck at 0% on loading
+]]></notes>
 		<info name="serial" value="HDR-0149"/>
 		<info name="release" value="20010315"/>
 		<info name="alt_title" value="ル・マン24アワーズ"/>
@@ -20614,6 +20730,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Monaco Grand Prix: Racing Simulation 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Ubisoft</publisher>
+		<notes><![CDATA[
+Wrong [PVR] texture renders in gameplay
+]]></notes>
 		<info name="serial" value="T-17701M"/>
 		<info name="release" value="19990311"/>
 		<info name="alt_title" value="モナコ・グランプリ・レーシング・シミュレーション2"/>
@@ -20684,6 +20803,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Monaco Grand Prix: Racing Simulation 2 (Japan, prototype 19990106)</description>
 		<year>1999</year>
 		<publisher>Ubisoft</publisher>
+		<notes><![CDATA[
+Wrong [PVR] texture renders in gameplay
+]]></notes>
 		<info name="release" value="19990106"/>
 		<info name="alt_title" value="モナコ・グランプリ・レーシング・シミュレーション2"/>
 		<part interface="cdrom" name="cdrom">
@@ -21050,6 +21172,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Motto Pro Yakyu Team wo Tsukurou! (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Crashes at "Produced by Sega", PC=C010094
+]]></notes>
 		<info name="serial" value="HDR-0092"/>
 		<info name="release" value="20000928"/>
 		<info name="alt_title" value="もっとプロ野球チームをつくろう!"/>
@@ -22490,6 +22615,9 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>NFL 2K1 (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Crashes at the end of FMV
+]]></notes>
 		<info name="serial" value="HDR-0144"/>
 		<info name="release" value="20010329"/>
 		<part interface="cdrom" name="cdrom">
