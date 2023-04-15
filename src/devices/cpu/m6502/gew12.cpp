@@ -19,7 +19,6 @@ gew12_device::gew12_device(const machine_config &mconfig, const char *tag, devic
 	, m_in_cb(*this), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
 	, m_bank(*this, "bank%u", 0U)
-	, m_uart(*this, "uart")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(gew12_device::internal_map), this);
 }
@@ -27,11 +26,7 @@ gew12_device::gew12_device(const machine_config &mconfig, const char *tag, devic
 
 void gew12_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: PCM
-
-	GEW12_UART(config, m_uart, DERIVED_CLOCK(1, 1));
-	m_uart->tx_irq_handler().set(FUNC(gew12_device::internal_irq<INTERNAL_IRQ_MIDI_TX>));
-	m_uart->rx_irq_handler().set(FUNC(gew12_device::internal_irq<INTERNAL_IRQ_MIDI_RX>));
+	// TODO: PCM, UART
 }
 
 void gew12_device::device_start()
@@ -83,9 +78,10 @@ void gew12_device::internal_map(address_map &map)
 	map(0x1f00, 0x1f00).rw(FUNC(gew12_device::irq_stat_r), FUNC(gew12_device::irq_en_w));
 	map(0x1f01, 0x1f01).w(FUNC(gew12_device::timer_stat_w));
 
-	map(0x1f11, 0x1f11).r(m_uart, FUNC(gew12_uart_device::data_r));
-	map(0x1f12, 0x1f12).r(m_uart, FUNC(gew12_uart_device::status_r));
-	map(0x1f13, 0x1f13).w(m_uart, FUNC(gew12_uart_device::data_w));
+	// TODO: UART
+	// map(0x1f11, 0x1f11) Rx data
+	// map(0x1f12, 0x1f12) status (bits 0-1: error, bit 2: Rx ready, bit 3: Tx ready)
+	// map(0x1f13, 0x1f13) Tx data
 
 	map(0x1f20, 0x1f23).w(FUNC(gew12_device::timer_count_w));
 	map(0x1f24, 0x1f25).r(FUNC(gew12_device::timer_count_r));

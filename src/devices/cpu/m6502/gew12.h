@@ -11,7 +11,6 @@
 #define MAME_CPU_M6502_GEW12_H
 
 #include "m65c02.h"
-#include "machine/gew12_uart.h"
 
 class gew12_device : public m65c02_device, public device_mixer_interface {
 public:
@@ -68,8 +67,6 @@ protected:
 
 	required_memory_region        m_rom;
 	required_memory_bank_array<2> m_bank;
-
-	required_device<gew12_uart_device> m_uart;
 };
 
 DECLARE_DEVICE_TYPE(GEW12, gew12_device)

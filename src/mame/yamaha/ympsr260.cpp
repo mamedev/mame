@@ -9,8 +9,6 @@
 
 #include "emu.h"
 
-#include "bus/midi/midiinport.h"
-#include "bus/midi/midioutport.h"
 #include "cpu/m6502/gew12.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -81,13 +79,7 @@ void psr260_state::psr260(machine_config &config)
 	GEW12(config, m_maincpu, 14'000'000);
 	m_maincpu->port_out_cb<5>().set(FUNC(psr260_state::lcd_w));
 
-	auto& mdin(MIDI_PORT(config, "mdin"));
-	midiin_slot(mdin);
-	mdin.rxd_handler().set("maincpu:uart", FUNC(gew12_uart_device::rx_w));
-
-	auto& mdout(MIDI_PORT(config, "mdout"));
-	midiout_slot(mdout);
-	m_maincpu->subdevice<gew12_uart_device>("uart")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	// TODO: MIDI in/out
 
 	// LCD
 	HD44780(config, m_lcdc, 0);
