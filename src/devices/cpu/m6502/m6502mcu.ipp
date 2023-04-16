@@ -44,8 +44,8 @@ void m6502_mcu_device_base<Base>::execute_run()
 	} else
 		this->count_before_instruction_step = 0;
 
-	while(bcount && icount <= bcount)
-		internal_update(total_cycles() + icount - bcount);
+	while(this->bcount && this->icount <= this->bcount)
+		internal_update(this->total_cycles() + this->icount - this->bcount);
 
 	if(this->icount > 0 && this->inst_substate)
 		this->do_exec_partial();
@@ -56,7 +56,7 @@ void m6502_mcu_device_base<Base>::execute_run()
 				this->PPC = this->NPC;
 				this->inst_state = this->IR | this->inst_state_base;
 				if(this->machine().debug_flags & DEBUG_FLAG_ENABLED)
-					this->debugger_instruction_hook(NPC);
+					this->debugger_instruction_hook(this->NPC);
 			}
 			this->do_exec_full();
 		}
