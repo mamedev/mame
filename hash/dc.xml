@@ -694,7 +694,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2001</year>
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen [GDROM]
 ]]></notes>
 		<info name="serial" value="T-46503M, T-46504M"/>
 		<info name="release" value="20011227"/>
@@ -2440,7 +2440,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2000</year>
 		<publisher>Visco</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen [GDROM]
 ]]></notes>
 		<info name="serial" value="T-5801M"/>
 		<info name="release" value="20001221"/>
@@ -3769,7 +3769,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2003</year>
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen [GDROM]
 ]]></notes>
 		<info name="serial" value="T-46513M"/>
 		<info name="release" value="20030529"/>
@@ -4171,7 +4171,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Black screen, [SH4] jumps to lalaland
+Black screen [GDROM], [SH4] jumps to lalaland
 ]]></notes>
 		<info name="serial" value="HDR-0115, HDR-0132 (Limited Box)"/>
 		<info name="release" value="20001228"/>
@@ -5852,7 +5852,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2001</year>
 		<publisher>Media Factory</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
+Hangs at "Produced by Sega", [GDROM] keeps reading LBA=$afbe with REQ_ERROR 13h
 ]]></notes>
 		<info name="serial" value="T-43903M"/>
 		<info name="release" value="20010712"/>
@@ -6064,7 +6064,7 @@ Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
 		<year>2001</year>
 		<publisher>Princess Soft</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen [GDROM]
 ]]></notes>
 		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
 		<info name="release" value="20011025"/>
@@ -13431,7 +13431,7 @@ No [redbook] audio
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [gdrom] reads LBA=$afd8 and $afdc (same as culdcept2?)
+Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept2?)
 ]]></notes>
 		<info name="serial" value="T-46305M"/>
 		<!-- JASRAC ID: V-021068 -->
@@ -13485,7 +13485,7 @@ Hangs at "Produced by Sega", [gdrom] reads LBA=$afd8 and $afdc (same as culdcept
 		<year>2002</year>
 		<publisher>Broccoli</publisher>
 		<notes><![CDATA[
-Hangs at "Produced by Sega", [gdrom] reads LBA=$afd8 and $afdc (same as culdcept2?)
+Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept2?)
 ]]></notes>
 		<info name="serial" value="T-46304M"/>
 		<!-- JASRAC ID: V-021068 -->
