@@ -198,13 +198,12 @@ Mario also shots in fault, which definitely indicates bad maths
 		</part>
 	</software>
 
-	<software name="nesterfb" supported="no">
+	<software name="nesterfb" supported="partial">
 		<description>Nester's Funky Bowling (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-I/O access (regression)
-Once that you hit the pins, animation phase takes a while to start (verify)
+Once that you hit the pins, animation phase takes a while to start (can't repro, assume fixed)
 ]]></notes>
 		<info name="developer" value="Nintendo IRD"/>
 		<info name="serial" value="VUE-VNFE-USA"/>

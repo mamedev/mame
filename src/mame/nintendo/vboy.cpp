@@ -187,7 +187,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 
 	void vboy_map(address_map &map);
-	void vboy_io(address_map &map);
 };
 
 
@@ -1057,15 +1056,6 @@ void vboy_state::vboy_map(address_map &map)
 	//map(0x07000000, 0x07ffffff) cartslot ROM
 }
 
-void vboy_state::vboy_io(address_map &map)
-{
-	map.global_mask(0x07ffffff);
-	map(0x00000000, 0x0007ffff).m(FUNC(vboy_state::vip_map));
-	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x020000ff).mirror(0x0ffff00).m(FUNC(vboy_state::io_map)).umask32(0x000000ff);
-	// TODO: verify if ROM/RAM mirrors on I/O space (nesterfb)
-}
-
 /* Input ports */
 static INPUT_PORTS_START( vboy )
 	PORT_START("INPUT")
@@ -1237,7 +1227,8 @@ void vboy_state::vboy(machine_config &config)
 	/* basic machine hardware */
 	V810(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_map);
-	m_maincpu->set_addrmap(AS_IO, &vboy_state::vboy_io);
+	// no AS_IO, and some games relies on r/w the program map with INH/OUTH
+	// cfr. vforce, nesterfb, panicbom (sound)
 
 	TIMER(config, "scantimer_l").configure_scanline(FUNC(vboy_state::vboy_scanlineL), "3dleft", 0, 1);
 	//TIMER(config, "scantimer_r").configure_scanline(FUNC(vboy_state::vboy_scanlineR), "3dright", 0, 1);
