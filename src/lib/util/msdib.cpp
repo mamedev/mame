@@ -93,7 +93,7 @@ union bitmap_headers
 };
 
 
-bool dib_parse_mask(std::uint32_t mask, unsigned &shift, unsigned &bits)
+bool dib_parse_mask(std::uint32_t mask, unsigned &shift, unsigned &bits) noexcept
 {
 	shift = count_leading_zeros_32(mask);
 	mask <<= shift;
@@ -104,7 +104,7 @@ bool dib_parse_mask(std::uint32_t mask, unsigned &shift, unsigned &bits)
 }
 
 
-void dib_truncate_channel(unsigned &shift, unsigned &bits)
+void dib_truncate_channel(unsigned &shift, unsigned &bits) noexcept
 {
 	if (8U < bits)
 	{
@@ -115,7 +115,7 @@ void dib_truncate_channel(unsigned &shift, unsigned &bits)
 }
 
 
-std::uint8_t dib_splat_sample(std::uint8_t val, unsigned bits)
+std::uint8_t dib_splat_sample(std::uint8_t val, unsigned bits) noexcept
 {
 	assert(8U >= bits);
 	for (val <<= (8U - bits); bits && (8U > bits); bits <<= 1)
@@ -124,7 +124,7 @@ std::uint8_t dib_splat_sample(std::uint8_t val, unsigned bits)
 }
 
 
-msdib_error dib_read_file_header(read_stream &fp, std::uint32_t &filelen)
+msdib_error dib_read_file_header(read_stream &fp, std::uint32_t &filelen) noexcept
 {
 	std::size_t actual;
 
@@ -172,7 +172,7 @@ msdib_error dib_read_bitmap_header(
 		std::size_t &palette_entries,
 		std::size_t &palette_size,
 		std::size_t &row_bytes,
-		std::uint32_t length)
+		std::uint32_t length) noexcept
 {
 	std::size_t actual;
 
@@ -397,7 +397,7 @@ msdib_error dib_read_bitmap_header(
 
 
 
-msdib_error msdib_verify_header(random_read &fp)
+msdib_error msdib_verify_header(random_read &fp) noexcept
 {
 	msdib_error err;
 
@@ -438,7 +438,7 @@ msdib_error msdib_verify_header(random_read &fp)
 }
 
 
-msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap)
+msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap) noexcept
 {
 	std::uint32_t file_length;
 	msdib_error const headerr(dib_read_file_header(fp, file_length));
@@ -449,7 +449,7 @@ msdib_error msdib_read_bitmap(random_read &fp, bitmap_argb32 &bitmap)
 }
 
 
-msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight)
+msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::uint32_t length, std::uint32_t dirheight) noexcept
 {
 	// read the bitmap header
 	std::size_t actual;
@@ -570,11 +570,15 @@ msdib_error msdib_read_bitmap_data(random_read &fp, bitmap_argb32 &bitmap, std::
 		dib_truncate_channel(alpha_shift, alpha_bits);
 	}
 
-	// allocate the bitmap and process row data
+	// allocate a row buffer as well as the destination bitmap
 	std::unique_ptr<std::uint8_t []> row_data(new (std::nothrow) std::uint8_t [row_bytes]);
 	if (!row_data)
 		return msdib_error::OUT_OF_MEMORY;
 	bitmap.allocate(header.info.width, header.info.height);
+	if (!bitmap.valid())
+		return msdib_error::OUT_OF_MEMORY;
+
+	// process row data
 	int const y_inc(top_down ? 1 : -1);
 	for (std::int32_t i = 0, y = top_down ? 0 : (header.info.height - 1); header.info.height > i; ++i, y += y_inc)
 	{

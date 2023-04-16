@@ -3018,7 +3018,7 @@ void i386_device::i386_group0F00_32()          // Opcode 0x0f 00
 				i386_load_protected_mode_segment(&seg,nullptr);
 
 				uint32_t addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
-				i386_translate_address(TRANSLATE_READ, &addr, nullptr);
+				i386_translate_address(TR_READ, false, &addr, nullptr);
 				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
 
 				m_task.limit = seg.limit;

@@ -282,7 +282,7 @@ void h8s2245_device::update_irq_filter()
 
 void h8s2245_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
+	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
 }
 
 void h8s2245_device::internal_update(uint64_t current_time)
@@ -338,17 +338,16 @@ void h8s2245_device::mstpcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	uint16_t omstpcr = mstpcr;
 	COMBINE_DATA(&mstpcr);
 	if((omstpcr ^ mstpcr) & 0x72e0) {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(p, "Online modules:");
-		if(mstpcr & 0x0020) p += sprintf(p, " sci0");
-		if(mstpcr & 0x0040) p += sprintf(p, " sci1");
-		if(mstpcr & 0x0080) p += sprintf(p, " sci2");
-		if(mstpcr & 0x0200) p += sprintf(p, " adc");
-		if(mstpcr & 0x1000) p += sprintf(p, " timer8");
-		if(mstpcr & 0x2000) p += sprintf(p, " timer16");
-		if(mstpcr & 0x4000) p += sprintf(p, " dtc");
-		p += sprintf(p, "\n");
-		logerror(buf);
+		std::ostringstream message;
+		message << "Online modules:";
+		if(mstpcr & 0x0020) message << " sci0";
+		if(mstpcr & 0x0040) message << " sci1";
+		if(mstpcr & 0x0080) message << " sci2";
+		if(mstpcr & 0x0200) message << " adc";
+		if(mstpcr & 0x1000) message << " timer8";
+		if(mstpcr & 0x2000) message << " timer16";
+		if(mstpcr & 0x4000) message << " dtc";
+		message << "\n";
+		logerror(std::move(message).str());
 	}
 }

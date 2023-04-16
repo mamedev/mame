@@ -12,7 +12,7 @@
 template<int Width, int AddrShift, typename READ> class handler_entry_read_delegate : public handler_entry_read_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_delegate(address_space *space, u16 flags, const READ &delegate) : handler_entry_read_address<Width, AddrShift>(space, flags), m_delegate(delegate) {}
 	~handler_entry_read_delegate() = default;
@@ -73,7 +73,7 @@ private:
 template<int Width, int AddrShift, typename WRITE> class handler_entry_write_delegate : public handler_entry_write_address<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_delegate(address_space *space, u16 flags, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift>(space, flags), m_delegate(delegate) {}
 	~handler_entry_write_delegate() = default;
@@ -139,7 +139,7 @@ private:
 template<int Width, int AddrShift> class handler_entry_read_ioport : public handler_entry_read<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_read_ioport(address_space *space, u16 flags, ioport_port *port) : handler_entry_read<Width, AddrShift>(space, flags), m_port(port) {}
 	~handler_entry_read_ioport() = default;
@@ -158,7 +158,7 @@ private:
 template<int Width, int AddrShift> class handler_entry_write_ioport : public handler_entry_write<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 
 	handler_entry_write_ioport(address_space *space, u16 flags, ioport_port *port) : handler_entry_write<Width, AddrShift>(space, flags), m_port(port) {}
 	~handler_entry_write_ioport() = default;

@@ -38,9 +38,7 @@ Memo:
 #include "emu.h"
 #include "niyanpai.h"
 
-#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "machine/tmp68301.h"
 
 
 
@@ -676,19 +674,12 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
-{
-	if (state)
-		m_maincpu->external_interrupt_0();
-}
-
-
 void niyanpai_state::niyanpai(machine_config &config)
 {
 	/* basic machine hardware */
 	TMP68301(config, m_maincpu, 12288000/2); /* TMP68301, 6.144 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::niyanpai_map);
-	m_maincpu->out_parallel_callback().set(FUNC(niyanpai_state::tmp68301_parallel_port_w));
+	m_maincpu->parallel_w_cb().set(FUNC(niyanpai_state::tmp68301_parallel_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -700,7 +691,7 @@ void niyanpai_state::niyanpai(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(niyanpai_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(niyanpai_state::vblank_irq));
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
 
 	PALETTE(config, m_palette).set_entries(256*3);
 

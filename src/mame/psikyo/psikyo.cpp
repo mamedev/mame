@@ -30,8 +30,7 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 To Do:
 
 - All games uses PORT_VBLANK and legacy screen parameters (which is already
-  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
-  or 59.90 Hz).
+  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30).
   The most blunt examples of something being wrong with timings are with
   Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
   doesn't sport anything like that.
@@ -1174,11 +1173,7 @@ void psikyo_state::s1945(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.9229);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1627,7 +1622,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
@@ -1753,6 +1752,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 Chips:  PS2001B
         PS3103
         PS3204

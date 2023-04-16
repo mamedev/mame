@@ -30,10 +30,17 @@ public:
 	// construction/destruction
 	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto outsel_rd_cb() { return m_read_outsel.bind(); }
+	auto sec_wr_cb() { return m_write_sec.bind(); }
+	auto min_wr_cb() { return m_write_min.bind(); }
+	auto hrs_wr_cb() { return m_write_hrs.bind(); }
+	auto day_wr_cb() { return m_write_day.bind(); }
+
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 	DECLARE_WRITE_LINE_MEMBER( dio_w );
 	DECLARE_READ_LINE_MEMBER( dio_r );
+	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
 	// device-level overrides
@@ -44,15 +51,24 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
+	devcb_read_line m_read_outsel;
+	devcb_write_line m_write_sec;
+	devcb_write_line m_write_min;
+	devcb_write_line m_write_hrs;
+	devcb_write_line m_write_day;
+
 private:
-	int m_cs;                       // chip select
-	int m_clk;                      // clock
-	int m_data_latch;               // data latch
-	int m_reg_latch;                // register latch
-	int m_read_write;               // read/write data
-	int m_state;                    // state
-	int m_bits;                     // number of bits transferred
-	int m_dio;                      // data pin
+	bool m_cs;
+	bool m_clk;
+	int m_cycle;
+	u64 m_data_latch;
+	int m_reg_latch;
+	int m_state;
+	int m_bits_left;
+	bool m_dio;
+	bool m_reset;
+
+	offs_t get_address() { return (m_reg_latch >> 1) & 0x07; }
 
 	// timers
 	emu_timer *m_timer;

@@ -388,7 +388,7 @@ void debugger_cpu::go_vblank()
 	m_execution_state = exec_state::RUNNING;
 }
 
-void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args)
+void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argument_pack<char> &&args)
 {
 	// if something is pending on this CPU already, ignore this request
 	if (device == m_breakcpu)
@@ -637,14 +637,45 @@ void device_debug::stop_hook()
 //  acknowledged
 //-------------------------------------------------
 
-void device_debug::interrupt_hook(int irqline)
+void device_debug::interrupt_hook(int irqline, offs_t pc)
 {
 	// see if this matches a pending interrupt request
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
-		m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag(), irqline);
+		const address_space &space = m_memory->space(AS_PROGRAM);
+		if (space.is_octal())
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*o)\n", m_device.tag(), irqline, (space.logaddr_width() + 2) / 3, pc);
+		else
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*X)\n", m_device.tag(), irqline, space.logaddrchars(), pc);
 		compute_debug_flags();
+	}
+
+	if (m_trace != nullptr)
+		m_trace->interrupt_update(irqline, pc);
+
+	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH)) != 0)
+	{
+		if ((m_flags & DEBUG_FLAG_CALL_IN_PROGRESS) == 0)
+		{
+			if ((m_flags & DEBUG_FLAG_TEST_IN_PROGRESS) != 0)
+			{
+				if ((m_stepaddr == pc && (m_flags & DEBUG_FLAG_STEPPING_BRANCH_FALSE) != 0) ||
+					(m_stepaddr != pc && m_delay_steps == 1 && (m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE)) != 0))
+				{
+					// step over the interrupt and then call it finished
+					m_flags = (m_flags & ~(DEBUG_FLAG_TEST_IN_PROGRESS | DEBUG_FLAG_STEPPING_ANY)) | DEBUG_FLAG_STEPPING_OVER;
+					m_stepsleft = 1;
+				}
+			}
+
+			// remember the interrupt return address
+			m_flags |= DEBUG_FLAG_CALL_IN_PROGRESS;
+			m_stepaddr = pc;
+		}
+
+		m_flags &= ~DEBUG_FLAG_TEST_IN_PROGRESS;
+		m_delay_steps = 0;
 	}
 }
 
@@ -675,7 +706,7 @@ void device_debug::exception_hook(int exception)
 		if (matched)
 		{
 			m_device.machine().debugger().cpu().set_execution_stopped();
-			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %X, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
+			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %X, PC=%s)\n", m_device.tag(), exception, m_state->state_string(STATE_GENPC));
 			compute_debug_flags();
 		}
 	}
@@ -701,7 +732,7 @@ void device_debug::exception_hook(int exception)
 				if (debugcpu.is_stopped())
 				{
 					debugcpu.set_execution_stopped();
-					m_device.machine().debugger().console().printf("Stopped at exception point %X (CPU '%s', PC=%X)\n", ep.m_index, m_device.tag(), exception, m_state->pcbase());
+					m_device.machine().debugger().console().printf("Stopped at exception point %X (CPU '%s', PC=%s)\n", ep.m_index, m_device.tag(), m_state->state_string(STATE_GENPC));
 					compute_debug_flags();
 				}
 				break;
@@ -799,7 +830,7 @@ void device_debug::instruction_hook(offs_t curpc)
 				m_delay_steps--;
 				if (m_delay_steps == 0)
 				{
-					// branch taken or subroutine entered (TODO: interrupt acknowledgment or interleaved multithreading can falsely trigger this)
+					// branch taken or subroutine entered (TODO: interleaved multithreading can falsely trigger this)
 					if ((m_flags & DEBUG_FLAG_TEST_IN_PROGRESS) != 0 && (m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE)) != 0)
 					{
 						debugcpu.set_execution_stopped();
@@ -847,7 +878,10 @@ void device_debug::instruction_hook(offs_t curpc)
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
-			machine.debugger().console().printf("Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
+			if (is_octal())
+				machine.debugger().console().printf("Stopped at temporary breakpoint %o on CPU '%s'\n", m_stopaddr, m_device.tag());
+			else
+				machine.debugger().console().printf("Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
 			debugcpu.set_execution_stopped();
 		}
 
@@ -1142,7 +1176,7 @@ void device_debug::go_branch(bool sense, const char *condition)
 //  to templates in C++ being janky as all get out
 //-------------------------------------------------
 
-void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std::ostream> &&args)
+void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<char> &&args)
 {
 	assert(m_exec != nullptr);
 	m_device.machine().debugger().cpu().halt_on_next_instruction(&m_device, std::move(args));
@@ -2016,10 +2050,36 @@ void device_debug::tracer::update(offs_t pc)
 
 
 //-------------------------------------------------
+//  interrupt_update - log interrupt to tracefile
+//-------------------------------------------------
+
+void device_debug::tracer::interrupt_update(int irqline, offs_t pc)
+{
+	if (m_trace_over)
+	{
+		if (m_trace_over_target != ~0)
+			return;
+		m_trace_over_target = pc;
+	}
+
+	// if we just finished looping, indicate as much
+	*m_file << "\n";
+	if (m_detect_loops && m_loops != 0)
+	{
+		util::stream_format(*m_file, "   (loops for %d instructions)\n", m_loops);
+		m_loops = 0;
+	}
+
+	util::stream_format(*m_file, "   (interrupted at %s, IRQ %d)\n\n", debug_disasm_buffer(m_debug.device()).pc_to_string(pc), irqline);
+	m_file->flush();
+}
+
+
+//-------------------------------------------------
 //  vprintf - generic print to the trace file
 //-------------------------------------------------
 
-void device_debug::tracer::vprintf(util::format_argument_pack<std::ostream> const &args)
+void device_debug::tracer::vprintf(util::format_argument_pack<char> const &args)
 {
 	// pass through to the file
 	util::stream_format(*m_file, args);

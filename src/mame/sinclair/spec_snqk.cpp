@@ -28,15 +28,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/uimain.h"
-#include "cpu/z80/z80.h"
-#include "spectrum.h"
-#include "spec128.h"
-#include "timex.h"
-#include "specpls3.h"
-#include "sound/ay8910.h"
 #include "spec_snqk.h"
+
+#include "specpls3.h"
+#include "spec128.h"
+#include "spectrum.h"
+#include "timex.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+
+#include "ui/uimain.h"
+
 #include "corestr.h"
+
 
 #define EXEC_NA "N/A"
 
@@ -119,10 +124,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	if (image.is_filetype("sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
-		{
-			logerror("Invalid .SNA file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNA file size");
+
 		setup_sna(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sp"))
@@ -130,38 +133,29 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
 			if (snapshot_size != SP_OLD_SIZE)
-			{
-				logerror("Invalid .SP file size.\n");
-				goto error;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SP file size");
 		}
 		setup_sp(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("ach"))
 	{
 		if (snapshot_size != ACH_SIZE)
-		{
-			logerror("Invalid .ACH file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .ACH file size");
+
 		setup_ach(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("prg"))
 	{
 		if (snapshot_size != PRG_SIZE)
-		{
-			logerror("Invalid .PRG file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .PRG file size");
+
 		setup_prg(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("plusd"))
 	{
 		if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
-		{
-			logerror("Invalid .PLUSD file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .PLUSD file size");
+
 		setup_plusd(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sem"))
@@ -171,57 +165,44 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
-			{
-				logerror("Invalid .SEM file size.\n");
-				goto error;
-			}
+				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SEM file size");
 		}
 		setup_sem(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("sit"))
 	{
 		if (snapshot_size != SIT_SIZE)
-		{
-			logerror("Invalid .SIT file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SIT file size");
+
 		setup_sit(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("zx"))
 	{
 		if (snapshot_size != ZX_SIZE)
-		{
-			logerror("Invalid .ZX file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .ZX file size");
+
 		setup_zx(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("snp"))
 	{
 		if (snapshot_size != SNP_SIZE)
-		{
-			logerror("Invalid .SNP file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNP file size");
+
 		setup_snp(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("snx"))
 	{
 		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
 			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
-		{
-			logerror("Invalid .SNX file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
+
 		setup_snx(&snapshot_data[0], snapshot_size);
 	}
 	else if (image.is_filetype("frz"))
 	{
 		if (snapshot_size != FRZ_SIZE)
-		{
-			logerror("Invalid .FRZ file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .FRZ file size");
+
 		setup_frz(&snapshot_data[0], snapshot_size);
 	}
 	else
@@ -229,10 +210,7 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 		setup_z80(&snapshot_data[0], snapshot_size);
 	}
 
-	return image_init_result::PASS;
-
-error:
-	return image_init_result::FAIL;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*******************************************************************
@@ -2429,26 +2407,19 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
 	if (image.is_filetype("scr"))
 	{
 		if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
-		{
-			logerror("Invalid .SCR file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SCR file size.");
+
 		setup_scr(&quickload_data[0], quickload_size);
 	}
 	else if (image.is_filetype("raw"))
 	{
 		if (quickload_size != RAW_SIZE)
-		{
-			logerror("Invalid .RAW file size.\n");
-			goto error;
-		}
+			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .RAW file size.");
+
 		setup_raw(&quickload_data[0], quickload_size);
 	}
 
-	return image_init_result::PASS;
-
-error:
-	return image_init_result::FAIL;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /*******************************************************************
@@ -2482,10 +2453,9 @@ error:
  *******************************************************************/
 void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
 {
-	int i;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	for (i = 0; i < quicksize; i++)
+	for (int i = 0; i < quicksize; i++)
 		space.write_byte(i + BASE_RAM, quickdata[i]);
 
 	log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
@@ -2519,19 +2489,16 @@ void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
  *******************************************************************/
 void spectrum_state::setup_raw(uint8_t *quickdata, uint32_t quicksize)
 {
-	int i;
-	uint8_t data;
-	uint16_t start, len;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
-	len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
+	uint16_t const start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
+	uint16_t const len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
 
-	for (i = 0; i < len; i++)
+	for (int i = 0; i < len; i++)
 		space.write_byte(i + start, quickdata[i + RAW_HDR]);
 
 	// Set border color
-	data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+	uint8_t const data = (space.read_byte(0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
 	m_port_fe_data = (m_port_fe_data & 0xf8) | data;
 	border_update(data);
 	logerror("Border color:%02X\n", data);

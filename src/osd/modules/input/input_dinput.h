@@ -24,6 +24,7 @@
 #include <mutex>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #include <windows.h>
@@ -89,11 +90,8 @@ public:
 	{
 		return m_dinput->EnumDevices(
 				devclass,
-				[] (LPCDIDEVICEINSTANCE instance, LPVOID ref) -> BOOL
-				{
-					return (*reinterpret_cast<T *>(ref))(instance);
-				},
-				reinterpret_cast<LPVOID>(&callback),
+				&di_enum_devices_cb<std::remove_reference_t<T> >,
+				LPVOID(&callback),
 				DIEDFL_ATTACHEDONLY);
 	}
 
@@ -123,6 +121,12 @@ private:
 			dinput_cooperative_level cooperative_level);
 
 	static std::string make_id(LPCDIDEVICEINSTANCE instance);
+
+	template <typename T>
+	static BOOL CALLBACK di_enum_devices_cb(LPCDIDEVICEINSTANCE instance, LPVOID ref)
+	{
+		return (*reinterpret_cast<T *>(ref))(instance);
+	}
 
 	Microsoft::WRL::ComPtr<IDirectInput8> m_dinput;
 	dynamic_module::ptr                   m_dinput_dll;

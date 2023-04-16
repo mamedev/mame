@@ -288,29 +288,6 @@ private:
 	{
 		xinput_deviceids.clear();
 
-		// CoInit if needed
-		class com_helper
-		{
-		public:
-			com_helper()
-			{
-				switch (CoInitialize(nullptr))
-				{
-				case S_OK:
-				case S_FALSE:
-					m_succeeded = true;
-				}
-			}
-			~com_helper()
-			{
-				if (m_succeeded)
-					CoUninitialize();
-			}
-		private:
-			bool m_succeeded = false;
-		};
-		com_helper cominit;
-
 		HRESULT hr;
 
 		// Create WMI

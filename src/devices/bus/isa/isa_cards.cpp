@@ -81,6 +81,7 @@
 #include "pds.h"
 
 // other
+#include "hpblp.h"
 #include "chessmdr.h"
 #include "chessmsr.h"
 #include "finalchs.h"
@@ -235,4 +236,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dc820b", TEKRAM_DC820B); // actually an EISA card
 	device.option_add("omti8621", ISA16_OMTI8621);
 	device.option_add("lrk331", LRK331);
+	device.option_add("hpblp", HPBLP);
 }

@@ -20,17 +20,140 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "chqflag.h"
+
+#include "k051733.h"
+#include "k051960.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h"
+#include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ymopm.h"
+#include "video/k051316.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "chqflag.lh"
+
+namespace {
+
+class chqflag_state : public driver_device
+{
+public:
+	chqflag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_bank1000(*this, "bank1000")
+		, m_k007232(*this, "k007232_%u", 1)
+		, m_k051960(*this, "k051960")
+		, m_k051316(*this, "k051316_%u", 1)
+		, m_palette(*this, "palette")
+		, m_rombank(*this, "rombank")
+	{
+	}
+
+	void chqflag(machine_config &config);
+
+private:
+	template<int Chip> uint8_t k051316_ramrom_r(offs_t offset);
+	void chqflag_bankswitch_w(uint8_t data);
+	void chqflag_vreg_w(uint8_t data);
+	void select_analog_ctrl_w(uint8_t data);
+	uint8_t analog_read_r();
+	void k007232_bankswitch_w(uint8_t data);
+	void k007232_extvolume_w(uint8_t data);
+	void volume_callback0(uint8_t data);
+	void volume_callback1(uint8_t data);
+	K051316_CB_MEMBER(zoom_callback_1);
+	K051316_CB_MEMBER(zoom_callback_2);
+	K051960_CB_MEMBER(sprite_callback);
+	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bank1000_map(address_map &map);
+	void chqflag_map(address_map &map);
+	void chqflag_sound_map(address_map &map);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+private:
+	/* misc */
+	int        m_k051316_readroms = 0;
+	int        m_last_vreg = 0;
+	int        m_analog_ctrl = 0;
+	int        m_accel = 0;
+	int        m_wheel = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank1000;
+	required_device_array<k007232_device, 2> m_k007232;
+	required_device<k051960_device> m_k051960;
+	required_device_array<k051316_device, 2> m_k051316;
+	required_device<palette_device> m_palette;
+
+	/* memory pointers */
+	required_memory_bank m_rombank;
+	void update_background_shadows(uint8_t data);
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(chqflag_state::sprite_callback)
+{
+	enum { sprite_colorbase = 0 };
+
+	*priority = (*color & 0x10) ? 0 : GFX_PMASK_1;
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+/***************************************************************************
+
+  Callbacks for the K051316
+
+***************************************************************************/
+
+K051316_CB_MEMBER(chqflag_state::zoom_callback_1)
+{
+	enum { zoom_colorbase_1 = 256 / 16 };
+
+	*code |= ((*color & 0x03) << 8);
+	*color = zoom_colorbase_1 + ((*color & 0x3c) >> 2);
+}
+
+K051316_CB_MEMBER(chqflag_state::zoom_callback_2)
+{
+	enum { zoom_colorbase_2 = 512 / 256 };
+
+	*code |= ((*color & 0x0f) << 8);
+	*color = zoom_colorbase_2 + ((*color & 0x10) >> 4);
+}
+
+/***************************************************************************
+
+    Display Refresh
+
+***************************************************************************/
+
+uint32_t chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
 
 
 /* these trampolines are less confusing than nested address_map_bank_devices */
@@ -439,6 +562,8 @@ ROM_START( chqflagj )
 	ROM_REGION( 0x080000, "k007232_2", 0 )  /* 007232 data (chip 2) */
 	ROM_LOAD( "717e09",     0x000000, 0x080000, CRC(d74e857d) SHA1(00c851c857650d67fc4caccea4461d99be4acb3c) )
 ROM_END
+
+} // anonymous namespace
 
 
 //     YEAR  NAME      PARENT   MACHINE  INPUT     CLASS          INIT        MONITOR  COMPANY   FULLNAME                  FLAGS                                                                                                       LAYOUT

@@ -54,7 +54,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 private:
@@ -237,11 +237,11 @@ void mtu130_rom_device::device_start()
 		memset(m_romdata + m_load_offset, 0xff, 4096);
 }
 
-image_init_result mtu130_rom_device::call_load()
+std::pair<std::error_condition, std::string> mtu130_rom_device::call_load()
 {
 	u32 len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 	if(!len || len > 4096 || (4096 % len))
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	if (!loaded_through_softlist())
 		fread(m_romdata + m_load_offset, len);
@@ -256,7 +256,7 @@ image_init_result mtu130_rom_device::call_load()
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void mtu130_rom_device::call_unload()

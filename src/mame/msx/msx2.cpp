@@ -62,7 +62,7 @@ class msx2_state : public msx2_base_state
 {
 public:
 	msx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx2_base_state(mconfig, type, tag)
+		: msx2_base_state(mconfig, type, tag, 21.477272_MHz_XTAL, 6)
 	{
 	}
 
@@ -173,6 +173,7 @@ public:
 	void vg8240(machine_config &config);
 	void victhc80(machine_config &config);
 	void victhc90(machine_config &config);
+	void victhc90a(machine_config &config);
 	void victhc95(machine_config &config);
 	void victhc95a(machine_config &config);
 	void y503iiir(machine_config &config);
@@ -3596,6 +3597,44 @@ void msx2_state::victhc90(machine_config &config)
 
 /* MSX2 - Victor HC-90(A) */
 
+ROM_START(victhc90a)
+	ROM_REGION(0x8000, "mainrom", 0)
+	ROM_LOAD("msx2basic_tmm23256.ic023", 0x0000, 0x8000, CRC(9b3e7b97) SHA1(0081ea0d25bc5cd8d70b60ad8cfdc7307812c0fd))
+
+	ROM_REGION(0x4000, "subrom", 0)
+	ROM_LOAD("msx2basicext_tmm23128p.ic034", 0x0000, 0x4000, CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33))
+
+	ROM_REGION(0x8000, "rs232fdd", 0)
+	ROM_LOAD("rs232c_fdd_jvc024c_27c256.ic052", 0x000, 0x8000, CRC(19cfc325) SHA1(c991440778d5dc9ba54cc0e0f8e032d2f451366f))
+	// Patch to fake reads from the system control register
+	ROM_FILL(0x3ffd, 1, 0x80)
+	ROM_FILL(0x7ffd, 1, 0x80)
+
+	ROM_REGION(0x8000, "turbo", 0)
+	ROM_LOAD("turbo_jvc019e_27c256.ic040", 0x0000, 0x8000, CRC(7820ea1a) SHA1(ae81cc93e3992e253d42f48451adc4806074f494))
+
+	ROM_REGION(0x20000, "kanji", 0)
+	ROM_LOAD("hc90a_kanjifont.rom", 0x0000, 0x20000, CRC(d23d4d2d) SHA1(db03211b7db46899df41db2b1dfbec972109a967))
+ROM_END
+
+void msx2_state::victhc90a(machine_config &config)
+{
+	// YM2149
+	// FDC: mb8877a?, 1 3.5" DSDD drive
+	// RS232C builtin
+	// 2nd CPU HD-64B180 @ 6.144 MHz
+	// 1 Cartridge slot
+
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 0, 2, "mainrom");
+	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232, "rs232fdd", 0, 1, 1, 1, "rs232fdd");
+	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 0, 2, 0, 4).set_total_size(0x40000); // 256KB Mapper RAM
+	add_cartridge_slot<1>(config, 1);
+	add_internal_disk(config, MSX_SLOT_DISK10_MB8877, "disk", 3, 1, 1, "rs232fdd", 0x4000);
+
+	msx2(SND_YM2149, config, REGION_JAPAN);
+}
+
 /* MSX2 - Victor HC-90(B) */
 
 /* MSX2 - Victor HC-90(V) */
@@ -3707,7 +3746,7 @@ void msx2_state::cx7128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3736,7 +3775,7 @@ void msx2_state::cx7m128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3819,7 +3858,7 @@ void msx2_state::yis604(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
-	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
 	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
@@ -3857,7 +3896,7 @@ void msx2_state::y805128(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK11_WD2793, "disk", 3, 0, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 	// Default: SKW-05
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
 	msx2(SND_YM2149, config, REGION_JAPAN);
@@ -3896,7 +3935,7 @@ void msx2_state::y805256(machine_config &config)
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom");
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x40000); // 256KB Mapper RAM
 	// Default: SKW-05
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	MSX_S1985(config, "s1985", 0);
 	msx2(SND_YM2149, config, REGION_JAPAN);
@@ -4714,6 +4753,7 @@ COMP(1985, hx34,       0,        0,     hx34,       msx2jp,   msx2_state, empty_
 COMP(1986, fstm1,      0,        0,     fstm1,      msx,      msx2_state, empty_init, "Toshiba", "FS-TM1 (MSX2, Italy)", 0)
 COMP(1986, victhc80,   0,        0,     victhc80,   msxjp,    msx2_state, empty_init, "Victor", "HC-80 (MSX2, Japan)", 0)
 COMP(1986, victhc90,   victhc95, 0,     victhc90,   msx2jp,   msx2_state, empty_init, "Victor", "HC-90 (MSX2, Japan)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
+COMP(1986, victhc90a,  victhc95, 0,     victhc90a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-90A (MSX2, Japan)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated
 COMP(1986, victhc95,   0,        0,     victhc95,   msx2jp,   msx2_state, empty_init, "Victor", "HC-95 (MSX2, Japan)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1986, victhc95a,  victhc95, 0,     victhc95a,  msx2jp,   msx2_state, empty_init, "Victor", "HC-95A (MSX2, Japan)", MACHINE_NOT_WORKING) // 2nd cpu/turbo not emulated, firmware won't start
 COMP(1985, cx7128,     cx7m128,  0,     cx7128,     msxjp,    msx2_state, empty_init, "Yamaha", "CX7/128 (MSX2, Japan)", 0)

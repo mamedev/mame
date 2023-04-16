@@ -61,7 +61,7 @@ license:CC0-1.0
 
 	<software name="pcos13a" cloneof="pcos13" supported="no"><!-- Missing FM track0, Error 53 in kb.all -->
 		<!-- kb.all can be copied from pcos13 -->
-		<description>Olivetti PCOS 1.3 (Alt?)</description>
+		<description>Olivetti PCOS 1.3 (alt?)</description>
 		<year>1982</year>
 		<publisher>Olivetti</publisher>
 
@@ -340,7 +340,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="multpland" cloneof="multplan"><!-- Missing FM track0 -->
-		<description>Multiplan (Ger)</description>
+		<description>Multiplan (Germany)</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Bootable pcos1.3; Select keyboard layout on first boot; Run with > mplan" />
@@ -353,7 +353,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="olidraw">
-		<description>OliDraw (Ita)</description>
+		<description>OliDraw (Italian)</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
 		<info name="usage" value="Bootable pcos4.1a; Run with > ba &quot;olidraw.bas&quot; or > ba &quot;install.bas&quot;"/>

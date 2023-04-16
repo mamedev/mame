@@ -89,7 +89,7 @@ void hng64_state::hng64_soundram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		if (offset==0x7ffff)
 		{
 			logerror("dumping sound program in m_soundram\n");
-			auto filename = std::string{"soundram_"} + machine().system().name;
+			auto filename = "soundram_" + std::string(machine().system().name);
 			auto fp = fopen(filename.c_str(), "w+b");
 			if (fp)
 			{
@@ -395,9 +395,9 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->in_memr_cb().set(FUNC(hng64_state::dma_memr_cb));
 	m_audiocpu->out_iow_cb<3>().set(FUNC(hng64_state::dma_iow3_cb));
 
-	m_audiocpu->out_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
-	m_audiocpu->out_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
-	m_audiocpu->out_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
+	m_audiocpu->tout_handler<0>().set(FUNC(hng64_state::tcu_tm0_cb));
+	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
+	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -420,12 +420,12 @@ void tms7000_device::do_interrupt(int irqline)
 	else
 		m_icount -= 19;
 
+	standard_irq_callback(irqline, m_pc);
+
 	push8(m_sr);
 	push16(m_pc);
 	m_sr = 0;
 	m_pc = read_mem16(0xfffc - irqline * 2);
-
-	standard_irq_callback(irqline);
 }
 
 

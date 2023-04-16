@@ -5,17 +5,17 @@
 #include "emumem_hea.h"
 #include "emumem_hem.h"
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_memory<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_memory<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_memory<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_memory<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)], this->m_flags);
 }
@@ -90,17 +90,17 @@ template<int Width, int AddrShift> std::string handler_entry_write_memory<Width,
 
 
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_memory_bank<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	return static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
-template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> emu::detail::handler_entry_size_t<Width> handler_entry_read_memory_bank<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
-template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_memory_bank<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> std::pair<emu::detail::handler_entry_size_t<Width>, u16> handler_entry_read_memory_bank<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)], this->m_flags);
 }

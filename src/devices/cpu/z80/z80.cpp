@@ -3259,7 +3259,7 @@ void z80_device::take_interrupt()
 
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
+	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w.l);
 	LOG(("Z80 single int. irq_vector $%02x\n", irq_vector));
 
 	/* 'interrupt latency' cycles */

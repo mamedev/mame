@@ -21,7 +21,7 @@ class msx_cart_msx_audio_hxmu900_device : public device_t, public msx_cart_inter
 public:
 	msx_cart_msx_audio_hxmu900_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;
@@ -40,7 +40,7 @@ class msx_cart_msx_audio_nms1205_device : public device_t, public msx_cart_inter
 public:
 	msx_cart_msx_audio_nms1205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;
@@ -65,7 +65,7 @@ class msx_cart_msx_audio_fsca1_device : public device_t, public msx_cart_interfa
 public:
 	msx_cart_msx_audio_fsca1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	virtual void device_start() override;

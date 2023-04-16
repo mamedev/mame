@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca, Angelo Salese
+// copyright-holders: Roberto Fresca, Angelo Salese
+
 /**********************************************************************************
 
   AMA-8000-1 / AMA-8000-2 Multi Game System.
@@ -411,12 +412,14 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
 #include "machine/ds1994.h"
+#include "machine/i8255.h"
+//#include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
-//#include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -424,13 +427,17 @@
 #include "suprstar.lh"
 
 
+// configurable logging
+#define LOG_PPIOUT     (1U <<  1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PPIOUT)
+
+#include "logmacro.h"
+
+#define LOGPPIOUT(...)     LOGMASKED(LOG_PPIOUT,     __VA_ARGS__)
+
+
 namespace {
-
-#define MASTER_CLOCK    XTAL(16'000'000)
-#define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
-#define SND_CLOCK       MASTER_CLOCK/4  /* guess */
-#define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */
-
 
 class amaticmg_state : public driver_device
 {
@@ -439,6 +446,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),
+		m_rombank(*this, "rombank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -455,15 +463,16 @@ public:
 	void init_ama8000_2_i();
 	void init_ama8000_2_v();
 	void init_ama8000_1_x();
+	void init_am_mg5hu();
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
+	required_memory_bank m_rombank;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -501,26 +510,20 @@ private:
 *          Video Hardware           *
 ************************************/
 
-void amaticmg_state::video_start()
-{
-}
-
 uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y, x;
 	int count = 0;
 
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 96; x++)
+		for (int x = 0; x < 96; x++)
 		{
 			uint16_t tile = m_vram[count];
-			uint8_t color;
 
 			tile += ((m_attr[count] & 0x0f) << 8);
-			/* TODO: this looks so out of place ... */
-			color = (m_attr[count] & 0xf0) >> 3;
+			// TODO: this looks so out of place ...
+			uint8_t const color = (m_attr[count] & 0xf0) >> 3;
 
 			gfx->opaque(bitmap, cliprect, tile, color, 0, 0, x * 4, y * 8);
 			count++;
@@ -533,18 +536,16 @@ uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_rg
 uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int y, x;
 	int count = 16;
 
-	for (y = 0; y < 32; y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 96; x++)
+		for (int x = 0; x < 96; x++)
 		{
 			uint16_t tile = m_vram[count];
-			uint8_t color;
 
 			tile += ((m_attr[count] & 0xff) << 8);
-			color = 0;
+			uint8_t color = 0;
 
 			gfx->opaque(bitmap, cliprect, tile, color, 0, 0, x * 4, y * 8);
 			count++;
@@ -617,7 +618,7 @@ void amaticmg_state::touchm_w(uint8_t data)
 
 void amaticmg_state::rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0xf);
+	m_rombank->set_entry(data & 0xf);
 }
 
 void amaticmg_state::nmi_mask_w(uint8_t data)
@@ -637,12 +638,12 @@ void amaticmg_state::out_a_w(uint8_t data)
     -x-- ----  HOLD4
 */
 
-	m_lamps[0] = BIT(data, 3);  /* START */
-	m_lamps[1] = BIT(data, 4);  /* BET */
-	m_lamps[2] = BIT(data, 5);  /* HOLD3 */
-	m_lamps[3] = BIT(data, 6);  /* HOLD4 */
+	m_lamps[0] = BIT(data, 3);  // START
+	m_lamps[1] = BIT(data, 4);  // BET
+	m_lamps[2] = BIT(data, 5);  // HOLD3
+	m_lamps[3] = BIT(data, 6);  // HOLD4
 
-	logerror("port A: %2X\n", data);
+	LOGPPIOUT("port A: %2X\n", data);
 }
 
 void amaticmg_state::out_c_w(uint8_t data)
@@ -658,19 +659,19 @@ void amaticmg_state::out_c_w(uint8_t data)
     x--- ----  Hopper motor
     --x- x---  (unknown)
 */
-	m_lamps[4] = BIT(data, 1);  /* HOLD1 */
-	m_lamps[5] = BIT(data, 4);  /* HOLD2 */
-	m_lamps[6] = BIT(data, 6);  /* CANCEL */
+	m_lamps[4] = BIT(data, 1);  // HOLD1
+	m_lamps[5] = BIT(data, 4);  // HOLD2
+	m_lamps[6] = BIT(data, 6);  // CANCEL
 
-//  machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Coin In */
-//  machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Coin Out */
+//  machine().bookkeeping().coin_counter_w(0, data & 0x04);  // Coin In
+//  machine().bookkeeping().coin_counter_w(1, data & 0x01);  // Coin Out
 
-	logerror("port C: %2X\n", data);
+	LOGPPIOUT("port C: %2X\n", data);
 }
 
 void amaticmg_state::unk80_w(uint8_t data)
 {
-//  m_dac->write(BIT(data, 0));       /* Sound DAC */
+//  m_dac->write(BIT(data, 0));       // Sound DAC
 }
 
 
@@ -683,9 +684,9 @@ void amaticmg_state::amaticmg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram(); // .share("nvram");
-	map(0xa000, 0xafff).ram().share("vram");
-	map(0xb000, 0xbfff).ram().share("attr");
-	map(0xc000, 0xffff).bankr("bank1");
+	map(0xa000, 0xafff).ram().share(m_vram);
+	map(0xb000, 0xbfff).ram().share(m_attr);
+	map(0xc000, 0xffff).bankr(m_rombank);
 }
 
 void amaticmg_state::amaticmg_portmap(address_map &map)
@@ -827,7 +828,7 @@ static const gfx_layout charlayout_6bpp =
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(0,3) + 0, RGN_FRAC(0,3) + 4, RGN_FRAC(1,3) + 0, RGN_FRAC(1,3) + 4,RGN_FRAC(2,3) + 0, RGN_FRAC(2,3) + 4, },
-	{ 3, 2, 1, 0 }, /* tiles are x-flipped */
+	{ 3, 2, 1, 0 }, // tiles are x-flipped
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
 };
@@ -838,11 +839,11 @@ static const gfx_layout charlayout_6bpp =
 ************************************/
 
 static GFXDECODE_START( gfx_amaticmg )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_4bpp, 0, 0x20 )
+	GFXDECODE_ENTRY( "chars", 0x0000, charlayout_4bpp, 0, 0x20 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_amaticmg2 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
+	GFXDECODE_ENTRY( "chars", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
 
@@ -854,14 +855,16 @@ void amaticmg_state::machine_start()
 {
 	uint8_t *rombank = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
+	m_rombank->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 
 	m_lamps.resolve();
+
+	save_item(NAME(m_nmi_mask));
 }
 
 void amaticmg_state::machine_reset()
 {
-	membank("bank1")->set_entry(0);
+	m_rombank->set_entry(0);
 	m_nmi_mask = 0;
 }
 
@@ -872,14 +875,19 @@ void amaticmg_state::machine_reset()
 
 void amaticmg_state::amaticmg(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, CPU_CLOCK);     /* WRONG! */
+	constexpr XTAL MASTER_CLOCK = XTAL(16'000'000);
+	constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 4; // guess
+	constexpr XTAL SND_CLOCK = MASTER_CLOCK / 4; // guess
+	constexpr XTAL CRTC_CLOCK = MASTER_CLOCK / 8; // guess
+
+	// basic machine hardware
+	Z80(config, m_maincpu, CPU_CLOCK);     // WRONG!
 	m_maincpu->set_addrmap(AS_PROGRAM, &amaticmg_state::amaticmg_map);
 	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg_portmap);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* 3x 8255 */
+	// 3x 8255
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");
 	ppi0.in_pb_callback().set_ioport("IN1");
@@ -890,7 +898,7 @@ void amaticmg_state::amaticmg(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("SW1");
 	ppi1.out_pc_callback().set(FUNC(amaticmg_state::out_c_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -907,10 +915,10 @@ void amaticmg_state::amaticmg(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amaticmg);
 	PALETTE(config, m_palette, FUNC(amaticmg_state::amaticmg_palette), 0x200);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	YM3812(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5); /* Y3014B DAC */
+	YM3812(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5); // Y3014B DAC
 }
 
 
@@ -965,10 +973,10 @@ void amaticmg_state::amaticmg4(machine_config &config)
 ROM_START( suprstar )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x20000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x20000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "chars", 0 )
 	ROM_LOAD( "u10.bin", 0x00000, 0x08000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
 	ROM_CONTINUE(        0x00000, 0x08000 )
 	ROM_LOAD( "u9.bin",  0x08000, 0x08000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
@@ -984,10 +992,10 @@ ROM_END
 ROM_START( am_mg24 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mgi_vger_3.9-i-8201.i6.bin", 0x00000, 0x40000, CRC(9ce159f7) SHA1(101c277d579a69cb03f879288b2cecf838cf1741) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "multi_2.4_zg1.i17.bin", 0x100000, 0x80000, CRC(4a60a718) SHA1(626991abee768da58e87c7cdfc4fcbae86c6ea2a) )
 	ROM_LOAD( "multi_2.4_zg2.i18.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )
 	ROM_LOAD( "multi_2.4_zg3.i33.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )
@@ -1007,16 +1015,14 @@ ROM_END
      Lfnd. Nr. 0940
      Type:     801 L
      Datum:    11.12.95
-
-  The program needs proper decryption.
 */
 ROM_START( am_mg24a )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "multi_stm_27_cl_8202.bin", 0x00000, 0x40000, CRC(e3625367) SHA1(cea3ae4042522c720119ea94c8f05f74cbcdcab0) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "multi_2.4_zg1.bin", 0x100000, 0x80000, CRC(29c3a45b) SHA1(97157a4d436a3dc8b81ffd7eb51f96f3bd969f4b) )  // this one doesn't match the parent.
 	ROM_LOAD( "multi_2.4_zg2.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )  // identical to the parent.
 	ROM_LOAD( "multi_2.4_zg3.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )  // identical to the parent.
@@ -1032,10 +1038,10 @@ ROM_END
 ROM_START( am_mg3 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mg_iii_vger_3.5-i-8205.bin", 0x00000, 0x40000, CRC(21d64029) SHA1(d5c3fde02833a96dd7a43481a489bfc4a5c9609d) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg_iii_51_zg1.bin", 0x100000, 0x80000, CRC(84f86874) SHA1(c483a50df6a9a71ddfdf8530a894135f9b852b89) )
 	ROM_LOAD( "mg_iii_51_zg2.bin", 0x080000, 0x80000, CRC(4425e535) SHA1(726c322c5d0b391b82e49dd1797ebf0abfa4a65a) )
 	ROM_LOAD( "mg_iii_51_zg3.bin", 0x000000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
@@ -1047,10 +1053,10 @@ ROM_END
 ROM_START( am_mg3a )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mg_iii_vger_3.64_v_8309.i16", 0x00000, 0x40000, CRC(c54f97c4) SHA1(d5ce91be7332ada304d18d07706e3b98ac0fa74b) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg_iii_51_zg1.i17", 0x100000, 0x80000, CRC(84f86874) SHA1(c483a50df6a9a71ddfdf8530a894135f9b852b89) )
 	ROM_LOAD( "mg_iii_51_zg2.i18", 0x080000, 0x80000, CRC(4425e535) SHA1(726c322c5d0b391b82e49dd1797ebf0abfa4a65a) )
 	ROM_LOAD( "mg_iii_51_zg3.i19", 0x000000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
@@ -1059,15 +1065,15 @@ ROM_START( am_mg3a )
 	ROM_LOAD( "iv.i35", 0x00000, 0x20000, CRC(82af7296) SHA1(1a07d6481e0f8fd785be9f1b737182d7e0b84605) )
 ROM_END
 
-/* Italian sets... */
+// Italian sets...
 
 ROM_START( am_mg31i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mgi_sita_3.1_o_8270.bin", 0x00000, 0x40000, CRC(7358bdde) SHA1(674b57ddaaaed9b88ad563762b2421be7057e498) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg2_ita.1", 0x100000, 0x80000, BAD_DUMP CRC(8663ce10) SHA1(00606bc69bd3a81a2f1b618d018d3ac315169fe4) )
 	ROM_LOAD( "mg2_ita.2", 0x080000, 0x80000, BAD_DUMP CRC(7dbaf752) SHA1(afefbd239519abb4898348a3923ff093e36fbcb0) )
 	ROM_LOAD( "mg2_ita.3", 0x000000, 0x80000, BAD_DUMP CRC(5dba55cf) SHA1(d237f8b3c72e8b59974059156070d0618ec41e9a) )
@@ -1079,10 +1085,10 @@ ROM_END
 ROM_START( am_mg33i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mgi_sita_3.3_o_8270.bin", 0x00000, 0x40000, CRC(eaa1ed83) SHA1(e50d06ea3631bd6e4f5fe14d8283c3550b2779a6) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg2_ita.1", 0x100000, 0x80000, BAD_DUMP CRC(8663ce10) SHA1(00606bc69bd3a81a2f1b618d018d3ac315169fe4) )
 	ROM_LOAD( "mg2_ita.2", 0x080000, 0x80000, BAD_DUMP CRC(7dbaf752) SHA1(afefbd239519abb4898348a3923ff093e36fbcb0) )
 	ROM_LOAD( "mg2_ita.3", 0x000000, 0x80000, BAD_DUMP CRC(5dba55cf) SHA1(d237f8b3c72e8b59974059156070d0618ec41e9a) )
@@ -1094,10 +1100,10 @@ ROM_END
 ROM_START( am_mg34i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mgi_sita_3.4_o_8270.bin", 0x00000, 0x40000, CRC(bea7cd25) SHA1(89c9e02b48f34b2168e8624e552ead476cc339b9) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg2_ita.1", 0x100000, 0x80000, BAD_DUMP CRC(8663ce10) SHA1(00606bc69bd3a81a2f1b618d018d3ac315169fe4) )
 	ROM_LOAD( "mg2_ita.2", 0x080000, 0x80000, BAD_DUMP CRC(7dbaf752) SHA1(afefbd239519abb4898348a3923ff093e36fbcb0) )
 	ROM_LOAD( "mg2_ita.3", 0x000000, 0x80000, BAD_DUMP CRC(5dba55cf) SHA1(d237f8b3c72e8b59974059156070d0618ec41e9a) )
@@ -1109,10 +1115,10 @@ ROM_END
 ROM_START( am_mg35i )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mgi_sita_3.5_o_8270.bin", 0x00000, 0x40000, CRC(816eb41e) SHA1(0cad597e764455011d03f519e4adafb310e75451) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg2_ita.1", 0x100000, 0x80000, BAD_DUMP CRC(8663ce10) SHA1(00606bc69bd3a81a2f1b618d018d3ac315169fe4) )
 	ROM_LOAD( "mg2_ita.2", 0x080000, 0x80000, BAD_DUMP CRC(7dbaf752) SHA1(afefbd239519abb4898348a3923ff093e36fbcb0) )
 	ROM_LOAD( "mg2_ita.3", 0x000000, 0x80000, BAD_DUMP CRC(5dba55cf) SHA1(d237f8b3c72e8b59974059156070d0618ec41e9a) )
@@ -1127,10 +1133,10 @@ ROM_END
 ROM_START( am_mg4v )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "mg_iv_vger_3__3.44_v_8373.bin", 0x00000, 0x40000, CRC(fab3aa28) SHA1(889870ca6ebfb0361e74803b7b50ff78c5e0df46) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg_iv_vger_3__zg_1.bin", 0x100000, 0x80000, CRC(da9a1282) SHA1(15c6e4b460184603108d79bc104b8a0d036aad43) )
 	ROM_LOAD( "mg_iv_vger_3__zg_2.bin", 0x080000, 0x80000, CRC(98dc36ed) SHA1(53ee317198730a8b34fec51f9fa237f980424fb9) )
 	ROM_LOAD( "mg_iv_vger_3__zg_3.bin", 0x000000, 0x80000, CRC(1525c235) SHA1(b873f0b8dc8537558e43b37c95b5663fbddc09cc) )
@@ -1140,12 +1146,29 @@ ROM_START( am_mg4v )
 ROM_END
 
 
+// TYPE: 80-O - AMA8000-2  board
+ROM_START( am_mg4sk )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
+	ROM_LOAD( "m27c2001.i6", 0x00000, 0x40000, CRC(add64d33) SHA1(6779412d9ef2333d417128b2d5ed2a18c17f7ac6) ) // unwritten yellow label
+
+	ROM_REGION( 0x180000, "chars", 0 )
+	ROM_LOAD( "mg iv 4.1 - zg 1.i17", 0x100000, 0x80000, CRC(a28fbf91) SHA1(9f6e35af6b5f840a5f36cdd098e57ea7635d3da5) )
+	ROM_LOAD( "mg iv 4.2 - zg 2.i18", 0x080000, 0x80000, CRC(e018b1e9) SHA1(5c0046e8c5cafcf59ff1b24e827f9b07b49ef9f9) )
+	ROM_LOAD( "mg iv 4.3 - zg 3.i33", 0x000000, 0x80000, CRC(25eb9d1f) SHA1(eda6702ca1b1e565831f14caa4939f506d251d46) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "iv.i35", 0x00000, 0x20000, CRC(82af7296) SHA1(1a07d6481e0f8fd785be9f1b737182d7e0b84605) )
+ROM_END
+
+
 //******** MG V ********
 
 /*
   Multi Game 5.
   PCB: AMA 8000-2
-  Program: AMGHU_V83.65
+  Program: AMGHU_VB3.65
 
   ROMs:
   OMH (program): 27C020.
@@ -1232,10 +1255,10 @@ ROM_END
 ROM_START( am_mg5hu )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
 	ROM_LOAD( "omh.bin", 0x00000, 0x40000, CRC(e68522df) SHA1(b53ef40ee65df855b4dc843119a2337fa0a39d6e) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "chars", 0 )
 	ROM_LOAD( "mg5_zg1.bin", 0x100000, 0x80000, CRC(e3c0e0a5) SHA1(9c672f49bf10dd96f9dc6eb9ca58aaba93576764) )
 	ROM_LOAD( "mg5_zg2.bin", 0x080000, 0x80000, CRC(76bbce77) SHA1(cc11efb151e749040ca69c4e91e7adaa992577ce) )
 	ROM_LOAD( "mg5_zg3.bin", 0x000000, 0x80000, CRC(2a78f9b5) SHA1(eb46c2da70a0aba4d1f93b99f39a2d3d594cb758) )
@@ -1299,6 +1322,11 @@ void amaticmg_state::init_ama8000_3_o()
 	decrypt(0x56e, 0xa7);
 }
 
+void amaticmg_state::init_am_mg5hu()
+{
+	decrypt(0x540, 0xa6);
+}
+
 } // anonymous namespace
 
 
@@ -1306,15 +1334,16 @@ void amaticmg_state::init_ama8000_3_o()
 *           Game Drivers            *
 ************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT              ROT    COMPANY                FULLNAME                       FLAGS                                                                                                                       LAYOUT */
-GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, init_ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
-GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (unknown V2.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs proper decryption.
-GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg3a,  0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.64)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg34i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.4)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg33i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  2000, am_mg4v,  0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME(  200?, am_mg5hu, 0,        amaticmg4, amaticmg, amaticmg_state, empty_init,       ROT0,  "Amatic Trading GmbH", "Multi Game V (AMGHU_V83.65)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs decryption.
+/*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT              ROT    COMPANY                FULLNAME                        FLAGS                                                                                                                       LAYOUT */
+GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, init_ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
+GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_1_x, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Stm 2.7)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg3a,  0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.64)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg35i, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.5)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg34i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.4)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg33i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.3)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2000, am_mg4v,  0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2003, am_mg4sk, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game IV (AMGSK_VA3.85)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  2001, am_mg5hu, 0,        amaticmg4, amaticmg, amaticmg_state, init_am_mg5hu,    ROT0,  "Amatic Trading GmbH", "Multi Game V (AMGHU_VB3.65)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

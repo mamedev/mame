@@ -52,19 +52,19 @@ void msx_slot_sony08_device::device_start()
 	m_view0[1].install_ram(0x0000, 0x3fff, m_sram.data());
 
 	page(1)->install_read_bank(0x4000, 0x5fff, m_rombank[0]);
-	page(1)->install_write_handler(0x4fff, 0x4fff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<0>)));
+	page(1)->install_write_handler(0x4fff, 0x4fff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<0>)));
 	page(1)->install_view(0x6000, 0x7fff, m_view1);
 	m_view1[0].install_read_bank(0x6000, 0x7fff, m_rombank[1]);
 	m_view1[1].install_read_bank(0x6000, 0x6fff, m_rombank[1]);
 	m_view1[1].install_read_bank(0x7000, 0x77ff, m_rombank[4]);
 	m_view1[1].install_read_bank(0x7800, 0x7fff, m_rombank[5]);
-	page(1)->install_write_handler(0x6fff, 0x6fff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<1>)));
-	page(1)->install_write_handler(0x77ff, 0x77ff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<4>)));
-	page(1)->install_write_handler(0x7fff, 0x7fff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<5>)));
+	page(1)->install_write_handler(0x6fff, 0x6fff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<1>)));
+	page(1)->install_write_handler(0x77ff, 0x77ff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<4>)));
+	page(1)->install_write_handler(0x7fff, 0x7fff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<5>)));
 	page(2)->install_read_bank(0x8000, 0x9fff, m_rombank[2]);
-	page(2)->install_write_handler(0x8fff, 0x8fff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<2>)));
+	page(2)->install_write_handler(0x8fff, 0x8fff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<2>)));
 	page(2)->install_read_bank(0xa000, 0xbfff, m_rombank[3]);
-	page(2)->install_write_handler(0xafff, 0xafff, write8smo_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<3>)));
+	page(2)->install_write_handler(0xafff, 0xafff, emu::rw_delegate(*this, FUNC(msx_slot_sony08_device::bank_w<3>)));
 }
 
 void msx_slot_sony08_device::device_reset()

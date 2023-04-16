@@ -62,7 +62,8 @@ public:
 		m_videosram(*this, "vsram"),
 		m_palette(*this, "palette"),
 		m_chargen(*this, "g2char"),
-		m_fdc(*this,"fdc")
+		m_fdc(*this,"fdc"),
+		m_keyboard(*this, "kb%i", 0U)
 	{
 	}
 
@@ -126,6 +127,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
 	required_device<fd1795_device> m_fdc;
+	required_ioport_array<8> m_keyboard;
 
 	emu_timer* m_kb_timer;
 	emu_timer* m_kb_serial_timer;
@@ -317,17 +319,12 @@ TIMER_CALLBACK_MEMBER(wicat_state::kb_serial_tick)
 
 TIMER_CALLBACK_MEMBER(wicat_state::poll_kb)
 {
-	uint8_t line;
 	uint8_t val = 0;
-	uint8_t x;
-	uint32_t data;
-	char kbtag[8];
 
-	for(line=0;line<8;line++)
+	for(uint8_t line=0; line<8; line++)
 	{
-		sprintf(kbtag,"kb%i",line);
-		data = ioport(kbtag)->read();
-		for(x=0;x<32;x++)
+		uint32_t data = m_keyboard[line]->read();
+		for(uint8_t x=0;x<32;x++)
 		{
 			if((data & (1<<x)) && !(m_kb_keys[line] & (1<<x)))
 			{

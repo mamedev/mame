@@ -272,15 +272,15 @@ brk_imp
 	write(SP, irq_taken ? P & ~F_B : P);
 	dec_SP();
 	if(nmi_pending) {
+		standard_irq_callback(NMI_LINE, PC);
 		PC = read_arg(0xfffa);
 		PC = set_h(PC, read_arg(0xfffb));
 		nmi_pending = false;
-		standard_irq_callback(NMI_LINE);
 	} else {
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE, PC);
 		PC = read_arg(0xfffe);
 		PC = set_h(PC, read_arg(0xffff));
-		if(irq_taken)
-			standard_irq_callback(IRQ_LINE);
 	}
 	irq_taken = false;
 	P |= F_I; // Do *not* move after the prefetch

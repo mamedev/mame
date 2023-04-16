@@ -10,7 +10,10 @@
 
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ds128x.h"
+#include "machine/am9517a.h"
 
 /*
  * Host
@@ -78,19 +81,33 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
 class lpcbus_host_interface {
 public:
 	virtual void set_virtual_line(int line, int state) = 0;
+	virtual void assign_virtual_line(int line, int device_index) = 0;
 	virtual void remap() = 0;
 };
 
 class lpcbus_device_interface {
 public:
+	enum class dma_operation {
+		READ = 1,
+		WRITE = 2,
+		END = 4
+	};
+	enum class dma_size {
+		BYTE = 1,
+		WORD = 2,
+		DWORD = 4
+	};
 	virtual void map_extra(address_space *memory_space, address_space *io_space) = 0;
-	virtual void set_host(int index, lpcbus_host_interface *host) = 0;
+	virtual void set_host(int device_index, lpcbus_host_interface *host) = 0;
+	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) = 0;
 };
 
 class mcpx_isalpc_device : public pci_device, public lpcbus_host_interface {
 public:
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> void set_dma_space(T &&bmtag, int bmspace) { m_dma_space.set_tag(std::forward<T>(bmtag), bmspace); }
+	template <bool R> void set_dma_space(const address_space_finder<R> &finder) { m_dma_space.set_tag(finder); }
 
 	auto smi() { return m_smi_callback.bind(); }
 	auto interrupt_output() { return m_interrupt_output.bind(); }
@@ -100,11 +117,41 @@ public:
 	void debug_generate_irq(int irq, int state);
 
 	virtual void set_virtual_line(int line, int state) override;
+	virtual void assign_virtual_line(int line, int device_index) override;
 	virtual void remap() override;
 
 	uint32_t acpi_r(offs_t offset, uint32_t mem_mask = ~0);
 	void acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void boot_state_w(uint8_t data);
+
+	uint8_t dma_page_r(offs_t offset);
+	void dma_page_w(offs_t offset, uint8_t data);
+	uint8_t dma_read_byte(offs_t offset);
+	void dma_write_byte(offs_t offset, uint8_t data);
+	uint8_t dma_read_word(offs_t offset);
+	void dma_write_word(offs_t offset, uint8_t data);
+	void set_dma_channel(int channel, bool state);
+	void send_dma_byte(int channel, uint8_t value);
+	void send_dma_word(int channel, uint16_t value);
+	uint8_t get_dma_byte(int channel);
+	uint16_t get_dma_word(int channel);
+	void signal_dma_end(int channel, int tc);
+	uint8_t dma2_r(offs_t offset) { return m_dma8237_2->read(offset / 2); }
+	void dma2_w(offs_t offset, uint8_t data) { m_dma8237_2->write(offset / 2, data); }
+	uint8_t dma1_ior0_r() { return get_dma_byte(0); }
+	uint8_t dma1_ior1_r() { return get_dma_byte(1); }
+	uint8_t dma1_ior2_r() { return get_dma_byte(2); }
+	uint8_t dma1_ior3_r() { return get_dma_byte(3); }
+	uint8_t dma2_ior1_r() { uint16_t const result = get_dma_word(5); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior2_r() { uint16_t const result = get_dma_word(6); m_dma_high_byte = result >> 8; return result; }
+	uint8_t dma2_ior3_r() { uint16_t const result = get_dma_word(7); m_dma_high_byte = result >> 8; return result; }
+	void dma1_iow0_w(uint8_t data) { send_dma_byte(0, data); }
+	void dma1_iow1_w(uint8_t data) { send_dma_byte(1, data); }
+	void dma1_iow2_w(uint8_t data) { send_dma_byte(2, data); }
+	void dma1_iow3_w(uint8_t data) { send_dma_byte(3, data); }
+	void dma2_iow1_w(uint8_t data) { send_dma_word(5, (m_dma_high_byte << 8) | data); }
+	void dma2_iow2_w(uint8_t data) { send_dma_word(6, (m_dma_high_byte << 8) | data); }
+	void dma2_iow3_w(uint8_t data) { send_dma_word(7, (m_dma_high_byte << 8) | data); }
 
 	DECLARE_WRITE_LINE_MEMBER(irq1);
 	DECLARE_WRITE_LINE_MEMBER(irq3);
@@ -112,6 +159,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq10);
 	DECLARE_WRITE_LINE_MEMBER(irq14);
 	DECLARE_WRITE_LINE_MEMBER(irq15);
+	DECLARE_WRITE_LINE_MEMBER(dma2_hreq_w) { m_dma8237_2->hack_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_eop_w) { m_dma_eop = state; if (m_dma_channel != -1) signal_dma_end(m_dma_channel, state & 1); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_dack0_w) { set_dma_channel(0, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_dack1_w) { set_dma_channel(1, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_dack2_w) { set_dma_channel(2, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma1_dack3_w) { set_dma_channel(3, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma2_dack0_w) { m_dma8237_1->hack_w(state ? 0 : 1); }
+	DECLARE_WRITE_LINE_MEMBER(dma2_dack1_w) { set_dma_channel(5, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma2_dack2_w) { set_dma_channel(6, state); }
+	DECLARE_WRITE_LINE_MEMBER(dma2_dack3_w) { set_dma_channel(7, state); }
 
 protected:
 	virtual void device_start() override;
@@ -120,8 +177,8 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
 	uint8_t get_slave_ack(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
@@ -140,7 +197,10 @@ private:
 	devcb_write8 m_boot_state_hook;
 	required_device<pic8259_device> pic8259_1;
 	required_device<pic8259_device> pic8259_2;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
 	required_device<pit8254_device> pit8254;
+	required_address_space m_dma_space;
 
 	uint16_t m_pm1_status;
 	uint16_t m_pm1_enable;
@@ -152,11 +212,17 @@ private:
 	uint8_t m_smi_command_port;
 	uint8_t m_gpio_mode[26];
 	lpcbus_device_interface *lpcdevices[16];
+	int m_lineowners[8];
 	uint8_t m_speaker;
 	bool m_refresh;
 	uint8_t m_pit_out2;
 	uint8_t m_spkrdata;
 	uint8_t m_channel_check;
+	int m_dma_eop;
+	uint8_t m_dma_page[0x10];
+	uint8_t m_dma_high_byte;
+	int m_dma_channel;
+	offs_t m_page_offset;
 };
 
 DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
@@ -391,6 +457,16 @@ class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace)
+	{
+		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(bmtag, bmspace);
+		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(bmtag, bmspace);
+	}
+	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder)
+	{
+		subdevice<bus_master_ide_controller_device>(m_pri.finder_tag())->set_bus_master_space(finder);
+		subdevice<bus_master_ide_controller_device>(m_sec.finder_tag())->set_bus_master_space(finder);
+	}
 
 	auto pri_interrupt_handler() { return m_pri_interrupt_handler.bind(); }
 	auto sec_interrupt_handler() { return m_sec_interrupt_handler.bind(); }

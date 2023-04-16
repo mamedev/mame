@@ -65,7 +65,7 @@ inline void hyperstone_device::ccfunc_print()
 
 inline void hyperstone_device::ccfunc_standard_irq_callback()
 {
-	standard_irq_callback(m_core->arg0);
+	standard_irq_callback(m_core->arg0, m_core->global_regs[0]);
 }
 
 static void cfunc_unimplemented(void *param)
@@ -215,7 +215,7 @@ void hyperstone_device::code_compile_block(offs_t pc)
 	const opcode_desc *seqhead, *seqlast;
 	bool override = false;
 
-	g_profiler.start(PROFILER_DRC_COMPILE);
+	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	const opcode_desc *desclist = m_drcfe->describe_code(pc);
@@ -296,7 +296,6 @@ void hyperstone_device::code_compile_block(offs_t pc)
 
 			/* end the sequence */
 			block.end();
-			g_profiler.stop();
 			succeeded = true;
 		}
 		catch (drcuml_block::abort_compilation &)

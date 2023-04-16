@@ -24,7 +24,9 @@ public:
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
-	virtual image_init_result call_load() override;
+
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	void write(offs_t offset, uint8_t data);

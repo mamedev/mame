@@ -696,16 +696,20 @@ void tms1k_base_device::execute_one()
 		if (m_fixed & F_LDP)   op_ldp();
 		if (m_fixed & F_COMC)  op_comc();
 		if (m_fixed & F_TPC)   op_tpc();
+
 		if (m_fixed & F_TAX)   op_tax();
 		if (m_fixed & F_TAC)   op_tac();
 		if (m_fixed & F_TADM)  op_tadm();
 		if (m_fixed & F_TMA)   op_tma();
+
 		if (m_fixed & F_OFF)   op_off();
 		if (m_fixed & F_SEAC)  op_seac();
 		if (m_fixed & F_REAC)  op_reac();
 		if (m_fixed & F_SAL)   op_sal();
 		if (m_fixed & F_SBL)   op_sbl();
 		if (m_fixed & F_XDA)   op_xda();
+
+		if (m_fixed & F_EXTRA) op_extra();
 
 		// after fixed opcode handling: store status, write ram
 		m_status = status;

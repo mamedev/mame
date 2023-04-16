@@ -187,6 +187,14 @@ void pce_control_port_devices(device_slot_interface &device)
 
 	// 3 Button Joypad/Joysticks (ex: Avenue Pad 3)
 	// PC Engine Mouse (PI-PD10)
-	// Memory Base 128 (PI-AD19)
+
+	// Memory BRAM storages, connects to joyport and exposes another DIN-8 port
+	// cfr. https://github.com/BlockoS/mb128
+	// NEC Memory Base 128 (PI-AD19, ﾒﾓﾘﾍﾞｰｽ128)
+	// Koei Save-Kun (セーブくん), clone of above?
+
+	// Serial Monitor for PCEMon
+	// https://www.chrismcovell.com/PCEmon/index.html
+
 	// etc...
 }

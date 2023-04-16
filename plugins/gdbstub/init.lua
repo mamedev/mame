@@ -1,11 +1,11 @@
 -- license:BSD-3-Clause
 -- copyright-holders: Carl
-local exports = {}
-exports.name = "gdbstub"
-exports.version = "0.0.1"
-exports.description = "GDB stub plugin"
-exports.license = "BSD-3-Clause"
-exports.author = { name = "Carl" }
+local exports = {
+	name = "gdbstub",
+	version = "0.0.1",
+	description = "GDB stub plugin",
+	license = "BSD-3-Clause",
+	author = { name = "Carl" } }
 
 local gdbstub = exports
 
@@ -25,6 +25,8 @@ local regmaps = {
 regmaps.i486 = regmaps.i386
 regmaps.pentium = regmaps.i386
 
+local reset_subscription, stop_subscription
+
 function gdbstub.startplugin()
 	local debugger
 	local debug
@@ -35,7 +37,7 @@ function gdbstub.startplugin()
 	local consolelast
 	local running
 
-	emu.register_start(function ()
+	reset_subscription = emu.add_machine_reset_notifier(function ()
 		debugger = manager.machine.debugger
 		if not debugger then
 			print("gdbstub: debugger not enabled")
@@ -56,7 +58,7 @@ function gdbstub.startplugin()
 		running = false
 	end)
 
-	emu.register_stop(function()
+	stop_subscription = emu.add_machine_stop_notifier(function ()
 		consolelog = nil
 		cpu = nil
 		debug = nil

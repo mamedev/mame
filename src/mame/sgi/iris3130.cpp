@@ -224,9 +224,9 @@ QUICKLOAD_LOAD_MEMBER(iris3000_state::load_romboard)
 	if (image.length() == 0 || image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /***************************************************************************

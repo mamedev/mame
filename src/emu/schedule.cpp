@@ -445,7 +445,7 @@ void device_scheduler::timeslice()
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
 					{
-						g_profiler.start(exec->m_profiler);
+						auto profile = g_profiler.start(exec->m_profiler);
 
 						// note that this global variable cycles_stolen can be modified
 						// via the call to cpu_execute
@@ -466,7 +466,6 @@ void device_scheduler::timeslice()
 						ran -= *exec->m_icountptr;
 						assert(ran >= exec->m_cycles_stolen);
 						ran -= exec->m_cycles_stolen;
-						g_profiler.stop();
 					}
 
 					// account for these cycles
@@ -704,6 +703,7 @@ void device_scheduler::postload()
 			assert(!timer.expire().is_never());
 
 			// temporary timers go away entirely (except our special never-expiring one)
+			timer.m_callback.reset();
 			m_timer_allocator.reclaim(timer_list_remove(timer));
 		}
 		else
@@ -943,15 +943,13 @@ inline void device_scheduler::execute_timers()
 		// call the callback
 		if (was_enabled)
 		{
-			g_profiler.start(PROFILER_TIMER_CALLBACK);
+			auto profile = g_profiler.start(PROFILER_TIMER_CALLBACK);
 
 			if (!timer.m_callback.isnull())
 			{
 				LOG("execute_timers: timer callback %s\n", timer.m_callback.name());
 				timer.m_callback(timer.m_param);
 			}
-
-			g_profiler.stop();
 		}
 
 		// reset or remove the timer, but only if it wasn't modified during the callback
@@ -965,6 +963,7 @@ inline void device_scheduler::execute_timers()
 			else
 			{
 				// otherwise, remove it now
+				timer.m_callback.reset();
 				m_timer_allocator.reclaim(timer_list_remove(timer));
 			}
 		}

@@ -500,6 +500,7 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			uint8_t sect_data[65536];
 			int sdatapos = 0;
 			int sector_count = 1;
+			uint8_t density = 0;
 			for(int i=0; i<sector_count; i++) {
 
 				if (pos + 16 > file_size)
@@ -519,6 +520,8 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					// Support broken vfman converter
 					if(sector_count == 0x1000)
 						sector_count = 0x10;
+
+					density = hs[6];
 				}
 
 				sects[i].track       = hs[0];
@@ -539,7 +542,10 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].data    = nullptr;
 			}
 
-			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			if(density == 0x40)
+				build_pc_track_fm(track, head, image, cell_count / 2, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			else
+				build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 		}
 
 	return true;

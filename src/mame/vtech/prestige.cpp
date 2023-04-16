@@ -914,6 +914,11 @@ ROM_START( snotecu )
 	ROM_LOAD("27-6100-00.u1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844))
 ROM_END
 
+ROM_START( snotecug )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD("27-6100-02.u1", 0x00000, 0x100000, CRC(1e14e6ea) SHA1(3e3b8dbea5f559ff98f525e3c7029b9d55e5515b))
+ROM_END
+
 ROM_START( glmcolor )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
@@ -942,6 +947,7 @@ COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, snotecug, snotecu, 0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ girlish (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

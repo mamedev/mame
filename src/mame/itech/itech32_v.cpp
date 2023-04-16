@@ -8,8 +8,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "itech32.h"
+
+#include "cpu/m68000/m68000.h"
+
 #include <algorithm>
 
 
@@ -1236,13 +1238,13 @@ void itech32_state::handle_video_command()
 
 		/* command 2: blit RLE-compressed data */
 		case 2:
-			g_profiler.start(PROFILER_USER2);
-			if (BLIT_LOGGING) logblit("Blit RLE");
+			{
+				auto profile = g_profiler.start(PROFILER_USER2);
+				if (BLIT_LOGGING) logblit("Blit RLE");
 
-			if (m_enable_latch[0]) draw_rle(m_videoplane[0], m_color_latch[0]);
-			if (m_enable_latch[1]) draw_rle(m_videoplane[1], m_color_latch[1]);
-
-			g_profiler.stop();
+				if (m_enable_latch[0]) draw_rle(m_videoplane[0], m_color_latch[0]);
+				if (m_enable_latch[1]) draw_rle(m_videoplane[1], m_color_latch[1]);
+			}
 			break;
 
 		/* command 3: set up raw data transfer */
@@ -1279,7 +1281,7 @@ void itech32_state::handle_video_command()
 
 void itech32_state::command_blit_raw()
 {
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	if (BLIT_LOGGING) logblit("Blit Raw");
 
 	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_WIDTHPIX)
@@ -1292,39 +1294,31 @@ void itech32_state::command_blit_raw()
 		if (m_enable_latch[0]) draw_raw(m_videoplane[0], m_color_latch[0]);
 		if (m_enable_latch[1]) draw_raw(m_videoplane[1], m_color_latch[1]);
 	}
-
-	g_profiler.stop();
 }
 
 void drivedge_state::command_blit_raw()
 {
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	if (BLIT_LOGGING) logblit("Blit Raw");
 
 	if (m_enable_latch[0]) draw_raw(m_videoplane[0], m_videoplane[1], m_color_latch[0]);
-
-	g_profiler.stop();
 }
 
 void itech32_state::command_shift_reg()
 {
-	g_profiler.start(PROFILER_USER3);
+	auto profile = g_profiler.start(PROFILER_USER3);
 	if (BLIT_LOGGING) logblit("ShiftReg");
 
 	if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], nullptr);
 	if (m_enable_latch[1]) shiftreg_clear(m_videoplane[1], nullptr);
-
-	g_profiler.stop();
 }
 
 void drivedge_state::command_shift_reg()
 {
-	g_profiler.start(PROFILER_USER3);
+	auto profile = g_profiler.start(PROFILER_USER3);
 	if (BLIT_LOGGING) logblit("ShiftReg");
 
 	if (m_enable_latch[0]) shiftreg_clear(m_videoplane[0], m_videoplane[1]);
-
-	g_profiler.stop();
 }
 
 

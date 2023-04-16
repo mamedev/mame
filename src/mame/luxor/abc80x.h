@@ -85,6 +85,7 @@ public:
 		m_sio(*this, Z80SIO_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_cassette(*this, CASSETTE_TAG),
+		m_quickload(*this, "quickload"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_video_ram(*this, "video_ram", 0x4000, ENDIANNESS_LITTLE),
@@ -105,6 +106,7 @@ public:
 	required_device<z80sio_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
+	required_device<snapshot_image_device> m_quickload;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_video_ram;

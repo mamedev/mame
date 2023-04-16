@@ -126,7 +126,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 
 	// create file dialog
 	Microsoft::WRL::ComPtr<IFileDialog> dialog;
-	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(dialog.GetAddressOf()));
+	hr = CoCreateInstance(class_id, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&dialog));
 
 	// set file types
 	if (SUCCEEDED(hr))
@@ -159,7 +159,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 			// FIXME: strip off archive names - opening a file inside an archive decompresses it to a temporary location
 			std::wstring wfull = osd::text::to_wstring(full);
 			Microsoft::WRL::ComPtr<IShellItem> item;
-			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(item.GetAddressOf()))))
+			if (SUCCEEDED(SHCreateItemFromParsingName(wfull.c_str(), nullptr, IID_PPV_ARGS(&item))))
 			{
 				//dialog->SetFolder(item); disabled until
 			}
@@ -176,7 +176,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 	if (SUCCEEDED(hr))
 	{
 		Microsoft::WRL::ComPtr<IShellItem> result;
-		hr = dialog->GetResult(result.GetAddressOf());
+		hr = dialog->GetResult(&result);
 		if (SUCCEEDED(hr))
 		{
 			PWSTR selection = nullptr;
@@ -556,9 +556,11 @@ void consolewin_info::open_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileOpenDialog,
 			true,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.load(selection);
+				auto [err, message] = device.load(selection);
+				if (err)
+					machine().debugger().console().printf("Error mounting image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 
@@ -570,9 +572,11 @@ void consolewin_info::create_image_file(device_image_interface &device)
 			window(),
 			CLSID_FileSaveDialog,
 			false,
-			[&device] (std::string_view selection)
+			[this, &device] (std::string_view selection)
 			{
-				device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				auto [err, message] = device.create(selection, device.device_get_indexed_creatable_format(0), nullptr);
+				if (err)
+					machine().debugger().console().printf("Error creating image file: %s\n", !message.empty() ? message : err.message());
 			});
 }
 

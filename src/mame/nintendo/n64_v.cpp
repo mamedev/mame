@@ -1445,15 +1445,15 @@ std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 		case 0x0a:      // Tri_Tex
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
- 			buffer << disassemble_vertices("Tri_Tex", lft, cmd_buf);
- 			buffer << disassemble_stw(cmd_buf);
+			buffer << disassemble_vertices("Tri_Tex", lft, cmd_buf);
+			buffer << disassemble_stw(cmd_buf);
 			break;
 		}
 		case 0x0b:      // Tri_TexZ
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
 			buffer << disassemble_vertices("Tri_TexZ", lft, cmd_buf);
- 			buffer << disassemble_stw(cmd_buf);
+			buffer << disassemble_stw(cmd_buf);
 			break;
 		}
 		case 0x0c:      // Tri_Shade
@@ -1475,7 +1475,7 @@ std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 			buffer << disassemble_vertices("Tri_TexShade", lft, cmd_buf);
 			buffer << disassemble_rgb(cmd_buf);
- 			buffer << disassemble_stw(cmd_buf);
+			buffer << disassemble_stw(cmd_buf);
 			break;
 		}
 		case 0x0f:      // Tri_TexShadeZ
@@ -1483,7 +1483,7 @@ std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 			buffer << disassemble_vertices("Tri_TexShadeZ", lft, cmd_buf);
 			buffer << disassemble_rgb(cmd_buf);
- 			buffer << disassemble_stw(cmd_buf);
+			buffer << disassemble_stw(cmd_buf);
 			break;
 		}
 		case 0x24:

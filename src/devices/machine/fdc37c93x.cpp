@@ -9,9 +9,10 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/isa/isa.h"
-#include "machine/ds128x.h"
 #include "machine/fdc37c93x.h"
+
+#include "formats/naslite_dsk.h"
+#include "formats/pc_dsk.h"
 
 DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
 

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Coates, Couriersud
+// copyright-holders: Mike Coates, Couriersud
+
 /***************************************************************************
 
 Century CVS System
@@ -96,9 +97,13 @@ Todo & FIXME:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cvs.h"
+
+#include "cvs_base.h"
+
 #include "speaker.h"
 
+
+namespace {
 
 /* Turn to 1 so all inputs are always available (this shall only be a debug feature) */
 #define CVS_SHOW_ALL_INPUTS 0
@@ -108,111 +113,360 @@ Todo & FIXME:
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
+class cvs_state : public cvs_base_state
+{
+public:
+	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cvs_base_state(mconfig, type, tag)
+		, m_palette_ram(*this, "palette_ram", 0x10, ENDIANNESS_BIG)
+		, m_character_ram(*this, "character_ram", 3 * 0x800, ENDIANNESS_BIG)
+		, m_4_bit_dac_data(*this, "4bit_dac")
+		, m_tms5110_ctl_data(*this, "tms5110_ctl")
+		, m_dac3_state(*this, "dac3_state")
+		, m_speech_data_rom(*this, "speechdata")
+		, m_audiocpu(*this, "audiocpu")
+		, m_speechcpu(*this, "speechcpu")
+		, m_dac2(*this, "dac2")
+		, m_dac3(*this, "dac3")
+		, m_tms5110(*this, "tms")
+		, m_soundlatch(*this, "soundlatch")
+		, m_in(*this, "IN%u", 0U)
+		, m_dsw2(*this, "DSW2")
+		, m_dsw3(*this, "DSW3")
+		, m_lamps(*this, "lamp%u", 1U)
+	{ }
+
+	void init_raiders() ATTR_COLD;
+	void init_huncholy() ATTR_COLD;
+	void init_hero() ATTR_COLD;
+	void init_superbik() ATTR_COLD;
+	void init_hunchbaka() ATTR_COLD;
+
+	void cvs(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	// memory pointers
+	memory_share_creator<uint8_t> m_palette_ram;
+	memory_share_creator<uint8_t> m_character_ram;  /* only half is used, but
+	                                                    by allocating twice the amount,
+	                                                    we can use the same gfx_layout */
+	required_shared_ptr<uint8_t> m_4_bit_dac_data;
+	required_shared_ptr<uint8_t> m_tms5110_ctl_data;
+	required_shared_ptr<uint8_t> m_dac3_state;
+	required_region_ptr<uint8_t> m_speech_data_rom;
+
+	bitmap_ind16 m_background_bitmap = 0;
+	bitmap_ind16 m_scrolled_collision_background = 0;
+	uint8_t m_stars_on = 0U;
+	uint8_t m_scroll_reg = 0U;
+
+	// misc
+	uint8_t m_protection_counter = 0U;
+	emu_timer *m_393hz_timer = nullptr;
+	uint8_t m_393hz_clock = 0U;
+
+	uint16_t m_character_ram_page_start = 0U;
+	uint8_t m_character_banking_mode = 0U;
+	uint16_t m_speech_rom_bit_address = 0U;
+
+	// devices
+	required_device<s2650_device> m_audiocpu;
+	required_device<s2650_device> m_speechcpu;
+	required_device<dac_byte_interface> m_dac2;
+	required_device<dac_bit_interface> m_dac3;
+	required_device<tms5110_device> m_tms5110;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_ioport_array<4> m_in;
+	required_ioport m_dsw2;
+	required_ioport m_dsw3;
+	output_finder<2> m_lamps;
+
+	uint8_t huncholy_prot_r(offs_t offset);
+	uint8_t superbik_prot_r();
+	uint8_t hero_prot_r(offs_t offset);
+	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
+	DECLARE_WRITE_LINE_MEMBER(slave_cpu_interrupt);
+	uint8_t input_r(offs_t offset);
+	void speech_rom_address_lo_w(uint8_t data);
+	void speech_rom_address_hi_w(uint8_t data);
+	uint8_t speech_command_r();
+	void audio_command_w(uint8_t data);
+	uint8_t palette_r(offs_t offset) { return m_palette_ram[offset & 0x0f]; }
+	void palette_w(offs_t offset, uint8_t data) { m_palette_ram[offset & 0x0f] = data; }
+	void video_fx_w(uint8_t data);
+	void scroll_w(uint8_t data);
+	void _4_bit_dac_data_w(offs_t offset, uint8_t data);
+	void unknown_w(offs_t offset, uint8_t data);
+	void tms5110_ctl_w(offs_t offset, uint8_t data);
+	void tms5110_pdc_w(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(_393hz_timer_cb);
+	void start_393hz_timer() ATTR_COLD;
+	void palette(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(main_cpu_interrupt);
+	void set_pens();
+	void dac_cpu_map(address_map &map) ATTR_COLD;
+	void main_cpu_data_map(address_map &map) ATTR_COLD;
+	void main_cpu_io_map(address_map &map) ATTR_COLD;
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void speech_cpu_map(address_map &map) ATTR_COLD;
+	template <uint8_t Which> uint8_t character_ram_r(offs_t offset);
+	template <uint8_t Which> void character_ram_w(offs_t offset, uint8_t data);
+};
+
+
+static constexpr uint16_t SPRITE_PEN_BASE = 0x820;
+static constexpr uint16_t BULLET_STAR_PEN = 0x828;
+
+
+/******************************************************
+ * Convert colour PROM to format for MAME colour map  *
+ *                                                    *
+ * There is a PROM used for colour mapping and plane  *
+ * priority. This is converted to a colour table here *
+ *                                                    *
+ * colours are taken from SRAM and are programmable   *
+ ******************************************************/
+
+void cvs_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	// color mapping PROM
+	for (int attr = 0; attr < 0x100; attr++)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			uint8_t ctabentry = color_prom[(i << 8) | attr] & 0x07;
+
+			// bits 0 and 2 are swapped
+			ctabentry = bitswap<8>(ctabentry, 7, 6, 5, 4, 3, 0, 1, 2);
+
+			palette.set_pen_indirect((attr << 3) | i, ctabentry);
+		}
+	}
+
+	// background collision map
+	for (int i = 0; i < 8; i++)
+	{
+		palette.set_pen_indirect(0x800 + i, 0);
+		palette.set_pen_indirect(0x808 + i, i & 0x04);
+		palette.set_pen_indirect(0x810 + i, i & 0x02);
+		palette.set_pen_indirect(0x818 + i, i & 0x06);
+	}
+
+	// sprites
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_indirect(SPRITE_PEN_BASE + i, i | 0x08);
+
+	// bullet
+	palette.set_pen_indirect(BULLET_STAR_PEN, 7);
+}
+
+
+void cvs_state::set_pens()
+{
+	for (int i = 0; i < 0x10; i++)
+	{
+		int const r = pal2bit(~m_palette_ram[i] >> 0);
+		int const g = pal3bit(~m_palette_ram[i] >> 2);
+		int const b = pal3bit(~m_palette_ram[i] >> 5);
+
+		m_palette->set_indirect_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+
+void cvs_state::video_fx_w(uint8_t data)
+{
+	if (data & 0xce)
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n", m_maincpu->pc(), data & 0xce);
+
+	m_stars_on = data & 0x01;
+
+	if (data & 0x02)   logerror("           SHADE BRIGHTER TO RIGHT\n");
+	if (data & 0x04)   logerror("           SCREEN ROTATE\n");
+	if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
+
+	m_lamps[0] = BIT(data, 4);
+	m_lamps[1] = BIT(data, 5);
+
+	if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
+	if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");
+}
+
+
+void cvs_state::scroll_w(uint8_t data)
+{
+	m_scroll_reg = 255 - data;
+}
+
+
+void cvs_state::video_start()
+{
+	init_stars();
+
+	// create helper bitmaps
+	m_screen->register_screen_bitmap(m_background_bitmap);
+	m_screen->register_screen_bitmap(m_collision_background);
+	m_screen->register_screen_bitmap(m_scrolled_collision_background);
+
+	// register save
+	save_item(NAME(m_background_bitmap));
+	save_item(NAME(m_collision_background));
+	save_item(NAME(m_scrolled_collision_background));
+}
+
+
+uint32_t cvs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
+
+	set_pens();
+
+	// draw the background
+	for (offs_t offs = 0; offs < 0x0400; offs++)
+	{
+		int collision_color = 0x100;
+		uint8_t const code = m_video_ram[offs];
+		uint8_t const color = m_color_ram[offs];
+
+		uint8_t const x = offs << 3;
+		uint8_t const y = offs >> 5 << 3;
+
+		int const gfxnum = (code < ram_based_char_start_indices[m_character_banking_mode]) ? 0 : 1;
+
+		m_gfxdecode->gfx(gfxnum)->opaque(m_background_bitmap, m_background_bitmap.cliprect(),
+				code, color,
+				0, 0,
+				x, y);
+
+		// foreground for collision detection
+		if (color & 0x80)
+			collision_color = 0x103;
+		else
+		{
+			if ((color & 0x03) == 0x03)
+				collision_color = 0x101;
+			else if ((color & 0x01) == 0)
+				collision_color = 0x102;
+		}
+
+		m_gfxdecode->gfx(gfxnum)->opaque(m_collision_background, m_collision_background.cliprect(),
+				code, collision_color,
+				0, 0,
+				x, y);
+	}
+
+
+	// Update screen - 8 regions, fixed scrolling area
+	int scroll[8];
+
+	scroll[0] = 0;
+	scroll[1] = m_scroll_reg;
+	scroll[2] = m_scroll_reg;
+	scroll[3] = m_scroll_reg;
+	scroll[4] = m_scroll_reg;
+	scroll[5] = m_scroll_reg;
+	scroll[6] = 0;
+	scroll[7] = 0;
+
+	copyscrollbitmap(bitmap, m_background_bitmap, 0, nullptr, 8, scroll, cliprect);
+	copyscrollbitmap(m_scrolled_collision_background, m_collision_background, 0, nullptr, 8, scroll, cliprect);
+
+	// update the S2636 chips
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(cliprect);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(cliprect);
+	bitmap_ind16 const &s2636_2_bitmap = m_s2636[2]->update(cliprect);
+
+	// Bullet Hardware
+	for (offs_t offs = 8; offs < 256; offs++)
+	{
+		if (m_bullet_ram[offs] != 0)
+		{
+			for (int ct = 0; ct < 4; ct++)
+			{
+				int const bx = 255 - 7 - m_bullet_ram[offs] - ct;
+
+				// Bullet/Object Collision
+				if ((s2636_0_bitmap.pix(offs, bx) != 0) ||
+					(s2636_1_bitmap.pix(offs, bx) != 0) ||
+					(s2636_2_bitmap.pix(offs, bx) != 0))
+					m_collision_register |= 0x08;
+
+				// Bullet/Background Collision
+				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(offs, bx)))
+					m_collision_register |= 0x80;
+
+				bitmap.pix(offs, bx) = BULLET_STAR_PEN;
+			}
+		}
+	}
+
+
+	// mix and copy the S2636 images into the main bitmap, also check for collision
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			int const pixel0 = s2636_0_bitmap.pix(y, x);
+			int const pixel1 = s2636_1_bitmap.pix(y, x);
+			int const pixel2 = s2636_2_bitmap.pix(y, x);
+
+			int const pixel = pixel0 | pixel1 | pixel2;
+
+			if (S2636_IS_PIXEL_DRAWN(pixel))
+			{
+				bitmap.pix(y, x) = SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel);
+
+				// S2636 vs. S2636 collision detection
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x04;
+
+				// S2636 vs. background collision detection
+				if (m_palette->pen_indirect(m_scrolled_collision_background.pix(y, x)))
+				{
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) m_collision_register |= 0x10;
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) m_collision_register |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) m_collision_register |= 0x40;
+				}
+			}
+		}
+	}
+
+	// stars circuit
+	if (m_stars_on)
+		update_stars(bitmap, cliprect, BULLET_STAR_PEN, 0);
+
+	return 0;
+}
+
+
 /*************************************
  *
  *  Multiplexed memory access
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cvs_state::write_s2650_flag)
+template <uint8_t Which>
+uint8_t cvs_state::character_ram_r(offs_t offset)
 {
-	m_s2650_flag = state;
+	return m_character_ram[(Which * 0x800) | 0x400 | m_character_ram_page_start | offset];
 }
 
-uint8_t cvs_state::cvs_video_or_color_ram_r(offs_t offset)
+template <uint8_t Which>
+void cvs_state::character_ram_w(offs_t offset, uint8_t data)
 {
-	if (m_s2650_flag)
-		return m_video_ram[offset];
-	else
-		return m_color_ram[offset];
-}
-
-void cvs_state::cvs_video_or_color_ram_w(offs_t offset, uint8_t data)
-{
-	if (m_s2650_flag)
-		m_video_ram[offset] = data;
-	else
-		m_color_ram[offset] = data;
-}
-
-
-uint8_t cvs_state::cvs_bullet_ram_or_palette_r(offs_t offset)
-{
-	if (m_s2650_flag)
-		return m_palette_ram[offset & 0x0f];
-	else
-		return m_bullet_ram[offset];
-}
-
-void cvs_state::cvs_bullet_ram_or_palette_w(offs_t offset, uint8_t data)
-{
-	if (m_s2650_flag)
-		m_palette_ram[offset & 0x0f] = data;
-	else
-		m_bullet_ram[offset] = data;
-}
-
-
-uint8_t cvs_state::cvs_s2636_0_or_character_ram_r(offs_t offset)
-{
-	if (m_s2650_flag)
-		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
-	else
-		return m_s2636[0]->read_data(offset);
-}
-
-void cvs_state::cvs_s2636_0_or_character_ram_w(offs_t offset, uint8_t data)
-{
-	if (m_s2650_flag)
-	{
-		offset |= (0 * 0x800) | 0x400 | m_character_ram_page_start;
-		m_character_ram[offset] = data;
-		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
-	}
-	else
-		m_s2636[0]->write_data(offset, data);
-}
-
-
-uint8_t cvs_state::cvs_s2636_1_or_character_ram_r(offs_t offset)
-{
-	if (m_s2650_flag)
-		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
-	else
-		return m_s2636[1]->read_data(offset);
-}
-
-void cvs_state::cvs_s2636_1_or_character_ram_w(offs_t offset, uint8_t data)
-{
-	if (m_s2650_flag)
-	{
-		offset |= (1 * 0x800) | 0x400 | m_character_ram_page_start;
-		m_character_ram[offset] = data;
-		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
-	}
-	else
-		m_s2636[1]->write_data(offset, data);
-}
-
-
-uint8_t cvs_state::cvs_s2636_2_or_character_ram_r(offs_t offset)
-{
-	if (m_s2650_flag)
-		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
-	else
-		return m_s2636[2]->read_data(offset);
-}
-
-void cvs_state::cvs_s2636_2_or_character_ram_w(offs_t offset, uint8_t data)
-{
-	if (m_s2650_flag)
-	{
-		offset |= (2 * 0x800) | 0x400 | m_character_ram_page_start;
-		m_character_ram[offset] = data;
-		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
-	}
-	else
-		m_s2636[2]->write_data(offset, data);
+	offset |= (Which * 0x800) | 0x400 | m_character_ram_page_start;
+	m_character_ram[offset] = data;
+	m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 }
 
 
@@ -223,15 +477,15 @@ void cvs_state::cvs_s2636_2_or_character_ram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
+INTERRUPT_GEN_MEMBER(cvs_state::main_cpu_interrupt)
 {
 	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
-	cvs_scroll_stars();
+	scroll_start();
 }
 
 
-WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
+WRITE_LINE_MEMBER(cvs_state::slave_cpu_interrupt)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -244,23 +498,23 @@ WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
  *
  *************************************/
 
-uint8_t cvs_state::cvs_input_r(offs_t offset)
+uint8_t cvs_state::input_r(offs_t offset)
 {
 	uint8_t ret = 0;
 
-	/* the upper 4 bits of the address is used to select the character banking attributes */
+	// the upper 4 bits of the address is used to select the character banking attributes
 	m_character_banking_mode = (offset >> 4) & 0x03;
 	m_character_ram_page_start = (offset << 2) & 0x300;
 
-	/* the lower 4 (or 3?) bits select the port to read */
-	switch (offset & 0x0f)  /* might be 0x07 */
+	// the lower 4 (or 3?) bits select the port to read
+	switch (offset & 0x0f)  // might be 0x07
 	{
-	case 0x00:  ret = ioport("IN0")->read(); break;
-	case 0x02:  ret = ioport("IN1")->read(); break;
-	case 0x03:  ret = ioport("IN2")->read(); break;
-	case 0x04:  ret = ioport("IN3")->read(); break;
-	case 0x06:  ret = ioport("DSW3")->read(); break;
-	case 0x07:  ret = ioport("DSW2")->read(); break;
+	case 0x00:  ret = m_in[0]->read(); break;
+	case 0x02:  ret = m_in[1]->read(); break;
+	case 0x03:  ret = m_in[2]->read(); break;
+	case 0x04:  ret = m_in[3]->read(); break;
+	case 0x06:  ret = m_dsw3->read(); break;
+	case 0x07:  ret = m_dsw2->read(); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", m_maincpu->pc(), offset & 0x0f); break;
 	}
 
@@ -277,27 +531,23 @@ uint8_t cvs_state::cvs_input_r(offs_t offset)
 #if 0
 READ_LINE_MEMBER(cvs_state::cvs_393hz_clock_r)
 {
-	return m_cvs_393hz_clock;
+	return m_393hz_clock;
 }
 #endif
 
-TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
+TIMER_CALLBACK_MEMBER(cvs_state::_393hz_timer_cb)
 {
-	m_cvs_393hz_clock = !m_cvs_393hz_clock;
+	m_393hz_clock = !m_393hz_clock;
 
-	/* quasar.c games use this timer but have no dac3! */
-	if (m_dac3 != nullptr)
-	{
-		if (m_dac3_state[2])
-			m_dac3->write(m_cvs_393hz_clock);
-	}
+	if (m_dac3_state[2])
+		m_dac3->write(m_393hz_clock);
 }
 
 
 void cvs_state::start_393hz_timer()
 {
-	m_cvs_393hz_timer = timer_alloc(FUNC(cvs_state::cvs_393hz_timer_cb), this);
-	m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
+	m_393hz_timer = timer_alloc(FUNC(cvs_state::_393hz_timer_cb), this);
+	m_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 
 
@@ -308,9 +558,8 @@ void cvs_state::start_393hz_timer()
  *
  *************************************/
 
-void cvs_state::cvs_4_bit_dac_data_w(offs_t offset, uint8_t data)
+void cvs_state::_4_bit_dac_data_w(offs_t offset, uint8_t data)
 {
-	uint8_t dac_value;
 	static int old_data[4] = {0,0,0,0};
 
 	if (data != old_data[offset])
@@ -318,19 +567,19 @@ void cvs_state::cvs_4_bit_dac_data_w(offs_t offset, uint8_t data)
 		LOG(("4BIT: %02x %02x\n", offset, data));
 		old_data[offset] = data;
 	}
-	m_cvs_4_bit_dac_data[offset] = data >> 7;
+	m_4_bit_dac_data[offset] = data >> 7;
 
-	/* merge into D0-D3 */
-	dac_value = (m_cvs_4_bit_dac_data[0] << 0) |
-				(m_cvs_4_bit_dac_data[1] << 1) |
-				(m_cvs_4_bit_dac_data[2] << 2) |
-				(m_cvs_4_bit_dac_data[3] << 3);
+	// merge into D0-D3
+	uint8_t const dac_value = (m_4_bit_dac_data[0] << 0) |
+							  (m_4_bit_dac_data[1] << 1) |
+							  (m_4_bit_dac_data[2] << 2) |
+							  (m_4_bit_dac_data[3] << 3);
 
-	/* output */
+	// output
 	m_dac2->write(dac_value);
 }
 
-void cvs_state::cvs_unknown_w(offs_t offset, uint8_t data)
+void cvs_state::unknown_w(offs_t offset, uint8_t data)
 {
 	/* offset 2 is used in 8ball
 	 * offset 0 is used in spacefrt
@@ -355,21 +604,21 @@ void cvs_state::cvs_unknown_w(offs_t offset, uint8_t data)
  *************************************/
 
 
-void cvs_state::cvs_speech_rom_address_lo_w(uint8_t data)
+void cvs_state::speech_rom_address_lo_w(uint8_t data)
 {
-	/* assuming that d0-d2 are cleared here */
+	// assuming that d0-d2 are cleared here
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
 	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
-void cvs_state::cvs_speech_rom_address_hi_w(uint8_t data)
+void cvs_state::speech_rom_address_hi_w(uint8_t data)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
 	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 
-uint8_t cvs_state::cvs_speech_command_r()
+uint8_t cvs_state::speech_command_r()
 {
 	/* FIXME: this was by observation on board ???
 	 *          -bit 7 is TMS status (active LO) */
@@ -377,27 +626,26 @@ uint8_t cvs_state::cvs_speech_command_r()
 }
 
 
-void cvs_state::cvs_tms5110_ctl_w(offs_t offset, uint8_t data)
+void cvs_state::tms5110_ctl_w(offs_t offset, uint8_t data)
 {
-	uint8_t ctl;
 	/*
 	 * offset 0: CS ?
 	 */
 	m_tms5110_ctl_data[offset] = (~data >> 7) & 0x01;
 
-	ctl = 0 |                               /* CTL1 */
-			(m_tms5110_ctl_data[1] << 1) |  /* CTL2 */
-			(m_tms5110_ctl_data[2] << 2) |  /* CTL4 */
-			(m_tms5110_ctl_data[1] << 3);   /* CTL8 */
+	uint8_t const ctl = 0 |                             // CTL1
+						(m_tms5110_ctl_data[1] << 1) |  // CTL2
+						(m_tms5110_ctl_data[2] << 2) |  // CTL4
+						(m_tms5110_ctl_data[1] << 3);   // CTL8
 
-	LOG(("CVS: Speech CTL = %04x %02x %02x\n",  ctl, offset, data));
+	LOG(("CVS: Speech CTL = %04x %02x %02x\n", ctl, offset, data));
 	m_tms5110->ctl_w(ctl);
 }
 
 
-void cvs_state::cvs_tms5110_pdc_w(offs_t offset, uint8_t data)
+void cvs_state::tms5110_pdc_w(offs_t offset, uint8_t data)
 {
-	uint8_t out = ((~data) >> 7) & 1;
+	uint8_t const out = ((~data) >> 7) & 1;
 	LOG(("CVS: Speech PDC = %02x %02x\n", offset, out));
 	m_tms5110->pdc_w(out);
 }
@@ -405,14 +653,11 @@ void cvs_state::cvs_tms5110_pdc_w(offs_t offset, uint8_t data)
 
 READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
 {
-	int bit;
-	uint8_t *ROM = memregion("speechdata")->base();
+	// before reading the bit, clamp the address to the region length
+	m_speech_rom_bit_address &= ((m_speech_data_rom.bytes() * 8) - 1);
+	int const bit = BIT(m_speech_data_rom[m_speech_rom_bit_address >> 3], m_speech_rom_bit_address & 0x07);
 
-	/* before reading the bit, clamp the address to the region length */
-	m_speech_rom_bit_address &= ((memregion("speechdata")->bytes() * 8) - 1);
-	bit = BIT(ROM[m_speech_rom_bit_address >> 3], m_speech_rom_bit_address & 0x07);
-
-	/* prepare for next bit */
+	// prepare for next bit
 	m_speech_rom_bit_address++;
 
 	return bit;
@@ -428,9 +673,9 @@ READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
 void cvs_state::audio_command_w(uint8_t data)
 {
 	LOG(("data %02x\n", data));
-	/* cause interrupt on audio CPU if bit 7 set */
+	// cause interrupt on audio CPU if bit 7 set
 	m_soundlatch->write(data);
-	cvs_slave_cpu_interrupt(data & 0x80 ? 1 : 0);
+	slave_cpu_interrupt(data & 0x80 ? 1 : 0);
 }
 
 
@@ -441,30 +686,36 @@ void cvs_state::audio_command_w(uint8_t data)
  *
  *************************************/
 
-void cvs_state::cvs_main_cpu_map(address_map &map)
+void cvs_state::main_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_bullet_ram_or_palette_r), FUNC(cvs_state::cvs_bullet_ram_or_palette_w)).share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_2_or_character_ram_r), FUNC(cvs_state::cvs_s2636_2_or_character_ram_w));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_1_or_character_ram_r), FUNC(cvs_state::cvs_s2636_1_or_character_ram_w));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_0_or_character_ram_r), FUNC(cvs_state::cvs_s2636_0_or_character_ram_w));
-	map(0x1800, 0x1bff).mirror(0x6000).rw(FUNC(cvs_state::cvs_video_or_color_ram_r), FUNC(cvs_state::cvs_video_or_color_ram_w)).share("video_ram");
+	map(0x1400, 0x1bff).mirror(0x6000).view(m_ram_view);
+	m_ram_view[0](0x1400, 0x14ff).ram().share(m_bullet_ram);
+	m_ram_view[1](0x1400, 0x14ff).rw(FUNC(cvs_state::palette_r), FUNC(cvs_state::palette_w));
+	m_ram_view[0](0x1500, 0x15ff).rw(m_s2636[2], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	m_ram_view[1](0x1500, 0x15ff).rw(FUNC(cvs_state::character_ram_r<2>), FUNC(cvs_state::character_ram_w<2>));
+	m_ram_view[0](0x1600, 0x16ff).rw(m_s2636[1], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	m_ram_view[1](0x1600, 0x16ff).rw(FUNC(cvs_state::character_ram_r<1>), FUNC(cvs_state::character_ram_w<1>));
+	m_ram_view[0](0x1700, 0x17ff).rw(m_s2636[0], FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	m_ram_view[1](0x1700, 0x17ff).rw(FUNC(cvs_state::character_ram_r<0>), FUNC(cvs_state::character_ram_w<0>));
+	m_ram_view[0](0x1800, 0x1bff).ram().share(m_color_ram);
+	m_ram_view[1](0x1800, 0x1bff).ram().share(m_video_ram);
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
 	map(0x4000, 0x53ff).rom();
 	map(0x6000, 0x73ff).rom();
 }
 
-void cvs_state::cvs_main_cpu_io_map(address_map &map)
+void cvs_state::main_cpu_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(FUNC(cvs_state::cvs_input_r), FUNC(cvs_state::cvs_scroll_w));
+	map(0x00, 0xff).rw(FUNC(cvs_state::input_r), FUNC(cvs_state::scroll_w));
 }
 
-void cvs_state::cvs_main_cpu_data_map(address_map &map)
+void cvs_state::main_cpu_data_map(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::cvs_collision_r), FUNC(cvs_state::audio_command_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::cvs_collision_clear), FUNC(cvs_state::cvs_video_fx_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::collision_r), FUNC(cvs_state::audio_command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::collision_clear), FUNC(cvs_state::video_fx_w));
 }
 
 /*************************************
@@ -473,15 +724,15 @@ void cvs_state::cvs_main_cpu_data_map(address_map &map)
  *
  *************************************/
 
-void cvs_state::cvs_dac_cpu_map(address_map &map)
+void cvs_state::dac_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x107f).ram();
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
-	map(0x1880, 0x1883).w(FUNC(cvs_state::cvs_4_bit_dac_data_w)).share("4bit_dac");
-	map(0x1884, 0x1887).w(FUNC(cvs_state::cvs_unknown_w)).share("dac3_state");  /* ???? not connected to anything */
+	map(0x1880, 0x1883).w(FUNC(cvs_state::_4_bit_dac_data_w)).share(m_4_bit_dac_data);
+	map(0x1884, 0x1887).w(FUNC(cvs_state::unknown_w)).share(m_dac3_state);  // ???? not connected to anything
 }
 
 
@@ -492,15 +743,15 @@ void cvs_state::cvs_dac_cpu_map(address_map &map)
  *
  *************************************/
 
-void cvs_state::cvs_speech_cpu_map(address_map &map)
+void cvs_state::speech_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).rom();
-	map(0x1d00, 0x1d00).w(FUNC(cvs_state::cvs_speech_rom_address_lo_w));
-	map(0x1d40, 0x1d40).w(FUNC(cvs_state::cvs_speech_rom_address_hi_w));
-	map(0x1d80, 0x1d80).r(FUNC(cvs_state::cvs_speech_command_r));
-	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::cvs_tms5110_ctl_w)).share("tms5110_ctl");
-	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::cvs_tms5110_pdc_w));
+	map(0x1d00, 0x1d00).w(FUNC(cvs_state::speech_rom_address_lo_w));
+	map(0x1d40, 0x1d40).w(FUNC(cvs_state::speech_rom_address_hi_w));
+	map(0x1d80, 0x1d80).r(FUNC(cvs_state::speech_command_r));
+	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::tms5110_ctl_w)).share(m_tms5110_ctl_data);
+	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::tms5110_pdc_w));
 }
 
 
@@ -511,19 +762,19 @@ void cvs_state::cvs_speech_cpu_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( cvs )
-	PORT_START("IN0")   /* Matrix 0 */
+	PORT_START("IN0")   // Matrix 0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL        /* "Red button" */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                      /* "Red button" */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL        // "Red button"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                      // "Red button"
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL        /* "Green button" */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )                      /* "Green button" */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL        // "Green button"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )                      // "Green button"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -532,7 +783,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* not sure it's SERVICE1 : it uses "Coin B" coinage and doesn't say "CREDIT" */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )           // not sure it's SERVICE1 : it uses "Coin B" coinage and doesn't say "CREDIT"
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
@@ -546,14 +797,14 @@ static INPUT_PORTS_START( cvs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW3")
-	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
-	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
@@ -569,24 +820,24 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  // can't tell if it's ACTIVE_HIGH or ACTIVE_LOW
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cvs_registration )
 	PORT_INCLUDE(cvs)
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Registration" )              /* can't tell what shall be the default value */
+	PORT_DIPNAME( 0x01, 0x01, "Registration" )              // can't tell what shall be the default value
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Registration Length" )       /* can't tell what shall be the default value */
+	PORT_DIPNAME( 0x02, 0x02, "Registration Length" )       // can't tell what shall be the default value
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "10" )
-	/* bits 2 and 3 determine bonus life settings but they might change from game to game - they are sometimes unused */
+	// bits 2 and 3 determine bonus life settings but they might change from game to game - they are sometimes unused
 
 	PORT_MODIFY("DSW2")
-	/* Told to be "Meter Pulses" but I don't know what this means */
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          /* has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1 */
+	// Told to be "Meter Pulses" but I don't know what this means
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )          // has an effect when COIN2 is pressed (when COIN1 is pressed, value always 1)
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "5" )
 INPUT_PORTS_END
@@ -604,22 +855,22 @@ static INPUT_PORTS_START( cosmos )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_SERVICE1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_SERVICE1
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP   PORT_COCKTAIL */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN PORT_COCKTAIL */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP   PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN
 #endif
 
 	PORT_MODIFY("DSW3")
-	/* DSW3 bits 0 and 1 stored at 0x7d55 (0, 2, 1, 3) - code at 0x66f3 - not read back */
+	// DSW3 bits 0 and 1 stored at 0x7d55 (0, 2, 1, 3) - code at 0x66f3 - not read back
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x08, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x04, "30k only" )                  /* displays "30000" */
-	PORT_DIPSETTING(    0x00, "40k only" )                  /* displays "40000" */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x08, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x04, "30k only" )                  // displays "30000"
+	PORT_DIPSETTING(    0x00, "40k only" )                  // displays "40000"
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( darkwar )
@@ -627,20 +878,20 @@ static INPUT_PORTS_START( darkwar )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_SERVICE1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_SERVICE1
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP   PORT_COCKTAIL */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN PORT_COCKTAIL */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP   PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN
 #endif
 
-	/* DSW3 bits 0 to 3 are not read */
+	// DSW3 bits 0 to 3 are not read
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacefrt )
@@ -648,22 +899,22 @@ static INPUT_PORTS_START( spacefrt )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_SERVICE1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_SERVICE1
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP   PORT_COCKTAIL */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN PORT_COCKTAIL */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP   PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN
 #endif
 
 	PORT_MODIFY("DSW3")
-	/* DSW3 bits 0 and 1 stored at 0x7d3f (0, 2, 1, 3) - code at 0x6895 - not read back */
+	// DSW3 bits 0 and 1 stored at 0x7d3f (0, 2, 1, 3) - code at 0x6895 - not read back
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "100k only" )                 /* displays "50000" */
-	PORT_DIPSETTING(    0x08, "150k only" )                 /* displays "110000" */
-	PORT_DIPSETTING(    0x04, "200k only" )                 /* displays "200000" */
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )             /* displays "200000" */
+	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "50000"
+	PORT_DIPSETTING(    0x08, "150k only" )                 // displays "110000"
+	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )             // displays "200000"
 INPUT_PORTS_END
 
 
@@ -672,21 +923,21 @@ static INPUT_PORTS_START( 8ball )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x08, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x04, "40k only" )                  /* displays "80000" */
-	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
-	PORT_DIPNAME( 0x20, 0x00, "Colors" )                    /* stored at 0x1ed4 - code at 0x0847 ('8ball') or 0x08af ('8ball1') */
-	PORT_DIPSETTING(    0x00, "Palette 1" )                 /* table at 0x0781 ('8ball') or 0x07e9 ('8ball1') - 16 bytes */
-	PORT_DIPSETTING(    0x20, "Palette 2" )                 /* table at 0x0791 ('8ball') or 0x07f9 ('8ball1') - 16 bytes */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x08, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x04, "40k only" )                  // displays "80000"
+	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
+	PORT_DIPNAME( 0x20, 0x00, "Colors" )                    // stored at 0x1ed4 - code at 0x0847 ('8ball') or 0x08af ('8ball1')
+	PORT_DIPSETTING(    0x00, "Palette 1" )                 // table at 0x0781 ('8ball') or 0x07e9 ('8ball1') - 16 bytes
+	PORT_DIPSETTING(    0x20, "Palette 2" )                 // table at 0x0791 ('8ball') or 0x07f9 ('8ball1') - 16 bytes
 
-	/* DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073 */
+	// DSW2 bit 5 stored at 0x1d93 - code at 0x0858 ('8ball') or 0x08c0 ('8ball1') - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( logger )
@@ -694,19 +945,19 @@ static INPUT_PORTS_START( logger )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x08, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x04, "40k only" )                  /* displays "40000" */
-	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
-	/* DSW3 bit 5 stored at 0x7dc8 - code at 0x6eb6 - not read back */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x08, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x04, "40k only" )                  // displays "40000"
+	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
+	// DSW3 bit 5 stored at 0x7dc8 - code at 0x6eb6 - not read back
 
-	/* DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073 */
+	// DSW2 bit 5 stored at 0x7da1 - code at 0x6ec7 - read back code at 0x0073
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dazzler )
@@ -714,18 +965,18 @@ static INPUT_PORTS_START( dazzler )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x04, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x08, "40k only" )                  /* displays "40000" */
-	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
+	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
 
-	/* DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099 */
+	// DSW2 bit 5 stored at 0x7d9c - code at 0x6b51 - read back code at 0x0099
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wallst )
@@ -733,18 +984,18 @@ static INPUT_PORTS_START( wallst )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x04, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x08, "40k only" )                  /* displays "40000" */
-	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
+	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
 
-	/* DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054 */
+	// DSW2 bit 5 stored at 0x1e95 - code at 0x1232 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radarzon )
@@ -752,18 +1003,18 @@ static INPUT_PORTS_START( radarzon )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "100k only" )                 /* displays "100000" */
-	PORT_DIPSETTING(    0x04, "200k only" )                 /* displays "200000" */
-	PORT_DIPSETTING(    0x08, "400k only" )                 /* displays "400000" */
-	PORT_DIPSETTING(    0x00, "800k only" )                 /* displays "800000" */
+	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
+	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
+	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
+	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
 
-	/* DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4 */
+	// DSW2 bit 5 stored at 0x3d6e - code at 0x22aa - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( goldbug )
@@ -771,18 +1022,18 @@ static INPUT_PORTS_START( goldbug )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "100k only" )                 /* displays "100000" */
-	PORT_DIPSETTING(    0x04, "200k only" )                 /* displays "200000" */
-	PORT_DIPSETTING(    0x08, "400k only" )                 /* displays "400000" */
-	PORT_DIPSETTING(    0x00, "800k only" )                 /* displays "800000" */
+	PORT_DIPSETTING(    0x0c, "100k only" )                 // displays "100000"
+	PORT_DIPSETTING(    0x04, "200k only" )                 // displays "200000"
+	PORT_DIPSETTING(    0x08, "400k only" )                 // displays "400000"
+	PORT_DIPSETTING(    0x00, "800k only" )                 // displays "800000"
 
-	/* DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054 */
+	// DSW2 bit 5 stored at 0x3d89 - code at 0x3377 - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( diggerc )
@@ -790,27 +1041,27 @@ static INPUT_PORTS_START( diggerc )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "50k only" )                  /* displays "50000" */
-	PORT_DIPSETTING(    0x04, "100k only" )                 /* displays "100000" */
-	PORT_DIPSETTING(    0x08, "150k only" )                 /* displays "150000" */
-	PORT_DIPSETTING(    0x00, "200k only" )                 /* displays "200000" */
+	PORT_DIPSETTING(    0x0c, "50k only" )                  // displays "50000"
+	PORT_DIPSETTING(    0x04, "100k only" )                 // displays "100000"
+	PORT_DIPSETTING(    0x08, "150k only" )                 // displays "150000"
+	PORT_DIPSETTING(    0x00, "200k only" )                 // displays "200000"
 
-	/* DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4 */
+	// DSW2 bit 5 stored at 0x3db3 - code at 0x22ad - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( heartatk )
 	PORT_INCLUDE(cvs_registration)
 
-	/* DSW3 bits 2 and 3 stored at 0x1c61 (0, 2, 1, 3) - code at 0x0c52
-	   read back code at 0x2197 but untested value : bonus life always at 100000 */
+	// DSW3 bits 2 and 3 stored at 0x1c61 (0, 2, 1, 3) - code at 0x0c52
+	// read back code at 0x2197 but untested value : bonus life always at 100000
 
-	/* DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4 */
+	// DSW2 bit 5 stored at 0x1e76 - code at 0x0c5c - read back code at 0x00e4
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hunchbak )
@@ -818,43 +1069,43 @@ static INPUT_PORTS_START( hunchbak )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP   PORT_COCKTAIL */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN PORT_COCKTAIL */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP   PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_UP
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_JOYSTICK_DOWN
 #endif
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10k only" )                  /* displays "10000" */
-	PORT_DIPSETTING(    0x04, "20k only" )                  /* displays "20000" */
-	PORT_DIPSETTING(    0x08, "40k only" )                  /* displays "40000" */
-	PORT_DIPSETTING(    0x00, "80k only" )                  /* displays "80000" */
+	PORT_DIPSETTING(    0x0c, "10k only" )                  // displays "10000"
+	PORT_DIPSETTING(    0x04, "20k only" )                  // displays "20000"
+	PORT_DIPSETTING(    0x08, "40k only" )                  // displays "40000"
+	PORT_DIPSETTING(    0x00, "80k only" )                  // displays "80000"
 
-	/* hunchbak : DSW2 bit 5 stored at 0x5e97 - code at 0x516c - read back code at 0x6054 */
-	/* hunchbaka : DSW2 bit 5 stored at 0x1e97 - code at 0x0c0c - read back code at 0x6054 */
+	// hunchbak : DSW2 bit 5 stored at 0x5e97 - code at 0x516c - read back code at 0x6054
+	// hunchbaka : DSW2 bit 5 stored at 0x1e97 - code at 0x0c0c - read back code at 0x6054
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superbik )
 	PORT_INCLUDE(cvs_registration)
 
-	/* DSW3 bits 2 and 3 are not read : bonus life alaways at 5000 */
+	// DSW3 bits 2 and 3 are not read : bonus life always at 5000
 
-	/* DSW2 bit 5 stored at 0x1e79 - code at 0x060f - read back code at 0x25bf */
+	// DSW2 bit 5 stored at 0x1e79 - code at 0x060f - read back code at 0x25bf
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiders )
 	PORT_INCLUDE(cvs_registration)
 
-	/* DSW3 bits 2 and 3 are not read : bonus life alaways at 100000 */
+	// DSW3 bits 2 and 3 are not read : bonus life always at 100000
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  /* always 4 lives - table at 0x4218 - 2 bytes */
-	/* DSW2 bit 5 stored at 0x1e79 - code at 0x1307 - read back code at 0x251d */
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 4 lives - table at 0x4218 - 2 bytes
+	// DSW2 bit 5 stored at 0x1e79 - code at 0x1307 - read back code at 0x251d
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hero )
@@ -862,15 +1113,15 @@ static INPUT_PORTS_START( hero )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	/* DSW3 bits 2 and 3 are not read : bonus life alaways at 150000 */
+	// DSW3 bits 2 and 3 are not read : bonus life always at 150000
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  /* always 3 lives - table at 0x4ebb - 2 bytes */
-	/* DSW2 bit 5 stored at 0x1e99 - code at 0x0fdd - read back code at 0x0352 */
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4ebb - 2 bytes
+	// DSW2 bit 5 stored at 0x1e99 - code at 0x0fdd - read back code at 0x0352
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( huncholy )
@@ -878,15 +1129,15 @@ static INPUT_PORTS_START( huncholy )
 
 #if !CVS_SHOW_ALL_INPUTS
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 PORT_COCKTAIL */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_BUTTON2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2 PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // IPT_BUTTON2
 #endif
 
-	/* DSW3 bits 2 and 3 are not read : bonus life alaways at 20000 */
+	// DSW3 bits 2 and 3 are not read : bonus life always at 20000
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  /* always 3 lives - table at 0x4531 - 2 bytes */
-	/* DSW2 bit 5 stored at 0x1e7c - code at 0x067d - read back code at 0x2f95 */
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  // always 3 lives - table at 0x4531 - 2 bytes
+	// DSW2 bit 5 stored at 0x1e7c - code at 0x067d - read back code at 0x2f95
 INPUT_PORTS_END
 
 
@@ -899,18 +1150,18 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	3,      /* 3 bits per pixel */
-	{ 0, 0x800*8, 0x1000*8 },   /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	256,    // 256 characters
+	3,      // 3 bits per pixel
+	{ 0, 0x800*8, 0x1000*8 },   // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_cvs )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
-	GFXDECODE_ENTRY( nullptr,   0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_ENTRY( "tiles",       0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_RAM( "character_ram", 0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
 
 
@@ -924,68 +1175,61 @@ GFXDECODE_END
 
 void cvs_state::machine_start()
 {
-	m_lamps.resolve();
+	cvs_base_state::machine_start();
 
-	/* allocate memory */
-	if (m_gfxdecode->gfx(1) != nullptr)
-		m_gfxdecode->gfx(1)->set_source(m_character_ram);
+	m_lamps.resolve();
 
 	start_393hz_timer();
 
-	/* register state save */
-	save_item(NAME(m_character_banking_mode));
+	// register state save
 	save_item(NAME(m_character_ram_page_start));
+	save_item(NAME(m_character_banking_mode));
+	save_item(NAME(m_393hz_clock));
 	save_item(NAME(m_speech_rom_bit_address));
-	save_item(NAME(m_s2650_flag));
-	save_item(NAME(m_cvs_393hz_clock));
-	save_item(NAME(m_collision_register));
-	save_item(NAME(m_total_stars));
 	save_item(NAME(m_stars_on));
 	save_item(NAME(m_scroll_reg));
-	save_item(NAME(m_stars_scroll));
 }
 
 void cvs_state::machine_reset()
 {
-	m_character_banking_mode = 0;
+	cvs_base_state::machine_reset();
+
 	m_character_ram_page_start = 0;
+	m_character_banking_mode = 0;
 	m_speech_rom_bit_address = 0;
-	m_cvs_393hz_clock = 0;
-	m_collision_register = 0;
+	m_393hz_clock = 0;
 	m_stars_on = 0;
 	m_scroll_reg = 0;
-	m_stars_scroll = 0;
-	m_s2650_flag = 0;
 }
 
 void cvs_state::cvs(machine_config &config)
 {
-	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(14'318'181)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &cvs_state::cvs_main_cpu_io_map);
-	m_maincpu->set_addrmap(AS_DATA, &cvs_state::cvs_main_cpu_data_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::cvs_main_cpu_interrupt));
+	// basic machine hardware
+	S2650(config, m_maincpu, XTAL(14'318'181) / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &cvs_state::main_cpu_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &cvs_state::main_cpu_data_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::main_cpu_interrupt));
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
 	m_maincpu->intack_handler().set_constant(0x03);
 
-	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);
+	S2650(config, m_audiocpu, XTAL(14'318'181) / 16);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::dac_cpu_map);
 	m_audiocpu->intack_handler().set([this] { m_audiocpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	/* doesn't look like it is used at all */
+	// doesn't look like it is used at all
 	//m_audiocpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 
-	S2650(config, m_speechcpu, XTAL(14'318'181)/16);
-	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_speech_cpu_map);
-	/* romclk is much more probable, 393 Hz results in timing issues */
+	S2650(config, m_speechcpu, XTAL(14'318'181) / 16);
+	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::speech_cpu_map);
+	// romclk is much more probable, 393 Hz results in timing issues
 	//m_speechcpu->sense_handler().set(FUNC(cvs_state::cvs_393hz_clock_r));
 	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
 
-	PALETTE(config, m_palette, FUNC(cvs_state::cvs_palette), (256 + 4) * 8 + 8 + 1, 16);
+	PALETTE(config, m_palette, FUNC(cvs_state::palette), (256 + 4) * 8 + 8 + 1, 16);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -993,7 +1237,7 @@ void cvs_state::cvs(machine_config &config)
 	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
-	m_screen->set_screen_update(FUNC(cvs_state::screen_update_cvs));
+	m_screen->set_screen_update(FUNC(cvs_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	S2636(config, m_s2636[0], 0);
@@ -1005,7 +1249,7 @@ void cvs_state::cvs(machine_config &config)
 	S2636(config, m_s2636[2], 0);
 	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -1057,7 +1301,7 @@ ROM_START( huncholy )
 
 	CVS_ROM_REGION_SPEECH_DATA( "ho-sp1.bin", 0x1000, CRC(3fd39b1e) SHA1(f5d0b2cfaeda994762403f039a6f7933c5525234) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "ho-cp1.bin",  0x0000, 0x0800, CRC(c6c73d46) SHA1(63aba92f77105fedf46337b591b074020bec05d0) )
 	ROM_LOAD( "ho-cp2.bin",  0x0800, 0x0800, CRC(e596371c) SHA1(93a0d0ccdf830ae72d070b03b7e2222f4a737ead) )
 	ROM_LOAD( "ho-cp3.bin",  0x1000, 0x0800, CRC(11fae1cf) SHA1(5ceabfb1ff1a6f76d1649512f57d7151f5258ecb) )
@@ -1078,7 +1322,7 @@ ROM_START( darkwar )
 
 	CVS_ROM_REGION_SPEECH_DATA( "dw-sp1.bin", 0x1000, CRC(ce815074) SHA1(105f24fb776131b30e35488cca29954298559518) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "dw-cp1.bin", 0x0000, 0x0800, CRC(7a0f9f3e) SHA1(0aa787923fbb614f15016d99c03093a59a0bfb88) )
 	ROM_LOAD( "dw-cp2.bin", 0x0800, 0x0800, CRC(232e5120) SHA1(76e4d6d17e8108306761604bd56d6269bfc431e1) )
 	ROM_LOAD( "dw-cp3.bin", 0x1000, 0x0800, CRC(573e0a17) SHA1(9c7991eac625b287bafb6cf722ffb405a9627e09) )
@@ -1099,7 +1343,7 @@ ROM_START( 8ball )
 
 	CVS_ROM_REGION_SPEECH_DATA( "8b-sp1.bin", 0x0800, CRC(1ee167f3) SHA1(40c876a60832456a27108252ba0b9963f9fe70b0) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "8b-cp1.bin", 0x0000, 0x0800, CRC(c1f68754) SHA1(481c8e3dc35300f779b7925fa8a54320688dac54) )
 	ROM_LOAD( "8b-cp2.bin", 0x0800, 0x0800, CRC(6ec1d711) SHA1(768df8e621a7b110a963c93402ee01b1c9009286) )
 	ROM_LOAD( "8b-cp3.bin", 0x1000, 0x0800, CRC(4a9afce4) SHA1(187e5106aa2d0bdebf6ec9f2b7c2c2f67d47d221) )
@@ -1120,7 +1364,7 @@ ROM_START( 8ball1 )
 
 	CVS_ROM_REGION_SPEECH_DATA( "8b-sp1.bin", 0x0800, CRC(1ee167f3) SHA1(40c876a60832456a27108252ba0b9963f9fe70b0) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "8a-cp1.bin", 0x0000, 0x0800, CRC(d9b36c16) SHA1(dbb496102fa2344f19b5d9a3eecdb29c433e4c08) )
 	ROM_LOAD( "8a-cp2.bin", 0x0800, 0x0800, CRC(6f66f0ff) SHA1(1e91474973356e97f89b4d9093565747a8331f50) )
 	ROM_LOAD( "8a-cp3.bin", 0x1000, 0x0800, CRC(baee8b17) SHA1(9f86f1d5903aeead17cc75dac8a2b892bb375dad) )
@@ -1141,7 +1385,7 @@ ROM_START( hunchbak ) // actual ROM label has "Century Elect. Ltd. (c)1981", and
 
 	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
 	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
 	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
@@ -1162,7 +1406,7 @@ ROM_START( hunchbaka )
 
 	CVS_ROM_REGION_SPEECH_DATA( "8a.sp1", 0x0800, CRC(ed1cd201) SHA1(6cc3842dda1bfddc06ffb436c55d14276286bd67) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "11a.cp1", 0x0000, 0x0800, CRC(f256b047) SHA1(02d79882bad37ffdd58ef478e2658a1369c32ebc) )
 	ROM_LOAD( "10a.cp2", 0x0800, 0x0800, CRC(b870c64f) SHA1(ce4f8de87568782ce02bba754edff85df7f5c393) )
 	ROM_LOAD( "9a.cp3",  0x1000, 0x0800, CRC(9a7dab88) SHA1(cd39a9d4f982a7f49c478db1408d7e07335f2ddc) )
@@ -1183,7 +1427,7 @@ ROM_START( wallst )
 
 	CVS_ROM_REGION_SPEECH_DATA( "ws-sp1.bin",  0x0800, CRC(84b72637) SHA1(9c5834320f39545403839fb7088c37177a6c8861) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "ws-cp1.bin", 0x0000, 0x0800, CRC(5aca11df) SHA1(5ef815b5b09445515ff8b958c4ea29f1a221cee1) )
 	ROM_LOAD( "ws-cp2.bin", 0x0800, 0x0800, CRC(ca530d85) SHA1(e5a78667c3583d06d8387848323b11e4a91091ec) )
 	ROM_LOAD( "ws-cp3.bin", 0x1000, 0x0800, CRC(1e0225d6) SHA1(410795046c64c24de6711b167315308808b54291) )
@@ -1204,7 +1448,7 @@ ROM_START( dazzler )
 
 	CVS_ROM_REGION_SPEECH_DATA( "dz-sp1.bin", 0x0800, CRC(25da1fc1) SHA1(c14717ec3399ce7dc47a9d42c8ac8f585db770e9) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "dz-cp1.bin", 0x0000, 0x0800, CRC(0a8a9034) SHA1(9df3d4f387bd5ce3d3580ba678aeda1b65634ac2) )
 	ROM_LOAD( "dz-cp2.bin", 0x0800, 0x0800, CRC(3868dd82) SHA1(844584c5a80fb8f1797b4aa4e22024e75726293d) )
 	ROM_LOAD( "dz-cp3.bin", 0x1000, 0x0800, CRC(755d9ed2) SHA1(a7165a1d12a5a81d8bb941d8ad073e2097c90beb) )
@@ -1225,7 +1469,7 @@ ROM_START( radarzon )
 
 	CVS_ROM_REGION_SPEECH_DATA( "rd-sp1.bin", 0x0800, CRC(43b17734) SHA1(59960f0c48ed24cedb4b4655f97f6f1fdac4445e) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "rd-cp1.bin", 0x0000, 0x0800, CRC(ed601677) SHA1(efe2b6033f319603ee80ed4ba66d3b3607537b13) )
 	ROM_LOAD( "rd-cp2.bin", 0x0800, 0x0800, CRC(35e317ff) SHA1(458550b431ec66006e2966d86a2286905c0495ed) )
 	ROM_LOAD( "rd-cp3.bin", 0x1000, 0x0800, CRC(90f2c43f) SHA1(406215217f6f20c1a78f31b2ae3c0a97391e3371) )
@@ -1246,7 +1490,7 @@ ROM_START( radarzon1 )
 
 	CVS_ROM_REGION_SPEECH_DATA( "rd-sp1.bin", 0x0800, CRC(43b17734) SHA1(59960f0c48ed24cedb4b4655f97f6f1fdac4445e) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "rd-cp1.bin", 0x0000, 0x0800, CRC(ed601677) SHA1(efe2b6033f319603ee80ed4ba66d3b3607537b13) )
 	ROM_LOAD( "rd-cp2.bin", 0x0800, 0x0800, CRC(35e317ff) SHA1(458550b431ec66006e2966d86a2286905c0495ed) )
 	ROM_LOAD( "rd-cp3.bin", 0x1000, 0x0800, CRC(90f2c43f) SHA1(406215217f6f20c1a78f31b2ae3c0a97391e3371) )
@@ -1267,7 +1511,7 @@ ROM_START( radarzont )
 
 	CVS_ROM_REGION_SPEECH_DATA( "rd-sp1.bin", 0x0800, CRC(43b17734) SHA1(59960f0c48ed24cedb4b4655f97f6f1fdac4445e) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "rd-cp1.bin", 0x0000, 0x0800, CRC(ed601677) SHA1(efe2b6033f319603ee80ed4ba66d3b3607537b13) )
 	ROM_LOAD( "rd-cp2.bin", 0x0800, 0x0800, CRC(35e317ff) SHA1(458550b431ec66006e2966d86a2286905c0495ed) )
 	ROM_LOAD( "rd-cp3.bin", 0x1000, 0x0800, CRC(90f2c43f) SHA1(406215217f6f20c1a78f31b2ae3c0a97391e3371) )
@@ -1288,7 +1532,7 @@ ROM_START( outline )
 
 	CVS_ROM_REGION_SPEECH_DATA( "ot-sp1.bin", 0x1000, CRC(fa21422a) SHA1(a75d13455c65e5a77db02fc87f0c112e329d0d6d) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "rd-cp1.bin", 0x0000, 0x0800, CRC(ed601677) SHA1(efe2b6033f319603ee80ed4ba66d3b3607537b13) )
 	ROM_LOAD( "rd-cp2.bin", 0x0800, 0x0800, CRC(35e317ff) SHA1(458550b431ec66006e2966d86a2286905c0495ed) )
 	ROM_LOAD( "rd-cp3.bin", 0x1000, 0x0800, CRC(90f2c43f) SHA1(406215217f6f20c1a78f31b2ae3c0a97391e3371) )
@@ -1309,7 +1553,7 @@ ROM_START( goldbug )
 
 	CVS_ROM_REGION_SPEECH_DATA( "gb-sp1.bin", 0x0800, CRC(5d0205c3) SHA1(578937058d56e5c9fba8a2204ddbb59a6d23dec7) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "gb-cp1.bin", 0x0000, 0x0800, CRC(80e1ad5a) SHA1(0a577b0faffd9d6807c39175ce213f017a5cc7f8) )
 	ROM_LOAD( "gb-cp2.bin", 0x0800, 0x0800, CRC(0a288b29) SHA1(0c6471a3517805a5c873857ff21ca94dfe91c24e) )
 	ROM_LOAD( "gb-cp3.bin", 0x1000, 0x0800, CRC(e5bcf8cf) SHA1(7f53b8ee6f87e6c8761d2200e8194a7d16d8c7ac) )
@@ -1330,7 +1574,7 @@ ROM_START( diggerc )
 
 	CVS_ROM_REGION_SPEECH_DATA( "dig-sp1.bin", 0x0800, CRC(db526ee1) SHA1(afe319e64350b0c54b72394294a6369c885fdb7f) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "dig-cp1.bin", 0x0000, 0x0800, CRC(ca30fb97) SHA1(148f3a6f20b1f256a73e7a1992262116d77cc0a8) )
 	ROM_LOAD( "dig-cp2.bin", 0x0800, 0x0800, CRC(bed2334c) SHA1(c93902d01174e13fb9265194e5e44f67b38c5970) )
 	ROM_LOAD( "dig-cp3.bin", 0x1000, 0x0800, CRC(46db9b65) SHA1(1c655b4611ab182b6e4a3cdd3ef930e0d4dad0d9) )
@@ -1351,7 +1595,7 @@ ROM_START( superbik )
 
 	CVS_ROM_REGION_SPEECH_DATA( "sb-sp1.bin", 0x0800, CRC(0aeb9ccd) SHA1(e7123eed21e4e758bbe1cebfd5aad44a5de45c27) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "sb-cp1.bin", 0x0000, 0x0800, CRC(03ba7760) SHA1(4ed252e2c4ec7cea2199524f7c35a1dc7c44f8d8) )
 	ROM_LOAD( "sb-cp2.bin", 0x0800, 0x0800, CRC(04de69f2) SHA1(3ef3b3c159d47230622b6cc45baad8737bd93a90) )
 	ROM_LOAD( "sb-cp3.bin", 0x1000, 0x0800, CRC(bb7d0b9a) SHA1(94c72d6961204be9cab351ac854ac9c69b51e79a) )
@@ -1372,7 +1616,7 @@ ROM_START( hero )
 
 	CVS_ROM_REGION_SPEECH_DATA( "hr-sp1.bin", 0x0800, CRC(a5c33cb1) SHA1(447ffb193b0dc4985bae5d8c214a893afd08664b) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "hr-cp1.bin", 0x0000, 0x0800, CRC(2d201496) SHA1(f195aa1b231a0e1752c7da824a10321f0527f8c9) )
 	ROM_LOAD( "hr-cp2.bin", 0x0800, 0x0800, CRC(21b61fe3) SHA1(31882003f0557ffc4ec38ae6ee07b5d294b4162c) )
 	ROM_LOAD( "hr-cp3.bin", 0x1000, 0x0800, CRC(9c8e3f9e) SHA1(9d949a4d12b45da12b434677670b2b109568564a) )
@@ -1393,7 +1637,7 @@ ROM_START( logger ) // actual ROM label has "Century Elect. Ltd. (c)1981", and L
 
 	CVS_ROM_REGION_SPEECH_DATA( "8clog3.sp1", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "11clog3.cp1", 0x0000, 0x0800, CRC(e4ede80e) SHA1(62f2bc78106a057b6a8420d40421908df609bf29) )
 	ROM_LOAD( "10clog3.cp2", 0x0800, 0x0800, CRC(d3de8e5b) SHA1(f95320e001869c42e51195d9cc11e4f2555e153f) )
 	ROM_LOAD( "9clog3.cp3",  0x1000, 0x0800, CRC(9b8d1031) SHA1(87ef12aeae80cc0f240dead651c6222848f8dccc) )
@@ -1414,7 +1658,7 @@ ROM_START( loggerr2 )
 
 	CVS_ROM_REGION_SPEECH_DATA( "logger_sp1_4626.8", 0x0800, CRC(74f67815) SHA1(6a26a16c27a7e4d58b611e5127115005a60cff91) ) // hand written LOGGER SP1 4626
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "logger_r2_cp1_d9cf.11", 0x0000, 0x0800, CRC(a1c1eb8c) SHA1(9fa2495b1b245f5889006cfc8857f51e57379cef) ) // hand written LOGGER R2 CP1 D9CF
 	ROM_LOAD( "logger_r2_cp2_cd1e.10", 0x0800, 0x0800, CRC(432d28d0) SHA1(30b9ec84fe04c5e48f4a1f9f7ab86a6a222db4cf) ) // hand written LOGGER R2 CP2 CD1E
 	ROM_LOAD( "logger_r2_cp3_5535.9",  0x1000, 0x0800, CRC(c87fcfcd) SHA1(eb937a6aa04ebe873cf46c4b3abf7bb02766eedf) ) // hand written LOGGER R2 CP3 5535
@@ -1435,7 +1679,7 @@ ROM_START( cosmos )
 
 	CVS_ROM_REGION_SPEECH_DATA( "cs-sp1.bin", 0x1000, CRC(3c7fe86d) SHA1(9ae0b63b231a7092820650a196cde60588bc6b58) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "cs-cp1.bin", 0x0000, 0x0800, CRC(6a48c898) SHA1(c27f7bcdb2fe042ec52d1b9b4b9a4e47c288862d) )
 	ROM_LOAD( "cs-cp2.bin", 0x0800, 0x0800, CRC(db0dfd8c) SHA1(f2b0dd43f0e514fdae54e4066606187f45b98e38) )
 	ROM_LOAD( "cs-cp3.bin", 0x1000, 0x0800, CRC(01eee875) SHA1(6c41d716b5795f085229d855518862fb85f395a4) )
@@ -1456,7 +1700,7 @@ ROM_START( heartatk )
 
 	CVS_ROM_REGION_SPEECH_DATA( "ha-sp1.bin", 0x1000, CRC(fa21422a) SHA1(a75d13455c65e5a77db02fc87f0c112e329d0d6d) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "ha-cp1.bin", 0x0000, 0x0800, CRC(2d0f6d13) SHA1(55e45eaf1bf24a7a78a2f34ffc0d99a4c191d138) )
 	ROM_LOAD( "ha-cp2.bin", 0x0800, 0x0800, CRC(7f5671bd) SHA1(7f4ae92a96c5a847c113f6f7e8d67d3e5ee0bcb0) )
 	ROM_LOAD( "ha-cp3.bin", 0x1000, 0x0800, CRC(35b05ab4) SHA1(f336eb0c674c3d52e84be0f37b70953cce6112dc) )
@@ -1477,7 +1721,7 @@ ROM_START( spacefrt )
 
 	CVS_ROM_REGION_SPEECH_DATA( "sf-sp1.bin", 0x1000, CRC(c5628d30) SHA1(d29a5852a1762cbd5f3eba29ae2bf49b3a26f894) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "sf-cp1.bin", 0x0000, 0x0800, CRC(da194a68) SHA1(4215267e91644cf1e1f32f898bc9562bfba711f3) )
 	ROM_LOAD( "sf-cp2.bin", 0x0800, 0x0800, CRC(b96977c7) SHA1(8f0fab044f16787bce83562e2b22d962d0a2c209) )
 	ROM_LOAD( "sf-cp3.bin", 0x1000, 0x0800, CRC(f5d67b9a) SHA1(a492b41c53b1f28ac5f70969e5f06afa948c1a7d) )
@@ -1498,7 +1742,7 @@ ROM_START( raiders )
 
 	CVS_ROM_REGION_SPEECH_DATA( "raidr1-8.bin", 0x0800, CRC(b6b90d2e) SHA1(a966fa208b72aec358b7fb277e603e47b6984aa7) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "raid4-11.bin", 0x0000, 0x0800, CRC(5eb7143b) SHA1(a19e803c15593b37ae2e61789f6e16f319620a37) )
 	ROM_LOAD( "raid4-10.bin", 0x0800, 0x0800, CRC(391948a4) SHA1(7e20ad4f7e5bf7ad5dcb08ba6475313e2b8b1f03) )
 	ROM_LOAD( "raid4-9b.bin", 0x1000, 0x0800, CRC(fecfde80) SHA1(23ea63080b8292fb00a743743cdff1a7ad0a8c6d) )
@@ -1519,7 +1763,7 @@ ROM_START( raidersr3 )
 
 	CVS_ROM_REGION_SPEECH_DATA( "raidr1-8.bin", 0x0800, CRC(b6b90d2e) SHA1(a966fa208b72aec358b7fb277e603e47b6984aa7) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_REGION( 0x1800, "tiles", 0 )
 	ROM_LOAD( "raid4-11.bin", 0x0000, 0x0800, CRC(5eb7143b) SHA1(a19e803c15593b37ae2e61789f6e16f319620a37) )
 	ROM_LOAD( "raid4-10.bin", 0x0800, 0x0800, CRC(391948a4) SHA1(7e20ad4f7e5bf7ad5dcb08ba6475313e2b8b1f03) )
 	ROM_LOAD( "raid4-9b.bin", 0x1000, 0x0800, CRC(fecfde80) SHA1(23ea63080b8292fb00a743743cdff1a7ad0a8c6d) )
@@ -1559,10 +1803,10 @@ void cvs_state::init_huncholy()
 
 void cvs_state::init_hunchbaka()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	/* data lines D2 and D5 swapped */
+	uint8_t *rom = memregion("maincpu")->base();
+	// data lines D2 and D5 swapped
 	for (offs_t offs = 0; offs < 0x7400; offs++)
-		ROM[offs] = bitswap<8>(ROM[offs],7,6,2,4,3,5,1,0);
+		rom[offs] = bitswap<8>(rom[offs], 7, 6, 2, 4, 3, 5, 1, 0);
 }
 
 
@@ -1584,7 +1828,7 @@ void cvs_state::init_superbik()
 
 uint8_t cvs_state::hero_prot_r(offs_t offset)
 {
-	u8 *ROM = memregion("maincpu")->base() + 0x73f0;
+	u8 *rom = memregion("maincpu")->base() + 0x73f0;
 
 	switch (offset + 0x73f0)
 	{
@@ -1604,7 +1848,7 @@ uint8_t cvs_state::hero_prot_r(offs_t offset)
 			return 0xff; // 0x5e at this address in ROM
 	}
 
-	return ROM[offset];
+	return rom[offset];
 }
 
 void cvs_state::init_hero()
@@ -1615,18 +1859,19 @@ void cvs_state::init_hero()
 
 void cvs_state::init_raiders()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
-	/* data lines D1 and D6 swapped */
+	// data lines D1 and D6 swapped
 	for (offs_t offs = 0; offs < 0x7400; offs++)
-		ROM[offs] = bitswap<8>(ROM[offs],7,1,5,4,3,2,6,0);
+		rom[offs] = bitswap<8>(rom[offs], 7, 1, 5, 4, 3, 2, 6, 0);
 
-	/* patch out protection */
-	ROM[0x010a] = 0xc0;
-	ROM[0x010b] = 0xc0;
-	ROM[0x010c] = 0xc0;
+	// patch out protection
+	rom[0x010a] = 0xc0;
+	rom[0x010b] = 0xc0;
+	rom[0x010c] = 0xc0;
 }
 
+} // anonymous namespace
 
 
 /*************************************

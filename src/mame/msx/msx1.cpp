@@ -98,7 +98,7 @@ class msx1_state : public msx_state
 {
 public:
 	msx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: msx_state(mconfig, type, tag)
+		: msx_state(mconfig, type, tag, 10.738635_MHz_XTAL, 3)
 	{
 	}
 

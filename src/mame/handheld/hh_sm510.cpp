@@ -579,7 +579,7 @@ public:
 	void gnw_ball(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_ball )
 	PORT_START("IN.0")
@@ -599,6 +599,8 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_ball_state::gnw_ball(machine_config &config)
 {
@@ -640,7 +642,7 @@ public:
 	void gnw_flagman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_flagman )
 	PORT_START("IN.0") // R2
@@ -666,6 +668,8 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_flagman_state::gnw_flagman(machine_config &config)
 {
@@ -709,7 +713,7 @@ public:
 	void gnw_vermin(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_vermin )
 	PORT_START("IN.0")
@@ -729,6 +733,8 @@ static INPUT_PORTS_START( gnw_vermin )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_vermin_state::gnw_vermin(machine_config &config)
 {
@@ -774,7 +780,7 @@ public:
 	void gnw_fires(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_fires )
 	PORT_START("IN.0")
@@ -794,6 +800,8 @@ static INPUT_PORTS_START( gnw_fires )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_fires_state::gnw_fires(machine_config &config)
 {
@@ -837,7 +845,7 @@ public:
 	void gnw_judge(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_judge )
 	PORT_START("IN.0") // R2
@@ -863,6 +871,8 @@ static INPUT_PORTS_START( gnw_judge )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_judge_state::gnw_judge(machine_config &config)
 {
@@ -913,7 +923,7 @@ public:
 	void gnw_manholeg(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_manholeg )
 	PORT_START("IN.0") // R2
@@ -942,6 +952,8 @@ static INPUT_PORTS_START( gnw_manholeg )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_manholeg_state::gnw_manholeg(machine_config &config)
 {
@@ -985,7 +997,7 @@ public:
 	void gnw_helmet(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_helmet )
 	PORT_START("IN.0") // R2
@@ -1014,6 +1026,8 @@ static INPUT_PORTS_START( gnw_helmet )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_helmet_state::gnw_helmet(machine_config &config)
 {
@@ -1065,7 +1079,7 @@ public:
 	void gnw_lion(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_lion )
 	PORT_START("IN.0") // R2
@@ -1099,6 +1113,8 @@ static INPUT_PORTS_START( gnw_lion )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_lion_state::gnw_lion(machine_config &config)
 {
@@ -1138,7 +1154,7 @@ public:
 	void gnw_pchute(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_pchute )
 	PORT_START("IN.0") // R2
@@ -1167,6 +1183,8 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_pchute_state::gnw_pchute(machine_config &config)
 {
@@ -1211,7 +1229,7 @@ public:
 	void taynyoke(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
@@ -1240,6 +1258,8 @@ static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_octopus_state::gnw_octopus(machine_config &config)
 {
@@ -1294,7 +1314,7 @@ public:
 	void gnw_popeye(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
@@ -1323,6 +1343,8 @@ static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_popeye_state::gnw_popeye(machine_config &config)
 {
@@ -1367,7 +1389,7 @@ public:
 	void gnw_chef(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_chef )
 	PORT_START("IN.0") // R2
@@ -1393,6 +1415,8 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_chef_state::gnw_chef(machine_config &config)
 {
@@ -1489,7 +1513,7 @@ public:
 	void ecircus(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mmouse )
 	PORT_START("IN.0") // R2
@@ -1522,6 +1546,8 @@ static INPUT_PORTS_START( rkosmosa )
 	PORT_MODIFY("BA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 {
@@ -1752,7 +1778,7 @@ public:
 	void gnw_fire(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
@@ -1781,6 +1807,8 @@ static INPUT_PORTS_START( gnw_fire )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_fire_state::gnw_fire(machine_config &config)
 {
@@ -1837,7 +1865,7 @@ public:
 	void gnw_tbridge(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_tbridge )
 	PORT_START("IN.0") // S1
@@ -1865,6 +1893,8 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_tbridge_state::gnw_tbridge(machine_config &config)
 {
@@ -1904,7 +1934,7 @@ public:
 	void gnw_fireatk(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_fireatk )
 	PORT_START("IN.0") // S1
@@ -1932,6 +1962,8 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_fireatk_state::gnw_fireatk(machine_config &config)
 {
@@ -1971,7 +2003,7 @@ public:
 	void gnw_stennis(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_stennis )
 	PORT_START("IN.0") // S1
@@ -1999,6 +2031,8 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_stennis_state::gnw_stennis(machine_config &config)
 {
@@ -2038,7 +2072,7 @@ public:
 	void gnw_opanic(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_opanic )
 	PORT_START("IN.0") // S1
@@ -2066,6 +2100,8 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_opanic_state::gnw_opanic(machine_config &config)
 {
@@ -2108,7 +2144,7 @@ public:
 	void gnw_dkong(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkong )
 	PORT_START("IN.0") // S1
@@ -2135,6 +2171,8 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkong_state::gnw_dkong(machine_config &config)
 {
@@ -2177,7 +2215,7 @@ public:
 	void gnw_mickdon(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mickdon )
 	PORT_START("IN.0") // S1
@@ -2200,6 +2238,8 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mickdon_state::gnw_mickdon(machine_config &config)
 {
@@ -2247,7 +2287,7 @@ public:
 	void gnw_ghouse(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_ghouse )
 	PORT_START("IN.0") // S1
@@ -2279,6 +2319,8 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_ghouse_state::gnw_ghouse(machine_config &config)
 {
@@ -2321,7 +2363,7 @@ public:
 	void gnw_dkong2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_START("IN.0") // S1
@@ -2348,6 +2390,8 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkong2_state::gnw_dkong2(machine_config &config)
 {
@@ -2390,7 +2434,7 @@ public:
 	void gnw_mario(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mario )
 	PORT_START("IN.0") // S1
@@ -2418,6 +2462,8 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mario_state::gnw_mario(machine_config &config)
 {
@@ -2460,7 +2506,7 @@ public:
 	void gnw_rshower(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_rshower )
 	PORT_START("IN.0") // S1
@@ -2494,6 +2540,8 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_rshower_state::gnw_rshower(machine_config &config)
 {
@@ -2536,7 +2584,7 @@ public:
 	void gnw_lboat(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_lboat )
 	PORT_START("IN.0") // S1
@@ -2564,6 +2612,8 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_lboat_state::gnw_lboat(machine_config &config)
 {
@@ -2606,7 +2656,7 @@ public:
 	void gnw_pinball(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_pinball )
 	PORT_START("IN.0") // S1
@@ -2634,6 +2684,8 @@ static INPUT_PORTS_START( gnw_pinball )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_pinball_state::gnw_pinball(machine_config &config)
 {
@@ -2679,7 +2731,7 @@ public:
 	void gnw_bjack(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_bjack )
 	PORT_START("IN.0") // S1
@@ -2697,6 +2749,8 @@ static INPUT_PORTS_START( gnw_bjack )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void gnw_bjack_state::gnw_bjack(machine_config &config)
 {
@@ -2745,7 +2799,7 @@ public:
 	void gnw_squish(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_squish )
 	PORT_START("IN.0") // S1
@@ -2773,6 +2827,8 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_squish_state::gnw_squish(machine_config &config)
 {
@@ -2815,7 +2871,7 @@ public:
 	void gnw_bsweep(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_bsweep )
 	PORT_START("IN.0") // S1
@@ -2843,6 +2899,8 @@ static INPUT_PORTS_START( gnw_bsweep )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_bsweep_state::gnw_bsweep(machine_config &config)
 {
@@ -2888,7 +2946,7 @@ public:
 	void gnw_sbuster(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_sbuster )
 	PORT_START("IN.0") // S1
@@ -2915,6 +2973,8 @@ static INPUT_PORTS_START( gnw_sbuster )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_sbuster_state::gnw_sbuster(machine_config &config)
 {
@@ -2960,7 +3020,7 @@ public:
 	void gnw_gcliff(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_gcliff )
 	PORT_START("IN.0") // S1
@@ -2992,6 +3052,8 @@ static INPUT_PORTS_START( gnw_gcliff )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_gcliff_state::gnw_gcliff(machine_config &config)
 {
@@ -3037,7 +3099,7 @@ public:
 	void gnw_zelda(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_zelda )
 	PORT_START("IN.0") // S1
@@ -3069,6 +3131,8 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_zelda_state::gnw_zelda(machine_config &config)
 {
@@ -3121,7 +3185,7 @@ public:
 	void gnw_mariocmt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mariocmt )
 	PORT_START("IN.0") // S1
@@ -3149,6 +3213,8 @@ static INPUT_PORTS_START( gnw_mariocmt )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mariocmt_state::gnw_mariocmt(machine_config &config)
 {
@@ -3205,7 +3271,7 @@ public:
 	void gnw_snoopyp(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_snoopyp )
 	PORT_START("IN.0") // S1
@@ -3233,6 +3299,8 @@ static INPUT_PORTS_START( gnw_snoopyp )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_snoopyp_state::gnw_snoopyp(machine_config &config)
 {
@@ -3282,7 +3350,7 @@ public:
 	void gnw_popeyep(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_popeyep )
 	PORT_START("IN.0") // S1
@@ -3310,6 +3378,8 @@ static INPUT_PORTS_START( gnw_popeyep )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_popeyep_state::gnw_popeyep(machine_config &config)
 {
@@ -3358,7 +3428,7 @@ public:
 	void gnw_dkjrp(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_START("IN.0") // S1
@@ -3390,6 +3460,8 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 {
@@ -3432,7 +3504,7 @@ public:
 	void gnw_mbaway(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mbaway )
 	PORT_START("IN.0") // S1
@@ -3460,6 +3532,8 @@ static INPUT_PORTS_START( gnw_mbaway )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mbaway_state::gnw_mbaway(machine_config &config)
 {
@@ -3512,7 +3586,7 @@ public:
 	void gnw_dkcirc(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mmousep )
 	PORT_START("IN.0") // S1
@@ -3540,6 +3614,8 @@ static INPUT_PORTS_START( gnw_mmousep )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mmousep_state::gnw_mmousep(machine_config &config)
 {
@@ -3600,7 +3676,7 @@ public:
 	void gnw_dkjr(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkjr )
 	PORT_START("IN.0") // S1
@@ -3632,6 +3708,8 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkjr_state::gnw_dkjr(machine_config &config)
 {
@@ -3672,7 +3750,7 @@ public:
 	void gnw_mariocm(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mariocm )
 	PORT_START("IN.0") // S1
@@ -3700,6 +3778,8 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mariocm_state::gnw_mariocm(machine_config &config)
 {
@@ -3743,7 +3823,7 @@ public:
 	void gnw_manhole(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_manhole )
 	PORT_START("IN.0") // S1
@@ -3771,6 +3851,8 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_manhole_state::gnw_manhole(machine_config &config)
 {
@@ -3810,7 +3892,7 @@ public:
 	void gnw_tfish(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_tfish )
 	PORT_START("IN.0") // S1
@@ -3833,6 +3915,8 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_tfish_state::gnw_tfish(machine_config &config)
 {
@@ -3881,7 +3965,7 @@ public:
 	void gnw_smbn(machine_config & config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_smb )
 	PORT_START("IN.0") // S1
@@ -3908,6 +3992,8 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_smb_state::gnw_smb(machine_config &config)
 {
@@ -3976,7 +4062,7 @@ public:
 	void gnw_climbern(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_climber )
 	PORT_START("IN.0") // S1
@@ -4003,6 +4089,8 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_climber_state::gnw_climber(machine_config &config)
 {
@@ -4073,7 +4161,7 @@ public:
 	void gnw_bfightn(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_bfight )
 	PORT_START("IN.0") // S1
@@ -4100,6 +4188,8 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_bfight_state::gnw_bfight(machine_config &config)
 {
@@ -4158,7 +4248,7 @@ public:
 	void gnw_mariotj(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_mariotj )
 	PORT_START("IN.0") // S1
@@ -4181,6 +4271,8 @@ static INPUT_PORTS_START( gnw_mariotj )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_mariotj_state::gnw_mariotj(machine_config &config)
 {
@@ -4223,7 +4315,7 @@ public:
 	void gnw_ssparky(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_ssparky )
 	PORT_START("IN.0") // S1
@@ -4251,6 +4343,8 @@ static INPUT_PORTS_START( gnw_ssparky )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_ssparky_state::gnw_ssparky(machine_config &config)
 {
@@ -4290,7 +4384,7 @@ public:
 	void gnw_cgrab(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_cgrab )
 	PORT_START("IN.0") // S1
@@ -4318,6 +4412,8 @@ static INPUT_PORTS_START( gnw_cgrab )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_cgrab_state::gnw_cgrab(machine_config &config)
 {
@@ -4358,7 +4454,7 @@ public:
 	void gnw_boxing(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( microvs_shared )
 	PORT_START("IN.0") // S1
@@ -4413,6 +4509,8 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+// config
+
 void gnw_boxing_state::gnw_boxing(machine_config &config)
 {
 	sm511_common(config, 1920, 524);
@@ -4454,7 +4552,7 @@ public:
 	void gnw_dkong3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkong3 )
 	PORT_INCLUDE( microvs_shared )
@@ -4464,6 +4562,8 @@ static INPUT_PORTS_START( gnw_dkong3 )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkong3_state::gnw_dkong3(machine_config &config)
 {
@@ -4506,7 +4606,7 @@ public:
 	void gnw_dkhockey(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gnw_dkhockey )
 	PORT_INCLUDE( microvs_shared )
@@ -4521,6 +4621,8 @@ static INPUT_PORTS_START( gnw_dkhockey )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gnw_dkhockey_state::gnw_dkhockey(machine_config &config)
 {
@@ -4569,7 +4671,7 @@ public:
 	void bassmate(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bassmate )
 	PORT_START("IN.0") // S1
@@ -4597,6 +4699,8 @@ static INPUT_PORTS_START( bassmate )
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void bassmate_state::bassmate(machine_config &config)
 {
@@ -4648,7 +4752,7 @@ public:
 	void kdribble(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kdribble )
 	PORT_START("IN.0") // S1
@@ -4670,6 +4774,8 @@ static INPUT_PORTS_START( kdribble )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kdribble_state::kdribble(machine_config &config)
 {
@@ -4714,7 +4820,7 @@ public:
 	void kcontra(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kcontra )
 	PORT_START("IN.0") // S1
@@ -4735,6 +4841,8 @@ static INPUT_PORTS_START( kcontra )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kcontra_state::kcontra(machine_config &config)
 {
@@ -4777,7 +4885,7 @@ public:
 	void ktopgun(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktopgun )
 	PORT_START("IN.0") // S1
@@ -4799,6 +4907,8 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void ktopgun_state::ktopgun(machine_config &config)
 {
@@ -4842,7 +4952,7 @@ public:
 	void kgradius(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kgradius )
 	PORT_START("IN.0") // S1
@@ -4860,6 +4970,8 @@ static INPUT_PORTS_START( kgradius )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kgradius_state::kgradius(machine_config &config)
 {
@@ -4909,7 +5021,7 @@ public:
 	void ktmnt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ktmnt )
 	PORT_START("IN.0") // S1
@@ -4932,6 +5044,8 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void ktmnt_state::ktmnt(machine_config &config)
 {
@@ -4977,7 +5091,7 @@ public:
 	void kskatedie(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kskatedie )
 	PORT_START("IN.0") // S1
@@ -4999,6 +5113,8 @@ static INPUT_PORTS_START( kskatedie )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kskatedie_state::kskatedie(machine_config &config)
 {
@@ -5041,7 +5157,7 @@ public:
 	void kbilly(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbilly )
 	PORT_START("IN.0") // S1
@@ -5064,6 +5180,8 @@ static INPUT_PORTS_START( kbilly )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kbilly_state::kbilly(machine_config &config)
 {
@@ -5111,7 +5229,7 @@ public:
 	void kbottom9(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbottom9 )
 	PORT_START("IN.0") // S1
@@ -5133,6 +5251,8 @@ static INPUT_PORTS_START( kbottom9 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kbottom9_state::kbottom9(machine_config &config)
 {
@@ -5175,7 +5295,7 @@ public:
 	void kloneran(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kloneran )
 	PORT_START("IN.0") // S1
@@ -5193,6 +5313,8 @@ static INPUT_PORTS_START( kloneran )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kloneran_state::kloneran(machine_config &config)
 {
@@ -5237,7 +5359,7 @@ public:
 	void knascar(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( knascar )
 	PORT_START("IN.0") // S1
@@ -5255,6 +5377,8 @@ static INPUT_PORTS_START( knascar )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void knascar_state::knascar(machine_config &config)
 {
@@ -5300,7 +5424,7 @@ public:
 	void kblades(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kblades )
 	PORT_START("IN.0") // S1
@@ -5322,6 +5446,8 @@ static INPUT_PORTS_START( kblades )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kblades_state::kblades(machine_config &config)
 {
@@ -5370,7 +5496,7 @@ public:
 	void knfl(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( knfl )
 	PORT_START("IN.0") // S1
@@ -5392,6 +5518,8 @@ static INPUT_PORTS_START( knfl )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void knfl_state::knfl(machine_config &config)
 {
@@ -5434,7 +5562,7 @@ public:
 	void kbucky(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kbucky )
 	PORT_START("IN.0") // S1
@@ -5452,6 +5580,8 @@ static INPUT_PORTS_START( kbucky )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kbucky_state::kbucky(machine_config &config)
 {
@@ -5497,7 +5627,7 @@ public:
 	void kgarfld(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( kgarfld )
 	PORT_START("IN.0") // S1
@@ -5519,6 +5649,8 @@ static INPUT_PORTS_START( kgarfld )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("All Clear")
 INPUT_PORTS_END
+
+// config
 
 void kgarfld_state::kgarfld(machine_config &config)
 {
@@ -5574,7 +5706,7 @@ public:
 	void nsmw(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gamewatch )
 	PORT_START("IN.0")
@@ -5587,6 +5719,8 @@ static INPUT_PORTS_START( gamewatch )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 INPUT_PORTS_END
+
+// config
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
@@ -5666,7 +5800,7 @@ void nstarfox_state::sound_w(u8 data)
 	// S2-S4: falling edge starts sound effect
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( nstarfox )
 	PORT_INCLUDE( gamewatch )
@@ -5675,6 +5809,8 @@ static INPUT_PORTS_START( nstarfox )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // laser
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) // bomb
 INPUT_PORTS_END
+
+// config
 
 void nstarfox_state::nstarfox(machine_config &config)
 {
@@ -5729,7 +5865,7 @@ public:
 	void tgaunt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaunt )
 	PORT_START("IN.0") // S1
@@ -5773,6 +5909,8 @@ static INPUT_PORTS_START( tgaunt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgaunt_state::tgaunt(machine_config &config)
 {
 	sm510_tiger(config, 1425, 1080);
@@ -5815,7 +5953,7 @@ public:
 	void tddragon(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tddragon )
 	PORT_START("IN.0") // S1
@@ -5853,6 +5991,8 @@ static INPUT_PORTS_START( tddragon )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tddragon_state::tddragon(machine_config &config)
 {
@@ -5893,7 +6033,7 @@ public:
 	void tsimquest(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsimquest )
 	PORT_START("IN.0") // S1
@@ -5936,6 +6076,8 @@ static INPUT_PORTS_START( tsimquest )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsimquest_state::tsimquest(machine_config &config)
 {
 	sm510_tiger(config, 1434, 1080); // R mask option confirmed
@@ -5975,7 +6117,7 @@ public:
 	void tkarnov(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkarnov )
 	PORT_START("IN.0") // S1
@@ -6018,6 +6160,8 @@ static INPUT_PORTS_START( tkarnov )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tkarnov_state::tkarnov(machine_config &config)
 {
 	sm510_tiger(config, 1477, 1080);
@@ -6057,7 +6201,7 @@ public:
 	void tvindictr(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tvindictr )
 	PORT_START("IN.0") // S1
@@ -6098,6 +6242,8 @@ static INPUT_PORTS_START( tvindictr )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tvindictr_state::tvindictr(machine_config &config)
 {
@@ -6153,7 +6299,7 @@ void tgaiden_state::machine_start()
 	m_led_out.resolve();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaiden )
 	PORT_START("IN.0") // S1
@@ -6191,6 +6337,8 @@ static INPUT_PORTS_START( tgaiden )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tgaiden_state::tgaiden(machine_config &config)
 {
@@ -6234,7 +6382,7 @@ public:
 	void tbatman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatman )
 	PORT_START("IN.0") // S1
@@ -6271,6 +6419,8 @@ static INPUT_PORTS_START( tbatman )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tbatman_state::tbatman(machine_config &config)
 {
@@ -6315,7 +6465,7 @@ public:
 	void tsharr2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsharr2 )
 	PORT_START("IN.0") // S1
@@ -6352,6 +6502,8 @@ static INPUT_PORTS_START( tsharr2 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tsharr2_state::tsharr2(machine_config &config)
 {
@@ -6392,7 +6544,7 @@ public:
 	void tstrider(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tstrider )
 	PORT_START("IN.0") // S1
@@ -6430,6 +6582,8 @@ static INPUT_PORTS_START( tstrider )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tstrider_state::tstrider(machine_config &config)
 {
@@ -6470,7 +6624,7 @@ public:
 	void tgoldnaxe(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgoldnaxe )
 	PORT_START("IN.0") // S1
@@ -6513,6 +6667,8 @@ static INPUT_PORTS_START( tgoldnaxe )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgoldnaxe_state::tgoldnaxe(machine_config &config)
 {
 	sm510_tiger(config, 1456, 1080);
@@ -6554,7 +6710,7 @@ public:
 	void trobocop2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobocop2 )
 	PORT_START("IN.0") // S1
@@ -6596,6 +6752,8 @@ static INPUT_PORTS_START( trobocop2 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void trobocop2_state::trobocop2(machine_config &config)
 {
@@ -6640,7 +6798,7 @@ public:
 	void taltbeast(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( taltbeast )
 	PORT_START("IN.0") // S1
@@ -6683,6 +6841,8 @@ static INPUT_PORTS_START( taltbeast )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void taltbeast_state::taltbeast(machine_config &config)
 {
 	sm510_tiger(config, 1455, 1080); // R mask option confirmed
@@ -6722,7 +6882,7 @@ public:
 	void tmegaman3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmegaman3 )
 	PORT_START("IN.0") // S1
@@ -6760,6 +6920,8 @@ static INPUT_PORTS_START( tmegaman3 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tmegaman3_state::tmegaman3(machine_config &config)
 {
@@ -6800,7 +6962,7 @@ public:
 	void tsf2010(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsf2010 )
 	PORT_START("IN.0") // S1
@@ -6843,6 +7005,8 @@ static INPUT_PORTS_START( tsf2010 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsf2010_state::tsf2010(machine_config &config)
 {
 	sm510_tiger(config, 1465, 1080);
@@ -6882,7 +7046,7 @@ public:
 	void tswampt(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tswampt )
 	PORT_START("IN.0") // S1
@@ -6920,6 +7084,8 @@ static INPUT_PORTS_START( tswampt )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tswampt_state::tswampt(machine_config &config)
 {
@@ -6960,7 +7126,7 @@ public:
 	void tspidman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tspidman )
 	PORT_START("IN.0") // S1
@@ -7003,6 +7169,8 @@ static INPUT_PORTS_START( tspidman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tspidman_state::tspidman(machine_config &config)
 {
 	sm510_tiger(config, 1440, 1080);
@@ -7042,7 +7210,7 @@ public:
 	void txmen(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( txmen )
 	PORT_START("IN.0") // S1
@@ -7085,6 +7253,8 @@ static INPUT_PORTS_START( txmen )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void txmen_state::txmen(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080);
@@ -7124,7 +7294,7 @@ public:
 	void tddragon3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tddragon3 )
 	PORT_START("IN.0") // S1
@@ -7167,6 +7337,8 @@ static INPUT_PORTS_START( tddragon3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tddragon3_state::tddragon3(machine_config &config)
 {
 	sm510_tiger(config, 1514, 1080);
@@ -7206,7 +7378,7 @@ public:
 	void tflash(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tflash )
 	PORT_START("IN.0") // S1
@@ -7249,6 +7421,8 @@ static INPUT_PORTS_START( tflash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tflash_state::tflash(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -7290,7 +7464,7 @@ public:
 	void trobhood(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobhood )
 	PORT_INCLUDE( tgaunt )
@@ -7298,6 +7472,8 @@ static INPUT_PORTS_START( trobhood )
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Money")
 INPUT_PORTS_END
+
+// config
 
 void trobhood_state::trobhood(machine_config &config)
 {
@@ -7338,7 +7514,7 @@ public:
 	void tmchammer(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmchammer )
 	PORT_START("IN.0") // S1
@@ -7381,6 +7557,8 @@ static INPUT_PORTS_START( tmchammer )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tmchammer_state::tmchammer(machine_config &config)
 {
@@ -7426,7 +7604,7 @@ public:
 	void trockteer(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trockteer )
 	PORT_INCLUDE( trobocop2 )
@@ -7441,6 +7619,8 @@ static INPUT_PORTS_START( trockteer )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
 INPUT_PORTS_END
+
+// config
 
 void trockteer_state::trockteer(machine_config &config)
 {
@@ -7481,7 +7661,7 @@ public:
 	void tbtoads(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbtoads )
 	PORT_START("IN.0") // S1
@@ -7524,6 +7704,8 @@ static INPUT_PORTS_START( tbtoads )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbtoads_state::tbtoads(machine_config &config)
 {
 	sm510_tiger(config, 1454, 1080);
@@ -7563,7 +7745,7 @@ public:
 	void thook(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thook )
 	PORT_START("IN.0") // S1
@@ -7605,6 +7787,8 @@ static INPUT_PORTS_START( thook )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void thook_state::thook(machine_config &config)
 {
@@ -7648,7 +7832,7 @@ public:
 	void tbttf(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbttf )
 	PORT_START("IN.0") // S1
@@ -7686,6 +7870,8 @@ static INPUT_PORTS_START( tbttf )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tbttf_state::tbttf(machine_config &config)
 {
@@ -7728,7 +7914,7 @@ public:
 	void taddams(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( taddams )
 	PORT_START("IN.0") // S1
@@ -7771,6 +7957,8 @@ static INPUT_PORTS_START( taddams )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void taddams_state::taddams(machine_config &config)
 {
 	sm510_tiger(config, 1464, 1080);
@@ -7810,7 +7998,7 @@ public:
 	void thalone(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thalone )
 	PORT_START("IN.0") // S1
@@ -7853,6 +8041,8 @@ static INPUT_PORTS_START( thalone )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void thalone_state::thalone(machine_config &config)
 {
 	sm510_tiger(config, 1448, 1080);
@@ -7892,7 +8082,7 @@ public:
 	void tgaiden3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgaiden3 )
 	PORT_START("IN.0") // S1
@@ -7930,6 +8120,8 @@ static INPUT_PORTS_START( tgaiden3 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tgaiden3_state::tgaiden3(machine_config &config)
 {
@@ -7970,7 +8162,7 @@ public:
 	void txmenpx(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( txmenpx )
 	PORT_START("IN.0") // S1
@@ -8008,6 +8200,8 @@ static INPUT_PORTS_START( txmenpx )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void txmenpx_state::txmenpx(machine_config &config)
 {
@@ -8048,7 +8242,7 @@ public:
 	void thalone2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( thalone2 )
 	PORT_START("IN.0") // S1
@@ -8091,6 +8285,8 @@ static INPUT_PORTS_START( thalone2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void thalone2_state::thalone2(machine_config &config)
 {
 	sm510_tiger(config, 1454, 1080);
@@ -8130,7 +8326,7 @@ public:
 	void tsonic(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsonic )
 	PORT_START("IN.0") // S2
@@ -8167,6 +8363,8 @@ static INPUT_PORTS_START( tsonic )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tsonic_state::tsonic(machine_config &config)
 {
@@ -8210,7 +8408,7 @@ public:
 	void trobocop3(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trobocop3 )
 	PORT_START("IN.0") // S1
@@ -8253,6 +8451,8 @@ static INPUT_PORTS_START( trobocop3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void trobocop3_state::trobocop3(machine_config &config)
 {
 	sm510_tiger(config, 1464, 1080);
@@ -8292,7 +8492,7 @@ public:
 	void tdummies(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tdummies )
 	PORT_START("IN.0") // S1
@@ -8330,6 +8530,8 @@ static INPUT_PORTS_START( tdummies )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tdummies_state::tdummies(machine_config &config)
 {
@@ -8370,7 +8572,7 @@ public:
 	void tsfight2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsfight2 )
 	PORT_START("IN.0") // S1
@@ -8413,6 +8615,8 @@ static INPUT_PORTS_START( tsfight2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsfight2_state::tsfight2(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -8452,7 +8656,7 @@ public:
 	void twworld(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( twworld )
 	PORT_START("IN.0") // S1
@@ -8495,6 +8699,8 @@ static INPUT_PORTS_START( twworld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void twworld_state::twworld(machine_config &config)
 {
 	sm510_tiger(config, 1429, 1080);
@@ -8534,7 +8740,7 @@ public:
 	void tjpark(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tjpark )
 	PORT_START("IN.0") // S1
@@ -8572,6 +8778,8 @@ static INPUT_PORTS_START( tjpark )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tjpark_state::tjpark(machine_config &config)
 {
@@ -8612,7 +8820,7 @@ public:
 	void tsonic2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsonic2 )
 	PORT_START("IN.0") // S2
@@ -8649,6 +8857,8 @@ static INPUT_PORTS_START( tsonic2 )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tsonic2_state::tsonic2(machine_config &config)
 {
@@ -8696,7 +8906,7 @@ public:
 	void tsddragon(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsddragon )
 	PORT_START("IN.0") // S1
@@ -8740,6 +8950,8 @@ static INPUT_PORTS_START( tsddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tsddragon_state::tsddragon(machine_config &config)
 {
 	sm510_tiger(config, 1503, 1080);
@@ -8779,7 +8991,7 @@ public:
 	void tdennis(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tdennis )
 	PORT_START("IN.0") // S1
@@ -8822,6 +9034,8 @@ static INPUT_PORTS_START( tdennis )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tdennis_state::tdennis(machine_config &config)
 {
@@ -8873,7 +9087,7 @@ void tnmarebc_state::input_w(u8 data)
 	hh_sm510_state::input_w((data & 0x1f) | (data >> 1 & 0x10));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tnmarebc )
 	PORT_START("IN.0") // S1
@@ -8910,6 +9124,8 @@ static INPUT_PORTS_START( tnmarebc )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tnmarebc_state::tnmarebc(machine_config &config)
 {
@@ -8950,7 +9166,7 @@ public:
 	void ttransf2(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ttransf2 )
 	PORT_START("IN.0") // S1
@@ -8993,6 +9209,8 @@ static INPUT_PORTS_START( ttransf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void ttransf2_state::ttransf2(machine_config &config)
 {
 	sm510_tiger(config, 1476, 1080);
@@ -9032,7 +9250,7 @@ public:
 	void topaliens(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( topaliens )
 	PORT_START("IN.0") // S1
@@ -9070,6 +9288,8 @@ static INPUT_PORTS_START( topaliens )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void topaliens_state::topaliens(machine_config &config)
 {
@@ -9110,7 +9330,7 @@ public:
 	void tmkombat(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tmkombat )
 	PORT_START("IN.0") // S1
@@ -9154,6 +9374,8 @@ static INPUT_PORTS_START( tmkombat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tmkombat_state::tmkombat(machine_config &config)
 {
 	sm510_tiger(config, 1468, 1080);
@@ -9193,7 +9415,7 @@ public:
 	void tshadow(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tshadow )
 	PORT_START("IN.0") // S1
@@ -9236,6 +9458,8 @@ static INPUT_PORTS_START( tshadow )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tshadow_state::tshadow(machine_config &config)
 {
 	sm510_tiger(config, 1484, 1080);
@@ -9275,7 +9499,7 @@ public:
 	void tskelwarr(machine_config &);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tskelwarr )
 	PORT_START("IN.0") // S1
@@ -9318,6 +9542,8 @@ static INPUT_PORTS_START( tskelwarr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tskelwarr_state::tskelwarr(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -9357,7 +9583,7 @@ public:
 	void tbatfor(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatfor )
 	PORT_START("IN.0") // S1
@@ -9401,6 +9627,8 @@ static INPUT_PORTS_START( tbatfor )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tbatfor_state::tbatfor(machine_config &config)
 {
 	sm510_tiger(config, 1493, 1080);
@@ -9440,7 +9668,7 @@ public:
 	void tjdredd(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tjdredd )
 	PORT_START("IN.0") // S1
@@ -9484,6 +9712,8 @@ static INPUT_PORTS_START( tjdredd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tjdredd_state::tjdredd(machine_config &config)
 {
 	sm510_tiger(config, 1444, 1080);
@@ -9523,7 +9753,7 @@ public:
 	void tapollo13(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tapollo13 )
 	PORT_START("IN.0") // S1
@@ -9567,6 +9797,8 @@ static INPUT_PORTS_START( tapollo13 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tapollo13_state::tapollo13(machine_config &config)
 {
 	sm510_tiger(config, 1467, 1080);
@@ -9606,7 +9838,7 @@ public:
 	void tgoldeye(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgoldeye )
 	PORT_START("IN.0") // S1
@@ -9650,6 +9882,8 @@ static INPUT_PORTS_START( tgoldeye )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tgoldeye_state::tgoldeye(machine_config &config)
 {
 	sm510_tiger(config, 1461, 1080);
@@ -9689,7 +9923,7 @@ public:
 	void tkazaam(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tkazaam )
 	PORT_START("IN.0") // S1
@@ -9733,6 +9967,8 @@ static INPUT_PORTS_START( tkazaam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+// config
+
 void tkazaam_state::tkazaam(machine_config &config)
 {
 	sm510_tiger(config, 1452, 1080); // no external XTAL
@@ -9772,7 +10008,7 @@ public:
 	void tsjam(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsjam )
 	PORT_START("IN.0") // S1
@@ -9810,6 +10046,8 @@ static INPUT_PORTS_START( tsjam )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tsjam_state::tsjam(machine_config &config)
 {
@@ -9850,7 +10088,7 @@ public:
 	void tinday(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tinday )
 	PORT_START("IN.0") // S1
@@ -9888,6 +10126,8 @@ static INPUT_PORTS_START( tinday )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tinday_state::tinday(machine_config &config)
 {
@@ -9928,7 +10168,7 @@ public:
 	void tbatmana(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tbatmana )
 	PORT_START("IN.0") // S2
@@ -9966,6 +10206,8 @@ static INPUT_PORTS_START( tbatmana )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tbatmana_state::tbatmana(machine_config &config)
 {
@@ -10011,7 +10253,7 @@ public:
 	void tgargnf(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tgargnf )
 	PORT_START("IN.0") // S2
@@ -10050,6 +10292,8 @@ static INPUT_PORTS_START( tgargnf )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void tgargnf_state::tgargnf(machine_config &config)
 {
@@ -10098,7 +10342,7 @@ public:
 	void tsuperman(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( tsuperman )
 	PORT_INCLUDE( tgargnf )
@@ -10106,6 +10350,8 @@ static INPUT_PORTS_START( tsuperman )
 	PORT_MODIFY("IN.3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch")
 INPUT_PORTS_END
+
+// config
 
 void tsuperman_state::tsuperman(machine_config &config)
 {
@@ -10151,7 +10397,7 @@ public:
 	void tigarden(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trshutvoy )
 	PORT_START("IN.0") // S1
@@ -10204,6 +10450,8 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
 INPUT_PORTS_END
+
+// config
 
 void trshutvoy_state::trshutvoy(machine_config &config)
 {
@@ -10259,7 +10507,7 @@ public:
 	void trthuball(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trsrescue )
 	PORT_START("IN.0") // S1
@@ -10282,6 +10530,8 @@ static INPUT_PORTS_START( trsrescue )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void trsrescue_state::trsrescue(machine_config &config)
 {
@@ -10343,7 +10593,7 @@ public:
 	void trspider(machine_config & config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( trspacmis )
 	PORT_START("IN.0") // R2
@@ -10372,6 +10622,8 @@ static INPUT_PORTS_START( trspacmis )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void trspacmis_state::trspacmis(machine_config &config)
 {
@@ -10426,7 +10678,7 @@ public:
 	void auslalom(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( auslalom )
 	PORT_START("IN.0") // R2
@@ -10447,6 +10699,8 @@ static INPUT_PORTS_START( auslalom )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
+
+// config
 
 void auslalom_state::auslalom(machine_config &config)
 {
@@ -10485,7 +10739,7 @@ public:
 	void nummunch(machine_config &config);
 };
 
-// config
+// inputs
 
 static INPUT_PORTS_START( nummunch )
 	PORT_START("IN.0") // S1
@@ -10536,6 +10790,8 @@ static INPUT_PORTS_START( nummunch )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button)
 INPUT_PORTS_END
+
+// config
 
 void nummunch_state::nummunch(machine_config &config)
 {

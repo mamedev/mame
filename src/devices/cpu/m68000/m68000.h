@@ -166,6 +166,7 @@ protected:
 	u32 m_int_level;
 	u32 m_int_next_state;
 	bool m_nmi_uses_generic;
+	bool m_disable_interrupt_callback;
 	u64 m_last_vpa_time;
 
 	// Current instruction state and substate
@@ -316,7 +317,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and(u16 a, u16 b) {
+	inline void alu_and(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -326,7 +327,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_andx(u16 a, u16 b) {
+	inline void alu_andx(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X ? SR_X|SR_C : 0;
 		if(!r)
@@ -336,7 +337,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and8(u16 a, u16 b) {
+	inline void alu_and8(u16 a, u16 b) {
 		u16 r = b & a;
 		m_isr = m_sr & SR_X;
 		if(!(r & 0xff))
@@ -346,7 +347,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_and8x(u8 a, u8 b) {
+	inline void alu_and8x(u8 a, u8 b) {
 		u8 r = b & a;
 		m_isr = m_sr & SR_X ? SR_X|SR_C : 0;
 		if(!r)
@@ -356,7 +357,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_or(u16 a, u16 b) {
+	inline void alu_or(u16 a, u16 b) {
 		u16 r = b | a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -366,7 +367,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_or8(u8 a, u8 b) {
+	inline void alu_or8(u8 a, u8 b) {
 		u8 r = b | a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -376,7 +377,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_eor(u16 a, u16 b) {
+	inline void alu_eor(u16 a, u16 b) {
 		u16 r = b ^ a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -386,7 +387,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_eor8(u8 a, u8 b) {
+	inline void alu_eor8(u8 a, u8 b) {
 		u8 r = b ^ a;
 		m_isr = m_sr & SR_X;
 		if(!r)
@@ -396,7 +397,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_ext(u16 a) {
+	inline void alu_ext(u16 a) {
 		u16 r = s8(a);
 		m_isr = 0;
 		if(!r)
@@ -406,7 +407,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_not(u16 a) {
+	inline void alu_not(u16 a) {
 		u16 r = ~a;
 		m_isr = 0;
 		if(!r)
@@ -416,7 +417,7 @@ protected:
 		m_aluo = r;
 	}
 
-  	inline void alu_not8(u8 a) {
+	inline void alu_not8(u8 a) {
 		u8 r = ~a;
 		m_isr = 0;
 		if(!r)
@@ -513,7 +514,7 @@ protected:
 			m_isr |= SR_X|SR_C;
 		if((r & 0x80) && !(r1 & 0x80))
 			m_isr |= SR_V;
-		m_aluo = r;		
+		m_aluo = r;
 	}
 
 	inline void alu_sbcd8(u8 a, u8 b) {
@@ -533,7 +534,7 @@ protected:
 			m_isr |= SR_X|SR_C;
 		if(!(r & 0x80) && (r1 & 0x80))
 			m_isr |= SR_V;
-		m_aluo = r;		
+		m_aluo = r;
 	}
 
 	inline void alu_sla0(u16 a) {
@@ -925,6 +926,22 @@ protected:
 	inline void sr_xnzvc_u() {
 		m_sr = (m_sr & ~(SR_X|SR_N|SR_V|SR_C) & (m_isr | ~SR_Z)) | (m_isr & (SR_X|SR_N|SR_V|SR_C));
 	}
+};
+
+class m68000_mcu_device : public m68000_device
+{
+protected:
+	m68000_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	virtual void execute_run() override;
+	void recompute_bcount(uint64_t event_time);
+	static void add_event(uint64_t &event_time, uint64_t new_event);
+	void internal_update();
+
+	virtual void internal_update(uint64_t current_time) = 0;
+	virtual void device_start() override;
+
+	void set_current_interrupt_level(u32 level);
 };
 
 DECLARE_DEVICE_TYPE(M68000, m68000_device)

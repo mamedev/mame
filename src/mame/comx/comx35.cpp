@@ -65,16 +65,12 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 	int size = image.length();
 
 	if (size > m_ram->size())
-	{
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is larger than RAM");
 
 	image.fread( header, 5);
 
 	if (header[1] != 'C' || header[2] != 'O' || header[3] != 'M' || header[4] != 'X' )
-	{
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 
 	switch (header[0])
 	{
@@ -200,7 +196,7 @@ QUICKLOAD_LOAD_MEMBER(comx35_state::quickload_cb)
 		break;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 //**************************************************************************

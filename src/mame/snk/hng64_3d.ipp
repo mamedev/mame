@@ -74,7 +74,7 @@ void hng64_state::dl_upload_w(uint32_t data)
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
@@ -84,7 +84,6 @@ g_profiler.start(PROFILER_USER1);
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
 	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200*8));
-g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
@@ -411,7 +410,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	//      ? = roadedge: all vehicles ingame + select screen (also 3d maps on select screen), vehicle lights+windows only in attract, nothing else?
 	//          all vehicles ingame + select screen, vehicle lights+windows only in attract, NOT on vehicles between stages, nothing else?
 	//          nothing on other games?
-	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
 	//
 	//
 	// [2]  - xxxx ... offset into ROM
@@ -569,13 +567,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
 			//                            a = blend this sprite (blend might use 'lighting' level as alpha?)
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
-			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
-			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
-			//                            X = horizontal subtexture
-			//                            * = broken banners in xrally
-			//                            Y = vertical subtexture
-			//                            # = broken banners in xrally
-			//                            u = unknown, set late on 2nd race+3rd race in xrally
+			// [2] S?hh hhhh hvvv vvvv    S = use texture offsets in lower bits
+			//                            ? = unknown, sometimes used on objects further way, then flipped off, maybe precision related / texturing sampling mode?
+			//                            h = horizontal offset into texture
+			//                            v = vertical offset into texture
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
 			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..
@@ -602,11 +597,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
 			else                         currentPoly.tex4bpp = 0x0;
 
-			currentPoly.texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
-			currentPoly.texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
-			currentPoly.texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
-
+			currentPoly.texPageSmall = chunkOffset[2];
 			currentPoly.texIndex = chunkOffset[1] & 0x000f;
+
+			// only values 07/08/09 have been observed.  Textures are only 1024 wide, so values above 09 (512) make little sense anyway
+			currentPoly.tex_mask_x = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 0];
+			currentPoly.tex_mask_y = 1 << m_texture_wrapsize_table[(currentPoly.texIndex * 2) + 1];
 
 			// Flat shaded polygon, no texture, no lighting
 			if (chunkOffset[1] & 0x8000)
@@ -684,8 +680,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// ---- --x- -
 			// ---- ---x - 1 = Has per-vert normals
 			//
-			// none of these seem directly connected to texture size to solve texturing problem in the racing games
-			// maybe some of the actual packet data is being used incorrectly?
 			/////////////////////////*/
 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
@@ -1217,17 +1211,31 @@ bbust2    08080808 08080808 08080808 08080808 08080808 08080808 08080808 0808080
 
 sams64    00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
 sams64_2  00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
+
+these values are used in the rendering, to control the size at which a texture wraps on each of
+the texture pages.
 */
-uint32_t hng64_state::hng64_fbtable_r(offs_t offset, uint32_t mem_mask)
+uint8_t hng64_state::hng64_texture_wrapsize_table_r(offs_t offset)
 {
-	logerror("%s: hng64_fbtable_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
-	return m_fbtable[offset];
+	logerror("%s: hng64_texture_wrapsize_table_r (%03x)\n", machine().describe_context(), offset * 4);
+	return m_texture_wrapsize_table[offset];
 }
 
-void hng64_state::hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data)
 {
-	logerror("%s: hng64_fbtable_w (%03x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
-	COMBINE_DATA(&m_fbtable[offset]);
+	logerror("%s: hng64_texture_wrapsize_table_w (%03x) %08x\n", machine().describe_context(), offset * 4, data);
+	m_texture_wrapsize_table[offset] = data;
+
+#if 0
+	{
+		printf("m_texture_wrapsize_table is now\n");
+		for (int i = 0; i < 0x20; i+=2)
+		{
+			printf("%01x:%02x,%02x| ", i/2, m_texture_wrapsize_table[i],m_texture_wrapsize_table[i+1]);
+		}
+		printf("\n");
+	}
+#endif
 }
 
 /////////////////////
@@ -1311,6 +1319,9 @@ void hng64_state::normalize(float* x)
 
 void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
@@ -1325,15 +1336,15 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
+	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
@@ -1349,37 +1360,32 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
-				textureS += (renderData.texscrolly & 0x3fff)>>4;
-				textureT += (renderData.texscrollx & 0x3fff)>>4;
+				textureS += (renderData.texscrolly & 0x3fff)>>5;
+				textureT += (renderData.texscrollx & 0x3fff)>>5;
 
 
-#if 1
+				int textPageSub = (renderData.texPageSmall & 0xc000) >> 14;
+				int texPageHorizOffset = (renderData.texPageSmall & 0x3f80) >> 7;
+				int texPageVertOffset =  (renderData.texPageSmall & 0x007f) >> 0;
+
 				// Small-Page textures
-				if (renderData.texPageSmall == 2)
+				// what is textPageSub & 1 used for? seems to be enabled on almost everything? it does not control wrap enable?
+				if (textPageSub & 2)
 				{
-					textureT = fmod(textureT, 256.0f);
-					textureS = fmod(textureS, 256.0f);
-
-					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
-					textureS += (256.0f * (renderData.texPageVertOffset>>1));
+					textureT = fmod(textureT, (float)renderData.tex_mask_x); textureT += (8.0f * texPageHorizOffset);
+					textureS = fmod(textureS, (float)renderData.tex_mask_y); textureS += (8.0f * texPageVertOffset);
 				}
-				else if (renderData.texPageSmall == 3)
-				{
-					// this can't be 128x128 textures, it is needed for the road etc. in xrally which is 256 wide,
-					// but also overhead objects which are 128 (eg lamps, near top left hand side on 8bpp texture page 8)
-					textureT = fmod(textureT, 128.0f);
-					textureS = fmod(textureS, 128.0f);
-
-					textureT += (128.0f * (renderData.texPageHorizOffset >> 0));
-					textureS += (128.0f * (renderData.texPageVertOffset >> 0));
-				}
-#endif
 
 				uint8_t paletteEntry;
 				int t = (int)textureT;
+				int s = (int)textureS;
+
+				t &= 1023;
+				s &= 1023; // 4bpp pages seem to be limited to 1024 pixels, with page numbering being the same, the bottom 1024 pixels of 4bpp pages are unsed?
+
 				if (renderData.tex4bpp)
 				{
-					paletteEntry = textureOffset[((int)textureS) * 512 + (t >> 1)];
+					paletteEntry = textureOffset[s * 512 + (t >> 1)];
 
 					if (t & 1)
 						paletteEntry = (paletteEntry >> 4) & 0x0f;
@@ -1388,10 +1394,10 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				}
 				else
 				{
-					paletteEntry = textureOffset[((int)textureS) * 1024 + t];
+					paletteEntry = textureOffset[s * 1024 + t];
 				}
 
-				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
+				// pen 0 in textures is always transparent
 				if (paletteEntry != 0)
 				{
 					float rIntensity = rCorrect / 16.0f;
@@ -1400,8 +1406,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					if (renderData.blend)
 						color |= 0x800;
 
-					*colorBuffer = color;
-					*depthBuffer = z;
+					colorBuffer[x & 511] = color;
+					depthBuffer[x & 511] = z;
 				}
 			}
 		}
@@ -1411,35 +1417,32 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 		light += dlight;
 		s += ds;
 		t += dt;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
 void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	const float dz = extent.param[0].dpdx;
 
 	// Pointers to the pixel buffers
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
-	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512)];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
-			*colorBuffer = renderData.palOffset + renderData.colorIndex;
-			*depthBuffer = z;
+			colorBuffer[x & 511] = renderData.palOffset + renderData.colorIndex;
+			depthBuffer[x & 511] = z;
 		}
 
 		z += dz;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
@@ -1451,12 +1454,12 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
 	rOptions.texPageSmall = p->texPageSmall;
-	rOptions.texPageHorizOffset = p->texPageHorizOffset;
-	rOptions.texPageVertOffset = p->texPageVertOffset;
 	rOptions.colorIndex = p->colorIndex;
 	rOptions.blend = p->blend;
 	rOptions.texscrollx = p->texscrollx;
 	rOptions.texscrolly = p->texscrolly;
+	rOptions.tex_mask_x = p->tex_mask_x;
+	rOptions.tex_mask_y = p->tex_mask_y;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();

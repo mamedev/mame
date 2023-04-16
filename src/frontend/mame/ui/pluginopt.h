@@ -27,7 +27,7 @@ class menu_plugin : public menu
 public:
 	menu_plugin(mame_ui_manager &mui, render_container &container);
 
-	static void show_menu(mame_ui_manager &mui, render_container &container, char *menu);
+	static void show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu);
 
 	virtual ~menu_plugin();
 
@@ -35,14 +35,14 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	std::vector<std::string> &m_plugins;
+	std::vector<std::string> const &m_plugins;
 };
 
 
 class menu_plugin_opt : public menu
 {
 public:
-	menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu);
+	menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot);
 	virtual ~menu_plugin_opt();
 
 protected:

@@ -207,7 +207,7 @@ u8 ctstein_state::read_l()
 	return read_inputs(3, 0xf) << 4 | 0xf;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( ctstein )
 	PORT_START("IN.0") // G0 port L
@@ -228,6 +228,8 @@ static INPUT_PORTS_START( ctstein )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
+
+// config
 
 void ctstein_state::ctstein(machine_config &config)
 {
@@ -326,7 +328,7 @@ u8 h2hbaskbc_state::read_in()
 	return read_inputs(4, 7) | (m_inputs[4]->read() & 8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( h2hbaskbc )
 	PORT_START("IN.0") // G0 port IN
@@ -376,6 +378,8 @@ static INPUT_PORTS_START( h2hsoccerc )
 	PORT_MODIFY("IN.1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
+
+// config
 
 void h2hbaskbc_state::h2hbaskbc(machine_config &config)
 {
@@ -499,7 +503,7 @@ void einvaderc_state::write_l(u8 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( einvaderc )
 	PORT_START("IN.0") // port IN
@@ -510,6 +514,8 @@ static INPUT_PORTS_START( einvaderc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
+
+// config
 
 void einvaderc_state::einvaderc(machine_config &config)
 {
@@ -631,7 +637,7 @@ u8 unkeinv_state::read_l()
 	return ret & ~m_l;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( unkeinv )
 	PORT_START("IN.0")
@@ -640,6 +646,8 @@ static INPUT_PORTS_START( unkeinv )
 	PORT_START("IN.1")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
+
+// config
 
 void unkeinv_state::unkeinv(machine_config &config)
 {
@@ -771,7 +779,7 @@ u8 lchicken_state::read_g()
 	return read_inputs(4, m_g);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lchicken )
 	PORT_START("IN.0") // D0 port G
@@ -798,6 +806,8 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(lchicken_state, motor_switch_r)
 INPUT_PORTS_END
+
+// config
 
 void lchicken_state::lchicken(machine_config &config)
 {
@@ -901,7 +911,7 @@ u8 funjacks_state::read_g()
 	return m_inputs[3]->read() | (m_g & 2);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( funjacks )
 	PORT_START("IN.0") // D0 port L
@@ -924,6 +934,8 @@ static INPUT_PORTS_START( funjacks )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void funjacks_state::funjacks(machine_config &config)
 {
@@ -1012,7 +1024,7 @@ void funrlgl_state::write_g(u8 data)
 	m_speaker->level_w(data >> 3 & 1);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( funrlgl )
 	PORT_START("IN.0") // port G
@@ -1026,6 +1038,8 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, 0)
 INPUT_PORTS_END
+
+// config
 
 void funrlgl_state::funrlgl(machine_config &config)
 {
@@ -1126,7 +1140,7 @@ u8 funtag_state::read_g()
 	return read_inputs(3, 3) | m_inputs[3]->read() | 4;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( funtag )
 	PORT_START("IN.0") // D0 port G
@@ -1149,6 +1163,8 @@ static INPUT_PORTS_START( funtag )
 	PORT_CONFSETTING(    0x04, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void funtag_state::funtag(machine_config &config)
 {
@@ -1273,7 +1289,7 @@ u8 mbaskb2_state::sub_read_in()
 	return read_inputs(3, 0xf);
 }
 
-// config
+// inputs
 
 CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
 {
@@ -1314,6 +1330,8 @@ static INPUT_PORTS_START( msoccer2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Teammate")
 INPUT_PORTS_END
+
+// config
 
 void mbaskb2_state::mbaskb2(machine_config &config)
 {
@@ -1435,7 +1453,7 @@ u8 lafootb_state::read_g()
 	return read_inputs(2, 7) | (m_inputs[2]->read() & 8);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lafootb )
 	PORT_START("IN.0") // D2 port G
@@ -1453,6 +1471,8 @@ static INPUT_PORTS_START( lafootb )
 	PORT_CONFSETTING(    0x08, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
+
+// config
 
 void lafootb_state::lafootb(machine_config &config)
 {
@@ -1558,7 +1578,7 @@ u8 mdallas_state::read_in()
 	return read_inputs(6, 0xf);
 }
 
-// config
+// inputs
 
 /* physical button layout and labels are like this:
 
@@ -1607,6 +1627,8 @@ static INPUT_PORTS_START( mdallas )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("South") // S
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
 INPUT_PORTS_END
+
+// config
 
 void mdallas_state::mdallas(machine_config &config)
 {
@@ -1685,7 +1707,7 @@ u8 plus1_state::read_l()
 	return m_inputs[1]->read() & m_l;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( plus1 )
 	PORT_START("IN.0") // port G
@@ -1701,6 +1723,8 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Sensor Position Yellow")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
 
 void plus1_state::plus1(machine_config &config)
 {
@@ -1804,7 +1828,7 @@ u8 lightfgt_state::read_g()
 	return read_inputs(5, 0xf);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lightfgt )
 	PORT_START("IN.0") // SO port G
@@ -1837,6 +1861,8 @@ static INPUT_PORTS_START( lightfgt )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
 INPUT_PORTS_END
+
+// config
 
 void lightfgt_state::lightfgt(machine_config &config)
 {
@@ -1932,7 +1958,7 @@ WRITE_LINE_MEMBER(bshipg_state::write_so)
 	m_display->matrix(1, state);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( bshipg )
 	PORT_START("IN.0") // D0 ports L,IN
@@ -1994,6 +2020,8 @@ static INPUT_PORTS_START( bshipg )
 	PORT_START("IN.4") // SI
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
 INPUT_PORTS_END
+
+// config
 
 void bshipg_state::bshipg(machine_config &config)
 {
@@ -2099,7 +2127,7 @@ WRITE_LINE_MEMBER(qkracer_state::write_sk)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( qkracer )
 	PORT_START("IN.0") // D3 port IN
@@ -2132,6 +2160,8 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
+
+// config
 
 void qkracer_state::qkracer(machine_config &config)
 {
@@ -2178,7 +2208,7 @@ ROM_END
 
 // handlers: see mdallas_state
 
-// config
+// inputs
 
 static INPUT_PORTS_START( copspa )
 	PORT_START("IN.0") // G0 port IN
@@ -2308,7 +2338,7 @@ void scat_state::main_map(address_map &map)
 	map(0x0000, 0x07ff).rom();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( solution )
 	PORT_START("IN.0") // D0 port IN
@@ -2347,6 +2377,8 @@ static INPUT_PORTS_START( solution )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Dil. Wntd.")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
 INPUT_PORTS_END
+
+// config
 
 void scat_state::scat(machine_config &config)
 {
@@ -2439,7 +2471,7 @@ WRITE_LINE_MEMBER(vidchal_state::write_sk)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( vidchal )
 	PORT_START("IN.0") // port IN
@@ -2448,6 +2480,8 @@ static INPUT_PORTS_START( vidchal )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Light Sensor")
 INPUT_PORTS_END
+
+// config
 
 void vidchal_state::vidchal(machine_config &config)
 {
@@ -2559,12 +2593,12 @@ WRITE_LINE_MEMBER(lilcomp_state::write_sk)
 	if (state == m_sk)
 		return;
 
-	// SK: trigger power off after a short delay
+	// SK: trigger power off after a short delay (since it also toggles at boot)
 	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
 	m_sk = state;
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( lilcomp )
 	PORT_START("IN.0") // L0 port G
@@ -2577,7 +2611,7 @@ static INPUT_PORTS_START( lilcomp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Code 5")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.2") // L2 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Code 1")
@@ -2588,6 +2622,8 @@ static INPUT_PORTS_START( lilcomp )
 	PORT_START("IN.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, power_button, true)
 INPUT_PORTS_END
+
+// config
 
 void lilcomp_state::lilcomp(machine_config &config)
 {
