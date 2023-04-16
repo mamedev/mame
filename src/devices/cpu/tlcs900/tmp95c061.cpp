@@ -562,23 +562,17 @@ void tmp95c061_device::tlcs900_handle_ad()
 				/* conversion channel sweep */
 				switch( m_ad_mode & 0x03 )
 				{
+				case 0x03:  /* AN3 */
+					m_ad_result[3] = m_an_read[3](0) & 0x3ff;
+					[[fallthrough]];
+				case 0x02:  /* AN2 */
+					m_ad_result[2] = m_an_read[2](0) & 0x3ff;
+					[[fallthrough]];
+				case 0x01:  /* AN1 */
+					m_ad_result[1] = m_an_read[1](0) & 0x3ff;
+					[[fallthrough]];
 				case 0x00:  /* AN0 */
 					m_ad_result[0] = m_an_read[0](0) & 0x3ff;
-					break;
-				case 0x01:  /* AN1 */
-					m_ad_result[0] = m_an_read[0](0) & 0x3ff;
-					m_ad_result[1] = m_an_read[1](0) & 0x3ff;
-					break;
-				case 0x02:  /* AN2 */
-					m_ad_result[0] = m_an_read[0](0) & 0x3ff;
-					m_ad_result[1] = m_an_read[1](0) & 0x3ff;
-					m_ad_result[2] = m_an_read[2](0) & 0x3ff;
-					break;
-				case 0x03:  /* AN3 */
-					m_ad_result[0] = m_an_read[0](0) & 0x3ff;
-					m_ad_result[1] = m_an_read[1](0) & 0x3ff;
-					m_ad_result[2] = m_an_read[2](0) & 0x3ff;
-					m_ad_result[3] = m_an_read[3](0) & 0x3ff;
 					break;
 				}
 			}

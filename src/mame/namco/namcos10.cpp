@@ -1008,17 +1008,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 
 void namcos10_state::namcos10_exio(machine_config &config)
 {
-	NAMCOS10_EXIO(config, m_exio, XTAL(22'118'400));
+	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio, XTAL(22'118'400)));
 
-	auto m_exio_cpu = subdevice<tmp95c061_device>("exio:exio_mcu");
-	m_exio_cpu->port7_write().set([this] (uint8_t data) {
-		m_exio_analog_idx = data;
-	});
-	m_exio_cpu->an_read<0>().set([this] () {
-		return m_analog[(m_exio_analog_idx & 3) * 2].read_safe(0);
-	});
-	m_exio_cpu->an_read<1>().set([this] () {
-		return m_analog[(m_exio_analog_idx & 3) * 2 + 1].read_safe(0);
+	exio.analog_callback().set([this] (offs_t offset) {
+		return m_analog[offset].read_safe(0);
 	});
 
 	m_psx_remapper = [this] () {
@@ -1391,8 +1384,8 @@ void namcos10_memn_state::pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address
 
 void namcos10_memn_state::pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
 {
-	uint16_t *ptr = reinterpret_cast<uint16_t*>(&p_n_psxram[n_address / 4]);
-	for (int32_t i = 0; i < n_size * 2; i++) {
+	auto ptr = util::little_endian_cast<uint16_t>(&p_n_psxram[n_address / 4]);
+	for (auto i = 0; i < n_size * 2; i++) {
 		ptr[i] = nand_data_r();
 	}
 }
@@ -2011,10 +2004,7 @@ void namcos10_memn_state::ns10_unks10md(machine_config &config)
 void namcos10_memp3_state::firmware_write_w(uint16_t data)
 {
 	if (data == 1) {
-		// This should happen in the device itself but it would require calling device_reset on the MCU
-		auto pc = ((m_mcu_ram[0x7fff02 / 2] << 16) | m_mcu_ram[0x7fff00 / 2]) & 0xffffff;
-		m_memp3_mcu->set_state_int(TLCS900_PC, pc);
-		m_memp3_mcu->resume(SUSPEND_REASON_HALT);
+		m_memp3_mcu->reset();
 	}
 }
 

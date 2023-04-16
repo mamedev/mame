@@ -10,38 +10,47 @@ DEFINE_DEVICE_TYPE(NAMCOS10_EXIO_BASE, namcos10_exio_base_device, "namcos10_exio
 DEFINE_DEVICE_TYPE(NAMCOS10_MGEXIO,    namcos10_mgexio_device,    "namcos10_mgexio", "Namco System 10 MGEXIO")
 
 // EXIO(G) has the bare minimum: CPLD, audio output jacks, gun I/O, and a card edge connector for additional I/O
-namcos10_exio_base_device::namcos10_exio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ident_code)
-	: device_t(mconfig, type, tag, owner, clock), m_ident_code(ident_code)
+namcos10_exio_base_device::namcos10_exio_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t ident_code) :
+	device_t(mconfig, type, tag, owner, clock), m_ident_code(ident_code)
 {
 }
 
-namcos10_exio_base_device::namcos10_exio_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namcos10_exio_base_device(mconfig, NAMCOS10_EXIO_BASE, tag, owner, clock, 0x32)
+namcos10_exio_base_device::namcos10_exio_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	namcos10_exio_base_device(mconfig, NAMCOS10_EXIO_BASE, tag, owner, clock, 0x32)
+{
+}
+
+void namcos10_exio_base_device::device_start()
 {
 }
 
 ////////////////////////////////////
 
-namcos10_exio_device::namcos10_exio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namcos10_exio_base_device(mconfig, NAMCOS10_EXIO, tag, owner, clock, 0x30),
+namcos10_exio_device::namcos10_exio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	namcos10_exio_base_device(mconfig, NAMCOS10_EXIO, tag, owner, clock, 0x30),
 	m_maincpu(*this, "exio_mcu"),
-	m_ram(*this, "exio_ram")
+	m_ram(*this, "exio_ram"),
+	m_analog_cb(*this)
 {
 }
 
 void namcos10_exio_device::device_start()
 {
-	save_item(NAME(m_is_active));
-}
+	namcos10_exio_base_device::device_start();
 
-void namcos10_exio_device::device_reset()
-{
+	m_analog_cb.resolve_safe(0);
+
+	save_item(NAME(m_is_active));
+	save_item(NAME(m_analog_idx));
 }
 
 void namcos10_exio_device::device_reset_after_children()
 {
+	namcos10_exio_base_device::device_reset_after_children();
+
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	m_is_active = false;
+	m_analog_idx = 0;
 }
 
 void namcos10_exio_device::map(address_map &map)
@@ -67,10 +76,21 @@ void namcos10_exio_device::device_add_mconfig(machine_config &config)
 	m_maincpu->port2_write().set(FUNC(namcos10_exio_device::port_write<2>));
 	m_maincpu->port5_write().set(FUNC(namcos10_exio_device::port_write<5>));
 	m_maincpu->port6_write().set(FUNC(namcos10_exio_device::port_write<6>));
-	m_maincpu->port7_write().set(FUNC(namcos10_exio_device::port_write<7>));
 	m_maincpu->port8_write().set(FUNC(namcos10_exio_device::port_write<8>));
 	m_maincpu->porta_write().set(FUNC(namcos10_exio_device::port_write<10>));
 	m_maincpu->portb_write().set(FUNC(namcos10_exio_device::port_write<11>));
+
+	m_maincpu->port7_write().set([this] (uint8_t data) {
+		// The common EXIO program uploaded seems to write what analog value it wants to read here.
+		// Going to the CPLD?
+		m_analog_idx = data;
+	});
+	m_maincpu->an_read<0>().set([this] () {
+		return m_analog_cb((m_analog_idx & 3) * 2);
+	});
+	m_maincpu->an_read<1>().set([this] () {
+		return m_analog_cb((m_analog_idx & 3) * 2 + 1);
+	});
 }
 
 uint16_t namcos10_exio_device::cpu_status_r()
@@ -84,11 +104,7 @@ void namcos10_exio_device::ctrl_w(uint16_t data)
 	logerror("%s: exio_ctrl_w %04x\n", machine().describe_context(), data);
 
 	if (data == 3) {
-		// Probably this should just reset the entire CPU once the program is loaded in memory
-		// The CPU was halted as soon as it was started so just set the PC and resume it.
-		auto pc = ((m_ram[0x4f02 / 2] << 16) | m_ram[0x4f00 / 2]) & 0xffffff;
-		m_maincpu->set_state_int(TLCS900_PC, pc);
-		m_maincpu->resume(SUSPEND_REASON_HALT);
+		m_maincpu->reset();
 	}
 }
 
@@ -108,28 +124,28 @@ uint16_t namcos10_exio_device::ram_r(offs_t offset)
 	return BIT(m_ram[offset / 2], 0, 8);
 }
 
-template <int port>
+template <int Port>
 void namcos10_exio_device::port_write(offs_t offset, uint8_t data)
 {
-	logerror("%s: exio_port%d_write %02x\n", machine().describe_context(), port, data);
+	logerror("%s: exio_port%d_write %02x\n", machine().describe_context(), Port, data);
 
-	if (port == 8) {
+	if (Port == 8) {
 		// HACK: Simple check to just know when the CPU is alive
 		m_is_active |= data != 0;
 	}
 }
 
-template <int port>
+template <int Port>
 uint8_t namcos10_exio_device::port_read(offs_t offset)
 {
-	logerror("%s: exio_port%d_read\n", machine().describe_context(), port);
+	logerror("%s: exio_port%d_read\n", machine().describe_context(), Port);
 	return 0;
 }
 
 ////////////////////////////////////
 
-namcos10_mgexio_device::namcos10_mgexio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namcos10_exio_base_device(mconfig, NAMCOS10_MGEXIO, tag, owner, clock, 0x33),
+namcos10_mgexio_device::namcos10_mgexio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	namcos10_exio_base_device(mconfig, NAMCOS10_MGEXIO, tag, owner, clock, 0x33),
 	m_maincpu(*this, "exio_mcu"),
 	m_ram(*this, "exio_ram"),
 	m_nvram(*this, "nvram")
@@ -142,12 +158,10 @@ void namcos10_mgexio_device::device_start()
 	m_nvram->set_base(m_ram, 0x8000);
 }
 
-void namcos10_mgexio_device::device_reset()
-{
-}
-
 void namcos10_mgexio_device::device_reset_after_children()
 {
+	namcos10_exio_base_device::device_reset_after_children();
+
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	m_active_state = 0;
 }
@@ -188,7 +202,7 @@ void namcos10_mgexio_device::ctrl_w(uint16_t data)
 	logerror("%s: exio_ctrl_w %04x\n", machine().describe_context(), data);
 
 	if (data == 3) {
-		m_maincpu->resume(SUSPEND_REASON_HALT);
+		m_maincpu->reset();
 		m_active_state = 1;
 	}
 }
