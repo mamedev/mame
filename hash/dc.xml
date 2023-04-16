@@ -257,7 +257,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdk120j" supported="no">
-	    <description>Dreamcast SDK for Sega Library Ver. 1.20J (Jpn)</description>
+	    <description>Dreamcast SDK for Sega Library Ver. 1.20J (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -270,7 +270,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdk130j" supported="no">
-	    <description>Dreamcast SDK for Sega Library Ver. 1.30J (Jpn)</description>
+	    <description>Dreamcast SDK for Sega Library Ver. 1.30J (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -283,7 +283,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdk142j" supported="no">
-	    <description>Dreamcast SDK (Sega Library) Ver. 1.42J for Dev. Box (Jpn)</description>
+	    <description>Dreamcast SDK (Sega Library) Ver. 1.42J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -296,7 +296,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdk155j" supported="no">
-	    <description>Dreamcast SDK (Sega Library) Ver. 1.55J for Dev. Box (Jpn)</description>
+	    <description>Dreamcast SDK (Sega Library) Ver. 1.55J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -322,7 +322,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdk200j" supported="no">
-	    <description>Dreamcast SDK (Sega Library) Ver. 2.00J for Dev. Box (Jpn)</description>
+	    <description>Dreamcast SDK (Sega Library) Ver. 2.00J for Dev. Box (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -335,7 +335,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdkr81" supported="no">
-	    <description>Dreamcast Software Development Kit: Release 8.1 (USA, Euro)</description>
+	    <description>Dreamcast Software Development Kit: Release 8.1 (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -348,7 +348,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdkr9e" supported="no">
-	    <description>Dreamcast Software Development Kit: Release 9 Europe (USA, Euro)</description>
+	    <description>Dreamcast Software Development Kit: Release 9 Europe (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -368,7 +368,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdkr101" supported="no">
-	    <description>Dreamcast Software Development Kit: Release 10.1 (USA, Euro)</description>
+	    <description>Dreamcast Software Development Kit: Release 10.1 (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -381,7 +381,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="dcsdkr11a" supported="no">
-	    <description>Dreamcast Software Development Kit: Release 11a (USA, Euro)</description>
+	    <description>Dreamcast Software Development Kit: Release 11a (USA, Europe)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <part interface="dc_cdrom" name="cdrom">
@@ -941,7 +941,7 @@ Black screen
 
 	<!--
 	<software name="aerodfbitt" cloneof="aerowing" supported="no">
-	    <description>Aero Dancing featuring Blue Impulse - Tentou Taikenban (Jpn)</description>
+	    <description>Aero Dancing featuring Blue Impulse - Tentou Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>CRI</publisher>
 	    <info name="serial" value="610-7106"/>
@@ -1106,7 +1106,7 @@ Black screen
 
 	<!--
 	<software name="after" cloneof="aftersg" supported="no">
-	    <description>After...: Wasureenu Kizuna (Jpn)</description>
+	    <description>After...: Wasureenu Kizuna (Japan)</description>
 	    <year>2004</year>
 	    <publisher>Pionesoft</publisher>
 	    <info name="serial" value="T-18706M"/>
@@ -1224,7 +1224,7 @@ Black screen
 
 	<!--
 	<software name="air1" cloneof="air" supported="no">
-	    <description>Air (Jpn, Rev. B)</description>
+	    <description>Air (Japan, Rev. B)</description>
 	    <year>2001</year>
 	    <publisher>NEC Interchannel</publisher>
 	    <info name="serial" value="T-20112M"/>
@@ -1475,7 +1475,7 @@ Black screen
 
 	<!--
 	<software name="willvi" supported="no">
-	    <description>Alabama Meets Will Vi (Jpn)</description>
+	    <description>Alabama Meets Will Vi (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="610-7196"/>
@@ -1543,7 +1543,7 @@ Black screen
 
 	<!--
 	<software name="alicedte" cloneof="alicedt" supported="no">
-	    <description>Alice Dreams Tournament (Euro)</description>
+	    <description>Alice Dreams Tournament (Europe)</description>
 	    <year>2017</year>
 	    <publisher>Alice Dreams</publisher>
 	    <info name="release" value="20170218"/>
@@ -1557,7 +1557,7 @@ Black screen
 
 	<!--
 	<software name="alicedtcee" cloneof="alicedt" supported="no">
-	    <description>Alice Dreams Tournament - Collector's Edition (Euro)</description>
+	    <description>Alice Dreams Tournament - Collector's Edition (Europe)</description>
 	    <year>2017</year>
 	    <publisher>Alice Dreams</publisher>
 	    <info name="release" value="20170218"/>
@@ -1578,7 +1578,7 @@ Black screen
 
 	<!--
 	<software name="alicedtj" cloneof="alicedt" supported="no">
-	    <description>Alice Dreams Tournament (Jpn)</description>
+	    <description>Alice Dreams Tournament (Japan)</description>
 	    <year>2017</year>
 	    <publisher>Alice Dreams</publisher>
 	    <info name="release" value="20170218"/>
@@ -1592,7 +1592,7 @@ Black screen
 
 	<!--
 	<software name="alicedtcej" cloneof="alicedt" supported="no">
-	    <description>Alice Dreams Tournament - Collector's Edition (Jpn)</description>
+	    <description>Alice Dreams Tournament - Collector's Edition (Japan)</description>
 	    <year>2017</year>
 	    <publisher>Alice Dreams</publisher>
 	    <info name="release" value="20170218"/>
@@ -1856,7 +1856,7 @@ Black screen
 
 	<!--
 	<software name="am2ofcri" supported="no">
-	    <description>AM2 of CRI New Lineup Movie Collection (Jpn)</description>
+	    <description>AM2 of CRI New Lineup Movie Collection (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="073-02536"/>
@@ -1916,7 +1916,7 @@ No [redbook] audio
 	<!-- The Limited Edition (PIO-05202) comes in a large DVD-style case and includes a mouse pad, phone strap and audio drama CD. -->
 	<!--
 	<software name="anglwishsp" cloneof="anglwish" supported="no">
-	    <description>Angel Wish: Kimi no Egao ni Chu! - Special Pack-ban (Jpn)</description>
+	    <description>Angel Wish: Kimi no Egao ni Chu! - Special Pack-ban (Japan)</description>
 	    <year>2005</year>
 	    <publisher>Pionesoft</publisher>
 	    <info name="serial" value="PIO-05202"/>
@@ -2156,7 +2156,7 @@ Optional [BBA] support
 
 	<!--
 	<software name="aggonsenwmc" cloneof="aggonsenbb" supported="no">
-	    <description>Atsumare! Guru Guru Onsen - Original WebMoney Card-tsuki (Jpn)</description>
+	    <description>Atsumare! Guru Guru Onsen - Original WebMoney Card-tsuki (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0120"/>
@@ -2171,7 +2171,7 @@ Optional [BBA] support
 
 	<!--
 	<software name="aggonsent" cloneof="aggonsenbb" supported="no">
-	    <description>Atsumare! Guru Guru Onsen - Taikenban (Jpn)</description>
+	    <description>Atsumare! Guru Guru Onsen - Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7351"/>
@@ -2186,7 +2186,7 @@ Optional [BBA] support
 
 	<!--
 	<software name="aggonsent1" cloneof="aggonsenbb" supported="no">
-	    <description>Atsumare! Guru Guru Onsen - Taikenban (Jpn, Alt)</description>
+	    <description>Atsumare! Guru Guru Onsen - Taikenban (Japan, Alt)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7187"/>
@@ -2824,7 +2824,7 @@ Black screen
 
 	<!--
 	<software name="biohazcvtdm" supported="no">
-	    <description>Biohazard: Code: Veronica Tentou-you Demo Movie (Jpn)</description>
+	    <description>Biohazard: Code: Veronica Tentou-you Demo Movie (Japan)</description>
 	    <year>????</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7724"/>
@@ -3064,7 +3064,7 @@ Black screen
 
 	<!--
 	<software name="bsb" supported="no">
-	    <description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa (Jpn)</description>
+	    <description>Blue-Sky-Blue[s]: Sora o Mau Tsubasa (Japan)</description>
 	    <year>2003</year>
 	    <publisher>Ecole</publisher>
 	    <info name="serial" value="T-23205M"/>
@@ -3328,7 +3328,7 @@ No [redbook] audio
 	<!-- The Limited Edition (T-46702M) includes a soundtrack CD. -->
 	<!--
 	<software name="brdrdowng" cloneof="brdrdown" supported="no">
-	    <description>Border Down - Genteiban (Jpn)</description>
+	    <description>Border Down - Genteiban (Japan)</description>
 	    <year>2003</year>
 	    <publisher>G.rev</publisher>
 	    <info name="serial" value="T-46702M (Game), SRIN-1009 (Audio CD)"/>
@@ -3502,7 +3502,7 @@ Crashes during FMV with [drc]
 	<!-- Was also awarded to the first 100 (possibly 130) people who applied for it online, where it was called Tokubetsu Taikenban. -->
 	<!--
 	<software name="buggheattt" cloneof="hardheat" supported="no">
-	    <description>Buggy Heat - Tentou Taikenban (Jpn)</description>
+	    <description>Buggy Heat - Tentou Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>CRI</publisher>
 	    <info name="serial" value="610-7120"/>
@@ -3858,7 +3858,7 @@ Black screen
 
 	<!--
 	<software name="gspikett" cloneof="cspike" supported="no">
-	    <description>Gunspike - Tentou Taikenban (Jpn)</description>
+	    <description>Gunspike - Tentou Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7982"/>
@@ -3993,7 +3993,7 @@ Black screen
 
 	<!--
 	<software name="capsnktt" cloneof="capsnk" supported="no">
-	    <description>Capcom vs. SNK: Millennium Fight 2000 - Tentou Taikenban (Jpn)</description>
+	    <description>Capcom vs. SNK: Millennium Fight 2000 - Tentou Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7917"/>
@@ -4043,6 +4043,7 @@ Hangs on ADX logo with [drc]
 ]]></notes>
 		<info name="serial" value="610-8086"/>
 		<info name="alt_title" value="CAPCOM対戦ファンディスク"/>
+		<info name="usage" value="Data bank for VMU"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="capcom taisen fan disc (jpn)" sha1="952751d0a313974cb1a13fecf4e12547446b7ef0"/>
@@ -4052,7 +4053,7 @@ Hangs on ADX logo with [drc]
 
 	<!--
 	<software name="cardofd" supported="no">
-	    <description>Card of Destiny: Hikari to Yami no Tougousha (Jpn)</description>
+	    <description>Card of Destiny: Hikari to Yami no Tougousha (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Abel</publisher>
 	    <info name="serial" value="T-44406M"/>
@@ -4207,7 +4208,7 @@ Crashes after ADX logo with [drc]
 
 	<!--
 	<software name="carriert" cloneof="carrier" supported="no">
-	    <description>Carrier - Taikenban (Jpn)</description>
+	    <description>Carrier - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Jaleco</publisher>
 	    <info name="serial" value="610-7742"/>
@@ -4543,7 +4544,7 @@ Crashes after ADX logo with [drc]
 
 	<!--
 	<software name="cheats1" supported="no">
-	    <description>Cheats Band 1 (Euro)</description>
+	    <description>Cheats Band 1 (Europe)</description>
 	    <year>2000</year>
 	    <publisher>Datel</publisher>
 	    <info name="alt_title" value="Über 50 fantastische cheats band 1 (Box), Cheats Volume 1 (Disc)"/>
@@ -4557,7 +4558,7 @@ Crashes after ADX logo with [drc]
 
 	<!--
 	<software name="cheats2" supported="no">
-	    <description>Cheats Band 2 (Euro)</description>
+	    <description>Cheats Band 2 (Europe)</description>
 	    <year>2000</year>
 	    <publisher>Datel</publisher>
 	    <info name="alt_title" value="Über 50 fantastische cheats band 2 (Box), Cheats Volume 2 (Disc)"/>
@@ -4571,7 +4572,7 @@ Crashes after ADX logo with [drc]
 
 	<!--
 	<software name="cheats3" supported="no">
-	    <description>Cheats Band 3 (Euro)</description>
+	    <description>Cheats Band 3 (Europe)</description>
 	    <year>2000</year>
 	    <publisher>Datel</publisher>
 	    <info name="alt_title" value="Über 50 fantastische cheats band 3 (Box), Cheats Volume 3 (Disc)"/>
@@ -4585,7 +4586,7 @@ Crashes after ADX logo with [drc]
 
 	<!--
 	<software name="chckicco" supported="no">
-	    <description>Checkicco no Miru CD (Jpn)</description>
+	    <description>Checkicco no Miru CD (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Pony Canyon</publisher>
 	    <info name="serial" value="PCCAX-10001"/>
@@ -4626,7 +4627,7 @@ Built on Windows CE, requires [MMU] support
 	<!-- The Limited Edition (T-37913M) comes in a cardboard slipcase and includes a mini drama CD. -->
 	<!--
 	<software name="cherrybsg" cloneof="cherryb" supported="no">
-	    <description>Cherry Blossom - Shokai Genteiban (Jpn)</description>
+	    <description>Cherry Blossom - Shokai Genteiban (Japan)</description>
 	    <year>2004</year>
 	    <publisher>Takuyo</publisher>
 	    <info name="serial" value="T-37913M, TAKUPW-0031 (Bonus CD)"/>
@@ -4801,7 +4802,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 
 	<!--
 	<software name="seamanj1" cloneof="seaman" supported="no">
-	    <description>Seaman: Kindan no Pet (Jpn)</description>
+	    <description>Seaman: Kindan no Pet (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Vivarium</publisher>
 	    <part interface="cdrom" name="cdrom">
@@ -4836,7 +4837,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 	<!-- The Complete Kit shares the same disc as the regular edition (T-39405M) but includes a VMU. -->
 	<!--
 	<software name="seaman2001" cloneof="seaman" supported="no">
-	    <description>Seaman: Kindan no Pet - 2001-nen Taiouban (Jpn)</description>
+	    <description>Seaman: Kindan no Pet - 2001-nen Taiouban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Vivarium</publisher>
 	    <info name="serial" value="T-39405M"/>
@@ -4908,7 +4909,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 	<!-- Bundled with the book Seaman Ikusei Shien Kit (ISBN: 4-7561-3572-2) -->
 	<!--
 	<software name="seamanesa" cloneof="seaman" supported="no">
-	    <description>Seaman Esa Disc (Jpn)</description>
+	    <description>Seaman Esa Disc (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Vivarium</publisher>
 	    <info name="serial" value="610-7804"/>
@@ -4924,7 +4925,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 
 	<!--
 	<software name="isaoseaman" cloneof="seaman" supported="no">
-	    <description>Isao Promotion Disk by Seaman (Jpn)</description>
+	    <description>Isao Promotion Disk by Seaman (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Isao</publisher>
 	    <info name="serial" value="610-7813"/>
@@ -5148,7 +5149,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 
 	<!--
 	<software name="chuchut" cloneof="chuchu" supported="no">
-	    <description>Chu-Chu Rocket! - Taikenban (Jpn)</description>
+	    <description>Chu-Chu Rocket! - Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7384"/>
@@ -5163,7 +5164,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 
 	<!--
 	<software name="cleofrtn" supported="no">
-	    <description>Cleopatra Fortune (Jpn)</description>
+	    <description>Cleopatra Fortune (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Altron</publisher>
 	    <info name="serial" value="T-16603M"/>
@@ -5525,7 +5526,7 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 
 	<!--
 	<software name="cooltoontt" cloneof="cooltoon" supported="no">
-	    <description>Cool Cool Toon - Tentou Taikenban (Jpn)</description>
+	    <description>Cool Cool Toon - Tentou Taikenban (Japan)</description>
 	    <year>200?</year>
 	    <publisher>SNK</publisher>
 	    <info name="serial" value="610-7877"/>
@@ -5763,7 +5764,7 @@ Crashes at "Produced by Sega"
 
 	<!--
 	<software name="crzytaxi2hatt" cloneof="crzytaxi2" supported="no">
-	    <description>Crazy Taxi 2 - Have a Try Taikenban (Jpn)</description>
+	    <description>Crazy Taxi 2 - Have a Try Taikenban (Japan)</description>
 	    <year>200?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="673-02830"/>
@@ -5954,7 +5955,7 @@ Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
 	<!-- Bundled together with Dreamcast consoles. -->
 	<!--
 	<software name="dnet" supported="no">
-	    <description>D-net (Jpn)</description>
+	    <description>D-net (Japan)</description>
 	    <year>2000</year>
 	    <publisher>JEA</publisher>
 	    <info name="serial" value="610-7843"/>
@@ -5969,7 +5970,7 @@ Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="dvineluv" supported="no">
-	    <description>D+Vine [Luv] (Jpn)</description>
+	    <description>D+Vine [Luv] (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46501M"/>
@@ -6215,7 +6216,7 @@ Black screen
 
 	<!--
 	<software name="d2ost" supported="no">
-	    <description>D2 Original Sound Track (Jpn)</description>
+	    <description>D2 Original Sound Track (Japan)</description>
 	    <year>1999</year>
 	    <publisher>First Smile Entertainment</publisher>
 	    <info name="serial" value="FSCA-10113"/>
@@ -6577,7 +6578,7 @@ Black screen
 
 	<!--
 	<software name="daytonat" cloneof="daytona" supported="no">
-	    <description>Daytona USA 2001 - Taikenban (Jpn)</description>
+	    <description>Daytona USA 2001 - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7967"/>
@@ -6636,7 +6637,7 @@ Black screen
 
 	<!--
 	<software name="dcxtrmntr" supported="no">
-	    <description>DC X-Terminator (Jpn)</description>
+	    <description>DC X-Terminator (Japan)</description>
 	    <year>200?</year>
 	    <publisher>Gametech</publisher>
 	    <info name="serial" value="DX0133"/>
@@ -6813,7 +6814,7 @@ Black screen
 
 	<!--
 	<software name="doa2t" cloneof="doa2" supported="no">
-	    <description>Dead or Alive 2 - Taikenban (Jpn)</description>
+	    <description>Dead or Alive 2 - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Tecmo</publisher>
 	    <info name="serial" value="610-7913"/>
@@ -6887,7 +6888,7 @@ Black screen
 
 	<!--
 	<software name="deathcoxj" cloneof="deathcox" supported="no">
-	    <description>Death Crimson OX (Jpn)</description>
+	    <description>Death Crimson OX (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Ecole</publisher>
 	    <info name="serial" value="T-23202M"/>
@@ -7292,7 +7293,7 @@ Black screen
 
 	<!--
 	<software name="shangrilamd" cloneof="tkshangrila" supported="no">
-	    <description>Dengen Tenshi Taisen Mahjong Shangri-La - Super Premium Movie Disc (Jpn)</description>
+	    <description>Dengen Tenshi Taisen Mahjong Shangri-La - Super Premium Movie Disc (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Marvelous Entertainment</publisher>
 	    <info name="serial" value="610-7369"/>
@@ -7379,7 +7380,7 @@ Built on Windows CE, requires [MMU] support
 	<!-- Handed out to the first 1000 people who ordered through Dreamcast Direct on or after June 23rd, 2000. -->
 	<!--
 	<software name="dbytsukut" cloneof="dbytsuku" supported="no">
-	    <description>Derby Tsuku: Derby Ba wo Tsukurou! - Taikenban (Jpn)</description>
+	    <description>Derby Tsuku: Derby Ba wo Tsukurou! - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="release" value="200000623"/>
@@ -7434,7 +7435,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="despiriat" cloneof="despiria" supported="no">
-	    <description>deSPIRIA - Taikenban (Jpn)</description>
+	    <description>deSPIRIA - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Atlus</publisher>
 	    <info name="serial" value="610-7925"/>
@@ -7511,7 +7512,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="celsior" supported="no">
-	    <description>Digital Catalog: Celsior (Jpn)</description>
+	    <description>Digital Catalog: Celsior (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39214M"/>
@@ -8093,7 +8094,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="dorip" supported="no">
-	    <description>Dori-P Passport: Trail (Jpn)</description>
+	    <description>Dori-P Passport: Trail (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7549"/>
@@ -8108,7 +8109,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="celica" supported="no">
-	    <description>Doricatch Series: Celica (Jpn)</description>
+	    <description>Doricatch Series: Celica (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39205M"/>
@@ -8123,7 +8124,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="estima1" cloneof="estima" supported="no">
-	    <description>Doricatch Series: Estima (Jpn)</description>
+	    <description>Doricatch Series: Estima (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39209M"/>
@@ -8138,7 +8139,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="estima" supported="no">
-	    <description>Doricatch Series: Estima (Jpn, Rev. 1)</description>
+	    <description>Doricatch Series: Estima (Japan, Rev. 1)</description>
 	    <year>2000</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39210M"/>
@@ -8153,7 +8154,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="funcargo" supported="no">
-	    <description>Doricatch Series: FunCargo (Jpn)</description>
+	    <description>Doricatch Series: FunCargo (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39206M"/>
@@ -8168,7 +8169,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="gaia" supported="no">
-	    <description>Doricatch Series: Gaia (Jpn)</description>
+	    <description>Doricatch Series: Gaia (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39201M"/>
@@ -8183,7 +8184,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="gaias" cloneof="gaia" supported="no">
-	    <description>Gaia - Sample (Jpn)</description>
+	    <description>Gaia - Sample (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="610-7151"/>
@@ -8197,7 +8198,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="hiluxsrf" supported="no">
-	    <description>Doricatch Series: Hilux Surf (Jpn)</description>
+	    <description>Doricatch Series: Hilux Surf (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39203M"/>
@@ -8212,7 +8213,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="lndcrusr" supported="no">
-	    <description>Doricatch Series: Land Cruiser 100/Cygnus (Jpn)</description>
+	    <description>Doricatch Series: Land Cruiser 100/Cygnus (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39202M"/>
@@ -8227,7 +8228,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="prado" supported="no">
-	    <description>Doricatch Series: Land Cruiser Prado (Jpn)</description>
+	    <description>Doricatch Series: Land Cruiser Prado (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39204M"/>
@@ -8242,7 +8243,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 
 	<!--
 	<software name="rav4l" supported="no">
-	    <description>Doricatch Series: RAV4 L (Jpn)</description>
+	    <description>Doricatch Series: RAV4 L (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Toyota</publisher>
 	    <info name="serial" value="T-39213M"/>
@@ -9478,7 +9479,7 @@ Software for [modem]
 	<!-- Bundled together with Toyota Keiretsu-ten Hanbai-ban Dreamcast consoles. -->
 	<!--
 	<software name="drmpasst" cloneof="drmpass101" supported="no">
-	    <description>Dream Passport Ver. 1.03 - Toyota (Jpn)</description>
+	    <description>Dream Passport Ver. 1.03 - Toyota (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7057"/>
@@ -9494,7 +9495,7 @@ Software for [modem]
 
 	<!--
 	<software name="kaigonp" cloneof="drmpass101" supported="no">
-	    <description>Kaigo Network Passport (Jpn)</description>
+	    <description>Kaigo Network Passport (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7972"/>
@@ -9557,7 +9558,7 @@ Software for [modem]
 
 	<!--
 	<software name="drmpass2ggo" cloneof="drmpass2" supported="no">
-	    <description>Dream Passport 2 with Guru Guru Onsen (Jpn)</description>
+	    <description>Dream Passport 2 with Guru Guru Onsen (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="alt_title" value="ドリームパスポート2 with ぐるぐる温泉"/>
@@ -9572,7 +9573,7 @@ Software for [modem]
 	<!-- Bundled together with Regulation #7 Dreamcast consoles. -->
 	<!--
 	<software name="drmpass2r7" cloneof="drmpass2" supported="no">
-	    <description>Dream Passport 2 - Regulation #7 (Jpn)</description>
+	    <description>Dream Passport 2 - Regulation #7 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="release" value="200003xx"/>
@@ -9588,7 +9589,7 @@ Software for [modem]
 	<!-- Bundled together with Toyota Keiretsu-ten Hanbai-ban Dreamcast consoles. -->
 	<!--
 	<software name="drmpass2t" cloneof="drmpass2" supported="no">
-	    <description>Dream Passport 2 - Toyota (Jpn)</description>
+	    <description>Dream Passport 2 - Toyota (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="alt_title" value="ドリームパスポート2 TOYOTA, TOYOTA系列店販売版 ドリームキャスト (Bundle)"/>
@@ -9650,7 +9651,7 @@ Software for [BBA]
 
 	<!--
 	<software name="jcode" cloneof="drmpass2" supported="no">
-	    <description>J-Code Passport (Jpn)</description>
+	    <description>J-Code Passport (Japan)</description>
 	    <year>????</year>
 	    <publisher>J-Data</publisher>
 	    <info name="serial" value="T-43601M"/>
@@ -9778,7 +9779,7 @@ Software for [modem]
 	<!-- Bundled with the Sakura Taisen: Dreamcast for Internet package (HKT-6800). -->
 	<!--
 	<software name="saktaidp3" cloneof="drmpass3" supported="no">
-	    <description>Sakura Taisen Dream Passport 3 (Jpn)</description>
+	    <description>Sakura Taisen Dream Passport 3 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="release" value="20001228"/>
@@ -9794,7 +9795,7 @@ Software for [modem]
 	<!-- Bundled together with CSK Kenkouhoken Kumiai Taiyo-ban Dreamcast Set. -->
 	<!--
 	<software name="cskdrmpass3" cloneof="drmpass3" supported="no">
-	    <description>CSK Kenkouhoken Kumiai Sen'you Dream Passport 3 (Jpn)</description>
+	    <description>CSK Kenkouhoken Kumiai Sen'you Dream Passport 3 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="release" value="20000821"/>
@@ -9859,7 +9860,7 @@ Compatible with Jp Windows and Macintosh
 	<!-- Bundled with the June 30th, 2001 issue of "Famitsu DC". -->
 	<!--
 	<software name="drmpasspt" cloneof="drmpassp" supported="no">
-	    <description>Dream Passport Premier - Taikenban (Jpn)</description>
+	    <description>Dream Passport Premier - Taikenban (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-8065"/>
@@ -9894,7 +9895,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw0" supported="no">
-	    <description>Dream Preview Vol. 0 (Jpn)</description>
+	    <description>Dream Preview Vol. 0 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-00"/>
@@ -9909,7 +9910,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw1" supported="no">
-	    <description>Dream Preview Vol. 1 (Jpn)</description>
+	    <description>Dream Preview Vol. 1 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-01"/>
@@ -9924,7 +9925,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw2" supported="no">
-	    <description>Dream Preview Vol. 2 (Jpn)</description>
+	    <description>Dream Preview Vol. 2 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-02"/>
@@ -9939,7 +9940,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw3" supported="no">
-	    <description>Dream Preview Vol. 3 (Jpn)</description>
+	    <description>Dream Preview Vol. 3 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-03"/>
@@ -9954,7 +9955,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw4" supported="no">
-	    <description>Dream Preview Vol. 4 (Jpn)</description>
+	    <description>Dream Preview Vol. 4 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-04"/>
@@ -9969,7 +9970,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw5" supported="no">
-	    <description>Dream Preview Vol. 5 (Jpn)</description>
+	    <description>Dream Preview Vol. 5 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-05"/>
@@ -9984,7 +9985,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw6" supported="no">
-	    <description>Dream Preview Vol. 6 (Jpn)</description>
+	    <description>Dream Preview Vol. 6 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-06"/>
@@ -9999,7 +10000,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="drmprevw7" supported="no">
-	    <description>Dream Preview Vol. 7 (Jpn)</description>
+	    <description>Dream Preview Vol. 7 (Japan)</description>
 	    <year>199?</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7027-07"/>
@@ -10034,7 +10035,7 @@ Compatible with Jp Windows and Macintosh
 
 	<!--
 	<software name="dcdenet" supported="no">
-	    <description>Dreamcast de Network!! Demonstration Disc (Jpn)</description>
+	    <description>Dreamcast de Network!! Demonstration Disc (Japan)</description>
 	    <year>????</year>
 	    <publisher>Sega</publisher>
 	    <info name="alt_title" value="リームキャストDEネットワーク!! ～デモンストレーション・ディスク～"/>
@@ -10440,6 +10441,7 @@ Sega Marine Fishing:
 		<info name="release" value="20011215"/>
 		<info name="alt_title" value="ドリームキャストVMデータ集"/>
 		<info name="ring_code" value="610-8094-0785 1MM1 C 1Y"/>
+		<info name="usage" value="Data bank for VMU"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dreamcast visual memory data issue (jpn)" sha1="8de504ac98a6fec223a1603bfcfa346aa64e1232"/>
@@ -10581,7 +10583,7 @@ Software for [modem], throws an error requiring a Dream Passport
 	<!-- Bundled together with Dreamcast consoles. -->
 	<!--
 	<software name="dreamkeydd" cloneof="dreamkey3" supported="no">
-	    <description>DreamKey including Demo Disc (Euro)</description>
+	    <description>DreamKey including Demo Disc (Europe)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="833-0003-05 (DreamKey), 833-0002-50 (Dream On)"/>
@@ -11081,7 +11083,7 @@ Software for [modem], throws an error requiring a Dream Passport
 
 	<!--
 	<software name="dyndeka2t1" cloneof="dynamcop" supported="no">
-	    <description>Dynamite Deka 2 - Taikenban (Jpn, Alt)</description>
+	    <description>Dynamite Deka 2 - Taikenban (Japan, Alt)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7150"/>
@@ -11992,7 +11994,7 @@ Hardlocks MAME after event "how to play" with [drc]
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="ever17pe" cloneof="ever17" supported="no">
-	    <description>Ever 17: The Out of Infinity - Premium Edition (Jpn)</description>
+	    <description>Ever 17: The Out of Infinity - Premium Edition (Japan)</description>
 	    <year>2003</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19723M"/>
@@ -12349,7 +12351,7 @@ Hardlocks MAME after event "how to play" with [drc]
 
 	<!--
 	<software name="shexpendbl" cloneof="expendbl" supported="no">
-	    <description>Seitai Heiki Expendable (Jpn)</description>
+	    <description>Seitai Heiki Expendable (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Imagineer</publisher>
 	    <info name="serial" value="T-15003M"/>
@@ -12410,7 +12412,7 @@ Hardlocks MAME after event "how to play" with [drc]
 	<!-- Bundled with the fashion magazine "Extra Cawaii!". -->
 	<!--
 	<software name="cawaii" supported="no">
-	    <description>Extra Cawaii! (Jpn)</description>
+	    <description>Extra Cawaii! (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="673-01633"/>
@@ -12577,7 +12579,7 @@ No [redbook] audio
 	<!-- The disc has the same design as regular promo discs. It has the markings 950-0041-50 952-0039-50. -->
 	<!--
 	<software name="f1wgprd" cloneof="f1wgp" supported="no">
-	    <description>F1 World Grand Prix for Dreamcast "Redbull Demo" (Euro)</description>
+	    <description>F1 World Grand Prix for Dreamcast "Redbull Demo" (Europe)</description>
 	    <year>????</year>
 	    <publisher>Video System</publisher>
 	    <info name="serial" value="952-0039-50"/>
@@ -12713,7 +12715,7 @@ No [redbook] audio
 	<!-- Given to people who applied for it online via Video System's webpage. -->
 	<!--
 	<software name="f1wgp2t" cloneof="f1wgp2" supported="no">
-	    <description>F1 World Grand Prix II for Dreamcast - Taikenban (Jpn)</description>
+	    <description>F1 World Grand Prix II for Dreamcast - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Video System</publisher>
 	    <info name="release" value="20001117"/>
@@ -12856,7 +12858,7 @@ Gameplay requires [PVR] user tile clip
 
 	<!--
 	<software name="f355t" cloneof="f355" supported="no">
-	    <description>F355 Challenge - Taikenban (Jpn)</description>
+	    <description>F355 Challenge - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7899"/>
@@ -13730,7 +13732,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="framgridps" cloneof="framgrid" supported="no">
-	    <description>Frame Gride: Pilot Style (Jpn)</description>
+	    <description>Frame Gride: Pilot Style (Japan)</description>
 	    <year>1999</year>
 	    <publisher>From Software</publisher>
 	    <info name="serial" value="610-7122"/>
@@ -14098,7 +14100,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="arcdx" cloneof="gmshrkcdx" supported="no">
-	    <description>Action Replay CDX (Euro)</description>
+	    <description>Action Replay CDX (Europe)</description>
 	    <year>2000</year>
 	    <publisher>Datel</publisher>
 	    <part interface="cdrom" name="cdrom">
@@ -14111,7 +14113,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="arcdxd" cloneof="gmshrkcdx" supported="no">
-	    <description>Action Replay CDX - Demo Version (Euro)</description>
+	    <description>Action Replay CDX - Demo Version (Europe)</description>
 	    <year>2000</year>
 	    <publisher>Datel</publisher>
 	    <part interface="cdrom" name="cdrom">
@@ -14124,7 +14126,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="eqxtreme" cloneof="gmshrkcdx" supported="no">
-	    <description>Equalizer Xtreme (Euro)</description>
+	    <description>Equalizer Xtreme (Europe)</description>
 	    <year>200?</year>
 	    <publisher>Datel</publisher>
 	    <part interface="cdrom" name="cdrom">
@@ -14137,7 +14139,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="dcpar" cloneof="gmshrkcdx" supported="no">
-	    <description>Pro Action Replay (Jpn)</description>
+	    <description>Pro Action Replay (Japan)</description>
 	    <year>200?</year>
 	    <publisher>Karat</publisher>
 	    <info name="alt_title" value="プロアクションリプレイ"/>
@@ -14151,7 +14153,7 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 
 	<!--
 	<software name="dcpar2" cloneof="gmshrkcdx" supported="no">
-	    <description>Pro Action Replay 2 (Jpn)</description>
+	    <description>Pro Action Replay 2 (Japan)</description>
 	    <year>200?</year>
 	    <publisher>Karat</publisher>
 	    <info name="alt_title" value="プロアクションリプレイ2"/>
@@ -14689,7 +14691,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="gram2000t" cloneof="gram2000" supported="no">
-	    <description>Giant Gram 2000: Zen Nihon Pro Wres 3 Eikou no Yuusha-tachi - Taikenban (Jpn)</description>
+	    <description>Giant Gram 2000: Zen Nihon Pro Wres 3 Eikou no Yuusha-tachi - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7905"/>
@@ -14978,7 +14980,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="golfscdtd" cloneof="golfscd" supported="no">
-	    <description>Golf Shiyou yo: Course Data-shuu Adventure-hen - Tournament Disc (Jpn)</description>
+	    <description>Golf Shiyou yo: Course Data-shuu Adventure-hen - Tournament Disc (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Softmax</publisher>
 	    <info name="serial" value="610-7939"/>
@@ -15057,7 +15059,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="golfs" cloneof="teeoff" supported="no">
-	    <description>Golf Shiyou yo (Jpn)</description>
+	    <description>Golf Shiyou yo (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Bottom Up</publisher>
 	    <info name="serial" value="T-40901M"/>
@@ -15115,7 +15117,7 @@ Hangs on FMV with [drc]
 
 	<!--
 	<software name="golfskp" cloneof="teeoff" supported="no">
-	    <description>Golf Shiyou yo - Kouryaku Pack (Jpn)</description>
+	    <description>Golf Shiyou yo - Kouryaku Pack (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Bottom Up</publisher>
 	    <info name="serial" value="T-40903M"/>
@@ -15151,7 +15153,7 @@ Hangs on FMV with [drc]
 
 	<!--
 	<software name="golfs2nrtt" cloneof="golfs2" supported="no">
-	    <description>Golf Shiyou yo 2: Aratanaru Chousen/Nishikaze no Rhapsody - Tentou Taikenban (Jpn)</description>
+	    <description>Golf Shiyou yo 2: Aratanaru Chousen/Nishikaze no Rhapsody - Tentou Taikenban (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Softmax</publisher>
 	    <info name="serial" value="610-7991"/>
@@ -15495,7 +15497,7 @@ Hangs on FMV with [drc]
 
 	<!--
 	<software name="grauen5" supported="no">
-	    <description>Grauen no Torikago Kapitel 5: Shokuzai (Jpn)</description>
+	    <description>Grauen no Torikago Kapitel 5: Shokuzai (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0037"/>
@@ -15511,7 +15513,7 @@ Hangs on FMV with [drc]
 
 	<!--
 	<software name="grauen6" supported="no">
-	    <description>Grauen no Torikago Kapitel 6: Senritsu (Jpn)</description>
+	    <description>Grauen no Torikago Kapitel 6: Senritsu (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0038"/>
@@ -15593,7 +15595,7 @@ No [redbook] audio
 	-->
 	<!--
 	<software name="ggxsg" cloneof="ggx" supported="no">
-	    <description>Guilty Gear X - Shokai Genteiban (Jpn)</description>
+	    <description>Guilty Gear X - Shokai Genteiban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sammy</publisher>
 	    <info name="serial" value="T-2401M"/>
@@ -15990,7 +15992,7 @@ Optional [BBA] support
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="hanacols2" supported="no">
-	    <description>Hanagumi Taisen Columns 2 (Jpn)</description>
+	    <description>Hanagumi Taisen Columns 2 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0046"/>
@@ -16006,7 +16008,7 @@ Optional [BBA] support
 
 	<!--
 	<software name="hangdj" supported="no">
-	    <description>Hang the DJ (Jpn)</description>
+	    <description>Hang the DJ (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Marvelous Entertainment</publisher>
 	    <info name="serial" value="MJCYX80002"/>
@@ -16142,7 +16144,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="heartbrk" supported="no">
-	    <description>Heartbreak Diary (Jpn)</description>
+	    <description>Heartbreak Diary (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Pioneer LDC</publisher>
 	    <info name="serial" value="PICL-7501"/>
@@ -16375,7 +16377,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="hkcookie" supported="no">
-	    <description>Hello Kitty no Waku Waku Cookies (Jpn)</description>
+	    <description>Hello Kitty no Waku Waku Cookies (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0090"/>
@@ -16448,7 +16450,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="himitsuost" supported="no">
-	    <description>Himitsu Original Sound Track (Jpn)</description>
+	    <description>Himitsu Original Sound Track (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Warner Music Japan</publisher>
 	    <info name="serial" value="WPCV-10045"/>
@@ -16485,7 +16487,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="hitachish4" supported="no">
-	    <description>Hitachi SH-4 Demo Disc (Jpn)</description>
+	    <description>Hitachi SH-4 Demo Disc (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Hitachi</publisher>
 	    <info name="alt_title" value="HITACHI SH-4 デモディスク"/>
@@ -16545,7 +16547,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="100swordb" cloneof="100sword" supported="no">
-	    <description>Hundred Swords - @barai (Jpn)</description>
+	    <description>Hundred Swords - @barai (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0127"/>
@@ -16878,7 +16880,7 @@ FMV draws [PVR] black pixels instead of transparent color
 	<!-- The Limited Edition (T-5702M) comes in a double-CD case and includes an audio CD. -->
 	<!--
 	<software name="idoljansg" cloneof="idoljan" supported="no">
-	    <description>Idol Janshi wo Tsukucchaou - Shokai Genteiban (Jpn)</description>
+	    <description>Idol Janshi wo Tsukucchaou - Shokai Genteiban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Jaleco</publisher>
 	    <info name="serial" value="T-5702M"/>
@@ -16977,7 +16979,7 @@ FMV draws [PVR] black pixels instead of transparent color
 	<!-- Bundled with the Mars 16th, 2001 issue of "Famitsu DC". -->
 	<!--
 	<software name="specialgd" supported="no">
-	    <description>Imakoso!! Dreamcast with SPECIAL GD!! (Jpn)</description>
+	    <description>Imakoso!! Dreamcast with SPECIAL GD!! (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Enterbrain</publisher>
 	    <info name="serial" value="610-7993"/>
@@ -17191,7 +17193,7 @@ No [redbook] audio
 
 	<!--
 	<software name="espionagetdm" cloneof="induspy" supported="no">
-	    <description>Espion-Age-Nts: Industrial Agents for Active Espionage - Tentouyou Demonstration Movie (Jpn)</description>
+	    <description>Espion-Age-Nts: Industrial Agents for Active Espionage - Tentouyou Demonstration Movie (Japan)</description>
 	    <year>1999</year>
 	    <publisher>NEC Home Electronics</publisher>
 	    <info name="serial" value="610-7185"/>
@@ -17242,7 +17244,7 @@ No [redbook] audio
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="irroommt" supported="no">
-	    <description>Inoue Ryouko: Roommate (Jpn)</description>
+	    <description>Inoue Ryouko: Roommate (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Datam Polystar</publisher>
 	    <info name="serial" value="T-19505M"/>
@@ -17284,7 +17286,7 @@ Crashes on FMV with [drc]
 	<!-- The Limited Edition (T-20117M) comes in a double-CD case and includes an audio CD. -->
 	<!--
 	<software name="intrludesg" cloneof="intrlude" supported="no">
-	    <description>Interlude - Shokai Genteiban (Jpn)</description>
+	    <description>Interlude - Shokai Genteiban (Japan)</description>
 	    <year>2003</year>
 	    <publisher>NEC Interchannel</publisher>
 	    <info name="serial" value="T-20117M"/>
@@ -17358,7 +17360,7 @@ Crashes on FMV with [drc]
 	<!-- The Limited Edition (T-19721M) comes in a larger cardboard case and includes a hand puppet. -->
 	<!--
 	<software name="irissg" cloneof="iris" supported="no">
-	    <description>Iris - Shokai Genteiban (Jpn)</description>
+	    <description>Iris - Shokai Genteiban (Japan)</description>
 	    <year>2003</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19721M"/>
@@ -17726,7 +17728,7 @@ No [redbook] audio
 	<!-- The Sega Direct version (HDR-0128) comes in a larger cardboard box and includes a t-shirt. -->
 	<!--
 	<software name="dljetsetrsd" cloneof="jetgrind" supported="no">
-	    <description>Jet Set Radio (Jpn, Sega Direct)</description>
+	    <description>Jet Set Radio (Japan, Sega Direct)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0128"/>
@@ -17756,7 +17758,7 @@ No [redbook] audio
 
 	<!--
 	<software name="jetsetrt" cloneof="jetgrind" supported="no">
-	    <description>Jet Set Radio - Taikenban (Jpn)</description>
+	    <description>Jet Set Radio - Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7888"/>
@@ -17970,7 +17972,7 @@ Pausing game overlay hides too much [PVR]
 
 	<!--
 	<software name="jojobatt" cloneof="jojoba" supported="no">
-	    <description>Jojo no Kimyou na Bouken: Mirai e no Isan - Tentou-you Taikenban (Jpn)</description>
+	    <description>Jojo no Kimyou na Bouken: Mirai e no Isan - Tentou-you Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7357"/>
@@ -17985,7 +17987,7 @@ Pausing game overlay hides too much [PVR]
 
 	<!--
 	<software name="jrapatv40l10" cloneof="jrapat" supported="no">
-	    <description>JRA PAT for Dreamcast (Jpn, V40L10)</description>
+	    <description>JRA PAT for Dreamcast (Japan, V40L10)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="T-42501M"/>
@@ -18021,7 +18023,7 @@ Horse bet service requiring a [modem] or [BBA]
 
 	<!--
 	<software name="jrapatv40l12" cloneof="jrapat" supported="no">
-	    <description>JRA PAT for Dreamcast (Jpn, V40L12)</description>
+	    <description>JRA PAT for Dreamcast (Japan, V40L12)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="T-42501M"/>
@@ -18451,7 +18453,7 @@ No [redbook] audio
 
 	<!--
 	<software name="ksnntmsd" cloneof="nadesico" supported="no">
-	    <description>Kidou Senkan Nadesico: Nadesico the Mission - Special Disc (Jpn)</description>
+	    <description>Kidou Senkan Nadesico: Nadesico the Mission - Special Disc (Japan)</description>
 	    <year>????</year>
 	    <publisher>Kadokawa Shoten</publisher>
 	    <info name="serial" value="610-7183"/>
@@ -18522,7 +18524,7 @@ No [redbook] audio
 
 	<!--
 	<software name="tvshop1" supported="no">
-	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 1.0 (Jpn)</description>
+	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 1.0 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>CSK Corporation</publisher>
 	    <info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.1.0"/>
@@ -18536,7 +18538,7 @@ No [redbook] audio
 
 	<!--
 	<software name="tvshop2" supported="no">
-	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 2.0 (Jpn)</description>
+	    <description>Kikan Genteiban Internet TV Denwa Shopping Ver. 2.0 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>CSK Corporation</publisher>
 	    <info name="alt_title" value="期間限定版　インターネットテレビ電話ショッピング　Ver.2.0"/>
@@ -18671,7 +18673,7 @@ No [redbook] audio
 
 	<!--
 	<software name="kitaepm" supported="no">
-	    <description>Kita e. Photo Memories (Jpn)</description>
+	    <description>Kita e. Photo Memories (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Hudson Soft</publisher>
 	    <info name="serial" value="T-14306M"/>
@@ -18711,7 +18713,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="kitaewipsp" supported="no">
-	    <description>Kita e. White Illumination - Pure Songs and Pictures (Jpn)</description>
+	    <description>Kita e. White Illumination - Pure Songs and Pictures (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Media Factory</publisher>
 	    <info name="serial" value="ZMCZ-656"/>
@@ -18783,7 +18785,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="kobepass" supported="no">
-	    <description>Kobe Passport TV Denwa-ban (Jpn)</description>
+	    <description>Kobe Passport TV Denwa-ban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>CSK Corporation</publisher>
 	    <info name="serial" value="610-7880"/>
@@ -18842,7 +18844,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="kizuna1" cloneof="kizuna" supported="no">
-	    <description>Kuon no Kizuna: Sairinshou (Jpn)</description>
+	    <description>Kuon no Kizuna: Sairinshou (Japan)</description>
 	    <year>2000</year>
 	    <publisher>FOG</publisher>
 	    <info name="serial" value="T-36701M"/>
@@ -18877,7 +18879,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="kyotei" supported="no">
-	    <description>Kyotei for Dreamcast (Jpn)</description>
+	    <description>Kyotei for Dreamcast (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Kyotei</publisher>
 	    <info name="serial" value="T-42601M"/>
@@ -18920,7 +18922,7 @@ Crashes on [drc] after pressing begin button
 
 	<!--
 	<software name="lakemstr" supported="no">
-	    <description>Lake Masters Pro Dreamcast plus! (Jpn)</description>
+	    <description>Lake Masters Pro Dreamcast plus! (Japan)</description>
 	    <year>2000</year>
 	    <publisher>DaZZ</publisher>
 	    <info name="serial" value="T-42401M"/>
@@ -18936,7 +18938,7 @@ Crashes on [drc] after pressing begin button
 
 	<!--
 	<software name="langriss" supported="no">
-	    <description>Langrisser Millennium (Jpn)</description>
+	    <description>Langrisser Millennium (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Masaya</publisher>
 	    <info name="serial" value="T-2501M"/>
@@ -19473,7 +19475,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 
 	<!--
 	<software name="maboroshit" cloneof="maboroshi" supported="no">
-	    <description>Maboroshi Tsukiyo - Taikenban (Jpn)</description>
+	    <description>Maboroshi Tsukiyo - Taikenban (Japan)</description>
 	    <year>????</year>
 	    <publisher>SIMS</publisher>
 	    <info name="serial" value="610-7186"/>
@@ -19509,7 +19511,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 
 	<!--
 	<software name="macrossm3t" cloneof="macrossm3" supported="no">
-	    <description>Macross M3 - Taikenban (Jpn)</description>
+	    <description>Macross M3 - Taikenban (Japan)</description>
 	    <year>????</year>
 	    <publisher>Shoeisha</publisher>
 	    <info name="serial" value="610-7961"/>
@@ -19631,7 +19633,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 
 	<!--
 	<software name="mtg" supported="no">
-	    <description>Magic: The Gathering (Jpn)</description>
+	    <description>Magic: The Gathering (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0116"/>
@@ -19666,7 +19668,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 
 	<!--
 	<software name="majoocha" supported="no">
-	    <description>Majo no Ochakai (Jpn)</description>
+	    <description>Majo no Ochakai (Japan)</description>
 	    <year>2003</year>
 	    <publisher>NEC Interchannel</publisher>
 	    <info name="serial" value="T-20124M"/>
@@ -19683,7 +19685,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 	<!-- The Limited Edition (T-18705M) includes a phone-strap mini figure and a drama CD. -->
 	<!--
 	<software name="majoochasg" cloneof="majoocha" supported="no">
-	    <description>Majo no Ochakai - Shokai Genteiban (Jpn)</description>
+	    <description>Majo no Ochakai - Shokai Genteiban (Japan)</description>
 	    <year>2003</year>
 	    <publisher>NEC Interchannel</publisher>
 	    <info name="serial" value="T-20126M"/>
@@ -19798,7 +19800,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 
 	<!--
 	<software name="marie" supported="no">
-	    <description>Marie &amp; Elie no Atelier: Salburg no Renkinjutsushi 1-2 (Jpn)</description>
+	    <description>Marie &amp; Elie no Atelier: Salburg no Renkinjutsushi 1-2 (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Kool Kizz</publisher>
 	    <info name="serial" value="T-44701M"/>
@@ -19903,7 +19905,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="marihand2" supported="no">
-	    <description>Marionette Handler 2 (Jpn)</description>
+	    <description>Marionette Handler 2 (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Micronet</publisher>
 	    <info name="serial" value="T-2204M"/>
@@ -19937,7 +19939,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="mmatrixj" cloneof="mmatrix" supported="no">
-	    <description>Mars Matrix (Jpn)</description>
+	    <description>Mars Matrix (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="T-1238M"/>
@@ -20013,7 +20015,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="mvsctt" cloneof="mvsc" supported="no">
-	    <description>Marvel vs. Capcom: Clash of Super Heroes - Tentou Taikenban (Jpn)</description>
+	    <description>Marvel vs. Capcom: Clash of Super Heroes - Tentou Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7121"/>
@@ -20087,7 +20089,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="mvsc2tt" cloneof="mvsc2" supported="no">
-	    <description>Marvel vs. Capcom 2: New Age of Heroes - Tentou Taikenban (Jpn)</description>
+	    <description>Marvel vs. Capcom 2: New Age of Heroes - Tentou Taikenban (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="610-7807"/>
@@ -20332,7 +20334,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="meipuru" supported="no">
-	    <description>Mei Puru (Jpn)</description>
+	    <description>Mei Puru (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46510M"/>
@@ -20394,7 +20396,7 @@ Built on Windows CE, requires [MMU] support
 	<!-- The Limited Edition (T-19708M) includes three trading cards and a "making of" GD. -->
 	<!--
 	<software name="memoff2sg" cloneof="memoff2" supported="no">
-	    <description>Memories Off 2nd - Shokai Genteiban (Jpn)</description>
+	    <description>Memories Off 2nd - Shokai Genteiban (Japan)</description>
 	    <year>2001</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19708M"/>
@@ -20438,7 +20440,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="merge" supported="no">
-	    <description>Merge: Marginal (Jpn)</description>
+	    <description>Merge: Marginal (Japan)</description>
 	    <year>2003</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46514M"/>
@@ -20455,7 +20457,7 @@ Built on Windows CE, requires [MMU] support
 	<!-- The Limited Edition (T-46506M) shares the same disc as the regular edition (T-46507M) but includes a telephone card. -->
 	<!--
 	<software name="metlwolf" supported="no">
-	    <description>Metal Wolf (Jpn)</description>
+	    <description>Metal Wolf (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46506M, T-46507M"/>
@@ -20494,7 +20496,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="webtvssl" cloneof="webtv" supported="no">
-	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Jpn)</description>
+	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>WebTV Networks</publisher>
 	    <info name="serial" value="610-7390"/>
@@ -20509,7 +20511,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="webtvssl1" cloneof="webtv" supported="no">
-	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Jpn, Alt)</description>
+	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Japan, Alt)</description>
 	    <year>1999</year>
 	    <publisher>WebTV Networks</publisher>
 	    <info name="serial" value="610-7391"/>
@@ -20610,7 +20612,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="milkyssn" supported="no">
-	    <description>Milky Season (Jpn)</description>
+	    <description>Milky Season (Japan)</description>
 	    <year>2002</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19713M"/>
@@ -20719,7 +20721,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="misspart3" supported="no">
-	    <description>Missing Parts 3: The Tantei Stories (Jpn)</description>
+	    <description>Missing Parts 3: The Tantei Stories (Japan)</description>
 	    <year>2003</year>
 	    <publisher>FOG</publisher>
 	    <info name="serial" value="T-36704M"/>
@@ -20759,7 +20761,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="moekan" supported="no">
-	    <description>Moekan (Jpn)</description>
+	    <description>Moekan (Japan)</description>
 	    <year>2003</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46515M"/>
@@ -20940,7 +20942,7 @@ No [redbook] audio
 	<!-- A promo version exists (950-0170-50 952-0165-50), it is most likely the same as retail. -->
 	<!--
 	<software name="racesim2o" cloneof="monacogp" supported="no">
-	    <description>Racing Simulation 2: Monaco Grand Prix On-Line (Euro)</description>
+	    <description>Racing Simulation 2: Monaco Grand Prix On-Line (Europe)</description>
 	    <year>2001</year>
 	    <publisher>Swing! Entertainment</publisher>
 	    <info name="serial" value="T-45006D-50"/>
@@ -21034,7 +21036,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="reversitt" cloneof="reversi" supported="no">
-	    <description>Morita no Saikyou Reversi - Tentou Taikenban (Jpn)</description>
+	    <description>Morita no Saikyou Reversi - Tentou Taikenban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Random House</publisher>
 	    <info name="serial" value="610-7132"/>
@@ -21512,7 +21514,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="mrdrillrj" cloneof="mrdrillr" supported="no">
-	    <description>Mr. Driller (Jpn)</description>
+	    <description>Mr. Driller (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Namco</publisher>
 	    <info name="serial" value="T-1402M"/>
@@ -21762,7 +21764,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="musapey" supported="no">
-	    <description>Musapey no Choco Marker (Jpn)</description>
+	    <description>Musapey no Choco Marker (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Ecole</publisher>
 	    <info name="serial" value="T-23203M"/>
@@ -21778,7 +21780,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="mmmay" supported="no">
-	    <description>My Merry May (Jpn)</description>
+	    <description>My Merry May (Japan)</description>
 	    <year>2002</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19714M"/>
@@ -21794,7 +21796,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="mmmaybe" supported="no">
-	    <description>My Merry Maybe (Jpn)</description>
+	    <description>My Merry Maybe (Japan)</description>
 	    <year>2003</year>
 	    <publisher>KID</publisher>
 	    <info name="serial" value="T-19719M"/>
@@ -21858,7 +21860,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="nanatsu" supported="no">
-	    <description>Nanatsu no Hikan: Senritsu no Bishou (Jpn)</description>
+	    <description>Nanatsu no Hikan: Senritsu no Bishou (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Koei</publisher>
 	    <info name="serial" value="T-7604M"/>
@@ -22040,7 +22042,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="nba2k1j" cloneof="nba2k1" supported="no">
-	    <description>NBA 2K1 (Jpn)</description>
+	    <description>NBA 2K1 (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0150"/>
@@ -22099,7 +22101,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="nba2k2j" cloneof="nba2k2" supported="no">
-	    <description>NBA 2K2 (Jpn)</description>
+	    <description>NBA 2K2 (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0197"/>
@@ -22221,7 +22223,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="goldlog" supported="no">
-	    <description>Neo Golden Logres (Jpn)</description>
+	    <description>Neo Golden Logres (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Success</publisher>
 	    <info name="serial" value="T-9904M"/>
@@ -22296,7 +22298,7 @@ Crashes at "Produced by Sega", PC=C010094
 
 	<!--
 	<software name="neppachi" supported="no">
-	    <description>Neppachi: 10-ren Chan de Las Vegas Ryokou (Jpn)</description>
+	    <description>Neppachi: 10-ren Chan de Las Vegas Ryokou (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Daikoku Denki</publisher>
 	    <info name="serial" value="T-41002M"/>
@@ -22313,7 +22315,7 @@ Crashes at "Produced by Sega", PC=C010094
 	<!-- The Limited Edition (T-41001M) includes 30 free plays during tournaments. -->
 	<!--
 	<software name="neppachisg" cloneof="neppachi" supported="no">
-	    <description>Neppachi: 10-ren Chan de Las Vegas Ryokou - Shokai Genteiban (Jpn)</description>
+	    <description>Neppachi: 10-ren Chan de Las Vegas Ryokou - Shokai Genteiban (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Daikoku Denki</publisher>
 	    <info name="serial" value="T-41001M"/>
@@ -22455,7 +22457,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="nettenn" supported="no">
-	    <description>Net de Tennis (Jpn)</description>
+	    <description>Net de Tennis (Japan)</description>
 	    <year>2000</year>
 	    <publisher>Capcom</publisher>
 	    <info name="serial" value="T-1234M"/>
@@ -22540,7 +22542,7 @@ Requires [VMU] and a working [modem] connection
 
 	<!--
 	<software name="nvigo" supported="no">
-	    <description>Net Versus: Igo (Jpn)</description>
+	    <description>Net Versus: Igo (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Atmark</publisher>
 	    <info name="serial" value="T-45703M"/>
@@ -22785,7 +22787,7 @@ Requires [VMU] and a working [modem] connection
 
 	<!--
 	<software name="nfl2kjdc" cloneof="nfl2k" supported="no">
-	    <description>NFL 2K (Jpn, Dreamcast Collection)</description>
+	    <description>NFL 2K (Japan, Dreamcast Collection)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0141"/>
@@ -22872,7 +22874,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nfl2k2j" cloneof="nfl2k2" supported="no">
-	    <description>NFL 2K2 (Jpn)</description>
+	    <description>NFL 2K2 (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0196"/>
@@ -23186,7 +23188,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nhl2k2j" cloneof="nhl2k2" supported="no">
-	    <description>NHL 2K2 (Jpn)</description>
+	    <description>NHL 2K2 (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="HDR-0199"/>
@@ -23624,7 +23626,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nihonpro1" cloneof="nihonpro" supported="no">
-	    <description>Nihon Pro Mahjong Renmei Kounin: Tetsuman Menkyokaiden (Jpn)</description>
+	    <description>Nihon Pro Mahjong Renmei Kounin: Tetsuman Menkyokaiden (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Naxat Soft</publisher>
 	    <info name="serial" value="T-18701M"/>
@@ -23640,7 +23642,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nihonpro" supported="no">
-	    <description>Nihon Pro Mahjong Renmei Kounin: Tetsuman Menkyokaiden (Jpn, Rev. 1)</description>
+	    <description>Nihon Pro Mahjong Renmei Kounin: Tetsuman Menkyokaiden (Japan, Rev. 1)</description>
 	    <year>2001</year>
 	    <publisher>Naxat Soft</publisher>
 	    <info name="serial" value="T-18703M"/>
@@ -23656,7 +23658,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nijuuei" supported="no">
-	    <description>Nijuuei (Jpn)</description>
+	    <description>Nijuuei (Japan)</description>
 	    <year>2002</year>
 	    <publisher>Princess Soft</publisher>
 	    <info name="serial" value="T-46505M"/>
@@ -23672,7 +23674,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="9chairs" supported="no">
-	    <description>Nine Chairs (Jpn)</description>
+	    <description>Nine Chairs (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Senha &amp; Co.</publisher>
 	    <info name="serial" value="SCLX2004"/>
@@ -23688,7 +23690,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nishikaze" supported="no">
-	    <description>Nishikaze no Rhapsody (Jpn)</description>
+	    <description>Nishikaze no Rhapsody (Japan)</description>
 	    <year>2001</year>
 	    <publisher>Softmax</publisher>
 	    <info name="serial" value="T-44502M"/>
@@ -23704,7 +23706,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="nobur" supported="no">
-	    <description>Nobunaga no Yabou: Reppuden (Jpn)</description>
+	    <description>Nobunaga no Yabou: Reppuden (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Koei</publisher>
 	    <info name="serial" value="T-7605M"/>
@@ -23740,7 +23742,7 @@ Crashes at the end of FMV
 
 	<!--
 	<software name="hometrad" supported="no">
-	    <description>Nomura Home Trade (Jpn)</description>
+	    <description>Nomura Home Trade (Japan)</description>
 	    <year>1999</year>
 	    <publisher>Nomura</publisher>
 	    <info name="release" value="199910xx"/>
