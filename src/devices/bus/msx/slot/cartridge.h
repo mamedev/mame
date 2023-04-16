@@ -46,6 +46,7 @@ class msx_cart_interface;
 class msx_slot_cartridge_base_device : public device_t
 								, public device_cartrom_image_interface
 								, public device_slot_interface
+								, public device_mixer_interface
 								, public msx_internal_slot_interface
 {
 public:
@@ -101,6 +102,7 @@ protected:
 	address_space &memory_space() const;
 	address_space &io_space() const;
 	cpu_device &maincpu() const;
+	device_mixer_interface &soundin() const;
 	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
 
 private:

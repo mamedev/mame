@@ -160,7 +160,7 @@ u32 microvision_state::tms1100_micro_pla(offs_t offset)
 	// default TMS1100 microinstructions PLA - this should work for all games
 	// verified for: blckbstr, bowling, pinball, vegasslt
 
-	// TCY, YNEC, TMCIY, AxAAC
+	// TCY, YNEC, TCMIY, AxAAC
 	static const u16 micro1[4] = { 0x0108, 0x9080, 0x8068, 0x0136 };
 
 	// 0x20, 0x30, 0x00

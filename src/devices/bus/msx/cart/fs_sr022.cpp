@@ -43,8 +43,8 @@ std::error_condition msx_cart_fs_sr022_device::initialize_cartridge(std::string 
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
-	page(2)->install_read_handler(0xbfff, 0xbfff, read8smo_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_r)));
-	page(2)->install_write_handler(0xbffc, 0xbffe, write8sm_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_w)));
+	page(2)->install_read_handler(0xbfff, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_r)));
+	page(2)->install_write_handler(0xbffc, 0xbffe, emu::rw_delegate(*this, FUNC(msx_cart_fs_sr022_device::buns_w)));
 
 	return std::error_condition();
 }

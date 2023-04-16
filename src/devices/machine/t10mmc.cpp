@@ -881,8 +881,8 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
 				m_device->logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
-				m_cdda->set_output_gain(0, data[17] / 255.0f);
-				m_cdda->set_output_gain(1, data[19] / 255.0f);
+				m_cdda->set_output_gain(0, data[9] / 255.0f);
+				m_cdda->set_output_gain(1, data[11] / 255.0f);
 				break;
 		}
 		break;

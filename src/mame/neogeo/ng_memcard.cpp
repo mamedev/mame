@@ -102,7 +102,7 @@ uint16_t ng_memcard_device::read(offs_t offset)
 
 void ng_memcard_device::write(offs_t offset, uint16_t data)
 {
-	if (m_regsel && !m_lock1 && m_unlock2)
+	if (!m_lock1 && m_unlock2)
 		m_memcard_data[offset & 0x07ff] = uint8_t(data & 0x00ff);
 }
 

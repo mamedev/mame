@@ -88,7 +88,7 @@ private:
 
 TILEMAP_MAPPER_MEMBER(topdrive_state::tilemap_scan_16x16)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	return (row & 0xf) | ((col & 0x3f) << 4) | ((row & 0x30) << 6);
 }
 
@@ -278,7 +278,7 @@ void topdrive_state::topdrive(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_topdrive);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50); // not verified
+	screen.set_refresh_hz(58.75); // verified
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2000));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
@@ -289,7 +289,7 @@ void topdrive_state::topdrive(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -314,4 +314,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1995, topdrive,     0,        topdrive,    topdrive,    topdrive_state, empty_init, ROT0,  "Proyesel", "Top Driving (version 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, topdrive, 0, topdrive, topdrive, topdrive_state, empty_init, ROT0, "Proyesel", "Top Driving (version 1.1)", MACHINE_SUPPORTS_SAVE )

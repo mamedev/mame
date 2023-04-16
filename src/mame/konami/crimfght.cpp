@@ -14,13 +14,139 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "konamipt.h"
-#include "crimfght.h"
 
+#include "k051960.h"
+#include "k052109.h"
+#include "konamipt.h"
+
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/k007232.h"
 #include "sound/ymopm.h"
+#include "emupal.h"
 #include "speaker.h"
+
+namespace {
+
+class crimfght_state : public driver_device
+{
+public:
+	crimfght_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_bank0000(*this, "bank0000"),
+		m_k007232(*this, "k007232"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
+		m_rombank(*this, "rombank")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+	void crimfght(machine_config &config);
+
+private:
+	/* devices */
+	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<address_map_bank_device> m_bank0000;
+	required_device<k007232_device> m_k007232;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_memory_bank m_rombank;
+
+	void crimfght_coin_w(uint8_t data);
+	void sound_w(uint8_t data);
+	uint8_t k052109_051960_r(offs_t offset);
+	void k052109_051960_w(offs_t offset, uint8_t data);
+	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
+	void ym2151_ct_w(uint8_t data);
+	virtual void machine_start() override;
+	uint32_t screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void volume_callback(uint8_t data);
+	K052109_CB_MEMBER(tile_callback);
+	K051960_CB_MEMBER(sprite_callback);
+	void banking_callback(uint8_t data);
+
+	void bank0000_map(address_map &map);
+	void crimfght_map(address_map &map);
+	void crimfght_sound_map(address_map &map);
+	int m_woco = 0;
+	int m_rmrd = 0;
+	int m_init = 0;
+};
+
+
+/***************************************************************************
+
+  Callbacks for the K052109
+
+***************************************************************************/
+
+K052109_CB_MEMBER(crimfght_state::tile_callback)
+{
+	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
+	*code |= ((*color & 0x1f) << 8) | (bank << 13);
+	*color = layer * 4 + ((*color & 0xc0) >> 6);
+}
+
+/***************************************************************************
+
+  Callbacks for the K051960
+
+***************************************************************************/
+
+K051960_CB_MEMBER(crimfght_state::sprite_callback)
+{
+	enum { sprite_colorbase = 256 / 16 };
+
+	/* The PROM allows for mixed priorities, where sprites would have */
+	/* priority over text but not on one or both of the other two planes. */
+	switch (*color & 0x70)
+	{
+		case 0x10: *priority = 0x00; break;            /* over ABF */
+		case 0x00: *priority = GFX_PMASK_4          ; break;  /* over AB, not F */
+		case 0x40: *priority = GFX_PMASK_4|GFX_PMASK_2     ; break;  /* over A, not BF */
+		case 0x20:
+		case 0x60: *priority = GFX_PMASK_4|GFX_PMASK_2|GFX_PMASK_1; break;  /* over -, not ABF */
+		case 0x50: *priority = GFX_PMASK_2     ; break;  /* over AF, not B */
+		case 0x30:
+		case 0x70: *priority = GFX_PMASK_2|GFX_PMASK_1; break;  /* over F, not AB */
+	}
+	/* bit 7 is on in the "Game Over" sprites, meaning unknown */
+	/* in Aliens it is the top bit of the code, but that's not needed here */
+	*color = sprite_colorbase + (*color & 0x0f);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+uint32_t crimfght_state::screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_k052109->tilemap_update();
+
+	screen.priority().fill(0, cliprect);
+	/* The background color is always from layer 1 */
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
+
+	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
+	return 0;
+}
 
 
 void crimfght_state::crimfght_coin_w(uint8_t data)
@@ -427,6 +553,8 @@ ROM_START( crimfghtu )
 	ROM_REGION( 0x40000, "k007232", 0 ) /* data for the 007232 */
 	ROM_LOAD( "821k03.e5",  0x00000, 0x40000, CRC(fef8505a) SHA1(5c5121609f69001838963e961cb227d6b64e4f5f) )
 ROM_END
+
+} // anonymous namespace
 
 /***************************************************************************
 

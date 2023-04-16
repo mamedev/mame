@@ -65,14 +65,19 @@ Notes:
     TODO:
      - Game speed seems to be completely wrong, timers and player movement too fast?
 
+    The EEPROM protection method is the same as in the subsino2.cpp games.
+
 *********************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/h8/h83048.h"
+#include "machine/ds2430a.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
+
+#define DEBUG_GFX 0
 
 
 namespace {
@@ -83,8 +88,10 @@ public:
 	lastfght_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_inputs(*this, "IN%u", 0U)
 		{ }
 
 	void lastfght(machine_config &config);
@@ -136,7 +143,7 @@ private:
 	int m_y = 0;
 	int m_w = 0;
 	int m_h = 0;
-#ifdef MAME_DEBUG
+#if DEBUG_GFX
 	unsigned m_base = 0;
 	int m_view_roms = 0;
 #endif
@@ -146,8 +153,10 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<ds2430a_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport_array<3> m_inputs;
 };
 
 
@@ -168,8 +177,7 @@ void lastfght_state::video_start()
 
 uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-#if 1
+#if DEBUG_GFX
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	uint8_t const *const gfxdata = memregion("gfx1")->base();
 
@@ -195,7 +203,6 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		popmessage("%x", m_base);
 		return 0;
 	}
-#endif
 #endif
 
 	copybitmap(bitmap, m_bitmap[m_dest ^ 1], 0, 0, 0, 0, cliprect);
@@ -372,12 +379,12 @@ uint16_t lastfght_state::c00002_r()
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
+	return (machine().rand() & 0x1c00) | m_inputs[0]->read();
 }
 
 uint16_t lastfght_state::c00004_r()
 {
-	return ioport("IN1")->read();
+	return m_inputs[1]->read();
 }
 
 uint16_t lastfght_state::c00006_r()
@@ -385,13 +392,15 @@ uint16_t lastfght_state::c00006_r()
 	// low byte:
 	// bit 7 = protection?
 	// bit 5 = blitter?
-	return ioport("IN2")->read();
+	return (m_c00006 & 0x005f) | (m_inputs[2]->read() & 0xffa0);
 }
 
 void lastfght_state::c00006_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c00006);
 	//  popmessage("%04x", m_c00006);
+
+	m_eeprom->data_w(!BIT(m_c00006, 6));
 }
 
 uint16_t lastfght_state::sound_r()
@@ -494,14 +503,9 @@ static INPUT_PORTS_START( lastfght )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2          )
 
 	PORT_START("IN2")   /* IN2 - c00006&7 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x005f, IP_ACTIVE_HIGH, IPT_UNUSED        ) // outputs
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN        )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
@@ -565,6 +569,8 @@ void lastfght_state::lastfght(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	DS2430A(config, m_eeprom).set_timing_scale(0.16);
+
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -596,14 +602,14 @@ ROM_START( lastfght )
 
 	ROM_REGION( 0x100000, "samples", 0 )    // Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(622a8862) SHA1(fae60a326e6905aefc36275d505147e1860a71d0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 void lastfght_state::init_lastfght()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// pass initial check (protection ? hw?)
-	rom[0x00354 / 2] = 0x403e;
 
 	// rts -> rte
 	rom[0x01b86 / 2] = 0x5670;

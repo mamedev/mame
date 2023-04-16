@@ -2,52 +2,49 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-		Heathkit Terminal Logic Board (TLB)
+  Heathkit Terminal Logic Board (TLB)
 
-		The board used in the H19 smart terminal designed and manufactured
-		by Heath Company. (and identical Z19 sold by Zenith Data Systems)
+    The board used in the H19 smart terminal designed and manufactured
+    by Heath Company. (and the identical Z19 sold by Zenith Data Systems)
+        This board is also used the Heath's H89 / H88, and ZDS's Z-89 and Z-90.
 
-		The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
-		mask-programmed keyboard controller. The output of this passes
-		through a rom.
+    The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
+    mask-programmed keyboard controller. The output of this passes
+    through a rom.
 
-		Input can also come from the serial port (a 8250).
-		Either device will signal an interrupt to the CPU when a key
-		is pressed/data is received.
+    Input can also come from the serial port (a 8250).
+    Either device will signal an interrupt to the CPU when a key
+    is pressed/data is received.
 
-		TODO:
-		- speed up emulation
-		- update SW401 baud rate options for Watz ROM
-		- update SW401 & SW402 definitions for Super-19 ROM
-		- update SW401 & SW402 definitions for ULTRA ROM
-		- add option for ULTRA ROMs second page of screen RAM
+  TODO:
+    - determine why ULTRA ROM's self-diag (ESC |) fails for the ROM and
+      scratchpad memory
 
 ****************************************************************************/
 /***************************************************************************
- Memory Layout
-	 The U435 three-to-eight line decoder uses A14 and A15 to generate three memory addresses:
+  Memory Layout
 
-	 1.   Program ROM        0x0000
+    The U435 three-to-eight line decoder uses A14 and A15 to generate three memory addresses:
 
-	 2.   Scratchpad RAM     0x4000
+      1.   Program ROM        0x0000
+      2.   Scratchpad RAM     0x4000
+      3.   Display Memory     0xF800
 
-	 3.   Display Memory     0xF800
 
+  Port Layout
 
- Port Layout
+    Only address lines A5, A6, A7 are used by the U442 three-to-eight line decoder
 
-	 Only address lines A5, A6, A7 are used by the U442 three-to-eight line decoder
-
-Address   Description
-----------------------------------------------------
- 0x00   Power-up configuration (primary - SW401)
- 0x20   Power-up configuration (secondary - SW402)
- 0x40   ACE (communications)
- 0x60   CRT controller
- 0x80   Keyboard encoder
- 0xA0   Keyboard status
- 0xC0   Key click enable
- 0xE0   Bell enable
+    Address   Description
+    ----------------------------------------------------
+      0x00    Power-up configuration (primary - SW401)
+      0x20    Power-up configuration (secondary - SW402)
+      0x40    ACE (communications)
+      0x60    CRT controller
+      0x80    Keyboard encoder
+      0xA0    Keyboard status
+      0xC0    Key click enable
+      0xE0    Bell enable
 
 ****************************************************************************/
 
@@ -55,17 +52,20 @@ Address   Description
 
 #include "tlb.h"
 
-// Standard H19 used a 2.048 MHz clock
-#define H19_CLOCK (XTAL(12'288'000) / 6)
-#define MC6845_CLOCK (XTAL(12'288'000) /8)
-#define INS8250_CLOCK (XTAL(12'288'000) /4)
+// Clocks
+static constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
 
-// Capacitor value in pF
-#define H19_KEY_DEBOUNCE_CAPACITOR 5000
-#define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
+// Standard H19 used a 2.048 MHz clock
+static constexpr XTAL H19_CLOCK = MASTER_CLOCK / 6;
+static constexpr XTAL MC6845_CLOCK = MASTER_CLOCK / 8;
+static constexpr XTAL INS8250_CLOCK = MASTER_CLOCK / 4;
 
 // Beep Frequency is 1 KHz
-#define H19_BEEP_FRQ (H19_CLOCK / 2048)
+static constexpr XTAL H19_BEEP_FRQ = (H19_CLOCK / 2048);
+
+// Capacitor value in pF
+static constexpr uint32_t H19_KEY_DEBOUNCE_CAPACITOR = 5000;
+#define MM5740_CLOCK (mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR))
 
 DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
 DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
@@ -79,9 +79,9 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_maincpu(*this, "maincpu"),
 	m_write_sd(*this),
 	m_palette(*this, "palette"),
-	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
 	m_ace(*this, "ins8250"),
 	m_beep(*this, "beeper"),
@@ -118,8 +118,8 @@ TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
 void heath_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).mirror(0x2000).rom();
-	map(0x4000, 0x4100).mirror(0x3e00).ram();
+	map(0x0000, 0x0fff).mirror(0x3000).rom();
+	map(0x4000, 0x40ff).mirror(0x3f00).ram();
 	map(0xc000, 0xc7ff).mirror(0x3800).ram().share(m_p_videoram);
 }
 
@@ -192,19 +192,19 @@ void heath_tlb_device::bell_w(uint8_t data)
 
 
 /***************************************************************************
-MM5740 B Mapping to the ROM address
+  MM5740 B Mapping to the ROM address
 
-B1     -> A0          A10  =  0
-B2     -> A1          A9   =  0
-B3     -> A2          A8   =  B8
-B4     -> A3          A7   =  B7
-B5     -> A4          A6   =  B9
-B6     -> A5          A5   =  B6
-B7     -> A7          A4   =  B5
-B8     -> A8          A3   =  B4
-B9     -> A6          A2   =  B3
-ground -> A9          A1   =  B2
-ground -> A10         A0   =  B1
+    B1     -> A0          A10  =  0
+    B2     -> A1          A9   =  0
+    B3     -> A2          A8   =  B8
+    B4     -> A3          A7   =  B7
+    B5     -> A4          A6   =  B9
+    B6     -> A5          A5   =  B6
+    B7     -> A7          A4   =  B5
+    B8     -> A8          A3   =  B4
+    B9     -> A6          A2   =  B3
+    ground -> A9          A1   =  B2
+    ground -> A10         A0   =  B1
 
 ****************************************************************************/
 uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
@@ -319,18 +319,18 @@ static GFXDECODE_START(gfx_h19)
 GFXDECODE_END
 
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( tlb )
 
 	PORT_START("MODIFIERS")
-	// bit 0 connects to B8 of MM5740 - low if either shift key is
-	// bit 7 is low if a key is pressed
+	// bit 0 - 0x001 connects to B8 of MM5740 - low if either shift key is
 	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)  PORT_TOGGLE
 	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
 	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)       PORT_TOGGLE
 	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_LALT)
+	// bit 7 - 0x080 is low if a key is pressed
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)
 
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(UCHAR_MAMEKEY(TAB))
 
 	PORT_START("X9")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &")        PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *")        PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (")        PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("SW401")
 	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3,4")
@@ -469,7 +469,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
-	PORT_START("SW402") // stored at 40C8
+	PORT_START("SW402")
 	PORT_DIPNAME( 0x01, 0x00, "Cursor")             PORT_DIPLOCATION("SW402:1")
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
@@ -492,8 +492,8 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x40, DEF_STR(Yes))
 	PORT_DIPNAME( 0x80, 0x00, "Refresh")            PORT_DIPLOCATION("SW402:8")
-	PORT_DIPSETTING(    0x00, "50Hz")
-	PORT_DIPSETTING(    0x80, "60Hz")
+	PORT_DIPSETTING(    0x00, "60Hz")
+	PORT_DIPSETTING(    0x80, "50Hz")
 INPUT_PORTS_END
 
 
@@ -660,7 +660,7 @@ WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
 void heath_tlb_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, H19_CLOCK); // From schematics
+	Z80(config, m_maincpu, H19_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
@@ -738,6 +738,24 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
 {
+}
+
+void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
+{
+	heath_tlb_device::device_add_mconfig(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_ultra_tlb_device::mem_map);
+}
+
+void heath_ultra_tlb_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).rom();
+	// Page 2 memory
+	map(0x1000, 0x1fff).mirror(0x2000).ram();
+	map(0x4000, 0x40ff).mirror(0x3f00).ram();
+	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
+
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const

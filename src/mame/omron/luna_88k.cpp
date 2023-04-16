@@ -777,5 +777,5 @@ ROM_END
 
 } // anonymous namespace
 
-/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME     FLAGS */
-COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", "Luna 88K²", MACHINE_NOT_WORKING)
+/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME       FLAGS */
+COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", u8"Luna 88K²", MACHINE_NOT_WORKING)

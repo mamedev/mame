@@ -11,6 +11,8 @@
 #include "sa16.h"
 #include "mb63h149.h"
 
+#include "formats/roland_dsk.h"
+
 //#include "bus/midi/midi.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/mcs96/i8x9x.h"
@@ -372,7 +374,8 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	//map(0xe800, 0xe83f).w("output", FUNC(upd65006gf_376_3b8_device::write)).umask16(0x00ff);
 	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
-	map(0xc000, 0xffff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
+	map(0xc000, 0xf7ff).rw(m_wave, FUNC(sa16_device::read), FUNC(sa16_device::write)).umask16(0xff00);
+	map(0xf800, 0xffff).rw(FUNC(roland_w30_state::key_r), FUNC(roland_w30_state::key_w));
 }
 
 [[maybe_unused]] void roland_w30_state::s330_mem_map(address_map &map)
@@ -410,6 +413,12 @@ static void s50_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+static void floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ROLAND_SDISK_FORMAT);
+}
+
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
@@ -429,8 +438,8 @@ void roland_s50_state::s50(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
 
 	// Floppy unit: FDD4261A0K or FDD4251G0K
-	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", &floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
 	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
 
@@ -499,8 +508,8 @@ void roland_w30_state::w30(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: FX-354 (307F1JC)
-	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", &floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
 	// SCSI controller on main board, by option (KW-30)
 	NSCSI_BUS(config, "scsi");
@@ -531,8 +540,8 @@ void roland_w30_state::s330(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: ND-362S-A
-	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", &floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
 	// LCD unit: DM1620-5BL7 (MW-5F)
 

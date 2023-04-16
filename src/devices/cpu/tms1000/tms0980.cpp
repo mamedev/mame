@@ -80,6 +80,39 @@ std::unique_ptr<util::disasm_interface> tms0980_cpu_device::create_disassembler(
 
 
 // device_reset
+void tms0980_cpu_device::device_reset()
+{
+	// common reset
+	tms1k_base_device::device_reset();
+
+	// pre-decode instructionset
+	m_fixed_decode.resize(0x200);
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u64));
+	m_micro_decode.resize(0x200);
+	memset(&m_micro_decode[0], 0, 0x200*sizeof(u32));
+
+	for (u16 op = 0; op < 0x200; op++)
+	{
+		// upper half of the opcodes is always branch/call
+		if (op & 0x100)
+			m_fixed_decode[op] = (op & 0x80) ? F_CALL: F_BR;
+
+		// 6 output bits select a microinstruction index
+		m_micro_decode[op] = m_decode_micro.isnull() ? decode_micro(m_ipla->read(op) & 0x3f) : m_decode_micro(op);
+
+		// the other ipla terms each select a fixed instruction
+		m_fixed_decode[op] |= decode_fixed(op);
+	}
+
+	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
+	// but it can't be pre-determined when it's active
+	m_micro_direct.resize(0x40);
+	memset(&m_micro_decode[0], 0, 0x40*sizeof(u32));
+
+	for (int op = 0; op < 0x40; op++)
+		m_micro_direct[op] = m_decode_micro.isnull() ? decode_micro(op) : m_decode_micro(op + 0x200);
+}
+
 u32 tms0980_cpu_device::decode_fixed(offs_t offset)
 {
 	u32 decode = 0;
@@ -112,39 +145,6 @@ u32 tms0980_cpu_device::decode_micro(offs_t offset)
 			decode |= md[bit];
 
 	return decode;
-}
-
-void tms0980_cpu_device::device_reset()
-{
-	// common reset
-	tms1k_base_device::device_reset();
-
-	// pre-decode instructionset
-	m_fixed_decode.resize(0x200);
-	memset(&m_fixed_decode[0], 0, 0x200*sizeof(u64));
-	m_micro_decode.resize(0x200);
-	memset(&m_micro_decode[0], 0, 0x200*sizeof(u32));
-
-	for (u16 op = 0; op < 0x200; op++)
-	{
-		// upper half of the opcodes is always branch/call
-		if (op & 0x100)
-			m_fixed_decode[op] = (op & 0x80) ? F_CALL: F_BR;
-
-		// 6 output bits select a microinstruction index
-		m_micro_decode[op] = m_decode_micro.isnull() ? decode_micro(m_ipla->read(op) & 0x3f) : m_decode_micro(op);
-
-		// the other ipla terms each select a fixed instruction
-		m_fixed_decode[op] |= decode_fixed(op);
-	}
-
-	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
-	// but it can't be pre-determined when it's active
-	m_micro_direct.resize(0x40);
-	memset(&m_micro_decode[0], 0, 0x40*sizeof(u32));
-
-	for (int op = 0; op < 0x40; op++)
-		m_micro_direct[op] = m_decode_micro.isnull() ? decode_micro(op) : m_decode_micro(op + 0x200);
 }
 
 

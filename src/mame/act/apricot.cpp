@@ -59,8 +59,7 @@ public:
 		m_rs232(*this, "rs232"),
 		m_centronics(*this, "centronics"),
 		m_fdc(*this, "ic68"),
-		m_floppy0(*this, "ic68:0"),
-		m_floppy1(*this, "ic68:1"),
+		m_floppy(*this, "ic68:%u", 0U),
 		m_palette(*this, "palette"),
 		m_exp(*this, "exp"),
 		m_screen_buffer(*this, "screen_buffer"),
@@ -114,8 +113,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_device<centronics_device> m_centronics;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<palette_device> m_palette;
 	required_device<apricot_expansion_bus_device> m_exp;
 	required_shared_ptr<uint16_t> m_screen_buffer;
@@ -191,7 +189,7 @@ void apricot_state::i8255_portb_w(uint8_t data)
 	floppy_image_device *floppy = nullptr;
 
 	if (!BIT(data, 5))
-		floppy = BIT(data, 6) ? m_floppy1->get_device() : m_floppy0->get_device();
+		floppy = m_floppy[BIT(data, 6)]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -472,8 +470,8 @@ void apricot_state::apricot(machine_config &config)
 	WD2797(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(apricot_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(m_iop, FUNC(i8089_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], apricot_floppies, "d32w", apricot_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], apricot_floppies, "d32w", apricot_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 

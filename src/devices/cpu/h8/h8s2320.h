@@ -43,6 +43,9 @@ class h8s2320_device : public h8s2000_device {
 public:
 	h8s2320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto tend0_cb() { return tend_cb[0].bind(); }
+	auto tend1_cb() { return tend_cb[1].bind(); }
+
 	uint8_t syscr_r();
 	void syscr_w(uint8_t data);
 
@@ -79,6 +82,8 @@ protected:
 	required_device<h8_sci_device> sci1;
 	required_device<h8_sci_device> sci2;
 	required_device<h8_watchdog_device> watchdog;
+
+	devcb_write_line::array<2> tend_cb;
 
 	uint32_t ram_start;
 	uint8_t syscr;

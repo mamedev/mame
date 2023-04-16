@@ -755,7 +755,7 @@ ROM_START( snspellc )
 	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd2354a.vsm", 0x0000, 0x4000, CRC(548a940c) SHA1(c37e620c4c70a05cbaaff9a166c6da2e2420196f) )
+	ROM_LOAD( "cd2354a", 0x0000, 0x4000, CRC(548a940c) SHA1(c37e620c4c70a05cbaaff9a166c6da2e2420196f) )
 ROM_END
 
 ROM_START( snspellca )
@@ -768,7 +768,7 @@ ROM_START( snspellca )
 	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd2354.vsm", 0x0000, 0x4000, CRC(3af3232e) SHA1(f89d90dca209ee612634d664d5d4562f1d1786cf) )
+	ROM_LOAD( "cd2354", 0x0000, 0x4000, CRC(3af3232e) SHA1(f89d90dca209ee612634d664d5d4562f1d1786cf) )
 ROM_END
 
 ROM_START( snwrite )
@@ -781,7 +781,7 @@ ROM_START( snwrite )
 	ROM_LOAD( "tms1100_cd8011_output.pla", 0, 365, CRC(b400dd75) SHA1(5a4b5d4532a8932cf4b469ddb71ad6b3b9911672) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "cd62174a.vsm", 0x0000, 0x4000, CRC(b7bbaaf3) SHA1(9eb949fcf522982f9c3c4649f207703b746b90ef) )
+	ROM_LOAD( "cd62174a", 0x0000, 0x4000, CRC(b7bbaaf3) SHA1(9eb949fcf522982f9c3c4649f207703b746b90ef) )
 ROM_END
 
 
@@ -795,7 +795,7 @@ ROM_START( mathsmag )
 	ROM_LOAD( "tms1100_mathsmag_output.pla", 0, 365, CRC(d21f19a2) SHA1(9781da173d473c255fa5cc5fcc8ae09c097c682d) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge?
-	ROM_LOAD( "cd62173a.vsm", 0x0000, 0x4000, CRC(a7230863) SHA1(8a6d1742fb94555f3b3fe37554a7c46fe4213116) )
+	ROM_LOAD( "cd62173a", 0x0000, 0x4000, CRC(a7230863) SHA1(8a6d1742fb94555f3b3fe37554a7c46fe4213116) )
 ROM_END
 
 
@@ -809,7 +809,7 @@ ROM_START( tntell )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
+	ROM_LOAD( "cd2610", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
 ROM_END
 
 ROM_START( tntelluk )
@@ -822,7 +822,7 @@ ROM_START( tntelluk )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd62170.vsm", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
+	ROM_LOAD( "cd62170", 0x0000, 0x4000, CRC(6dc9d072) SHA1(9d2c9ff57c4f8fe69768666ffa41fcac649279ef) )
 ROM_END
 
 ROM_START( tntellfr )
@@ -835,7 +835,7 @@ ROM_START( tntellfr )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd62171.vsm", 0x0000, 0x4000, CRC(cc26f7d1) SHA1(2b03e37b3bf3cbeca36980acfc45246dac706b83) )
+	ROM_LOAD( "cd62171", 0x0000, 0x4000, CRC(cc26f7d1) SHA1(2b03e37b3bf3cbeca36980acfc45246dac706b83) )
 ROM_END
 
 ROM_START( tntellp )
@@ -848,7 +848,7 @@ ROM_START( tntellp )
 	ROM_LOAD( "tms1100_us4403965_output.pla", 0, 365, CRC(66cfb3c3) SHA1(80a05e5d729518e1f35d8f26438f56e80ffbd003) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // 4000-7fff = space reserved for cartridge
-	ROM_LOAD( "cd2610.vsm", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
+	ROM_LOAD( "cd2610", 0x0000, 0x1000, CRC(6db34e5a) SHA1(10fa5db20fdcba68034058e7194f35c90b9844e6) )
 ROM_END
 
 
@@ -862,7 +862,7 @@ ROM_START( vocaid )
 	ROM_LOAD( "tms1100_cd8012_output.pla", 0, 365, CRC(5ada9306) SHA1(a4140118dd535af45a691832530d55cd86a23510) )
 
 	ROM_REGION( 0x8000, "tms6100", ROMREGION_ERASEFF ) // same hw as tntell, but no external slot
-	ROM_LOAD( "cd2357.vsm", 0x0000, 0x4000, CRC(19c251fa) SHA1(8f8163069f32413379e7e1681ce6a4d0819d4ebc) )
+	ROM_LOAD( "cd2357", 0x0000, 0x4000, CRC(19c251fa) SHA1(8f8163069f32413379e7e1681ce6a4d0819d4ebc) )
 ROM_END
 
 } // anonymous namespace

@@ -63,7 +63,7 @@ void tmp68301_device::internal_update(uint64_t current_time)
 void tmp68301_device::device_start()
 {
 	m68000_mcu_device::device_start();
-	m_parallel_r_cb.resolve_safe(0);
+	m_parallel_r_cb.resolve_safe(0xffff);
 	m_parallel_w_cb.resolve_safe();
 
 	for(auto &tx : m_tx_cb)
@@ -596,7 +596,7 @@ u8 tmp68301_device::interrupt_callback()
 	if(slot < 3)
 		standard_irq_callback(slot, m_pc);
 	if(vector != 0x1f) {
-		m_isr |= 1 << slot;
+		m_iisr |= 1 << slot;
 		if(slot >= 3 || !(m_icr[slot] & 0x08))
 			m_ipr &= ~(1 << slot);
 		m_interrupt_state &= ~(1U << vector);

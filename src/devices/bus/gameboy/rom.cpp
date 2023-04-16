@@ -84,9 +84,9 @@ protected:
 	void install_bank_switch_handlers() ATTR_COLD
 	{
 		// A5, A3 and A2 are not connected to the controller (effective address mask 0xffd3)
-		cart_space()->install_write_handler(0x0000, 0x1fff, write8smo_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_switch_outer)));
-		cart_space()->install_write_handler(0x2000, 0x3fff, write8smo_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_switch_inner)));
-		cart_space()->install_write_handler(0x4000, 0x5fff, write8smo_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_mux)));
+		cart_space()->install_write_handler(0x0000, 0x1fff, emu::rw_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_switch_outer)));
+		cart_space()->install_write_handler(0x2000, 0x3fff, emu::rw_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_switch_inner)));
+		cart_space()->install_write_handler(0x4000, 0x5fff, emu::rw_delegate(*this, FUNC(sachen_mmc_device_base::bank_rom_mux)));
 	}
 
 	u8 rom_read(offs_t offset, bool spoof)
@@ -330,7 +330,6 @@ public:
 				bytes,
 				0x7fff,
 				0,
-				0,
 				0x0000,
 				[this, base = &romregion->as_u8()] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{
@@ -460,8 +459,8 @@ public:
 			logerror("Installing banked ROM at 0x0000-0x3FFF and 0x4000-0x7FFF\n");
 			cart_space()->install_read_bank(0x0000, 0x3fff, m_bank_rom_low);
 			cart_space()->install_read_bank(0x4000, 0x7fff, m_bank_rom_high);
-			cart_space()->install_write_handler(0x0001, 0x0001, write8smo_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_high)));
-			cart_space()->install_write_handler(0xb000, 0xb000, write8smo_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch)));
+			cart_space()->install_write_handler(0x0001, 0x0001, emu::rw_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_high)));
+			cart_space()->install_write_handler(0xb000, 0xb000, emu::rw_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch)));
 		}
 		else if (*fixedbank)
 		{
@@ -469,14 +468,14 @@ public:
 			logerror("Installing fixed ROM at 0x0000-0x3FFF and banked ROM at 0x4000-0x7FFF\n");
 			cart_space()->install_rom(0x0000, 0x3fff, base);
 			cart_space()->install_read_bank(0x4000, 0x7fff, m_bank_rom_high);
-			cart_space()->install_write_handler(0x0001, 0x0001, write8smo_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_high)));
+			cart_space()->install_write_handler(0x0001, 0x0001, emu::rw_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_high)));
 		}
 		else
 		{
 			// banked ROM at 0x0000-0x7fff
 			logerror("Installing banked ROM at 0x0000-0x7FFF\n");
 			cart_space()->install_read_bank(0x0000, 0x7fff, m_bank_rom_low);
-			cart_space()->install_write_handler(0xb000, 0xb000, write8smo_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_low)));
+			cart_space()->install_write_handler(0xb000, 0xb000, emu::rw_delegate(*this, FUNC(megaduck_banked_device::bank_rom_switch_low)));
 		}
 
 		// all good
@@ -589,7 +588,7 @@ public:
 		install_ram();
 
 		// install bank switch handler
-		cart_space()->install_write_handler(0x0000, 0x7fff, write8sm_delegate(*this, FUNC(m161_device::bank_rom_switch)));
+		cart_space()->install_write_handler(0x0000, 0x7fff, emu::rw_delegate(*this, FUNC(m161_device::bank_rom_switch)));
 
 		// all good
 		return std::error_condition();
@@ -649,7 +648,7 @@ public:
 		set_bank_rom(0);
 
 		// install bank switch handler
-		cart_space()->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(wisdom_device::bank_rom_switch)));
+		cart_space()->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(wisdom_device::bank_rom_switch)));
 
 		// all good
 		return std::error_condition();
@@ -686,7 +685,7 @@ public:
 		install_ram();
 
 		// install bank switch handler
-		cart_space()->install_write_handler(0x2000, 0x2000, write8smo_delegate(*this, FUNC(yong_device::bank_rom_switch)));
+		cart_space()->install_write_handler(0x2000, 0x2000, emu::rw_delegate(*this, FUNC(yong_device::bank_rom_switch)));
 
 		// all good
 		return std::error_condition();
@@ -731,7 +730,7 @@ public:
 		install_ram();
 
 		// install bank switch handler
-		cart_space()->install_write_handler(0x2000, 0x3fff, write8smo_delegate(*this, FUNC(rockman8_device::bank_rom_switch)));
+		cart_space()->install_write_handler(0x2000, 0x3fff, emu::rw_delegate(*this, FUNC(rockman8_device::bank_rom_switch)));
 
 		// all good
 		return std::error_condition();
@@ -797,8 +796,8 @@ public:
 		install_ram();
 
 		// install bank switch handler
-		cart_space()->install_write_handler(0x2000, 0x2fff, write8smo_delegate(*this, FUNC(sm3sp_device::bank_rom_switch)));
-		cart_space()->install_write_handler(0x5000, 0x5fff, write8smo_delegate(*this, FUNC(sm3sp_device::bank_rom_mode)));
+		cart_space()->install_write_handler(0x2000, 0x2fff, emu::rw_delegate(*this, FUNC(sm3sp_device::bank_rom_switch)));
+		cart_space()->install_write_handler(0x5000, 0x5fff, emu::rw_delegate(*this, FUNC(sm3sp_device::bank_rom_mode)));
 
 		// all good
 		return std::error_condition();
@@ -913,7 +912,7 @@ public:
 
 		// actually install ROM and bank switch handlers
 		logerror("Installing banked ROM at 0x0000-0x3FFF and 0x4000-0x7FFF\n");
-		cart_space()->install_read_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(sachen_mmc1_device::read_rom)));
+		cart_space()->install_read_handler(0x0000, 0x7fff, emu::rw_delegate(*this, FUNC(sachen_mmc1_device::read_rom)));
 		install_bank_switch_handlers();
 
 		// all good
@@ -976,7 +975,7 @@ public:
 
 		// actually install ROM and bank switch handlers
 		logerror("Installing banked ROM at 0x0000-0x3FFF and 0x4000-0x7FFF\n");
-		cart_space()->install_read_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(sachen_mmc2_device::read_rom)));
+		cart_space()->install_read_handler(0x0000, 0x7fff, emu::rw_delegate(*this, FUNC(sachen_mmc2_device::read_rom)));
 		install_bank_switch_handlers();
 
 		// all good
@@ -1016,9 +1015,9 @@ public:
 
 		// actually install ROM and bank switch handlers
 		logerror("Installing banked ROM at 0x0000-0x3FFF and 0x4000-0x7FFF\n");
-		cart_space()->install_read_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(rocket_device::read_rom)));
-		cart_space()->install_write_handler(0x3f00, 0x3f00, write8smo_delegate(*this, FUNC(rocket_device::bank_rom_switch_fine)));
-		cart_space()->install_write_handler(0x3fc0, 0x3fc0, write8smo_delegate(*this, FUNC(rocket_device::bank_rom_switch_coarse)));
+		cart_space()->install_read_handler(0x0000, 0x7fff, emu::rw_delegate(*this, FUNC(rocket_device::read_rom)));
+		cart_space()->install_write_handler(0x3f00, 0x3f00, emu::rw_delegate(*this, FUNC(rocket_device::bank_rom_switch_fine)));
+		cart_space()->install_write_handler(0x3fc0, 0x3fc0, emu::rw_delegate(*this, FUNC(rocket_device::bank_rom_switch_coarse)));
 
 		// all good
 		return std::error_condition();
@@ -1090,8 +1089,8 @@ public:
 		install_ram();
 
 		// install bank switch handlers
-		cart_space()->install_write_handler(0x2080, 0x2080, write8smo_delegate(*this, FUNC(lasama_device::ctrl_2080_w)));
-		cart_space()->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(lasama_device::ctrl_6000_w)));
+		cart_space()->install_write_handler(0x2080, 0x2080, emu::rw_delegate(*this, FUNC(lasama_device::ctrl_2080_w)));
+		cart_space()->install_write_handler(0x6000, 0x6000, emu::rw_delegate(*this, FUNC(lasama_device::ctrl_6000_w)));
 
 		// all good
 		return std::error_condition();

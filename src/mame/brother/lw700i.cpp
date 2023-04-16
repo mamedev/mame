@@ -16,9 +16,11 @@
 #include "emu.h"
 
 #include "cpu/h8/h83003.h"
+#include "imagedev/floppy.h"
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -32,41 +34,42 @@ class lw700i_state : public driver_device
 {
 public:
 	lw700i_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_mainram(*this, "mainram"),
-			m_screen(*this, "screen"),
-			m_keyboard(*this, "X%u", 0)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_mainram(*this, "mainram")
+		, m_screen(*this, "screen")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:1")
+		, m_keyboard(*this, "X%u", 0)
 	{ }
 
-	void lw700i(machine_config &config);
+	void lw700i(machine_config &config) ATTR_COLD;
 
-	uint16_t status_r() { return 0x8080; }  // "ready"
-	void data_w(uint16_t data) { }
+protected:
+	// driver_device implementation
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
+private:
 	uint8_t p7_r();
 	uint8_t pb_r();
 	void pb_w(uint8_t data);
 
-private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<h83003_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<screen_device> m_screen;
+	required_device<hd63266f_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	required_ioport_array<9> m_keyboard;
-
-	// driver_device overrides
-	virtual void video_start() override;
 
 	uint8_t m_keyrow = 0;
 };
@@ -117,6 +120,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw700i_state::vbl_interrupt)
 
 void lw700i_state::machine_reset()
 {
+	m_fdc->rate_w(1);  // machine supports 250k and 500k rate, this must be controlled somewhere
 }
 
 void lw700i_state::machine_start()
@@ -157,7 +161,7 @@ void lw700i_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0x0000);
 	map(0x600000, 0x63ffff).ram().share("mainram"); // 256K of main RAM
-	map(0xe00000, 0xe00001).rw(FUNC(lw700i_state::status_r), FUNC(lw700i_state::data_w));
+	map(0xe00000, 0xe00003).m(m_fdc, FUNC(hd63266f_device::map));
 	map(0xf00048, 0xf00049).ram();
 }
 
@@ -270,11 +274,17 @@ static INPUT_PORTS_START( lw700i )
 
 INPUT_PORTS_END
 
+static void lw700i_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
+
 void lw700i_state::lw700i(machine_config &config)
 {
 	H83003(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &lw700i_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &lw700i_state::io_map);
+	m_maincpu->tend2().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -283,6 +293,12 @@ void lw700i_state::lw700i(machine_config &config)
 	m_screen->set_screen_update(FUNC(lw700i_state::screen_update));
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 480, 0, 128);
+
+	HD63266F(config, m_fdc, XTAL(16'000'000));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ4);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, H8_INPUT_LINE_DREQ2); // dreq2 is not connected in the hd83003
+	m_fdc->inp_rd_callback().set([this](){ return m_floppy->get_device()->dskchg_r(); });
+	FLOPPY_CONNECTOR(config, m_floppy, lw700i_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 }
 
 ROM_START(lw700i)

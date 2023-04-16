@@ -14795,6 +14795,10 @@ ax145                           // Brother AX-145 (c) 198? Brother Industries, L
 @source:brother/lw30.cpp
 lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
 
+@source:brother/lw350.cpp
+lw350                           // Brother LW-350 (c) 1995 Brother Industries, Ltd.
+lw450                           // Brother LW-450 (c) 1992 Brother Industries, Ltd.
+
 @source:brother/lw700i.cpp
 lw700i                          // (c) 1995 Brother
 
@@ -23310,6 +23314,9 @@ gijoej                          // GX069 (c) 1991 (Japan)
 gijoeu                          // GX069 (c) 1991 (US)
 gijoeua                         // GX069 (c) 1991 (US)
 
+@source:konami/goldenregion.cpp
+glregion
+
 @source:konami/gradius3.cpp
 gradius3                        // GX945 (c) 1989 (World)
 gradius3a                       // GX945 (c) 1989 (Asia)
@@ -24409,6 +24416,12 @@ adm31                           //
 
 @source:learsiegler/adm36.cpp
 adm36                           //
+
+@source:liberty/freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
+@source:liberty/freedom220.cpp
+free220                         // (c) 1984 Liberty Electronics
 
 @source:lsi/m3.cpp
 m3                              //
@@ -32394,8 +32407,11 @@ sws93                           // (c) 1993 (Japan)
 valkyrie                        // (c) 1989 (Japan)
 
 @source:namco/namcos10.cpp
+ballpom                         // 2005.02 Ball Pom Line
 chocovdr                        // 2002.10 Uchuu Daisakusen : Chocovader Contactee
 g13jnc                          // 2001.?? Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)
+gahaha                          // 2000.?? GAHAHA Ippatsudou (World, GID2 Ver.A)
+gahaha2                         // 2001.?? GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
 gamsharaj                       // 2002.08 Gamshara (10021 Ver.A)
 gegemdb                         // 2007.?? Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A)
@@ -32405,11 +32421,11 @@ kd2001                          // 2001.1? Knock Down 2001 (KD11 Ver.B)
 keroro                          // 2006.?? Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
 konotako                        // 2003.?? Kono e Tako (10021 Ver.A)
+medalnt2                        // 2007.02 Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)
 mrdrilr2                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
 mrdrilr2j                       // 2000.07 Mr Driller 2 (DR21 Ver.A)
 mrdrilr2u                       // 2000.?? Mr Driller 2 (DR23 Ver.A)
 mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
-mrdrilrga                       // 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
 pacmball                        // 2003.?? Pacman Ball
 panikuru                        // 2002.03 Panicuru Panekuru
@@ -32418,9 +32434,12 @@ puzzball                        // 2002.02 Puzz Ball (Japan, PZB1 Ver.A)
 sekaikh                         // 2004.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
 sekaikha                        // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
-taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
+taiko2                          // 2001.08 Taiko no Tatsujin 2 (Japan, TK21 Ver.C)
+taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.A)
+taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
+taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
+taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
-unks10md2                       // 2005.02 unknown Namco System 10 medal game
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)
@@ -32428,6 +32447,7 @@ danceyesu                       // 1996.10 Dancing Eyes (US, DC3/VER.C)
 danceyesj                       // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
 dunkmnia                        // 1996.05 Dunk Mania (World, DM2/VER.C)
 dunkmniajc                      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
+fambowl                         // 1997.?? Family Bowl (Ver. 1.00)
 gunbarla                        // 1999.?? Gunbarl (Japan, GNB1/VER.A)
 myangel3                        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
 pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
@@ -38894,7 +38914,10 @@ transfrm                        // 834-5803 (c) 1986
 
 @source:sega/segafruit.cpp
 m3001
+m3004
 m4001
+m4002
+m5001
 
 @source:sega/segag80r.cpp
 005                             // (c) 1981
@@ -39173,6 +39196,7 @@ wb33                            // (c) 1988 Sega / Westone (FD1094)
 wb33d                           //
 wb34                            // (c) 1988 Sega / Westone (FD1094)
 wb34d                           //
+wfishing                        // (c) 1996 (Unprotected)
 wrestwar                        // (c) 1989 (8751)
 wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
@@ -40908,9 +40932,6 @@ fc100                           //
 
 @source:skeleton/fk1.cpp
 fk1                             //
-
-@source:skeleton/freedom120.cpp
-free120                         // (c) 1993 Liberty Electronics
 
 @source:skeleton/fs3216.cpp
 fs3216                          //
@@ -44850,7 +44871,8 @@ crshrace2a                      // (c) 1993 Video System Co.
 f1gp                            // (c) 1991 Video System Co.
 f1gp2                           // (c) 1992 Video System Co.
 f1gpa                           // (c) 1991 Video System Co.
-f1gpb                           // bootleg
+f1gpb                           // (c) 1991 Video System Co.
+f1gpbl                          // bootleg
 
 @source:vsystem/fromanc2.cpp
 fromanc2                        // (c) 1995 Video System Co. (Japan)

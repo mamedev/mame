@@ -75,14 +75,14 @@ void msx_slot_panasonic08_device::device_start()
 	page(1)->install_view(0x6000, 0x7fff, m_view3);
 	m_view3[0].install_read_bank(0x6000, 0x7fff, m_bank[3]);
 	m_view3[1].install_read_bank(0x6000, 0x7fff, m_bank[3]);
-	m_view3[1].install_read_handler(0x7ff0, 0x7ff7, read8sm_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_r)));
-	page(1)->install_write_handler(0x6000, 0x6000, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<0>)));
-	page(1)->install_write_handler(0x6400, 0x6400, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<1>)));
-	page(1)->install_write_handler(0x6800, 0x6800, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<2>)));
-	page(1)->install_write_handler(0x6c00, 0x6c00, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<3>)));
-	page(1)->install_write_handler(0x7000, 0x7000, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<4>)));
-	page(1)->install_write_handler(0x7800, 0x7800, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<5>)));
-	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*this, FUNC(msx_slot_panasonic08_device::control_w)));
+	m_view3[1].install_read_handler(0x7ff0, 0x7ff7, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_r)));
+	page(1)->install_write_handler(0x6000, 0x6000, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<0>)));
+	page(1)->install_write_handler(0x6400, 0x6400, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<1>)));
+	page(1)->install_write_handler(0x6800, 0x6800, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<2>)));
+	page(1)->install_write_handler(0x6c00, 0x6c00, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<3>)));
+	page(1)->install_write_handler(0x7000, 0x7000, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<4>)));
+	page(1)->install_write_handler(0x7800, 0x7800, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::bank_w<5>)));
+	page(1)->install_write_handler(0x7ff9, 0x7ff9, emu::rw_delegate(*this, FUNC(msx_slot_panasonic08_device::control_w)));
 
 	page(2)->install_view(0x8000, 0x9fff, m_view4);
 	m_view4[0].install_read_bank(0x8000, 0x9fff, m_bank[4]);
