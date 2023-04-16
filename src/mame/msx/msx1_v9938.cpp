@@ -124,7 +124,7 @@ void msx1_v9938_state::ax200(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "arabic", 0, 3, 1, 2, "arabic");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, nullptr);
 
 	msx1_v9938_pal(SND_YM2149, config, REGION_ARAB);
 }
@@ -156,7 +156,7 @@ void msx1_v9938_state::ax200m(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	// Dumped unit had a SFG05 with version M5.00.011 rom
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, msx_yamaha_60pin, "sfg05");
 
 	msx1_v9938_pal(SND_YM2149, config, REGION_ARAB);
 }
