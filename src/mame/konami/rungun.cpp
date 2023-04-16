@@ -63,7 +63,13 @@ public:
 		m_palette2(*this, "palette2"),
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
-		m_sysreg(*this, "sysreg")
+		m_sysreg(*this, "sysreg"),
+		m_bank2(*this, "bank2"),
+		m_spriteram_bank(*this, "spriteram_bank"),
+		m_p_inputs(*this, "P%u", 1U),
+		m_dsw(*this, "DSW"),
+		m_system(*this, "SYSTEM"),
+		m_eepromout(*this, "EEPROMOUT")
 	{ }
 
 	void rng(machine_config &config);
@@ -92,6 +98,14 @@ private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_sysreg;
 
+	required_memory_bank m_bank2;
+	required_memory_bank m_spriteram_bank;
+
+	required_ioport_array<4> m_p_inputs;
+	required_ioport m_dsw;
+	required_ioport m_system;
+	required_ioport m_eepromout;
+
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap[2]{};
 	tilemap_t   *m_936_tilemap[2]{};
@@ -107,7 +121,6 @@ private:
 
 	/* sound */
 	uint8_t       m_sound_ctrl = 0;
-	uint8_t       m_sound_status = 0;
 	uint8_t       m_sound_nmi_clk = 0;
 
 	bool        m_video_priority_mode = false;
@@ -155,10 +168,10 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 		case 0x00/2:
-			return (ioport("P1")->read() | ioport("P3")->read() << 8);
+			return (m_p_inputs[0]->read() | m_p_inputs[2]->read() << 8);
 
 		case 0x02/2:
-			return (ioport("P2")->read() | ioport("P4")->read() << 8);
+			return (m_p_inputs[1]->read() | m_p_inputs[3]->read() << 8);
 
 
 		case 0x04/2:
@@ -171,12 +184,12 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 				uint8_t field_bit = m_screen->frame_number() & 1;
 				if(m_single_screen_mode == true)
 					field_bit = 1;
-				return (ioport("SYSTEM")->read() & 0xfdff) | (field_bit << 9);
+				return (m_system->read() & 0xfdff) | (field_bit << 9);
 			}
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = ioport("DSW")->read();
+				data = m_dsw->read();
 			}
 			return ((m_sysreg[0x06 / 2] & 0xff00) | data);
 	}
@@ -204,9 +217,9 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
-				membank("spriteram_bank")->set_entry((data & 0x80) >> 7);
+				m_spriteram_bank->set_entry((data & 0x80) >> 7);
 				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
-				ioport("EEPROMOUT")->write(data, 0xff);
+				m_eepromout->write(data, 0xff);
 
 				machine().bookkeeping().coin_counter_w(0, data & 0x08);
 				machine().bookkeeping().coin_counter_w(1, data & 0x10);
@@ -472,7 +485,7 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 	    xx.. .... - BLT2/1 (?)
 	*/
 
-	membank("bank2")->set_entry(data & 0x07);
+	m_bank2->set_entry(data & 0x07);
 
 	if (!(data & 0x10))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -608,14 +621,13 @@ void rungun_state::machine_start()
 	uint8_t *ROM = memregion("soundcpu")->base();
 
 	m_roz_rom = memregion("gfx1")->base();
-	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	m_bank2->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_banked_ram = make_unique_clear<uint16_t[]>(0x2000);
 	m_pal_ram = make_unique_clear<uint16_t[]>(0x800*2);
-	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
+	m_spriteram_bank->configure_entries(0,2,&m_banked_ram[0],0x2000);
 
 	save_item(NAME(m_sound_ctrl));
-	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_nmi_clk));
 	//save_item(NAME(m_ttl_vram));
 }
@@ -626,7 +638,6 @@ void rungun_state::machine_reset()
 	//memset(m_ttl_vram, 0, 0x1000 * sizeof(uint16_t));
 
 	m_sound_ctrl = 0;
-	m_sound_status = 0;
 }
 
 void rungun_state::rng(machine_config &config)
