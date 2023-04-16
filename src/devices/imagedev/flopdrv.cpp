@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "flopdrv.h"
+
 #include "softlist_dev.h"
 
 #include "formats/imageutl.h"
@@ -22,9 +23,9 @@
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
-#define VERBOSE     0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /***************************************************************************
     CONSTANTS
@@ -40,7 +41,6 @@ struct floppy_error_map
 {
 	floperr_t ferr;
 	std::error_condition ierr;
-	const char *message;
 };
 
 
@@ -256,7 +256,7 @@ int legacy_floppy_image_device::floppy_drive_get_flag_state(int flag)
 
 void legacy_floppy_image_device::floppy_drive_seek(signed int signed_tracks)
 {
-	LOG(("seek from: %d delta: %d\n",m_current_track, signed_tracks));
+	LOG("seek from: %d delta: %d\n", m_current_track, signed_tracks);
 
 	/* update position */
 	m_current_track+=signed_tracks;
@@ -422,7 +422,7 @@ void legacy_floppy_image_device::floppy_drive_set_controller(device_t *controlle
 	m_controller = controller;
 }
 
-image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args)
+std::error_condition legacy_floppy_image_device::internal_floppy_device_load(bool is_create, int create_format, util::option_resolution *create_args)
 {
 	const struct FloppyFormat *floppy_options = m_config->formats;
 
@@ -459,16 +459,16 @@ image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool i
 		if (m_load_proc)
 			m_load_proc(*this, is_create);
 
-		return image_init_result::PASS;
+		return std::error_condition();
 	}
 	else
 	{
 		for (int i = 0; i < std::size(errmap); i++)
 		{
 			if (err == errmap[i].ferr)
-				seterror(errmap[i].ierr, errmap[i].message);
+				return errmap[i].ierr;
 		}
-		return image_init_result::FAIL;
+		return image_error::UNSPECIFIED;
 	}
 }
 
@@ -728,14 +728,14 @@ const software_list_loader &legacy_floppy_image_device::get_software_list_loader
 	return image_software_list_loader::instance();
 }
 
-image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return internal_floppy_device_load(true, format_type, format_options);
+	return std::make_pair(internal_floppy_device_load(true, format_type, format_options), std::string());
 }
 
-image_init_result legacy_floppy_image_device::call_load()
+std::pair<std::error_condition, std::string> legacy_floppy_image_device::call_load()
 {
-	image_init_result retVal = internal_floppy_device_load(false, -1, nullptr);
+	std::error_condition retVal = internal_floppy_device_load(false, -1, nullptr);
 
 	/* push disk halfway into drive */
 	m_wpt = CLEAR_LINE;
@@ -751,7 +751,7 @@ image_init_result legacy_floppy_image_device::call_load()
 
 	m_wpt_timer->adjust(attotime::from_msec(250), next_wpt);
 
-	return retVal;
+	return std::make_pair(retVal, std::string());
 }
 
 void legacy_floppy_image_device::call_unload()

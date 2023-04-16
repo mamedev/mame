@@ -34,7 +34,7 @@ public:
 		m_max_size = max_size;
 	}
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -43,16 +43,16 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "port"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "p"; }
 
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	uint32_t port_size() const { return m_port_size; }
 	bool port_write() const { return m_port_write; }
 	uint8_t *port_data() const { return m_port_data.get(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

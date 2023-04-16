@@ -76,7 +76,7 @@ public:
 	}
 
 	// This function sets all elements to the same val
-	void set_all(const s32& val) { set(val, val, val, val); }
+	void set_all(const s32 &val) { set(val, val, val, val); }
 	// This function zeros all elements
 	void zero() { set_all(0); }
 	// This function zeros only the alpha element
@@ -100,31 +100,31 @@ public:
 		return result;
 	}
 
-	void set_a16(const s32 value)
+	void set_a16(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
-	void set_a(const s32 value)
+	void set_a(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, alpha_perm);
 	}
 
-	void set_r(const s32 value)
+	void set_r(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, red_perm);
 	}
 
-	void set_g(const s32 value)
+	void set_g(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, green_perm);
 	}
 
-	void set_b(const s32 value)
+	void set_b(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_perm(m_value, temp, blue_perm);
@@ -229,13 +229,13 @@ public:
 		m_value = vec_add(m_value, color2.m_value);
 	}
 
-	inline void add_imm(const s32 imm)
+	inline void add_imm(s32 imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_add(m_value, temp);
 	}
 
-	inline void add_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void add_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -250,13 +250,13 @@ public:
 		m_value = vec_sub(m_value, color2.m_value);
 	}
 
-	inline void sub_imm(const s32 imm)
+	inline void sub_imm(s32 imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(m_value, temp);
 	}
 
-	inline void sub_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void sub_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -271,13 +271,13 @@ public:
 		m_value = vec_sub(color2.m_value, m_value);
 	}
 
-	inline void subr_imm(const s32 imm)
+	inline void subr_imm(s32 imm)
 	{
 		const VECS32 temp = { imm, imm, imm, imm };
 		m_value = vec_sub(temp, m_value);
 	}
 
-	inline void subr_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void subr_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -298,7 +298,7 @@ public:
 #endif
 	}
 
-	inline void mul_imm(const s32 imm)
+	inline void mul_imm(s32 imm)
 	{
 		const VECU32 value = { u32(imm), u32(imm), u32(imm), u32(imm) };
 		const VECU32 shift = vec_splat_u32(-16);
@@ -310,7 +310,7 @@ public:
 #endif
 	}
 
-	inline void mul_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void mul_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECU32 value = { u32(b), u32(g), u32(r), u32(a) };
@@ -332,10 +332,17 @@ public:
 		m_value = vec_and(vec_sl(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
-	inline void shl_imm(const u8 shift)
+	inline void shl_imm(u8 shift)
 	{
-		const VECU32 temp = { shift, shift, shift, shift };
-		m_value = vec_sl(m_value, temp);
+		if (32 > shift)
+		{
+			const VECU32 temp = { shift, shift, shift, shift };
+			m_value = vec_sl(m_value, temp);
+		}
+		else
+		{
+			m_value = vec_splat_s32(0);
+		}
 	}
 
 	inline void shr(const rgbaint_t& shift)
@@ -344,10 +351,17 @@ public:
 		m_value = vec_and(vec_sr(m_value, VECU32(shift.m_value)), vec_cmpgt(limit, VECU32(shift.m_value)));
 	}
 
-	inline void shr_imm(const u8 shift)
+	inline void shr_imm(u8 shift)
 	{
-		const VECU32 temp = { shift, shift, shift, shift };
-		m_value = vec_sr(m_value, temp);
+		if (32 > shift)
+		{
+			const VECU32 temp = { shift, shift, shift, shift };
+			m_value = vec_sr(m_value, temp);
+		}
+		else
+		{
+			m_value = vec_splat_s32(0);
+		}
 	}
 
 	inline void sra(const rgbaint_t& shift)
@@ -356,8 +370,9 @@ public:
 		m_value = vec_sra(m_value, vec_min(VECU32(shift.m_value), limit));
 	}
 
-	inline void sra_imm(const u8 shift)
+	inline void sra_imm(u8 shift)
 	{
+		shift = std::min<u8>(shift, 31);
 		const VECU32 temp = { shift, shift, shift, shift };
 		m_value = vec_sra(m_value, temp);
 	}
@@ -367,13 +382,13 @@ public:
 		m_value = vec_or(m_value, color2.m_value);
 	}
 
-	inline void or_imm(const s32 value)
+	inline void or_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_or(m_value, temp);
 	}
 
-	inline void or_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void or_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -393,13 +408,13 @@ public:
 		m_value = vec_andc(m_value, color.m_value);
 	}
 
-	inline void and_imm(const s32 value)
+	inline void and_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_and(m_value, temp);
 	}
 
-	inline void and_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void and_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -414,13 +429,13 @@ public:
 		m_value = vec_xor(m_value, color2.m_value);
 	}
 
-	inline void xor_imm(const s32 value)
+	inline void xor_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_xor(m_value, temp);
 	}
 
-	inline void xor_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void xor_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -430,7 +445,7 @@ public:
 		m_value = vec_xor(m_value, temp);
 	}
 
-	inline void clamp_and_clear(const u32 sign)
+	inline void clamp_and_clear(u32 sign)
 	{
 		const VECS32 vzero = { 0, 0, 0, 0 };
 		VECS32 vsign = { s32(sign), s32(sign), s32(sign), s32(sign) };
@@ -454,7 +469,7 @@ public:
 #endif
 	}
 
-	inline void sign_extend(const u32 compare, const u32 sign)
+	inline void sign_extend(u32 compare, u32 sign)
 	{
 		const VECS32 compare_vec = { s32(compare), s32(compare), s32(compare), s32(compare) };
 		const VECS32 compare_mask = VECS32(vec_cmpeq(vec_and(m_value, compare_vec), compare_vec));
@@ -462,13 +477,13 @@ public:
 		m_value = vec_or(m_value, vec_and(sign_vec, compare_mask));
 	}
 
-	inline void min(const s32 value)
+	inline void min(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_min(m_value, temp);
 	}
 
-	inline void max(const s32 value)
+	inline void max(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = vec_max(m_value, temp);
@@ -477,7 +492,7 @@ public:
 	void blend(const rgbaint_t& other, u8 factor);
 
 	void scale_and_clamp(const rgbaint_t& scale);
-	void scale_imm_and_clamp(const s32 scale);
+	void scale_imm_and_clamp(s32 scale);
 
 	void scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
 	{
@@ -503,13 +518,13 @@ public:
 		m_value = VECS32(vec_cmpeq(m_value, value.m_value));
 	}
 
-	inline void cmpeq_imm(const s32 value)
+	inline void cmpeq_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmpeq(m_value, temp));
 	}
 
-	inline void cmpeq_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void cmpeq_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -524,13 +539,13 @@ public:
 		m_value = VECS32(vec_cmpgt(m_value, value.m_value));
 	}
 
-	inline void cmpgt_imm(const s32 value)
+	inline void cmpgt_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmpgt(m_value, temp));
 	}
 
-	inline void cmpgt_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void cmpgt_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -545,13 +560,13 @@ public:
 		m_value = VECS32(vec_cmplt(m_value, value.m_value));
 	}
 
-	inline void cmplt_imm(const s32 value)
+	inline void cmplt_imm(s32 value)
 	{
 		const VECS32 temp = { value, value, value, value };
 		m_value = VECS32(vec_cmplt(m_value, temp));
 	}
 
-	inline void cmplt_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
+	inline void cmplt_imm_rgba(s32 a, s32 r, s32 g, s32 b)
 	{
 #ifdef __LITTLE_ENDIAN__
 		const VECS32 temp = { b, g, r, a };
@@ -567,7 +582,7 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator+=(const s32 other)
+	inline rgbaint_t& operator+=(s32 other)
 	{
 		const VECS32 temp = { other, other, other, other };
 		m_value = vec_add(m_value, temp);
@@ -592,7 +607,7 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator*=(const s32 other)
+	inline rgbaint_t& operator*=(s32 other)
 	{
 		const VECS32 value = { other, other, other, other };
 		const VECU32 shift = vec_splat_u32(-16);
@@ -605,19 +620,20 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator>>=(const s32 shift)
+	inline rgbaint_t& operator>>=(s32 shift)
 	{
+		shift = s32(std::min<u32>(shift, 31));
 		const VECU32 temp = { u32(shift), u32(shift), u32(shift), u32(shift) };
 		m_value = vec_sra(m_value, temp);
 		return *this;
 	}
 
-	inline void merge_alpha16(const rgbaint_t& alpha)
+	inline void merge_alpha16(const rgbaint_t &alpha)
 	{
 		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}
 
-	inline void merge_alpha(const rgbaint_t& alpha)
+	inline void merge_alpha(const rgbaint_t &alpha)
 	{
 		m_value = vec_perm(m_value, alpha.m_value, alpha_perm);
 	}

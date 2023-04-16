@@ -121,13 +121,13 @@ void h8_dma_device::dmabcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 h8_dma_channel_device::h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, H8_DMA_CHANNEL, tag, owner, clock),
 	dmac(*this, "^"),
-	cpu(*this, "^^")
+	cpu(*this, "^^"),
+	intc(*this, finder_base::DUMMY_TAG)
 {
 }
 
-void h8_dma_channel_device::set_info(const char *_intc, int _irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf)
+void h8_dma_channel_device::set_info(int _irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf)
 {
-	intc_tag = _intc;
 	irq_base = _irq_base;
 	activation_vectors[ 0] = v0;
 	activation_vectors[ 1] = v1;
@@ -538,7 +538,7 @@ void h8_dma_channel_device::count_done(int submodule)
 			dmac->clear_dte(state[0].id);
 			dtcr[0] &= ~0x80; // clear DTE (for H8H)
 			if(dtie & 1)
-				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in full address/normal mode unimplemented.\n", tag());
+				intc->internal_interrupt(irq_base + submodule);
 		}
 	} else {
 		uint8_t cr = submodule ? dmacr & 0x00ff : dmacr >> 8;
@@ -554,7 +554,7 @@ void h8_dma_channel_device::count_done(int submodule)
 			dmac->clear_dte(state[0].id + submodule);
 			dtcr[submodule] &= ~0x80; // clear DTE (for H8H)
 			if(dtie & (1 << submodule))
-				throw emu_fatalerror("%s: DMA end-of-transfer interrupt in short address mode unimplemented.\n", tag());
+				intc->internal_interrupt(irq_base + submodule);
 		}
 	}
 }

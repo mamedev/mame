@@ -254,12 +254,14 @@ private:
 
 		attotime tm;
 		int state, next_state;
-		uint16_t shift_reg;
+		uint32_t shift_reg;
 		uint16_t crc;
 		int bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
+		template <unsigned B> uint32_t shift_reg_low() const;
+		uint8_t shift_reg_data() const;
 	};
 
 	enum {

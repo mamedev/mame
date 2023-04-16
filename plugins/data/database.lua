@@ -112,9 +112,9 @@ function dbtable.set_version(filename, version)
 	local result
 	while result == nil do
 		local status = query:step()
-		if status == sqlite3.DONE then
+		if status == sql.DONE then
 			result = true
-		elseif result ~= sqlite3.ROW then
+		elseif result ~= sql.ROW then
 			result = false
 		end
 	end

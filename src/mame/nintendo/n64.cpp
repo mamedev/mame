@@ -39,7 +39,7 @@ private:
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void mempak_format(uint8_t* pak);
-	image_init_result disk_load(device_image_interface &image);
+	std::error_condition disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
@@ -357,7 +357,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 	logerror("cart length = %d\n", length);
 
 	device_image_interface *battery_image = dynamic_cast<device_image_interface *>(m_rcp_periphs->m_nvram_image);
-	if(battery_image)
+	if (battery_image)
 	{
 		//printf("Loading\n");
 		uint8_t data[0x30800];
@@ -378,7 +378,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::cart_load)
 		mempak_format(m_rcp_periphs->m_save_data.mempak[1]);
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 MACHINE_START_MEMBER(n64_mess_state,n64dd)
@@ -400,12 +400,12 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 	}
 }
 
-image_init_result n64_mess_state::disk_load(device_image_interface &image)
+std::error_condition n64_mess_state::disk_load(device_image_interface &image)
 {
 	image.fseek(0, SEEK_SET);
 	image.fread(memregion("disk")->base(), image.length());
 	m_rcp_periphs->disk_present = true;
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void n64_mess_state::disk_unload(device_image_interface &image)

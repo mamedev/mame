@@ -687,7 +687,8 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 {
 	debugger_console &con = machine().debugger().console();
 	offs_t addr = (offs_t)address;
-	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
+	address_space *tspace;
+	if (!space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, addr, tspace))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
@@ -696,30 +697,26 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	{
 		offs_t base = addr;
 
-		uint32_t opcode = space.read_byte(addr);
+		uint32_t opcode = tspace->read_byte(addr);
 		addr++;
-		uint32_t op1 = space.read_dword_unaligned(addr);
+		uint32_t op1 = tspace->read_dword_unaligned(addr);
 		addr += 4;
-		uint32_t op2 = space.read_dword_unaligned(addr);
+		uint32_t op2 = tspace->read_dword_unaligned(addr);
 		addr += 4;
 
-		char sop1[16];
-		char sop2[16];
-		char pcrel[16];
+		std::string sop1;
+		std::string pcrel;
 		if (opcode == 0xe1)
 		{
 			opcode = op2 & 255;
 			op2 = op1;
-			//op1=edi;
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "ACC");
-			sprintf(pcrel, "PC+ACC");
+			sop1 = "ACC";
+			pcrel = "PC+ACC";
 		}
 		else
 		{
-			sprintf(sop2, "%08X", op2);
-			sprintf(sop1, "%08X", op1);
-			sprintf(pcrel, "%08X", base + 9 + op1);
+			sop1 = util::string_format("%08X", op1);
+			pcrel = util::string_format("%08X", base + 9 + op1);
 		}
 		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
@@ -736,33 +733,33 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x02:
-			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x03:
-			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%08X]=%s\n", op2, sop1);
 			break;
 		case 0x04:
-			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %08X THEN PC=%s\n", op2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%08X]\n", op2);
 			break;
 		case 0x06:
-			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %08X) | %s\n", op2, sop1);
 			break;
 		case 0x07:
 			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			con.printf("INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%08X]\n", op2);
 			break;
 		case 0x09:
-			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%08X]\n", op2);
 			break;
 		case 0xee:
 			con.printf("END\n");

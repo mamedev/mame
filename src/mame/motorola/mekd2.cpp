@@ -101,6 +101,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_trace_timer(*this, "trace_timer")
 		, m_digits(*this, "digit%u", 0U)
+		, m_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void mekd2(machine_config &config);
@@ -132,6 +133,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	required_device<timer_device> m_trace_timer;
 	output_finder<6> m_digits;
+	required_ioport_array<6> m_keyboard;
 };
 
 
@@ -232,7 +234,6 @@ READ_LINE_MEMBER( mekd2_state::key40_r )
 
 uint8_t mekd2_state::key_r()
 {
-	char kbdrow[4];
 	uint8_t i;
 	m_keydata = 0xff;
 
@@ -240,8 +241,7 @@ uint8_t mekd2_state::key_r()
 	{
 		if (BIT(m_digit, i))
 		{
-			sprintf(kbdrow,"X%d",i);
-			m_keydata &= ioport(kbdrow)->read();
+			m_keydata &= m_keyboard[i]->read();
 		}
 	}
 
@@ -301,11 +301,12 @@ QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 	uint16_t addr, size;
 	uint8_t ident, *RAM = memregion("maincpu")->base();
 
-	image.fread(buff, sizeof (buff));
-	if (memcmp(buff, magic, sizeof (buff)))
+	image.fread(buff, sizeof(buff));
+	if (memcmp(buff, magic, sizeof(buff)))
 	{
-		logerror("mekd2 rom load: magic '%s' not found\n", magic);
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("Magic '%s' not found", magic));
 	}
 	image.fread(&addr, 2);
 	addr = little_endianize_int16(addr);
@@ -316,7 +317,7 @@ QUICKLOAD_LOAD_MEMBER(mekd2_state::quickload_cb)
 	while (size-- > 0)
 		image.fread(&RAM[addr++], 1);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_w)

@@ -1,7 +1,7 @@
 /** @file patest_multi_sine.c
-	@ingroup test_src
-	@brief Play a different sine wave on each channel.
-	@author Phil Burk  http://www.softsynth.com
+    @ingroup test_src
+    @brief Play a different sine wave on each channel.
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -31,16 +31,16 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
- 
+
 #include <stdio.h>
 #include <math.h>
 
@@ -125,8 +125,8 @@ int test(short interleaved)
 
     outputParameters.device = Pa_GetDefaultOutputDevice();  /* Default output device, max channels. */
     if (outputParameters.device == paNoDevice) {
-      fprintf(stderr,"Error: No default output device.\n");
-      return paInvalidDevice;
+        fprintf(stderr,"Error: No default output device.\n");
+        return paInvalidDevice;
     }
     pdi = Pa_GetDeviceInfo(outputParameters.device);
     outputParameters.channelCount = pdi->maxOutputChannels;
@@ -135,7 +135,7 @@ int test(short interleaved)
     outputParameters.sampleFormat = paFloat32;              /* 32 bit floating point output */
     outputParameters.suggestedLatency = pdi->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
-    
+
     data.interleaved = interleaved;
     data.numChannels = outputParameters.channelCount;
     for (n = 0; n < data.numChannels; n++)
@@ -169,7 +169,7 @@ int test(short interleaved)
             }
         Pa_CloseStream( stream );
         }
-    return err;    
+    return err;
 }
 
 
@@ -196,7 +196,7 @@ int main(void)
 done:
     if (err)
         {
-        fprintf(stderr, "An error occured while using the portaudio stream\n");
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
         fprintf(stderr, "Error number: %d\n", err );
         fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
         }

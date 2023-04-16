@@ -496,29 +496,30 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 			offs_t const address = addressSpace->byte_to_address(memView.addressAtCursorPosition(pos));
 			offs_t a = address & addressSpace->logaddrmask();
 			bool good = false;
-			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), TRANSLATE_READ_DEBUG, a))
+			address_space *tspace;
+			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), device_memory_interface::TR_READ, a, tspace))
 			{
 				m_lastPc = "Bad address";
 			}
 			else
 			{
-				uint64_t memValue = addressSpace->unmap();
-				auto dis = addressSpace->device().machine().disable_side_effects();
-				switch (addressSpace->data_width())
+				uint64_t memValue = tspace->unmap();
+				auto dis = tspace->device().machine().disable_side_effects();
+				switch (tspace->data_width())
 				{
-				case  8: memValue = addressSpace->read_byte(a);            break;
-				case 16: memValue = addressSpace->read_word_unaligned(a);  break;
-				case 32: memValue = addressSpace->read_dword_unaligned(a); break;
-				case 64: memValue = addressSpace->read_qword_unaligned(a); break;
+				case  8: memValue = tspace->read_byte(a);            break;
+				case 16: memValue = tspace->read_word_unaligned(a);  break;
+				case 32: memValue = tspace->read_dword_unaligned(a); break;
+				case 64: memValue = tspace->read_qword_unaligned(a); break;
 				}
 
 				offs_t const pc = source.device()->debug()->track_mem_pc_from_space_address_data(
-						addressSpace->spacenum(),
+						tspace->spacenum(),
 						address,
 						memValue);
 				if (pc != offs_t(-1))
 				{
-					if (addressSpace->is_octal())
+					if (tspace->is_octal())
 						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 8).arg(pc, 2, 8);
 					else
 						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);

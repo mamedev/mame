@@ -397,124 +397,89 @@ void vc4000_state::machine_start()
 
 QUICKLOAD_LOAD_MEMBER(vc4000_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int exec_addr;
-	int quick_length;
+	int const quick_length = image.length();
 	std::vector<uint8_t> quick_data;
-	int read_;
-	image_init_result result = image_init_result::FAIL;
-
-	quick_length = image.length();
 	quick_data.resize(quick_length);
-	read_ = image.fread( &quick_data[0], quick_length);
+	int read_ = image.fread( &quick_data[0], quick_length);
 	if (read_ != quick_length)
+		return std::make_pair(image_error::UNSPECIFIED, "Cannot read the file");
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	if (image.is_filetype("tvc"))
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
+		if (quick_length < 0x5)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too short");
+		else if (quick_data[0] != 2)
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
+
+		int const quick_addr = quick_data[1] * 256 + quick_data[2];
+		if ((quick_length + quick_addr - 5) > 0x1600)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long");
+
+		int const exec_addr = quick_data[3] * 256 + quick_data[4];
+
+		space.write_byte(0x08be, quick_data[3]);
+		space.write_byte(0x08bf, quick_data[4]);
+
+		for (int i = 5; i < quick_length; i++)
+			space.write_byte(i - 5 + quick_addr, quick_data[i]);
+
+		// display a message about the loaded quickload
+		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+
+		// Start the quickload
+		m_maincpu->set_state_int(S2650_PC, exec_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	else
+	else if (image.is_filetype("pgm"))
 	{
-		if (image.is_filetype("tvc"))
+		if (quick_length < 0x904)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too short");
+		else if (quick_length > 0x2000)
+			return std::make_pair(image_error::INVALIDLENGTH, "File too long (must be no larger than 8K)");
+		else if (quick_data[0] != 0)
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid header");
+
+		int const exec_addr = quick_data[1] * 256 + quick_data[2];
+		if (exec_addr >= quick_length)
 		{
-			if (quick_data[0] != 2)
-			{
-				image.seterror(image_error::INVALIDIMAGE, "Invalid header");
-				image.message(" Invalid header");
-			}
-			else
-			{
-				int quick_addr = quick_data[1] * 256 + quick_data[2];
-				exec_addr = quick_data[3] * 256 + quick_data[4];
-
-				if (quick_length < 0x5)
-				{
-					image.seterror(image_error::INVALIDIMAGE, "File too short");
-					image.message(" File too short");
-				}
-				else
-					if ((quick_length + quick_addr - 5) > 0x1600)
-					{
-						image.seterror(image_error::INVALIDIMAGE, "File too long");
-						image.message(" File too long");
-					}
-					else
-					{
-						space.write_byte(0x08be, quick_data[3]);
-						space.write_byte(0x08bf, quick_data[4]);
-
-						for (i = 5; i < quick_length; i++)
-							space.write_byte(i - 5 + quick_addr, quick_data[i]);
-
-						/* display a message about the loaded quickload */
-						image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
-
-						// Start the quickload
-						m_maincpu->set_state_int(S2650_PC, exec_addr);
-						result = image_init_result::PASS;
-					}
-			}
+			return std::make_pair(
+					image_error::INVALIDIMAGE,
+					util::string_format("Exec address %04X beyond end of file %04X", exec_addr, quick_length));
 		}
-		else
-			if (image.is_filetype("pgm"))
-			{
-				if (quick_data[0] != 0)
-				{
-					image.seterror(image_error::INVALIDIMAGE, "Invalid header");
-					image.message(" Invalid header");
-				}
-				else
-				{
-					exec_addr = quick_data[1] * 256 + quick_data[2];
 
-					if (exec_addr >= quick_length)
-					{
-						image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
-						image.message(" Exec address beyond end of file");
-					}
-					else
-						if (quick_length < 0x904)
-						{
-							image.seterror(image_error::INVALIDIMAGE, "File too short");
-							image.message(" File too short");
-						}
-						else
-							if (quick_length > 0x2000)
-							{
-								image.seterror(image_error::INVALIDIMAGE, "File too long");
-								image.message(" File too long");
-							}
-							else
-							{
-								space.write_byte(0x08be, quick_data[1]);
-								space.write_byte(0x08bf, quick_data[2]);
+		space.write_byte(0x08be, quick_data[1]);
+		space.write_byte(0x08bf, quick_data[2]);
 
-								// load to 08C0-15FF (standard ram + extra)
-								int read_ = 0x1600;
-								if (quick_length < 0x1600)
-									read_ = quick_length;
-								for (i = 0x8c0; i < read_; i++)
-									space.write_byte(i, quick_data[i]);
+		// load to 08C0-15FF (standard ram + extra)
+		read_ = 0x1600;
+		if (quick_length < 0x1600)
+			read_ = quick_length;
+		for (int i = 0x8c0; i < read_; i++)
+			space.write_byte(i, quick_data[i]);
 
-								// load to 1F50-1FAF (PVI regs)
-								read_ = 0x1FB0;
-								if (quick_length < 0x1FB0)
-									read_ = quick_length;
-								if (quick_length > 0x1FC0)
-									for (i = 0x1F50; i < read_; i++)
-										vc4000_video_w(i-0x1f00, quick_data[i]);
+		// load to 1F50-1FAF (PVI regs)
+		read_ = 0x1fb0;
+		if (quick_length < 0x1fb0)
+			read_ = quick_length;
+		if (quick_length > 0x1fc0)
+		{
+			for (int i = 0x1f50; i < read_; i++)
+				vc4000_video_w(i-0x1f00, quick_data[i]);
+		}
 
-								/* display a message about the loaded quickload */
-								image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+		// display a message about the loaded quickload */
+		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
-								// Start the quickload
-								m_maincpu->set_state_int(S2650_PC, exec_addr);
-								result = image_init_result::PASS;
-							}
-				}
-			}
+		// Start the quickload
+		m_maincpu->set_state_int(S2650_PC, exec_addr);
+
+		return std::make_pair(std::error_condition(), std::string());
 	}
-	return result;
+
+	return std::make_pair(image_error::UNSUPPORTED, std::string());
 }
 
 static void vc4000_cart(device_slot_interface &device)

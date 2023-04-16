@@ -77,7 +77,6 @@ void flat_ram_device_base<Base>::install_ram()
 				nvrambytes,
 				0x1fff,
 				0,
-				0,
 				0xa000,
 				[this, nvrambase] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 				{
@@ -111,7 +110,6 @@ void flat_ram_device_base<Base>::install_ram()
 					rambytes,
 					0x1fff,
 					0,
-					0,
 					0xa000,
 					[this, rambase] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 					{
@@ -130,7 +128,6 @@ void flat_ram_device_base<Base>::install_ram()
 			device_generic_cart_interface::install_non_power_of_two<0>(
 					rambytes,
 					nvrambytes - 1,
-					0,
 					0,
 					0xa000 | nvrambytes,
 					[this, rambase, highmirror = 0x1fff & ~(nvrambytes | (nvrambytes - 1))] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
@@ -352,7 +349,6 @@ void mbc_ram_device_base<Base>::install_ram(
 		device_generic_cart_interface::install_non_power_of_two<0>(
 				nvrambytes ? nvrambytes : rambytes,
 				PAGE_RAM_SIZE - 1,
-				0,
 				0,
 				0xa000,
 				[this, rospace, rwspace, base = nvrambase ? nvrambase : rambase] (offs_t begin, offs_t end, offs_t mirror, offs_t src)

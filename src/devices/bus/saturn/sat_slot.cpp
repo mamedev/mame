@@ -135,7 +135,7 @@ void sat_cart_slot_device::device_start()
  -------------------------------------------------*/
 
 
-image_init_result sat_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> sat_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -145,10 +145,9 @@ image_init_result sat_cart_slot_device::call_load()
 		{
 			// from fullpath, only ROM carts
 			uint32_t len = loaded_through_softlist() ? get_software_region_length("rom") : length();
-			uint32_t *ROM;
 
 			m_cart->rom_alloc(len);
-			ROM = m_cart->get_rom_base();
+			uint32_t *const ROM = m_cart->get_rom_base();
 
 			if (loaded_through_softlist())
 				memcpy(ROM, get_software_region("rom"), len);
@@ -157,15 +156,7 @@ image_init_result sat_cart_slot_device::call_load()
 
 			// fix endianness....
 			for (int i = 0; i < len/4; i ++)
-				ROM[i] = bitswap<32>(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
-//          {
-//              uint8_t tempa = ROM[i+0];
-//              uint8_t tempb = ROM[i+1];
-//              ROM[i+1] = ROM[i+2];
-//              ROM[i+0] = ROM[i+3];
-//              ROM[i+3] = tempa;
-//              ROM[i+2] = tempb;
-//          }
+				ROM[i] = big_endianize_int32(ROM[i]);
 		}
 		else
 		{
@@ -177,10 +168,9 @@ image_init_result sat_cart_slot_device::call_load()
 			if (get_software_region("dram1"))
 				m_cart->dram1_alloc(get_software_region_length("dram1"));
 		}
-		return image_init_result::PASS;
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 

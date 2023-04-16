@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "swim2.h"
 
-#define LOG_SETUP   (1 << 1U)
-#define LOG_MODE    (1 << 2U)
+#define LOG_SETUP   (1U << 1)
+#define LOG_MODE    (1U << 2)
 #define VERBOSE     0
 #include "logmacro.h"
 

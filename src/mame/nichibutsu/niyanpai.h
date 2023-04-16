@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "screen.h"
 #include "nichisnd.h"
 #include "nb1413m3.h"

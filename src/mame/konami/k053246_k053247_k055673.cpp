@@ -197,6 +197,18 @@ u16 k053247_device::k055673_ps_rom_word_r(offs_t offset)
 	return ROM[finoffs+2] | (ROM[finoffs]<<8);
 }
 
+u16 k053247_device::k055673_gr_rom_word_r(offs_t offset)
+{
+	const u8 *ROM = (u8 *)&m_gfxrom[0];
+	const int romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
+
+	offset = ((offset & 4) >> 1);
+
+	const int finoffs = (romofs * 2) + (offset * 2);
+
+	return ROM[finoffs + 1] | (ROM[finoffs] << 8);
+}
+
 u8 k053247_device::k053246_r(offs_t offset)
 {
 	if (m_objcha_line == ASSERT_LINE)

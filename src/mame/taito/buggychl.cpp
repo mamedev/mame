@@ -360,7 +360,7 @@ void buggychl_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
@@ -411,8 +411,6 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			}
 		}
 	}
-
-	g_profiler.stop();
 }
 
 

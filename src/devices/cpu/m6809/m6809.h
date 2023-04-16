@@ -204,7 +204,7 @@ protected:
 	// state stack - implemented as a uint32_t
 	void push_state(uint16_t state)                 { m_state = (m_state << 9) | state; }
 	uint16_t pop_state()                            { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
-	void reset_state()                              { m_state = 0; }
+	void reset_state()                              { m_state = 1; }
 
 	// effective address reading/writing
 	uint8_t read_ea()                               { return read_memory(m_ea.w); }
@@ -279,6 +279,7 @@ private:
 	// other state
 	uint32_t                      m_state;
 	bool                        m_cond;
+	bool                        m_free_run;
 
 	// incidentals
 	int                         m_clock_divider;

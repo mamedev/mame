@@ -9,6 +9,9 @@
 ***************************************************************************/
 
 #include "aviio.h"
+
+#include "strformat.h"
+
 #include "osdcomm.h"
 #include "osdfile.h"
 
@@ -16,6 +19,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 
 /***************************************************************************
@@ -457,7 +461,7 @@ public:
 
 	virtual ~avi_file_impl() override;
 
-	virtual void printf_chunks() override;
+	virtual void display_chunks() override;
 
 	virtual movie_info const &get_movie_info() const override;
 	virtual std::uint32_t first_sample_in_frame(std::uint32_t framenum) const override;
@@ -539,7 +543,7 @@ private:
 	error soundbuf_flush(bool only_flush_full);
 
 	// debugging
-	void printf_chunk_recursive(avi_chunk const *chunk, int indent);
+	void display_chunk_recursive(avi_chunk const *chunk, int indent);
 
 	/* shared data */
 	osd_file::ptr       m_file;                 /* pointer to open file */
@@ -708,26 +712,6 @@ inline void put_64bits(std::uint8_t *data, std::uint64_t value)
 	data[5] = value >> 40;
 	data[6] = value >> 48;
 	data[7] = value >> 56;
-}
-
-
-/**
- * @fn  static void u64toa(std::uint64_t val, char *output)
- *
- * @brief   64toas.
- *
- * @param   val             The value.
- * @param [in,out]  output  If non-null, the output.
- */
-
-inline void u64toa(std::uint64_t val, char *output)
-{
-	auto lo = std::uint32_t(val & 0xffffffff);
-	auto hi = std::uint32_t(val >> 32);
-	if (hi != 0)
-		sprintf(output, "%X%08X", hi, lo);
-	else
-		sprintf(output, "%X", lo);
 }
 
 
@@ -1609,20 +1593,20 @@ avi_file_impl::~avi_file_impl()
 
 
 /*-------------------------------------------------
-    avi_printf_chunks - print the chunks in a file
+    display_chunks - print the chunks in a file
 -------------------------------------------------*/
 
 /**
- * @fn  void avi_printf_chunks(avi_file *file)
+ * @fn  void display_chunks(avi_file *file)
  *
  * @brief   Avi printf chunks.
  *
  * @param [in,out]  file    If non-null, the file.
  */
 
-void avi_file_impl::printf_chunks()
+void avi_file_impl::display_chunks()
 {
-	printf_chunk_recursive(&m_rootchunk, 0);
+	display_chunk_recursive(&m_rootchunk, 0);
 }
 
 
@@ -3561,12 +3545,12 @@ avi_file::error avi_file_impl::soundbuf_flush(bool only_flush_full)
 
 
 /*-------------------------------------------------
-    printf_chunk_recursive - print information
+    display_chunk_recursive - print information
     about a chunk recursively
 -------------------------------------------------*/
 
 /**
- * @fn  static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int indent)
+ * @fn  static void display_chunk_recursive(avi_file *file, avi_chunk *container, int indent)
  *
  * @brief   Printf chunk recursive.
  *
@@ -3575,34 +3559,33 @@ avi_file::error avi_file_impl::soundbuf_flush(bool only_flush_full)
  * @param   indent              The indent.
  */
 
-void avi_file_impl::printf_chunk_recursive(avi_chunk const *container, int indent)
+void avi_file_impl::display_chunk_recursive(avi_chunk const *container, int indent)
 {
-	char size[20], offset[20];
 	avi_chunk curchunk;
 	error avierr;
 
-	/* iterate over chunks in this container */
+	// iterate over chunks in this container
 	for (avierr = get_first_chunk(container, curchunk); avierr == error::NONE; avierr = get_next_chunk(container, curchunk))
 	{
 		std::uint32_t chunksize = curchunk.size;
 		bool recurse = false;
 
-		u64toa(curchunk.size, size);
-		u64toa(curchunk.offset, offset);
-		printf("%*schunk = %c%c%c%c, size=%s (%s)\n", indent, "",
+		util::stream_format(std::cout, "%*schunk = %c%c%c%c, size=%X (%X)\n",
+				indent, "",
 				std::uint8_t(curchunk.type >> 0),
 				std::uint8_t(curchunk.type >> 8),
 				std::uint8_t(curchunk.type >> 16),
 				std::uint8_t(curchunk.type >> 24),
-				size, offset);
+				curchunk.size,
+				curchunk.offset);
 
-		/* certain chunks are just containers; recurse into them */
+		// certain chunks are just containers; recurse into them
 		switch (curchunk.type)
 		{
-			/* basic containers */
+			// basic containers
 			case CHUNKTYPE_RIFF:
 			case CHUNKTYPE_LIST:
-				printf("%*stype = %c%c%c%c\n", indent, "",
+				util::stream_format(std::cout, "%*stype = %c%c%c%c\n", indent, "",
 						std::uint8_t(curchunk.listtype >> 0),
 						std::uint8_t(curchunk.listtype >> 8),
 						std::uint8_t(curchunk.listtype >> 16),
@@ -3612,34 +3595,34 @@ void avi_file_impl::printf_chunk_recursive(avi_chunk const *container, int inden
 				break;
 		}
 
-		/* print data within the chunk */
+		// print data within the chunk
 		if (chunksize > 0 && curchunk.size < 1024 * 1024)
 		{
 			std::unique_ptr<std::uint8_t []> data;
 
-			/* read the data for a chunk */
+			// read the data for a chunk
 			avierr = read_chunk_data(curchunk, data);
 			if (avierr == error::NONE)
 			{
-				std::uint32_t const bytes = (std::min)(std::uint32_t(512), chunksize);
+				auto bytes = std::min<std::uint32_t>(512, chunksize);
 				for (std::uint32_t i = 0; i < bytes; i++)
 				{
-					if (i % 16 == 0) printf("%*s   ", indent, "");
-					printf("%02X ", data[i]);
-					if (i % 16 == 15) printf("\n");
+					if (i % 16 == 0) util::stream_format(std::cout, "%*s   ", indent, "");
+					util::stream_format(std::cout, "%02X ", data[i]);
+					if (i % 16 == 15) std::cout << "\n";
 				}
-				if (chunksize % 16 != 0) printf("\n");
+				if (chunksize % 16 != 0) std::cout << "\n";
 			}
 		}
 
-		/* if we're recursing, dive down */
+		// if we're recursing, dive down
 		if (recurse)
-			printf_chunk_recursive(&curchunk, indent + 4);
+			display_chunk_recursive(&curchunk, indent + 4);
 	}
 
-	/* if we didn't get a legitimate error, indicate that */
+	// if we didn't get a legitimate error, indicate that
 	if (avierr != error::END)
-		printf("[chunk error %d]\n", int(avierr));
+		std::cout << "[chunk error " << int(avierr) << "]\n";
 }
 
 } // anonymous namespace

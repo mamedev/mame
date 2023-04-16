@@ -42,9 +42,10 @@ Aminosan (satellite)                        837-15041    F*           ROM  JP   
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Galaxy (main)                         834-14788    C MDA-C0039A CF   JP     253-5508-0513J  AAFE-xxxxxxxxxxx
 Bingo Galaxy (satellite)                    837-14481    C            ROM  JP     not used        AAFE-01A36474716, Medal
 Bingo Galaxy (satellite)                    837-14789    F*           ROM  JP     not used        AAFE-xxxxxxxxxxx, game is same as above
-Bingo Parade                                ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Bingo Parade                                ???-?????      MDA-C0008E CF   JP     253-5508-0407J  AAFE-xxxxxxxxxxx, Medal
 Brick People / Block People                 834-14881                 ROM  ANY    253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
 Dinosaur King                               834-14493                 no   JP     ???-????-????   AAFE-xxxxxxxxxxx
 Dinosaur King                               834-14493-01 D            ROM  US     253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816

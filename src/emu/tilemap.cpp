@@ -772,7 +772,7 @@ void tilemap_t::pixmap_update()
 	if (m_all_tiles_clean)
 		return;
 
-g_profiler.start(PROFILER_TILEMAP_DRAW);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// flush the dirty state to all tiles as appropriate
 	realize_all_dirty_tiles();
@@ -786,8 +786,6 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// mark it all clean
 	m_all_tiles_clean = true;
-
-g_profiler.stop();
 }
 
 
@@ -797,7 +795,7 @@ g_profiler.stop();
 
 void tilemap_t::tile_update(logical_index logindex, u32 col, u32 row)
 {
-g_profiler.start(PROFILER_TILEMAP_UPDATE);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_UPDATE);
 
 	// call the get info callback for the associated memory index
 	tilemap_memory_index memindex = m_logical_to_memory[logindex];
@@ -822,8 +820,6 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 		m_gfx_used |= 1 << m_tileinfo.gfxnum;
 		m_gfx_dirtyseq[m_tileinfo.gfxnum] = m_tileinfo.decoder->gfx(m_tileinfo.gfxnum)->dirtyseq();
 	}
-
-g_profiler.stop();
 }
 
 
@@ -997,7 +993,8 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	if (!m_enable)
 		return;
 
-g_profiler.start(PROFILER_TILEMAP_DRAW);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW);
+
 	// configure the blit parameters based on the input parameters
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
@@ -1095,7 +1092,6 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 			}
 		}
 	}
-g_profiler.stop();
 }
 
 void tilemap_t::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
@@ -1134,7 +1130,8 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 		return;
 	}
 
-g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
+	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
+
 	// configure the blit parameters
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
@@ -1146,7 +1143,6 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 
 	// then do the roz copy
 	draw_roz_core(screen, dest, blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
-g_profiler.stop();
 }
 
 void tilemap_t::draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect,

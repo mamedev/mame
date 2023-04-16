@@ -183,7 +183,7 @@ void autorace_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( autorace )
 	PORT_START("IN.0") // KB
@@ -207,6 +207,8 @@ static INPUT_PORTS_START( autorace )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
+
+// config
 
 void autorace_state::autorace(machine_config &config)
 {
@@ -280,7 +282,7 @@ void misatk_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( misatk )
 	PORT_START("IN.0") // KB
@@ -297,6 +299,8 @@ static INPUT_PORTS_START( misatk )
 	PORT_START("POWER") // power switch
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
+
+// config
 
 void misatk_state::misatk(machine_config &config)
 {
@@ -378,7 +382,7 @@ void mfootb_state::write_seg(u16 data)
 	update_display();
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mfootb )
 	PORT_START("IN.0") // KB
@@ -397,6 +401,8 @@ static INPUT_PORTS_START( mfootb )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void mfootb_state::mfootb(machine_config &config)
 {
@@ -466,7 +472,7 @@ void mbaseb_state::write_seg(u16 data)
 	m_display->write_mx(bitswap<10>(data,7,8,9,6,5,4,3,2,1,0));
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( mbaseb )
 	PORT_START("IN.0") // KB
@@ -485,6 +491,8 @@ static INPUT_PORTS_START( mbaseb )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void mbaseb_state::mbaseb(machine_config &config)
 {
@@ -561,7 +569,7 @@ void gravity_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( gravity )
 	PORT_START("IN.0") // KB
@@ -575,6 +583,8 @@ static INPUT_PORTS_START( gravity )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
+
+// config
 
 void gravity_state::gravity(machine_config &config)
 {
@@ -659,7 +669,7 @@ u8 rw10r_state::read_kb()
 	return read_inputs(4);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rw10r )
 	PORT_START("IN.0") // STR4
@@ -686,6 +696,8 @@ static INPUT_PORTS_START( rw10r )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
+
+// config
 
 void rw10r_state::rw10r(machine_config &config)
 {
@@ -769,7 +781,7 @@ u8 rw18r_state::read_kb()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rw18r )
 	PORT_START("IN.0") // STR4
@@ -802,6 +814,8 @@ static INPUT_PORTS_START( rw18r )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
+
+// config
 
 void rw18r_state::rw18r(machine_config &config)
 {
@@ -882,7 +896,7 @@ u8 rw30r_state::read_kb()
 	return read_inputs(5);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rw30r )
 	PORT_START("IN.0") // STR4
@@ -915,6 +929,8 @@ static INPUT_PORTS_START( rw30r )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"% / u221ax" /* √ */)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
 INPUT_PORTS_END
+
+// config
 
 void rw30r_state::rw30r(machine_config &config)
 {
@@ -1010,7 +1026,7 @@ u8 rw24k_state::read_kb()
 	return read_inputs(9);
 }
 
-// config
+// inputs
 
 static INPUT_PORTS_START( rw24k )
 	PORT_START("IN.0") // STR0
@@ -1062,6 +1078,8 @@ static INPUT_PORTS_START( rw24k )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
+
+// config
 
 void rw24k_state::rw24k(machine_config &config)
 {

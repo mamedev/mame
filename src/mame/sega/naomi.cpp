@@ -10518,6 +10518,43 @@ ROM_START( wccf322e )
 	ROM_LOAD("317-0419-exp.pic", 0x00, 0x4000, CRC(3f5e1445) SHA1(184731633c0264e2104baa006ac80d3927c3e6e5) )
 ROM_END
 
+ROM_START( wccf331j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10020", 0, SHA1(7ef0e3ec987f28a7bf06ef12f488c30cde397ced) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A label unknown
+	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, CRC(a4abd76b) SHA1(1fa95d99d78a52d779106438e73716e7e86160c0) )
+ROM_END
+
+ROM_START( wccf341j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10021", 0, SHA1(22a23a2afa13920ed6044beec34e7616371477cc) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A label unknown
+	ROM_LOAD("317-unk-jpn.pic", 0x00, 0x4000, CRC(a4abd76b) SHA1(1fa95d99d78a52d779106438e73716e7e86160c0) )
+ROM_END
+
+ROM_START( wccf400j )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10025", 0, SHA1(897fb72a0a581cf9ff462ae1b370ec7e06c8f408) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0456-JPN)
+	//(sticker 253-5508-0456J)
+	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
+ROM_END
+
 ROM_START( wccf420e )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -10648,10 +10685,8 @@ void naomi_state::create_pic_from_retdat()
 			{
 				uint8_t* newregion = rgn_newregion->base();
 
-				FILE *fp;
-				char filename[256];
-				sprintf(filename,"picbin_%s", machine().system().name);
-				fp=fopen(filename, "w+b");
+				auto filename = "picbin_" + std::string(machine().system().name);
+				auto fp = fopen(filename.c_str(), "w+b");
 				if (fp)
 				{
 					fwrite(newregion, outcount, 1, fp);
@@ -11124,9 +11159,9 @@ void naomi_state::init_hotd2()
 /* CDV-10013 */ GAME( 2005, wccf310j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 (Asia) (CDV-10013)", GAME_FLAGS )
 /* CDV-10015 */ GAME( 2005, wccf331e, wccf322e,naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Export) (CDV-10015)", GAME_FLAGS )
 /* CDV-10015P*/ GAME( 2005, wccf322e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.3.22 (Export) (CDV-10015P)", GAME_FLAGS )
-// CDV-10020 - World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Sega, 2005)
-// CDV-10021 - World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Sega, 2005)
-// CDV-10025 - World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
+/* CDV-10020 */ GAME( 2005, wccf331j, wccf341j,naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Japan) (CDV-10020)", GAME_FLAGS )
+/* CDV-10021 */ GAME( 2006, wccf341j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Japan) (CDV-10021)", GAME_FLAGS )
+/* CDV-10025 */ GAME( 2006, wccf400j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2005-2006 (Japan) (CDV-10025)", GAME_FLAGS )
 // CDV-10025A- World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
 /* CDV-10027 */ GAME( 2006, wccf420e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2005-2006 (Export) (CDV-10027)", GAME_FLAGS )
 

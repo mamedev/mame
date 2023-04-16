@@ -29,32 +29,29 @@ public:
 	void asic_w(offs_t offset, u8 data);
 	void asic68_w(offs_t offset, u8 data);
 
-	u8 mem_r(offs_t offset);
-	void mem_w(offs_t offset, u8 data);
+	u8 mem_r(offs_t offset) { return reinterpret_cast<u8 const *>(m_upd4464_bank->base())[offset & 0x03ff]; }
+	void mem_w(offs_t offset, u8 data) { reinterpret_cast<u8 *>(m_upd4464_bank->base())[offset & 0x03ff] = data; }
 
-	u8 mem68_r(offs_t offset);
-	void mem68_w(offs_t offset, u8 data);
+	u8 mem68_r(offs_t offset) { return reinterpret_cast<u8 const *>(m_upd4464_bank68->base())[offset & 0x03ff]; }
+	void mem68_w(offs_t offset, u8 data) { reinterpret_cast<u8 *>(m_upd4464_bank68->base())[offset & 0x03ff] = data; }
 
 	void ext_interrupt(int state);
 
 protected:
-	void cchip_map(address_map &map);
-	void cchip_ram_bank(address_map &map);
-	void cchip_ram_bank68(address_map &map);
+	void cchip_map(address_map &map) ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 m_asic_ram[4];
 
 	required_device<cpu_device> m_upd7811;
-	required_device<address_map_bank_device> m_upd4464_bank;
-	required_device<address_map_bank_device> m_upd4464_bank68;
-	required_shared_ptr<u8> m_upd4464;
+	required_memory_bank m_upd4464_bank;
+	memory_bank_creator m_upd4464_bank68;
+	memory_share_creator<u8> m_sharedram;
 
 	devcb_read8        m_in_pa_cb;
 	devcb_read8        m_in_pb_cb;

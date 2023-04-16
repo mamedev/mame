@@ -746,11 +746,11 @@ QUICKLOAD_LOAD_MEMBER(tvc_state::quickload_cb)
 	{
 		image.fseek(0x90, SEEK_SET);
 		image.fread(m_ram->pointer() + 0x19ef, image.length() - 0x90);
-		return image_init_result::PASS;
+		return std::make_pair(std::error_condition(), std::string());
 	}
 	else
 	{
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDIMAGE, std::string());
 	}
 }
 

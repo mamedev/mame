@@ -1796,7 +1796,7 @@ void cps2_state::cps2(machine_config &config)
 	M68000(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 

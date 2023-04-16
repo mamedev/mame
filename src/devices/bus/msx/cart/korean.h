@@ -18,7 +18,7 @@ class msx_cart_korean_80in1_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_korean_80in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -39,7 +39,7 @@ class msx_cart_korean_90in1_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_korean_90in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -60,7 +60,7 @@ class msx_cart_korean_126in1_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_korean_126in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides

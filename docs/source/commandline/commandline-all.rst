@@ -396,25 +396,6 @@ overwritten.
             000-lo.lo                            131072 CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a)
             sfix.sfix                            131072 CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3)
 
-.. _mame-commandline-listbios:
-
-**-listbios** [*<pattern>*...]
-
-    Displays a list of alternate ROM BIOSes for supported systems/devices that
-    match the specified pattern(s).  If no patterns are specified, the results
-    will include *all* supported systems and devices.
-
-    Example:
-        .. code-block:: bash
-
-            mame -listbios 3do
-            4 BIOSes available for driver "3do".
-            Name:             Description:
-            panafz10          "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer"
-            goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
-            panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
-            sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
-
 .. _mame-commandline-listsamples:
 
 **-listsamples** [<*pattern*>]
@@ -476,10 +457,10 @@ overwritten.
     sets taken from unknown boards. On exit, the errorlevel is returned as one
     of the following:
 
-		* 0: means all files were identified
-		* 7: means all files were identified except for 1 or more "non-ROM" files
-		* 8: means some files were identified
-		* 9: means no files were identified
+    * 0: means all files were identified
+    * 7: means all files were identified except for 1 or more "non-ROM" files
+    * 8: means some files were identified
+    * 9: means no files were identified
 
     Example:
         .. code-block:: bash
@@ -553,6 +534,32 @@ overwritten.
                              gameio           compeyes         Digital Vision ComputerEyes
                                               joy              Apple II analog joysticks
                                               paddles          Apple II paddles
+
+.. _mame-commandline-listbios:
+
+**-listbios** [*<pattern>*]
+
+    Show available BIOS options for a system (if available).  BIOS options may
+    be available for the system or any devices selected as slot options.
+
+    If no pattern is specified, the results will include *all* supported
+    systems.
+
+    Example:
+        .. code-block:: bash
+
+            mamed -listbios apple2 -sl2 grapplus -sl4 videoterm
+            BIOS options for system Apple ][ (apple2):
+                default          Original Monitor
+                autostart        Autostart Monitor
+
+              BIOS options for device Orange Micro Grappler+ Printer Interface (-sl2 grapplus):
+                  v30              ROM 3.0
+                  v32              ROM 3.2
+
+              BIOS options for device Videx Videoterm 80 Column Display (-sl4 videoterm):
+                  v24_60hz         Firmware v2.4 (60 Hz)
+                  v24_50hz         Firmware v2.4 (50 Hz)
 
 .. _mame-commandline-listmedia:
 
@@ -3299,17 +3306,17 @@ Core Input Options
     map.  Below is an example map for an 8-way joystick that matches the
     picture shown above:
 
-		+-------------+--------------------------------------------------------+
-		| | 777888999 |                                                        |
-		| | 777888999 | | Note that the numeric digits correspond to the keys  |
-		| | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps|
-		| | 444555666 | | to left, '5' maps to neutral, etc. In addition to the|
-		| | 444555666 | | numeric values, you can specify the character 's',   |
-		| | 444555666 | | which means "sticky".  Sticky map positions will keep|
-		| | 111222333 | | the output the same as the last non-sticky input sent|
-		| | 111222333 | | to the system.                                       |
-		| | 111222333 |                                                        |
-		+-------------+--------------------------------------------------------+
+    +-------------+--------------------------------------------------------+
+    | | 777888999 |                                                        |
+    | | 777888999 | | Note that the numeric digits correspond to the keys  |
+    | | 777888999 | | on a numeric keypad. So '7' maps to up+left, '4' maps|
+    | | 444555666 | | to left, '5' maps to neutral, etc. In addition to the|
+    | | 444555666 | | numeric values, you can specify the character 's',   |
+    | | 444555666 | | which means "sticky".  Sticky map positions will keep|
+    | | 111222333 | | the output the same as the last non-sticky input sent|
+    | | 111222333 | | to the system.                                       |
+    | | 111222333 |                                                        |
+    +-------------+--------------------------------------------------------+
 
     To specify the map for this parameter, you can specify a string of rows
     separated by a '.' (which indicates the end of a row), like so:
@@ -3358,17 +3365,17 @@ Core Input Options
 
     This map would look somewhat like:
 
-		+-------------+---------------------------------------------------------+
-		| | s8888888s |                                                         |
-		| | 4s88888s6 | | For this mapping, we have a wide range for the        |
-		| | 44s888s66 | | cardinal directions on 8, 4, 6, and 2.  We have sticky|
-		| | 444555666 | | on the meeting points between those cardinal          |
-		| | 444555666 | | directions where the appropriate direction isn't      |
-		| | 444555666 | | going to be completely obvious.                       |
-		| | 44s222s66 |                                                         |
-		| | 4s22222s6 |                                                         |
-		| | s2222222s |                                                         |
-		+-------------+---------------------------------------------------------+
+    +-------------+---------------------------------------------------------+
+    | | s8888888s |                                                         |
+    | | 4s88888s6 | | For this mapping, we have a wide range for the        |
+    | | 44s888s66 | | cardinal directions on 8, 4, 6, and 2.  We have sticky|
+    | | 444555666 | | on the meeting points between those cardinal          |
+    | | 444555666 | | directions where the appropriate direction isn't      |
+    | | 444555666 | | going to be completely obvious.                       |
+    | | 44s222s66 |                                                         |
+    | | 4s22222s6 |                                                         |
+    | | s2222222s |                                                         |
+    +-------------+---------------------------------------------------------+
 
     To specify the map for this parameter, you can specify a string of rows
     separated by a '.' (which indicates the end of a row), like so:

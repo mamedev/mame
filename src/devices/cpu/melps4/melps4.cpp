@@ -376,6 +376,8 @@ void melps4_cpu_device::execute_set_input(int line, int state)
 
 void melps4_cpu_device::do_interrupt(int which)
 {
+	standard_irq_callback(which, m_pc);
+
 	m_inte = 0;
 	m_irqflag[which] = false;
 
@@ -385,8 +387,6 @@ void melps4_cpu_device::do_interrupt(int which)
 	m_sm = false;
 	m_op = 0; // fake nop
 	m_pc = m_int_page << 7 | (which * 2);
-
-	standard_irq_callback(which);
 }
 
 void melps4_cpu_device::check_interrupt()

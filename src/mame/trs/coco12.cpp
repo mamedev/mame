@@ -181,13 +181,6 @@ INPUT_PORTS_START( coco_beckerport )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
 INPUT_PORTS_END
 
-INPUT_PORTS_START( coco_beckerport_dw )
-	PORT_START(BECKERPORT_TAG)
-	PORT_CONFNAME( 0x01, 0x01, "Becker Port" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(    0x01, DEF_STR( On ))
-INPUT_PORTS_END
-
 
 
 //-------------------------------------------------
@@ -637,7 +630,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 void coco12_state::coco2(machine_config &config)
 {
 	coco(config);
-	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdcv11"));
+	cococart_slot_device &cartslot(COCOCART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "fdc"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);

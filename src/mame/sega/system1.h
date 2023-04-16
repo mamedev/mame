@@ -7,6 +7,7 @@
 
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
 #include "machine/z80pio.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -27,6 +28,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_mcu(*this, "mcu"),
+		m_sn(*this, "sn%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -70,7 +72,7 @@ public:
 	void sys1piox_315_5135(machine_config &config);
 	void sys2rowxboot(machine_config &config);
 	void sys1piox_315_5102(machine_config &config);
-	void sys1piosx_315_spat(machine_config &config);
+	void sys1piosx_315_5096(machine_config &config);
 	void sys2x(machine_config &config);
 	void sys1piox_315_5051(machine_config &config);
 	void sys1piox_315_5098(machine_config &config);
@@ -204,6 +206,7 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<i8751_device> m_mcu;
+	required_device_array<sn76489a_device, 2> m_sn;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

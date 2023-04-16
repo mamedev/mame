@@ -36,18 +36,20 @@
 
     TODO:
 
-	- systest1600
-		- chip test crashes with trap 4
-		- keyboard test fails
-		- mouse test fails
+    - systest1600 failures
+        - CIO timer
+        - RTC (seconds advance too slowly)
+        - DMA
+    - bootpar writes console bauds without high order byte (9600=>128)
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
-    - short/long reset (RSTBUT)
+    - crashes after reset
     - CIO
         - optimize timers!
-        - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
+        [:] SCC write 000003
+        [:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
 
 */
 
@@ -362,9 +364,9 @@ void abc1600_state::fw0_w(uint8_t data)
 	// drive select
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	for (int n = 0; n < 3; n++)
+		if (BIT(data, n))
+			floppy = m_floppy[n]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -535,11 +537,29 @@ void abc1600_state::mac_mem(address_map &map)
 //**************************************************************************
 
 //-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( reset )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( abc1600_state::reset )
+{
+	if (!oldval && newval)
+	{
+		machine_reset();
+	}
+
+	m_mac->rstbut_w(newval);
+}
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( abc1600 )
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
-	// inputs defined in machine/abc99.cpp
+	// keyboard inputs defined in machine/abc99.cpp
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc1600_state, reset, 0)
 INPUT_PORTS_END
 
 
@@ -873,6 +893,13 @@ void abc1600_state::machine_reset()
 
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+
+	// reset devices
+	m_mac->reset();
+	m_maincpu->reset();
+	m_cio->reset();
+	m_scc->reset();
+	m_kb->reset();
 }
 
 
@@ -991,15 +1018,16 @@ void abc1600_state::abc1600(machine_config &config)
 
 	NMC9306(config, m_nvram, 0);
 
-	E0516(config, E050_C16PC_TAG, 32.768_kHz_XTAL);
+	E0516(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->outsel_rd_cb().set_constant(0);
 
 	FD1797(config, m_fdc, 64_MHz_XTAL / 64); // clocked by 9229B
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", abc1600_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], abc1600_floppies, nullptr, abc1600_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], abc1600_floppies, "525qd", abc1600_state::floppy_formats).enable_sound(true);
 
 	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

@@ -53,10 +53,10 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C8050,   c8050_device,   "c8050",    "Commodore 8050")
-DEFINE_DEVICE_TYPE(C8250,   c8250_device,   "c8250",    "Commodore 8250")
-DEFINE_DEVICE_TYPE(C8250LP, c8250lp_device, "c8250lp",  "Commodore 8250LP")
-DEFINE_DEVICE_TYPE(SFD1001, sfd1001_device, "sfd10001", "Commodore SFD-1001")
+DEFINE_DEVICE_TYPE(C8050,   c8050_device,   "c8050",   "Commodore 8050")
+DEFINE_DEVICE_TYPE(C8250,   c8250_device,   "c8250",   "Commodore 8250")
+DEFINE_DEVICE_TYPE(C8250LP, c8250lp_device, "c8250lp", "Commodore 8250LP")
+DEFINE_DEVICE_TYPE(SFD1001, sfd1001_device, "sfd1001", "Commodore SFD-1001")
 
 
 //-------------------------------------------------

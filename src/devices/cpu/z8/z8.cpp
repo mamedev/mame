@@ -26,9 +26,9 @@
 #include "z8.h"
 #include "z8dasm.h"
 
-#define LOG_TIMER       (1 << 1U)
-#define LOG_RECEIVE     (1 << 2U)
-#define LOG_TRANSMIT    (1 << 3U)
+#define LOG_TIMER       (1U << 1)
+#define LOG_RECEIVE     (1U << 2)
+#define LOG_TRANSMIT    (1U << 3)
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -1347,7 +1347,7 @@ void z8_device::take_interrupt(int irq)
 
 	// acknowledge the IRQ
 	m_irq &= ~(1 << irq);
-	standard_irq_callback(irq);
+	standard_irq_callback(irq, m_pc);
 
 	// get the interrupt vector address
 	uint16_t vector = irq * 2;

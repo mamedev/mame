@@ -1186,6 +1186,33 @@ public:
 	///   been found.
 	size_t bytes() const { return m_bytes; }
 
+	/// \brief Get iterator to first element
+	///
+	/// Returns an iterator to the first element of the memory share.
+	/// \return Iterator to first element.
+	PointerType *begin() const { return this->m_target; }
+
+	/// \brief Get iterator beyond last element
+	///
+	/// Returns an iterator one past the last element of the memory
+	/// share.
+	/// \return Iterator one past last element.
+	PointerType *end() const { return this->m_target + length(); }
+
+	/// \brief Get constant iterator to first element
+	///
+	/// Returns a constant iterator to the first element of the memory
+	/// share.
+	/// \return Constant iterator to first element.
+	PointerType const *cbegin() const { return this->m_target; }
+
+	/// \brief Get constant iterator beyond last element
+	///
+	/// Returns a constant iterator one past the last element of the
+	/// memory share.
+	/// \return Constant iterator one past last element.
+	PointerType const *cend() const { return this->m_target + length(); }
+
 private:
 	/// \brief Find memory share base pointer
 	///
@@ -1311,6 +1338,34 @@ public:
 	/// Must not be called before creation is attempted.
 	/// \return Memory share width in bytes.
 	u8 bytewidth() const { return m_target->bytewidth(); }
+
+	/// \brief Get iterator to first element
+	///
+	/// Returns an iterator to the first element of the memory share.
+	/// Must not be called before creation is attempted.
+	/// \return Iterator to first element.
+	PointerType *begin() const { return target(); }
+
+	/// \brief Get iterator beyond last element
+	///
+	/// Returns an iterator one past the last element of the memory
+	/// share.  Must not be called before creation is attempted.
+	/// \return Iterator one past last element.
+	PointerType *end() const { return target() + length(); }
+
+	/// \brief Get constant iterator to first element
+	///
+	/// Returns a constant iterator to the first element of the memory
+	/// share.  Must not be called before creation is attempted.
+	/// \return Constant iterator to first element.
+	PointerType const *cbegin() const { return target(); }
+
+	/// \brief Get constant iterator beyond last element
+	///
+	/// Returns a constant iterator one past the last element of the
+	/// memory share.  Must not be called before creation is attempted.
+	/// \return Constant iterator one past last element.
+	PointerType const *cend() const { return target() + length(); }
 
 protected:
 	virtual bool findit(validity_checker *valid) override;

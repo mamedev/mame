@@ -12570,7 +12570,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dune2us" cloneof="dune2">
-		<description>Dune II - The Building Of A Dynasty (USA)</description>
+		<description>Dune II - The Building of a Dynasty (USA)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
@@ -12594,6 +12594,22 @@ license:CC0-1.0
 			<dataarea name="flop" size = "1474560">
 				<!-- Modified root -->
 				<rom name="Dune II - The Building Of A Dynasty [Virgin] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="5d8718b5" sha1="4aa6b229574327d420599699e1785dd674e7268d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynablst" supported="no">
+		<description>Dyna Blaster</description>
+		<year>1992</year>
+		<publisher>Ubi Soft</publisher>
+		<notes><![CDATA[
+Prompts user to "press fire" but no correlated keyboard bind, requires unemulated parallel port dongle
+]]></notes>
+		<info name="developer" value="Hudson Soft" />
+		<info name="usage" value="Requires HDD install" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dyna Blaster [Ubi Soft] [[1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d6af7500" sha1="c4acd9f2731d9d80eda759d9833cc1c4e4c064ea"/>
 			</dataarea>
 		</part>
 	</software>
