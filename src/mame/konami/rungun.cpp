@@ -118,7 +118,6 @@ private:
 	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_irq_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void sound_status_w(uint8_t data);
 	void sound_ctrl_w(uint8_t data);
 	uint16_t ttl_ram_r(offs_t offset);
 	void ttl_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -464,11 +463,6 @@ void rungun_state::sprite_dma_trigger(void)
 
 
 /**********************************************************************************/
-
-void rungun_state::sound_status_w(uint8_t data)
-{
-	m_sound_status = data;
-}
 
 void rungun_state::sound_ctrl_w(uint8_t data)
 {
