@@ -739,6 +739,9 @@ Black screen
 		<description>J.League Spectacle Soccer (Japan)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="HDR-0154"/>
 		<!-- Disc ID: 673-03371 -->
 		<!-- Inlay ID: 673-03373 -->
@@ -1137,6 +1140,9 @@ Black screen
 		<description>After...: Wasureenu Kizuna - Shokai Genteiban (Japan)</description>
 		<year>2004</year>
 		<publisher>Pionesoft</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-18705M"/>
 		<!-- Disc Serial: T-18705M/T-18706M -->
 		<info name="release" value="20040226"/>
@@ -1188,6 +1194,9 @@ Black screen
 		<description>Aikagi: Hidamari to Kanojo no Heyagi (Japan)</description>
 		<year>2003</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20130M, T-20131M"/>
 		<!-- Disc Serial: T-20130M/T-20131M -->
 		<info name="release" value="20030807"/>
@@ -1212,6 +1221,9 @@ Black screen
 		<description>Air (Japan, rev. A)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20112M"/>
 		<info name="release" value="20010920"/>
 		<info name="ring_code" value="T-20112M-0752A   10MM1   C   19, T-20112M-0752A   11M4   C   19, T-20112M-0752A   12M1   C   19"/>
@@ -1901,6 +1913,9 @@ No [redbook] audio
 		<description>Angel Wish: Kimi no Egao ni Chu! (Japan)</description>
 		<year>2005</year>
 		<publisher>Pionesoft</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-18712M"/>
 		<info name="release" value="20050224"/>
 		<info name="alt_title" value="Angel Wish 君の笑顔にチュッ!"/>
@@ -1966,6 +1981,9 @@ No [redbook] audio
 		<description>Ao no 6-go Saigetsufutai Hito: Time and Tide (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="HDR-0075"/>
 		<info name="release" value="20001207"/>
 		<info name="alt_title" value="青の6号　～歳月不待人～ TIME AND TIDE"/>
@@ -2210,6 +2228,9 @@ Optional [BBA] support
 		<description>Baldr Force EXE (Japan)</description>
 		<year>2004</year>
 		<publisher>Alchemist</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-47110M"/>
 		<info name="release" value="20041028"/>
 		<info name="alt_title" value="バルドフォース エグゼ"/>
@@ -2395,6 +2416,9 @@ Optional [BBA] support
 		<description>Bakuretsu Muteki Bangaioh (Japan)</description>
 		<year>1999</year>
 		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-38702M"/>
 		<info name="release" value="19991209"/>
 		<info name="alt_title" value="爆裂無敵 バンガイオー"/>
@@ -3140,6 +3164,9 @@ Black screen
 		<description>Bokomu no Tatsujin (Japan)</description>
 		<year>2002</year>
 		<publisher>Fujicom</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-42904M"/>
 		<info name="release" value="20020124"/>
 		<info name="alt_title" value="ボコ夢の達人"/>
@@ -3315,6 +3342,9 @@ No [redbook] audio
 		<description>Border Down (Japan)</description>
 		<year>2003</year>
 		<publisher>G.rev</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-46703M"/>
 		<info name="release" value="20030925"/>
 		<info name="alt_title" value="ボーダーダウン"/>
@@ -3762,6 +3792,9 @@ Black screen
 		<description>Canary: Kono Omoi wo Uta ni Nosete (Japan)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20111M"/>
 		<info name="release" value="20010823"/>
 		<info name="alt_title" value="カナリア 〜この想いを歌にのせて〜"/>
@@ -3881,6 +3914,9 @@ Black screen
 		<description>Canvas: Sepia-iro no Motif (Japan)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20108M"/>
 		<info name="release" value="20010405"/>
 		<info name="alt_title" value="Canvas 〜セピア色のモチーフ〜"/>
@@ -4099,6 +4135,9 @@ Hangs on ADX logo with [drc]
 		<description>Card of Destiny: Hikari to Yami no Tougousha - Genteiban (Japan)</description>
 		<year>2002</year>
 		<publisher>Abel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-44405M"/>
 		<info name="release" value="20020328"/>
 		<info name="alt_title" value="カード・オブ・デスティニー 〜光と闇の統合者〜 限定版"/>
@@ -4429,6 +4468,9 @@ Crashes after ADX logo with [drc]
 		<description>Chaos Field (Japan)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-47801M"/>
 		<info name="release" value="20041216"/>
 		<info name="alt_title" value="カオスフィールド"/>
@@ -4444,6 +4486,9 @@ Crashes after ADX logo with [drc]
 		<description>Chaos Field (Japan, Sega Direct)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-47801M, STRV-002 (Bonus CD)"/>
 		<info name="release" value="20041216"/>
 		<info name="alt_title" value="カオスフィールド"/>
@@ -4466,6 +4511,9 @@ Crashes after ADX logo with [drc]
 		<description>Chaos Field (Japan, Sega Direct, rev. 1)</description>
 		<year>2004</year>
 		<publisher>Milestone Inc.</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-47801M, STRV-003 (Bonus CD)"/>
 		<info name="release" value="20050224"/>
 		<info name="alt_title" value="カオスフィールド"/>
@@ -4728,6 +4776,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Chocolat: Maid Cafe "Curio" (Japan)</description>
 		<year>2003</year>
 		<publisher>Alchemist</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-47107M"/>
 		<info name="release" value="20031225"/>
 		<info name="alt_title" value="ショコラ 〜maid cafe “curio”〜"/>
@@ -4749,6 +4800,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Chocolat: Maid Cafe "Curio" - Taikenban (Japan)</description>
 		<year>2003</year>
 		<publisher>Alchemist</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="610-8395"/>
 		<info name="alt_title" value="ショコラ 〜maid cafe “curio”〜 体験版"/>
 		<part interface="cdrom" name="cdrom">
@@ -5338,6 +5392,9 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 		<description>Comic Party (Japan)</description>
 		<year>2001</year>
 		<publisher>AquaPlus</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-38301M, T-38302M (Shokai Genteiban)"/>
 		<info name="release" value="20010809"/>
 		<info name="alt_title" value="こみっくパーティー, こみっくパーティー 初回限定版 (Shokai Genteiban)"/>
@@ -5406,6 +5463,9 @@ Overly stretched [PVR] output (displays top right of actual screen, SCALER_CTL)
 		<description>Confidential Mission (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="HDR-0160"/>
 		<info name="release" value="20010614"/>
 		<info name="alt_title" value="コンフィデンシャル ミッション"/>
@@ -5589,6 +5649,9 @@ Crashes at "Produced by Sega"
 		<description>CR Hissatsu Shigotonin: Pachitte Chonmage @VP@CHI (Japan)</description>
 		<year>2001</year>
 		<publisher>Hackberry</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-45801M"/>
 		<info name="release" value="20010802"/>
 		<info name="alt_title" value="CR必殺仕事人　パチってちょんまげ@VP@CHI"/>
@@ -8081,6 +8144,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Doki Doki Idol Star Seeker Remix (Japan)</description>
 		<year>2002</year>
 		<publisher>G.rev</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-46701M"/>
 		<info name="release" value="20020131"/>
 		<info name="alt_title" value="どきどきアイドルスターシーカーRemix"/>
@@ -11640,6 +11706,9 @@ Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timi
 		<description>Eldorado Gate Vol. 5 (Japan)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-1227M"/>
 		<info name="release" value="20010606"/>
 		<info name="alt_title" value="エルドラドゲート 第5巻"/>
@@ -11660,6 +11729,9 @@ Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timi
 		<description>Eldorado Gate Vol. 6 (Japan)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-1228M"/>
 		<info name="release" value="20010808"/>
 		<info name="alt_title" value="エルドラドゲート 第6巻"/>
@@ -11680,6 +11752,9 @@ Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timi
 		<description>Eldorado Gate Dai-7-kan (Japan)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-1229M"/>
 		<info name="release" value="20011010"/>
 		<info name="alt_title" value="エルドラドゲート 第7巻"/>
@@ -11741,6 +11816,9 @@ Doesn't detect key repeat properly in main menu (inputs get stuck), [Maple] timi
 		<description>Elysion: Eien no Sanctuary (Japan)</description>
 		<year>2002</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20116M"/>
 		<info name="release" value="20020725"/>
 		<info name="alt_title" value="エリュシオン 〜永遠のサンクチュアリ〜"/>
@@ -11951,6 +12029,9 @@ Hardlocks MAME after event "how to play" with [drc]
 		<description>Eve Zero Kanzenban: Ark of the Matter - Shokai Gentei Pack (Japan)</description>
 		<year>2001</year>
 		<publisher>NetVillage</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-39802M"/>
 		<info name="release" value="20010322"/>
 		<info name="alt_title" value="イヴ·ゼロ 完全版 -Ark of the Matter- 初回限定パック"/>
@@ -12246,6 +12327,9 @@ Hardlocks MAME after event "how to play" with [drc]
 		<description>Exodus Guilty Neos (Japan)</description>
 		<year>2001</year>
 		<publisher>Abel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-44404M"/>
 		<info name="release" value="20010531"/>
 		<info name="alt_title" value="エクソダスギルティー ネオス"/>
@@ -13000,6 +13084,9 @@ Gameplay requires [PVR] user tile clip
 		<description>Garou: Mark of the Wolves (Japan)</description>
 		<year>2001</year>
 		<publisher>SNK</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-3108M, T-47302M (SNK Best Buy)"/>
 		<info name="release" value="20010927"/>
 		<info name="alt_title" value="餓狼 MARK OF THE WOLVES"/>
@@ -15141,6 +15228,9 @@ Hangs on FMV with [drc]
 		<description>Golf Shiyou yo 2: Aratanaru Chousen (Japan)</description>
 		<year>2001</year>
 		<publisher>Softmax</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-44501M"/>
 		<info name="release" value="20010125"/>
 		<info name="alt_title" value="ゴルフしようよ2 〜新たなる挑戦〜"/>
@@ -15939,6 +16029,7 @@ Optional [BBA] support
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Optional [BBA] support
+Punts to BIOS at start of loading [GDROM]
 ]]></notes>
 		<info name="serial" value="HDR-0195"/>
 		<info name="release" value="20020314"/>
@@ -16099,6 +16190,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Harusame Youbi (Japan)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20106M"/>
 		<info name="release" value="20010322"/>
 		<info name="alt_title" value="春雨曜日"/>
@@ -16474,6 +16568,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Himitsu: Yui ga Ita Natsu (Japan)</description>
 		<year>2001</year>
 		<publisher>Starfish-SD</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-46101M"/>
 		<info name="release" value="20010726"/>
 		<info name="alt_title" value="秘密 〜唯がいた夏〜"/>
@@ -16910,7 +17007,10 @@ FMV draws [PVR] black pixels instead of transparent color
 		-->
 		<description>Ikaruga (Japan)</description>
 		<year>2002</year>
-		<publisher>Entertainment Software Publishing</publisher>
+		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-38706M"/>
 		<info name="release" value="20020905"/>
 		<info name="alt_title" value="斑鳩"/>
@@ -17230,6 +17330,9 @@ No [redbook] audio
 		<description>Inoue Ryouko: Last Scene (Japan)</description>
 		<year>2001</year>
 		<publisher>Datam Polystar</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-19506M"/>
 		<info name="release" value="20011108"/>
 		<info name="alt_title" value="井上涼子 〜ラストシーン〜"/>
@@ -17443,6 +17546,9 @@ Crashes on FMV with [drc]
 		<description>Izumo (Japan)</description>
 		<year>2004</year>
 		<publisher>Symbio Planning</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-46902M"/>
 		<info name="release" value="20040129"/>
 		<info name="alt_title" value="イズモ"/>
@@ -18381,6 +18487,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Karous (Japan)</description>
 		<year>2007</year>
 		<publisher>Milestone Inc.</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM], locks up
+]]></notes>
 		<info name="serial" value="T-47803M"/>
 		<info name="release" value="20070308"/>
 		<info name="alt_title" value="カラス"/>
@@ -18561,6 +18670,9 @@ No [redbook] audio
 		<description>Kimi ga Nozomu Eien (Japan)</description> <!-- Kimi ga Nozomu Eien - Shokai Genteiban -->
 		<year>2002</year>
 		<publisher>Alchemist</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-47101M, T-47102M"/>
 		<info name="release" value="20020926"/>
 		<info name="alt_title" value="君が望む永遠, 君が望む永遠 初回限定版"/>
@@ -18810,6 +18922,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Konohana: True Report (Japan)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-9905M"/>
 		<info name="release" value="20010426"/>
 		<info name="alt_title" value="此花トゥルーリポート"/>
@@ -18832,6 +18947,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Konohana 2: Todokanai Requiem (Japan)</description>
 		<year>2002</year>
 		<publisher>Success</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-9906M"/>
 		<info name="release" value="20021128"/>
 		<info name="alt_title" value="此花2 〜届かないレクイエム〜"/>
@@ -20689,6 +20807,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Missing Parts: The Tantei Stories (Japan)</description>
 		<year>2002</year>
 		<publisher>FOG</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-36702M"/>
 		<info name="release" value="20020117"/>
 		<info name="alt_title" value="ミッシングパーツ ザ 探偵ストーリーズ"/>
@@ -20709,6 +20830,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Missing Parts 2: The Tantei Stories (Japan)</description>
 		<year>2002</year>
 		<publisher>FOG</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-36703M"/>
 		<info name="release" value="20021024"/>
 		<info name="alt_title" value="ミッシングパーツ2 ザ 探偵ストーリーズ"/>
@@ -20749,6 +20873,9 @@ Built on Windows CE, requires [MMU] support
 		<description>Mizu Iro (Japan)</description>
 		<year>2002</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+Punts to BIOS at start of loading [GDROM]
+]]></notes>
 		<info name="serial" value="T-20114M"/>
 		<info name="release" value="20020307"/>
 		<info name="alt_title" value="みずいろ"/>
