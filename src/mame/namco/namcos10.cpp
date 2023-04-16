@@ -1782,7 +1782,7 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	/* decrypter device (CPLD in hardware?) */
-	// GAHAHA2_DECRYPTER(config, m_decrypter, 0);
+	GAHAHA2_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_gamshara(machine_config &config)
@@ -2862,7 +2862,7 @@ GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, 
 GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,   namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   namcos10, namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,   namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,  namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
