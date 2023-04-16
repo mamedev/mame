@@ -2352,12 +2352,13 @@ static INPUT_PORTS_START( g13jnc )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up Select")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE
 
 	// If the player is 10cm or closer then this will be on.
 	// For playability, make it so that the player has to explicity toggle the scope
 	// to be off to simulate stepping away from the scope instead of always having to
 	// hold the scope sensor button
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scope Sensor")
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scope Sensor") PORT_TOGGLE
 
 	PORT_MODIFY("SYSTEM")
 	// No idea what DIPSW 1 (0x80) is doing but it causes the game to freeze
