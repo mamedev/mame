@@ -1878,6 +1878,9 @@ Black screen
 		<description>Angel Present (Japan)</description>
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-20107M"/>
 		<info name="release" value="20010412"/>
 		<info name="alt_title" value="エンジェルプレゼント"/>
@@ -2134,6 +2137,7 @@ Ugly sample scratches coming from [AICA]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Ugly sample scratches coming from [AICA]
+Optional [BBA] support
 ]]></notes>
 		<info name="serial" value="HDR-0121"/>
 		<!-- Disc ID: 673-02170 -->
@@ -3206,6 +3210,9 @@ Black screen
 		<description>Boku no Tennis Jinsei (Japan)</description>
 		<year>2001</year>
 		<publisher>Bimboosoft</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-41202M"/>
 		<info name="release" value="20010920"/>
 		<info name="alt_title" value="ぼくのテニス人生"/>
@@ -3388,6 +3395,9 @@ Black screen
 		<description>Broadband Passport (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [BBA]
+]]></notes>
 		<info name="serial" value="610-7883"/>
 		<info name="alt_title" value="ブロードバンドパスポート, ブロードバンドアダプタ (Bundle)"/>
 		<info name="ring_code" value="610-7883-0442 1M1, 610-7883-0442 1M3"/>
@@ -3413,6 +3423,9 @@ Black screen
 		<description>Broadband Passport (Japan, alt)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [BBA]
+]]></notes>
 		<info name="serial" value="610-7883"/>
 		<info name="alt_title" value="ブロードバンドパスポート, ブロードバンドアダプタ (Bundle)"/>
 		<info name="ring_code" value="610-7883-0442 2M1"/>
@@ -3625,6 +3638,9 @@ Crashes during FMV with [drc]
 		<description>Puzzle Bobble 4 (Japan)</description>
 		<year>2000</year>
 		<publisher>Cyberfront</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-42301M"/>
 		<info name="release" value="20000316"/>
 		<info name="alt_title" value="パズルボブル4"/>
@@ -3722,6 +3738,9 @@ Crashes during FMV with [drc]
 		<description>Cafe Little Wish (Japan)</description>
 		<year>2003</year>
 		<publisher>Princess Soft</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="T-46513M"/>
 		<info name="release" value="20030529"/>
 		<info name="alt_title" value="カフェ・リトルウィッシュ"/>
@@ -4111,6 +4130,9 @@ Hangs on ADX logo with [drc]
 		<description>Cardcaptor Sakura: Tomoyo no Video Daisakusen (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, [SH4] jumps to lalaland
+]]></notes>
 		<info name="serial" value="HDR-0115, HDR-0132 (Limited Box)"/>
 		<info name="release" value="20001228"/>
 		<info name="alt_title" value="カードキャプターさくら　知世のビデオ大作戦, カードキャプターさくら　知世のビデオ大作戦 限定版「LIMITED BOX」 (Limited Box)"/>
@@ -4587,6 +4609,9 @@ Crashes after ADX logo with [drc]
 		<description>Cherry Blossom (Japan)</description>
 		<year>2004</year>
 		<publisher>Takuyo</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-37912M"/>
 		<info name="release" value="20040428"/>
 		<info name="alt_title" value="チェリーブロッサム"/>
@@ -5974,6 +5999,9 @@ Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
 		<description>D+Vine [Luv] - Shokai Genteiban (Japan)</description>
 		<year>2001</year>
 		<publisher>Princess Soft</publisher>
+		<notes><![CDATA[
+Black screen
+]]></notes>
 		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
 		<info name="release" value="20011025"/>
 		<info name="alt_title" value="ディヴァイン ラヴ 初回限定版"/>
@@ -7292,6 +7320,7 @@ Hangs at "Produced by Sega", [gdrom] keeps reading LBA=$afbe with REQ_ERROR 13h
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
 Test case for [PVR] flickerfree feature
+No [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-14305M"/>
 		<info name="release" value="19990722"/>
@@ -7313,6 +7342,9 @@ Test case for [PVR] flickerfree feature
 		<description>Densha de Go! 2: Kousoku-hen 3000 Bandai (Japan)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-1102M"/>
 		<info name="release" value="20000120"/>
 		<info name="alt_title" value="電車でGO!2 高速編3000番台"/>
@@ -8248,6 +8280,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 1 (Japan)</description>
 		<year>1999</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164"/>
 		<info name="release" value="19990723"/>
 		<info name="alt_title" value="ドリマガGD Vol.1"/>
@@ -8278,6 +8313,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-02 (Disc 1), 610-7164-03 (Disc 2)"/>
 		<info name="release" value="19990827"/>
 		<info name="alt_title" value="ドリマガGD Vol.2"/>
@@ -8370,6 +8408,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 5 (Japan)</description>
 		<year>2000</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-06"/>
 		<info name="release" value="20000707"/>
 		<info name="alt_title" value="ドリマガGD Vol.5"/>
@@ -8391,6 +8432,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 6 (Japan)</description>
 		<year>2000</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-07"/>
 		<info name="release" value="20000811"/>
 		<info name="alt_title" value="ドリマガGD Vol.6"/>
@@ -8412,6 +8456,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 7 (Japan)</description>
 		<year>2000</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-08"/>
 		<info name="release" value="20000929"/>
 		<info name="alt_title" value="ドリマガGD Vol.7"/>
@@ -8445,6 +8492,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 8 (Japan)</description>
 		<year>2000</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-09"/>
 		<info name="release" value="20001127"/>
 		<info name="alt_title" value="ドリマガGD Vol.8"/>
@@ -8467,6 +8517,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 9 (Japan)</description>
 		<year>2000</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-10"/>
 		<info name="release" value="20001229"/>
 		<info name="alt_title" value="ドリマガGD Vol.9"/>
@@ -8489,6 +8542,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 10 (Japan)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-11"/>
 		<info name="release" value="20010209"/>
 		<info name="alt_title" value="ドリマガGD Vol.10"/>
@@ -8511,6 +8567,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 11 (Japan)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-12"/>
 		<info name="release" value="20010330"/>
 		<info name="alt_title" value="ドリマガGD Vol.11"/>
@@ -8533,6 +8592,9 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<description>Dorimaga GD Vol. 12 (Japan)</description>
 		<year>2001</year>
 		<publisher>Softbank</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7164-13"/>
 		<info name="release" value="2001"/>
 		<info name="alt_title" value="ドリマガGD Vol.12"/>
@@ -9375,6 +9437,7 @@ Hardlocks MAME if left idle on title screen with [drc]
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
+Software for [modem]
 ]]></notes>
 		<info name="serial" value="610-7055"/>
 		<info name="alt_title" value="ドリームパスポート"/>
@@ -9399,6 +9462,7 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
+Software for [modem]
 ]]></notes>
 		<info name="serial" value="610-7000"/>
 		<info name="release" value="19981127"/>
@@ -9454,6 +9518,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 2 (Japan, rev. 1)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7180"/>
 		<info name="alt_title" value="ドリームパスポート2"/>
 		<info name="ring_code" value="610-7180-0122B 20M4 C 99"/>
@@ -9475,6 +9542,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7180"/>
 		<info name="alt_title" value="ドリームパスポート2"/>
 		<info name="ring_code" value="610-7180-0122A 12M1 C 97, 610-7180-0122A 12M3 C 97"/>
@@ -9541,6 +9611,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Hello Kitty no Dream Passport 2 (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7349"/>
 		<info name="release" value="19991125"/>
 		<info name="alt_title" value="ハローキティのドリームパスポート2"/>
@@ -9563,6 +9636,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 2 for LAN (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [BBA]
+]]></notes>
 		<info name="serial" value="610-7710"/>
 		<info name="alt_title" value="ドリームパスポート2 for LAN, LANアダプタ (Bundle)"/>
 		<part interface="cdrom" name="cdrom">
@@ -9602,6 +9678,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 3 (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7819, 610-7851 (Ch@b)"/>
 		<info name="alt_title" value="ドリームパスポート3"/>
 		<info name="ring_code" value="610-7819-0374B 1, 610-7819-0374B 2, 610-7819-0374B 3"/>
@@ -9629,6 +9708,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 3 (Japan, alt)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7819, 610-7851 (Ch@b)"/>
 		<info name="alt_title" value="ドリームパスポート3"/>
 		<info name="ring_code" value="610-7819-0374B 22MB3, 610-7819-0374B 22MM1"/>
@@ -9656,6 +9738,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 3 (Japan, alt 2)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7819, 610-7851 (Ch@b)"/>
 		<info name="alt_title" value="ドリームパスポート3"/>
 		<info name="ring_code" value="610-7819-0374B 25M3, 610-7819-0374B 25M12"/>
@@ -9677,6 +9762,9 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport 3: Urban Style (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+]]></notes>
 		<info name="serial" value="610-7894"/>
 		<info name="release" value="20000914"/>
 		<info name="alt_title" value="ドリームパスポート3 アーバンスタイル, リビングルームでインターネット: Internet StaterKit (Bundle)"/>
@@ -9719,7 +9807,7 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 	</software>
 	-->
 
-	<software name="dejiko" cloneof="drmpass3" supported="no">
+	<software name="dejiko" supported="no">
 		<!--
 		<rom name="Dejiko no Maibura v1.000 (2000)(ISAO)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
 		<rom name="track01.bin" size="705600" md5="eba49319e8c9a24611323ee71f17826c" sha1="25598497e9ada69c572a9c35275af1c1a739f4ed"/>
@@ -9729,9 +9817,13 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dejiko no Maibura (Japan)</description>
 		<year>2000</year>
 		<publisher>Isao</publisher>
+		<notes><![CDATA[
+Software for [modem], throws an error requiring a Dream Passport (3?)
+]]></notes>
 		<info name="serial" value="T-44601M"/>
 		<info name="release" value="20001214"/>
 		<info name="alt_title" value="でじこのまいブラ"/>
+		<info name="usage" value="Software for Dream Passport"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dejiko no maibura (jpn)" sha1="6594bcf8409839a5323fec91ab2f1ce2e3eb3a23"/>
@@ -9750,8 +9842,13 @@ Overly stretched [PVR] output (displays half right of actual screen, SCALER_CTL)
 		<description>Dream Passport Premier (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem]
+Compatible with Jp Windows and Macintosh
+]]></notes>
 		<info name="serial" value="610-8061"/>
 		<info name="ring_code" value="610-8061-0725 3M7 C 17"/>
+		<info name="alt_title" value="ドリームパスポートプレミア with PC/Macintosh"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dream passport premier (jpn)" sha1="60ff8356e5e14fd27b8ca2f8a42f06a04f22f12e"/>
@@ -10396,8 +10493,12 @@ Sega Marine Fishing:
 		<description>DreamFlyer (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Software for [modem], throws an error requiring a Dream Passport
+]]></notes>
 		<info name="serial" value="HDR-0042"/>
 		<info name="alt_title" value="ドリームフライヤー"/>
+		<info name="usage" value="Requires Dream Passport"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dreamflyer (jpn)" sha1="73b3c7ff921a98f554f24eb563e49f5a64b296d9"/>
@@ -11408,6 +11509,9 @@ Heavy [PVR] texture issues
 		<description>Eisei Meijin III: Game Creator Yoshimura Nobuhiro no Zunou (Japan)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="TT-9503M"/>
 		<info name="release" value="19990708"/>
 		<info name="alt_title" value="永世名人III 〜ゲームクリエイター吉村信弘の頭脳〜"/>
@@ -12457,6 +12561,9 @@ Hardlocks MAME after event "how to play" with [drc]
 		<description>F1 World Grand Prix for Dreamcast (Japan)</description>
 		<year>1999</year>
 		<publisher>Video System</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-3001M"/>
 		<info name="release" value="19991125"/>
 		<info name="alt_title" value="F1 ワールド グランプリ for Dreamcast"/>
@@ -12733,6 +12840,10 @@ Hardlocks MAME after event "how to play" with [drc]
 		<description>F355 Challenge (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen with [drc]
+Gameplay requires [PVR] user tile clip
+]]></notes>
 		<info name="serial" value="HDR-0100"/>
 		<info name="release" value="20000803"/>
 		<info name="alt_title" value="F355 チャレンジ"/>
@@ -13200,6 +13311,9 @@ Hardlocks MAME after event "how to play" with [drc]
 		<description>Fire Pro Wrestling D (Japan)</description> <!-- Fire Pro Wrestling D - Shokai Genteiban -->
 		<year>2001</year>
 		<publisher>Spike</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-18804M, T-18805M"/>
 		<info name="release" value="20010301"/>
 		<info name="alt_title" value="ファイヤープロレスリングD, ファイヤープロレスリングD 初回限定版"/>
@@ -13534,6 +13648,9 @@ Checkered flag is blackened on main menu [PVR]
 		<description>For Symphony: With All One's Heart (Japan)</description>
 		<year>2003</year>
 		<publisher>Takuyo</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-37908M"/>
 		<info name="release" value="20030731"/>
 		<info name="alt_title" value="フォーシンフォニー　～with all one's heart～"/>
@@ -13554,6 +13671,9 @@ Checkered flag is blackened on main menu [PVR]
 		<description>Fragrance Tale (Japan)</description>
 		<year>2001</year>
 		<publisher>Takuyo</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-37904M"/> <!-- Internal Serial: T-37905M -->
 		<info name="release" value="20010726"/>
 		<info name="alt_title" value="フレグランス・テイル"/>
@@ -14388,6 +14508,9 @@ Corrupted [PVR] render ingame when selecting a map location, bump mapping
 		<description>Get!! Colonies (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="HDR-0071"/>
 		<info name="release" value="20000330"/>
 		<info name="alt_title" value="GET!! コロニーズ"/>
@@ -15450,6 +15573,7 @@ Hangs on FMV with [drc]
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
 [PVR] tester for bare polygons wrong normals (in training)
+No [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2402M"/>
 		<info name="release" value="20001214"/>
@@ -15535,6 +15659,9 @@ Hangs on FMV with [drc]
 		<description>Guilty Gear X - Taikenban (Japan)</description>
 		<year>2000</year>
 		<publisher>Sammy</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="610-7937"/>
 		<info name="alt_title" value="GUILTY GEAR X 体験版"/>
 		<part interface="cdrom" name="cdrom">
@@ -15785,6 +15912,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Guru Guru Onsen 2 (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Optional [BBA] support
+]]></notes>
 		<info name="serial" value="HDR-0168"/>
 		<info name="release" value="20010809"/>
 		<info name="alt_title" value="ぐるぐる温泉2"/>
@@ -15805,6 +15935,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Guru Guru Onsen 3 (Japan)</description>
 		<year>2002</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Optional [BBA] support
+]]></notes>
 		<info name="serial" value="HDR-0195"/>
 		<info name="release" value="20020314"/>
 		<info name="alt_title" value="ぐるぐる温泉3"/>
@@ -15918,6 +16051,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Happy Lesson (Japan)</description>
 		<year>2001</year>
 		<publisher>Datam Polystar</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-19503M"/>
 		<info name="release" value="20010426"/>
 		<info name="alt_title" value="ハッピーレッスン"/>
@@ -15938,6 +16074,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Happy Lesson: First Lesson (Japan)</description>
 		<year>2000</year>
 		<publisher>Datam Polystar</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-19504M"/>
 		<info name="release" value="20000928"/>
 		<info name="alt_title" value="HAPPY★LESSON 〜ファーストレッスン〜"/>
@@ -16101,6 +16240,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Heisei Mahjong-sou (Japan)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-2202M"/>
 		<info name="release" value="20001026"/>
 		<info name="alt_title" value="平成麻雀荘"/>
@@ -16145,6 +16287,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Hello Kitty no Garden Panic (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="610-7381"/>
 		<info name="release" value="19991125"/>
 		<info name="alt_title" value="ハローキティのガーデンパニック"/>
@@ -16170,6 +16315,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Hello Kitty no Lovely Fruit Park (Japan)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="HDR-0055"/>
 		<info name="release" value="19991125"/>
 		<info name="alt_title" value="ハローキティのラブリー・フルーツパーク"/>
@@ -16192,6 +16340,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Hello Kitty no Magical Block (Japan)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="HDR-0070"/>
 		<info name="release" value="20000330"/>
 		<info name="alt_title" value="ハローキティのマジカルブロック"/>
@@ -16379,6 +16530,9 @@ Hardlocks MAME after character and team setup with [drc]
 		<description>Hundred Swords (Japan)</description>
 		<year>2001</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="HDR-0124"/>
 		<info name="release" value="20010215"/>
 		<info name="alt_title" value="ハンドレッド ソード"/>
@@ -16918,6 +17072,9 @@ FMV draws [PVR] black pixels instead of transparent color
 		<description>Incoming: Jinrui Saishuu Kessen (Japan)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
 		<info name="alt_title" value="インカミング 人類最終決戦"/>
@@ -16949,6 +17106,9 @@ FMV draws [PVR] black pixels instead of transparent color
 		<description>Incoming: Jinrui Saishuu Kessen (Japan, rev. 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
 		<info name="alt_title" value="インカミング 人類最終決戦"/>
@@ -17467,6 +17627,9 @@ No [redbook] audio
 		<description>Jet Coaster Dream 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Bimboosoft</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-41201M"/>
 		<info name="release" value="20001102"/>
 		<info name="alt_title" value="ジェットコースタードリーム2"/>
@@ -17844,6 +18007,9 @@ Pausing game overlay hides too much [PVR]
 		<description>JRA PAT for Dreamcast (Japan, V40L11)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Horse bet service requiring a [modem] or [BBA]
+]]></notes>
 		<info name="serial" value="T-42501M"/>
 		<info name="ring_code" value="T-42501M-0351A   10MM1   C   05"/>
 		<part interface="cdrom" name="cdrom">
@@ -17877,6 +18043,9 @@ Pausing game overlay hides too much [PVR]
 		<description>JRA PAT for Dreamcast (Japan, V50L10)</description>
 		<year>2000</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Horse bet service requiring a [modem] or [BBA]
+]]></notes>
 		<info name="serial" value="HDR-0204"/>
 		<info name="ring_code" value="HDR-0204-0849   1MM1   C   27"/>
 		<part interface="cdrom" name="cdrom">
@@ -17990,6 +18159,9 @@ Pausing game overlay hides too much [PVR]
 		<description>Kaitou Apricot (Japan)</description>
 		<year>2003</year>
 		<publisher>Takuyo</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-37910M"/>
 		<info name="release" value="20030306"/>
 		<info name="alt_title" value="怪盗アプリコット"/>
@@ -18230,6 +18402,9 @@ Pausing game overlay hides too much [PVR]
 		<description>Kaze no Uta (Japan)</description>
 		<year>2004</year>
 		<publisher>Rain Software</publisher>
+		<notes><![CDATA[
+No [redbook] audio
+]]></notes>
 		<info name="serial" value="T-47501M"/>
 		<info name="release" value="20040415"/>
 		<info name="alt_title" value="風ノ唄"/>
@@ -18520,6 +18695,9 @@ Pausing game overlay hides too much [PVR]
 		<description>Kita e. White Illumination (Japan)</description>
 		<year>1999</year>
 		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-14301M"/>
 		<info name="release" value="19990318"/>
 		<info name="alt_title" value="北へ。White Illumination"/>
@@ -18569,6 +18747,9 @@ Pausing game overlay hides too much [PVR]
 		<description>Kitahei Gold (Japan)</description>
 		<year>1999</year>
 		<publisher>NetVillage</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-39801M"/>
 		<info name="release" value="19991118"/>
 		<info name="alt_title" value="棋太平GOLD"/>
@@ -19649,6 +19830,9 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Marionette Company (Japan)</description>
 		<year>1999</year>
 		<publisher>Microcabin</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-5201M, T-5202M"/>
 		<info name="release" value="19991007"/>
 		<info name="alt_title" value="マリオネットカンパニー"/>
@@ -19671,6 +19855,9 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Marionette Company 2 (Japan)</description>
 		<year>2000</year>
 		<publisher>Microcabin</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-5203M"/>
 		<info name="release" value="20000518"/>
 		<info name="alt_title" value="マリオネットカンパニー 2"/>
@@ -20292,6 +20479,9 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Microsoft WebTV Setsuzoku Kit (Japan)</description>
 		<year>1999</year>
 		<publisher>WebTV Networks</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="610-7117"/>
 		<info name="release" value="19990423"/>
 		<info name="ring_code" value="610-7117-0062 10MM1"/>
@@ -20474,6 +20664,9 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Miss Moonlight (Japan)</description>
 		<year>2001</year>
 		<publisher>Naxat Soft</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-18702M"/>
 		<info name="release" value="20010621"/>
 		<info name="alt_title" value="ミス・ムーンライト"/>
@@ -20732,6 +20925,7 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
 Wrong [PVR] texture renders in gameplay
+No [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-17701M"/>
 		<info name="release" value="19990311"/>
@@ -20825,6 +21019,9 @@ Wrong [PVR] texture renders in gameplay
 		<description>Morita no Saikyou Reversi (Japan)</description>
 		<year>1999</year>
 		<publisher>Random House</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-39102M"/>
 		<info name="release" value="19990415"/>
 		<info name="alt_title" value="森田の最強Reversi"/>
@@ -20860,6 +21057,9 @@ Wrong [PVR] texture renders in gameplay
 		<description>Morita no Saikyou Shougi (Japan)</description>
 		<year>1999</year>
 		<publisher>Random House</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-39101M"/>
 		<info name="release" value="19990415"/>
 		<info name="alt_title" value="森田の最強将棋"/>
@@ -22240,6 +22440,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net de Para: Nekosogi Paradise (Japan)</description>
 		<year>2000</year>
 		<publisher>Takyuo</publisher>
+		<notes><![CDATA[
+Built on Windows CE, requires [MMU] support
+]]></notes>
 		<info name="serial" value="T-37903M"/>
 		<info name="release" value="20000727"/>
 		<info name="alt_title" value="ねっとDEぱら ねこそぎパラダイス"/>
@@ -22276,6 +22479,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Chess (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45706M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス チェス"/>
@@ -22296,6 +22502,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Gomoku Narabe to Renju (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45705M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス 五目並べと連珠"/>
@@ -22316,6 +22525,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Hanafuda (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45704M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス 花札"/>
@@ -22352,6 +22564,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Mahjong (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45701M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス 麻雀"/>
@@ -22372,6 +22587,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Reversi (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45707M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス リバーシ"/>
@@ -22392,6 +22610,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Net Versus: Shougi (Japan)</description>
 		<year>2001</year>
 		<publisher>Atmark</publisher>
+		<notes><![CDATA[
+Requires [VMU] and a working [modem] connection
+]]></notes>
 		<info name="serial" value="T-45702M"/>
 		<info name="release" value="20010524"/>
 		<info name="alt_title" value="ネット バーサス 将棋"/>
