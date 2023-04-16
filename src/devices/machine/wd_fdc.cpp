@@ -366,9 +366,7 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if(drq)
-		drop_drq();
-	else if (status & S_BUSY) {
+	if(status & S_BUSY) {
 		if (!t_cmd->enabled()) {
 			status &= ~S_BUSY;
 		}
@@ -1096,12 +1094,7 @@ void wd_fdc_device_base::interrupt_start()
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
-	}
-
-	if(drq) {
-		drq = false;
-		if(!drq_cb.isnull())
-			drq_cb(false);
+		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
