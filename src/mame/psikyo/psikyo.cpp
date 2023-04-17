@@ -32,6 +32,8 @@ To Do:
 - Some games use naive/unlikely measurements (exactly 59.30), which should be verified.
   Tengai and Strikers 1945 has accurate measurements from PCB. Maybe these could be used
   for other titles too?
+- All games but Tengai / Strikers 1945 use IRQ1 for VBlank. This is likely incorrect.
+  On Tengai/Strikers 1945, its actually IPL2 that's asserted (Interrupt Level = 4).
 - tengai / tengaij: "For use in Japan" screen is supposed to output the
   typical blue Psikyo backdrop gradient instead of being pure black as it is
   now;
@@ -1156,7 +1158,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));  // Actually IPL2 being asserted (Level = 4).
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
