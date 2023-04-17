@@ -1315,7 +1315,7 @@ void v810_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
-	space(has_configured_map(AS_IO) ? AS_IO : AS_PROGRAM).specific(m_io);
+	space(has_space(AS_IO) ? AS_IO : AS_PROGRAM).specific(m_io);
 
 	m_irq_state = 0;
 	m_nmi_line = CLEAR_LINE;
