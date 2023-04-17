@@ -1881,12 +1881,13 @@ uint64_t mips3_device::get_cop0_reg(int idx)
 	}
 	else if (idx == COP0_Random)
 	{
-		int wired = m_core->cpr[0][COP0_Wired] & 0x3f;
-		int range = 48 - wired;
-		if (range > 0)
-			return ((total_cycles() - m_core->count_zero_time) % range + wired) & 0x3f;
-		else
-			return 47;
+		uint32_t wired = m_core->cpr[0][COP0_Wired] & 0x3f;
+		uint32_t unwired = m_tlbentries - wired;
+
+		if (unwired == 0)
+			return m_tlbentries - 1;
+
+		return (generate_tlb_index() % unwired) + wired;
 	}
 	return m_core->cpr[0][idx];
 }
