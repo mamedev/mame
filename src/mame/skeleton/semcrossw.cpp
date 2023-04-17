@@ -146,7 +146,7 @@ ROM_START(semcrossw)
 	ROM_REGION(0x800, "maincpu", 0)
 	ROM_LOAD("at27c16.bin",    0x000, 0x800, CRC(2e7b10b1) SHA1(fba6465db1baa38ab79ed24a85de460f8be488b9))
 
-	ROM_REGION(0x800, "nvram", 0)
+	ROM_REGION(0x800, "eeprom", 0)
 	ROM_LOAD("x2816cp-12.bin", 0x000, 0x800, BAD_DUMP CRC(c2ef2e80) SHA1(6c3c4215169c2941a37053888174fe0499301bac)) // BAD_DUMP because dumped from an already configured machine
 ROM_END
 
