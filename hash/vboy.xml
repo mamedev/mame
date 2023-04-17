@@ -101,8 +101,9 @@ Missing [cart] SRAM
 		<year>2013?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Glitchy [VIP] backgrounds during gameplay
+Glitchy [VIP] backgrounds during gameplay (fixed)
 [VIP] palette ramps are pretty dim even on max brightness
+bp 7020fea,1,{R10=1;g} in Versus Mode to force serial to master mode (and be able to select stage)
 ]]></notes>
 		<info name="developer" value="Mr. Anon"/>
 		<info name="serial" value="VUE ANON"/>

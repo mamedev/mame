@@ -172,11 +172,11 @@ private:
 
 	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal);
 	void fill_ovr_char(uint16_t code, uint8_t pal);
-	int8_t get_bg_map_pixel(int num, int xpos, int ypos);
+	int8_t get_bg_map_pixel(int num, int xpos, int ypos, u8 scx);
 	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
-											uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+											uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx);
 	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
-												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx);
 	uint8_t display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
 	void set_brightness();
 	void vboy_palette(palette_device &palette) const;
@@ -222,16 +222,19 @@ void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 	}
 }
 
-inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
+inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos, u8 scx)
 {
 //  auto profile1 = g_profiler.start(PROFILER_USER1);
 
-	int const y = ypos >>3;
-	int const x = xpos >>3;
+	int const y = ypos >> 3;
+	int const x = xpos >> 3;
 
-	// TODO: hyperfgt backgrounds fails page offsets beyond 512 / 512 pixels
+	// an individual tilemap is 64x64, the upper X/Y bits selects pages in 4096 units and joins with the global BGMAP_BASE.
+	// hyperfgt backgrounds in particular wants to multiply Y page by SCX factor,
+	// - it's 1 for E.Honda stage (the two 512x1024 tilemaps composing the hot bath)
+	// - and 2 elsewhere (1024x1024).
 	uint8_t const stepx = (x & 0x1c0) >> 6;
-	uint8_t const stepy = ((y & 0x1c0) >> 6) * (stepx+1);
+	uint8_t const stepy = ((y & 0x1c0) >> 6) * (scx + 1);
 	uint16_t const val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
 	int const pal = m_vip_io.GPLT[(val >> 14) & 3];
 	int const code = val & 0x3fff;
@@ -244,11 +247,11 @@ inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 	if(dat == 0)
 		return -1;
 	else
-		return (pal >> (dat*2)) & 3;
+		return (pal >> (dat * 2)) & 3;
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
-													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
+													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx)
 {
 //  auto profile2 = g_profiler.start(PROFILER_USER2);
 
@@ -288,12 +291,12 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 				}
 				else
 				{
-					pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+					pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 				}
 			}
 			else
 			{
-				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 			}
 
 			if(pix != -1)
@@ -303,7 +306,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
-														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
+														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx)
 {
 //  auto profile3 = g_profiler.start(PROFILER_USER3);
 
@@ -338,7 +341,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 			else
 			{
-				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 			}
 
 			if(pix != -1)
@@ -384,8 +387,8 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
  * --01 ---- ---- ----     Hi-Bias
  * --10 ---- ---- ----     Affine
  * --11 ---- ---- ----     OAM
- * ---- xx-- ---- ----     SCX
- * ---- --xx ---- ----     SCY
+ * ---- xx-- ---- ----     SCX number of pages in the X axis
+ * ---- --xx ---- ----     SCY number of pages in the Y axis
  * ---- ---- x--- ----     OVR enable overdraw char
  * ---- ---- -x-- ----     END marker for end of list processing
  * ---- ---- --00 ----
@@ -395,25 +398,29 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt)
 {
 	num <<= 4;
-	uint16_t def = READ_WORLD(num);
-	uint8_t lon = (def >> 15) & 1;
-	uint8_t ron = (def >> 14) & 1;
-	uint8_t mode = (def >> 12) & 3;
-	uint16_t scx = 64 << ((def >> 10) & 3);
-	uint16_t scy = 64 << ((def >> 8) & 3);
-	uint8_t ovr = (def >> 7) & 1;
-	uint8_t end = (def >> 6) & 1;
-	int16_t gx  = READ_WORLD(num+1);
-	int16_t gp  = READ_WORLD(num+2);
-	int16_t gy  = READ_WORLD(num+3);
-	int16_t mx  = READ_WORLD(num+4);
-	int16_t mp  = READ_WORLD(num+5);
-	int16_t my  = READ_WORLD(num+6);
-	uint16_t w  = READ_WORLD(num+7);
-	uint16_t h  = READ_WORLD(num+8);
-	uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
-	uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
-	uint8_t bg_map_num = def & 0x0f;
+	const uint16_t def = READ_WORLD(num);
+	const uint8_t lon = (def >> 15) & 1;
+	const uint8_t ron = (def >> 14) & 1;
+	const uint8_t mode = (def >> 12) & 3;
+	const u8 raw_scx = ((def >> 10) & 3);
+	const u8 raw_scy = ((def >> 8) & 3);
+	const uint16_t scx = 64 << raw_scx;
+	const uint16_t scy = 64 << raw_scy;
+	const uint16_t scx_mask = scx * 8 - 1;
+	const uint16_t scy_mask = scy * 8 - 1;
+	const uint8_t ovr = (def >> 7) & 1;
+	const uint8_t end = (def >> 6) & 1;
+	const int16_t gx  = READ_WORLD(num+1);
+	const int16_t gp  = READ_WORLD(num+2);
+	const int16_t gy  = READ_WORLD(num+3);
+	const int16_t mx  = READ_WORLD(num+4);
+	const int16_t mp  = READ_WORLD(num+5);
+	const int16_t my  = READ_WORLD(num+6);
+	const uint16_t w  = READ_WORLD(num+7);
+	const uint16_t h  = READ_WORLD(num+8);
+	const uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
+	const uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
+	const uint8_t bg_map_num = def & 0x0f;
 
 	if(end)
 		return 1;
@@ -425,12 +432,12 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 
 		if (lon && (!right))
 		{
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 
 		if (ron && (right))
 		{
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 	}
 	else if (mode==2) // Affine Mode
@@ -440,12 +447,12 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 
 		if (lon && (!right))
 		{
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 
 		if (ron && (right))
 		{
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 	}
 	else if (mode==3) // OBJ Mode
