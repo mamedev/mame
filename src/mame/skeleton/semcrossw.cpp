@@ -27,7 +27,7 @@ Main PCB
  |__    |_______________|   |_______________|        __|
  |__                                                 __|
  |__     _________           ________________        __|
- |__    |_74LS156|          | MS6821P       |       |
+ |__    |_74LS156|          | MC6821P       |       |
  |__                        |_______________|       |
  |__                                                |
  |__     _________    _________    _________        |
@@ -99,7 +99,7 @@ SCL4052BE || C |  | D |  | E |  | F |       |    ___  ___ |
    |______________________________________________________|
 
 Notes from one operator that used to work with this controller model:
- For progranning the semaphore controller, you just put the memory values with the keyboard.
+ For programming the semaphore controller, you just put the memory values with the keyboard.
  From 100 to 200 you'll find the first program, from 200 to 300 the second, and so on up to
  seven programs, with 100 for green, 101 for yellow, 102 for clear, and them repeat it again.
 
