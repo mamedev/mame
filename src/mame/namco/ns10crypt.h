@@ -202,6 +202,15 @@ private:
 	static const ns10_crypto_logic crypto_logic;
 };
 
+class medalnt_decrypter_device : public ns10_type2_decrypter_device
+{
+public:
+	medalnt_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+private:
+	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
+	static const ns10_crypto_logic crypto_logic;
+};
+
 class medalnt2_decrypter_device : public ns10_type2_decrypter_device
 {
 public:
@@ -211,20 +220,31 @@ private:
 	static const ns10_crypto_logic crypto_logic;
 };
 
+class sugorotic_decrypter_device : public ns10_type2_decrypter_device
+{
+public:
+	sugorotic_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+private:
+	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
+	static const ns10_crypto_logic crypto_logic;
+};
 
-DECLARE_DEVICE_TYPE(CHOCOVDR_DECRYPTER, chocovdr_decrypter_device)
-DECLARE_DEVICE_TYPE(GAMSHARA_DECRYPTER, gamshara_decrypter_device)
-DECLARE_DEVICE_TYPE(GJSPACE_DECRYPTER,  gjspace_decrypter_device)
-DECLARE_DEVICE_TYPE(KNPUZZLE_DECRYPTER, knpuzzle_decrypter_device)
-DECLARE_DEVICE_TYPE(KONOTAKO_DECRYPTER, konotako_decrypter_device)
-DECLARE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device)
-DECLARE_DEVICE_TYPE(NFLCLSFB_DECRYPTER, nflclsfb_decrypter_device)
-DECLARE_DEVICE_TYPE(STARTRGN_DECRYPTER, startrgn_decrypter_device)
-DECLARE_DEVICE_TYPE(GAHAHA_DECRYPTER,   gahaha_decrypter_device)
-DECLARE_DEVICE_TYPE(G13JNC_DECRYPTER,   g13jnc_decrypter_device)
-DECLARE_DEVICE_TYPE(SEKAIKH_DECRYPTER,  sekaikh_decrypter_device)
-DECLARE_DEVICE_TYPE(PACMBALL_DECRYPTER, pacmball_decrypter_device)
-DECLARE_DEVICE_TYPE(GAHAHA2_DECRYPTER,  gahaha2_decrypter_device)
-DECLARE_DEVICE_TYPE(MEDALNT2_DECRYPTER, medalnt2_decrypter_device)
+
+DECLARE_DEVICE_TYPE(CHOCOVDR_DECRYPTER,  chocovdr_decrypter_device)
+DECLARE_DEVICE_TYPE(G13JNC_DECRYPTER,    g13jnc_decrypter_device)
+DECLARE_DEVICE_TYPE(GAHAHA_DECRYPTER,    gahaha_decrypter_device)
+DECLARE_DEVICE_TYPE(GAHAHA2_DECRYPTER,   gahaha2_decrypter_device)
+DECLARE_DEVICE_TYPE(GAMSHARA_DECRYPTER,  gamshara_decrypter_device)
+DECLARE_DEVICE_TYPE(GJSPACE_DECRYPTER,   gjspace_decrypter_device)
+DECLARE_DEVICE_TYPE(KNPUZZLE_DECRYPTER,  knpuzzle_decrypter_device)
+DECLARE_DEVICE_TYPE(KONOTAKO_DECRYPTER,  konotako_decrypter_device)
+DECLARE_DEVICE_TYPE(MEDALNT_DECRYPTER,   medalnt_decrypter_device)
+DECLARE_DEVICE_TYPE(MEDALNT2_DECRYPTER,  medalnt2_decrypter_device)
+DECLARE_DEVICE_TYPE(MRDRILR2_DECRYPTER,  mrdrilr2_decrypter_device)
+DECLARE_DEVICE_TYPE(NFLCLSFB_DECRYPTER,  nflclsfb_decrypter_device)
+DECLARE_DEVICE_TYPE(PACMBALL_DECRYPTER,  pacmball_decrypter_device)
+DECLARE_DEVICE_TYPE(SEKAIKH_DECRYPTER,   sekaikh_decrypter_device)
+DECLARE_DEVICE_TYPE(STARTRGN_DECRYPTER,  startrgn_decrypter_device)
+DECLARE_DEVICE_TYPE(SUGOROTIC_DECRYPTER, sugorotic_decrypter_device)
 
 #endif // MAME_NAMCO_NS10CRYPT_H

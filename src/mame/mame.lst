@@ -32421,6 +32421,7 @@ kd2001                          // 2001.11 Knock Down 2001 (KD11 Ver.B)
 keroro                          // 2006.08 Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
 konotako                        // 2003.11 Kono e Tako (10021 Ver.A)
+medalnt                         // 2005.04 Medal No Tatsujin Doki! Ooatari-Darake No Sugoroku Matsuri (MTL1 SPR0B)
 medalnt2                        // 2007.02 Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)
 mrdrilr2                        // 2000.07 Mr Driller 2 (DR22 Ver.A)
 mrdrilr2j                       // 2000.07 Mr Driller 2 (DR21 Ver.A)
@@ -32440,7 +32441,6 @@ taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.
 taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
 taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
 taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
-unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)

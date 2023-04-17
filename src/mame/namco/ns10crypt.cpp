@@ -118,20 +118,22 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
-DEFINE_DEVICE_TYPE(CHOCOVDR_DECRYPTER, chocovdr_decrypter_device, "chocovdr_decrypter", "Chocovader Contactee decrypter")
-DEFINE_DEVICE_TYPE(GAMSHARA_DECRYPTER, gamshara_decrypter_device, "gamshara_decrypter", "Gamshara decrypter")
-DEFINE_DEVICE_TYPE(GJSPACE_DECRYPTER,  gjspace_decrypter_device,  "gjspace_decrypter",  "Gekitorider-Jong Space decrypter")
-DEFINE_DEVICE_TYPE(KNPUZZLE_DECRYPTER, knpuzzle_decrypter_device, "knpuzzle_decrypter", "Kotoba no Puzzle Mojipittan decrypter")
-DEFINE_DEVICE_TYPE(KONOTAKO_DECRYPTER, konotako_decrypter_device, "konotako_decrypter", "Kono Tako decrypter")
-DEFINE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device, "mrdrilr2_decrypter", "Mr Driller 2 decrypter")
-DEFINE_DEVICE_TYPE(NFLCLSFB_DECRYPTER, nflclsfb_decrypter_device, "nflclsfg_decrypter", "NFL Classic Football decrypter")
-DEFINE_DEVICE_TYPE(STARTRGN_DECRYPTER, startrgn_decrypter_device, "startrgn_decrypter", "Star Trigon decrypter")
-DEFINE_DEVICE_TYPE(GAHAHA_DECRYPTER,   gahaha_decrypter_device,   "gahaha_decrypter",   "GAHAHA Ippatsudou decrypter")
-DEFINE_DEVICE_TYPE(G13JNC_DECRYPTER,   g13jnc_decrypter_device,   "g13jnc_decrypter",   "Golgo 13: Juusei no Chinkonka decrypter")
-DEFINE_DEVICE_TYPE(SEKAIKH_DECRYPTER,  sekaikh_decrypter_device,  "sekaikh_decrypter",  "Sekai Kaseki Hakken decrypter")
-DEFINE_DEVICE_TYPE(PACMBALL_DECRYPTER, pacmball_decrypter_device, "pacmball_decrypter", "Pacman BALL decrypter")
-DEFINE_DEVICE_TYPE(GAHAHA2_DECRYPTER,  gahaha2_decrypter_device,  "gahaha2_decrypter",  "GAHAHA Ippatsudou 2 decrypter")
-DEFINE_DEVICE_TYPE(MEDALNT2_DECRYPTER, medalnt2_decrypter_device, "medalnt2_decrypter", "Medal no Tatsujin 2 decrypter")
+DEFINE_DEVICE_TYPE(CHOCOVDR_DECRYPTER,  chocovdr_decrypter_device,  "chocovdr_decrypter",  "Chocovader Contactee decrypter")
+DEFINE_DEVICE_TYPE(G13JNC_DECRYPTER,    g13jnc_decrypter_device,    "g13jnc_decrypter",    "Golgo 13: Juusei no Chinkonka decrypter")
+DEFINE_DEVICE_TYPE(GAHAHA_DECRYPTER,    gahaha_decrypter_device,    "gahaha_decrypter",    "GAHAHA Ippatsudou decrypter")
+DEFINE_DEVICE_TYPE(GAHAHA2_DECRYPTER,   gahaha2_decrypter_device,   "gahaha2_decrypter",   "GAHAHA Ippatsudou 2 decrypter")
+DEFINE_DEVICE_TYPE(GAMSHARA_DECRYPTER,  gamshara_decrypter_device,  "gamshara_decrypter",  "Gamshara decrypter")
+DEFINE_DEVICE_TYPE(GJSPACE_DECRYPTER,   gjspace_decrypter_device,   "gjspace_decrypter",   "Gekitorider-Jong Space decrypter")
+DEFINE_DEVICE_TYPE(KNPUZZLE_DECRYPTER,  knpuzzle_decrypter_device,  "knpuzzle_decrypter",  "Kotoba no Puzzle Mojipittan decrypter")
+DEFINE_DEVICE_TYPE(KONOTAKO_DECRYPTER,  konotako_decrypter_device,  "konotako_decrypter",  "Kono Tako decrypter")
+DEFINE_DEVICE_TYPE(MEDALNT_DECRYPTER,   medalnt_decrypter_device,   "medalnt_decrypter",   "Medal no Tatsujin decrypter")
+DEFINE_DEVICE_TYPE(MEDALNT2_DECRYPTER,  medalnt2_decrypter_device,  "medalnt2_decrypter",  "Medal no Tatsujin 2 decrypter")
+DEFINE_DEVICE_TYPE(MRDRILR2_DECRYPTER,  mrdrilr2_decrypter_device,  "mrdrilr2_decrypter",  "Mr Driller 2 decrypter")
+DEFINE_DEVICE_TYPE(NFLCLSFB_DECRYPTER,  nflclsfb_decrypter_device,  "nflclsfg_decrypter",  "NFL Classic Football decrypter")
+DEFINE_DEVICE_TYPE(PACMBALL_DECRYPTER,  pacmball_decrypter_device,  "pacmball_decrypter",  "Pacman BALL decrypter")
+DEFINE_DEVICE_TYPE(SEKAIKH_DECRYPTER,   sekaikh_decrypter_device,   "sekaikh_decrypter",   "Sekai Kaseki Hakken decrypter")
+DEFINE_DEVICE_TYPE(STARTRGN_DECRYPTER,  startrgn_decrypter_device,  "startrgn_decrypter",  "Star Trigon decrypter")
+DEFINE_DEVICE_TYPE(SUGOROTIC_DECRYPTER, sugorotic_decrypter_device, "sugorotic_decrypter", "Sugorotic JAPAN decrypter")
 
 // base class
 
@@ -567,6 +569,28 @@ const ns10_type2_decrypter_device::ns10_crypto_logic gahaha2_decrypter_device::c
 	&nonlinear_calc
 };
 
+uint16_t medalnt_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
+{
+	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+	return (1 & (previous_masks>>26) & (reducer.gf2_reduce(previous_cipherwords & 0x10100080) ^ reducer.gf2_reduce(previous_plainwords & 0x40100080))) << 4;
+}
+
+const medalnt_decrypter_device::ns10_crypto_logic medalnt_decrypter_device::crypto_logic = {
+	{
+		0x00000080601000ull,0x00000000006020ull,0x00000000004840ull,0x00000000000201ull,
+		0x00000000020004ull,0x00000000000081ull,0x00000000009001ull,0x00000001041810ull,
+		0x000000ca001806ull,0x00000080600500ull,0x00000000002022ull,0x0000002204001cull,
+		0x0000000c508044ull,0x00000000000808ull,0x000000ca001094ull,0x00000000000184ull
+	}, {
+		0x00000081201000ull,0x00000000006080ull,0x00000000000840ull,0x00000000000201ull,
+		0x00000000080005ull,0x00000000000081ull,0x00000000009004ull,0x000000042c4810ull,
+		0x0000000a003006ull,0x00000081201100ull,0x00000000008022ull,0x00000028050034ull,
+		0x0000004c000044ull,0x0000000000080aull,0x0000000a001214ull,0x00000000000190ull
+	},
+	0x5d04,
+	&nonlinear_calc
+};
+
 uint16_t medalnt2_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
 {
 	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
@@ -586,6 +610,28 @@ const ns10_type2_decrypter_device::ns10_crypto_logic medalnt2_decrypter_device::
 		0x00000000000024ull,0x0000000000a080ull,0x00000000000042ull,0x0000000020001eull
 	},
 	0x4c57,
+	&nonlinear_calc
+};
+
+uint16_t sugorotic_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer&)
+{
+	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+	return (1 & (previous_masks >> 25) & (previous_masks >> 22)) * 0xa00;
+}
+
+const ns10_type2_decrypter_device::ns10_crypto_logic sugorotic_decrypter_device::crypto_logic = {
+	{
+		0x00061402200010ull,0x00000000b2a150ull,0x00000080280021ull,0x00000000000880ull,
+		0x00061410010004ull,0x00000000000800ull,0x00000000000141ull,0x00000041002000ull,
+		0x00000000000084ull,0x00000000020401ull,0x00000041120100ull,0x00000000020480ull,
+		0x00000000b21110ull,0x00000000128800ull,0x00000000003000ull,0x00061410014020ull
+	}, {
+		0x00223011000034ull,0x00000040228150ull,0x00000000280101ull,0x00000000000880ull,
+		0x00223010010004ull,0x00000000000848ull,0x00000000000301ull,0x00000041002001ull,
+		0x00000000000084ull,0x00000000100408ull,0x00000041160800ull,0x00000000100000ull,
+		0x00000040228110ull,0x0000000016c000ull,0x00000000003002ull,0x00223010010020ull
+	},
+	0x9006,
 	&nonlinear_calc
 };
 
@@ -657,7 +703,17 @@ gahaha2_decrypter_device::gahaha2_decrypter_device(const machine_config &mconfig
 {
 }
 
+medalnt_decrypter_device::medalnt_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ns10_type2_decrypter_device(mconfig, MEDALNT2_DECRYPTER, tag, owner, clock, crypto_logic)
+{
+}
+
 medalnt2_decrypter_device::medalnt2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ns10_type2_decrypter_device(mconfig, MEDALNT2_DECRYPTER, tag, owner, clock, crypto_logic)
+{
+}
+
+sugorotic_decrypter_device::sugorotic_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_type2_decrypter_device(mconfig, MEDALNT2_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }
