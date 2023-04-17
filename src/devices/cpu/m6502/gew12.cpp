@@ -158,9 +158,9 @@ u8 gew12_device::timer_count_r(offs_t offset)
 {
 	// both timer IRQ handlers read the current count from the same registers
 	// apparently reading timer 1 count if its IRQ is pending, else timer 0 count
+	internal_update();
 	const unsigned timer = BIT(m_irq_pending, INTERNAL_IRQ_TIMER1);
 
-	internal_update();
 	if (!BIT(offset, 0))
 		return m_timer_count[timer];
 	else
