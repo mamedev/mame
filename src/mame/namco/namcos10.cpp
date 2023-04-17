@@ -617,8 +617,9 @@ block for a specific device using: 0x1f500000 + 2 * (0x3ec * device_id + block_i
 Known issues:
 - mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
 - nflclsfb: Needs additional I/O for trackball
-- ballpom: Needs additional I/O devices
 - g13jnc: Needs MP3 decoder emulation
+- sugorotic, sekaikh(?): BGMs stop early and/or crash the game. Seems to be expecting an SPU-related IRQ?
+- Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
 User data note:
@@ -635,6 +636,7 @@ User data note:
 #include "machine/intelfsh.h"
 #include "machine/nandflash.h"
 #include "machine/ram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/spu.h"
 #include "video/psx.h"
@@ -655,23 +657,13 @@ public:
 		, m_io_update_interrupt(*this)
 		, m_io_system(*this, "SYSTEM")
 		, m_exio(*this, "exio")
-		, m_analog(*this, "ANALOG%u", 1U)
+		, m_exio_analog(*this, "EXIO_ANALOG%u", 1U)
+		, m_mgexio_hopper(*this, "mgexio_hopper%u", 1U)
+		, m_mgexio_outputs(*this, "MGEXIO_OUTPUT%u", 0U)
+		, m_mgexio_sensor(*this, "MGEXIO_SENSOR")
 	{ }
 
-	void namcos10_base(machine_config &config);
-
-	void namcos10_exio(machine_config &config);
-	void namcos10_mgexio(machine_config &config);
-	void namcos10_exfinalio(machine_config &config);
-
-	void namcos10_map_exio_inner(address_map &map);
-	void namcos10_map_exio(address_map &map);
-
-	void namcos10_map_mgexio_inner(address_map &map);
-	void namcos10_map_mgexio(address_map &map);
-
-	void namcos10_map_inner(address_map &map);
-	void namcos10_map(address_map &map);
+	INPUT_CHANGED_MEMBER(mgexio_coin_start);
 
 protected:
 	using unscramble_func = uint16_t (*)(uint16_t);
@@ -680,11 +672,25 @@ protected:
 	virtual void machine_reset() override;
 	virtual void device_resolve_objects() override;
 
+	void namcos10_base(machine_config &config);
+	void namcos10_exio(machine_config &config);
+	void namcos10_mgexio(machine_config &config);
+	void namcos10_exfinalio(machine_config &config);
+
+	void namcos10_map_inner(address_map &map);
+	void namcos10_map(address_map &map);
+
+	void namcos10_map_exio_inner(address_map &map);
+	void namcos10_map_exio(address_map &map);
+
+	void namcos10_map_mgexio_inner(address_map &map);
+	void namcos10_map_mgexio(address_map &map);
+
 	required_device<psxcpu_device> m_maincpu;
-	optional_device<ns10_decrypter_device> m_decrypter; // not every game has a decrypter implemented yet, so optional for now
+	optional_device<ns10_decrypter_device> m_decrypter;
 
 	unscramble_func m_unscrambler;
-	std::function<void()> m_psx_remapper;
+	timer_expired_delegate m_psx_remapper;
 
 private:
 	enum : int8_t {
@@ -694,8 +700,9 @@ private:
 		I2CP_RECIEVE_ACK_0
 	};
 
+	uint16_t io_system_r();
+
 	uint16_t control_r(offs_t offset);
-	void control_w(offs_t offset, uint16_t data);
 
 	uint16_t exio_ident_r();
 	void exio_ident_w(uint16_t data);
@@ -705,8 +712,6 @@ private:
 	uint16_t i2c_data_r();
 	void i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void i2c_update();
-
-	void psx_remap_io(s32 param);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
 
@@ -724,9 +729,17 @@ private:
 
 	optional_device<namcos10_exio_base_device> m_exio;
 
-	// Game-specific data
-	optional_ioport_array<8> m_analog;
-	uint32_t m_exio_analog_idx;
+	// EXIO
+	optional_ioport_array<8> m_exio_analog;
+
+	// MGEXIO
+	template <int N> void mgexio_output_w(offs_t offset, uint16_t data);
+
+	optional_device_array<hopper_device, 4> m_mgexio_hopper;
+	output_finder<16> m_mgexio_outputs;
+	optional_ioport m_mgexio_sensor;
+
+	attotime m_mgexio_coin_start_time[2];
 };
 
 class namcos10_memm_state : public namcos10_state
@@ -737,8 +750,6 @@ public:
 		, m_nand(*this, "nand")
 	{ }
 
-	void namcos10_memm(machine_config &config);
-
 	void ns10_mrdrilr2(machine_config &config);
 
 	void init_mrdrilr2();
@@ -748,6 +759,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void namcos10_memm(machine_config &config);
+
 	void namcos10_memm_map_inner(address_map &map);
 	void namcos10_memm_map(address_map &map);
 
@@ -774,12 +787,6 @@ public:
 		: namcos10_state(mconfig, type, tag)
 		, m_nand(*this, "nand%u", 0U)
 	{ }
-
-	void namcos10_memn_base(machine_config &config);
-	void namcos10_memn(machine_config &config);
-
-	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
-	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
 
 	void ns10_ballpom(machine_config &config);
 	void ns10_chocovdr(machine_config &config);
@@ -839,7 +846,13 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void namcos10_memn_base(machine_config &config);
+	void namcos10_memn(machine_config &config);
+
 	void namcos10_memn_map(address_map &map);
+
+	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
+	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
 
 	void memn_driver_init();
 
@@ -882,8 +895,6 @@ public:
 		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
 	{ }
 
-	void namcos10_memp3_base(machine_config &config);
-
 	void ns10_g13jnc(machine_config &config);
 
 	void init_g13jnc();
@@ -893,6 +904,8 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	void namcos10_memp3_base(machine_config &config);
+
 	void namcos10_memp3_map_inner(address_map &map);
 	void namcos10_memp3_map(address_map &map);
 	void mcu_map(address_map &map);
@@ -907,24 +920,74 @@ private:
 	uint16_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint16_t data);
 
-	uint16_t analog_io_r(offs_t offset);
+	uint16_t io_analog_r(offs_t offset);
 
 	required_device<tmp95c061_device> m_memp3_mcu;
 	required_shared_ptr<uint16_t> m_mcu_ram;
 	optional_ioport_array<4> m_p3_analog;
 
-	uint16_t m_mcu_bank;
+	uint16_t m_mcu_ram_bank;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-void namcos10_state::psx_remap_io(s32 param)
+void namcos10_state::machine_start()
 {
-	if (!m_psx_remapper)
-		return;
+	m_maincpu->space(AS_PROGRAM).install_write_tap(
+		0x1f801010, 0x1f801013,
+		"rom_configure_tap_w",
+		[this] (offs_t offset, u32 &data, u32 mem_mask) {
+			// reinstall memory map after rom_config_w finishes with update_rom_config
+			machine().scheduler().synchronize(m_psx_remapper);
+		}
+	);
 
-	m_psx_remapper();
+	save_item(NAME(m_i2c_dev_clock));
+	save_item(NAME(m_i2c_dev_data));
+	save_item(NAME(m_i2c_host_clock));
+	save_item(NAME(m_i2c_host_data));
+	save_item(NAME(m_i2c_prev_clock));
+	save_item(NAME(m_i2c_prev_data));
+	save_item(NAME(m_i2cp_mode));
+	save_item(NAME(m_i2c_byte));
+	save_item(NAME(m_i2c_bit));
+	save_item(NAME(m_exio_ident_bit));
+	save_item(NAME(m_exio_ident_byte));
+
+	save_item(NAME(m_mgexio_coin_start_time));
 }
+
+void namcos10_state::machine_reset()
+{
+	m_i2c_dev_clock = m_i2c_dev_data = 1;
+	m_i2c_host_clock = m_i2c_host_data = 1;
+	m_i2c_prev_clock = m_i2c_prev_data = 1;
+	m_i2cp_mode = I2CP_IDLE;
+	m_i2c_byte = 0x00;
+	m_i2c_bit = 0;
+
+	m_exio_ident_bit = 0;
+	m_exio_ident_byte = 0;
+
+	std::fill(std::begin(m_mgexio_outputs), std::end(m_mgexio_outputs), 0);
+	std::fill(std::begin(m_mgexio_coin_start_time), std::end(m_mgexio_coin_start_time), attotime::never);
+
+	// update_rom_config is called on device_reset
+	machine().scheduler().synchronize(m_psx_remapper);
+}
+
+void namcos10_state::device_resolve_objects()
+{
+	m_io_update_interrupt.resolve_safe();
+	m_mgexio_outputs.resolve();
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
+{
+	m_io_update_interrupt(1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 void namcos10_state::namcos10_base(machine_config &config)
 {
@@ -945,125 +1008,12 @@ void namcos10_state::namcos10_base(machine_config &config)
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, also handles CD-ROM?
 	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
-	spu.add_route(0, "lspeaker", 1.0);
-	spu.add_route(1, "rspeaker", 1.0);
+	spu.add_route(0, "lspeaker", 0.75);
+	spu.add_route(1, "rspeaker", 0.75);
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	TIMER(config, "io_timer").configure_periodic(FUNC(namcos10_state::io_update_interrupt_callback), attotime::from_hz(100));
-}
-
-void namcos10_state::machine_start()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_tap(
-		0x1f801010, 0x1f801013,
-		"rom_configure_tap_w",
-		[this] (offs_t offset, u32 &data, u32 mem_mask) {
-			// reinstall memory map after rom_config_w finishes with update_rom_config
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(namcos10_state::psx_remap_io), this));
-		}
-	);
-
-	save_item(NAME(m_i2c_dev_clock));
-	save_item(NAME(m_i2c_dev_data));
-	save_item(NAME(m_i2c_host_clock));
-	save_item(NAME(m_i2c_host_data));
-	save_item(NAME(m_i2c_prev_clock));
-	save_item(NAME(m_i2c_prev_data));
-	save_item(NAME(m_i2cp_mode));
-	save_item(NAME(m_i2c_byte));
-	save_item(NAME(m_i2c_bit));
-	save_item(NAME(m_exio_ident_bit));
-	save_item(NAME(m_exio_ident_byte));
-}
-
-void namcos10_state::machine_reset()
-{
-	m_i2c_dev_clock = m_i2c_dev_data = 1;
-	m_i2c_host_clock = m_i2c_host_data = 1;
-	m_i2c_prev_clock = m_i2c_prev_data = 1;
-	m_i2cp_mode = I2CP_IDLE;
-	m_i2c_byte = 0x00;
-	m_i2c_bit = 0;
-
-	m_exio_ident_bit = 0;
-	m_exio_ident_byte = 0;
-	m_exio_analog_idx = 0;
-
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namcos10_state::psx_remap_io), this)); // update_rom_config is called on device_reset
-}
-
-void namcos10_state::device_resolve_objects()
-{
-	m_io_update_interrupt.resolve_safe();
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
-{
-	m_io_update_interrupt(1);
-}
-
-void namcos10_state::namcos10_exio(machine_config &config)
-{
-	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio, XTAL(22'118'400)));
-
-	exio.analog_callback().set([this] (offs_t offset) {
-		return m_analog[offset].read_safe(0);
-	});
-
-	m_psx_remapper = [this] () {
-		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_exio);
-	};
-}
-
-void namcos10_state::namcos10_mgexio(machine_config &config)
-{
-	NAMCOS10_MGEXIO(config, m_exio, XTAL(22'118'400));
-
-	m_psx_remapper = [this] () {
-		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_mgexio);
-	};
-}
-
-void namcos10_state::namcos10_exfinalio(machine_config &config)
-{
-}
-
-void namcos10_state::namcos10_map_exio_inner(address_map &map)
-{
-	// TODO: Figure out what the commented out registers are actually used for
-	map(0x06000, 0x0ffff).rw(m_exio, FUNC(namcos10_exio_device::ram_r), FUNC(namcos10_exio_device::ram_w));
-	map(0x10000, 0x10003).w(m_exio, FUNC(namcos10_exio_device::ctrl_w));
-	// map(0x18000, 0x18003).noprw();
-	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_exio_device::cpu_status_r));
-	// map(0x30000, 0x30003).nopw();
-	// map(0x40000, 0x40003).nopw();
-	// map(0x48000, 0x48003).nopw();
-	map(0x50000, 0x50003).portr("EXIO_IN1");
-	map(0x58000, 0x58003).portr("EXIO_IN2");
-	// map(0xc0000, 0xc0003).nopw();
-	// map(0xc8000, 0xc8003).nopw();
-}
-
-void namcos10_state::namcos10_map_exio(address_map &map)
-{
-	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
-	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
-	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
-}
-
-void namcos10_state::namcos10_map_mgexio_inner(address_map &map)
-{
-	map(0x00000, 0x0ffff).rw(m_exio, FUNC(namcos10_mgexio_device::ram_r), FUNC(namcos10_mgexio_device::ram_w));
-	map(0x10000, 0x10003).nopr().w(m_exio, FUNC(namcos10_mgexio_device::ctrl_w));
-	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_mgexio_device::cpu_status_r));
-}
-
-void namcos10_state::namcos10_map_mgexio(address_map &map)
-{
-	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
-	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
-	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
 }
 
 void namcos10_state::namcos10_map_inner(address_map &map)
@@ -1074,11 +1024,12 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 	map(0xf500000, 0xf5fffff).ram().share("share3");
 
 	map(0xfb60000, 0xfb60003).noprw(); // ?
-	map(0xfba0000, 0xfba001f).rw(FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
+	map(0xfba0000, 0xfba0001).r(FUNC(namcos10_state::io_system_r));
 	map(0xfba0002, 0xfba0003).rw(FUNC(namcos10_state::exio_ident_r), FUNC(namcos10_state::exio_ident_w));
 	map(0xfba0004, 0xfba0007).portr("IN1");
 	map(0xfba0008, 0xfba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
 	map(0xfba000a, 0xfba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+	map(0xfba001a, 0xfba001b).r(FUNC(namcos10_state::control_r));
 }
 
 void namcos10_state::namcos10_map(address_map &map)
@@ -1088,27 +1039,19 @@ void namcos10_state::namcos10_map(address_map &map)
 	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_inner));
 }
 
-uint16_t namcos10_state::control_r(offs_t offset)
+uint16_t namcos10_state::io_system_r()
 {
-	// logerror("%s: control_r %d\n", machine().describe_context(), offset);
-	if(offset == 0)
-		return m_io_system->read();
-
-	if(offset == 13) {
-		// bit = cleared registers
-		// 0 = 1fba0012
-		// 1 = 1fba0014, 1fe20000
-		// 2 = 1fba0016
-		// 3 = 1fba0018 (forces I/O update)
-		return 8;
-	}
-
-	return 0;
+	return m_io_system->read();
 }
 
-void namcos10_state::control_w(offs_t offset, uint16_t data)
+uint16_t namcos10_state::control_r(offs_t offset)
 {
-	// logerror("%s: control_w %d, %04x\n", machine().describe_context(), offset, data);
+	// bit = cleared registers
+	// 0 = 1fba0012
+	// 1 = 1fba0014, 1fe20000
+	// 2 = 1fba0016
+	// 3 = 1fba0018 (forces I/O update)
+	return 8;
 }
 
 void namcos10_state::exio_ident_w(uint16_t data)
@@ -1126,6 +1069,8 @@ uint16_t namcos10_state::exio_ident_r()
 	// 0x31 = EXIO PCB, has CPU and I/O (different pinout from 0x30, but some games like nflclsfb support both layouts)
 	// 0x32 = EXIO PCB, has no CPU but has I/O
 	// 0x33 = MGEXIO PCB
+	// 0x34 = EXUSB?
+	// 0x35 = EXFINAL PCB
 	// 0xff = disabled
 	const uint8_t resp = m_exio ? m_exio->ident_code() : 0xff;
 
@@ -1223,6 +1168,175 @@ void namcos10_state::i2c_update()
 	m_i2c_prev_clock = clock;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+void namcos10_state::namcos10_exio(machine_config &config)
+{
+	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio, 0));
+
+	exio.analog_callback().set([this] (offs_t offset) {
+		return m_exio_analog[offset].read_safe(0);
+	});
+
+	m_psx_remapper = timer_expired_delegate([this] (s32) {
+		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_exio);
+	}, "psx_remapper");
+}
+
+void namcos10_state::namcos10_map_exio_inner(address_map &map)
+{
+	// TODO: Base registers are probably similar between EXIO and MGEXIO, fill in registers and rename if possible
+	// TODO: Figure out what the commented out registers are actually used for
+	map(0x06000, 0x0ffff).rw(m_exio, FUNC(namcos10_exio_device::ram_r), FUNC(namcos10_exio_device::ram_w));
+	map(0x10000, 0x10003).w(m_exio, FUNC(namcos10_exio_device::ctrl_w));
+	// map(0x18000, 0x18003).noprw();
+	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_exio_device::cpu_status_r));
+	// map(0x30000, 0x30003).nopw();
+	// map(0x40000, 0x40003).nopw();
+	// map(0x48000, 0x48003).nopw();
+	map(0x50000, 0x50003).portr("EXIO_IN1");
+	map(0x58000, 0x58003).portr("EXIO_IN2");
+	// map(0xc0000, 0xc0003).nopw();
+	// map(0xc8000, 0xc8003).nopw();
+}
+
+void namcos10_state::namcos10_map_exio(address_map &map)
+{
+	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+void namcos10_state::namcos10_mgexio(machine_config &config)
+{
+	// Probably stands for Medal Game EXIO. Every game so far is a medal game.
+	// The inputs are best effort to get the games booting.
+	// sekaikh sometimes throws a divider sol sensor error on boot.
+	// I had success faking the pusher motor using a hopper device using 1000ms timer but it's a gross hack.
+	// You can use the check sensor I/O to get some feedback from the games but it's hard
+	// to understand what's going on or if things are really working as intended.
+
+	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio, 0));
+
+	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+
+	mgexio.port4_read_callback().set([this] (offs_t offset) {
+		uint16_t r = 0;
+		r |= (m_mgexio_outputs[6] & 1); // divider sol (l) sensor
+		r |= (m_mgexio_outputs[7] & 1) << 1; //divider sol (r) sensor
+		return r;
+	});
+
+	mgexio.port7_read_callback().set([this] (offs_t offset) {
+		return m_mgexio_sensor->read();
+	});
+
+	mgexio.porta_read_callback().set([this] (offs_t offset) {
+		uint16_t r = 0b1111;
+
+		// update coin states
+		auto curtime = machine().time();
+		for (int i = 0; i < 2; i++) {
+			if (m_mgexio_coin_start_time[i] == attotime::never)
+				continue;
+
+			auto diff = curtime - m_mgexio_coin_start_time[i];
+
+			if (diff < attotime::from_msec(25))
+				r ^= 1 << (2 * i); // L1/R1
+			else if (diff < attotime::from_msec(50))
+				r ^= 1 << (2 * i + 1); // L2/R2
+			else
+				m_mgexio_coin_start_time[i] = attotime::never;
+		}
+
+		r |= m_mgexio_hopper[0]->line_r() << 4; // hopper (l)
+		r |= m_mgexio_hopper[1]->line_r() << 5; // hopper (r)
+		r |= m_mgexio_hopper[2]->line_r() << 6; // hopper (c)
+		r |= 1 << 7; // TODO: pusher motor, how does this work?
+		return r;
+	});
+
+	mgexio.port4_write_callback().set([this] (uint16_t data) {
+		m_mgexio_outputs[8] = BIT(data, 6); // win lamp
+	});
+
+	mgexio.portb_write_callback().set([this] (uint16_t data) {
+		m_mgexio_hopper[0]->motor_w(BIT(data, 0));
+		m_mgexio_hopper[1]->motor_w(BIT(data, 1));
+		m_mgexio_hopper[2]->motor_w(BIT(data, 4));
+		m_mgexio_outputs[2] = BIT(data, 2); // lockout sol (l)
+		m_mgexio_outputs[3] = BIT(data, 3); // lockout sol (r)
+		m_mgexio_outputs[5] = BIT(data, 5); // payout sol
+		m_mgexio_outputs[6] = !BIT(data, 6); // divider sol (l)
+		m_mgexio_outputs[7] = !BIT(data, 7); // divider sol (r)
+	});
+
+	m_psx_remapper = timer_expired_delegate([this] (s32) {
+		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_mgexio);
+	}, "psx_remapper");
+}
+
+void namcos10_state::namcos10_map_mgexio_inner(address_map &map)
+{
+	map(0x00000, 0x0ffff).rw(m_exio, FUNC(namcos10_mgexio_device::ram_r), FUNC(namcos10_mgexio_device::ram_w));
+	map(0x10000, 0x10003).rw(m_exio, FUNC(namcos10_mgexio_device::ctrl_r), FUNC(namcos10_mgexio_device::ctrl_w));
+	map(0x18000, 0x18003).rw(m_exio, FUNC(namcos10_mgexio_device::bus_req_r), FUNC(namcos10_mgexio_device::bus_req_w));
+	/*
+	0x20000 (w) - If bit 1 of 1fba001a is set then this gets cleared too
+	(pacmball) When the CPU is recognized as being on, 1fba001a is set to 0xfffd and 0x1fe20000 is set to 0.
+	When an error occurs then 0x1fe10000 and 1fe18000 are set to 0, and 0x1fe20000 is set to 2.
+	*/
+	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_mgexio_device::cpu_status_r));
+	map(0x40000, 0x40003).w(FUNC(namcos10_state::mgexio_output_w<0>));
+	map(0x41000, 0x41003).w(FUNC(namcos10_state::mgexio_output_w<1>));
+	map(0x42000, 0x42003).w(FUNC(namcos10_state::mgexio_output_w<2>));
+	map(0x43000, 0x43003).w(FUNC(namcos10_state::mgexio_output_w<3>));
+	map(0x44000, 0x44003).w(FUNC(namcos10_state::mgexio_output_w<4>));
+	map(0x45000, 0x45003).w(FUNC(namcos10_state::mgexio_output_w<5>));
+	map(0x46000, 0x46003).w(FUNC(namcos10_state::mgexio_output_w<6>));
+	map(0x47000, 0x47003).w(FUNC(namcos10_state::mgexio_output_w<7>));
+}
+
+void namcos10_state::namcos10_map_mgexio(address_map &map)
+{
+	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_mgexio_inner));
+}
+
+template <int N>
+void namcos10_state::mgexio_output_w(offs_t offset, uint16_t data)
+{
+	switch (N) {
+		case 0: m_mgexio_outputs[10] = data != 0; break; // led 2
+		case 1: m_mgexio_outputs[9] = data != 0; break;  // led 1
+		case 2: m_mgexio_outputs[12] = data != 0; break; // led 4
+		case 3: m_mgexio_outputs[11] = data != 0; break; // led 3
+		case 4: m_mgexio_outputs[14] = data != 0; break; // led 6
+		case 5: m_mgexio_outputs[13] = data != 0; break; // led 5
+		case 6: m_mgexio_outputs[15] = data != 0; break; // led 7
+		default: break;
+	}
+}
+
+INPUT_CHANGED_MEMBER(namcos10_state::mgexio_coin_start)
+{
+	if (newval && m_mgexio_coin_start_time[param] == attotime::never)
+		m_mgexio_coin_start_time[param] = machine().time();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+void namcos10_state::namcos10_exfinalio(machine_config &config)
+{
+	// TODO: Implement EXFINAL I/O board
+	// Only seen on Medal no Tatsujin?
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // MEM(M)
@@ -1381,6 +1495,7 @@ void namcos10_memn_state::pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address
 
 void namcos10_memn_state::pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
 {
+	logerror("%s: pio_dma_read: DMA read %08x %08x\n", machine().describe_context(), n_address, n_size * 4);
 	auto ptr = util::little_endian_cast<uint16_t>(&p_n_psxram[n_address / 4]);
 	for (auto i = 0; i < n_size * 2; i++) {
 		ptr[i] = nand_data_r();
@@ -2009,7 +2124,7 @@ void namcos10_memp3_state::firmware_write_w(uint16_t data)
 
 void namcos10_memp3_state::ram_bank_w(uint16_t data)
 {
-	m_mcu_bank = data;
+	m_mcu_ram_bank = data;
 }
 
 uint16_t namcos10_memp3_state::unk_status1_r()
@@ -2020,12 +2135,12 @@ uint16_t namcos10_memp3_state::unk_status1_r()
 
 uint16_t namcos10_memp3_state::ram_r(offs_t offset)
 {
-	return m_mcu_ram[m_mcu_bank * 0x10000 + offset];
+	return m_mcu_ram[m_mcu_ram_bank * 0x10000 + offset];
 }
 
 void namcos10_memp3_state::ram_w(offs_t offset, uint16_t data)
 {
-	m_mcu_ram[m_mcu_bank * 0x10000 + offset] = data;
+	m_mcu_ram[m_mcu_ram_bank * 0x10000 + offset] = data;
 }
 
 uint16_t namcos10_memp3_state::unk_status2_r()
@@ -2036,7 +2151,7 @@ uint16_t namcos10_memp3_state::unk_status2_r()
 	return 1;
 }
 
-uint16_t namcos10_memp3_state::analog_io_r(offs_t offset)
+uint16_t namcos10_memp3_state::io_analog_r(offs_t offset)
 {
 	return m_p3_analog[offset].read_safe(0);
 }
@@ -2049,7 +2164,7 @@ void namcos10_memp3_state::namcos10_memp3_map_inner(address_map &map)
 	map(0xf30000c, 0xf30000d).w(FUNC(namcos10_memp3_state::ram_bank_w));
 	map(0xf30000e, 0xf30000f).r(FUNC(namcos10_memp3_state::unk_status1_r));
 	map(0xf320000, 0xf33ffff).rw(FUNC(namcos10_memp3_state::ram_r), FUNC(namcos10_memp3_state::ram_w));
-	map(0xf33fff0, 0xf33fff7).r(FUNC(namcos10_memp3_state::analog_io_r));
+	map(0xf33fff0, 0xf33fff7).r(FUNC(namcos10_memp3_state::io_analog_r));
 }
 
 void namcos10_memp3_state::namcos10_memp3_map(address_map &map)
@@ -2084,14 +2199,14 @@ void namcos10_memp3_state::machine_start()
 {
 	namcos10_memn_state::machine_start();
 
-	save_item(NAME(m_mcu_bank));
+	save_item(NAME(m_mcu_ram_bank));
 }
 
 void namcos10_memp3_state::machine_reset()
 {
 	namcos10_memn_state::machine_reset();
 
-	m_mcu_bank = 0;
+	m_mcu_ram_bank = 0;
 
 	m_memp3_mcu->suspend(SUSPEND_REASON_HALT, 1);
 }
@@ -2155,7 +2270,7 @@ static INPUT_PORTS_START( namcos10 )
 
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Test SW
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE // Test SW, almost all games expect this to be a slide type and the medal games explicitly say "slide on and off test to restart"
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("EXIO_IN1")
@@ -2239,8 +2354,8 @@ static INPUT_PORTS_START( nflclsfb )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("EXIO_IN1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("1P PASS 1")
@@ -2273,48 +2388,32 @@ static INPUT_PORTS_START( gahaha )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("ANALOG1")
+	PORT_START("EXIO_ANALOG1")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P1 Left X") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
 
-	PORT_START("ANALOG2")
+	PORT_START("EXIO_ANALOG2")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P1 Left Y") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
 
-	PORT_START("ANALOG3")
+	PORT_START("EXIO_ANALOG3")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P1 Right X") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
 
-	PORT_START("ANALOG4")
+	PORT_START("EXIO_ANALOG4")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P1 Right Y") PORT_PLAYER(1) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
 
-	PORT_START("ANALOG5")
+	PORT_START("EXIO_ANALOG5")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P2 Left X") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
 
-	PORT_START("ANALOG6")
+	PORT_START("EXIO_ANALOG6")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P2 Left Y") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
 
-	PORT_START("ANALOG7")
+	PORT_START("EXIO_ANALOG7")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_NAME("P2 Right X") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20) PORT_REVERSE
 
-	PORT_START("ANALOG8")
+	PORT_START("EXIO_ANALOG8")
 	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("P2 Right Y") PORT_PLAYER(2) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_CENTERDELTA(20)
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sekaikh )
-	PORT_INCLUDE(namcos10)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0fffffe3, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select Down")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
-
-	PORT_MODIFY("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(0x00, DEF_STR( On ))
 
 INPUT_PORTS_END
 
@@ -2326,8 +2425,8 @@ static INPUT_PORTS_START( gjspace )
 
 	PORT_MODIFY("SYSTEM")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
@@ -2341,7 +2440,6 @@ static INPUT_PORTS_START( g13jnc )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up Select")
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Trigger")
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE
 
 	// If the player is 10cm or closer then this will be on.
 	// For playability, make it so that the player has to explicity toggle the scope
@@ -2352,14 +2450,44 @@ static INPUT_PORTS_START( g13jnc )
 	PORT_MODIFY("SYSTEM")
 	// No idea what DIPSW 1 (0x80) is doing but it causes the game to freeze
 	PORT_DIPNAME( 0x01, 0x01, "Show Crosshair" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(0x00, DEF_STR( On ))
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("P3_ANALOG1")
 	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P3_ANALOG2")
 	PORT_BIT( 0xffff, 0x7fff, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x0000,0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mgexio_medal )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fffffe3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
+
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_START("MGEXIO_SENSOR")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Check Sensor(2)")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Check Sensor(1)")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Check Sensor(4)")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Check Sensor(3)")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Check Sensor(6)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Check Sensor(5)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Check Sensor(7)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_START("MGEXIO_COIN")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
 
 INPUT_PORTS_END
 
@@ -2862,13 +2990,13 @@ GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, 
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotic, 0,        ns10_sugorotic, namcos10, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
+GAME( 2002, sugorotic, 0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // uses MGEXIO
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, pacmball,  0,        ns10_pacmball,  namcos10, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikh,   0,        ns10_sekaikh,   sekaikh,  namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
+GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10, namcos10_memn_state, init_medalnt,   ROT0, "Namco", "Medal No Tatsujin Doki! Ooatari-Darake No Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ

@@ -127,7 +127,7 @@ uint16_t namcos10_exio_device::ram_r(offs_t offset)
 template <int Port>
 void namcos10_exio_device::port_write(offs_t offset, uint8_t data)
 {
-	logerror("%s: exio_port%d_write %02x\n", machine().describe_context(), Port, data);
+	// logerror("%s: exio_port%d_write %02x\n", machine().describe_context(), Port, data);
 
 	if (Port == 8) {
 		// HACK: Simple check to just know when the CPU is alive
@@ -138,7 +138,7 @@ void namcos10_exio_device::port_write(offs_t offset, uint8_t data)
 template <int Port>
 uint8_t namcos10_exio_device::port_read(offs_t offset)
 {
-	logerror("%s: exio_port%d_read\n", machine().describe_context(), Port);
+	// logerror("%s: exio_port%d_read\n", machine().describe_context(), Port);
 	return 0;
 }
 
@@ -148,23 +148,24 @@ namcos10_mgexio_device::namcos10_mgexio_device(const machine_config &mconfig, co
 	namcos10_exio_base_device(mconfig, NAMCOS10_MGEXIO, tag, owner, clock, 0x33),
 	m_maincpu(*this, "exio_mcu"),
 	m_ram(*this, "exio_ram"),
-	m_nvram(*this, "nvram")
+	m_nvram(*this, "nvram"),
+	m_port_read(*this),
+	m_port_write(*this)
 {
 }
 
 void namcos10_mgexio_device::device_start()
 {
 	save_item(NAME(m_is_active));
+	save_item(NAME(m_bus_req));
+	save_item(NAME(m_ctrl));
+
+	m_port_read.resolve_all_safe(0);
+	m_port_write.resolve_all_safe();
 
 	m_cpu_reset_timer = timer_alloc(FUNC(namcos10_mgexio_device::cpu_reset_timeout), this);
 
 	m_nvram->set_base(m_ram, 0x8000);
-}
-
-TIMER_CALLBACK_MEMBER(namcos10_mgexio_device::cpu_reset_timeout)
-{
-	m_maincpu->reset();
-	m_is_active = true;
 }
 
 void namcos10_mgexio_device::device_reset_after_children()
@@ -173,6 +174,14 @@ void namcos10_mgexio_device::device_reset_after_children()
 
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	m_is_active = false;
+	m_bus_req = 0;
+	m_ctrl = 0;
+}
+
+TIMER_CALLBACK_MEMBER(namcos10_mgexio_device::cpu_reset_timeout)
+{
+	m_maincpu->reset();
+	m_is_active = true;
 }
 
 void namcos10_mgexio_device::map(address_map &map)
@@ -180,9 +189,27 @@ void namcos10_mgexio_device::map(address_map &map)
 	map(0x00000, 0x7ffff).ram().share(m_ram);
 }
 
+template <int Port>
+uint16_t namcos10_mgexio_device::port_r()
+{
+	return m_port_read[Port](0);
+}
+
+template <int Port>
+void namcos10_mgexio_device::port_w(uint16_t data)
+{
+	m_port_write[Port](data);
+}
+
 void namcos10_mgexio_device::io_map(address_map &map)
 {
-	// TODO: Hook up I/O ports
+	map(h8_device::PORT_4, h8_device::PORT_4).rw(FUNC(namcos10_mgexio_device::port_r<0>), FUNC(namcos10_mgexio_device::port_w<0>));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(namcos10_mgexio_device::port_r<1>), FUNC(namcos10_mgexio_device::port_w<1>));
+	map(h8_device::PORT_7, h8_device::PORT_7).rw(FUNC(namcos10_mgexio_device::port_r<2>), FUNC(namcos10_mgexio_device::port_w<2>));
+	map(h8_device::PORT_8, h8_device::PORT_8).rw(FUNC(namcos10_mgexio_device::port_r<3>), FUNC(namcos10_mgexio_device::port_w<3>));
+	map(h8_device::PORT_9, h8_device::PORT_9).rw(FUNC(namcos10_mgexio_device::port_r<4>), FUNC(namcos10_mgexio_device::port_w<4>));
+	map(h8_device::PORT_A, h8_device::PORT_A).rw(FUNC(namcos10_mgexio_device::port_r<5>), FUNC(namcos10_mgexio_device::port_w<5>));
+	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(namcos10_mgexio_device::port_r<6>), FUNC(namcos10_mgexio_device::port_w<6>));
 }
 
 void namcos10_mgexio_device::device_add_mconfig(machine_config &config)
@@ -201,16 +228,59 @@ uint16_t namcos10_mgexio_device::cpu_status_r()
 	return m_is_active ? 2 : 0;
 }
 
+uint16_t namcos10_mgexio_device::ctrl_r()
+{
+	// bit 0 being 1 makes some games check for sensor responses on the H8's ports (sekaikh, ballpom)
+	// pacmball doesn't seem to care about bit 0
+	// Possibly those games only want to check I/O when the CPU is known to be active?
+	return m_ctrl;
+}
+
 void namcos10_mgexio_device::ctrl_w(uint16_t data)
 {
-	logerror("%s: exio_ctrl_w %04x\n", machine().describe_context(), data);
+	logerror("%s: exio_ctrl_w %04x %04x\n", machine().describe_context(), data, m_ctrl ^ data);
 
-	if (data == 3) {
+	// sekaikh and ballpom only write 3 here and that's all
+	// pacmball will write 3 at the start when the CPU is to be started
+	// and then flip bit 1 at the end of the main loop so it might be I/O related
+	if ((data & 1) && !(m_ctrl & 1)) {
 		// Timed such that there's enough delay before starting but also
 		// so it doesn't wait too long into the timeout before starting.
 		// So far only pacmball relies on timings to be correct to boot.
+		//
+		// TODO: Should this really be restarted every time or just the first time?
+		// Even pacmball only wants to see the timings correct the first time
+		// so it might actually just use standby mode after the initial boot.
 		m_cpu_reset_timer->adjust(attotime::from_msec(40));
+	} else if (!(data & 1) && (m_ctrl & 1)) {
+		// Stop the CPU when bit 0 is flipped from 1 to 0
+		// This happens when a sub CPU-related error occurs
+		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	}
+
+	m_ctrl = data;
+}
+
+uint16_t namcos10_mgexio_device::bus_req_r()
+{
+	// Should have bit 1 set when the CPU is requested
+	return m_bus_req == 1 ? 2 : 0;
+}
+
+void namcos10_mgexio_device::bus_req_w(uint16_t data)
+{
+	// Usage before using RAM:
+	// Write 0 to bus_req_w
+	// Check if unk_r has bit 0 set
+	//   If set, loop until bus_req_r bit 1 is 0
+	//     If bus_req_r bit 1 does not return 0 within 500 polls, "BREQ time out" and "BUS-ACK" is raised
+	// (do RAM things)
+	// Write 1 to bus_req_w
+	//
+	// bus_req_r bit 1 must be 1 for the CPU check
+
+	// logerror("%s: bus_req_w %04x\n", machine().describe_context(), data);
+	m_bus_req = data;
 }
 
 void namcos10_mgexio_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

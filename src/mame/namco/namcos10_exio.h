@@ -70,7 +70,27 @@ class namcos10_mgexio_device : public namcos10_exio_base_device
 public:
 	namcos10_mgexio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto port4_read_callback() { return m_port_read[0].bind(); }
+	auto port6_read_callback() { return m_port_read[1].bind(); }
+	auto port7_read_callback() { return m_port_read[2].bind(); }
+	auto port8_read_callback() { return m_port_read[3].bind(); }
+	auto port9_read_callback() { return m_port_read[4].bind(); }
+	auto porta_read_callback() { return m_port_read[5].bind(); }
+	auto portb_read_callback() { return m_port_read[6].bind(); }
+
+	auto port4_write_callback() { return m_port_write[0].bind(); }
+	auto port6_write_callback() { return m_port_write[1].bind(); }
+	auto port7_write_callback() { return m_port_write[2].bind(); }
+	auto port8_write_callback() { return m_port_write[3].bind(); }
+	auto port9_write_callback() { return m_port_write[4].bind(); }
+	auto porta_write_callback() { return m_port_write[5].bind(); }
+	auto portb_write_callback() { return m_port_write[6].bind(); }
+
+	virtual uint16_t ctrl_r();
 	virtual void ctrl_w(uint16_t data) override;
+
+	virtual uint16_t bus_req_r();
+	virtual void bus_req_w(uint16_t data);
 
 	virtual uint16_t cpu_status_r() override;
 
@@ -86,15 +106,23 @@ private:
 	void map(address_map &map);
 	void io_map(address_map &map);
 
+	template <int Port> uint16_t port_r();
+	template <int Port> void port_w(uint16_t data);
+
 	TIMER_CALLBACK_MEMBER(cpu_reset_timeout);
 
 	required_device<h83007_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<nvram_device> m_nvram;
 
+	devcb_read16::array<7> m_port_read;
+	devcb_write16::array<7> m_port_write;
+
 	emu_timer *m_cpu_reset_timer;
 
 	bool m_is_active;
+	uint16_t m_bus_req;
+	uint16_t m_ctrl;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS10_EXIO,      namcos10_exio_device)
