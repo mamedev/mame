@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="m5_flop" description="Sord m5 diskettes">
+<softwarelist name="m5_flop" description="Sord M5 diskettes">
 
 	<software name="bb">
 		<description>Booting diskette for CP/M.[Brno mod]</description>
