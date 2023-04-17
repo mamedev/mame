@@ -65,6 +65,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pwm(*this, "pwm")
 		, m_lcdc(*this, "lcdc")
+		, m_port(*this, "P%c", 'A')
 		, m_keys(*this, "KEY%u", 0U)
 		, m_outputs(*this, "%02x.%d.%d", 0U, 0U, 0U)
 		, m_switch(*this, "switch_pos")
@@ -84,6 +85,9 @@ public:
 	void pss6(machine_config& config);
 	void psr190_base(machine_config& config);
 	void psr78(machine_config& config);
+
+	template <offs_t Num, u8 PullUps = 0xff>
+	void port_pullup_w(offs_t offset, u8 data, u8 mem_mask);
 
 	// most of these keyboards have key matrix rows & columns split across multiple ports each,
 	// so use templates to be able to generate multiple r/w methods as appropriate
@@ -117,6 +121,7 @@ private:
 	optional_device<pwm_display_device> m_pwm;
 	optional_device<hd44780_device> m_lcdc;
 
+	optional_ioport_array<6> m_port;
 	optional_ioport_array<19> m_keys;
 	output_finder<64, 8, 5> m_outputs;
 	output_finder<> m_switch;
@@ -125,6 +130,14 @@ private:
 	ioport_value m_key_sel{};
 	ioport_value m_pwm_col{};
 };
+
+template <offs_t Num, u8 PullUps>
+void psr150_state::port_pullup_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	// these keyboards scan the buttons by setting one matrix row to output, the rest to input,
+	// and relying on external pullup resistors to keep the 'input' rows deselected
+	m_port[Num]->write((data & mem_mask) | (PullUps & ~mem_mask));
+}
 
 template <unsigned StartBit, unsigned Count>
 WRITE_LINE_MEMBER(psr150_state::keys_w)
@@ -199,13 +212,13 @@ void psr150_state::driver_start()
 
 void psr150_state::psr150(machine_config& config)
 {
-	YMW270F(config, m_maincpu, 8_MHz_XTAL);
+	GEW7(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->port_in_cb<0>().set_ioport("PA");
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC");
 	m_maincpu->port_in_cb<5>().set_ioport("PF");
-	m_maincpu->port_out_cb<5>().set_ioport("PF");
+	m_maincpu->port_out_cb<5>().set(FUNC(psr150_state::port_pullup_w<5>));
 	m_maincpu->add_route(0, "lfilter", 1.0);
 	m_maincpu->add_route(1, "rfilter", 1.0);
 
@@ -229,24 +242,32 @@ void psr150_state::psr110(machine_config& config)
 void psr150_state::pss21(machine_config& config)
 {
 	psr150(config);
+	// bits 6-7 indicate model (see also pss11, pss31, psr75)
+	m_maincpu->port_force_bits(5, 0x40, 0xc0);
+
 	config.set_default_layout(layout_pss21);
 }
 
 void psr150_state::pss31(machine_config& config)
 {
 	psr150(config);
+	// bits 6-7 indicate model (see also pss11, pss21, psr75)
+	m_maincpu->port_force_bits(5, 0x80, 0xc0);
+
 	config.set_default_layout(layout_pss31);
 }
 
 void psr150_state::psr75(machine_config& config)
 {
-	YMW270F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_in_cb<0>().set_ioport("PA");
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC");
 	m_maincpu->port_in_cb<5>().set_ioport("PF");
-	m_maincpu->port_out_cb<5>().set_ioport("PF");
+	m_maincpu->port_out_cb<5>().set(FUNC(psr150_state::port_pullup_w<5>));
+	// bits 6-7 indicate model (see also pss11, pss21, pss31)
+	m_maincpu->port_force_bits(5, 0xc0, 0xc0);
 	m_maincpu->add_route(0, "filter", 1.0);
 
 	// set up AC filter since the keyboard purposely outputs a DC offset when idle
@@ -260,12 +281,14 @@ void psr150_state::psr75(machine_config& config)
 
 void psr150_state::pss11(machine_config& config)
 {
-	YMW270F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
 	m_maincpu->port_in_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC");
-	m_maincpu->port_out_cb<2>().set_ioport("PC");
+	m_maincpu->port_out_cb<2>().set(FUNC(psr150_state::port_pullup_w<2>));
 	m_maincpu->port_in_cb<5>().set_ioport("PF");
+	// bits 6-7 indicate model (see also pss21, pss31, psr75)
+	m_maincpu->port_force_bits(5, 0x00, 0xc0);
 	m_maincpu->add_route(0, "filter", 1.0);
 
 	// set up AC filter since the keyboard purposely outputs a DC offset when idle
@@ -279,7 +302,7 @@ void psr150_state::pss11(machine_config& config)
 
 void psr150_state::psr180_base(machine_config& config)
 {
-	YMW282F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
 	m_maincpu->port_in_cb<1>().set_ioport("PB");
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
@@ -326,11 +349,11 @@ void psr150_state::psr76(machine_config& config)
 
 void psr150_state::pss12(machine_config &config)
 {
-	YMW282F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_in_cb<0>().set_ioport("PA");
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC");
-	m_maincpu->port_out_cb<2>().set_ioport("PC");
+	m_maincpu->port_out_cb<2>().set(FUNC(psr150_state::port_pullup_w<2>));
 	m_maincpu->port_out_cb<5>().set_ioport("PF");
 	m_maincpu->add_route(1, "filter", 1.0);
 
@@ -345,10 +368,9 @@ void psr150_state::pss12(machine_config &config)
 
 void psr150_state::pss6(machine_config& config)
 {
-	YMW282F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
-	m_maincpu->port_in_cb<2>().set_ioport("PC");
-	m_maincpu->port_out_cb<2>().set_ioport("PC");
+	m_maincpu->port_out_cb<2>().set(FUNC(psr150_state::port_pullup_w<2>));
 	m_maincpu->port_in_cb<5>().set_ioport("PF");
 	m_maincpu->add_route(0, "filter", 1.0);
 
@@ -362,14 +384,14 @@ void psr150_state::pss6(machine_config& config)
 
 void psr150_state::psr190_base(machine_config& config)
 {
-	YMW282F(config, m_maincpu, 8'000'000);
+	GEW7(config, m_maincpu, 8'000'000);
 	m_maincpu->port_out_cb<0>().set_ioport("PA");
 	m_maincpu->port_in_cb<1>().set_ioport("PB");
 	m_maincpu->port_out_cb<1>().set_ioport("PB");
 	m_maincpu->port_in_cb<2>().set_ioport("PC_R");
 	m_maincpu->port_out_cb<2>().set_ioport("PC_W");
-	m_maincpu->port_in_cb<5>().set_ioport("PF");
-	m_maincpu->port_out_cb<5>().set_ioport("PF");
+	// pull up the button select bits, but not the LCD enable bit
+	m_maincpu->port_out_cb<5>().set(&psr150_state::port_pullup_w<5, 0x1f>, "port_pullup_w");
 
 	HD44780(config, m_lcdc);
 	m_lcdc->set_lcd_size(2, 8);
@@ -715,7 +737,7 @@ INPUT_PORTS_START(psr75)
 
 	PORT_START("PF")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, KEY_OUT_BITS(9, 4))
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED ) // bits 6-7 indicate model (see also pss11, pss21, pss31)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("SWITCH")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Mode (Song)")  PORT_CHANGED_MEMBER(DEVICE_SELF, psr150_state, switch_w, 0x1)
@@ -836,9 +858,6 @@ INPUT_PORTS_END
 INPUT_PORTS_START(pss31)
 	PORT_INCLUDE(psr110)
 
-	PORT_MODIFY("PF")
-	PORT_BIT( 0xc0, 0x80, IPT_CUSTOM ) // bits 6-7 indicate model
-
 	PORT_MODIFY("KEY13")
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Drum Pad +")
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Drum Pad -")
@@ -857,9 +876,6 @@ INPUT_PORTS_START(pss21)
 	PORT_MODIFY("PA") // in & out bits are swapped
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(psr150_state, KEY_OUT_BITS(7, 2))
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(psr150_state, keys_r<0>)
-
-	PORT_MODIFY("PF")
-	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) // bits 6-7 indicate model
 
 	PORT_MODIFY("KEY7")
 	PORT_BIT( 0x7ff, IP_ACTIVE_HIGH, IPT_UNUSED )

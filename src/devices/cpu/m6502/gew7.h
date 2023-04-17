@@ -17,12 +17,14 @@
 class gew7_device : public m6502_mcu_device_base<m65c02_device>, public device_mixer_interface
 {
 public:
+	gew7_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 	template<offs_t Num> auto port_in_cb() { return m_in_cb[Num].bind(); }
 	template<offs_t Num> auto port_out_cb() { return m_out_cb[Num].bind(); }
 
+	void port_force_bits(offs_t num, u8 bits, u8 mask);
+
 protected:
-	gew7_device(const machine_config &mconfig, device_type type, bool ignore_in_ddr, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -57,9 +59,8 @@ protected:
 	devcb_write8::array<6> m_out_cb;
 	u8 m_port_data[6];
 	u8 m_port_ddr[6];
-	// GEW7 and GEW7S seem to have different behavior when reading input bits
-	// (see gew7_device::port_r)
-	const bool m_ignore_in_ddr;
+	u8 m_port_force_bits[6];
+	u8 m_port_force_mask[6];
 
 	required_memory_region        m_rom;
 	required_memory_bank_array<2> m_bank;
@@ -68,26 +69,6 @@ protected:
 	required_device<gew7_pcm_device> m_pcm;
 };
 
-class ymw270f_device : public gew7_device
-{
-public:
-	ymw270f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class ymw276f_device : public gew7_device
-{
-public:
-	ymw276f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class ymw282f_device : public gew7_device
-{
-public:
-	ymw282f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-DECLARE_DEVICE_TYPE(YMW270F, ymw270f_device)
-DECLARE_DEVICE_TYPE(YMW276F, ymw276f_device)
-DECLARE_DEVICE_TYPE(YMW282F, ymw282f_device)
+DECLARE_DEVICE_TYPE(GEW7, gew7_device)
 
 #endif // MAME_CPU_M6502_GEW7_H

@@ -12,6 +12,7 @@
 #include "gew12.h"
 
 #include "m6502mcu.ipp"
+#include "bus/generic/slot.h"
 
 DEFINE_DEVICE_TYPE(GEW12, gew12_device, "gew12", "Yamaha YMW728-F (GEW12)")
 
@@ -38,14 +39,18 @@ void gew12_device::device_start()
 	m_in_cb.resolve_all_safe(0);
 	m_out_cb.resolve_all_safe();
 
-	m_bank[0]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
-	m_bank[1]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
-	m_bank_mask = (m_rom->bytes() >> 14) - 1;
+	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
+		unsigned(m_rom->bytes() >> 14),
+		[this, base = &m_rom->as_u8()](unsigned entry, unsigned page)
+	{
+		m_bank[0]->configure_entry(entry, &base[page << 14]);
+		m_bank[1]->configure_entry(entry, &base[page << 14]);
+	});
 
 	m_timer_base[0] = m_timer_base[1] = 0;
 
-	memset(m_port_data, 0, sizeof m_port_data);
-	memset(m_port_ddr, 0, sizeof m_port_ddr);
+	std::fill(std::begin(m_port_data), std::end(m_port_data), 0);
+	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
 
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_enable));
@@ -210,9 +215,7 @@ u8 gew12_device::port_r(offs_t offset)
 void gew12_device::port_w(offs_t offset, u8 data)
 {
 	m_port_data[offset] = data;
-
-	const u8 out_data = m_port_data[offset] & ~m_port_ddr[offset];
-	m_out_cb[offset](out_data | (m_in_cb[offset]() & m_port_ddr[offset]));
+	m_out_cb[offset](0, m_port_data[offset], ~m_port_ddr[offset]);
 }
 
 u8 gew12_device::port_ddr_r(offs_t offset)
@@ -223,7 +226,5 @@ u8 gew12_device::port_ddr_r(offs_t offset)
 void gew12_device::port_ddr_w(offs_t offset, u8 data)
 {
 	m_port_ddr[offset] = data;
-
-	const u8 out_data = m_port_data[offset] & ~m_port_ddr[offset];
-	m_out_cb[offset](out_data | (m_in_cb[offset]() & m_port_ddr[offset]));
+	m_out_cb[offset](0, m_port_data[offset], ~m_port_ddr[offset]);
 }
