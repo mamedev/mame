@@ -28,7 +28,7 @@ GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro
 Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
 Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A) (C) Namco, 2007
 Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
-Golgo 13 Juusei no Chinkonka (GLT1 Ver.A)                        (C) Namco/8ing/Raizing, 2001
+Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
 *Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
 *Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J) (C) Namco/Taito, 2002
@@ -382,7 +382,7 @@ This PCB is used on:
                                    MEM PCB
 Game                               Sticker      KEYCUS   ROMs Populated                                 CD           Notes
 ------------------------------------------------------------------------------------------------------------------------------------------
-Golgo 13 Juusei no Chinkonka       GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5                               N/A
+Golgo 13 Juusei no Requiem         GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5                               N/A
 Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13   N/A
 Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   0, 1, 2, 3, 4, 5, 6, 7                         not dumped   Game uses several JAMMA PL1 & PL2 buttons for controls.
 
@@ -2877,7 +2877,7 @@ GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, 
 GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
-GAME( 2001, g13jnc,    0,        ns10_g13jnc,    g13jnc,   namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, g13jnc,    0,        ns10_g13jnc,    g13jnc,   namcos10_memp3_state, init_g13jnc,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Unknown
 GAME( 200?, unks10md,  0,        ns10_unks10md,  namcos10, namcos10_memn_state, init_unks10md,  ROT0, "Namco", "unknown Namco System 10 medal game (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
