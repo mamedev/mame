@@ -2725,39 +2725,13 @@ void newport_base_device::do_setup(void)
 	const int32_t y2 = util::sext(m_rex3.m_y_end >> 7, 20);
 	const int32_t dx = abs(x1 - x2);
 	const int32_t dy = abs(y1 - y2);
-	const uint8_t adrmode = (m_rex3.m_draw_mode0 >> 2) & 7;
+	uint8_t octant;
 
-	if (adrmode >= 0 && adrmode <= 1)
-	{
-		/* quadrant for block or span */
-		uint8_t quadrant = 0;
-		/* This is purely guessed */
-		if (x1 > x2)
-		{
-			if (y1 > y2)
-				quadrant = 3;
-			else
-				quadrant = 2;
-		}
-		else
-		{
-			if (y1 > y2)
-				quadrant = 1;
-			else
-				quadrant = 0;
-		}
-		m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
-		m_rex3.m_bres_octant_inc1 |= quadrant << 24;
-	}
-	else if (adrmode >= 2 && adrmode <= 4)
-	{
-		uint8_t octant;
-		/* octant for line */
-		/* FIXME: error terms and Bresenham terms */
-		octant = get_octant(x1, y1, x2, y2, dx, dy);
-		m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
-		m_rex3.m_bres_octant_inc1 |= octant << 24;
-	}
+	/* octant for line and block, span */
+	octant = get_octant(x1, y1, x2, y2, dx, dy);
+	m_rex3.m_bres_octant_inc1 &= ~(0x7 << 24);
+	m_rex3.m_bres_octant_inc1 |= octant << 24;
+	/* FIXME: error terms and Bresenham terms */
 }
 
 void newport_base_device::do_fline(uint32_t color)
@@ -3342,6 +3316,14 @@ void newport_base_device::do_rex3_command()
 	int16_t end_x = m_rex3.m_x_end_i;
 	int16_t end_y = m_rex3.m_y_end_i;
 	int16_t dx = 1, dy = 1;
+	int8_t octant;
+
+	int16_t delta[8][2] = {
+		{  1, -1 }, {  1, -1 },
+		{ -1, -1 }, { -1, -1 },
+		{ -1, -1 }, { -1,  1 },
+		{  1,  1 }, {  1,  1 }
+	};
 
 	LOGMASKED(LOG_COMMANDS, "REX3 Command: %08x|%08x - %s %s\n", mode0, mode1, s_opcode_str[mode0 & 3], s_adrmode_str[(mode0 >> 2) & 7]);
 
@@ -3358,26 +3340,10 @@ void newport_base_device::do_rex3_command()
 		case 2: // Draw
 			if (BIT(mode0, 5))
 				do_setup();
+			octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
+			dx = delta[octant][0];
+			dy = delta[octant][1];
 
-			switch ((m_rex3.m_bres_octant_inc1 >> 24) & 0x3)
-			{
-				case 0:
-					dx = 1;
-					dy = 1;
-					break;
-				case 1:
-					dx = 1;
-					dy = -1;
-					break;
-				case 2:
-					dx = -1;
-					dy = 1;
-					break;
-				case 3:
-					dx = -1;
-					dy = -1;
-					break;
-			}
 			switch (adrmode)
 			{
 				case 0: // Span
@@ -3547,6 +3513,12 @@ void newport_base_device::do_rex3_command()
 			{
 				const bool stop_on_x = BIT(mode0, 8);
 				const bool stop_on_y = BIT(mode0, 9);
+
+				if (BIT(mode0, 5))
+					do_setup();
+				octant = (m_rex3.m_bres_octant_inc1 >> 24) & 0x7;
+				dx = delta[octant][0];
+				dy = delta[octant][1];
 
 				end_x += dx;
 				end_y += dy;
