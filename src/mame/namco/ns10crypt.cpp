@@ -131,6 +131,7 @@ DEFINE_DEVICE_TYPE(G13JNC_DECRYPTER,   g13jnc_decrypter_device,   "g13jnc_decryp
 DEFINE_DEVICE_TYPE(SEKAIKH_DECRYPTER,  sekaikh_decrypter_device,  "sekaikh_decrypter",  "Sekai Kaseki Hakken decrypter")
 DEFINE_DEVICE_TYPE(PACMBALL_DECRYPTER, pacmball_decrypter_device, "pacmball_decrypter", "Pacman BALL decrypter")
 DEFINE_DEVICE_TYPE(GAHAHA2_DECRYPTER,  gahaha2_decrypter_device,  "gahaha2_decrypter",  "GAHAHA Ippatsudou 2 decrypter")
+DEFINE_DEVICE_TYPE(MEDALNT2_DECRYPTER, medalnt2_decrypter_device, "medalnt2_decrypter", "Medal no Tatsujin 2 decrypter")
 
 // base class
 
@@ -566,6 +567,28 @@ const ns10_type2_decrypter_device::ns10_crypto_logic gahaha2_decrypter_device::c
 	&nonlinear_calc
 };
 
+uint16_t medalnt2_decrypter_device::nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer& reducer)
+{
+	uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+	return (((previous_masks>>15) & (reducer.gf2_reduce(previous_cipherwords & 0x24200000) ^ reducer.gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
+}
+
+const ns10_type2_decrypter_device::ns10_crypto_logic medalnt2_decrypter_device::crypto_logic = {
+	{
+		0x00000000000202ull,0x00242000120110ull,0x00000001624608ull,0x00000000001820ull,
+		0x0000000000c040ull,0x00000000000184ull,0x00000007900002ull,0x00000000005008ull,
+		0x00000000008401ull,0x00000000008800ull,0x00000000000250ull,0x00000000002000ull,
+		0x00000000000024ull,0x00000000006080ull,0x00000000000042ull,0x00000007900006ull
+	}, {
+		0x00000000000203ull,0x00442000140120ull,0x00000002024008ull,0x00000000001840ull,
+		0x00000000004040ull,0x00000000000188ull,0x00000000200002ull,0x00000000006008ull,
+		0x00000000008801ull,0x00000000009000ull,0x00000000000290ull,0x00000000002003ull,
+		0x00000000000024ull,0x0000000000a080ull,0x00000000000042ull,0x0000000020001eull
+	},
+	0x4c57,
+	&nonlinear_calc
+};
+
 
 // game-specific devices
 
@@ -631,5 +654,10 @@ pacmball_decrypter_device::pacmball_decrypter_device(const machine_config &mconf
 
 gahaha2_decrypter_device::gahaha2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_type2_decrypter_device(mconfig, GAHAHA2_DECRYPTER, tag, owner, clock, crypto_logic)
+{
+}
+
+medalnt2_decrypter_device::medalnt2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ns10_type2_decrypter_device(mconfig, MEDALNT2_DECRYPTER, tag, owner, clock, crypto_logic)
 {
 }

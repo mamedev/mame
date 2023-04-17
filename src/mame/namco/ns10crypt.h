@@ -202,6 +202,15 @@ private:
 	static const ns10_crypto_logic crypto_logic;
 };
 
+class medalnt2_decrypter_device : public ns10_type2_decrypter_device
+{
+public:
+	medalnt2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+private:
+	static uint16_t nonlinear_calc(uint64_t previous_cipherwords, uint64_t previous_plainwords, const gf2_reducer &reducer);
+	static const ns10_crypto_logic crypto_logic;
+};
+
 
 DECLARE_DEVICE_TYPE(CHOCOVDR_DECRYPTER, chocovdr_decrypter_device)
 DECLARE_DEVICE_TYPE(GAMSHARA_DECRYPTER, gamshara_decrypter_device)
@@ -216,5 +225,6 @@ DECLARE_DEVICE_TYPE(G13JNC_DECRYPTER,   g13jnc_decrypter_device)
 DECLARE_DEVICE_TYPE(SEKAIKH_DECRYPTER,  sekaikh_decrypter_device)
 DECLARE_DEVICE_TYPE(PACMBALL_DECRYPTER, pacmball_decrypter_device)
 DECLARE_DEVICE_TYPE(GAHAHA2_DECRYPTER,  gahaha2_decrypter_device)
+DECLARE_DEVICE_TYPE(MEDALNT2_DECRYPTER, medalnt2_decrypter_device)
 
 #endif // MAME_NAMCO_NS10CRYPT_H

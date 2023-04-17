@@ -1844,10 +1844,11 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_exfinalio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
 	/* decrypter device (CPLD in hardware?) */
-	// MEDALNT2_DECRYPTER(config, m_decrypter, 0);
+	MEDALNT2_DECRYPTER(config, m_decrypter, 0);
 }
 
 void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
@@ -2868,7 +2869,7 @@ GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   namcos10, namcos10_memn_state, 
 GAME( 2005, ballpom,   0,        ns10_ballpom,   namcos10, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
-GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10, namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10, namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
