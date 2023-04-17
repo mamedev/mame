@@ -154,8 +154,17 @@ namcos10_mgexio_device::namcos10_mgexio_device(const machine_config &mconfig, co
 
 void namcos10_mgexio_device::device_start()
 {
-	save_item(NAME(m_active_state));
+	save_item(NAME(m_is_active));
+
+	m_cpu_reset_timer = timer_alloc(FUNC(namcos10_mgexio_device::cpu_reset_timeout), this);
+
 	m_nvram->set_base(m_ram, 0x8000);
+}
+
+TIMER_CALLBACK_MEMBER(namcos10_mgexio_device::cpu_reset_timeout)
+{
+	m_maincpu->reset();
+	m_is_active = true;
 }
 
 void namcos10_mgexio_device::device_reset_after_children()
@@ -163,7 +172,7 @@ void namcos10_mgexio_device::device_reset_after_children()
 	namcos10_exio_base_device::device_reset_after_children();
 
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
-	m_active_state = 0;
+	m_is_active = false;
 }
 
 void namcos10_mgexio_device::map(address_map &map)
@@ -189,12 +198,7 @@ void namcos10_mgexio_device::device_add_mconfig(machine_config &config)
 uint16_t namcos10_mgexio_device::cpu_status_r()
 {
 	// pacmball's code call bit 1 the "sub_cpu_enable_flag"
-	auto r = m_active_state == 2 ? 2 : 0;
-
-	if (m_active_state == 1)
-		m_active_state = 2; // needs to see this as not active at least once
-
-	return r;
+	return m_is_active ? 2 : 0;
 }
 
 void namcos10_mgexio_device::ctrl_w(uint16_t data)
@@ -202,8 +206,10 @@ void namcos10_mgexio_device::ctrl_w(uint16_t data)
 	logerror("%s: exio_ctrl_w %04x\n", machine().describe_context(), data);
 
 	if (data == 3) {
-		m_maincpu->reset();
-		m_active_state = 1;
+		// Timed such that there's enough delay before starting but also
+		// so it doesn't wait too long into the timeout before starting.
+		// So far only pacmball relies on timings to be correct to boot.
+		m_cpu_reset_timer->adjust(attotime::from_msec(40));
 	}
 }
 

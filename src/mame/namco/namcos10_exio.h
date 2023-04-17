@@ -86,11 +86,15 @@ private:
 	void map(address_map &map);
 	void io_map(address_map &map);
 
+	TIMER_CALLBACK_MEMBER(cpu_reset_timeout);
+
 	required_device<h83007_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<nvram_device> m_nvram;
 
-	uint32_t m_active_state;
+	emu_timer *m_cpu_reset_timer;
+
+	bool m_is_active;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS10_EXIO,      namcos10_exio_device)
