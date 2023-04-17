@@ -5397,7 +5397,7 @@ void mips3_device::execute_run()
 				{
 					// Should actually use physical address
 					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-					RTVAL64 = temp;
+					RTVAL64 = (int32_t)temp;
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
