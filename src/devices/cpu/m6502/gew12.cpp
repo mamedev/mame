@@ -36,7 +36,7 @@ void gew12_device::device_start()
 {
 	m65c02_device::device_start();
 
-	m_in_cb.resolve_all_safe(0);
+	m_in_cb.resolve_all_safe(0xff);
 	m_out_cb.resolve_all_safe();
 
 	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
