@@ -441,9 +441,9 @@ void mips3_device::device_start()
 	for (int regnum = 0; regnum < 32; regnum++)
 	{
 		char buf[10];
-		sprintf(buf, "r%d", regnum);
+		snprintf(buf, 10, "r%d", regnum);
 		m_drcuml->symbol_add(&m_core->r[regnum], sizeof(m_core->r[regnum]), buf);
-		sprintf(buf, "f%d", regnum);
+		snprintf(buf, 10, "f%d", regnum);
 		m_drcuml->symbol_add(&m_core->cpr[1][regnum], sizeof(m_core->cpr[1][regnum]), buf);
 	}
 	m_drcuml->symbol_add(&m_core->r[REG_LO], sizeof(m_core->r[REG_LO]), "lo");
