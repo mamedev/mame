@@ -15,35 +15,31 @@ DEFINE_DEVICE_TYPE(YMW270F, ymw270f_device, "ymw270f", "Yamaha YMW270-F (GEW7)")
 DEFINE_DEVICE_TYPE(YMW276F, ymw276f_device, "ymw276f", "Yamaha YMW276-F (GEW7I)")
 DEFINE_DEVICE_TYPE(YMW282F, ymw282f_device, "ymw282f", "Yamaha YMW282-F (GEW7S)")
 
-gew7_device::gew7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+gew7_device::gew7_device(const machine_config &mconfig, device_type type, bool ignore_in_ddr, const char *tag, device_t *owner, uint32_t clock)
 	: m65c02_device(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_in_cb(*this), m_out_cb(*this)
+	, m_ignore_in_ddr(ignore_in_ddr)
 	, m_rom(*this, DEVICE_SELF)
 	, m_bank(*this, "bank%u", 0U)
 	, m_pcm(*this, "pcm")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(gew7_device::internal_map), this);
-
-	// GEW7 and GEW7S seem to have different behavior when reading input bits
-	// (see gew7_device::port_r)
-	m_ignore_in_ddr = true;
 }
 
 ymw270f_device::ymw270f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gew7_device(mconfig, YMW270F, tag, owner, clock)
+	: gew7_device(mconfig, YMW270F, true, tag, owner, clock)
 {
 }
 
 ymw276f_device::ymw276f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gew7_device(mconfig, YMW276F, tag, owner, clock)
+	: gew7_device(mconfig, YMW276F, true, tag, owner, clock)
 {
 }
 
 ymw282f_device::ymw282f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gew7_device(mconfig, YMW282F, tag, owner, clock)
+	: gew7_device(mconfig, YMW282F, false, tag, owner, clock)
 {
-	m_ignore_in_ddr = false;
 }
 
 
@@ -67,6 +63,7 @@ void gew7_device::device_start()
 
 	m_bank[0]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
 	m_bank[1]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
+	m_bank_mask = (m_rom->bytes() >> 14) - 1;
 
 	memset(m_port_data, 0, sizeof m_port_data);
 	memset(m_port_ddr, 0, sizeof m_port_ddr);
@@ -169,7 +166,7 @@ TIMER_CALLBACK_MEMBER(gew7_device::timer_tick)
 
 void gew7_device::bank_w(offs_t offset, u8 data)
 {
-	m_bank[offset]->set_entry(data & 0x1f);
+	m_bank[offset]->set_entry(data & m_bank_mask);
 }
 
 

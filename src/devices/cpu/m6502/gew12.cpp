@@ -41,6 +41,7 @@ void gew12_device::device_start()
 
 	m_bank[0]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
 	m_bank[1]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
+	m_bank_mask = (m_rom->bytes() >> 14) - 1;
 
 	memset(m_port_data, 0, sizeof m_port_data);
 	memset(m_port_ddr, 0, sizeof m_port_ddr);
@@ -91,9 +92,9 @@ void gew12_device::internal_map(address_map &map)
 	map(0x1f2a, 0x1f2f).rw(FUNC(gew12_device::port_r), FUNC(gew12_device::port_w));
 	map(0x1f3a, 0x1f3f).rw(FUNC(gew12_device::port_ddr_r), FUNC(gew12_device::port_ddr_w));
 
-	map(0x1f52, 0x1f52).lw8(NAME([this](uint8_t data) { m_bank[0]->set_entry(data); }));
+	map(0x1f52, 0x1f52).lw8(NAME([this](uint8_t data) { m_bank[0]->set_entry(data & m_bank_mask); }));
 	map(0x1f53, 0x1f53).nopw(); // bank 0 MSB? (always zero)
-	map(0x1f54, 0x1f54).lw8(NAME([this](uint8_t data) { m_bank[1]->set_entry(data); }));
+	map(0x1f54, 0x1f54).lw8(NAME([this](uint8_t data) { m_bank[1]->set_entry(data & m_bank_mask); }));
 	map(0x1f55, 0x1f55).nopw(); // bank 1 MSB? (always zero)
 
 	map(0x4000, 0x7fff).bankr(m_bank[0]);

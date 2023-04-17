@@ -19,18 +19,6 @@ public:
 	template<offs_t Num> auto port_in_cb() { return m_in_cb[Num].bind(); }
 	template<offs_t Num> auto port_out_cb() { return m_out_cb[Num].bind(); }
 
-	u8 irq_stat_r();
-	void irq_en_w(u8 data);
-	void timer_stat_w(u8 data);
-
-	u8 timer_count_r(offs_t offset);
-	void timer_count_w(offs_t offset, u8 data);
-
-	u8 port_r(offs_t offset);
-	void port_w(offs_t offset, u8 data);
-	u8 port_ddr_r(offs_t offset);
-	void port_ddr_w(offs_t offset, u8 data);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -44,6 +32,18 @@ protected:
 		INTERNAL_IRQ_MIDI_TX,
 		INTERNAL_IRQ_MIDI_RX
 	};
+
+	u8 irq_stat_r();
+	void irq_en_w(u8 data);
+	void timer_stat_w(u8 data);
+
+	u8 timer_count_r(offs_t offset);
+	void timer_count_w(offs_t offset, u8 data);
+
+	u8 port_r(offs_t offset);
+	void port_w(offs_t offset, u8 data);
+	u8 port_ddr_r(offs_t offset);
+	void port_ddr_w(offs_t offset, u8 data);
 
 	template<int Num>
 	void internal_irq(int state) { internal_irq(Num, state); }
@@ -67,6 +67,7 @@ protected:
 
 	required_memory_region        m_rom;
 	required_memory_bank_array<2> m_bank;
+	u8 m_bank_mask;
 };
 
 DECLARE_DEVICE_TYPE(GEW12, gew12_device)

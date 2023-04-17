@@ -35,7 +35,7 @@ const double gew_pcm_device::BASE_TIMES[64] = {
 constexpr uint32_t gew_pcm_device::TL_SHIFT;
 constexpr uint32_t gew_pcm_device::EG_SHIFT;
 
-void gew_pcm_device::retrigger_sample(slot_t& slot)
+void gew_pcm_device::retrigger_sample(slot_t &slot)
 {
 	slot.m_offset = 0;
 	slot.m_prev_sample = 0;
@@ -50,7 +50,7 @@ void gew_pcm_device::retrigger_sample(slot_t& slot)
 #endif
 }
 
-void  gew_pcm_device::update_step(slot_t& slot)
+void  gew_pcm_device::update_step(slot_t &slot)
 {
 	const uint8_t oct = (slot.m_octave - 1) & 0xf;
 	uint32_t pitch = m_freq_step_table[slot.m_pitch];
@@ -65,7 +65,7 @@ void  gew_pcm_device::update_step(slot_t& slot)
 	slot.m_step = pitch / m_rate;
 }
 
-void gew_pcm_device::envelope_generator_init(const double(&rates)[64], double attack_decay_ratio)
+void gew_pcm_device::envelope_generator_init(const double (&rates)[64], double attack_decay_ratio)
 {
 	for (int32_t i = 4; i < 0x40; ++i)
 	{
@@ -78,7 +78,7 @@ void gew_pcm_device::envelope_generator_init(const double(&rates)[64], double at
 	m_decay_release_step[0] = m_decay_release_step[1] = m_decay_release_step[2] = m_decay_release_step[3] = 0;
 }
 
-int32_t gew_pcm_device::envelope_generator_update(slot_t& slot)
+int32_t gew_pcm_device::envelope_generator_update(slot_t &slot)
 {
 	switch (slot.m_envelope_gen.m_state)
 	{
@@ -136,7 +136,7 @@ int32_t gew_pcm_device::envelope_generator_update(slot_t& slot)
 	return m_linear_to_exp_volume[slot.m_envelope_gen.m_volume >> EG_SHIFT];
 }
 
-uint32_t gew_pcm_device::get_rate(uint32_t* steps, int32_t rate, uint32_t val)
+uint32_t gew_pcm_device::get_rate(uint32_t *steps, int32_t rate, uint32_t val)
 {
 	if (val == 0)
 	{
@@ -151,7 +151,7 @@ uint32_t gew_pcm_device::get_rate(uint32_t* steps, int32_t rate, uint32_t val)
 	return steps[r];
 }
 
-void gew_pcm_device::envelope_generator_calc(slot_t& slot)
+void gew_pcm_device::envelope_generator_calc(slot_t &slot)
 {
 	int32_t octave = slot.m_octave;
 	if (octave & 8) {
@@ -279,7 +279,7 @@ uint32_t gew_pcm_device::value_to_fixed(const uint32_t bits, const float value)
 	return uint32_t(float_shift * value);
 }
 
-int32_t gew_pcm_device::pitch_lfo_step(lfo_t& lfo)
+int32_t gew_pcm_device::pitch_lfo_step(lfo_t &lfo)
 {
 	lfo.m_phase += lfo.m_phase_step;
 	int32_t p = lfo.m_table[(lfo.m_phase >> LFO_SHIFT) & 0xff];
@@ -287,7 +287,7 @@ int32_t gew_pcm_device::pitch_lfo_step(lfo_t& lfo)
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-int32_t gew_pcm_device::amplitude_lfo_step(lfo_t& lfo)
+int32_t gew_pcm_device::amplitude_lfo_step(lfo_t &lfo)
 {
 	lfo.m_phase += lfo.m_phase_step;
 	int32_t p = lfo.m_table[(lfo.m_phase >> LFO_SHIFT) & 0xff];
@@ -295,7 +295,7 @@ int32_t gew_pcm_device::amplitude_lfo_step(lfo_t& lfo)
 	return p << (TL_SHIFT - LFO_SHIFT);
 }
 
-void gew_pcm_device::lfo_compute_step(lfo_t& lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
+void gew_pcm_device::lfo_compute_step(lfo_t &lfo, uint32_t lfo_frequency, uint32_t lfo_scale, int32_t amplitude_lfo)
 {
 	float step = (float)LFO_FREQ[lfo_frequency] * 256.0f / (float)m_rate;
 	lfo.m_phase_step = uint32_t(float(1 << LFO_SHIFT) * step);
@@ -313,7 +313,7 @@ void gew_pcm_device::lfo_compute_step(lfo_t& lfo, uint32_t lfo_frequency, uint32
 
 /* MAME access functions */
 
-gew_pcm_device::gew_pcm_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock,
+gew_pcm_device::gew_pcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
 		uint32_t voices, uint32_t clock_divider) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
@@ -507,7 +507,7 @@ void gew_pcm_device::device_clock_changed()
 //-----------------------------------------------------
 
 #if MULTIPCM_LOG_SAMPLES
-void gew_pcm_device::dump_sample(slot_t& slot)
+void gew_pcm_device::dump_sample(slot_t &slot)
 {
 	if (m_logged_map[slot.m_sample.m_start])
 		return;
@@ -542,7 +542,7 @@ void gew_pcm_device::dump_sample(slot_t& slot)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void gew_pcm_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
+void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	for (int32_t i = 0; i < outputs[0].samples(); ++i)
 	{

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "dirom.h"
 #include "gew.h"
 
 class multipcm_device : public gew_pcm_device

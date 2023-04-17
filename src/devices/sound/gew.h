@@ -20,11 +20,10 @@ class gew_pcm_device : public device_t,
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
+protected:
 	gew_pcm_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
 		uint32_t voices, uint32_t clock_divider);
 
-protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
@@ -106,7 +105,7 @@ protected:
 	uint32_t value_to_fixed(const uint32_t bits, const float value);
 
 	void retrigger_sample(slot_t &slot);
-	void update_step(slot_t& slot);
+	void update_step(slot_t &slot);
 
 	static constexpr uint32_t TL_SHIFT = 12;
 	static constexpr uint32_t EG_SHIFT = 16;
