@@ -14711,6 +14711,12 @@ sc5woka                         //
 sc5wotw                         // War Of The Wads (Mazooma)
 sc5wotwa                        //
 
+@source:bfm/bfm_sc6.cpp
+sc6dndem
+sc6dndema
+sc6dndemb
+sc6dndemc
+
 @source:bfm/bfm_swp.cpp
 c3_ppays                        // The Phrase That Pays
 c3_rtime                        // Radio Times
