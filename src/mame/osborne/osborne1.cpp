@@ -141,8 +141,7 @@ public:
 		m_acia(*this, "acia"),
 		m_fdc(*this, "mb8877"),
 		m_ieee(*this, IEEE488_TAG),
-		m_floppy0(*this, "mb8877:0"),
-		m_floppy1(*this, "mb8877:1"),
+		m_floppy(*this, "mb8877:%u", 0U),
 		m_keyb_row(*this, { "ROW0", "ROW1", "ROW3", "ROW4", "ROW5", "ROW2", "ROW6", "ROW7" }),
 		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
@@ -218,8 +217,7 @@ private:
 	required_device<acia6850_device>        m_acia;
 	required_device<mb8877_device>          m_fdc;
 	required_device<ieee488_device>         m_ieee;
-	required_device<floppy_connector>       m_floppy0;
-	required_device<floppy_connector>       m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 	// user inputs
 	required_ioport_array<8>    m_keyb_row;
@@ -499,13 +497,13 @@ void osborne1_state::video_pia_port_b_w(u8 data)
 
 	if (BIT(data, 6))
 	{
-		m_fdc->set_floppy(m_floppy0->get_device());
-		m_floppy0->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[0]->get_device());
+		m_floppy[0]->get_device()->mon_w(0);
 	}
 	else if (BIT(data, 7))
 	{
-		m_fdc->set_floppy(m_floppy1->get_device());
-		m_floppy1->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[1]->get_device());
+		m_floppy[1]->get_device()->mon_w(0);
 	}
 	else
 	{
@@ -1018,8 +1016,8 @@ void osborne1_state::osborne1_base(machine_config &config)
 
 	MB8877(config, m_fdc, MAIN_CLOCK/16);
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("osborne1");
 }

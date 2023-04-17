@@ -563,6 +563,10 @@ template <typename T>
 inline detail::rw_delegate_type_t<T> rw_delegate(detail::rw_delegate_device_class_t<T> &object, T &&func, char const *name)
 { return detail::rw_delegate_type_t<T>(object, std::forward<T>(func), name); }
 
+template <typename D, bool Reqd, typename T>
+inline detail::rw_delegate_type_t<T> rw_delegate(device_finder<D, Reqd> const &finder, T &&func, char const *name)
+{ return detail::rw_delegate_type_t<T>(finder, std::forward<T>(func), name); }
+
 } // namespace emu
 
 

@@ -1643,6 +1643,8 @@ if CPUS["M6502"] then
 		MAME_DIR .. "src/devices/cpu/m6502/m6500_1.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6502.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.h",
+		MAME_DIR .. "src/devices/cpu/m6502/m6502mcu.ipp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m6507.cpp",

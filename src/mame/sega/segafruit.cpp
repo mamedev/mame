@@ -10,7 +10,9 @@
     16 MHz XTAL
     8-dip bank
 
-    TODO: decryption needs to be verified, then everything else
+    TODO:
+    m300x and m400x: decryption needs to be verified (may be good), then everything else
+    m5001: everything
 
 ************************************************************************************************************/
 
@@ -27,6 +29,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+
 namespace {
 
 class segafruit_state : public driver_device
@@ -39,7 +42,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_rf5c68(*this, "rf5c68")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_soundbank(*this, "soundbank")
+		//, m_soundbank(*this, "soundbank")
 	{
 	}
 
@@ -47,6 +50,7 @@ public:
 
 	void decrypt_m3001();
 	void decrypt_m4001();
+	void decrypt_m5001();
 
 protected:
 	virtual void machine_start() override;
@@ -65,12 +69,12 @@ private:
 	required_device<rf5c68_device> m_rf5c68;
 
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
-	required_memory_bank m_soundbank;
+	// required_memory_bank m_soundbank; // disabled until mapping is done
 };
 
 void segafruit_state::machine_start()
 {
-	m_soundbank->configure_entries(0, 0x10, memregion("rf5c68")->base(), 0x2000);
+	// m_soundbank->configure_entries(0, 0x10, memregion("rf5c68")->base(), 0x2000);
 };
 
 void segafruit_state::mem_map(address_map &map) // TODO: check everything
@@ -230,8 +234,59 @@ void segafruit_state::decrypt_m4001()
 			case 0x1111: rom[i] = bitswap<8>(rom[i] ^ 0x20, 7, 6, 3, 4, 5, 2, 1, 0); break;
 		}
 	}
-
 }
+
+void segafruit_state::decrypt_m5001() // TODO
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		switch (i & 0x1111)
+		{
+			case 0x0000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+		}
+	}
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		switch (i & 0x1111)
+		{
+			case 0x0000: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0010: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0011: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0100: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0101: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0110: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0111: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1000: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1001: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1010: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1011: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1100: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1101: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1110: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x1111: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+		}
+	}
+}
+
 
 void segafruit_state::segafruit(machine_config & config)
 {
@@ -245,7 +300,7 @@ void segafruit_state::segafruit(machine_config & config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segafruit_state::sound_mem_map);
 	m_soundcpu->set_addrmap(AS_IO, &segafruit_state::sound_io_map);
 
-	RTC62421(config, "rtc", XTAL(32'768));//.out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	RTC62421(config, "rtc", 32.768_kHz_XTAL);//.out_int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	GENERIC_LATCH_8(config, m_soundlatch);//.data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
@@ -289,7 +344,57 @@ ROM_START(m3001)
 	ROM_LOAD("315-5371.ic72", 0x000, 0x104, NO_DUMP) // PAL16L8, protected
 ROM_END
 
+ROM_START(m3004)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("epr-14116.ic46", 0x000000, 0x008000, CRC(2b02d391) SHA1(d4f700f10ff03a090c90223fab967b74f42826e7))
+
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("epr-14115.ic51", 0x000000, 0x004000, CRC(b199edb3) SHA1(17d6c99eb926a49d573672acbbc597ad6ea9955c))
+
+	ROM_REGION(0x20000, "rf5c68", 0)
+	ROM_LOAD("epr-14113.ic38", 0x000000, 0x010000, CRC(5d51900b) SHA1(bf28d709e19b80e405f8401f8e6123bee56a8dd3))
+	ROM_LOAD("epr-14114.ic24", 0x010000, 0x010000, CRC(6caf7c9e) SHA1(12a44fd6c74ed28b751ec35d2f59f406d5bad1df))
+
+	// PAL16L8
+	ROM_REGION(0x104, "plds", 0) // probably for decryption purpose
+	ROM_LOAD("315-6510.ic72", 0x000, 0x104, NO_DUMP) // PAL16L8, protected. 6510 may be wrong, difficult to read.
+ROM_END
+
+ROM_START(m4002)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("epr-13248.ic46", 0x000000, 0x008000, CRC(ddcad7a6) SHA1(1ab2508a220476e9eb783ac0f4129734225c258a))
+
+	ROM_REGION(0x4000, "soundcpu", 0) // very few bytes different to m4001. Both need to be checked.
+	ROM_LOAD("epr-13247.ic51", 0x000000, 0x004000, CRC(39d6f8ef) SHA1(ebc5eb2e68202058919e960415123a34d87a1f9b)) // 1xxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x20000, "rf5c68", 0) // same as m4001
+	ROM_LOAD("epr-13245.ic38", 0x000000, 0x010000, CRC(26b8a8ff) SHA1(2f0aa625d4162d63265618691701dc40593bdbdf))
+	ROM_LOAD("epr-13246.ic24", 0x010000, 0x010000, CRC(b9db6c6e) SHA1(fc4610abd593e7f54422f4dcd2ff0170d6221d65))
+
+	ROM_REGION(0x104, "plds", 0) // probably for decryption purpose
+	ROM_LOAD("315-5438.ic72", 0x000, 0x104, NO_DUMP) // PAL16L8, protected. 5438 may be wrong, difficult to read.
+ROM_END
+
+ROM_START(m5001)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("epr-a13163.ic46", 0x000000, 0x008000, CRC(d220c761) SHA1(5b69f80285e8aa5457244f62c5096a083ef9eaed))
+
+	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_LOAD("epr-13162.ic51", 0x000000, 0x004000, CRC(efb13f18) SHA1(bb04ed352dc0ccdefe33ad12a7932dc646edfc96)) // 1xxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x20000, "rf5c68", 0)
+	ROM_LOAD("epr-13160.ic38", 0x000000, 0x010000, CRC(3bc70ce4) SHA1(bfb4652002b3e9a48fd5645035306b35d4b4a699))
+	ROM_LOAD("epr-13161.ic24", 0x010000, 0x010000, CRC(e8e3ad8e) SHA1(bfd466d150bba4b80981cd68323eac69935d3a25))
+
+	ROM_REGION(0x104, "plds", 0) // probably for decryption purpose
+	ROM_LOAD("315-5432.ic72", 0x000, 0x104, NO_DUMP) // PAL16L8, protected. 5438 may be wrong, difficult to read.
+ROM_END
+
 } // anonymous namespace
 
-GAME(1990, m3001, 0, segafruit, segafruit, segafruit_state, decrypt_m3001, ROT0, "Sega", "M3001", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1990, m4001, 0, segafruit, segafruit, segafruit_state, decrypt_m4001, ROT0, "Sega", "M4001", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+
+GAME(1990, m3001, 0, segafruit, segafruit, segafruit_state, decrypt_m3001, ROT0, "Sega", "M3001",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(199?, m3004, 0, segafruit, segafruit, segafruit_state, decrypt_m3001, ROT0, "Sega", "M3004",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // apparently same XORs / bitswaps as m3001
+GAME(1990, m4001, 0, segafruit, segafruit, segafruit_state, decrypt_m4001, ROT0, "Sega", "M4001 (rev. A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(199?, m4002, 0, segafruit, segafruit, segafruit_state, decrypt_m4001, ROT0, "Sega", "M4002",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND) // apparently same XORs / bitswaps as m4001
+GAME(199?, m5001, 0, segafruit, segafruit, segafruit_state, decrypt_m5001, ROT0, "Sega", "M5001 (rev. A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

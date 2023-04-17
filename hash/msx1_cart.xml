@@ -4138,6 +4138,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="cyborgz">
 		<description>Cyborg Z (Korea)</description>
 		<year>1991</year>
@@ -11524,6 +11525,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="sboy3">
 		<description>Super Boy 3 (Korea)</description>
 		<year>1991</year>
@@ -12800,6 +12802,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="wonsiin">
 		<description>Wonsiin (Korea)</description>
 		<year>1991</year>
@@ -18261,7 +18264,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
-				<rom name="zero and the castle of infinite sadness - dioniso (2014) [msxdev2014].rom" size="0xc000" crc="7b6f90ef" sha1="b61b66e14574b683f75807a6aa18b7868cd628d8"/>
+				<rom name="zero and the castle of infinite sadness - dioniso (2014) [matra].rom" size="0xc000" crc="7b6f90ef" sha1="b61b66e14574b683f75807a6aa18b7868cd628d8"/>
 			</dataarea>
 		</part>
 	</software>

@@ -12,6 +12,7 @@ DEFINE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device, "scsi_cdrom_news",
 DEFINE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device, "nrrd45", "RRD45 CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM3301, nscsi_toshiba_xm3301_device, "nxm3301", "XM-3301TA CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5301SUN, nscsi_toshiba_xm5301_sun_device, "nxm5301sun", "XM-5301B Sun 4x CD-ROM (New)")
+DEFINE_DEVICE_TYPE(NSCSI_XM5401, nscsi_toshiba_xm5401_device, "nxm5401", "XM-5401B 4x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device, "nxm5401sun", "XM-5401B Sun 4x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device, "nxm5701", "XM-5701B 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun", "XM-5701B Sun 12x CD-ROM (New)")
@@ -47,6 +48,11 @@ nscsi_toshiba_xm5301_sun_device::nscsi_toshiba_xm5301_sun_device(const machine_c
 {
 }
 
+nscsi_toshiba_xm5401_device::nscsi_toshiba_xm5401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_device(mconfig, NSCSI_XM5401, tag, owner, "TOSHIBA ", "CD-ROM XM-5401TA", "3605", 0x98, 0x02)
+{
+}
+
 nscsi_toshiba_xm5401_sun_device::nscsi_toshiba_xm5401_sun_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_cdrom_device(mconfig, NSCSI_XM5401SUN, tag, owner, "TOSHIBA ", "XM-5401TASUN4XCD", "1036", 0x98, 0x02)
 {
@@ -71,6 +77,7 @@ nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_full_device(mconfig, type, tag, owner, clock)
 	, cdrom(nullptr)
+	, cdda(*this, "cdda")
 	, bytes_per_block(bytes_per_sector)
 	, lba(0)
 	, cur_sector(0)
@@ -81,23 +88,28 @@ nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, device_typ
 void nscsi_cdrom_device::device_start()
 {
 	nscsi_full_device::device_start();
+
 	save_item(NAME(sector_buffer));
 	save_item(NAME(lba));
 	save_item(NAME(cur_sector));
 	save_item(NAME(bytes_per_block));
+	save_item(NAME(mode_data_size));
 }
 
 void nscsi_cdrom_device::device_reset()
 {
 	nscsi_full_device::device_reset();
 	cdrom = image->get_cdrom_file();
+	cdda->set_cdrom(cdrom);
 	lba = 0;
 	cur_sector = -1;
+	mode_data_size = 12;
 }
 
 void nscsi_cdrom_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, image).set_interface("cdrom");
+	CDDA(config, "cdda");
 }
 
 int nscsi_cdrom_device::to_msf(int frame)
@@ -145,14 +157,30 @@ void nscsi_cdrom_device::scsi_put_data(int id, int pos, uint8_t data)
 	}
 
 	// process mode parameter header and one block descriptor
-	if(pos < sizeof(mode_data)) {
+	if(pos < mode_data_size) {
 		mode_data[pos] = data;
 
 		// is this the last byte of the mode parameter block descriptor?
-		if(pos == sizeof(mode_data) - 1)
+		if(pos == mode_data_size - 1) {
 			// is there exactly one block descriptor?
 			if(mode_data[3] == 8)
 				set_block_size((mode_data[9] << 16) | (mode_data[10] << 8) | (mode_data[11] << 0));
+
+			// Size of block descriptor should change based on if it's mode select (6) or (10)
+			// TODO: Find a usage of mode select (10) for testing
+			int pagedata_offset = 4 + mode_data[3];
+			switch(mode_data[pagedata_offset] & 0x3f) {
+				case 0x0e: // CD Audio Control Mode Page
+					cdda_sotc = BIT(mode_data[pagedata_offset+2], 1);
+					LOG("Ch 0 route: %x vol: %x\n", mode_data[pagedata_offset+8], mode_data[pagedata_offset+9]);
+					LOG("Ch 1 route: %x vol: %x\n", mode_data[pagedata_offset+10], mode_data[pagedata_offset+11]);
+					LOG("Ch 2 route: %x vol: %x\n", mode_data[pagedata_offset+12], mode_data[pagedata_offset+13]);
+					LOG("Ch 3 route: %x vol: %x\n", mode_data[pagedata_offset+14], mode_data[pagedata_offset+15]);
+					cdda->set_output_gain(0, mode_data[pagedata_offset+9] / 255.0f);
+					cdda->set_output_gain(1, mode_data[pagedata_offset+11] / 255.0f);
+					break;
+			}
+		}
 	}
 }
 
@@ -260,8 +288,9 @@ void nscsi_cdrom_device::scsi_command()
 		LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
 
 		// accept mode select parameter data
-		if(scsi_cmdbuf[4])
-			scsi_data_out(2, scsi_cmdbuf[4]);
+		mode_data_size = scsi_cmdbuf[4];
+		if(mode_data_size)
+			scsi_data_out(2, mode_data_size);
 
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -428,6 +457,25 @@ void nscsi_cdrom_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00; // Reserved
 				break;
 
+			case 0x0e: // CD Audio control page
+				scsi_cmdbuf[pos++] = 0x8e; // PS, page id
+				scsi_cmdbuf[pos++] = 0x0e; // Page length
+				scsi_cmdbuf[pos++] = (1 << 2) | (cdda_sotc << 1); // IMMED = 1
+				scsi_cmdbuf[pos++] = 0x00; // Reserved
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x00;
+				scsi_cmdbuf[pos++] = 0x01; // Ch 1 connected
+				scsi_cmdbuf[pos++] = 0xff; // Ch 1 max volume
+				scsi_cmdbuf[pos++] = 0x02; // Ch 2 connected
+				scsi_cmdbuf[pos++] = 0xff; // Ch 2 max volume
+				scsi_cmdbuf[pos++] = 0x04; // Ch 3 connected
+				scsi_cmdbuf[pos++] = 0xff; // Ch 3 max volume
+				scsi_cmdbuf[pos++] = 0x08; // Ch 4 connected
+				scsi_cmdbuf[pos++] = 0xff; // Ch 4 max volume
+				break;
+
 			case 0x30: // magic Apple page
 				{
 					static const u8 apple_magic[0x17] =
@@ -510,6 +558,83 @@ void nscsi_cdrom_device::scsi_command()
 		LOG("command %s MEDIUM REMOVAL\n", (scsi_cmdbuf[4] & 0x1) ? "PREVENT" : "ALLOW");
 		scsi_status_complete(SS_GOOD);
 		break;
+
+	case SC_READ_SUB_CHANNEL: {
+		const bool msf = BIT(scsi_cmdbuf[1], 1) != 0;
+		const bool subq = BIT(scsi_cmdbuf[2], 6);
+		const int param = scsi_cmdbuf[3];
+		const int track = scsi_cmdbuf[6];
+		const int alloc_length = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
+
+		LOG("command READ SUB CHANNEL Param = %d, Track = %d, MSF = %d, SUBQ = %d\n", param, track, msf, subq);
+
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
+
+		std::fill_n(scsi_cmdbuf, alloc_length, 0);
+
+		scsi_cmdbuf[0] = 0x00; // Reserved
+
+		int audio_active = cdda->audio_active();
+		if(audio_active) {
+			if(cdda->audio_paused())
+				scsi_cmdbuf[1] = 0x12; // Audio play operation paused
+			else
+				scsi_cmdbuf[1] = 0x11; // Audio play operation in progress
+		} else {
+			if(cdda->audio_ended())
+				scsi_cmdbuf[1] = 0x13; // Audio play operation successfully completed
+			else
+				scsi_cmdbuf[1] = 0x15; // No current audio status to return
+		}
+
+		if(subq) {
+			switch(param) {
+				case 1: { //  CD current position
+					int m_last_lba = audio_active ? cdda->get_audio_lba() : 0;
+
+					scsi_cmdbuf[2] = 0; // Sub-channel Data Length
+					scsi_cmdbuf[3] = 12;
+
+					scsi_cmdbuf[4] = 0x01; // Sub-channel Data Format Code
+					scsi_cmdbuf[5] = (audio_active ? 0 : 4) | 0x10; // Q Sub-channel encodes current position data
+					scsi_cmdbuf[6] = cdrom->get_track(m_last_lba) + 1; // Track Number
+					scsi_cmdbuf[7] = 0x00; // Index Number
+
+					uint32_t frame = m_last_lba;
+					if(msf)
+						frame = to_msf(frame);
+
+					scsi_cmdbuf[8] = BIT(frame, 24, 8); // Absolute CD Address
+					scsi_cmdbuf[9] = BIT(frame, 16, 8);
+					scsi_cmdbuf[10] = BIT(frame, 8, 8);
+					scsi_cmdbuf[11] = BIT(frame, 0, 8);
+
+					frame = m_last_lba - cdrom->get_track_start(scsi_cmdbuf[6] - 1);
+					if(msf)
+						frame = to_msf(frame);
+
+					scsi_cmdbuf[12] = BIT(frame, 24, 8); // Track Relative CD Address
+					scsi_cmdbuf[13] = BIT(frame, 16, 8);
+					scsi_cmdbuf[14] = BIT(frame, 8, 8);
+					scsi_cmdbuf[15] = BIT(frame, 0, 8);
+					break;
+				}
+
+				case 0x02: // Media Catalog number (UPC/bar code)
+				case 0x03: // Track International standard recording code (ISRC)
+				default:
+					LOG("Unknown subchannel type %d requested\n", scsi_cmdbuf[3]);
+					break;
+			}
+		}
+
+		scsi_data_in(0, alloc_length);
+		scsi_status_complete(SS_GOOD);
+		break;
+	}
 
 	case SC_READ_TOC_PMA_ATIP: {
 		/*
@@ -650,6 +775,44 @@ void nscsi_cdrom_device::scsi_command()
 		}
 		break;
 	}
+
+	case SC_PLAY_AUDIO_TRACK_INDEX: {
+		LOG("command PLAY AUDIO TRACK INDEX tr %d/idx %d to tr %d/idx %d\n", scsi_cmdbuf[4], scsi_cmdbuf[5], scsi_cmdbuf[7], scsi_cmdbuf[8]);
+
+		if(scsi_cmdbuf[4] > scsi_cmdbuf[7]) {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, 0x00, 0x14);
+			break;
+		}
+
+		// TODO: Index isn't accounted for at all
+		const uint32_t start_track = scsi_cmdbuf[4];
+		const uint32_t end_track = cdda_sotc ? start_track : std::min(cdrom->get_last_track(), (int)scsi_cmdbuf[7]);
+		const uint32_t m_lba = cdrom->get_track_start(start_track - 1);
+		const uint32_t m_blocks = cdrom->get_track_start(end_track) - m_lba;
+		const uint32_t track = cdrom->get_track(m_lba);
+
+		if(cdrom->get_track_type(track) == cdrom_file::CD_TRACK_AUDIO) {
+			LOG("Playing %d blocks from track %d (lba %d)\n", m_blocks, start_track, m_lba);
+
+			cdda->start_audio(m_lba, m_blocks);
+			scsi_status_complete(SS_GOOD);
+			sense(false, SK_NO_SENSE, 0x00, 0x11);
+		} else {
+			LOG("Track %d is not audio\n", start_track);
+
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, 0x64, 0x00);
+		}
+		break;
+	}
+
+	case SC_PAUSE_RESUME:
+		if (cdrom)
+			cdda->pause_audio(BIT(scsi_cmdbuf[8], 0) ^ 1);
+
+		scsi_status_complete(SS_GOOD);
+		break;
 
 	default:
 		nscsi_full_device::scsi_command();

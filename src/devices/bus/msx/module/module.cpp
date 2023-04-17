@@ -3,11 +3,13 @@
 #include "emu.h"
 #include "module.h"
 #include "sfg.h"
+#include "skw01.h"
 
 
 namespace bus::msx::module::slotoptions {
 char const *const SFG01 = "sfg01";
 char const *const SFG05 = "sfg05";
+char const *const SKW01 = "skw01";
 }
 
 
@@ -16,6 +18,7 @@ void msx_yamaha_60pin(device_slot_interface &device, bool is_in_subslot)
 	using namespace bus::msx::module;
 	device.option_add(slotoptions::SFG01, MSX_CART_SFG01);
 	device.option_add(slotoptions::SFG05, MSX_CART_SFG05);
+	device.option_add(slotoptions::SKW01, MSX_CART_SKW01);
 }
 
 

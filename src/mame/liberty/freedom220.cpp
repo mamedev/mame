@@ -91,9 +91,6 @@ private:
 	uint8_t m_current_line;
 	bool m_nmi_enabled;
 
-	uint8_t m_current_line;
-	bool m_nmi_enabled;
-
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
