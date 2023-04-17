@@ -3,7 +3,14 @@
 #include "emu.h"
 #include "hbi55.h"
 
+#include "imagedev/memcard.h"
 #include "machine/i8255.h"
+
+#include <memory>
+#include <string>
+#include <system_error>
+#include <utility>
+
 
 namespace {
 
@@ -11,17 +18,17 @@ namespace {
 Emulation of Sony HBI-55 and Yamaha UDC-01 data cartridges.
 Internally these two data cartridges are the same.
 
-In theory these battery backed ram cartridges could use up to 8 x 2KB sram
-chips but only cartridges using 2 2KB sram chips were produced.
+In theory these battery-backed RAM cartridges could use up to 8 x 2KB SRAM
+chips but only cartridges using 2 2KB SRAM chips were produced.
 */
 
-class msx_cart_hbi55_device : public device_t, public msx_cart_interface, public device_image_interface
+class msx_cart_hbi55_device : public device_t, public msx_cart_interface, public device_memcard_image_interface
 {
 public:
 	msx_cart_hbi55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, MSX_CART_HBI55, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
-		, device_image_interface(mconfig, *this)
+		, device_memcard_image_interface(mconfig, *this)
 		, m_i8255(*this, "i8255")
 		, m_address(0)
 		, m_ce(false)
@@ -33,16 +40,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
-	virtual bool support_command_line_image_creation() const noexcept override { return true; }
 	virtual char const *file_extensions() const noexcept override { return "bin"; }
-	virtual const char *image_type_name() const noexcept override { return "sramcard"; }
-	virtual const char *image_brief_type_name() const noexcept override { return "sram"; }
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
-	virtual image_init_result call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 private:
@@ -63,15 +64,15 @@ private:
 	u8 m_last_c;
 };
 
-image_init_result msx_cart_hbi55_device::call_load()
+std::pair<std::error_condition, std::string> msx_cart_hbi55_device::call_load()
 {
 	if (length() != SRAM_SIZE)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	if (fread(m_sram.get(), SRAM_SIZE) != SRAM_SIZE)
-		return image_init_result::FAIL;
+		return std::make_pair(std::errc::io_error, std::string());
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void msx_cart_hbi55_device::call_unload()
@@ -84,14 +85,14 @@ void msx_cart_hbi55_device::call_unload()
 	clear_sram();
 }
 
-image_init_result msx_cart_hbi55_device::call_create(int format_type, util::option_resolution *format_options)
+std::pair<std::error_condition, std::string> msx_cart_hbi55_device::call_create(int format_type, util::option_resolution *format_options)
 {
 	clear_sram();
 
 	if (fwrite(m_sram.get(), SRAM_SIZE) != SRAM_SIZE)
-		return image_init_result::FAIL;
+		return std::make_pair(std::errc::io_error, std::string());
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void msx_cart_hbi55_device::device_add_mconfig(machine_config &config)
