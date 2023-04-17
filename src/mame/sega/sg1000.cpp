@@ -257,7 +257,7 @@ uint8_t sg1000_state::peripheral_r(offs_t offset)
 	if (joy_ports_disabled)
 		return m_sgexpslot->read(offset);
 	else if (offset & 0x01)
-		return BIT(m_ctrlports[1]->in_r(), 2, 4) | 0xf0;
+		return BIT(m_ctrlports[1]->in_r(), 2, 4) | (0xf0 & m_sgexpslot->read(offset));
 	else
 		return BIT(m_ctrlports[0]->in_r(), 0, 6) | (BIT(m_ctrlports[1]->in_r(), 0, 2) << 6);
 }
