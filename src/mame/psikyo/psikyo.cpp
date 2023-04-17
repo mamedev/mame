@@ -30,7 +30,7 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 To Do:
 
 - Some games use naive/unlikely measurements (exactly 59.30), which should be verified.
-  Tengai and Strikers 1945 has accurate measurements from PCB. Maybe these could be used
+  Tengai and Strikers 1945 have accurate measurements from PCB. Maybe these could be used
   for other titles too?
 - All games but Tengai / Strikers 1945 use IRQ1 for VBlank. This is likely incorrect.
   On Tengai/Strikers 1945, its actually IPL2 that's asserted (Interrupt Level = 4).
