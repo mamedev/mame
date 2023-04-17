@@ -706,8 +706,9 @@ private:
 	void i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void i2c_update();
 
+	void psx_remap_io(s32 param);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(psx_remap_tick);
 
 	devcb_write_line m_io_update_interrupt;
 
@@ -720,8 +721,6 @@ private:
 	uint32_t m_exio_ident_byte;
 
 	required_ioport m_io_system;
-
-	emu_timer *m_psx_remap_timer;
 
 	optional_device<namcos10_exio_base_device> m_exio;
 
@@ -918,7 +917,7 @@ private:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-TIMER_CALLBACK_MEMBER(namcos10_state::psx_remap_tick)
+void namcos10_state::psx_remap_io(s32 param)
 {
 	if (!m_psx_remapper)
 		return;
@@ -955,15 +954,12 @@ void namcos10_state::namcos10_base(machine_config &config)
 
 void namcos10_state::machine_start()
 {
-	m_psx_remap_timer = timer_alloc(FUNC(namcos10_state::psx_remap_tick), this);
-	m_psx_remap_timer->adjust(attotime::never);
-
 	m_maincpu->space(AS_PROGRAM).install_write_tap(
 		0x1f801010, 0x1f801013,
 		"rom_configure_tap_w",
 		[this] (offs_t offset, u32 &data, u32 mem_mask) {
 			// reinstall memory map after rom_config_w finishes with update_rom_config
-			m_psx_remap_timer->adjust(attotime::zero);
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(namcos10_state::psx_remap_io), this));
 		}
 	);
 
@@ -993,7 +989,7 @@ void namcos10_state::machine_reset()
 	m_exio_ident_byte = 0;
 	m_exio_analog_idx = 0;
 
-	m_psx_remap_timer->adjust(attotime::zero); // update_rom_config is called on device_reset
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namcos10_state::psx_remap_io), this)); // update_rom_config is called on device_reset
 }
 
 void namcos10_state::device_resolve_objects()
