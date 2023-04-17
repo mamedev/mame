@@ -11,10 +11,12 @@
 #include "emu.h"
 #include "gew12.h"
 
+#include "m6502mcu.ipp"
+
 DEFINE_DEVICE_TYPE(GEW12, gew12_device, "gew12", "Yamaha YMW728-F (GEW12)")
 
 gew12_device::gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m65c02_device(mconfig, GEW12, tag, owner, clock)
+	: m6502_mcu_device_base<m65c02_device>(mconfig, GEW12, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_in_cb(*this), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
@@ -33,9 +35,6 @@ void gew12_device::device_start()
 {
 	m65c02_device::device_start();
 
-	m_timer[0] = timer_alloc(FUNC(gew12_device::timer_tick), this);
-	m_timer[1] = timer_alloc(FUNC(gew12_device::timer_tick), this);
-
 	m_in_cb.resolve_all_safe(0);
 	m_out_cb.resolve_all_safe();
 
@@ -43,29 +42,29 @@ void gew12_device::device_start()
 	m_bank[1]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
 	m_bank_mask = (m_rom->bytes() >> 14) - 1;
 
+	m_timer_base[0] = m_timer_base[1] = 0;
+
 	memset(m_port_data, 0, sizeof m_port_data);
 	memset(m_port_ddr, 0, sizeof m_port_ddr);
 
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_base));
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_ddr));
 }
 
 void gew12_device::device_reset()
 {
-	m65c02_device::device_reset();
+	m6502_mcu_device_base<m65c02_device>::device_reset();
 
+	internal_update();
 	m_irq_pending = 0;
 	m_irq_enable = 0;
 
 	m_timer_count[0] = m_timer_count[1] = 0;
-
-	// TODO: how are the timers enabled/disabled?
-	const attotime period = clocks_to_attotime(48);
-	m_timer[0]->adjust(period, 0, period);
-	m_timer[1]->adjust(period, 1, period);
+	internal_update();
 }
 
 
@@ -103,15 +102,27 @@ void gew12_device::internal_map(address_map &map)
 }
 
 
+void gew12_device::internal_update(u64 current_time)
+{
+	u64 event_time(0U);
+	add_event(event_time, timer_update(0, current_time));
+	add_event(event_time, timer_update(1, current_time));
+	recompute_bcount(event_time);
+}
+
+
 u8 gew12_device::irq_stat_r()
 {
+	internal_update();
 	return m_irq_pending & m_irq_enable;
 }
 
 void gew12_device::irq_en_w(u8 data)
 {
+	internal_update();
 	m_irq_enable = data;
 	irq_update();
+	internal_update();
 }
 
 void gew12_device::internal_irq(int num, int state)
@@ -135,10 +146,12 @@ void gew12_device::irq_update()
 
 void gew12_device::timer_stat_w(u8 data)
 {
+	internal_update();
 	if (BIT(data, 0))
 		internal_irq(INTERNAL_IRQ_TIMER0, CLEAR_LINE);
 	if (BIT(data, 1))
 		internal_irq(INTERNAL_IRQ_TIMER1, CLEAR_LINE);
+	internal_update();
 }
 
 u8 gew12_device::timer_count_r(offs_t offset)
@@ -147,6 +160,7 @@ u8 gew12_device::timer_count_r(offs_t offset)
 	// apparently reading timer 1 count if its IRQ is pending, else timer 0 count
 	const unsigned timer = BIT(m_irq_pending, INTERNAL_IRQ_TIMER1);
 
+	internal_update();
 	if (!BIT(offset, 0))
 		return m_timer_count[timer];
 	else
@@ -157,18 +171,33 @@ void gew12_device::timer_count_w(offs_t offset, u8 data)
 {
 	const unsigned timer = offset >> 1;
 
+	internal_update();
 	if (!BIT(offset, 0))
 		m_timer_count[timer] = (m_timer_count[timer] & 0xff00) | data;
 	else
 		m_timer_count[timer] = (m_timer_count[timer] & 0x00ff) | (data << 8);
+	internal_update();
 }
 
-TIMER_CALLBACK_MEMBER(gew12_device::timer_tick)
+u64 gew12_device::timer_update(int num, u64 current_time)
 {
-	if (!m_timer_count[param])
-		internal_irq(INTERNAL_IRQ_TIMER0 + param, ASSERT_LINE);
+	static constexpr unsigned tick_rate = 48;
 
-	m_timer_count[param]--;
+	const u64 ticks = current_time / tick_rate;
+	const u64 elapsed = ticks - m_timer_base[num];
+	m_timer_base[num] = ticks;
+
+	// TODO: how are the timers enabled/disabled?
+	// for now, just have 'timer IRQ enable' double as 'timer enable'
+	if (!BIT(m_irq_enable, INTERNAL_IRQ_TIMER0 + num))
+		return 0;
+
+	if (elapsed > m_timer_count[num])
+		internal_irq(INTERNAL_IRQ_TIMER0 + num, ASSERT_LINE);
+
+	m_timer_count[num] -= elapsed;
+
+	return (m_timer_base[num] + m_timer_count[num] + 1) * tick_rate;
 }
 
 

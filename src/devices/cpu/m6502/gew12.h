@@ -10,9 +10,10 @@
 #ifndef MAME_CPU_M6502_GEW12_H
 #define MAME_CPU_M6502_GEW12_H
 
+#include "m6502mcu.h"
 #include "m65c02.h"
 
-class gew12_device : public m65c02_device, public device_mixer_interface {
+class gew12_device : public m6502_mcu_device_base<m65c02_device>, public device_mixer_interface {
 public:
 	gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -24,6 +25,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual void internal_update(u64 current_time) override;
+	using m6502_mcu_device_base<m65c02_device>::internal_update;
 
 	enum
 	{
@@ -39,6 +43,7 @@ protected:
 
 	u8 timer_count_r(offs_t offset);
 	void timer_count_w(offs_t offset, u8 data);
+	u64 timer_update(int num, u64 current_time);
 
 	u8 port_r(offs_t offset);
 	void port_w(offs_t offset, u8 data);
@@ -51,14 +56,12 @@ protected:
 
 	void irq_update();
 
-	TIMER_CALLBACK_MEMBER(timer_tick);
-
 	void internal_map(address_map &map);
 
 	u8 m_irq_pending, m_irq_enable;
 
-	emu_timer* m_timer[2];
 	u16 m_timer_count[2];
+	u64 m_timer_base[2];
 
 	devcb_read8::array<6> m_in_cb;
 	devcb_write8::array<6> m_out_cb;

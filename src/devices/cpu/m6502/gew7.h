@@ -10,10 +10,11 @@
 #ifndef MAME_CPU_M6502_GEW7_H
 #define MAME_CPU_M6502_GEW7_H
 
+#include "m6502mcu.h"
 #include "m65c02.h"
 #include "sound/gew7.h"
 
-class gew7_device : public m65c02_device, public device_mixer_interface
+class gew7_device : public m6502_mcu_device_base<m65c02_device>, public device_mixer_interface
 {
 public:
 
@@ -28,12 +29,16 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void internal_update(u64 current_time) override;
+	using m6502_mcu_device_base<m65c02_device>::internal_update;
+
 	u8 timer_stat_r();
 	void timer_stat_w(u8 data);
 	void timer_en_w(u8 data);
 
 	u8 timer_count_r(offs_t offset);
 	void timer_count_w(offs_t offset, u8 data);
+	u64 timer_update(int num, u64 current_time);
 
 	void bank_w(offs_t offset, u8 data);
 
@@ -42,13 +47,11 @@ protected:
 	u8 port_ddr_r(offs_t offset);
 	void port_ddr_w(offs_t offset, u8 data);
 
-	TIMER_CALLBACK_MEMBER(timer_tick);
-
 	void internal_map(address_map &map);
 
-	emu_timer* m_timer[2];
-	u8 m_timer_stat;
+	u8 m_timer_stat, m_timer_en;
 	u16 m_timer_count[2];
+	u64 m_timer_base[2];
 
 	devcb_read8::array<6> m_in_cb;
 	devcb_write8::array<6> m_out_cb;

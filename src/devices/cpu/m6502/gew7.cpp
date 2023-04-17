@@ -11,12 +11,14 @@
 #include "emu.h"
 #include "gew7.h"
 
+#include "m6502mcu.ipp"
+
 DEFINE_DEVICE_TYPE(YMW270F, ymw270f_device, "ymw270f", "Yamaha YMW270-F (GEW7)")
 DEFINE_DEVICE_TYPE(YMW276F, ymw276f_device, "ymw276f", "Yamaha YMW276-F (GEW7I)")
 DEFINE_DEVICE_TYPE(YMW282F, ymw282f_device, "ymw282f", "Yamaha YMW282-F (GEW7S)")
 
 gew7_device::gew7_device(const machine_config &mconfig, device_type type, bool ignore_in_ddr, const char *tag, device_t *owner, uint32_t clock)
-	: m65c02_device(mconfig, type, tag, owner, clock)
+	: m6502_mcu_device_base<m65c02_device>(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_in_cb(*this), m_out_cb(*this)
 	, m_ignore_in_ddr(ignore_in_ddr)
@@ -53,10 +55,7 @@ void gew7_device::device_add_mconfig(machine_config &config)
 
 void gew7_device::device_start()
 {
-	m65c02_device::device_start();
-
-	m_timer[0] = timer_alloc(FUNC(gew7_device::timer_tick), this);
-	m_timer[1] = timer_alloc(FUNC(gew7_device::timer_tick), this);
+	m6502_mcu_device_base<m65c02_device>::device_start();
 
 	m_in_cb.resolve_all_safe(0);
 	m_out_cb.resolve_all_safe();
@@ -65,24 +64,27 @@ void gew7_device::device_start()
 	m_bank[1]->configure_entries(0, m_rom->bytes() >> 14, m_rom->base(), 1 << 14);
 	m_bank_mask = (m_rom->bytes() >> 14) - 1;
 
+	m_timer_base[0] = m_timer_base[1] = 0;
+
 	memset(m_port_data, 0, sizeof m_port_data);
 	memset(m_port_ddr, 0, sizeof m_port_ddr);
 
 	save_item(NAME(m_timer_stat));
+	save_item(NAME(m_timer_en));
 	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_base));
 	save_item(NAME(m_port_data));
 	save_item(NAME(m_port_ddr));
 }
 
 void gew7_device::device_reset()
 {
-	m65c02_device::device_reset();
+	m6502_mcu_device_base<m65c02_device>::device_reset();
 
-	m_timer_stat = 0;
+	internal_update();
+	m_timer_stat = m_timer_en = 0;
 	m_timer_count[0] = m_timer_count[1] = 0;
-
-	m_timer[0]->adjust(attotime::never);
-	m_timer[1]->adjust(attotime::never);
+	internal_update();
 }
 
 
@@ -106,36 +108,42 @@ void gew7_device::internal_map(address_map &map)
 }
 
 
+void gew7_device::internal_update(u64 current_time)
+{
+	u64 event_time(0U);
+	add_event(event_time, timer_update(0, current_time));
+	add_event(event_time, timer_update(1, current_time));
+	recompute_bcount(event_time);
+}
+
 u8 gew7_device::timer_stat_r()
 {
+	internal_update();
 	return m_timer_stat;
 }
 
 void gew7_device::timer_stat_w(u8 data)
 {
+	internal_update();
 	m_timer_stat &= ~data;
 
 	if (!(m_timer_stat & 3))
 		set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	internal_update();
 }
 
 void gew7_device::timer_en_w(u8 data)
 {
-	const attotime period = clocks_to_attotime(48);
-
-	for (int i = 0; i < 2; i++)
-	{
-		if (BIT(data, i))
-			m_timer[i]->adjust(period, i, period);
-		else
-			m_timer[i]->adjust(attotime::never);
-	}
+	internal_update();
+	m_timer_en = data;
+	internal_update();
 }
 
 u8 gew7_device::timer_count_r(offs_t offset)
 {
 	const unsigned timer = offset >> 1;
 
+	internal_update();
 	if (!BIT(offset, 0))
 		return m_timer_count[timer];
 	else
@@ -146,21 +154,34 @@ void gew7_device::timer_count_w(offs_t offset, u8 data)
 {
 	const unsigned timer = offset >> 1;
 
+	internal_update();
 	if (!BIT(offset, 0))
 		m_timer_count[timer] = (m_timer_count[timer] & 0xff00) | data;
 	else
 		m_timer_count[timer] = (m_timer_count[timer] & 0x00ff) | (data << 8);
+	internal_update();
 }
 
-TIMER_CALLBACK_MEMBER(gew7_device::timer_tick)
+u64 gew7_device::timer_update(int num, u64 current_time)
 {
-	if (!m_timer_count[param])
+	static constexpr unsigned tick_rate = 48;
+
+	const u64 ticks = current_time / tick_rate;
+	const u64 elapsed = ticks - m_timer_base[num];
+	m_timer_base[num] = ticks;
+
+	if (!BIT(m_timer_en, num))
+		return 0; // timer disabled
+
+	if (elapsed > m_timer_count[num])
 	{
-		m_timer_stat |= (1 << param);
+		m_timer_stat |= (1 << num);
 		set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
 	}
 
-	m_timer_count[param]--;
+	m_timer_count[num] -= elapsed;
+
+	return (m_timer_base[num] + m_timer_count[num] + 1) * tick_rate;
 }
 
 
