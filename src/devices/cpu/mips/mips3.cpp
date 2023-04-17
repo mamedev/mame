@@ -441,9 +441,9 @@ void mips3_device::device_start()
 	for (int regnum = 0; regnum < 32; regnum++)
 	{
 		char buf[10];
-		sprintf(buf, "r%d", regnum);
+		snprintf(buf, 10, "r%d", regnum);
 		m_drcuml->symbol_add(&m_core->r[regnum], sizeof(m_core->r[regnum]), buf);
-		sprintf(buf, "f%d", regnum);
+		snprintf(buf, 10, "f%d", regnum);
 		m_drcuml->symbol_add(&m_core->cpr[1][regnum], sizeof(m_core->cpr[1][regnum]), buf);
 	}
 	m_drcuml->symbol_add(&m_core->r[REG_LO], sizeof(m_core->r[REG_LO]), "lo");
@@ -1881,12 +1881,13 @@ uint64_t mips3_device::get_cop0_reg(int idx)
 	}
 	else if (idx == COP0_Random)
 	{
-		int wired = m_core->cpr[0][COP0_Wired] & 0x3f;
-		int range = 48 - wired;
-		if (range > 0)
-			return ((total_cycles() - m_core->count_zero_time) % range + wired) & 0x3f;
-		else
-			return 47;
+		uint32_t wired = m_core->cpr[0][COP0_Wired] & 0x3f;
+		uint32_t unwired = m_tlbentries - wired;
+
+		if (unwired == 0)
+			return m_tlbentries - 1;
+
+		return (generate_tlb_index() % unwired) + wired;
 	}
 	return m_core->cpr[0][idx];
 }
@@ -5397,7 +5398,7 @@ void mips3_device::execute_run()
 				{
 					// Should actually use physical address
 					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-					RTVAL64 = temp;
+					RTVAL64 = int64_t(int32_t(temp));
 					m_core->llbit = 1;
 					if LL_BREAK
 						machine().debug_break();
