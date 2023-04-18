@@ -45,6 +45,7 @@ private:
 	void io_map(address_map &map);
 
 	uint8_t select_r(offs_t offset);
+	void speaker_w(offs_t offset, uint8_t data);
 	uint8_t p1_r();
 	void p2_w(uint8_t data);
 

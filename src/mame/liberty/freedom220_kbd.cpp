@@ -17,6 +17,7 @@
 
     Notes:
     - Also used by the Freedom 200?
+    - Data transfer with 1200 baud, 8n1
 
 ***************************************************************************/
 
@@ -42,7 +43,7 @@ void freedom220_kbd_device::mem_map(address_map &map)
 
 void freedom220_kbd_device::io_map(address_map &map)
 {
-	map(0x00, 0xff).r(FUNC(freedom220_kbd_device::select_r));
+	map(0x00, 0xff).rw(FUNC(freedom220_kbd_device::select_r), FUNC(freedom220_kbd_device::speaker_w));
 }
 
 //-------------------------------------------------
@@ -275,6 +276,11 @@ uint8_t freedom220_kbd_device::select_r(offs_t offset)
 {
 	m_select = offset & 0x0f;
 	return 0;
+}
+
+void freedom220_kbd_device::speaker_w(offs_t offset, uint8_t data)
+{
+	// TODO
 }
 
 uint8_t freedom220_kbd_device::p1_r()

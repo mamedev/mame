@@ -26,8 +26,15 @@
     - Expansion slot
 
     TODO:
-    - Fix and improve video emulation
-    - Aux port
+    - Font selection
+    - Light/dark background
+    - Double sized characters
+    - Soft scroll
+    - Pixel clock, characters should be 9 pixels?
+
+    Notes:
+    - On first boot you will get an "error 8" - this is because
+      RAM is uninitialized.
 
 ****************************************************************************/
 
@@ -37,6 +44,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "video/scn2674.h"
 
@@ -67,8 +75,7 @@ public:
 		m_translate(*this, "translate"),
 		m_charram(*this, "charram%u", 0U),
 		m_attrram(*this, "attrram%u", 0U),
-		m_current_line(0),
-		m_nmi_enabled(false)
+		m_video_ctrl(0x00)
 	{ }
 
 	void freedom220(machine_config &config);
@@ -88,20 +95,16 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_charram;
 	required_shared_ptr_array<uint8_t, 2> m_attrram;
 
-	uint8_t m_current_line;
-	bool m_nmi_enabled;
+	uint8_t m_video_ctrl;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	void row_buffer_map(address_map &map);
-	uint8_t mbc_char_r(offs_t offset);
-	uint8_t mbc_attr_r(offs_t offset);
+	void char_map(address_map &map);
+	void attr_map(address_map &map);
 	void avdc_intr_w(int state);
-	void avdc_breq_w(int state);
+	void video_ctrl_w(uint8_t data);
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
-
-	void nmi_control_w(uint8_t data);
 };
 
 
@@ -116,7 +119,7 @@ void freedom220_state::mem_map(address_map &map)
 	map(0x8800, 0x8fff).ram().share(m_attrram[0]);
 	map(0x9000, 0x97ff).ram().share(m_charram[1]);
 	map(0x9800, 0x9fff).ram().share(m_attrram[1]);
-	map(0xa000, 0xafff).ram();
+	map(0xa000, 0xafff).ram().share("nvram");
 }
 
 void freedom220_state::io_map(address_map &map)
@@ -127,7 +130,7 @@ void freedom220_state::io_map(address_map &map)
 	map(0x40, 0x41).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x61).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x81).rw(m_usart[2], FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xa0, 0xa0).w(FUNC(freedom220_state::nmi_control_w));
+	map(0xa0, 0xa0).w(FUNC(freedom220_state::video_ctrl_w));
 }
 
 
@@ -135,40 +138,38 @@ void freedom220_state::io_map(address_map &map)
 //  VIDEO EMULATION
 //**************************************************************************
 
-void freedom220_state::row_buffer_map(address_map &map)
+void freedom220_state::char_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0xff).ram();
+	map(0x0000, 0x07ff).ram().share(m_charram[0]);
+	map(0x1000, 0x17ff).ram().share(m_charram[1]);
+	map(0x2000, 0x2fff).ram().share("nvram");
 }
 
-uint8_t freedom220_state::mbc_char_r(offs_t offset)
+void freedom220_state::attr_map(address_map &map)
 {
-	if (offset >= 0x800)
-		logerror("%d read char offset %04x\n", m_current_line, offset);
-
-	return m_charram[0][(m_current_line * 0x50 + offset) & 0x7ff];
-}
-
-uint8_t freedom220_state::mbc_attr_r(offs_t offset)
-{
-	return m_attrram[0][(m_current_line * 0x50 + offset) & 0x7ff];
+	map(0x0000, 0x07ff).ram().share(m_attrram[0]);
+	map(0x1000, 0x17ff).ram().share(m_attrram[1]);
+	map(0x2000, 0x2fff).ram().share("nvram");
 }
 
 void freedom220_state::avdc_intr_w(int state)
 {
-	if (state && m_nmi_enabled)
+	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void freedom220_state::avdc_breq_w(int state)
+void freedom220_state::video_ctrl_w(uint8_t data)
 {
-	if (state)
-	{
-		if (m_screen->vblank())
-			m_current_line = 0;
-		else
-			m_current_line++;
-	}
+	// 7-------  unknown
+	// -6------  unknown
+	// --5-----  unknown
+	// ---432--  font select
+	// ------1-  normal/reverse video
+	// -------0  unknown
+
+	logerror("video_ctrl_w: %02x\n", data);
+
+	m_video_ctrl = data;
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
@@ -197,8 +198,7 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
 	if (BIT(attrcode, 2))
 		data = ~data;
 
-	// TODO
-	if (0 && cursor)
+	if (cursor)
 		data = ~data;
 
 	// foreground/background colors
@@ -230,25 +230,14 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-void freedom220_state::nmi_control_w(uint8_t data)
-{
-	logerror("nmi_control_w: %02x\n", data);
-
-	// unknown if a simple write is enough
-	m_nmi_enabled = true;
-}
-
 void freedom220_state::machine_start()
 {
 	// register for save states
-	save_item(NAME(m_current_line));
-	save_item(NAME(m_nmi_enabled));
+	save_item(NAME(m_video_ctrl));
 }
 
 void freedom220_state::machine_reset()
 {
-	m_nmi_enabled = false;
-
 	// allow data to be send to keyboard
 	m_usart[2]->write_dsr(1);
 	m_usart[2]->write_cts(0);
@@ -268,6 +257,8 @@ void freedom220_state::freedom220(machine_config &config)
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16000000, 768, 0, 640, 321, 0, 300); // clock unverified
@@ -279,14 +270,11 @@ void freedom220_state::freedom220(machine_config &config)
 
 	SCN2674(config, m_avdc, 16000000 / 8); // clock unverified
 	m_avdc->intr_callback().set(FUNC(freedom220_state::avdc_intr_w));
-	m_avdc->breq_callback().set(FUNC(freedom220_state::avdc_breq_w));
 	m_avdc->set_screen(m_screen);
 	m_avdc->set_character_width(8); // unverified
-	m_avdc->set_addrmap(0, &freedom220_state::row_buffer_map);
-	m_avdc->set_addrmap(1, &freedom220_state::row_buffer_map);
+	m_avdc->set_addrmap(0, &freedom220_state::char_map);
+	m_avdc->set_addrmap(1, &freedom220_state::attr_map);
 	m_avdc->set_display_callback(FUNC(freedom220_state::draw_character));
-	m_avdc->mbc_char_callback().set(FUNC(freedom220_state::mbc_char_r));
-	m_avdc->mbc_attr_callback().set(FUNC(freedom220_state::mbc_attr_r));
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(18.432_MHz_XTAL / 10);
@@ -306,14 +294,22 @@ void freedom220_state::freedom220(machine_config &config)
 	m_usart[0]->rts_handler().set("mainport", FUNC(rs232_port_device::write_rts));
 
 	I8251(config, m_usart[1], 0); // unknown clock
+	m_usart[1]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_usart[1]->txrdy_handler().set("irq", FUNC(input_merger_device::in_w<3>));
+	m_usart[1]->txd_handler().set("auxport", FUNC(rs232_port_device::write_txd));
+	m_usart[1]->rts_handler().set("auxport", FUNC(rs232_port_device::write_rts));
 
 	I8251(config, m_usart[2], 0); // unknown clock
-	m_usart[2]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_usart[2]->rxrdy_handler().set("irq", FUNC(input_merger_device::in_w<4>));
 	m_usart[2]->txd_handler().set("kbd", FUNC(freedom220_kbd_device::rx_w));
 
 	rs232_port_device &mainport(RS232_PORT(config, "mainport", default_rs232_devices, nullptr));
 	mainport.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
 	mainport.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
+
+	rs232_port_device &auxport(RS232_PORT(config, "auxport", default_rs232_devices, nullptr));
+	auxport.rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
+	auxport.cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
 
 	freedom220_kbd_device &kbd(FREEDOM220_KBD(config, "kbd"));
 	kbd.tx_handler().set(m_usart[2], FUNC(i8251_device::write_rxd));
@@ -346,4 +342,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME       FLAGS
-COMP( 1984, free220, 0,      0,      freedom220, 0,     freedom220_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, free220, 0,      0,      freedom220, 0,     freedom220_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
