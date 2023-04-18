@@ -216,9 +216,10 @@ void gdrom_device::ExecCommand()
 					throw emu_fatalerror("GDROM: Unhandled data_select %d", data_select);
 				}
 
+				// LBA 45000 is start of double density GD-ROM
 				LOGCMD("CD_READ %02x %02x\n", command[2], command[4]);
-				LOGCMD("   LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n",
-					m_lba, m_blocks,
+				LOGCMD("   LBA %d (%x) for %d blocks (%d bytes, read type %d, data select %d)\n",
+					m_lba + 150, m_lba, m_blocks,
 					m_blocks * m_sector_bytes, read_type, data_select
 				);
 
@@ -346,6 +347,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 					{
 						LOGWARN("CD read error!\n");
+						return;
 					}
 
 					LOGXFER("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
