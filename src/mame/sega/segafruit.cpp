@@ -11,8 +11,7 @@
     8-dip bank
 
     TODO:
-    m300x and m400x: decryption needs to be verified (may be good), then everything else
-    m5001: everything
+    decryption needs to be verified (may be good), then everything else
 
 ************************************************************************************************************/
 
@@ -46,22 +45,22 @@ public:
 	{
 	}
 
-	void segafruit(machine_config &config);
+	void segafruit(machine_config &config) ATTR_COLD;
 
-	void decrypt_m3001();
-	void decrypt_m4001();
-	void decrypt_m5001();
+	void decrypt_m3001() ATTR_COLD;
+	void decrypt_m4001() ATTR_COLD;
+	void decrypt_m5001() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void opcodes_map(address_map &map);
-	void pcm_map(address_map &map);
-	void sound_mem_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void opcodes_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
+	void sound_mem_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80_device> m_soundcpu;
@@ -236,7 +235,7 @@ void segafruit_state::decrypt_m4001()
 	}
 }
 
-void segafruit_state::decrypt_m5001() // TODO
+void segafruit_state::decrypt_m5001()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -244,22 +243,22 @@ void segafruit_state::decrypt_m5001() // TODO
 	{
 		switch (i & 0x1111)
 		{
-			case 0x0000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x88, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x20, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x0111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1000: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x08, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1001: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x1010: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x1011: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1100: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x08, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1101: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1110: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0x08, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1111: m_decrypted_opcodes[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
 		}
 	}
 
@@ -267,22 +266,22 @@ void segafruit_state::decrypt_m5001() // TODO
 	{
 		switch (i & 0x1111)
 		{
-			case 0x0000: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0001: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0010: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0011: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0100: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0101: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0110: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x0111: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1000: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1001: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1010: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1011: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1100: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1101: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1110: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
-			case 0x1111: rom[i] = bitswap<8>(rom[i] ^ 0x00, 7, 6, 5, 4, 3, 2, 1, 0); break;
+			case 0x0000: rom[i] = bitswap<8>(rom[i] ^ 0x08, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0001: rom[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0010: rom[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x0011: rom[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x0100: rom[i] = bitswap<8>(rom[i] ^ 0x88, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0101: rom[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x0110: rom[i] = bitswap<8>(rom[i] ^ 0x88, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: rom[i] = bitswap<8>(rom[i] ^ 0x88, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x1000: rom[i] = bitswap<8>(rom[i] ^ 0x08, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1001: rom[i] = bitswap<8>(rom[i] ^ 0xa0, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1010: rom[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1011: rom[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1100: rom[i] = bitswap<8>(rom[i] ^ 0x20, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1101: rom[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x1110: rom[i] = bitswap<8>(rom[i] ^ 0x88, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1111: rom[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 7, 4, 5, 2, 1, 0); break;
 		}
 	}
 }
