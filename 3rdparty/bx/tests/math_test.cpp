@@ -11,18 +11,17 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
-#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 TEST_CASE("isFinite, isInfinite, isNan", "")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
-		REQUIRE(std::isnan(u.f)    == bx::isNan(u.f) );
-		REQUIRE(std::isfinite(u.f) == bx::isFinite(u.f) );
-		REQUIRE(std::isinf(u.f)    == bx::isInfinite(u.f) );
+
+		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
+		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
+		REQUIRE(::isinff(u.f)  == bx::isInfinite(u.f) );
 	}
 }
-#endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 
 bool log2_test(float _a)
 {
