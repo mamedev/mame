@@ -1873,8 +1873,24 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 5);
 
-	/* decrypter device (CPLD in hardware?) */
-	CHOCOVDR_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00005239351ec1daull, 0x0000000000008090ull, 0x0000000048264808ull, 0x0000000000004820ull,
+			0x0000000000000500ull, 0x0000000058ff5a54ull, 0x00000000d8220208ull, 0x00005239351e91d3ull,
+			0x000000009a1dfaffull, 0x0000000090040001ull, 0x0000000000000100ull, 0x0000000000001408ull,
+			0x0000000032efd3f1ull, 0x00000000000000d0ull, 0x0000000032efd2d7ull, 0x0000000000000840ull,
+		}, {
+			0x00002000410485daull, 0x0000000000008081ull, 0x0000000008044088ull, 0x0000000000004802ull,
+			0x0000000000000500ull, 0x00000000430cda54ull, 0x0000000010000028ull, 0x00002000410491dbull,
+			0x000000001100fafeull, 0x0000000018040001ull, 0x0000000000000010ull, 0x0000000000000508ull,
+			0x000000006800d3f5ull, 0x0000000000000058ull, 0x000000006800d2d5ull, 0x0000000000001840ull,
+		},
+		0x5b22,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 9) & (reducer.gf2_reduce(0x0000000010065810ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000021005810ull & previous_plainwords)) & 1) << 10;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_gahaha(machine_config &config)
@@ -1883,8 +1899,23 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	GAHAHA_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000010a08200ull, 0x00000000001b0204ull, 0x00004ba503024016ull, 0x0000000000000004ull,
+			0x0000000000000240ull, 0x0000000088080180ull, 0x000011821ce50066ull, 0x000000000a204200ull,
+			0x0000000014018800ull, 0x00000000000000a0ull, 0x0000000000000412ull, 0x0000000000004002ull,
+			0x000000003100c002ull, 0x0000000000002100ull, 0x00000000084000a4ull, 0x0000000031010180ull,
+		}, {
+			0x0000000000808000ull, 0x0000004400130200ull, 0x0000021804a54036ull, 0x0000000000000014ull,
+			0x0000000000000240ull, 0x0000000085000100ull, 0x000008ca15400166ull, 0x000000009822c280ull,
+			0x0000000014008008ull, 0x00000000000010a0ull, 0x0000000000000016ull, 0x0000000000004002ull,
+			0x000000003120c000ull, 0x0000000000002100ull, 0x0000000018e002a6ull, 0x00000000a19121a0ull,
+		},
+		0xaea7,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			return 0;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_gahaha2(machine_config &config)
@@ -1893,8 +1924,24 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	GAHAHA2_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000080064001ull,0x0000000a000104ull,0x00018220912000ull,0x00000001822010ull,
+			0x000000000001a0ull,0x000481a4220004ull,0x00a11490041269ull,0x00000000000810ull,
+			0x0000000a008200ull,0x000000010b0010ull,0x00000052108820ull,0x00042209a00258ull,
+			0x00000001820401ull,0x00000090040040ull,0x00000000001002ull,0x00209008020004ull
+		}, {
+			0x00000000020001ull,0x0000000a000024ull,0x00018000830400ull,0x00000001802002ull,
+			0x00000000000130ull,0x00200110060004ull,0x000581080c1260ull,0x00000000000810ull,
+			0x0000000a008040ull,0x00000021bf0010ull,0x00000040588820ull,0x00003000220210ull,
+			0x00000001800400ull,0x00000090000040ull,0x00000000009002ull,0x000403a5020004ull
+		},
+		0x925a,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			u64 previous_masks = previous_cipherwords^previous_plainwords;
+			return (1 & ((previous_masks >> 26) ^ (previous_masks >> 37)) & (previous_masks >> 46)) * 0x8860;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_gamshara(machine_config &config)
@@ -1902,8 +1949,24 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	GAMSHARA_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000000000028ull, 0x0000cae83f389fd9ull, 0x0000000000001000ull, 0x0000000042823402ull,
+			0x0000cae8736a0592ull, 0x0000cae8736a8596ull, 0x000000008b4095b9ull, 0x0000000000002100ull,
+			0x0000000004018228ull, 0x0000000000000042ull, 0x0000000000000818ull, 0x0000000000004010ull,
+			0x000000008b4099f1ull, 0x00000000044bce08ull, 0x00000000000000c1ull, 0x0000000042823002ull,
+		}, {
+			0x0000000000000028ull, 0x00000904c2048dd9ull, 0x0000000000008000ull, 0x0000000054021002ull,
+			0x00000904e0078592ull, 0x00000904e00785b2ull, 0x00000000440097f9ull, 0x0000000000002104ull,
+			0x0000000029018308ull, 0x0000000000000042ull, 0x0000000000000850ull, 0x0000000000004012ull,
+			0x000000004400d1f1ull, 0x000000006001ce08ull, 0x00000000000000c8ull, 0x0000000054023002ull,
+		},
+		0x25ab,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_gegemdb(machine_config &config)
@@ -1921,8 +1984,23 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 4);
 
-	/* decrypter device (CPLD in hardware?) */
-	GJSPACE_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000000000240ull, 0x0000d617eb0f1ab1ull, 0x00000000451111c0ull, 0x00000000013b1f44ull,
+			0x0000aab0b356abceull, 0x00007ca76b89602aull, 0x0000000000001800ull, 0x00000000031d1303ull,
+			0x0000000000000801ull, 0x0000000030111160ull, 0x0000000001ab3978ull, 0x00000000c131b160ull,
+			0x0000000000001110ull, 0x0000000000008002ull, 0x00000000e1113540ull, 0x0000d617fdce8bfcull,
+		}, {
+			0x0000000000008240ull, 0x000000002f301ab1ull, 0x00000000050011c0ull, 0x00000000412817c4ull,
+			0x00000004c338abc6ull, 0x000000046108602aull, 0x0000000000005800ull, 0x00000000c3081347ull,
+			0x0000000000000801ull, 0x0000000061001160ull, 0x0000000061183978ull, 0x00000000e520b142ull,
+			0x0000000000001101ull, 0x000000000000a002ull, 0x0000000029001740ull, 0x00000000a4309bfcull,
+		},
+		0x2e7f,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			return 0;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_kd2001(machine_config &config)
@@ -1932,8 +2010,7 @@ void namcos10_memn_state::ns10_kd2001(machine_config &config)
 
 	// TODO: Also has a "pdrive" ROM? What's that for?
 
-	/* decrypter device (CPLD in hardware?) */
-	// KD2001_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_keroro(machine_config &config)
@@ -1942,8 +2019,7 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	// KERORO_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
@@ -1951,8 +2027,24 @@ void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	KNPUZZLE_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000c0a4208cull, 0x00000000204100a8ull, 0x000000000c0306a0ull, 0x000000000819e944ull,
+			0x0000000000001400ull, 0x0000000000000061ull, 0x000000000141401cull, 0x0000000000000020ull,
+			0x0000000001418010ull, 0x00008d6a1eb690cfull, 0x00008d6a4d3b90ceull, 0x0000000000004201ull,
+			0x00000000012c00a2ull, 0x000000000c0304a4ull, 0x0000000000000500ull, 0x0000000000000980ull,
+		}, {
+			0x000000002a22608cull, 0x00000000002300a8ull, 0x0000000000390ea0ull, 0x000000000100a9c4ull,
+			0x0000000000001400ull, 0x0000000000000041ull, 0x0000000003014014ull, 0x0000000000000022ull,
+			0x0000000003010110ull, 0x00000800031a80cfull, 0x00000800003398deull, 0x0000000000004200ull,
+			0x00000000012a04a2ull, 0x00000000003984a4ull, 0x0000000000000700ull, 0x0000000000000882ull,
+		},
+		0x01e2,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 0x13) & (reducer.gf2_reduce(0x0000000014001290ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000000021290ull & previous_plainwords)) & 1) << 1;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_konotako(machine_config &config)
@@ -1960,8 +2052,24 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	KONOTAKO_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x000000000000004cull, 0x00000000d39e3d3dull, 0x0000000000001110ull, 0x0000000000002200ull,
+			0x000000003680c008ull, 0x0000000000000281ull, 0x0000000000005002ull, 0x00002a7371895a47ull,
+			0x0000000000000003ull, 0x00002a7371897a4eull, 0x00002a73aea17a41ull, 0x00002a73fd895a4full,
+			0x000000005328200aull, 0x0000000000000010ull, 0x0000000000000040ull, 0x0000000000000200ull,
+		}, {
+			0x000000000000008cull, 0x0000000053003d25ull, 0x0000000000001120ull, 0x0000000000002200ull,
+			0x0000000037004008ull, 0x0000000000000282ull, 0x0000000000006002ull, 0x0000060035005a47ull,
+			0x0000000000000003ull, 0x0000060035001a4eull, 0x0000060025007a41ull, 0x00000600b5005a2full,
+			0x000000009000200bull, 0x0000000000000310ull, 0x0000000000001840ull, 0x0000000000000400ull,
+		},
+		0x0748,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_medalnt(machine_config &config)
@@ -1970,8 +2078,24 @@ void namcos10_memn_state::ns10_medalnt(machine_config &config)
 	namcos10_exfinalio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	MEDALNT_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000080601000ull,0x00000000006020ull,0x00000000004840ull,0x00000000000201ull,
+			0x00000000020004ull,0x00000000000081ull,0x00000000009001ull,0x00000001041810ull,
+			0x000000ca001806ull,0x00000080600500ull,0x00000000002022ull,0x0000002204001cull,
+			0x0000000c508044ull,0x00000000000808ull,0x000000ca001094ull,0x00000000000184ull
+		}, {
+			0x00000081201000ull,0x00000000006080ull,0x00000000000840ull,0x00000000000201ull,
+			0x00000000080005ull,0x00000000000081ull,0x00000000009004ull,0x000000042c4810ull,
+			0x0000000a003006ull,0x00000081201100ull,0x00000000008022ull,0x00000028050034ull,
+			0x0000004c000044ull,0x0000000000080aull,0x0000000a001214ull,0x00000000000190ull
+		},
+		0x5d04,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & (previous_masks>>26) & (reducer.gf2_reduce(previous_cipherwords & 0x10100080) ^ reducer.gf2_reduce(previous_plainwords & 0x40100080))) << 4;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_medalnt2(machine_config &config)
@@ -1980,8 +2104,24 @@ void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 	namcos10_exfinalio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	MEDALNT2_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000000202ull,0x00242000120110ull,0x00000001624608ull,0x00000000001820ull,
+			0x0000000000c040ull,0x00000000000184ull,0x00000007900002ull,0x00000000005008ull,
+			0x00000000008401ull,0x00000000008800ull,0x00000000000250ull,0x00000000002000ull,
+			0x00000000000024ull,0x00000000006080ull,0x00000000000042ull,0x00000007900006ull
+		}, {
+			0x00000000000203ull,0x00442000140120ull,0x00000002024008ull,0x00000000001840ull,
+			0x00000000004040ull,0x00000000000188ull,0x00000000200002ull,0x00000000006008ull,
+			0x00000000008801ull,0x00000000009000ull,0x00000000000290ull,0x00000000002003ull,
+			0x00000000000024ull,0x0000000000a080ull,0x00000000000042ull,0x0000000020001eull
+		},
+		0x4c57,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (((previous_masks>>15) & (reducer.gf2_reduce(previous_cipherwords & 0x24200000) ^ reducer.gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
@@ -1989,8 +2129,7 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// MRDRILRG_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
@@ -1999,8 +2138,24 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 4);
 
-	/* decrypter device (CPLD in hardware?) */
-	NFLCLSFB_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x000034886e281880ull, 0x0000000012c5e7baull, 0x0000000000000200ull, 0x000000002900002aull,
+			0x00000000000004c0ull, 0x0000000012c5e6baull, 0x00000000e0df8bbbull, 0x000000002011532aull,
+			0x0000000000009040ull, 0x0000000000006004ull, 0x000000000000a001ull, 0x000034886e2818e1ull,
+			0x0000000000004404ull, 0x0000000000004200ull, 0x0000000000009100ull, 0x0000000020115712ull,
+		}, {
+			0x00000e00060819c0ull, 0x000000000e08e7baull, 0x0000000000000800ull, 0x000000000100002aull,
+			0x00000000000010c0ull, 0x000000000e08cebaull, 0x0000000088018bbbull, 0x000000008c005302ull,
+			0x000000000000c040ull, 0x0000000000006010ull, 0x0000000000000001ull, 0x00000e00060818e3ull,
+			0x0000000000000404ull, 0x0000000000004201ull, 0x0000000000001100ull, 0x000000008c0057b2ull,
+		},
+		0xbe32,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 1) & (reducer.gf2_reduce(0x0000000040de8fb3ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000088008fb3ull & previous_plainwords)) & 1) << 2;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_pacmball(machine_config &config)
@@ -2009,8 +2164,24 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	PACMBALL_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000008028ull, 0x00000000000400ull, 0x000000a9100004ull, 0x00000028004200ull,
+			0x00000000001002ull, 0x00000000001041ull, 0x00001a70008022ull, 0x00000081100022ull,
+			0x00000000000890ull, 0x00000000003040ull, 0x00e00000108411ull, 0x000000000000a4ull,
+			0x00000000000980ull, 0x00000000004208ull, 0x00000000000300ull, 0x00e00000108001ull
+		}, {
+			0x00000000008030ull, 0x00000000000800ull, 0x00000029100008ull, 0x00000028008200ull,
+			0x00000000001002ull, 0x00000000002041ull, 0x00002e20038024ull, 0x00000001100042ull,
+			0x00000000001090ull, 0x00000000003080ull, 0x00800000228421ull, 0x00000000000124ull,
+			0x00000000000a80ull, 0x00000000004408ull, 0x00000000000300ull, 0x00800000228002ull,
+		},
+		0x247c,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 2) & (previous_masks >> 6) & 1) << 1;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_panikuru(machine_config &config)
@@ -2018,8 +2189,7 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// PANIKURU_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_ptblank3(machine_config &config)
@@ -2027,8 +2197,7 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	// PTBLANK3_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_puzzball(machine_config &config)
@@ -2036,8 +2205,7 @@ void namcos10_memn_state::ns10_puzzball(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	// PUZZBALL_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_sekaikh(machine_config &config)
@@ -2046,8 +2214,25 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	SEKAIKH_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000000510ull, 0x00000000004000ull, 0x00000000000406ull, 0x00000000000400ull,
+			0x000000c0410890ull, 0x00000041610800ull, 0x00000000002008ull, 0x0000002051a000ull,
+			0x00000008800020ull, 0x00000008800014ull, 0x00000000000800ull, 0x00000000004001ull,
+			0x00000041610884ull, 0x00000042308018ull, 0x00000000000888ull, 0x00000070014820ull
+		},
+		{
+			0x00000000000100ull, 0x00000000005040ull, 0x00000000000402ull, 0x00000000000608ull,
+			0x00000084020892ull, 0x00000001418a00ull, 0x00000000000008ull, 0x00000000d0a400ull,
+			0x00000000801020ull, 0x00000000800004ull, 0x00000000000020ull, 0x00000000000001ull,
+			0x00000001410806ull, 0x000000042c8019ull, 0x00000000000880ull, 0x000000b0010920ull,
+		},
+		0x3aa8,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 0) & (previous_masks >> 3) & 1) << 10;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
@@ -2055,8 +2240,24 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	STARTRGN_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00003e4bfe92c6a9ull, 0x000000000000010cull, 0x00003e4b7bd6c4aaull, 0x0000b1a904b8fab8ull,
+			0x0000000000000080ull, 0x0000000000008c00ull, 0x0000b1a9b2f0b4cdull, 0x000000006c100828ull,
+			0x000000006c100838ull, 0x0000b1a9d3913fcdull, 0x000000006161aa00ull, 0x0000000000006040ull,
+			0x0000000000000420ull, 0x0000000000001801ull, 0x00003e4b7bd6deabull, 0x0000000000000105ull,
+		}, {
+			0x000012021f00c6a8ull, 0x0000000000000008ull, 0x000012020b1046aaull, 0x000012001502fea8ull,
+			0x0000000000002000ull, 0x0000000000008800ull, 0x000012001e02b4cdull, 0x000000002c0008aaull,
+			0x000000002c00083aull, 0x000012003f027ecdull, 0x0000000021008a00ull, 0x0000000000002040ull,
+			0x0000000000000428ull, 0x0000000000001001ull, 0x000012020b10ceabull, 0x0000000000000144ull,
+		},
+		0x8c46,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_sugorotic(machine_config &config)
@@ -2065,8 +2266,24 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	SUGOROTIC_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00061402200010ull,0x00000000b2a150ull,0x00000080280021ull,0x00000000000880ull,
+			0x00061410010004ull,0x00000000000800ull,0x00000000000141ull,0x00000041002000ull,
+			0x00000000000084ull,0x00000000020401ull,0x00000041120100ull,0x00000000020480ull,
+			0x00000000b21110ull,0x00000000128800ull,0x00000000003000ull,0x00061410014020ull
+		}, {
+			0x00223011000034ull,0x00000040228150ull,0x00000000280101ull,0x00000000000880ull,
+			0x00223010010004ull,0x00000000000848ull,0x00000000000301ull,0x00000041002001ull,
+			0x00000000000084ull,0x00000000100408ull,0x00000041160800ull,0x00000000100000ull,
+			0x00000040228110ull,0x0000000016c000ull,0x00000000003002ull,0x00223010010020ull
+		},
+		0x9006,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & (previous_masks >> 25) & (previous_masks >> 22)) * 0xa00;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_taiko2(machine_config &config)
@@ -2075,8 +2292,7 @@ void namcos10_memn_state::ns10_taiko2(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// TAIKO2_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_taiko3(machine_config &config)
@@ -2085,8 +2301,7 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// TAIKO3_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_taiko4(machine_config &config)
@@ -2095,8 +2310,7 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// TAIKO4_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_taiko5(machine_config &config)
@@ -2105,8 +2319,7 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 	namcos10_exfinalio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// TAIKO5_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 void namcos10_memn_state::ns10_taiko6(machine_config &config)
@@ -2115,8 +2328,7 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	/* decrypter device (CPLD in hardware?) */
-	// TAIKO6_DECRYPTER(config, m_decrypter, 0);
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -2229,8 +2441,24 @@ void namcos10_memp3_state::ns10_g13jnc(machine_config &config)
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 6);
 
-	/* decrypter device (CPLD in hardware?) */
-	G13JNC_DECRYPTER(config, m_decrypter, 0);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x005600001c0582ull, 0x00000000004024ull, 0x00010212403000ull, 0x00000000008404ull,
+			0x00005121060021ull, 0x00010212402001ull, 0x00000001024000ull, 0x00000000000840ull,
+			0x000981c2100148ull, 0x00000020108400ull, 0x00000008110134ull, 0x00000000000003ull,
+			0x004c9801080102ull, 0x00000040860083ull, 0x00000000000001ull, 0x00000000000288ull,
+		}, {
+			0x00441800340584ull, 0x00000000004028ull, 0x00010212800000ull, 0x00000000000404ull,
+			0x00485022000041ull, 0x00010212804001ull, 0x00000001028000ull, 0x00000000000841ull,
+			0x000e0104080150ull, 0x00000023208400ull, 0x00000040110104ull, 0x00000000000003ull,
+			0x00470001100102ull, 0x000000408c0083ull, 0x00000000000002ull, 0x00000000000308ull
+		},
+		0x9546,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & (previous_masks >> 6) & (previous_masks >> 10)) << 14;
+		}
+	});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
