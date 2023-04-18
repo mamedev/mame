@@ -166,14 +166,13 @@ void h89_state::h89_mem(address_map &map)
 
 	// View 0 - ROM / Floppy RAM R/O
 	// View 1 - ROM / Floppy RAM R/W
-	
 	// monitor ROM
 	m_mem_view[0](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
 	m_mem_view[1](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
 
 	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
+	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
 
 }
 
@@ -306,7 +305,6 @@ void h89_state::machine_start()
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
-
 	//
 	u8 *m_floppy_ram_ptr = m_floppy_ram->pointer();
 
@@ -329,8 +327,8 @@ void h89_state::machine_start()
 		m_mem_view[1].install_ram(0x2000, 0xffff, m_ram_ptr);
 		m_mem_view[2].install_ram(0x2000, 0xffff, m_ram_ptr);
 
-		// install shadow writing to RAM when in ROM mode
-		m_mem_view[0].install_write_handler(0x0000, 0x1fff, write8sm_delegate(*this, FUNC(h89_state::shadow_ram_w)));
+		// TODO: install shadow writing to RAM when in ROM mode
+		//m_mem_view[0].install_write_handler(0x0000, 0x1fff, write8sm_delegate(*this, FUNC(h89_state::shadow_ram_w)));
 
 		// Only the CP/M - Org 0 view will have it at the lower 8k
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
