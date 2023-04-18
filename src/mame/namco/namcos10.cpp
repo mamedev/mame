@@ -690,7 +690,7 @@ protected:
 	optional_device<ns10_decrypter_device> m_decrypter;
 
 	unscramble_func m_unscrambler;
-	timer_expired_delegate m_psx_remapper;
+	std::function<void()> m_psx_remapper;
 
 private:
 	enum : int8_t {
@@ -728,6 +728,9 @@ private:
 	required_ioport m_io_system;
 
 	optional_device<namcos10_exio_base_device> m_exio;
+
+	util::notifier_subscription m_notif_psx_space;
+	bool m_remapping_psx_io;
 
 	// EXIO
 	optional_ioport_array<8> m_exio_analog;
@@ -933,14 +936,19 @@ private:
 
 void namcos10_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_tap(
-		0x1f801010, 0x1f801013,
-		"rom_configure_tap_w",
-		[this] (offs_t offset, u32 &data, u32 mem_mask) {
-			// reinstall memory map after rom_config_w finishes with update_rom_config
-			machine().scheduler().synchronize(m_psx_remapper);
-		}
-	);
+	if (m_psx_remapper) {
+		m_notif_psx_space = m_maincpu->space(AS_PROGRAM).add_change_notifier(
+			[this] (read_or_write mode)
+			{
+				if (!m_remapping_psx_io)
+				{
+					m_remapping_psx_io = true;
+					m_psx_remapper();
+					m_remapping_psx_io = false;
+				}
+			}
+		);
+	}
 
 	save_item(NAME(m_i2c_dev_clock));
 	save_item(NAME(m_i2c_dev_data));
@@ -959,6 +967,8 @@ void namcos10_state::machine_start()
 
 void namcos10_state::machine_reset()
 {
+	m_remapping_psx_io = false;
+
 	m_i2c_dev_clock = m_i2c_dev_data = 1;
 	m_i2c_host_clock = m_i2c_host_data = 1;
 	m_i2c_prev_clock = m_i2c_prev_data = 1;
@@ -971,9 +981,6 @@ void namcos10_state::machine_reset()
 
 	std::fill(std::begin(m_mgexio_outputs), std::end(m_mgexio_outputs), 0);
 	std::fill(std::begin(m_mgexio_coin_start_time), std::end(m_mgexio_coin_start_time), attotime::never);
-
-	// update_rom_config is called on device_reset
-	machine().scheduler().synchronize(m_psx_remapper);
 }
 
 void namcos10_state::device_resolve_objects()
@@ -1178,9 +1185,9 @@ void namcos10_state::namcos10_exio(machine_config &config)
 		return m_exio_analog[offset].read_safe(0);
 	});
 
-	m_psx_remapper = timer_expired_delegate([this] (s32) {
+	m_psx_remapper = [this] () {
 		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_exio);
-	}, "psx_remapper");
+	};
 }
 
 void namcos10_state::namcos10_map_exio_inner(address_map &map)
@@ -1276,9 +1283,9 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 		m_mgexio_outputs[7] = !BIT(data, 7); // divider sol (r)
 	});
 
-	m_psx_remapper = timer_expired_delegate([this] (s32) {
+	m_psx_remapper = [this] () {
 		m_maincpu->space(AS_PROGRAM).install_device(0x00000000, 0xffffffff, *this, &namcos10_state::namcos10_map_mgexio);
-	}, "psx_remapper");
+	};
 }
 
 void namcos10_state::namcos10_map_mgexio_inner(address_map &map)
