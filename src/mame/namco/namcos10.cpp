@@ -2337,7 +2337,24 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000042c82001,0x00000000000200,0x0000000910405c,0x00000000000c00,
+			0x0000000f401100,0x0000000910002a,0x006280110a0440,0x00000040680044,
+			0x000000b408b000,0x00000000108860,0x00000009100008,0x00a024b0000000,
+			0x0000000a401a40,0x00000000001400,0x00000000100162,0x00000020402081
+		}, {
+			0x00000082102019,0x00000000000400,0x00000005104050,0x00000000000c00,
+			0x00000002001d00,0x0000000510001a,0x00129910a10443,0x00000040040044,
+			0x00000034088000,0x00000000259060,0x00000005100188,0x00204480000000,
+			0x0000000a801a80,0x00000000001400,0x00000000250262,0x00000020404081
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & (previous_masks >> 2) & (previous_masks>>14)) << 1;
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_taiko5(machine_config &config)
@@ -3378,7 +3395,7 @@ GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_sta
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10,     namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10,     namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10,     namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10,     namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10,     namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10,     namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
