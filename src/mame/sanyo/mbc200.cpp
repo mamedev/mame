@@ -52,7 +52,6 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
-#include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
@@ -76,7 +75,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
-		, m_beep(*this, "beeper")
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0)
@@ -111,7 +109,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
-	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
@@ -135,6 +132,7 @@ void mbc200_state::pm_porta_w(u8 data)
 	m_comm_latch = data; // to slave CPU
 }
 
+/* Writing to PPI port B ($E9).  Being programmed for output, read operations will get the current value. */
 void mbc200_state::pm_portb_w(u8 data)
 {
 	// The BIOS supports up tp 4 drives, (2 internal + 2 external)
@@ -151,7 +149,8 @@ void mbc200_state::pm_portb_w(u8 data)
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 7));
 	}
-	m_beep->set_state(BIT(data, 1)); // key-click
+
+	m_speaker->level_w(BIT(data, 1)); // key-click
 }
 
 void mbc200_state::main_io(address_map &map)
@@ -335,7 +334,6 @@ void mbc200_state::mbc200(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
