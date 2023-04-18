@@ -60,7 +60,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_maincpu_region(*this, "maincpu")
-		, m_rom_view(*this, "rom_bank")
+		, m_mem_view(*this, "rom_bank")
 		, m_ram(*this, RAM_TAG)
 		, m_floppy_ram(*this, "floppyram")
 		, m_tlb(*this, "tlb")
@@ -80,7 +80,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_maincpu_region;
-	memory_view m_rom_view;
+	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
 	required_device<ram_device> m_floppy_ram;
 	required_device<heath_tlb_device> m_tlb;
@@ -105,6 +105,8 @@ private:
 	static constexpr uint8_t GPP_DISABLE_ROM_BIT = 5;
 	static constexpr uint8_t GPP_H17_SIDE_SELECT_BIT = 6;
 
+	void update_mem_view();
+
 	void update_gpp(uint8_t gpp);
 	void port_f2_w(uint8_t data);
 
@@ -117,10 +119,7 @@ private:
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
 
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-	uint8_t floppy_ram_r(offs_t offset);
-	void floppy_ram_w(offs_t offset, uint8_t data);
+	void shadow_ram_w(offs_t offset, uint8_t data);
 };
 
 /*
@@ -162,15 +161,20 @@ private:
 void h89_state::h89_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0xffff).rw(FUNC(h89_state::ram_r), FUNC(h89_state::ram_w));
 
-	map(0x0000, 0x1fff).view(m_rom_view);
+	map(0x0000, 0xffff).view(m_mem_view);
+
+	// View 0 - ROM / Floppy RAM R/O
+	// View 1 - ROM / Floppy RAM R/W
+	
 	// monitor ROM
-	m_rom_view[0](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
-	// Floppy RAM
-	m_rom_view[0](0x1400, 0x17ff).rw(FUNC(h89_state::floppy_ram_r), FUNC(h89_state::floppy_ram_w));
+	m_mem_view[0](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[1](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
+
 	// Floppy ROM
-	m_rom_view[0](0x1800, 0x1fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[1](0x1800, 0x1fff).rom().region("maincpu", 0).unmapw();
+
 }
 
 /*                                 PORT
@@ -272,14 +276,14 @@ static INPUT_PORTS_START( h89 )
 	// Settings with the MTR-90 ROM (#444-84 or 444-142)
 	PORT_START("SW501")
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )  PORT_DIPLOCATION("S1:1,2")
-	PORT_DIPSETTING( 0x00, "H-88-1" )
-	PORT_DIPSETTING( 0x01, "H/Z-47" )
-	PORT_DIPSETTING( 0x02, "Z-67" )
+	PORT_DIPSETTING( 0x00, "H-88-1 (Not yet implemented)" )
+	PORT_DIPSETTING( 0x01, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING( 0x02, "Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x03, "Undefined" )
 	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )  PORT_DIPLOCATION("S1:3,4")
-	PORT_DIPSETTING( 0x00, "H-89-37" )
-	PORT_DIPSETTING( 0x04, "H/Z-47" )
-	PORT_DIPSETTING( 0x08, "Z-67" )
+	PORT_DIPSETTING( 0x00, "H-89-37 (Not yet implemented)" )
+	PORT_DIPSETTING( 0x04, "H/Z-47 (Not yet implemented)" )
+	PORT_DIPSETTING( 0x08, "Z-67 (Not yet implemented)" )
 	PORT_DIPSETTING( 0x0c, "Undefined" )
 	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )  PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING( 0x00, "Disk I/O #2" )
@@ -303,6 +307,54 @@ void h89_state::machine_start()
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
 
+	//
+	u8 *m_floppy_ram_ptr = m_floppy_ram->pointer();
+
+	// Floppy RAM - Read/Only, note, it's not rom, but behaves like it in this
+	// view.
+	m_mem_view[0].install_rom(0x1400, 0x17ff, m_floppy_ram_ptr);
+
+	// Floppy RAM - Read/write
+	m_mem_view[1].install_ram(0x1400, 0x17ff, m_floppy_ram_ptr);
+
+	// update RAM mappings based on RAM size
+	u8 *m_ram_ptr = m_ram->pointer();
+	u32 ram_size = m_ram->size();
+
+	if (ram_size == 0x10000)
+	{
+		// system has a full 64k
+		// All views will have RAM from 8k -> 64k.
+		m_mem_view[0].install_ram(0x2000, 0xffff, m_ram_ptr);
+		m_mem_view[1].install_ram(0x2000, 0xffff, m_ram_ptr);
+		m_mem_view[2].install_ram(0x2000, 0xffff, m_ram_ptr);
+
+		// install shadow writing to RAM when in ROM mode
+		m_mem_view[0].install_write_handler(0x0000, 0x1fff, write8sm_delegate(*this, FUNC(h89_state::shadow_ram_w)));
+
+		// Only the CP/M - Org 0 view will have it at the lower 8k
+		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
+	}
+	else
+	{
+		// less than 64k
+		u32 ram_end = ram_size + 0x1fff;
+
+		// Less than 64k, so all memory will be used above the
+		// 8k point when ROM is active.
+		m_mem_view[0].install_ram(0x2000, ram_end, m_ram_ptr);
+		m_mem_view[0].unmap_readwrite(ram_end + 1, 0xffff);
+		m_mem_view[1].install_ram(0x2000, ram_end, m_ram_ptr);
+		m_mem_view[1].unmap_readwrite(ram_end + 1, 0xffff);
+
+		// when ROM is not active, memory still starts at 8k
+		m_mem_view[2].install_ram(0x2000, ram_size - 1, m_ram_ptr);
+		// unmap everything above the amount of RAM in the SYSTEM
+		m_mem_view[2].unmap_readwrite(ram_size, 0xffff);
+		// remap the top 8k down to addr 0
+		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
+	}
+
 	update_gpp(0);
 }
 
@@ -312,78 +364,6 @@ void h89_state::machine_reset()
 	update_gpp(0);
 }
 
-uint8_t h89_state::ram_r(offs_t offset)
-{
-	uint8_t data = 0x00;
-
-	if (m_rom_enabled)
-  {
-		offs_t max_offset = m_ram->size() + 0x2000;
-
-		if (offset < max_offset)
-		{
-			data = m_ram->pointer()[offset - 0x2000];
-		}
-	}
-	else
-	{
-		offs_t max_ram = m_ram->size();
-
-		if (offset < 0x2000)
-		{
-			data = m_ram->pointer()[max_ram - 0x2000 + offset];
-		}
-
-		// check before subtracting the offset
-		if (offset < max_ram)
-		{
-			data = m_ram->pointer()[offset - 0x2000];
-		}
-	}
-
-	return data;
-}
-
-void h89_state::ram_w(offs_t offset, uint8_t data)
-{
-	if (m_rom_enabled)
-	{
-		offs_t max_offset = m_ram->size() + 0x2000;
-
-		if (offset < max_offset)
-		{
-			m_ram->pointer()[offset - 0x2000] = data;
-		}
-	}
-	else
-	{
-		offs_t max_ram = m_ram->size();
-
-		if (offset < 0x2000)
-		{
-			m_ram->pointer()[max_ram - 0x2000 + offset] = data;
-		}
-
-		// check before subtracting the offset
-		if (offset < max_ram)
-		{
-			m_ram->pointer()[offset - 0x2000] = data;
-		}
-	}
-}
-
-uint8_t h89_state::floppy_ram_r(offs_t offset)
-{
-	return m_floppy_ram->pointer()[offset];
-}
-
-void h89_state::floppy_ram_w(offs_t offset, uint8_t data)
-{
-	if (!m_floppy_ram_wp)
-	{
-		m_floppy_ram->pointer()[offset] = data;
-	}
-}
 
 uint8_t h89_state::raise_NMI_r()
 {
@@ -405,19 +385,33 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 	}
 }
 
+void h89_state::shadow_ram_w(offs_t offset, uint8_t data)
+{
+	offs_t max_ram = m_ram->size();
+
+	m_ram->pointer()[max_ram - 0x2000 + offset] = data;
+}
+
+void h89_state::update_mem_view()
+{
+	if (m_rom_enabled)
+	{
+		m_mem_view.select(m_floppy_ram_wp ? 0 : 1);
+	}
+	else
+	{
+		m_mem_view.select(2);
+	}
+}
+
 void h89_state::update_gpp(uint8_t gpp)
 {
 	m_gpp = gpp;
 
 	m_rom_enabled = BIT(m_gpp, GPP_DISABLE_ROM_BIT) == 0;
-	if (m_rom_enabled)
-	{
-		m_rom_view.select(0);
-	}
-	else
-	{
-		m_rom_view.disable();
-	}
+
+	update_mem_view();
+
 	m_timer_intr_enabled = BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT) == 1;
 }
 
