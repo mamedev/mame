@@ -31262,6 +31262,9 @@ version4v                       // (c) 2006 Amcoe
 version4v2                      // (c) 2006 Amcoe
 version4v3                      // (c) 2006 Amcoe
 
+@source:misc/shambros.cpp
+shambros
+
 @source:misc/shangkid.cpp
 chinhero                        // (c) 1984 Taiyo
 chinhero2                       // (c) 1984 Taiyo
@@ -35752,6 +35755,7 @@ tmnt_101                        //
 tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
+tmnt_a07                        //
 tomy_102                        //
 tomy_102be                      //
 tomy_300h                       //
@@ -37601,6 +37605,7 @@ mjgtaste                        // (c) 2002
 s1945ii                         // (c) 1997
 s1945iii                        // (c) 1999
 s1945iiibl                      // bootleg
+s1945iiibla                     // bootleg
 sbomber                         // (c) 1998
 sbombera                        // (c) 1998
 soldivid                        // (c) 1997
@@ -38031,6 +38036,9 @@ st1714                          //
 @source:sega/angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
 spcpostn                        // (c) 1986 Sega / Nasco
+
+@source:sega/anyworks.cpp
+unkanyw
 
 @source:sega/bingoc.cpp
 bingoc                          // (c) 1989 Sega
