@@ -90,7 +90,7 @@ panikuru  -> #2
 ptblank3  -> #11
 startrgn  -> #4
 
-Overall, the values used as linear masks, those from the initSbox and
+Overall, the values used as linear masks, those from the INIT_SBOX and
 the values and bit order used at initialization time are not expected to
 be exactly the ones used by the hardware; given the many degrees of freedom
 caused by the nature of the scheme, the whole set of values should
@@ -118,6 +118,9 @@ really exist.
 #include "emu.h"
 #include "ns10crypt.h"
 
+#include <utility>
+
+
 DEFINE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device, "mrdrilr2_decrypter", "Mr Driller 2 decrypter")
 
 DEFINE_DEVICE_TYPE(NS10_TYPE2_DECRYPTER, ns10_type2_decrypter_device, "ns10_type2_decrypter", "Namco System 10 Type 2 decrypter")
@@ -126,8 +129,8 @@ DEFINE_DEVICE_TYPE(NS10_TYPE2_DECRYPTER, ns10_type2_decrypter_device, "ns10_type
 
 ns10_decrypter_device::ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_active(false)
 {
-	m_active = false;
 }
 
 void ns10_decrypter_device::activate(int iv)
@@ -141,11 +144,6 @@ void ns10_decrypter_device::deactivate()
 	m_active = false;
 }
 
-bool ns10_decrypter_device::is_active() const
-{
-	return m_active;
-}
-
 ns10_decrypter_device::~ns10_decrypter_device()
 {
 }
@@ -155,16 +153,18 @@ ns10_decrypter_device::~ns10_decrypter_device()
 constexpr int UNKNOWN{16};
 constexpr int U{UNKNOWN};
 // this could perfectly be part of the per-game logic but, with only one known type-1 game, we cannot say anything definitive
-const int ns10_type1_decrypter_device::initSbox[16]{U, U, U, 0, 4, 9, U, U, U, 8, U, 1, U, 9, U, 5};
+const int ns10_type1_decrypter_device::INIT_SBOX[16]{U, U, U, 0, 4, 9, U, U, U, 8, U, 1, U, 9, U, 5};
 
 ns10_type1_decrypter_device::ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, type, tag, owner, clock)
+	, m_mask(0)
+	, m_counter(0)
 {
 }
 
 uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 {
-	uint16_t plainword = m_mask ^ bitswap(cipherword, 9, 13, 15, 7, 14, 8, 6, 10, 11, 12, 3, 5, 0, 1, 4, 2);
+	uint16_t plainword = m_mask ^ bitswap<16>(cipherword, 9, 13, 15, 7, 14, 8, 6, 10, 11, 12, 3, 5, 0, 1, 4, 2);
 
 	uint16_t nbs =
 		((BIT(m_counter, 4)) << 15) ^
@@ -181,7 +181,7 @@ uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 		(((BIT(cipherword, 7) & BIT(m_counter, 7))) << 2) ^
 		((BIT(m_counter, 5)) << 1) ^
 		(((BIT(cipherword, 7) | BIT(m_counter, 1))) << 0);
-	m_mask = nbs ^ bitswap(cipherword, 6, 11, 3, 1, 13, 5, 15, 10, 2, 9, 8, 4, 0, 12, 7, 14) ^ bitswap(plainword, 9, 7, 5, 2, 14, 4, 13, 8, 0, 15, 10, 1, 3, 6, 12, 11) ^ 0xecbe;
+	m_mask = nbs ^ bitswap<16>(cipherword, 6, 11, 3, 1, 13, 5, 15, 10, 2, 9, 8, 4, 0, 12, 7, 14) ^ bitswap<16>(plainword, 9, 7, 5, 2, 14, 4, 13, 8, 0, 15, 10, 1, 3, 6, 12, 11) ^ 0xecbe;
 	++m_counter;
 
 	return plainword;
@@ -189,7 +189,7 @@ uint16_t ns10_type1_decrypter_device::decrypt(uint16_t cipherword)
 
 void ns10_type1_decrypter_device::init(int iv)
 {
-	m_mask = initSbox[iv];
+	m_mask = INIT_SBOX[iv];
 	m_counter = 0;
 }
 
@@ -206,22 +206,26 @@ mrdrilr2_decrypter_device::mrdrilr2_decrypter_device(const machine_config &mconf
 // type-2 decrypter
 
 // this could perfectly be part of the per-game logic; by now, only gamshara seems to use it, so we keep it global
-const int ns10_type2_decrypter_device::initSbox[16]{0, 12, 13, 6, 2, 4, 9, 8, 11, 1, 7, 15, 10, 5, 14, 3};
+const int ns10_type2_decrypter_device::INIT_SBOX[16]{0, 12, 13, 6, 2, 4, 9, 8, 11, 1, 7, 15, 10, 5, 14, 3};
 
 ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER, tag, owner, clock)
+	, m_mask(0)
+	, m_previous_cipherwords(0)
+	, m_previous_plainwords(0)
 {
 }
 
-ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const ns10_type2_decrypter_device::ns10_crypto_logic logic)
-	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER, tag, owner, clock), m_logic(logic)
+ns10_type2_decrypter_device::ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ns10_crypto_logic &&logic)
+	: ns10_decrypter_device(mconfig, NS10_TYPE2_DECRYPTER, tag, owner, clock)
+	, m_logic(std::move(logic))
 {
 	m_logic_initialized = true;
 }
 
 uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 {
-	uint16_t plainword = cipherword ^ m_mask;
+	uint16_t const plainword = cipherword ^ m_mask;
 
 	m_previous_cipherwords <<= 16;
 	m_previous_cipherwords ^= cipherword;
@@ -232,11 +236,11 @@ uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 	for (int j = 15; j >= 0; --j)
 	{
 		m_mask <<= 1;
-		m_mask ^= m_reducer->gf2_reduce(m_logic.eMask[j] & m_previous_cipherwords);
-		m_mask ^= m_reducer->gf2_reduce(m_logic.dMask[j] & m_previous_plainwords);
+		m_mask ^= gf2_reduce(m_logic.eMask[j] & m_previous_cipherwords);
+		m_mask ^= gf2_reduce(m_logic.dMask[j] & m_previous_plainwords);
 	}
 	m_mask ^= m_logic.xMask;
-	m_mask ^= m_logic.nonlinear_calculation(m_previous_cipherwords, m_previous_plainwords, *m_reducer);
+	m_mask ^= m_logic.nonlinear_calculation(m_previous_cipherwords, m_previous_plainwords);
 
 	return plainword;
 }
@@ -245,7 +249,7 @@ void ns10_type2_decrypter_device::init(int iv)
 {
 	// by now, only gamshara requires non-trivial initialization code; data
 	// should be moved to the per-game logic in case any other game do it differently
-	m_previous_cipherwords = bitswap(initSbox[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
+	m_previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
 	m_previous_plainwords = 0;
 	m_mask = 0;
 }
@@ -256,30 +260,24 @@ void ns10_type2_decrypter_device::device_start()
 	assert(m_logic_initialized == true);
 
 	m_active = false;
-	m_reducer = std::make_unique<gf2_reducer>();
 }
 
-ns10_type2_decrypter_device::gf2_reducer::gf2_reducer()
+
+// create a lookup table of GF2 reductions of 16-bits words
+
+static constexpr int make_gf2_reduction(uint32_t i)
 {
-	int reduction;
-
-	// create a look-up table of GF2 reductions of 16-bits words
-	for (int i = 0; i < 0x10000; ++i)
-	{
-		reduction = i;
-		reduction ^= reduction >> 8;
-		reduction ^= reduction >> 4;
-		reduction ^= reduction >> 2;
-		reduction ^= reduction >> 1;
-
-		m_gf2Reduction[i] = reduction & 1;
-	}
+	i ^= i >> 8;
+	i ^= i >> 4;
+	i ^= i >> 2;
+	i ^= i >> 1;
+	return int(i & 1);
 }
 
-int ns10_type2_decrypter_device::gf2_reducer::gf2_reduce(uint64_t num) const
+template <uint32_t... Values>
+static constexpr auto make_gf2_reduction(std::integer_sequence<uint32_t, Values...>)
 {
-	return m_gf2Reduction[num & 0xffff] ^
-		   m_gf2Reduction[(num >> 16) & 0xffff] ^
-		   m_gf2Reduction[(num >> 32) & 0xffff] ^
-		   m_gf2Reduction[num >> 48];
+	return std::array<int, sizeof...(Values)>({ make_gf2_reduction(Values)... });
 }
+
+const std::array<int, 0x1'0000> ns10_type2_decrypter_device::GF2_REDUCTION = make_gf2_reduction(std::make_integer_sequence<uint32_t, 0x1'0000>());

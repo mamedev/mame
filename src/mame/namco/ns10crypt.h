@@ -4,23 +4,29 @@
 #ifndef MAME_NAMCO_NS10CRYPT_H
 #define MAME_NAMCO_NS10CRYPT_H
 
+#pragma once
+
+#include <array>
 #include <cstdint>
+
 
 class ns10_decrypter_device : public device_t
 {
 public:
+	virtual ~ns10_decrypter_device();
+
 	void activate(int iv);
 	void deactivate();
-	bool is_active() const;
+	bool is_active() const { return m_active; }
 
 	virtual uint16_t decrypt(uint16_t cipherword) = 0;
-	virtual ~ns10_decrypter_device();
 
 protected:
 	ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void init(int iv) = 0;
 	virtual void device_start() override = 0;
+
+	virtual void init(int iv) = 0;
 
 	bool m_active;
 };
@@ -30,59 +36,62 @@ class ns10_type1_decrypter_device : public ns10_decrypter_device
 public:
 	// with just only type-1 game known, we cannot say which parts of the crypto_logic is common, if any,
 	// and which is game-specific. In practice, this class is just an alias for the decrypter device of mrdrilr2
-	uint16_t decrypt(uint16_t cipherword) override;
+	virtual uint16_t decrypt(uint16_t cipherword) override;
 
 protected:
 	ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-private:
-	uint16_t m_mask = 0;
-	uint8_t m_counter = 0;
-	static const int initSbox[16];
+	virtual void device_start() override;
 
-	void init(int iv) override;
-	void device_start() override;
+private:
+	static const int INIT_SBOX[16];
+
+	virtual void init(int iv) override;
+
+	uint16_t m_mask;
+	uint8_t m_counter;
 };
 
 class ns10_type2_decrypter_device : public ns10_decrypter_device
 {
 public:
-	class gf2_reducer // helper class
-	{
-	public:
-		gf2_reducer();
-		int gf2_reduce(uint64_t num) const;
-
-	private:
-		int m_gf2Reduction[0x10000]{};
-	};
-
-	// this encodes the decryption logic, which varies per game
-	// and is probably hard-coded into the CPLD
+	// this encodes the decryption logic, which varies per game and is probably hard-coded into the CPLD
 	struct ns10_crypto_logic
 	{
+		using nonlinear_calculation_function = uint16_t (*)(uint64_t, uint64_t);
 		uint64_t eMask[16]{};
 		uint64_t dMask[16]{};
 		uint16_t xMask = 0;
-		std::function<uint16_t(uint64_t, uint64_t, const gf2_reducer &)> nonlinear_calculation; // preliminary encoding; need research
+		nonlinear_calculation_function nonlinear_calculation = nullptr; // preliminary encoding; need research
 	};
 
 	ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const ns10_crypto_logic logic);
+	ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, ns10_crypto_logic &&logic);
 
-	uint16_t decrypt(uint16_t cipherword) override;
+	virtual uint16_t decrypt(uint16_t cipherword) override;
+
+	static int gf2_reduce(uint64_t num)
+	{
+		return
+				GF2_REDUCTION[num & 0xffff] ^
+				GF2_REDUCTION[(num >> 16) & 0xffff] ^
+				GF2_REDUCTION[(num >> 32) & 0xffff] ^
+				GF2_REDUCTION[num >> 48];
+	}
+
+protected:
+	virtual void device_start() override;
 
 private:
-	uint16_t m_mask = 0;
-	uint64_t m_previous_cipherwords = 0;
-	uint64_t m_previous_plainwords = 0;
+	static const int INIT_SBOX[16];
+	static const std::array<int, 0x1'0000> GF2_REDUCTION;
+
+	virtual void init(int iv) override;
+
+	uint16_t m_mask;
+	uint64_t m_previous_cipherwords;
+	uint64_t m_previous_plainwords;
 	const ns10_crypto_logic m_logic;
-	static const int initSbox[16];
-
-	void init(int iv) override;
-	void device_start() override;
-
-	std::unique_ptr<const gf2_reducer> m_reducer;
 
 	bool m_logic_initialized;
 };

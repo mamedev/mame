@@ -26,7 +26,7 @@ Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)    (C) Namco, 2005
 GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
 GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
 Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
-Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A) (C) Namco, 2007
+Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
 Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
 Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
@@ -83,7 +83,7 @@ MAIN PCB - This is the mother board PCB. It holds the main CPU/GPU & SPU and all
            phased out. Instead, they have been replaced by (custom programmed) CPLDs, probably due to cost-cutting
            measures within the company, or to reduce the cost of System10 to an entry-level no-frills development platform.
 MEM PCB  - There are four known types of this PCB (so far).
-           The first type uses SSOP56 flash and TSOP48 mask ROMs.
+           The first type uses SSOP56 Flash and TSOP48 mask ROMs.
            The second type uses TSOP48 NAND ROMs and also has a RAM chip on it.
            The third type uses TSOP48 NAND ROMs and has some extra hardware to decode MP3 data which comes from the ROMs or an external CDROM.
            The fourth type is manufactured by Taito and is completely different but appears to use NAND ROMs. Taito uses their PCB numbering system.
@@ -96,7 +96,7 @@ MEM PCB  - There are four known types of this PCB (so far).
            dot. A similar red dot has also been seen on Namco System 246 security carts and means nothing. Speculation about a red dot on a sticker
            is pointless and has no impact on the dumps or the emulation.
            Any System 10 MEM PCB can be swapped to run on any System 10 Main PCB regardless of the main board revision.
-           The high scores are stored on the MEM PCB (inside the main program flashROM or block 1 of the first NAND chip).
+           The high scores are stored on the MEM PCB (inside the main program Flash ROM or block 1 of the first NAND chip).
            There are no "alt" versions with the same code, this simply means the game was dumped without first resetting the
            high score records and coinage/play statistics info to factory defaults.
            Also, on all System 10 games, there is a sticker with a serial number on it and the program ROMs also contain
@@ -193,15 +193,15 @@ Additional Notes:
                    interlace mode are visually much smoother with noticeable screen flickering. Non-interlace modes gives
                    a much blockier graphic display (i.e. lower resolution) but without screen flickering.
                 2. There is no dedicated highscore/options EEPROM present on the PCB. The game stores the settings on the
-                   MEM PCB in the program flashROM or block 1 of the first NAND ROM.
+                   MEM PCB in the program Flash ROM or block 1 of the first NAND Flash.
 
 ROM Daughterboard PCBs
 ----------------------
 This PCB holds all the ROMs.
 There are four known types of ROM daughterboards used on System 10 games (so far).
 All of the PCBs are the same size (approx 5" x 5") containing one custom connector surface-mounted to the underside of
-the PCB, some mask/flash/NAND ROMs, a CPLD (the customary Namco 'KEYCUS' chip but doing de-scrambling/decryption too). On the
-2nd type a RAM chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROM-less Microcontroller.
+the PCB, some mask/Flash/NAND ROMs, a CPLD (the customary Namco 'KEYCUS' chip but doing de-scrambling/decryption too). On the
+2nd type a RAM chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROM-less microcontroller.
 The 4th type was manufactured by Taito.
 
 ********
@@ -278,8 +278,8 @@ System10 MEM(N) PCB 8906961402 (8906971402)
 |-------------------------------------|
 Notes:
       CY37256VP208 - Cypress CY37256VP208 Complex Programmable Logic Device (TQFP208)
-          CY7C1019 - Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static Ram (SOJ32)
-           1D - 8E - Samsung Electronics K9F2808U0B-YCBO 64Mbit or K9F5608U0D 128Mbit NAND flash ROM (TSOP48)
+          CY7C1019 - Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static RAM (SOJ32)
+           1D - 8E - Samsung Electronics K9F2808U0B-YCBO 64Mbit or K9F5608U0D 128Mbit NAND Flash ROM (TSOP48)
                 J1 - 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
@@ -429,8 +429,8 @@ SYSTEM10 MEM/IO PCB
 |-------------------------------------|
 Notes:
       CY37256VP208 - Cypress CY37256VP208 Complex Programmable Logic Device (TQFP208)
-          CY7C1019 - Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static Ram (SOJ32)
-          IC4-IC10 - Samsung Electronics K9F2808U0B-YCBO 64Mbit or Toshiba NAND flash ROM (TSOP48)
+          CY7C1019 - Cypress CY7C1019BV33-15VC or Samsung Electronics K6R1008V1C-JC15 128k x8 bit 3.3V High Speed CMOS Static RAM (SOJ32)
+          IC4-IC10 - Samsung Electronics K9F2808U0B-YCBO 64Mbit or Toshiba NAND Flash ROM (TSOP48)
            PAL20V8 - marked F06-02
                 J1 - 10-pin header for programming the CPLD via JTAG
                CN2 - 10-pin connector for controls
@@ -635,7 +635,7 @@ Known issues:
 - mrdrilr2, mrdrilr2j: Opening the operator menu sometimes can crash Mr. Driller 2
 - nflclsfb: Needs additional I/O for trackball
 - g13jnr: Needs MP3 decoder emulation
-- sugorotic, sekaikh(?): BGMs stop early and/or crash the game. Seems to be expecting an SPU-related IRQ?
+- sugorotc, sekaikh(?): BGMs stop early and/or crash the game. Seems to be expecting an SPU-related IRQ?
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -1887,6 +1887,9 @@ void namcos10_memn_state::ns10_ballpom(machine_config &config)
 	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
 }
 
+// nasty, but makes code more terse
+inline int gf2_reduce(uint64_t num) { return ns10_type2_decrypter_device::gf2_reduce(num); }
+
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 {
 	namcos10_memn_base(config);
@@ -1905,9 +1908,9 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 			0x000000006800d3f5ull, 0x0000000000000058ull, 0x000000006800d2d5ull, 0x0000000000001840ull,
 		},
 		0x5b22,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks >> 9) & (reducer.gf2_reduce(0x0000000010065810ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000021005810ull & previous_plainwords)) & 1) << 10;
+			return ((previous_masks >> 9) & (gf2_reduce(0x0000000010065810ull & previous_cipherwords) ^ gf2_reduce(0x0000000021005810ull & previous_plainwords)) & 1) << 10;
 		}
 	});
 }
@@ -1931,7 +1934,7 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 			0x000000003120c000ull, 0x0000000000002100ull, 0x0000000018e002a6ull, 0x00000000a19121a0ull,
 		},
 		0xaea7,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			return 0;
 		}
 	});
@@ -1956,7 +1959,7 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 			0x00000001800400ull,0x00000090000040ull,0x00000000009002ull,0x000403a5020004ull
 		},
 		0x925a,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			u64 previous_masks = previous_cipherwords^previous_plainwords;
 			return (1 & ((previous_masks >> 26) ^ (previous_masks >> 37)) & (previous_masks >> 46)) * 0x8860;
 		}
@@ -1981,7 +1984,7 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 			0x000000004400d1f1ull, 0x000000006001ce08ull, 0x00000000000000c8ull, 0x0000000054023002ull,
 		},
 		0x25ab,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
 		}
@@ -2016,7 +2019,7 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 			0x0000000000001101ull, 0x000000000000a002ull, 0x0000000029001740ull, 0x00000000a4309bfcull,
 		},
 		0x2e7f,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			return 0;
 		}
 	});
@@ -2059,9 +2062,9 @@ void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 			0x00000000012a04a2ull, 0x00000000003984a4ull, 0x0000000000000700ull, 0x0000000000000882ull,
 		},
 		0x01e2,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks >> 0x13) & (reducer.gf2_reduce(0x0000000014001290ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000000021290ull & previous_plainwords)) & 1) << 1;
+			return ((previous_masks >> 0x13) & (gf2_reduce(0x0000000014001290ull & previous_cipherwords) ^ gf2_reduce(0x0000000000021290ull & previous_plainwords)) & 1) << 1;
 		}
 	});
 }
@@ -2084,7 +2087,7 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 			0x000000009000200bull, 0x0000000000000310ull, 0x0000000000001840ull, 0x0000000000000400ull,
 		},
 		0x0748,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
 		}
@@ -2110,9 +2113,9 @@ void namcos10_memn_state::ns10_medalnt(machine_config &config)
 			0x0000004c000044ull,0x0000000000080aull,0x0000000a001214ull,0x00000000000190ull
 		},
 		0x5d04,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return (1 & (previous_masks>>26) & (reducer.gf2_reduce(previous_cipherwords & 0x10100080) ^ reducer.gf2_reduce(previous_plainwords & 0x40100080))) << 4;
+			return (1 & (previous_masks>>26) & (gf2_reduce(previous_cipherwords & 0x10100080) ^ gf2_reduce(previous_plainwords & 0x40100080))) << 4;
 		}
 	});
 }
@@ -2136,9 +2139,9 @@ void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 			0x00000000000024ull,0x0000000000a080ull,0x00000000000042ull,0x0000000020001eull
 		},
 		0x4c57,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return (((previous_masks>>15) & (reducer.gf2_reduce(previous_cipherwords & 0x24200000) ^ reducer.gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
+			return (((previous_masks>>15) & (gf2_reduce(previous_cipherwords & 0x24200000) ^ gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
 		}
 	});
 }
@@ -2170,9 +2173,9 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 			0x0000000000000404ull, 0x0000000000004201ull, 0x0000000000001100ull, 0x000000008c0057b2ull,
 		},
 		0xbe32,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks >> 1) & (reducer.gf2_reduce(0x0000000040de8fb3ull & previous_cipherwords) ^ reducer.gf2_reduce(0x0000000088008fb3ull & previous_plainwords)) & 1) << 2;
+			return ((previous_masks >> 1) & (gf2_reduce(0x0000000040de8fb3ull & previous_cipherwords) ^ gf2_reduce(0x0000000088008fb3ull & previous_plainwords)) & 1) << 2;
 		}
 	});
 }
@@ -2196,7 +2199,7 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 			0x00000000000a80ull, 0x00000000004408ull, 0x00000000000300ull, 0x00800000228002ull,
 		},
 		0x247c,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 2) & (previous_masks >> 6) & 1) << 1;
 		}
@@ -2247,7 +2250,7 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 			0x00000001410806ull, 0x000000042c8019ull, 0x00000000000880ull, 0x000000b0010920ull,
 		},
 		0x3aa8,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 0) & (previous_masks >> 3) & 1) << 10;
 		}
@@ -2272,7 +2275,7 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 			0x0000000000000428ull, 0x0000000000001001ull, 0x000012020b10ceabull, 0x0000000000000144ull,
 		},
 		0x8c46,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
 		}
@@ -2298,7 +2301,7 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 			0x00000040228110ull,0x0000000016c000ull,0x00000000003002ull,0x00223010010020ull
 		},
 		0x9006,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 25) & (previous_masks >> 22)) * 0xa00;
 		}
@@ -2479,7 +2482,7 @@ void namcos10_memp3_state::ns10_g13jnr(machine_config &config)
 			0x00470001100102ull, 0x000000408c0083ull, 0x00000000000002ull, 0x00000000000308ull
 		},
 		0x9546,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords, const ns10_type2_decrypter_device::gf2_reducer& reducer) {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 6) & (previous_masks >> 10)) << 14;
 		}
@@ -3112,7 +3115,7 @@ ROM_START( startrgn )
 	ROM_LOAD( "stt1a_1.bin", 0x0000000, 0x1080000, CRC(aa527694) SHA1(a25dcbeca58a1443070848b3487a24d51d41a34b) )
 ROM_END
 
-ROM_START( sugorotic )
+ROM_START( sugorotc )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
@@ -3269,43 +3272,43 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2, namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,   namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10, namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,   namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,  namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10, namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2, namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10, namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara, namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10, namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
-GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn, namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotic, 0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // uses MGEXIO
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako, namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb, namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
+GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  namcos10,     namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // title guessed based on known game list and PCB sticker
+GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // uses MGEXIO
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
-GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10, namcos10_memn_state, init_medalnt,   ROT0, "Namco", "Medal No Tatsujin Doki! Ooatari-Darake No Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2006, keroro,    0,        ns10_keroro,    namcos10, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
-GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10, namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state, init_medalnt,   ROT0, "Namco", "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2006, keroro,    0,        ns10_keroro,    namcos10,     namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10, namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10, namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10, namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10, namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10, namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10,     namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10,     namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10,     namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10,     namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10,     namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
-GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,   namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  namcos10, namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  namcos10,     namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
