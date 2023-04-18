@@ -118,8 +118,6 @@ private:
 
 	uint8_t raise_NMI_r();
 	void raise_NMI_w(uint8_t data);
-
-	void shadow_ram_w(offs_t offset, uint8_t data);
 };
 
 /*
@@ -305,10 +303,11 @@ void h89_state::machine_start()
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
-	//
+
+
 	u8 *m_floppy_ram_ptr = m_floppy_ram->pointer();
 
-	// Floppy RAM - Read/Only, note, it's not rom, but behaves like it in this
+	// Floppy RAM - Read/Only. note: it's not rom, but behaves like it in this
 	// view.
 	m_mem_view[0].install_rom(0x1400, 0x17ff, m_floppy_ram_ptr);
 
@@ -328,7 +327,6 @@ void h89_state::machine_start()
 		m_mem_view[2].install_ram(0x2000, 0xffff, m_ram_ptr);
 
 		// TODO: install shadow writing to RAM when in ROM mode
-		//m_mem_view[0].install_write_handler(0x0000, 0x1fff, write8sm_delegate(*this, FUNC(h89_state::shadow_ram_w)));
 
 		// Only the CP/M - Org 0 view will have it at the lower 8k
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + 0xe000);
@@ -336,10 +334,11 @@ void h89_state::machine_start()
 	else
 	{
 		// less than 64k
+
+		// for views with ROM visible, the top of memory is 8k higher than
+		// the memory size, since the base starts at 8k.
 		u32 ram_end = ram_size + 0x1fff;
 
-		// Less than 64k, so all memory will be used above the
-		// 8k point when ROM is active.
 		m_mem_view[0].install_ram(0x2000, ram_end, m_ram_ptr);
 		m_mem_view[0].unmap_readwrite(ram_end + 1, 0xffff);
 		m_mem_view[1].install_ram(0x2000, ram_end, m_ram_ptr);
@@ -381,13 +380,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 	{
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
 	}
-}
-
-void h89_state::shadow_ram_w(offs_t offset, uint8_t data)
-{
-	offs_t max_ram = m_ram->size();
-
-	m_ram->pointer()[max_ram - 0x2000 + offset] = data;
 }
 
 void h89_state::update_mem_view()
