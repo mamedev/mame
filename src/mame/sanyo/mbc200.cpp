@@ -101,6 +101,8 @@ private:
 	void sub_mem(address_map &map);
 	void sub_io(address_map &map);
 
+	u8 cpu_m_sound = 0U;
+	u8 cpu_s_sound = 0U;
 	u8 m_comm_latch = 0U;
 	u8 m_term_data = 0U;
 	required_device<mc6845_device> m_crtc;
@@ -122,7 +124,8 @@ void mbc200_state::main_mem(address_map &map)
 
 void mbc200_state::p1_portc_w(u8 data)
 {
-	m_speaker->level_w(BIT(data, 4)); // used by beep command in basic
+	cpu_s_sound=(BIT(data, 4)); // used by beep command in basic
+	m_speaker->level_w(cpu_m_sound + cpu_s_sound);
 }
 
 void mbc200_state::pm_porta_w(u8 data)
@@ -150,7 +153,8 @@ void mbc200_state::pm_portb_w(u8 data)
 		floppy->ss_w(BIT(data, 7));
 	}
 
-	m_speaker->level_w(BIT(data, 1)); // key-click
+	cpu_m_sound=(BIT(data, 1)); // key-click
+	m_speaker->level_w(cpu_m_sound + cpu_s_sound);
 }
 
 void mbc200_state::main_io(address_map &map)
@@ -334,8 +338,10 @@ void mbc200_state::mbc200(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
+	static const double speaker_levels[4] = { 0.0, 0.6, 1.0 };
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->set_levels(3, speaker_levels);
+	
 	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
 	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
 
