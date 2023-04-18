@@ -63,7 +63,7 @@ Taiko no Tatsujin 3 (TK31 Ver.A & *CDROM)                        (C) Namco, 2002
 Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
 Taiko no Tatsujin 5 (TK51 Ver.A & *CDROM)                        (C) Namco, 2003
 Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A & *CDROM)         (C) Namco/Metro, 2002
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
 
 * - denotes not dumped yet. If a game code is listed a PCB has been seen.
@@ -395,13 +395,13 @@ Notes:
 This PCB is used on:
 
                                    MEM PCB
-Game                               Sticker      KEYCUS   ROMs Populated            CD           Notes
----------------------------------------------------------------------------------------------------------------------
-Golgo 13 Juusei no Requiem         GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5          N/A          Cabinet-mounted X,Y gun. I/O board = none. Test mode shows ANALOG X & ANALOG Y and is using 2x 5k-ohm pots for the gun on-screen positioning.
-Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   0 to 13 (14 total)        N/A          I/O board = none
-Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   0, 1, 2, 3, 4, 5, 6, 7    not dumped   Game uses several JAMMA PL1 & PL2 buttons for controls. Main board came with EXIO(G) I/O board but the game works without it
-                                                                                                so possible the main board was for a light gun game and an operator swapped the ROM board for this game. Meaning this game doesn't
-                                                                                                use an I/O board which makes sense as there are no special controls. Game works without CD but music doesn't play.
+Game                               Sticker      KEYCUS   ROMs Populated           Notes
+-------------------------------------------------------------------------------------------------------
+Golgo 13 Juusei no Requiem         GLT1 Ver.A   KC009A   0, 1, 2, 3, 4, 5         Cabinet-mounted X,Y gun. I/O board = none. Test mode shows ANALOG X & ANALOG Y and is using 2x 5k-ohm pots for the gun on-screen positioning.
+Seishun Quiz Colorful High School  CHS1 Ver.A   KC025A   0 to 13 (14 total)       I/O board = none
+Tsukkomi Yousei Gips Nice Tsukkomi NTK1 Ver.A   KC018A   0, 1, 2, 3, 4, 5, 6, 7   Game uses several JAMMA PL1 & PL2 buttons for controls. Main board came with EXIO(G) I/O board but the game works without it
+                                                                                  so possible the main board was for a light gun game and an operator swapped the ROM board for this game. Meaning this game doesn't
+                                                                                  use an I/O board which makes sense as there are no special controls.
 Type 4
 TAITO CORPORATION
 SYSTEM10 MEM/IO PCB
@@ -3279,9 +3279,6 @@ ROM_START( nicetsuk )
 
 	ROM_REGION32_LE( 0x1080000, "nand7", 0 )
 	ROM_LOAD( "ntk1vera_7.1e", 0x0000000, 0x1080000, CRC(5c8981e4) SHA1(5315b8a5426199c3bb08d427491d644b435bddc1) )
-
-	DISK_REGION("cd")
-	DISK_IMAGE_READONLY( "ntk1-cd", 0, NO_DUMP )
 ROM_END
 
 ROM_START( squizchs )
