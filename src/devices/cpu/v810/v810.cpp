@@ -632,13 +632,14 @@ uint32_t v810_device::opJAL(uint32_t op)
 	return 3;
 }
 
-
+// TODO: specific to NVC
 uint32_t v810_device::opEI(uint32_t op)
 {
 	SET_ID(0);
 	return 1;
 }
 
+// TODO: specific to NVC
 uint32_t v810_device::opDI(uint32_t op)
 {
 	SET_ID(1);
@@ -1059,6 +1060,33 @@ uint32_t v810_device::opCVTW(uint32_t op)
 	return 18;
 }
 
+uint32_t v810_device::opXB(uint32_t op)
+{
+	int val=GETREG(GET2);
+	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((val==0.0f)?1:0);
+	//SET_S((val<0.0f)?1:0);
+	SETREG(GET2,val);
+	// TODO: unknown
+	return 1;
+}
+
+
+uint32_t v810_device::opXH(uint32_t op)
+{
+	int val=GETREG(GET2);
+	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((val==0.0f)?1:0);
+	//SET_S((val<0.0f)?1:0);
+	SETREG(GET2,val);
+	// TODO: unknown
+	return 1;
+}
+
 uint32_t v810_device::opMPYHW(uint32_t op)
 {
 	s16 val1 = (s16)GETREG(GET1);
@@ -1072,37 +1100,13 @@ uint32_t v810_device::opMPYHW(uint32_t op)
 	return 9;
 }
 
-uint32_t v810_device::opXB(uint32_t op)
-{
-	int val=GETREG(GET2);
-	SET_OV(0);
-	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
-	SET_Z((val==0.0f)?1:0);
-	SET_S((val<0.0f)?1:0);
-	SETREG(GET2,val);
-	// TODO: unknown
-	return 18;
-}
-
-
-uint32_t v810_device::opXH(uint32_t op)
-{
-	int val=GETREG(GET2);
-	SET_OV(0);
-	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
-	SET_Z((val==0.0f)?1:0);
-	SET_S((val<0.0f)?1:0);
-	SETREG(GET2,val);
-	// TODO: unknown
-	return 18;
-}
-
 uint32_t v810_device::opFpoint(uint32_t op)
 {
 	uint32_t tmp=R_OP(PC);
 	uint32_t op_cycles = 0;
-	PC+=2;
-	switch((tmp&0xfc00)>>10)
+	const u8 op_type = (tmp&0xfc00)>>10;
+	PC += 2;
+	switch(op_type)
 	{
 		// TODO: (*) denotes Virtual Boy specific opcodes
 		// likely needs co-processor override
@@ -1115,10 +1119,11 @@ uint32_t v810_device::opFpoint(uint32_t op)
 		case 0x7: op_cycles = opDIVF(op);break;
 		case 0x8: op_cycles = opXB(op);  break; // (*)
 		case 0x9: op_cycles = opXH(op);  break; // (*)
+		//case 0xa: REV (*)
 		case 0xb: op_cycles = opTRNC(op);break;
 		case 0xc: op_cycles = opMPYHW(op); break; // (*)
 		default: 
-			throw emu_fatalerror("Floating point unknown type %02x\n",(tmp&0xfc00) >> 10);
+			throw emu_fatalerror("Floating point unknown type %02x\n", op_type);
 			break;
 	}
 	return op_cycles;
