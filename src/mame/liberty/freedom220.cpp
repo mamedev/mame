@@ -28,7 +28,6 @@
     TODO:
     - Font selection
     - Light/dark background
-    - Double sized characters
     - Soft scroll
     - Pixel clock, characters should be 9 pixels?
 
@@ -75,7 +74,8 @@ public:
 		m_translate(*this, "translate"),
 		m_charram(*this, "charram%u", 0U),
 		m_attrram(*this, "attrram%u", 0U),
-		m_video_ctrl(0x00)
+		m_video_ctrl(0x00),
+		m_dw_active(false)
 	{ }
 
 	void freedom220(machine_config &config);
@@ -96,6 +96,7 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_attrram;
 
 	uint8_t m_video_ctrl;
+	bool m_dw_active;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -119,7 +120,7 @@ void freedom220_state::mem_map(address_map &map)
 	map(0x8800, 0x8fff).ram().share(m_attrram[0]);
 	map(0x9000, 0x97ff).ram().share(m_charram[1]);
 	map(0x9800, 0x9fff).ram().share(m_attrram[1]);
-	map(0xa000, 0xafff).ram().share("nvram");
+	map(0xa000, 0xafff).ram().share("nvram"); // actual NVRAM possibly only 0x800 in size
 }
 
 void freedom220_state::io_map(address_map &map)
@@ -206,8 +207,24 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
 	rgb_t bg = pen[0];
 
 	// draw 8 pixels of the character
-	for (int i = 0; i < 8; i++)
-		bitmap.pix(y, x + i) = BIT(data, 7 - i) ? fg : bg;
+	if (dw)
+	{
+		// first or second half of char
+		int b = m_dw_active ? 3 : 7;
+
+		for (int i = 0; i < 4; i++)
+		{
+			bitmap.pix(y, x + i * 2 + 0) = BIT(data, b - i) ? fg : bg;
+			bitmap.pix(y, x + i * 2 + 1) = BIT(data, b - i) ? fg : bg;
+		}
+
+		m_dw_active = !m_dw_active;
+	}
+	else
+	{
+		for (int i = 0; i < 8; i++)
+			bitmap.pix(y, x + i) = BIT(data, 7 - i) ? fg : bg;
+	}
 }
 
 static const gfx_layout char_layout =
@@ -234,10 +251,13 @@ void freedom220_state::machine_start()
 {
 	// register for save states
 	save_item(NAME(m_video_ctrl));
+	save_item(NAME(m_dw_active));
 }
 
 void freedom220_state::machine_reset()
 {
+	m_dw_active = false;
+
 	// allow data to be send to keyboard
 	m_usart[2]->write_dsr(1);
 	m_usart[2]->write_cts(0);
