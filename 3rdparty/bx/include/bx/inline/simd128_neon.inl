@@ -653,7 +653,7 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt(simd128_neon_t _a)
 	{
 		const simd128_neon_t rsqrt  = simd_rsqrt(_a);
-		const simd128_neon_t result = simd_rcp(rsqrt);
+		const simd128_neon_t result = simd_mul(_a, rsqrt);
 
 		return result;
 	}

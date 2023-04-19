@@ -17,9 +17,13 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
 
+#if BX_PLATFORM_OSX
+		BX_UNUSED(u);
+#else
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::isinff(u.f)  == bx::isInfinite(u.f) );
+#endif // BX_PLATFORM_OSX
 	}
 }
 
@@ -105,6 +109,10 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
 	}
+
+	REQUIRE(bx::isNan(bx::sqrt(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrt(0.0f), 0.0f, 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrt(1.0f), 1.0f, 0.0f) );
 
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
