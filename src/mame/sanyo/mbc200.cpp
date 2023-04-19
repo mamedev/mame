@@ -124,7 +124,7 @@ void mbc200_state::main_mem(address_map &map)
 
 void mbc200_state::p1_portc_w(u8 data)
 {
-	m_cpu_s_sound=(BIT(data, 4)); // used by beep command in basic
+	m_cpu_s_sound = BIT(data, 4); // used by beep command in basic
 	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
 }
 
@@ -134,7 +134,7 @@ void mbc200_state::pm_porta_w(u8 data)
 	m_comm_latch = data; // to slave CPU
 }
 
-/* Writing to PPI port B ($E9).  Being programmed for output, read operations will get the current value. */
+// Writing to PPI port B ($E9).  Being programmed for output, read operations will get the current value.
 void mbc200_state::pm_portb_w(u8 data)
 {
 	// The BIOS supports up tp 4 drives, (2 internal + 2 external)
@@ -152,7 +152,7 @@ void mbc200_state::pm_portb_w(u8 data)
 		floppy->ss_w(BIT(data, 7));
 	}
 
-	m_cpu_m_sound=(BIT(data, 1)); // key-click
+	m_cpu_m_sound = BIT(data, 1); // key-click
 	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
 }
 
