@@ -472,7 +472,7 @@ void mips3_device::device_start()
 	m_drcuml->symbol_add(&m_core->cpr[0][COP0_TagHi], sizeof(m_core->cpr[0][COP0_TagHi]), "TagHi");
 	m_drcuml->symbol_add(&m_core->cpr[0][COP0_ErrorPC], sizeof(m_core->cpr[0][COP0_ErrorPC]), "ErrorPC");
 	m_drcuml->symbol_add(&m_core->ccr[1][0], sizeof(m_core->ccr[1][0]), "fcr0");
-	m_drcuml->symbol_add(&m_core->ccr[1][31], sizeof(m_core->cpr[1][31]), "fcr31");
+	m_drcuml->symbol_add(&m_core->ccr[1][31], sizeof(m_core->ccr[1][31]), "fcr31");
 	m_drcuml->symbol_add(&m_core->mode, sizeof(m_core->mode), "mode");
 	m_drcuml->symbol_add(&m_core->arg0, sizeof(m_core->arg0), "arg0");
 	m_drcuml->symbol_add(&m_core->arg1, sizeof(m_core->arg1), "arg1");
