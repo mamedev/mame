@@ -1,18 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle, Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
 This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
+- atari/hitparade.cpp: Atari Europe Hit Parade jukebox(es)
 - entex/sag.cpp: Entex Select-A-Game Machine (actually most games are on HMCS40)
 - miltonbradley/microvsn.cpp: Milton Bradley Microvision
 - misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
 - ti/snspell.cpp: TI Speak & Spell series gen. 1
 - ti/snspellc.cpp: TI Speak & Spell Compact / Touch & Tell
 - ti/spellb.cpp: TI Spelling B series gen. 1
-- tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
+- tiger/bingobear.cpp: Hasbro/Tiger Bingo Bear / Monkgomery Monkey
+- tiger/k28m2.cpp: Tiger K-2-8: Talking Learning Computer (model 7-232)
 
 About the approximated MCU frequency everywhere: The RC osc. is not that
 stable on most of these handhelds. When comparing multiple video recordings
@@ -57,7 +59,7 @@ TODO:
 - is alphie(patent) the same as the final version?
 - is starwbcp the same as MP3438? (starwbc is MP3438A)
 
-============================================================================
+================================================================================
 
 Let's use this driver for a list of known devices and their serials,
 excluding most of TI's own products(they normally didn't use "MP" codes).
@@ -111,8 +113,9 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  @MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1981, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
+ *MP1342   TMS1100   1985, Tiger Micro-Bot
  @MP1343   TMS1100   1984, Tandy (Micronta) VoxClock 3
- *MP1359   TMS1100   1985, Capsela CRC2000
+ *MP1359   TMS1100   1985, Play-Jour Capsela CRC2000
  @MP1362   TMS1100   1985, Technasonic Weight Talker
  @MP1525   TMS1170   1980, Coleco Head to Head: Electronic Baseball
  @MP1604   TMS1370   1982, Gakken Invader 2000/Tandy Cosmic Fire Away 3000
@@ -131,6 +134,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
  @MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
  @MP3208   TMS1000   1978, Milton Bradley Electronic Battleship (1977, model 4750B)
+ *MP3209   TMS1000   1978, Kenner Star Wars: Electronic Laser Battle Game
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3228   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
@@ -152,7 +156,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3407   TMS1100   1979, General Electric The Great Awakening (model 7-4880)
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
- @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
+ @MP3438A  TMS1100   1979, Kenner Star Wars: Electronic Battle Command Game
   MP3450A  TMS1100   1979, Microvision cartridge: Block Buster
   MP3454   TMS1100   1979, Microvision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, Microvision cartridge: Pinball
@@ -169,7 +173,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
   MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
   M34009   TMS1100   1981, Microvision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
- @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
+ @M34012   TMS1100   1980, Mattel Dungeons & Dragons: Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
   M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
  @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
@@ -188,7 +192,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
-  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tiger/k28m2.cpp
+  MP7324   TMS1400   1985, Tiger K-2-8/Coleco Talking Teacher -> tiger/k28m2.cpp
  @MP7332   TMS1400   1981, Milton Bradley Dark Tower
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
@@ -205,7 +209,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -417,11 +421,9 @@ void hh_tms1k_state::machine_reset()
 
 
 
-/***************************************************************************
-
-  Helper Functions
-
-***************************************************************************/
+/*******************************************************************************
+    Helper Functions
+*******************************************************************************/
 
 // generic input handlers
 
@@ -497,13 +499,11 @@ void hh_tms1k_state::set_power(bool state)
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+*******************************************************************************/
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
-
-***************************************************************************/
-
-/***************************************************************************
+/*******************************************************************************
 
   A-One LSI Match Number
   * PCB label: PT-204 "Pair Card"
@@ -518,7 +518,7 @@ void hh_tms1k_state::set_power(bool state)
   - USA: Electronic Concentration, published by LJN (black case, rainbow pattern bezel)
   - UK: Electronic Concentration, published by Peter Pan Playthings (same as USA version)
 
-***************************************************************************/
+*******************************************************************************/
 
 class matchnum_state : public hh_tms1k_state
 {
@@ -650,7 +650,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   A-One LSI Arrange Ball
   * PCB label: Kaken, PT-249
@@ -663,7 +663,7 @@ ROM_END
   - USA(2): Computer Impulse, published by LJN (white case)
   - Germany: Fixball, unknown publisher, same as LJN version
 
-***************************************************************************/
+*******************************************************************************/
 
 class arrball_state : public hh_tms1k_state
 {
@@ -766,7 +766,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   APF Mathemagician
   * TMS1100 MCU, label MP1030 (no decap)
@@ -787,7 +787,7 @@ ROM_END
   5) Football
   6) Lunar Lander
 
-***************************************************************************/
+*******************************************************************************/
 
 class mathmagi_state : public hh_tms1k_state
 {
@@ -932,7 +932,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
   * TMS1000NLL MP0915 (die label: 1000B, MP0915)
@@ -948,7 +948,7 @@ ROM_END
   - USA: The Incredible Brain Buggy, published by Fundimensions
   - UK: The Incredible Brain Buggy, published by Palitoy (same as USA version)
 
-***************************************************************************/
+*******************************************************************************/
 
 class bcheetah_state : public hh_tms1k_state
 {
@@ -1070,7 +1070,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Race Time
   * PCB label: SM-007
@@ -1081,7 +1081,7 @@ ROM_END
   - World: Race Time (model 8007), published by Bandai
   - Japan: FL Grand Prix Champion (model 16162), published by Bandai
 
-***************************************************************************/
+*******************************************************************************/
 
 class racetime_state : public hh_tms1k_state
 {
@@ -1187,7 +1187,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai TC7: Air Traffic Control
   * TMS1100 MCU, label MP1311 (die label: 1100E, MP1311)
@@ -1195,7 +1195,7 @@ ROM_END
 
   It is a very complicated game, refer to the manual on how to play.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tc7atc_state : public hh_tms1k_state
 {
@@ -1315,7 +1315,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
   Triumph-Adler 81 SN, Silver-Reed 8J, more
@@ -1327,7 +1327,7 @@ ROM_END
   was used in any TI calculator. It was up to the manufacturer to choose which
   functions(keys) to leave out.
 
-***************************************************************************/
+*******************************************************************************/
 
 class palmf31_state : public hh_tms1k_state
 {
@@ -1485,7 +1485,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
@@ -1495,7 +1495,7 @@ ROM_END
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.
 
-***************************************************************************/
+*******************************************************************************/
 
 class palmmd8_state : public hh_tms1k_state
 {
@@ -1655,7 +1655,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Chromatronics Chroma-Chime
   * PCB label: DESIGNED BY CHROMATRONICS, 118-2-003
@@ -1673,7 +1673,7 @@ ROM_END
 
   The MCU was also used in Bell-Fruit Oranges and Lemons (slot machine).
 
-***************************************************************************/
+*******************************************************************************/
 
 class cchime_state : public hh_tms1k_state
 {
@@ -1834,7 +1834,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Amaze-A-Tron, by Ralph Baer
   * TMS1100 MCU, label MP3405 (die label same)
@@ -1844,7 +1844,7 @@ ROM_END
   This is an electronic board game with a selection of 8 maze games,
   most of them for 2 players.
 
-***************************************************************************/
+*******************************************************************************/
 
 class amaztron_state : public hh_tms1k_state
 {
@@ -1982,16 +1982,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Coleco Zodiac - The Astrology Computer (model 2110)
+  Coleco Zodiac: The Astrology Computer (model 2110)
   * TMS1100 MP3435 (no decap)
   * 8-digit 7seg display, 12 other LEDs, 1-bit sound
 
   As the name suggests, this is an astrologic calculator. Refer to the
   (very extensive) manual on how to use it.
 
-***************************************************************************/
+*******************************************************************************/
 
 class zodiac_state : public hh_tms1k_state
 {
@@ -2143,7 +2143,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Electronic Quarterback (model 2120)
   * TMS1100NLL MP3415 (die label same)
@@ -2153,7 +2153,7 @@ ROM_END
   - USA(1): Electronic Quarterback, published by Coleco
   - USA(2): Electronic Touchdown, published by Sears
 
-***************************************************************************/
+*******************************************************************************/
 
 class cqback_state : public hh_tms1k_state
 {
@@ -2272,7 +2272,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Head to Head: Electronic Football (model 2140)
   * TMS1100NLLE (rev. E!) MP3460 (die label same)
@@ -2285,7 +2285,7 @@ ROM_END
   - USA(1): Head to Head: Electronic Football, published by Coleco
   - USA(2): Team Play Football, published by Sears
 
-***************************************************************************/
+*******************************************************************************/
 
 class h2hfootb_state : public hh_tms1k_state
 {
@@ -2404,7 +2404,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Head to Head: Electronic Basketball (model 2150)
   * TMS1000NLL MP3320A (die label: 1000E, MP3320A)
@@ -2417,7 +2417,7 @@ ROM_END
   Unlike the COP420 version(see hh_cop400.cpp driver), each game has its own MCU.
   To begin play, press start while holding left/right.
 
-***************************************************************************/
+*******************************************************************************/
 
 class h2hbaskb_state : public hh_tms1k_state
 {
@@ -2599,7 +2599,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Head to Head: Electronic Baseball (model 2180)
   * PCB labels: Coleco rev C 73891/2
@@ -2610,7 +2610,7 @@ ROM_END
   - USA: Head to Head: Electronic Baseball, published by Coleco
   - Japan: Computer Baseball, published by Tsukuda
 
-***************************************************************************/
+*******************************************************************************/
 
 class h2hbaseb_state : public hh_tms1k_state
 {
@@ -2750,7 +2750,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Head to Head: Electronic Boxing (model 2190)
   * TMS1100NLL M34018-N2 (die label: 1100E, M34018)
@@ -2758,7 +2758,7 @@ ROM_END
 
   This appears to be the last game of Coleco's Head to Head series.
 
-***************************************************************************/
+*******************************************************************************/
 
 class h2hboxing_state : public hh_tms1k_state
 {
@@ -2879,7 +2879,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Quiz Wiz Challenger
   * TMS1000NLL M32001-N2 (die label: 1000E, M32001)
@@ -2902,7 +2902,7 @@ ROM_END
   The cartridge connects one or more of the R pins to K1. Together with the
   question numbers, the game generates a pseudo-random answerlist.
 
-***************************************************************************/
+*******************************************************************************/
 
 class quizwizc_state : public hh_tms1k_state
 {
@@ -3070,7 +3070,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die label: TMS1400, MP7334, 28L 01D D000 R000)
@@ -3093,7 +3093,7 @@ ROM_END
 
   The cartridge connects pin 8 with one of the K-pins.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tc4_state : public hh_tms1k_state
 {
@@ -3259,7 +3259,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Concept 2000 Lite 'n Learn (model 554)
   * PCB label: CONCEPT 2000, SEC 554
@@ -3273,7 +3273,7 @@ ROM_END
   much smaller PCB. It doesn't have the tone knob either. They removed the
   LEDs and learn mode.
 
-***************************************************************************/
+*******************************************************************************/
 
 class litelrn_state : public hh_tms1k_state
 {
@@ -3416,7 +3416,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Concept 2000 Mr. Mus-I-Cal (model 560)
   * PCB label: CONCEPT 2000, ITE 556
@@ -3425,7 +3425,7 @@ ROM_END
 
   It's a simple 4-function calculator, and plays music tones too.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mrmusical_state : public hh_tms1k_state
 {
@@ -3556,7 +3556,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Conic Electronic Basketball
   * PCB label: CONIC 101-006
@@ -3570,7 +3570,7 @@ ROM_END
   - Hong Kong: Electronic Basketball, published by Conic
   - USA: Electronic Basketball, published by Cardinal
 
-***************************************************************************/
+*******************************************************************************/
 
 class cnbaskb_state : public hh_tms1k_state
 {
@@ -3683,7 +3683,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Conic Electronic Multisport
   * PCB label: CONIC 101-027(1979), or CONIC 101-021 REV A(1980, with DS8871N)
@@ -3699,7 +3699,7 @@ ROM_END
   - USA(1): Electronic Multisport, published by Innocron
   - USA(2): Sports Arena, published by Tandy (model 60-2158)
 
-***************************************************************************/
+*******************************************************************************/
 
 class cmsport_state : public hh_tms1k_state
 {
@@ -3814,7 +3814,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Conic Electronic Football
   * TMS1000 MP0170 (die label same)
@@ -3832,7 +3832,7 @@ ROM_END
 
   Another hardware revision of this game uses a PIC16 MCU.
 
-***************************************************************************/
+*******************************************************************************/
 
 class cnfball_state : public hh_tms1k_state
 {
@@ -3959,7 +3959,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Conic Electronic Football II
   * TMS1100 MP1181 (no decap)
@@ -3973,7 +3973,7 @@ ROM_END
   - Hong Kong: Electronic Football II, published by Conic
   - USA: Electronic Football II, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class cnfball2_state : public hh_tms1k_state
 {
@@ -4095,7 +4095,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Conic Electronic I.Q.
   * PCB labels: main: CONIC 101-037 (other side: HG-15, 11*00198*00), button PCB:
@@ -4109,7 +4109,7 @@ ROM_END
   - Hong Kong: Electronic I.Q., published by Conic
   - UK: Solitaire, published by Grandstand
 
-***************************************************************************/
+*******************************************************************************/
 
 class eleciq_state : public hh_tms1k_state
 {
@@ -4245,7 +4245,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Electroplay Quickfire
   * TMS1000NLL MP3260 (die label same)
@@ -4255,7 +4255,7 @@ ROM_END
   button 1 to "Z or X or C" and each lightsensor to one of those keys.
   Although the game seems mostly playable without having to use the gun trigger
 
-***************************************************************************/
+*******************************************************************************/
 
 class qfire_state : public hh_tms1k_state
 {
@@ -4363,7 +4363,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex (Electronic) Soccer
   * TMS1000NL MP0158 (die label: 1000B, MP0158)
@@ -4373,7 +4373,7 @@ ROM_END
   - USA: Electronic Soccer, 2 versions (leds on green bezel, or leds under bezel)
   - Germany: Fussball, with skill switch
 
-***************************************************************************/
+*******************************************************************************/
 
 class esoccer_state : public hh_tms1k_state
 {
@@ -4486,7 +4486,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex (Electronic) Baseball (1)
   * TMS1000NLP MP0914 (die label: 1000B, MP0914A)
@@ -4515,7 +4515,7 @@ ROM_END
     8 = 0.3   18 = 3.0   28 = 7.2
     9 = 1.4   19 = 2.0   29 = 7.3
 
-***************************************************************************/
+*******************************************************************************/
 
 class ebball_state : public hh_tms1k_state
 {
@@ -4637,7 +4637,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex (Electronic) Baseball 2
   * PCB label: ZENY
@@ -4662,7 +4662,7 @@ ROM_END
     08 = 6.3   18 = 7.3   28 = 4.2   38 = 3.2
     09 = 9.1   19 = 6.0   29 = 4.3
 
-***************************************************************************/
+*******************************************************************************/
 
 class ebball2_state : public hh_tms1k_state
 {
@@ -4777,7 +4777,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex (Electronic) Baseball 3
   * PCB label: ZENY
@@ -4807,7 +4807,7 @@ ROM_END
     O1,O2: 4.2,4.3
     I1-I6: 2.0-2.5, I7-I9: 3.3-3.5
 
-***************************************************************************/
+*******************************************************************************/
 
 class ebball3_state : public hh_tms1k_state
 {
@@ -4964,7 +4964,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Space Battle
   * TMS1000 EN-6004 MP0920 (die label: 1000B, MP0920)
@@ -4985,7 +4985,7 @@ ROM_END
     8 = 0.7   18 = 2.1   28 = 5.0
     9 = 1.0   19 = 2.2   29 = 5.1
 
-***************************************************************************/
+*******************************************************************************/
 
 class esbattle_state : public hh_tms1k_state
 {
@@ -5092,13 +5092,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Blast It
   * TMS1000 MP0230 (die label: 1000B, MP0230)
   * 3 7seg LEDs, 49 other LEDs (both under an overlay mask), 1-bit sound
 
-***************************************************************************/
+*******************************************************************************/
 
 class blastit_state : public hh_tms1k_state
 {
@@ -5200,7 +5200,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Space Invader
   * TMS1100 MP1211 (die label same)
@@ -5210,7 +5210,7 @@ ROM_END
   TMS1100, the second more widespread release runs on a COP400. There are
   also differences with the overlay mask.
 
-***************************************************************************/
+*******************************************************************************/
 
 class einvader_state : public hh_tms1k_state
 {
@@ -5329,7 +5329,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Color Football 4
   * TMS1670 6009 MP7551 (die label: TMS1400, MP7551, 40H 01D D000 R000)
@@ -5337,7 +5337,7 @@ ROM_END
 
   Another version exist, one with a LED(red) 7seg display.
 
-***************************************************************************/
+*******************************************************************************/
 
 class efootb4_state : public hh_tms1k_state
 {
@@ -5471,7 +5471,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex (Electronic) Basketball 2
   * TMS1100 6010 MP1218 (die label: 1100B, MP1218)
@@ -5489,7 +5489,7 @@ ROM_END
     A  = 9.4
     B  = 6.4
 
-***************************************************************************/
+*******************************************************************************/
 
 class ebaskb2_state : public hh_tms1k_state
 {
@@ -5610,7 +5610,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Raise The Devil
   * TMS1100 MP1221 (die label: 1100B, MP1221)
@@ -5636,7 +5636,7 @@ ROM_END
 
   NOTE!: MAME external artwork is required
 
-***************************************************************************/
+*******************************************************************************/
 
 class raisedvl_state : public hh_tms1k_state
 {
@@ -5783,7 +5783,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Musical Marvin
   * TMS1100 MP1228 (no decap)
@@ -5793,7 +5793,7 @@ ROM_END
   The design patent was assigned to Hanzawa (Japan), so it's probably
   manufactured by them.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mmarvin_state : public hh_tms1k_state
 {
@@ -5958,7 +5958,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Fonas 2 Player Baseball
   * PCB label: CA-014 (probably Cassia)
@@ -5986,7 +5986,7 @@ ROM_END
     8 = 1.4   18 = 2.0   28 = 3.0
     9 = 1.7   19 = 0.7   29 = 1.5
 
-***************************************************************************/
+*******************************************************************************/
 
 class f2pbball_state : public hh_tms1k_state
 {
@@ -6102,7 +6102,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Fonas 3 in 1: Football, Basketball, Soccer
   * PCB label: HP-801
@@ -6117,7 +6117,7 @@ ROM_END
 
   MAME external artwork is needed for the switchable overlays.
 
-***************************************************************************/
+*******************************************************************************/
 
 class f3in1_state : public hh_tms1k_state
 {
@@ -6257,7 +6257,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Poker
   * PCB label: POKER. gakken
@@ -6268,7 +6268,7 @@ ROM_END
   - Japan: Poker, published by Gakken
   - USA: Electronic Poker, published by Entex
 
-***************************************************************************/
+*******************************************************************************/
 
 class gpoker_state : public hh_tms1k_state
 {
@@ -6414,7 +6414,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Jackpot: Gin Rummy & Black Jack
   * PCB label: gakken
@@ -6425,7 +6425,7 @@ ROM_END
   - Japan: Jackpot(?), published by Gakken
   - USA: Electronic Jackpot: Gin Rummy & Black Jack, published by Entex
 
-***************************************************************************/
+*******************************************************************************/
 
 class gjackpot_state : public gpoker_state
 {
@@ -6539,7 +6539,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Invader
   * PCB label: GAKKEN, INVADER, KS-00779
@@ -6555,7 +6555,7 @@ ROM_END
   On the real thing, the joystick is "sticky"(it doesn't autocenter when you let go).
   There's also a version with a cyan/red VFD, possibly the same ROM.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ginv_state : public hh_tms1k_state
 {
@@ -6671,7 +6671,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Invader 1000
   * TMS1370 MP2139 (die label: 1170, MP2139)
@@ -6683,7 +6683,7 @@ ROM_END
   - USA(1): Galaxy Invader 1000, published by CGL
   - USA(2): Cosmic 1000 Fire Away, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class ginv1000_state : public hh_tms1k_state
 {
@@ -6798,7 +6798,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Invader 2000
   * TMS1370(28 pins) MP1604 (die label: 1370A, MP1604)
@@ -6810,7 +6810,7 @@ ROM_END
   - USA(1): Galaxy Invader 10000, published by CGL
   - USA(2): Cosmic 3000 Fire Away, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class ginv2000_state : public hh_tms1k_state
 {
@@ -6944,7 +6944,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken FX-Micom R-165
   * TMS1100 MCU, label MP1312 (die label: 1100E, MP1312A)
@@ -6960,7 +6960,7 @@ ROM_END
   - USA: Science Fair Microcomputer Trainer, published by Tandy. Of note is
     the complete redesign of the case, adding more adjustable wiring
 
-***************************************************************************/
+*******************************************************************************/
 
 class fxmcr165_state : public hh_tms1k_state
 {
@@ -7097,7 +7097,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die label: 0980B-00)
@@ -7110,7 +7110,7 @@ ROM_END
   difficulty(1-3), then number of players(1-4), then [ENTER]. Refer to the
   manual for more information.
 
-***************************************************************************/
+*******************************************************************************/
 
 class elecdet_state : public hh_tms1k_state
 {
@@ -7247,9 +7247,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Kenner Star Wars - Electronic Battle Command
+  Kenner Star Wars: Electronic Battle Command Game (model 40370)
   * TMS1100 MCU, label MP3438A (die label: 1100B, MP3438A)
   * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1-bit sound
 
@@ -7257,7 +7257,7 @@ ROM_END
   press BASIC/INTER/ADV and enter P#(number of players), then
   START TURN. Refer to the official manual for more information.
 
-***************************************************************************/
+*******************************************************************************/
 
 class starwbc_state : public hh_tms1k_state
 {
@@ -7400,7 +7400,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Kenner Live Action Football
   * TMS1100NLL MCU, label MP3489-N2 (die label: 1100E, MP3489)
@@ -7414,7 +7414,7 @@ ROM_END
   (eg. 1 rising edge per full rotation), so there's no difference between
   rotating left or right.
 
-***************************************************************************/
+*******************************************************************************/
 
 class liveafb_state : public hh_tms1k_state
 {
@@ -7550,7 +7550,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Kosmos Astro
   * TMS1470NLHL MP1133 (die label: TMS1400, MP1133, 28H 01D D000 R000)
@@ -7559,7 +7559,7 @@ ROM_END
   This is an astrological calculator, and also supports 4-function
   calculations. Refer to the official manual on how to use this device.
 
-***************************************************************************/
+*******************************************************************************/
 
 class astro_state : public hh_tms1k_state
 {
@@ -7691,7 +7691,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Marx Series 300 Electronic Bowling Game
   * TMS1100NLL MP3403 DBS 7836 SINGAPORE (no decap)
@@ -7715,7 +7715,7 @@ ROM_END
     u5 Q6 -> u2 A5 -> L10 (pin #10)     u6 Q6 -> u1 A3 -> L13 (spare)
     u5 Q7 -> u2 A4 -> L9 (pin #9)       u6 Q7 -> u3 A3 -> digit 4 B+C
 
-***************************************************************************/
+*******************************************************************************/
 
 class elecbowl_state : public hh_tms1k_state
 {
@@ -7861,7 +7861,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Thoroughbred Horse Race Analyzer
   * PCB label: 1670-4619D
@@ -7874,7 +7874,7 @@ ROM_END
   It was rereleased in 1994 in China/Canada by AHTI(Advanced Handicapping
   Technologies, Inc.), on a Hitachi HD613901.
 
-***************************************************************************/
+*******************************************************************************/
 
 class horseran_state : public hh_tms1k_state
 {
@@ -8028,16 +8028,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Mattel Dungeons & Dragons - Computer Labyrinth Game
+  Mattel Dungeons & Dragons: Computer Labyrinth Game
   * TMS1100 M34012-N2LL (die label: 1100E, M34012)
   * 72 buttons, no LEDs, 1-bit sound
 
   This is an electronic board game. It requires markers and wall pieces to play.
   Refer to the official manual for more information.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mdndclab_state : public hh_tms1k_state
 {
@@ -8223,7 +8223,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die label: 0970D-04A)
@@ -8239,7 +8239,7 @@ ROM_END
   - Europe: Logic 5, published by MB
   - Japan: Pythaligoras, published by Takara
 
-***************************************************************************/
+*******************************************************************************/
 
 class comp4_state : public hh_tms1k_state
 {
@@ -8344,7 +8344,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Electronic Battleship (model 4750A)
   * PCB label: 4750A
@@ -8364,7 +8364,7 @@ ROM_END
   1982: model 4750G: back to MCU, COP420 instead of TI, emulated in hh_cop400.cpp
   1982: model 4750H: unknown hardware, probably also COP420
 
-***************************************************************************/
+*******************************************************************************/
 
 class bship_state : public hh_tms1k_state
 {
@@ -8528,7 +8528,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Electronic Battleship (model 4750B)
   * PCB label: MB 4750B
@@ -8538,7 +8538,7 @@ ROM_END
 
   This is the 2nd version. The sound hardware was changed to a SN76477.
 
-***************************************************************************/
+*******************************************************************************/
 
 class bshipb_state : public hh_tms1k_state
 {
@@ -8652,7 +8652,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Simon (model 4850), created by Ralph Baer
   * TMS1000 (die label: 1000C, MP3226), or MP3300 (die label: 1000C, MP3300)
@@ -8666,7 +8666,7 @@ ROM_END
 
   The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
 
-***************************************************************************/
+*******************************************************************************/
 
 class simon_state : public hh_tms1k_state
 {
@@ -8789,7 +8789,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Super Simon
   * TMS1100 MP3476NLL (die label: 1100E, MP3476)
@@ -8798,7 +8798,7 @@ ROM_END
   The semi-squel to Simon, not as popular. It includes more game variations
   and a 2-player head-to-head mode.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ssimon_state : public hh_tms1k_state
 {
@@ -8950,7 +8950,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Big Trak
   * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die label: 1000E, MP3301)
@@ -8965,7 +8965,7 @@ ROM_END
   The In command was canceled midst production, it is basically a nop. Newer
   releases and the European version removed the button completely.
 
-***************************************************************************/
+*******************************************************************************/
 
 class bigtrak_state : public hh_tms1k_state
 {
@@ -9174,7 +9174,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Dark Tower
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C) (die label:
@@ -9191,7 +9191,7 @@ ROM_END
   Then select level and number of players and the game will start. Read the
   official manual on how to play the game.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mbdtower_state : public hh_tms1k_state
 {
@@ -9422,7 +9422,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Milton Bradley Electronic Arcade Mania
   * TMS1100 M34078A-N2LL (die label: 1100G, M34078A)
@@ -9431,7 +9431,7 @@ ROM_END
   This is a board game. The mini arcade machine is the emulated part here.
   External artwork is needed for the game overlays.
 
-***************************************************************************/
+*******************************************************************************/
 
 class arcmania_state : public hh_tms1k_state
 {
@@ -9549,7 +9549,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die label: 0970F-05B)
@@ -9559,7 +9559,7 @@ ROM_END
   boats are used to remember your locations (a Paint app should be ok too).
   Refer to the official manual for more information, it is not a simple game.
 
-***************************************************************************/
+*******************************************************************************/
 
 class cnsector_state : public hh_tms1k_state
 {
@@ -9685,7 +9685,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404 or MP3404A-N2
@@ -9705,7 +9705,7 @@ ROM_END
 
   Refer to the official manual for more information on the games.
 
-***************************************************************************/
+*******************************************************************************/
 
 class merlin_state : public hh_tms1k_state
 {
@@ -9819,7 +9819,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Master Merlin
   * TMS1400 MP7351-N2LL (die label: 1400CR, MP7351)
@@ -9839,7 +9839,7 @@ ROM_END
   8: Patterns
   9: Hot Potato
 
-***************************************************************************/
+*******************************************************************************/
 
 class mmerlin_state : public merlin_state
 {
@@ -9893,7 +9893,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Electronic Master Mind
   * TMS1000NLL MP3200 (die label: 1000E, MP3200)
@@ -9903,7 +9903,7 @@ ROM_END
   It's not related to the equally named Electronic Master Mind by Invicta,
   that one is on a Rockwell MM75.
 
-***************************************************************************/
+*******************************************************************************/
 
 class pbmastm_state : public hh_tms1k_state
 {
@@ -10013,7 +10013,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die label: 0980B-01A)
@@ -10024,7 +10024,7 @@ ROM_END
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
   For the patent romset, it needs to be turned off and on to exit test mode.
 
-***************************************************************************/
+*******************************************************************************/
 
 class stopthief_state : public hh_tms1k_state
 {
@@ -10161,7 +10161,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
   * TMS1400NLL MP7313-N2 (die label: TMS1400, MP7313, 28L 01D D000 R000)
@@ -10178,7 +10178,7 @@ ROM_END
   BTANB: Some of the other (not cue) balls temporarily flash brighter sometimes,
   eg. the bottom one when they're placed. This happens on the real device.
 
-***************************************************************************/
+*******************************************************************************/
 
 class bankshot_state : public hh_tms1k_state
 {
@@ -10294,7 +10294,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Split Second
   * TMS1400NLL MP7314-N2 (die label: TMS1400, MP7314, 28L 01D D000 R000)
@@ -10324,7 +10324,7 @@ ROM_END
     50 60 52 62 54 64 56
        70    72    74
 
-***************************************************************************/
+*******************************************************************************/
 
 class splitsec_state : public hh_tms1k_state
 {
@@ -10428,16 +10428,16 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
-  Parker Brothers Lost Treasure - The Electronic Deep-Sea Diving Game,
+  Parker Brothers Lost Treasure: The Electronic Deep-Sea Diving Game,
   Featuring The Electronic Dive-Control Center
   * TMS1100 M34038-NLL (die label: 1100E, M34038)
   * 11 LEDs, 4-bit sound
 
   This is a board game. The electronic accessory is the emulated part here.
 
-***************************************************************************/
+*******************************************************************************/
 
 class lostreas_state : public hh_tms1k_state
 {
@@ -10562,7 +10562,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Playskool Alphie
   * TMS1000 (label not known yet)
@@ -10579,7 +10579,7 @@ ROM_END
   - X symbol: used with Robot Land board game
   - music note: play a selection of 5 tunes
 
-***************************************************************************/
+*******************************************************************************/
 
 class alphie_state : public hh_tms1k_state
 {
@@ -10707,7 +10707,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy Championship Football (model 60-2150)
   * PCB label: CYG-316
@@ -10717,7 +10717,7 @@ ROM_END
   Another clone of Mattel Football II. The original manufacturer is unknown, but
   suspected to be Conic/E.R.S.(Electronic Readout Systems).
 
-***************************************************************************/
+*******************************************************************************/
 
 class tcfball_state : public hh_tms1k_state
 {
@@ -10834,7 +10834,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy Championship Football (model 60-2151)
   * TMS1100NLL MP1183 (no decap)
@@ -10847,7 +10847,7 @@ ROM_END
   - World(2): Super-Pro Football, no brand
   - USA: Championship Football (model 60-2151), published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class tcfballa_state : public tcfball_state
 {
@@ -10902,7 +10902,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy Computerized Arcade (model 60-2159)
   * PCB label: HP-805 or CDC-805
@@ -10929,7 +10929,7 @@ ROM_END
 
   See below at the input defs for a list of the games.
 
-***************************************************************************/
+*******************************************************************************/
 
 class comparc_state : public hh_tms1k_state
 {
@@ -11085,7 +11085,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy (Radio Shack division) Monkey See (1982 version)
   * TMS1000 MP0271 (die label: 1000E, MP0271), only half of ROM space used
@@ -11099,7 +11099,7 @@ ROM_END
   - USA(1): Monkey See, published by Tandy
   - USA(2): Heathcliff, published by McNaught Syndicate in 1983
 
-***************************************************************************/
+*******************************************************************************/
 
 class monkeysee_state : public hh_tms1k_state
 {
@@ -11210,7 +11210,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy 3 in 1 Sports Arena (model 60-2178)
   * PCB label: HP-804
@@ -11226,7 +11226,7 @@ ROM_END
   It is always in 2-player head-to-head mode, the Player switch is just meant
   for allowing the other player to have full control over 2 defense spots.
 
-***************************************************************************/
+*******************************************************************************/
 
 class t3in1sa_state : public hh_tms1k_state
 {
@@ -11379,7 +11379,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tandy (Micronta) VoxClock 3 (sold by Radio Shack, model 63-906)
   * PCB label: VOXCLOCK 3
@@ -11396,7 +11396,7 @@ ROM_END
 
   Spartus AVT from 1982 is nearly the same as VoxClock 3.
 
-***************************************************************************/
+*******************************************************************************/
 
 class vclock3_state : public hh_tms1k_state
 {
@@ -11590,7 +11590,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Technasonic Weight Talker
   * PCB label: BHP_8338A8
@@ -11606,7 +11606,7 @@ ROM_END
   increase pressure, right to decrease. After around 0.5s of inactivity,
   it will tell your 'weight'.
 
-***************************************************************************/
+*******************************************************************************/
 
 class wtalker_state : public hh_tms1k_state
 {
@@ -11821,7 +11821,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Telesensory Systems, Inc.(TSI) Speech+
   * TMS1000 MCU, label TMS1007NL (die label: 1000B, 1007A)
@@ -11832,7 +11832,7 @@ ROM_END
   with it were on audio cassette. It was also released in 1978 by APH
   (American Printing House for the Blind).
 
-***************************************************************************/
+*******************************************************************************/
 
 class speechp_state : public hh_tms1k_state
 {
@@ -11990,7 +11990,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments SR-16 (1974, first consumer product with TMS1000 series MCU)
   * TMS1000 MCU label TMS1001NL (die label: 1000, 1001A)
@@ -12000,7 +12000,7 @@ ROM_END
   * TMS1000 MCU label TMS1016NL (die label: 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tisr16_state : public hh_tms1k_state
 {
@@ -12232,7 +12232,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-1250/TI-1200 (1975 version), Spirit of '76
   * TMS0950 MCU label TMC0952NL, K0952 (die label: 0950A 0952)
@@ -12255,7 +12255,7 @@ ROM_END
   * 8-digit 7seg LED display
   * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti1250_state : public hh_tms1k_state
 {
@@ -12431,7 +12431,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-2550 II, more (see below)
   * TMS1070 TMS1071NL (die label: 1070A, 1071A)
@@ -12440,7 +12440,7 @@ ROM_END
   This chip was also used in 3rd-party calculators, like Citizen 831RD,
   Prinztronic M800, Lloyd's E311, Privileg 861MD.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti25502_state : public hh_tms1k_state
 {
@@ -12575,7 +12575,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label: 1040A, 1043A)
@@ -12584,7 +12584,7 @@ ROM_END
   Only the TI-2550 III has the top button row (RV, SQRT, etc).
   TI-1600 doesn't have the memory buttons.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti25503_state : public hh_tms1k_state
 {
@@ -12710,7 +12710,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-5100, more (see below)
   * TMS1070 MCU label TMS1073NL or TMC1073NL (die label: 1070B, 1073)
@@ -12720,7 +12720,7 @@ ROM_END
   Panasonic JE1601U, Radio Shack EC2001, Triumph-Adler D100. The original
   TI version did not have the 3 buttons at R4.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti5100_state : public hh_tms1k_state
 {
@@ -12864,13 +12864,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-5200
   * TMS1270 MCU label TMS1278NL or TMC1278NL (die label: 1070B, 1278A)
   * 13-digit 7seg VFD Itron FG139A1 (1 custom digit)
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti5200_state : public hh_tms1k_state
 {
@@ -13004,7 +13004,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TMC098x series Majestic-line calculators
 
@@ -13023,7 +13023,7 @@ ROM_END
   TI Programmer
   * TMS0980 MCU label ZA0675NL, JP0983AT (die label: 0980B-83)
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti30_state : public hh_tms1k_state
 {
@@ -13310,7 +13310,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-1000 (1977 version)
   * TMS1990 MCU label TMC1991NL (die label: 1991-91A)
@@ -13319,7 +13319,7 @@ ROM_END
   Texas Instruments TI-1000 (1978 version)
   * TMS1990 MCU label TMC1992-4NL **not dumped yet
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti1000_state : public hh_tms1k_state
 {
@@ -13431,13 +13431,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments WIZ-A-TRON
   * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label: 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
-***************************************************************************/
+*******************************************************************************/
 
 class wizatron_state : public hh_tms1k_state
 {
@@ -13552,7 +13552,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments Little Professor (1976 version)
   * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label: 0970D-75C)
@@ -13561,7 +13561,7 @@ ROM_END
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
   one is older).
 
-***************************************************************************/
+*******************************************************************************/
 
 class lilprof_state : public wizatron_state
 {
@@ -13641,7 +13641,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments Little Professor (1978 version)
   * TMS1990 MCU label TMC1993NL (die label: 1990C-c3C)
@@ -13650,7 +13650,7 @@ ROM_END
   1978 re-release, with on/off and level select on buttons instead of
   switches. The casing was slightly revised in 1980 again, but same rom.
 
-***************************************************************************/
+*******************************************************************************/
 
 class lilprofa_state : public hh_tms1k_state
 {
@@ -13771,7 +13771,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments TI-1680, TI-2550-IV
   * TMS1980 MCU label TMC1981NL (die label: 1980A 81F)
@@ -13781,7 +13781,7 @@ ROM_END
   The extra RAM is for scrolling back through calculations. For some reason,
   TI-2550-IV has the same hardware, this makes it very different from II and III.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ti1680_state : public hh_tms1k_state
 {
@@ -13920,13 +13920,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments DataMan
   * TMS1980 MCU label TMC1982NL (die label: 1980A 82B)
   * 10-digit cyan VFD(3 digits are custom)
 
-***************************************************************************/
+*******************************************************************************/
 
 class dataman_state : public hh_tms1k_state
 {
@@ -14052,7 +14052,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments Math Marvel
   * TMS1980 MCU label TMC1986A-NL (die label: 1980A 86A)
@@ -14060,7 +14060,7 @@ ROM_END
 
   This is the same hardware as DataMan, with R8 connected to a piezo.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mathmarv_state : public dataman_state
 {
@@ -14136,7 +14136,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments maze game (unreleased, from patent GB2040172A)
   * TMS1000 (development version)
@@ -14151,7 +14151,7 @@ ROM_END
   is too simple and obviously unfinished, start and goal positions are always the same
   and there is a lot of ROM space left for more levels.
 
-***************************************************************************/
+*******************************************************************************/
 
 class timaze_state : public hh_tms1k_state
 {
@@ -14232,7 +14232,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Texas Instruments Electronic Digital Thermostat
   * TMS0970 MCU, label TMS0970NLL TMC0910B (die label: 0970F-10E)
@@ -14242,7 +14242,7 @@ ROM_END
   This is a thermostat and digital clock. It's the 2nd one described in
   patents US4388692 and US4298946.
 
-***************************************************************************/
+*******************************************************************************/
 
 class tithermos_state : public hh_tms1k_state
 {
@@ -14396,7 +14396,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Sub Wars (model 7-490)
   * PCB label: CSG201A(main), CSG201B(leds)
@@ -14408,7 +14408,7 @@ ROM_END
   This handheld was modified and used as a prop in the 1981 movie Escape from
   New York, Snake Plissken uses it as a homing device.
 
-***************************************************************************/
+*******************************************************************************/
 
 class subwars_state : public hh_tms1k_state
 {
@@ -14497,7 +14497,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Playmaker: Hockey, Soccer, Basketball (model 7-540 or 7-540A)
   * TMS1100 MP1215 (die label: 1100B, MP1215)
@@ -14515,7 +14515,7 @@ ROM_END
   It is patented under US4256931 (mid-1979, a couple of years before Nintendo's
   Game & Watch d-pad with US4687200).
 
-***************************************************************************/
+*******************************************************************************/
 
 class playmaker_state : public hh_tms1k_state
 {
@@ -14660,7 +14660,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Deluxe Football with Instant Replay (model 7-550)
   * TMS1400NLL MP7302 (die label: TMS1400, MP7302, 28L 01D D000 R000)
@@ -14673,7 +14673,7 @@ ROM_END
   Booting the handheld with the Score and Replay buttons held down will
   initiate a halftime show.
 
-***************************************************************************/
+*******************************************************************************/
 
 class dxfootb_state : public hh_tms1k_state
 {
@@ -14794,7 +14794,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label: CC REV B
@@ -14806,7 +14806,7 @@ ROM_END
   - USA(1): Follow Me, published by Sears
   - USA(2): Electronic Repeat, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class copycat_state : public hh_tms1k_state
 {
@@ -14916,7 +14916,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Electronics Copy Cat (model 7-522)
   * PCB label: WS 8107-1
@@ -14932,7 +14932,7 @@ ROM_END
   - yellow case, purple orange blue pink buttons, leds are same as older version
   - transparent case, transparent purple orange blue red buttons, leds same as before
 
-***************************************************************************/
+*******************************************************************************/
 
 class copycata_state : public hh_tms1k_state
 {
@@ -15010,7 +15010,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger Ditto (model 7-530)
   * TMS1700 MCU, label MP1801-N2LL (die label: 1700, MP1801)
@@ -15021,7 +15021,7 @@ ROM_END
   - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), published by Tandy
     note: 1996 model 60-2482 MCU is a Z8, and is assumed to be a clone of Tiger Copycat Jr.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ditto_state : public hh_tms1k_state
 {
@@ -15099,7 +15099,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tiger 7 in 1 Sports Stadium (model 7-555)
   * TMS1400 MP7304 (die label: TMS1400, MP7304A, 28L 01D D000 R300)
@@ -15113,7 +15113,7 @@ ROM_END
   - World: 7 in 1 Sports Stadium, published by Tiger
   - USA: 7 in 1 Sports, published by Sears
 
-***************************************************************************/
+*******************************************************************************/
 
 class t7in1ss_state : public hh_tms1k_state
 {
@@ -15232,7 +15232,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronics) Break Up (manufactured in Japan)
   * PCB label: TOMY B.O.
@@ -15265,7 +15265,7 @@ ROM_END
     8.*        13.*
     10.*       12.*
 
-***************************************************************************/
+*******************************************************************************/
 
 class tbreakup_state : public hh_tms1k_state
 {
@@ -15435,7 +15435,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Power House Pinball
   * PCB label: TOMY P-B
@@ -15462,7 +15462,7 @@ ROM_END
 
   NOTE!: MAME external artwork is required
 
-***************************************************************************/
+*******************************************************************************/
 
 class phpball_state : public hh_tms1k_state
 {
@@ -15570,7 +15570,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tsukuda The Dracula
   * PCB label: TOFL-001A / B
@@ -15582,7 +15582,7 @@ ROM_END
   - Japan: The Dracula, published by Tsukuda
   - France: Dracula/The Dracula, published by Euro Toy
 
-***************************************************************************/
+*******************************************************************************/
 
 class tdracula_state : public hh_tms1k_state
 {
@@ -15699,7 +15699,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tsukuda Slot Elepachi 「スロットエレパチ」
   * PCB label: TOFL003
@@ -15711,7 +15711,7 @@ ROM_END
   and one with a blue trigger button and red slot button. The game itself is
   assumed to be the same.
 
-***************************************************************************/
+*******************************************************************************/
 
 class slepachi_state : public hh_tms1k_state
 {
@@ -15840,7 +15840,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   U.S. Games Space Cruiser (model TF2)
   * PCB label: TF2
@@ -15854,7 +15854,7 @@ ROM_END
   - USA(1): Space Cruiser, published by U.S. Games
   - USA(2): Pro-Action Strategy Football, published by Calfax / Caprice
 
-***************************************************************************/
+*******************************************************************************/
 
 class scruiser_state : public hh_tms1k_state
 {
@@ -16001,7 +16001,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   U.S. Games Super Sports-4 (model TH42)
   * TMS1100 MP1219 (no decap)
@@ -16014,7 +16014,7 @@ ROM_END
   This handheld includes 4 games: Basketball, Football, Soccer, Hockey.
   MAME external artwork is needed for the switchable overlays.
 
-***************************************************************************/
+*******************************************************************************/
 
 class ssports4_state : public hh_tms1k_state
 {
@@ -16163,7 +16163,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Vulcan XL 25
   * TMS1000SLC MP4486A (die label: 1000C/, MP4486A)
@@ -16172,7 +16172,7 @@ ROM_END
   This game is the same logic puzzle as Tiger's Lights Out, except that
   all 25 lights need to be turned on instead of off.
 
-***************************************************************************/
+*******************************************************************************/
 
 class xl25_state : public hh_tms1k_state
 {
@@ -16344,158 +16344,156 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
+    Game driver(s)
+*******************************************************************************/
 
-  Game driver(s)
+//    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, matchnum,   0,         0,      matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, arrball,    0,         0,      arrball,   arrball,   arrball_state,   empty_init, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
 
-***************************************************************************/
+SYST( 1980, mathmagi,   0,         0,      mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-//    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, matchnum,   0,         0, matchnum,  matchnum,  matchnum_state,  empty_init, "A-One LSI", "Match Number", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, arrball,    0,         0, arrball,   arrball,   arrball_state,   empty_init, "A-One LSI", "Arrange Ball", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bcheetah,   0,         0,      bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+SYST( 1980, racetime,   0,         0,      racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, tc7atc,     0,         0,      tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  empty_init, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, palmf31,    0,         0,      palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, palmmd8,    0,         0,      palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
-CONS( 1980, racetime,   0,         0, racetime,  racetime,  racetime_state,  empty_init, "Bandai", "Race Time", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, tc7atc,     0,         0, tc7atc,    tc7atc,    tc7atc_state,    empty_init, "Bandai", "TC7: Air Traffic Control", MACHINE_SUPPORTS_SAVE )
+SYST( 1977, cchime,     0,         0,      cchime,    cchime,    cchime_state,    empty_init, "Chromatronics", "Chroma-Chime", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1978, amaztron,   0,         0,      amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+SYST( 1979, zodiac,     0,         0,      zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac: The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, cqback,     0,         0,      cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, h2hfootb,   0,         0,      h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, h2hbaskb,   0,         0,      h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, h2hhockey,  0,         0,      h2hhockey, h2hhockey, h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, h2hbaseb,   0,         0,      h2hbaseb,  h2hbaseb,  h2hbaseb_state,  empty_init, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, h2hboxing,  0,         0,      h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, quizwizc,   0,         0,      quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1981, tc4,        0,         0,      tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-SYST( 1977, cchime,     0,         0, cchime,    cchime,    cchime_state,    empty_init, "Chromatronics", "Chroma-Chime", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, litelrn,    0,         0,      litelrn,   litelrn,   litelrn_state,   empty_init, "Concept 2000", "Lite 'n Learn: Electronic Organ", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, mrmusical,  0,         0,      mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
-COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, cqback,     0,         0, cqback,    cqback,    cqback_state,    empty_init, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, h2hfootb,   0,         0, h2hfootb,  h2hfootb,  h2hfootb_state,  empty_init, "Coleco", "Head to Head: Electronic Football", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, h2hbaskb,   0,         0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Basketball (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, h2hhockey,  0,         0, h2hhockey, h2hhockey, h2hbaskb_state,  empty_init, "Coleco", "Head to Head: Electronic Hockey (TMS1000 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hbaseb,   0,         0, h2hbaseb,  h2hbaseb,  h2hbaseb_state,  empty_init, "Coleco", "Head to Head: Electronic Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, h2hboxing,  0,         0, h2hboxing, h2hboxing, h2hboxing_state, empty_init, "Coleco", "Head to Head: Electronic Boxing", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, quizwizc,   0,         0, quizwizc,  quizwizc,  quizwizc_state,  empty_init, "Coleco", "Quiz Wiz Challenger", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1981, tc4,        0,         0, tc4,       tc4,       tc4_state,       empty_init, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1979, cnbaskb,    0,         0,      cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, cmsport,    0,         0,      cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1979, cnfball,    0,         0,      cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, cnfball2,   0,         0,      cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, eleciq,     0,         0,      eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1978, litelrn,    0,         0, litelrn,   litelrn,   litelrn_state,   empty_init, "Concept 2000", "Lite 'n Learn: Electronic Organ", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1978, mrmusical,  0,         0, mrmusical, mrmusical, mrmusical_state, empty_init, "Concept 2000", "Mr. Mus-I-Cal", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, qfire,      0,         0,      qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, cnbaskb,    0,         0, cnbaskb,   cnbaskb,   cnbaskb_state,   empty_init, "Conic", "Electronic Basketball (Conic)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, cmsport,    0,         0, cmsport,   cmsport,   cmsport_state,   empty_init, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1979, cnfball,    0,         0, cnfball,   cnfball,   cnfball_state,   empty_init, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, cnfball2,   0,         0, cnfball2,  cnfball2,  cnfball2_state,  empty_init, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, eleciq,     0,         0, eleciq,    eleciq,    eleciq_state,    empty_init, "Conic", "Electronic I.Q.", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, esoccer,    0,         0,      esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ebball,     0,         0,      ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, ebball2,    0,         0,      ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ebball3,    0,         0,      ebball3,   ebball3,   ebball3_state,   empty_init, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, esbattle,   0,         0,      esbattle,  esbattle,  esbattle_state,  empty_init, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, blastit,    0,         0,      blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, einvader,   0,         0,      einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, efootb4 ,   0,         0,      efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ebaskb2 ,   0,         0,      ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, raisedvl,   0,         0,      raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, ebknight,   0,         0,      ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, mmarvin,    0,         0,      mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, qfire,      0,         0, qfire,     qfire,     qfire_state,     empty_init, "Electroplay", "Quickfire", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, f2pbball,   0,         0,      f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, f3in1,      0,         0,      f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, esoccer,    0,         0, esoccer,   esoccer,   esoccer_state,   empty_init, "Entex", "Electronic Soccer (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ebball,     0,         0, ebball,    ebball,    ebball_state,    empty_init, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ebball2,    0,         0, ebball2,   ebball2,   ebball2_state,   empty_init, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, ebball3,    0,         0, ebball3,   ebball3,   ebball3_state,   empty_init, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  empty_init, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, blastit,    0,         0, blastit,   blastit,   blastit_state,   empty_init, "Entex", "Blast It", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, ebknight,   0,         0, ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, mmarvin,    0,         0, mmarvin,   mmarvin,   mmarvin_state,   empty_init, "Entex", "Musical Marvin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, gpoker,     0,         0,      gpoker,    gpoker,    gpoker_state,    empty_init, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, gjackpot,   0,         0,      gjackpot,  gjackpot,  gjackpot_state,  empty_init, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ginv,       0,         0,      ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, ginv1000,   0,         0,      ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, ginv2000,   0,         0,      ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, fxmcr165,   0,         0,      fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1979, elecdet,    0,         0,      elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1979, gpoker,     0,         0, gpoker,    gpoker,    gpoker_state,    empty_init, "Gakken", "Poker (Gakken, 1979 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, gjackpot,   0,         0, gjackpot,  gjackpot,  gjackpot_state,  empty_init, "Gakken", "Jackpot: Gin Rummy & Black Jack", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, ginv,       0,         0, ginv,      ginv,      ginv_state,      empty_init, "Gakken", "Invader (Gakken, cyan version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, ginv1000,   0,         0, ginv1000,  ginv1000,  ginv1000_state,  empty_init, "Gakken", "Galaxy Invader 1000", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, ginv2000,   0,         0, ginv2000,  ginv2000,  ginv2000_state,  empty_init, "Gakken", "Invader 2000", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, fxmcr165,   0,         0, fxmcr165,  fxmcr165,  fxmcr165_state,  empty_init, "Gakken", "FX-Micom R-165", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, starwbc,    0,         0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, starwbcp,   starwbc,   0,      starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars: Electronic Battle Command Game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, liveafb,    0,         0,      liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, elecdet,    0,         0, elecdet,   elecdet,   elecdet_state,   empty_init, "Ideal Toy Corporation", "Electronic Detective", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1979, astro,      0,         0,      astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, starwbc,    0,         0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, starwbcp,   starwbc,   0, starwbc,   starwbc,   starwbc_state,   empty_init, "Kenner", "Star Wars - Electronic Battle Command (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1980, liveafb,    0,         0, liveafb,   liveafb,   liveafb_state,   empty_init, "Kenner", "Live Action Football", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, elecbowl,   0,         0,      elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
 
-COMP( 1979, astro,      0,         0, astro,     astro,     astro_state,     empty_init, "Kosmos", "Astro", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, horseran,   0,         0,      horseran,  horseran,  horseran_state,  empty_init, "Mattel Electronics", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1980, mdndclab,   0,         0,      mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons: Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
-CONS( 1978, elecbowl,   0,         0, elecbowl,  elecbowl,  elecbowl_state,  empty_init, "Marx", "Electronic Bowling (Marx)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS | MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // ***
+SYST( 1977, comp4,      0,         0,      comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1977, bship,      0,         0,      bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
+SYST( 1978, bshipb,     bship,     0,      bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+SYST( 1978, simon,      0,         0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, simonf,     simon,     0,      simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ssimon,     0,         0,      ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, bigtrak,    0,         0,      bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
+SYST( 1981, mbdtower,   0,         0,      mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
+SYST( 1983, arcmania,   0,         0,      arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
 
-COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  empty_init, "Mattel Electronics", "Thoroughbred Horse Race Analyzer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
+SYST( 1977, cnsector,   0,         0,      cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
+SYST( 1978, merlin,     0,         0,      merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin: The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, pbmastm,    0,         0,      pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+SYST( 1979, stopthief,  0,         0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1979, stopthiefp, stopthief, 0,      stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief: Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1980, bankshot,   0,         0,      bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot: Electronic Pool", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, splitsec,   0,         0,      splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, mmerlin,    0,         0,      mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, lostreas,   0,         0,      lostreas,  lostreas,  lostreas_state,  empty_init, "Parker Brothers", "Lost Treasure: The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
-CONS( 1978, bshipb,     bship,     0, bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1978, simon,      0,         0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, ssimon,     0,         0, ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, bigtrak,    0,         0, bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
-CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***
-CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  empty_init, "Milton Bradley", "Electronic Arcade Mania (Arcade Machine)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK ) // ***
+SYST( 1978, alphie,     0,         0,      alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie: The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
 
-CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, pbmastm,    0,         0, pbmastm,   pbmastm,   pbmastm_state,   empty_init, "Parker Brothers", "Electronic Master Mind (Parker Brothers)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
-CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
-CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief - Electronic Cops and Robbers (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
-CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, lostreas,   0,         0, lostreas,  lostreas,  lostreas_state,  empty_init, "Parker Brothers", "Lost Treasure - The Electronic Deep-Sea Diving Game (Electronic Dive-Control Center)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1980, tcfball,    0,         0,      tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, tcfballa,   tcfball,   0,      tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, comparc,    0,         0,      comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+SYST( 1982, monkeysee,  0,         0,      monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, t3in1sa,    0,         0,      t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1984, vclock3,    0,         0,      vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1978, alphie,     0,         0, alphie,    alphie,    alphie_state,    empty_init, "Playskool", "Alphie - The Electronic Robot (patent)", MACHINE_SUPPORTS_SAVE ) // ***
+SYST( 1985, wtalker,    0,         0,      wtalker,   wtalker,   wtalker_state,   empty_init, "Technasonic", "Weight Talker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 
-CONS( 1980, tcfball,    0,         0, tcfball,   tcfball,   tcfball_state,   empty_init, "Tandy Corporation", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tcfballa,   tcfball,   0, tcfballa,  tcfballa,  tcfballa_state,  empty_init, "Tandy Corporation", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, comparc,    0,         0, comparc,   comparc,   comparc_state,   empty_init, "Tandy Corporation", "Computerized Arcade (TMS1100 version, model 60-2159)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
-CONS( 1982, monkeysee,  0,         0, monkeysee, monkeysee, monkeysee_state, empty_init, "Tandy Corporation", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, t3in1sa,    0,         0, t3in1sa,   t3in1sa,   t3in1sa_state,   empty_init, "Tandy Corporation", "3 in 1 Sports Arena", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1984, vclock3,    0,         0, vclock3,   vclock3,   vclock3_state,   empty_init, "Tandy Corporation", "VoxClock 3", MACHINE_SUPPORTS_SAVE )
+SYST( 1976, speechp,    0,         0,      speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1985, wtalker,    0,         0, wtalker,   wtalker,   wtalker_state,   empty_init, "Technasonic", "Weight Talker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1974, tisr16,     0,         0,      tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1975, tisr16ii,   0,         0,      tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1975, ti1250,     0,         0,      ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, ti1250a,    ti1250,    0,      ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, ti1270,     0,         0,      ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1975, ti25502,    0,         0,      ti25502,   ti25502,   ti25502_state,   empty_init, "Texas Instruments", "TI-2550 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, ti25503,    0,         0,      ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, ti5100,     0,         0,      ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, ti5200,     0,         0,      ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, ti30,       0,         0,      ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, tibusan,    0,         0,      ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, tiprog,     0,         0,      ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, ti1000,     0,         0,      ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, wizatron,   0,         0,      wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1976, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1978, lilprofa,   lilprof,   0,      lilprofa,  lilprofa,  lilprofa_state,  empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, ti1680,     0,         0,      ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, dataman,    0,         0,      dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1980, mathmarv,   0,         0,      mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, timaze,     0,         0,      timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1979, tithermos,  0,         0,      tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
-COMP( 1976, speechp,    0,         0, speechp,   speechp,   speechp_state,   empty_init, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, subwars,    0,         0,      subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, playmaker,  0,         0,      playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, dxfootb,    0,         0,      dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, copycat,    0,         0,      copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, copycata,   copycat,   0,      copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, ditto,      0,         0,      ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, t7in1ss,    0,         0,      t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1974, tisr16,     0,         0, tisr16,    tisr16,    tisr16_state,    empty_init, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, tisr16ii,   0,         0, tisr16,    tisr16ii,  tisr16_state,    empty_init, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1975 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti1250a,    ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1975, ti25502,    0,         0, ti25502,   ti25502,   ti25502_state,   empty_init, "Texas Instruments", "TI-2550 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, ti5200,     0,         0, ti5200,    ti5200,    ti5200_state,    empty_init, "Texas Instruments", "TI-5200", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, ti1000,     0,         0, ti1000,    ti1000,    ti1000_state,    empty_init, "Texas Instruments", "TI-1000 (1977 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, wizatron,   0,         0, wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, lilprof,    0,         0, lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1978, lilprofa,   lilprof,   0, lilprofa,  lilprofa,  lilprofa_state,  empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, ti1680,     0,         0, ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1979, tbreakup,   0,         0,      tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, phpball,    0,         0,      phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, playmaker,  0,         0, playmaker, playmaker, playmaker_state, empty_init, "Tiger Electronics", "Playmaker: Hockey, Soccer, Basketball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, dxfootb,    0,         0, dxfootb,   dxfootb,   dxfootb_state,   empty_init, "Tiger Electronics", "Deluxe Football with Instant Replay", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, copycata,   copycat,   0, copycata,  copycata,  copycata_state,  empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, t7in1ss,    0,         0, t7in1ss,   t7in1ss,   t7in1ss_state,   empty_init, "Tiger Electronics", "7 in 1 Sports Stadium", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, tdracula,   0,         0,      tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, slepachi,   0,         0,      slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, tbreakup,   0,         0, tbreakup,  tbreakup,  tbreakup_state,  empty_init, "Tomy", "Break Up (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   empty_init, "Tomy", "Power House Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, scruiser,   0,         0,      scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games Corporation", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1980, ssports4,   0,         0,      ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games Corporation", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, slepachi,   0,         0, slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games Corporation", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games Corporation", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-
-CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, xl25,       0,         0,      xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

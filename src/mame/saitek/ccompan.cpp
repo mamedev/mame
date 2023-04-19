@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Chess Companion
 
@@ -16,7 +16,7 @@ Hardware notes:
 - 1KB RAM (2*HM472114P-4)
 - beeper, button sensors chessboard, 16+12 leds
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -86,9 +86,9 @@ void ccompan_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void ccompan_state::update_display()
 {
@@ -140,9 +140,9 @@ u8 ccompan_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void ccompan_state::main_map(address_map &map)
 {
@@ -154,9 +154,9 @@ void ccompan_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( ccompan )
 	PORT_START("IN.0")
@@ -182,13 +182,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void ccompan_state::ccompan(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6504(config, m_maincpu, 1000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccompan_state::main_map);
 
@@ -202,20 +202,20 @@ void ccompan_state::ccompan(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(10+2, 3);
 	config.set_default_layout(layout_saitek_ccompan);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( ccompan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -226,9 +226,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, ccompan, 0,      0, ccompan, ccompan, ccompan_state, empty_init, "SciSys", "Chess Companion", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, ccompan, 0,      0,      ccompan, ccompan, ccompan_state, empty_init, "SciSys", "Chess Companion", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

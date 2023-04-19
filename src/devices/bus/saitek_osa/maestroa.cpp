@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek OSA Module: Kasparov Maestro A (SciSys, 1986)
 
@@ -17,7 +17,7 @@ Hardware notes:
 The CPU is a 4MHz part, higher speed modules overclock it. The PCB is not
 compatible for upgrading to newer Maestro versions.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "maestroa.h"

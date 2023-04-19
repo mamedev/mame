@@ -5,7 +5,8 @@
   Suwa Seikosha (now Seiko Epson) SMC1102, SMC1112
 
 SMC1102 is a CMOS MCU based on TMS1100, keeping the same ALU and opcode mnemonics.
-They added a timer, interrupts, and a built-in LCD controller.
+The stack(CALL/RETN) works a bit differently. They added a timer, interrupts,
+and a built-in LCD controller.
 
 In the USA, it was marketed by S-MOS Systems, an affiliate of Seiko Group.
 
@@ -20,6 +21,7 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 TODO:
 - each opcode is 4 cycles instead of 6
 - LCD refresh timing is unknown
+- add (micro)instructions PLA if it turns out it can be customized
 - add timer
 - add halt opcode
 
@@ -119,28 +121,30 @@ u32 smc1102_cpu_device::decode_micro(offs_t offset)
 	// TCY, YNEC, TCMIY
 	static const u16 micro1[3] = { 0x0402, 0x1204, 0x1032 };
 
-	// 0x20, 0x30, 0x00, 0x70
+	// 0x00, 0x20, 0x30, 0x70
 	static const u16 micro2[0x40] =
 	{
+		0x0904, 0x0898, 0x1104, 0x2821, 0x104a, 0x101a, 0x0909, 0x0849,
+		0x0401, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0404, 0x0000,
+
 		0x0102, 0x0801, 0x0802, 0x1001, 0x306a, 0x303a, 0x2021, 0x2020,
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 		0x0e04, 0x0e04, 0x0e04, 0x0e04, 0x0899, 0x0099, 0x0819, 0x0804,
 
-		0x0904, 0x0898, 0x1104, 0x2821, 0x104a, 0x101a, 0x0909, 0x0849,
-		0x0401, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0404, 0x0000,
-
 		0x0519, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0519,
-		0x0000, 0x0519, 0x0519, 0x0000, 0x0000, 0x0000, 0x0519, 0x0419,
+		0x0000, 0x0519, 0x0519, 0x0000, 0x0000, 0x0000, 0x0519, 0x0419
 	};
+
+	static const int micro2h[8] = { 0x00, -1, 0x10, 0x20, -1, -1, -1, 0x30 };
 
 	u16 mask = 0;
 
 	if (offset >= 0x40 && offset < 0x70)
 		mask = micro1[offset >> 4 & 3];
 	else if (offset < 0x80 && (offset & 0xf0) != 0x10)
-		mask = micro2[((offset ^ 0x20) | (offset >> 1 & 0x20)) & 0x3f];
+		mask = micro2[micro2h[offset >> 4] | (offset & 0xf)];
 
 	// does not have M_MTN or M_STSL
 	const u32 md[14] = { M_AUTA, M_AUTY, M_NE, M_C8, M_CIN, M_CKM, M_15TN, M_NATN, M_ATN, M_CKN, M_CKP, M_MTP, M_YTP, M_STO };
@@ -224,15 +228,15 @@ void smc1102_cpu_device::interrupt()
 void smc1102_cpu_device::op_call()
 {
 	// CALL: call subroutine
-	if (!m_status)
-		return;
+	if (m_status)
+	{
+		m_stack[m_sp] = m_ca << 10 | m_pa << 6 | m_pc;
+		m_sp = (m_sp + 1) % m_stack_levels;
 
-	m_stack[m_sp] = m_ca << 10 | m_pa << 6 | m_pc;
-	m_sp = (m_sp + 1) % m_stack_levels;
-
-	m_pc = m_opcode & m_pc_mask;
-	m_pa = m_pb;
-	m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+		m_pa = m_pb;
+		m_ca = m_cb;
+	}
 }
 
 void smc1102_cpu_device::op_retn()

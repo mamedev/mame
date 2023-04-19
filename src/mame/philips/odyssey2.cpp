@@ -249,9 +249,9 @@ void vpp_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 constexpr rgb_t odyssey2_colors[] =
 {
@@ -348,9 +348,9 @@ u32 vpp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // 8048 ports
 
@@ -516,9 +516,9 @@ void vpp_state::ef934x_extram_w(offs_t offset, u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void odyssey2_state::odyssey2_mem(address_map &map)
 {
@@ -534,9 +534,9 @@ void odyssey2_state::odyssey2_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( o2 )
 	PORT_START("KEY.0")
@@ -743,13 +743,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void odyssey2_state::odyssey2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8048(config, m_maincpu, (7.15909_MHz_XTAL * 3) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
@@ -761,7 +761,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	m_maincpu->t0_in_cb().set(m_cart, FUNC(o2_cart_slot_device::t0_read));
 	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(odyssey2_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -777,7 +777,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	/* cartridge */
+	// cartridge
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("O2");
 }
@@ -810,7 +810,7 @@ void odyssey2_state::videopacf(machine_config &config)
 
 void vpp_state::g7400(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8048(config, m_maincpu, 5.911_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vpp_state::odyssey2_mem);
 	m_maincpu->set_addrmap(AS_IO, &vpp_state::odyssey2_io);
@@ -823,7 +823,7 @@ void vpp_state::g7400(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(vpp_state::t1_read));
 	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(vpp_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -850,7 +850,7 @@ void vpp_state::g7400(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	/* cartridge */
+	// cartridge
 	O2_CART_SLOT(config, m_cart, o2_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
@@ -885,9 +885,9 @@ void vpp_state::odyssey3(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START (videopac)
 	ROM_REGION(0x0400, "maincpu", 0)
@@ -924,15 +924,15 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE    INPUT  STATE           INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1978, videopac,  0,         0, videopac,  o2,    odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, videopacf, videopac,  0, videopacf, o2,    odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, odyssey2,  videopac,  0, odyssey2,  o2,    odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT     COMPAT  MACHINE    INPUT  CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, videopac,  0,         0,      videopac,  o2,    odyssey2_state, empty_init, "Philips", "Videopac G7000 (Europe)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, videopacf, videopac,  0,      videopacf, o2,    odyssey2_state, empty_init, "Philips", "Videopac C52 (France)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, odyssey2,  videopac,  0,      odyssey2,  o2,    odyssey2_state, empty_init, "Magnavox", "Odyssey 2 (US)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1983, videopacp, 0,         0, g7400,     vpp,   vpp_state,      empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, jopac,     videopacp, 0, jo7400,    vpp,   vpp_state,      empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, odyssey3,  videopacp, 0, odyssey3,  o3,    vpp_state,      empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, videopacp, 0,         0,      g7400,     vpp,   vpp_state,      empty_init, "Philips", "Videopac+ G7400 (Europe)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, jopac,     videopacp, 0,      jo7400,    vpp,   vpp_state,      empty_init, "Philips (Brandt license)", "Jopac JO7400 (France)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, odyssey3,  videopacp, 0,      odyssey3,  o3,    vpp_state,      empty_init, "Philips", "Odyssey 3 Command Center (US, prototype)", MACHINE_SUPPORTS_SAVE )

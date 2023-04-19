@@ -586,11 +586,11 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1980, spellb,   0,        0, rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, spellba,  spellb,   0, rev1,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, spellabc, spellb,   0, rev2,    spellabc, spellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, spellb,   0,        0,      rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1978, spellba,  spellb,   0,      rev1,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1980, spellabc, spellb,   0,      rev2,    spellabc, spellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1979, mrchalgr, 0,        0, rev2,    mrchalgr, spellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlf, mrchalgr, 0, rev2,    letterlf, spellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlg, mrchalgr, 0, rev2,    letterlg, spellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, mrchalgr, 0,        0,      rev2,    mrchalgr, spellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, letterlf, mrchalgr, 0,      rev2,    letterlf, spellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, letterlg, mrchalgr, 0,      rev2,    letterlg, spellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )

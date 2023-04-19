@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Saitek OSA Module: Kasparov Maestro/Analyst (1987-1990)
 This is for the newer versions. For Maestro A, see maestroa.*
@@ -28,7 +28,7 @@ handle the overclock well enough, they went for a slightly lower speed XTAL.
 TODO:
 - cpu clock divider after writing to 0x2000/0x2200
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "maestro.h"

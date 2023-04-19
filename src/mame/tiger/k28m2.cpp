@@ -1,21 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Sean Riddle, David Viens, Kevin Horton
+// thanks-to:Sean Riddle, David Viens
 /*******************************************************************************
 
-Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
+Tiger Electronics K-2-8 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher (model 8100)
 - Sears: Talkatron: Learning Computer
 
-1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
+1981 K-2-8 models 7-230 and 7-231 are on different hardware, showing a different
 keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
 
 Hardware notes:
 - PCB label: 201223A (main), REV0 ET828D (LCD)
-- MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
-- TMS51xx: TMS5110ANL
-- VSM: 16KB CM62084
-- LCD: SMC1112 MCU under epoxy (die label: SMC1112 D2N0), 8*14-seg display
+- TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
+- SMC1112 under epoxy (die label: SMC1112 D2N0), 8*14-seg display
+- TMS5110ANL, CM62084 VSM (16KB)
 - module slot (not compatible with the 1981 version(s))
 
 TODO:
@@ -236,7 +235,7 @@ static INPUT_PORTS_START( k28m2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 
 	PORT_START("IN.1") // O1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, k28m2_state, power_on, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, k28m2_state, power_on, 0) PORT_NAME("On")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B/2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('K') PORT_NAME("K/+")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
@@ -358,4 +357,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1985, k28m2,  0,      0,      k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1985, k28m2,  0,      0,      k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

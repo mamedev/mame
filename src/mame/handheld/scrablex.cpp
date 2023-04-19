@@ -225,5 +225,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, scrablex, 0,      0, scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor - Computer Word Game", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, scrablex, 0,      0,      scrablex, scrablex, scrablex_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game", MACHINE_SUPPORTS_SAVE )

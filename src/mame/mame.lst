@@ -43664,6 +43664,10 @@ ti990_4v                        // 1976 TI 990/4 with video display terminal
 990189                          // 1978 TM 990/189
 990189v                         // 1980 TM 990/189 with Color Video Board
 
+@source:tiger/bingobear.cpp
+bbear
+monkmonk
+
 @source:tiger/gamecom.cpp
 gamecom                         // Tiger Game.com
 

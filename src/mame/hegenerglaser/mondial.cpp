@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Mondial
 
@@ -14,7 +14,7 @@ TODO:
 - verify XTAL (or maybe RC or LC circuit), 2MHz is correct
 - dump/add MM 1000 module
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -73,9 +73,9 @@ void mondial_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::control_w(u8 data)
 {
@@ -113,9 +113,9 @@ u8 mondial_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::mondial_mem(address_map &map)
 {
@@ -128,9 +128,9 @@ void mondial_state::mondial_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mondial )
 	PORT_START("KEY.0")
@@ -156,13 +156,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mondial_state::mondial(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
 
@@ -176,11 +176,11 @@ void mondial_state::mondial(machine_config &config)
 	//GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mondial_cart");
 	//SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mondial");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 3);
 	config.set_default_layout(layout_mephisto_mondial);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 2150); // approximation
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -188,9 +188,9 @@ void mondial_state::mondial(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mondial )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -201,9 +201,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME            FLAGS */
-CONS( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -4,13 +4,6 @@
 
   TMS1000 family - base/shared
 
-  TODO:
-  - accurate INIT pin (currently, just use INPUT_LINE_RESET)
-  - emulate newer die revisions? TMS1xxx rev. E and up have 4 cycles
-    per opcode instead of 6. But which steps go where, is unknown.
-    For now, just overclock the MCU instead.
-
-
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
 slightly bigger addressable area and uses 9bit instructions where the TMS1000
 family uses 8bit instruction. The instruction set themselves are very similar
@@ -412,109 +405,106 @@ void tms1k_base_device::set_cki_bus()
 // add(latch) and bl(branch latch) are specific to 0980 series, c(chapter) bits are specific to 1100(and 1400) series
 // TMS1400 and up and the CMOS chips have multiple stack levels, branches work a bit differently
 
-void tms1k_base_device::op_br()
+// BR/BL: conditional branch
+
+void tms1k_base_device::op_br1()
 {
-	// BR/BL: conditional branch
-	if (m_stack_levels == 1)
+	if (m_status)
 	{
-		if (m_status)
-		{
-			if (m_clatch == 0)
-				m_pa = m_pb;
-
-			m_ca = m_cb;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-	else
-	{
-		if (m_status)
-		{
-			m_pa = m_pb; // don't care about clatch
-			m_ca = m_cb;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-}
-
-void tms1k_base_device::op_call()
-{
-	// CALL/CALLL: conditional call
-	if (m_stack_levels == 1)
-	{
-		if (m_status)
-		{
-			u8 prev_pa = m_pa;
-
-			if (!m_clatch)
-			{
-				m_clatch = 1;
-				m_sr = m_pc;
-				m_pa = m_pb;
-				m_cs = m_ca;
-			}
-
-			m_ca = m_cb;
-			m_pb = prev_pa;
-			m_pc = m_opcode & m_pc_mask;
-		}
-	}
-	else
-	{
-		if (m_status)
-		{
-			// mask clatch bits (no need to mask others)
-			u8 smask = (1 << m_stack_levels) - 1;
-			m_clatch = (m_clatch << 1 | 1) & smask;
-
-			m_sr = m_sr << m_pc_bits | m_pc;
-			m_pc = m_opcode & m_pc_mask;
-
-			m_ps = m_ps << 4 | m_pa;
+		if (m_clatch == 0)
 			m_pa = m_pb;
 
-			m_cs = m_cs << 2 | m_ca;
-			m_ca = m_cb;
-		}
-		else
-		{
-			m_pb = m_pa;
-			m_cb = m_ca;
-		}
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
 	}
 }
 
-void tms1k_base_device::op_retn()
+void tms1k_base_device::op_brn()
 {
-	// RETN: return from subroutine
-	if (m_stack_levels == 1)
+	if (m_status)
 	{
-		if (m_clatch)
+		m_pa = m_pb; // don't care about clatch
+		m_ca = m_cb;
+		m_pc = m_opcode & m_pc_mask;
+	}
+}
+
+// CALL/CALLL: conditional call
+
+void tms1k_base_device::op_call1()
+{
+	if (m_status)
+	{
+		u8 prev_pa = m_pa;
+
+		if (!m_clatch)
 		{
-			m_clatch = 0;
-			m_pc = m_sr;
-			m_ca = m_cs;
+			m_clatch = 1;
+			m_sr = m_pc;
+			m_pa = m_pb;
+			m_cs = m_ca;
 		}
 
-		m_add = 0;
-		m_bl = 0;
+		m_ca = m_cb;
+		m_pb = prev_pa;
+		m_pc = m_opcode & m_pc_mask;
+	}
+}
+
+void tms1k_base_device::op_calln()
+{
+	if (m_status)
+	{
+		// mask clatch bits (no need to mask others)
+		u8 smask = (1 << m_stack_levels) - 1;
+		m_clatch = (m_clatch << 1 | 1) & smask;
+
+		m_sr = m_sr << m_pc_bits | m_pc;
+		m_pc = m_opcode & m_pc_mask;
+
+		m_ps = m_ps << 4 | m_pa;
 		m_pa = m_pb;
+
+		m_cs = m_cs << 2 | m_ca;
+		m_ca = m_cb;
 	}
 	else
 	{
-		if (m_clatch & 1)
-		{
-			m_clatch >>= 1;
+		m_pb = m_pa;
+		m_cb = m_ca;
+	}
+}
 
-			m_pc = m_sr & m_pc_mask;
-			m_sr >>= m_pc_bits;
+// RETN: return from subroutine
 
-			m_pa = m_pb = m_ps & 0xf;
-			m_ps >>= 4;
+void tms1k_base_device::op_retn1()
+{
+	if (m_clatch)
+	{
+		m_clatch = 0;
+		m_pc = m_sr;
+		m_ca = m_cs;
+	}
 
-			m_ca = m_cb = m_cs & 3;
-			m_cs >>= 2;
-		}
+	m_add = 0;
+	m_bl = 0;
+	m_pa = m_pb;
+}
+
+void tms1k_base_device::op_retnn()
+{
+	if (m_clatch & 1)
+	{
+		m_clatch >>= 1;
+
+		m_pc = m_sr & m_pc_mask;
+		m_sr >>= m_pc_bits;
+
+		m_pa = m_pb = m_ps & 0xf;
+		m_ps >>= 4;
+
+		m_ca = m_cb = m_cs & 3;
+		m_cs >>= 2;
 	}
 }
 

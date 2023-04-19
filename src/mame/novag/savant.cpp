@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Savant, chess computer with touchscreen. It was followed by Savant II and
 Savant Royale on the same hardware, the program is the same and they just added
@@ -22,7 +22,7 @@ anymore in original working order.
 TODO:
 - get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -122,9 +122,9 @@ void savant_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // Z80 side
 
@@ -264,9 +264,9 @@ u8 savant_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void savant_state::main_map(address_map &map)
 {
@@ -300,9 +300,9 @@ void savant_state::mcu_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( savant )
 	PORT_START("IN.0")
@@ -343,13 +343,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void savant_state::savant(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &savant_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &savant_state::main_io);
@@ -374,7 +374,7 @@ void savant_state::savant(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
+	// video hardware
 	HLCD0538(config, m_lcd1).write_cols().set(FUNC(savant_state::lcd1_output_w));
 	HLCD0539(config, m_lcd2).write_cols().set(FUNC(savant_state::lcd2_output_w));
 
@@ -386,16 +386,16 @@ void savant_state::savant(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
 	config.set_default_layout(layout_novag_savant);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( savant )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
@@ -429,10 +429,10 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, savant,  0,      0, savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, savant2, savant, 0, savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

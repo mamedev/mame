@@ -2,10 +2,10 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-Talking Wrinkles, a plushie dog handpuppet toy
+Talking Wrinkles (model 6006), a dog hand puppet
 
 Published by Lakeside (a Coleco subsidiary at that time, after Coleco purchased
-Leisure Dynamics in 1985). Programming by Steve Beck. The speech technology is
+Leisure Dynamics in 1985). Programming by Stephen Beck. The speech technology is
 by Electronic Speech Systems. The plushie itself is licensed from Ganz Bros.
 
 Hardware notes:
@@ -128,4 +128,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, wrinkles,  0,      0,      wrinkles, wrinkles, wrinkles_state, empty_init, "Lakeside / Coleco / Ganz Bros", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+SYST( 1986, wrinkles,  0,      0,      wrinkles, wrinkles, wrinkles_state, empty_init, "Lakeside / Coleco / Ganz Bros", "Talking Wrinkles", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )

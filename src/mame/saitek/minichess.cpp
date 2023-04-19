@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Mini Chess, pocket calculator style chesscomputer
 
@@ -23,7 +23,7 @@ On CP3000/4000 they added a level slider. This will oscillate the level switch
 input pin, so the highest level setting is the same as level 2 on Mini Chess.
 It works on the old A34 MCU because the game keeps reading D0 while computing.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
@@ -87,9 +87,9 @@ void mini_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mini_state::update_display()
 {
@@ -140,9 +140,9 @@ u16 mini_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( smchess )
 	PORT_START("IN.0")
@@ -172,20 +172,20 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mini_state::smchess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD44801(config, m_maincpu, 400000);
 	m_maincpu->write_r<2>().set(FUNC(mini_state::seg_w<0>));
 	m_maincpu->write_r<3>().set(FUNC(mini_state::seg_w<1>));
 	m_maincpu->write_d().set(FUNC(mini_state::mux_w));
 	m_maincpu->read_d().set(FUNC(mini_state::input_r));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	m_display->set_refresh(attotime::from_hz(30));
@@ -197,9 +197,9 @@ void mini_state::smchess(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( smchess )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -210,9 +210,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, smchess, 0,      0, smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, smchess, 0,      0,      smchess, smchess, mini_state, empty_init, "SciSys", "Mini Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
