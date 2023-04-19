@@ -648,6 +648,8 @@ User data note:
 #include "namcos10_exio.h"
 #include "ns10crypt.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/cr589.h"
 #include "cpu/psx/psx.h"
 #include "cpu/tlcs900/tmp95c061.h"
 #include "machine/intelfsh.h"
@@ -671,6 +673,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_decrypter(*this, "decrypter")
+		, m_ata(*this, "ata")
 		, m_io_update_interrupt(*this)
 		, m_io_system(*this, "SYSTEM")
 		, m_exio(*this, "exio")
@@ -709,6 +712,10 @@ protected:
 	unscramble_func m_unscrambler;
 	std::function<void()> m_psx_remapper;
 
+	required_device<ata_interface_device> m_ata;
+
+	bool m_is_cdrom_dma;
+
 private:
 	enum : int8_t {
 		I2CP_IDLE,
@@ -717,9 +724,12 @@ private:
 		I2CP_RECIEVE_ACK_0
 	};
 
+	uint16_t cdrom_unk_r();
+	void int_ack_w(offs_t offset, uint16_t data);
+
 	uint16_t io_system_r();
 
-	uint16_t control_r(offs_t offset);
+	uint16_t int_r(offs_t offset);
 
 	uint16_t exio_ident_r();
 	void exio_ident_w(uint16_t data);
@@ -731,6 +741,8 @@ private:
 	void i2c_update();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(cdrom_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(cdrom_dmarq);
 
 	devcb_write_line m_io_update_interrupt;
 
@@ -748,6 +760,8 @@ private:
 
 	util::notifier_subscription m_notif_psx_space;
 	bool m_remapping_psx_io;
+
+	uint16_t m_int;
 
 	// EXIO
 	optional_ioport_array<8> m_exio_analog;
@@ -982,6 +996,10 @@ void namcos10_state::machine_start()
 	save_item(NAME(m_i2cp_mode));
 	save_item(NAME(m_i2c_byte));
 	save_item(NAME(m_i2c_bit));
+
+	save_item(NAME(m_int));
+	save_item(NAME(m_is_cdrom_dma));
+
 	save_item(NAME(m_exio_ident_bit));
 	save_item(NAME(m_exio_ident_byte));
 
@@ -999,6 +1017,9 @@ void namcos10_state::machine_reset()
 	m_i2c_byte = 0x00;
 	m_i2c_bit = 0;
 
+	m_int = 0;
+	m_is_cdrom_dma = false;
+
 	m_exio_ident_bit = 0;
 	m_exio_ident_byte = 0;
 
@@ -1014,6 +1035,7 @@ void namcos10_state::device_resolve_objects()
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 {
+	m_int |= 8; // I/O interrupt
 	m_io_update_interrupt(1);
 }
 
@@ -1038,12 +1060,39 @@ void namcos10_state::namcos10_base(machine_config &config)
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, also handles CD-ROM?
 	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
+	spu.set_stream_flags(STREAM_SYNCHRONOUS);
 	spu.add_route(0, "lspeaker", 0.75);
 	spu.add_route(1, "rspeaker", 0.75);
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	TIMER(config, "io_timer").configure_periodic(FUNC(namcos10_state::io_update_interrupt_callback), attotime::from_hz(100));
+
+	// Taiko wants any drive with a name matching "Toshiba", "TEAC", "Matsushita", "LG", or "No Brand"(?)
+	// The default CD drive in MAME identifies as "MAME Virtual CDROM" so just give it a Matsushita drive
+	ATA_INTERFACE(config, m_ata).options([] (device_slot_interface &device) { device.option_add("cdrom", CR589); }, "cdrom", nullptr, true);
+	m_ata->slot(0).set_fixed(true);
+	m_ata->irq_handler().set(FUNC(namcos10_state::cdrom_interrupt));
+	m_ata->dmarq_handler().set(FUNC(namcos10_state::cdrom_dmarq));
+}
+
+WRITE_LINE_MEMBER(namcos10_state::cdrom_interrupt)
+{
+	if (state)
+		m_int |= 4;
+	else
+		m_int &= ~4;
+
+	m_io_update_interrupt(state);
+}
+
+WRITE_LINE_MEMBER(namcos10_state::cdrom_dmarq)
+{
+	if (!state)
+		return;
+
+	// Start of CD-ROM DMA, will continue in pio_dma_read after dmarq is received
+	m_is_cdrom_dma = true;
 }
 
 void namcos10_state::namcos10_map_inner(address_map &map)
@@ -1060,8 +1109,10 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 	map(0xfba0004, 0xfba0007).portr("IN1");
 	map(0xfba0008, 0xfba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
 	map(0xfba000a, 0xfba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
-	map(0xfba0018, 0xfba001b).nopw();
-	map(0xfba001a, 0xfba001b).r(FUNC(namcos10_state::control_r));
+	map(0xfba0012, 0xfba0019).w(FUNC(namcos10_state::int_ack_w));
+	map(0xfba001a, 0xfba001b).r(FUNC(namcos10_state::int_r));
+	map(0xfbc0000, 0xfbc000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0xfbf0000, 0xfbf000f).r(FUNC(namcos10_state::cdrom_unk_r));
 }
 
 void namcos10_state::namcos10_map(address_map &map)
@@ -1071,19 +1122,30 @@ void namcos10_state::namcos10_map(address_map &map)
 	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_inner));
 }
 
+uint16_t namcos10_state::cdrom_unk_r()
+{
+	// Used to check if CD drive is connected/available?
+	return 1;
+}
+
+void namcos10_state::int_ack_w(offs_t offset, uint16_t data)
+{
+	m_int &= ~(1 << offset);
+}
+
 uint16_t namcos10_state::io_system_r()
 {
 	return m_io_system->read();
 }
 
-uint16_t namcos10_state::control_r(offs_t offset)
+uint16_t namcos10_state::int_r(offs_t offset)
 {
 	// bit = cleared registers
 	// 0 = 1fba0012
 	// 1 = 1fba0014, 1fe20000
-	// 2 = 1fba0016
-	// 3 = 1fba0018 (forces I/O update)
-	return 8;
+	// bit 2 is for CD-ROM
+	// bit 3 is for I/O (must be set to update I/O)
+	return m_int;
 }
 
 void namcos10_state::exio_ident_w(uint16_t data)
@@ -1220,8 +1282,8 @@ void namcos10_state::namcos10_map_exio_inner(address_map &map)
 	// TODO: Base registers are probably similar between EXIO and MGEXIO, fill in registers and rename if possible
 	// TODO: Figure out what the commented out registers are actually used for
 	map(0x06000, 0x0ffff).rw(m_exio, FUNC(namcos10_exio_device::ram_r), FUNC(namcos10_exio_device::ram_w));
-	map(0x10000, 0x10003).w(m_exio, FUNC(namcos10_exio_device::ctrl_w));
-	// map(0x18000, 0x18003).noprw();
+	map(0x10000, 0x10003).rw(m_exio, FUNC(namcos10_exio_device::ctrl_r), FUNC(namcos10_exio_device::ctrl_w));
+	map(0x18000, 0x18003).rw(m_exio, FUNC(namcos10_exio_device::bus_req_r), FUNC(namcos10_exio_device::bus_req_w));
 	map(0x28000, 0x28003).r(m_exio, FUNC(namcos10_exio_device::cpu_status_r));
 	// map(0x30000, 0x30003).nopw();
 	// map(0x40000, 0x40003).nopw();
@@ -1528,9 +1590,18 @@ void namcos10_memn_state::pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address
 void namcos10_memn_state::pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size)
 {
 	logerror("%s: pio_dma_read: DMA read %08x %08x\n", machine().describe_context(), n_address, n_size * 4);
+
+	if (m_is_cdrom_dma)
+		m_ata->write_dmack(ASSERT_LINE);
+
 	auto ptr = util::little_endian_cast<uint16_t>(&p_n_psxram[n_address / 4]);
 	for (auto i = 0; i < n_size * 2; i++) {
-		ptr[i] = nand_data_r();
+		ptr[i] = m_is_cdrom_dma ? m_ata->read_dma() : nand_data_r();
+	}
+
+	if (m_is_cdrom_dma) {
+		m_ata->write_dmack(CLEAR_LINE);
+		m_is_cdrom_dma = false;
 	}
 }
 
@@ -2360,7 +2431,7 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 void namcos10_memn_state::ns10_taiko5(machine_config &config)
 {
 	namcos10_memn_base(config);
-	namcos10_exfinalio(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
 	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
@@ -2547,16 +2618,16 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 
 static INPUT_PORTS_START( namcos10 )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// TODO: 0x400 might be required for extension boards
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_BIT( 0xfb00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED ) // JVS sense?
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f110000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2805,6 +2876,42 @@ static INPUT_PORTS_START( mgexio_medal )
 	PORT_START("MGEXIO_COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( taiko )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fffffe3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
+
+	// Drums use PKS1-4A1 Piezoelectric ceramic sensors for input values
+	PORT_START("EXIO_ANALOG1") // P1R Fuchi
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1R Rim") PORT_PLAYER(1)
+
+	PORT_START("EXIO_ANALOG2") // P1R Men
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1R Surface") PORT_PLAYER(1)
+
+	PORT_START("EXIO_ANALOG3") // P1L Men
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1L Surface") PORT_PLAYER(1)
+
+	PORT_START("EXIO_ANALOG4") // P1L Fuchi
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1L Rim") PORT_PLAYER(1)
+
+	PORT_START("EXIO_ANALOG5") // P2R Fuchi
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2R Rim") PORT_PLAYER(2)
+
+	PORT_START("EXIO_ANALOG6") // P2R Men
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2R Surface") PORT_PLAYER(2)
+
+	PORT_START("EXIO_ANALOG7") // P2L Men
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2L Surface") PORT_PLAYER(2)
+
+	PORT_START("EXIO_ANALOG8") // P2L Fuchi
+	PORT_BIT( 0x3ff, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2L Rim") PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
@@ -3185,7 +3292,7 @@ ROM_START( taiko2 )
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
 	ROM_LOAD( "tk21verc_2.7e", 0x0000000, 0x1080000, CRC(f1dbe387) SHA1(8ae5f3b659acec150d89af2a14fc2dec8c3b1643) )
 
-	DISK_REGION("cd")
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-21", 0, SHA1(cede127f3d87f894ccaa1d77c8b279f209f6a8e4) )
 ROM_END
 
@@ -3202,7 +3309,7 @@ ROM_START( taiko3 )
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
 	ROM_LOAD( "tk31vera_2.7e", 0x0000000, 0x1080000, CRC(904c09ee) SHA1(a81b70661e3f07a4e8f7cb5c2be6c2c526ce27c3) )
 
-	DISK_REGION("cd")
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-3", 0, NO_DUMP )
 ROM_END
 
@@ -3219,7 +3326,7 @@ ROM_START( taiko4 )
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
 	ROM_LOAD( "tk41vera_2.7e", 0x0000000, 0x1080000, CRC(6fc63af0) SHA1(78bac0a11497d5cdfba17fb0ff4d6916349df527) )
 
-	DISK_REGION("cd")
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-41", 0, SHA1(6a5b960e792e4b291cdcc9e5ac4bcf84967e30e7) )
 ROM_END
 
@@ -3236,7 +3343,7 @@ ROM_START( taiko5 )
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
 	ROM_LOAD( "tk51vera_2.7e", 0x0000000, 0x1080000, CRC(1f419247) SHA1(93e624107b614bd30b18f6bac0422e64ad467742) )
 
-	DISK_REGION("cd")
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-5", 0, NO_DUMP )
 ROM_END
 
@@ -3253,7 +3360,7 @@ ROM_START( taiko6 )
 	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
 	ROM_LOAD( "tk61vera_2.7e", 0x0000000, 0x1080000, CRC(550bb6a1) SHA1(466ff7d5a8a06cdddbb1976ca05ccfd34c0851fd) )
 
-	DISK_REGION("cd")
+	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
 ROM_END
 
@@ -3393,11 +3500,11 @@ GAME( 2006, keroro,    0,        ns10_keroro,    namcos10,     namcos10_memn_sta
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    namcos10,     namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    namcos10,     namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    namcos10,     namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    namcos10,     namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10,     namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
