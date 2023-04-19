@@ -156,6 +156,7 @@ protected:
 
 	uint8_t m_volume_l = 0;
 	uint8_t m_volume_r = 0;
+	unsigned SYSTEM_CLOCK = 50'000'000;
 };
 
 class ip22_state : public ip24_state
@@ -408,9 +409,10 @@ void ip24_state::ip24(machine_config &config)
 
 void ip24_state::indy_5015(machine_config &config)
 {
+	SYSTEM_CLOCK = 50'000'000;
 	ip24(config);
-
-	R5000BE(config, m_maincpu, 75'000'000);
+	R5000BE(config, m_maincpu, 3 * SYSTEM_CLOCK);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 	m_maincpu->set_icache_size(0x8000);
 	m_maincpu->set_dcache_size(0x8000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -418,9 +420,10 @@ void ip24_state::indy_5015(machine_config &config)
 
 void ip24_state::indy_4613(machine_config &config)
 {
+	SYSTEM_CLOCK = 66'666'666;
 	ip24(config);
-
-	R4600BE(config, m_maincpu, 66'666'666);
+	R4600BE(config, m_maincpu, 2 * SYSTEM_CLOCK);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -428,9 +431,10 @@ void ip24_state::indy_4613(machine_config &config)
 
 void ip24_state::indy_4610(machine_config &config)
 {
+	SYSTEM_CLOCK = 50'000'000;
 	ip24(config);
-
-	R4600BE(config, m_maincpu, 50'000'000);
+	R4600BE(config, m_maincpu, 2 * SYSTEM_CLOCK);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
@@ -445,7 +449,9 @@ void ip22_state::wd33c93_2(device_t *device)
 
 void ip22_state::indigo2_4415(machine_config &config)
 {
-	R4400BE(config, m_maincpu, 75'000'000);
+	SYSTEM_CLOCK = 50'000'000;
+	R4400BE(config, m_maincpu, 3 * SYSTEM_CLOCK);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 	m_maincpu->set_icache_size(0x4000);
 	m_maincpu->set_dcache_size(0x4000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
