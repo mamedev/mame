@@ -336,7 +336,7 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x5500;
 
 		case MIPS3_TYPE_R4600:
-			return 0x2000;
+			return 0x2020;
 
 		case MIPS3_TYPE_R4650:
 			return 0x2200;
