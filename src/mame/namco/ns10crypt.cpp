@@ -261,23 +261,3 @@ void ns10_type2_decrypter_device::device_start()
 
 	m_active = false;
 }
-
-
-// create a lookup table of GF2 reductions of 16-bits words
-
-static constexpr int make_gf2_reduction(uint32_t i)
-{
-	i ^= i >> 8;
-	i ^= i >> 4;
-	i ^= i >> 2;
-	i ^= i >> 1;
-	return int(i & 1);
-}
-
-template <uint32_t... Values>
-static constexpr auto make_gf2_reduction(std::integer_sequence<uint32_t, Values...>)
-{
-	return std::array<int, sizeof...(Values)>({ make_gf2_reduction(Values)... });
-}
-
-const std::array<int, 0x1'0000> ns10_type2_decrypter_device::GF2_REDUCTION = make_gf2_reduction(std::make_integer_sequence<uint32_t, 0x1'0000>());

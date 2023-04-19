@@ -72,11 +72,7 @@ public:
 
 	static int gf2_reduce(uint64_t num)
 	{
-		return
-				GF2_REDUCTION[num & 0xffff] ^
-				GF2_REDUCTION[(num >> 16) & 0xffff] ^
-				GF2_REDUCTION[(num >> 32) & 0xffff] ^
-				GF2_REDUCTION[num >> 48];
+		return population_count_64(num) & 1;
 	}
 
 protected:
@@ -84,7 +80,6 @@ protected:
 
 private:
 	static const int INIT_SBOX[16];
-	static const std::array<int, 0x1'0000> GF2_REDUCTION;
 
 	virtual void init(int iv) override;
 
