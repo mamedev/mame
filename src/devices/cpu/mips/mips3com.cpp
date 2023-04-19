@@ -364,6 +364,12 @@ uint32_t mips3_device::compute_prid_register()
 	//return 0x2000;
 }
 
+uint32_t mips3_device::compute_fpu_prid_register()
+{
+	/* For most CPUs they are same */
+	return compute_prid_register();
+}
+
 /*-------------------------------------------------
     tlb_map_entry - map a single TLB
     entry
