@@ -19,6 +19,9 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 
 #if BX_PLATFORM_OSX
 		BX_UNUSED(u);
+		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
+		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
+		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
 #else
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
