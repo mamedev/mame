@@ -224,6 +224,7 @@ void indigo4k_state::indigo4k(machine_config &config)
 
 	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
 	m_mem_ctrl->eisa_present().set_constant(0);
+	m_mem_ctrl->set_clock(50000000);
 	SGI_HPC1(config, m_hpc, m_maincpu, m_eeprom);
 }
 

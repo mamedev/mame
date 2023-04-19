@@ -173,7 +173,7 @@ void sgi_mc_device::device_reset()
 	m_dma_run = 0;
 	m_eeprom_ctrl = 0;
 	memset(m_semaphore, 0, sizeof(uint32_t) * 16);
-	m_rpss_timer->adjust(attotime::from_hz(10000000), 0, attotime::from_hz(10000000));
+	m_rpss_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_rpss_divide_counter = 4;
 	m_rpss_divide_count = 4;
 	m_rpss_increment = 1;

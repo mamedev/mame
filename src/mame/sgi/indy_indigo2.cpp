@@ -333,6 +333,7 @@ void ip24_state::scsi_devices(device_slot_interface &device)
 void ip24_state::ip24_base(machine_config &config)
 {
 	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	m_mem_ctrl->set_clock(SYSTEM_CLOCK);
 	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
 	m_mem_ctrl->eisa_present().set_constant(1);
 
