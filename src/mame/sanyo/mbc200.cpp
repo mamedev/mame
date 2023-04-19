@@ -52,7 +52,6 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
-#include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
@@ -76,7 +75,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
-		, m_beep(*this, "beeper")
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0)
@@ -103,6 +101,8 @@ private:
 	void sub_mem(address_map &map);
 	void sub_io(address_map &map);
 
+	u8 m_cpu_m_sound = 0U;
+	u8 m_cpu_s_sound = 0U;
 	u8 m_comm_latch = 0U;
 	u8 m_term_data = 0U;
 	required_device<mc6845_device> m_crtc;
@@ -111,7 +111,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
-	required_device<beep_device> m_beep;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
@@ -125,16 +124,17 @@ void mbc200_state::main_mem(address_map &map)
 
 void mbc200_state::p1_portc_w(u8 data)
 {
-	m_speaker->level_w(BIT(data, 4)); // used by beep command in basic
+	m_cpu_s_sound = BIT(data, 4); // used by beep command in basic
+	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
 }
 
 void mbc200_state::pm_porta_w(u8 data)
 {
 	machine().scheduler().synchronize(); // force resync
-	//printf("A %02x %c\n",data,data);
 	m_comm_latch = data; // to slave CPU
 }
 
+// Writing to PPI port B ($E9).  Being programmed for output, read operations will get the current value.
 void mbc200_state::pm_portb_w(u8 data)
 {
 	// The BIOS supports up tp 4 drives, (2 internal + 2 external)
@@ -151,7 +151,9 @@ void mbc200_state::pm_portb_w(u8 data)
 		floppy->mon_w(0);
 		floppy->ss_w(BIT(data, 7));
 	}
-	m_beep->set_state(BIT(data, 1)); // key-click
+
+	m_cpu_m_sound = BIT(data, 1); // key-click
+	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
 }
 
 void mbc200_state::main_io(address_map &map)
@@ -256,6 +258,8 @@ void mbc200_state::kbd_put(u8 data)
 
 void mbc200_state::machine_start()
 {
+	save_item(NAME(m_cpu_m_sound));
+	save_item(NAME(m_cpu_s_sound));
 	save_item(NAME(m_comm_latch));
 	save_item(NAME(m_term_data));
 }
@@ -335,9 +339,10 @@ void mbc200_state::mbc200(machine_config &config)
 
 	// sound
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50); // frequency unknown
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
+	static const double speaker_levels[4] = { 0.0, 0.6, 1.0 };
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->set_levels(3, speaker_levels);
+	
 	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
 	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
 
