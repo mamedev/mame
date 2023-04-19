@@ -71,7 +71,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
 		, m_ppi_m(*this, "ppi_m")
-		, m_ppi_s(*this, "ppi_s")
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
@@ -88,13 +87,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	u8 sub_to_main_comm_r();
-	void sub_to_main_comm_w(u8 data);
-	u8 ps_porta_r();
-	void ps_portc_w(u8 data);
+	u8 p2_porta_r();
+	void p1_portc_w(u8 data);
 	void pm_porta_w(u8 data);
 	void pm_portb_w(u8 data);
-	void pm_portc_w(u8 data);
 	u8 keyboard_r(offs_t offset);
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(update_row);
@@ -107,13 +103,10 @@ private:
 
 	u8 m_cpu_m_sound = 0U;
 	u8 m_cpu_s_sound = 0U;
-	u8 m_cpu_s_obf = 0U;      // "data ready" signals for slave PPI, notably OBF
 	u8 m_comm_latch = 0U;
-	u8 m_comm_latch2 = 0U;
 	u8 m_term_data = 0U;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
-	required_device<i8255_device> m_ppi_s;
 	required_shared_ptr<u8> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -129,12 +122,7 @@ void mbc200_state::main_mem(address_map &map)
 	map(0x0000, 0xffff).ram().share("mainram");
 }
 
-u8 mbc200_state::ps_porta_r()
-{
-	return m_cpu_s_obf; // bit7,6 = OBF,ACK: "data ready" signal to the secondary Z80 (video board)
-}
-
-void mbc200_state::ps_portc_w(u8 data)
+void mbc200_state::p1_portc_w(u8 data)
 {
 	m_cpu_s_sound=(BIT(data, 4)); // used by beep command in basic
 	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
@@ -166,23 +154,6 @@ void mbc200_state::pm_portb_w(u8 data)
 
 	m_cpu_m_sound=(BIT(data, 1)); // key-click
 	m_speaker->level_w(m_cpu_m_sound + m_cpu_s_sound);
-	
-	//// PA5 line
-	//if (BIT(data, 0))
-	//{
-	//	m_cpu_s_obf &= 0x20;
-	//}
-	//else
-	//{
-	//	m_cpu_s_obf |= 0x20;
-	//}
-}
-
-void mbc200_state::pm_portc_w(u8 data)
-{
-	// OBF + ACK bits
-	m_cpu_s_obf &= 0x3F;
-	m_cpu_s_obf |= (data & 0xC0);
 }
 
 void mbc200_state::main_io(address_map &map)
@@ -196,6 +167,8 @@ void mbc200_state::main_io(address_map &map)
 	map(0xec, 0xed).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
+
+
 void mbc200_state::sub_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -204,27 +177,23 @@ void mbc200_state::sub_mem(address_map &map)
 	map(0x8000, 0xffff).ram().share("vram");
 }
 
-u8 mbc200_state::sub_to_main_comm_r()
+u8 mbc200_state::p2_porta_r()
 {
 	machine().scheduler().synchronize(); // force resync
+	u8 tmp = m_comm_latch;
+	m_comm_latch = 0;
 	m_ppi_m->pc6_w(0); // ppi_ack
-	return m_comm_latch;
-}
-
-void mbc200_state::sub_to_main_comm_w(u8 data)
-{
-	machine().scheduler().synchronize(); // force resync
-	m_comm_latch2 = data; // to slave CPU
+	return tmp;
 }
 
 void mbc200_state::sub_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x70, 0x73).rw(m_ppi_s, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x70, 0x73).rw("ppi_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb0, 0xb0).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xb1, 0xb1).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xd0, 0xd0).rw(FUNC(mbc200_state::sub_to_main_comm_r), FUNC(mbc200_state::sub_to_main_comm_w));
+	map(0xd0, 0xd3).rw("ppi_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 /* Input ports */
@@ -289,11 +258,9 @@ void mbc200_state::kbd_put(u8 data)
 
 void mbc200_state::machine_start()
 {
-	save_item(NAME(m_cpu_s_obf));
-	save_item(NAME(m_comm_latch));
-	save_item(NAME(m_comm_latch2));
 	save_item(NAME(m_cpu_m_sound));
 	save_item(NAME(m_cpu_s_sound));
+	save_item(NAME(m_comm_latch));
 	save_item(NAME(m_term_data));
 }
 
@@ -376,14 +343,12 @@ void mbc200_state::mbc200(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 	m_speaker->set_levels(3, speaker_levels);
 	
-	I8255(config, m_ppi_s);
-	m_ppi_s->in_pa_callback().set(FUNC(mbc200_state::ps_porta_r));
-	m_ppi_s->out_pa_callback().set(FUNC(mbc200_state::ps_portc_w));
+	I8255(config, "ppi_1").out_pc_callback().set(FUNC(mbc200_state::p1_portc_w));
+	I8255(config, "ppi_2").in_pa_callback().set(FUNC(mbc200_state::p2_porta_r));
 
 	I8255(config, m_ppi_m);
 	m_ppi_m->out_pa_callback().set(FUNC(mbc200_state::pm_porta_w));
 	m_ppi_m->out_pb_callback().set(FUNC(mbc200_state::pm_portb_w));
-	m_ppi_m->out_pc_callback().set(FUNC(mbc200_state::pm_portc_w));
 
 	I8251(config, "uart1", 0); // INS8251N
 
