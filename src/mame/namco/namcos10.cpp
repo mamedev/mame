@@ -924,6 +924,7 @@ class namcos10_memp3_state : public namcos10_memn_state
 public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_memn_state(mconfig, type, tag)
+		, m_ram(*this, "maincpu:ram")
 		, m_memp3_mcu(*this, "memp3_mcu")
 		, m_mcu_ram(*this, "mcu_ram")
 		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
@@ -962,6 +963,7 @@ private:
 
 	uint16_t io_analog_r(offs_t offset);
 
+	required_device<ram_device> m_ram;
 	required_device<tmp95c061_device> m_memp3_mcu;
 	required_shared_ptr<uint16_t> m_mcu_ram;
 	optional_ioport_array<4> m_p3_analog;
@@ -2623,6 +2625,21 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 {
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 8);
+
+	subdevice<screen_device>("screen")->screen_vblank().set([this] (int state) {
+		// nicetsuk wants to start the pads and it hangs inside the pad callback routine
+		// due to issues with the PSX timer (rcnt) so disable the pad callbacks
+		// by nulling the addrs that would be used by PadStartCom.
+		// The actual game inputs are over JAMMA so perhaps his was left over from
+		// debug menus?
+		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
+
+		if( p_n_psxram[ 0x105e20 / 4 ] == 0x800de200 )
+		{
+			p_n_psxram[ 0x105e20 / 4 ] = 0;
+			p_n_psxram[ 0x105e24 / 4 ] = 0;
+		}
+	});
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
