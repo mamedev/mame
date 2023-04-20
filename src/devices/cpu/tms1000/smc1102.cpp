@@ -19,10 +19,8 @@ SMC1112 die notes (SMC1102 is assumed to be the same):
 - no output PLA
 
 TODO:
-- each opcode is 4 cycles instead of 6
 - LCD refresh timing is unknown
 - add (micro)instructions PLA if it turns out it can be customized
-- add timer
 - add halt opcode
 
 */
@@ -72,6 +70,11 @@ void smc1102_cpu_device::device_start()
 	m_selin = 0;
 	m_k_line = false;
 
+	m_div = 0;
+	m_timer = 0;
+	m_timeout = false;
+	m_tmset = 0;
+
 	memset(m_stack, 0, sizeof(m_stack));
 	m_sp = 0;
 	m_pb_stack = 0;
@@ -86,6 +89,11 @@ void smc1102_cpu_device::device_start()
 	save_item(NAME(m_inten));
 	save_item(NAME(m_selin));
 	save_item(NAME(m_k_line));
+
+	save_item(NAME(m_div));
+	save_item(NAME(m_timer));
+	save_item(NAME(m_timeout));
+	save_item(NAME(m_tmset));
 
 	save_item(NAME(m_stack));
 	save_item(NAME(m_sp));
@@ -102,6 +110,7 @@ void smc1102_cpu_device::device_reset()
 
 	m_inten = false;
 	m_selin = 0;
+	m_timeout = false;
 
 	// changed/added fixed instructions (mostly handled in op_extra)
 	m_fixed_decode[0x0a] = F_EXTRA;
@@ -186,11 +195,12 @@ void smc1102_cpu_device::read_opcode()
 	}
 
 	// check interrupts (blocked after INTEN)
-	if (m_inten && m_opcode != 0x74)
+	if (m_opcode != 0x74)
 	{
-		bool taken = (m_selin & 2) ? false : m_k_line;
+		const bool taken = (m_selin & 2) ? m_timeout : m_k_line;
+		m_timeout = false;
 
-		if (taken)
+		if (m_inten && taken)
 		{
 			interrupt();
 			return;
@@ -221,6 +231,46 @@ void smc1102_cpu_device::interrupt()
 	m_cb = 0;
 	m_status = 1;
 	m_inten = false;
+}
+
+void smc1102_cpu_device::execute_run()
+{
+	while (m_icount > 0)
+	{
+		m_icount--;
+
+		// decrement timer
+		m_div = (m_div + 1) & 0x1fff;
+		const u16 tmask = (m_selin & 1) ? 0x1ff : 0x1fff;
+		if ((m_div & tmask) == 0)
+		{
+			m_timer = (m_timer - 1) & 0xf;
+			if (m_timer == 0)
+			{
+				m_timer = m_tmset;
+				m_timeout = true;
+			}
+		}
+
+		// 4 cycles per opcode instead of 6
+		switch (m_subcycle)
+		{
+			case 2:
+				execute_one(2);
+				execute_one(3);
+				break;
+
+			case 3:
+				execute_one(4);
+				execute_one(5);
+				break;
+
+			default:
+				execute_one(m_subcycle);
+				break;
+		}
+		m_subcycle = (m_subcycle + 1) & 3;
+	}
 }
 
 
@@ -283,6 +333,7 @@ void smc1102_cpu_device::op_selin()
 void smc1102_cpu_device::op_tmset()
 {
 	// TMSET: transfer A to timer latch
+	m_tmset = m_a;
 }
 
 void smc1102_cpu_device::op_halt()

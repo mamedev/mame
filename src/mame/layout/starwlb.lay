@@ -26,8 +26,8 @@ license:CC0-1.0
 	</element>
 
 	<element name="lamp" defstate="0">
-		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
-		<disk state="0"><color red="0.25" green="0.25" blue="0.25" /></disk>
+		<disk state="1"><color red="1.0" green="0.97" blue="0.9" /></disk>
+		<disk state="0"><color red="0.3" green="0.3" blue="0.3" /></disk>
 	</element>
 
 	<element name="hl" defstate="0">
