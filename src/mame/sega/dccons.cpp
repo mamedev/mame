@@ -19,7 +19,6 @@
             25925600 (PAL 480 @ 50.00), 13462800 (PAL 240 @ 50.00)
 
     TODO:
-    - RTC error always pops up at start-up, no flash plus bug with ticks (needs rewrite)
     - cfr. naomi.cpp header for general DC notes;
     - https://github.com/flyinghead/flycast/blob/master/docs/Notable%20game%20bugs.md
       For a comprehensive list of issues to be verified;
@@ -27,15 +26,22 @@
     - G1 i/f for GD-ROM needs to be converted in device class and hunted for unsupported features;
     - VMU;
     - Modem;
+    - regtest dc.xml against region setting, find the bad chance that a SW item
+      managed to brick a dcjp and turning into PAL. Notable symptoms:
+      - crzytaxi2j will start with 50Hz/60Hz screen selector;
+      - jojobaj will run in PAL mode;
+
+    Notes:
+    - RTC error pops up at start-up. (btanb)
+      System saves to flash the AICA RTC timestamp and prompt user to change the clock in
+      case that drifts out significantly during boot.
+      Solution is to insert the actual host PC timestamp and have MAME nvram_save on,
+      that will lift the RTC prompt at next boot.
 
     Old TODO (to be rechecked and moved in XML notes):
     - Inputs doesn't work most of the time;
     - Candy Stripe: fills the log with "ATAPI_FEATURES_FLAG_OVL not supported", black screen
-    - Carrier: Jaleco logo uses YUV, but y size is halved?
     - Close To: Hangs at FMV
-    - F355 Challenge: black screen after Sega logo;
-    - Gundam - Side Story 0079: currently hangs at Bandai logo (regression)
-    - Idol Janshi wo Tsukucchaou: pixel aspect is way wrong (stretched and offsetted horizontally)
     - Power Stone: hangs at Capcom logo;
     - Sega GT: no cursor on main menu;
     - Tetris 4D: hangs at BPS FMV (bp 0C0B0C4E)
