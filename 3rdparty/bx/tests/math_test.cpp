@@ -22,6 +22,10 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
+#elif BX_COMPILER_MSVC
+		REQUIRE(!!::_isnanf(u.f)  == bx::isNan(u.f));
+		REQUIRE(!!::_finitef(u.f) == bx::isFinite(u.f));
+		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f));
 #else
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );

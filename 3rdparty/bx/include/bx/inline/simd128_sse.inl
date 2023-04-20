@@ -588,7 +588,7 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf)
 	template<>
 	BX_SIMD_INLINE simd128_sse_t simd_rsqrt_nr(simd128_sse_t _a)
 	{
-		return simd_rsqrt_nr_ni(_a);
+		return simd_rsqrt_ni(_a);
 	}
 
 	template<>

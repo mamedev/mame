@@ -24,19 +24,19 @@ struct MockNonFreeingAllocator : public bx::AllocatorI
 		BX_ASSERT(m_sbrk + _size < BX_COUNTOF(m_storage), "");
 		BX_UNUSED(_ptr, _file, _line);
 
-		const uint32_t sbrk = bx::alignUp(m_sbrk, bx::max(_align, 1) );
+		const uintptr_t sbrk = bx::alignUp(m_sbrk, bx::max(int32_t(_align), 1) );
 		m_sbrk = sbrk + _size;
 
 		return &m_storage[sbrk];
 	}
 
-	uint32_t m_sbrk;
+	uintptr_t m_sbrk;
 	BX_ALIGN_DECL(256, uint8_t) m_storage[0x10000];
 };
 
 bool testAlignment(size_t _expected, void* _ptr)
 {
-	bool aligned = bx::isAligned(_ptr, _expected);
+	bool aligned = bx::isAligned(_ptr, int32_t(_expected) );
 //	BX_TRACE("%p, %d", _ptr, _expected);
 	BX_WARN(aligned, "%p not aligned to %d bytes.", _ptr, _expected);
 	return aligned;
