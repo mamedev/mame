@@ -939,7 +939,9 @@ private:
 	void ram_bank_w(uint16_t data);
 
 	uint16_t unk_status1_r();
+
 	uint16_t unk_status2_r();
+	void mcu_int5_w(uint16_t data);
 
 	uint16_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint16_t data);
@@ -1051,12 +1053,14 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 	// based on the invalid block table found at the beginning of a game's first NAND
 	map(0xf500000, 0xf5fffff).ram().share("share3");
 
+	map(0xfb20000, 0xfb20003).nopw(); // written to when DMA are finished? maybe some kind of IRQ?
 	map(0xfb60000, 0xfb60003).noprw(); // ?
 	map(0xfba0000, 0xfba0001).r(FUNC(namcos10_state::io_system_r));
 	map(0xfba0002, 0xfba0003).rw(FUNC(namcos10_state::exio_ident_r), FUNC(namcos10_state::exio_ident_w));
 	map(0xfba0004, 0xfba0007).portr("IN1");
 	map(0xfba0008, 0xfba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
 	map(0xfba000a, 0xfba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+	map(0xfba0018, 0xfba001b).nopw();
 	map(0xfba001a, 0xfba001b).r(FUNC(namcos10_state::control_r));
 }
 
@@ -1676,7 +1680,6 @@ void namcos10_memn_state::namcos10_memn_map_inner(address_map &map)
 	map(0xf460000, 0xf460001).w(FUNC(namcos10_memn_state::nand_bank_w));
 	map(0xf470000, 0xf470001).rw(FUNC(namcos10_memn_state::ctrl_reg_r), FUNC(namcos10_memn_state::ctrl_reg_w));
 	//map(0xf480000, 0xf480001).w(); // 0xffff is written here after a nand write/erase?
-	// fb20000 something to do with DMAs?
 }
 
 void namcos10_memn_state::namcos10_memn_map(address_map &map)
@@ -2394,6 +2397,15 @@ uint16_t namcos10_memp3_state::unk_status2_r()
 	return 1;
 }
 
+void namcos10_memp3_state::mcu_int5_w(uint16_t data)
+{
+	// MP3 decoder commands will only be processed when INT5 is triggered.
+	// 0 gets written to this register (only?) after the MP3 decoder commands are
+	// written into the MCU's memory so I believe it's responsible for making the
+	// INT5 get triggered.
+	m_memp3_mcu->set_input_line(TLCS900_INT5, ASSERT_LINE);
+}
+
 uint16_t namcos10_memp3_state::io_analog_r(offs_t offset)
 {
 	return m_p3_analog[offset].read_safe(0);
@@ -2403,7 +2415,7 @@ void namcos10_memp3_state::namcos10_memp3_map_inner(address_map &map)
 {
 	map(0xf300000, 0xf300001).w(FUNC(namcos10_memp3_state::firmware_write_w));
 	// 1f300004 unk
-	map(0xf300006, 0xf300007).r(FUNC(namcos10_memp3_state::unk_status2_r));
+	map(0xf300006, 0xf300007).rw(FUNC(namcos10_memp3_state::unk_status2_r), FUNC(namcos10_memp3_state::mcu_int5_w));
 	map(0xf30000c, 0xf30000d).w(FUNC(namcos10_memp3_state::ram_bank_w));
 	map(0xf30000e, 0xf30000f).r(FUNC(namcos10_memp3_state::unk_status1_r));
 	map(0xf320000, 0xf33ffff).rw(FUNC(namcos10_memp3_state::ram_r), FUNC(namcos10_memp3_state::ram_w));
@@ -2434,6 +2446,7 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 
 	TMP95C061(config, m_memp3_mcu, XTAL(16'934'400));
 	m_memp3_mcu->set_addrmap(AS_PROGRAM, &namcos10_memp3_state::mcu_map);
+	// Port 7 is used for communicating with the MP3 decoder chip
 
 	// LC82310 16.9344MHz
 }
