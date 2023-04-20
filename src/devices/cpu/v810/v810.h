@@ -113,9 +113,8 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	uint32_t m_reg[65];
-	uint8_t m_irq_line;
-	uint8_t m_irq_state;
+	uint32_t m_reg[65]{};
+	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
@@ -191,7 +190,7 @@ private:
 	uint32_t opXH(uint32_t op);
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
-	void take_interrupt();
+	void check_interrupts();
 };
 
 
