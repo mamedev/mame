@@ -506,7 +506,16 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 0;
 		break;
 
-	case T10MMC_CMD_READ_CD: {
+	case T10MMC_CMD_READ_CD:
+	{
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
 		// TODO: Implement reladr bit, flag bits, test and handle other conditions besides reads to "any type" sector types
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[6]<<16 | command[7]<<8 | command[8];
@@ -514,12 +523,12 @@ void t10mmc::ExecCommand()
 		// m_device->logerror("T10MMC: READ CD start_lba[%08x] block_len[%06x] %02x %02x %02x %02x\n", m_lba, m_blocks, command[1], command[9], command[10], command[11]);
 
 		auto expected_sector_type = BIT(command[1], 2, 3);
+		auto trk = m_cdrom->get_track(m_lba);
+		auto track_type = m_cdrom->get_track_type(trk);
 		if (expected_sector_type != 0)
 		{
 			m_device->logerror("T10MMC: READ CD requested a sector type of %d which is unhandled\n", expected_sector_type);
 
-			auto trk = m_cdrom->get_track(m_lba);
-			auto track_type = m_cdrom->get_track_type(trk);
 			if ((expected_sector_type == 1 && track_type != cdrom_file::CD_TRACK_AUDIO)
 			|| (expected_sector_type == 2 && track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW)
 			|| (expected_sector_type == 3 && track_type != cdrom_file::CD_TRACK_MODE2 && track_type != cdrom_file::CD_TRACK_MODE2_RAW)
@@ -533,6 +542,17 @@ void t10mmc::ExecCommand()
 				m_transfer_length = 0;
 				break;
 			}
+		}
+
+		if ((track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW) || command[9] != 0x10)
+		{
+			// TODO: Only mode 1 user data reads are supported for now
+			m_device->logerror("T10MMC: READ CD called with unimplemented parameters\n");
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
 		}
 
 		if (m_num_subblocks > 1)
