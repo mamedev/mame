@@ -3281,7 +3281,7 @@ ROM_START( nflclsfb )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(b08d4270) SHA1(5f5dc1c2862292a9e597f6a21c0f9db2e5796ded) )
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(97ac7216) SHA1(0f3383e5df534daf899fd6d40d1932d7ace78217) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(d3f519d8) SHA1(60d5f2fafd700e39245bed17e3cc6d608cc2c088) )
@@ -3395,7 +3395,7 @@ ROM_START( taiko2 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "tk21verc_0.8e", 0x0000000, 0x1080000, CRC(12d6c187) SHA1(5f3d15fbd53c30320aa8c004ea555bba1d31016f) )
+	ROM_LOAD( "tk21verc_0.8e", 0x0000000, 0x1080000, CRC(f3842791) SHA1(3108e23cb98455e5016e7fa845ab686e89ed61e8) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "tk21verc_1.8d", 0x0000000, 0x1080000, CRC(e294f460) SHA1(a22d553215d7e109c03af8bd0edb962fdcede5dc) )
@@ -3429,7 +3429,7 @@ ROM_START( taiko4 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "tk41vera_0.8e", 0x0000000, 0x1080000, CRC(6cd09cd2) SHA1(f3869570ff42f316d85416306fcc0a25957caa7d) )
+	ROM_LOAD( "tk41vera_0.8e", 0x0000000, 0x1080000, CRC(6dc209b1) SHA1(406a4c9e4bee9d4353d8847d7916ad459da9e089) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "tk41vera_1.8d", 0x0000000, 0x1080000, CRC(0d1731d8) SHA1(b1e30fd2a4f1034325b9745f8c371d918413d03c) )
@@ -3463,7 +3463,7 @@ ROM_START( taiko6 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "tk61vera_0.8e", 0x0000000, 0x1080000, CRC(186ae8f3) SHA1(e164570db63112ab667fa248ea6a5a14603e2821) )
+	ROM_LOAD( "tk61vera_0.8e", 0x0000000, 0x1080000, CRC(a07936c6) SHA1(a9e02f4f3d901def294a7b4758f2e7d2397aaf68) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "tk61vera_1.8d", 0x0000000, 0x1080000, CRC(288fb1aa) SHA1(0ff6b608f2540cd993a443b0d2c74567e9af5b10) )
@@ -3505,7 +3505,7 @@ ROM_START( nicetsuk )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "ntk1vera_0.2j", 0x0000000, 0x1080000, CRC(6461fcce) SHA1(adb78328cad182fb7638717c07e28901a86f02a1) )
+	ROM_LOAD( "ntk1vera_0.2j", 0x0000000, 0x1080000, CRC(92b60f09) SHA1(2219c306e3241736d7141d59987becf2aa2a2baa) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "ntk1vera_1.1j", 0x0000000, 0x1080000, CRC(5d5a4ca2) SHA1(b14ab6ca26236f819bd7d8bd5bbd828e36a528da) )
@@ -3585,10 +3585,10 @@ GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_sta
 GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state, init_gahaha,    ROT0, "Namco", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state, init_gahaha,    ROT0, "Namco / Metro", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
@@ -3601,7 +3601,7 @@ GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_sta
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // uses MGEXIO
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state, init_nflclsfb,  ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state, init_nflclsfb,  ROT0, "Namco / Metro", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
