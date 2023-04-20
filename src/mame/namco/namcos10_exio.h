@@ -16,7 +16,11 @@ public:
 
 	uint8_t ident_code() { return m_ident_code; }
 
-	virtual void ctrl_w(uint16_t data) {}
+	virtual uint16_t ctrl_r()  { return 0; }
+	virtual void ctrl_w(uint16_t data)  {}
+
+	virtual uint16_t bus_req_r()  { return 0; }
+	virtual void bus_req_w(uint16_t data)  {}
 
 	virtual uint16_t cpu_status_r() { return 0; }
 
@@ -38,7 +42,11 @@ public:
 
 	auto analog_callback() { return m_analog_cb.bind(); }
 
+	virtual uint16_t ctrl_r() override;
 	virtual void ctrl_w(uint16_t data) override;
+
+	virtual uint16_t bus_req_r() override;
+	virtual void bus_req_w(uint16_t data) override;
 
 	virtual uint16_t cpu_status_r() override;
 
@@ -63,6 +71,9 @@ private:
 
 	bool m_is_active;
 	uint32_t m_analog_idx;
+
+	uint16_t m_bus_req;
+	uint16_t m_ctrl;
 };
 
 class namcos10_mgexio_device : public namcos10_exio_base_device
@@ -86,11 +97,11 @@ public:
 	auto porta_write_callback() { return m_port_write[5].bind(); }
 	auto portb_write_callback() { return m_port_write[6].bind(); }
 
-	virtual uint16_t ctrl_r();
+	virtual uint16_t ctrl_r() override;
 	virtual void ctrl_w(uint16_t data) override;
 
-	virtual uint16_t bus_req_r();
-	virtual void bus_req_w(uint16_t data);
+	virtual uint16_t bus_req_r() override;
+	virtual void bus_req_w(uint16_t data) override;
 
 	virtual uint16_t cpu_status_r() override;
 
@@ -121,6 +132,7 @@ private:
 	emu_timer *m_cpu_reset_timer;
 
 	bool m_is_active;
+
 	uint16_t m_bus_req;
 	uint16_t m_ctrl;
 };

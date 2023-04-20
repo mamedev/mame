@@ -81,7 +81,9 @@ void psxrcnt_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			root->n_count = 0;
 		}
 
-		root->n_mode = data;
+		// Reached FFFF and reached target value are read-only flags that are only cleared when read
+		data &= ~( PSX_RC_REACHEDFFFF | PSX_RC_REACHEDTARGET );
+		root->n_mode = data | ( root->n_mode & ( PSX_RC_REACHEDFFFF | PSX_RC_REACHEDTARGET ) );
 
 #if 0
 		if( ( data & 0xfca6 ) != 0 ||
@@ -116,6 +118,7 @@ uint32_t psxrcnt_device::read(offs_t offset, uint32_t mem_mask)
 		break;
 	case 1:
 		data = root->n_mode;
+		root->n_mode &= ~( PSX_RC_REACHEDFFFF | PSX_RC_REACHEDTARGET );
 		break;
 	case 2:
 		data = root->n_target;
@@ -173,6 +176,7 @@ uint16_t psxrcnt_device::root_current( int n_counter )
 			/* TODO: use timer for wrap on 0x10000. */
 			root->n_count = n_current;
 			root->n_start = gettotalcycles();
+			root->n_mode |= PSX_RC_REACHEDFFFF;
 		}
 		return n_current;
 	}
@@ -206,6 +210,15 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 		if( n_duration < 1 )
 		{
 			n_duration += 0x10000;
+
+			if ( ( root->n_mode & PSX_RC_COUNTTARGET ) != 0 )
+			{
+				root->n_mode |= PSX_RC_REACHEDTARGET;
+			}
+			else
+			{
+				root->n_mode |= PSX_RC_REACHEDFFFF;
+			}
 		}
 
 		n_duration *= root_divider( n_counter );
