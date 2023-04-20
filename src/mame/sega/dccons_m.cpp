@@ -105,6 +105,10 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		atapi_xferbase += 2048;
 	}
 
+	// TODO: understand when this should go off
+	// (would otherwise cause REQ ERRORs in gdrom_device with current hookup)
+	m_ata->write_dmack(0);
+
 	// set the next transfer, or a transfer end event.
 	atapi_timer->adjust(attotime::from_usec(ATAPI_SINGLE_XFER_TIME), atapi_xferlen);
 }
