@@ -2609,7 +2609,7 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 {
 	namcos10_memp3_base(config);
-	namcos10_nand_k9f2808u0b(config, 16);
+	namcos10_nand_k9f2808u0b(config, 14);
 
 	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
