@@ -917,9 +917,11 @@ public:
 
 	void ns10_g13jnr(machine_config &config);
 	void ns10_nicetsuk(machine_config &config);
+	void ns10_squizchs(machine_config &config);
 
 	void init_g13jnr();
 	void init_nicetsuk();
+	void init_squizchs();
 
 protected:
 	virtual void machine_start() override;
@@ -2464,6 +2466,12 @@ void namcos10_memp3_state::init_nicetsuk()
 	memn_driver_init();
 }
 
+void namcos10_memp3_state::init_squizchs()
+{
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x8, 0xb, 0x9, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x3, 0x2); };
+	memn_driver_init();
+}
+
 void namcos10_memp3_state::ns10_g13jnr(machine_config &config)
 {
 	namcos10_memp3_base(config);
@@ -2493,6 +2501,14 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 {
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 8);
+
+	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+}
+
+void namcos10_memp3_state::ns10_squizchs(machine_config &config)
+{
+	namcos10_memp3_base(config);
+	namcos10_nand_k9f2808u0b(config, 16);
 
 	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
@@ -3268,6 +3284,53 @@ ROM_START( nicetsuk )
 	DISK_IMAGE_READONLY( "ntk1-cd", 0, NO_DUMP )
 ROM_END
 
+ROM_START( squizchs )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "chs1vera_0.2j", 0x0000000, 0x1080000, CRC(2b1a1392) SHA1(fd5a0e448d8bc7ba8ca57db3008196c9c9433231) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "chs1vera_1.1j", 0x0000000, 0x1080000, CRC(85212a85) SHA1(3c8c1d1671d65d594d30da546e8f4c2dcdfca840) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "chs1vera_2.2h", 0x0000000, 0x1080000, CRC(6a6a1ee7) SHA1(6f42afbc58d9b40b152bb004fa06b096b1f9c29a) )
+
+	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
+	ROM_LOAD( "chs1vera_3.1h", 0x0000000, 0x1080000, CRC(b7ccfaf6) SHA1(3b5ab8fc0ccd59b4566c3d26e347f550030d0a2c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand4", 0 )
+	ROM_LOAD( "chs1vera_4.2f", 0x0000000, 0x1080000, CRC(6623029d) SHA1(b84e2291cd15271ce8417be71a9e2e238a7d6820) )
+
+	ROM_REGION32_LE( 0x1080000, "nand5", 0 )
+	ROM_LOAD( "chs1vera_5.1f", 0x0000000, 0x1080000, CRC(5f771c16) SHA1(7d48476283f6fd4c8fc754d7a312eea542d4b4ca) )
+
+	ROM_REGION32_LE( 0x1080000, "nand6", 0 )
+	ROM_LOAD( "chs1vera_6.2e", 0x0000000, 0x1080000, CRC(840514fd) SHA1(5afe352c4b871b71f16c8df3f53e73985df1a270) )
+
+	ROM_REGION32_LE( 0x1080000, "nand7", 0 )
+	ROM_LOAD( "chs1vera_7.1e", 0x0000000, 0x1080000, CRC(24c38637) SHA1(8b3682683fcb63c55835793e1fbfb62c8e12b61c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand8", 0 )
+	ROM_LOAD( "chs1vera_8.2d", 0x0000000, 0x1080000, CRC(d59d87ec) SHA1(d08b6073481248555c03d32d9353c5fef972cc7b) )
+
+	ROM_REGION32_LE( 0x1080000, "nand9", 0 )
+	ROM_LOAD( "chs1vera_9.1d", 0x0000000, 0x1080000, CRC(822532d8) SHA1(0cb30628761ea575ac7dfc6e68b9e6745a910146) )
+
+	ROM_REGION32_LE( 0x1080000, "nand10", 0 )
+	ROM_LOAD( "chs1vera_10.2c", 0x0000000, 0x1080000, CRC(46752e59) SHA1(60b5f4a1dd83011aeed097ba8dcb05b67d55407e) )
+
+	ROM_REGION32_LE( 0x1080000, "nand11", 0 )
+	ROM_LOAD( "chs1vera_11.1c", 0x0000000, 0x1080000, CRC(fc9ed471) SHA1(7e2827e5babdbcbd5cc6f3bd4165d68f3e62bc86) )
+
+	ROM_REGION32_LE( 0x1080000, "nand12", 0 )
+	ROM_LOAD( "chs1vera_12.2b", 0x0000000, 0x1080000, CRC(ab786753) SHA1(99348e0a7d389e2e177f8907683a1bb12635e855) )
+
+	ROM_REGION32_LE( 0x1080000, "nand13", 0 )
+	ROM_LOAD( "chs1vera_13.1b", 0x0000000, 0x1080000, CRC(739e3b1e) SHA1(d7a25984d939d69de11b0fea000e51fdb4759163) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -3312,3 +3375,4 @@ GAME( 2004, taiko6,    0,        ns10_taiko6,    namcos10,     namcos10_memn_sta
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  namcos10,     namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  namcos10,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
