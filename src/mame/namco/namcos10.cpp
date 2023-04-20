@@ -2700,7 +2700,24 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 14);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000080203001,0x0000008e001402,0x00000000000005,0x00000002030840,
+			0x00000000008420,0x00000000000088,0x0000001c020442,0x000080c0a01041,
+			0x000000a1800d08,0x00000000002240,0x00020385a08010,0x00008054080024,
+			0x00000080209020,0x001408c4200004,0x00000000000010,0x00000000004108
+		}, {
+			0x00000080203001,0x00000008001404,0x00000000000005,0x00000002001040,
+			0x00000000000420,0x00000000000089,0x00000020020842,0x000100c1201081,
+			0x000000dc800b08,0x00000000004240,0x00020006a08010,0x00010054100044,
+			0x00000080209020,0x00141044200008,0x00000000000020,0x00000000008108
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x140840000000ULL) ^ gf2_reduce(previous_plainwords & 0x141040000000ULL))) << 14;
+		}
+	});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -3616,4 +3633,4 @@ GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_sta
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, squizchs,  0,        ns10_squizchs,  namcos10,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  namcos10,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
