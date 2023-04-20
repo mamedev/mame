@@ -24477,7 +24477,8 @@ adm36                           //
 @source:liberty/freedom120.cpp
 free120                         // (c) 1993 Liberty Electronics
 
-@source:liberty/freedom220.cpp
+@source:liberty/freedom200.cpp
+free200                         // (c) 1983 Liberty Electronics
 free220                         // (c) 1984 Liberty Electronics
 
 @source:lsi/m3.cpp

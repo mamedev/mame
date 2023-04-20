@@ -2,8 +2,10 @@
 // copyright-holders: Dirk Best
 /****************************************************************************
 
-    Liberty Electronics Freedom 220 Video Display Terminal
+    Liberty Electronics Freedom 200 Video Display Terminal
+    Serial terminal
 
+    Liberty Electronics Freedom 220 Video Display Terminal
     VT220 compatible serial terminal
 
     Hardware:
@@ -26,10 +28,10 @@
     - Expansion slot
 
     TODO:
-    - Font selection
     - Light/dark background
     - Soft scroll
     - Pixel clock, characters should be 9 pixels?
+    - I/O write to 0xc0
 
     Notes:
     - On first boot you will get an "error 8" - this is because
@@ -60,10 +62,10 @@ namespace {
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class freedom220_state : public driver_device
+class freedom200_state : public driver_device
 {
 public:
-	freedom220_state(const machine_config &mconfig, device_type type, const char *tag) :
+	freedom200_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_avdc(*this, "avdc"),
@@ -74,11 +76,10 @@ public:
 		m_translate(*this, "translate"),
 		m_charram(*this, "charram%u", 0U),
 		m_attrram(*this, "attrram%u", 0U),
-		m_video_ctrl(0x00),
-		m_dw_active(false)
+		m_video_ctrl(0x00)
 	{ }
 
-	void freedom220(machine_config &config);
+	void freedom200(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -96,7 +97,14 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_attrram;
 
 	uint8_t m_video_ctrl;
+
+	// double width support
 	bool m_dw_active;
+	uint8_t m_dw_char;
+	uint8_t m_dw_attr;
+	bool m_dw_ul;
+	bool m_dw_blink;
+	bool m_dw_cursor;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -113,17 +121,18 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-void freedom220_state::mem_map(address_map &map)
+void freedom200_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share(m_charram[0]);
 	map(0x8800, 0x8fff).ram().share(m_attrram[0]);
 	map(0x9000, 0x97ff).ram().share(m_charram[1]);
 	map(0x9800, 0x9fff).ram().share(m_attrram[1]);
-	map(0xa000, 0xafff).ram().share("nvram"); // actual NVRAM possibly only 0x800 in size
+	map(0xa000, 0xa7ff).ram().share("nvram");
+	map(0xa800, 0xafff).ram().share("workram");
 }
 
-void freedom220_state::io_map(address_map &map)
+void freedom200_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).rw(m_avdc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
@@ -131,7 +140,8 @@ void freedom220_state::io_map(address_map &map)
 	map(0x40, 0x41).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x60, 0x61).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x81).rw(m_usart[2], FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0xa0, 0xa0).w(FUNC(freedom220_state::video_ctrl_w));
+	map(0xa0, 0xa0).w(FUNC(freedom200_state::video_ctrl_w));
+	// c0 - used by free200 only
 }
 
 
@@ -139,53 +149,76 @@ void freedom220_state::io_map(address_map &map)
 //  VIDEO EMULATION
 //**************************************************************************
 
-void freedom220_state::char_map(address_map &map)
+void freedom200_state::char_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share(m_charram[0]);
 	map(0x1000, 0x17ff).ram().share(m_charram[1]);
-	map(0x2000, 0x2fff).ram().share("nvram");
+	map(0x2000, 0x27ff).ram().share("nvram");
+	map(0x2800, 0x2fff).ram().share("workram");
 }
 
-void freedom220_state::attr_map(address_map &map)
+void freedom200_state::attr_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share(m_attrram[0]);
 	map(0x1000, 0x17ff).ram().share(m_attrram[1]);
-	map(0x2000, 0x2fff).ram().share("nvram");
+	map(0x2000, 0x27ff).ram().share("workram");
+	map(0x2800, 0x2fff).ram().share("workram");
 }
 
-void freedom220_state::avdc_intr_w(int state)
+void freedom200_state::avdc_intr_w(int state)
 {
 	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void freedom220_state::video_ctrl_w(uint8_t data)
+void freedom200_state::video_ctrl_w(uint8_t data)
 {
 	// 7-------  unknown
 	// -6------  unknown
 	// --5-----  unknown
-	// ---432--  font select
+	// ---432--  translation table bit 210
 	// ------1-  normal/reverse video
-	// -------0  unknown
+	// -------0  translation table bit 3
 
 	logerror("video_ctrl_w: %02x\n", data);
 
 	m_video_ctrl = data;
 }
 
-SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
+SCN2674_DRAW_CHARACTER_MEMBER( freedom200_state::draw_character )
 {
 	// 765-----  unknown
 	// ---4----  normal/bold
 	// ----3---  underline
 	// -----2--  invert
 	// ------1-  blink
-	// -------0  unknown
+	// -------0  invisible
 
 	const pen_t *const pen = m_palette->pens();
 
-	// translation table
-	const int table = 0; // 0-f
+	// either save or restore attributes for double-width
+	if (dw)
+	{
+		if (m_dw_active)
+		{
+			charcode = m_dw_char;
+			attrcode = m_dw_attr;
+			ul = m_dw_ul;
+			blink = m_dw_blink;
+			cursor = m_dw_cursor;
+		}
+		else
+		{
+			m_dw_char = charcode;
+			m_dw_attr = attrcode;
+			m_dw_ul = ul;
+			m_dw_blink = blink;
+			m_dw_cursor = cursor;
+		}
+	}
+
+	// apply translation table
+	const int table = bitswap<4>(m_video_ctrl, 0, 4, 3, 2);
 	charcode = m_translate[(table << 8) | charcode];
 
 	uint8_t data = m_chargen[charcode << 4 | linecount];
@@ -194,6 +227,9 @@ SCN2674_DRAW_CHARACTER_MEMBER( freedom220_state::draw_character )
 		data = 0xff;
 
 	if (blink && (BIT(attrcode, 1)))
+		data = 0x00;
+
+	if (BIT(attrcode, 0))
 		data = 0x00;
 
 	if (BIT(attrcode, 2))
@@ -247,14 +283,19 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-void freedom220_state::machine_start()
+void freedom200_state::machine_start()
 {
 	// register for save states
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_dw_active));
+	save_item(NAME(m_dw_char));
+	save_item(NAME(m_dw_attr));
+	save_item(NAME(m_dw_ul));
+	save_item(NAME(m_dw_blink));
+	save_item(NAME(m_dw_cursor));
 }
 
-void freedom220_state::machine_reset()
+void freedom200_state::machine_reset()
 {
 	m_dw_active = false;
 
@@ -268,11 +309,11 @@ void freedom220_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void freedom220_state::freedom220(machine_config &config)
+void freedom200_state::freedom200(machine_config &config)
 {
 	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &freedom220_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &freedom220_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &freedom200_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &freedom200_state::io_map);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
@@ -289,12 +330,12 @@ void freedom220_state::freedom220(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
 	SCN2674(config, m_avdc, 16000000 / 8); // clock unverified
-	m_avdc->intr_callback().set(FUNC(freedom220_state::avdc_intr_w));
+	m_avdc->intr_callback().set(FUNC(freedom200_state::avdc_intr_w));
 	m_avdc->set_screen(m_screen);
 	m_avdc->set_character_width(8); // unverified
-	m_avdc->set_addrmap(0, &freedom220_state::char_map);
-	m_avdc->set_addrmap(1, &freedom220_state::attr_map);
-	m_avdc->set_display_callback(FUNC(freedom220_state::draw_character));
+	m_avdc->set_addrmap(0, &freedom200_state::char_map);
+	m_avdc->set_addrmap(1, &freedom200_state::attr_map);
+	m_avdc->set_display_callback(FUNC(freedom200_state::draw_character));
 
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	pit.set_clk<0>(18.432_MHz_XTAL / 10);
@@ -340,6 +381,19 @@ void freedom220_state::freedom220(machine_config &config)
 //  ROM DEFINITIONS
 //**************************************************************************
 
+ROM_START( free200 )
+	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_LOAD("m120020.ic213", 0x0000, 0x2000, CRC(869de37e) SHA1(22f9c847aa8d99c22791df7a40a7c1d67f21516b))
+	ROM_LOAD("m220020.ic212", 0x2000, 0x2000, CRC(85095c20) SHA1(e7515c8b188732e391015f20ad38207876850589))
+	ROM_LOAD("m320020.ic214", 0x4000, 0x2000, CRC(827cafe6) SHA1(887d78bfbfcdc07efc35a7c560822b1386300632))
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("g020010.bin", 0x0000, 0x1000, CRC(b99bf3b1) SHA1(799395694d2f88c68230ce7f6bf5453b799926f4))
+
+	ROM_REGION(0x1000, "translate", 0)
+	ROM_LOAD("t020010.bin", 0x0000, 0x1000, CRC(19f9c677) SHA1(903eb82b2a7b63d79c00085c8c7ec2cb9583e2a0))
+ROM_END
+
 ROM_START( free220 )
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("m122010__8cdd.ic213", 0x0000, 0x2000, CRC(a1181809) SHA1(0ec0fd30c8a55f0bb9e1c6453120ab9a696f9041))
@@ -362,4 +416,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY                FULLNAME       FLAGS
-COMP( 1984, free220, 0,      0,      freedom220, 0,     freedom220_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, free200, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 200", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, free220, 0,      0,      freedom200, 0,     freedom200_state, empty_init, "Liberty Electronics", "Freedom 220", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
