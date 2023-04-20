@@ -1142,7 +1142,7 @@ uint16_t namcos10_state::int_r(offs_t offset)
 {
 	// bit = cleared registers
 	// 0 = 1fba0012
-	// 1 = 1fba0014, 1fe20000
+	// bit 1 is EXIO board-related? Medal no Tatsujin (EXFINAL) uses this to update the EXIO states (ARCNET among other things)
 	// bit 2 is for CD-ROM
 	// bit 3 is for I/O (must be set to update I/O)
 	return m_int;
@@ -2722,7 +2722,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( nflclsfb )
 	PORT_INCLUDE(namcos10)
 
-	// TODO: Trackball (EXIO)
+	// TODO: Trackball (EXIO, requires serial emulation in TMP95C061)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff1c00, IP_ACTIVE_LOW, IPT_UNUSED )
