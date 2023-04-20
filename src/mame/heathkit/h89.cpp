@@ -82,7 +82,7 @@ private:
 	required_memory_region m_maincpu_region;
 	memory_view m_mem_view;
 	required_device<ram_device> m_ram;
-	required_device<ram_device> m_floppy_ram;
+	required_shared_ptr<uint8_t> m_floppy_ram;
 	required_device<heath_tlb_device> m_tlb;
 	required_device<ins8250_device> m_console;
 	required_device<ins8250_device> m_serial1;
@@ -158,15 +158,19 @@ private:
 */
 void h89_state::h89_mem(address_map &map)
 {
-	map.unmap_value_low();
+	map.unmap_value_high();
 
 	map(0x0000, 0xffff).view(m_mem_view);
 
 	// View 0 - ROM / Floppy RAM R/O
 	// View 1 - ROM / Floppy RAM R/W
 	// monitor ROM
-	m_mem_view[0](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
-	m_mem_view[1](0x0000, 0x13ff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[0](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).rom().region("maincpu", 0).unmapw();
+
+	// Floppy RAM
+	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
+	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
 
 	// Floppy ROM
 	m_mem_view[0](0x1800, 0x1fff).rom().region("maincpu", 0x1800).unmapw();
@@ -304,16 +308,6 @@ void h89_state::machine_start()
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_floppy_ram_wp));
 
-
-	u8 *m_floppy_ram_ptr = m_floppy_ram->pointer();
-
-	// Floppy RAM - Read/Only. note: it's not rom, but behaves like it in this
-	// view.
-	m_mem_view[0].install_rom(0x1400, 0x17ff, m_floppy_ram_ptr);
-
-	// Floppy RAM - Read/write
-	m_mem_view[1].install_ram(0x1400, 0x17ff, m_floppy_ram_ptr);
-
 	// update RAM mappings based on RAM size
 	u8 *m_ram_ptr = m_ram->pointer();
 	u32 ram_size = m_ram->size();
@@ -337,17 +331,14 @@ void h89_state::machine_start()
 
 		// for views with ROM visible, the top of memory is 8k higher than
 		// the memory size, since the base starts at 8k.
-		u32 ram_end = ram_size + 0x1fff;
+		u32 ram_top = ram_size + 0x1fff;
 
-		m_mem_view[0].install_ram(0x2000, ram_end, m_ram_ptr);
-		m_mem_view[0].unmap_readwrite(ram_end + 1, 0xffff);
-		m_mem_view[1].install_ram(0x2000, ram_end, m_ram_ptr);
-		m_mem_view[1].unmap_readwrite(ram_end + 1, 0xffff);
+		m_mem_view[0].install_ram(0x2000, ram_top, m_ram_ptr);
+		m_mem_view[1].install_ram(0x2000, ram_top, m_ram_ptr);
 
-		// when ROM is not active, memory still starts at 8k
+		// when ROM is not active, memory still starts at 8k, but is 8k smaller
 		m_mem_view[2].install_ram(0x2000, ram_size - 1, m_ram_ptr);
-		// unmap everything above the amount of RAM in the SYSTEM
-		m_mem_view[2].unmap_readwrite(ram_size, 0xffff);
+
 		// remap the top 8k down to addr 0
 		m_mem_view[2].install_ram(0x0000, 0x1fff, m_ram_ptr + ram_size - 0x2000);
 	}
@@ -419,8 +410,6 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
-
-	RAM(config, m_floppy_ram).set_default_size("1K");
 
 	INS8250(config, m_console, INS8250_CLOCK);
 	HEATH_TLB(config, m_tlb);
