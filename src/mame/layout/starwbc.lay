@@ -35,14 +35,14 @@ license:CC0-1.0
 			<bounds x="0.4" y="0.4" width="0.2" height="0.2" />
 		</disk>
 		<disk state="0">
-			<color red="0.2" green="0.02" blue="0.03" />
+			<color red="0.15" green="0.015" blue="0.0225" />
 			<bounds x="0.4" y="0.4" width="0.2" height="0.2" />
 		</disk>
 	</element>
 
 	<element name="nlamp" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
-		<disk state="0"><color red="0.2" green="0.02" blue="0.03" /></disk>
+		<disk state="0"><color red="0.15" green="0.015" blue="0.0225" /></disk>
 	</element>
 
 	<element name="text_a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
