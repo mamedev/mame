@@ -514,7 +514,8 @@ void t10mmc::ExecCommand()
 		// m_device->logerror("T10MMC: READ CD start_lba[%08x] block_len[%06x] %02x %02x %02x %02x\n", m_lba, m_blocks, command[1], command[9], command[10], command[11]);
 
 		auto expected_sector_type = BIT(command[1], 2, 3);
-		if (expected_sector_type != 0) {
+		if (expected_sector_type != 0)
+		{
 			m_device->logerror("T10MMC: READ CD requested a sector type of %d which is unhandled\n", expected_sector_type);
 
 			auto trk = m_cdrom->get_track(m_lba);
@@ -523,7 +524,8 @@ void t10mmc::ExecCommand()
 			|| (expected_sector_type == 2 && track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW)
 			|| (expected_sector_type == 3 && track_type != cdrom_file::CD_TRACK_MODE2 && track_type != cdrom_file::CD_TRACK_MODE2_RAW)
 			|| (expected_sector_type == 4 && track_type != cdrom_file::CD_TRACK_MODE2_FORM1)
-			|| (expected_sector_type == 5 && track_type != cdrom_file::CD_TRACK_MODE2_FORM2)) {
+			|| (expected_sector_type == 5 && track_type != cdrom_file::CD_TRACK_MODE2_FORM2))
+			{
 				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
 
 				m_phase = SCSI_PHASE_STATUS;

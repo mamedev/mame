@@ -42,6 +42,8 @@ void namcos10_exio_device::device_start()
 
 	save_item(NAME(m_is_active));
 	save_item(NAME(m_analog_idx));
+	save_item(NAME(m_bus_req));
+	save_item(NAME(m_ctrl));
 }
 
 void namcos10_exio_device::device_reset_after_children()
@@ -51,6 +53,8 @@ void namcos10_exio_device::device_reset_after_children()
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	m_is_active = false;
 	m_analog_idx = 0;
+	m_bus_req = 0;
+	m_ctrl = 0;
 }
 
 void namcos10_exio_device::map(address_map &map)

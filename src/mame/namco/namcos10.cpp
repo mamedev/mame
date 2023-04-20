@@ -636,6 +636,7 @@ Known issues:
 - nflclsfb: Needs additional I/O for trackball
 - g13jnr: Needs MP3 decoder emulation
 - sugorotc, sekaikh(?): BGMs stop early and/or crash the game. Seems to be expecting an SPU-related IRQ?
+- nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -2660,21 +2661,6 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 8);
 
-	subdevice<screen_device>("screen")->screen_vblank().set([this] (int state) {
-		// nicetsuk wants to start the pads and it hangs inside the pad callback routine
-		// due to issues with the PSX timer (rcnt) so disable the pad callbacks
-		// by nulling the addrs that would be used by PadStartCom.
-		// The actual game inputs are over JAMMA so perhaps his was left over from
-		// debug menus?
-		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
-
-		if( p_n_psxram[ 0x105e20 / 4 ] == 0x800de200 )
-		{
-			p_n_psxram[ 0x105e20 / 4 ] = 0;
-			p_n_psxram[ 0x105e24 / 4 ] = 0;
-		}
-	});
-
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x00000000000022,0x00000000008082,0x00808400d10000,0x00000000000088,
@@ -2733,7 +2719,7 @@ static INPUT_PORTS_START( namcos10 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0020, IP_ACTIVE_LOW, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:1" )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED ) // JVS sense?
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // JVS sense?
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f110000, IP_ACTIVE_LOW, IPT_UNUSED )

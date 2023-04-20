@@ -33,9 +33,6 @@ protected:
 	virtual void device_start() override;
 
 	const uint8_t m_ident_code;
-
-	uint16_t m_bus_req;
-	uint16_t m_ctrl;
 };
 
 class namcos10_exio_device : public namcos10_exio_base_device
@@ -74,6 +71,9 @@ private:
 
 	bool m_is_active;
 	uint32_t m_analog_idx;
+
+	uint16_t m_bus_req;
+	uint16_t m_ctrl;
 };
 
 class namcos10_mgexio_device : public namcos10_exio_base_device
@@ -132,6 +132,9 @@ private:
 	emu_timer *m_cpu_reset_timer;
 
 	bool m_is_active;
+
+	uint16_t m_bus_req;
+	uint16_t m_ctrl;
 };
 
 DECLARE_DEVICE_TYPE(NAMCOS10_EXIO,      namcos10_exio_device)
