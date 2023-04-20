@@ -14,8 +14,8 @@ TODO:
 #include "emu.h"
 
 #include "cpu/melps4/m58846.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -75,7 +75,9 @@ void hh_melps4_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -101,7 +103,9 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -368,7 +372,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS

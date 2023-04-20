@@ -22,8 +22,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/rw5000/b5500.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -95,7 +95,9 @@ void hh_rw5000_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -136,7 +138,9 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -1103,7 +1107,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS

@@ -16,9 +16,9 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
 #include "cpu/pps41/mm78la.h"
-#include "video/pwm.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -93,7 +93,9 @@ void hh_pps41_state::machine_start()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -119,7 +121,9 @@ INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -1606,7 +1610,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS

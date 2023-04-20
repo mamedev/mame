@@ -42,7 +42,7 @@ regular Speak & Math. No known external modules were released.
 ================================================================================
 
 Touch & Tell (US), 1981
-- MCU: CD8012, label CD8012NL (die label: 1100G, CD8012)
+- MCU: CD8012, label CD8012NL (die label: 1100G CD8012)
 - TMS51xx: CD2802
 - VSM: 4KB CD2610
 - notes: MCU is TMS1100 instead of TMS0270. CD8010 is seen in some devices

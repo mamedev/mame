@@ -157,6 +157,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars: Electronic Battle Command Game
+  MP3447   TMS1100   1982, Texas Instruments Les Maths Magiques -> ti/snspellc.cpp
   MP3450A  TMS1100   1979, Microvision cartridge: Block Buster
   MP3454   TMS1100   1979, Microvision cartridge: Star Trek Phaser Strike
   MP3455   TMS1100   1980, Microvision cartridge: Pinball
@@ -422,7 +423,9 @@ void hh_tms1k_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -500,7 +503,9 @@ void hh_tms1k_state::set_power(bool state)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -9425,7 +9430,7 @@ ROM_END
 /*******************************************************************************
 
   Milton Bradley Electronic Arcade Mania
-  * TMS1100 M34078A-N2LL (die label: 1100G, M34078A)
+  * TMS1100 M34078A-N2LL (die label: 1100G M34078A)
   * 9 LEDs, 3-bit sound
 
   This is a board game. The mini arcade machine is the emulated part here.
@@ -16345,7 +16350,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS

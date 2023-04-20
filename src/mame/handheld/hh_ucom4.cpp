@@ -93,9 +93,9 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "emu.h"
 
 #include "cpu/ucom4/ucom4.h"
-#include "video/pwm.h"
-#include "video/hlcd0515.h"
 #include "sound/spkrdev.h"
+#include "video/hlcd0515.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -189,7 +189,9 @@ void hh_ucom4_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -234,7 +236,9 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -3330,7 +3334,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS

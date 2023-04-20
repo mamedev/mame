@@ -12,7 +12,7 @@ Programming was apparently done by Micom Tech.
 
 Hardware notes:
 - PCB label: 7-130M-9R
-- TMS1100 custom label (no decap)
+- TMS1100 E7CL04N2L (die label: 1100G E7CL04)
 - TMS5110ANL, 2*16KB VSM
 - module slot
 
@@ -30,7 +30,6 @@ obviously his voice will change.
 
 TODO:
 - dump/add Doctor Bingo Bear module
-- add output PLA
 
 *******************************************************************************/
 
@@ -241,9 +240,9 @@ ROM_START( bbear )
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_bbear_output.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_bbear_output.pla", 0, 365, CRC(5a0b8e88) SHA1(e96cffb2ac3bf81f335d6f95125637446ff0f1b7) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-7fff = space reserved for cartridge
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cm62056", 0x0000, 0x4000, CRC(550b40d1) SHA1(ead5ed19a875309ec0be07adcb2986fead3405e0) ) // CM62091 label also seen, same ROM contents
 	ROM_LOAD( "cm62057", 0x4000, 0x4000, CRC(383a8a9a) SHA1(3a4b8837febbec9fe9603970cf520f69304c5a68) ) // CM62092 "
 ROM_END
@@ -255,9 +254,9 @@ ROM_START( monkmonk )
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_common1_micro.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_bbear_output.pla", 0, 365, NO_DUMP )
+	ROM_LOAD( "tms1100_bbear_output.pla", 0, 365, CRC(5a0b8e88) SHA1(e96cffb2ac3bf81f335d6f95125637446ff0f1b7) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-7fff = space reserved for cartridge
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cm62059", 0x0000, 0x4000, CRC(fa00a337) SHA1(b8625cee6605a9083de5da9e6ef3ea1c5d36e15c) )
 	ROM_LOAD( "cm62060", 0x4000, 0x4000, CRC(494e06c2) SHA1(679517f1304617f7db1cd89ea2260e969170c6ac) )
 ROM_END

@@ -16,9 +16,11 @@ There's also a version of this game on a Panasonic MN1405 MCU.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mb88xx/mb88xx.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 #include "scrablex.lh"

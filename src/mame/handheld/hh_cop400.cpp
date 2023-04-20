@@ -21,10 +21,10 @@ TODO:
 #include "emu.h"
 
 #include "cpu/cop400/cop400.h"
-#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -114,7 +114,9 @@ void hh_cop400_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -154,7 +156,9 @@ void hh_cop400_state::set_power(bool state)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -2656,7 +2660,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS

@@ -20,8 +20,8 @@ TODO:
 
 #include "cpu/cops1/mm5799.h"
 #include "machine/ds8874.h"
-#include "video/pwm.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -93,7 +93,9 @@ void hh_cops1_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -113,7 +115,9 @@ u8 hh_cops1_state::read_inputs(int columns)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -834,7 +838,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
