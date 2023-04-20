@@ -169,6 +169,7 @@ void gdrom_device::device_reset()
 
 void gdrom_device::ExecCommand()
 {
+	printf("%02x\n", command[0]);
 	switch ( command[0] )
 	{
 		case 0x11: // REQ_MODE
@@ -255,30 +256,15 @@ void gdrom_device::ExecCommand()
 				break;
 			}
 
-			// TODO: is this correct?
-			int start_trk = command[2];
-			int end_trk = m_cdrom->get_last_track();
-			int length;
-			int allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
+			// TODO: it's supposed to write a single and a double density TOC request
+			// Passing TOC as same is enough for DC in-game but not for the CD player
+			//if (command[1])
+			//	throw emu_fatalerror("Double density unsupported");
 
-			if( start_trk == 0 )
-			{
-				start_trk = 1;
-			}
-			if( start_trk == 0xaa )
-			{
-				end_trk = start_trk;
-			}
+			u16 allocation_length = SCSILengthFromUINT16( &command[ 3 ] );
 
-			length = 4 + ( 8 * ( ( end_trk - start_trk ) + 1 ) );
-			if( length > allocation_length )
-			{
-				length = allocation_length;
-			}
-			else if( length < 4 )
-			{
-				length = 4;
-			}
+			if (allocation_length != 408)
+				throw emu_fatalerror("TOC with allocation length != 408 (%d)", allocation_length);
 
 			if (m_cdda != nullptr)
 			{
@@ -287,9 +273,20 @@ void gdrom_device::ExecCommand()
 
 			m_phase = SCSI_PHASE_DATAIN;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
-			m_transfer_length = length;
+			m_transfer_length = allocation_length;
 			break;
 		}
+
+		// GET SESSION
+		/*case 0x15:
+		{
+			int allocation_length = SCSILengthFromUINT8( &command[ 4 ] );
+			printf("REQ_SES %02x %02x\n", command[2], allocation_length);
+			m_phase = SCSI_PHASE_DATAIN;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 6;
+			break;
+		}*/
 
 		case 0x70:  // security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
 			m_phase = SCSI_PHASE_STATUS;
@@ -303,18 +300,65 @@ void gdrom_device::ExecCommand()
 			m_transfer_length = sizeof(GDROM_Cmd71_Reply);
 			break;
 
-		case 0x40:
-			if(command[1] & 0xf)
+		case 0x20: // CD_PLAY
+		{
+			if (m_cdrom == nullptr)
 			{
-				m_phase = SCSI_PHASE_DATAIN;
-				m_status_code = SCSI_STATUS_CODE_GOOD;
-				m_transfer_length = 0xe;
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+
+			for (int i = 0; i < 12; i++)
+				printf("%02x|", command[i]);
+			printf("\n");
+			const u32 start_offs = (command[2]<<16 | command[3]<<8 | command[4]);
+			const u32 end_offs = (command[8]<<16 | command[9]<<8 | command[10]);
+			//(command[8] % 75) + ((command[7] * 75) % (60*75)) + (command[6] * (75*60)) - m_lba;
+
+			//m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
+
+			int trk = m_cdrom->get_track(start_offs);
+
+			if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO && end_offs > start_offs)
+			{
+				m_cdda->start_audio(start_offs, end_offs - start_offs);
+				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+				printf("playing %d %d %d\n", trk + 1, start_offs, end_offs - start_offs);
 			}
 			else
 			{
-				LOGWARN("command 0x40: unhandled subchannel request\n");
+				LOGWARN("track is NOT audio!\n");
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+			}
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_GOOD;
+			m_transfer_length = 0;
+			break;
+		}
+
+		case 0x40:
+		{
+			switch(command[1] & 0xf)
+			{
+				case 0x00:
+					m_phase = SCSI_PHASE_DATAIN;
+					m_status_code = SCSI_STATUS_CODE_GOOD;
+					m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
+					break;
+				case 0x01:
+					m_phase = SCSI_PHASE_DATAIN;
+					m_status_code = SCSI_STATUS_CODE_GOOD;
+					m_transfer_length = 0xe;
+					break;
+				default:
+					LOGWARN("command 0x40: unhandled subchannel request\n");
+					break;
 			}
 			break;
+		}
 
 		default:
 			t10mmc::ExecCommand();
@@ -384,41 +428,33 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			{
 				case 0:     // normal
 				{
-					int start_trk;
-					int end_trk;
-					int len;
-					int in_len;
+					int start_trk = 1;
+					int end_trk = m_cdrom->get_last_track();
+					int len = 408;
+					//int in_len;
 					int dptr;
 					uint32_t tstart;
 
-					start_trk = command[2];
-					if( start_trk == 0 )
+					//start_trk = command[2];
+					/*if( start_trk == 0 )
 					{
 						start_trk = 1;
-					}
+					}*/
 
-					end_trk = m_cdrom->get_last_track();
-					len = (end_trk * 8) + 2;
 
 					// the returned TOC DATA LENGTH must be the full amount,
 					// regardless of how much we're able to pass back due to in_len
+					//dptr = 0;
+					//data[dptr++] = (len>>8) & 0xff;
+					//data[dptr++] = (len & 0xff);
+
+					memset(data, 0, len);
 					dptr = 0;
-					data[dptr++] = (len>>8) & 0xff;
-					data[dptr++] = (len & 0xff);
-					data[dptr++] = 1;
-					data[dptr++] = end_trk;
-
-					if( start_trk == 0xaa )
-					{
-						end_trk = 0xaa;
-					}
-
-					in_len = command[3]<<8 | command[4];
-
+					printf("%d %d\n", start_trk, end_trk);
 					for (i = start_trk; i <= end_trk; i++)
 					{
-						int cdrom_track = i;
-						if( cdrom_track != 0xaa )
+						//int cdrom_track = i;
+						/*if( cdrom_track != 0xaa )
 						{
 							cdrom_track--;
 						}
@@ -426,29 +462,54 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 						if( dptr >= in_len )
 						{
 							break;
-						}
+						}*/
 
-						data[dptr++] = 0;
-						data[dptr++] = m_cdrom->get_adr_control(cdrom_track);
-						data[dptr++] = i;
-						data[dptr++] = 0;
+						data[dptr++] = m_cdrom->get_adr_control(i);
 
-						tstart = m_cdrom->get_track_start(cdrom_track);
-						if ((command[1]&2)>>1)
-							tstart = cdrom_file::lba_to_msf(tstart);
-						data[dptr++] = (tstart>>24) & 0xff;
+						tstart = m_cdrom->get_track_start(i);
+						//if ((command[1]&2)>>1)
+						//	tstart = cdrom_file::lba_to_msf(tstart);
 						data[dptr++] = (tstart>>16) & 0xff;
 						data[dptr++] = (tstart>>8) & 0xff;
 						data[dptr++] = (tstart & 0xff);
+						printf("%d %d\n", i, tstart);
 					}
-
+					
+					dptr = 396;
+					data[dptr++] = m_cdrom->get_adr_control(0);
+					data[dptr++] = start_trk;
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+					data[dptr++] = m_cdrom->get_adr_control(end_trk);
+					data[dptr++] = end_trk;
+					data[dptr++] = 0;
+					data[dptr++] = 0;
+					const u32 tend = m_cdrom->get_track_start(0xaa);
+					//if ((command[1]&2)>>1)
+					//	tstart = cdrom_file::lba_to_msf(tstart);
+					data[dptr++] = (tend>>16) & 0xff;
+					data[dptr++] = (tend>>8) & 0xff;
+					data[dptr++] = (tend & 0xff);
 					break;
 				}
 				default:
-					LOGWARN("Unhandled READ TOC format %d\n", command[2]&0xf);
+					printf("Unhandled READ TOC format %d\n", command[2]&0xf);
 					break;
 			}
 			break;
+
+/*		case 0x15:
+		{
+			const u8 session_num = command[2] & 0xff;
+			printf("%d\n", session_num);
+			data[0] = 0x1;
+			data[1] = 0;
+			data[2] = 1;
+			data[3] = 0x10;
+			data[4] = 0;
+			data[5] = 0x96;
+			break;
+		}*/
 
 		case 0x71:
 			LOGCMD("SYS_REQ_SECU\n");
@@ -458,20 +519,44 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			break;
 
 		case 0x40: // Get Subchannel status
-			data[0] = 0; // Reserved
-			data[1] = 0x15; // Audio Playback status (todo)
-			data[2] = 0;
-			data[3] = 0x0e; // header size
-			data[4] = 0; // ?
-			data[5] = 1; // Track Number
-			data[6] = 1; // gap #1
-			data[7] = 0; // ?
-			data[8] = 0; // ?
-			data[9] = 0; // ?
-			data[0xa] = 0; // ?
-			data[0xb] = 0; // FAD >> 16
-			data[0xc] = 0; // FAD >> 8
-			data[0xd] = 0x96; // FAD >> 0
+			switch (command[2] & 0x0f)
+			{
+				case 0:
+					data[0] = 0; // Reserved
+					data[1] = 0x11; // Audio Playback status (todo)
+					data[2] = 0;
+					data[3] = 64; // header size
+					data[4] = 0; // ?
+					data[5] = 1; // Track Number
+					data[6] = 1; // gap #1
+					data[7] = 0; // ?
+					data[8] = 0; // ?
+					data[9] = 0; // ?
+					data[0xa] = 0; // ?
+					data[0xb] = 0; // FAD >> 16
+					data[0xc] = 0; // FAD >> 8
+					data[0xd] = 0x96; // FAD >> 0
+					for (int i = 0xe; i < 64; i++)
+						data[i] = 0;
+					break;
+				case 1:
+					data[0] = 0; // Reserved
+					data[1] = 0x15; // Audio Playback status (todo)
+					data[2] = 0;
+					data[3] = 0x0e; // header size
+					data[4] = 0; // ?
+					data[5] = 1; // Track Number
+					data[6] = 1; // gap #1
+					data[7] = 0; // ?
+					data[8] = 0; // ?
+					data[9] = 0; // ?
+					data[0xa] = 0; // ?
+					data[0xb] = 0; // FAD >> 16
+					data[0xc] = 0; // FAD >> 8
+					data[0xd] = 0x96; // FAD >> 0
+
+					break;
+			}
 			break;
 
 		default:
