@@ -1244,6 +1244,7 @@ void wangpc_state::wangpc(machine_config &config)
 
 	// devices
 	AM9517A(config, m_dmac, 4000000);
+	m_dmac->dreq_active_low();
 	m_dmac->out_hreq_callback().set(FUNC(wangpc_state::hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(wangpc_state::eop_w));
 	m_dmac->in_memr_callback().set(FUNC(wangpc_state::memr_r));
