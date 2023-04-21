@@ -303,13 +303,15 @@ TIMER_CALLBACK_MEMBER(sgi_mc_device::perform_dma)
 
 void sgi_mc_device::update_count()
 {
+	const uint32_t divide = (m_rpss_divider & 0xff) + 1;
+	const uint32_t increment = (m_rpss_divider >> 8) & 0xff;
+	const uint32_t freq = clock() / divide;
 	attotime curr_time = machine().scheduler().time();
+	/* Quantise curr_time to the clock frequency */
+	curr_time = attotime::from_ticks(curr_time.as_ticks(freq), freq);
 	attotime time_delta = curr_time - m_last_update_time;
 	m_last_update_time = curr_time;
 	m_elapsed_time += time_delta;
-	uint32_t divide = (m_rpss_divider & 0xff) + 1;
-	uint32_t increment = (m_rpss_divider >> 8) & 0xff;
-	uint32_t freq = clock() / divide;
 	uint32_t ticks = (uint32_t)m_elapsed_time.as_ticks(freq);
 	if (ticks > 0)
 	{
