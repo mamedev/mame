@@ -19,8 +19,8 @@ class sgi_mc_device : public device_t
 {
 public:
 	template <typename T, typename U>
-	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag)
-		: sgi_mc_device(mconfig, tag, owner, (uint32_t)0)
+	sgi_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag, uint32_t clock)
+		: sgi_mc_device(mconfig, tag, owner, clock)
 	{
 		m_maincpu.set_tag(std::forward<T>(cpu_tag));
 		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
