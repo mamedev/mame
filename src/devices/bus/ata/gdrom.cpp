@@ -399,6 +399,13 @@ void gdrom_device::ExecCommand()
 			break;
 		}
 
+		case 0x10:
+			LOGCMD("REQ_STAT offset %02x length %02x\n", command[2], command[4]);
+			// any game that enables redbook
+			//t10mmc::ExecCommand();
+
+			break;
+
 		// case 0x22: CD_SCAN
 		// case 0x31: CD_READ2
 		// case 0x13: REQ_ERROR

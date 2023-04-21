@@ -1891,7 +1891,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>NEC Interchannel</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+No [AICA] audio on opening FMV
 ]]></notes>
 		<info name="serial" value="T-20107M"/>
 		<info name="release" value="20010412"/>
@@ -3238,7 +3238,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2001</year>
 		<publisher>Bimboosoft</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Ugly Bimboosoft [PVR] render at startup
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-41202M"/>
 		<info name="release" value="20010920"/>
@@ -7384,7 +7385,7 @@ Black screen [GDROM]
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
 Test case for [PVR] flickerfree feature
-No [redbook] audio
+Has [redbook] audio (title screen)
 ]]></notes>
 		<info name="serial" value="T-14305M"/>
 		<info name="release" value="19990722"/>
@@ -8348,7 +8349,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>1999</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164"/>
 		<info name="release" value="19990723"/>
@@ -8381,7 +8382,7 @@ No [redbook] audio
 		<year>1999</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-02 (Disc 1), 610-7164-03 (Disc 2)"/>
 		<info name="release" value="19990827"/>
@@ -8476,7 +8477,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-06"/>
 		<info name="release" value="20000707"/>
@@ -8500,7 +8501,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-07"/>
 		<info name="release" value="20000811"/>
@@ -8524,7 +8525,12 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+deSPIRIA:
+OutTrigger: crashes during loading with big [GDROM] transfer [drc]
+18 Wheeler:
+Illbleed:
+Capcom vs SNK:
 ]]></notes>
 		<info name="serial" value="610-7164-08"/>
 		<info name="release" value="20000929"/>
@@ -8560,7 +8566,12 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+Virtua Tennis: fails [GDROM] loading, punts to game select
+Guilty Gear X:
+Marionette Handler 2:
+Tricolore Crise (FMV):
+Moero! Justice Gakuen (FMV):
 ]]></notes>
 		<info name="serial" value="610-7164-09"/>
 		<info name="release" value="20001127"/>
@@ -8585,7 +8596,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-10"/>
 		<info name="release" value="20001229"/>
@@ -8610,7 +8621,8 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
+[AICA] sound crackling on game select menu
 ]]></notes>
 		<info name="serial" value="610-7164-11"/>
 		<info name="release" value="20010209"/>
@@ -8635,7 +8647,7 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-12"/>
 		<info name="release" value="20010330"/>
@@ -8660,7 +8672,7 @@ No [redbook] audio
 		<year>2001</year>
 		<publisher>Softbank</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title/attract (btanb)
 ]]></notes>
 		<info name="serial" value="610-7164-13"/>
 		<info name="release" value="2001"/>
@@ -12648,7 +12660,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>1999</year>
 		<publisher>Video System</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
+[PVR] Z-fighting on car select, specifically front wings
 ]]></notes>
 		<info name="serial" value="T-3001M"/>
 		<info name="release" value="19991125"/>
@@ -13401,7 +13414,10 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2001</year>
 		<publisher>Spike</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
+[PVR] goes blank during first frames, should display white over black screen before CD audio starts up
+[PVR] ROP bug for end intro title/pre-match presentation flames
+[PVR] user tile clip for referee on exibition match setup
 ]]></notes>
 		<info name="serial" value="T-18804M, T-18805M"/>
 		<info name="release" value="20010301"/>
@@ -13594,7 +13610,7 @@ Hangs at "Produced by Sega", [GDROM] reads LBA=$afd8 and $afdc (same as culdcept
 		<notes><![CDATA[
 [PVR] safety cars in attract mode have ugly renders
 Black screen on title, [PVR] wrong ROP?
-Checkered flag is blackened on main menu [PVR]
+[PVR] Checkered flag is blackened on main menu
 ]]></notes>
 		<info name="serial" value="HDR-0013"/>
 		<info name="release" value="19990325"/>
@@ -15664,8 +15680,8 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
-[PVR] tester for bare polygons wrong normals (in training)
-No [redbook] audio
+[PVR] tester for bare polygons wrong normals, cfr. HP bars in training
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2402M"/>
 		<info name="release" value="20001214"/>
@@ -15752,7 +15768,7 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="610-7937"/>
 		<info name="alt_title" value="GUILTY GEAR X 体験版"/>
@@ -16337,7 +16353,7 @@ Punts to BIOS at start of loading [GDROM]
 		<year>2000</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2202M"/>
 		<info name="release" value="20001026"/>
@@ -17175,7 +17191,7 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio, requires pause state to kick in during attract
 ]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
@@ -17209,7 +17225,7 @@ No [redbook] audio
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Has [redbook] audio, requires pause state to kick in during attract
 ]]></notes>
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217"/>
@@ -17600,7 +17616,7 @@ Punts to BIOS at start of loading [GDROM]
 		<publisher>Visit</publisher>
 		<notes><![CDATA[
 Black screen after initial screen loading with [drc]
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-43401M"/>
 		<info name="release" value="20000831"/>
@@ -17736,7 +17752,8 @@ No [redbook] audio
 		<year>2000</year>
 		<publisher>Bimboosoft</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Ugly Bimboosoft [PVR] render at startup
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-41201M"/>
 		<info name="release" value="20001102"/>
@@ -18514,7 +18531,8 @@ Punts to BIOS at start of loading [GDROM], locks up
 		<year>2004</year>
 		<publisher>Rain Software</publisher>
 		<notes><![CDATA[
-No [redbook] audio
+Goes silent on title screen (verify)
+cdrom2: [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-47501M"/>
 		<info name="release" value="20040415"/>
@@ -21054,7 +21072,7 @@ Punts to BIOS at start of loading [GDROM]
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
 Wrong [PVR] texture renders in gameplay
-No [redbook] audio
+Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-17701M"/>
 		<info name="release" value="19990311"/>
