@@ -149,7 +149,10 @@ protected:
 		m_reels(*this, "emreel%u", 1U)
 	{ }
 
-	void add_em_reels(machine_config &config, int symbols, attotime speed);
+	enum { STEPS_PER_SYMBOL = 20 };
+
+	void add_em_reels(machine_config &config, int symbols, double speed);
+	template <unsigned Reel> void reel_sample_cb(uint8_t state);
 
 	void out_triacs2_w(address_space &space, uint8_t data);
 	uint8_t out_triacs2_r(address_space &space);
@@ -172,6 +175,7 @@ public:
 
 protected:
 	uint8_t in_2000_r(offs_t offset);
+	uint8_t reel_pos_r(uint8_t reel);
 	void out_lamps2_buzzer_w(address_space &space, uint8_t data);
 	void out_bellt_in_select_w(address_space &space, uint8_t data);
 	uint8_t out_lamps2_buzzer_r(address_space &space);
@@ -246,8 +250,8 @@ public:
 		blackbox_em_base_state(mconfig, type, tag)
 	{ }
 
-	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(symbol_opto_r) { return m_reels[Reel]->read_bfm_symbol_opto(); }
-	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(reel_opto_r) { return m_reels[Reel]->read_bfm_reel_opto(); }
+	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(symbol_opto_r);
+	template <unsigned Reel> DECLARE_READ_LINE_MEMBER(reel_opto_r);
 
 protected:
 	void out_meters_w(address_space &space, uint8_t data);
@@ -510,7 +514,7 @@ uint8_t blackbox_em_state::in_2000_r(offs_t offset)
 	if(offset < 5) // First 5 bits return reel position bits if any of them are enabled
 	{
 		for(int i = 0; i < 4; i++)
-			if(m_input_en[i] && BIT(m_reels[i]->read_pos(), offset)) return 0x80;
+			if(m_input_en[i] && BIT(reel_pos_r(i), offset)) return 0x80;
 	}
 	return BIT(m_in_2000->read(), offset) ? 0x80 : 0;
 }
@@ -537,6 +541,32 @@ READ_LINE_MEMBER(blackbox_em_state::in_extra_r)
 	for(int i = 0; i < 8; i++) 
 		if(m_in_extra_select[i] && BIT(m_in_extra->read(), i)) return 1;
 	return 0;
+}
+
+uint8_t blackbox_em_state::reel_pos_r(uint8_t reel)
+{
+	uint16_t pos = m_reels[reel]->get_pos();
+
+	if(pos % STEPS_PER_SYMBOL == 0)
+		return (pos / STEPS_PER_SYMBOL) + 1;
+	else
+		return 0;
+}
+
+template <unsigned Reel>
+READ_LINE_MEMBER( blackbox_em_opto_state::symbol_opto_r )
+{
+	uint8_t sym_pos = m_reels[Reel]->get_pos() % STEPS_PER_SYMBOL;
+
+	return (sym_pos >= 12 && sym_pos <= 15); // Symbol tab is on every symbol
+}
+
+template <unsigned Reel>
+READ_LINE_MEMBER( blackbox_em_opto_state::reel_opto_r )
+{
+	uint16_t pos = m_reels[Reel]->get_pos();
+
+	return (pos >= 10 && pos <= 13); // Reel tab is only on the first symbol
 }
 
 INPUT_CHANGED_MEMBER( blackbox_base_state::chute_inserted )
@@ -1050,6 +1080,15 @@ uint8_t blackbox_em_admc_state::prot_r()
 	const uint8_t prot_values[8] = { 0, 0, 0x80, 0, 0x80, 0, 0x80, 0 }; // 0x54 in reverse
 	if(m_prot_index < 8) value = prot_values[m_prot_index];
 	return value;
+}
+
+template <unsigned Reel>
+void blackbox_em_base_state::reel_sample_cb(uint8_t state)
+{
+	if(state == 0)
+		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_STOP + Reel);
+	else if(state == 1)
+		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_START + Reel);
 }
 
 static INPUT_PORTS_START( blackbox_inputs )
@@ -1579,15 +1618,20 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	FRUIT_SAMPLES(config, m_samples);
 }
 
-void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, attotime speed)
+void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, double speed)
 {
-	for(int i = 0; i < 4; i++) EM_REEL(config, m_reels[i], symbols, speed);
+	for(int i = 0; i < 4; i++) EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, symbols, speed);
+
+	m_reels[0]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<0>));
+	m_reels[1]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<1>));
+	m_reels[2]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<2>));
+	m_reels[3]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<3>));
 }
 
 void blackbox_em_state::blackbox_em(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, attotime::from_usec(2750));
+	add_em_reels(config, 20, 0.91);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_state::blackbox_em_map);
 }
@@ -1622,7 +1666,7 @@ void blackbox_em_21up_state::blackbox_em_21up(machine_config &config)
 void blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, attotime::from_usec(2750));
+	add_em_reels(config, 20, 0.91);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_sndgen_state::blackbox_em_opto_sndgen_map);
 
@@ -1641,7 +1685,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux_base(machine_config &confi
 void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	add_em_reels(config, 20, attotime::from_usec(2750));
+	add_em_reels(config, 20, 0.91);
 	
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_aux_state::blackbox_em_opto_aux_map);
 }
@@ -1649,7 +1693,7 @@ void blackbox_em_opto_aux_state::blackbox_em_opto_aux(machine_config &config)
 void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config)
 {
 	blackbox_base(config);
-	add_em_reels(config, 20, attotime::from_usec(2750));
+	add_em_reels(config, 20, 0.91);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_music_state::blackbox_em_opto_music_map);
 	TMS1000(config, m_tms1000, 452000); // R and C unknown, pitch matches a real machine
@@ -1668,7 +1712,7 @@ void blackbox_em_opto_music_state::blackbox_em_opto_music(machine_config &config
 void blackbox_em_opto_club_state::blackbox_em_opto_club(machine_config &config)
 {
 	blackbox_em_opto_aux_base(config);
-	add_em_reels(config, 24, attotime::from_usec(3000));
+	add_em_reels(config, 24, 0.694);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &blackbox_em_opto_club_state::blackbox_em_opto_club_map);
 

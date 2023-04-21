@@ -67,7 +67,10 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	enum { STEPS_PER_SYMBOL = 20 };
+
 	template <unsigned Lamp> DECLARE_WRITE_LINE_MEMBER(pia_lamp_w) { m_lamps[Lamp] = state; }
+	template <unsigned Reel> void reel_sample_cb(uint8_t state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
@@ -77,6 +80,7 @@ private:
 	uint8_t pia2_porta_r();
 	void pia2_porta_w(uint8_t data);
 	void pia2_portb_w(uint8_t data);
+	uint8_t reel_pos_r(uint8_t reel);
 	void payout_cash_w(bool state);
 	void payout_token_w(bool state);
 	void meter_w(int meter, bool state);
@@ -169,7 +173,7 @@ uint8_t mpu1_state::pia2_porta_r()
 {
 	if(m_pia2a_select == 0)
 	{
-		return m_reels[m_reel_select]->read_pos();
+		return reel_pos_r(m_reel_select);
 	}
 	else
 	{
@@ -187,6 +191,16 @@ void mpu1_state::pia2_porta_w(uint8_t data)
 void mpu1_state::pia2_portb_w(uint8_t data)
 {
 	for(int i = 0; i < 8; i++) m_lamps[i] = BIT(data, i);
+}
+
+uint8_t mpu1_state::reel_pos_r(uint8_t reel)
+{
+	uint16_t pos = m_reels[reel]->get_pos();
+
+	if(pos % STEPS_PER_SYMBOL == 0)
+		return (pos / STEPS_PER_SYMBOL) + 1;
+	else
+		return 0;
 }
 
 void mpu1_state::payout_cash_w(bool state)
@@ -234,6 +248,15 @@ INPUT_CHANGED_MEMBER( mpu1_state::coin_input )
 TIMER_CALLBACK_MEMBER( mpu1_state::change_pia2a_bit7 )
 {
 	m_pia2a_bit7_value = 0;
+}
+
+template <unsigned Reel>
+void mpu1_state::reel_sample_cb(uint8_t state)
+{
+	if(state == 0)
+		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_STOP + Reel);
+	else if(state == 1)
+		m_samples->play(fruit_samples_device::SAMPLE_EM_REEL_1_START + Reel);
 }
 
 static INPUT_PORTS_START( mpu1_inputs )
@@ -349,15 +372,19 @@ void mpu1_state::mpu1(machine_config &config)
 	m_pia2->cb1_w(0);
 	m_pia2->cb2_handler().set(FUNC(mpu1_state::pia_lamp_w<10>));
 
-	EM_REEL(config, m_reels[0], 20, attotime::from_usec(2000));
-	EM_REEL(config, m_reels[1], 20, attotime::from_usec(2000));
-	EM_REEL(config, m_reels[2], 20, attotime::from_usec(2000));
-	EM_REEL(config, m_reels[3], 20, attotime::from_usec(2000));
+	EM_REEL(config, m_reels[0], 20 * STEPS_PER_SYMBOL, 20, 1.25);
+	EM_REEL(config, m_reels[1], 20 * STEPS_PER_SYMBOL, 20, 1.25);
+	EM_REEL(config, m_reels[2], 20 * STEPS_PER_SYMBOL, 20, 1.25);
+	EM_REEL(config, m_reels[3], 20 * STEPS_PER_SYMBOL, 20, 1.25);
 
 	SPEAKER(config, "mono").front_center();
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	FRUIT_SAMPLES(config, m_samples);
+	m_reels[0]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<0>));
+	m_reels[1]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<1>));
+	m_reels[2]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<2>));
+	m_reels[3]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<3>));
 }
 
 void mpu1_state::mpu1_lg(machine_config &config)
@@ -366,7 +393,7 @@ void mpu1_state::mpu1_lg(machine_config &config)
 
 	m_pia1->writepb_handler().set(FUNC(mpu1_state::pia1_portb_lg_w));
 
-	for(int i = 0; i < 4; i++) m_reels[i]->set_speed(attotime::from_usec(2600)); // Slower reels
+	for(int i = 0; i < 4; i++) m_reels[i]->set_speed(0.96); // Slower reels
 }
 
 // Common mask ROM on most cartridges, also used by MPU2

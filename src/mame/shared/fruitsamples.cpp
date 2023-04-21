@@ -14,20 +14,31 @@
 
 namespace {
 
-const char *const fruit_sample_names[fruit_samples_device::SAMPLE_END + 2] =
+const char *const fruit_sample_names[] =
 {
 	"*fruitsamples",
 	"payout",        // 0
 	"meter",         // 1
 	"buzzer",        // 2
+	"em_reel_start", // 3
+	"em_reel_stop",  // 4
 	nullptr
 };
 
-const fruit_samples_device::sample_params params[fruit_samples_device::SAMPLE_END] =
+const fruit_samples_device::sample_params params[] =
 {
+	//id ch loop
 	{ 0, 0, false }, // SAMPLE_PAYOUT
 	{ 1, 1, false }, // SAMPLE_METER
-	{ 2, 2, false } // SAMPLE_BUZZER
+	{ 2, 2, false }, // SAMPLE_BUZZER
+	{ 3, 3, false }, // SAMPLE_EM_REEL_1_START
+	{ 3, 4, false }, // SAMPLE_EM_REEL_2_START
+	{ 3, 5, false }, // SAMPLE_EM_REEL_3_START
+	{ 3, 6, false }, // SAMPLE_EM_REEL_4_START
+	{ 4, 3, false }, // SAMPLE_EM_REEL_1_STOP
+	{ 4, 4, false }, // SAMPLE_EM_REEL_2_STOP
+	{ 4, 5, false }, // SAMPLE_EM_REEL_3_STOP
+	{ 4, 6, false }  // SAMPLE_EM_REEL_4_STOP
 };
 
 } // anonymous namespace
@@ -51,7 +62,7 @@ void fruit_samples_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "fruitmech").front_center();
 
 	SAMPLES(config, m_samples);
-	m_samples->set_channels(3);
+	m_samples->set_channels(7);
 	m_samples->set_samples_names(fruit_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "fruitmech", 1.0);
 }
