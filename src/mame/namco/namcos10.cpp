@@ -2313,7 +2313,27 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000000130,0x00000018802004,0x00b04a04781081,0x00000006802000,
+			0x00000000000c02,0x00000042040020,0x00000000000003,0x00b040c00c0940,
+			0x00000000000009,0x001020a0010400,0x00000010204104,0x0000005a840004,
+			0x00000000000290,0x00000010204380,0x00000000001041,0x00000000006100
+		}, {
+			0x00000000000120,0x00000028002004,0x00010800480001,0x00000006040100,
+			0x00000000000c00,0x00000042000820,0x00000000001003,0x00910212040100,
+			0x00000000008009,0x00900021018000,0x00000090004104,0x0000006a004004,
+			0x00000000000214,0x00000090004190,0x00000000001040,0x00000000006008
+		},
+		0x7c29,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			return (1 & ((gf2_reduce(0x0000000088300281ull & previous_cipherwords) ^ gf2_reduce(0x0000000004600281ull & previous_plainwords))) & ((gf2_reduce(0x0000a13140090000ull & previous_cipherwords) ^ gf2_reduce(0x0000806240090000ull & previous_plainwords)))) << 2;
+		},
+		[] (int iv) -> uint64_t {
+			constexpr uint64_t values[16]{ 0x0000, 0x020e, 0x0412, 0x0411, 0x0204, 0x001b, 0x0009, 0x0207, 0x2040, 0x2440, 0x0012, 0x0001, 0x0614, 0x000a, 0x0214, 0x041b };
+			return values[iv];
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_ptblank3(machine_config &config)
@@ -2723,6 +2743,11 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x140840000000ULL) ^ gf2_reduce(previous_plainwords & 0x141040000000ULL))) << 14;
+		},
+		[] (int iv) -> uint64_t {
+			constexpr int UNKNOWN{16};
+			constexpr uint64_t values[16]{UNKNOWN,0x9000,0x9101,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN};;
+			return values[iv];
 		}
 	});
 }
@@ -3617,7 +3642,7 @@ GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_sta
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // title guessed based on known game list and PCB sticker
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // uses MGEXIO
