@@ -14,9 +14,11 @@ public:
 
 	template <typename T> void set_mbus(T &&tag, int spacenum) { m_mbus.set_tag(std::forward<T>(tag), spacenum); }
 
-	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor, bool debug = false);
-	template <typename T> bool write(u32 virtual_address, T data, bool supervisor, bool debug = false);
-	WRITE_LINE_MEMBER(bus_error_w) { m_bus_error = true; }
+	bool translate(int intention, u32 &address, bool supervisor);
+
+	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor);
+	template <typename T> bool write(u32 virtual_address, T data, bool supervisor);
+	WRITE_LINE_MEMBER(bus_error_w) { if (!machine().side_effects_disabled()) m_bus_error = true; }
 
 protected:
 	virtual void device_start() override;
@@ -69,7 +71,7 @@ protected:
 		bool const g;  // global
 		bool const wt; // writethrough
 	};
-	std::optional<translate_result> translate(u32 virtual_address, bool supervisor, bool write, bool debug = false);
+	std::optional<translate_result> translate(u32 virtual_address, bool supervisor, bool write);
 
 	struct cache_set
 	{
@@ -104,8 +106,6 @@ protected:
 	typedef bool (mc88200_device::cache_set::cache_line::* match_function)(u32 const) const;
 
 	std::optional<unsigned> cache_replace(cache_set const &cs);
-	template <typename T> std::optional<T> cache_read(u32 physical_address);
-	template <typename T> bool cache_write(u32 physical_address, T data, bool writethrough, bool global);
 	void cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate);
 
 	template <typename T> std::optional<T> mbus_read(u32 address);
