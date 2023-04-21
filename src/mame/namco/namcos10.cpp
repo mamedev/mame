@@ -3072,6 +3072,24 @@ static INPUT_PORTS_START( nicetsuk )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( squizchs )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fff7070, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
 // MEM(M)
 ROM_START( mrdrilr2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
@@ -3666,4 +3684,4 @@ GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_sta
 // MEM(P3)
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, squizchs,  0,        ns10_squizchs,  namcos10,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
