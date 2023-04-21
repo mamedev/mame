@@ -2745,8 +2745,8 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x140840000000ULL) ^ gf2_reduce(previous_plainwords & 0x141040000000ULL))) << 14;
 		},
 		[] (int iv) -> uint64_t {
-			constexpr int UNKNOWN{16};
-			constexpr uint64_t values[16]{UNKNOWN,0x9000,0x9101,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN};;
+			constexpr int UNKNOWN = 16;
+			constexpr uint64_t values[16]{ UNKNOWN, 0x9000, 0x9101, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN };
 			return values[iv];
 		}
 	});
