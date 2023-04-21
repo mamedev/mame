@@ -58,6 +58,7 @@
 #endif // defined(__has_extension)
 
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
+#	define BX_ASSUME(_condition) BX_MACRO_BLOCK_BEGIN if (!(_condition) ) { __builtin_unreachable(); } BX_MACRO_BLOCK_END
 #	define BX_ALIGN_DECL(_align, _decl) _decl __attribute__( (aligned(_align) ) )
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
 #	define BX_FORCE_INLINE inline __attribute__( (__always_inline__) )
@@ -67,6 +68,7 @@
 #	define BX_NO_INLINE   __attribute__( (noinline) )
 #	define BX_NO_RETURN   __attribute__( (noreturn) )
 #	define BX_CONST_FUNC  __attribute__( (pure) )
+#	define BX_UNREACHABLE __builtin_unreachable()
 
 #	if BX_COMPILER_GCC >= 70000
 #		define BX_FALLTHROUGH __attribute__( (fallthrough) )
@@ -89,6 +91,7 @@
 #		define __stdcall
 #	endif // BX_CRT_MSVC
 #elif BX_COMPILER_MSVC
+#	define BX_ASSUME(_condition) __assume(_condition)
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
 #	define BX_FORCE_INLINE __forceinline
@@ -98,6 +101,7 @@
 #	define BX_NO_INLINE __declspec(noinline)
 #	define BX_NO_RETURN
 #	define BX_CONST_FUNC  __declspec(noalias)
+#	define BX_UNREACHABLE __assume(false)
 #	define BX_FALLTHROUGH BX_NOOP()
 #	define BX_NO_VTABLE __declspec(novtable)
 #	define BX_PRINTF_ARGS(_format, _args)
