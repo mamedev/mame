@@ -247,9 +247,10 @@ uint16_t ns10_type2_decrypter_device::decrypt(uint16_t cipherword)
 
 void ns10_type2_decrypter_device::init(int iv)
 {
-	// by now, only gamshara requires non-trivial initialization code; data
-	// should be moved to the per-game logic in case any other game do it differently
-	m_previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
+	if (m_logic.iv_calculation)
+		m_previous_cipherwords = m_logic.iv_calculation(iv);
+	else
+		m_previous_cipherwords = bitswap(INIT_SBOX[iv], 3, 16, 16, 2, 1, 16, 16, 0, 16, 16, 16, 16, 16, 16, 16, 16);
 	m_previous_plainwords = 0;
 	m_mask = 0;
 }

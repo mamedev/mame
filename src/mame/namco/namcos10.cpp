@@ -1061,7 +1061,7 @@ void namcos10_state::namcos10_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
-	// TODO: This must be replaced with a proper CXD2938Q device, also handles CD-ROM?
+	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
 	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
 	spu.set_stream_flags(STREAM_SYNCHRONOUS);
 	spu.add_route(0, "lspeaker", 0.75);
@@ -2122,7 +2122,28 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000000024,0x00000000000884,0x000000000e0a00,0x00000000000040,
+			0x0000000a002100,0x00000000002011,0x00000000004010,0x00050006000000,
+			0x0000000000a004,0x00000000001082,0x000500060000c0,0x00000000000403,
+			0x00000020014040,0x00000000001208,0x00000000000218,0x00000020014100
+		}, {
+			0x00000000000024,0x00000000000888,0x000000001c1200,0x00000000000020,
+			0x0000003a182101,0x00000000002012,0x00000000008010,0x00050000008000,
+			0x0000000000c004,0x00000000001084,0x00050000000140,0x00000000000803,
+			0x00000020014080,0x00000000002208,0x00000000000228,0x00000020014200
+		},
+		0xee91,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks>>4) & ((previous_masks>>24) ^ (previous_masks>>26)) & 1) << 6;
+		},
+		[] (int iv) -> uint64_t {
+			constexpr uint64_t values[16]{ 0x0000, 0x0602, 0x0302, 0x0101, 0x0203, 0x0802, 0x0603, 0x0303, 0x0001, 0x0803, 0x0501, 0x0500, 0x0202, 0x0100, 0x0401, 0x0400 };
+			return values[iv];
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
@@ -3013,16 +3034,16 @@ static INPUT_PORTS_START( nicetsuk )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0ff9ef40, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Up (SW)")
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Down (SW)")
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down Select")
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up Select")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pedal")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Up") // Used in-game
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Down")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Down Select") // Used in operator menu
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Up Select")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Enter")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Pedal")
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Choose")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Forehead/Odeko")
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Back of Head/Toubu")
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Chest/Mune")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Forehead/Odeko")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Back of Head/Toubu")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Chest/Mune")
 
 INPUT_PORTS_END
 
@@ -3607,7 +3628,7 @@ GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_sta
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
 GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state, init_medalnt,   ROT0, "Namco", "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state, init_keroro,    ROT0, "Namco", "Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 

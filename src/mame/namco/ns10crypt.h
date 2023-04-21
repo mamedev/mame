@@ -59,10 +59,12 @@ public:
 	struct ns10_crypto_logic
 	{
 		using nonlinear_calculation_function = uint16_t (*)(uint64_t, uint64_t);
+		using iv_calculation_function = uint64_t (*)(int);
 		uint64_t eMask[16]{};
 		uint64_t dMask[16]{};
 		uint16_t xMask = 0;
 		nonlinear_calculation_function nonlinear_calculation = nullptr; // preliminary encoding; need research
+		iv_calculation_function iv_calculation = nullptr;
 	};
 
 	ns10_type2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
