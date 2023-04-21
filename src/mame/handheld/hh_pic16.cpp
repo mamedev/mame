@@ -115,11 +115,11 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_a = 0;                     // MCU port A write data
-	u8 m_b = 0;                     // " B
-	u8 m_c = 0;                     // " C
-	u8 m_d = 0;                     // " D
-	u16 m_inp_mux = ~0;             // multiplexed inputs mask
+	u8 m_a = 0;         // MCU port A write data
+	u8 m_b = 0;         // " B
+	u8 m_c = 0;         // " C
+	u8 m_d = 0;         // " D
+	u16 m_inp_mux = ~0; // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);

@@ -49,10 +49,10 @@ protected:
 	optional_ioport_array<4> m_inputs; // max 4
 
 	// misc common
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u32 m_plate = 0;   // VFD current column data
 
 	u8 read_inputs(int columns);
 };

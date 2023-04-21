@@ -143,12 +143,12 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_port[9] = { };             // MCU port A-I write data (optional)
-	u8 m_int = 0;                   // MCU INT pin state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_port[9] = { }; // MCU port A-I write data (optional)
+	u8 m_int = 0;       // MCU INT pin state
+	u16 m_inp_mux = 0;  // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;     // VFD current row data
+	u32 m_plate = 0;    // VFD current column data
 
 	u8 read_inputs(int columns);
 	void refresh_interrupts(void);

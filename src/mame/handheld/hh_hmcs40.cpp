@@ -175,13 +175,13 @@ protected:
 	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
-	u8 m_r[8] = { };                // MCU R ports write data (optional)
-	u16 m_d = 0;                    // MCU D port write data (optional)
-	u8 m_int[2] = { };              // MCU INT0/1 pins state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_r[8] = { };   // MCU R ports write data (optional)
+	u16 m_d = 0;       // MCU D port write data (optional)
+	u8 m_int[2] = { }; // MCU INT0/1 pins state
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u64 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u64 m_plate = 0;   // VFD current column data
 
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
