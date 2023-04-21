@@ -32,6 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+//	virtual bool set_features() override;
 
 private:
 	uint8_t GDROM_Cmd11_Reply[32];
