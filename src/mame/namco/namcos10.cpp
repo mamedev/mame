@@ -1061,7 +1061,7 @@ void namcos10_state::namcos10_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
-	// TODO: This must be replaced with a proper CXD2938Q device, also handles CD-ROM?
+	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
 	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
 	spu.set_stream_flags(STREAM_SYNCHRONOUS);
 	spu.add_route(0, "lspeaker", 0.75);
