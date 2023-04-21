@@ -1145,17 +1145,24 @@ void sprinter_state::vram_w(offs_t offset, u8 data)
 u8 sprinter_state::isa_r(offs_t offset)
 {
 	const u8 ctrl = m_ram_pages[m_pg3];
-	if ((ctrl & 0xfd) == 0xd4) // D:2 0-mem, 1-io
-		return m_isa[BIT(ctrl, 1)]->io_r((m_isa_addr_ext << 14) | offset);
-	else
-		return 0xff;
+	if ((ctrl & 0xf9) == 0xd0)
+		return BIT(ctrl, 2) // D:2 0-mem, 1-io
+			? m_isa[BIT(ctrl, 1)]->io_r((m_isa_addr_ext << 14) | offset)
+			: m_isa[BIT(ctrl, 1)]->mem_r((m_isa_addr_ext << 14) | offset);
+
+	return 0xff;
 }
 
 void sprinter_state::isa_w(offs_t offset, u8 data)
 {
 	const u8 ctrl = m_ram_pages[m_pg3];
-	if ((ctrl & 0xfd) == 0xd4)
-		m_isa[BIT(ctrl, 1)]->io_w((m_isa_addr_ext << 14) | offset, data);
+	if ((ctrl & 0xf9) == 0xd0)
+	{
+		if (BIT(ctrl, 2))
+			m_isa[BIT(ctrl, 1)]->io_w((m_isa_addr_ext << 14) | offset, data);
+		else
+			m_isa[BIT(ctrl, 1)]->mem_w((m_isa_addr_ext << 14) | offset, data);
+	}
 }
 
 void sprinter_state::update_int(bool recalculate)
@@ -1267,6 +1274,9 @@ void sprinter_state::init_taps()
 
 void sprinter_state::machine_start()
 {
+	m_isa[0]->space(isa8_device::AS_ISA_IO).unmap_value_high();
+	m_isa[1]->space(isa8_device::AS_ISA_IO).unmap_value_high();
+
 	spectrum_128_state::machine_start();
 
 	save_item(NAME(m_ram_pages));
