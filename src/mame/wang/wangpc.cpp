@@ -173,6 +173,7 @@ private:
 	uint8_t ppi_pb_r();
 	uint8_t ppi_pc_r();
 	void ppi_pc_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER( pit0_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
@@ -445,7 +446,7 @@ void wangpc_state::timer0_irq_clr_w(uint8_t data)
 {
 	//if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
-	m_pic->ir0_w(CLEAR_LINE);
+	m_pic->ir0_w(0);
 }
 
 
@@ -1012,6 +1013,12 @@ void wangpc_state::ppi_pc_w(uint8_t data)
 	m_centronics->write_init(BIT(data, 2));
 }
 
+WRITE_LINE_MEMBER( wangpc_state::pit0_w )
+{
+	if (state)
+		m_pic->ir0_w(1);
+}
+
 WRITE_LINE_MEMBER( wangpc_state::pit2_w )
 {
 	if (state)
@@ -1271,7 +1278,7 @@ void wangpc_state::wangpc(machine_config &config)
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(500000);
-	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->out_handler<0>().set(FUNC(wangpc_state::pit0_w));
 	m_pit->set_clk<1>(2000000);
 	m_pit->set_clk<2>(500000);
 	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
@@ -1312,7 +1319,7 @@ void wangpc_state::wangpc(machine_config &config)
 	rs232.dsr_handler().set(m_epci, FUNC(scn_pci_device::dsr_w));
 	rs232.dcd_handler().set(m_epci, FUNC(scn_pci_device::dcd_w));
 
-	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
+	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::rri_w));
 
 	// bus
 	WANGPC_BUS(config, m_bus, 0);
