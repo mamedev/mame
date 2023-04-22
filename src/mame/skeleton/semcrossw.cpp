@@ -7,7 +7,7 @@
  (unknown model, unknown year).
 
 Main PCB
-  __________________________________________________ 
+  __________________________________________________
  |     _______    _______    _______                |
  |    |      |   |      |   |      |                |
  |    |______|   |______|   |______|                |
@@ -36,7 +36,7 @@ Main PCB
    |________________________________________________|
 
 Relays PCB
-           _________________________________________ 
+           _________________________________________
           |                                         |
           |                                         |
           |                        _________        |
@@ -79,7 +79,7 @@ Programmer PCB (keyboard)
    | ___  | ____   ____   ____   ____       |      SWITCH |
    ||  |  || 0 |  | 1 |  | 2 |  | 3 |   __  |             |
    ||  |  ||___|  |___|  |___|  |___|  (||) |             |
-   ||__|  | ____   ____   ____   ____       |             |  
+   ||__|  | ____   ____   ____   ____       |             |
  74LS155N || 4 |  | 5 |  | 6 |  | 7 |   __  |             |
    |      ||___|  |___|  |___|  |___|  (||) |             |
    | ___  | ____   ____   ____   ____       |    ___      |
@@ -101,11 +101,12 @@ SCL4052BE || C |  | D |  | E |  | F |       |    ___  ___ |
 Notes from one operator that used to work with this controller model:
  For programming the semaphore controller, you just put the memory values with the keyboard.
  From 100 to 200 you'll find the first program, from 200 to 300 the second, and so on up to
- seven programs, with 100 for green, 101 for yellow, 102 for clear, and them repeat it again.
+ seven programs, with 100 for green, 101 for yellow, 102 for clear, and then repeat it again.
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 
@@ -118,8 +119,7 @@ public:
 	semcrossw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pia1(*this, "pia1")
-		, m_pia2(*this, "pia2")
+		, m_pia(*this, "pia%u", 1U)
 	{
 	}
 
@@ -128,8 +128,7 @@ public:
 private:
 	// devices/pointers
 	required_device<m6802_cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia1;
-	required_device<pia6821_device> m_pia2;
+	required_device_array<pia6821_device, 2> m_pia;
 };
 
 static INPUT_PORTS_START(semcrossw)
@@ -138,8 +137,10 @@ INPUT_PORTS_END
 void semcrossw_state::semcrossw(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL(4'000'000));
-	PIA6821(config, m_pia1, 0);
-	PIA6821(config, m_pia2, 0);
+
+	PIA6821(config, m_pia[0], 0);
+
+	PIA6821(config, m_pia[1], 0);
 }
 
 ROM_START(semcrossw)
@@ -153,5 +154,5 @@ ROM_END
 } // anonymous namespace
 
 
-//   YEAR  NAME       PARENT COMPAT     MACHINE    INPUT            CLASS       INIT  COMPANY  FULLNAME                                              FLAGS
-GAME(19??, semcrossw, 0,     semcrossw, semcrossw, semcrossw_state, empty_init, ROT0, "Etra",  "Crosswalk traffic light controller (unknown model)", MACHINE_IS_SKELETON)
+//   YEAR  NAME       PARENT COMPAT MACHINE    INPUT      CLASS            INIT        COMPANY  FULLNAME                                              FLAGS
+SYST(19??, semcrossw, 0,     0,     semcrossw, semcrossw, semcrossw_state, empty_init, "Etra",  "Crosswalk traffic light controller (unknown model)", MACHINE_IS_SKELETON)
