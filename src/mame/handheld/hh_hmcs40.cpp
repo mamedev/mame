@@ -128,11 +128,11 @@ TODO:
 
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
-#include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -175,13 +175,13 @@ protected:
 	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
-	u8 m_r[8] = { };                // MCU R ports write data (optional)
-	u16 m_d = 0;                    // MCU D port write data (optional)
-	u8 m_int[2] = { };              // MCU INT0/1 pins state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_r[8] = { };   // MCU R ports write data (optional)
+	u16 m_d = 0;       // MCU D port write data (optional)
+	u8 m_int[2] = { }; // MCU INT0/1 pins state
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u64 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u64 m_plate = 0;   // VFD current column data
 
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -210,7 +210,9 @@ void hh_hmcs40_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -257,7 +259,9 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -5362,7 +5366,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS

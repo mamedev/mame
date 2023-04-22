@@ -58,7 +58,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/netlist.h"
@@ -66,6 +65,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -115,11 +115,11 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_a = 0;                     // MCU port A write data
-	u8 m_b = 0;                     // " B
-	u8 m_c = 0;                     // " C
-	u8 m_d = 0;                     // " D
-	u16 m_inp_mux = ~0;             // multiplexed inputs mask
+	u8 m_a = 0;         // MCU port A write data
+	u8 m_b = 0;         // " B
+	u8 m_c = 0;         // " C
+	u8 m_d = 0;         // " D
+	u16 m_inp_mux = ~0; // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
@@ -147,7 +147,9 @@ void hh_pic16_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -201,7 +203,9 @@ void hh_pic16_state::set_power(bool state)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -2188,7 +2192,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS

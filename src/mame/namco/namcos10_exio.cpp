@@ -42,6 +42,8 @@ void namcos10_exio_device::device_start()
 
 	save_item(NAME(m_is_active));
 	save_item(NAME(m_analog_idx));
+	save_item(NAME(m_bus_req));
+	save_item(NAME(m_ctrl));
 }
 
 void namcos10_exio_device::device_reset_after_children()
@@ -51,6 +53,8 @@ void namcos10_exio_device::device_reset_after_children()
 	m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	m_is_active = false;
 	m_analog_idx = 0;
+	m_bus_req = 0;
+	m_ctrl = 0;
 }
 
 void namcos10_exio_device::map(address_map &map)
@@ -99,13 +103,32 @@ uint16_t namcos10_exio_device::cpu_status_r()
 	return (r << 8) | r;
 }
 
+uint16_t namcos10_exio_device::ctrl_r()
+{
+	return m_ctrl;
+}
+
 void namcos10_exio_device::ctrl_w(uint16_t data)
 {
-	logerror("%s: exio_ctrl_w %04x\n", machine().describe_context(), data);
+	logerror("%s: exio_ctrl_w %04x %04x\n", machine().describe_context(), data, m_ctrl ^ data);
 
-	if (data == 3) {
+	if ((data & 1) && !(m_ctrl & 1)) {
 		m_maincpu->reset();
+	} else if (!(data & 1) && (m_ctrl & 1)) {
+		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 	}
+
+	m_ctrl = data;
+}
+
+uint16_t namcos10_exio_device::bus_req_r()
+{
+	return m_bus_req == 1 ? 2 : 0;
+}
+
+void namcos10_exio_device::bus_req_w(uint16_t data)
+{
+	m_bus_req = data;
 }
 
 void namcos10_exio_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

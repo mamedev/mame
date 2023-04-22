@@ -62,7 +62,7 @@ protected:
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 1; }
 	virtual void execute_run() override;
-	virtual void execute_one();
+	virtual void execute_one(int subcycle);
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

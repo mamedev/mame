@@ -83,7 +83,8 @@ Ball goes out of bounds sometimes on gameplay (verify)
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-Missing intro and gameplay graphics, uses [VIP] framebuffer
+Missing attract and gameplay graphics, uses [VIP] framebuffer
+Missing [cart] SRAM
 ]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGE-USA"/>
@@ -100,7 +101,9 @@ Missing intro and gameplay graphics, uses [VIP] framebuffer
 		<year>2013?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Glitchy [VIP] backgrounds during gameplay
+Glitchy [VIP] backgrounds during gameplay (fixed)
+[VIP] palette ramps are pretty dim even on max brightness
+bp 7020fea,1,{R10=1;g} in Versus Mode to force serial to master mode (and be able to select stage)
 ]]></notes>
 		<info name="developer" value="Mr. Anon"/>
 		<info name="serial" value="VUE ANON"/>
@@ -181,7 +184,9 @@ Glitchy [VIP] backgrounds during gameplay
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-Title screen logo is misplaced if intro isn't skipped
+Title screen logo is misplaced if intro isn't skipped, uses [V810] CMPF, CVTS, ADDF, SUBF.
+Mario also shots in fault, which definitely indicates bad maths
+[VIP] palette ramps are particularly bad, cfr. ROZ layer
 ]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1, Tose Software"/>
 		<info name="serial" value="VUE-VMTJ-JPN, VUE-VMTJ-USA"/>
@@ -194,13 +199,12 @@ Title screen logo is misplaced if intro isn't skipped
 		</part>
 	</software>
 
-	<software name="nesterfb" supported="no">
+	<software name="nesterfb" supported="partial">
 		<description>Nester's Funky Bowling (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-I/O access (regression)
-Once that you hit the pins, animation phase takes a while to start (verify)
+Once that you hit the pins, animation phase takes a while to start (can't repro, assume fixed)
 ]]></notes>
 		<info name="developer" value="Nintendo IRD"/>
 		<info name="serial" value="VUE-VNFE-USA"/>
@@ -251,8 +255,6 @@ Gameplay [VIP] flickers too much, framebuffer?
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
 Missing graphics, uses [VIP] framebuffer
-Triggers [V810] DIVr divide by zero on intro (related to above?)
-Triggers [V810] TRAP opcode on gameplay (related to above?)
 ]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREE-USA"/>
@@ -270,8 +272,6 @@ Triggers [V810] TRAP opcode on gameplay (related to above?)
 		<publisher>T&amp;E Soft</publisher>
 		<notes><![CDATA[
 Missing graphics, uses [VIP] framebuffer
-Triggers [V810] DIVr divide by zero on intro (related to above?)
-[V810] crashes on gameplay (related to above?)
 ]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VREJ-JPN"/>
@@ -308,8 +308,8 @@ Overdriven [sound] samples when moving outside the allocated space
 		<year>1995</year>
 		<publisher>Taito</publisher>
 		<notes><![CDATA[
-No graphics during attract mode, [VIP] framebuffer?
-No shots during gameplay, [VIP] framebuffer?
+No FMV during attract mode (two of them), [VIP] framebuffer
+No shots during gameplay, [VIP] affine GP out of bounds (fixed)
 Spams lots of "error reading INTCLR" in error.log
 ]]></notes>
 		<info name="developer" value="Taito"/>
@@ -357,7 +357,7 @@ I/O access (regression)
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<notes><![CDATA[
-Verify player KO graphics
+Verify player KO [VIP] graphics
 ]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VTBJ-JPN, VUE-VTBJ-USA"/>
@@ -406,7 +406,7 @@ Verify player KO graphics
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
 		<notes><![CDATA[
-Missing GFXs for gender select in name entry
+Missing GFXs for gender select in name entry, [VIP] palette ramps
 ]]></notes>
 		<info name="developer" value="Pack-In-Video"/>
 		<info name="serial" value="VUE-VVFJ-JPN"/>
@@ -459,7 +459,8 @@ Missing GFXs for gender select in name entry
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
 		<notes><![CDATA[
-Missing intro and gameplay graphics, uses [VIP] framebuffer
+Missing attract and gameplay graphics, uses [VIP] framebuffer
+Missing [cart] SRAM
 ]]></notes>
 		<info name="developer" value="T&amp;E Soft"/>
 		<info name="serial" value="VUE-VVGJ-JPN"/>
@@ -525,7 +526,7 @@ Unresponsive [pad] inputs on gameplay
 		</part>
 	</software>
 
-	<software name="vtetris" supported="no">
+	<software name="vtetris" supported="partial">
 		<description>V-Tetris (Japan)</description>
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
@@ -550,6 +551,7 @@ Slightly overdriven [sound] samples during gameplay
 		<notes><![CDATA[
 [VIP] brightness dips during intro, [V810] core bug?
 Dash doesn't produce any [sound]
+[VIP] palette ramps are ugly on default brightness
 ]]></notes>
 		<info name="developer" value="Nintendo R&amp;D1"/>
 		<info name="serial" value="VUE-VWCJ-JPN, VUE-VWCJ-USA"/>

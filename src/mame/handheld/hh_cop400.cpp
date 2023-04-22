@@ -21,10 +21,10 @@ TODO:
 #include "emu.h"
 
 #include "cpu/cop400/cop400.h"
-#include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -81,12 +81,12 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_l = 0;                     // MCU port L write data
-	u8 m_g = 0;                     // MCU port G write data
-	u8 m_d = 0;                     // MCU port D write data
-	int m_so = 0;                   // MCU SO line state
-	int m_sk = 0;                   // MCU SK line state
-	u16 m_inp_mux = ~0;             // multiplexed inputs mask
+	u8 m_l = 0;         // MCU port L write data
+	u8 m_g = 0;         // MCU port G write data
+	u8 m_d = 0;         // MCU port D write data
+	int m_so = 0;       // MCU SO line state
+	int m_sk = 0;       // MCU SK line state
+	u16 m_inp_mux = ~0; // multiplexed inputs mask
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	void set_power(bool state);
@@ -114,7 +114,9 @@ void hh_cop400_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -154,7 +156,9 @@ void hh_cop400_state::set_power(bool state)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -2656,7 +2660,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS

@@ -104,9 +104,11 @@ Substitutes:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs51/mcs51.h"
-#include "video/pwm.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork

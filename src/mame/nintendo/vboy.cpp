@@ -172,11 +172,11 @@ private:
 
 	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal);
 	void fill_ovr_char(uint16_t code, uint8_t pal);
-	int8_t get_bg_map_pixel(int num, int xpos, int ypos);
+	int8_t get_bg_map_pixel(int num, int xpos, int ypos, u8 scx);
 	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
-											uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+											uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx);
 	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
-												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx);
 	uint8_t display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
 	void set_brightness();
 	void vboy_palette(palette_device &palette) const;
@@ -187,7 +187,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 
 	void vboy_map(address_map &map);
-	void vboy_io(address_map &map);
 };
 
 
@@ -206,33 +205,6 @@ void vboy_state::video_start()
 	m_bgmap = make_unique_clear<uint16_t[]>(0x20000 >> 1);
 }
 
-void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
-{
-	for (uint8_t yi = 0; yi < 8; yi++)
-	{
-		uint16_t const data = READ_FONT(code * 8 + yi);
-
-		for (uint8_t xi = 0; xi < 8; xi++)
-		{
-			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
-
-			if (dat)
-			{
-				uint16_t const res_x = x + xi;
-				uint16_t const res_y = y + yi;
-
-				if (cliprect.contains(res_x, res_y))
-				{
-					uint8_t const col = (pal >> (dat * 2)) & 3;
-
-					bitmap.pix((res_y), (res_x)) = m_palette->pen(col);
-				}
-			}
-		}
-	}
-}
-
-
 
 void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 {
@@ -250,15 +222,19 @@ void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 	}
 }
 
-inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
+inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos, u8 scx)
 {
 //  auto profile1 = g_profiler.start(PROFILER_USER1);
 
-	int const y = ypos >>3;
-	int const x = xpos >>3;
+	int const y = ypos >> 3;
+	int const x = xpos >> 3;
 
+	// an individual tilemap is 64x64, the upper X/Y bits selects pages in 4096 units and joins with the global BGMAP_BASE.
+	// hyperfgt backgrounds in particular wants to multiply Y page by SCX factor,
+	// - it's 1 for E.Honda stage (the two 512x1024 tilemaps composing the hot bath)
+	// - and 2 elsewhere (1024x1024).
 	uint8_t const stepx = (x & 0x1c0) >> 6;
-	uint8_t const stepy = ((y & 0x1c0) >> 6) * (stepx+1);
+	uint8_t const stepy = ((y & 0x1c0) >> 6) * (scx + 1);
 	uint16_t const val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
 	int const pal = m_vip_io.GPLT[(val >> 14) & 3];
 	int const code = val & 0x3fff;
@@ -271,11 +247,11 @@ inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 	if(dat == 0)
 		return -1;
 	else
-		return (pal >> (dat*2)) & 3;
+		return (pal >> (dat * 2)) & 3;
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
-													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
+													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx)
 {
 //  auto profile2 = g_profiler.start(PROFILER_USER2);
 
@@ -315,12 +291,12 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 				}
 				else
 				{
-					pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+					pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 				}
 			}
 			else
 			{
-				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 			}
 
 			if(pix != -1)
@@ -330,17 +306,17 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, ui
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
-														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
+														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num, u8 scx)
 {
 //  auto profile3 = g_profiler.start(PROFILER_USER3);
 
-	for(int y=0;y<=h;y++)
+	for(int y = 0; y <= h; y++)
 	{
-		float h_skw = (int16_t)READ_BGMAP(param_base + (y*8+0)) / 8.0;
-		float prlx = (int16_t)READ_BGMAP(param_base + (y*8+1)) / 8.0;
-		float v_skw = (int16_t)READ_BGMAP(param_base + (y*8+2)) / 8.0;
-		float h_scl = (int16_t)READ_BGMAP(param_base + (y*8+3)) / 512.0;
-		float v_scl = (int16_t)READ_BGMAP(param_base + (y*8+4)) / 512.0;
+		float h_skw = (int16_t)READ_BGMAP(param_base + (y * 8 + 0)) / 8.0;
+		float prlx = (int16_t)READ_BGMAP(param_base + (y * 8 + 1)) / 8.0;
+		float v_skw = (int16_t)READ_BGMAP(param_base + (y * 8 + 2)) / 8.0;
+		float h_scl = (int16_t)READ_BGMAP(param_base + (y * 8 + 3)) / 512.0;
+		float v_scl = (int16_t)READ_BGMAP(param_base + (y * 8 + 4)) / 512.0;
 
 		h_skw += right ? -prlx : prlx;
 
@@ -351,7 +327,10 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int16_t x1 = (x+gx);
 			int pix = 0;
 
-			x1 += right ? -gp : gp;
+			x1 += (right ? -gp : gp);
+			// clamp for spaceinv gameplay shots
+			// (sets GPs with out of bounds GP values, cfr. $3da40/$3daa0 0xc*** world entries)
+			x1 &= 0x1fff;
 
 			src_x = (int32_t)((h_skw) + (h_scl * x));
 			src_y = (int32_t)((v_skw) + (v_scl * x));
@@ -362,7 +341,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 			else
 			{
-				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask, scx);
 			}
 
 			if(pix != -1)
@@ -372,40 +351,76 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
+void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
+{
+	for (uint8_t yi = 0; yi < 8; yi++)
+	{
+		uint16_t const data = READ_FONT(code * 8 + yi);
+
+		for (uint8_t xi = 0; xi < 8; xi++)
+		{
+			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
+
+			if (dat)
+			{
+				uint16_t const res_x = x + xi;
+				uint16_t const res_y = y + yi;
+
+				if (cliprect.contains(res_x, res_y))
+				{
+					uint8_t const col = (pal >> (dat * 2)) & 3;
+
+					bitmap.pix((res_y), (res_x)) = m_palette->pen(col);
+				}
+			}
+		}
+	}
+}
+
 /*
-x--- ---- ---- ---- [0] LON
--x-- ---- ---- ----     RON
---xx ---- ---- ----     BGM type
----- xx-- ---- ----     SCX
----- --xx ---- ----     SCY
----- ---- x--- ----     OVR
----- ---- -x-- ----     END
----- ---- --00 ----
----- ---- ---- xxxx     BGMAP_BASE
+ * $3d800 World list
+ *
+ * x--- ---- ---- ---- [0] LON enabled for left screen
+ * -x-- ---- ---- ----     RON enabled for right screen
+ * --xx ---- ---- ----     BGM type
+ * --00 ---- ---- ----     Normal
+ * --01 ---- ---- ----     Hi-Bias
+ * --10 ---- ---- ----     Affine
+ * --11 ---- ---- ----     OAM
+ * ---- xx-- ---- ----     SCX number of pages in the X axis
+ * ---- --xx ---- ----     SCY number of pages in the Y axis
+ * ---- ---- x--- ----     OVR enable overdraw char
+ * ---- ---- -x-- ----     END marker for end of list processing
+ * ---- ---- --00 ----
+ * ---- ---- ---- xxxx     BGMAP_BASE
 */
 
 uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt)
 {
 	num <<= 4;
-	uint16_t def = READ_WORLD(num);
-	uint8_t lon = (def >> 15) & 1;
-	uint8_t ron = (def >> 14) & 1;
-	uint8_t mode = (def >> 12) & 3;
-	uint16_t scx = 64 << ((def >> 10) & 3);
-	uint16_t scy = 64 << ((def >> 8) & 3);
-	uint8_t ovr = (def >> 7) & 1;
-	uint8_t end = (def >> 6) & 1;
-	int16_t gx  = READ_WORLD(num+1);
-	int16_t gp  = READ_WORLD(num+2);
-	int16_t gy  = READ_WORLD(num+3);
-	int16_t mx  = READ_WORLD(num+4);
-	int16_t mp  = READ_WORLD(num+5);
-	int16_t my  = READ_WORLD(num+6);
-	uint16_t w  = READ_WORLD(num+7);
-	uint16_t h  = READ_WORLD(num+8);
-	uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
-	uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
-	uint8_t bg_map_num = def & 0x0f;
+	const uint16_t def = READ_WORLD(num);
+	const uint8_t lon = (def >> 15) & 1;
+	const uint8_t ron = (def >> 14) & 1;
+	const uint8_t mode = (def >> 12) & 3;
+	const u8 raw_scx = ((def >> 10) & 3);
+	const u8 raw_scy = ((def >> 8) & 3);
+	const uint16_t scx = 64 << raw_scx;
+	const uint16_t scy = 64 << raw_scy;
+	const uint16_t scx_mask = scx * 8 - 1;
+	const uint16_t scy_mask = scy * 8 - 1;
+	const uint8_t ovr = (def >> 7) & 1;
+	const uint8_t end = (def >> 6) & 1;
+	const int16_t gx  = READ_WORLD(num+1);
+	const int16_t gp  = READ_WORLD(num+2);
+	const int16_t gy  = READ_WORLD(num+3);
+	const int16_t mx  = READ_WORLD(num+4);
+	const int16_t mp  = READ_WORLD(num+5);
+	const int16_t my  = READ_WORLD(num+6);
+	const uint16_t w  = READ_WORLD(num+7);
+	const uint16_t h  = READ_WORLD(num+8);
+	const uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
+	const uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
+	const uint8_t bg_map_num = def & 0x0f;
 
 	if(end)
 		return 1;
@@ -417,12 +432,12 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 
 		if (lon && (!right))
 		{
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 
 		if (ron && (right))
 		{
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 	}
 	else if (mode==2) // Affine Mode
@@ -432,12 +447,12 @@ uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle
 
 		if (lon && (!right))
 		{
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 
 		if (ron && (right))
 		{
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx_mask, scy_mask, ovr, right, bg_map_num, raw_scx);
 		}
 	}
 	else if (mode==3) // OBJ Mode
@@ -611,11 +626,18 @@ void vboy_state::timer_control_w(offs_t offset, u8 data)
 			{
 				m_maintimer->adjust(attotime::from_hz(10000));
 			}
-
 		}
 	}
+	else
+	{
+		m_maintimer->adjust(attotime::never);
+		// hyperfgt writes 0x18 -> 0x1c -> 0x19 in irq service,
+		// implying that a 1 -> 0 transition will ack as well
+		m_maincpu->set_input_line(1, CLEAR_LINE);
+	}
 
-	m_regs.tcr = (data & 0xfd) | (0xe4) | (m_regs.tcr & 2);   // according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+	m_regs.tcr = (data & 0xfd) | (0xe4) | (m_regs.tcr & 2);
 	if(data & 4)
 		m_regs.tcr &= 0xfd;
 }
@@ -675,8 +697,10 @@ void vboy_state::vip_map(address_map &map)
 }
 
 // TODO: verify against real HW
-// - brightness presumably isn't a linear algorithm
-// - REST needs to be taken into account (needs a working example)
+// - LED brightness doesn't scale well with regular raster pen color.
+//   These BRTx values are the "time" where the LED stays on.
+// - REST needs to be taken into account (nothing sets it up so far)
+// - vfishing draws selection accents in main menu with BRTA signal (currently almost invisible);
 void vboy_state::set_brightness()
 {
 	int a,b,c;
@@ -773,13 +797,13 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 
 			//printf("%d\n",row_num);
 
-			res =  m_vip_io.XPSTTS & 0x00f3; // empty ^^'
+			res =  m_vip_io.XPSTTS & 0x00f3;
 			res |= m_drawfb << 2;
 
 			if(m_row_num < 224/8)
 			{
 				res |= 0x8000;
-				res |= m_row_num<<8;
+				res |= m_row_num << 8;
 			}
 
 			return res;
@@ -824,8 +848,9 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 
 void vboy_state::vip_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// wariolnd end boss has these writes
 	if(mem_mask != 0xffff)
-		printf("%04x %02x\n",mem_mask,offset*2);
+		logerror("Warning: register %04x write with non-word access %02x & %04x\n",offset*2, data, mem_mask);
 
 	switch(offset << 1) {
 		/*
@@ -1038,15 +1063,6 @@ void vboy_state::vboy_map(address_map &map)
 	//map(0x07000000, 0x07ffffff) cartslot ROM
 }
 
-void vboy_state::vboy_io(address_map &map)
-{
-	map.global_mask(0x07ffffff);
-	map(0x00000000, 0x0007ffff).m(FUNC(vboy_state::vip_map));
-	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x020000ff).mirror(0x0ffff00).m(FUNC(vboy_state::io_map)).umask32(0x000000ff);
-	// TODO: verify if ROM/RAM mirrors on I/O space (nesterfb)
-}
-
 /* Input ports */
 static INPUT_PORTS_START( vboy )
 	PORT_START("INPUT")
@@ -1218,7 +1234,8 @@ void vboy_state::vboy(machine_config &config)
 	/* basic machine hardware */
 	V810(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_map);
-	m_maincpu->set_addrmap(AS_IO, &vboy_state::vboy_io);
+	// no AS_IO, and some games relies on r/w the program map with INH/OUTH
+	// cfr. vforce, nesterfb, panicbom (sound)
 
 	TIMER(config, "scantimer_l").configure_scanline(FUNC(vboy_state::vboy_scanlineL), "3dleft", 0, 1);
 	//TIMER(config, "scantimer_r").configure_scanline(FUNC(vboy_state::vboy_scanlineR), "3dright", 0, 1);
@@ -1234,13 +1251,13 @@ void vboy_state::vboy(machine_config &config)
 	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */
-	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_LCD));
 	lscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	lscreen.set_screen_update(FUNC(vboy_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	/* Right screen */
-	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_LCD));
 	rscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	rscreen.set_screen_update(FUNC(vboy_state::screen_update_right));
 	rscreen.set_palette(m_palette);

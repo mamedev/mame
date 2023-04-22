@@ -93,9 +93,9 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "emu.h"
 
 #include "cpu/ucom4/ucom4.h"
-#include "video/pwm.h"
-#include "video/hlcd0515.h"
 #include "sound/spkrdev.h"
+#include "video/hlcd0515.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -143,12 +143,12 @@ protected:
 	optional_ioport_array<6> m_inputs; // max 6
 
 	// misc common
-	u8 m_port[9] = { };             // MCU port A-I write data (optional)
-	u8 m_int = 0;                   // MCU INT pin state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_port[9] = { }; // MCU port A-I write data (optional)
+	u8 m_int = 0;       // MCU INT pin state
+	u16 m_inp_mux = 0;  // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u32 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;     // VFD current row data
+	u32 m_plate = 0;    // VFD current column data
 
 	u8 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -189,7 +189,9 @@ void hh_ucom4_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // generic input handlers
@@ -234,7 +236,9 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 /*******************************************************************************
@@ -3330,7 +3334,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS

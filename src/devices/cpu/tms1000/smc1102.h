@@ -62,6 +62,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 decode_micro(offs_t offset) override;
+	virtual void execute_run() override;
 
 	virtual void read_opcode() override;
 	void interrupt();
@@ -91,6 +92,11 @@ protected:
 	bool m_inten;
 	u8 m_selin;
 	bool m_k_line;
+
+	u16 m_div;
+	u8 m_timer;
+	bool m_timeout;
+	u8 m_tmset;
 
 	// stack
 	u16 m_stack[4];

@@ -598,9 +598,9 @@ void tms1k_base_device::op_tpc()
 //  execute
 //-------------------------------------------------
 
-void tms1k_base_device::execute_one()
+void tms1k_base_device::execute_one(int subcycle)
 {
-	switch (m_subcycle)
+	switch (subcycle)
 	{
 	case 0:
 		// fetch: rom address 1/2
@@ -735,8 +735,6 @@ void tms1k_base_device::execute_one()
 		// execute: br/call 1/2
 		break;
 	}
-
-	m_subcycle = (m_subcycle + 1) % 6;
 }
 
 void tms1k_base_device::execute_run()
@@ -744,6 +742,8 @@ void tms1k_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
-		execute_one();
+
+		execute_one(m_subcycle);
+		m_subcycle = (m_subcycle + 1) % 6;
 	}
 }

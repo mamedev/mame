@@ -203,7 +203,9 @@ void hh_sm510_state::machine_reset()
 
 
 /*******************************************************************************
-    Helper Functions
+
+  Helper Functions
+
 *******************************************************************************/
 
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
@@ -350,7 +352,9 @@ void hh_sm510_state::piezo2bit_input_w(u8 data)
 
 
 /*******************************************************************************
-    Common Machine Configurations
+
+  Common Machine Configurations
+
 *******************************************************************************/
 
 // building blocks
@@ -545,7 +549,9 @@ void hh_sm510_state::sm511_tiger2bit(machine_config &config, u16 width, u16 heig
 
 
 /*******************************************************************************
-    Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
+
 *******************************************************************************/
 
 namespace {
@@ -10810,7 +10816,9 @@ ROM_END
 } // anonymous namespace
 
 /*******************************************************************************
-    Game driver(s)
+
+  Game driver(s)
+
 *******************************************************************************/
 
 //    YEAR  NAME          PARENT       COMPAT  MACHINE       INPUT         CLASS               INIT        COMPANY, FULLNAME, FLAGS

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina, Angelo Salese
 /******************************************************************
- NEC V810 (upd70732) core
+ NEC V810 (μpd70732) core
   Tomasz Slanina
   Angelo Salese
 
@@ -20,12 +20,13 @@
 
  TODO:
   - Verify floating point opcodes (single precision IEEE-754 standard)
-  - CY flag in few floating point opcodes;
-  - split maskable interrupt lines into separate entities;
+  - CY flag in floating point opcodes that supports them;
+  - Subclass NVC (vboy CPU), few extra opcodes plus onchip peripherals ($0200'0000 area);
   - implement trap opcode;
   - implement halt opcode;
   - implement double exception behaviour;
   - implement NP fatal exception;
+  - implement NMI;
   - implement floating point exceptions;
   - verify and improve bitstring opcodes;
   - cache handling;
@@ -189,6 +190,7 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 
 
 
+// r0 is literally a "register zero", reading returns 0, writing is ignored.
 void v810_device::SETREG(uint32_t reg,uint32_t val)
 {
 	if(reg)
@@ -630,13 +632,14 @@ uint32_t v810_device::opJAL(uint32_t op)
 	return 3;
 }
 
-
+// TODO: specific to NVC
 uint32_t v810_device::opEI(uint32_t op)
 {
 	SET_ID(0);
 	return 1;
 }
 
+// TODO: specific to NVC
 uint32_t v810_device::opDI(uint32_t op)
 {
 	SET_ID(1);
@@ -1057,50 +1060,53 @@ uint32_t v810_device::opCVTW(uint32_t op)
 	return 18;
 }
 
-uint32_t v810_device::opMPYHW(uint32_t op)
-{
-	int val1=(GETREG(GET1) & 0xffff);
-	int val2=(GETREG(GET2) & 0xffff);
-	SET_OV(0);
-	val2*=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,val2);
-	// TODO: unknown
-	return 18;
-}
-
 uint32_t v810_device::opXB(uint32_t op)
 {
 	int val=GETREG(GET2);
-	SET_OV(0);
 	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
-	SET_Z((val==0.0f)?1:0);
-	SET_S((val<0.0f)?1:0);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((val==0.0f)?1:0);
+	//SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);
 	// TODO: unknown
-	return 18;
+	return 1;
 }
 
 
 uint32_t v810_device::opXH(uint32_t op)
 {
 	int val=GETREG(GET2);
-	SET_OV(0);
 	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
-	SET_Z((val==0.0f)?1:0);
-	SET_S((val<0.0f)?1:0);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((val==0.0f)?1:0);
+	//SET_S((val<0.0f)?1:0);
 	SETREG(GET2,val);
 	// TODO: unknown
-	return 18;
+	return 1;
+}
+
+uint32_t v810_device::opMPYHW(uint32_t op)
+{
+	s16 val1 = (s16)GETREG(GET1);
+	s16 val2 = (s16)GETREG(GET2);
+	s32 result = (s32)(val1 * val2);
+	// TODO: verify flags really being unaffected
+	//SET_OV(0);
+	//SET_Z((result == 0) ? 1 : 0);
+	//SET_S((result < 0) ? 1 : 0);
+	SETREG(GET2,result);
+	return 9;
 }
 
 uint32_t v810_device::opFpoint(uint32_t op)
 {
 	uint32_t tmp=R_OP(PC);
 	uint32_t op_cycles = 0;
-	PC+=2;
-	switch((tmp&0xfc00)>>10)
+	const u8 op_type = (tmp&0xfc00)>>10;
+	PC += 2;
+	switch(op_type)
 	{
 		// TODO: (*) denotes Virtual Boy specific opcodes
 		// likely needs co-processor override
@@ -1113,10 +1119,11 @@ uint32_t v810_device::opFpoint(uint32_t op)
 		case 0x7: op_cycles = opDIVF(op);break;
 		case 0x8: op_cycles = opXB(op);  break; // (*)
 		case 0x9: op_cycles = opXH(op);  break; // (*)
+		//case 0xa: REV (*)
 		case 0xb: op_cycles = opTRNC(op);break;
 		case 0xc: op_cycles = opMPYHW(op); break; // (*)
 		default: 
-			throw emu_fatalerror("Floating point unknown type %02x\n",(tmp&0xfc00) >> 10);
+			throw emu_fatalerror("Floating point unknown type %02x\n", op_type);
 			break;
 	}
 	return op_cycles;
@@ -1315,13 +1322,11 @@ void v810_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 	space(has_space(AS_IO) ? AS_IO : AS_PROGRAM).specific(m_io);
 
-	m_irq_line = 0;
-	m_irq_state = CLEAR_LINE;
+	m_irq_state = 0;
 	m_nmi_line = CLEAR_LINE;
 	memset(m_reg, 0x00, sizeof(m_reg));
 
 	save_item(NAME(m_reg));
-	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_PPC));
@@ -1398,60 +1403,82 @@ void v810_device::state_string_export(const device_state_entry &entry, std::stri
 
 void v810_device::device_reset()
 {
-	int i;
-	for(i=0;i<64;i++)   m_reg[i]=0;
+	// everything else is "Undefind" (sic)
+	m_reg[0] = 0;
 	PC = 0xfffffff0;
-	PSW = 0x1000;
-	ECR   = 0x0000fff0;
+	PSW = 0x00008000;
+	ECR = 0x0000fff0;
 }
 
-// TODO: unsafe on different irq levels asserted at same time
-// TODO: sketchy, lacks fatal & double exceptions
-void v810_device::take_interrupt()
+// TODO: remaining exception types
+void v810_device::check_interrupts()
 {
-	EIPC = PC;
-	EIPSW = PSW;
+	if (m_irq_state == 0)
+		return;
 
-	PC = 0xfffffe00 | (m_irq_line << 4);
-	ECR = 0xfe00 | (m_irq_line << 4);
+	if (GET_NP || GET_EP || GET_ID)
+		return;
 
-	uint8_t num = m_irq_line + 1;
-	if (num==0x10) num=0x0f;
+	for (u16 irq_line = 15; irq_line >= (PSW & 0xF0000) >> 16; irq_line --)
+	{
+		if (!((1 << irq_line) & m_irq_state))
+			continue;
 
-	PSW &= 0xfff0ffff; // clear interrupt level
-	SET_EP(1);
-	SET_ID(1);
-	PSW |= num << 16;
+		standard_irq_callback(irq_line, PC);
 
-	m_icount -= clkIRQ;
+		EIPC = PC;
+		EIPSW = PSW;
+
+		PC = 0xfffffe00 | (irq_line << 4);
+		ECR = 0xfe00 | (irq_line << 4);
+
+		uint8_t num = irq_line + 1;
+		if (num == 0x10) num = 0x0f;
+
+		// clear interrupt level
+		PSW &= 0xfff0ffff;
+		SET_EP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PSW |= num << 16;
+
+		m_icount -= clkIRQ;
+		return;
+	}
 }
 
 void v810_device::execute_run()
 {
-	if (m_irq_state != CLEAR_LINE) {
-		if (!(GET_NP | GET_EP | GET_ID)) {
-			if (m_irq_line >=((PSW & 0xF0000) >> 16)) {
-				take_interrupt();
-			}
-		}
-	}
-	while(m_icount>0)
-	{
-		uint32_t op;
+	// TODO: move in execution body
+	// (breaks pcfx boot)
+	check_interrupts();
 
-		m_PPC=PC;
+	do
+	{
+		m_PPC = PC;
 		debugger_instruction_hook(PC);
-		op=R_OP(PC);
-		PC+=2;
-		int cnt;
-		cnt = (this->*s_OpCodeTable[op>>10])(op);
-		m_icount-= cnt;
-	}
+		uint32_t op = R_OP(PC);
+		PC += 2;
+
+		int cnt = (this->*s_OpCodeTable[op>>10])(op);
+		m_icount -= cnt;
+
+	} while(m_icount > 0);
 }
 
 
-void v810_device::execute_set_input( int irqline, int state)
+// TODO: logically connects to /INTV0-/INTV3 pins
+// v810 just exposes an INT and 4 V(ector?) lines.
+// - on pcfx there's an unknown chip irq priority/mask dispatcher;
+// - on vboy it's implied in the NVC specs with a laconic "Interrupt Encoder".
+//   It's also 5 possible lines, which wouldn't work bitwise;
+void v810_device::execute_set_input( int irqline, int state )
 {
-	m_irq_state = state;
-	m_irq_line = irqline;
+	if (state == HOLD_LINE)
+		throw emu_fatalerror("V810: using HOLD_LINE is unsupported by the core");
+	u16 mask = 1 << irqline;
+	if (state == ASSERT_LINE)
+		m_irq_state |= mask;
+	else
+		m_irq_state &= ~mask;
 }

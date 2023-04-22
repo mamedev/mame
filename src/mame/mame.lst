@@ -18905,6 +18905,10 @@ txmenpx                         // Tiger
 vespovar                        // Elektronika
 vfutbol                         // Elektronika
 
+@source:handheld/hh_smc1k.cpp
+tkkongq                         // Tiger
+tlluke2                         // Tiger
+
 @source:handheld/hh_tms1k.cpp
 alphie                          // Playskool
 arcmania                        // Milton Bradley
@@ -18991,6 +18995,7 @@ ssimon                          // Milton Bradley
 ssports4                        // US Games
 starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
+starwlb                         // Kenner
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
 subwars                         // Tiger Electronics
@@ -20653,6 +20658,7 @@ pexmp017a                       // (c) 1997 IGT - International Game Technology
 pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
+sv1pf434                        // (c) 1992 IGT - International Game Technology
 
 @source:igt/splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology
@@ -24477,7 +24483,8 @@ adm36                           //
 @source:liberty/freedom120.cpp
 free120                         // (c) 1993 Liberty Electronics
 
-@source:liberty/freedom220.cpp
+@source:liberty/freedom200.cpp
+free200                         // (c) 1983 Liberty Electronics
 free220                         // (c) 1984 Liberty Electronics
 
 @source:lsi/m3.cpp
@@ -32478,7 +32485,7 @@ gegemdb                         // 2007.12 Gegege no Kitarō Yōkai Yokochō Mat
 gjspace                         // 2001.12 Gekitoride-Jong Space (10011 Ver.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
 kd2001                          // 2001.11 Knock Down 2001 (KD11 Ver.B)
-keroro                          // 2006.08 Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
+keroro                          // 2006.08 Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
 konotako                        // 2003.11 Kono e Tako (10021 Ver.A)
 medalnt                         // 2005.04 Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)
@@ -32495,6 +32502,7 @@ ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 puzzball                        // 2002.02 Puzz Ball (Japan, PZB1 Ver.A)
 sekaikh                         // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
 sekaikha                        // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+squizchs                        // 2003.03 Seishun-Quiz Colorful High School (CHS1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
 sugorotc                        // 2002.02 Sugorotic JAPAN (STJ1 Ver.C)
 taiko2                          // 2001.08 Taiko no Tatsujin 2 (Japan, TK21 Ver.C)
@@ -41308,6 +41316,9 @@ sagitta180                      // 1979?
 @source:skeleton/seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
+@source:skeleton/semcrossw.cpp
+semcrossw                       // Semaphore controller from Etra
+
 @source:skeleton/sh4robot.cpp
 sh4robot                        //
 
@@ -45321,14 +45332,29 @@ psr40                           // 1985 PSR-40
 psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
+@source:yamaha/ympsr150.cpp
+psr110                          // 1993
+psr150                          // 1992
+psr180                          // 1994
+psr75                           // 1992
+psr76                           // 1994
+psr78                           // 1996
+pss11                           // 1992
+pss12                           // 1994
+pss21                           // 1992
+pss31                           // 1992
+pss6                            // 1994
+
+@source:yamaha/ympsr260.cpp
+psr160                          // 2000
+psr260                          // 2000
+psr79                           // 1998
+
 @source:yamaha/ympsr340.cpp
 psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
-
-@source:yamaha/ympss12.cpp
-pss12                           //
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70
