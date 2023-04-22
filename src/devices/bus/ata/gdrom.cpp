@@ -439,6 +439,7 @@ void gdrom_device::ExecCommand()
 		case 0x00:
 			// TEST_UNIT
 			// TODO: verify if t10mmc use is enough
+			// loopchk returns OK in Packet cmnd (0201)
 			t10mmc::ExecCommand();
 			break;
 		// case 0x08: ??? loopchk uses it in one of the Packet cmnd tests
@@ -705,31 +706,33 @@ void gdrom_device::device_start()
 
 	m_identify_buffer[0] = 0x8600; // ATAPI device, cmd set 6 compliant, DRQ within 3 ms of PACKET command
 
-	m_identify_buffer[23] = ('S' << 8) | 'E';
-	m_identify_buffer[24] = (' ' << 8) | ' ';
-	m_identify_buffer[25] = (' ' << 8) | ' ';
-	m_identify_buffer[26] = (' ' << 8) | ' ';
+	// non-standard identify returns
+	// TODO: should be centralized in command 11h
+	// loopchk: identify device Maker test (0104) PC=c04694a
+	// Was 23
+	int dptr = 8;
+	m_identify_buffer[dptr++] = 'S' | ('E' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
 
-	m_identify_buffer[27] = ('C' << 8) | 'D';
-	m_identify_buffer[28] = ('-' << 8) | 'R';
-	m_identify_buffer[29] = ('O' << 8) | 'M';
-	m_identify_buffer[30] = (' ' << 8) | 'D';
-	m_identify_buffer[31] = ('R' << 8) | 'I';
-	m_identify_buffer[32] = ('V' << 8) | 'E';
-	m_identify_buffer[33] = (' ' << 8) | ' ';
-	m_identify_buffer[34] = (' ' << 8) | ' ';
-	m_identify_buffer[35] = ('6' << 8) | '.';
-	m_identify_buffer[36] = ('4' << 8) | '2';
-	m_identify_buffer[37] = (' ' << 8) | ' ';
-	m_identify_buffer[38] = (' ' << 8) | ' ';
-	m_identify_buffer[39] = (' ' << 8) | ' ';
-	m_identify_buffer[40] = (' ' << 8) | ' ';
-	m_identify_buffer[41] = (' ' << 8) | ' ';
-	m_identify_buffer[42] = (' ' << 8) | ' ';
-	m_identify_buffer[43] = (' ' << 8) | ' ';
-	m_identify_buffer[44] = (' ' << 8) | ' ';
-	m_identify_buffer[45] = (' ' << 8) | ' ';
-	m_identify_buffer[46] = (' ' << 8) | ' ';
+	// loopchk: identify device Model test (0104) PC=c046acc
+	// Was 27
+	dptr = 16;
+	m_identify_buffer[dptr++] = 'C' | ('D' << 8);
+	m_identify_buffer[dptr++] = '-' | ('R' << 8);
+	m_identify_buffer[dptr++] = 'O' | ('M' << 8);
+	m_identify_buffer[dptr++] = ' ' | ('D' << 8);
+	m_identify_buffer[dptr++] = 'R' | ('I' << 8);
+	m_identify_buffer[dptr++] = 'V' | ('E' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	m_identify_buffer[dptr++] = ' ' | (' ' << 8);
+	// TODO: versioning is unchecked by loopchk
+	m_identify_buffer[dptr++] = '6' | ('.' << 8);
+	m_identify_buffer[dptr++] = '4' | ('2' << 8);
+	// FIXME: doc mentions a "System Date" readback
+	for (; dptr < 47; dptr ++)
+		m_identify_buffer[dptr] = ' ' | (' ' << 8);
 
 	m_identify_buffer[49] = 0x0400; // IORDY may be disabled
 
