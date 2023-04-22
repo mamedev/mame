@@ -33,6 +33,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 //	virtual bool set_features() override;
+	// TODO: how GDROM determines ready flag?
+	// cfr. dc.xml [GDROM READY] for a list of SW that wants this on.
+	virtual bool is_ready() override { return true; }
 
 private:
 	uint8_t GDROM_Cmd11_Reply[32];
