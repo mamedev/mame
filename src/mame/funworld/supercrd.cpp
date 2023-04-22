@@ -25,7 +25,7 @@
   To boot into the game...
 
   1) Let the initial test ends.
-  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5". 
+  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5".
   3) Turn ON Personal A key (key 0).
   4) Turn OFF Personal A key.
 
@@ -429,8 +429,8 @@ static INPUT_PORTS_START( supercrd )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x01, 0x01, "Personal A Settings" )
-	PORT_DIPSETTING(    0x01, "Brief" )					// Remote A, Abgeschrieben A.
-	PORT_DIPSETTING(    0x00, "Complete" )				// Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
+	PORT_DIPSETTING(    0x01, "Brief" )                 // Remote A, Abgeschrieben A.
+	PORT_DIPSETTING(    0x00, "Complete" )              // Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -497,7 +497,7 @@ void supercrd_state::supercrd(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &supercrd_state::io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &supercrd_state::decrypted_opcodes_map);
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");

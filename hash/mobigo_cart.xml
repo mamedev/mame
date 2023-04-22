@@ -8,8 +8,8 @@ license:CC0-1.0
 	<!-- This list is ordered by game description -->
 
 	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
-		80-250700 - Touch & Learn - Game Pack (US)
-		80-250704 - MobiGo 2 (GE) -->
+	    80-250700 - Touch & Learn - Game Pack (US)
+	    80-250704 - MobiGo 2 (GE) -->
 
 	<software name="ben10g" supported="no">
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>

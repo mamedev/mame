@@ -57,7 +57,7 @@ void tmp68301_device::internal_update(uint64_t current_time)
 			event_time = m_timer_next_event[i];
 	}
 
-	recompute_bcount(event_time);    
+	recompute_bcount(event_time);
 }
 
 void tmp68301_device::device_start()
@@ -68,7 +68,7 @@ void tmp68301_device::device_start()
 
 	for(auto &tx : m_tx_cb)
 		tx.resolve_safe();
-	
+
 	save_item(NAME(m_external_interrupt_state));
 
 	save_item(NAME(m_amar));
@@ -379,7 +379,7 @@ const int tmp68301_device::interrupt_vector_to_slot[32] = {
 	-1, -1, -1, -1, -1, -1, -1, -1
 };
 
-u8 tmp68301_device::icr_r(offs_t reg) {	return m_icr[reg]; }
+u8 tmp68301_device::icr_r(offs_t reg) { return m_icr[reg]; }
 u16 tmp68301_device::imr_r()  { return m_imr; }
 u16 tmp68301_device::ipr_r()  { return m_ipr; }
 u16 tmp68301_device::iisr_r() { return m_iisr; }
@@ -578,12 +578,12 @@ void tmp68301_device::interrupt_update()
 {
 	auto [level, vector, slot] = interrupt_get_current();
 	set_current_interrupt_level(level);
-	//	logerror("interrupt update ipr=%03x imr=%03x state=%08x (%x, %02x, %2d)\n", m_ipr, m_imr, m_interrupt_state, level, vector, slot);
+	//  logerror("interrupt update ipr=%03x imr=%03x state=%08x (%x, %02x, %2d)\n", m_ipr, m_imr, m_interrupt_state, level, vector, slot);
 }
 
 void tmp68301_device::interrupt_internal_trigger(int vector)
 {
-	//	logerror("interrupt internal trigger %02x\n", vector);
+	//  logerror("interrupt internal trigger %02x\n", vector);
 	m_interrupt_state |= 1 << vector;
 	m_ipr |= 1 << interrupt_vector_to_slot[vector];
 	interrupt_update();
@@ -592,7 +592,7 @@ void tmp68301_device::interrupt_internal_trigger(int vector)
 u8 tmp68301_device::interrupt_callback()
 {
 	auto [level, vector, slot] = interrupt_get_current();
-	//	logerror("interrupt callback ipr=%03x imr=%03x (%x, %02x, %d)\n", m_ipr, m_imr, level, vector, slot);
+	//  logerror("interrupt callback ipr=%03x imr=%03x (%x, %02x, %d)\n", m_ipr, m_imr, level, vector, slot);
 	if(slot < 3)
 		standard_irq_callback(slot, m_pc);
 	if(vector != 0x1f) {
@@ -681,7 +681,7 @@ void tmp68301_device::pmr_w(u8 data)
 			 m_pmr & 0x04 ? "auto" : "manual",
 			 m_pmr & 0x02 ? "ack" : "-",
 			 m_pmr & 0x01 ? "external" : "internal");
-	
+
 }
 
 u16 tmp68301_device::pdr_r()
@@ -701,7 +701,7 @@ void tmp68301_device::pdr_w(offs_t, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_pdr);
 	if(m_pdr == old)
 		return;
-	//	logerror("parallel data %04x\n", m_pdr);
+	//  logerror("parallel data %04x\n", m_pdr);
 	if(m_parallel_mode == 0) {
 		if(m_pdir == 0x0000)
 			return;
@@ -775,10 +775,10 @@ void tmp68301_device::serial_check_interrupt(int ch)
 			intr |= 1 << SR_INT_ERR;
 	}
 	if(intr != old_interrupt) {
-		//		logerror("serial intr mask %x\n", intr);
+		//      logerror("serial intr mask %x\n", intr);
 		for(int i=0; i != 3; i++)
 			if((intr & (1 << i)) && !(m_sr_intr[ch] & (1 << i)))
-				interrupt_internal_trigger(8 + 4*ch + i);	
+				interrupt_internal_trigger(8 + 4*ch + i);
 	}
 	m_sr_intr[ch] = intr;
 }
@@ -965,7 +965,7 @@ void tmp68301_device::serial_rx_w(int ch, int state)
 
 void tmp68301_device::serial_rx_update(int ch)
 {
-	//	logerror("rx update channel %d state %d\n", ch, m_serial_rx_state[ch]);
+	//  logerror("rx update channel %d state %d\n", ch, m_serial_rx_state[ch]);
 	u64 next = m_serial_rx_next_event[ch] + 8*m_serial_gclk[ch];
 	u8 nstate = m_serial_rx_state[ch] + 1;
 	u8 line = m_serial_rx_line[ch];
@@ -1042,12 +1042,12 @@ void tmp68301_device::serial_rx_update(int ch)
 	}
 
 	m_serial_rx_next_event[ch] = next;
-	m_serial_rx_state[ch] = nstate;	
+	m_serial_rx_state[ch] = nstate;
 }
 
 void tmp68301_device::serial_tx_update(int ch)
 {
-	//	logerror("tx update channel %d state %d\n", ch, m_serial_tx_state[ch]);
+	//  logerror("tx update channel %d state %d\n", ch, m_serial_tx_state[ch]);
 	u64 next = m_serial_tx_next_event[ch] + 8*m_serial_gclk[ch];
 	u8 nstate = m_serial_tx_state[ch] + 1;
 	switch(m_serial_tx_state[ch]) {
@@ -1115,7 +1115,7 @@ void tmp68301_device::serial_tx_update(int ch)
 	}
 
 	m_serial_tx_next_event[ch] = next;
-	m_serial_tx_state[ch] = nstate;	
+	m_serial_tx_state[ch] = nstate;
 	machine().scheduler().synchronize();
 }
 
@@ -1251,7 +1251,7 @@ void tmp68301_device::timer_sync(int ch)
 	u64 ctime = total_cycles();
 	// Don't fold the shifts, the computation would be incorrect
 	u32 ntctr = m_tctr[ch] + ((ctime >> div) - (m_timer_last_sync[ch] >> div));
-	
+
 	u32 maxmode = (m_tcr[ch] >> TCR_MR) & 3;
 	if(maxmode == 1 || maxmode == 2) {
 		u32 max = (maxmode == 1) ? m_tmcr1[ch] : m_tmcr2[ch];
@@ -1294,7 +1294,7 @@ void tmp68301_device::timer_predict(int ch)
 		logerror("timer %d alternating max mode unsupported\n", ch);
 		return;
 	}
-	
+
 	if((m_tcr[ch] & TCR_N1) == 0) {
 		// Need to add a flag to say "counter done" to make it work, reset on mode change.
 		logerror("timer %d single-shot mode unsupported\n");

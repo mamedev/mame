@@ -82,7 +82,7 @@ protected:
 	static const int interrupt_vector_to_slot[32];
 	static const int interrupt_slot_to_priority[11];
 
-	u16 m_external_interrupt_state;		
+	u16 m_external_interrupt_state;
 	u32 m_interrupt_state;
 	u8 m_icr[10];
 	u16 m_imr, m_ipr, m_iisr;
@@ -266,7 +266,7 @@ protected:
 	void timer_update(int ch);
 	void timer_sync(int ch);
 	void timer_predict(int ch);
-	
+
 	void tcr_w(int ch, u16 data, u16 mem_mask);
 	void tmcr1_w(int ch, u16 data, u16 mem_mask);
 	void tmcr2_w(int ch, u16 data, u16 mem_mask);

@@ -23,8 +23,8 @@
     History:
 
 January 2023 tlindner:
-	Add 6809 undocumented opcodes as described here:
-	https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
+    Add 6809 undocumented opcodes as described here:
+    https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
 
 July 2016 ErikGav:
     Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)

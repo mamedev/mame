@@ -256,8 +256,8 @@ void csplayh5_state::csplayh5_sub_io_map(address_map &map)
 {
 	map(h8_device::PORT_A, h8_device::PORT_A).w (FUNC(csplayh5_state::pa_w));
 	map(h8_device::PORT_B, h8_device::PORT_B).rw(FUNC(csplayh5_state::pb_r), FUNC(csplayh5_state::pb_w));
-//	map(h8_device::PORT_6, h8_device::PORT_6).noprw();
-//	map(h8_device::PORT_A, h8_device::PORT_A).nopw();
+//  map(h8_device::PORT_6, h8_device::PORT_6).noprw();
+//  map(h8_device::PORT_A, h8_device::PORT_A).nopw();
 }
 
 
@@ -412,17 +412,17 @@ void csplayh5_state::machine_reset()
 {
 	m_p5 = 0;
 	m_pa = 0;
-	m_pb = 0;	
+	m_pb = 0;
 }
 
 WRITE_LINE_MEMBER(csplayh5_state::ata_irq)
 {
-	//	logerror("ata irq %d\n", state);
+	//  logerror("ata irq %d\n", state);
 }
 
 WRITE_LINE_MEMBER(csplayh5_state::ata_drq)
 {
-	//	logerror("ata drq %d\n", state);
+	//  logerror("ata drq %d\n", state);
 	m_pb = (m_pb & 0x7f) | (state ? 0x00 : 0x80);
 }
 
@@ -459,7 +459,7 @@ void csplayh5_state::csplayh5(machine_config &config)
 	m_ata->irq_handler().set(FUNC(csplayh5_state::ata_irq));
 	m_ata->dmarq_handler().set(FUNC(csplayh5_state::ata_drq));
 
-	//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
@@ -585,7 +585,7 @@ ROM_START( junai )
 
 	DISK_REGION( "ata:0:cdrom" )
 	DISK_IMAGE_READONLY( "junai", 0, SHA1(0491533e0ce3e4d2af608ea0b9d9646316b512bd) )
-//	DISK_IMAGE_READONLY( "junai", 0, SHA1(282cc528ff175ac55f1545481ca1c40377cf9347) )
+//  DISK_IMAGE_READONLY( "junai", 0, SHA1(282cc528ff175ac55f1545481ca1c40377cf9347) )
 ROM_END
 
 ROM_START( csplayh5 )

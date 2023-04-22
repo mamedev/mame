@@ -1122,7 +1122,7 @@ uint32_t v810_device::opFpoint(uint32_t op)
 		//case 0xa: REV (*)
 		case 0xb: op_cycles = opTRNC(op);break;
 		case 0xc: op_cycles = opMPYHW(op); break; // (*)
-		default: 
+		default:
 			throw emu_fatalerror("Floating point unknown type %02x\n", op_type);
 			break;
 	}

@@ -220,7 +220,7 @@ void telestrat_state::telestrat_mem(address_map &map)
 	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0320, 0x032f).m(m_via2, FUNC(via6522_device::map));
-	
+
 	// Theorically, these are cartridges.  There's no real point to
 	// making them configurable, when only 4 existed and there are 7
 	// slots.

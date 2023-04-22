@@ -2845,7 +2845,7 @@ void newport_base_device::do_fline(uint32_t color)
 		dy = temp_d;
 		break;
 	}
-	case 0:	// Pseudo 7
+	case 0: // Pseudo 7
 	{
 		const int16_t temp_fract = 0x10 - y1_fract;
 		y1_fract = x1_fract;

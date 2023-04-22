@@ -5418,7 +5418,7 @@ void blktouch_state::init_blktouch()
 {
 	// fearsome encryption ;-)
 	uint8_t *src;
-		
+
 	src = (uint8_t *)memregion("maincpu")->base();
 	for (int i = 0; i < 0x90000; i++)
 		src[i] = bitswap<8>(src[i], 7, 6, 5, 3, 4, 2, 1, 0);

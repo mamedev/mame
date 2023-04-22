@@ -110,7 +110,7 @@ sn74s262_device::sn74s262_device(const machine_config &mconfig, const char *tag,
 }
 
 sn74s263_device::sn74s263_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-    sn74s262_device(mconfig, SN74S263, tag, owner, clock)
+	sn74s262_device(mconfig, SN74S263, tag, owner, clock)
 {
 }
 
@@ -121,10 +121,10 @@ sn74s263_device::sn74s263_device(const machine_config &mconfig, const char *tag,
 
 u8 sn74s262_device::read(u8 character, u8 row)
 {
-    if ((row & 0xf) > 8)
-    {
-        return 0;
-    }
+	if ((row & 0xf) > 8)
+	{
+		return 0;
+	}
 
-    return m_char_rom[((character & 0x7f) * 10) + (row & 0xf)];
+	return m_char_rom[((character & 0x7f) * 10) + (row & 0xf)];
 }

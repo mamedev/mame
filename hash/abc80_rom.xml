@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="abc80_rom" description="Luxor ABC 80 memory card ROMs">
 
 	<software name="abcdos">
-        <!-- Scandia Metric FD2 -->
+		<!-- Scandia Metric FD2 -->
 		<description>ABC-DOS</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
@@ -19,7 +19,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dosdd80">
-        <!-- ABC 830 -->
+		<!-- ABC 830 -->
 		<description>ABC-DOS DD</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
@@ -32,7 +32,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ufd20">
-        <!-- ABC 830 -->
+		<!-- ABC 830 -->
 		<description>UFD-DOS v.20</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>

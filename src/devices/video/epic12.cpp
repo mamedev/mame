@@ -366,7 +366,7 @@ inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy)
 	{
 		num_vram_rows += x_rows;
 		if (((start_y & 31) + std::min(32, y_pixels)) > 32)
-			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.	
+			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.
 	}
 	return num_vram_rows;
 }
@@ -412,7 +412,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	COPY_NEXT_WORD(space, addr);
 	u16 src_x_start = COPY_NEXT_WORD(space, addr);
 	u16 src_y_start = COPY_NEXT_WORD(space, addr);
-	u16 dst_x_start = COPY_NEXT_WORD(space, addr); 
+	u16 dst_x_start = COPY_NEXT_WORD(space, addr);
 	u16 dst_y_start = COPY_NEXT_WORD(space, addr);
 	u16 src_dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
 	u16 src_dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
@@ -424,7 +424,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	// by asserting BREQ on the SH3 and then reading from Main RAM.
 	// Since the reads are done concurrently to executions of operations, its
 	// ok to estimate the delay all at once instead for emulation purposes.
-	
+
 	u16 dst_x_end = dst_x_start + src_dimx - 1;
 	u16 dst_y_end = dst_y_start + src_dimy - 1;
 
@@ -436,14 +436,14 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	}
 
 	m_blit_idle_op_bytes = 0;  // Blitter no longer idle.
-	
-	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed. 
+
+	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed.
 	int src_num_vram_rows = calculate_vram_accesses(src_x_start, src_y_start, src_dimx, src_dimy);
 	int dst_num_vram_rows = calculate_vram_accesses(dst_x_start, dst_y_start, src_dimx, src_dimy);
 
 	// Since draws are done 4 pixels at the time, extend the draw area to coordinates aligned for this.
 	// Doing this after VRAM calculations simplify things a bit, and these extensions will never make the
-	// destination area span additional VRAM rows. 
+	// destination area span additional VRAM rows.
 	dst_x_start -= dst_x_start & 3;
 	dst_x_end += (4 - ((dst_x_end + 1) & 3)) & 3;
 	u16 dst_dimx = dst_x_end - dst_x_start + 1;
@@ -459,7 +459,7 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 	//   - 11 CLK of overhead after each write to a destination VRAM row.
 	// - 12 CLK of additional overhead per sprite at the end of writing.
 	// Note: Details are from https://buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-	//       There may be mistakes.	
+	//       There may be mistakes.
 	u32 num_vram_clk = src_dimx * src_dimy / 4 + dst_dimx * dst_dimy / 2 + src_num_vram_rows * 6 + dst_num_vram_rows * (20 + 11) + 12;
 	m_blit_delay_ns += num_vram_clk * EP1C_VRAM_CLK_NANOSEC;
 }
@@ -797,7 +797,7 @@ void epic12_device::gfx_exec_w(address_space &space, offs_t offset, u32 data, u3
 			// Create a copy of the blit list so we can safely thread it.
 			// Copying the Blitter operations will also estimate the delay needed for processing.
 			m_blit_delay_ns = 0;
-			gfx_create_shadow_copy(space); 
+			gfx_create_shadow_copy(space);
 
 			// Every EP1C_VRAM_H_LINE_PERIOD_NANOSEC, the Blitter will block other operations, due
 			// to fetching a horizontal line from VRAM for output.
