@@ -8,7 +8,7 @@ Machine MBC-1200 is identical but sold outside of Japan
 
 16 x HM6116P-3 2K x 8 SRAM soldered onboard (so 32k ram)
 4 x HM6116P-3 2K x 8 SRAM socketed (so 8k ram)
-4 x MB83256 32K x 8 socketed (128k ram)
+4 x MB83256 32K x 8 socketed (128k rom)
 Floppy = 5.25"
 MBC1200 has one floppy while MBC1250 has 2. The systems are otherwise identical.
 
@@ -425,6 +425,7 @@ void mbc200_state::mbc200(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL, 816, 0, 640, 420, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));
+	screen.set_color(rgb_t::green());
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mbc200);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -460,8 +461,8 @@ void mbc200_state::mbc200(machine_config &config)
 	uart2.rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 	uart2.dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
 
-	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
-	
+	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
+
 	FLOPPY_CONNECTOR(config,  m_floppy[0], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config,  m_floppy[1], mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config,  m_floppy[2], mbc200_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
