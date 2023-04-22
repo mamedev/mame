@@ -848,7 +848,7 @@ Type-in from magazine
 		</part>
 	</software>
 
-	<software name="crossbomber1">
+	<software name="crossbomber1" cloneof="crossbomber">
 		<description>Cross Bomber (2021-05-13)</description>
 		<year>2022</year>
 		<publisher>Fabrizio Caruso</publisher>
