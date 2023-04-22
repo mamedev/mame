@@ -1,38 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
-  ** subclass of hh_sm510_state (hh_sm510.h, hh_sm510.cpp) **
+** subclass of hh_sm510_state (hh_sm510.h, hh_sm510.cpp) **
 
-  Tiger R-Zone driver
+Tiger R-Zone driver
 
-  This is a backwards console, the heart of the machine is the cartridge.
-  The console houses the controller, speaker, power, backlight, and a
-  polarizer filter for the screen. The cartridge has the MCU, optional
-  sound ROM, and the LCD screen in a translucent window.
+This is a backwards console, the heart of the machine is the cartridge. The
+console houses the controller, speaker, power, backlight, and a polarizer filter
+for the screen. The cartridge has the MCU, optional sound ROM, and the LCD screen
+in a translucent window.
 
-  Console family:
+Console family:
 
-  1995: R-Zone HeadGear: Wearable headset, controller is separate,
-  red-on-black screen is reflected in front of the right eye.
-  1996: R-Zone SuperScreen: Handheld console, inverted filter(aka black
-  LCD segments), optional background sheet as with standalone handhelds.
-  1997: R-Zone X.P.G - Xtreme Pocket Game: Handheld version of HeadGear.
-  1997: R-Zone DataZone: PDA with a built-in SuperScreen.
+1995: R-Zone HeadGear: Wearable headset, controller is separate, red-on-black
+      screen is reflected in front of the right eye.
+1996: R-Zone SuperScreen: Handheld console, inverted filter (aka black LCD
+      segments), optional background sheet as with standalone handhelds.
+1997: R-Zone X.P.G - Xtreme Pocket Game: Handheld version of HeadGear.
+1997: R-Zone DataZone: PDA with a built-in SuperScreen.
 
-  TODO:
-  - softwarelist? it's impossible right now due to SVG initialization
-  - support for SuperScreen. SVG colors will need to be inverted, or maybe
-    with artwork or HLSL?
-  - add DataZone, will get its own driver
+TODO:
+- softwarelist? it's impossible right now due to SVG initialization
+- support for SuperScreen. SVG colors will need to be inverted, or maybe with
+  artwork or HLSL?
+- add DataZone, will get its own driver
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "hh_sm510.h"
 
 #include "machine/timer.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -99,9 +100,10 @@ void rzone_state::machine_start()
 }
 
 
-/***************************************************************************
+
+/*******************************************************************************
     I/O
-***************************************************************************/
+*******************************************************************************/
 
 // console
 
@@ -209,9 +211,9 @@ void rzone_state::t2_write_s(u8 data)
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Inputs
-***************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( rzone )
 	PORT_START("IN.0")
@@ -233,9 +235,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Machine Configs
-***************************************************************************/
+*******************************************************************************/
 
 void rzone_state::rzbatfor(machine_config &config)
 {
@@ -310,9 +312,9 @@ void rzone_state::rzindy500(machine_config &config)
 
 
 
-/***************************************************************************
+/*******************************************************************************
     ROM Definitions
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START( rzbatfor )
 	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-231, SM512 under epoxy (die label KMN1202) (not the same game as the standalone Tiger handheld)
@@ -345,11 +347,11 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Takara)", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
+SYST( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Takara)", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE )
+SYST( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )

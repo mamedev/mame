@@ -13,6 +13,9 @@
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK        17734470
 
 #define SAMPLES_PER_FRAME    (355255)
@@ -224,6 +227,9 @@ ROM_START( phasor )
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(49036547) SHA1(d98c4d02771e80499c56dd71ad3d07597102f9b7) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS             INIT        COMPANY            FULLNAME */
 CONS(2010, phasor,   0,      0,      phasor,     empty_input, lft_phasor_state, empty_init, u8"Linus Åkesson", "Phasor", MACHINE_IMPERFECT_GRAPHICS)

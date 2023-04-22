@@ -5,9 +5,9 @@
 About MegaTech:
 
 Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
-a BIOS rom with the game instructions.  The last part number of the bios ROM is the cart/game ID code.
+a BIOS ROM with the game instructions.  The last part number of the BIOS ROM is the cart/game ID code.
 
-The instruction rom appears to map at 0x300000 in the cart space.
+The instruction ROM appears to map at 0x300000 in the cart space.
 
 In Megatech games your coins buy you time to play the game, how you perform in the game does not
 matter, you can die and start a new game providing you still have time, likewise you can be playing
@@ -93,11 +93,11 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 
 namespace {
 
-class mtech_state : public md_base_state
+class mtech_state : public md_ctrl_state
 {
 public:
-	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
+	mtech_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_ctrl_state(mconfig, type, tag),
 		m_vdp1(*this, "vdp1"),
 		m_cart1(*this, "mt_slot1"),
 		m_cart2(*this, "mt_slot2"),
@@ -146,7 +146,7 @@ private:
 	uint8_t sms_ioport_dd_r();
 	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
@@ -500,8 +500,8 @@ void mtech_state::bios_porte_w(uint8_t data)
 	m_flash_screen = BIT(data, 1);
 }
 
-/* this sets 0x300000 which may indicate that the 68k can see the instruction rom
-   there, this limiting the max game rom capacity to 3meg. */
+/* this sets 0x300000 which may indicate that the 68k can see the instruction ROM
+   there, this limiting the max game ROM capacity to 3meg. */
 
 uint8_t mtech_state::read_68k_banked_data(offs_t offset)
 {
@@ -535,15 +535,15 @@ void mtech_state::banked_ram_w(offs_t offset, uint8_t data)
 
 void mtech_state::megatech_bios_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rom(); // from bios rom (0x0000-0x2fff populated in ROM)
+	map(0x0000, 0x2fff).rom(); // from bios ROM (0x0000-0x2fff populated in ROM)
 	map(0x3000, 0x3fff).rw(FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
 	map(0x4000, 0x5fff).ram(); // plain ram?
 	map(0x6000, 0x6000).w(FUNC(mtech_state::mt_z80_bank_w));
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
-	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
+	map(0x7000, 0x77ff).rom(); // from bios ROM (0x7000-0x77ff populated in ROM)
 	//map(0x7800, 0x7fff).ram(); // ?
-	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
+	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr ROM and writes to reset banks on Z80 carts?
 }
 
 
@@ -560,14 +560,14 @@ uint8_t mtech_state::bios_joypad_r(offs_t offset)
 	if (m_bios_port_ctrl == 0x55)
 	{
 		/* A keys */
-		retdata = ((m_io_pad_3b[0]->read() & 0x40) >> 2) | ((m_io_pad_3b[1]->read() & 0x40) >> 4) | 0xeb;
+		retdata = ((m_pad[0]->read() & 0x40) >> 2) | ((m_pad[1]->read() & 0x40) >> 4) | 0xeb;
 	}
 	else
 	{
 		if (offset == 0)
-			retdata = (m_io_pad_3b[0]->read() & 0x3f) | ((m_io_pad_3b[1]->read() & 0x03) << 6);
+			retdata = (m_pad[0]->read() & 0x3f) | ((m_pad[1]->read() & 0x03) << 6);
 		else
-			retdata = ((m_io_pad_3b[1]->read() & 0x3c) >> 2) | 0xf0;
+			retdata = ((m_pad[1]->read() & 0x3c) >> 2) | 0xf0;
 
 	}
 	return retdata;
@@ -652,7 +652,7 @@ WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 
 void mtech_state::machine_start()
 {
-	md_base_state::machine_start();
+	md_ctrl_state::machine_start();
 
 	m_alarm_sound.resolve();
 	m_flash_screen.resolve();
@@ -661,7 +661,7 @@ void mtech_state::machine_start()
 void mtech_state::machine_reset()
 {
 	m_mt_bank_addr = 0;
-	md_base_state::machine_reset();
+	md_ctrl_state::machine_reset();
 
 	for (int i = 0; i < 8; i++)
 		m_cart_reg[i] = nullptr;
@@ -697,10 +697,14 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 
 void mtech_state::megatech(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	md_ntsc(config);
 
-	/* Megatech has an extra SMS based bios *and* an additional screen */
+	// integrated 3-button controllers
+	ctrl1_3button(config);
+	ctrl2_3button(config);
+
+	// Megatech has an extra SMS-based BIOS *and* an additional screen
 	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
@@ -745,21 +749,21 @@ void mtech_state::megatech(machine_config &config)
 }
 
 
-image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
+std::pair<std::error_condition, std::string> mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
 	uint8_t *ROM;
 	const char  *pcb_name;
 	uint32_t size = slot->common_get_size("rom");
 
 	if (!image.loaded_through_softlist())
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSUPPORTED, "Cartridges must be loaded from the software list");
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	ROM = slot->get_rom_base();
 	memcpy(ROM, image.get_software_region("rom"), size);
 
 	if ((pcb_name = image.get_feature("pcb_type")) == nullptr)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'pcb_type' feature");
 	else
 	{
 		if (!strcmp("genesis", pcb_name))
@@ -773,10 +777,14 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 			m_cart_is_genesis[gameno] = 0;
 		}
 		else
-			osd_printf_debug("cart%d is invalid\n", gameno + 1);
+		{
+			return std::make_pair(
+					image_error::BADSOFTWARE,
+					util::string_format("Software item has invalid 'pcb_type' feature '%s' (must be 'genesis' or 'sms')", pcb_name));
+		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 #define MEGATECH_CARTSLOT(_tag, _load) \

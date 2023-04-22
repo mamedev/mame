@@ -17,7 +17,7 @@ class msx_cart_majutsushi_device : public device_t, public msx_cart_interface
 public:
 	msx_cart_majutsushi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -28,7 +28,7 @@ protected:
 private:
 	template <int Bank> void bank_w(u8 data);
 
-	required_device<dac_byte_interface> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac;
 	memory_bank_array_creator<3> m_rombank;
 };
 

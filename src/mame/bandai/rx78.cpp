@@ -76,6 +76,9 @@ BTANB:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class rx78_state : public driver_device
 {
 public:
@@ -488,15 +491,12 @@ DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 	u32 size = m_cart->common_get_size("rom");
 
 	if (size != 0x2000 && size != 0x4000 && size != 0x8000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 8K, 16K or 32K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* F4 Character Displayer */
@@ -569,6 +569,9 @@ void rx78_state::init_rx78()
 	if (ram_size == 0x4000)
 		prg.unmap_readwrite(0x6000, 0xafff);
 }
+
+} // anonymous namespace
+
 
 /* Driver */
 

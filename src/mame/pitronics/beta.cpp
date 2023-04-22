@@ -31,6 +31,7 @@
 */
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
@@ -43,6 +44,9 @@
 #include "speaker.h"
 
 #include "beta.lh"
+
+
+namespace {
 
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "m6502"
@@ -293,18 +297,15 @@ void beta_state::riot_pb_w(uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
 {
-	uint32_t size = m_eprom->common_get_size("rom");
+	uint32_t const size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2K cartridges are supported)");
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)
@@ -381,6 +382,9 @@ ROM_START( beta )
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "beta.rom", 0x8000, 0x0800, CRC(d42fdb17) SHA1(595225a0cd43dd76c46b2aff6c0f27d5991cc4f0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

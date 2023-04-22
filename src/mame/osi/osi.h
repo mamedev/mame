@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
-#ifndef MAME_INCLUDES_OSI_H
-#define MAME_INCLUDES_OSI_H
+#ifndef MAME_OSI_OSI_H
+#define MAME_OSI_OSI_H
 
 #pragma once
 
@@ -121,8 +121,7 @@ class c1pmf_state : public c1p_state
 public:
 	c1pmf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c1p_state(mconfig, type, tag)
-		, m_floppy0(*this, "floppy0")
-		, m_floppy1(*this, "floppy1")
+		, m_floppy(*this, "floppy%u", 0U)
 	{ }
 
 	void c1pmf(machine_config &config);
@@ -138,8 +137,7 @@ protected:
 	void c1pmf_mem(address_map &map);
 
 private:
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 class uk101_state : public sb2m600_state
@@ -159,4 +157,4 @@ protected:
 	void uk101_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_OSI_H
+#endif // MAME_OSI_OSI_H

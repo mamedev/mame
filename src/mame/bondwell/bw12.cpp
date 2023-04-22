@@ -78,8 +78,8 @@ void bw12_state::floppy_motor_on_off()
 	if (m_motor0 || m_motor1)
 	{
 		m_motor_on = 1;
-		m_floppy0->mon_w(0);
-		m_floppy1->mon_w(0);
+		m_floppy[0]->mon_w(0);
+		m_floppy[1]->mon_w(0);
 		m_floppy_timer->adjust(attotime::never);
 	}
 	else
@@ -90,8 +90,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 {
 	if (m_motor0 || m_motor1)
 		return;
-	m_floppy0->mon_w(1);
-	m_floppy1->mon_w(1);
+	m_floppy[0]->mon_w(1);
+	m_floppy[1]->mon_w(1);
 
 	m_motor_on = 0;
 }

@@ -23,6 +23,9 @@
 #include "speaker.h"
 #include "cp1.lh"
 
+
+namespace {
+
 class cp1_state : public driver_device
 {
 public:
@@ -259,11 +262,11 @@ QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 		}
 		else
 		{
-			return image_init_result::FAIL;
+			return std::make_pair(image_error::INVALIDIMAGE, std::string());
 		}
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void cp1_state::cp1(machine_config &config)
@@ -316,6 +319,9 @@ ROM_START( cp1 )
 	ROM_SYSTEM_BIOS( 1, "2716", "2716" )
 	ROMX_LOAD( "cp1-2716.bin",     0x0000, 0x0800, CRC(3a2caf0e) SHA1(ff4befcf82a664950186d3af1843fdef70d2209f), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

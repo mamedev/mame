@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Turniermaschinen (dedicated in-house chesscomputers used at tournaments),
 and their limited-release home versions. These are mephisto_modular hardware
@@ -21,7 +21,7 @@ but ROM has many differences.
 BTANB:
 - lyon32t8 still says "2048Kbyte" even though it uses 8MB RAM
 
-===============================================================================
+================================================================================
 
 Hardware notes:
 
@@ -38,7 +38,7 @@ T(Turnier) tournament version: (differences)
 
 After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -144,9 +144,9 @@ void mmtm_state::set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
@@ -174,9 +174,9 @@ void mmtm_state::mmtm_8m_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mmtm_v )
 	PORT_START("KEY1")
@@ -204,13 +204,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mmtm_state::mmtm_v(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68030(config, m_maincpu, 36_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmtm_state::mmtm_2m_map);
 
@@ -232,16 +232,16 @@ void mmtm_state::mmtm_t(machine_config &config)
 {
 	mmtm_v(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(50_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmtm_state::mmtm_8m_map);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( port32t ) // V101 FA1D 1CD7
 	ROM_REGION32_BE( 0x40000, "maincpu", ROMREGION_ERASE00 )
@@ -287,19 +287,19 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, port32t,   port32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32t,   lyon32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, lyon32t8,  lyon32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Lyon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32t,    van32,  0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, van32t8,   van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Vancouver", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, berl32t8p, van32,  0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Hegener + Glaser", "Mephisto TM Berlin (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek took over H+G
-CONS( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
+SYST( 1996, lond32t,   lond32, 0,      mmtm_v,  mmtm_v, mmtm_state, empty_init, "Saitek", "Mephisto London 68030", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek took over H+G
+SYST( 1996, lond32t8,  lond32, 0,      mmtm_t,  mmtm_t, mmtm_state, empty_init, "Saitek", "Mephisto TM London", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "

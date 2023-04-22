@@ -19,6 +19,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pp_state : public driver_device
 {
 public:
@@ -494,6 +497,8 @@ ROM_START(pp)
 	ROM_LOAD("chargen.bin", 0x0000, 0x0800, CRC(111e443a) SHA1(455a573addf274ae3fd41307316d87587d8f5550))
 	ROM_CONTINUE(0x0000, 0x0800) // first half blank
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1983, pp, 0, 0, pp, pp, pp_state, empty_init, "STM Electronics", "Pied Piper Communicator 1", MACHINE_NOT_WORKING)

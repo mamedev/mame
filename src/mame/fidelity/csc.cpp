@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity CSC(and derived) hardware
 - Champion Sensory Chess Challenger
@@ -15,7 +15,7 @@ TODO:
 - hook up csce I/O properly, it doesn't have PIAs
 - verify super9cc maskrom dump
 
-*******************************************************************************
+********************************************************************************
 
 Champion Sensory Chess Challenger (CSC)
 ---------------------------------------
@@ -148,7 +148,7 @@ LED display:
 -----
 88:88
 
-The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+The LED display is four 7 segment digits. Normal ABCDEFG lettering is used for segments.
 
 The upper dot is connected to digit 3 common
 The lower dot is connected to digit 4 common
@@ -156,7 +156,7 @@ The lone LED is connected to digit 1 common
 
 All three of the above are called "segment H".
 
-*******************************************************************************
+********************************************************************************
 
 Elite Champion Challenger (ELITE)
 This is a limited-release chess computer based on the CSC. They removed the PIAs
@@ -169,7 +169,7 @@ The "Fidelity X" that won the 1981 Travemünde contest is also on this hardware,
 a 5MHz CPU and 32KB total ROM size. In the 90s, Wilfried Bucke provided an upgrade
 kit for csce to make it similar to this version, CPU was changed to a R65C02P4.
 
-*******************************************************************************
+********************************************************************************
 
 Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
@@ -183,7 +183,7 @@ built-in CB9 module
 
 See CSC description above for more information.
 
-*******************************************************************************
+********************************************************************************
 
 Reversi Sensory Challenger (RSC)
 The 1st version came out in 1980, a program revision was released in 1981.
@@ -200,7 +200,7 @@ To play it on MAME with the sensorboard device, it is recommended to set up
 keyboard shortcuts for the spawn inputs. Then hold the spawn input down while
 clicking on the game board.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -332,9 +332,9 @@ void su9_state::su9_set_cpu_freq()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // sensorboard handlers
 
@@ -410,10 +410,8 @@ u8 csc_state::pia0_read(offs_t offset)
 	// CA1/CB1: button row 6/7
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 1)
-			m_pia[0]->ca1_w(BIT(read_inputs(), 6));
-		else if (offset == 3)
-			m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
 	}
 
 	return m_pia[0]->read(offset);
@@ -505,9 +503,9 @@ WRITE_LINE_MEMBER(csc_state::pia1_ca2_w)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void csc_state::csc_map(address_map &map)
 {
@@ -541,9 +539,9 @@ void csc_state::rsc_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( csc )
 	PORT_START("IN.0")
@@ -611,9 +609,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void csc_state::csc(machine_config &config)
 {
@@ -711,9 +709,9 @@ void csc_state::rsc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( csc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -851,15 +849,15 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, cscet,    csce,   0, cscet,    csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, csc,      0,      0,      csc,     csc,   csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, csce,     0,      0,      csce,    csc,   csc_state, empty_init, "Fidelity Electronics", "Elite Champion Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, cscet,    csce,   0,      cscet,   csc,   csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, super9cc, 0,      0,      su9,     su9,   su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1981, reversic, 0,      0, rsc,      rsc,  csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, reversic, 0,      0,      rsc,     rsc,   csc_state, empty_init, "Fidelity Electronics", "Reversi Sensory Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

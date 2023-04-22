@@ -74,6 +74,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class mycom_state : public driver_device
 {
 public:
@@ -96,6 +98,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
+		, m_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void mycom(machine_config &config);
@@ -122,7 +125,7 @@ private:
 	u8 m_keyb_press = 0U;
 	u8 m_sn_we = 0U;
 	u16 m_i_videoram = 0U;
-	bool m_keyb_press_flag = 0;
+	bool m_keyb_press_flag = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -142,6 +145,7 @@ private:
 	required_device<msm5832_device> m_rtc;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_p_chargen;
+	required_ioport_array<9> m_keyboard;
 };
 
 
@@ -442,32 +446,23 @@ static const u8 mycom_keyval[] = { 0,
 
 TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 {
-	u8 x, y, scancode = 0;
-	u16 pressed[9];
-	char kbdrow[3];
 	u8 modifiers = ioport("XX")->read();
 	u8 shift_pressed = (modifiers & 2) >> 1;
-	m_keyb_press_flag = 0;
+	m_keyb_press_flag = false;
 
-	/* see what is pressed */
-	for (x = 0; x < 9; x++)
+	// Read keyboard
+	for (u8 x = 0; x < 9; x++)
 	{
-		sprintf(kbdrow,"X%d",x);
-		pressed[x] = (ioport(kbdrow)->read());
-	}
-
-	/* find what has changed */
-	for (x = 0; x < 9; x++)
-	{
-		if (pressed[x])
+		u16 pressed = m_keyboard[x]->read();
+		if (pressed)
 		{
-			/* get scankey value */
-			for (y = 0; y < 10; y++)
+			// get scankey value
+			for (u8 y = 0; y < 10; y++)
 			{
-				if (BIT(pressed[x], y))
+				if (BIT(pressed, y))
 				{
-					scancode = ((x + y * 9) << 1) + shift_pressed + 1;
-					m_keyb_press_flag = 1;
+					u8 scancode = ((x + y * 9) << 1) + shift_pressed + 1;
+					m_keyb_press_flag = true;
 					m_keyb_press = mycom_keyval[scancode];
 				}
 			}
@@ -583,6 +578,9 @@ ROM_START( mycom )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(4039bb6f) SHA1(086ad303bf4bcf983fd6472577acbf744875fea8) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

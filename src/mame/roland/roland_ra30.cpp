@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "cpu/h8500/h8510.h"
 
+
+namespace {
+
 class roland_ra30_state : public driver_device
 {
 public:
@@ -48,5 +51,8 @@ ROM_START(ra30)
 	ROM_REGION(0x80000, "stylerom", 0)
 	ROM_LOAD("roland_r00679623_hn62444bp_e76.ic18", 0x00000, 0x80000, CRC(3c1670a6) SHA1(d0ef77143f64a20c6a151746eb0bfad15a98b2e5))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1995, ra30, 0, 0, ra30, ra30, roland_ra30_state, empty_init, "Roland", "RA-30 Realtime Arranger", MACHINE_IS_SKELETON)

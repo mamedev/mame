@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:Berger
-/***************************************************************************
+/*******************************************************************************
 
 Mephisto Mondial 68000XL
 The chess engine is actually the one from Mephisto Dallas.
@@ -12,7 +12,10 @@ Hardware notes:
 - 16KB RAM
 - PCF2112T LCD driver
 
-***************************************************************************/
+TODO:
+- does it have waitstates, like glasgow/amsterdam?
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -50,6 +53,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
+private:
 	void mondial68k_mem(address_map &map);
 
 	void update_leds();
@@ -70,7 +74,6 @@ protected:
 	u8 m_board_mux = 0xff;
 };
 
-
 void mondial68k_state::machine_start()
 {
 	m_digits.resolve();
@@ -81,9 +84,9 @@ void mondial68k_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void mondial68k_state::update_leds()
 {
@@ -131,9 +134,9 @@ u8 mondial68k_state::inputs_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void mondial68k_state::mondial68k_mem(address_map &map)
 {
@@ -147,9 +150,9 @@ void mondial68k_state::mondial68k_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( mondial68k )
 	PORT_START("IN.0")
@@ -182,45 +185,46 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void mondial68k_state::mondial68k(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial68k_state::mondial68k_mem);
-	m_maincpu->set_periodic_int(FUNC(mondial68k_state::irq5_line_hold), attotime::from_hz(128));
+
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 256); // 128Hz
+	m_maincpu->set_periodic_int(FUNC(mondial68k_state::irq6_line_hold), irq_period);
 
 	HC259(config, m_lcd_latch);
 	m_lcd_latch->q_out_cb<0>().set(m_lcd, FUNC(pcf2112_device::clb_w));
 	m_lcd_latch->q_out_cb<1>().set(m_lcd, FUNC(pcf2112_device::data_w));
 	m_lcd_latch->q_out_cb<2>().set(m_lcd, FUNC(pcf2112_device::dlen_w));
-	m_lcd_latch->q_out_cb<6>().set_nop(); // another DAC input?
-	m_lcd_latch->q_out_cb<7>().set("dac", FUNC(dac_1bit_device::write));
+	m_lcd_latch->parallel_out_cb().set("dac", FUNC(dac_2bit_ones_complement_device::write)).rshift(6).mask(0x3);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
-	/* video hardware */
+	// video hardware
 	PCF2112(config, m_lcd, 50); // frequency guessed
 	m_lcd->write_segs().set(FUNC(mondial68k_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_mephisto_mondial68k);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_2BIT_ONES_COMPLEMENT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( mondl68k )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
@@ -232,9 +236,9 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
     Drivers
-***************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY             FULLNAME                    FLAGS */
-CONS( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE      INPUT       CLASS             INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1988, mondl68k,  0,        0,      mondial68k,  mondial68k, mondial68k_state, empty_init, "Hegener + Glaser", "Mephisto Mondial 68000XL", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

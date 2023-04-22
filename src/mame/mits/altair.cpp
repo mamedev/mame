@@ -96,16 +96,14 @@ INPUT_PORTS_END
 
 QUICKLOAD_LOAD_MEMBER(altair_state::quickload_cb)
 {
-	int quick_length;
-	int read_;
-	quick_length = image.length();
+	int const quick_length = image.length();
 	if (quick_length >= 0xfd00)
-		return image_init_result::FAIL;
-	read_ = image.fread(m_ram, quick_length);
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+	int const read_ = image.fread(m_ram, quick_length);
 	if (read_ != quick_length)
-		return image_init_result::FAIL;
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void altair_state::machine_reset()

@@ -56,6 +56,10 @@ protected:
 	emu_timer *              m_timer;
 	int32_t                  m_bank;
 	uint8_t                  m_byte_count;
+
+	uint8_t                  m_write_buffer[32];
+	uint32_t                 m_write_buffer_start_address;
+	uint32_t                 m_write_buffer_count;
 };
 
 
@@ -315,6 +319,12 @@ public:
 	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class intel_28f640j5_device : public intelfsh16_device
+{
+public:
+	intel_28f640j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sst_39vf400a_device : public intelfsh16_device
 {
 public:
@@ -379,6 +389,7 @@ DECLARE_DEVICE_TYPE(SPANSION_S29GL064S,    spansion_s29gl064s_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device)
 DECLARE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device)
+DECLARE_DEVICE_TYPE(INTEL_28F640J5,        intel_28f640j5_device)
 DECLARE_DEVICE_TYPE(SST_39VF400A,          sst_39vf400a_device)
 DECLARE_DEVICE_TYPE(ATMEL_49F4096,         atmel_49f4096_device)
 DECLARE_DEVICE_TYPE(CAT28F020,             cat28f020_device)

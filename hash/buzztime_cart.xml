@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 Only 4 cartridges were released for this system, all in 'Series 1'
 -->
 
-<softwarelist name="buzztime_cart" description="Cadaco Buzztime Trivia Cartridges">
+<softwarelist name="buzztime_cart" description="Cadaco Buzztime Trivia cartridges">
 	<software name="tv" supported="no">
 		<description>Series 1 - TV Trivia</description>
 		<year>200?</year>

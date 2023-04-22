@@ -300,7 +300,7 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 	const opcode_desc *desclist;
 	bool override = false;
 
-	g_profiler.start(PROFILER_DRC_COMPILE);
+	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = m_drcfe->describe_code(pc);
@@ -395,7 +395,6 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 
 			/* end the sequence */
 			block.end();
-			g_profiler.stop();
 			succeeded = true;
 		}
 		catch (drcuml_block::abort_compilation &)
@@ -703,9 +702,9 @@ void mips3_device::static_generate_tlb_mismatch()
 		UML_MOV(block, mem(&m_core->arg1), I1);                                 // mov     [arg1],i1
 		UML_CALLC(block, cfunc_printf_debug, this);                             // callc   printf_debug
 	}
-	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                    // test    i1,VTLB_FETCH_ALLOWED
+	UML_TEST(block, I1, FETCH_ALLOWED);                                    // test    i1,FETCH_ALLOWED
 	UML_JMPc(block, COND_NZ, 1);                                                // jmp     1,nz
-	UML_TEST(block, I1, VTLB_FLAG_FIXED);                                       // test    i1,VTLB_FLAG_FIXED
+	UML_TEST(block, I1, FLAG_FIXED);                                       // test    i1,FLAG_FIXED
 	UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBLOAD], I0);              // exh     exception[TLBLOAD],i0,nz
 	UML_EXH(block, *m_exception[EXCEPTION_TLBLOAD_FILL], I0);                   // exh     exception[TLBLOAD_FILL],i0
 	UML_LABEL(block, 1);                                                        // 1:
@@ -829,120 +828,106 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 
 
 /*------------------------------------------------------------------
-    static_generate_memory_accessor
+    static_generate_memory_mode_checks
 ------------------------------------------------------------------*/
 
-void mips3_device::static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr)
+void mips3_device::static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, int &label, int mode)
 {
-	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
-	/* on exit, read result is in I0 */
-	/* routine trashes I0-I3 */
-	uml::code_handle &exception_tlb = *m_exception[iswrite ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD];
-	uml::code_handle &exception_tlbfill = *m_exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
-	uml::code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
-	int tlbmiss = 0;
-	int label = 1;
-	int ramnum;
-
-	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
-
-	/* add a global entry for this */
-	alloc_handle(*m_drcuml, handleptr, name);
-	UML_HANDLE(block, *handleptr);                                              // handle  handleptr
-
 	/* user mode? generate address exception if top bit is set */
 	if (mode == MODE_USER)
 	{
-		UML_TEST(block, I0, 0x80000000);                                        // test    i0,0x80000000
-		UML_EXHc(block, COND_NZ, exception_addrerr, I0);                        // exh     addrerr,i0,nz
+		UML_TEST(block, I0, 0x80000000);                                            // test    i0,0x80000000
+		UML_EXHc(block, COND_NZ, exception_addrerr, I0);                            // exh     addrerr,i0,nz
 	}
 
 	/* supervisor mode? generate address exception if not in user space or in $C0000000-DFFFFFFF */
 	if (mode == MODE_SUPER)
 	{
 		int addrok;
-		UML_TEST(block, I0, 0x80000000);                                    // test    i0,0x80000000
+		UML_TEST(block, I0, 0x80000000);                                            // test    i0,0x80000000
 		UML_JMPc(block, COND_Z, addrok = label++);                                  // jz      addrok
-		UML_SHR(block, I3, I0, 29);                                 // shr     i3,i0,29
-		UML_CMP(block, I3, 6);                                          // cmp     i3,6
+		UML_SHR(block, I3, I0, 29);                                                 // shr     i3,i0,29
+		UML_CMP(block, I3, 6);                                                      // cmp     i3,6
 		UML_EXHc(block, COND_NE, exception_addrerr, I0);                            // exh     addrerr,i0,ne
-		UML_LABEL(block, addrok);                                               // addrok:
+		UML_LABEL(block, addrok);                                                   // addrok:
 	}
+}
 
-	/* general case: assume paging and perform a translation */
-	UML_SHR(block, I3, I0, 12);                                     // shr     i3,i0,12
-	UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb_table],i3,dword
-	UML_TEST(block, I3, iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED);// test    i3,iswrite ? VTLB_WRITE_ALLOWED : VTLB_READ_ALLOWED
-	UML_JMPc(block, COND_Z, tlbmiss = label++);                                     // jmp     tlbmiss,z
-	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                   // rolins  i0,i3,0,0xfffff000
 
+/*------------------------------------------------------------------
+    static_generate_fastram_accessor
+------------------------------------------------------------------*/
+
+void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked)
+{
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		for (ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+		{
 			if (!(iswrite && m_fastram[ramnum].readonly))
 			{
 				void *fastbase = (uint8_t *)m_fastram[ramnum].base - m_fastram[ramnum].start;
 				uint32_t skip = label++;
 				if (m_fastram[ramnum].end != 0xffffffff)
 				{
-					UML_CMP(block, I0, m_fastram[ramnum].end);   // cmp     i0,end
-					UML_JMPc(block, COND_A, skip);                                      // ja      skip
+					UML_CMP(block, I0, m_fastram[ramnum].end);                      // cmp     i0,end
+					UML_JMPc(block, COND_A, skip);                                  // ja      skip
 				}
 				if (m_fastram[ramnum].start != 0x00000000)
 				{
-					UML_CMP(block, I0, m_fastram[ramnum].start);// cmp     i0,fastram_start
-					UML_JMPc(block, COND_B, skip);                                      // jb      skip
+					UML_CMP(block, I0, m_fastram[ramnum].start);                    // cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                                  // jb      skip
 				}
 				if (!iswrite)
 				{
 					if (size == 1)
 					{
 						UML_XOR(block, I0, I0, m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
-																						// xor     i0,i0,bytexor
-						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+																					// xor     i0,i0,bytexor
+						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);     // load    i0,fastbase,i0,byte
 					}
 					else if (size == 2)
 					{
 						UML_XOR(block, I0, I0, m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
-																						// xor     i0,i0,wordxor
-						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+																					// xor     i0,i0,wordxor
+						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);     // load    i0,fastbase,i0,word_x1
 					}
 					else if (size == 4)
 					{
-						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);    // load    i0,fastbase,i0,dword_x1
 					}
 					else if (size == 8)
 					{
-						UML_DLOAD(block, I0, fastbase, I0, SIZE_QWORD, SCALE_x1);           // dload   i0,fastbase,i0,qword_x1
+						UML_DLOAD(block, I0, fastbase, I0, SIZE_QWORD, SCALE_x1);   // dload   i0,fastbase,i0,qword_x1
 						UML_DROR(block, I0, I0, 32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																						// dror    i0,i0,32*bytexor
+																					// dror    i0,i0,32*bytexor
 					}
-					UML_RET(block);                                                     // ret
+					UML_RET(block);                                                 // ret
 				}
 				else
 				{
 					if (size == 1)
 					{
 						UML_XOR(block, I0, I0, m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
-																						// xor     i0,i0,bytexor
-						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+																					// xor     i0,i0,bytexor
+						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);    // store   fastbase,i0,i1,byte
 					}
 					else if (size == 2)
 					{
 						UML_XOR(block, I0, I0, m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
-																						// xor     i0,i0,wordxor
-						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+																					// xor     i0,i0,wordxor
+						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);    // store   fastbase,i0,i1,word_x1
 					}
 					else if (size == 4)
 					{
 						if (ismasked)
 						{
-							UML_LOAD(block, I3, fastbase, I0, SIZE_DWORD, SCALE_x1);        // load    i3,fastbase,i0,dword_x1
-							UML_ROLINS(block, I3, I1, 0, I2);       // rolins  i3,i1,0,i2
-							UML_STORE(block, fastbase, I0, I3, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i3,dword_x1
+							UML_LOAD(block, I3, fastbase, I0, SIZE_DWORD, SCALE_x1);    // load    i3,fastbase,i0,dword_x1
+							UML_ROLINS(block, I3, I1, 0, I2);                           // rolins  i3,i1,0,i2
+							UML_STORE(block, fastbase, I0, I3, SIZE_DWORD, SCALE_x1);   // store   fastbase,i0,i3,dword_x1
 						}
 						else
-							UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+							UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);   // store   fastbase,i0,i1,dword_x1
 					}
 					else if (size == 8)
 					{
@@ -952,8 +937,8 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 						{
 							UML_DROR(block, I2, I2, 32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
 																						// dror    i2,i2,32*bytexor
-							UML_DLOAD(block, I3, fastbase, I0, SIZE_QWORD, SCALE_x1);       // dload   i3,fastbase,i0,qword_x1
-							UML_DROLINS(block, I3, I1, 0, I2);      // drolins i3,i1,0,i2
+							UML_DLOAD(block, I3, fastbase, I0, SIZE_QWORD, SCALE_x1);   // dload   i3,fastbase,i0,qword_x1
+							UML_DROLINS(block, I3, I1, 0, I2);                          // drolins i3,i1,0,i2
 							UML_DSTORE(block, fastbase, I0, I3, SIZE_QWORD, SCALE_x1);  // dstore  fastbase,i0,i3,qword_x1
 						}
 						else
@@ -962,9 +947,19 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 					UML_RET(block);                                                     // ret
 				}
 
-				UML_LABEL(block, skip);                                             // skip:
+				UML_LABEL(block, skip);                                                 // skip:
 			}
+		}
+	}
+}
 
+
+/*------------------------------------------------------------------
+    static_generate_memory_rw
+------------------------------------------------------------------*/
+
+void mips3_device::static_generate_memory_rw(drcuml_block &block, int size, bool iswrite, bool ismasked)
+{
 	switch (size)
 	{
 		case 1:
@@ -985,9 +980,9 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 			if (iswrite)
 			{
 				if (!ismasked)
-					UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);                // write   i0,i1,program_dword
+					UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);            // write   i0,i1,program_dword
 				else
-					UML_WRITEM(block, I0, I1, I2, SIZE_DWORD, SPACE_PROGRAM);   // writem  i0,i1,i2,program_dword
+					UML_WRITEM(block, I0, I1, I2, SIZE_DWORD, SPACE_PROGRAM);       // writem  i0,i1,i2,program_dword
 			}
 			else
 			{
@@ -1002,38 +997,104 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 			if (iswrite)
 			{
 				if (!ismasked)
-					UML_DWRITE(block, I0, I1, SIZE_QWORD, SPACE_PROGRAM);               // dwrite  i0,i1,program_qword
+					UML_DWRITE(block, I0, I1, SIZE_QWORD, SPACE_PROGRAM);           // dwrite  i0,i1,program_qword
 				else
-					UML_DWRITEM(block, I0, I1, I2, SIZE_QWORD, SPACE_PROGRAM);  // dwritem i0,i1,i2,program_qword
+					UML_DWRITEM(block, I0, I1, I2, SIZE_QWORD, SPACE_PROGRAM);      // dwritem i0,i1,i2,program_qword
 			}
 			else
 			{
 				if (!ismasked)
-					UML_DREAD(block, I0, I0, SIZE_QWORD, SPACE_PROGRAM);                // dread   i0,i0,program_qword
+					UML_DREAD(block, I0, I0, SIZE_QWORD, SPACE_PROGRAM);            // dread   i0,i0,program_qword
 				else
-					UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);   // dreadm  i0,i0,i2,program_qword
+					UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);       // dreadm  i0,i0,i2,program_qword
 			}
 			break;
 	}
 	UML_RET(block);                                                                 // ret
+}
+
+
+/*------------------------------------------------------------------
+    static_generate_memory_accessor
+------------------------------------------------------------------*/
+
+void mips3_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
+{
+	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
+	/* on exit, read result is in I0 */
+	/* routine trashes I0-I3 */
+	uml::code_handle &exception_tlb = *m_exception[iswrite ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD];
+	uml::code_handle &exception_tlbfill = *m_exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
+	uml::code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
+	int tlbmiss = 0;
+	int label = 1;
+
+	/* begin generating */
+	drcuml_block &block(m_drcuml->begin_block(1024));
+
+	/* add a global entry for this */
+	alloc_handle(*m_drcuml, handleptr, name);
+	UML_HANDLE(block, *handleptr);                                                  // handle  handleptr
+
+	static_generate_memory_mode_checks(block, exception_addrerr, label, mode);
+
+	/* general case: assume paging and perform a translation */
+	UML_SHR(block, I3, I0, 12);                                                     // shr     i3,i0,12
+	UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);            // load    i3,[vtlb_table],i3,dword
+	UML_TEST(block, I3, iswrite ? WRITE_ALLOWED : READ_ALLOWED);                    // test    i3,iswrite ? WRITE_ALLOWED : READ_ALLOWED
+	UML_JMPc(block, COND_Z, tlbmiss = label++);                                     // jmp     tlbmiss,z
+	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                                       // rolins  i0,i3,0,0xfffff000
+
+	static_generate_fastram_accessor(block, label, size, iswrite, ismasked);
+	static_generate_memory_rw(block, size, iswrite, ismasked);
 
 	if (tlbmiss != 0)
 	{
-		UML_LABEL(block, tlbmiss);                                              // tlbmiss:
+		UML_LABEL(block, tlbmiss);                                                  // tlbmiss:
 		if (iswrite)
 		{
-			UML_TEST(block, I3, VTLB_READ_ALLOWED);                     // test    i3,VTLB_READ_ALLOWED
-			UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBMOD], I0);
-																					// exh     tlbmod,i0,nz
+			UML_TEST(block, I3, READ_ALLOWED);                                      // test    i3,READ_ALLOWED
+			UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_TLBMOD], I0);           // exh     tlbmod,i0,nz
 		}
-		UML_TEST(block, I3, VTLB_FLAG_FIXED);                               // test    i3,VTLB_FLAG_FIXED
+		UML_TEST(block, I3, FLAG_FIXED);                                            // test    i3,FLAG_FIXED
 		UML_EXHc(block, COND_NZ, exception_tlb, I0);                                // exh     tlb,i0,nz
-		UML_EXH(block, exception_tlbfill, I0);                                  // exh     tlbfill,i0
+		UML_EXH(block, exception_tlbfill, I0);                                      // exh     tlbfill,i0
 	}
 
 	block.end();
 }
 
+void r4650_device::static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr)
+{
+	/* on entry, address is in I0; data for writes is in I1; mask for accesses is in I2 */
+	/* on exit, read result is in I0 */
+	/* routine trashes I0-I3 */
+	uml::code_handle &exception_addrerr = *m_exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
+	int label = 1;
+
+	/* begin generating */
+	drcuml_block &block(m_drcuml->begin_block(1024));
+
+	/* add a global entry for this */
+	alloc_handle(*m_drcuml, handleptr, name);
+	UML_HANDLE(block, *handleptr);                                                  // handle  handleptr
+
+	static_generate_memory_mode_checks(block, exception_addrerr, label, mode);
+
+	if (mode == MODE_USER)
+	{
+		int addrok;
+		UML_CMP(block, I0, CPR032(COP0_R4650_DBound));                              // cmp     i0,CPR0[DBound]
+		UML_JMPc(block, COND_LE, addrok = label++);                                 // jle     addrok
+		UML_EXHc(block, COND_G, exception_addrerr, I0);                             // exh     addrerr,i0,ne
+		UML_LABEL(block, addrok);                                                   // addrok:
+		UML_ADD(block, I0, I0, CPR032(COP0_R4650_DBase));                           // add     i0,i0,CPR0[DBase]
+	}
+
+	static_generate_fastram_accessor(block, label, size, iswrite, ismasked);
+	static_generate_memory_rw(block, size, iswrite, ismasked);
+	block.end();
+}
 
 
 /***************************************************************************
@@ -1365,7 +1426,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 		const vtlb_entry *tlbtable = vtlb_table();
 
 		/* if we currently have a valid TLB read entry, we just verify */
-		if (tlbtable[desc->pc >> 12] & VTLB_FETCH_ALLOWED)
+		if (tlbtable[desc->pc >> 12] & FETCH_ALLOWED)
 		{
 			if (PRINTF_MMU)
 			{

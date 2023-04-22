@@ -412,6 +412,8 @@ Donkey Kong Notes
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eepromser.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -910,6 +912,11 @@ void dkong_state::s2650_io_map(address_map &map)
 void dkong_state::s2650_data_map(address_map &map)
 {
 	map(S2650_DATA_PORT, S2650_DATA_PORT).w(FUNC(dkong_state::s2650_data_w));
+}
+
+void dkong_state::spclforc_data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w("snsnd", FUNC(sn76496_device::write));
 }
 
 
@@ -1873,8 +1880,13 @@ void dkong_state::herbiedk(machine_config &config)
 void dkong_state::spclforc(machine_config &config)
 {
 	herbiedk(config);
+
+	m_maincpu->set_addrmap(AS_DATA, &dkong_state::spclforc_data_map);
 	config.device_remove("soundcpu");
+
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_spclforc));
+
+	SN76496(config, "snsnd", CLOCK_1H).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /*************************************
@@ -3617,7 +3629,6 @@ void dkong_state::init_drakton()
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
-
 	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
 	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
 	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
@@ -3644,7 +3655,7 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
-	/* custom handlers supporting Joystick or Steering Wheel */
+	// custom handlers supporting Joystick or Steering Wheel
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8smo_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
@@ -3686,12 +3697,15 @@ void dkong_state::init_dkongx()
 
 void dkong_state::init_dkong3()
 {
-	// RP2A03 bus conflict between internal APU and external RAM
+	// RP2A03 bus conflict between internal APU and external RAM.
+	// dkong3 relies on it, eg. sound effects when player dies, jumps down a platform, Creepy inchworm appears/gets hit
+	// BTANB: squeak that randomly interrupts Creepy inchworm's sound effect
 	m_dkong3_tap[0] = m_dev_rp2a03a->space(AS_PROGRAM).install_write_tap(
 			0x4000, 0x4017,
 			"rp2a03a_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
+				// write to RAM
 				m_dev_rp2a03a->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[0]);
@@ -3701,6 +3715,7 @@ void dkong_state::init_dkong3()
 			"rp2a03b_conflict_w",
 			[this] (offs_t offset, u8 &data, u8 mem_mask)
 			{
+				// write to RAM
 				m_dev_rp2a03b->space(AS_PROGRAM).write_byte(offset & 0x07ff, data);
 			},
 			&m_dkong3_tap[1]);
@@ -3788,8 +3803,8 @@ GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, empty_init,  
 GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, empty_init,    ROT0,   "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
 GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",     MACHINE_SUPPORTS_SAVE )

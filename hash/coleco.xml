@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="coleco" description="Coleco ColecoVision cartridges">
@@ -548,30 +548,6 @@ license:CC0
 			<dataarea name="rom" size="16384">
 				<rom name="drseuss.1" size="8192" crc="47cf6908" sha1="51cc13a608b41cf6a3b5c0e23dd53bd6911cdbf0" offset="0x0000" />
 				<rom name="drseuss.2" size="8192" crc="b524f389" sha1="c521a1e58da8d6da94eedde83c2e3aed1445c9ab" offset="0x2000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="drseussp" cloneof="drseuss">
-		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle (prototype, rev r)</description>
-		<year>1984</year>
-		<publisher>Coleco / CBS</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="0x4000">
-				<rom name="jigsaw 10 6-7 1 5274 e052.1" size="0x2000" crc="e63951b3" sha1="528b441c516211c884925a7e11c30b6cb5f85ecb" offset="0x0000" />
-				<rom name="jigsaw 10 6-7 2 8dde e052.2" size="0x2000" crc="b0ecd4a4" sha1="c77cb81424d585acc41dd1120e81ca7adc0e555b" offset="0x2000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- The label says the checksum is 90B3 but the dump's checksum is 90A3. Possible bit rot or just an error on the label? -->
-	<software name="drseussp1" cloneof="drseuss">
-		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle Graphics Demo</description>
-		<year>1984</year>
-		<publisher>Coleco / CBS</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="0x2000">
-				<rom name="link seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" /> <!-- original label: LINK: Seuss 4/6 1 Puzzler 90B3 -->
 			</dataarea>
 		</part>
 	</software>
@@ -2684,6 +2660,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="drseussp" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle (prototype, rev r)</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="jigsaw 10 6-7 1 5274 e052.1" size="0x2000" crc="e63951b3" sha1="528b441c516211c884925a7e11c30b6cb5f85ecb" offset="0x0000" />
+				<rom name="jigsaw 10 6-7 2 8dde e052.2" size="0x2000" crc="b0ecd4a4" sha1="c77cb81424d585acc41dd1120e81ca7adc0e555b" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The label says the checksum is 90B3 but the dump's checksum is 90A3. Possible bit rot or just an error on the label? -->
+	<software name="drseussp1" cloneof="drseuss">
+		<description>Dr. Seuss's Fix-Up the Mix-Up Puzzle Graphics Demo</description>
+		<year>1984</year>
+		<publisher>Coleco / CBS</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="link seuss 4-6 1 puzzler 90b3.1" size="0x2000" crc="6485a603" sha1="96652d5e5592de62474c094b507f43924ffa06d1" /> <!-- original label: LINK: Seuss 4/6 1 Puzzler 90B3 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dlair" supported="no">
 		<description>Dragon's Lair (prototype, 0416)</description>
 		<year>1984</year>
@@ -2720,6 +2720,18 @@ license:CC0
 			<dataarea name="rom" size="16384">
 				<rom name="fallguy.1" size="8192" crc="f77d3ffd" sha1="af0127d99b61df3ba98132dc98a527a8dc4a9d86" offset="0x0000" />
 				<rom name="fallguy.2" size="8192" crc="c85c0f58" sha1="bd44df9081a593dccf9cb0a87d0d2059e452bfab" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger2p" cloneof="frogger2">
+		<description>Frogger II: Threedeep! (prototype, 19840615)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="frogger ii - threeedeep (jun 15, 1984 prototype).1" size="0x2000" crc="29ae3ab6" sha1="6e77709b74cae4c8d080ad4a8aa8eaef274e7a81" offset="0x0000" />
+				<rom name="frogger ii - threeedeep (jun 15, 1984 prototype).2" size="0x2000" crc="c63c4408" sha1="d2682cd8166882935179de590c4f26d90b96ff23" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2867,6 +2879,19 @@ license:CC0
 				<rom name="spy13-chip2.bin" size="8192" crc="1aabc54a" sha1="79c8b636847ed38adb998268ba3cc29295bba3d3" offset="0x2000" />
 				<rom name="spy13-chip3.bin" size="8192" crc="bd730c9f" sha1="7ea4c43a3177a3233baaa57b401f985a390f9c35" offset="0x4000" />
 				<rom name="spy13-chip4.bin" size="8192" crc="c85c6303" sha1="64fd7eaeea489768023396f34aeff87e39065e04" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwarsp" cloneof="starwars">
+		<description>Star Wars: The Arcade Game (prototype, 19840412)</description>
+		<year>1984</year>
+		<publisher>Parker Brothers</publisher>
+		<info name="developer" value="Atari" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="star wars - the arcade game (apr 12, 1984 prototype).1" size="0x2000" crc="21174d6a" sha1="ea45736701e2cc55fec1f4f8c3839824be46be4b" offset="0x0000" />
+				<rom name="star wars - the arcade game (apr 12, 1984 prototype).2" size="0x2000" crc="93940cce" sha1="cef3d0f085a148ab5760afbe93384f8f12773770" offset="0x2000" />
 			</dataarea>
 		</part>
 	</software>

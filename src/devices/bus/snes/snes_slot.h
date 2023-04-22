@@ -177,13 +177,13 @@ public:
 	void set_scanlines(int scanlines) { m_scanlines = scanlines; }
 	void set_address(offs_t address) { m_address = address; }
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 
-	// slot interface overrides
+	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	void get_cart_type_addon(const uint8_t *ROM, uint32_t len, int &type, int &addon) const;
@@ -236,7 +236,7 @@ public:
 protected:
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override;
 
 private:

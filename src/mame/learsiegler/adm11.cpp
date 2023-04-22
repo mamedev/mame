@@ -33,6 +33,9 @@
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class adm11_state : public driver_device
 {
 public:
@@ -192,5 +195,8 @@ ROM_START(adm12)
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u35.bin", 0x0000, 0x1000, CRC(66d7bc44) SHA1(cd839839f29657207098d85900cb570285be91a6)) // HN462732-P
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, adm12, 0, 0, adm12, adm12, adm11_state, empty_init, "Lear Siegler", "ADM 12 Video Display Terminal", MACHINE_IS_SKELETON)

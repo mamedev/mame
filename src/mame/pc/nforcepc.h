@@ -190,7 +190,8 @@ class it8703f_device : public device_t, public lpcbus_device_interface
 public:
 	it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
-	virtual void set_host(int index, lpcbus_host_interface *host) override;
+	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
+	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	auto pin_reset() { return pin_reset_callback.bind(); }
@@ -326,6 +327,7 @@ private:
 	uint16_t read_serial1_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial1][index]; }
 	uint16_t read_serial2_configuration_register(int index) { return configuration_registers[LogicalDevice::Serial2][index]; }
 	uint16_t read_keyboard_configuration_register(int index) { return configuration_registers[LogicalDevice::Keyboard][index]; }
+	void assign_dma_channels();
 };
 
 DECLARE_DEVICE_TYPE(IT8703F, it8703f_device)

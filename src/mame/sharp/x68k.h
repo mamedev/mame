@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X68K_H
-#define MAME_INCLUDES_X68K_H
+#ifndef MAME_SHARP_X68K_H
+#define MAME_SHARP_X68K_H
 
 #pragma once
 
@@ -23,7 +23,7 @@
 #include "machine/8530scc.h"
 #include "machine/hd63450.h"
 #include "machine/i8255.h"
-#include "machine/mb89352.h"
+#include "machine/mb87030.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rp5c15.h"
@@ -129,7 +129,7 @@ protected:
 	bitmap_ind16 m_special;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
-	image_init_result floppy_load(floppy_image_device *dev);
+	void floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 	static void floppy_formats(format_registration &fr);
 
@@ -309,7 +309,7 @@ class x68ksupr_state : public x68k_state
 public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
-		, m_scsictrl(*this, "mb89352")
+		, m_scsictrl(*this, "scsi:7:spc")
 	{
 	}
 
@@ -344,4 +344,4 @@ protected:
 	void x68030_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_X68K_H
+#endif // MAME_SHARP_X68K_H

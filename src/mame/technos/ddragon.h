@@ -5,8 +5,8 @@
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DDRAGON_H
-#define MAME_INCLUDES_DDRAGON_H
+#ifndef MAME_TECHNOS_DDRAGON_H
+#define MAME_TECHNOS_DDRAGON_H
 
 #pragma once
 
@@ -15,6 +15,7 @@
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/msm5205.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -202,4 +203,4 @@ private:
 	void toffy_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DDRAGON_H
+#endif // MAME_TECHNOS_DDRAGON_H

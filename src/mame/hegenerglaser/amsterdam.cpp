@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering, hap
-/******************************************************************************
+/*******************************************************************************
 
 Mephisto Amsterdam (2-ROM hardware version)
 
@@ -10,7 +10,7 @@ have more RAM and a faster CPU.
 TODO:
 - waitstates, same as mephisto_glasgow.cpp
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -88,9 +88,9 @@ INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void amsterdam_state::led_w(offs_t offset, u8 data)
 {
@@ -114,9 +114,9 @@ u8 amsterdam_state::keys_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void amsterdam_state::amsterd_mem(address_map &map)
 {
@@ -145,9 +145,9 @@ void amsterdam_state::dallas32_mem(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( amsterdam )
 	PORT_START("KEY.0")
@@ -180,13 +180,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void amsterdam_state::amsterdam(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_periodic_int(FUNC(amsterdam_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterdam_state::amsterd_mem);
@@ -194,11 +194,11 @@ void amsterdam_state::amsterdam(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	MEPHISTO_DISPLAY_MODULE1(config, m_display);
 	config.set_default_layout(layout_mephisto_amsterdam);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -207,7 +207,7 @@ void amsterdam_state::dallas32(machine_config &config)
 {
 	amsterdam(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68020(config.replace(), m_maincpu, 14_MHz_XTAL);
 	m_maincpu->set_periodic_int(FUNC(amsterdam_state::irq5_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterdam_state::dallas32_mem);
@@ -215,9 +215,9 @@ void amsterdam_state::dallas32(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( amsterd )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
@@ -246,22 +246,22 @@ ROM_END
 ROM_START( roma16 )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("roma16-u.bin", 0x00000, 0x08000, CRC(111d030f) SHA1(e027f7e7018d28ab794e7730392506056809db6b) )
-	ROM_LOAD16_BYTE("roma16-l.bin", 0x00001, 0x08000, CRC(8245ddd2) SHA1(ab048b60fdc4358913a5d07b6fee863b66dd6734) )
+	ROM_LOAD16_BYTE("roma16-l.bin", 0x00001, 0x08000, CRC(736e1c8d) SHA1(3a71f9185406ab5237c912ec8563b88b01ad50e8) )
 ROM_END
 
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS          INIT          COMPANY             FULLNAME                  FLAGS */
-CONS( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000",    MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

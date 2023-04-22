@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Milton Bradley Milton
 
@@ -15,7 +15,7 @@ Hardware is an odd combination: MC6805P2 MCU, GI SP0250 speech + 2*TMC0430 GROM.
 See patent 4326710 for detailed information, except MC6805 clocked from SP0250 3.12MHz
 and GROM clocked by 3.12MHz/8=390kHz.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6805/m68705.h"
@@ -75,9 +75,9 @@ void milton_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     LED Filter
-******************************************************************************/
+*******************************************************************************/
 
 class milton_filter_device : public device_t, public device_sound_interface
 {
@@ -127,9 +127,9 @@ void milton_filter_device::sound_stream_update(sound_stream &stream, std::vector
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void milton_state::data_w(u8 data)
 {
@@ -201,9 +201,9 @@ u8 milton_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( milton )
 	PORT_START("IN.0")
@@ -249,13 +249,13 @@ INPUT_CHANGED_MEMBER(milton_state::volume_changed)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void milton_state::milton(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6805P2(config, m_maincpu, 3.12_MHz_XTAL);
 	m_maincpu->porta_w().set(FUNC(milton_state::data_w));
 	m_maincpu->porta_r().set(FUNC(milton_state::data_r));
@@ -272,7 +272,7 @@ void milton_state::milton(machine_config &config)
 
 	config.set_default_layout(layout_milton);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	SP0250(config, m_speech, 3.12_MHz_XTAL).add_route(0, m_filter, 1.0, 0);
 	MILTON_LED_FILTER(config, m_filter).add_route(0, "speaker", 1.0);
@@ -280,9 +280,9 @@ void milton_state::milton(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( milton )
 	ROM_REGION( 0x800, "maincpu", 0 )
@@ -295,9 +295,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, milton, 0,      0, milton,  milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, milton, 0,      0,      milton,  milton, milton_state, empty_init, "Milton Bradley", "Electronic Milton", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -129,6 +129,11 @@ References:
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/exorterm.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/pty.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -137,10 +142,12 @@ References:
 #include "machine/mc14411.h"
 #include "machine/m68sfdc.h"
 
-#include "bus/rs232/rs232.h"
 #include "imagedev/printer.h"
 
 #include "formats/mdos_dsk.h"
+
+
+namespace {
 
 class exorciser_state : public driver_device
 {
@@ -162,10 +169,7 @@ public:
 		, m_printer(*this, "printer")
 		, m_acia_prn(*this, "acia_prn")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "floppy0")
-		, m_floppy1(*this, "floppy1")
-		, m_floppy2(*this, "floppy2")
-		, m_floppy3(*this, "floppy3")
+		, m_floppy(*this, "floppy%u", 0U)
 	{ }
 
 	void exorciser(machine_config &config);
@@ -203,15 +207,16 @@ private:
 	required_device<printer_image_device> m_printer;
 	required_device<acia6850_device> m_acia_prn;
 	required_device<m68sfdc_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppy;
 
 	// RS232 bit rate generator clocks
 	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f3_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f7_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f8_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f9_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
 	u8 m_restart_count;
@@ -236,10 +241,6 @@ private:
 	static void exorciser_rs232_devices(device_slot_interface &device);
 
 	static void floppy_formats(format_registration &fr);
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
 };
 
 void exorciser_state::dbg_map(address_map &map)
@@ -594,7 +595,7 @@ void exorciser_state::machine_reset()
 
 	m_restart_count = 0;
 
-	m_fdc->set_floppies_4(m_floppy0, m_floppy1, m_floppy2, m_floppy3);
+	m_fdc->set_floppies_4(m_floppy[0], m_floppy[1], m_floppy[2], m_floppy[3]);
 
 	m_irq = 1;
 	m_stop_address = 0x0000;
@@ -635,11 +636,6 @@ static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
 DEVICE_INPUT_DEFAULTS_END
-
-#include "bus/rs232/exorterm.h"
-#include "bus/rs232/null_modem.h"
-#include "bus/rs232/pty.h"
-#include "bus/rs232/terminal.h"
 
 void exorciser_state::exorciser_rs232_devices(device_slot_interface &device)
 {
@@ -708,11 +704,8 @@ void exorciser_state::exorciser(machine_config &config)
 	m_fdc->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 	m_fdc->nmi_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<3>));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, mdos_floppies, "8dssd", exorciser_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mdos_floppies, "8dssd", exorciser_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy2, mdos_floppies, "8dssd", exorciser_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy3, mdos_floppies, "8dssd", exorciser_state::floppy_formats).enable_sound(true);
-
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, mdos_floppies, "8dssd", exorciser_state::floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */
@@ -804,6 +797,9 @@ ROM_START( exorciser )
 	ROMX_LOAD("exbug11.bin", 0x0000, 0x0c00, CRC(5a5db110) SHA1(14f3e14ed809f9ec30b8189e5506ed911127de34), ROM_BIOS(1))
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

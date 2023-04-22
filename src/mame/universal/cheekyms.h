@@ -5,8 +5,8 @@
     Cheeky Mouse
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CHEEKYMS_H
-#define MAME_INCLUDES_CHEEKYMS_H
+#ifndef MAME_UNIVERSAL_CHEEKYMS_H
+#define MAME_UNIVERSAL_CHEEKYMS_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	uint8_t          m_irq_mask = 0U;
 };
 
-#endif // MAME_INCLUDES_CHEEKYMS_H
+#endif // MAME_UNIVERSAL_CHEEKYMS_H

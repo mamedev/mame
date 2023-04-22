@@ -43,6 +43,8 @@
   * Cuore 1 (Italian, set 3),                                      C.M.C.,             1996.
   * Cuore 1 (Italian, set 4),                                      C.M.C.,             1996.
   * Cuore 1 (Italian, set 5),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 6),                                      C.M.C.,             1996.
+  * Cuore 1 (Italian, set 7),                                      bootleg,            1996.
   * Elephant Family (Italian, new),                                C.M.C.,             1997.
   * Elephant Family (Italian, old),                                C.M.C.,             1996.
   * Pool 10 (Italian, set 1),                                      C.M.C.,             1996.
@@ -55,6 +57,7 @@
   * Pool 10 (Italian, set 8),                                      C.M.C.,             1997.
   * Pool 10 (Italian, set 9),                                      bootleg (R.B.),     1996.
   * Pool 10 (Italian, set 10),                                     C.M.C.,             1997.
+  * Magic 10 Nevada (bootleg of Pool 10),                          bootleg (Magic),    1997.
   * New Biliard 98 (Pool 10 hack),                                 bootleg,            1998.
   * Royal (Pool 10 hack),                                          unknown,            2001.
   * Tortuga Family (Italian),                                      C.M.C.,             1997.
@@ -107,8 +110,8 @@
   * Jolly Card (Italian, blue TAB board, encrypted),               bootleg,            199?.
   * Jolly Card (Italian, encrypted bootleg, set 1),                bootleg,            1990.
   * Jolly Card (Italian, encrypted bootleg, set 2),                bootleg,            1993.
-  * Jolly Card (Italian, encrypted bootleg, set 3),                bootleg,            1993.
-  * Zabavni Karti (cyrillic, Bulgarian, encrypted),                bootleg,            1993.
+  * Jolly Card (Italian, encrypted bootleg, set 3),                bootleg (Cleco),    1993.
+  * Zabavni Karti (Bulgarian, cyrillic, encrypted),                bootleg (Cleco),    1993.
   * Pool 10 (Italian, Dino 4 hardware, encrypted),                 C.M.C.,             1997.
   * Royal Card (Italian, Dino 4 hardware, encrypted),              unknown,            1998.
   * China Town (Ver 1B, Dino4 HW),                                 unknown,            1998.
@@ -128,11 +131,12 @@
   * Gkoulit (encrypted GFX),                                       JK Amusement,       1995.
   * Reflex Cards (English, serial protected),                      TAB Austria,        1999.
   * Club Card (ver. 1.1 English),                                  Impera / Mega Tech, 199?.
-  * Royal Card (stealth with NES multigame),                       bootleg,            1991.
+  * Royal Card (stealth with NES multigame, set 1),                bootleg,            1991.
+  * Royal Card (stealth with NES multigame, set 2),                bootleg,            1991.
   * Royal Card (stealth with MSX multigame),                       bootleg,            1991.
 
 
-  Supported games: 110
+  Supported games: 116
 
 
 *****************************************************************************************
@@ -8769,7 +8773,7 @@ GAMEL( 199?, jolycdit,   jollycrd, cuoreuno, jolycdit,  funworld_state, init_tab
 GAMEL( 1990, jolycdib,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 1)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdic,   jollycrd, cuoreuno, jolycdic,  funworld_state, init_tabblue,  ROT0, "bootleg",           "Jolly Card (Italian, encrypted bootleg, set 2)",  0,                       layout_jollycrd ) // not a real TAB blue PCB
 GAMEL( 1993, jolycdii,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Jolly Card (Italian, encrypted bootleg, set 3)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
-GAMEL( 1993, jolycdcy,   jollycrd, cuoreuno, jolycdcy,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Zabavni Karti (Bulgarian, encrypted)",            0,                       layout_jollycrd )
+GAMEL( 1993, jolycdcy,   jollycrd, cuoreuno, jolycdcy,  funworld_state, init_tabblue,  ROT0, "bootleg (Cleco)",   "Zabavni Karti (Bulgarian, cyrillic, encrypted)",  0,                       layout_jollycrd ) // Cleco bootleg PCB
 
 // Dino 4 encrypted hardware...
 GAMEL( 1997, pool10e,    pool10,   cuoreuno, cuoreuno,  funworld_state, init_dino4,    ROT0, "C.M.C.",            "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )

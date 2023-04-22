@@ -27,6 +27,7 @@
  */
 
 #include "emu.h"
+#include "divtlb.h"
 #include "debug/debugcpu.h"
 #include "r4000.h"
 #include "mips3dsm.h"
@@ -237,9 +238,9 @@ void r4000_base_device::device_reset()
 	// initialize tlb mru index with identity mapping
 	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
-		m_tlb_mru[TRANSLATE_READ][i] = i;
-		m_tlb_mru[TRANSLATE_WRITE][i] = i;
-		m_tlb_mru[TRANSLATE_FETCH][i] = i;
+		m_tlb_mru[TR_READ][i] = i;
+		m_tlb_mru[TR_WRITE][i] = i;
+		m_tlb_mru[TR_FETCH][i] = i;
 	}
 
 	// initialize statistics
@@ -266,12 +267,13 @@ device_memory_interface::space_config_vector r4000_base_device::memory_space_con
 	};
 }
 
-bool r4000_base_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool r4000_base_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
+	target_space = &space(spacenum);
 	// FIXME: address truncation
 	u64 placeholder = s32(address);
 
-	translate_result const t = translate(intention, placeholder);
+	translate_result const t = translate(intention, true, placeholder);
 
 	if (t == ERROR || t == MISS)
 		return false;
@@ -1113,7 +1115,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 			u32 const iphw = CAUSE & SR & CAUSE_IPHW;
 
 			if (iphw)
-				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw));
+				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw), m_pc);
 		}
 	}
 	else
@@ -1249,7 +1251,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 		{
 			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 physical_address = ADDR(m_r[RSREG], s16(op));
-			translate_result const t = translate(TRANSLATE_READ, physical_address);
+			translate_result const t = translate(TR_READ, false, physical_address);
 			if (t == ERROR || t == MISS)
 				return;
 
@@ -1279,7 +1281,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 			// TODO: translation type for CACHE instruction? Read seems reasonable since only the tag is changing here
 			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
 			u64 physical_address = virtual_address;
-			translate_result const t = translate(TRANSLATE_READ, physical_address);
+			translate_result const t = translate(TR_READ, false, physical_address);
 			if (t == ERROR || t == MISS)
 				return;
 
@@ -3488,7 +3490,7 @@ void r4000_base_device::cp2_execute(u32 const op)
 	}
 }
 
-r4000_base_device::translate_result r4000_base_device::translate(int intention, u64 &address)
+r4000_base_device::translate_result r4000_base_device::translate(int intention, bool debug, u64 &address)
 {
 	/*
 	 * Decode the program address into one of the following ranges depending on
@@ -3642,7 +3644,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 	// address needs translation, using a combination of VPN2 and ASID
 	u64 const key = (address & (extended ? (EH_R | EH_VPN2_64) : EH_VPN2_32)) | (m_cp0[CP0_EntryHi] & EH_ASID);
 
-	unsigned *mru = m_tlb_mru[intention & TRANSLATE_TYPE_MASK];
+	unsigned *mru = m_tlb_mru[intention & device_vtlb_interface::TR_TYPE];
 	if (VERBOSE & LOG_STATS)
 		m_tlb_scans++;
 
@@ -3673,7 +3675,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 		}
 
 		// test dirty
-		if ((intention & TRANSLATE_WRITE) && !(pfn & EL_D))
+		if ((intention & TR_WRITE) && !(pfn & EL_D))
 		{
 			modify = true;
 			break;
@@ -3691,7 +3693,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 	}
 
 	// tlb miss, invalid entry, or a store to a non-dirty entry
-	if (!machine().side_effects_disabled() && !(intention & TRANSLATE_DEBUG_MASK))
+	if (!machine().side_effects_disabled() && !debug)
 	{
 		if (VERBOSE & LOG_TLB)
 		{
@@ -3702,7 +3704,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 					m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 			else
 				LOGMASKED(LOG_TLB, "tlb miss %c asid 0x%02x address 0x%016x (%s)\n",
-					mode[intention & TRANSLATE_TYPE_MASK], m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
+					mode[intention & device_vtlb_interface::TR_TYPE], m_cp0[CP0_EntryHi] & EH_ASID, address, machine().describe_context());
 		}
 
 		// load tlb exception registers
@@ -3712,9 +3714,9 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 		m_cp0[CP0_XContext] = (m_cp0[CP0_XContext] & XCONTEXT_PTEBASE) | ((address >> 31) & XCONTEXT_R) | ((address >> 9) & XCONTEXT_BADVPN2);
 
 		if (invalid || modify || (SR & SR_EXL))
-			cpu_exception(modify ? EXCEPTION_MOD : (intention & TRANSLATE_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL);
+			cpu_exception(modify ? EXCEPTION_MOD : (intention & TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL);
 		else
-			cpu_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x080 : 0x000);
+			cpu_exception((intention & TR_WRITE) ? EXCEPTION_TLBS : EXCEPTION_TLBL, extended ? 0x080 : 0x000);
 	}
 
 	return MISS;
@@ -3722,7 +3724,7 @@ r4000_base_device::translate_result r4000_base_device::translate(int intention, 
 
 void r4000_base_device::address_error(int intention, u64 const address)
 {
-	if (!machine().side_effects_disabled() && !(intention & TRANSLATE_DEBUG_MASK))
+	if (!machine().side_effects_disabled())
 	{
 		logerror("address_error 0x%016x (%s)\n", address, machine().describe_context());
 
@@ -3730,7 +3732,7 @@ void r4000_base_device::address_error(int intention, u64 const address)
 		if (!(SR & SR_EXL))
 			m_cp0[CP0_BadVAddr] = address;
 
-		cpu_exception((intention & TRANSLATE_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
+		cpu_exception((intention & TR_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
 
 		// address errors shouldn't typically occur, so a breakpoint is handy
 		machine().debug_break();
@@ -3757,16 +3759,16 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TR_READ, address);
 		return false;
 	}
 
-	translate_result const t = translate(TRANSLATE_READ, address);
+	translate_result const t = translate(TR_READ, false, address);
 
 	// address error
 	if (t == ERROR)
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TR_READ, address);
 
 		return false;
 	}
@@ -3820,16 +3822,16 @@ template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::f
 	// alignment error
 	if (address & (sizeof(T) - 1))
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TR_READ, address);
 		return false;
 	}
 
-	translate_result const t = translate(TRANSLATE_READ, address);
+	translate_result const t = translate(TR_READ, false, address);
 
 	// address error
 	if (t == ERROR)
 	{
-		address_error(TRANSLATE_READ, address);
+		address_error(TR_READ, address);
 		return false;
 	}
 
@@ -3865,16 +3867,16 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
 	{
-		address_error(TRANSLATE_WRITE, address);
+		address_error(TR_WRITE, address);
 		return false;
 	}
 
-	translate_result const t = translate(TRANSLATE_WRITE, address);
+	translate_result const t = translate(TR_WRITE, false, address);
 
 	// address error
 	if (t == ERROR)
 	{
-		address_error(TRANSLATE_WRITE, address);
+		address_error(TR_WRITE, address);
 		return false;
 	}
 
@@ -3918,17 +3920,17 @@ bool r4000_base_device::fetch(u64 address, std::function<void(u32)> &&apply)
 	// alignment error
 	if (address & 3)
 	{
-		address_error(TRANSLATE_FETCH, address);
+		address_error(TR_FETCH, address);
 
 		return false;
 	}
 
-	translate_result const t = translate(TRANSLATE_FETCH, address);
+	translate_result const t = translate(TR_FETCH, false, address);
 
 	// address error
 	if (t == ERROR)
 	{
-		address_error(TRANSLATE_FETCH, address);
+		address_error(TR_FETCH, address);
 
 		return false;
 	}

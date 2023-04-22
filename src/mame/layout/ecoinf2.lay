@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 	<element name="vfd0">
@@ -836,48 +836,13 @@ license:CC0
 		<bounds x="120" y="120" width="7" height="7"/>
 	</element>
 
-	<element name="vfd0" ref="vfd0" state="0">
-		<bounds x="17" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd1" ref="vfd0" state="0">
-		<bounds x="24" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd2" ref="vfd0" state="0">
-		<bounds x="31" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd3" ref="vfd0" state="0">
-		<bounds x="38" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd4" ref="vfd0" state="0">
-		<bounds x="45" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd5" ref="vfd0" state="0">
-		<bounds x="52" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd6" ref="vfd0" state="0">
-		<bounds x="59" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd7" ref="vfd0" state="0">
-		<bounds x="66" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd8" ref="vfd0" state="0">
-		<bounds x="73" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd9" ref="vfd0" state="0">
-		<bounds x="80" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd10" ref="vfd0" state="0">
-		<bounds x="87" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd11" ref="vfd0" state="0">
-		<bounds x="94" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd12" ref="vfd0" state="0">
-		<bounds x="101" y="280" width="7" height="10"/>
-	</element>
-	<element name="vfd13" ref="vfd0" state="0">
-		<bounds x="108" y="280" width="7" height="10"/>
-	</element>
+	<repeat count="14">
+		<param name="i" start="0" increment="1"/>
+		<param name="x" start="17" increment="7"/>
+		<element name="vfd~i~" ref="vfd0">
+			<bounds x="~x~" y="280" width="7" height="10"/>
+		</element>
+	</repeat>
 
 	<element name="sreel1" ref="SteppersReel1" state="0">
 		<bounds x="17" y="300" width="32" height="32"/>

@@ -1,0 +1,419 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.81" /></rect></element>
+
+	<element name="text_repeat">
+		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
+		<text string="REPEAT-2"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+	<element name="text_space">
+		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
+		<text string="SPACE-2"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+
+	<element name="text_start">
+		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
+		<text string="START"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+	<element name="text_select">
+		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
+		<text string="SELECT"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+	<element name="text_play">
+		<rect><color red="0.8" green="0.8" blue="0.81" /></rect>
+		<text string="PLAY-2/HIT-7"><color red="0.6" green="0.6" blue="0.6" /></text>
+	</element>
+
+	<element name="buto" defstate="0">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
+			<color red="0.9" green="0.65" blue="0.3" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
+			<color red="0.77" green="0.55" blue="0.26" />
+		</rect>
+	</element>
+	<element name="butb">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
+			<color red="0.25" green="0.25" blue="0.26" />
+		</rect>
+		<rect state="1">
+			<bounds xc="0" yc="0" width="8.5" height="8.5" />
+			<color red="0.42" green="0.42" blue="0.44" />
+		</rect>
+	</element>
+
+	<element name="mask1" defstate="0">
+		<rect state="0"><color red="0" green="0" blue="0" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+
+	<element name="mask2" defstate="0">
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.94" y="0.0" width="0.06" height="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.94" width="1.0" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="mask3" defstate="0">
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.94" y="0.0" width="0.06" height="0.06" />
+		</rect>
+		<rect state="0">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.94" width="0.06" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="mask4" defstate="0">
+		<rect state="1">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.0" width="0.06" height="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="0.06" />
+		</rect>
+	</element>
+
+	<element name="button1"><rect state="0"><color red="0.5" green="0.1" blue="1.0" /></rect></element>
+	<element name="button2"><rect state="0"><color red="1.0" green="0.75" blue="0.2" /></rect></element>
+	<element name="button3"><rect state="0"><color red="1.0" green="0.2" blue="0.8" /></rect></element>
+	<element name="button4"><rect state="0"><color red="0.1" green="0.7" blue="0.1" /></rect></element>
+	<element name="button5"><rect state="0"><color red="0.25" green="0.25" blue="1.0" /></rect></element>
+	<element name="button6"><rect state="0"><color red="0.2" green="0.9" blue="1.0" /></rect></element>
+	<element name="button7"><rect state="0"><color red="0.9" green="0.9" blue="0.2" /></rect></element>
+	<element name="button8"><rect state="0"><color red="1.0" green="0.42" blue="0.2" /></rect></element>
+	<element name="button9"><rect state="0"><color red="0.53" green="1.0" blue="0.5" /></rect></element>
+	<element name="button10"><rect state="0"><color red="1.0" green="0.23" blue="0.25" /></rect></element>
+	<element name="button11"><rect state="0"><color red="0.7" green="0.5" blue="1.0" /></rect></element>
+	<element name="button12"><rect state="0"><color red="0.66" green="0.25" blue="0.1" /></rect></element>
+
+	<element name="text_g1"><text string="ORGAN" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g2"><text string="SONG WRITER" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g3"><text string="REPEAT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g4"><text string="TORPEDO" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g5"><text string="TAG-IT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g6"><text string="ROULETTE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g7"><text string="BASEBALL" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g8"><text string="REPEAT PLUS" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g9"><text string="TREASURE HUNT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g10"><text string="COMPETE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g11"><text string="FIRE AWAY" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_g12"><text string="HIDE 'N SEEK" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<element name="text_b1"><text string="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b2"><text string="2"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b3"><text string="3"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b4"><text string="4"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b5"><text string="5"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b6"><text string="6"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b7"><text string="7"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b8"><text string="8"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b9"><text string="9"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b10"><text string="10"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b11"><text string="11"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b12"><text string="12"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="42" top="0" bottom="75" />
+
+		<element ref="white"><bounds x="0" y="0" width="42" height="6" /></element>
+		<element ref="white"><bounds x="0" y="69" width="42" height="6" /></element>
+
+		<!-- misc buttons -->
+		<element ref="buto" inputtag="IN.2" inputmask="0x01"><bounds x="12" y="2" width="2" height="2" /></element>
+		<element ref="buto" inputtag="IN.1" inputmask="0x01"><bounds x="28" y="2" width="2" height="2" /></element>
+
+		<element ref="text_repeat"><bounds x="8" y="0.2" width="10" height="1.4" /></element>
+		<element ref="text_space"><bounds x="24" y="0.2" width="10" height="1.4" /></element>
+
+		<element ref="butb" inputtag="IN.1" inputmask="0x08"><bounds x="12" y="71" width="2" height="2" /></element>
+		<element ref="butb" inputtag="IN.1" inputmask="0x04"><bounds x="20" y="71" width="2" height="2" /></element>
+		<element ref="butb" inputtag="IN.1" inputmask="0x02"><bounds x="28" y="71" width="2" height="2" /></element>
+
+		<element ref="text_start"><bounds x="8" y="73.2" width="10" height="1.4" /></element>
+		<element ref="text_select"><bounds x="16" y="73.2" width="10" height="1.4" /></element>
+		<element ref="text_play"><bounds x="24" y="73.2" width="10" height="1.4" /></element>
+
+		<!-- coloured lighted buttons -->
+		<!-- row 1 5 9 -->
+		<element ref="button1">
+			<bounds x="3" y="9" width="10" height="12" />
+		</element>
+		<element name="0.1" ref="mask1">
+			<bounds x="3" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.3" inputmask="0x08">
+			<bounds x="3" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.3" inputmask="0x08">
+			<bounds x="3" y="9" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.3" inputmask="0x08">
+			<bounds x="3" y="9" width="10" height="12" />
+		</element>
+
+		<element ref="button5">
+			<bounds x="16" y="9" width="10" height="12" />
+		</element>
+		<element name="0.5" ref="mask1">
+			<bounds x="16" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.4" inputmask="0x08">
+			<bounds x="16" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.4" inputmask="0x08">
+			<bounds x="16" y="9" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.4" inputmask="0x08">
+			<bounds x="16" y="9" width="10" height="12" />
+		</element>
+
+		<element ref="button9">
+			<bounds x="29" y="9" width="10" height="12" />
+		</element>
+		<element name="0.9" ref="mask1">
+			<bounds x="29" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="9" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="9" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.0" inputmask="0x08">
+			<bounds x="29" y="9" width="10" height="12" />
+		</element>
+
+		<!-- row 2 6 10 -->
+		<element ref="button2">
+			<bounds x="3" y="24" width="10" height="12" />
+		</element>
+		<element name="0.2" ref="mask1">
+			<bounds x="3" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.3" inputmask="0x04">
+			<bounds x="3" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.3" inputmask="0x04">
+			<bounds x="3" y="24" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.3" inputmask="0x04">
+			<bounds x="3" y="24" width="10" height="12" />
+		</element>
+
+		<element ref="button6">
+			<bounds x="16" y="24" width="10" height="12" />
+		</element>
+		<element name="0.6" ref="mask1">
+			<bounds x="16" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.4" inputmask="0x04">
+			<bounds x="16" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.4" inputmask="0x04">
+			<bounds x="16" y="24" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.4" inputmask="0x04">
+			<bounds x="16" y="24" width="10" height="12" />
+		</element>
+
+		<element ref="button10">
+			<bounds x="29" y="24" width="10" height="12" />
+		</element>
+		<element name="0.10" ref="mask1">
+			<bounds x="29" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="24" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="24" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.0" inputmask="0x04">
+			<bounds x="29" y="24" width="10" height="12" />
+		</element>
+
+		<!-- row 3 7 11 -->
+		<element ref="button3">
+			<bounds x="3" y="39" width="10" height="12" />
+		</element>
+		<element name="0.3" ref="mask1">
+			<bounds x="3" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.3" inputmask="0x02">
+			<bounds x="3" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.3" inputmask="0x02">
+			<bounds x="3" y="39" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.3" inputmask="0x02">
+			<bounds x="3" y="39" width="10" height="12" />
+		</element>
+
+		<element ref="button7">
+			<bounds x="16" y="39" width="10" height="12" />
+		</element>
+		<element name="0.7" ref="mask1">
+			<bounds x="16" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.4" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.4" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.4" inputmask="0x02">
+			<bounds x="16" y="39" width="10" height="12" />
+		</element>
+
+		<element ref="button11">
+			<bounds x="29" y="39" width="10" height="12" />
+		</element>
+		<element name="0.11" ref="mask1">
+			<bounds x="29" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.0" inputmask="0x02">
+			<bounds x="29" y="39" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.0" inputmask="0x02">
+			<bounds x="29" y="39" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.0" inputmask="0x02">
+			<bounds x="29" y="39" width="10" height="12" />
+		</element>
+
+		<!-- row 4 8 12 -->
+		<element ref="button4">
+			<bounds x="3" y="54" width="10" height="12" />
+		</element>
+		<element name="0.4" ref="mask1">
+			<bounds x="3" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.3" inputmask="0x01">
+			<bounds x="3" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.3" inputmask="0x01">
+			<bounds x="3" y="54" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.3" inputmask="0x01">
+			<bounds x="3" y="54" width="10" height="12" />
+		</element>
+
+		<element ref="button8">
+			<bounds x="16" y="54" width="10" height="12" />
+		</element>
+		<element name="0.8" ref="mask1">
+			<bounds x="16" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.4" inputmask="0x01">
+			<bounds x="16" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.4" inputmask="0x01">
+			<bounds x="16" y="54" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.4" inputmask="0x01">
+			<bounds x="16" y="54" width="10" height="12" />
+		</element>
+
+		<element ref="button12">
+			<bounds x="29" y="54" width="10" height="12" />
+		</element>
+		<element name="0.12" ref="mask1">
+			<bounds x="29" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask2" inputtag="IN.0" inputmask="0x01">
+			<bounds x="29" y="54" width="10" height="12" />
+			<color alpha="0.4" />
+		</element>
+		<element ref="mask3" inputtag="IN.0" inputmask="0x01">
+			<bounds x="29" y="54" width="10" height="12" />
+		</element>
+		<element ref="mask4" inputtag="IN.0" inputmask="0x01">
+			<bounds x="29" y="54" width="10" height="12" />
+		</element>
+
+		<!-- gamename labels -->
+		<element ref="text_g1"><bounds x="3.8" y="21.8" width="12" height="1.4" /></element>
+		<element ref="text_g5"><bounds x="16.8" y="21.8" width="12" height="1.4" /></element>
+		<element ref="text_g9"><bounds x="29.8" y="21.8" width="12" height="1.4" /></element>
+
+		<element ref="text_g2"><bounds x="3.8" y="36.8" width="12" height="1.4" /></element>
+		<element ref="text_g6"><bounds x="16.8" y="36.8" width="12" height="1.4" /></element>
+		<element ref="text_g10"><bounds x="29.8" y="36.8" width="12" height="1.4" /></element>
+
+		<element ref="text_g3"><bounds x="3.8" y="51.8" width="12" height="1.4" /></element>
+		<element ref="text_g7"><bounds x="16.8" y="51.8" width="12" height="1.4" /></element>
+		<element ref="text_g11"><bounds x="29.8" y="51.8" width="12" height="1.4" /></element>
+
+		<element ref="text_g4"><bounds x="3.8" y="66.8" width="12" height="1.4" /></element>
+		<element ref="text_g8"><bounds x="16.8" y="66.8" width="12" height="1.4" /></element>
+		<element ref="text_g12"><bounds x="29.8" y="66.8" width="12" height="1.4" /></element>
+
+		<!-- number labels -->
+		<element ref="text_b1"><bounds x="12.8" y="20.8" width="2" height="2" /></element>
+		<element ref="text_b5"><bounds x="25.8" y="20.8" width="2" height="2" /></element>
+		<element ref="text_b9"><bounds x="38.8" y="20.8" width="2" height="2" /></element>
+
+		<element ref="text_b2"><bounds x="12.8" y="35.8" width="2" height="2" /></element>
+		<element ref="text_b6"><bounds x="25.8" y="35.8" width="2" height="2" /></element>
+		<element ref="text_b10"><bounds x="38.8" y="35.8" width="2" height="2" /></element>
+
+		<element ref="text_b3"><bounds x="12.8" y="50.8" width="2" height="2" /></element>
+		<element ref="text_b7"><bounds x="25.8" y="50.8" width="2" height="2" /></element>
+		<element ref="text_b11"><bounds x="38.8" y="50.8" width="2" height="2" /></element>
+
+		<element ref="text_b4"><bounds x="12.8" y="65.8" width="2" height="2" /></element>
+		<element ref="text_b8"><bounds x="25.8" y="65.8" width="2" height="2" /></element>
+		<element ref="text_b12"><bounds x="38.8" y="65.8" width="2" height="2" /></element>
+
+	</view>
+</mamelayout>

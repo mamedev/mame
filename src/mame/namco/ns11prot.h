@@ -4,8 +4,8 @@
  * Namco System 11 Protection
  *
  */
-#ifndef MAME_MACHINE_NS11PROT_H
-#define MAME_MACHINE_NS11PROT_H
+#ifndef MAME_NAMCO_NS11PROT_H
+#define MAME_NAMCO_NS11PROT_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ public:
 
 DECLARE_DEVICE_TYPE(KEYCUS_C443, keycus_c443_device)
 
-#endif // MAME_MACHINE_NS11PROT_H
+#endif // MAME_NAMCO_NS11PROT_H

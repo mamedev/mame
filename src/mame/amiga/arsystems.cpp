@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 // arcadia_state was also defined in mess/includes/arcadia.h
 class arcadia_amiga_state : public amiga_state
 {
@@ -934,15 +936,13 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 	for (i = 0; i < 0x20000/2; i++)
 		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
-	#if 0
+	if (0)
 	{
 		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "decrypted_" + std::string(machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (i = 0; i < 0x20000; i++)
@@ -951,7 +951,6 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 			fclose(fp);
 		}
 	}
-	#endif
 }
 
 
@@ -1002,6 +1001,8 @@ void arcadia_amiga_state::init_xeon() { init_arcadia(); generic_decode("user3", 
 void arcadia_amiga_state::init_pm()   { init_arcadia(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 void arcadia_amiga_state::init_dlta() { init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
 void arcadia_amiga_state::init_argh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+
+} // anonymous namespace
 
 
 /*************************************

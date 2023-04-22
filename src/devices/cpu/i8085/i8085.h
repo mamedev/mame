@@ -91,7 +91,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 	address_space_config m_opcode_config;
@@ -131,9 +130,9 @@ private:
 	u8 lut_zs[256];
 	u8 lut_zsp[256];
 
-	virtual int extra_ret() { return 6; }
-	virtual int extra_jmp() { return 3; }
-	virtual int extra_call() { return 9; }
+	virtual int ret_taken() { return 6; }
+	virtual int jmp_taken() { return 3; }
+	virtual int call_taken() { return 9; }
 	virtual bool is_8085() { return true; }
 
 	void set_sod(int state);
@@ -182,8 +181,10 @@ protected:
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return clocks; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles; }
 
-	virtual int extra_jmp() override { return 0; }
-	virtual int extra_call() override { return 6; }
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	virtual int jmp_taken() override { return 0; }
+	virtual int call_taken() override { return 6; }
 	virtual bool is_8085() override { return false; }
 };
 

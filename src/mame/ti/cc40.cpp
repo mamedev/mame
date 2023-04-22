@@ -1,86 +1,86 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Jon Guidry
-/***************************************************************************
+/*******************************************************************************
 
-  Texas Instruments Compact Computer 40 (aka CC-40)
-  hardware family: CC-40 -> CC-40+(unreleased) -> TI-74 BASICALC -> TI-95 PROCALC
+Texas Instruments Compact Computer 40 (aka CC-40)
+hardware family: CC-40 -> CC-40+(unreleased) -> TI-74 BASICALC -> TI-95 PROCALC
 
-  ---------------------------------------------
-  | ---------------------------------------   |
-  | |                                     |   |
-  | |             LCD screen              |   |
-  | |                                     |   ---------------
-  | ---------------------------------------                 |
-  |                                                         |
-  |                                                         |
-  |                                                         |
-  |                           *HD44100H                     |
-  |       *HD44780A00                                       |
-  |                                                         |
-  |                                                         |
-  |                                                         |
-  ----|||||||||||-----------------------------|||||||||||----
-      |||||||||||                             |||||||||||
-  ----|||||||||||-----------------------------|||||||||||----
-  |                                                         |
-  |            HM6116LP-4    HM6116LP-4                     |
-  |                                                         |
-  |                                                         |
-  |             HM6116LP-4                    TMX70C20N2L   |
-  |                                      5MHz               |
-  |                             AMI 1041036-1               |
-  |             HN61256PC09                                 |
-  |                                             *Cartridge  |
-  |                                           ---------------
-  |                                           |
-  |       -------------------------------------
-  |*HEXBUS|
-  ---------
+---------------------------------------------
+| ---------------------------------------   |
+| |                                     |   |
+| |             LCD screen              |   |
+| |                                     |   ---------------
+| ---------------------------------------                 |
+|                                                         |
+|                                                         |
+|                                                         |
+|                           *HD44100H                     |
+|       *HD44780A00                                       |
+|                                                         |
+|                                                         |
+|                                                         |
+----|||||||||||-----------------------------|||||||||||----
+    |||||||||||                             |||||||||||
+----|||||||||||-----------------------------|||||||||||----
+|                                                         |
+|            HM6116LP-4    HM6116LP-4                     |
+|                                                         |
+|                                                         |
+|             HM6116LP-4                    TMX70C20N2L   |
+|                                      5MHz               |
+|                             AMI 1041036-1               |
+|             HN61256PC09                                 |
+|                                             *Cartridge  |
+|                                           ---------------
+|                                           |
+|       -------------------------------------
+|*HEXBUS|
+---------
 
-  HM6116LP-4    - Hitachi 2KB SRAM (newer 18KB version has two HM6264 8KB chips)
-  HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM (also seen with HN61256PB02, earlier version?)
-  TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz, 40 pins - "X" implies prototype
-  AMI 1041036-1 - 68-pin QFP AMI Gate Array
-  HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
-  HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller
+HM6116LP-4    - Hitachi 2KB SRAM (newer 18KB version has two HM6264 8KB chips)
+HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM (also seen with HN61256PB02, earlier version?)
+TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz, 40 pins - "X" implies prototype
+AMI 1041036-1 - 68-pin QFP AMI Gate Array
+HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
+HD44780A00    - 80-pin TFP Hitachi HD44780 LCD Controller
 
-  *             - indicates that it's on the other side of the PCB
-
-
-  CC-40 is powered by 4 AA batteries. These will also save internal RAM,
-  provided that the machine is turned off properly. If a program is running,
-  you may have to press [BREAK] before turning the CC-40 off. If RAM contents
-  ends up dodgy somehow, just delete the nvram files.
-
-  Officially, minimum total RAM size is 6KB. The system will still boot with less,
-  but don't expect all software to work properly.
-
-  To run a cartridge, usually the command RUN "DIR" shows which program(s)
-  can be loaded. Load a program by pressing the [RUN] key while viewing the list,
-  or manually with the command RUN "<shortname of program in list>"
-
-  As for the CC-40+, the product was finalized, but in the end it wasn't released.
-  The hardware is very similar to CC-40. The main differences are a TMS70C40 CPU
-  (twice larger internal ROM), and a cassette port separate from Hexbus. The
-  controller chip is a TI TP0373 this time, it appears that the basic functionality
-  is the same as the one by AMI. Like the CC-40, it had either 6KB or 18KB RAM.
-
-  The CC-40+ cassette device number is 1, eg. SAVE"1.FILENAME" to save, and
-  OLD"1.FILENAME" to load.
+*             - indicates that it's on the other side of the PCB
 
 
-  TODO:
-  - external RAM cartridge (bus_control_w cartridge memory addressing)
-  - auto clock divider on slow memory access
-  - Hexbus interface and peripherals
-    * HX-1000: color plotter
-    * HX-1010: thermal printer
-    * HX-3000: RS-232 interface
-    * HX-3100: modem
-    * HX-3200: Centronics printer interface
+CC-40 is powered by 4 AA batteries. These will also save internal RAM,
+provided that the machine is turned off properly. If a program is running,
+you may have to press [BREAK] before turning the CC-40 off. If RAM contents
+ends up dodgy somehow, just delete the nvram files.
 
-***************************************************************************/
+Officially, minimum total RAM size is 6KB. The system will still boot with less,
+but don't expect all software to work properly.
+
+To run a cartridge, usually the command RUN "DIR" shows which program(s)
+can be loaded. Load a program by pressing the [RUN] key while viewing the list,
+or manually with the command RUN "<shortname of program in list>"
+
+As for the CC-40+, the product was finalized, but in the end it wasn't released.
+The hardware is very similar to CC-40. The main differences are a TMS70C40 CPU
+(twice larger internal ROM), and a cassette port separate from Hexbus. The
+controller chip is a TI TP0373 this time, it appears that the basic functionality
+is the same as the one by AMI. Like the CC-40, it had either 6KB or 18KB RAM.
+
+The CC-40+ cassette device number is 1, eg. SAVE"1.FILENAME" to save, and
+OLD"1.FILENAME" to load.
+
+
+TODO:
+- external RAM cartridge (bus_control_w cartridge memory addressing)
+- auto clock divider on slow memory access
+- Hexbus interface and peripherals
+  * HX-1000: color plotter
+  * HX-1010: thermal printer
+  * HX-3000: RS-232 interface
+  * HX-3100: modem
+  * HX-3200: Centronics printer interface
+
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -183,36 +183,96 @@ private:
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Initialisation
+*******************************************************************************/
 
-  File Handling
-
-***************************************************************************/
-
-DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
+void cc40_state::init_sysram(int chip, u16 size)
 {
-	u32 size = m_cart->common_get_size("rom");
-
-	// max size is 4*32KB
-	if (size > 0x20000)
+	if (m_sysram[chip] == nullptr)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
-		return image_init_result::FAIL;
+		// init to largest possible
+		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
+		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
+
+		save_item(NAME(m_sysram_size[chip]), chip);
+		save_item(NAME(m_sysram_end[chip]), chip);
+		save_item(NAME(m_sysram_mask[chip]), chip);
 	}
 
-	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+	m_nvram[chip]->set_base(m_sysram[chip].get(), size);
+	m_sysram_size[chip] = size;
+}
 
-	return image_init_result::PASS;
+void cc40_state::device_post_load()
+{
+	init_sysram(0, m_sysram_size[0]);
+	init_sysram(1, m_sysram_size[1]);
+
+	update_clock_divider();
+}
+
+void cc40_state::machine_start()
+{
+	// init
+	m_segs.resolve();
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+
+	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
+	if (m_cart_rom)
+		m_cartbank->configure_entries(0, 4, m_cart_rom->base(), 0x8000);
+	else
+		m_cartbank->set_base(memregion("maincpu")->base() + 0x5000);
+
+	init_sysram(0, 0x800); // default to 6KB
+	init_sysram(1, 0x800); // "
+
+	bus_control_w(0);
+	bankswitch_w(0);
+
+	// register for savestates
+	save_item(NAME(m_bus_control));
+	save_item(NAME(m_power));
+	save_item(NAME(m_banks));
+	save_item(NAME(m_clock_control));
+	save_item(NAME(m_clock_divider));
+	save_item(NAME(m_key_select));
+}
+
+void cc40_state::machine_reset()
+{
+	m_power = 1;
+
+	update_clock_divider();
+	bankswitch_w(0);
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Cartridge
+*******************************************************************************/
 
-  Video
+DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
+{
+	u32 const size = m_cart->common_get_size("rom");
 
-***************************************************************************/
+	// max size is 4*32KB
+	if (size > 0x2'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid file size (must be no more than 128K)");
+
+	m_cart->rom_alloc(0x2'0000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // allocate a larger ROM region to have 4x32K banks
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 void cc40_state::cc40_palette(palette_device &palette) const
 {
@@ -253,11 +313,9 @@ HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
 
 
 
-/***************************************************************************
-
-  I/O, Memory Maps
-
-***************************************************************************/
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 u8 cc40_state::sysram_r(offs_t offset)
 {
@@ -407,6 +465,12 @@ void cc40_state::cass_w(u8 data)
 	m_cass->output((data & 8) ? +1.0 : -1.0);
 }
 
+
+
+/*******************************************************************************
+    Address Maps
+*******************************************************************************/
+
 void cc40_state::cc40_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -415,7 +479,7 @@ void cc40_state::cc40_map(address_map &map)
 	map(0x0111, 0x0111).rw(FUNC(cc40_state::power_r), FUNC(cc40_state::power_w));
 	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
 	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
-	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
+	map(0x0114, 0x0114).noprw(); // d1: Hexbus handshake
 	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w));
 	map(0x0116, 0x0116).portr("BATTERY");
 	map(0x0119, 0x0119).rw(FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));
@@ -436,11 +500,9 @@ void cc40_state::cc40p_map(address_map &map)
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Inputs
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
@@ -549,72 +611,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
-
-void cc40_state::machine_reset()
-{
-	m_power = 1;
-
-	update_clock_divider();
-	bankswitch_w(0);
-}
-
-void cc40_state::init_sysram(int chip, u16 size)
-{
-	if (m_sysram[chip] == nullptr)
-	{
-		// init to largest possible
-		m_sysram[chip] = std::make_unique<u8[]>(0x2000);
-		save_pointer(NAME(m_sysram[chip]), 0x2000, chip);
-
-		save_item(NAME(m_sysram_size[chip]), chip);
-		save_item(NAME(m_sysram_end[chip]), chip);
-		save_item(NAME(m_sysram_mask[chip]), chip);
-	}
-
-	m_nvram[chip]->set_base(m_sysram[chip].get(), size);
-	m_sysram_size[chip] = size;
-}
-
-void cc40_state::device_post_load()
-{
-	init_sysram(0, m_sysram_size[0]);
-	init_sysram(1, m_sysram_size[1]);
-
-	update_clock_divider();
-}
-
-void cc40_state::machine_start()
-{
-	// init
-	m_segs.resolve();
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
-	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
-	if (m_cart_rom)
-		m_cartbank->configure_entries(0, 4, m_cart_rom->base(), 0x8000);
-	else
-		m_cartbank->set_base(memregion("maincpu")->base() + 0x5000);
-
-	init_sysram(0, 0x800); // default to 6KB
-	init_sysram(1, 0x800); // "
-
-	bus_control_w(0);
-	bankswitch_w(0);
-
-	// register for savestates
-	save_item(NAME(m_bus_control));
-	save_item(NAME(m_power));
-	save_item(NAME(m_banks));
-	save_item(NAME(m_clock_control));
-	save_item(NAME(m_clock_divider));
-	save_item(NAME(m_key_select));
-}
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void cc40_state::cc40(machine_config &config)
 {
@@ -672,11 +671,9 @@ void cc40_state::cc40p(machine_config &config)
 
 
 
-/***************************************************************************
-
-  ROM Definitions
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( cc40 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -697,6 +694,11 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME               FLAGS
-COMP( 1983, cc40,  0,     0, cc40,    cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cc40p, cc40,  0, cc40p,   cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40 Plus (prototype)", MACHINE_SUPPORTS_SAVE )
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
+
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME               FLAGS
+SYST( 1983, cc40,  0,     0,      cc40,    cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, cc40p, cc40,  0,      cc40p,   cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40 Plus (prototype)", MACHINE_SUPPORTS_SAVE )

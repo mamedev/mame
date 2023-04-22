@@ -66,7 +66,8 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) = 0;
 	virtual void update(bool skip_redraw) = 0;
-	virtual void input_update() = 0;
+	virtual void input_update(bool relative_reset) = 0;
+	virtual void check_osd_inputs() = 0;
 	virtual void set_verbose(bool print_verbose) = 0;
 
 	// debugger overridables

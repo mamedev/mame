@@ -123,7 +123,6 @@
 		},
 		{
 			"effect": "lcd-grid/lcd-grid",
-			"applytint": true,
 			"name": "LCD",
 			"uniforms": [
 				{ "uniform": "u_rsubpix",   "slider": "rsubpix" },

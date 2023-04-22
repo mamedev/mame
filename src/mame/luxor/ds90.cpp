@@ -26,6 +26,9 @@
 #include "machine/z8536.h"
 #include "abc1600_v.h"
 
+
+namespace {
+
 #define MC68010_TAG  "14m"
 #define NS32081_TAG  "06o"
 #define MC68450_TAG  "11m"
@@ -47,13 +50,9 @@ public:
 		m_dmac(*this, MC68450_TAG),
 		m_cio(*this, Z8536A_TAG),
 		m_nvram(*this, NMC9306_TAG),
-		m_scc0(*this, Z8530A_0_TAG),
-		m_scc1(*this, Z8530A_1_TAG),
-		m_scc2(*this, Z8530A_2_TAG),
+		m_scc(*this, {Z8530A_0_TAG, Z8530A_1_TAG, Z8530A_2_TAG}),
 		m_fdc(*this, FD1797_TAG),
-		m_floppy0(*this, FD1797_TAG":0"),
-		m_floppy1(*this, FD1797_TAG":1"),
-		m_floppy2(*this, FD1797_TAG":2"),
+		m_floppy(*this, FD1797_TAG":%u", 0U),
 		m_sasi(*this, "sasi:7:scsicb")
 	{ }
 
@@ -65,13 +64,9 @@ private:
 	required_device<hd63450_device> m_dmac;
 	required_device<z8536_device> m_cio;
 	required_device<nmc9306_device> m_nvram;
-	required_device<scc8530_device> m_scc0;
-	required_device<scc8530_device> m_scc1;
-	required_device<scc8530_device> m_scc2;
+	required_device_array<scc8530_device, 3> m_scc;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
+	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<nscsi_callback_device> m_sasi;
 
 	virtual void machine_reset() override;
@@ -126,15 +121,15 @@ void x37_state::x37(machine_config &config)
 	NMC9306(config, m_nvram, 0);
 	E0516(config, E050_16_TAG, 32'768);
 
-	SCC8530N(config, m_scc0, 6000000);
-	SCC8530N(config, m_scc1, 6000000);
-	SCC8530N(config, m_scc2, 6000000);
+	SCC8530N(config, m_scc[0], 6000000);
+	SCC8530N(config, m_scc[1], 6000000);
+	SCC8530N(config, m_scc[2], 6000000);
 
 	FD1797(config, m_fdc, 16'000'000/16);
 
-	FLOPPY_CONNECTOR(config, FD1797_TAG":0", x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FD1797_TAG":1", x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FD1797_TAG":2", x37_floppies, "525qd", x37_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], x37_floppies, nullptr, x37_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], x37_floppies, "525qd", x37_state::floppy_formats).enable_sound(true);
 
 	NSCSI_BUS(config, "sasi");
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
@@ -164,5 +159,8 @@ ROM_START( x37 )
 	ROM_LOAD( "pat8038.04n", 0x820, 0x104, CRC(46ff5ce3) SHA1(c4a9025162b623bfcb74ac52f39de25bd53e448b) ) // DS60 PARITY GENERATION/DETECTION CONTROL
 	ROM_LOAD( "pat8039.12h", 0x924, 0x104, CRC(d3f6974f) SHA1(98dc1bac1c822fe7af0edd683acfc2e5c51f0451) ) // DS60 NS32081 FLOATING POINT PROCESSOR INTERFACE
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, x37, 0,      0,      x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

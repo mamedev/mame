@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
-#ifndef MAME_INCLUDES_PGM_H
-#define MAME_INCLUDES_PGM_H
+#ifndef MAME_IGS_PGM_H
+#define MAME_IGS_PGM_H
 
 #pragma once
 
@@ -22,7 +22,6 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-#define PGMARM7LOGERROR 0
 
 class pgm_state : public driver_device
 {
@@ -154,4 +153,4 @@ INPUT_PORTS_EXTERN(pgm);
 
 extern gfx_decode_entry const gfx_pgm[];
 
-#endif // MAME_INCLUDES_PGM_H
+#endif // MAME_IGS_PGM_H

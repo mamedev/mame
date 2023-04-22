@@ -53,6 +53,9 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_DISK11_WD2793, msx_slot_disk11_wd2793_device)
 
 class msx_slot_disk_device : public msx_slot_rom_device
 {
+public:
+	int get_nr_drives() const { return m_nr_drives; }
+
 protected:
 	static constexpr int NO_DRIVES = 0;
 	static constexpr int DRIVES_1 = 1;
@@ -62,41 +65,54 @@ protected:
 	static constexpr bool DS = true;
 	static constexpr bool SS = false;
 
-	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 
 	static void floppy_formats(format_registration &fr);
-	void add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	void add_drive_mconfig(machine_config &config, bool double_sided);
+	void set_drive_access_led_state(int drive, int led_state);
 
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
-	optional_device<floppy_connector> m_floppy2;
-	optional_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
+	optional_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_current_floppy;
+
+private:
+	output_finder<4> m_internal_drive_led;
+	output_finder<4> m_internal_drive_name;
+	int m_nr_drives;
 };
 
 
 class msx_slot_wd_disk_device : public msx_slot_disk_device
 {
+public:
+	virtual void use_motor_for_led() { }
+
 protected:
 	static constexpr bool FORCE_READY = true;
 	static constexpr bool NO_FORCE_READY = false;
 
-	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives);
 
 	virtual void device_start() override;
-	template <typename FDCType> void add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided);
+	template <typename FDCType> void add_mconfig(machine_config &config, FDCType &&type, bool force_ready, bool double_sided);
+	void set_control_led_bit(u8 control_led_bit) { m_control_led_bit = control_led_bit; }
+	u8 get_control_led_bit() const { return m_control_led_bit; }
 
 	required_device<wd_fdc_analog_device_base> m_fdc;
-	output_finder<> m_led;
+
+private:
+	u8 m_control_led_bit; // For the implementations that need it, which bit of a control write controls the LED bit.
 };
 
 
 class msx_slot_tc8566_disk_device : public msx_slot_disk_device
 {
 protected:
-	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives);
 
-	void add_mconfig(machine_config &config, int nr_of_drives);
+	void add_mconfig(machine_config &config);
+	void dor_w(u8 data);
 
 	required_device<tc8566af_device> m_fdc;
 };
@@ -104,8 +120,11 @@ protected:
 
 class msx_slot_disk1_base_device : public msx_slot_wd_disk_device
 {
+public:
+	virtual void use_motor_for_led() override { set_control_led_bit(7); }
+
 protected:
-	msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
@@ -196,8 +215,11 @@ protected:
 
 class msx_slot_disk2_base_device : public msx_slot_wd_disk_device
 {
+public:
+	virtual void use_motor_for_led() override { set_control_led_bit(3); }
+
 protected:
-	msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
@@ -271,7 +293,7 @@ public:
 	msx_slot_disk3_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 };
@@ -333,15 +355,16 @@ private:
 	void select_drive();
 	u8 side_motor_r();
 	u8 select0_r();
-	u8 select1_r();
+	u8 dskchg_r();
 	u8 status_r();
 	void side_motor_w(u8 data);
-	void select0_w(u8 data);
-	void select1_w(u8 data);
+	void select_w(u8 data);
+	void unknown_w(u8 data);
 
 	u8 m_side_motor;
-	u8 m_drive_select0;
-	u8 m_drive_select1;
+	u8 m_drive_select;
+	bool m_drive_present;
+	u8 m_unknown;
 };
 
 
@@ -372,7 +395,7 @@ public:
 	msx_slot_disk8_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -421,7 +444,7 @@ public:
 	msx_slot_disk10_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

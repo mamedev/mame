@@ -26,13 +26,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -61,7 +61,7 @@
 typedef struct
 {
     float sine[TABLE_SIZE];
-	double phase;
+    double phase;
 }
 paTestData;
 
@@ -82,20 +82,20 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     (void) timeInfo; /* Prevent unused variable warnings. */
     (void) statusFlags;
     (void) inputBuffer;
-    
+
     for( i=0; i<framesPerBuffer; i++ )
     {
         float x = data->sine[(int)data->phase];
         data->phase += 20;
         if( data->phase >= TABLE_SIZE ){
-			data->phase -= TABLE_SIZE;
-		}
+            data->phase -= TABLE_SIZE;
+        }
 
-		for( j = 0; j < CHANNEL_COUNT; ++j ){
+        for( j = 0; j < CHANNEL_COUNT; ++j ){
             *out++ = x;
-		}
-	}
-    
+        }
+    }
+
     return paContinue;
 }
 
@@ -115,12 +115,12 @@ int main(int argc, char* argv[])
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
-	deviceIndex = Pa_GetHostApiInfo( Pa_HostApiTypeIdToHostApiIndex( paDirectSound ) )->defaultOutputDevice;
-	if( argc == 2 ){
-		sscanf( argv[1], "%d", &deviceIndex );
-	}
+    deviceIndex = Pa_GetHostApiInfo( Pa_HostApiTypeIdToHostApiIndex( paDirectSound ) )->defaultOutputDevice;
+    if( argc == 2 ){
+        sscanf( argv[1], "%d", &deviceIndex );
+    }
 
-	printf( "using device id %d (%s)\n", deviceIndex, Pa_GetDeviceInfo(deviceIndex)->name );
+    printf( "using device id %d (%s)\n", deviceIndex, Pa_GetDeviceInfo(deviceIndex)->name );
 
     /* initialise sinusoidal wavetable */
     for( i=0; i<TABLE_SIZE; i++ )
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
     }
 
-	data.phase = 0;
+    data.phase = 0;
 
     outputParameters.device = deviceIndex;
     outputParameters.channelCount = CHANNEL_COUNT;
@@ -137,18 +137,18 @@ int main(int argc, char* argv[])
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     dsoundStreamInfo.size = sizeof(PaWinDirectSoundStreamInfo);
-    dsoundStreamInfo.hostApiType = paDirectSound; 
+    dsoundStreamInfo.hostApiType = paDirectSound;
     dsoundStreamInfo.version = 2;
     dsoundStreamInfo.flags = paWinDirectSoundUseLowLevelLatencyParameters;
     dsoundStreamInfo.framesPerBuffer = DSOUND_FRAMES_PER_HOST_BUFFER;
     outputParameters.hostApiSpecificStreamInfo = &dsoundStreamInfo;
-   
 
-	if( Pa_IsFormatSupported( 0, &outputParameters, SAMPLE_RATE ) == paFormatIsSupported  ){
-		printf( "Pa_IsFormatSupported reports device will support %d channels.\n", CHANNEL_COUNT );
-	}else{
-		printf( "Pa_IsFormatSupported reports device will not support %d channels.\n", CHANNEL_COUNT );
-	}
+
+    if( Pa_IsFormatSupported( 0, &outputParameters, SAMPLE_RATE ) == paFormatIsSupported  ){
+        printf( "Pa_IsFormatSupported reports device will support %d channels.\n", CHANNEL_COUNT );
+    }else{
+        printf( "Pa_IsFormatSupported reports device will not support %d channels.\n", CHANNEL_COUNT );
+    }
 
     err = Pa_OpenStream(
               &stream,
@@ -175,13 +175,12 @@ int main(int argc, char* argv[])
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;
 }
-

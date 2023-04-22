@@ -1013,7 +1013,7 @@ std::error_condition zip_file_impl::read_ecd() noexcept
 		// if we found it, fill out the data
 		if (offset >= 0)
 		{
-			osd_printf_verbose("unzip: found %s ECD\n", m_filename);
+			osd_printf_verbose("unzip: found %s ECD at %d\n", m_filename, offset);
 
 			// extract ECD info
 			ecd_reader const ecd_rd(buffer.get() + offset);

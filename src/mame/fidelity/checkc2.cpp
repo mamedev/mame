@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Checker Challenger (CR)
 
@@ -18,7 +18,7 @@ TODO:
 - according to the manual, the right digits should blink when the CPU
   opponent wants to make a double jump, but it doesn't blink on MAME
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -88,9 +88,9 @@ void cr_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void cr_state::update_display()
 {
@@ -169,9 +169,9 @@ u8 cr_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( cr )
 	PORT_START("IN.0")
@@ -201,13 +201,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void cr_state::cr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NEC_D546(config, m_maincpu, 400000); // approximation
 	m_maincpu->read_a().set(FUNC(cr_state::input_r));
 	m_maincpu->read_b().set(FUNC(cr_state::ram_r));
@@ -219,7 +219,7 @@ void cr_state::cr(machine_config &config)
 	m_maincpu->write_h().set(FUNC(cr_state::seg1_w));
 	m_maincpu->write_i().set(FUNC(cr_state::seg0_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_cr);
@@ -227,9 +227,9 @@ void cr_state::cr(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( checkc2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -240,9 +240,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE INPUT CLASS     INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, checkc2, 0,      0, cr,     cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT CLASS     INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, checkc2, 0,      0,      cr,      cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

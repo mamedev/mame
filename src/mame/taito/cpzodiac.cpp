@@ -37,6 +37,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class cpzodiac_state : public driver_device
 {
 public:
@@ -240,6 +242,8 @@ ROM_START( cpzodiacj )
 	ROM_REGION( 0x1000, "pals", 0 )
 	ROM_LOAD( "d52-02.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) ) // PAL16L8BCN
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY              FULLNAME                  FLAGS

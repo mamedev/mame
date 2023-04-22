@@ -18,8 +18,6 @@
 void cdda_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	get_audio_data(outputs[0], outputs[1]);
-	m_audio_volume[0] = outputs[0].get(0);
-	m_audio_volume[1] = outputs[1].get(0);
 }
 
 //-------------------------------------------------
@@ -41,6 +39,8 @@ void cdda_device::device_start()
 	m_audio_samples = 0;
 	m_audio_bptr = 0;
 	m_disc = nullptr;
+
+	m_audio_end_cb.resolve_safe();
 
 	save_item( NAME(m_audio_playing) );
 	save_item( NAME(m_audio_pause) );
@@ -174,8 +174,10 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 			{
 				m_audio_playing = false;
 				m_audio_ended_normally = true;
+				m_audio_end_cb(ASSERT_LINE);
 			}
 
+			m_audio_data[0] = m_audio_data[1] = 0;
 			bufL.fill(0, sampindex);
 			bufR.fill(0, sampindex);
 			return;
@@ -190,8 +192,12 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 		for (i = 0; i < samples; i++)
 		{
 			/* CD-DA data on the disc is big-endian */
-			bufL.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
-			bufR.put_int(sampindex + i, s16(big_endianize_int16( audio_cache[ m_audio_bptr ] )), 32768); m_audio_bptr++;
+			m_audio_data[0] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
+			bufL.put_int(sampindex + i, m_audio_data[0], 32768);
+			m_audio_bptr++;
+			m_audio_data[1] = s16(big_endianize_int16( audio_cache[ m_audio_bptr ] ));
+			bufR.put_int(sampindex + i, m_audio_data[1], 32768);
+			m_audio_bptr++;
 		}
 
 		sampindex += samples;
@@ -222,13 +228,16 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 }
 
 /*-------------------------------------------------
-    cdda_get_channel_volume - sets CD-DA volume level
-    for either speaker, used for volume control display
+    get_channel_sample - reads currently decoded
+    data sample on the stream.
+    Used by PC Engine CD class family for volume
+    metering on audio CD player.
 -------------------------------------------------*/
 
-int16_t cdda_device::get_channel_volume(int channel)
+int16_t cdda_device::get_channel_sample(int channel)
 {
-	return m_audio_volume[channel];
+	m_stream->update();
+	return m_audio_data[channel];
 }
 
 DEFINE_DEVICE_TYPE(CDDA, cdda_device, "cdda", "CD/DA")
@@ -238,5 +247,6 @@ cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_
 	, device_sound_interface(mconfig, *this)
 	, m_disc(nullptr)
 	, m_stream(nullptr)
+	, m_audio_end_cb(*this)
 {
 }

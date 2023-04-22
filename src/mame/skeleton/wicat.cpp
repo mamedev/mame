@@ -39,6 +39,9 @@ Wicat - various systems.
 
 #include "wicat.lh"
 
+
+namespace {
+
 class wicat_state : public driver_device
 {
 public:
@@ -59,7 +62,8 @@ public:
 		m_videosram(*this, "vsram"),
 		m_palette(*this, "palette"),
 		m_chargen(*this, "g2char"),
-		m_fdc(*this,"fdc")
+		m_fdc(*this,"fdc"),
+		m_keyboard(*this, "kb%i", 0U)
 	{
 	}
 
@@ -83,8 +87,6 @@ private:
 
 	void send_key(uint8_t val);
 
-	uint16_t invalid_r(offs_t offset);
-	void invalid_w(offs_t offset, uint16_t data);
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(adir_w);
@@ -125,6 +127,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_memory_region m_chargen;
 	required_device<fd1795_device> m_fdc;
+	required_ioport_array<8> m_keyboard;
 
 	emu_timer* m_kb_timer;
 	emu_timer* m_kb_serial_timer;
@@ -145,7 +148,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
 	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);  // UARTs
@@ -161,7 +164,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf00f00, 0xf00fff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
 void wicat_state::video_mem(address_map &map)
@@ -316,17 +319,12 @@ TIMER_CALLBACK_MEMBER(wicat_state::kb_serial_tick)
 
 TIMER_CALLBACK_MEMBER(wicat_state::poll_kb)
 {
-	uint8_t line;
 	uint8_t val = 0;
-	uint8_t x;
-	uint32_t data;
-	char kbtag[8];
 
-	for(line=0;line<8;line++)
+	for(uint8_t line=0; line<8; line++)
 	{
-		sprintf(kbtag,"kb%i",line);
-		data = ioport(kbtag)->read();
-		for(x=0;x<32;x++)
+		uint32_t data = m_keyboard[line]->read();
+		for(uint8_t x=0;x<32;x++)
 		{
 			if((data & (1<<x)) && !(m_kb_keys[line] & (1<<x)))
 			{
@@ -369,27 +367,6 @@ void wicat_state::via_b_w(uint8_t data)
 {
 	m_portB = data;
 	logerror("VIA: write %02x to port B\n",data);
-}
-
-uint16_t wicat_state::invalid_r(offs_t offset)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xff;
-}
-
-void wicat_state::invalid_w(offs_t offset, uint16_t data)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
 }
 
 // TODO
@@ -840,6 +817,8 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("wd3.u97",    0x00001, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )  // 8X300 code odd
 	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )  // "Fast IO select" bytes
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

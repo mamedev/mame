@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Sega CD / Mega CD */
-#ifndef MAME_MACHINE_MEGACD_H
-#define MAME_MACHINE_MEGACD_H
+#ifndef MAME_SEGA_MEGACD_H
+#define MAME_SEGA_MEGACD_H
 
 #pragma once
 
@@ -226,4 +226,4 @@ DECLARE_DEVICE_TYPE(SEGA_SEGACD_US,     sega_segacd_us_device)
 DECLARE_DEVICE_TYPE(SEGA_SEGACD_JAPAN,  sega_segacd_japan_device)
 DECLARE_DEVICE_TYPE(SEGA_SEGACD_EUROPE, sega_segacd_europe_device)
 
-#endif // MAME_MACHINE_MEGACD_H
+#endif // MAME_SEGA_MEGACD_H

@@ -8,14 +8,16 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2440.h"
-#include "machine/smartmed.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <cstdarg>
 
+
+namespace {
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -41,7 +43,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f1g08u0b_device> m_nand;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport m_penx;
@@ -198,7 +200,6 @@ INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 
 void mini2440_state::machine_start()
 {
-	m_nand->set_data_ptr(memregion("nand")->base());
 }
 
 void mini2440_state::machine_reset()
@@ -258,8 +259,7 @@ void mini2440_state::mini2440(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
+	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 
@@ -285,5 +285,8 @@ ROM_START( mini2440 )
 	ROM_SYSTEM_BIOS( 2, "android", "Android 1.5 (2009/05/13)" )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

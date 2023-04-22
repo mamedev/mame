@@ -48,6 +48,7 @@ h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, 
 	sci1(*this, "sci1"),
 	sci2(*this, "sci2"),
 	watchdog(*this, "watchdog"),
+	tend_cb(*this),
 	ram_start(start),
 	syscr(0)
 {
@@ -350,7 +351,14 @@ void h8s2320_device::device_add_mconfig(machine_config &config)
 
 void h8s2320_device::execute_set_input(int inputnum, int state)
 {
-	intc->set_input(inputnum, state);
+	if(inputnum == H8_INPUT_LINE_TEND0 || inputnum == H8_INPUT_LINE_TEND1) {
+		if(!tend_cb[inputnum - H8_INPUT_LINE_TEND0].isnull())
+			tend_cb[inputnum - H8_INPUT_LINE_TEND0](state);
+	}
+	else if(inputnum == H8_INPUT_LINE_DREQ0 || inputnum == H8_INPUT_LINE_DREQ1)
+		dma->set_input(inputnum, state);
+	else
+		intc->set_input(inputnum, state);
 }
 
 bool h8s2320_device::exr_in_stack() const
@@ -406,7 +414,7 @@ void h8s2320_device::update_irq_filter()
 
 void h8s2320_device::interrupt_taken()
 {
-	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
+	standard_irq_callback(intc->interrupt_taken(taken_irq_vector), NPC);
 }
 
 void h8s2320_device::internal_update(uint64_t current_time)
@@ -435,6 +443,8 @@ void h8s2320_device::device_start()
 	h8s2000_device::device_start();
 	dma_device = dma;
 	dtc_device = dtc;
+
+	tend_cb.resolve_all();
 }
 
 void h8s2320_device::device_reset()

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods,Sean Riddle,Tim Lindner
 /*****************************************************************************
 
-    6x09dasm.cpp - a 6809/6309/Konami opcode disassembler
+    a 6809/6309/Konami opcode disassembler
 
     Based on:
         6309dasm.c - a 6309 opcode disassembler
@@ -29,6 +29,8 @@
 #ifndef MAME_CPU_M6809_6X09DASM_H
 #define MAME_CPU_M6809_6X09DASM_H
 
+#include <set>
+
 #pragma once
 
 class m6x09_base_disassembler : public util::disasm_interface
@@ -37,22 +39,21 @@ protected:
 	class opcodeinfo;
 
 public:
-	// General, or 6309 only?
-	enum m6x09_instruction_level
+	// General, undocumented, or 6309 only?
+	enum m6x09_instruction_level : uint8_t
 	{
-		M6x09_GENERAL,
-		HD6309_EXCLUSIVE
+		M6x09_GENERAL = 1,
+		M6809_UNDOCUMENTED = 2,
+		HD6309_EXCLUSIVE = 4
 	};
 
-	m6x09_base_disassembler(const opcodeinfo *opcodes, size_t opcode_count, m6x09_instruction_level level)
-		: m_opcodes(opcodes, opcode_count), m_level(level)
-	{
-	}
+	m6x09_base_disassembler(const opcodeinfo *opcodes, size_t opcode_count, uint32_t level);
+
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 protected:
-	enum m6x09_addressing_mode
+	enum m6x09_addressing_mode : uint8_t
 	{
 		INH,                // Inherent
 		PSHS, PSHU,         // Push
@@ -67,33 +68,41 @@ protected:
 		IMM_RR,             // Register-to-register
 		IMM_BW,             // Bitwise operations (6309 only)
 		IMM_TFM,            // Transfer from memory (6309 only)
-		PG1,                // Switch to page 1 opcodes
-		PG2                 // Switch to page 2 opcodes
+		PG2,                // Switch to page 2 opcodes
+		PG3                 // Switch to page 3 opcodes
 	};
 
 	// Opcode structure
 	class opcodeinfo
 	{
 	public:
-		constexpr opcodeinfo(uint16_t opcode, uint8_t length, const char *name, m6x09_addressing_mode mode, m6x09_instruction_level level, unsigned flags = 0)
-			: m_opcode(opcode), m_length(length), m_mode(mode), m_level(level), m_flags(flags), m_name(name)
+		constexpr opcodeinfo(uint16_t opcode, uint8_t operand_length, const char *name, m6x09_addressing_mode mode, uint32_t level, unsigned flags = 0)
+			: m_opcode(opcode), m_operand_length(operand_length), m_mode(mode), m_level(level), m_flags(flags), m_name(name)
 		{
 		}
 
 		uint16_t opcode() const { return m_opcode; }
-		uint8_t length() const { return m_length; }
+		uint8_t operand_length() const { return m_operand_length; }
 		m6x09_addressing_mode mode() const { return m_mode; }
-		m6x09_instruction_level level() const { return m_level; }
+		uint32_t level() const { return m_level; }
 		unsigned flags() const { return m_flags; }
 		const char *name() const { return m_name; }
 
+		struct compare
+		{
+			using is_transparent = void;
+			bool operator()(opcodeinfo const& lhs, opcodeinfo const& rhs) const;
+			bool operator()(uint16_t opcode, opcodeinfo const& rhs) const;
+			bool operator()(opcodeinfo const& lhs, uint16_t opcode) const;
+		};
+
 	private:
-		uint16_t                m_opcode;       // 8-bit opcode value
-		uint8_t                 m_length;       // Opcode length in bytes
-		m6x09_addressing_mode   m_mode : 6;     // Addressing mode
-		m6x09_instruction_level m_level : 2;    // General, or 6309 only?
-		unsigned                m_flags;        // Disassembly flags
-		const char *            m_name;         // Opcode name
+		uint16_t                m_opcode;         // 8-bit opcode value
+		uint8_t                 m_operand_length; // Opcode length in bytes
+		m6x09_addressing_mode   m_mode;           // Addressing mode
+		uint8_t                 m_level;          // General, or 6309 only?
+		unsigned                m_flags;          // Disassembly flags
+		const char *            m_name;           // Opcode name
 	};
 
 	static const char *const m6x09_regs[5];
@@ -105,14 +114,16 @@ protected:
 	virtual void register_register(std::ostream &stream, uint8_t pb) = 0;
 
 private:
-	util::contiguous_sequence_wrapper<const opcodeinfo> m_opcodes;
-	m6x09_instruction_level m_level;
+	std::set<opcodeinfo, opcodeinfo::compare> m_opcodes;
+
+	uint32_t m_level;
+	uint16_t m_page;
 
 	const opcodeinfo *fetch_opcode(const data_buffer &opcodes, offs_t &p);
 
 	void assert_hd6309_exclusive()
 	{
-		if (m_level < HD6309_EXCLUSIVE)
+		if (!(m_level & HD6309_EXCLUSIVE))
 			throw false;
 	}
 };
@@ -120,7 +131,7 @@ private:
 class m6x09_disassembler : public m6x09_base_disassembler
 {
 public:
-	m6x09_disassembler(m6x09_instruction_level level, const char teregs[16][4]);
+	m6x09_disassembler(uint32_t level, const char teregs[16][4]);
 
 protected:
 	virtual void indexed(std::ostream &stream, uint8_t pb, const data_buffer &params, offs_t &p) override;

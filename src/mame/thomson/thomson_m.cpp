@@ -14,23 +14,17 @@
 #include "machine/ram.h"
 
 #define VERBOSE       0
-#define VERBOSE_IRQ   0
 #define VERBOSE_KBD   0  /* TO8 / TO9 / TO9+ keyboard */
 #define VERBOSE_BANK  0
 #define VERBOSE_VIDEO 0  /* video & lightpen */
-#define VERBOSE_IO    0  /* serial & parallel I/O */
-#define VERBOSE_MIDI  0
 
 #define PRINT(x) osd_printf_info x
 
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 #define VLOG(x) do { if (VERBOSE > 1) logerror x; } while (0)
-#define LOG_IRQ(x) do { if (VERBOSE_IRQ) logerror x; } while (0)
 #define LOG_KBD(x) do { if (VERBOSE_KBD) logerror x; } while (0)
 #define LOG_BANK(x) do { if (VERBOSE_BANK) logerror x; } while (0)
 #define LOG_VIDEO(x) do { if (VERBOSE_VIDEO) logerror x; } while (0)
-#define LOG_IO(x) do { if (VERBOSE_IO) logerror x; } while (0)
-#define LOG_MIDI(x) do { if (VERBOSE_MIDI) logerror x; } while (0)
 
 /* This set to 1 handle the .k7 files without passing through .wav */
 /* It must be set accordingly in formats/thom_cas.c */
@@ -231,18 +225,6 @@ void thomson_state::thom_irq_reset()
 
 
 
-/*
-   current IRQ usage:
-
-   line 0 => 6846 interrupt
-   line 1 => 6821 interrupts (shared for all 6821)
-   line 2 => TO8 lightpen interrupt (from gate-array)
-   line 3 => TO9 keyboard interrupt (from 6850 ACIA)
-   line 4 => MIDI interrupt (from 6850 ACIA)
-*/
-
-
-
 /* ------------ 6850 defines ------------ */
 
 #define ACIA_6850_RDRF  0x01    /* Receive data register full */
@@ -260,52 +242,49 @@ void thomson_state::thom_irq_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 {
-	int i,j;
-	uint8_t* pos = &m_cart_rom[0];
 	offs_t size;
-	char name[129];
-
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %u", size).c_str());
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread( pos, size ) != size )
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
-		}
+		if (image.fread(pos, size) != size)
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
-	for ( i = 0; i < size && pos[i] != ' '; i++ );
-	for ( i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
+	// extract name
+	int i,j;
+	char name[129];
+	for (i = 0; i < size && pos[i] != ' '; i++);
+	for (i++, j = 0; i + j < size && j < 128 && pos[i+j] >= 0x20; j++)
 		name[j] = pos[i+j];
 	name[j] = 0;
 
-	/* sanitize name */
-	for ( i = 0; name[i]; i++)
+	// sanitize name
+	for (i = 0; name[i]; i++)
 	{
 		if ( name[i] < ' ' || name[i] >= 127 )
 			name[i] = '?';
@@ -313,7 +292,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, m_thom_cart_nb_banks, size ));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -478,226 +457,6 @@ uint8_t thomson_state::to7_sys_portb_in()
 {
 	/* lightpen low */
 	return to7_lightpen_gpl( TO7_LIGHTPEN_DECAL, m_to7_lightpen_step ) & 0xff;
-}
-
-
-
-/* ------------ CC 90-232 I/O extension ------------ */
-
-/* Features:
-   - 6821 PIA
-   - serial RS232: bit-banging?
-   - parallel CENTRONICS: a printer (-prin) is emulated
-   - usable on TO7(/70), MO5(E) only; not on TO9 and higher
-
-   Note: it seems impossible to connect both a serial & a parallel device
-   because the Data Transmit Ready bit is shared in an incompatible way!
-*/
-
-DEFINE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device, "to7_io_line", "TO7 Serial source")
-
-//-------------------------------------------------
-//  to7_io_line_device - constructor
-//-------------------------------------------------
-
-to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TO7_IO_LINE, tag, owner, clock),
-	m_pia_io(*this, THOM_PIA_IO),
-	m_rs232(*this, "rs232"),
-	m_last_low(0)
-{
-}
-
-void to7_io_line_device::device_add_mconfig(machine_config &config)
-{
-	/// THIS PIO is part of CC 90-232 expansion
-	PIA6821(config, m_pia_io, 0);
-	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
-	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
-	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
-	m_pia_io->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
-	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
-	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
-
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(FUNC(to7_io_line_device::write_rxd));
-	m_rs232->cts_handler().set(FUNC(to7_io_line_device::write_cts));
-	m_rs232->dsr_handler().set(FUNC(to7_io_line_device::write_dsr));
-
-	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
-	centronics.ack_handler().set(m_pia_io, FUNC(pia6821_device::cb1_w));
-	centronics.busy_handler().set(FUNC(to7_io_line_device::write_centronics_busy));
-
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	centronics.set_output_latch(cent_data_out);
-}
-
-
-void to7_io_line_device::device_start()
-{
-	m_rs232->write_dtr(0);
-}
-
-void to7_io_line_device::porta_out(uint8_t data)
-{
-	int txd = (data >> 0) & 1;
-	int rts = (data >> 1) & 1;
-
-	LOG_IO(( "%s %f to7_io_porta_out: txd=%i, rts=%i\n",  machine().describe_context(), machine().time().as_double(), txd, rts ));
-
-	m_rs232->write_txd(txd);
-	m_rs232->write_rts(rts);
-}
-
-
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_rxd )
-{
-	m_rxd = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_dsr )
-{
-	if (!state) m_last_low = 0;
-
-	m_dsr = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_cts )
-{
-	m_pia_io->ca1_w(state);
-	m_cts = state;
-}
-
-WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
-{
-	if (!state) m_last_low = 1;
-
-	m_centronics_busy = state;
-}
-
-
-uint8_t to7_io_line_device::porta_in()
-{
-	LOG_IO(( "%s %f to7_io_porta_in: select=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), m_centronics_busy, m_cts, m_dsr, m_rxd ));
-
-	/// HACK: without high impedance we can't tell whether a device is driving a line high or if it's being pulled up.
-	/// so assume the last device to drive it low is active.
-	int dsr;
-	if (m_last_low == 0)
-		dsr = m_dsr;
-	else
-		dsr = !m_centronics_busy;
-
-	return (0x1f /* not required when converted to write_pa */) | (m_cts << 5) | (dsr << 6) | (m_rxd << 7);
-}
-
-
-
-/* ------------ RF 57-932 RS232 extension ------------ */
-
-/* Features:
-   - SY 6551 ACIA.
-   - higher transfer rates than the CC 90-232
-   - usable on all computer, including TO9 and higher
- */
-
-
-
-/* ------------  MD 90-120 MODEM extension (not functional) ------------ */
-
-/* Features:
-   - 6850 ACIA
-   - 6821 PIA
-   - asymetric 1200/ 75 bauds (reversable)
-
-   TODO!
- */
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_modem_cb )
-{
-	LOG(( "to7_modem_cb: called %i\n", state ));
-}
-
-
-
-WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
-{
-	m_to7_modem_tx = state;
-}
-
-
-WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
-void thomson_state::to7_modem_reset()
-{
-	LOG (( "to7_modem_reset called\n" ));
-	m_acia->write_rxd(0);
-	m_to7_modem_tx = 0;
-	/* pia_reset() is called in machine_reset */
-	/* acia_6850 has no reset (?) */
-}
-
-
-
-void thomson_state::to7_modem_init()
-{
-	LOG (( "to7_modem_init: MODEM not implemented!\n" ));
-	save_item(NAME(m_to7_modem_tx));
-}
-
-
-
-/* ------------  dispatch MODEM / speech extension ------------ */
-
-uint8_t thomson_state::to7_modem_mea8000_r(offs_t offset)
-{
-	if ( machine().side_effects_disabled() )
-	{
-		return 0;
-	}
-
-	if ( m_io_mconfig->read() & 1 )
-	{
-		return m_mea8000->read(offset);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 0:
-		case 1:
-			return m_acia->read(offset & 1);
-
-		default:
-			return 0;
-		}
-	}
-}
-
-
-
-void thomson_state::to7_modem_mea8000_w(offs_t offset, uint8_t data)
-{
-	if ( m_io_mconfig->read() & 1 )
-	{
-		m_mea8000->write(offset, data);
-	}
-	else
-	{
-		switch (offset)
-		{
-		case 0:
-		case 1:
-			m_acia->write(offset & 1, data);
-			break;
-		}
-	}
 }
 
 
@@ -886,61 +645,6 @@ void thomson_state::to7_game_reset()
 
 
 
-/* ------------ MIDI extension ------------ */
-
-/* IMPORTANT NOTE:
-   The following is experimental and not compiled in by default.
-   It relies on the existence of an hypothetical "character device" API able
-   to transmit bytes between the MAME driver and the outside world
-   (using, e.g., character device special files on some UNIX).
-*/
-
-/* Features an EF 6850 ACIA
-
-   MIDI protocol is a serial asynchronous protocol
-   Each 8-bit byte is transmitted as:
-   - 1 start bit
-   - 8 data bits
-   - 1 stop bits
-   320 us per transmitted byte => 31250 baud
-
-   Emulation is based on the Motorola 6850 documentation, not EF 6850.
-
-   We do not emulate the seral line but pass bytes directly between the
-   6850 registers and the MIDI device.
-*/
-
-
-uint8_t thomson_state::to7_midi_r()
-{
-	if(!machine().side_effects_disabled())
-		logerror( "to7_midi_r: not implemented\n" );
-	return 0;
-}
-
-
-
-void thomson_state::to7_midi_w(uint8_t data)
-{
-	logerror( "to7_midi_w: not implemented\n" );
-}
-
-
-
-void thomson_state::to7_midi_reset()
-{
-	logerror( "to7_midi_reset: not implemented\n" );
-}
-
-
-
-void thomson_state::to7_midi_init()
-{
-	logerror( "to7_midi_init: not implemented\n" );
-}
-
-
-
 /* ------------ init / reset ------------ */
 
 
@@ -952,11 +656,9 @@ MACHINE_RESET_MEMBER( thomson_state, to7 )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
@@ -987,11 +689,9 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -1178,11 +878,9 @@ MACHINE_RESET_MEMBER( thomson_state, to770 )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO770 );
@@ -1215,11 +913,9 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -1368,52 +1064,50 @@ void mo5_state::mo5_gatearray_w(offs_t offset, uint8_t data)
 
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 {
-	uint8_t* pos = &m_cart_rom[0];
 	uint64_t size, i;
 	int j;
-	char name[129];
 
 	if (!image.loaded_through_softlist())
 		size = image.length();
 	else
 		size = image.get_software_region_length("rom");
 
-	/* get size & number of 16-KB banks */
-	if ( size > 32 && size <= 0x04000 )
+	// get size & number of 16-KB banks
+	if (size > 32 && size <= 0x04000)
 		m_thom_cart_nb_banks = 1;
-	else if ( size == 0x08000 )
+	else if (size == 0x08000)
 		m_thom_cart_nb_banks = 2;
-	else if ( size == 0x0c000 )
+	else if (size == 0x0c000)
 		m_thom_cart_nb_banks = 3;
-	else if ( size == 0x10000 )
+	else if (size == 0x10000)
 		m_thom_cart_nb_banks = 4;
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, string_format("Invalid cartridge size %d", size).c_str());
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDLENGTH,
+				util::string_format("Invalid cartridge size %u", size));
 	}
 
+	uint8_t *const pos = &m_cart_rom[0];
 	if (!image.loaded_through_softlist())
 	{
-		if ( image.fread(pos, size ) != size )
-		{
-			image.seterror(image_error::INVALIDIMAGE, "Read error");
-			return image_init_result::FAIL;
-		}
+		if (image.fread(pos, size) != size)
+			return std::make_pair(image_error::UNSPECIFIED, "Error reading file");
 	}
 	else
 	{
 		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
-	/* extract name */
+	// extract name
 	i = size - 32;
-	while ( i < size && !pos[i] ) i++;
-	for ( j = 0; i < size && pos[i] >= 0x20; j++, i++)
+	char name[129];
+	while (i < size && !pos[i]) i++;
+	for (j = 0; i < size && pos[i] >= 0x20; j++, i++)
 		name[j] = pos[i];
 	name[j] = 0;
 
-	/* sanitize name */
+	// sanitize name
 	for ( j = 0; name[j]; j++)
 	{
 		if ( name[j] < ' ' || name[j] >= 127 ) name[j] = '?';
@@ -1421,7 +1115,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state::mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, m_thom_cart_nb_banks, (unsigned) size ));
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -1561,8 +1255,6 @@ MACHINE_RESET_MEMBER( mo5_state, mo5 )
 	/* subsystems */
 	thom_irq_reset();
 	to7_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* video */
@@ -1595,12 +1287,10 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 
 	/* subsystems */
 	to7_game_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo5_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -2504,11 +2194,9 @@ MACHINE_RESET_MEMBER( to9_state, to9 )
 	thom_irq_reset();
 	to7_game_reset();
 	to9_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* video */
 	thom_set_video_mode( THOM_VMODE_TO9 );
@@ -2543,11 +2231,9 @@ MACHINE_START_MEMBER( to9_state, to9 )
 	to7_game_init();
 	to9_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_vram = ram;
@@ -2588,7 +2274,7 @@ MACHINE_START_MEMBER( to9_state, to9 )
    PIA ports.
 
    Note: if we conform to the (scarce) documentation the CPU tend to lock
-   waitting for keyboard input.
+   waiting for keyboard input.
    The protocol documentation is pretty scarce and does not account for these
    behaviors!
    The emulation code contains many hacks (delays, timeouts, spurious
@@ -3421,8 +3107,6 @@ MACHINE_RESET_MEMBER( to9_state, to8 )
 	thom_irq_reset();
 	to7_game_reset();
 	to8_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3469,11 +3153,9 @@ MACHINE_START_MEMBER( to9_state, to8 )
 	to7_game_init();
 	to8_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -3570,8 +3252,6 @@ MACHINE_RESET_MEMBER( to9_state, to9p )
 	thom_irq_reset();
 	to7_game_reset();
 	to9_kbd_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 
 	/* gate-array */
 	m_to7_lightpen = 0;
@@ -3617,11 +3297,9 @@ MACHINE_START_MEMBER( to9_state, to9p )
 	to7_game_init();
 	to9_kbd_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xe000, 0xe7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7d0, 0xe7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xe7c0, 0xe7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -4257,8 +3935,6 @@ MACHINE_RESET_MEMBER( mo6_state, mo6 )
 	/* subsystems */
 	thom_irq_reset();
 	mo6_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* gate-array */
@@ -4301,12 +3977,10 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	/* subsystems */
 	mo6_game_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo6_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
-	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
+	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7c0, 0xa7ff);
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -4357,31 +4031,6 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 
 
 /***************************** MO5 NR *************************/
-
-
-
-/* ------------ printer ------------ */
-
-/* Unlike the TO8, TO9, TO9+, MO6, the printer has its own ports and does not
-   go through the 6821 PIA.
-*/
-
-
-uint8_t mo5nr_state::mo5nr_prn_r()
-{
-	uint8_t result = 0;
-
-	result |= m_centronics_busy << 7;
-
-	return result;
-}
-
-
-void mo5nr_state::mo5nr_prn_w(uint8_t data)
-{
-	/* TODO: understand other bits */
-	m_centronics->write_strobe(BIT(data, 3));
-}
 
 
 
@@ -4459,8 +4108,6 @@ MACHINE_RESET_MEMBER( mo5nr_state, mo5nr )
 	/* subsystems */
 	thom_irq_reset();
 	mo5nr_game_reset();
-	to7_modem_reset();
-	to7_midi_reset();
 	mo5_init_timer();
 
 	/* gate-array */
@@ -4503,14 +4150,12 @@ MACHINE_START_MEMBER( mo5nr_state, mo5nr )
 	/* subsystems */
 	mo5nr_game_init();
 	to9_palette_init();
-	to7_modem_init();
-	to7_midi_init();
 	m_mo5_periodic_timer = timer_alloc(FUNC(mo5nr_state::mo5_periodic_cb), this);
 
 	m_extension->rom_map(m_extension_view[0], 0xa000, 0xa7bf);
-	m_extension->io_map (m_extension_view[0], 0xa7d0, 0xa7df);
+	m_extension->io_map (m_extension_view[0], 0xa7c0, 0xa7ff);
 	m_extension_view[1].install_device(0xa000, 0xa7bf, *m_nanoreseau, &nanoreseau_device::rom_map );
-	m_extension_view[1].install_device(0xa7d0, 0xa7df, *m_nanoreseau, &nanoreseau_device::io_map  );
+	m_extension_view[1].install_device(0xa7c0, 0xa7ff, *m_nanoreseau, &nanoreseau_device::io_map  );
 
 	/* memory */
 	m_thom_cart_bank = 0;

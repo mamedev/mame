@@ -6,8 +6,8 @@
  *
  ******************************************/
 
-#ifndef MAME_INCLUDES_PC9801_H
-#define MAME_INCLUDES_PC9801_H
+#ifndef MAME_NEC_PC9801_H
+#define MAME_NEC_PC9801_H
 
 #pragma once
 
@@ -547,4 +547,4 @@ private:
 	void gdc_31kHz_w(offs_t offset, u8 data);
 };
 
-#endif // MAME_INCLUDES_PC9801_H
+#endif // MAME_NEC_PC9801_H

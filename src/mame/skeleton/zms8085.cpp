@@ -20,6 +20,9 @@ hardware, since no schematics or manuals have been found.
 #include "machine/clock.h"
 #include "screen.h"
 
+
+namespace {
+
 class zms8085_state : public driver_device
 {
 public:
@@ -369,5 +372,8 @@ ROM_START( zephyr )
 	ROM_REGION(0x0800, "chargen", 0)
 	ROM_LOAD( "23-066-02a.bin",  0x0000, 0x0800, CRC(d5650b6c) SHA1(e6333e59018d9904f12abb270db4ba28aeff1995) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )

@@ -5,7 +5,7 @@
  * IBM Rosetta MMU.
  *
  * Sources:
- *   - http://bitsavers.org/pdf/ibm/pc/rt/75X0232_RT_PC_Technical_Reference_Volume_1_Jun87.pdf
+ *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
  *
  * TODO:
  *   - tighten error detection/reporting
@@ -281,6 +281,15 @@ bool rosetta_device::ior(u32 address, u32 &data)
 				data = rca_r(offset - 0x1000U);
 				return true;
 			}
+			else
+			{
+				// invalid i/o address logic only applies to accesses within the mapped range
+				LOGMASKED(LOG_INVALID, "ior invalid address 0x%06x (%s)\n", address, machine().describe_context());
+				m_control[MER] |= MER_O;
+				set_mear(address, MEMORY);
+
+				return bool(m_control[TCR] & TCR_D);
+			}
 			break;
 		}
 	}
@@ -290,11 +299,8 @@ bool rosetta_device::ior(u32 address, u32 &data)
 		return true;
 	}
 
-	LOGMASKED(LOG_INVALID, "ior invalid address 0x%06x (%s)\n", address, machine().describe_context());
-	m_control[MER] |= MER_O;
-	set_mear(address, MEMORY);
-
-	return bool(m_control[TCR] & TCR_D);
+	LOGMASKED(LOG_INVALID, "ior unknown address 0x%06x (%s)\n", address, machine().describe_context());
+	return false;
 }
 
 bool rosetta_device::iow(u32 address, u32 data)
@@ -334,6 +340,16 @@ bool rosetta_device::iow(u32 address, u32 data)
 				rca_w(offset - 0x1000U, data);
 				return true;
 			}
+			else
+			{
+				// invalid i/o address logic only applies to accesses within the mapped range
+				LOGMASKED(LOG_INVALID, "iow invalid address 0x%06x data 0x%08x (%s)\n", address, data, machine().describe_context());
+				m_control[MER] |= MER_O;
+				set_mear(address, MEMORY);
+				set_pchk(true);
+
+				return true;
+			}
 			break;
 		}
 	}
@@ -343,11 +359,7 @@ bool rosetta_device::iow(u32 address, u32 data)
 		return true;
 	}
 
-	LOGMASKED(LOG_INVALID, "iow invalid address 0x%06x data 0x%08x (%s)\n", address, data, machine().describe_context());
-	m_control[MER] |= MER_O;
-	set_mear(address, MEMORY);
-	set_pchk(true);
-
+	LOGMASKED(LOG_INVALID, "iow unknown address 0x%06x data 0x%08x (%s)\n", address, data, machine().describe_context());
 	return true;
 }
 

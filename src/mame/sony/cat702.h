@@ -2,8 +2,8 @@
 // copyright-holders:smf
 /*  CAT702 security chip */
 
-#ifndef MAME_MACHINE_CAT702_H
-#define MAME_MACHINE_CAT702_H
+#ifndef MAME_SONY_CAT702_H
+#define MAME_SONY_CAT702_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 	devcb_write_line m_dataout_handler;
 };
 
-#endif // MAME_MACHINE_CAT702_H
+#endif // MAME_SONY_CAT702_H

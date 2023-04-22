@@ -651,7 +651,7 @@ bool coco_os9_impl::validate_filename(std::string_view name)
 {
 	return !is_ignored_filename(name)
 		&& name.size() <= 29
-		&& std::find_if(name.begin(), name.end(), [](const char ch) { return ch == '\0' || ch == '/' || ch >= 0x80; }) == name.end();
+		&& std::find_if(name.begin(), name.end(), [](const char ch) { return ch == '\0' || ch == '/' || (ch & 0x80); }) == name.end();
 }
 
 

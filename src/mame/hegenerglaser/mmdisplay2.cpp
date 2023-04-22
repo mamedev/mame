@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
-/**********************************************************************
+/*******************************************************************************
 
-Hegener + Glaser Mephisto Display Module for modular chesscomputers,
-the 2nd version with 2 LCD lines. The 16/32bit module also includes 8KB NVRAM,
-but that part is emulated in the driver.
+Hegener + Glaser Mephisto Display Module for modular chesscomputers, the 2nd
+version with 2 LCD lines. The 16/32bit module also includes 8KB NVRAM, but that
+part is emulated in the driver.
 
-*********************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "mmdisplay2.h"

@@ -27,6 +27,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class newton_state : public driver_device
 {
 public:
@@ -178,6 +181,9 @@ ROM_START( mp2100 )
 	ROM_REGION32_LE( 0x800000, "maincpu", 0 )
 	ROMX_LOAD( "mp2100.rom", 0x000000, 0x800000, CRC(81d5efc6) SHA1(82a191652b2689ce0e254ee11c6f43c84b5185cc), ROM_REVERSE | ROM_GROUPDWORD )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

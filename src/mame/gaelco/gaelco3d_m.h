@@ -5,8 +5,8 @@
     Gaelco 3D serial hardware
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_GAELCO3D_H
-#define MAME_MACHINE_GAELCO3D_H
+#ifndef MAME_GAELCO_GAELCO3D_M_H
+#define MAME_GAELCO_GAELCO3D_M_H
 
 #pragma once
 
@@ -105,4 +105,4 @@ private:
 
 DECLARE_DEVICE_TYPE(GAELCO_SERIAL, gaelco_serial_device)
 
-#endif // MAME_MACHINE_GAELCO3D_H
+#endif // MAME_GAELCO_GAELCO3D_M_H

@@ -26,21 +26,16 @@
       pulling TH high and reading the high nybble, suggesting that
       pulling TH low triggers acquisition.
 
-      Only a single paddle controller was released that works with
-      both Japanese and export consoles, and the Mark III has the pin
-      that became TH tied low while it's left high when reading the
-      paddle on Japanese Master Systems.  This suggests that if the
-      TH line doesn't change state for some amount of time, the
-      paddle will periodically switch between high and low nybbles.
+      Only a single model of paddle controller was released for the
+      Japanese market.  Photos show no connection to pin 7.  There
+      are a few reports of paddle controllers working on export
+      consoles, but this is not possible unless another hardware
+      revision exists.
 
 **********************************************************************/
 
 #include "emu.h"
 #include "paddle.h"
-
-//#define VERBOSE 1
-//#define LOG_OUTPUT_FUNC osd_printf_info
-#include "logmacro.h"
 
 
 namespace  {
@@ -67,31 +62,17 @@ public:
 
 	// device_sms_control_interface implementation
 	virtual u8 in_r() override;
-	virtual void out_w(u8 data, u8 mem_mask) override;
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_paddle); }
-	virtual void device_start() override;
+	virtual void device_start() override { }
 
 private:
 	TIMER_CALLBACK_MEMBER(timeout);
 
-	// time interval guessed
-	// Player 2 of Galactic Protector is the most sensitive to this timing
-	static attotime interval() { return attotime::from_hz(XTAL(10'738'635) / 3 / 100); }
-
-	// delay guessed
-	static attotime delay() { return attotime::from_msec(5); }
-
 	required_ioport m_button;
 	required_ioport m_axis;
-
-	emu_timer *m_idle_timer;
-
-	u8 m_th;
-	u8 m_nybble;
-	u8 m_data;
 };
 
 
@@ -99,78 +80,17 @@ sms_paddle_device::sms_paddle_device(machine_config const &mconfig, char const *
 	device_t(mconfig, SMS_PADDLE, tag, owner, clock),
 	device_sms_control_interface(mconfig, *this),
 	m_button(*this, "BUTTON"),
-	m_axis(*this, "PADDLE"),
-	m_idle_timer(nullptr),
-	m_th(1),
-	m_nybble(1),
-	m_data(0)
+	m_axis(*this, "PADDLE")
 {
 }
 
 
 u8 sms_paddle_device::in_r()
 {
-	LOG("%s: read %s nybble = 0x%x\n", machine().describe_context(), m_nybble ? "high" : "low", m_data & 0x0f);
-	return (m_nybble << 5) | (m_button->read() << 4) | (m_data & 0x0f);
-}
-
-
-void sms_paddle_device::out_w(u8 data, u8 mem_mask)
-{
-	u8 const th = BIT(data, 6);
-	if (th != m_th)
-	{
-		m_idle_timer->reset(delay());
-		if (!th)
-		{
-			m_nybble = 0;
-			m_data = m_axis->read();
-			LOG("%s: TH %u -> %u\n, acquire data 0x%02X", machine().describe_context(), m_th, th, m_data);
-		}
-		else if (!m_nybble)
-		{
-			m_nybble = 1;
-			m_data >>= 4;
-			LOG("%s: TH %u -> %u\n, shift data", machine().describe_context(), m_th, th);
-		}
-		else
-		{
-			LOG("%s: TH %u -> %u\n", machine().describe_context(), m_th, th);
-		}
-		m_th = th;
-	}
-}
-
-
-void sms_paddle_device::device_start()
-{
-	m_idle_timer = timer_alloc(FUNC(sms_paddle_device::timeout), this);
-
-	m_nybble = 1;
-	m_data = 0;
-
-	save_item(NAME(m_th));
-	save_item(NAME(m_nybble));
-	save_item(NAME(m_data));
-
-	m_idle_timer->adjust(delay(), 0, interval());
-}
-
-
-TIMER_CALLBACK_MEMBER(sms_paddle_device::timeout)
-{
-	if (m_nybble)
-	{
-		m_nybble = 0;
-		m_data = m_axis->read();
-		LOG("timeout: acquire data 0x%02X\n", m_data);
-	}
-	else
-	{
-		m_nybble = 1;
-		m_data >>= 4;
-		LOG("timeout: shift data\n");
-	}
+	// time interval guessed
+	// Player 2 of Galactic Protector is the most sensitive to this timing
+	uint8_t const nybble = machine().time().as_ticks(XTAL(10'738'635) / 3 / 100) & 1;
+	return (nybble << 5) | (m_button->read() << 4) | BIT(m_axis->read(), nybble ? 4 : 0, 4);
 }
 
 } // anonymous namespace

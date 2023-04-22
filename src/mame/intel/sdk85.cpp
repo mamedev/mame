@@ -54,6 +54,8 @@ Press 0 to restart.
 #include "sdk85.lh"
 
 
+namespace {
+
 class sdk85_state : public driver_device
 {
 public:
@@ -265,6 +267,9 @@ ROM_START( sdk85 )
 	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
 	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

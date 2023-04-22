@@ -38,6 +38,8 @@
 #include "layout/generic.h"
 
 
+namespace {
+
 #define EMULATE_BLITTER 0 // FIXME: code is incomplete
 
 class tmmjprd_state : public driver_device
@@ -844,6 +846,8 @@ ROM_START( tmpdoki )
 	ROM_REGION( 0x400000, "i5000snd", 0 ) /* Sound Roms */
 	ROM_LOAD( "21.bin", 0x0000000, 0x400000, CRC(bb5fa8da) SHA1(620e609b3e2524d06d58844625f186fd4682205f))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1997, tmmjprd,       0, tmmjprd, tmmjprd, tmmjprd_state, empty_init, ROT0, "Media / Sonnet", "Tokimeki Mahjong Paradise - Dear My Love",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

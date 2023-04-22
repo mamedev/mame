@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class d6800_state : public driver_device
 {
 public:
@@ -340,34 +342,31 @@ void d6800_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	u8 ch;
-	u16 quick_addr = 0x200;
-	u16 exec_addr = 0xc000;
-	u32 quick_length = image.length();
-	if (quick_length > 0xe00)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "File exceeds 3584 bytes");
-		image.message(" File exceeds 3584 bytes");
-		return image_init_result::FAIL;
-	}
+	constexpr u16 QUICK_ADDR = 0x200;
 
+	u32 const quick_length = image.length();
+	if (quick_length > 0xe00)
+		return std::make_pair(image_error::INVALIDIMAGE, "File exceeds 3584 bytes");
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (u32 i = 0; i < quick_length; i++)
 	{
+		u8 ch;
 		image.fread(&ch, 1);
-		space.write_byte(i + quick_addr, ch);
+		space.write_byte(i + QUICK_ADDR, ch);
 	}
 
+	u16 exec_addr = 0xc000;
 	if (image.is_filetype("bin"))
-		exec_addr = quick_addr;
+		exec_addr = QUICK_ADDR;
 
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
+	// display a message about the loaded quickload
+	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X", quick_length, QUICK_ADDR, QUICK_ADDR+quick_length, exec_addr);
 
 	// Start the quickload
 	m_maincpu->set_pc(exec_addr);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void d6800_state::d6800(machine_config &config)
@@ -429,6 +428,9 @@ ROM_START( d6800 )
 	ROM_SYSTEM_BIOS(2, "d2m", "Dreamsoft2m")
 	ROMX_LOAD( "d6800d2m.bin",  0x0000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
 COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_SUPPORTS_SAVE )

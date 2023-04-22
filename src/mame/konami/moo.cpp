@@ -115,19 +115,234 @@ Bucky:
 ***************************************************************************/
 
 #include "emu.h"
-#include "moo.h"
+
+#include "k053246_k053247_k055673.h"
+#include "k053251.h"
+#include "k054156_k054157_k056832.h"
+#include "k054000.h"
+#include "k054338.h"
 #include "konamipt.h"
+#include "konami_helper.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/k053252.h"
+#include "machine/k054321.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+
+namespace {
 
 #define MOO_DEBUG 0
 #define MOO_DMADELAY (100)
+
+class moo_state : public driver_device
+{
+public:
+	moo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_workram(*this, "workram"),
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_oki(*this, "oki"),
+		m_k054539(*this, "k054539"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
+		m_k056832(*this, "k056832"),
+		m_k054338(*this, "k054338"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_k054321(*this, "k054321")
+	{ }
+
+	void bucky(machine_config &config) ATTR_COLD;
+	void moo(machine_config &config) ATTR_COLD;
+	void moobl(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	/* memory pointers */
+	optional_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* video-related */
+	int         m_sprite_colorbase = 0;
+	int         m_layer_colorbase[4];
+	int         m_layerpri[3];
+	int         m_alpha_enabled = 0;
+	uint16_t      m_zmask = 0;
+
+	/* misc */
+	uint16_t      m_protram[16];
+	uint16_t      m_cur_control2 = 0;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
+	optional_device<k054539_device> m_k054539;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	optional_device<k053252_device> m_k053252;
+	required_device<k056832_device> m_k056832;
+	required_device<k054338_device> m_k054338;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	optional_device<k054321_device> m_k054321;
+
+	emu_timer *m_dmaend_timer = nullptr;
+	uint16_t control2_r();
+	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sound_irq_w(uint16_t data);
+	void sound_bankswitch_w(uint8_t data);
+	void moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void moobl_oki_bank_w(uint16_t data);
+	DECLARE_VIDEO_START(moo);
+	DECLARE_VIDEO_START(bucky);
+	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(moo_interrupt);
+	INTERRUPT_GEN_MEMBER(moobl_interrupt);
+	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void moo_objdma();
+	K056832_CB_MEMBER(tile_callback);
+	K053246_CB_MEMBER(sprite_callback);
+	void bucky_map(address_map &map);
+	void moo_map(address_map &map);
+	void moobl_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+K053246_CB_MEMBER(moo_state::sprite_callback)
+{
+	int pri = (*color & 0x03e0) >> 4;
+
+	if (pri <= m_layerpri[2])
+		*priority_mask = 0;
+	else if (pri <= m_layerpri[1])
+		*priority_mask = 0xf0;
+	else if (pri <= m_layerpri[0])
+		*priority_mask = 0xf0|0xcc;
+	else
+		*priority_mask = 0xf0|0xcc|0xaa;
+
+	*color = m_sprite_colorbase | (*color & 0x001f);
+}
+
+K056832_CB_MEMBER(moo_state::tile_callback)
+{
+	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+}
+
+VIDEO_START_MEMBER(moo_state,moo)
+{
+	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
+
+	m_alpha_enabled = 0;
+	m_zmask = 0xffff;
+
+	// other than the intro showing one blank line alignment is good through the game
+	m_k056832->set_layer_offs(0, -2 + 1, 0);
+	m_k056832->set_layer_offs(1,  2 + 1, 0);
+	m_k056832->set_layer_offs(2,  4 + 1, 0);
+	m_k056832->set_layer_offs(3,  6 + 1, 0);
+}
+
+VIDEO_START_MEMBER(moo_state,bucky)
+{
+	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
+
+	m_alpha_enabled = 0;
+	m_zmask = 0x00ff;
+
+	// Bucky doesn't chain tilemaps
+	m_k056832->set_layer_association(0);
+
+	m_k056832->set_layer_offs(0, -2, 0);
+	m_k056832->set_layer_offs(1,  2, 0);
+	m_k056832->set_layer_offs(2,  4, 0);
+	m_k056832->set_layer_offs(3,  6, 0);
+}
+
+uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int layers[3];
+	int new_colorbase, plane, dirty, alpha;
+
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	m_layer_colorbase[0] = 0x70;
+
+	if (m_k056832->get_layer_association())
+	{
+		for (plane = 1; plane < 4; plane++)
+		{
+			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+			if (m_layer_colorbase[plane] != new_colorbase)
+			{
+				m_layer_colorbase[plane] = new_colorbase;
+				m_k056832->mark_plane_dirty( plane);
+			}
+		}
+	}
+	else
+	{
+		for (dirty = 0, plane = 1; plane < 4; plane++)
+		{
+			new_colorbase = m_k053251->get_palette_index(K053251_CI[plane]);
+			if (m_layer_colorbase[plane] != new_colorbase)
+			{
+				m_layer_colorbase[plane] = new_colorbase;
+				dirty = 1;
+			}
+		}
+		if (dirty)
+			m_k056832->mark_all_tilemaps_dirty();
+	}
+
+	layers[0] = 1;
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
+	layers[1] = 2;
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
+	layers[2] = 3;
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+
+	konami_sortlayers3(layers, m_layerpri);
+
+	m_k054338->update_all_shadows(0, *m_palette);
+	m_k054338->fill_solid_bg(bitmap, cliprect);
+
+	screen.priority().fill(0, cliprect);
+
+	if (m_layerpri[0] < m_k053251->get_priority(k053251_device::CI1))   /* bucky hides back layer behind background */
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[0], 0, 1);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[1], 0, 2);
+
+	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
+	// There is probably a control bit somewhere to turn off alpha blending.
+	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
+
+	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) : 255;
+
+	if (alpha > 0)
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);
+
+	m_k053246->k053247_sprites_draw( bitmap, cliprect);
+
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	return 0;
+}
 
 
 uint16_t moo_state::control2_r()
@@ -464,7 +679,7 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(moo_state,moo)
+void moo_state::machine_start()
 {
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
@@ -476,7 +691,7 @@ MACHINE_START_MEMBER(moo_state,moo)
 	m_dmaend_timer = timer_alloc(FUNC(moo_state::dmaend_callback), this);
 }
 
-MACHINE_RESET_MEMBER(moo_state,moo)
+void moo_state::machine_reset()
 {
 	int i;
 
@@ -503,9 +718,6 @@ void moo_state::moo(machine_config &config)
 
 	Z80(config, m_soundcpu, XTAL(32'000'000)/4); // 8MHz verified
 	m_soundcpu->set_addrmap(AS_PROGRAM, &moo_state::sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
-	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -560,9 +772,6 @@ void moo_state::moobl(machine_config &config)
 	M68000(config, m_maincpu, 16100000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &moo_state::moobl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(moo_state::moobl_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
-	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
@@ -1031,6 +1240,8 @@ ROM_START( moomesabl )
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "moo.nv", 0x0000, 0x080, CRC(7bd904a8) SHA1(8747c5c62d1832e290be8ace73c61b1f228c0bec) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1992, moomesa,    0,       moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

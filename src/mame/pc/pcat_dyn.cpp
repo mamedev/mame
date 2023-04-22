@@ -25,7 +25,6 @@ If the output isn't satisfactory, it prints "I/O BOARD FAILURE".
 #include "pcshare.h"
 
 #include "cpu/i386/i386.h"
-#include "machine/bankdev.h"
 #include "machine/ds128x.h"
 #include "machine/ins8250.h"
 #include "machine/nvram.h"

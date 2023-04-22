@@ -65,6 +65,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class easy_karaoke_state : public driver_device
 {
 public:
@@ -120,12 +123,12 @@ void easy_karaoke_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 static INPUT_PORTS_START( easy_karaoke )
@@ -174,5 +177,8 @@ ROM_START( easykara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2004, easykara,      0,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies", "Easy Karaoke Groove Station", MACHINE_IS_SKELETON )

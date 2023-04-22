@@ -39,6 +39,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class c2_color_state : public driver_device
 {
 public:
@@ -97,12 +100,12 @@ void c2_color_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(c2_color_state::cart_load)
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 u8 c2_color_state::cart_r(offs_t offset)
@@ -179,6 +182,9 @@ ROM_START( c2color )
 	ROM_REGION( 0x400000, "spi2", ROMREGION_ERASEFF )
 	ROM_LOAD( "spi.u16", 0x000000, 0x400000, CRC(9101b02a) SHA1(8c31e7641f4667bd8d5d7cc991cd5976828a0628) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 201?, c2color,      0,       0,      c2_color,   c2_color, c2_color_state, empty_init, "Baiyi Animation", "C2 Color (China)", MACHINE_IS_SKELETON )

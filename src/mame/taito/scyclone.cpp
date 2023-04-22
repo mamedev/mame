@@ -51,6 +51,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class scyclone_state : public driver_device
 {
 public:
@@ -684,5 +686,8 @@ ROM_START( scyclone )
 	ROM_LOAD( "de16.4a.82s123", 0x0000, 0x0020, CRC(5178e9c5) SHA1(dd2f81894069282f37feae21c5cfacf50f77dcd5) )
 	ROM_LOAD( "de17.2e.82s123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state, empty_init, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

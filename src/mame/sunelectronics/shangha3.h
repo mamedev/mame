@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_SHANGHA3_H
-#define MAME_INCLUDES_SHANGHA3_H
+#ifndef MAME_SUNELECTRONICS_SHANGHA3_H
+#define MAME_SUNELECTRONICS_SHANGHA3_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ private:
 	void shangha3_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SHANGHA3_H
+#endif // MAME_SUNELECTRONICS_SHANGHA3_H

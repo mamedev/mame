@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Red Corsair */
+// Red Corsair
 
-/* skeleton driver */
+// skeleton driver
 /* This driver is not being worked on by the original author.
    Somebody will probably need to do extensive research on the
    PCB to establish what the custom block actually contains,
@@ -56,11 +56,19 @@ Notes added 2014-09-10:
 
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
+
+namespace {
 
 class rcorsair_state : public driver_device
 {
@@ -73,19 +81,20 @@ public:
 
 	void rcorsair(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void video_start() override;
+
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void rcorsair_main_map(address_map &map);
 	void rcorsair_sub_io_map(address_map &map);
 	void rcorsair_sub_map(address_map &map);
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
-
-	// driver_device overrides
-	virtual void video_start() override;
 };
 
 
@@ -158,8 +167,7 @@ uint32_t rcorsair_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void rcorsair_state::rcorsair(machine_config &config)
 {
-	/* Main CPU is probably inside Custom Block with
-	   program code, unknown type */
+	// Main CPU is probably inside Custom Block with program code, unknown type
 
 	Z80(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_main_map);
@@ -168,6 +176,8 @@ void rcorsair_state::rcorsair(machine_config &config)
 	I8035(config, m_subcpu, 8000000);
 	m_subcpu->set_addrmap(AS_PROGRAM, &rcorsair_state::rcorsair_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &rcorsair_state::rcorsair_sub_io_map);
+
+	I8255(config, "ppi");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -179,6 +189,14 @@ void rcorsair_state::rcorsair(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rcorsair);
 	PALETTE(config, "palette").set_entries(0x100);
+
+	HD6845S(config, "crtc", 8000000 / 8).set_screen("screen");
+
+	SPEAKER(config, "speaker").front_center();
+
+	AY8910(config, "ay1", 8000000 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+
+	AY8910(config, "ay2", 8000000 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 ROM_START( rcorsair )
@@ -190,7 +208,7 @@ ROM_START( rcorsair )
 	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "rcs_6d.bin", 0x00000, 0x2000, CRC(b7f34f91) SHA1(16d5ed6a60db09f04727be8500c1c8c869281a8a) ) // sound code? (or part of the game code?)
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* there looks to be a slight scramble per tile, probably simle address xor */
+	ROM_REGION( 0x6000, "gfx1", 0 ) // there looks to be a slight scramble per tile, probably simple address XOR
 	ROM_LOAD( "rcd2_2b.bin", 0x0000, 0x2000, CRC(d52b39f1) SHA1(20ce812fb4a9157d7c1d45902645695f0dd84add) )
 	ROM_LOAD( "rcd1_2c.bin", 0x2000, 0x2000, CRC(9ec5dd51) SHA1(84939799f64d9d3e9a67b51046dd0c3403904d97) )
 	ROM_LOAD( "rcd0_2d.bin", 0x4000, 0x2000, CRC(b86fe547) SHA1(30dc51f65d2bd807d2498829087ba1a8eaa2e146) )
@@ -199,6 +217,8 @@ ROM_START( rcorsair )
 	ROM_LOAD( "prom_3d.bin", 0x00000, 0x100, CRC(fd8bc85b) SHA1(79324a6cecea652bc920ec762e7a30044003ed3f) ) // ?
 	ROM_LOAD( "prom_3c.bin", 0x00000, 0x100, CRC(edca1d4a) SHA1(a5ff659cffcd09cc161960da8f5cdd234e0db92c) ) // ?
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, rcorsair,  0,    rcorsair, inports, rcorsair_state, empty_init, ROT90, "Nakasawa", "Red Corsair", MACHINE_IS_SKELETON )

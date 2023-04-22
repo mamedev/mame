@@ -66,9 +66,10 @@ void device_memory_interface::set_addrmap(int spacenum, address_map_constructor 
 //  translation is supported
 //-------------------------------------------------
 
-bool device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address)
+bool device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	// by default it maps directly
+	target_space = &space(spacenum);
 	return true;
 }
 

@@ -224,6 +224,8 @@
 #include "mgames.lh"
 
 
+namespace {
+
 class mgames_state : public driver_device
 {
 public:
@@ -683,6 +685,8 @@ ROM_START( mgames )
 	ROM_LOAD( "u66_cgm2_mk2716j.bin", 0x1000, 0x0800, CRC(3b6b98d3) SHA1(9fc1d9d61d67ad696750c21ef9a19968ddb0a9e1) )
 	ROM_LOAD( "u65_cgm3_mk2716j.bin", 0x1800, 0x0800, CRC(d61ae9d1) SHA1(219123518999fc925397db4f442ac444dfddffbe) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

@@ -453,7 +453,7 @@ ROM_START( pasopia )
 	ROM_LOAD( "tbasic.rom", 0x0000, 0x8000, CRC(f53774ff) SHA1(bbec45a3bad8d184505cc6fe1f6e2e60a7fb53f2))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
-	ROM_LOAD( "font.rom", 0x0000, 0x0800, BAD_DUMP CRC(a91c45a9) SHA1(a472adf791b9bac3dfa6437662e1a9e94a88b412)) //stolen from pasopia7
+	ROM_LOAD( "5t_2716.ic79", 0x0000, 0x0800, CRC(b5693720) SHA1(d25327dfaa40b0f4144698e3bad43125fd8e46d0))
 ROM_END
 
 /* Driver */

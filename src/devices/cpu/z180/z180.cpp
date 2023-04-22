@@ -15,6 +15,32 @@
           work. Currently, only timers are implemented. Ideally, the
           burn_cycles routine would go away and halt processing be
           implemented in cpu_execute.
+
+        - Documentation for RXS/CTS1 pin is contradictory.
+
+          From page 12:
+          "During RESET, this pin is initialized as RXS pin. If CTS1E
+          bit in ASCI status register ch1 (STAT1) is set to 1, CTS1
+          function is selected.  If CTS1E bit is set to 0, RXS function
+          is selected."
+
+          However, there is no CTS1E bit in the ASCI status register.
+
+          From pages 43-44:
+          "CTS/PS: Clear to Send/Prescale (bit 5)—If bit 5 of the System
+          Configuration Register is 0, the CTS0/RxS pin features the
+          CTS0 function, and the state of the pin can be read in bit 5
+          of CNTLB0 in a real-time, positive-logic fashion (HIGH = 1 ,
+          LOW = 0).  If bit 5 in the System Configuration Register is 0
+          to auto-enable CTS0, and the pin is negated (High), the TDRE
+          bit is inhibited (forced to 0).  Bit 5 of CNTLB1 reads back as
+          0."
+
+          This contradicts everything else in the documentation as it
+          implies RXS shares a pin with CTS0 (rather than CTS1)
+
+          For now, the input is always sent to both RXS and CTS1.
+
  *****************************************************************************/
 
 /*****************************************************************************
@@ -94,12 +120,12 @@ z180_device::z180_device(const machine_config &mconfig, device_type type, const 
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_decrypted_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 20, 0, 16, 12, internal_map)
 	, m_asci(*this, "asci_%u", 0U)
+	, m_csio(*this, "csio")
 	, m_extended_io(extended_io)
 	, m_tend0_cb(*this)
 	, m_tend1_cb(*this)
 {
 	// some arbitrary initial values
-	m_csio_trdr = 0;
 	m_tmdr[0].w = m_tmdr[1].w = 0;
 	m_rldr[0].w = m_rldr[1].w = 0xffff;
 	m_dma_sar0.d = 0;
@@ -235,15 +261,6 @@ bool z180_device::get_tend1()
 #define _HY     m_IY.b.h
 #define _LY     m_IY.b.l
 
-
-/* 0a CSI/O control/status register (EF is read-only) */
-#define Z180_CNTR_EF            0x80
-#define Z180_CNTR_EIE           0x40
-#define Z180_CNTR_RE            0x20
-#define Z180_CNTR_TE            0x10
-#define Z180_CNTR_SS            0x07
-
-#define Z180_CNTR_MASK          0xf7
 
 /* 10 TIMER control register (TIF1 and TIF0 are read-only) */
 #define Z180_TCR_TIF1           0x80
@@ -450,13 +467,11 @@ uint8_t z180_device::z180_internal_port_read(uint8_t port)
 		break;
 
 	case 0x0a:
-		data = m_csio_cntr | ~Z180_CNTR_MASK;
-		LOG("Z180 CNTR   rd $%02x ($%02x)\n", data, m_csio_cntr);
+		data = m_csio->cntr_r();
 		break;
 
 	case 0x0b:
-		data = m_csio_trdr;
-		LOG("Z180 TRDR   rd $%02x\n", data);
+		data = m_csio->trdr_r();
 		break;
 
 	case 0x0c:
@@ -788,14 +803,11 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 		break;
 
 	case 0x0a:
-		// Inhibit setting up TE & RE flags due to the lack of CSIO implementation
-		LOG("Z180 CNTR   wr $%02x ($%02x)\n", data,  data & ~(Z180_CNTR_EF | Z180_CNTR_RE | Z180_CNTR_TE));
-		m_csio_cntr = (m_csio_cntr & (Z180_CNTR_EF | Z180_CNTR_RE | Z180_CNTR_TE)) | (data & ~(Z180_CNTR_EF | Z180_CNTR_RE | Z180_CNTR_TE));
+		m_csio->cntr_w(data);
 		break;
 
 	case 0x0b:
-		LOG("Z180 TRDR   wr $%02x\n", data);
-		m_csio_trdr = data;
+		m_csio->trdr_w(data);
 		break;
 
 	case 0x0c:
@@ -1566,8 +1578,7 @@ void z180_device::device_start()
 
 		m_asci[0]->state_add(*this);
 		m_asci[1]->state_add(*this);
-		state_add(Z180_CNTR,       "CNTR",      m_csio_cntr).mask(Z180_CNTR_MASK);
-		state_add(Z180_TRDR,       "TRDR",      m_csio_trdr);
+		m_csio->state_add(*this);
 
 		state_add(Z180_TMDR0,      "TMDR0",     m_tmdr_value[0]);
 		state_add(Z180_RLDR0,      "RLDR0",     m_rldr[0].w);
@@ -1627,8 +1638,6 @@ void z180_device::device_start()
 	save_item(NAME(m_tmdrh));
 	save_item(NAME(m_tmdr_latch));
 
-	save_item(NAME(m_csio_cntr));
-	save_item(NAME(m_csio_trdr));
 	save_item(NAME(m_tmdr[0].w));
 	save_item(NAME(m_tmdr[1].w));
 	save_item(NAME(m_rldr[0].w));
@@ -1727,7 +1736,6 @@ void z180_device::device_reset()
 	m_frc_prescale = 0;
 
 	/* reset io registers */
-	m_csio_cntr = 0x07;
 	m_tcr = 0x00;
 	m_dma_iar1.b.h2 = 0x00;
 	m_dstat = Z180_DSTAT_DWE1 | Z180_DSTAT_DWE0;
@@ -1750,6 +1758,8 @@ void z180_device::device_add_mconfig(machine_config &config)
 	Z180ASCI_CHANNEL_0(config, m_asci[0], DERIVED_CLOCK(1,2));
 
 	Z180ASCI_CHANNEL_1(config, m_asci[1], DERIVED_CLOCK(1,2));
+
+	Z180CSIO(config, m_csio, DERIVED_CLOCK(1,2));
 }
 
 void z8s180_device::device_add_mconfig(machine_config &config)
@@ -1757,6 +1767,8 @@ void z8s180_device::device_add_mconfig(machine_config &config)
 	Z180ASCI_EXT_CHANNEL_0(config, m_asci[0], DERIVED_CLOCK(1,2));
 
 	Z180ASCI_EXT_CHANNEL_1(config, m_asci[1], DERIVED_CLOCK(1,2));
+
+	Z180CSIO(config, m_csio, DERIVED_CLOCK(1,2));
 }
 
 void z8s180_device::device_reset()
@@ -1770,8 +1782,10 @@ void z8s180_device::device_reset()
 
 void z8s180_device::device_clock_changed()
 {
-	m_asci[0]->set_clock((m_cmr & 0x80) ? DERIVED_CLOCK(2,1) : (m_ccr & 0x80) ? DERIVED_CLOCK(1,1) : DERIVED_CLOCK(1,2));
-	m_asci[1]->set_clock((m_cmr & 0x80) ? DERIVED_CLOCK(2,1) : (m_ccr & 0x80) ? DERIVED_CLOCK(1,1) : DERIVED_CLOCK(1,2));
+	auto const rate = (m_cmr & 0x80) ? DERIVED_CLOCK(2,1) : (m_ccr & 0x80) ? DERIVED_CLOCK(1,1) : DERIVED_CLOCK(1,2);
+	m_asci[0]->set_clock(rate);
+	m_asci[1]->set_clock(rate);
+	m_csio->set_clock(rate);
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
@@ -1818,9 +1832,6 @@ void z180_device::clock_timers()
 
 int z180_device::check_interrupts()
 {
-	int i;
-	int cycles = 0;
-
 	/* check for IRQs before each instruction */
 	if (m_IFF1 && !m_after_EI)
 	{
@@ -1833,19 +1844,26 @@ int z180_device::check_interrupts()
 		if (m_irq_state[2] != CLEAR_LINE && (m_itc & Z180_ITC_ITE2) == Z180_ITC_ITE2)
 			m_int_pending[Z180_INT_IRQ2] = 1;
 
+		m_int_pending[Z180_INT_CSIO] = m_csio->check_interrupt();
 		m_int_pending[Z180_INT_ASCI0] = m_asci[0]->check_interrupt();
 		m_int_pending[Z180_INT_ASCI1] = m_asci[1]->check_interrupt();
 	}
 
-	for (i = 0; i <= Z180_INT_MAX; i++)
+	int cycles = 0;
+	for (int i = 0; i <= Z180_INT_MAX; i++)
+	{
 		if (m_int_pending[i])
 		{
 			cycles += take_interrupt(i);
 			m_int_pending[i] = 0;
-			if (i == Z180_INT_ASCI0) m_asci[0]->clear_interrupt();
-			if (i == Z180_INT_ASCI1) m_asci[1]->clear_interrupt();
+			switch (i)
+			{
+			case Z180_INT_ASCI0: m_asci[0]->clear_interrupt(); break;
+			case Z180_INT_ASCI1: m_asci[1]->clear_interrupt(); break;
+			}
 			break;
 		}
+	}
 
 	return cycles;
 }
@@ -2056,12 +2074,13 @@ void z180_device::execute_set_input(int irqline, int state)
 }
 
 /* logical to physical address translation */
-bool z180_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool z180_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
 {
 	if (spacenum == AS_PROGRAM)
 	{
 		address = MMU_REMAP_ADDR(address);
 	}
+	target_space = &space(spacenum);
 	return true;
 }
 

@@ -13,10 +13,10 @@
 //  MACROS
 //**************************************************************************
 
-#define LOG_SETUP    (1 << 1U)
-#define LOG_CTL_READ (1 << 2U)
-#define LOG_CA1      (1 << 3U)
-#define LOG_CB1      (1 << 4U)
+#define LOG_SETUP    (1U << 1)
+#define LOG_CTL_READ (1U << 2)
+#define LOG_CA1      (1U << 3)
+#define LOG_CB1      (1U << 4)
 
 //#define VERBOSE (LOG_SETUP | LOG_GENERAL | LOG_CA1)
 //#define LOG_OUTPUT_STREAM std::cout

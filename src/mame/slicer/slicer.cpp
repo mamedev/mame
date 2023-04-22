@@ -15,6 +15,9 @@
 #include "bus/isa/isa.h"
 #include "bus/scsi/scsi.h"
 
+
+namespace {
+
 class slicer_state : public driver_device
 {
 public:
@@ -164,5 +167,8 @@ ROM_START( slicer )
 	ROM_LOAD( "slvid_o.bin",  0x000000, 0x001000, CRC(c62dda77) SHA1(1d0b9abc53412b0725072d4c33c478fb5358ab5c) )
 	ROM_LOAD( "slvid_e.bin",  0x000000, 0x001000, CRC(8694274f) SHA1(8373baaea8d689bf52699b587942a57f26baf740) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, slicer, 0, 0, slicer, 0, slicer_state, empty_init, "Slicer Computers", "Slicer", MACHINE_NO_SOUND )

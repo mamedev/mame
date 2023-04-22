@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard, Berger
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Chesster Challenger
 
 These were made after Hegener + Glaser took over Fidelity(design phase started
 before that). Kishon Chesster was released under both Fidelity, and Mephisto brands.
 
-*******************************************************************************
+********************************************************************************
 
 Fidelity Chesster (model 6120)
 There is also a German version titled Kishon Chesster (model 6120G, or 6127)
@@ -24,7 +24,7 @@ I/O is via TTL, memory map is similar to Designer Display
 The speech technology was invented by Forrest S. Mozer(same person that invented
 the S14001A in the 70s), this time a 65C02 software solution.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -98,9 +98,9 @@ void chesster_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // TTL/generic
 
@@ -143,9 +143,9 @@ u8 chesster_state::input_r(offs_t offset)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void chesster_state::main_map(address_map &map)
 {
@@ -158,9 +158,9 @@ void chesster_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( chesster )
 	PORT_START("IN.0")
@@ -176,13 +176,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void chesster_state::chesster(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
@@ -194,11 +194,11 @@ void chesster_state::chesster(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(100));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	config.set_default_layout(layout_fidel_chesster);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5); // m74hc374b1.ic1 + 8l513_02.z2
 }
@@ -207,15 +207,15 @@ void chesster_state::kishon(machine_config &config)
 {
 	chesster(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(3.579545_MHz_XTAL); // same CPU
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -253,12 +253,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT     STATE           INIT           COMPANY, FULLNAME, FLAGS
-CONS( 1990, chesster,  0,        0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, chesstera, chesster, 0, chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, kishon,    chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, kishona,   chesster, 0, kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
+SYST( 1990, chesster,  0,        0,      chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, chesstera, chesster, 0,      chesster, chesster, chesster_state, init_chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, kishon,    chesster, 0,      kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, kishona,   chesster, 0,      kishon,   chesster, chesster_state, init_chesster, "Fidelity Electronics", "Kishon Chesster (v2.2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

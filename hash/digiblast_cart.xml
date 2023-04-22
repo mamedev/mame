@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <!--
     These dumps seem to have blank ECC data, it might need to be reconstructed as done in eolith/ghosteo.cpp
 -->
-<softwarelist name="digiblast_cart" description="Nikko Entertainment B.V. / Grey Innovation digiBLAST Cartridges">
+<softwarelist name="digiblast_cart" description="Nikko Entertainment B.V. / Grey Innovation digiBLAST cartridges">
 
 	<software name="sonicx1" supported="no">
 		<description>Sonic X 1 (Italy / Spain)</description>

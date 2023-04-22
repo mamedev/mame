@@ -93,18 +93,20 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
-#include "machine/tmp68301.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+namespace {
 
 class joystand_state : public driver_device
 {
@@ -553,20 +555,13 @@ void joystand_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
-{
-	// VBlank is connected to INT1 (external interrupts pin 1)
-	m_maincpu->external_interrupt_1();
-}
-
 void joystand_state::joystand(machine_config &config)
 {
 	// basic machine hardware
 	TMP68301(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::joystand_map);
-	m_maincpu->set_vblank_int("screen", FUNC(joystand_state::joystand_interrupt));
-	m_maincpu->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
-	m_maincpu->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
+	m_maincpu->parallel_r_cb().set(FUNC(joystand_state::eeprom_r));
+	m_maincpu->parallel_w_cb().set(FUNC(joystand_state::eeprom_w));
 
 	ADDRESS_MAP_BANK(config, m_cartflash_bankdev).set_map(&joystand_state::cart_map).set_options(ENDIANNESS_BIG, 16, 24, 0x800000); // TODO: address bit per carts?
 	// video hardware
@@ -575,6 +570,7 @@ void joystand_state::joystand(machine_config &config)
 	screen.set_screen_update(FUNC(joystand_state::screen_update));
 	screen.set_size(0x200, 0x100);
 	screen.set_visarea(0x40, 0x40+0x178-1, 0x10, 0x100-1);
+	screen.screen_vblank().set_inputline(m_maincpu, 1);
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_joystand);
@@ -650,5 +646,8 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-sub.1f",    0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

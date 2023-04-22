@@ -3,8 +3,8 @@
 
 // Only known to be used by the Tandy VIS
 
-#ifndef MAME_MACHINE_DS6417_H_
-#define MAME_MACHINE_DS6417_H_
+#ifndef MAME_MACHINE_DS6417_H
+#define MAME_MACHINE_DS6417_H
 
 #pragma once
 
@@ -21,8 +21,8 @@ public:
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	virtual image_init_result call_load() override;
-	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual std::pair<std::error_condition, std::string> call_create(int format_type, util::option_resolution *format_options) override;
 
 	DECLARE_WRITE_LINE_MEMBER(data_w) { if(!m_read) m_data = state; }
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
@@ -60,4 +60,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DS6417, ds6417_device)
 
-#endif /* MAME_MACHINE_DS6417_H_ */
+#endif // MAME_MACHINE_DS6417_H

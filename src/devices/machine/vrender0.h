@@ -20,14 +20,6 @@
 #include "diserial.h"
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define IDLE_LOOP_SPEEDUP
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -191,13 +183,6 @@ private:
 	void textureram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t frameram_r(offs_t offset);
 	void frameram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	// Hacks
-#ifdef IDLE_LOOP_SPEEDUP
-	uint8_t     m_FlipCntRead = 0;
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_resume_w);
-	DECLARE_WRITE_LINE_MEMBER(idle_skip_speedup_w);
-#endif
 };
 
 

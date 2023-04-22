@@ -18,7 +18,7 @@
     Known Issues:
         * Some features used by the AWP games such as reels are not emulated.
         * Timing for reels, and other opto devices is controlled by a generated clock
-        in a weird daisychain setup.
+        in a weird daisychain setup. We're using the later direct drive approach for now
 
     AWP game notes:
       The byte at 0x81 of the EVEN 68k rom appears to be some kind of
@@ -245,31 +245,32 @@ void jpmsys5_state::reel_0123_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: reel_0123_w %04x %04x\n", machine().describe_context(), data, mem_mask);
 
+
 	// only writes 0/1/2/3 to each reel?
 	if (data & 0xcccc)
 		popmessage("reel_0123_w upper bits set", data & 0xcccc);
 
 	if (m_reel[0])
 	{
-		m_reel[0]->update((data >> 0) & 0x03);
+		m_reel[0]->update(reel_interface_table[(data >> 0) & 0x03]);
 		awp_draw_reel(machine(), "reel1", *m_reel[0]);
 	}
 
 	if (m_reel[1])
 	{
-		m_reel[1]->update((data >> 4) & 0x03);
+		m_reel[1]->update(reel_interface_table[(data >> 4) & 0x03]);
 		awp_draw_reel(machine(), "reel2", *m_reel[1]);
 	}
 
 	if (m_reel[2])
 	{
-		m_reel[2]->update((data >> 8) & 0x03);
+		m_reel[2]->update(reel_interface_table[(data >> 8) & 0x03]);
 		awp_draw_reel(machine(), "reel3", *m_reel[2]);
 	}
 
 	if (m_reel[3])
 	{
-		m_reel[3]->update((data >> 12) & 0x03);
+		m_reel[3]->update(reel_interface_table[(data >> 12) & 0x03]);
 		awp_draw_reel(machine(), "reel4", *m_reel[3]);
 	}
 }
@@ -283,23 +284,23 @@ void jpmsys5_state::reel_4567_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (m_reel[4])
 	{
-		m_reel[4]->update((data >> 0) & 0x03);
+		m_reel[4]->update(reel_interface_table[(data >> 0) & 0x03]);
 		awp_draw_reel(machine(), "reel5", *m_reel[4]);
 	}
 	if (m_reel[5])
 	{
-		m_reel[5]->update((data >> 4) & 0x03);
+		m_reel[5]->update(reel_interface_table[(data >> 4) & 0x03]);
 		awp_draw_reel(machine(), "reel6", *m_reel[5]);
 	}
 #if 0
 	if (m_reel[6])
 	{
-		m_reel[6]->update(data >> 8) & 0x03);
+		m_reel[6]->update(reel_interface_table[(data >> 8) & 0x03]);
 		awp_draw_reel(machine(), "reel6", *m_reel[6]);
 	}
 	if (m_reel[7])
 	{
-		m_reel[7]->update((data >> 12) & 0x03);
+		m_reel[7]->update(reel_interface_table[(data >> 12) & 0x03]);
 		awp_draw_reel(machine(), "reel7", *m_reel[7]);
 	}
 #endif
@@ -850,20 +851,17 @@ void jpmsys5v_state::jpmsys5v(machine_config &config)
 
 void jpmsys5_state::reels(machine_config &config)
 {
-	// probably incorrect reel types, but they do seem to only require 2 bits to write?
-	// forcing 200 steps keeps j5fair main reels aligned, so probably needs a type
-	// with the same write patterns as MPU3_48STEP_REEL, but with 200 steps defining?
-	REEL(config, m_reel[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[0], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[0]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[1], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[1]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[2], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[2]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[3], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[3]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[4], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[4]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], MPU3_48STEP_REEL, 1, 3, 0x00, 2, 200);
+	REEL(config, m_reel[5], SYS5_100STEP_REEL, 1, 3, 0x00, 2, 200);
 	m_reel[5]->optic_handler().set(FUNC(jpmsys5_state::reel_optic_cb<5>));
 }
 
@@ -953,7 +951,7 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
-	PORT_DIPNAME( 0x08, 0x00, "Direct 0x08" ) // These are the % key, at least for popeye?
+	PORT_DIPNAME( 0x08, 0x00, "Direct 0x08" ) // These are the % key, at least for popeye? But there's a pin missing if so, usually these have 4 bits
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Direct 0x10" )
@@ -968,29 +966,73 @@ INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("COINS")
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("20p")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("50p")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
-	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Token")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STROBE0")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("00")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("01")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("02")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("03")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("04")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("05")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("06")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("07")
 
 	PORT_START("STROBE1")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("08")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("09")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("11")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("12")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("13")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("14")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("15")
 
 	PORT_START("STROBE2")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Exchange")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Collect")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 3/Lo")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 2/Hi")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Cancel")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("23")
 
 	PORT_START("STROBE3")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("24")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("25")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("26")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("27")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("28")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("29")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("30")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("31")
 
 	PORT_START("STROBE4")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("32")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("33")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("34")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("35")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("36")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("37")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("38")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("39")
 
 	PORT_START("STROBE5")
-	PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("45")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("46")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("47")
 
 	PORT_START("UNKNOWN_PORT")
 	PORT_DIPNAME( 0x0001, 0x0000, "Unknown 0x0001" ) // if this and 0x0008 are on then j5popeye boots, what is it? something opto related?

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
-#ifndef MAME_INCLUDES_PSIKYOSH_H
-#define MAME_INCLUDES_PSIKYOSH_H
+#ifndef MAME_PSIKYO_PSIKYOSH_H
+#define MAME_PSIKYO_PSIKYOSH_H
 
 #pragma once
 
@@ -42,10 +42,15 @@ public:
 	void psikyo5_mahjong(machine_config &config);
 	void psikyo5_240(machine_config &config);
 	void s1945iiibl(machine_config &config);
+	void s1945iiibla(machine_config &config);
 
 	void init_ps3();
 	void init_ps5();
 	void init_s1945iiibl();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -104,8 +109,6 @@ private:
 	void vidregs_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 mjgtaste_input_r();
 	void eeprom_w(u8 data);
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -127,6 +130,7 @@ private:
 	void ps5_map(address_map &map);
 	void ps5_mahjong_map(address_map &map);
 	void s1945iiibl_map(address_map &map);
+	void s1945iiibla_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PSIKYOSH_H
+#endif // MAME_PSIKYO_PSIKYOSH_H

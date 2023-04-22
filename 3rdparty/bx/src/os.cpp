@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/string.h>
 #include <bx/os.h>
 #include <bx/uint32_t.h>
@@ -15,6 +14,9 @@
 #endif // BX_CRT_MSVC
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID    \
@@ -183,12 +185,19 @@ namespace bx
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
-		return ::dlopen(_filePath.getCPtr(), RTLD_LOCAL|RTLD_LAZY);
+		void* so = ::dlopen(_filePath.getCPtr(), RTLD_LOCAL|RTLD_LAZY);
+		BX_WARN(NULL != so, "dlopen failed: \"%s\".", ::dlerror() );
+		return so;
 #endif // BX_PLATFORM_
 	}
 
 	void dlclose(void* _handle)
 	{
+		if (NULL == _handle)
+		{
+			return;
+		}
+
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
 #elif  BX_PLATFORM_EMSCRIPTEN \
@@ -206,7 +215,7 @@ namespace bx
 	{
 		const int32_t symbolMax = _symbol.getLength()+1;
 		char* symbol = (char*)alloca(symbolMax);
-		bx::strCopy(symbol, symbolMax, _symbol);
+		strCopy(symbol, symbolMax, _symbol);
 
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, symbol);
@@ -226,7 +235,7 @@ namespace bx
 	{
 		const int32_t nameMax = _name.getLength()+1;
 		char* name = (char*)alloca(nameMax);
-		bx::strCopy(name, nameMax, _name);
+		strCopy(name, nameMax, _name);
 
 #if BX_PLATFORM_WINDOWS
 		DWORD len = ::GetEnvironmentVariableA(name, _out, *_inOutSize);
@@ -264,14 +273,14 @@ namespace bx
 	{
 		const int32_t nameMax = _name.getLength()+1;
 		char* name = (char*)alloca(nameMax);
-		bx::strCopy(name, nameMax, _name);
+		strCopy(name, nameMax, _name);
 
 		char* value = NULL;
 		if (!_value.isEmpty() )
 		{
 			int32_t valueMax = _value.getLength()+1;
 			value = (char*)alloca(valueMax);
-			bx::strCopy(value, valueMax, _value);
+			strCopy(value, valueMax, _value);
 		}
 
 #if BX_PLATFORM_WINDOWS
@@ -341,7 +350,7 @@ namespace bx
 		int32_t len = 0;
 		for(uint32_t ii = 0; NULL != _argv[ii]; ++ii)
 		{
-			len += snprintf(&temp[len], bx::uint32_imax(0, total-len)
+			len += snprintf(&temp[len], uint32_imax(0, total-len)
 				, "%s "
 				, _argv[ii]
 				);
@@ -368,6 +377,11 @@ namespace bx
 		BX_UNUSED(_argv);
 		return NULL;
 #endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
+	}
+
+	void exit(int32_t _exitCode)
+	{
+		::exit(_exitCode);
 	}
 
 } // namespace bx

@@ -74,8 +74,7 @@ public:
 		, m_ctc(*this, Z80CTC_TAG)
 		, m_sio(*this, Z80SIO2_TAG)
 		, m_fdc(*this, WD2797_TAG)
-		, m_floppy0(*this, WD2797_TAG ":0")
-		, m_floppy1(*this, WD2797_TAG ":1")
+		, m_floppy(*this, WD2797_TAG ":%u", 0U)
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_irqs(*this, "irqs")
@@ -95,8 +94,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio_device> m_sio;
 	required_device<wd2797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_merger_device> m_irqs;
@@ -217,15 +215,15 @@ void f1_state::system_w(offs_t offset, u8 data)
 		break;
 
 	case 1: // drive select
-		m_fdc->set_floppy(BIT(data, 0) ? m_floppy0->get_device() : m_floppy1->get_device());
+		m_fdc->set_floppy(m_floppy[!BIT(data, 0)]->get_device());
 		break;
 
 	case 3: // drive head load
 		break;
 
 	case 5: // drive motor on
-		m_floppy0->get_device()->mon_w(!BIT(data, 0));
-		m_floppy1->get_device()->mon_w(!BIT(data, 0));
+		m_floppy[0]->get_device()->mon_w(!BIT(data, 0));
+		m_floppy[1]->get_device()->mon_w(!BIT(data, 0));
 		break;
 
 	case 7: // video lines (1=200, 0=256)

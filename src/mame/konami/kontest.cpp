@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
@@ -286,5 +289,8 @@ ROM_START( kontest )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "800a02.4f",    0x000000, 0x000020, CRC(6d604171) SHA1(6b1366fb53cecbde6fb651142a77917dd16daf69) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987?, kontest, 0, kontest, kontest, kontest_state, empty_init, ROT0, "Konami",      "Konami Test Board (GX800, Japan)", MACHINE_SUPPORTS_SAVE ) // late 1987 or early 1988

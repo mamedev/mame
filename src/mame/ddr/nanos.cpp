@@ -28,6 +28,8 @@ Status:
 #include "screen.h"
 
 
+namespace {
+
 class nanos_state : public driver_device
 {
 public:
@@ -537,6 +539,9 @@ ROM_START( nanos )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "zg_nanos.rom", 0x0000, 0x0800, CRC(5682d3f9) SHA1(5b738972c815757821c050ee38b002654f8da163))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

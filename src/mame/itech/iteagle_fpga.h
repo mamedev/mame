@@ -3,8 +3,8 @@
 //*************************************
 // iteagle fpga device
 //*************************************
-#ifndef MAME_MACHINE_ITEAGLE_FPGA_H
-#define MAME_MACHINE_ITEAGLE_FPGA_H
+#ifndef MAME_ITECH_ITEAGLE_FPGA_H
+#define MAME_ITECH_ITEAGLE_FPGA_H
 
 #include "machine/pci.h"
 #include "machine/nvram.h"
@@ -176,4 +176,4 @@ DECLARE_DEVICE_TYPE(ITEAGLE_FPGA, iteagle_fpga_device)
 DECLARE_DEVICE_TYPE(ITEAGLE_EEPROM, iteagle_eeprom_device)
 DECLARE_DEVICE_TYPE(ITEAGLE_PERIPH, iteagle_periph_device)
 
-#endif // MAME_MACHINE_ITEAGLE_FPGA_H
+#endif // MAME_ITECH_ITEAGLE_FPGA_H

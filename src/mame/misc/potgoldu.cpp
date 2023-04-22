@@ -25,6 +25,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class potgold_state : public driver_device
 {
 public:
@@ -132,5 +134,8 @@ ROM_START( potgoldu580 ) // TMS34010FNL-40 + MC68H705 + YMF704C + ADV476KP35 RAM
 	ROM_LOAD( "potgoldu_mc68hc705j1acp.bin", 0x000, 0x800, CRC(4130e596) SHA1(cd7e80a371abd4208a64c537fc84f1525be9203c) ) // 'Ver 1.00a' (assumed to be for this set)
 ROM_END
 
-GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+} // anonymous namespace
+
+
+GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
+GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )

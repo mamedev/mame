@@ -5,8 +5,8 @@
     Galaxian hardware family
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALAXIAN_H
-#define MAME_INCLUDES_GALAXIAN_H
+#ifndef MAME_GALAXIAN_GALAXIAN_H
+#define MAME_GALAXIAN_GALAXIAN_H
 
 #pragma once
 
@@ -934,4 +934,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_GALAXIAN_H
+#endif // MAME_GALAXIAN_GALAXIAN_H

@@ -24,6 +24,9 @@ TODO: figure out keycodes (are they translated externally?)
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class sk101bl_state : public driver_device
 {
 public:
@@ -182,5 +185,8 @@ ROM_START(sk101bl)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("sk_101_5.0_1ca2.ic7", 0x0000, 0x8000, CRC(f7903ca5) SHA1(66648cc1622c1241cdbd443af706750acbb93502)) // 27256-25
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1988, sk101bl, 0, 0, sk101bl, sk101bl, sk101bl_state, empty_init, "Reuters", "Model SK 101 BL", MACHINE_NOT_WORKING)

@@ -5,8 +5,8 @@
     Atari Cloak & Dagger hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CLOAK_H
-#define MAME_INCLUDES_CLOAK_H
+#ifndef MAME_ATARI_CLOAK_H
+#define MAME_ATARI_CLOAK_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-#endif // MAME_INCLUDES_CLOAK_H
+#endif // MAME_ATARI_CLOAK_H

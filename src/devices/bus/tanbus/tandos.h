@@ -12,17 +12,17 @@
 
 #pragma once
 
-#include "bus/tanbus/tanbus.h"
-#include "imagedev/floppy.h"
+#include "tanbus.h"
 #include "machine/wd_fdc.h"
+#include "machine/tms9914.h"
+#include "bus/ieee488/ieee488.h"
+#include "imagedev/floppy.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class tanbus_tandos_device :
-	public device_t,
-	public device_tanbus_interface
+class tanbus_tandos_device : public device_t, public device_tanbus_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::DISK; }
@@ -46,18 +46,20 @@ protected:
 	virtual void set_inhibit_lines(offs_t offset, int &inhram, int &inhrom) override;
 
 private:
-	void control_w(uint8_t val);
+	void control_w(uint8_t data);
 	uint8_t status_r();
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
 	required_memory_region m_dos_rom;
+	required_device<ieee488_device> m_ieee;
+	required_device<tms9914_device> m_tms9914;
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 	floppy_image_device *m_floppy;
 
-	uint8_t m_drive_control;
+	uint8_t m_status;
 	int m_irq_enable;
 	int m_drq_enable;
 

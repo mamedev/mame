@@ -178,29 +178,28 @@ void aim65_state::aim65_palette(palette_device &palette) const
     MACHINE DRIVERS
 ***************************************************************************/
 
-image_init_result aim65_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag)
+std::pair<std::error_condition, std::string> aim65_state::load_cart(
+		device_image_interface &image,
+		generic_slot_device *slot,
+		const char *slot_tag)
 {
 	uint32_t size = slot->common_get_size(slot_tag);
 
 	if (size > 0x1000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported ROM size (must be no more than 4K)");
 
 	if (image.loaded_through_softlist() && image.get_software_region(slot_tag) == nullptr)
 	{
-		std::string errmsg = string_format(
-				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
-				slot_tag, slot_tag);
-		image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
-		return image_init_result::FAIL;
+		// FIXME: error message seems to be outdated - actual error seems to be incorrect region name in software item
+		return std::make_pair(
+				image_error::UNSUPPORTED,
+				util::string_format("Unsupported file name extension (socket '%1$s' only accepts files with '.%1$s' extension", slot_tag));
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, slot_tag);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // TTY terminal settings. To use, turn KB/TTY switch to TTY, reset, press DEL. All input to be in UPPERCASE.

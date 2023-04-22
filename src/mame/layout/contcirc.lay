@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 
@@ -95,6 +95,8 @@ license:CC0
 			<bounds x="-40" y="414" width="32" height="64" />
 		</element>
 	</view>
+
+	<!-- for the 3D Scope views, enable stereoscopic 3D DIP switch first (does not apply to Japanese version) -->
 
 	<view name="3D Scope Straight View">
 		<!-- parallel-eyed -->

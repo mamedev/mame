@@ -51,6 +51,8 @@
 #include "dlair.lh"
 
 
+namespace {
+
 class dlair_state : public driver_device
 {
 public:
@@ -1026,6 +1028,7 @@ void dlair_state::init_variable()
 //  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
+} // anonymous namespace
 
 
 /*************************************

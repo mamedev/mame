@@ -7,25 +7,25 @@
  * Sprite Format
  * ------------------
  *
- * uint32_t | Bits                                    | Use
+ * offset | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
- *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
- *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
- *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
- *   4    | mmmm -?fF a??? tttt tttt tttt tttt tttt | mosaic factor, unknown (**) , flip bits, additive blending, unknown (***), tile number
- *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
- *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
- *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   0  0 | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
+ *   1  4 | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
+ *   2  8 | ---- Szzz zzzz zzzz ---- ---I cccc CCCC | S = set on CPU car markers above cars (in roadedge) z = Z-buffer value, i = 'Inline' chain flag, cC = x/y chain
+ *   3  c | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
+ *   4 10 | mmmm -cfF aggg tttt tttt tttt tttt tttt | mosaic factor, unknown (x1), checkerboard, flip bits, blend, group?, tile number
+ *   5 14 | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   6 18 | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   7 1c | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *
+ *  in (4) ggg seems to be either group, or priority against OTHER layers (7 being the lowest, 0 being the highest in normal situations eg most of the time in buriki)
  *
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
- * (**) setted by black squares in ranking screen in Samurai Shodown 64 1, sprite disable?
- * (***) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
  ** Sprite Global Registers
  * -----------------------
  *
- * uint32_t | Bits                                    | Use
+ * offset | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ssss z--f b--- -aap ---- ---- ---- ---- | s = unknown, samsho  z = zooming mode, f = priority sort mode (unset set in roadedge ingame) b = bpp select a = always, p = post, disable?
@@ -40,15 +40,224 @@
 
  */
 
-void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+
+#define PIXEL_OP_REBASE_TRANSPEN(DEST, DESTZ, SOURCE) \
+do \
+{ \
+	uint32_t srcdata = (SOURCE); \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
+	{ \
+		if (zval < (DESTZ)) \
+		{ \
+			if (srcdata != trans_pen) \
+			{ \
+				(DESTZ) = zval; \
+				(DEST) = color + srcdata; \
+			} \
+		} \
+	} \
+} \
+while (0)
+
+
+#define PIXEL_OP_REBASE_TRANSPEN_REV(DEST, DESTZ, SOURCE) \
+do \
+{ \
+	uint32_t srcdata = (SOURCE); \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
+	{ \
+		if (zval >= (DESTZ)) \
+		{ \
+			if (srcdata != trans_pen) \
+			{ \
+				(DESTZ) = zval; \
+				(DEST) = color + srcdata; \
+			} \
+		} \
+	} \
+} \
+while (0)
+
+#define PIX_CHECKERBOARD \
+do \
+{ \
+	if (!mosaic) \
+		srcpix = srcptr[(cursrcx >> 16) & 0xf]; \
+	else \
+	{ \
+		if (mosaic_count_x == 0) \
+		{ \
+			srcpix = srcptr[(cursrcx >> 16) & 0xf]; \
+			mosaic_count_x = mosaic; \
+		} \
+		else \
+		{ \
+			mosaic_count_x--; \
+		} \
+	} \
+	\
+	if (checkerboard) \
+	{ \
+		if (curx & 1) \
+		{ \
+			if (!(ypos & 1)) \
+				srcpix = 0; \
+		} \
+		else \
+		{ \
+			if ((ypos & 1)) \
+				srcpix = 0; \
+		} \
+	} \
+} \
+while (0)
+
+inline void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
+	gfx_element * gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
+	int32_t dx, int32_t dy, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int32_t ypos, const u8 *srcdata, int32_t srcx, uint32_t leftovers, int curyy, uint16_t &srcpix)
 {
-	gfx_element *gfx;
-	uint32_t *source = m_spriteram;
-	uint32_t *finish = m_spriteram + 0xc000/4;
+	auto* destptr = &dest.pix(ypos, 0);
+	auto* destzptr = &destz.pix(ypos, 0);
+
+	const u8* srcptr = srcdata + (flipy ? ((15-curyy) & 0xf) : (curyy & 0xf)) * gfx->rowbytes();
+	int32_t cursrcx = srcx;
+
+	if (zrev)
+	{
+		// iterate over leftover pixels
+		for (int32_t curx = 0; curx < leftovers; curx++)
+		{
+			int xdrawpos = xpos + curx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
+			cursrcx += dx;
+		}
+	}
+	else
+	{
+		// iterate over leftover pixels
+		for (int32_t curx = 0; curx < leftovers; curx++)
+		{
+			int xdrawpos = xpos + curx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
+			cursrcx += dx;
+		}
+	}
+}
+
+inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int curyy, uint16_t &srcpix)
+{
+	// use pen usage to optimize
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
+	{
+		// fully transparent; do nothing
+		uint32_t usage = gfx->pen_usage(code);
+		if ((usage & ~(1 << trans_pen)) == 0)
+			return;
+	}
+
+	// render
+	color = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+
+	if (blend)
+		color |= 0x8000;
+
+	color |= group;
+
+	assert(dest.valid());
+	assert(dest.cliprect().contains(cliprect));
+
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
+
+	if (dstwidth < 1)
+		return;
+
+	int32_t srcx = 0;
+	// apply X flipping
+	if (flipx)
+	{
+		srcx = (dstwidth - 1) * dx - srcx;
+		dx = -dx;
+	}
+
+	// fetch the source data
+	const u8 *srcdata = gfx->get_data(code);
+
+	int32_t destendx = xpos + dstwidth - 1;
+	uint32_t leftovers = (destendx + 1 - xpos);
+
+	drawline(dest, destz, cliprect,
+		gfx, code, color, flipy, xpos,
+		dx, dy, trans_pen, zval, zrev, blend, checkerboard, mosaic, mosaic_count_x, ypos, srcdata, srcx, leftovers, curyy, srcpix);
+
+}
+
+inline void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
+{
+	int offset;
+	if (!xflip)
+	{
+		if (!yflip)
+			offset = (xtile + (ytile * (xsize + 1)));
+		else
+			offset = (xtile + ((ysize - ytile) * (xsize + 1)));
+	}
+	else
+	{
+		if (!yflip)
+			offset = ((xsize - xtile) + (ytile * (xsize + 1)));
+		else
+			offset = ((xsize - xtile) + ((ysize - ytile) * (xsize + 1)));
+	}
+
+	if (!chain)
+	{
+		tileno = (m_spriteram[(spritenum * 8) + 4] & 0x0007ffff);
+		pal = (m_spriteram[(spritenum * 8) + 3] & 0x00ff0000) >> 16;
+
+		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		{
+			gfxregion = 4;
+		}
+		else
+		{
+			gfxregion = 5;
+			tileno >>= 1;
+			pal &= 0xf;
+		}
+
+		tileno += offset;
+	}
+	else
+	{
+		tileno = (m_spriteram[((spritenum + offset) * 8) + 4] & 0x0007ffff);
+		pal = (m_spriteram[((spritenum + offset) * 8) + 3] & 0x00ff0000) >> 16;
+		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		{
+			gfxregion = 4;
+		}
+		else
+		{
+			gfxregion = 5;
+			tileno >>= 1;
+			pal &= 0xf;
+		}
+	}
+}
+
+void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cliprect)
+{
+	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	// global offsets in sprite regs
-	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
-	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
+	int spriteoffsx = (m_spriteregs[1] >> 0) & 0xffff;
+	int spriteoffsy = (m_spriteregs[1] >> 16) & 0xffff;
 
 	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
 	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
@@ -56,178 +265,159 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	// Could also be draw order related, check if it inverts the z value?
 	bool zsort = !(m_spriteregs[0] & 0x01000000);
 
-#if 0
-	for (int iii = 0; iii < 0x0f; iii++)
-		osd_printf_debug("%.8x ", m_videoregs[iii]);
-	osd_printf_debug("\n");
-#endif
-
-	// start with empty list
-	m_spritelist.clear();
-
-	while(source < finish)
-	{
-		if (source[4]&0x04000000) // disable bit, ss64 rankings ?
-		{
-			source += 8;
-		}
-		else
-		{
-			if ((!zsort && (source[2]&0x07ff0000) != 0x07ff0000) || (zsort && (source[2]&0x07ff0000) != 0))
-			{
-				m_spritelist.emplace_back((source[2]&0x7ff0000)>>16, source);
-				if (source[2]&0x00000100) // inline chain mode
-					source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
-				else
-					source += 8;
-			}
-			else
-				source += 8;
-		}
-	}
-
 	if (zsort)
-		std::stable_sort(m_spritelist.begin(), m_spritelist.end(), [] (auto const &a, auto const &b) { return a.first > b.first; });
+		m_sprite_zbuffer.fill(0x0000, cliprect);
+	else
+		m_sprite_zbuffer.fill(0x07ff, cliprect);
 
-	for(auto it : m_spritelist)
+	int nextsprite = 0;
+	int currentsprite = 0;
+
+	while (currentsprite < ((0xc000 / 4) / 8))
 	{
-		source = it.second;
+		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
-		int tileno,chainx,chainy,xflip;
-		int pal,xinc,yinc,yflip;
-		uint16_t xpos, ypos;
-		int xdrw,ydrw;
-		int chaini;
-		uint32_t zoomx,zoomy;
-		float foomX, foomY;
-		int blend;
 
-		ypos = (source[0]&0xffff0000)>>16;
-		xpos = (source[0]&0x0000ffff)>>0;
+		int16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
+		int16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+
+		// should the offsets also be sign extended?
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
 
-		tileno= (source[4]&0x0007ffff);
-		blend=  (source[4]&0x00800000);
-		yflip=  (source[4]&0x01000000)>>24;
-		xflip=  (source[4]&0x02000000)>>25;
+		// sams64_2 wants bit 0x200 to be the sign bit on character select screen
+		xpos = util::sext(xpos, 10);
+		ypos = util::sext(ypos, 10);
 
-		pal =(source[3]&0x00ff0000)>>16;
+		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
+		uint16_t group = (m_spriteram[(currentsprite * 8) + 4] & 0x00700000) >> 8;
+		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
+		uint8_t mosaic = (m_spriteram[(currentsprite * 8) + 4] & 0xf0000000) >> 28;
 
-		chainy=(source[2]&0x0000000f);
-		chainx=(source[2]&0x000000f0)>>4;
-		chaini=(source[2]&0x00000100);
+		int yflip = (m_spriteram[(currentsprite * 8) + 4] & 0x01000000) >> 24;
+		int xflip = (m_spriteram[(currentsprite * 8) + 4] & 0x02000000) >> 25;
 
-		zoomy = (source[1]&0xffff0000)>>16;
-		zoomx = (source[1]&0x0000ffff)>>0;
+		int chainy = (m_spriteram[(currentsprite * 8) + 2] & 0x0000000f);
+		int chainx = (m_spriteram[(currentsprite * 8) + 2] & 0x000000f0) >> 4;
+		int chaini = (m_spriteram[(currentsprite * 8) + 2] & 0x00000100);
 
-#if 0
-		if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
-			osd_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
-				source[4], source[5], source[6], source[7]);
-#endif
+		if (!chaini)
+		{
+			nextsprite = currentsprite + 1;
+		}
+		else
+		{
+			nextsprite = currentsprite + ((chainx + 1) * (chainy + 1));
+		}
+
+		uint32_t zoomy = (m_spriteram[(currentsprite * 8) + 1] & 0xffff0000) >> 16;
+		uint32_t zoomx = (m_spriteram[(currentsprite * 8) + 1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
+		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+
+		/* Sprites after 'Fair and Square' have a zoom of 0 in sams64 for one frame, they shouldn't be seen? */
+		if (!zoomx || !zoomy)
 		{
-			int zoom_factor;
+			currentsprite = nextsprite;
+			continue;
+		};
 
-			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
-			zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
-			if(!zoomx) zoomx=zoom_factor;
-			if(!zoomy) zoomy=zoom_factor;
-
-			/* First, prevent any possible divide by zero errors */
-			foomX = (float)(zoom_factor) / (float)zoomx;
-			foomY = (float)(zoom_factor) / (float)zoomy;
-
-			zoomx = ((int)foomX) << 16;
-			zoomy = ((int)foomY) << 16;
-
-			zoomx += (int)((foomX - floor(foomX)) * (float)0x10000);
-			zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
+		// skip the lowest sprite priority depending on the zsort mode
+		// it was previously assumed the default buffer fill would take care of this
+		// but unless there's a sign bit, the roadedge name entry screen disagrees as it
+		// requires a >= check on the sprite draw, not >
+		//
+		// for the non-zsort/zrev case, fatfurywa char selectappears requires <, not <=
+		if (zsort && (zval == 0))
+		{
+			currentsprite = nextsprite;
+			continue;
 		}
 
-		if (m_spriteregs[0] & 0x00800000) //bpp switch
-		{
-			gfx= m_gfxdecode->gfx(4);
-		}
-		else
-		{
-			gfx= m_gfxdecode->gfx(5);
-			tileno>>=1;
-			pal&=0xf;
-		}
+		int32_t dx, dy;
 
-		// Accommodate for chaining and flipping
-		if(xflip)
+		if (zoom_factor == 0x100)
 		{
-			xinc=-(int)(16.0f*foomX);
-			xpos-=xinc*chainx;
+			dx = zoomx << 8;
+			dy = zoomy << 8;
 		}
 		else
 		{
-			xinc=(int)(16.0f*foomX);
+			dx = zoomx << 4;
+			dy = zoomy << 4;
 		}
 
-		if(yflip)
-		{
-			yinc=-(int)(16.0f*foomY);
-			ypos-=yinc*chainy;
-		}
-		else
-		{
-			yinc=(int)(16.0f*foomY);
-		}
 
-#if 0
-		if (((source[2) & 0xffff0000) >> 16) == 0x0001)
+		uint32_t full_srcpix_y = 0;
+		uint32_t full_dstheight = 0;
+		do
 		{
-			popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
-			//popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
-		}
-#endif
+			full_srcpix_y += dy;
+			full_dstheight++;
+		} while (full_srcpix_y < ((chainy+1) * 0x100000));
 
-		for(ydrw=0;ydrw<=chainy;ydrw++)
+		int realline = 0;
+		int mosaic_y_counter = 0;
+		for (int32_t curyy = 0; curyy <= full_dstheight - 1; curyy++)
 		{
-			for(xdrw=0;xdrw<=chainx;xdrw++)
+			if (!mosaic)
 			{
-				int16_t drawx = xpos+(xinc*xdrw);
-				int16_t drawy = ypos+(yinc*ydrw);
-
-				// 0x3ff (0x200 sign bit) based on sams64_2 char select
-				drawx &= 0x3ff;
-				drawy &= 0x3ff;
-
-				if (drawx&0x0200)drawx-=0x400;
-				if (drawy&0x0200)drawy-=0x400;
-
-				if (!chaini)
+				realline = curyy;
+			}
+			else
+			{
+				if (mosaic_y_counter == 0)
 				{
-					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					tileno++;
+					realline = curyy;
+					mosaic_y_counter = mosaic;
 				}
-				else // inline chain mode, used by ss64
+				else
 				{
-					tileno=(source[4]&0x0007ffff);
-					pal =(source[3]&0x00ff0000)>>16;
-
-					if (m_spriteregs[0] & 0x00800000) //bpp switch
-					{
-						gfx= m_gfxdecode->gfx(4);
-					}
-					else
-					{
-						gfx= m_gfxdecode->gfx(5);
-						tileno>>=1;
-						pal&=0xf;
-					}
-
-					if (!blend) gfx->prio_zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					source +=8;
+					mosaic_y_counter--;
 				}
 			}
+
+			if (ypos <= cliprect.bottom() && ypos >= cliprect.top())
+			{
+				uint32_t full_srcpix_y2 = realline * dy;
+				int used_ysource_pos = full_srcpix_y2 >> 16;
+				int ytilebbb = used_ysource_pos / 0x10;
+				int use_tile_line = used_ysource_pos & 0xf;
+				draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, group, checkerboard, mosaic);
+			}
+			ypos++;
 		}
+
+		currentsprite = nextsprite;
 	}
+}
+
+
+inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t ypos, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic)
+{
+	uint32_t srcpix_x = 0;
+	uint16_t srcpix = 0;
+
+	uint8_t mosaic_count_x = 0;
+
+	for (int xdrw = 0; xdrw <= chainx; xdrw++)
+	{
+		uint32_t dstwidth = 0;
+		do
+		{
+			srcpix_x += dx;
+			dstwidth++;
+		} while (srcpix_x < 0x100000);
+		srcpix_x &= 0x0fffff;
+
+		uint32_t tileno;
+		uint16_t pal;
+		uint8_t gfxregion;
+
+		get_tile_details(chaini, currentsprite, xdrw, ytileblock, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
+		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, group, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);
+		xpos += dstwidth;
+	}
+
 }

@@ -231,8 +231,6 @@ private:
 };
 
 
-// video
-
 /*******************************************************************************
  Write Handlers
 ********************************************************************************
@@ -250,6 +248,7 @@ void wwfsstar_state::bg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_m
 	COMBINE_DATA(&m_bg0_videoram[offset]);
 	m_bg0_tilemap->mark_tile_dirty(offset / 2);
 }
+
 
 /*******************************************************************************
  Tilemap Related Functions
@@ -273,12 +272,9 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 	**- End of Comments -*/
 
 	uint16_t *tilebase =  &m_fg0_videoram[tile_index * 2];
-	int tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
+	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x00f0) >> 4;
-	tileinfo.set(0,
-			tileno,
-			colbank,
-			0);
+	tileinfo.set(0, tileno, colbank, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(wwfsstar_state::bg0_scan)
@@ -305,14 +301,12 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 	**- End of Comments -*/
 
 	uint16_t *tilebase =  &m_bg0_videoram[tile_index * 2];
-	int tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
+	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x0070) >> 4;
-	int flipx   = (tilebase[0] & 0x0080) >> 7;
-	tileinfo.set(2,
-			tileno,
-			colbank,
-			flipx ? TILE_FLIPX : 0);
+	int flipx = (tilebase[0] & 0x0080) >> 7;
+	tileinfo.set(2, tileno, colbank, flipx ? TILE_FLIPX : 0);
 }
+
 
 /*******************************************************************************
  Sprite Related Functions
@@ -324,7 +318,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	/*- SPR RAM Format -**
 
-	  0x3FF sized region (1024 bytes)
+	  0x400 sized region (1024 bytes)
 
 	  10 bytes per sprite
 
@@ -344,25 +338,24 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	**- End of Comments -*/
 
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	uint16_t *source = m_spriteram;
-	uint16_t *finish = source + 0x3ff / 2;
 
-	while (source < finish)
+	for (int offset = 0; offset <= m_spriteram.length() - 5; offset += 5)
 	{
-		int const enable = (source [1] & 0x0001);
+		const uint16_t *source = m_spriteram + offset;
+		int const enable = (source[1] & 0x0001);
 
 		if (enable)
 		{
-			int ypos = ((source [0] & 0x00ff) | ((source [1] & 0x0004) << 6) );
+			int ypos = ((source[0] & 0x00ff) | ((source[1] & 0x0004) << 6));
 			ypos = (((256 - ypos) & 0x1ff) - 16) ;
-			int xpos = ((source [4] & 0x00ff) | ((source [1] & 0x0008) << 5) );
+			int xpos = ((source[4] & 0x00ff) | ((source[1] & 0x0008) << 5));
 			xpos = (((256 - xpos) & 0x1ff) - 16);
-			int flipx = (source [2] & 0x0080 ) >> 7;
-			int flipy = (source [2] & 0x0040 ) >> 6;
-			int chain = (source [1] & 0x0002 ) >> 1;
+			int flipx = (source[2] & 0x0080 ) >> 7;
+			int flipy = (source[2] & 0x0040 ) >> 6;
+			int chain = (source[1] & 0x0002 ) >> 1;
 			chain += 1;
-			int number = (source [3] & 0x00ff) | ((source [2] & 0x003f) << 8);
-			int const colourbank = (source [1] & 0x00f0) >> 4;
+			int number = (source[3] & 0x00ff) | ((source[2] & 0x003f) << 8);
+			int const colourbank = (source[1] & 0x00f0) >> 4;
 
 			number &= ~(chain - 1);
 
@@ -374,36 +367,27 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xpos = 240 - xpos;
 			}
 
-			for (int count=0; count < chain; count++)
+			for (int count = 0; count < chain; count++)
 			{
 				if (flip_screen())
 				{
 					if (!flipy)
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos + 16 * count, 0);
-					}
 					else
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos + (16 * (chain - 1)) - (16 * count), 0);
-					}
 				}
 				else
 				{
 					if (!flipy)
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos - (16 * (chain - 1)) + (16 * count), 0);
-					}
 					else
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos - 16 * count, 0);
-					}
 				}
 			}
 		}
-
-		source += 5;
 	}
 }
+
 
 /*******************************************************************************
  Video Start and Refresh Functions
@@ -413,7 +397,6 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  SPR - Middle
  FG0 - Front
 *******************************************************************************/
-
 
 void wwfsstar_state::video_start()
 {
@@ -440,8 +423,6 @@ uint32_t wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*******************************************************************************
  Memory Maps
@@ -511,6 +492,7 @@ void wwfsstar_state::irqack_w(offs_t offset, uint16_t data)
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
+
 /*
     Interrupt behaviour verified from actual PCB.
 
@@ -559,6 +541,7 @@ READ_LINE_MEMBER(wwfsstar_state::vblank_r)
 {
 	return m_vblank;
 }
+
 
 /*******************************************************************************
  Input Ports
@@ -646,6 +629,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+
 /*******************************************************************************
  Graphic Decoding
 ********************************************************************************
@@ -690,12 +674,8 @@ GFXDECODE_END
 
 void wwfsstar_state::wwfsstar(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
-	static constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 2;
-	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 4;
-
 	// basic machine hardware
-	M68000(config, m_maincpu, CPU_CLOCK);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(wwfsstar_state::scanline), "screen", 0, 1);
@@ -705,7 +685,7 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248);   // HTOTAL and VTOTAL are guessed
+	m_screen->set_raw(20_MHz_XTAL / 4, 320, 0, 256, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(wwfsstar_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -728,6 +708,7 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 }
+
 
 /*******************************************************************************
  Rom Loaders / Game Drivers
@@ -873,6 +854,34 @@ ROM_START( wwfsstarj )
 	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
 ROM_END
 
+ROM_START( wwfsstarc )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000
+	ROM_LOAD16_BYTE( "24ac-0c.ic34", 0x00000, 0x20000, CRC(3e5eebf3) SHA1(888a7ce95dd38231e5bcd3273b78e2aa0c826a72) )
+	ROM_LOAD16_BYTE( "24ad-0c.ic35", 0x00001, 0x20000, CRC(154bf54c) SHA1(1503e0d523e6bfddf7707361a835caa436f3d84c) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 ) // Z80
+	ROM_LOAD( "24ab-0.12", 0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "24a9-0.46", 0x00000, 0x20000, CRC(703ff08f) SHA1(08c4d33208eb4c76c751a1a0fe16a817bdc30820) )
+	ROM_LOAD( "24j8-0.45", 0x20000, 0x20000, CRC(61138487) SHA1(6d5e3b12acdefb6923aa8ae0704f6c328f4747b3) )
+
+	ROM_REGION( 0x20000, "fgtiles", 0 ) // 8x8
+	ROM_LOAD( "24aa-0.58", 0x00000, 0x20000, CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
+
+	ROM_REGION( 0x200000, "sprites", 0 ) // 16x16
+	ROM_LOAD( "c951.114",   0x000000, 0x80000, CRC(fa76d1f0) SHA1(f69f8e6d1c5f27b054133e0faa49a8e1a9c391b2) )
+	ROM_LOAD( "24j4-0.115", 0x080000, 0x40000, CRC(c4a589a3) SHA1(5511e77c8b381419d7c63971023783c26ef6d94b) )
+	ROM_LOAD( "24j5-0.116", 0x0c0000, 0x40000, CRC(d6bca436) SHA1(25857a840b93f7f106a3a5c7dde8e0a732f45013) )
+	ROM_LOAD( "c950.117",   0x100000, 0x80000, CRC(cca5703d) SHA1(d10ef7ef1789a4f1a732a7c08ab163ec0d347da1) )
+	ROM_LOAD( "24j2-0.118", 0x180000, 0x40000, CRC(dc1b7600) SHA1(bd80d7d4063f2b739ac9420132859c23473d9968) )
+	ROM_LOAD( "24j3-0.119", 0x1c0000, 0x40000, CRC(3ba12d43) SHA1(f60d5ff54fdef5a31fe1ee7041dda325ef6649c8) )
+
+	ROM_REGION( 0x80000, "bgtiles", 0 ) // 16x16
+	ROM_LOAD( "24j7-0.113", 0x00000, 0x40000, CRC(e0a1909e) SHA1(6ec0db2e0297256d1c6d003a0e5b29236048bd88) )
+	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
+ROM_END
+
 ROM_START( wwfsstarb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_BYTE( "wwfs08.bin", 0x00000, 0x10000, CRC(621df265) SHA1(eded019352428f2caf1de88eac837beb4eea7562) ) // These 2 == 24ac-04.34
@@ -943,10 +952,10 @@ ROM_END
 
 // There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
 
-
 GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Europe)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarc,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Canada)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "bootleg",       "WWF Superstars (bootleg)",       MACHINE_SUPPORTS_SAVE )

@@ -6,8 +6,8 @@
     Midway 8080-based black and white hardware
 
 ****************************************************************************/
-#ifndef MAME_AUDIO_MW8080BW_H
-#define MAME_AUDIO_MW8080BW_H
+#ifndef MAME_MIDW8080_MW8080BW_A_H
+#define MAME_MIDW8080_MW8080BW_A_H
 
 #pragma once
 
@@ -360,4 +360,4 @@ DECLARE_DEVICE_TYPE(INVAD2CT_AUDIO, invad2ct_audio_device)
 DECLARE_DEVICE_TYPE(ZZZAP_AUDIO,    zzzap_audio_device)
 DECLARE_DEVICE_TYPE(LAGUNAR_AUDIO,  lagunar_audio_device)
 
-#endif // MAME_AUDIO_MW8080BW_H
+#endif // MAME_MIDW8080_MW8080BW_A_H

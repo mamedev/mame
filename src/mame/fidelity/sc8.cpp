@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity Sensory Chess Challenger "8" (SCC)
 
@@ -20,7 +20,7 @@ Hardware notes:
 - chessboard buttons, 8*8+1 leds
 - PCB label 510-1011 REV.2
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -84,9 +84,9 @@ void scc_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void scc_state::control_w(offs_t offset, u8 data)
 {
@@ -120,9 +120,9 @@ u8 scc_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void scc_state::main_map(address_map &map)
 {
@@ -138,9 +138,9 @@ void scc_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( scc )
 	PORT_START("IN.0")
@@ -156,13 +156,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void scc_state::scc(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 3.9_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &scc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &scc_state::main_io);
@@ -171,20 +171,20 @@ void scc_state::scc(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	config.set_default_layout(layout_fidel_sc8);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fscc8 ) // model SCC
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -195,9 +195,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME   PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1980, fscc8, 0,      0, scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"8\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1980, fscc8, 0,      0,      scc,     scc,   scc_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"8\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

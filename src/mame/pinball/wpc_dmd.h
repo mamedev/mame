@@ -5,8 +5,8 @@
 
 // A 128x32 plasma display with 16 pages and refreshed at 240Hz (for PWM luminosity control)
 
-#ifndef MAME_VIDEO_WPC_DMD_H
-#define MAME_VIDEO_WPC_DMD_H
+#ifndef MAME_PINBALL_WPC_DMD_H
+#define MAME_PINBALL_WPC_DMD_H
 
 #include "machine/timer.h"
 
@@ -47,4 +47,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device)
 
-#endif // MAME_VIDEO_WPC_DMD_H
+#endif // MAME_PINBALL_WPC_DMD_H

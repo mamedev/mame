@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:MetalliC
-#ifndef MAME_MACHINE_M3COMM_H
-#define MAME_MACHINE_M3COMM_H
+#ifndef MAME_SEGA_M3COMM_H
+#define MAME_SEGA_M3COMM_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(M3COMM, m3comm_device)
 
-#endif  // MAME_MACHINE_M3COMM_H
+#endif  // MAME_SEGA_M3COMM_H

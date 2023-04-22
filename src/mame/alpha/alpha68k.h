@@ -5,8 +5,8 @@
     SNK/Alpha 68000 based games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ALPHA68K_H
-#define MAME_INCLUDES_ALPHA68K_H
+#ifndef MAME_ALPHA_ALPHA68K_H
+#define MAME_ALPHA_ALPHA68K_H
 
 #pragma once
 
@@ -424,4 +424,4 @@ enum
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
-#endif // MAME_INCLUDES_ALPHA68K_H
+#endif // MAME_ALPHA_ALPHA68K_H

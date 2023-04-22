@@ -14,6 +14,7 @@
 #include "imagedev/snapquik.h"
 #include "jag_blitter.h"
 #include "cdrom.h"
+#include "bus/generic/slot.h"
 #include "imagedev/chd_cd.h"
 #include "screen.h"
 #include "emupal.h"
@@ -271,7 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload_cb(device_image_interface &image);
+	std::pair<std::error_condition, std::string> quickload_cb(snapshot_image_device &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);

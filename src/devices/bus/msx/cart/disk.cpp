@@ -103,6 +103,7 @@
 
 #include "emu.h"
 #include "disk.h"
+#include "slotoptions.h"
 
 #include "bus/msx/slot/cartridge.h"
 #include "imagedev/floppy.h"
@@ -137,24 +138,25 @@ DECLARE_DEVICE_TYPE(MSX_CART_VY0010,   msx_cart_interface)
 
 void msx_cart_disk_register_options(device_slot_interface &device)
 {
-	device.option_add_internal("disk_avdpf550", MSX_CART_AVDPF550);
-	device.option_add_internal("disk_cdx2", MSX_CART_CDX2);
-	device.option_add_internal("disk_ddx3", MSX_CART_DDX3);
-	device.option_add_internal("disk_fd03", MSX_CART_FD03);
-	device.option_add_internal("disk_fd051", MSX_CART_FD051);
-	device.option_add_internal("disk_fscf351", MSX_CART_FSCF351);
-	device.option_add_internal("disk_fsfd1", MSX_CART_FSFD1);
-	device.option_add_internal("disk_fsfd1a", MSX_CART_FSFD1A);
-	device.option_add_internal("disk_hb3600", MSX_CART_HB3600);
-	device.option_add_internal("disk_hbd20w", MSX_CART_HBD20W);
-	device.option_add_internal("disk_hbd50", MSX_CART_HBD50);
-	device.option_add_internal("disk_hbdf1", MSX_CART_HBDF1);
-	device.option_add_internal("disk_hxf101pe", MSX_CART_HXF101PE);
-	device.option_add_internal("disk_mfd001", MSX_CART_MFD001);
-	device.option_add_internal("disk_ml30dc", MSX_CART_ML30DC);
-	device.option_add_internal("disk_nms1200", MSX_CART_NMS1200);
-	device.option_add_internal("disk_tadpf550", MSX_CART_TADPF550);
-	device.option_add_internal("disk_vy0010", MSX_CART_VY0010);
+	using namespace bus::msx::cart;
+	device.option_add_internal(slotoptions::DISK_AVDPF550, MSX_CART_AVDPF550);
+	device.option_add_internal(slotoptions::DISK_CDX2,     MSX_CART_CDX2);
+	device.option_add_internal(slotoptions::DISK_DDX3,     MSX_CART_DDX3);
+	device.option_add_internal(slotoptions::DISK_FD03,     MSX_CART_FD03);
+	device.option_add_internal(slotoptions::DISK_FD051,    MSX_CART_FD051);
+	device.option_add_internal(slotoptions::DISK_FSCF351,  MSX_CART_FSCF351);
+	device.option_add_internal(slotoptions::DISK_FSFD1,    MSX_CART_FSFD1);
+	device.option_add_internal(slotoptions::DISK_FSFD1A,   MSX_CART_FSFD1A);
+	device.option_add_internal(slotoptions::DISK_HB3600,   MSX_CART_HB3600);
+	device.option_add_internal(slotoptions::DISK_HBD20W,   MSX_CART_HBD20W);
+	device.option_add_internal(slotoptions::DISK_HBD50,    MSX_CART_HBD50);
+	device.option_add_internal(slotoptions::DISK_HBDF1,    MSX_CART_HBDF1);
+	device.option_add_internal(slotoptions::DISK_HXF101PE, MSX_CART_HXF101PE);
+	device.option_add_internal(slotoptions::DISK_MFD001,   MSX_CART_MFD001);
+	device.option_add_internal(slotoptions::DISK_ML30DC,   MSX_CART_ML30DC);
+	device.option_add_internal(slotoptions::DISK_NMS1200,  MSX_CART_NMS1200);
+	device.option_add_internal(slotoptions::DISK_TADPF550, MSX_CART_TADPF550);
+	device.option_add_internal(slotoptions::DISK_VY0010,   MSX_CART_VY0010);
 }
 
 
@@ -173,7 +175,7 @@ void msx_floppies(device_slot_interface &device)
 class msx_cart_disk_device : public device_t, public msx_cart_interface
 {
 public:
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	msx_cart_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page, int fdc_regs_end_page)
@@ -215,21 +217,21 @@ void msx_cart_disk_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_DMK_FORMAT);
 }
 
-image_init_result msx_cart_disk_device::initialize_cartridge(std::string &message)
+std::error_condition msx_cart_disk_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_disk_device: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x4000)
 	{
 		message = "msx_cart_disk_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void msx_cart_disk_device::softlist_35(machine_config &config)
@@ -308,7 +310,7 @@ protected:
 class disk_type1_device : public disk_wd_device
 {
 public:
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
@@ -341,32 +343,32 @@ void disk_type1_device::device_start()
 	save_item(NAME(m_control));
 }
 
-image_init_result disk_type1_device::initialize_cartridge(std::string &message)
+std::error_condition disk_type1_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
-		page(i)->install_read_handler(base + 0x3ff8, base + 0x3ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(disk_type1_device::side_control_r)));
-		page(i)->install_read_handler(base + 0x3ffd, base + 0x3ffd, read8smo_delegate(*this, FUNC(disk_type1_device::control_r)));
-		page(i)->install_read_handler(base + 0x3fff, base + 0x3fff, read8smo_delegate(*this, FUNC(disk_type1_device::status_r)));
-		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(disk_type1_device::set_side_control)));
-		page(i)->install_write_handler(base + 0x3ffd, base + 0x3ffd, write8smo_delegate(*this, FUNC(disk_type1_device::set_control)));
+		page(i)->install_read_handler(base + 0x3ff8, base + 0x3ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, emu::rw_delegate(*this, FUNC(disk_type1_device::side_control_r)));
+		page(i)->install_read_handler(base + 0x3ffd, base + 0x3ffd, emu::rw_delegate(*this, FUNC(disk_type1_device::control_r)));
+		page(i)->install_read_handler(base + 0x3fff, base + 0x3fff, emu::rw_delegate(*this, FUNC(disk_type1_device::status_r)));
+		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, emu::rw_delegate(*this, FUNC(disk_type1_device::set_side_control)));
+		page(i)->install_write_handler(base + 0x3ffd, base + 0x3ffd, emu::rw_delegate(*this, FUNC(disk_type1_device::set_control)));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void disk_type1_device::device_post_load()
@@ -586,7 +588,7 @@ protected:
 class disk_type2_device : public disk_wd_device
 {
 public:
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int fdc_regs_start_page = PAGE1, int fdc_regs_end_page = PAGE2)
@@ -618,29 +620,29 @@ void disk_type2_device::device_post_load()
 	set_control(m_control);
 }
 
-image_init_result disk_type2_device::initialize_cartridge(std::string &message)
+std::error_condition disk_type2_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
-		page(i)->install_read_handler(base + 0x3fb8, base + 0x3fb8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-		page(i)->install_read_handler(base + 0x3fb9, base + 0x3fb9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-		page(i)->install_read_handler(base + 0x3fba, base + 0x3fba, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-		page(i)->install_read_handler(base + 0x3fbb, base + 0x3fbb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3fbc, base + 0x3fbc, read8smo_delegate(*this, FUNC(disk_type2_device::status_r)));
-		page(i)->install_write_handler(base + 0x3fb8, base + 0x3fb8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-		page(i)->install_write_handler(base + 0x3fb9, base + 0x3fb9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-		page(i)->install_write_handler(base + 0x3fba, base + 0x3fba, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-		page(i)->install_write_handler(base + 0x3fbb, base + 0x3fbb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3fbc, base + 0x3fbc, write8smo_delegate(*this, FUNC(disk_type2_device::set_control)));
+		page(i)->install_read_handler(base + 0x3fb8, base + 0x3fb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+		page(i)->install_read_handler(base + 0x3fb9, base + 0x3fb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+		page(i)->install_read_handler(base + 0x3fba, base + 0x3fba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+		page(i)->install_read_handler(base + 0x3fbb, base + 0x3fbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+		page(i)->install_read_handler(base + 0x3fbc, base + 0x3fbc, emu::rw_delegate(*this, FUNC(disk_type2_device::status_r)));
+		page(i)->install_write_handler(base + 0x3fb8, base + 0x3fb8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+		page(i)->install_write_handler(base + 0x3fb9, base + 0x3fb9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+		page(i)->install_write_handler(base + 0x3fba, base + 0x3fba, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+		page(i)->install_write_handler(base + 0x3fbb, base + 0x3fbb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+		page(i)->install_write_handler(base + 0x3fbc, base + 0x3fbc, emu::rw_delegate(*this, FUNC(disk_type2_device::set_control)));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void disk_type2_device::set_control(u8 data)
@@ -721,7 +723,7 @@ protected:
 class disk_type5_device : public disk_wd_device
 {
 public:
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	disk_type5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -744,27 +746,27 @@ void disk_type5_device::device_start()
 	save_item(NAME(m_control));
 }
 
-image_init_result disk_type5_device::initialize_cartridge(std::string &message)
+std::error_condition disk_type5_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	io_space().install_write_handler(0xd4, 0xd4, write8smo_delegate(*this, FUNC(disk_type5_device::control_w)));
-	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(disk_type5_device::status_r)));
+	io_space().install_write_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	io_space().install_write_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	io_space().install_write_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	io_space().install_write_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	io_space().install_write_handler(0xd4, 0xd4, emu::rw_delegate(*this, FUNC(disk_type5_device::control_w)));
+	io_space().install_read_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	io_space().install_read_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	io_space().install_read_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	io_space().install_read_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	io_space().install_read_handler(0xd4, 0xd4, emu::rw_delegate(*this, FUNC(disk_type5_device::status_r)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void disk_type5_device::device_post_load()
@@ -844,7 +846,7 @@ public:
 		: disk_tc8566_device(mconfig, MSX_CART_FSFD1A, tag, owner, clock)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -856,24 +858,24 @@ protected:
 	}
 };
 
-image_init_result fsfd1a_device::initialize_cartridge(std::string &message)
+std::error_condition fsfd1a_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_tc8566_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_tc8566_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
-		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
-		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
-		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
-		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
+		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
+		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
+		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
+		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 
@@ -887,7 +889,7 @@ public:
 		, m_control(0)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -916,18 +918,18 @@ void fd03_device::device_start()
 	save_item(NAME(m_control));
 }
 
-image_init_result fd03_device::initialize_cartridge(std::string &message)
+std::error_condition fd03_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "fd03_device:: Required region 'rom' was not found.";
-		return image_init_result::FAIL;
+		return image_error::INTERNAL;
 	}
 
 	if (cart_rom_region()->bytes() != 0x4000 && cart_rom_region()->bytes() != 0x8000)
 	{
 		message = "fd03_device: Region 'rom' has unsupported size.";
-		return image_init_result::FAIL;
+		return image_error::INVALIDLENGTH;
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
@@ -937,21 +939,21 @@ image_init_result fd03_device::initialize_cartridge(std::string &message)
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
-		page(i)->install_read_handler(base + 0x3fc0, base + 0x3fc0, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-		page(i)->install_read_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-		page(i)->install_read_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-		page(i)->install_read_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3fe0, base + 0x3fef, read8smo_delegate(*this, FUNC(fd03_device::status_r)));
-		page(i)->install_read_handler(base + 0x3ff0, base + 0x3fff, read8smo_delegate(*this, FUNC(fd03_device::dskchg_r)));
-		page(i)->install_write_handler(base + 0x3fc0, base + 0x3fc0, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-		page(i)->install_write_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-		page(i)->install_write_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-		page(i)->install_write_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3fe0, base + 0x3fef, write8smo_delegate(*this, FUNC(fd03_device::set_control)));
-		page(i)->install_write_handler(base + 0x3ff0, base + 0x3fff, write8smo_delegate(*this, FUNC(fd03_device::dskchg_w)));
+		page(i)->install_read_handler(base + 0x3fc0, base + 0x3fc0, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+		page(i)->install_read_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+		page(i)->install_read_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+		page(i)->install_read_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+		page(i)->install_read_handler(base + 0x3fe0, base + 0x3fef, emu::rw_delegate(*this, FUNC(fd03_device::status_r)));
+		page(i)->install_read_handler(base + 0x3ff0, base + 0x3fff, emu::rw_delegate(*this, FUNC(fd03_device::dskchg_r)));
+		page(i)->install_write_handler(base + 0x3fc0, base + 0x3fc0, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+		page(i)->install_write_handler(base + 0x3fc1, base + 0x3fc1, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+		page(i)->install_write_handler(base + 0x3fc2, base + 0x3fc2, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+		page(i)->install_write_handler(base + 0x3fc3, base + 0x3fc3, 0, 0x001c, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+		page(i)->install_write_handler(base + 0x3fe0, base + 0x3fef, emu::rw_delegate(*this, FUNC(fd03_device::set_control)));
+		page(i)->install_write_handler(base + 0x3ff0, base + 0x3fff, emu::rw_delegate(*this, FUNC(fd03_device::dskchg_w)));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void fd03_device::device_post_load()
@@ -1038,7 +1040,7 @@ public:
 		, m_drive_select1(0)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -1073,30 +1075,30 @@ void hxf101pe_device::device_start()
 	save_item(NAME(m_drive_select1));
 }
 
-image_init_result hxf101pe_device::initialize_cartridge(std::string &message)
+std::error_condition hxf101pe_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
-	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::side_motor_r)));
-	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::select0_r)));
-	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::select1_r)));
-	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(hxf101pe_device::status_r)));
-	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::side_motor_w)));
-	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::select0_w)));
-	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(hxf101pe_device::select1_w)));
+	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	page(1)->install_read_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	page(1)->install_read_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::side_motor_r)));
+	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::select0_r)));
+	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::select1_r)));
+	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::status_r)));
+	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::side_motor_w)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::select0_w)));
+	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, emu::rw_delegate(*this, FUNC(hxf101pe_device::select1_w)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void hxf101pe_device::device_post_load()
@@ -1191,7 +1193,7 @@ public:
 		, m_control(0)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -1212,10 +1214,10 @@ void mfd001_device::device_add_mconfig(machine_config &config)
 	add_mconfig<F525, DS>(config, MB8877);
 }
 
-image_init_result mfd001_device::initialize_cartridge(std::string &message)
+std::error_condition mfd001_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
@@ -1223,19 +1225,19 @@ image_init_result mfd001_device::initialize_cartridge(std::string &message)
 	for (int i = m_fdc_regs_start_page; i <= m_fdc_regs_end_page; i++)
 	{
 		const offs_t base = 0x4000 * i;
-		page(i)->install_read_handler(base + 0x3ff8, base + 0x3ff8, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, read8smo_delegate(*this, FUNC(mfd001_device::status_r)));
-		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, write8smo_delegate(*this, FUNC(mfd001_device::control_w)));
+		page(i)->install_read_handler(base + 0x3ff8, base + 0x3ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+		page(i)->install_read_handler(base + 0x3ff9, base + 0x3ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+		page(i)->install_read_handler(base + 0x3ffa, base + 0x3ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+		page(i)->install_read_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+		page(i)->install_read_handler(base + 0x3ffc, base + 0x3ffc, emu::rw_delegate(*this, FUNC(mfd001_device::status_r)));
+		page(i)->install_write_handler(base + 0x3ff8, base + 0x3ff8, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+		page(i)->install_write_handler(base + 0x3ff9, base + 0x3ff9, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+		page(i)->install_write_handler(base + 0x3ffa, base + 0x3ffa, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+		page(i)->install_write_handler(base + 0x3ffb, base + 0x3ffb, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+		page(i)->install_write_handler(base + 0x3ffc, base + 0x3ffc, emu::rw_delegate(*this, FUNC(mfd001_device::control_w)));
 	}
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void mfd001_device::device_start()
@@ -1294,7 +1296,7 @@ public:
 		, m_control(0)
 	{ }
 
-	virtual image_init_result initialize_cartridge(std::string &message) override;
+	virtual std::error_condition initialize_cartridge(std::string &message) override;
 
 protected:
 	// device-level overrides
@@ -1319,27 +1321,27 @@ void avdpf550_device::device_start()
 	save_item(NAME(m_control));
 }
 
-image_init_result avdpf550_device::initialize_cartridge(std::string &message)
+std::error_condition avdpf550_device::initialize_cartridge(std::string &message)
 {
-	image_init_result result = disk_wd_device::initialize_cartridge(message);
-	if (image_init_result::PASS != result)
+	std::error_condition result = disk_wd_device::initialize_cartridge(message);
+	if (result)
 		return result;
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xd0, 0xd0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
-	io_space().install_write_handler(0xd1, 0xd1, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
-	io_space().install_write_handler(0xd2, 0xd2, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
-	io_space().install_write_handler(0xd3, 0xd3, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
-	io_space().install_write_handler(0xd5, 0xd5, write8smo_delegate(*this, FUNC(avdpf550_device::control_w)));
-	io_space().install_read_handler(0xd0, 0xd0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
-	io_space().install_read_handler(0xd1, 0xd1, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
-	io_space().install_read_handler(0xd2, 0xd2, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
-	io_space().install_read_handler(0xd3, 0xd3, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
-	io_space().install_read_handler(0xd4, 0xd4, read8smo_delegate(*this, FUNC(avdpf550_device::status_r)));
+	io_space().install_write_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
+	io_space().install_write_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
+	io_space().install_write_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
+	io_space().install_write_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
+	io_space().install_write_handler(0xd5, 0xd5, emu::rw_delegate(*this, FUNC(avdpf550_device::control_w)));
+	io_space().install_read_handler(0xd0, 0xd0, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
+	io_space().install_read_handler(0xd1, 0xd1, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_r)));
+	io_space().install_read_handler(0xd2, 0xd2, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_r)));
+	io_space().install_read_handler(0xd3, 0xd3, emu::rw_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
+	io_space().install_read_handler(0xd4, 0xd4, emu::rw_delegate(*this, FUNC(avdpf550_device::status_r)));
 
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void avdpf550_device::device_post_load()

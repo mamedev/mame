@@ -5,8 +5,8 @@
     Atari Cyberball hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CYBERBAL_H
-#define MAME_INCLUDES_CYBERBAL_H
+#ifndef MAME_ATARI_CYBERBAL_H
+#define MAME_ATARI_CYBERBAL_H
 
 #pragma once
 
@@ -145,4 +145,4 @@ private:
 
 };
 
-#endif // MAME_INCLUDES_CYBERBAL_H
+#endif // MAME_ATARI_CYBERBAL_H

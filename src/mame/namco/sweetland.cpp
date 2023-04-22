@@ -11,8 +11,7 @@ SWEET LAND III (1998) not yet dumped (ROM labeled "SWS 1 MPR 0", and at least
 this version has a sub pcb with a ROM labeled "SWS 1 SPR 0")
 SWEET LAND 4 (1999) no technical information found but sounds different FM sound
 and PCM voice. the music is partially from NEW SWEET FACTORY (1994).
-Sweet Land 4 Sakura Version/Bright Version (2005) music replaced and seems not
-to sound FM sound.
+Sweet Land 4 Sakura Version/Bright Version (2005) music replaced (Oki M9810B).
 other variations and later versions are not researched.
 
 SWEET LAND (1986) ~ Sweet Land II (1994) PCB layout
@@ -85,6 +84,9 @@ SWEET LAND III (1998) main PCB layout
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
+
+
+namespace {
 
 class sweetland_state : public driver_device
 {
@@ -173,6 +175,8 @@ ROM_START(sweetlnd)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "sw1.5h", 0x0000, 0x4000, CRC(6e361ae5) SHA1(b12ce39aa8235993d0acdc623ff8dbce9feb146e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1986, sweetlnd, 0, sweetland, sweetland, sweetland_state, empty_init, ROT0, "Namco", "Sweet Land", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

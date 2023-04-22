@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
 SNK Micon-Kit series
 
@@ -17,6 +17,9 @@ adds moving obstacles. The 3rd game in the series, Space Micon Kit, adds a 2nd
 row of bricks.
 
 Hardware notes:
+
+Micon-Kit (1/2):
+- 2 PCBs: one with CPU and video hardware, one with RAM, ROM, PPI
 - NEC D8080A-C, 18.432MHz XTAL, NEC uPB8224C (/9 divider)
 - NEC uPB8228C, NEC D8255C
 - 4KB ROM (4*MB8518), 256 bytes RAM (2*D2111AL-4)
@@ -24,12 +27,18 @@ Hardware notes:
 - video timing: 10MHz XTAL, h/v: ?
 - beeper
 
+Space Micon Kit:
+- PCB label: OKAYA ELECTRIC IND.CO.,LTD., SHIN NIHON KIKAKU
+- 5KB ROM (room for 8KB), 1KB RAM (2*TMM314APL)
+- 4KB VRAM (8*TMM314APL)
+- same CPU/divider/PPI but Mitsubishi brand, rest is same as above
+
 TODO:
 - correct video timing, maybe 10MHz / 2 / (262*320)
 - there's a 2-player start button on the cocktail cabinet, but where is it
   hooked up, if at all? (when inserting 2 coins, the game automatically starts)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -41,6 +50,7 @@ TODO:
 #include "speaker.h"
 
 #include "micon2.lh"
+#include "smiconk.lh"
 
 
 namespace {
@@ -60,6 +70,7 @@ public:
 	{ }
 
 	void micon2(machine_config &config);
+	void smiconk(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -75,6 +86,8 @@ private:
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
+	void smiconk_main_map(address_map &map);
+	void smiconk_io_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -96,9 +109,9 @@ void miconkit_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 u32 miconkit_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -116,9 +129,9 @@ u32 miconkit_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 u8 miconkit_state::paddle_r()
 {
@@ -159,9 +172,9 @@ u8 miconkit_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void miconkit_state::main_map(address_map &map)
 {
@@ -176,11 +189,24 @@ void miconkit_state::io_map(address_map &map)
 	map(0x04, 0x04).r(FUNC(miconkit_state::input_r));
 }
 
+void miconkit_state::smiconk_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x7000, 0x7fff).ram().share("vram");
+}
+
+void miconkit_state::smiconk_io_map(address_map &map)
+{
+	map(0x30, 0x33).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x34, 0x34).r(FUNC(miconkit_state::input_r));
+}
 
 
-/******************************************************************************
+
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( micon2 )
 	PORT_START("IN.0")
@@ -215,11 +241,28 @@ static INPUT_PORTS_START( micon2 )
 	PORT_DIPSETTING(    0x80, "5" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(smiconk)
+	PORT_INCLUDE(micon2)
+
+	PORT_MODIFY("IN.4")
+	PORT_DIPNAME( 0x30, 0x10, "Replay" )           PORT_DIPLOCATION("DS1:4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x10, "800" )
+	PORT_DIPSETTING(    0x20, "1000" )
+	PORT_DIPSETTING(    0x30, "1200" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DS1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )   PORT_DIPLOCATION("DS1:1")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "5" )
+INPUT_PORTS_END
 
 
-/******************************************************************************
+
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void miconkit_state::micon2(machine_config &config)
 {
@@ -231,8 +274,10 @@ void miconkit_state::micon2(machine_config &config)
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(miconkit_state::paddle_r));
 	m_ppi->out_pb_callback().set(FUNC(miconkit_state::sound_w));
+	m_ppi->tri_pb_callback().set_constant(0);
 	m_ppi->out_pc_callback().set(FUNC(miconkit_state::select_w));
 	m_ppi->in_pc_callback().set(FUNC(miconkit_state::vblank_r));
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -248,27 +293,45 @@ void miconkit_state::micon2(machine_config &config)
 	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
+void miconkit_state::smiconk(machine_config &config)
+{
+	micon2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &miconkit_state::smiconk_main_map);
+	m_maincpu->set_addrmap(AS_IO, &miconkit_state::smiconk_io_map);
+}
 
 
-/******************************************************************************
+
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( micon2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ufo_no_0", 0x0000, 0x0400, CRC(3eb5a299) SHA1(5e7de4cb8312be8b84f7e5e035b61a6cb9798bc0) )
 	ROM_LOAD( "ufo_no_1", 0x0400, 0x0400, CRC(e796338e) SHA1(86c5f283b4a41e19dd0b624d04e1a62ff2ffbf58) )
 	ROM_LOAD( "ufo_no_2", 0x0800, 0x0400, CRC(bf246cd7) SHA1(147fb9b877ee108c9c09461ae7e0d72af9ab3275) )
 	ROM_LOAD( "ufo_no_3", 0x0c00, 0x0400, CRC(0e93b4f0) SHA1(9405e85a7e005edd0043cb43ce2ef283b4c1b341) )
 ROM_END
 
+ROM_START( smiconk )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.1a", 0x0000, 0x0400, CRC(927dfbb8) SHA1(a73e7352ddcc3409701a9037ac32868c1a2592bd) )
+	ROM_LOAD( "2.1b", 0x0400, 0x0400, CRC(1d0f1474) SHA1(2ead9a60ef1770f8704fff951caba31ad06a38c7) )
+	ROM_LOAD( "3.1c", 0x0800, 0x0400, CRC(b89cb388) SHA1(6ec6af0c4e809e8b0b9544eb7007a3e483f921f2) )
+	ROM_LOAD( "4.1d", 0x0c00, 0x0400, CRC(a5897e6e) SHA1(5ecc65bfbecb6e1b10d272693309be827fdb3ef7) )
+	ROM_LOAD( "5.1e", 0x1000, 0x0400, CRC(98db7810) SHA1(32d6b828bb22145ae1b4e70d6f69baba1d5aad6b) )
+ROM_END
+
 } // anonymous namespace
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAMEL(1978, micon2, 0,      micon2,  micon2, miconkit_state, empty_init, ROT90,  "SNK", "Micon-Kit Part II", MACHINE_SUPPORTS_SAVE, layout_micon2 )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
+GAMEL(1978, micon2,  0,      micon2,  micon2,  miconkit_state, empty_init, ROT90,  "SNK", "Micon-Kit Part II", MACHINE_SUPPORTS_SAVE, layout_micon2 )
+GAMEL(1978, smiconk, 0,      smiconk, smiconk, miconkit_state, empty_init, ROT90,  "SNK", "Space Micon Kit", MACHINE_SUPPORTS_SAVE, layout_smiconk )

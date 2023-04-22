@@ -65,11 +65,14 @@ end
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/nandflash.h"
 #include "machine/s3c2410.h"
-#include "machine/smartmed.h"
 #include "screen.h"
 
 #include <cstdarg>
+
+
+namespace {
 
 #define PALM_Z22_BATTERY_LEVEL  75
 
@@ -98,7 +101,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
-	required_device<nand_device> m_nand;
+	required_device<samsung_k9f5608u0dj_device> m_nand;
 
 	uint32_t m_port[8];
 
@@ -262,8 +265,6 @@ INPUT_CHANGED_MEMBER(palmz22_state::input_changed)
 
 void palmz22_state::machine_start()
 {
-	m_nand->set_data_ptr( memregion("nand")->base());
-
 	save_item(NAME(m_port));
 }
 
@@ -316,8 +317,7 @@ void palmz22_state::palmz22(machine_config &config)
 	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
 	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
 
-	NAND(config, m_nand, 0);
-	m_nand->set_nand_type(nand_device::chip::K9F5608U0D_J);
+	SAMSUNG_K9F5608U0DJ(config, m_nand, 0);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
 }
 
@@ -347,5 +347,8 @@ ROM_START( palmz22 )
 	ROM_REGION( 0x2100000, "nand", 0 )
 	ROM_LOAD( "palmz22.bin", 0, 0x2100000, CRC(6d0320b3) SHA1(99297975fdad44faf69cc6eaf0fa2560d5579a4d) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, init_palmz22, "Palm", "Palm Z22", MACHINE_NO_SOUND)

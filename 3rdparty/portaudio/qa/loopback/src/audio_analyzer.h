@@ -26,13 +26,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -46,44 +46,44 @@
 
 typedef struct PaQaSineGenerator_s
 {
-	double    phase;
-	double    phaseIncrement;
-	double    frequency;
-	double    amplitude;
+    double    phase;
+    double    phaseIncrement;
+    double    frequency;
+    double    amplitude;
 } PaQaSineGenerator;
 
-/** Container for a monophonic audio sample in memory. */ 
+/** Container for a monophonic audio sample in memory. */
 typedef struct PaQaRecording_s
 {
-	/** Maximum number of frames that can fit in the allocated buffer. */
-	int       maxFrames;
-	float    *buffer;
-	/** Actual number of valid frames in the buffer. */
-	int       numFrames;
-	int       sampleRate;
+    /** Maximum number of frames that can fit in the allocated buffer. */
+    int       maxFrames;
+    float    *buffer;
+    /** Actual number of valid frames in the buffer. */
+    int       numFrames;
+    int       sampleRate;
 } PaQaRecording;
 
 typedef struct PaQaTestTone_s
 {
-	int       samplesPerFrame;
-	int       startDelay;
-	double    sampleRate;
-	double    frequency;
-	double    amplitude;
+    int       samplesPerFrame;
+    int       startDelay;
+    double    sampleRate;
+    double    frequency;
+    double    amplitude;
 } PaQaTestTone;
 
 typedef struct PaQaAnalysisResult_s
 {
-	int       valid;
-	/** Latency in samples from output to input. */
-	double    latency;
-	double    amplitudeRatio;
-	double    popAmplitude;
-	double    popPosition;
-	double    numDroppedFrames;
-	double    droppedFramesPosition;
-	double    numAddedFrames;
-	double    addedFramesPosition;
+    int       valid;
+    /** Latency in samples from output to input. */
+    double    latency;
+    double    amplitudeRatio;
+    double    popAmplitude;
+    double    popPosition;
+    double    numDroppedFrames;
+    double    droppedFramesPosition;
+    double    numAddedFrames;
+    double    addedFramesPosition;
 } PaQaAnalysisResult;
 
 
@@ -101,7 +101,7 @@ void PaQa_EraseBuffer( float *buffer, int numFrames, int samplesPerFrame );
 void PaQa_MixSine( PaQaSineGenerator *generator, float *buffer, int numSamples, int stride );
 
 void PaQa_WriteSine( float *buffer, int numSamples, int stride,
-					double frequency, double amplitude );
+                     double frequency, double amplitude );
 
 /**
  * Generate a signal with a sharp edge in the middle that can be recognized despite some phase shift.
@@ -130,15 +130,15 @@ void PaQa_SetupSineGenerator( PaQaSineGenerator *generator, double frequency, do
 /*================= Recordings ===================================*/
 /*================================================================*/
 /**
- * Allocate memory for containg a mono audio signal. Set up recording for writing.
+ * Allocate memory for containing a mono audio signal. Set up recording for writing.
  */
  int PaQa_InitializeRecording( PaQaRecording *recording, int maxSamples, int sampleRate );
- 
+
 /**
 * Free memory allocated by PaQa_InitializeRecording.
  */
  void PaQa_TerminateRecording( PaQaRecording *recording );
- 
+
 /**
  * Apply a biquad filter to the audio from the input recording and write it to the output recording.
  */
@@ -146,29 +146,29 @@ void PaQa_FilterRecording( PaQaRecording *input, PaQaRecording *output, BiquadFi
 
 
 int PaQa_SaveRecordingToWaveFile( PaQaRecording *recording, const char *filename );
- 
+
 /**
  * @param stride is the spacing of samples to skip in the input buffer. To use every samples pass 1. To use every other sample pass 2.
  */
 int PaQa_WriteRecording( PaQaRecording *recording, float *buffer, int numSamples, int stride );
- 
+
 /** Write zeros into a recording. */
 int PaQa_WriteSilence( PaQaRecording *recording, int numSamples );
- 
+
 int PaQa_RecordFreeze( PaQaRecording *recording, int numSamples );
 
 double PaQa_CorrelateSine( PaQaRecording *recording, double frequency, double frameRate,
-						  int startFrame, int numSamples, double *phasePtr );
+                           int startFrame, int numSamples, double *phasePtr );
 
 double PaQa_FindFirstMatch( PaQaRecording *recording, float *buffer, int numSamples, double tolerance  );
 
-/** 
+/**
  * Estimate the original amplitude of a clipped sine wave by measuring
  * its average slope at the zero crossings.
  */
 double PaQa_MeasureSineAmplitudeBySlope( PaQaRecording *recording,
-										double frequency, double frameRate,
-										int startFrame, int numFrames );
+                                         double frequency, double frameRate,
+                                         int startFrame, int numFrames );
 
 double PaQa_MeasureRootMeanSquare( float *buffer, int numFrames );
 

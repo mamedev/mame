@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="saitek_kso" description="Saitek KSO ROM">
@@ -10,12 +10,23 @@ license:CC0
 <!-- Used in: Superstar 36K, Turbostar chess computers, also in Maestro A module -->
 
 	<software name="kso">
-		<description>Kasparov Selected Openings</description>
+		<description>Kasparov Selected Openings (set 1)</description>
 		<year>1985</year>
 		<publisher>SciSys</publisher>
 		<part name="extrom" interface="saitek_kso">
 			<dataarea name="rom" size="0x2000">
 				<rom name="y01d-kso" size="0x2000" crc="25fac442" sha1="b2886d497e09b3df3a6ece25ee0900c27d092c54" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ksoa" cloneof="kso">
+		<description>Kasparov Selected Openings (set 2)</description>
+		<year>1985</year>
+		<publisher>SciSys</publisher>
+		<part name="extrom" interface="saitek_kso">
+			<dataarea name="rom" size="0x2000">
+				<rom name="kso_v0.bin" size="0x2000" crc="afcddd0c" sha1="0aff44f04bebd8d232e6db05a5ab6cd3d4fe5221" />
 			</dataarea>
 		</part>
 	</software>

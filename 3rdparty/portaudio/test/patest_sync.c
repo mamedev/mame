@@ -1,19 +1,19 @@
 /** @file patest_sync.c
-	@ingroup test_src
-	@brief Test time stamping and synchronization of audio and video.
+    @ingroup test_src
+    @brief Test time stamping and synchronization of audio and video.
 
-	A high latency is used so we can hear the difference in time.
-	Random durations are used so we know we are hearing the right beep
-	and not the one before or after.
+    A high latency is used so we can hear the difference in time.
+    Random durations are used so we know we are hearing the right beep
+    and not the one before or after.
 
-	Sequence of events:
-		-# Foreground requests a beep.
-		-# Background randomly schedules a beep.
-		-# Foreground waits for the beep to be heard based on PaUtil_GetTime().
-		-# Foreground outputs video (printf) in sync with audio.
-		-# Repeat.
-	
-	@author Phil Burk  http://www.softsynth.com
+    Sequence of events:
+        -# Foreground requests a beep.
+        -# Background randomly schedules a beep.
+        -# Foreground waits for the beep to be heard based on PaUtil_GetTime().
+        -# Foreground outputs video (printf) in sync with audio.
+        -# Repeat.
+
+    @author Phil Burk  http://www.softsynth.com
 */
 /*
  * $Id$
@@ -43,13 +43,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -97,8 +97,8 @@ static unsigned long GenerateRandomNumber( void )
 */
 static int patestCallback( const void *inputBuffer, void *outputBuffer,
                            unsigned long framesPerBuffer,
-			   const PaStreamCallbackTimeInfo *timeInfo,
-			   PaStreamCallbackFlags statusFlags, void *userData )
+                           const PaStreamCallbackTimeInfo *timeInfo,
+                           PaStreamCallbackFlags statusFlags, void *userData )
 {
     /* Cast data passed through stream to our structure. */
     paTestData *data = (paTestData*)userData;
@@ -186,7 +186,7 @@ int main(void)
     /* Initialize library before making any other calls. */
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
-    
+
     outputParameters.device = Pa_GetDefaultOutputDevice();
     if (outputParameters.device == paNoDevice) {
         fprintf(stderr,"Error: No default output device.\n");
@@ -198,16 +198,16 @@ int main(void)
     outputParameters.suggestedLatency = (double)LATENCY_MSEC / 1000;
 
     /* Open an audio I/O stream. */
-     err = Pa_OpenStream(
-              &stream,
-	      NULL,                         /* no input */
-	      &outputParameters,
-              SAMPLE_RATE,
-              FRAMES_PER_BUFFER,            /* frames per buffer */
-              paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-              patestCallback,
-              &DATA );
-   if( err != paNoError ) goto error;
+    err = Pa_OpenStream(
+            &stream,
+            NULL,                         /* no input */
+            &outputParameters,
+            SAMPLE_RATE,
+            FRAMES_PER_BUFFER,            /* frames per buffer */
+            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+            patestCallback,
+            &DATA );
+    if( err != paNoError ) goto error;
 
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
@@ -264,7 +264,7 @@ int main(void)
     return err;
 error:
     Pa_Terminate();
-    fprintf( stderr, "An error occured while using the portaudio stream\n" );
+    fprintf( stderr, "An error occurred while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
     return err;

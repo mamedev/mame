@@ -5,7 +5,6 @@ project ("texturev")
 	configuration {}
 
 	includedirs {
-		path.join(BX_DIR,   "include"),
 		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 		path.join(BGFX_DIR, "3rdparty"),
@@ -23,8 +22,9 @@ project ("texturev")
 		"bimg_decode",
 		"bimg",
 		"bgfx",
-		"bx",
 	}
+
+	using_bx()
 
 	if _OPTIONS["with-sdl"] then
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
@@ -62,7 +62,6 @@ project ("texturev")
 		configuration { "osx*" }
 			linkoptions {
 				"-framework CoreVideo",
-				"-framework IOKit",
 			}
 
 		configuration {}
@@ -148,9 +147,10 @@ project ("texturev")
 	configuration { "osx*" }
 		linkoptions {
 			"-framework Cocoa",
+			"-framework IOKit",
 			"-framework Metal",
-			"-framework QuartzCore",
 			"-framework OpenGL",
+			"-framework QuartzCore",
 		}
 
 	configuration { "ios*" }
@@ -158,9 +158,10 @@ project ("texturev")
 		linkoptions {
 			"-framework CoreFoundation",
 			"-framework Foundation",
+			"-framework IOKit",
 			"-framework OpenGLES",
-			"-framework UIKit",
 			"-framework QuartzCore",
+			"-framework UIKit",
 		}
 
 	configuration { "xcode*", "ios" }

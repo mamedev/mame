@@ -34,6 +34,8 @@
 #include "maxaflex.lh"
 
 
+namespace {
+
 class maxaflex_state : public atari_common_state
 {
 public:
@@ -437,6 +439,8 @@ ROM_START(mf_flip)
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))   /* for simulating keystrokes ?*/
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, maxaflex, 0,        maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy",                       "Max-A-Flex",                MACHINE_IS_BIOS_ROOT )

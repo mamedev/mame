@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, David Haywood
-#ifndef MAME_INCLUDES_DECOCASS_H
-#define MAME_INCLUDES_DECOCASS_H
+#ifndef MAME_DATAEAST_DECOCASS_H
+#define MAME_DATAEAST_DECOCASS_H
 
 #pragma once
 
@@ -35,6 +35,7 @@ public:
 		, m_mcu(*this, "mcu")
 		, m_dongle_r(*this)
 		, m_dongle_w(*this)
+		, m_donglerom(*this, "dongle")
 		, m_audiocpu(*this, "audiocpu")
 		, m_watchdog(*this, "watchdog")
 		, m_cassette(*this, "cassette")
@@ -70,6 +71,8 @@ protected:
 	/* dongles-related */
 	read8sm_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
 	write8sm_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
+
+	optional_region_ptr<uint8_t> m_donglerom;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -450,4 +453,23 @@ private:
 	int32_t     m_widel_latch = 0;        /* latched enable PROM (1100xxxx written to E5x1) */
 };
 
-#endif // MAME_INCLUDES_DECOCASS_H
+class decocass_darksoft_state : public decocass_state
+{
+public:
+	decocass_darksoft_state(const machine_config &mconfig, device_type type, const char *tag)
+		: decocass_state(mconfig, type, tag)
+	{
+	}
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t decocass_darksoft_r(offs_t offset);
+	void decocass_darksoft_w(offs_t offset, uint8_t data);
+
+	uint32_t m_address;
+};
+
+#endif // MAME_DATAEAST_DECOCASS_H

@@ -95,7 +95,7 @@ u8 sms_md6button_device::in_r()
 		if (m_th)
 			result = BIT(lines, 0, 6);                              // CBRLDU
 		else
-			result = (BIT(lines, 6, 2) << 4);                       // SA0000
+			result = BIT(lines, 6, 2) << 4;                         // SA0000
 		break;
 	case 3:
 		if (m_th)
@@ -151,7 +151,7 @@ void sms_md6button_device::device_start()
 
 void sms_md6button_device::device_reset()
 {
-	// TODO: doesn't work reset happens before inputs are read
+	// TODO: doesn't work - reset happens before host inputs are read for the first time
 	if (!m_mode)
 		m_mode = BIT(m_pad->read(), 11) | 0x02;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="c128_flop" description="Commodore 128 diskettes">
 
@@ -227,6 +227,32 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="333744">
 				<rom name="data_manager_128_s2[timeworks_1984].g64" size="333744" crc="fbf7cf7f" sha1="2d2aa58bd1a71cffd5d6765a9b79af867d12ecc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="devpack" supported="no">
+		<description>C128 Developer's Package</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="devpack1of4.d64" size="174848" crc="7e3231d4" sha1="15b90b4fcaccd6e317348c5a00d02bbc31a8aa51"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="devpack2of4.d64" size="174848" crc="f861918d" sha1="e6531e6af3d47ea5798c23c50f868a58861737ab"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="devpack3of4.d64" size="174848" crc="19d37de2" sha1="9e9a63897a9e39e3d9958f72fa870025d2f2f308"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="devpack4of4.d64" size="174848" crc="34c15968" sha1="c12dad60cbaa4366c3e25b461c44c22f0e22260c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -487,6 +513,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="1571de13">
+		<description>Commodore 128D/1571 Test/Demo Disk v1.3</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="314855-02" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1571-128d-v13-314855-02.d64" size="174848" crc="d54a66d8" sha1="af02f486b54b26ed5e9403467387ee83e131de11" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1581demo">
 		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
 		<year>198?</year>
@@ -525,7 +564,7 @@ license:CC0
 	</software>
 
 	<software name="cpm">
-		<description>CP/M Version 3.0</description>
+		<description>CP/M Version 3.0 (8 Dec 1985)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-580745" />
@@ -546,7 +585,7 @@ license:CC0
 	</software>
 
 	<software name="cpma" cloneof="cpm">
-		<description>CP/M Version 3.0 (Alt)</description>
+		<description>CP/M Version 3.0 (8 Dec 1985, Alt)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-598666" />
@@ -567,7 +606,7 @@ license:CC0
 	</software>
 
 	<software name="cpmb" cloneof="cpm">
-		<description>CP/M Version 3.0 (Alt 2)</description>
+		<description>CP/M Version 3.0 (1 Aug 1985)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="6228129311" />
@@ -588,7 +627,7 @@ license:CC0
 	</software>
 
 	<software name="cpmc" cloneof="cpm">
-		<description>CP/M Version 3.0 (Alt 3)</description>
+		<description>CP/M Version 3.0 (1 Aug 1985, Alt)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="6228151676" />
@@ -684,7 +723,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cpmplus3" cloneof="cpm">
+	<software name="cpmplus3" cloneof="cpm" supported="no">
 		<description>CP/M 3 Version 3.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -696,7 +735,19 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cpmfast3" cloneof="cpm">
+	<software name="cpmfast" cloneof="cpm" supported="no">
+		<description>CPMFAST</description>
+		<year>1999</year>
+		<publisher>Linards Ticmanis</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349696">
+				<rom name="cpmfast.d71" size="349696" crc="1c7be360" sha1="034d9a4ba610564c0dfa2ad9539a9a75f391863e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmfast3" cloneof="cpm" supported="no">
 		<description>CP/M 3 - BDOS 3.0 / FastBIOS 3.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -97,6 +97,8 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "logmacro.h"
 
 
+namespace {
+
 class vcombat_state : public driver_device
 {
 public:
@@ -820,6 +822,9 @@ ROM_START( shadfgtr )
 	ROM_LOAD( "shadfgtr.u51", 0x000, 0x1f1, CRC(bab58337) SHA1(c4a79c8e53aeadb7f64d49d214b607b5b36f144e) )
 	/* The second upper-board PAL couldn't be read */
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT      MONITOR              COMPANY         FULLNAME           FLAGS
 GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, init_vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )

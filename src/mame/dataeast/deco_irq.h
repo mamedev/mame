@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DECO_IRQ_H
-#define MAME_MACHINE_DECO_IRQ_H
+#ifndef MAME_DATAEAST_DECO_IRQ_H
+#define MAME_DATAEAST_DECO_IRQ_H
 
 #pragma once
 
@@ -89,4 +89,4 @@ private:
 DECLARE_DEVICE_TYPE(DECO_IRQ, deco_irq_device)
 
 
-#endif // MAME_MACHINE_DECO_IRQ_H
+#endif // MAME_DATAEAST_DECO_IRQ_H

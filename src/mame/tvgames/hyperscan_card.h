@@ -2,8 +2,8 @@
 // copyright-holders:Sandro Ronco
 
 
-#ifndef MAME_MACHINE_HYPERSCAN_CARD_H
-#define MAME_MACHINE_HYPERSCAN_CARD_H
+#ifndef MAME_TVGAMES_HYPERSCAN_CARD_H
+#define MAME_TVGAMES_HYPERSCAN_CARD_H
 
 #pragma once
 
@@ -22,15 +22,14 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	// image-level overrides
-	virtual image_init_result call_load() override;
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "hyperscan_card"; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
-	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 private:
@@ -51,4 +50,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HYPERSCAN_CARD, hyperscan_card_device)
 
-#endif // MAME_MACHINE_HYPERSCAN_CARD_H
+#endif // MAME_TVGAMES_HYPERSCAN_CARD_H

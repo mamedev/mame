@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_REALBRK_H
-#define MAME_INCLUDES_REALBRK_H
+#ifndef MAME_DYNAX_REALBRK_H
+#define MAME_DYNAX_REALBRK_H
 
 #pragma once
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -94,4 +94,4 @@ private:
 	void realbrk_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_REALBRK_H
+#endif // MAME_DYNAX_REALBRK_H

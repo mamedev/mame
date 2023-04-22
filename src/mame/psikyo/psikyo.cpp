@@ -29,15 +29,11 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 
 To Do:
 
-- All games uses PORT_VBLANK and legacy screen parameters (which is already
-  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
-  or 59.90 Hz).
-  The most blunt examples of something being wrong with timings are with
-  Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
-  doesn't sport anything like that.
-  Given the above, all games are marked with MACHINE_IMPERFECT_TIMING until
-  somebody provides accurate H/Vsync signals for at least one game of this
-  driver.
+- Some games use naive/unlikely measurements (exactly 59.30), which should be verified.
+  Tengai and Strikers 1945 have accurate measurements from PCB. Maybe these could be used
+  for other titles too?
+- All games but Tengai / Strikers 1945 use IRQ1 for VBlank. This is likely incorrect.
+  On Tengai/Strikers 1945, its actually IPL2 that's asserted (Interrupt Level = 4).
 - tengai / tengaij: "For use in Japan" screen is supposed to output the
   typical blue Psikyo backdrop gradient instead of being pure black as it is
   now;
@@ -1162,7 +1158,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, 16_MHz_XTAL);  // 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(psikyo_state::irq4_line_hold));
 
 	LZ8420M(config, m_audiocpu, 16_MHz_XTAL / 2);  // 8 MHz (16 / 2)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psikyo_state::gunbird_sound_map);
@@ -1174,11 +1170,7 @@ void psikyo_state::s1945(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.9229);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 256);
-	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
+	m_screen->set_raw(14.318181_MHz_XTAL / 2, 456, 0, 320, 262, 0, 224);  // Approximately 59.923Hz, 38 Lines in VBlank
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 
@@ -1597,7 +1589,7 @@ Notes:
       PS2001B  - Psikyo Custom (QFP160)
       PS3103   - Psikyo Custom (QFP160)
       6116     - 2k x8 SRAM (x4, DIP24)
-      LH5168   - Sharp LH5168 2k x8 SRAM (x3, DIP24)
+      LH5168   - Sharp LH5168 8k x8 SRAM (x3, DIP28)
       62256    - NKK N341256 32k x8 SRAM (x14, DIP28)
       6264     - ISSI IS61C64 8k x8 SRAM (x4, DIP28)
       MB3771   - Fujitsu MB3771 Master Reset IC (DIP8)
@@ -1627,7 +1619,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
-SYNCS:  HSync 15.2183kHz, VSync 59.9229Hz
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
@@ -1753,6 +1749,11 @@ OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
+SYNCS:  HSync 15.700kHz, VSync 59.923Hz
+        HSync most likely derived from 14.3181MHz OSC (divided by 912)
+        262 lines per frame consisting of:
+          - Visible lines: 224
+          - VBlank lines: 38 (Front/Back porch: 15 lines, VSync pulse: 8 lines)
 Chips:  PS2001B
         PS3103
         PS3204
@@ -1965,24 +1966,24 @@ void psikyo_state::init_s1945bl()
 
 ***************************************************************************/
 
-GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Samurai Aces (World)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo (Banpresto license)",  "Sengoku Ace (Japan, set 2)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)",                                                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)",                                                MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",                                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",                                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)",                                          MACHINE_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
 
-GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",                                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)",                             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",                                  MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
-GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II (Japan) / Tengai (World)", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World

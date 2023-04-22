@@ -416,12 +416,11 @@ u32 mcatadv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				draw_tilemap_part(screen, 1, i | 0x8, bitmap, cliprect);
 	}
 
-	g_profiler.start(PROFILER_USER1);
+	auto profile = g_profiler.start(PROFILER_USER1);
 #ifdef MAME_DEBUG
 	if (!machine().input().code_pressed(KEYCODE_E))
 #endif
 		draw_sprites(screen, bitmap, cliprect);
-	g_profiler.stop();
 	return 0;
 }
 

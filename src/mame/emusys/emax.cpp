@@ -18,6 +18,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class emax_state : public driver_device
 {
 public:
@@ -301,6 +304,9 @@ ROM_START(emax2)
 	ROM_REGION16_LE(0x20, "eeprom", 0)
 	ROM_LOAD("93c06n.ic24", 0x00, 0x20, CRC(403ef05b) SHA1(893ef614127ac1898d8ac529521f87ff62207138))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1986, emax,  0,    0, emax,  emax,  emax_state, empty_init, "E-mu Systems", "Emax Digital Sampling Keyboard", MACHINE_IS_SKELETON)
 SYST(198?, emaxp, emax, 0, emaxp, emax,  emax_state, empty_init, "E-mu Systems", "Emax Plus Digital Sampling Keyboard", MACHINE_IS_SKELETON)

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger, yoyo_chessboard
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity 68000-based Elite Avant Garde driver
 For 6502-based EAG, see elite.cpp
@@ -25,7 +25,7 @@ actual speed, overclock V10 and V11 to 230%. This can be done by starting MAME
 with the -cheat option and going to the Slider Controls menu, hold Ctrl and press
 Right to overclock maincpu.
 
-*******************************************************************************
+********************************************************************************
 
 Excel 68000 (model 6094) overview:
 - 16KB RAM(2*SRM2264C-10 @ U8/U9), 64KB ROM(2*AT27C256-15DC @ U6/U7)
@@ -43,7 +43,7 @@ I/O is via TTL, overall very similar to EAG.
 fex68km4 continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
-*******************************************************************************
+********************************************************************************
 
 Elite Avant Garde (EAG, model 6114)
 -----------------------------------
@@ -92,7 +92,7 @@ Memory map: (of what is known)
 700002-700003 R lo d7: 74251: keypad row 8
 604000-607FFF: 16KB EEPROM
 
-*******************************************************************************
+********************************************************************************
 
 Elite Avant Garde (EAG, model 6117)
 -----------------------------------
@@ -161,7 +161,7 @@ V1x Memory map:
 200000-3FFFFF: hashtable SRAM (less on V10?)
 B0000x-xxxxxx: see V7, -800000
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -312,9 +312,9 @@ private:
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // TTL/generic
 
@@ -406,9 +406,9 @@ u8 eagv5_state::sub_ack_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 // Excel 68000
 
@@ -512,9 +512,9 @@ void eag_state::eagv10_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( excel68k )
 	PORT_START("IN.0")
@@ -547,13 +547,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void excel68k_state::fex68k(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL); // HD68HC000P12
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68k_map);
 
@@ -565,12 +565,12 @@ void excel68k_state::fex68k(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0x55, 0x7f);
 	config.set_default_layout(layout_fidel_ex_68k);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
@@ -579,7 +579,7 @@ void excel68k_state::fex68km2(machine_config &config)
 {
 	fex68k(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km2_map);
 }
 
@@ -587,7 +587,7 @@ void excel68k_state::fex68km3(machine_config &config)
 {
 	fex68k(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(16_MHz_XTAL); // factory overclock
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km3_map);
 }
@@ -596,7 +596,7 @@ void excel68k_state::fex68km4(machine_config &config)
 {
 	fex68k(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // XC68020RC16 or MC68020RC20E
 	m_maincpu->set_addrmap(AS_PROGRAM, &excel68k_state::fex68km4_map);
 
@@ -605,9 +605,9 @@ void excel68k_state::fex68km4(machine_config &config)
 
 void eag_state::eag_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eag_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 4.9152_MHz_XTAL / 0x2000)); // 4060 Q13, 600Hz
@@ -620,16 +620,16 @@ void eag_state::eag_base(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ef, 0x7f);
 	config.set_default_layout(layout_fidel_eag_68k);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "fidel_scc");
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -638,7 +638,7 @@ void eag_state::eagv2(machine_config &config)
 {
 	eag_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	RAM(config, m_ram).set_extra_options("128K, 512K, 1M");
 	m_ram->set_default_size("128K");
 	m_ram->set_default_value(0);
@@ -648,7 +648,7 @@ void eag_state::eagv3(machine_config &config)
 {
 	eagv2(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_ram->set_default_size("512K");
 }
 
@@ -656,7 +656,7 @@ void eagv5_state::eagv5(machine_config &config)
 {
 	eagv2(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &eagv5_state::main_map);
 
 	M68000(config, m_subcpu, 16_MHz_XTAL);
@@ -669,16 +669,16 @@ void eagv5_state::eagv5(machine_config &config)
 
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 }
 
 void eag_state::eagv7(machine_config &config)
 {
 	eag_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68020(config.replace(), m_maincpu, 20_MHz_XTAL); // also seen with 25MHz XTAL
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
@@ -686,9 +686,9 @@ void eag_state::eagv9(machine_config &config)
 {
 	eagv7(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68030(config.replace(), m_maincpu, 32_MHz_XTAL); // also seen with 40MHz XTAL
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv7_map);
 }
 
@@ -696,9 +696,9 @@ void eag_state::eagv10(machine_config &config)
 {
 	eagv7(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68040(config.replace(), m_maincpu, 25_MHz_XTAL);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
 }
 
@@ -706,7 +706,7 @@ void eag_state::eagv11(machine_config &config)
 {
 	eagv7(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M68EC040(config.replace(), m_maincpu, 36_MHz_XTAL*2); // wrong! should be M68EC060
 	m_maincpu->set_addrmap(AS_PROGRAM, &eag_state::eagv10_map);
 
@@ -716,9 +716,9 @@ void eag_state::eagv11(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( fex68k ) // model 6094, PCB label 510.1120B01
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
@@ -835,26 +835,26 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT  CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1987, fex68k,    0,       0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fex68ka,   fex68k,  0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, fex68kb,   fex68k,  0, fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km2,  fex68k,  0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km2a, fex68k,  0, fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km3,  fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km3a, fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, fex68km3b, fex68k,  0, fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, fex68km4,  fex68k,  0, fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1987, fex68k,    0,       0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, fex68ka,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, fex68kb,   fex68k,  0,      fex68k,   excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km2,  fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km2a, fex68k,  0,      fex68km2, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach II (rev. C+, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach III Master (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity Electronics", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, feagv2,    0,       0, eagv2,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, feagv3,    feagv2,  0, eagv3,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, feagv5,    feagv2,  0, eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv7,    feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv7a,   feagv2,  0, eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv9,    feagv2,  0, eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0, eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 2002, feagv11,   feagv2,  0, eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1989, feagv2,    0,       0,      eagv2,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv3,    feagv2,  0,      eagv3,    eag,      eag_state,      init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, feagv5,    feagv2,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity Electronics", "Elite Avant Garde (model 6114-5)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv7,    feagv2,  0,      eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv7a,   feagv2,  0,      eagv7,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-7, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv9,    feagv2,  0,      eagv9,    eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, feagv10,   feagv2,  0,      eagv10,   eag,      eag_state,      empty_init, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 2002, feagv11,   feagv2,  0,      eagv11,   eag,      eag_state,      empty_init, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

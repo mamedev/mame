@@ -1,6 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner, hap
-/******************************************************************************
+/*******************************************************************************
 
 Hartung Game Master
 Hong Kong LCD handheld console (mainly sold in Europe)
@@ -36,7 +36,7 @@ BTANB:
 - LCD flickers partially, especially bad in finitezn
 - fast button retriggers, for example the gear shift in carracing
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -53,6 +53,7 @@ BTANB:
 
 #include "gmaster.lh"
 
+
 namespace {
 
 class gmaster_state : public driver_device
@@ -61,6 +62,7 @@ public:
 	gmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
 		m_lcd(*this, "lcd%u", 0),
 		m_screen(*this, "screen"),
 		m_speaker(*this, "speaker")
@@ -73,6 +75,7 @@ protected:
 
 private:
 	required_device<upd78c11_device> m_maincpu;
+	required_shared_ptr<u8> m_ram;
 	required_device_array<sed1520_device, 2> m_lcd;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
@@ -86,21 +89,19 @@ private:
 
 	void main_map(address_map &map);
 
-	u8 m_ram[0x800] = { };
 	u8 m_chipsel = 0;
 };
 
 void gmaster_state::machine_start()
 {
-	save_item(NAME(m_ram));
 	save_item(NAME(m_chipsel));
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // LCD outputs
 
@@ -171,7 +172,7 @@ void gmaster_state::io_w(offs_t offset, u8 data)
 void gmaster_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
-	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
+	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w)).share("ram");
 	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	// 0xff00-0xffff is internal RAM
 }
@@ -196,9 +197,9 @@ void gmaster_state::portc_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( gmaster )
 	PORT_START("JOY")
@@ -214,9 +215,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void gmaster_state::gmaster(machine_config &config)
 {
@@ -253,9 +254,9 @@ void gmaster_state::gmaster(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START(gmaster)
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -266,9 +267,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME       FLAGS
-CONS( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, gmaster, 0,      0,      gmaster, gmaster, gmaster_state, empty_init, "Hartung", "Game Master", MACHINE_SUPPORTS_SAVE )

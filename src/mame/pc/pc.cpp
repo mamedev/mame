@@ -36,6 +36,8 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 /******************************************************* Generic PC with CGA ***/
 
 
+namespace {
+
 class pc_state : public driver_device
 {
 public:
@@ -2336,6 +2338,8 @@ ROM_START( mpu9088vf ) // From a motherboard marked MY-COM MPU-9088-VF SAN-MS94V
 	ROM_LOAD( "27128-mpu-9088-vf_rom1.bin", 0xc000, 0x4000, CRC(a211e539) SHA1(1a45627fb34e38f6e3485c1526ff1d9a645c8683))
 ROM_END
 
+} // anonymous namespace
+
 
 /***************************************************************************
 
@@ -2366,7 +2370,7 @@ COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
 COMP( 1990, ec1847,         ibm5150, 0,      ec1847,         pccga,    pc_state, empty_init,    "<unknown>",                       "EC-1847",               MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
-COMP( 1989, fraking,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
+COMP( 1989, fraking,        ibm5150, 0,      fraking,        pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )

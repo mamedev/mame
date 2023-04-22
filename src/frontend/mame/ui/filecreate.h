@@ -27,14 +27,14 @@ namespace ui {
 class menu_confirm_save_as : public menu
 {
 public:
-	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes);
+	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes);
 	virtual ~menu_confirm_save_as() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
-	bool *m_yes;
+	bool &m_yes;
 };
 
 
@@ -47,11 +47,13 @@ public:
 	virtual ~menu_file_create() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_back() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	bool &                          m_ok;
 	device_image_interface *        m_image;
@@ -71,8 +73,8 @@ public:
 	virtual ~menu_select_format() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	// internal state
 	std::vector<const floppy_image_format_t *> m_formats;
@@ -90,8 +92,8 @@ public:
 	virtual ~menu_select_floppy_init() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 
 	// internal state
 	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> m_fs;

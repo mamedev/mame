@@ -134,6 +134,8 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 #include "emupal.h"
 
 
+namespace {
+
 class psattack_state : public driver_device
 {
 public:
@@ -266,6 +268,9 @@ ROM_END
 void psattack_state::init_psattack()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 2004, psattack, 0,        psattack, psattack,  psattack_state, init_psattack, ROT0, "Uniana",              "P's Attack", MACHINE_IS_SKELETON ) // has a CF card instead of flash roms
 

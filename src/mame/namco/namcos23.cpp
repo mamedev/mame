@@ -1340,6 +1340,8 @@ Notes:
 #include <cfloat>
 
 
+namespace {
+
 #define JVSCLOCK    (XTAL(14'745'600))
 
 //#define H8CLOCK     (16737350)      /* from 2061 */
@@ -1805,13 +1807,12 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
-	char buf[4096];
-	char *p = buf;
-	p += sprintf(p, "projection matrix line:");
+	std::ostringstream buf;
+	buf << "projection matrix line:";
 	for(int i=0; i<8; i++)
-		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
-	p += sprintf(p, "\n");
-	logerror(buf);
+		util::stream_format(buf, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
+	buf << "\n";
+	logerror(std::move(buf).str());
 }
 
 void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
@@ -1820,13 +1821,12 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	case 0x0001: c435_state_set_interrupt(param); break;
 	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
 	default: {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(buf, "WARNING: Unhandled state type %04x :", type);
+		std::ostringstream buf;
+		util::stream_format(buf, "WARNING: Unhandled state type %04x :", type);
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
-			p += sprintf(p, " %04x", param[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", param[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 		break;
 	}
 	}
@@ -2067,13 +2067,12 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(p, "c435 -");
+		std::ostringstream buf;
+		buf << "c435 -";
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			p += sprintf(p, " %04x", m_c435_buffer[i]);
-		p += sprintf(p, "\n");
-		logerror(buf);
+			util::stream_format(buf, " %04x", m_c435_buffer[i]);
+		buf << "\n";
+		logerror(std::move(buf).str());
 	}
 
 	m_c435_buffer_pos = 0;
@@ -5453,6 +5452,8 @@ ROM_START( crszonev2a )
 	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
 	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Games */

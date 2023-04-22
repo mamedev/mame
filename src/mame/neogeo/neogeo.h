@@ -6,11 +6,17 @@
     Neo-Geo hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_NEOGEO_H
-#define MAME_INCLUDES_NEOGEO_H
+#ifndef MAME_NEOGEO_NEOGEO_H
+#define MAME_NEOGEO_NEOGEO_H
 
 #pragma once
 
+#include "ng_memcard.h"
+#include "neogeo_spr.h"
+
+#include "bus/neogeo/slot.h"
+#include "bus/neogeo/carts.h"
+#include "bus/neogeo_ctrl/ctrl.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ymopn.h"
@@ -18,12 +24,6 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
-#include "ng_memcard.h"
-#include "neogeo_spr.h"
-
-#include "bus/neogeo/slot.h"
-#include "bus/neogeo/carts.h"
-#include "bus/neogeo_ctrl/ctrl.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -66,13 +66,11 @@ protected:
 		, m_edge(*this, "edge")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
-		, m_use_cart_vectors(0)
-		, m_use_cart_audio(0)
 		, m_slots(*this, "cslot%u", 1U)
 		, m_audionmi(*this, "audionmi")
 	{ }
 
-	uint16_t memcard_r(offs_t offset);
+	uint16_t memcard_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memcard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t audio_cpu_bank_select_r(offs_t offset);
 	void audio_cpu_enable_nmi_w(offs_t offset, uint8_t data);
@@ -106,6 +104,7 @@ protected:
 
 	void neogeo_base(machine_config &config);
 	void neogeo_stereo(machine_config &config);
+	void neogeo_memcard(machine_config &config);
 
 	void base_main_map(address_map &map);
 	void audio_io_map(address_map &map);
@@ -118,7 +117,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	// MVS-specific devices
 	optional_device<ym2610_device> m_ym;
@@ -157,8 +156,9 @@ protected:
 	uint8_t      m_vblank_level = 0;
 	uint8_t      m_raster_level = 0;
 
-	int m_use_cart_vectors = 0;
-	int m_use_cart_audio = 0;
+	uint8_t      m_use_cart_vectors = 0;
+	uint8_t      m_use_cart_audio = 0;
+	uint8_t      m_card_bank = 0;
 
 	void set_slot_idx(int slot);
 
@@ -280,4 +280,4 @@ private:
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
 
-#endif // MAME_INCLUDES_NEOGEO_H
+#endif // MAME_NEOGEO_NEOGEO_H

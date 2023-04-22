@@ -34,6 +34,7 @@ tekken2ub  Tekken 2 Ver.B (TES3/VER.B)             COH-100             SYSTEM11 
 tekken2b   Tekken 2 Ver.B (TES2/VER.B)             COH-100             "                        "                       "        "
 tekken2jc  Tekken 2 Ver.B (TES1/VER.C)             COH-100             "                        "                       "        "
 tekken2a   Tekken 2 (TES2/VER.A)                   COH-100             "                        "                       "        "
+tekken2ua  Tekken 2 (TES3/VER.A)                   COH-100             "                        "                       "        "
 souledge   Soul Edge Ver. II (SO4/VER.C)           COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C409     6
 souledgeuc Soul Edge Ver. II (SO3/VER.C)           COH-100 / COH-110   "                        "                       "        "
 souledgeua Soul Edge (SO3/VER.A)                   COH-100 / COH-110   "                        "                       "        "
@@ -308,6 +309,133 @@ Pin 3 Parts Side - +5V
 Pin 22 Parts Side - Gun 1 Trigger
 Pin 22 Solder Side - Gun 2 Trigger
 
+************************************************************************************
+
+Namco Family Bowl (FB1 Ver.A, V1.00)
+Namco 1997
+Hardware info by Guru
+---------------------
+
+Family Bowl is a video and mechanical ten pin bowling game.
+
+It uses the following boards....
+- Standard Namco System 11 main board SYSTEM11 MOTHER(B) PCB
+  The MOTHER(B) PCB is identical to the MOTHER PCB other than it uses 2x 16Mbit TSOP56 flash ROMs
+  instead of 4x 8Mbit TSOP40 flash ROMs.
+    ROMs on main board are....
+    FB1VERA.1L   \
+    FB1VERA.1J   / main program, either Intel 28E016SA or Sharp LH28F016SUT TSOP56 flash ROM
+    FB1VERA.7E   - sound program, Intel PA28F200BX flash ROM
+    FB1WAVE0A.8K - sound data, 42 pin 32Mbit mask ROM
+    Keycus socket is EMPTY
+
+- Standard SYSTEM11 ROM8 PCB for the graphics.
+    ROMs on ROM8 PCB are....
+    FB1_ROM0L.IC5
+    FB1_ROM0U.IC6
+
+- Standard SONY CPU board COH-110.
+
+- M139 SUB PCB (I/O board)
+
+Video output is a standard 29" 15kHz monitor rotated to vertical orientation.
+There are 7 sensors (photo-sensors) to detect the position of the ball.
+There are 3 buttons on the control panel for left, right and select.
+The machine has a short bowling lane (approx 6-8 feet long) and the screen is located
+at the end and above the lane, facing down and projected onto the end of the lane via a mirror.
+The ball is about 4" to 5" diameter and is launched by the player and then disappears 'into' the screen.
+The on-screen graphical ball rolls down the 'video' lane and knocks out the graphical pins.
+The sensors are likely just checking on the 'approximate' position of the ball.
+After the ball reaches the end of the mechanical lane and disappears, the actual ball trajectory is
+entirely CPU-controlled.
+
+The following is a guess about how the ball movement/sensors work as far as emulation is concerned.
+There are 7 sensors total based on the test mode input test.
+There could be 6 sensors for ball position (3 near the player, 3 at the other end near the screen) and one
+for the motor/ball kicker when it leaves the mechanical lane.
+The sensor layout could be something like the following....
+
+           motor 7                motor 7
+   screen  | |             screen | |
+|---------|| |         |---------|| |
+| 4  5  6 || |         | 2  4  6 || |
+|         || |         |         || |
+|         || |         |         || |
+|         || |  or     |         || |
+|         || |         |         || |
+|         || |         |         || |
+| 1  2  3 || |         | 1  3  5 || |
+|---------|| /         |---------|| /
+  player ---/              player -/
+
+The on-screen action/ball position is initiated when the sensors on the lane are activated 'on' for a fraction of
+a second as the ball passes over the sensors. i.e. a transistion from off to on then off again.
+At least 2 switches should toggle, probably within 1-2 seconds of each other.
+The software must know the physical position of the sensors. So for example if sw2 and sw5 are triggered, the ball
+will initially show on the screen in the middle and travel in a straight line down the middle of the lane. If sw1
+and sw5 are triggered the ball will initially show on the screen starting in the middle but moving towards the
+right side. The sensors are probably accurate enough to detect even small angles so an accurate screen trajectory can be
+calculated as well as the speed of the ball movement based on the time taken for the ball to be seen as it passes
+over the two sensors.
+Then the ball seemlessly enters the screen and continues down the lane towards the pins.
+The on-screen ball speed does vary depending on how fast the player throws the ball so there's definitely a speed
+calculation from point A (start) to point B (end).
+For basic and initial emulation purposes there can be 6 clickable buttons at the bottom of the screen. Those buttons
+are clicked in the correct order (to be determined by trial and error because the physical location of the sensors is unknown)
+which will pass the triggering (and thus ball position) to the software and then the ball will show on the screen. When the
+sensors are clicked in the correct order the ball will show on the screen in the expected location.
+The sensors are able to detect movement up to 1 meter so perhaps two sliders will be needed instead of buttons which
+are pre-set where the middle setting on both will be a center ball and anything offset from center will make the ball travel
+at an angle. Perhaps with another slider for the pre-set delay ranging from 0.00 to 3.00 seconds or similar to simulate
+the time between triggering the two switches.
+Then a 'go' button is pressed that passes those ranges to the software one after the other causing the ball to show on screen.
+After the on-screen ball/pin action has stopped sw7 motor/ball switch should trigger and after a small delay the ball is fired
+up the return lane back to the player. For emulation, sw7 may need to be held on for a few seconds on the return mechanism/motor
+as a 'ball-capture' then released, signifying that the ball was correctly located then sent back to the player.
+
+A short video of the full game in action is available here...
+https://www.youtube.com/watch?v=hOk7tEYR-uQ
+
+Better and longer video-only is available here...
+https://www.youtube.com/watch?v=OSO4d5-JkbM
+
+I/O board
+---------
+
+M139 SUB PCB
+1711960101 (1711970101)
+
+On the right side of the main board at J106 is a 4 pin connector tied to the I/O board.
+The connector contains only 3 wires... GND, VCC and 1 wire for communication
+between the I/O and main board.
+The I/O board is approx. 4" x 4" and contains the following parts....
+27C4002 EPROM, dump is fb1_spr0.ic5
+H8/3002 (rom-less) microcontroller
+62256 SRAM (32kx8)
+74F08 logic chip
+LED connected to the logic chip output pins 6 and 8 (probably shows I/O activity)
+MB3771 reset chip
+4x BD-8 EMI filters
+14.746MHz crystal
+J1 20-pin connector tied to the machine/sensors.
+
+The game is probably checking the sensors at boot-up and won't go in-game unless they are correct. When
+not correct there is only a Japanese text message displayed, likely saying something like 'See Attendant'.
+Without the machine plugged into J1 all the sensors are ON in test mode 'input check' but they should
+probably be off at boot time to get it to go into the game.
+The buttons A, B, C are connected to the JAMMA connector LEFT, BUTTON 1 (select), RIGHT.
+In the test mode Monitor Adjust there is a lane display graphic to adjust the position of the picture.
+The test mode and screen adjust is available even if the game does not go in-game.
+
+There is also a Family Bowl 2. The hardware appears to be PC-based. It is currently not dumped.
+It appears to be mostly identical to Namco's Family Bowl but with an added redemption ticket dispenser.
+A short video is available here.... https://www.youtube.com/watch?v=jiNvI48WUUQ
+The manual is available here... https://gametrade.info/upload/iblock/100/Familybowling_manual.pdf
+This is possibly related to the Namco game (it looks nearly identical) but is PC-based.
+The ball sensors are OMRON EE-SPWD311 and EE-SPWL311, 1 Meter Long-Distance Reflective Photo Micro-Sensor.
+These sensors are in pairs (emitter and receiver).
+It is highly likely Namco's game uses the same sensors and mechanics.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -323,6 +451,9 @@ Pin 22 Solder Side - Gun 2 Trigger
 #include "speaker.h"
 
 #include <cstdarg>
+
+
+namespace {
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
@@ -355,6 +486,7 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
+	void fambowl(machine_config &config);
 
 private:
 	void rom8_w(offs_t offset, uint16_t data);
@@ -548,6 +680,10 @@ void namcos11_state::c76_map(address_map &map)
 	map(0x280000, 0x2fffff).rom().region("c76", 0);
 	map(0x300000, 0x300001).nopw();
 	map(0x301000, 0x301001).nopw();
+	// fambowl needs something here.  It has to contain bytes with bit 7 set or the C76 hangs.
+	// This lets it run enough to get into test mode, but the C76 crashes once you get in.
+	// Setting this to the C76 data ROM crashes even before that.
+	map(0x510000, 0x51ffff).lr8([]() { return 0x80; }, "unknown");
 }
 
 uint16_t namcos11_state::c76_speedup_r()
@@ -716,6 +852,13 @@ void namcos11_state::pocketrc(machine_config &config)
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	KEYCUS_C432(config, "keycus", 0);
+}
+
+void namcos11_state::fambowl(machine_config &config)
+{
+	coh110(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C432(config, "keycus", 0);   // no keycus is actually present, but the driver isn't ready for that
 }
 
 void namcos11_state::starswep(machine_config &config)
@@ -1657,6 +1800,30 @@ ROM_START( tekken2ub )
 	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
+ROM_START( tekken2ua )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes3vera.2l",  0x0000000, 0x100000, CRC(0276680b) SHA1(508bb1c8a0ce929181508108ad3797e67ddd3df8) )
+	ROM_LOAD16_BYTE( "tes3vera.2j",  0x0000001, 0x100000, CRC(80e9b5ec) SHA1(2f6313492f0d78b9745303418cd77347d14acc8c) )
+	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
+	ROM_LOAD16_BYTE( "tes1vera.2f",  0x0200001, 0x100000, CRC(fbb0b146) SHA1(08b11ac0fbfeed62910c5cb5ff7b5939ecbca142) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
 ROM_START( tekken2b )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes2verb.2l",  0x0000000, 0x100000, CRC(aa9a4503) SHA1(e6fdd34216591510593bbda0232ddc0fcd80e80b) )
@@ -1822,6 +1989,29 @@ ROM_START( xevi3dgj )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
+ROM_START( fambowl )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD( "fb1_vera.1j",  0x000000, 0x200000, CRC(1a3c7317) SHA1(1535a41aa5e6e5c5f83b647895cfdd231e47728a) )
+	ROM_LOAD( "fb1_vera.1l",  0x200000, 0x200000, CRC(63393cbc) SHA1(51051a032da52ae1bda7f2b4431bea56750aab96) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "fb1_rom0l.ic5", 0x000000, 0x400000, CRC(0bb1dee3) SHA1(3feaa50a64aecba89ca0ca209069fde45a09a2ed) )
+	ROM_LOAD16_BYTE( "fb1_rom0u.ic6", 0x000001, 0x400000, CRC(e735b2eb) SHA1(f3b1088f38d32195b0cf839b3dff35142bc5cccc) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "fb1_spr0.ic5", 0x000000, 0x080000, CRC(4325439f) SHA1(0ce62c1d2f6adc3b3102f403e9d594b8a071829f) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "fb1_wave0a.8k", 0x000000, 0x400000, CRC(ef45939f) SHA1(8bad6d008c10b8d9920dbff25006e9c25e8db925) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+
+	ROM_REGION( 0x40000, "iomcu", 0)    // H8/3002 on sensor board. Connects to main PCB with 3 wires: Vcc, GND, and data.
+	ROM_LOAD( "fb1_vera.7e",  0x000000, 0x040000, CRC(452794c4) SHA1(cc128e368d5fab2e891bc4daf877e4348a095946) )
+ROM_END
+
+} // anonymous namespace
+
+
 /*
 1 = Japan
 2 = World
@@ -1840,6 +2030,7 @@ GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_
 GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           0 )
 GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           0 )
 GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 0 )
+GAME( 1995, tekken2ua,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (US, TES3/VER.A)",                    0 )
 GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          0 )
 GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            0 )
 GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 0 )
@@ -1855,11 +2046,12 @@ GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, empty_
 GAME( 1996, danceyesu,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 0 ) // Oct 30 1996  17:36:39
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              0 ) // Sep  4 1996  11:50:49
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_init, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_NODEVICE_LAN )
+GAME( 1997, fambowl,    0,        fambowl,    namcos11,   namcos11_state, empty_init, ROT90,"Namco",         "Family Bowl (Japan, FB1/VER.A V1.00)",                       MACHINE_NOT_WORKING )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               0 )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               0 )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
-GAME( 1999, ptblank2a,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
-GAME( 1999, ptblank2b,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
-GAME( 1999, ptblank2c,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (unknown region)",               0 )
+GAME( 1999, ptblank2a,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
+GAME( 1999, ptblank2b,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
+GAME( 1999, ptblank2c,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, unknown version)",       0 )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               0 )
 GAME( 1999, gunbarla,   ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Gunbarl (Japan, GNB1/VER.A)",                  0 )

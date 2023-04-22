@@ -29,6 +29,9 @@
 #include "video/pwm.h"
 #include "babbage.lh"
 
+
+namespace {
+
 #define MAIN_CLOCK 25e5
 
 class babbage_state : public driver_device
@@ -277,6 +280,8 @@ ROM_START(babbage)
 	ROM_REGION(0x0800, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("mon.rom",    0x0000, 0x0200, CRC(469bd607) SHA1(8f3489a0f96de6a03b05c1ee01b89d9848f4b152) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME       FLAGS

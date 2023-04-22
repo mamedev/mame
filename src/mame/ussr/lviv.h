@@ -5,8 +5,8 @@
  * includes/lviv.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_LVIV_H
-#define MAME_INCLUDES_LVIV_H
+#ifndef MAME_USSR_LVIV_H
+#define MAME_USSR_LVIV_H
 
 #pragma once
 
@@ -69,9 +69,9 @@ private:
 	void update_palette(uint8_t pal);
 
 	void update_memory();
-	void setup_snapshot(uint8_t * data);
+	void setup_snapshot(uint8_t *data);
 	void dump_registers();
-	image_verify_result verify_snapshot(uint8_t * data, uint32_t size);
+	std::pair<std::error_condition, std::string> verify_snapshot(const uint8_t * data, uint32_t size);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -97,4 +97,4 @@ private:
 	static const rgb_t s_palette[8];
 };
 
-#endif // MAME_INCLUDES_LVIV_H
+#endif // MAME_USSR_LVIV_H

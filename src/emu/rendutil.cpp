@@ -26,18 +26,18 @@ namespace {
 
 struct jpeg_corefile_source : public jpeg_source_mgr
 {
-	static void source(j_decompress_ptr cinfo, util::random_read &file);
+	static void source(j_decompress_ptr cinfo, util::random_read &file) noexcept;
 
 private:
 	static constexpr unsigned INPUT_BUF_SIZE = 4096;
 
-	static void do_init(j_decompress_ptr cinfo)
+	static void do_init(j_decompress_ptr cinfo) noexcept
 	{
 		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
 		src.start_of_file = true;
 	}
 
-	static boolean do_fill(j_decompress_ptr cinfo)
+	static boolean do_fill(j_decompress_ptr cinfo) noexcept
 	{
 		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
 
@@ -61,7 +61,7 @@ private:
 		return TRUE;
 	}
 
-	static void do_skip(j_decompress_ptr cinfo, long num_bytes)
+	static void do_skip(j_decompress_ptr cinfo, long num_bytes) noexcept
 	{
 		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
 
@@ -70,14 +70,14 @@ private:
 			while (long(src.bytes_in_buffer) < num_bytes)
 			{
 				num_bytes -= long(src.bytes_in_buffer);
-				(void)(*src.fill_input_buffer)(cinfo);
+				std::ignore = (*src.fill_input_buffer)(cinfo);
 			}
 			src.next_input_byte += size_t(num_bytes);
 			src.bytes_in_buffer -= size_t(num_bytes);
 		}
 	}
 
-	static void do_term(j_decompress_ptr cinfo)
+	static void do_term(j_decompress_ptr cinfo) noexcept
 	{
 	}
 
@@ -86,7 +86,7 @@ private:
 	bool start_of_file;
 };
 
-void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::random_read &file)
+void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::random_read &file) noexcept
 {
 	jpeg_corefile_source *src;
 	if (!cinfo->src)
@@ -121,7 +121,7 @@ void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::random_read &fil
 
 struct jpeg_setjmp_error_mgr : public jpeg_error_mgr
 {
-	jpeg_setjmp_error_mgr()
+	jpeg_setjmp_error_mgr() noexcept
 	{
 		jpeg_std_error(this);
 		error_exit = [] (j_common_ptr cinfo) { std::longjmp(static_cast<jpeg_setjmp_error_mgr *>(cinfo->err)->m_jump_buffer, 1); };
@@ -138,9 +138,9 @@ struct jpeg_setjmp_error_mgr : public jpeg_error_mgr
 ***************************************************************************/
 
 /* utilities */
-static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
-static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
-static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png);
+static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy) noexcept;
+static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy) noexcept;
+static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png) noexcept;
 
 
 
@@ -153,15 +153,15 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info
     quality resampling of a texture
 -------------------------------------------------*/
 
-void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force)
+void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force) noexcept
 {
 	if (dest.width() == 0 || dest.height() == 0)
 		return;
 
-	/* adjust the source base */
+	// adjust the source base
 	const u32 *sbase = &source.pix(0);
 
-	/* determine the steppings */
+	// determine the steppings
 	u32 swidth = source.width();
 	u32 sheight = source.height();
 	u32 dwidth = dest.width();
@@ -169,7 +169,7 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 	u32 dx = (swidth << 12) / dwidth;
 	u32 dy = (sheight << 12) / dheight;
 
-	/* if the source is higher res than the target, use full averaging */
+	// if the source is higher res than the target, use full averaging
 	if (dx > 0x1000 || dy > 0x1000 || force)
 		resample_argb_bitmap_average(&dest.pix(0), dest.rowpixels(), dwidth, dheight, sbase, source.rowpixels(), swidth, sheight, color, dx, dy);
 	else
@@ -183,62 +183,58 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
     all contributing pixels
 -------------------------------------------------*/
 
-static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy)
+static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy) noexcept
 {
-	u64 sumscale = u64(dx) * u64(dy);
-	u32 r, g, b, a;
-	u32 x, y;
+	u64 const sumscale = u64(dx) * u64(dy);
 
-	/* precompute premultiplied R/G/B/A factors */
-	r = color.r * color.a * 256.0f;
-	g = color.g * color.a * 256.0f;
-	b = color.b * color.a * 256.0f;
-	a = color.a * 256.0f;
+	// precompute premultiplied R/G/B/A factors
+	u32 const r = color.r * color.a * 256.0f;
+	u32 const g = color.g * color.a * 256.0f;
+	u32 const b = color.b * color.a * 256.0f;
+	u32 const a = color.a * 256.0f;
 
-	/* loop over the target vertically */
-	for (y = 0; y < dheight; y++)
+	// loop over the target vertically
+	for (u32 y = 0; y < dheight; y++)
 	{
-		u32 starty = y * dy;
+		u32 const starty = y * dy;
 
-		/* loop over the target horizontally */
-		for (x = 0; x < dwidth; x++)
+		// loop over the target horizontally
+		for (u32 x = 0; x < dwidth; x++)
 		{
 			u64 sumr = 0, sumg = 0, sumb = 0, suma = 0;
-			u32 startx = x * dx;
-			u32 xchunk, ychunk;
-			u32 curx, cury;
+			u32 const startx = x * dx;
 
 			u32 yremaining = dy;
+			u32 ychunk;
 
-			/* accumulate all source pixels that contribute to this pixel */
-			for (cury = starty; yremaining; cury += ychunk)
+			// accumulate all source pixels that contribute to this pixel
+			for (u32 cury = starty; yremaining; cury += ychunk)
 			{
 				u32 xremaining = dx;
+				u32 xchunk;
 
-				/* determine the Y contribution, clamping to the amount remaining */
+				// determine the Y contribution, clamping to the amount remaining
 				ychunk = 0x1000 - (cury & 0xfff);
 				if (ychunk > yremaining)
 					ychunk = yremaining;
 				yremaining -= ychunk;
 
-				/* loop over all source pixels in the X direction */
-				for (curx = startx; xremaining; curx += xchunk)
+				// loop over all source pixels in the X direction
+				for (u32 curx = startx; xremaining; curx += xchunk)
 				{
-					u32 factor;
-
-					/* determine the X contribution, clamping to the amount remaining */
+					// determine the X contribution, clamping to the amount remaining
 					xchunk = 0x1000 - (curx & 0xfff);
 					if (xchunk > xremaining)
 						xchunk = xremaining;
 					xremaining -= xchunk;
 
-					/* total contribution = x * y */
-					factor = xchunk * ychunk;
+					// total contribution = x * y
+					u32 const factor = xchunk * ychunk;
 
-					/* fetch the source pixel */
-					rgb_t pix = source[(cury >> 12) * srowpixels + (curx >> 12)];
+					// fetch the source pixel
+					rgb_t const pix = source[(cury >> 12) * srowpixels + (curx >> 12)];
 
-					/* accumulate the RGBA values */
+					// accumulate the RGBA values
 					sumr += factor * pix.r();
 					sumg += factor * pix.g();
 					sumb += factor * pix.b();
@@ -246,23 +242,23 @@ static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, 
 				}
 			}
 
-			/* apply scaling */
+			// apply scaling
 			suma = (suma / sumscale) * a / 256;
 			sumr = (sumr / sumscale) * r / 256;
 			sumg = (sumg / sumscale) * g / 256;
 			sumb = (sumb / sumscale) * b / 256;
 
-			/* if we're translucent, add in the destination pixel contribution */
+			// if we're translucent, add in the destination pixel contribution
 			if (a < 256)
 			{
-				rgb_t dpix = dest[y * drowpixels + x];
+				rgb_t const dpix = dest[y * drowpixels + x];
 				suma += dpix.a() * (256 - a);
 				sumr += dpix.r() * (256 - a);
 				sumg += dpix.g() * (256 - a);
 				sumb += dpix.b() * (256 - a);
 			}
 
-			/* store the target pixel, dividing the RGBA values by the overall scale factor */
+			// store the target pixel, dividing the RGBA values by the overall scale factor
 			dest[y * drowpixels + x] = rgb_t(suma, sumr, sumg, sumb);
 		}
 	}
@@ -274,44 +270,37 @@ static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, 
     sampling via a bilinear filter
 -------------------------------------------------*/
 
-static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy)
+static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy) noexcept
 {
-	u32 maxx = swidth << 12, maxy = sheight << 12;
-	u32 r, g, b, a;
-	u32 x, y;
+	u32 const maxx = swidth << 12, maxy = sheight << 12;
 
-	/* precompute premultiplied R/G/B/A factors */
-	r = color.r * color.a * 256.0f;
-	g = color.g * color.a * 256.0f;
-	b = color.b * color.a * 256.0f;
-	a = color.a * 256.0f;
+	// precompute premultiplied R/G/B/A factors
+	u32 const r = color.r * color.a * 256.0f;
+	u32 const g = color.g * color.a * 256.0f;
+	u32 const b = color.b * color.a * 256.0f;
+	u32 const a = color.a * 256.0f;
 
-	/* loop over the target vertically */
-	for (y = 0; y < dheight; y++)
+	// loop over the target vertically
+	for (u32 y = 0; y < dheight; y++)
 	{
-		u32 starty = y * dy;
+		u32 const starty = y * dy;
 
-		/* loop over the target horizontally */
-		for (x = 0; x < dwidth; x++)
+		// loop over the target horizontally
+		for (u32 x = 0; x < dwidth; x++)
 		{
-			u32 startx = x * dx;
-			rgb_t pix0, pix1, pix2, pix3;
-			u32 sumr, sumg, sumb, suma;
-			u32 nextx, nexty;
-			u32 curx, cury;
-			u32 factor;
+			u32 const startx = x * dx;
 
-			/* adjust start to the center; note that this math will tend to produce */
-			/* negative results on the first pixel, which is why we clamp below */
-			curx = startx + dx / 2 - 0x800;
-			cury = starty + dy / 2 - 0x800;
+			// adjust start to the center; note that this math will tend to produce
+			// negative results on the first pixel, which is why we clamp below
+			u32 curx = startx + dx / 2 - 0x800;
+			u32 cury = starty + dy / 2 - 0x800;
 
-			/* compute the neighboring pixel */
-			nextx = curx + 0x1000;
-			nexty = cury + 0x1000;
+			// compute the neighboring pixel
+			u32 const nextx = curx + 0x1000;
+			u32 const nexty = cury + 0x1000;
 
-			/* fetch the four relevant pixels */
-			pix0 = pix1 = pix2 = pix3 = 0;
+			// fetch the four relevant pixels
+			rgb_t pix0 = 0, pix1 = 0, pix2 = 0, pix3 = 0;
 			if (s32(cury) >= 0 && cury < maxy && s32(curx) >= 0 && curx < maxx)
 				pix0 = source[(cury >> 12) * srowpixels + (curx >> 12)];
 			if (s32(cury) >= 0 && cury < maxy && s32(nextx) >= 0 && nextx < maxx)
@@ -321,55 +310,58 @@ static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth,
 			if (s32(nexty) >= 0 && nexty < maxy && s32(nextx) >= 0 && nextx < maxx)
 				pix3 = source[(nexty >> 12) * srowpixels + (nextx >> 12)];
 
-			/* compute the x/y scaling factors */
+			// compute the x/y scaling factors
 			curx &= 0xfff;
 			cury &= 0xfff;
 
-			/* contributions from pixel 0 (top,left) */
+			u32 factor;
+			u32 sumr, sumg, sumb, suma;
+
+			// contributions from pixel 0 (top,left)
 			factor = (0x1000 - curx) * (0x1000 - cury);
 			sumr = factor * pix0.r();
 			sumg = factor * pix0.g();
 			sumb = factor * pix0.b();
 			suma = factor * pix0.a();
 
-			/* contributions from pixel 1 (top,right) */
+			// contributions from pixel 1 (top,right)
 			factor = curx * (0x1000 - cury);
 			sumr += factor * pix1.r();
 			sumg += factor * pix1.g();
 			sumb += factor * pix1.b();
 			suma += factor * pix1.a();
 
-			/* contributions from pixel 2 (bottom,left) */
+			// contributions from pixel 2 (bottom,left)
 			factor = (0x1000 - curx) * cury;
 			sumr += factor * pix2.r();
 			sumg += factor * pix2.g();
 			sumb += factor * pix2.b();
 			suma += factor * pix2.a();
 
-			/* contributions from pixel 3 (bottom,right) */
+			// contributions from pixel 3 (bottom,right)
 			factor = curx * cury;
 			sumr += factor * pix3.r();
 			sumg += factor * pix3.g();
 			sumb += factor * pix3.b();
 			suma += factor * pix3.a();
 
-			/* apply scaling */
+			// apply scaling
 			suma = (suma >> 24) * a / 256;
 			sumr = (sumr >> 24) * r / 256;
 			sumg = (sumg >> 24) * g / 256;
 			sumb = (sumb >> 24) * b / 256;
 
-			/* if we're translucent, add in the destination pixel contribution */
+			// if we're translucent, add in the destination pixel contribution
 			if (a < 256)
 			{
-				rgb_t dpix = dest[y * drowpixels + x];
+				rgb_t const dpix = dest[y * drowpixels + x];
 				suma += dpix.a() * (256 - a);
 				sumr += dpix.r() * (256 - a);
 				sumg += dpix.g() * (256 - a);
 				sumb += dpix.b() * (256 - a);
 			}
 
-			/* store the target pixel, dividing the RGBA values by the overall scale factor */
+			// store the target pixel, dividing the RGBA values by the overall scale factor
 			dest[y * drowpixels + x] = rgb_t(suma, sumr, sumg, sumb);
 		}
 	}
@@ -653,7 +645,7 @@ std::pair<render_bounds, render_bounds> render_line_to_quad(const render_bounds 
     into a bitmap
 -------------------------------------------------*/
 
-void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file)
+void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file) noexcept
 {
 	// deallocate previous bitmap
 	bitmap.reset();
@@ -673,7 +665,7 @@ void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file)
     bitmap
 -------------------------------------------------*/
 
-void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file)
+void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file) noexcept
 {
 	// deallocate previous bitmap
 	bitmap.reset();
@@ -711,30 +703,39 @@ void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file)
 	// allocates a buffer to receive the information and copy them into the bitmap
 	row_stride = cinfo.output_width * cinfo.output_components;
 	buffer = reinterpret_cast<JSAMPARRAY>(std::malloc(sizeof(JSAMPROW)));
-	buffer[0] = reinterpret_cast<JSAMPROW>(std::malloc(sizeof(JSAMPLE) * row_stride));
+	if (buffer)
+		buffer[0] = reinterpret_cast<JSAMPROW>(std::malloc(sizeof(JSAMPLE) * row_stride));
 
-	while (cinfo.output_scanline < cinfo.output_height)
+	if (bitmap.valid() && buffer && buffer[0])
 	{
-		j = cinfo.output_scanline;
-		jpeg_read_scanlines(&cinfo, buffer, 1);
+		while (cinfo.output_scanline < cinfo.output_height)
+		{
+			j = cinfo.output_scanline;
+			jpeg_read_scanlines(&cinfo, buffer, 1);
 
-		if (s == 1)
-		{
-			for (i = 0; i < w; ++i)
-				bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i], buffer[0][i], buffer[0][i]);
+			if (s == 1)
+			{
+				for (i = 0; i < w; ++i)
+					bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i], buffer[0][i], buffer[0][i]);
 
+			}
+			else if (s == 3)
+			{
+				for (i = 0; i < w; ++i)
+					bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+			}
+			else
+			{
+				osd_printf_error("Cannot read JPEG data from file.\n");
+				bitmap.reset();
+				break;
+			}
 		}
-		else if (s == 3)
-		{
-			for (i = 0; i < w; ++i)
-				bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
-		}
-		else
-		{
-			osd_printf_error("Cannot read JPEG data from file.\n");
-			bitmap.reset();
-			break;
-		}
+	}
+	else
+	{
+		osd_printf_error("Error allocating memory for JPEG image.\n");
+		bitmap.reset();
 	}
 
 	// finish decompression and free the memory
@@ -755,7 +756,7 @@ cleanup:
     bitmap
 -------------------------------------------------*/
 
-bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_as_alpha_to_existing)
+bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_as_alpha_to_existing) noexcept
 {
 	// deallocate if we're not overlaying alpha
 	if (!load_as_alpha_to_existing)
@@ -810,7 +811,7 @@ bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_a
     to the alpha channel of a bitmap
 -------------------------------------------------*/
 
-static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png)
+static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info &png) noexcept
 {
 	// FIXME: this function is basically copy/pasted from the PNG code in util, and should be unified with it
 	u8 accumalpha = 0xff;
@@ -921,7 +922,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info
     render_detect_image - detect image format
 -------------------------------------------------*/
 
-ru_imgformat render_detect_image(util::random_read &file)
+ru_imgformat render_detect_image(util::random_read &file) noexcept
 {
 	// PNG: check for valid header
 	{

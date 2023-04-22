@@ -1807,7 +1807,19 @@ ROM_START( tomplc )
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
 ROM_END
 
+ROM_START( gungunad )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
+	ROM_LOAD("gga.bin", 0x000000, 0x40000, CRC(5252b6bb) SHA1(8a9f920e4bccabbd337f37a838af574e2b16746f) )
+	ROM_CONTINUE(0x080000,0x040000)
+	ROM_CONTINUE(0x040000,0x040000)
+	ROM_CONTINUE(0x0c0000,0x040000)
 
+	ROM_CONTINUE(0x100000,0x040000)
+	ROM_CONTINUE(0x180000,0x040000)
+	ROM_CONTINUE(0x140000,0x040000)
+	ROM_CONTINUE(0x1c0000,0x040000)
+ROM_END
 
 /*
     The e-kara cartridges require the BIOS rom to map into 2nd external bus space as they fetch palette data from
@@ -2006,10 +2018,11 @@ CONS( 2003, jarajal,   0,          0,  xavix_nv,         jarajal,  xavix_state, 
 
 CONS( 2003, tcarnavi,  0,          0,  xavix_nv,         jarajal,  xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, tomplc,   0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+CONS( 2001, gungunad,  0,          0,  xavix_nv,         xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 /* Music titles: Emulation note:
    SEEPROM write appears to work (save NVRAM file looks valid) but game fails to read it back properly, fails backup data checksum, and blanks it again.
@@ -2028,7 +2041,6 @@ CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_s
 
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
 CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
-
 
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 

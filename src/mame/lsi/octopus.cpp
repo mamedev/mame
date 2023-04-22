@@ -137,6 +137,8 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "speaker.h"
 
 
+namespace {
+
 class octopus_state : public driver_device
 {
 public:
@@ -153,8 +155,7 @@ public:
 		m_pic2(*this, "pic_slave"),
 		m_rtc(*this, "rtc"),
 		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
+		m_floppy(*this, "fdc:%u", 0U),
 		m_kb_uart(*this, "keyboard"),
 		m_pit(*this, "pit"),
 		m_ppi(*this, "ppi"),
@@ -180,7 +181,7 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	uint8_t bank_sel_r(offs_t offset);
 	void bank_sel_w(offs_t offset, uint8_t data);
 	uint8_t dma_read(offs_t offset);
@@ -241,8 +242,7 @@ private:
 	required_device<pic8259_device> m_pic2;
 	required_device<mc146818_device> m_rtc;
 	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<i8251_device> m_kb_uart;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
@@ -558,12 +558,12 @@ void octopus_state::cntl_w(uint8_t data)
 	switch(m_current_drive)
 	{
 	case 1:
-		m_fdc->set_floppy(m_floppy0->get_device());
-		m_floppy0->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[0]->get_device());
+		m_floppy[0]->get_device()->mon_w(0);
 		break;
 	case 2:
-		m_fdc->set_floppy(m_floppy1->get_device());
-		m_floppy1->get_device()->mon_w(0);
+		m_fdc->set_floppy(m_floppy[1]->get_device());
+		m_floppy[1]->get_device()->mon_w(0);
 		break;
 	}
 	logerror("Selected floppy drive %i (%02x)\n",m_current_drive,data);
@@ -584,10 +584,10 @@ void octopus_state::gpo_w(uint8_t data)
 	switch(m_current_drive)
 	{
 	case 1:
-		m_floppy0->get_device()->ss_w((data & 0x04) >> 2);
+		m_floppy[0]->get_device()->ss_w((data & 0x04) >> 2);
 		break;
 	case 2:
-		m_floppy1->get_device()->ss_w((data & 0x04) >> 2);
+		m_floppy[1]->get_device()->ss_w((data & 0x04) >> 2);
 		break;
 	default:
 		logerror("Attempted to set side on unknown drive %i\n",m_current_drive);
@@ -965,8 +965,8 @@ void octopus_state::octopus(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);
@@ -1028,6 +1028,9 @@ ROM_START( octopus )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "octopus_gfx_card",  0x0000, 0x2000, CRC(b2386534) SHA1(5e3c4682afb4eb222e48a7203269a16d26911836) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

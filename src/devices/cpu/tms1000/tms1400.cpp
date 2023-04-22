@@ -33,21 +33,21 @@ DEFINE_DEVICE_TYPE(TMS1600, tms1600_cpu_device, "tms1600", "Texas Instruments TM
 DEFINE_DEVICE_TYPE(TMS1670, tms1670_cpu_device, "tms1670", "Texas Instruments TMS1670") // high voltage version
 
 
-tms1400_cpu_device::tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1400_cpu_device(mconfig, TMS1400, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 3 /* stack levels */, 12 /* rom width */, address_map_constructor(FUNC(tms1400_cpu_device::rom_12bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms1400_cpu_device::ram_7bit), this))
-{ }
-
 tms1400_cpu_device::tms1400_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1100_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
 { }
 
-
-tms1470_cpu_device::tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1470_cpu_device(mconfig, TMS1470, tag, owner, clock, 8, 10, 6, 8, 3, 3, 12, address_map_constructor(FUNC(tms1470_cpu_device::rom_12bit), this), 7, address_map_constructor(FUNC(tms1470_cpu_device::ram_7bit), this))
+tms1400_cpu_device::tms1400_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1400_cpu_device(mconfig, TMS1400, tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 3 /* x width */, 3 /* stack levels */, 12 /* rom width */, address_map_constructor(FUNC(tms1400_cpu_device::rom_12bit), this), 7 /* ram width */, address_map_constructor(FUNC(tms1400_cpu_device::ram_7bit), this))
 { }
+
 
 tms1470_cpu_device::tms1470_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1400_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms1470_cpu_device::tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1470_cpu_device(mconfig, TMS1470, tag, owner, clock, 8, 10, 6, 8, 3, 3, 12, address_map_constructor(FUNC(tms1470_cpu_device::rom_12bit), this), 7, address_map_constructor(FUNC(tms1470_cpu_device::ram_7bit), this))
 { }
 
 tms1475_cpu_device::tms1475_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -55,12 +55,12 @@ tms1475_cpu_device::tms1475_cpu_device(const machine_config &mconfig, const char
 { }
 
 
-tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	tms1600_cpu_device(mconfig, TMS1600, tag, owner, clock, 8, 16, 6, 8, 3, 3, 12, address_map_constructor(FUNC(tms1600_cpu_device::rom_12bit), this), 7, address_map_constructor(FUNC(tms1600_cpu_device::ram_7bit), this))
-{ }
-
 tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, u8 stack_levels, int rom_width, address_map_constructor rom_map, int ram_width, address_map_constructor ram_map) :
 	tms1400_cpu_device(mconfig, type, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, stack_levels, rom_width, rom_map, ram_width, ram_map)
+{ }
+
+tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tms1600_cpu_device(mconfig, TMS1600, tag, owner, clock, 8, 16, 6, 8, 3, 3, 12, address_map_constructor(FUNC(tms1600_cpu_device::rom_12bit), this), 7, address_map_constructor(FUNC(tms1600_cpu_device::ram_7bit), this))
 { }
 
 tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -71,9 +71,8 @@ tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char
 // machine configs
 void tms1400_cpu_device::device_add_mconfig(machine_config &config)
 {
-	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
+	tms1100_cpu_device::device_add_mconfig(config);
+	m_opla->set_num_terms(32);
 }
 
 

@@ -14,8 +14,8 @@
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/spifi.c
  */
 
-#ifndef MAME_MACHINE_DMAC3_H
-#define MAME_MACHINE_DMAC3_H
+#ifndef MAME_SONY_DMAC3_H
+#define MAME_SONY_DMAC3_H
 
 #pragma once
 
@@ -190,4 +190,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(DMAC3, dmac3_device)
 
-#endif // MAME_MACHINE_DMAC3
+#endif // MAME_SONY_DMAC3

@@ -125,9 +125,12 @@ std::string osd_subst_env(std::string_view src)
 
 HMODULE WINAPI GetModuleHandleUni()
 {
-	MEMORY_BASIC_INFORMATION mbi;
-	VirtualQuery((LPCVOID)GetModuleHandleUni, &mbi, sizeof(mbi));
-	return (HMODULE)mbi.AllocationBase;
+	HMODULE result = nullptr;
+	BOOL const succeeded = GetModuleHandleEx(
+			GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+			LPCWSTR(uintptr_t(&GetModuleHandleUni)),
+			&result);
+	return succeeded ? result : nullptr;
 }
 
 

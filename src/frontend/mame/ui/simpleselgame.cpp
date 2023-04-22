@@ -110,37 +110,36 @@ void simple_menu_select_game::build_driver_list()
 //  handle - handle the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::handle(event const *ev)
+bool simple_menu_select_game::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
+	if (!ev)
+		return false;
+
+	if (m_error)
 	{
-		if (m_error)
-		{
-			// reset the error on any subsequent menu event
-			m_error = false;
-			machine().ui_input().reset();
-		}
-		else
-		{
-			// handle selections
-			switch(ev->iptkey)
-			{
-			case IPT_UI_SELECT:
-				inkey_select(*ev);
-				break;
-			case IPT_UI_CANCEL:
-				inkey_cancel();
-				break;
-			case IPT_UI_PASTE:
-				if (paste_text(m_search, uchar_is_printable))
-					reset(reset_options::SELECT_FIRST);
-				break;
-			case IPT_SPECIAL:
-				inkey_special(*ev);
-				break;
-			}
-		}
+		// reset the error on any subsequent menu event
+		m_error = false;
+		machine().ui_input().reset();
+		return true;
+	}
+
+	// handle selections
+	bool changed = false;
+	switch (ev->iptkey)
+	{
+	case IPT_UI_SELECT:
+		changed = inkey_select(*ev);
+		break;
+	case IPT_UI_CANCEL:
+		inkey_cancel();
+		break;
+	case IPT_UI_PASTE:
+		if (paste_text(m_search, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+	case IPT_SPECIAL:
+		inkey_special(*ev);
+		break;
 	}
 
 	// if we're in an error state, overlay an error message
@@ -152,6 +151,7 @@ void simple_menu_select_game::handle(event const *ev)
 				"Please select a different game.\n\nPress any key to continue."),
 				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
+	return changed;
 }
 
 
@@ -159,7 +159,7 @@ void simple_menu_select_game::handle(event const *ev)
 //  inkey_select
 //-------------------------------------------------
 
-void simple_menu_select_game::inkey_select(const event &menu_event)
+bool simple_menu_select_game::inkey_select(const event &menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event.itemref;
 
@@ -169,10 +169,12 @@ void simple_menu_select_game::inkey_select(const event &menu_event)
 				ui(),
 				container(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
+		return false;
 	}
 	else if (!driver) // special case for previous menu
 	{
 		stack_pop();
+		return false;
 	}
 	else // anything else is a driver
 	{
@@ -188,12 +190,14 @@ void simple_menu_select_game::inkey_select(const event &menu_event)
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
 			stack_reset();
+			return false;
 		}
 		else
 		{
 			// otherwise, display an error
 			reset(reset_options::REMEMBER_REF);
 			m_error = true;
+			return true;
 		}
 	}
 }
@@ -236,7 +240,7 @@ void simple_menu_select_game::inkey_special(const event &menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate(float &customtop, float &custombottom)
+void simple_menu_select_game::populate()
 {
 	int matchcount;
 	int curitem;
@@ -282,10 +286,19 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		item_append(_("Return to Previous Menu"), 0, nullptr);
 	}
+}
+
+
+//-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void simple_menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	set_custom_space(line_height() + 3.0f * tb_border(), 4.0f * line_height() + 3.0f * tb_border());
 }
 
 
@@ -307,7 +320,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 						emulator_info::get_configname(),
 						emulator_info::get_appname()),
 				text_layout::text_justify::CENTER,
-				0.5f, origy2 + ui().box_tb_border() + (0.5f * (bottom - ui().box_tb_border())),
+				0.5f, origy2 + tb_border() + (0.5f * (bottom - tb_border())),
 				UI_RED_COLOR);
 		return;
 	}
@@ -324,9 +337,9 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the top box
 	draw_text_box(
 			tempbuf, tempbuf + 1,
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 
 	// determine the text to render below
 	driver = ((uintptr_t)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
@@ -412,9 +425,9 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the bottom box
 	draw_text_box(
 			tempbuf, tempbuf + 4,
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
-			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color());
 }
 
 

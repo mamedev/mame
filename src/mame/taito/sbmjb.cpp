@@ -26,14 +26,19 @@
     no dips
 
     TODO:
+    general:
     - everything is guesswork and should be taken with a grain of salt, especially the M66220FP hook up;
     - are the correct sounds played at the right times?
-    - hopper / medal (main roadblock before it can be considered playable);
+    - hopper / medal (main roadblock before sbmjb can be considered playable, while honooinv also needs the mechanical parts);
+    sbmjb:
     - at boot the game zero-fills the 0x020000-0x020fff range in the tc0091lvc VRAM space, which is currently unmapped in tc009xlvc.cpp.
       Doesn't seem to use it afterwards, though.
+    honooinv:
+    - mechanical parts
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/tc009xlvc.h"
 #include "machine/te7750.h"
@@ -41,6 +46,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,6 +62,7 @@ public:
 		m_vdpcpu(*this, "vdpcpu")
 	{ }
 
+	void honooinv(machine_config &config);
 	void sbmjb(machine_config &config);
 
 private:
@@ -134,10 +141,52 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable in test mode
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Separator") // in I/O test; also seems to have effect on 'Hopper Rotation'. Effects shown also in the shot test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Select Sw") // in I/O test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Enter Sw") // in I/O test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Wait")  // in shot test; seems to have effect on 'Show Power Level', too
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Charge Solenoid") // in shot test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Shoot Solenoid") // in shot test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // "
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // in pinpanel test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Start Close") // in pinpanel test
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Win-L") // in pinpanel test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Win-R") // in pinpanel test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Lucky-L") // in pinpanel test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("Lucky-C") // in pinpanel test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("Lucky-R") // in pinpanel test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("Lucky Close") // in pinpanel test
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Pay Out Sen") // in I/O test
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("Reset-Key") // in I/O test; seems to have effect on 'Lock Out Coil', too
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("Crt-Key") // in I/O test
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW ) // 'Operate Sw' in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("All Clear Sw") // in I/O test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) // in I/O test;  TODO: active high works correctly in I/O test but not in-game?
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // in I/O test;  TODO: active high works correctly in I/O test but not in-game?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // in I/O test
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // seems to have no effect in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("Rail Min") // in shot test
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_NAME("Rail Max") // in shot test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) PORT_NAME("Open-L") // in pinpanel test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4) PORT_NAME("Open-R") // in pinpanel test
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbmjb_state::scanline_callback) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 240 && (m_vdpcpu->irq_enable() & 4))
 	{
@@ -166,7 +215,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbmjb_state::scanline_callback), "screen", 0, 1);
 
-	te7751_device & io(TE7751(config, "io"));
+	te7751_device &io(TE7751(config, "io"));
 	io.in_port1_cb().set_ioport("IN0");
 	io.in_port2_cb().set_ioport("IN1");
 	// TODO: rest of ports. port9 medal / hopper?
@@ -190,6 +239,16 @@ void sbmjb_state::sbmjb(machine_config &config)
 	OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // pin not verified
 }
 
+void sbmjb_state::honooinv(machine_config &config)
+{
+	sbmjb(config);
+
+	te7751_device &io(*subdevice<te7751_device>("io"));
+	io.in_port1_cb().set_ioport("IN0");
+	io.in_port2_cb().set_ioport("IN1");
+	io.in_port3_cb().set_ioport("IN2");
+	io.in_port4_cb().set_ioport("IN3");
+}
 
 ROM_START( sbmjb ) // all labels were peeled off / unreadable
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Main ver. 1.1 1998/08/25
@@ -213,7 +272,30 @@ ROM_START( sbmjb ) // all labels were peeled off / unreadable
 	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( honooinv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "e41-08.ic12", 0x00000, 0x10000, CRC(71fc6a58) SHA1(8e95f42fa227e7bbf80dc7690a016f5e43a8125d) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "e41-07.ic5", 0x00000, 0x10000, CRC(0f1faa0b) SHA1(ff8a242507207be3ced2a77705b24a5b6dd1189c) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "vdpcpu", 0 )
+	ROM_LOAD( "e41-04.ic52", 0x00000, 0x80000, CRC(2e236b65) SHA1(4c5dda35d083742ad708d575e1d8cd158fa89210) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "vdpcpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "e41-05.ic49", 0x00000, 0x80000, CRC(493ddfac) SHA1(b37ac65c08dda284e15446bdc545cca889e03ba7) )
+	ROM_LOAD16_BYTE( "e41-06.ic48", 0x00001, 0x80000, CRC(edb38f82) SHA1(d94f05f96a7acdb9e3c98646cbdd797fdc3b92b7) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "e41-09.ic3", 0x00000, 0x40000, CRC(5d25fb77) SHA1(b474be05cdb2e57632595caee7f8c27572db8935) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "e41-02.ic51", 0x000, 0x117, CRC(67fd54e0) SHA1(f64fb33b9a4a935af5662b5103709131727c8411) )
+	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1998, sbmjb, 0, sbmjb, sbmjb, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING )
+GAME( 1998, sbmjb,    0, sbmjb,    sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, honooinv, 0, honooinv, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader (main ver. 1.35, video ver. 1.35)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -693,7 +693,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			// and ends up clearing IRQs out of turn.
 			// The IRQ0 clear bit is also questionable but games run too fast and crash without it.
 			// if (data & 0x80)
-			// 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			//  m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 

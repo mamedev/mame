@@ -622,6 +622,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( h8_d2_r );
 	DECLARE_READ_LINE_MEMBER( h8_d3_r );
 
+	template<int N> DECLARE_READ_LINE_MEMBER( pccard_cd_r );
+
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
 	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
@@ -737,6 +739,8 @@ private:
 	emu_timer *m_atapi_timer;
 	int m_atapi_xferbase;
 	int m_atapi_xfersize;
+
+	int m_pccard_cd[2];
 
 	uint32_t m_control;
 	uint16_t m_n_security_control;
@@ -1166,6 +1170,12 @@ void ksys573_state::update_disc()
 	}
 }
 
+template<int N>
+READ_LINE_MEMBER( ksys573_state::pccard_cd_r )
+{
+	return m_pccard_cd[N];
+}
+
 void ksys573_state::driver_start()
 {
 	m_atapi_timer = timer_alloc( FUNC( ksys573_state::atapi_xfer_end ), this );
@@ -1179,6 +1189,7 @@ void ksys573_state::driver_start()
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
+	save_item( NAME( m_pccard_cd ) );
 
 	m_h8_index = 0;
 }
@@ -2333,7 +2344,7 @@ void pnchmn_state::init_pnchmn()
 
 void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	char s[ 1024 ] = "";
+	std::string message;
 
 	switch( offset )
 	{
@@ -2345,41 +2356,40 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		switch( data & 0xa0 )
 		{
 		case 0x20:
-			strcat( s, "cable holder motor release " );
-
+			message += "cable holder motor release ";
 			m_cable_holder_release = 1;
 			break;
 
 		case 0x80:
-			strcat( s, "cable holder motor catch " );
+			message += "cable holder motor catch ";
 
 			m_cable_holder_release = 0;
 			break;
 
 		case 0xa0:
-			strcat( s, "cable holder motor stop " );
+			message += "cable holder motor stop ";
 			break;
 		}
 
 		switch( data & 0x50 )
 		{
 		case 0x10:
-			strcat( s, "bullet supply motor rotate " );
+			message += "bullet supply motor rotate ";
 			break;
 
 		case 0x40:
-			strcat( s, "bullet supply motor reverse " );
+			message += "bullet supply motor reverse ";
 			break;
 
 		case 0x50:
-			strcat( s, "bullet shutter motor unknown " );
+			message += "bullet shutter motor unknown ";
 			break;
 		}
 
 		switch( data & 0x0a )
 		{
 		case 0x02:
-			strcat( s, "tank shutter motor close " );
+			message += "tank shutter motor close ";
 
 			if( m_tank_shutter_position > 0 )
 			{
@@ -2389,7 +2399,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 0x08:
-			strcat( s, "tank shutter motor open " );
+			message += "tank shutter motor open ";
 
 			if( m_tank_shutter_position < 100 )
 			{
@@ -2399,20 +2409,18 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 0x0a:
-			strcat( s, "tank shutter motor unknown " );
+			message += "tank shutter motor unknown ";
 			break;
 		}
 
 		if( ( data & ~0xfa ) != 0 )
 		{
-			char unknown[ 128 ];
-			sprintf( unknown, "unknown bits %08x", data & ~0xfa );
-			strcat( s, unknown );
+			message += util::string_format("unknown bits %08x", data & ~0xfa);
 		}
 
-		if( s[ 0 ] != 0 )
+		if( !message.empty() )
 		{
-//          popmessage( "%s", s );
+			LOG( message );
 		}
 
 		break;
@@ -2520,7 +2528,10 @@ void ksys573_state::konami573(machine_config &config)
 	FUJITSU_29F016A(config, "29f016a.27h");
 
 	PCCARD_SLOT(config, m_pccard1, 0);
+	m_pccard1->card_detect_cb().set([this](int state) { m_pccard_cd[0] = state; });
+
 	PCCARD_SLOT(config, m_pccard2, 0);
+	m_pccard2->card_detect_cb().set([this](int state) { m_pccard_cd[1] = state; });
 
 	ADDRESS_MAP_BANK(config, m_flashbank ).set_map( &ksys573_state::flashbank_map ).set_options( ENDIANNESS_LITTLE, 16, 32, 0x400000);
 
@@ -3116,8 +3127,8 @@ static INPUT_PORTS_START( konami573 )
 //  PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "pccard1", pccard_slot_device, read_line_inserted )
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( "pccard2", pccard_slot_device, read_line_inserted )
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<0> )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER( DEVICE_SELF, ksys573_state, pccard_cd_r<1> )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 //  PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )

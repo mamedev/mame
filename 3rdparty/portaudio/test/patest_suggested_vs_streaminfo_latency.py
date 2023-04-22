@@ -88,7 +88,7 @@ compositeTestFramesPerBufferValues.append( 882 )
 
 individualPlotFramesPerBufferValues = [0,64,128,256,512] #output separate plots for these
 
-isFirst = True    
+isFirst = True
 
 for framesPerBuffer in compositeTestFramesPerBufferValues:
     commandString = testExeName + " " + str(inputDeviceIndex) + " " + str(outputDeviceIndex) + " " + str(sampleRate) + " " + str(framesPerBuffer) + ' > ' + dataFileName
@@ -102,13 +102,13 @@ for framesPerBuffer in compositeTestFramesPerBufferValues:
         gcf().text(0.1, 0.0,
            "patest_suggested_vs_streaminfo_latency\n%s\n%s\n%s\n"%(d.inputDevice,d.outputDevice,d.sampleRate))
         pdfFile.savefig()
-        
-        
+
+
     figure(2) # composite plot, includes all compositeTestFramesPerBufferValues
 
     if isFirst:
         plot( d.suggestedLatency, d.suggestedLatency, label="Suggested latency" )
-    
+
     plot( d.suggestedLatency, d.halfDuplexOutputLatency )
     plot( d.suggestedLatency, d.halfDuplexInputLatency )
     plot( d.suggestedLatency, d.fullDuplexOutputLatency )

@@ -104,10 +104,13 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_CHANNELS (1 << 1U)
+#define LOG_CHANNELS (1U << 1)
 
 #define VERBOSE     (0)
 #include "logmacro.h"
+
+
+namespace {
 
 #define Q209_CPU_CLOCK          (40.21_MHz_XTAL / 40) // verified by manual
 #define SYSTEM_CAS_CLOCK        (40.21_MHz_XTAL / 20) // likewise
@@ -206,8 +209,7 @@ public:
 		, m_midi_out(*this, "midi_out_%u", 1U)
 		, m_midi_in(*this, "midi_in_%u", 1U)
 		, m_qfc9_region(*this, "qfc9")
-		, m_floppy0(*this, "wd1791:0")
-		, m_floppy1(*this, "wd1791:1")
+		, m_floppy(*this, "wd1791:%u", 0U)
 		, m_wd1791(*this, "wd1791")
 		, m_channels(*this, "cmi01a_%u", 0)
 		, m_screen(*this, "screen")
@@ -278,8 +280,8 @@ public:
 	template <int CpuNum> u8 periphs_range_r(offs_t offset);
 	template <int CpuNum> void periphs_range_w(offs_t offset, u8 data);
 
-	u8 tvt_r();
-	void tvt_w(u8 data);
+	[[maybe_unused]] u8 tvt_r();
+	[[maybe_unused]] void tvt_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqa);
 	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqb);
 	DECLARE_WRITE_LINE_MEMBER(ptm_q219_irq);
@@ -372,8 +374,7 @@ protected:
 	required_device_array<midi_port_device, 3> m_midi_in;
 
 	required_memory_region m_qfc9_region;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<fd1791_device> m_wd1791;
 
 	required_device_array<cmi01a_device, 8> m_channels;
@@ -1315,14 +1316,10 @@ void cmi_state::write_fdc_ctrl(u8 data)
 	int drive = data & 1;
 	int side = BIT(data, 5) ? 1 : 0;
 
-	switch (drive)
-	{
-	case 0: m_wd1791->set_floppy(m_floppy0->get_device()); break;
-	case 1: m_wd1791->set_floppy(m_floppy1->get_device()); break;
-	}
+	m_wd1791->set_floppy(m_floppy[drive]->get_device());
 
-	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(side);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(side);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(side);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(side);
 
 	m_wd1791->dden_w(BIT(data, 7) ? true : false);
 
@@ -2198,8 +2195,8 @@ void cmi_state::cmi2x(machine_config &config)
 	FD1791(config, m_wd1791, 16_MHz_XTAL / 8); // wd1791_interface
 	m_wd1791->intrq_wr_callback().set(FUNC(cmi_state::wd1791_irq));
 	m_wd1791->drq_wr_callback().set(FUNC(cmi_state::wd1791_drq));
-	FLOPPY_CONNECTOR(config, "wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1791:1", cmi2x_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], cmi2x_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], cmi2x_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -2269,5 +2266,8 @@ ROM_END
 void cmi_state::init_cmi2x()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, init_cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

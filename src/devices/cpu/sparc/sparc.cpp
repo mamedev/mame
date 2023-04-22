@@ -59,8 +59,8 @@ DEFINE_DEVICE_TYPE(MB86930, mb86930_device, "mb86930", "Fujitsu MB86930 'SPARCli
 
 namespace
 {
-const sparc_disassembler::asi_desc_map::value_type mb86930_asi_desc[] = {
-
+const sparc_disassembler::asi_desc_map::value_type mb86930_asi_desc[] =
+{
 	{ 0x01, { nullptr, "Control Registers"          } },
 	{ 0x02, { nullptr, "Instruction Cache Lock"     } },
 	{ 0x03, { nullptr, "Data Cache Lock"            } },
@@ -73,7 +73,13 @@ const sparc_disassembler::asi_desc_map::value_type mb86930_asi_desc[] = {
 	{ 0x0e, { nullptr, "Data Cache Tag RAM"         } },
 	{ 0x0f, { nullptr, "Data Cache Data RAM"        } }
 };
-}
+} // anonymous namespace
+
+const char *const sparc_base_device::DEFAULT_ASI_NAMES[16] =
+{
+	"asi0",  "asi1",  "asi2",  "asi3",  "asi4",  "asi5",  "asi6",  "asi7",
+	"asi8",  "asi9",  "asi10", "asi11", "asi12", "asi13", "asi14", "asi15"
+};
 
 //-------------------------------------------------
 //  sparc_base_device - constructor
@@ -89,8 +95,7 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	{
 		for (int i = 0; i < 0x10; i++)
 		{
-			m_asi_names[i] = util::string_format("asi%x", i);
-			m_asi_config[i] = address_space_config(m_asi_names[i].c_str(), ENDIANNESS_BIG, 32, 32);
+			m_asi_config[i] = address_space_config(DEFAULT_ASI_NAMES[i], ENDIANNESS_BIG, 32, 32);
 		}
 	}
 }
@@ -136,39 +141,22 @@ mb86930_device::mb86930_device(const machine_config &mconfig, const char *tag, d
 	, m_cs_r(*this)
 	, m_cs_w(*this)
 {
-	m_asi_names[0x00] = "debugger";
-	m_asi_names[0x01] = "system_control";
-	m_asi_names[0x02] = "icache_lock";
-	m_asi_names[0x03] = "dcache_lock";
-	m_asi_names[0x04] = "asi4";
-	m_asi_names[0x05] = "asi5";
-	m_asi_names[0x06] = "asi6";
-	m_asi_names[0x07] = "asi7";
-	m_asi_names[0x08] = "user_insn";
-	m_asi_names[0x09] = "super_insn";
-	m_asi_names[0x0a] = "user_data";
-	m_asi_names[0x0b] = "super_data";
-	m_asi_names[0x0c] = "icache_tag";
-	m_asi_names[0x0d] = "icache_data";
-	m_asi_names[0x0e] = "dcache_tag";
-	m_asi_names[0x0f] = "dcache_data";
-
-	m_asi_config[0x00] = address_space_config(m_asi_names[0x00].c_str(), ENDIANNESS_BIG, 32, 32);
-	m_asi_config[0x01] = address_space_config(m_asi_names[0x01].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::control_map), this));
-	m_asi_config[0x02] = address_space_config(m_asi_names[0x02].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_lock_map), this));
-	m_asi_config[0x03] = address_space_config(m_asi_names[0x03].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_lock_map), this));
-	m_asi_config[0x04] = address_space_config(m_asi_names[0x04].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<4>), this));
-	m_asi_config[0x05] = address_space_config(m_asi_names[0x05].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<5>), this));
-	m_asi_config[0x06] = address_space_config(m_asi_names[0x06].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<6>), this));
-	m_asi_config[0x07] = address_space_config(m_asi_names[0x07].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<7>), this));
-	m_asi_config[0x08] = address_space_config(m_asi_names[0x08].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<8>), this));
-	m_asi_config[0x09] = address_space_config(m_asi_names[0x09].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<9>), this));
-	m_asi_config[0x0a] = address_space_config(m_asi_names[0x0a].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<10>), this));
-	m_asi_config[0x0b] = address_space_config(m_asi_names[0x0b].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<11>), this));
-	m_asi_config[0x0c] = address_space_config(m_asi_names[0x0c].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_tag_map), this));
-	m_asi_config[0x0d] = address_space_config(m_asi_names[0x0d].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_data_map), this));
-	m_asi_config[0x0e] = address_space_config(m_asi_names[0x0e].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_tag_map), this));
-	m_asi_config[0x0f] = address_space_config(m_asi_names[0x0f].c_str(), ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_data_map), this));
+	m_asi_config[0x00] = address_space_config("debugger",       ENDIANNESS_BIG, 32, 32);
+	m_asi_config[0x01] = address_space_config("system_control", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::control_map), this));
+	m_asi_config[0x02] = address_space_config("icache_lock",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_lock_map), this));
+	m_asi_config[0x03] = address_space_config("dcache_lock",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_lock_map), this));
+	m_asi_config[0x04] = address_space_config("asi4",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<4>), this));
+	m_asi_config[0x05] = address_space_config("asi5",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<5>), this));
+	m_asi_config[0x06] = address_space_config("asi6",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<6>), this));
+	m_asi_config[0x07] = address_space_config("asi7",           ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<7>), this));
+	m_asi_config[0x08] = address_space_config("user_insn",      ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<8>), this));
+	m_asi_config[0x09] = address_space_config("super_insn",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<9>), this));
+	m_asi_config[0x0a] = address_space_config("user_data",      ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<10>), this));
+	m_asi_config[0x0b] = address_space_config("super_data",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::mmu_map<11>), this));
+	m_asi_config[0x0c] = address_space_config("icache_tag",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_tag_map), this));
+	m_asi_config[0x0d] = address_space_config("icache_data",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::icache_data_map), this));
+	m_asi_config[0x0e] = address_space_config("dcache_tag",     ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_tag_map), this));
+	m_asi_config[0x0f] = address_space_config("dcache_data",    ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(mb86930_device::dcache_data_map), this));
 
 	add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(mb86930_asi_desc); });
 }
@@ -1622,6 +1610,14 @@ void sparc_base_device::execute_mulscc(uint32_t op)
 void sparc_base_device::execute_rdsr(uint32_t op)
 {
 	// The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
+
+	if (RDASR && RS1 == 15 && RD == 0)
+	{
+		// Store Barrier instruction - not implemented, as stores are always consistent in the context of MAME
+		PC = nPC;
+		nPC = nPC + 4;
+		return;
+	}
 
 	if (((RDPSR || RDWIM || RDTBR) || (RDASR && m_privileged_asr[RS1])) && IS_USER)
 	{

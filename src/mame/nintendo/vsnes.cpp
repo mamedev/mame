@@ -186,7 +186,6 @@ protected:
 
 	virtual void machine_reset() override;
 
-	template <u8 Side> void sprite_dma_w(address_space &space, u8 data);
 	template <u8 Side> void vsnes_coin_counter_w(offs_t offset, u8 data);
 	template <u8 Side> u8 vsnes_coin_counter_r(offs_t offset);
 	template <u8 Side> void vsnes_in0_w(u8 data);
@@ -354,15 +353,6 @@ private:
 
 //******************************************************************************
 
-
-template <u8 Side>
-void vs_base_state::sprite_dma_w(address_space &space, u8 data)
-{
-	if (Side == MAIN)
-		m_ppu1->spriteram_dma(space, data & 0x07);
-	else
-		m_ppu2->spriteram_dma(space, data & 0x07);
-}
 
 template <u8 Side>
 void vs_base_state::vsnes_coin_counter_w(offs_t offset, u8 data)
@@ -996,7 +986,7 @@ void vs_base_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<MAIN>));
+	map(0x4014, 0x4014).w(m_ppu1, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<MAIN>), FUNC(vs_base_state::vsnes_in0_w<MAIN>));
 	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<MAIN>)); // IN1 - input port 2 / PSG second control register
 	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<MAIN>), FUNC(vs_base_state::vsnes_coin_counter_w<MAIN>));
@@ -1015,7 +1005,7 @@ void vs_base_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(vs_base_state::sprite_dma_w<SUB>));
+	map(0x4014, 0x4014).w(m_ppu2, FUNC(ppu2c0x_device::spriteram_dma));
 	map(0x4016, 0x4016).rw(FUNC(vs_base_state::vsnes_in0_r<SUB>), FUNC(vs_base_state::vsnes_in0_w<SUB>));
 	map(0x4017, 0x4017).r(FUNC(vs_base_state::vsnes_in1_r<SUB>));  // IN1 - input port 2 / PSG second control register
 	map(0x4020, 0x5fff).rw(FUNC(vs_base_state::vsnes_coin_counter_r<SUB>), FUNC(vs_base_state::vsnes_coin_counter_w<SUB>));
@@ -1231,10 +1221,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vsnes_zapper )
 	PORT_START("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )            // low 6 bits always read 0b010000
+	PORT_CONFNAME( 0x10, 0x10, "Gun Alarm Wire" )           // ALM wire (ignored by Gumshoe and Freedom Force?)
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x10, "Connected" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )            // sprite hit
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun trigger
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )            // gun HIT
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )           // gun TRG
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1296,7 +1288,7 @@ static INPUT_PORTS_START( platoon )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0xE0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!6,!7,!8")
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -1341,7 +1333,7 @@ Win Hole    +1  +2
 Tie          0   0
 Lose Hole   -1  -2
 */
-	PORT_DIPNAME( 0x60, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW1:!6,7")
+	PORT_DIPNAME( 0x60, 0x20, "Starting Points" )       PORT_DIPLOCATION("SW1:!6,7")
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x40, "13" )
 	PORT_DIPSETTING(    0x20, "16" )
@@ -1349,6 +1341,17 @@ Lose Hole   -1  -2
 	PORT_DIPNAME( 0x80, 0x00, "Difficulty Vs. Computer" )   PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( golfj )
+	PORT_INCLUDE( golf )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x60, 0x20, "Starting Points" )       PORT_DIPLOCATION("SW1:!6,7")
+	PORT_DIPSETTING(    0x00, "300" )
+	PORT_DIPSETTING(    0x40, "400" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0x60, "600" )
 INPUT_PORTS_END
 
 // Same as 'golf', but 4 start buttons
@@ -1557,12 +1560,12 @@ static INPUT_PORTS_START( vsbball )
 	PORT_INCLUDE( vsnes_dual_rev )
 
 	PORT_START("DSW0")  // bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017
-	PORT_DIPNAME( 0x03, 0x02, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPNAME( 0x03, 0x01, "Player Defense Strength" )   PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x03, "Strong" )
-	PORT_DIPNAME( 0x0c, 0x08, "Player Offense Strength" )   PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x04, "Player Offense Strength" )   PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
@@ -1585,7 +1588,7 @@ static INPUT_PORTS_START( vsbball )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x00, "Starting Points" )       PORT_DIPLOCATION("SW2:!4,!5,!6")
+	PORT_DIPNAME( 0x38, 0x30, "Starting Points" )       PORT_DIPLOCATION("SW2:!4,!5,!6")
 	PORT_DIPSETTING(    0x00, "80 Pts" )
 	PORT_DIPSETTING(    0x20, "100 Pts" )
 	PORT_DIPSETTING(    0x10, "150 Pts" )
@@ -1776,7 +1779,7 @@ static INPUT_PORTS_START( cstlevna )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7")  // Damage taken
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )                     // Normal
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )                     // Double
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:!8" )       // Manual states "Must be Set to "OFF"
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:!8" )       // Manual states Must be Set to "OFF"
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( iceclimb )
@@ -1945,7 +1948,7 @@ static INPUT_PORTS_START( suprmrio )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "100 Coins" )
 	PORT_DIPSETTING(    0x20, "150 Coins" )
 	PORT_DIPSETTING(    0x10, "200 Coins" )
@@ -1953,7 +1956,7 @@ static INPUT_PORTS_START( suprmrio )
 	PORT_DIPNAME( 0x40, 0x00, "Timer" )                 PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x40, "Fast" )
-	PORT_DIPNAME( 0x80, 0x80, "Continue Lives" )        PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Continue Lives" )        PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
@@ -1999,7 +2002,7 @@ static INPUT_PORTS_START( hogalley )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
@@ -2027,12 +2030,12 @@ static INPUT_PORTS_START( vsgshoe )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!4,!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x40, 0x00, "Bullets per Balloon" )   PORT_DIPLOCATION("SW1:!7")
@@ -2203,17 +2206,28 @@ static INPUT_PORTS_START( vssoccer )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x18, 0x08, "Points Timer" )          PORT_DIPLOCATION("SW1:!4,!5")
-	PORT_DIPSETTING(    0x00, "600 Pts" )
-	PORT_DIPSETTING(    0x10, "800 Pts" )
-	PORT_DIPSETTING(    0x08, "1000 Pts" )
-	PORT_DIPSETTING(    0x18, "1200 Pts" )
+	PORT_DIPNAME( 0x18, 0x00, "Points Timer" )          PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPSETTING(    0x00, "1000 Pts" )
+	PORT_DIPSETTING(    0x10, "1500 Pts" )
+	PORT_DIPSETTING(    0x08, "2000 Pts" )
+	PORT_DIPSETTING(    0x18, "600 Pts" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!6,!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Hard ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:!8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vssoccera )
+	PORT_INCLUDE( vssoccer )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x18, 0x18, "Points Timer" )          PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPSETTING(    0x00, "600 Pts" )
+	PORT_DIPSETTING(    0x10, "800 Pts" )
+	PORT_DIPSETTING(    0x08, "1000 Pts" )
+	PORT_DIPSETTING(    0x18, "1200 Pts" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsgradus )
@@ -2229,7 +2243,7 @@ static INPUT_PORTS_START( vsgradus )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0x30, 0x00, "Bonus" )                 PORT_DIPLOCATION("SW1:!5,!6")
@@ -2269,7 +2283,7 @@ static INPUT_PORTS_START( vsslalom )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:!7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Inverted input" )        PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPNAME( 0x80, 0x00, "Inverted input" )        PORT_DIPLOCATION("SW1:!8")       // Manual states Not Used - Must be Set to "OFF"
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2307,11 +2321,11 @@ static INPUT_PORTS_START( tkoboxng )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0C, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!3,!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x0C, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Very_Hard ) )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )
 	PORT_DIPNAME( 0xe0, 0x00, "PPU Type" )              PORT_DIPLOCATION("SW1:!6,!7,!8")
 	PORT_DIPSETTING(    0x00, "RP2C04-0003" )
@@ -3555,14 +3569,14 @@ GAME( 1985, vsskykid,       0,             vsnes,         vsskykid, vs_uni_state
 GAME( 1987, tkoboxng,       0,             vsnes,         tkoboxng, vs_uni_state,   init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing",                                        0 )
 GAME( 1984, smgolf,         0,             vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
 GAME( 1984, smgolfb,        smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
-GAME( 1984, smgolfj,        smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
+GAME( 1984, smgolfj,        smgolf,        vsnes,         golfj,    vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
 GAME( 1984, ladygolfe,      smgolf,        vsnes,         golf4s,   vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
 GAME( 1984, ladygolf,       smgolf,        vsnes,         golf,     vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
 GAME( 1984, vspinbal,       0,             vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",                            0 )
 GAME( 1984, vspinbalj,      vspinbal,      vsnes,         vspinbal, vs_uni_state,   init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)",                           0 )
 GAME( 1986, vsslalom,       0,             vsnes,         vsslalom, vs_uni_state,   init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom",                                               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, vssoccer,       0,             vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)",                                 0 )
-GAME( 1985, vssoccera,      vssoccer,      vsnes,         vssoccer, vs_uni_state,   init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)",                                 0 )
+GAME( 1985, vssoccera,      vssoccer,      vsnes,         vssoccera, vs_uni_state,  init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)",                                 0 )
 GAME( 1986, vsgradus,       0,             vsnes,         vsgradus, vs_uni_state,   init_vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)",                               0 )
 GAME( 1987, nvs_platoon,    0,             vsnes,         platoon,  vs_uni_state,   init_platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon",                                              0 )
 GAME( 1987, vstetris,       0,             vsnes,         vstetris, vs_uni_state,   init_vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" ,                                              0 )

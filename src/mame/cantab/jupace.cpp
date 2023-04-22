@@ -63,6 +63,8 @@ Ports:
 #include "formats/ace_tap.h"
 
 
+namespace {
+
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"
 #define I8255_TAG       "i8255"
@@ -170,24 +172,18 @@ private:
 
 SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 {
-	std::vector<uint8_t> RAM(0x10000);
-	cpu_device *cpu = m_maincpu;
-	address_space &space = cpu->space(AS_PROGRAM);
-	unsigned char ace_repeat, ace_byte;
+	if (m_ram->size() < 16*1024)
+		return std::make_pair(image_error::UNSUPPORTED, "At least 16KB RAM expansion required");
+
 	u16 ace_index=0x2000;
 	bool done = false;
 
-	if (m_ram->size() < 16*1024)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "At least 16KB RAM expansion required");
-		image.message("At least 16KB RAM expansion required");
-		return image_init_result::FAIL;
-	}
-
 	logerror("Loading file %s.\r\n", image.filename());
+	std::vector<uint8_t> RAM(0x10000);
 	while (!done && (ace_index < 0x8001))
 	{
-		image.fread( &ace_byte, 1);
+		unsigned char ace_repeat, ace_byte;
+		image.fread(&ace_byte, 1);
 		if (ace_byte == 0xed)
 		{
 			image.fread(&ace_byte, 1);
@@ -215,21 +211,18 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 	logerror("Decoded %X bytes.\r\n", ace_index-0x2000);
 
 	if (!done)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "EOF marker not found");
-		image.message("EOF marker not found");
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid snapshot file: EOF marker not found");
 
-		// patch CPU registers
-		// Some games do not follow the standard, and have rubbish in the CPU area. So,
-		// we check that some other bytes are correct.
-		// 2080 = memory size of original machine, should be 0000 or 8000 or C000.
-		// 2118 = new stack pointer, do not use if between 8000 and FF00.
+	// patch CPU registers
+	// Some games do not follow the standard, and have rubbish in the CPU area. So,
+	// we check that some other bytes are correct.
+	// 2080 = memory size of original machine, should be 0000 or 8000 or C000.
+	// 2118 = new stack pointer, do not use if between 8000 and FF00.
 
 	ace_index = RAM[0x2080] | (RAM[0x2081] << 8);
 
-	if ((ace_index & 0x3FFF)==0)
+	cpu_device *cpu = m_maincpu;
+	if ((ace_index & 0x3fff) == 0)
 	{
 		cpu->set_state_int(Z80_AF, RAM[0x2100] | (RAM[0x2101] << 8));
 		cpu->set_state_int(Z80_BC, RAM[0x2104] | (RAM[0x2105] << 8));
@@ -252,11 +245,12 @@ SNAPSHOT_LOAD_MEMBER(ace_state::snapshot_cb)
 			cpu->set_state_int(Z80_SP, RAM[0x2118] | (RAM[0x2119] << 8));
 	}
 
-	/* Copy data to the address space */
+	// Copy data to the address space
+	address_space &space = cpu->space(AS_PROGRAM);
 	for (ace_index = 0x2000; ace_index < 0x8000; ace_index++)
 		space.write_byte(ace_index, RAM[ace_index]);
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 //**************************************************************************
@@ -839,6 +833,7 @@ ROM_START( jupace )
 	ROM_LOAD( "sp0256-al2.ic1", 0x000, 0x800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

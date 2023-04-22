@@ -44,6 +44,9 @@
 #include "softlist_dev.h"
 //#include "speaker.h"
 
+
+namespace {
+
 class bdsm_state : public driver_device
 {
 public:
@@ -70,7 +73,7 @@ private:
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_bdesignm);
+	[[maybe_unused]] DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_bdesignm);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cartslot;
@@ -98,7 +101,7 @@ DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)
 	m_cartslot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 	m_cartslot->common_load_rom(m_cartslot->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 void bdsm_state::mem_map(address_map &map)
@@ -157,6 +160,8 @@ ROM_START( bdesignm )
 	ROM_REGION16_BE(0x88000, "roms", ROMREGION_ERASE00)
 	ROM_LOAD( "h8_328.bin", 0x00000, 0x6000, NO_DUMP ) // internal rom (When the console is booted up without a cart it enters the default (builtin) art / drawing program, otherwise probably not used as carts contain boot vectors etc.)
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 1995, bdesignm,  0,      0,      bdesignm,   bdesignm, bdsm_state, empty_init, "Bandai", "Design Master Denshi Mangajuku",   MACHINE_IS_SKELETON )

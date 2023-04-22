@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class magnum_state : public driver_device
 {
 public:
@@ -333,5 +336,8 @@ ROM_START( magnum )
 	ROM_REGION(0x1000, "char", 0)
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, empty_init, "Dulmont", "Magnum", MACHINE_IMPERFECT_SOUND)

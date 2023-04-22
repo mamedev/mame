@@ -28,6 +28,8 @@
 #include "alinvade.lh"
 
 
+namespace {
+
 class alinvade_state : public driver_device
 {
 public:
@@ -239,6 +241,8 @@ ROM_START( alinvade )
 	ROM_FILL( 0x00, 0x0f, 0xea )
 	ROM_FILL( 0x0f, 0x01, 0x60 )    // rts for whole area, interrupt code jumps to various addresses here, check note on top.
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )

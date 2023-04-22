@@ -112,6 +112,8 @@ www.multitech.com
 #include "screen.h"
 
 
+namespace {
+
 //*************************************
 // Main iteagle driver
 //*************************************
@@ -700,6 +702,9 @@ ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "bbhcotw_v3.02.05_cf", 0, SHA1(b1fcaab3a5aa51821673a914333c8868d36f77ae) ) /* Build 21:00:39, Sep 10 2006 - 4gb Compact Flash conversion  */
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

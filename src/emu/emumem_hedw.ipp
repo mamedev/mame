@@ -131,6 +131,11 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 	dispatch_write<Level, Width, AddrShift>(HIGHMASK, offset, data, mem_mask, m_a_dispatch);
 }
 
+template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispatch<HighBits, Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	dispatch_write_interruptible<Level, Width, AddrShift>(HIGHMASK, offset, data, mem_mask, m_a_dispatch);
+}
+
 template<int HighBits, int Width, int AddrShift> u16 handler_entry_write_dispatch<HighBits, Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	return dispatch_write_flags<Level, Width, AddrShift>(HIGHMASK, offset, data, mem_mask, m_a_dispatch);
@@ -446,20 +451,63 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 
 template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispatch<HighBits, Width, AddrShift>::passthrough_patch(handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings, handler_entry_write<Width, AddrShift> *&target)
 {
-	handler_entry_write<Width, AddrShift> *original = target;
-	handler_entry_write<Width, AddrShift> *replacement = nullptr;
+	// Look in cache first
 	for(const auto &p : mappings)
-		if(p.original == original) {
-			replacement = p.patched;
-			break;
+		if(p.original == target) {
+			p.patched->ref();
+			target->unref();
+			target = p.patched;
+			return;
 		}
-	if(!replacement) {
-		replacement = handler->instantiate(original);
+
+	handler_entry_write<Width, AddrShift> *original = target;
+	u32 target_priority = original->f_get_pt();
+	u32 new_priority = handler->f_get_pt();
+
+	// 3 cases: new one on top, new one on bottom, or new one replaces old one
+
+	if(!target_priority || new_priority > target_priority || (new_priority == target_priority && !(new_priority & 1))) {
+		// New one goes over the old one
+		//   previous one is not passthrough (target_priority = 0)
+		//   new one has higher priority
+		//   both have the same priority, and the priority is even which means keep both
+
+		// We instantiate the new one with the old one under it and put it in place and in the cache
+
+		handler_entry_write<Width, AddrShift> *replacement = handler->instantiate(original);
 		mappings.emplace_back(mapping{ original, replacement });
-	} else
-		replacement->ref();
-	target->unref();
-	target = replacement;
+		target->unref();
+		target = replacement;
+
+	} else if(new_priority == target_priority) {
+		// New one replaces the old one
+		//   both have the same priority, and the priority is odd which means keep only the new one
+
+		// We instantiate the new one with the old one's subtarget and put it in place and in the cache
+
+		handler_entry_write<Width, AddrShift> *replacement = handler->instantiate(static_cast<handler_entry_write_passthrough<Width, AddrShift> *>(original)->get_subhandler());
+		mappings.emplace_back(mapping{ original, replacement });
+		target->unref();
+		target = replacement;
+
+	} else {
+		// New one goes under the old one
+		//   both are passthrough and new one has lower priority
+		//
+		// This can be recursive, so do the passthrough patch on the subhandler, then instantiate the old one with the result
+
+		handler_entry_write<Width, AddrShift> *recursive = static_cast<handler_entry_write_passthrough<Width, AddrShift> *>(original)->get_subhandler();
+		recursive->ref();
+
+		passthrough_patch(handler, mappings, recursive);
+
+		handler_entry_write<Width, AddrShift> *replacement = static_cast<handler_entry_write_passthrough<Width, AddrShift> *>(original)->instantiate(recursive);
+		mappings.emplace_back(mapping{ original, replacement });
+		target->unref();
+		target = replacement;
+		recursive->unref();
+	}
+
 }
 
 template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispatch<HighBits, Width, AddrShift>::populate_passthrough_nomirror_subdispatch(offs_t entry, offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings)

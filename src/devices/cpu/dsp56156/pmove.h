@@ -20,8 +20,7 @@ public:
 	virtual ~ParallelMove() {}
 
 	virtual bool decode(const uint16_t word0, const uint16_t word1) = 0;
-	virtual void disassemble(std::string& retString) const = 0;
-	virtual void evaluate() = 0;
+	virtual std::string disassemble() const = 0;
 
 	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const uint16_t word0, const uint16_t word1);
 
@@ -70,11 +69,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -112,11 +110,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -158,19 +155,15 @@ public:
 		/* D1 and D2 may not specify the same register : A-142 */
 		if (r == iR3) return false;
 
-		char temp[32];
-		sprintf(temp,  "X:%s,%s", ea1.c_str(), regIdAsString(D1).c_str());
-		parallelMove = temp;
-		sprintf(temp, "X:%s,%s", ea2.c_str(), regIdAsString(D2).c_str());
-		parallelMove2 = temp;
+		parallelMove = util::string_format("X:%s,%s", ea1, regIdAsString(D1));
+		parallelMove2 = util::string_format("X:%s,%s", ea2, regIdAsString(D2));
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = parallelMove + " " + parallelMove2;
+		return parallelMove + " " + parallelMove2;
 	}
-	void evaluate() override {}
 
 private:
 	std::string parallelMove;
@@ -213,15 +206,14 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		// (?,?) is a parallel nop
 		if (m_source == iWEIRD && m_destination == iWEIRD)
-			retString = "";
+			return "";
 		else
-			retString = regIdAsString(m_source) + "," + regIdAsString(m_destination);
+			return regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
-	void evaluate() override {}
 
 private:
 	reg_id m_source;
@@ -244,8 +236,6 @@ public:
 		reg_id r;
 		reg_id S;
 		reg_id Dnot;
-		char parallel_move_str[128];
-		char parallel_move_str2[128];
 
 		if (opDestination() == iA) Dnot = iB;
 		else                       Dnot = iA;
@@ -254,17 +244,14 @@ public:
 		decode_RR_table(BITSn(word0,0x00c0), r);
 		decode_DD_table(BITSn(word0,0x0030), S);
 
-		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).c_str(), regIDAsNum(r), regIDAsNum(r));
-		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).c_str(), regIdAsString(Dnot).c_str());
-		pms = parallel_move_str;
-		pms2 = parallel_move_str2;
+		pms = util::string_format("%s,X:(R%d)+N%d", regIdAsString(Dnot), regIDAsNum(r), regIDAsNum(r));
+		pms2 = util::string_format("%s,%s", regIdAsString(S), regIdAsString(Dnot));
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = pms + " " + pms2;
+		return pms + " " + pms2;
 	}
-	void evaluate() override {}
 
 private:
 	std::string pms;    // TODO
@@ -289,11 +276,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_ea;
+		return m_ea;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_ea;
@@ -320,11 +306,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;

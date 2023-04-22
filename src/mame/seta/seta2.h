@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_INCLUDES_SETA2_H
-#define MAME_INCLUDES_SETA2_H
+#ifndef MAME_SETA_SETA2_H
+#define MAME_SETA_SETA2_H
 
 #pragma once
 
 
-#include "machine/tmp68301.h"
+#include "cpu/m68000/tmp68301.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/ticket.h"
@@ -98,9 +98,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void sound_bank_w(offs_t offset, uint8_t data);
-
-	INTERRUPT_GEN_MEMBER(seta2_interrupt);
-	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
 
 	void ablastb_map(address_map &map);
 	void grdians_map(address_map &map);
@@ -248,4 +245,4 @@ private:
 	uint8_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
 };
 
-#endif // MAME_INCLUDES_SETA2_H
+#endif // MAME_SETA_SETA2_H

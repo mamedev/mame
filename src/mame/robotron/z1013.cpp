@@ -61,6 +61,8 @@ Due to no input checking, misuse of commands can crash the system.
 #include "sound/spkrdev.h"
 
 
+namespace {
+
 class z1013_state : public driver_device
 {
 public:
@@ -402,36 +404,41 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 0020 up   - Program to load
 */
 
+	if (image.length() < 0x20)
+		return std::make_pair(image_error::INVALIDIMAGE, "File too short to contain Z1013 image header");
+
 	std::vector<uint8_t> data(image.length());
-	uint16_t startaddr,endaddr,runaddr;
-
 	image.fread(&data[0], image.length());
+	if ((data[13] != data[14]) || (data[14] != data[15]))
+		return std::make_pair(image_error::INVALIDIMAGE, "Not a Z1013 image");
 
-	startaddr = data[0] + data[1]*256;
-	endaddr   = data[2] + data[3]*256;
-	runaddr   = data[4] + data[5]*256;
-
-	if ((data[13]==data[14]) && (data[14]==data[15]))
-	{ }
-	else
+	uint16_t const startaddr = data[0] + data[1]*256;
+	uint16_t const endaddr   = data[2] + data[3]*256;
+	uint16_t const runaddr   = data[4] + data[5]*256;
+	if (endaddr < startaddr)
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Not a Z1013 image");
-		image.message(" Not a Z1013 image");
-		return image_init_result::FAIL;
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("End address 0x%04X is less than start address 0x%04X", endaddr, startaddr));
+	}
+	else if ((endaddr - startaddr + 1) > (data.size() - 0x20))
+	{
+		return std::make_pair(
+				image_error::INVALIDIMAGE,
+				util::string_format("File too short to contain %u-byte program", endaddr - startaddr + 1));
 	}
 
-	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
-			&data[0x20], endaddr - startaddr + 1);
+	memcpy(m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr), &data[0x20], endaddr - startaddr + 1);
 
 	if (runaddr)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
-		image.seterror(image_error::INVALIDIMAGE, "Loaded but cannot run");
-		image.message(" Loaded but cannot run");
+		osd_printf_error("%s: Loaded but cannot run due to zero entry point\n", image.basename());
+		image.message(" Loaded but cannot run due to zero entry point");
 	}
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 /* F4 Character Displayer */
@@ -565,6 +572,9 @@ ROM_START( z1013k69 )
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 /* Driver */
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
 COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  MACHINE_SUPPORTS_SAVE )

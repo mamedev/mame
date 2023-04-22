@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Graves
-#ifndef MAME_INCLUDES_SUPERCHS_H
-#define MAME_INCLUDES_SUPERCHS_H
+#ifndef MAME_TAITO_SUPERCHS_H
+#define MAME_TAITO_SUPERCHS_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 	void superchs_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SUPERCHS_H
+#endif // MAME_TAITO_SUPERCHS_H

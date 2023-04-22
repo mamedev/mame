@@ -3,10 +3,6 @@
 /******************************************************************************
  *  Microtan 65
  *
- *  machine driver
- *
- *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
- *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
  *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
@@ -21,115 +17,13 @@
 #include "logmacro.h"
 
 
-static const char keyboard[8][9][8] = {
-	{ /* normal */
-		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0',':','-', 12,127,'^'},
-		{'q','w','e','r','t','y','u','i'},
-		{'o','p','[',']', 13,  3,  0,  0},
-		{'a','s','d','f','g','h','j','k'},
-		{'l',';','@', 92,  0,'z','x','c'},
-		{'v','b','n','m',',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Shift */
-		{ 27,'!','"','#','$','%','&', 39},
-		{'(',')','~','*','=', 12,127,'_'},
-		{'Q','W','E','R','T','Y','U','I'},
-		{'O','P','{','}', 13,  3,  0,  0},
-		{'A','S','D','F','G','H','J','K'},
-		{'L','+','`','|',  0,'Z','X','C'},
-		{'V','B','N','M','<','>','?',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Control */
-		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0',':','-','`',127, 30},
-		{ 17, 23,  5, 18, 20, 25, 21,  9},
-		{ 15, 16, 27, 29, 13,  3,  0,  0},
-		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,';','@', 28,  0, 26, 24,  3},
-		{ 22,  2, 14, 13,',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Shift+Control */
-		{ 27,'!','"','#','$','%','&', 39},
-		{'(',')','~','*','=', 12,127, 31},
-		{ 17, 23,  5, 18, 20, 25, 21,  9},
-		{ 15, 16, 27, 29, 13,127,  0,  0},
-		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,'+','`', 28,  0, 26, 24,  3},
-		{ 22,  2, 14, 13,',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* CapsLock */
-		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0',':','-', 12,127,'^'},
-		{'Q','W','E','R','T','Y','U','I'},
-		{'O','P','[',']', 13,  3,  0,  0},
-		{'A','S','D','F','G','H','J','K'},
-		{'L',';','@', 92,  0,'Z','X','C'},
-		{'V','B','N','M',',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Shift+CapsLock */
-		{ 27,'!','"','#','$','%','&', 39},
-		{'(',')','~','*','=', 12,127,'_'},
-		{'q','w','e','r','t','y','u','i'},
-		{'o','p','{','}', 13,  3,  0,  0},
-		{'a','s','d','f','g','h','j','k'},
-		{'l','+','`','|',  0,'z','x','c'},
-		{'v','b','n','m','<','>','?',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Control+CapsLock */
-		{ 27,'1','2','3','4','5','6','7'},
-		{'8','9','0',':','-', 12,127,  9},
-		{ 17, 23,  5, 18, 20, 25, 21,  9},
-		{ 15, 16, 27, 29, 13,127,  0,  0},
-		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,';', 39, 28,  0, 26, 24,  3},
-		{ 22,  2, 14, 13,',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-	{ /* Shift+Control+CapsLock */
-		{ 27,'!','"','#','$','%','&', 39},
-		{'(',')','~','*','=', 12,127,  9},
-		{ 17, 23,  5, 18, 20, 25, 21,  9},
-		{ 15, 16, 27, 29, 13,127,  0,  0},
-		{  1, 19,  4,  6,  7,  8, 10, 11},
-		{ 12,':','"', 28,  0, 26, 24,  3},
-		{ 22,  2, 14, 13,',','.','/',  0},
-		{ 10,' ','-',',', 13,'.','0','1'},
-		{'2','3','4','5','6','7','8','9'},
-	},
-};
-
-
-uint8_t microtan_state::sound_r()
-{
-	int data = 0xff;
-	LOG("sound_r: -> %02x\n", data);
-	return data;
-}
-
-void microtan_state::sound_w(uint8_t data)
-{
-	LOG("sound_w: <- %02x\n", data);
-}
-
-
 uint8_t microtan_state::bffx_r(offs_t offset)
 {
-	int data = 0xff;
-	switch( offset & 3 )
+	uint8_t data = 0xff;
+
+	if (machine().side_effects_disabled()) return data;
+
+	switch (offset & 3)
 	{
 	case  0: /* BFF0: read enables chunky graphics */
 		m_chunky_graphics = 1;
@@ -142,22 +36,7 @@ uint8_t microtan_state::bffx_r(offs_t offset)
 		LOG("bff2_r: -> %02x\n", data);
 		break;
 	case 3: /* BFF3: read keyboard/keypad */
-		switch (m_config->read() & 3)
-		{
-		case 0: /* ASCII Keyboard */
-			data = m_keyboard_ascii;
-			break;
-		case 1: /* Hex Keypad */
-			data = 0x00;
-			for (u8 i = 0; i < 4; i++)
-				if (BIT(m_keypad_column, i))
-					data |= m_io_keypad[i]->read();
-
-			break;
-		case 2: /* ETI Keypad */
-			data = (m_keypad->read() & 0x1f) | (m_config->read() & 0x60);
-			break;
-		}
+		data = m_keyboard->read() | (m_keyboard_int_flag << 7);
 		LOG("bff3_r: -> %02x (keyboard ASCII)\n", data);
 		break;
 	}
@@ -173,21 +52,20 @@ TIMER_CALLBACK_MEMBER(microtan_state::pulse_nmi)
 
 void microtan_state::bffx_w(offs_t offset, uint8_t data)
 {
-	switch( offset & 3 )
+	switch (offset & 3)
 	{
 	case 0: /* BFF0: write reset keyboard interrupt flag */
 		/* This removes bit 7 from the ASCII value of the last key pressed. */
 		LOG("bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data);
-		m_keyboard_ascii &= ~0x80;
-		m_irq_line->in_w<IRQ_KBD>(0);
+		kbd_int(0);
 		break;
 	case 1: /* BFF1: write delayed NMI */
 		LOG("bff1_w: %d <- %02x (delayed NMI)\n", offset, data);
 		m_pulse_nmi_timer->adjust(m_maincpu->cycles_to_attotime(8));
 		break;
 	case 2: /* BFF2: write keypad */
-		LOG("bff2_w: %d <- %02x (keypad column)\n", offset, data); // 1, 2, 4, 7, f
-		m_keypad_column = data & 0x0f;
+		LOG("bff2_w: %d <- %02x (keypad column)\n", offset, data);
+		m_keyboard->write(data);
 		break;
 	case 3: /* BFF3: write disable chunky graphics */
 		LOG("bff3_w: %d <- %02x (chunky graphics off)\n", offset, data);
@@ -196,110 +74,40 @@ void microtan_state::bffx_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t mt6809_state::keyboard_r()
+
+uint8_t mt6809_state::bffx_r(offs_t offset)
 {
-	uint8_t data = m_keyboard_ascii;
+	uint8_t data = 0xff;
 
-	m_keyboard_ascii = 0x00;
+	if (machine().side_effects_disabled()) return data;
 
+	switch (offset & 3)
+	{
+	case 3: /* BFF3: read keyboard */
+		data = m_keyboard->read();
+		LOG("bff3_r: -> %02x (keyboard ASCII)\n", data);
+		break;
+	}
 	return data;
 }
 
-void mt6809_state::store_key(int key)
+void mt6809_state::bffx_w(offs_t offset, uint8_t data)
 {
-	m_keyboard_ascii = key | 0x80;
+	switch (offset & 3)
+	{
+	case 0: /* BFF0: write reset keyboard interrupt flag */
+		LOG("bff0_w: %d <- %02x (keyboard NMI clear )\n", offset, data);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		break;
+	}
 }
 
-void microtan_state::store_key(int key)
+
+void microtan_state::kbd_int(int state)
 {
-	m_keyboard_ascii = key | 0x80;
-	m_irq_line->in_w<IRQ_KBD>(1);
-}
+	m_keyboard_int_flag = state;
 
-TIMER_DEVICE_CALLBACK_MEMBER(microtan_state::kbd_scan)
-{
-	/* ASCII Keyboard only */
-	if (m_config->read() & 3)
-		return;
-
-	int mod, row, col, chg, newvar;
-
-	if( m_repeat )
-	{
-		if( !--m_repeat )
-			m_repeater = 4;
-	}
-	else if( m_repeater )
-		m_repeat = m_repeater;
-
-	row = 9;
-	newvar = m_io_keyboard[8]->read();
-	chg = m_keyrows[--row] ^ newvar;
-
-	while ( !chg && row > 0)
-	{
-		newvar = m_io_keyboard[row - 1]->read();
-		chg = m_keyrows[--row] ^ newvar;
-	}
-	if (!chg)
-		--row;
-
-	if (row >= 0)
-	{
-		m_repeater = 0x00;
-		m_mask = 0x00;
-		m_key = 0x00;
-		m_lastrow = row;
-		/* CapsLock LED */
-		if( row == 3 && chg == 0x80 )
-			m_led = BIT(~m_keyrows[3], 7);
-
-		if (newvar & chg)  /* key(s) pressed ? */
-		{
-			mod = 0;
-
-			/* Shift modifier */
-			if ( (m_keyrows[5] & 0x10) || (m_keyrows[6] & 0x80) )
-				mod |= 1;
-
-			/* Control modifier */
-			if (m_keyrows[3] & 0x40)
-				mod |= 2;
-
-			/* CapsLock modifier */
-			if (m_keyrows[3] & 0x80)
-				mod |= 4;
-
-			/* find newvar key */
-			m_mask = 0x01;
-			for (col = 0; col < 8; col ++)
-			{
-				if (chg & m_mask)
-				{
-					newvar &= m_mask;
-					m_key = keyboard[mod][row][col];
-					break;
-				}
-				m_mask <<= 1;
-			}
-			if( m_key )   /* normal key */
-			{
-				m_repeater = 30;
-				store_key(m_key);
-			}
-			else
-			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				store_key(0);
-			m_keyrows[row] |= newvar;
-		}
-		else
-			m_keyrows[row] = newvar;
-
-		m_repeat = m_repeater;
-	}
-	else
-	if ( m_key && (m_keyrows[m_lastrow] & m_mask) && m_repeat == 0 )
-		store_key(m_key);
+	m_irq_line->in_w<IRQ_KBD>(state);
 }
 
 
@@ -320,7 +128,8 @@ void microtan_state::pgm_chargen_w(offs_t offset, uint8_t data)
 	}
 }
 
-void microtan_state::init_gfx2()
+
+void microtan_state::machine_start()
 {
 	uint8_t *dst = memregion("gfx2")->base();
 
@@ -328,88 +137,66 @@ void microtan_state::init_gfx2()
 	{
 		switch (i & 3)
 		{
-		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
-		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
-		case 2: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x0f; break;
-		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
+		case 0: dst[0] = dst[1] = dst[2] = dst[3] = 0x00; break;
+		case 1: dst[0] = dst[1] = dst[2] = dst[3] = 0xf0; break;
+		case 2: dst[0] = dst[1] = dst[2] = dst[3] = 0x0f; break;
+		case 3: dst[0] = dst[1] = dst[2] = dst[3] = 0xff; break;
 		}
 		dst += 4;
 		switch (BIT(i, 2, 2))
 		{
-		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
-		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
-		case 2: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x0f; break;
-		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
+		case 0: dst[0] = dst[1] = dst[2] = dst[3] = 0x00; break;
+		case 1: dst[0] = dst[1] = dst[2] = dst[3] = 0xf0; break;
+		case 2: dst[0] = dst[1] = dst[2] = dst[3] = 0x0f; break;
+		case 3: dst[0] = dst[1] = dst[2] = dst[3] = 0xff; break;
 		}
 		dst += 4;
 		switch (BIT(i, 4, 2))
 		{
-		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
-		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
-		case 2: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x0f; break;
-		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
+		case 0: dst[0] = dst[1] = dst[2] = dst[3] = 0x00; break;
+		case 1: dst[0] = dst[1] = dst[2] = dst[3] = 0xf0; break;
+		case 2: dst[0] = dst[1] = dst[2] = dst[3] = 0x0f; break;
+		case 3: dst[0] = dst[1] = dst[2] = dst[3] = 0xff; break;
 		}
 		dst += 4;
 		switch (BIT(i, 6, 2))
 		{
-		case 0: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x00; break;
-		case 1: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xf0; break;
-		case 2: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0x0f; break;
-		case 3: dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = 0xff; break;
+		case 0: dst[0] = dst[1] = dst[2] = dst[3] = 0x00; break;
+		case 1: dst[0] = dst[1] = dst[2] = dst[3] = 0xf0; break;
+		case 2: dst[0] = dst[1] = dst[2] = dst[3] = 0x0f; break;
+		case 3: dst[0] = dst[1] = dst[2] = dst[3] = 0xff; break;
 		}
 		dst += 4;
 	}
-}
-
-void microtan_state::init_microtan()
-{
-	init_gfx2();
 
 	m_pulse_nmi_timer = timer_alloc(FUNC(microtan_state::pulse_nmi), this);
 }
 
-void microtan_state::machine_start()
+void mt6809_state::machine_start()
 {
-	m_led.resolve();
-
-	save_item(NAME(m_keypad_column));
-	save_item(NAME(m_keyboard_ascii));
-	save_item(NAME(m_keyrows));
-	save_item(NAME(m_lastrow));
-	save_item(NAME(m_mask));
-	save_item(NAME(m_key));
-	save_item(NAME(m_repeat));
-	save_item(NAME(m_repeater));
 }
 
-void microtan_state::machine_reset()
-{
-	for (int i = 1; i < 10;  i++)
-		m_keyrows[i] = m_io_keyboard[i-1].read_safe(0);
 
-	m_led = BIT(~m_keyrows[3], 7);
-}
-
-image_verify_result microtan_state::verify_snapshot(uint8_t *data, int size)
+std::error_condition microtan_state::verify_snapshot(const uint8_t *data, int size)
 {
 	if (size == 8263)
 	{
 		logerror("snapshot_id: magic size %d found\n", size);
-		return image_verify_result::PASS;
+		return std::error_condition();
 	}
 	else
 	{
 		if (4 + data[2] + 256 * data[3] + 1 + 16 + 16 + 16 + 1 + 1 + 16 + 16 + 64 + 7 == size)
 		{
 			logerror("snapshot_id: header RAM size + structures matches filesize %d\n", size);
-			return image_verify_result::PASS;
+			return std::error_condition();
 		}
 	}
 
-	return image_verify_result::FAIL;
+	return image_error::INVALIDIMAGE;
 }
 
-image_init_result microtan_state::parse_intel_hex(uint8_t *snapshot_buff, char *src)
+std::error_condition microtan_state::parse_intel_hex(uint8_t *snapshot_buff, const char *src)
 {
 	char line[128];
 	int /*row = 0,*/ column = 0, last_addr = 0, last_size = 0;
@@ -479,10 +266,10 @@ image_init_result microtan_state::parse_intel_hex(uint8_t *snapshot_buff, char *
 		logerror("parse_intel_hex: registers (?) at %04X\n", last_addr);
 		memcpy(&snapshot_buff[8192+64], &snapshot_buff[last_addr], last_size);
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
-image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char *src)
+std::error_condition microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, const char *src)
 {
 	char line[128];
 	int parsing = 0, /*row = 0,*/ column = 0;
@@ -554,7 +341,7 @@ image_init_result microtan_state::parse_zillion_hex(uint8_t *snapshot_buff, char
 		}
 		src++;
 	}
-	return image_init_result::PASS;
+	return std::error_condition();
 }
 
 void microtan_state::set_cpu_regs(const uint8_t *snapshot_buff, int base)
@@ -639,7 +426,7 @@ void microtan_state::snapshot_copy(uint8_t *snapshot_buff, int snapshot_size)
 				bffx_w(i, snapshot_buff[base++]);
 		}
 
-		sound_w(snapshot_buff[base++]);
+		space.write_byte(0xbc04, snapshot_buff[base++]);
 		m_chunky_graphics = snapshot_buff[base++];
 
 		/* first set of AY8910 registers */
@@ -669,26 +456,18 @@ SNAPSHOT_LOAD_MEMBER(microtan_state::snapshot_cb)
 {
 	uint64_t snapshot_len = image.length();
 	if (snapshot_len < 4 || snapshot_len >= 66000)
-	{
-		//image.seterror(image_error::INVALIDIMAGE);
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
 	auto snapshot_buff = std::make_unique<uint8_t []>(snapshot_len);
 	if (image.fread(snapshot_buff.get(), snapshot_len) != snapshot_len)
-	{
-		//image.seterror(image_error::UNSPECIFIED);
-		return image_init_result::FAIL;
-	}
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
 
-	if (verify_snapshot(snapshot_buff.get(), snapshot_len) != image_verify_result::PASS)
-	{
-		//image.seterror(image_error::INVALIDIMAGE);
-		return image_init_result::FAIL;
-	}
+	std::error_condition err = verify_snapshot(snapshot_buff.get(), snapshot_len);
+	if (err)
+		return std::make_pair(err, std::string());
 
 	snapshot_copy(snapshot_buff.get(), snapshot_len);
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
@@ -696,7 +475,7 @@ QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
 	int snapshot_size = 8263;   /* magic size */
 	std::vector<uint8_t> snapshot_buff(snapshot_size, 0);
 	std::vector<char> buff(image.length() + 1);
-	image_init_result rc;
+	std::error_condition rc;
 
 	image.fread(&buff[0], image.length());
 
@@ -706,7 +485,7 @@ QUICKLOAD_LOAD_MEMBER(microtan_state::quickload_cb)
 		rc = parse_intel_hex(&snapshot_buff[0], &buff[0]);
 	else
 		rc = parse_zillion_hex(&snapshot_buff[0], &buff[0]);
-	if (rc == image_init_result::PASS)
+	if (!rc)
 		snapshot_copy(&snapshot_buff[0], snapshot_size);
-	return rc;
+	return std::make_pair(rc, std::string());
 }

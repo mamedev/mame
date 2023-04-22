@@ -8,10 +8,10 @@
 #include "dsp56pcu.h"
 
 #define LOG_OUTPUT_FUNC cpustate->device->logerror
-#define LOG_INVALID             (1 << 1U)
-#define LOG_PERIPHERAL_READS    (1 << 2U)
-#define LOG_PERIPHERAL_WRITES   (1 << 3U)
-#define LOG_HOST_READS          (1 << 4U)
+#define LOG_INVALID             (1U << 1)
+#define LOG_PERIPHERAL_READS    (1U << 2)
+#define LOG_PERIPHERAL_WRITES   (1U << 3)
+#define LOG_HOST_READS          (1U << 4)
 
 #define VERBOSE (0)
 #include "logmacro.h"

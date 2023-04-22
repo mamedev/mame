@@ -100,8 +100,8 @@ protected:
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -115,8 +115,8 @@ protected:
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -130,8 +130,8 @@ protected:
 	virtual void menu_activated() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
+	virtual void populate() override;
+	virtual bool handle(event const *ev) override;
 	void image_info(device_image_interface *image);
 };
 

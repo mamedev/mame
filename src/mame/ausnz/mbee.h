@@ -5,8 +5,8 @@
  * includes/mbee.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MBEE_H
-#define MAME_INCLUDES_MBEE_H
+#ifndef MAME_AUSNZ_MBEE_H
+#define MAME_AUSNZ_MBEE_H
 
 #pragma once
 
@@ -65,10 +65,10 @@ public:
 		, m_bankr(*this, "bankr%d", 0U)
 		, m_bankw(*this, "bankw%d", 0U)
 		, m_pak(*this, "optrom%u", 0U)  // "rom" causes issues
-		{
-			for (u8 n : m_pak_extended)
-				m_pak_extended[n] = 0;
-		}
+	{
+		for (u8 n : m_pak_extended)
+			m_pak_extended[n] = 0;
+	}
 
 	void mbee56(machine_config &config);
 	void mbeeppc(machine_config &config);
@@ -125,7 +125,7 @@ private:
 	void premium_palette(palette_device &palette) const;
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, u8);
+	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, u8);
 	void unload_cart(u8);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	template <u8 T> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak_load) { return load_cart(image, m_pak[T], T); }
@@ -209,4 +209,4 @@ private:
 	optional_device_array<generic_slot_device, 20> m_pak;
 };
 
-#endif // MAME_INCLUDES_MBEE_H
+#endif // MAME_AUSNZ_MBEE_H

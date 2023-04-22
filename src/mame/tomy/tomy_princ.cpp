@@ -47,13 +47,18 @@
 ************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/f2mc16/mb9061x.h"
+#include "machine/timer.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "machine/timer.h"
-#include "cpu/f2mc16/mb9061x.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
+
+namespace {
 
 class tomy_princ_state : public driver_device
 {
@@ -161,4 +166,13 @@ ROM_START( princ )
 	ROM_LOAD("29f800t.u4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
 ROM_END
 
-COMP( 1996?, princ,    0,       0,      tomy_princ,    tomy_princ, tomy_princ_state, empty_init, "Tomy", "Prin-C", MACHINE_IS_SKELETON )
+ROM_START( princnt ) // Prin-C E100-T001-11 PCB
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD("tc538000.u3", 0x00000, 0x100000, CRC(e4e2bfe9) SHA1(b3a7727544918b9030c362694ddf9a2fc3bca8b4))
+ROM_END
+
+} // anonymous namespace
+
+
+COMP( 1996?, princ,    0,       0,      tomy_princ,    tomy_princ, tomy_princ_state, empty_init, "Tomy", "Prin-C (with touch-pad)",    MACHINE_IS_SKELETON )
+COMP( 1996?, princnt,  princ,   0,      tomy_princ,    tomy_princ, tomy_princ_state, empty_init, "Tomy", "Prin-C (without touch-pad)", MACHINE_IS_SKELETON )

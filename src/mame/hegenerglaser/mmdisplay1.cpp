@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/**********************************************************************
+/*******************************************************************************
 
-Hegener + Glaser Mephisto Display Module for modular chesscomputers,
-the 1st version with a 4*7seg LCD. There is no LCD chip, it's handled
-with 4 4015 dual shift registers.
+Hegener + Glaser Mephisto Display Module for modular chesscomputers, the 1st
+version with a 4*7seg LCD. There is no LCD chip, it's handled with 4 4015 dual
+shift registers.
 
-*********************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 #include "mmdisplay1.h"

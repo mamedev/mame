@@ -13,7 +13,7 @@
 template<int HighBits, int Width, int AddrShift> class handler_entry_write_dispatch : public handler_entry_write<Width, AddrShift>
 {
 public:
-	using uX = typename emu::detail::handler_entry_size<Width>::uX;
+	using uX = emu::detail::handler_entry_size_t<Width>;
 	using mapping = typename handler_entry_write<Width, AddrShift>::mapping;
 
 	handler_entry_write_dispatch(address_space *space, const handler_entry::range &init, handler_entry_write<Width, AddrShift> *handler);
@@ -22,6 +22,7 @@ public:
 	~handler_entry_write_dispatch();
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
+	void write_interruptible(offs_t offset, uX data, uX mem_mask) const override;
 	u16 write_flags(offs_t offset, uX data, uX mem_mask) const override;
 	u16 lookup_flags(offs_t offset, uX mem_mask) const override;
 	void *get_ptr(offs_t offset) const override;

@@ -92,6 +92,8 @@ Notes:
 #include "pasha2.lh"
 
 
+namespace {
+
 class pasha2_state : public driver_device
 {
 public:
@@ -594,6 +596,9 @@ void pasha2_state::init_pasha2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16sm_delegate(*this, FUNC(pasha2_state::pasha2_speedup_r)));
 }
+
+} // anonymous namespace
+
 
 GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, init_pasha2, ROT0, "Dong Sung",        "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )
 GAME ( 2000, zdrum,  0, zdrum,  zdrum,  pasha2_state, empty_init,  ROT0, "PARA Enterprises", "Zooty Drum",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // missing HD dump, MP3 board emulation. Inputs seem to be read differently.

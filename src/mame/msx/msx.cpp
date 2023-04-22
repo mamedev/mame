@@ -70,7 +70,7 @@
 **   - pause button
 **   - speed controller slider
 **   - rensha turbo slider
-** - victhc90, victhc95, victhc95a: Turbo/2nd cpu not supported. Firmware not working.
+** - victhc90, victhc90a, victhc95, victhc95a: Turbo/2nd cpu not supported. Firmware not working.
 ** - fsa1fx, fsa1wsx, fsa1wx
 **   - rensha turbo slider
 **   - pause button
@@ -107,12 +107,14 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "msx.lh"
+
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
-msx_state::msx_state(const machine_config &mconfig, device_type type, const char *tag)
+msx_state::msx_state(const machine_config &mconfig, device_type type, const char *tag, XTAL main_xtal, int cpu_xtal_divider)
 	: driver_device(mconfig, type, tag)
 	, m_maincpu(*this, "maincpu")
 	, m_cassette(*this, "cassette")
@@ -131,7 +133,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_gen_port1(*this, "gen1")
 	, m_gen_port2(*this, "gen2")
 	, m_io_key(*this, "KEY%u", 0U)
-	, m_leds(*this, "led%u", 1U)
 	, m_view_page0(*this, "view0")
 	, m_view_page1(*this, "view1")
 	, m_view_page2(*this, "view2")
@@ -159,6 +160,13 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_secondary_slot{0, 0, 0, 0}
 	, m_port_c_old(0)
 	, m_keylatch(0)
+	, m_caps_led(*this, "caps_led")
+	, m_caps_led_name(*this, "caps_led_name")
+	, m_code_led(*this, "code_led")
+	, m_code_led_name(*this, "code_led_name")
+	, m_region(REGION_UNKNOWN)
+	, m_main_xtal(main_xtal)
+	, m_cpu_xtal_divider(cpu_xtal_divider)
 {
 	m_view[0] = &m_view_page0;
 	m_view[1] = &m_view_page1;
@@ -301,11 +309,18 @@ void msx_state::machine_reset()
 		m_view_slot0_page2.select(0);
 		m_view_slot0_page3.select(0);
 	}
+	m_caps_led_name = m_hw_def.has_caps_led() ? 1 : 0;
+	m_caps_led = m_hw_def.has_caps_led() ? 1 : 0;
+	m_code_led_name = m_hw_def.has_code_led() ? m_region : 0;
+	m_code_led = m_hw_def.has_code_led() ? 1 : 0;
 }
 
 void msx_state::machine_start()
 {
-	m_leds.resolve();
+	m_caps_led.resolve();
+	m_caps_led_name.resolve();
+	m_code_led.resolve();
+	m_code_led_name.resolve();
 	m_port_c_old = 0xff;
 }
 
@@ -449,9 +464,9 @@ void msx_state::psg_port_a_w(u8 data)
 
 void msx_state::psg_port_b_w(u8 data)
 {
-	// Arabic or kana mode led
-	if ((data ^ m_psg_b) & 0x80)
-		m_leds[1] = BIT(~data, 7);
+	// Code(/Kana/Arabic/Hangul) led
+	if (m_hw_def.has_code_led())
+		m_code_led = 1 + BIT(~data, 7);
 
 	m_gen_port1->pin_6_w(BIT(data, 0));
 	m_gen_port1->pin_7_w(BIT(data, 1));
@@ -479,8 +494,8 @@ void msx_state::ppi_port_c_w(u8 data)
 	m_keylatch = data & 0x0f;
 
 	// caps lock
-	if (BIT(m_port_c_old ^ data, 6))
-		m_leds[0] = BIT(~data, 6);
+	if (m_hw_def.has_caps_led())
+		m_caps_led = 1 + BIT(~data, 6);
 
 	// key click
 	if (BIT(m_port_c_old ^ data, 7))
@@ -550,10 +565,11 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
+void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
+	m_region = region;
 	// basic machine hardware
-	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
+	Z80(config, m_maincpu, m_main_xtal / m_cpu_xtal_divider);         // 3.579545 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -569,18 +585,19 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 
 	// sound hardware
 	SPEAKER(config, m_speaker).front_center();
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.1);
+	DAC_1BIT(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_speaker, 0.1);
 
 	if (ay8910_type == SND_AY8910)
-		AY8910(config, m_ay8910, xtal / cpu_divider / 2);
+		AY8910(config, m_ay8910, m_main_xtal / m_cpu_xtal_divider / 2);
 	if (ay8910_type == SND_YM2149)
-		YM2149(config, m_ay8910, xtal / cpu_divider / 2);
+		YM2149(config, m_ay8910, m_main_xtal / m_cpu_xtal_divider / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_base_state::psg_port_a_r));
 	m_ay8910->port_b_read_callback().set(FUNC(msx2_base_state::psg_port_b_r));
 	m_ay8910->port_a_write_callback().set(FUNC(msx2_base_state::psg_port_a_w));
 	m_ay8910->port_b_write_callback().set(FUNC(msx2_base_state::psg_port_b_w));
-	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 0.3);
+	m_ay8910->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port1, msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_gen_port2, msx_general_purpose_port_devices, "joystick");
@@ -605,9 +622,11 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		CASSETTE(config, m_cassette);
 		m_cassette->set_formats(fmsx_cassette_formats);
 		m_cassette->set_default_state(CASSETTE_PLAY);
-		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.05);
+		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.15);
 		m_cassette->set_interface("msx_cass");
 	}
+
+	config.set_default_layout(layout_msx);
 }
 
 void msx_state::msx1_add_softlists(machine_config &config)
@@ -622,26 +641,26 @@ void msx_state::msx1_add_softlists(machine_config &config)
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config)
+void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
+	msx_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 
 	if (vdp_type == VDP_TMS9118)
-		TMS9118(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9118(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9128)
-		TMS9128(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9128(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9129)
-		TMS9129(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9129(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9918)
-		TMS9918(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9918(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9918A)
-		TMS9918A(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9918A(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9928A)
-		TMS9928A(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9928A(config, m_tms9928a, m_main_xtal);
 	if (vdp_type == VDP_TMS9929A)
-		TMS9929A(config, m_tms9928a, 10.738635_MHz_XTAL);
+		TMS9929A(config, m_tms9928a, m_main_xtal);
 	m_tms9928a->set_screen(m_screen);
 	m_tms9928a->set_vram_size(0x4000);
 	m_tms9928a->int_callback().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
@@ -726,12 +745,12 @@ WRITE_LINE_MEMBER(msx2_base_state::turbo_w)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz
-	m_maincpu->set_unscaled_clock(21.477272_MHz_XTAL / (state ? 6 : 4));
+	m_maincpu->set_unscaled_clock(m_main_xtal / (state ? 6 : 4));
 }
 
 void msx2_base_state::msx_ym2413(machine_config &config)
 {
-	YM2413(config, "ym2413", 21.477272_MHz_XTAL / 6).add_route(ALL_OUTPUTS, m_speaker, 0.4);
+	YM2413(config, "ym2413", m_main_xtal / m_cpu_xtal_divider).add_route(ALL_OUTPUTS, m_speaker, 0.8);
 }
 
 void msx2_base_state::msx2_64kb_vram(machine_config &config)
@@ -805,22 +824,22 @@ void msx2_base_state::turbor_add_softlists(machine_config &config)
 	}
 }
 
-void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
+	msx_base(ay8910_type, config, region);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2_base(ay8910_type, config);
+	msx2_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_io_map);
 
 	// video hardware
-	V9938(config, m_v9938, 21.477272_MHz_XTAL);
+	V9938(config, m_v9938, m_main_xtal);
 	m_v9938->set_screen_ntsc(m_screen);
 	m_v9938->set_vram_size(0x20000);
 	m_v9938->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
@@ -829,42 +848,42 @@ void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config)
 	msx2_add_softlists(config);
 }
 
-void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2(ay8910_type, config);
+	msx2(ay8910_type, config, region);
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2_base(ay8910_type, config);
+	msx2_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
 
 	// video hardware
-	V9958(config, m_v9958, 21.477272_MHz_XTAL);
+	V9958(config, m_v9958, m_main_xtal);
 	m_v9958->set_screen_ntsc(m_screen);
 	m_v9958->set_vram_size(0x20000);
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus_base(ay8910_type, config);
+	msx2plus_base(ay8910_type, config, region);
 
 	// Software lists
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus(ay8910_type, config);
+	msx2plus(ay8910_type, config, region);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus_base(ay8910_type, config);
+	msx2plus_base(ay8910_type, config, region);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);

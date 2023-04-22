@@ -1,0 +1,449 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="digit" defstate="00">
+	<led7seg>
+		<color red="1.0" green="0.3" blue="0.0" />
+	</led7seg>
+	</element>
+
+	<element name="unknownlp" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
+		<text string="?">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="coinlp" defstate="0">
+		<disk state ="0"> <color red="0.3" green="0.3" blue="0.0" /> </disk>
+		<disk state ="1"> <color red="1.0" green="1.0" blue="0.0" /> </disk>
+	</element>
+
+	<element name="orangelp" defstate="0">
+		<rect state ="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
+		<rect state ="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
+	</element>
+
+	<element name="redlp" defstate="0">
+		<rect state ="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<rect state ="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+	</element>
+
+	<element name="bluelp" defstate="0">
+		<rect state ="0"> <color red="0.0" green="0.0" blue="0.3" /> </rect>
+		<rect state ="1"> <color red="0.0" green="0.0" blue="1.0" /> </rect>
+	</element>
+
+	<element name="greenlp" defstate="0">
+		<rect state ="0"> <color red="0.0" green="0.3" blue="0.0" /> </rect>
+		<rect state ="1"> <color red="0.0" green="1.0" blue="0.0" /> </rect>
+	</element>
+
+	<element name="yellowlp" defstate="0">
+		<rect state ="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
+		<rect state ="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
+	</element>
+
+	<element name="yellow1lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="yellow2lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="orange3lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="orange4lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
+		<text string="4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="red5lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="red6lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="stake2lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
+		<text string="STK2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="stake3lp" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="STK3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="stake4lp" defstate="0">
+		<rect state="1"> <color red="0.0" green="0.0" blue="1.0" /> </rect>
+		<rect state="0"> <color red="0.0" green="0.0" blue="0.3" /> </rect>
+		<text string="STK4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="stake5lp" defstate="0">
+		<rect state="1"> <color red="0.0" green="1.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" /> </rect>
+		<text string="STK5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="halflp" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
+		<text string="HALF">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="doubleorlp" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
+		</text>
+		<text string="OR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.5" width="0.9" height="0.45" />
+		</text>
+	</element>
+
+	<element name="nixie">
+		<rect><color red="0.1" green="0.06" blue="0.02" /></rect>
+		<text state="0" string="Melon"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="1" string="Bell"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="2" string="Andra"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="3" string="Pear"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="4" string="Cherry"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="5" string="Strawberry"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="6" string="Pineapple"><color red="1.0" green="0.6" blue="0.3" /> </text>
+		<text state="7" string="Coin"><color red="1.0" green="0.6" blue="0.3" /> </text>
+	</element>
+
+	<element name="L1" defstate="0">
+		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
+		<text string="APUESTA">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
+		</text>
+		<text string="COBRA">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.5" width="0.9" height="0.45" />
+		</text>
+	</element>
+
+	<element name="L2" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="STOP1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="L3" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="STOP2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="L4" defstate="0">
+		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
+		<text string="STOP3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</text>
+	</element>
+
+	<element name="L5" defstate="0">
+		<rect state="1"> <color red="0.0" green="1.0" blue="0.0" /> </rect>
+		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" /> </rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
+		</text>
+		<text string="DOBLAR">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.5" width="0.9" height="0.45" />
+		</text>
+	</element>
+
+	<view name="Internal Layout">
+		<element name="lamp40" ref="orangelp">
+			<bounds x="0" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp41" ref="redlp">
+			<bounds x="8" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp42" ref="bluelp">
+			<bounds x="16" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp43" ref="greenlp">
+			<bounds x="24" y="8" width="7" height="7"/>
+		</element>
+		<element name="lamp44" ref="yellowlp">
+			<bounds x="32" y="8" width="7" height="7"/>
+		</element>
+
+		<element name="nixie0" ref="nixie"><bounds x="50" y="20" width="20" height="8" /> </element>
+		<element name="nixie1" ref="nixie"><bounds x="72" y="30" width="20" height="8" /> </element>
+		<element name="nixie2" ref="nixie"><bounds x="72" y="20" width="20" height="8" /> </element>
+		<element name="nixie3" ref="nixie"><bounds x="94" y="20" width="20" height="8" /> </element>
+
+		<element name="lamp32" ref="yellow1lp">
+			<bounds x="40" y="25" width="7" height="7"/>
+		</element>
+		<element name="lamp33" ref="yellow2lp">
+			<bounds x="32" y="25" width="7" height="7"/>
+		</element>
+		<element name="lamp34" ref="orange3lp">
+			<bounds x="24" y="25" width="7" height="7"/>
+		</element>
+		<element name="lamp35" ref="orange4lp">
+			<bounds x="16" y="25" width="7" height="7"/>
+		</element>
+		<element name="lamp36" ref="red5lp">
+			<bounds x="8" y="25" width="7" height="7"/>
+		</element>
+		<element name="lamp37" ref="red6lp">
+			<bounds x="0" y="25" width="7" height="7"/>
+		</element>
+
+		<!--
+		win leds
+		-->
+		<element name="digit0" ref="digit">
+			<bounds x="120" y="15" width="4" height="10"/>
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="125" y="15" width="4" height="10"/>
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds x="130" y="15" width="4" height="10"/>
+		</element>
+
+		<!--
+		credit leds
+		-->
+		<element name="digit3" ref="digit">
+			<bounds x="140" y="15" width="4" height="10"/>
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds x="145" y="15" width="4" height="10"/>
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds x="150" y="15" width="4" height="10"/>
+		</element>
+
+		<!--
+		left hand bonus coins
+		-->
+		<element name="lamp30" ref="coinlp">
+			<bounds x="20" y="70" width="7" height="7"/>
+		</element>
+		<element name="lamp31" ref="coinlp">
+			<bounds x="20" y="62" width="7" height="7"/>
+		</element>
+		<element name="lamp16" ref="coinlp">
+			<bounds x="20" y="54" width="7" height="7"/>
+		</element>
+
+		<element name="lamp17" ref="coinlp">
+			<bounds x="20" y="46" width="7" height="7"/>
+		</element>
+		<element name="lamp9" ref="coinlp">
+			<bounds x="20" y="38" width="7" height="7"/>
+		</element>
+
+		<element name="lamp18" ref="coinlp">
+			<bounds x="28" y="66" width="7" height="7"/>
+		</element>
+		<element name="lamp19" ref="coinlp">
+			<bounds x="28" y="58" width="7" height="7"/>
+		</element>
+		<element name="lamp20" ref="coinlp">
+			<bounds x="28" y="50" width="7" height="7"/>
+		</element>
+
+		<element name="lamp21" ref="coinlp">
+			<bounds x="12" y="66" width="7" height="7"/>
+		</element>
+		<element name="lamp22" ref="coinlp">
+			<bounds x="12" y="58" width="7" height="7"/>
+		</element>
+		<element name="lamp23" ref="coinlp">
+			<bounds x="12" y="50" width="7" height="7"/>
+		</element>
+
+		<!--
+		right hand bonus coins
+		-->
+		<element name="lamp14" ref="coinlp">
+			<bounds x="118" y="70" width="7" height="7"/>
+		</element>
+		<element name="lamp15" ref="coinlp">
+			<bounds x="118" y="62" width="7" height="7"/>
+		</element>
+		<element name="lamp0" ref="coinlp">
+			<bounds x="118" y="54" width="7" height="7"/>
+		</element>
+
+		<element name="lamp1" ref="coinlp">
+			<bounds x="118" y="46" width="7" height="7"/>
+		</element>
+		<element name="lamp8" ref="coinlp">
+			<bounds x="118" y="38" width="7" height="7"/>
+		</element>
+
+		<element name="lamp2" ref="coinlp">
+			<bounds x="126" y="66" width="7" height="7"/>
+		</element>
+		<element name="lamp3" ref="coinlp">
+			<bounds x="126" y="58" width="7" height="7"/>
+		</element>
+		<element name="lamp4" ref="coinlp">
+			<bounds x="126" y="50" width="7" height="7"/>
+		</element>
+
+		<element name="lamp5" ref="coinlp">
+			<bounds x="110" y="66" width="7" height="7"/>
+		</element>
+		<element name="lamp6" ref="coinlp">
+			<bounds x="110" y="58" width="7" height="7"/>
+		</element>
+		<element name="lamp7" ref="coinlp">
+			<bounds x="110" y="50" width="7" height="7"/>
+		</element>
+
+		<!--
+		unknown or not used lamps
+		-->
+		<element name="lamp10" ref="unknownlp">
+			<bounds x="40" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp11" ref="unknownlp">
+			<bounds x="48" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp12" ref="unknownlp">
+			<bounds x="56" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp13" ref="unknownlp">
+			<bounds x="64" y="48" width="7" height="7"/>
+		</element>
+
+		<element name="lamp28" ref="unknownlp">
+			<bounds x="72" y="48" width="7" height="7"/>
+		</element>
+		<element name="lamp29" ref="unknownlp">
+			<bounds x="80" y="48" width="7" height="7"/>
+		</element>
+
+		<!--
+		stake winplan lamps
+		-->
+		<element name="lamp24" ref="stake2lp">
+			<bounds x="40" y="64" width="7" height="7"/>
+		</element>
+		<element name="lamp25" ref="stake3lp">
+			<bounds x="48" y="64" width="7" height="7"/>
+		</element>
+		<element name="lamp26" ref="stake4lp">
+			<bounds x="56" y="64" width="7" height="7"/>
+		</element>
+		<element name="lamp27" ref="stake5lp">
+			<bounds x="64" y="64" width="7" height="7"/>
+		</element>
+
+		<!--
+		double or half gamble lamps
+		-->
+		<element name="lamp39" ref="doubleorlp">
+			<bounds x="88" y="64" width="8" height="7"/>
+		</element>
+		<element name="lamp38" ref="halflp">
+			<bounds x="96" y="64" width="8" height="7"/>
+		</element>
+
+		<!--
+		button panel
+		-->
+		<element name="button0" ref="L1">
+			<bounds x="0" y="80" width="15" height="8" />
+		</element>
+
+		<element name="button1" ref="L2">
+			<bounds x="18" y="80" width="15" height="8" />
+		</element>
+
+		<element name="button2" ref="L3">
+			<bounds x="36" y="80" width="15" height="8" />
+		</element>
+
+		<element name="button3" ref="L4">
+			<bounds x="54" y="80" width="15" height="8" />
+		</element>
+
+		<element name="button4" ref="L5">
+			<bounds x="72" y="80" width="15" height="8" />
+		</element>
+
+	</view>
+</mamelayout>

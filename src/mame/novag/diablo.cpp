@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:yoyo_chessboard, Berger
-/******************************************************************************
+/*******************************************************************************
 
 Novag Diablo 68000 (model 908)
 Novag Scorpio 68000 (model 909)
@@ -16,7 +16,7 @@ Hardware notes (Diablo):
 
 Scorpio 68000 hardware is very similar, but with chessboard buttons and side leds.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -110,9 +110,9 @@ void diablo_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // LCD
 
@@ -193,9 +193,9 @@ u8 diablo_state::input2_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void diablo_state::diablo68k_map(address_map &map)
 {
@@ -220,20 +220,20 @@ void diablo_state::scorpio68k_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( diablo68k )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("->")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Right")
 
 	PORT_START("IN.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Level")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Flip Display / Time Control")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("<-")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Left")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Hint / Next Best")
@@ -268,15 +268,15 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void diablo_state::diablo68k(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->disable_interrupt_mixer();
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::diablo68k_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
@@ -290,7 +290,7 @@ void diablo_state::diablo68k(machine_config &config)
 	m_board->set_delay(attotime::from_msec(100));
 	m_board->set_nvram_enable(true);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60); // arbitrary
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -308,12 +308,12 @@ void diablo_state::diablo68k(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(8, 8+2);
 	config.set_default_layout(layout_novag_diablo68k);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 32.768_kHz_XTAL/32); // 1024Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* uart (configure after video) */
+	// uart (configure after video)
 	MOS6551(config, m_acia).set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_IPL2);
 	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
@@ -329,7 +329,7 @@ void diablo_state::scorpio68k(machine_config &config)
 {
 	diablo68k(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &diablo_state::scorpio68k_map);
 
 	m_board->set_type(sensorboard_device::BUTTONS);
@@ -340,9 +340,9 @@ void diablo_state::scorpio68k(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( diablo68 ) // ID = D 1.08
 	ROM_REGION16_BE( 0x20000, "maincpu", ROMREGION_ERASE00 )
@@ -370,12 +370,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1991, diablo68,  0,        0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, diablo68a, diablo68, 0, diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT       CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1991, diablo68,  0,        0,      diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, diablo68a, diablo68, 0,      diablo68k,  diablo68k,  diablo_state, empty_init, "Novag", "Diablo 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, scorpio68, 0,        0, scorpio68k, diablo68k,  diablo_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1991, scorpio68, 0,        0,      scorpio68k, diablo68k,  diablo_state, empty_init, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

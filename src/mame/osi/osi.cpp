@@ -711,8 +711,8 @@ void c1pmf_state::machine_start()
 	c1p_state::machine_start();
 
 	// drive select logic missing
-	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&c1pmf_state::floppy_index_callback, this));
+	if (m_floppy[0]->get_device())
+		m_floppy[0]->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&c1pmf_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -869,8 +869,8 @@ void c1pmf_state::c1pmf(machine_config &config)
 
 	CLOCK(config, "floppy_clock", XTAL(4'000'000)/8).signal_handler().set("acia_1", FUNC(acia6850_device::write_txc)); // 250 kHz
 
-	FLOPPY_CONNECTOR(config, "floppy0", osi_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "floppy1", osi_floppies, nullptr,   floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], osi_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], osi_floppies, nullptr,   floppy_image_device::default_mfm_floppy_formats);
 
 	/* internal ram */
 	m_ram->set_default_size("20K");

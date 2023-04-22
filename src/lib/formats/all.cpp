@@ -36,6 +36,10 @@
 #include "abc800_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_ABC800I_DSK
+#include "abc800i_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ABCFD2_DSK
 #include "abcfd2_dsk.h"
 #endif
@@ -336,6 +340,10 @@
 #include "hti_tape.h"
 #endif
 
+#ifdef HAS_FORMATS_HP300_DSK
+#include "hp300_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_HPI_DSK
 #include "hpi_dsk.h"
 #endif
@@ -556,6 +564,10 @@
 #include "rk_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_ROLAND_DSK
+#include "roland_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_RX50_DSK
 #include "rx50_dsk.h"
 #endif
@@ -676,6 +688,10 @@
 #include "vg5k_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_VGI_DSK
+#include "vgi_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_VICTOR9K_DSK
 #include "victor9k_dsk.h"
 #endif
@@ -718,6 +734,10 @@
 
 #ifdef HAS_FORMATS_FS_FAT
 #include "fs_fat.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_HPLIF
+#include "fs_hplif.h"
 #endif
 
 #ifdef HAS_FORMATS_FS_ISIS
@@ -808,6 +828,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_ABC800_DSK
 	en.add(FLOPPY_ABC800_FORMAT); // abc800_dsk.h
 #endif
+#ifdef HAS_FORMATS_ABC800I_DSK
+	en.add(FLOPPY_ABC800I_FORMAT); // abc800i_dsk.h
+#endif
 #ifdef HAS_FORMATS_ABCFD2_DSK
 	en.add(FLOPPY_ABC_FD2_FORMAT); // abcfd2_dsk.h
 #endif
@@ -867,11 +890,17 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_APOLLO_DSK
 	en.add(FLOPPY_APOLLO_FORMAT); // apollo_dsk.h
 #endif
+#ifdef HAS_FORMATS_HP300_DSK
+	en.add(FLOPPY_HP300_FORMAT); // hp300_dsk.h
+#endif
 #ifdef HAS_FORMATS_HP_IPC_DSK
 	en.add(FLOPPY_HP_IPC_FORMAT); // hp_ipc_dsk.h
 #endif
 #ifdef HAS_FORMATS_HPI_DSK
 	en.add(FLOPPY_HPI_FORMAT); // hpi_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_HPLIF
+	en.add(fs::HPLIF); // fs_lif.h
 #endif
 
 	en.category("Applix");
@@ -1246,6 +1275,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_RC759_FORMAT); // rc759_dsk.h
 #endif
 
+	en.category("Roland");
+#ifdef HAS_FORMATS_ROLAND_DSK
+	en.add(FLOPPY_ROLAND_SDISK_FORMAT); // roland_dsk.h
+#endif
+
 	en.category("DEC");
 #ifdef HAS_FORMATS_RX50_DSK
 	en.add(FLOPPY_RX50IMG_FORMAT); // rx50_dsk.h
@@ -1380,6 +1414,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Microbee");
 #ifdef HAS_FORMATS_MBEE_CAS
 	en.add(mbee_cassette_formats); // mbee_cas.h
+#endif
+
+	en.category("Micropolis");
+#ifdef HAS_FORMATS_VGI_DSK
+	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
 	en.category("Orao");

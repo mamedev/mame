@@ -10,19 +10,26 @@
 */
 
 #include "emu.h"
-#include "screen.h"
-#include "softlist_dev.h"
-#include "speaker.h"
+
+#include "cbm_snqk.h"
+
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "bus/vic20/exp.h"
 #include "bus/vic20/user.h"
 #include "cpu/m6502/m6510.h"
+#include "imagedev/snapquik.h"
 #include "machine/6522via.h"
-#include "cbm_snqk.h"
 #include "machine/ram.h"
 #include "sound/mos6560.h"
+
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
+
+namespace {
 
 #define M6502_TAG       "ue10"
 #define M6522_1_TAG     "uab3"
@@ -1023,6 +1030,7 @@ ROM_START( vic20_se )
 	ROM_LOAD( "nec22101.207", 0x0000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

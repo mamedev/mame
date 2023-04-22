@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pet_flop" description="Commodore PET diskettes">
 
@@ -902,6 +902,25 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="bumblebee.d64" size="174848" crc="a4656e08" sha1="f914aa058458bed3c319e6b297f7af7b4d788a05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ytob8TCMcjk -->
+	<software name="brightst">
+		<description>A Bright Shining Star</description>
+		<year>2022</year>
+		<publisher>Genesis Project</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="gp_a_bright_shining_star.d64" size="174848" crc="e305adb9" sha1="e27a02233394072a0411735c9dc41eff9ea6e4a2"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="gp_a_bright_shining_star_emulator.d64" size="174848" crc="c898e6ad" sha1="e21c760e400aaf2bc8a93b1e137fd1bf54158091"/>
 			</dataarea>
 		</part>
 	</software>

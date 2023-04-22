@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#ifndef MAME_INCLUDES_BW12_H
-#define MAME_INCLUDES_BW12_H
+#ifndef MAME_BONDWELL_BW12_H
+#define MAME_BONDWELL_BW12_H
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -53,8 +53,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_centronics(*this, CENTRONICS_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_floppy0(*this, UPD765_TAG ":1:525dd")
-		, m_floppy1(*this, UPD765_TAG ":2:525dd")
+		, m_floppy(*this, UPD765_TAG ":%u:525dd", 1U)
 		, m_floppy_timer(*this, FLOPPY_TIMER_TAG)
 		, m_rom(*this, Z80_TAG)
 		, m_char_rom(*this, "chargen")
@@ -112,8 +111,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device_array<floppy_image_device, 2> m_floppy;
 	required_device<timer_device> m_floppy_timer;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
@@ -143,4 +141,4 @@ protected:
 	int m_centronics_perror = 0;
 };
 
-#endif
+#endif // MAME_BONDWELL_BW12_H

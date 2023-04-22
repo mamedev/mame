@@ -103,6 +103,9 @@ Chips:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 /***************************************************************************
 
                                  General
@@ -1214,6 +1217,9 @@ ROM_START( tm8k902 )
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
 	ROM_LOAD( "9.0_touchmaster_8000_u8_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Mask rom labeled 5341-16513-03 U8 SOUND */
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1996, tm,         0,        tm,       tm,   tmaster_state, empty_init, ROT0, "Midway Games Inc. / CES Inc.", "Touchmaster (v3.00 Euro)",                          0 )
 GAME( 1996, tmdo,       tm,       tm,       tm,   tmaster_state, empty_init, ROT0, "Midway Games Inc. / CES Inc.", "Touchmaster (v2.2-01 Standard)",                    0 )

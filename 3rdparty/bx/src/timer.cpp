@@ -1,9 +1,8 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include "bx_p.h"
 #include <bx/timer.h>
 
 #if BX_CRT_NONE
@@ -13,6 +12,9 @@
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #else
 #	include <sys/time.h> // gettimeofday

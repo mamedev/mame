@@ -40,25 +40,12 @@
 // core misc options
 #define OPTION_SYSTEM_NAMES           "system_names"
 #define OPTION_SKIP_WARNINGS          "skip_warnings"
-#define OPTION_REMEMBER_LAST          "remember_last"
-#define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
-#define OPTION_FORCED4X3              "forced4x3"
-#define OPTION_USE_BACKGROUND         "use_background"
-#define OPTION_SKIP_BIOS_MENU         "skip_biosmenu"
-#define OPTION_SKIP_PARTS_MENU        "skip_partsmenu"
-#define OPTION_LAST_USED_FILTER       "last_used_filter"
-#define OPTION_LAST_RIGHT_PANEL       "last_right_panel"
-#define OPTION_LAST_USED_MACHINE      "last_used_machine"
-#define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
-#define OPTION_HIDE_ROMLESS           "hide_romless"
 #define OPTION_UNTHROTTLE_MUTE        "unthrottle_mute"
 
 
 // core UI options
 #define OPTION_INFOS_SIZE             "infos_text_size"
 #define OPTION_FONT_ROWS              "font_rows"
-#define OPTION_HIDE_PANELS            "hide_main_panel"
-
 #define OPTION_UI_BORDER_COLOR        "ui_border_color"
 #define OPTION_UI_BACKGROUND_COLOR    "ui_bg_color"
 #define OPTION_UI_GFXVIEWER_BG_COLOR  "ui_gfxviewer_color"
@@ -75,6 +62,24 @@
 #define OPTION_UI_MOUSEDOWN_BG_COLOR  "ui_mousedown_bg_color"
 #define OPTION_UI_DIPSW_COLOR         "ui_dipsw_color"
 #define OPTION_UI_SLIDER_COLOR        "ui_slider_color"
+
+// system/software selection menu options
+#define OPTION_HIDE_PANELS            "hide_main_panel"
+#define OPTION_USE_BACKGROUND         "use_background"
+#define OPTION_SKIP_BIOS_MENU         "skip_biosmenu"
+#define OPTION_SKIP_PARTS_MENU        "skip_partsmenu"
+#define OPTION_REMEMBER_LAST          "remember_last"
+#define OPTION_LAST_USED_MACHINE      "last_used_machine"
+#define OPTION_LAST_USED_FILTER       "last_used_filter"
+#define OPTION_SYSTEM_RIGHT_PANEL     "system_right_panel"
+#define OPTION_SOFTWARE_RIGHT_PANEL   "software_right_panel"
+#define OPTION_SYSTEM_RIGHT_IMAGE     "system_right_image"
+#define OPTION_SOFTWARE_RIGHT_IMAGE   "software_right_image"
+#define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
+#define OPTION_FORCED4X3              "forced4x3"
+#define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
+#define OPTION_HIDE_ROMLESS           "hide_romless"
+
 
 class ui_options : public core_options
 {
@@ -107,23 +112,13 @@ public:
 	// Misc options
 	const char *system_names() const { return value(OPTION_SYSTEM_NAMES); }
 	bool skip_warnings() const { return bool_value(OPTION_SKIP_WARNINGS); }
-	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }
 	bool forced_4x3_snapshot() const { return bool_value(OPTION_FORCED4X3); }
-	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
-	bool skip_bios_menu() const { return bool_value(OPTION_SKIP_BIOS_MENU); }
-	bool skip_parts_menu() const { return bool_value(OPTION_SKIP_PARTS_MENU); }
-	const char *last_used_machine() const { return value(OPTION_LAST_USED_MACHINE); }
-	const char *last_used_filter() const { return value(OPTION_LAST_USED_FILTER); }
-	int last_right_panel() const { return int_value(OPTION_LAST_RIGHT_PANEL); }
-	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
-	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
 	bool unthrottle_mute() const { return bool_value(OPTION_UNTHROTTLE_MUTE); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }
 	int font_rows() const { return int_value(OPTION_FONT_ROWS); }
-	int hide_panels() const { return int_value(OPTION_HIDE_PANELS); }
 
 	rgb_t border_color() const { return rgb_value(OPTION_UI_BORDER_COLOR); }
 	rgb_t background_color() const { return rgb_value(OPTION_UI_BACKGROUND_COLOR); }
@@ -141,6 +136,21 @@ public:
 	rgb_t mousedown_bg_color() const { return rgb_value(OPTION_UI_MOUSEDOWN_BG_COLOR); }
 	rgb_t dipsw_color() const { return rgb_value(OPTION_UI_DIPSW_COLOR); }
 	rgb_t slider_color() const { return rgb_value(OPTION_UI_SLIDER_COLOR); }
+
+	// system/software selection menu options
+	int hide_panels() const { return int_value(OPTION_HIDE_PANELS); }
+	bool use_background_image() const { return bool_value(OPTION_USE_BACKGROUND); }
+	bool skip_bios_menu() const { return bool_value(OPTION_SKIP_BIOS_MENU); }
+	bool skip_parts_menu() const { return bool_value(OPTION_SKIP_PARTS_MENU); }
+	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
+	const char *last_used_machine() const { return value(OPTION_LAST_USED_MACHINE); }
+	const char *last_used_filter() const { return value(OPTION_LAST_USED_FILTER); }
+	char const *system_right_panel() const { return value(OPTION_SYSTEM_RIGHT_PANEL); }
+	char const *software_right_panel() const { return value(OPTION_SOFTWARE_RIGHT_PANEL); }
+	char const *system_right_image() const { return value(OPTION_SYSTEM_RIGHT_IMAGE); }
+	char const *software_right_image() const { return value(OPTION_SOFTWARE_RIGHT_IMAGE); }
+	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
+	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
 
 	rgb_t rgb_value(const char *option) const;
 

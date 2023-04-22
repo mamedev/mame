@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:bataais
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Sensor Chess (model 221)
 (not to be confused with Saitek Kasparov Sensor Chess)
@@ -30,7 +30,7 @@ Expansion modules: (* denotes not dumped)
 - Classical Style Super Strong
 - *Hyper Modern Super Strong
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -98,9 +98,9 @@ void schess_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 void schess_state::update_display()
 {
@@ -152,9 +152,9 @@ u8 schess_state::input_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void schess_state::main_map(address_map &map)
 {
@@ -169,9 +169,9 @@ void schess_state::main_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( schess )
 	PORT_START("IN.0")
@@ -205,13 +205,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void schess_state::schess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2000000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &schess_state::main_map);
 
@@ -222,20 +222,20 @@ void schess_state::schess(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "schess_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_schess");
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8);
 	config.set_default_layout(layout_saitek_schess);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( schess )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -246,9 +246,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME    PARENT CMP MACHINE INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, schess, 0,      0, schess, schess, schess_state, empty_init, "SciSys", "Sensor Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, schess, 0,      0,      schess,  schess, schess_state, empty_init, "SciSys", "Sensor Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

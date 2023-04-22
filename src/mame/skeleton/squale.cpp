@@ -98,6 +98,8 @@ TODO
 #include "utf8.h"
 
 
+namespace {
+
 #define MAIN_CLOCK           14_MHz_XTAL
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
@@ -627,18 +629,15 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
-	uint32_t size = m_cart->common_get_size("rom");
+	uint32_t const size = m_cart->common_get_size("rom");
 
-	if ( ! size || size > 0x10000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
+	if (!size || size > 0x1'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be more than 64K)");
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return image_init_result::PASS;
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
@@ -880,6 +879,9 @@ ROM_START( squale )
 
 	// place ROM v1.2 signature here.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

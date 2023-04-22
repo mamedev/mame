@@ -9,8 +9,11 @@
  We've also seen CDs of this for sale, so maybe there should be a CD too, for the music?
 
 TODO:
-can't be emulated without proper mb bios
+- Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 263,255,63.
+  Recompressing as -chs 4150,16,63 fixes it.
+- In pcipc throws "E0409 -- Security key not found." in glquake.exe when it starts running.
 
+===================================================================================================
  -- set info
 
 Quake Arcade Tournament by Lazer-Tron
@@ -22,12 +25,12 @@ Created .chd with version 0.125
 It found the following disk paramaters...
 
 Input offset    511
-Cyclinders  263
+Cylinders   263
 Heads       255
 Sectors     63
 Byte/Sector 512
 Sectors/Hunk    8
-Logical size    2,1163,248,864
+Logical size    2,163,248,864
 
 The "backup" directory on hard disk was created by the dumper.
 
@@ -72,115 +75,64 @@ Note: Quantum3D Quicksilver QS233G configuration seem very similar to the HM233G
 
 Dongle: Rainbow Technologies parallel-port security dongle (at least 1024 bytes)
 
-===============================================================================
-TODO:
-    * Add BIOS dump (standard NX440LX motherboard)
-    * Hook up PC hardware
-    * Hook up the Quantum3D GCI-2 (details? ROMs?)
-    * What's the dongle do?
-===============================================================================
+HDD image contains remnants of an Actua Soccer Arcade installation.
+
 */
 
 #include "emu.h"
-
-#include "pcshare.h"
-
 #include "cpu/i386/i386.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 
 namespace {
 
-class quakeat_state : public pcat_base_state
+class quakeat_state : public driver_device
 {
 public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void quake(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void quake_io(address_map &map);
+	required_device<cpu_device> m_maincpu;
+
 	void quake_map(address_map &map);
 };
 
 
-void quakeat_state::video_start()
-{
-}
-
-uint32_t quakeat_state::screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void quakeat_state::quake_map(address_map &map)
 {
-	map(0x00000000, 0x0000ffff).rom().region("pc_bios", 0); /* BIOS */
 }
 
-void quakeat_state::quake_io(address_map &map)
-{
-	pcat32_io_common(map);
-	map(0x00e8, 0x00eb).noprw();
-//  map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
-	map(0x0300, 0x03af).noprw();
-	map(0x03b0, 0x03df).noprw();
-//  map(0x0278, 0x027b).w(FUNC(quakeat_state::pnp_config_w));
-//  map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
-//  map(0x0a78, 0x0a7b).w(FUNC(quakeat_state::pnp_data_w));
-//  map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
-}
-
-/*************************************************************/
 
 static INPUT_PORTS_START( quake )
 INPUT_PORTS_END
 
-/*************************************************************/
-
-void quakeat_state::machine_start()
-{
-}
-/*************************************************************/
 
 void quakeat_state::quake(machine_config &config)
 {
-	/* basic machine hardware */
-	PENTIUM2(config, m_maincpu, 233000000); /* Pentium II, 233MHz */
+	PENTIUM2(config, m_maincpu, 233'000'000); /* Pentium II, 233MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
-	m_maincpu->set_addrmap(AS_IO, &quakeat_state::quake_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_disable();
 
-	pcat_common(config);
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(quakeat_state::screen_update_quake));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(0x100);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
 ROM_START(quake)
 	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
-	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x10000, NO_DUMP )
+	ROM_LOAD("quakearcadetournament.pcbios", 0x000000, 0x20000, NO_DUMP )
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "quakeat", 0, SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
+	DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
 ROM_END
 
 } // anonymous namespace
 
 
 GAME( 1998, quake,  0,   quake, quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+// Actua Soccer Arcade
