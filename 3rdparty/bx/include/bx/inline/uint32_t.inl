@@ -778,15 +778,15 @@ namespace bx
 		ftou.flt = _a;
 
 		const uint32_t one                       = uint32_li(0x00000001);
-		const uint32_t f_s_mask                  = uint32_li(0x80000000);
-		const uint32_t f_e_mask                  = uint32_li(0x7f800000);
-		const uint32_t f_m_mask                  = uint32_li(0x007fffff);
+		const uint32_t f_s_mask                  = uint32_li(kFloatSignMask);
+		const uint32_t f_e_mask                  = uint32_li(kFloatExponentMask);
+		const uint32_t f_m_mask                  = uint32_li(kFloatMantissaMask);
 		const uint32_t f_m_hidden_bit            = uint32_li(0x00800000);
 		const uint32_t f_m_round_bit             = uint32_li(0x00001000);
 		const uint32_t f_snan_mask               = uint32_li(0x7fc00000);
 		const uint32_t f_e_pos                   = uint32_li(0x00000017);
 		const uint32_t h_e_pos                   = uint32_li(0x0000000a);
-		const uint32_t h_e_mask                  = uint32_li(0x00007c00);
+		const uint32_t h_e_mask                  = uint32_li(kHalfExponentMask);
 		const uint32_t h_snan_mask               = uint32_li(0x00007e00);
 		const uint32_t h_e_mask_value            = uint32_li(0x0000001f);
 		const uint32_t f_h_s_pos_offset          = uint32_li(0x00000010);
@@ -841,14 +841,14 @@ namespace bx
 
 	inline BX_CONST_FUNC float halfToFloat(uint16_t _a)
 	{
-		const uint32_t h_e_mask             = uint32_li(0x00007c00);
-		const uint32_t h_m_mask             = uint32_li(0x000003ff);
-		const uint32_t h_s_mask             = uint32_li(0x00008000);
+		const uint32_t h_e_mask             = uint32_li(kHalfExponentMask);
+		const uint32_t h_m_mask             = uint32_li(kHalfMantissaMask);
+		const uint32_t h_s_mask             = uint32_li(kHalfSignMask);
 		const uint32_t h_f_s_pos_offset     = uint32_li(0x00000010);
 		const uint32_t h_f_e_pos_offset     = uint32_li(0x0000000d);
 		const uint32_t h_f_bias_offset      = uint32_li(0x0001c000);
-		const uint32_t f_e_mask             = uint32_li(0x7f800000);
-		const uint32_t f_m_mask             = uint32_li(0x007fffff);
+		const uint32_t f_e_mask             = uint32_li(kFloatExponentMask);
+		const uint32_t f_m_mask             = uint32_li(kFloatMantissaMask);
 		const uint32_t h_f_e_denorm_bias    = uint32_li(0x0000007e);
 		const uint32_t h_f_m_denorm_sa_bias = uint32_li(0x00000008);
 		const uint32_t f_e_pos              = uint32_li(0x00000017);

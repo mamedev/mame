@@ -55,7 +55,7 @@ namespace bx
 		//
 		const uint32_t tmp0   = uint32_sra(_value, 31);
 		const uint32_t tmp1   = uint32_neg(tmp0);
-		const uint32_t mask   = uint32_or(tmp1, 0x80000000);
+		const uint32_t mask   = uint32_or(tmp1, kFloatSignMask);
 		const uint32_t result = uint32_xor(_value, mask);
 		return result;
 	}
@@ -63,37 +63,37 @@ namespace bx
 	inline BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp > UINT32_C(0x7f800000);
+		return tmp > kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp > UINT64_C(0x7ff0000000000000);
+		return tmp > kDoubleExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp < UINT32_C(0x7f800000);
+		return tmp < kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp < UINT64_C(0x7ff0000000000000);
+		return tmp < kDoubleExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp == UINT32_C(0x7f800000);
+		return tmp == kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp == UINT64_C(0x7ff0000000000000);
+		return tmp == kDoubleExponentMask;
 	}
 
 	inline BX_CONSTEXPR_FUNC float floor(float _a)
@@ -214,7 +214,7 @@ namespace bx
 	{
 		if (_a < kNearZero)
 		{
-			return kInfinity;
+			return kFloatInfinity;
 		}
 
 		return pow(_a, -0.5f);
