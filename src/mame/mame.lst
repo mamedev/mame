@@ -41316,6 +41316,9 @@ sagitta180                      // 1979?
 @source:skeleton/seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
 
+@source:skeleton/semcrossw.cpp
+semcrossw                       // Semaphore controller from Etra
+
 @source:skeleton/sh4robot.cpp
 sh4robot                        //
 
