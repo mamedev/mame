@@ -23957,7 +23957,7 @@ cfr. https://github.com/mamedev/mame/issues/9106 for more info.
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Check-GD program
-Stuck with a Sega copyright printed on screen
+Stuck with "Please Connect PAD Port A" [Maple]
 ]]></notes>
 		<!--<info name="serial" value="DCFD01"/>-->
 		<info name="serial" value="HKT-999999"/>
