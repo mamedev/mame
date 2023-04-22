@@ -10,7 +10,8 @@
 
 namespace bx
 {
-	const float kInfinity = bitsToFloat(UINT32_C(0x7f800000) );
+	const float  kFloatInfinity  = bitsToFloat(kFloatExponentMask);
+	const double kDoubleInfinity = bitsToDouble(kDoubleExponentMask);
 
 	namespace
 	{
@@ -135,11 +136,11 @@ namespace bx
 	BX_CONST_FUNC float ldexp(float _a, int32_t _b)
 	{
 		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked   = uint32_and(ftob, UINT32_C(0xff800000) );
+		const uint32_t masked   = uint32_and(ftob, kFloatSignMask | kFloatExponentMask);
 		const uint32_t expsign0 = uint32_sra(masked, 23);
 		const uint32_t tmp      = uint32_iadd(expsign0, _b);
 		const uint32_t expsign1 = uint32_sll(tmp, 23);
-		const uint32_t mantissa = uint32_and(ftob, UINT32_C(0x007fffff) );
+		const uint32_t mantissa = uint32_and(ftob, kFloatMantissaMask);
 		const uint32_t bits     = uint32_or(mantissa, expsign1);
 		const float    result   = bitsToFloat(bits);
 
@@ -149,9 +150,9 @@ namespace bx
 	float frexp(float _a, int32_t* _outExp)
 	{
 		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
+		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
 		const uint32_t exp0     = uint32_srl(masked0, 23);
-		const uint32_t masked1  = uint32_and(ftob,   UINT32_C(0x807fffff) );
+		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
 		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
 		const float    result   = bitsToFloat(bits);
 

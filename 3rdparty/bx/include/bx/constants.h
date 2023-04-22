@@ -50,11 +50,50 @@ namespace bx
 	///
 	constexpr float    kNearZero       = 1.0f/float(1 << 28);
 
+	///
+	constexpr uint8_t  kHalfSignNumBits      = 1;
+	constexpr uint8_t  kHalfSignBitShift     = 15;
+	constexpr uint16_t kHalfSignMask         = UINT16_C(0x8000);
+	constexpr uint8_t  kHalfExponentNumBits  = 5;
+	constexpr uint8_t  kHalfExponentBitShift = 10;
+	constexpr uint16_t kHalfExponentMask     = UINT16_C(0x7c00);
+	constexpr uint32_t kHalfExponentBias     = 15;
+	constexpr uint8_t  kHalfMantissaNumBits  = 10;
+	constexpr uint8_t  kHalfMantissaBitShift = 0;
+	constexpr uint16_t kHalfMantissaMask     = UINT16_C(0x03ff);
+
+	///
+	constexpr uint8_t  kFloatSignNumBits      = 1;
+	constexpr uint8_t  kFloatSignBitShift     = 31;
+	constexpr uint32_t kFloatSignMask         = UINT32_C(0x80000000);
+	constexpr uint8_t  kFloatExponentNumBits  = 8;
+	constexpr uint8_t  kFloatExponentBitShift = 23;
+	constexpr uint32_t kFloatExponentMask     = UINT32_C(0x7f800000);
+	constexpr uint32_t kFloatExponentBias     = 127;
+	constexpr uint8_t  kFloatMantissaNumBits  = 23;
+	constexpr uint8_t  kFloatMantissaBitShift = 0;
+	constexpr uint32_t kFloatMantissaMask     = UINT32_C(0x007fffff);
+
 	/// Smallest normalized positive floating-point number.
 	constexpr float    kFloatSmallest  = 1.175494351e-38f;
 
 	/// Maximum representable floating-point number.
 	constexpr float    kFloatLargest   = 3.402823466e+38f;
+
+	///
+	extern const float kFloatInfinity;
+
+	///
+	constexpr uint8_t  kDoubleSignNumBits     = 1;
+	constexpr uint8_t  kDoubleSignBitShift    = 63;
+	constexpr uint64_t kDoubleSignMask        = UINT64_C(0x8000000000000000);
+	constexpr uint8_t  kDoubleExponentNumBits = 11;
+	constexpr uint8_t  kDoubleExponentShift   = 52;
+	constexpr uint64_t kDoubleExponentMask    = UINT64_C(0x7ff0000000000000);
+	constexpr uint32_t kDoubleExponentBias    = 1023;
+	constexpr uint8_t  kDoubleMantissaNumBits = 52;
+	constexpr uint8_t  kDoubleMantissaShift   = 0;
+	constexpr uint64_t kDoubleMantissaMask    = UINT64_C(0x000fffffffffffff);
 
 	/// Smallest normalized positive double-precision floating-point number.
 	constexpr double   kDoubleSmallest = 2.2250738585072014e-308;
@@ -63,7 +102,7 @@ namespace bx
 	constexpr double   kDoubleLargest  = 1.7976931348623158e+308;
 
 	///
-	extern const float kInfinity;
+	extern const double kDoubleInfinity;
 
 } // namespace bx
 
