@@ -345,11 +345,17 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
+		// [4] track start
+		// [5] index start
+		// [7] track end
+		// [8] index end
 		if (command[4] > command[7])
 		{
 			// TODO: check error
 			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR);
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+
+			m_device->logerror("Error: start TNO (%d,%d) > end TNO (%d,%d)\n", command[4], command[5], command[7], command[8]);
 		}
 		else
 		{
@@ -360,12 +366,16 @@ void t10mmc::ExecCommand()
 			if (end_track > command[7])
 				end_track = command[7];
 
-			// HACK: assume index 0 & 1 means beginning of track and anything else means end of track
-			if (command[8] <= 1)
-				end_track--;
+			// konamigv lacrazyc just sends same track start/end
+			if (command[4] != command[7] && command[5] != command[8])
+			{
+				// HACK: assume index 0 & 1 means beginning of track and anything else means end of track
+				if (command[8] <= 1)
+					end_track--;
 
-			if (m_sotc)
-				end_track = command[4];
+				if (m_sotc)
+					end_track = command[4];
+			}
 
 			m_lba = m_cdrom->get_track_start(command[4] - 1);
 			m_blocks = m_cdrom->get_track_start(end_track) - m_lba;
@@ -376,6 +386,7 @@ void t10mmc::ExecCommand()
 				m_cdda->start_audio(m_lba, m_blocks);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 				m_status_code = SCSI_STATUS_CODE_GOOD;
+				m_device->logerror("Starting audio TNO %d LBA %d blocks %d\n", trk, m_lba, m_blocks);
 			}
 			else
 			{
