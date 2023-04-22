@@ -2953,7 +2953,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 	m_pinout = bitswap<8>(m_pinout,4,3,7,5,2,1,6,0) << 4;
 
 	if (m_pinout == 0)
-		return std::make_pair(image_error::BADSOFTWARE, "Invalid cartridge pinout\n");
+		return std::make_pair(image_error::BADSOFTWARE, "Invalid cartridge pinout");
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -3136,7 +3136,7 @@ void tc4_state::machine_start()
 DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
-		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list\n");
+		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list");
 
 	// get cartridge pinout R9 to K connections
 	const char *pinout = image.get_feature("pinout");
@@ -11847,7 +11847,7 @@ static INPUT_PORTS_START( wtalker )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 
 	PORT_START("IN.1") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Guest")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Guest")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 
@@ -14673,7 +14673,7 @@ void playmaker_state::machine_start()
 DEVICE_IMAGE_LOAD_MEMBER(playmaker_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
-		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list\n");
+		return std::make_pair(image_error::UNSUPPORTED, "Can only load through software list");
 
 	// get cartridge notch
 	const char *notch = image.get_feature("notch");

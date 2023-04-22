@@ -5974,7 +5974,7 @@ GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_ne
 GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
 
 GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )

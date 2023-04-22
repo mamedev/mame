@@ -56,7 +56,7 @@ std::pair<std::error_condition, std::string> hp48_port_image_device::call_load()
 	{
 		return std::make_pair(
 				image_error::INVALIDLENGTH,
-				util::string_format("Image size must be a power of two between %i and %i\n", 32*1024, m_max_size));
+				util::string_format("Image size must be a power of two between %i and %i", 32*1024, m_max_size));
 	}
 
 	m_port_size = size;
@@ -79,7 +79,7 @@ std::pair<std::error_condition, std::string> hp48_port_image_device::call_create
 	{
 		return std::make_pair(
 				image_error::INVALIDLENGTH,
-				util::string_format("Image size must be a power of two between %i and %i\n", 32*1024, m_max_size));
+				util::string_format("Image size must be a power of two between %i and %i", 32*1024, m_max_size));
 	}
 
 	m_port_size = size;

@@ -6,8 +6,9 @@
 Suwa Seikosha (S-MOS) SMC11xx handhelds
 Some LCD games with this MCU, and perhaps early-80s Seiko wristwatches too.
 
-Before Tiger's 78-xxx series (hh_sm510.cpp), they released their games in Europe
-through different publishers, eg. Orlitronic in France, Virca in Italy.
+In Europe, Tiger didn't release their pre-78-xxx LCD games (hh_sm510.cpp)
+themselves, but through different publishers, eg. Orlitronic in France,
+Grandstand in the UK, Virca in Italy.
 
 TODO:
 - add common mcfg (like hh_sm510) when more games are added?
