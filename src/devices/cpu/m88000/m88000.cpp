@@ -5,10 +5,9 @@
  * Motorola M88000 Family of RISC microprocessors.
  *
  * TODO:
- *  - pipeline and cycles counts
+ *  - instruction cycle counts
  *  - mc88110
  *  - little-endian mode
- *  - optimize shadow register update
  */
 
 #include "emu.h"
@@ -269,14 +268,6 @@ void mc88100_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		// update shadow registers
-		if (!(m_cr[PSR] & PSR_SFRZ))
-		{
-			m_cr[SXIP] = m_xip;
-			m_cr[SNIP] = m_nip;
-			m_cr[SFIP] = m_fip;
-		}
-
 		// execute
 		if (m_xip & IP_V)
 		{
@@ -286,11 +277,11 @@ void mc88100_device::execute_run()
 				execute(m_xop);
 			else
 				exception(E_INSTRUCTION);
-		}
 
-		// interrupt check
-		if (m_int_state && !(m_cr[PSR] & PSR_IND))
-			exception(E_INTERRUPT);
+			// interrupt check
+			if (m_int_state && !(m_cr[PSR] & PSR_IND))
+				exception(E_INTERRUPT);
+		}
 
 		// fetch
 		if (m_fip & IP_V)
@@ -448,7 +439,18 @@ void mc88100_device::execute(u32 const inst)
 		{
 		case 0x08: // ldcr: load from control register (privileged)
 			if (m_cr[PSR] & PSR_MODE)
-				m_r[D] = m_cr[CR];
+			{
+				switch (CR)
+				{
+				case SSBR: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_sb; break;
+				case SXIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_xip; break;
+				case SNIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_nip; break;
+				case SFIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_fip; break;
+				default:
+					m_r[D] = m_cr[CR];
+					break;
+				}
+			}
 			else
 				exception(E_PRIVILEGE);
 			break;
@@ -475,7 +477,17 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1];
 
-				m_r[D] = m_cr[CR];
+				switch (CR)
+				{
+				case SSBR: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_sb; break;
+				case SXIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_xip; break;
+				case SNIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_nip; break;
+				case SFIP: m_r[D] = (m_cr[PSR] & PSR_SFRZ) ? m_cr[CR] : m_fip; break;
+				default:
+					m_r[D] = m_cr[CR];
+					break;
+				}
+
 				set_cr(CR, data);
 			}
 			else
@@ -1021,9 +1033,9 @@ void mc88100_device::execute(u32 const inst)
 		case 0x7e0: // rte: return from exception (privileged)
 			if (m_cr[PSR] & PSR_MODE)
 			{
-				m_sb = m_cr[SSBR];
 				m_cr[PSR] = m_cr[EPSR];
 
+				m_sb = m_cr[SSBR];
 				m_nip = m_cr[SNIP];
 				m_fip = m_cr[SFIP];
 
@@ -1272,8 +1284,17 @@ void mc88100_device::set_cr(unsigned const cr, u32 const data)
 		break;
 
 	case PSR:
+		if (data & PSR_SFRZ)
+		{
+			m_cr[SSBR] = m_sb;
+			m_cr[SXIP] = m_xip;
+			m_cr[SNIP] = m_nip;
+			m_cr[SFIP] = m_fip;
+		}
+
 		if (!(data & PSR_MODE))
 			debugger_privilege_hook();
+
 		[[fallthrough]];
 	case EPSR:
 		if (data & PSR_BO)
@@ -1344,7 +1365,14 @@ void mc88100_device::exception(unsigned vector, bool const trap)
 	LOGMASKED(LOG_EXCEPTION, "exception %u xip 0x%08x\n", vector, m_xip & IP_A);
 
 	if (!(m_cr[PSR] & PSR_SFRZ))
+	{
+		m_cr[SSBR] = m_sb;
+		m_cr[SXIP] = m_xip;
+		m_cr[SNIP] = m_nip;
+		m_cr[SFIP] = m_fip;
+
 		m_cr[EPSR] = m_cr[PSR];
+	}
 	else if (!trap)
 		vector = E_ERROR;
 
