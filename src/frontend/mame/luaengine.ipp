@@ -589,10 +589,10 @@ auto lua_engine::make_notifier_adder(util::notifier<T...> &notifier, const char 
 					delegate<void (T...)>(
 						[this, desc, cbfunc = sol::protected_function(m_lua_state, cb)] (T... args)
 						{
-							auto status = invoke(cbfunc, args...);
+							auto status(invoke(cbfunc, args...));
 							if (!status.valid())
 							{
-								sol::error err(status);
+								auto err(status.template get<sol::error>());
 								osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
 							}
 						}));
@@ -643,7 +643,7 @@ auto lua_engine::make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&
 								}
 								else
 								{
-									sol::error err(status);
+									auto err(status.get<sol::error>());
 									osd_printf_error("[LUA ERROR] error in %s callback: %s\n", desc, err.what());
 									if constexpr (!std::is_same_v<R, void>)
 										return dflt();
