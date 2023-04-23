@@ -58,10 +58,10 @@ Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
 Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
 Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
 *Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C & CDROM TK21-A)                  (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A & *CDROM)                        (C) Namco, 2002
+Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)           (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)           (C) Namco, 2002
 Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A & *CDROM)                        (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                    (C) Namco, 2003
 Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
@@ -309,10 +309,10 @@ Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
 Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
-Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
-Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    I/O board = ?
+Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           NM-002        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
+Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           NM-003        I/O board = ?
 Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4          also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
-Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped    also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
+Taiko no Tatsujin 5                                 TK51  Ver.A   KC031A   8E, 8D, 7E           TK-5          also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
 Taiko no Tatsujin 6                                 TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6          also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
 Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A           I/O board = none
 
@@ -3468,7 +3468,7 @@ ROM_START( taiko2 )
 	ROM_LOAD( "tk21verc_2.7e", 0x0000000, 0x1080000, CRC(f1dbe387) SHA1(8ae5f3b659acec150d89af2a14fc2dec8c3b1643) )
 
 	DISK_REGION( "ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "tk-21", 0, SHA1(cede127f3d87f894ccaa1d77c8b279f209f6a8e4) )
+	DISK_IMAGE_READONLY( "nm-002", 0, SHA1(cede127f3d87f894ccaa1d77c8b279f209f6a8e4) )
 ROM_END
 
 ROM_START( taiko3 )
