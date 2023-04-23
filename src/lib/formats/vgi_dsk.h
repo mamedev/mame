@@ -22,6 +22,7 @@ public:
 	int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const override;
 	bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const override;
+	bool create(const std::vector<uint32_t> &variants, floppy_image *image) const override;
 
 	const char *name() const override { return "vgi"; }
 	const char *description() const override { return "Micropolis VGI disk image"; }

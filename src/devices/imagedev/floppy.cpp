@@ -372,7 +372,7 @@ void floppy_image_device::set_rpm(float _rpm)
 		return;
 
 	rpm = _rpm;
-	rev_time = attotime::from_double(60/rpm);
+	rev_time = attotime::from_double(60.0/rpm);
 	angular_speed = rpm/60.0*2e8;
 }
 
@@ -805,6 +805,10 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_create(in
 		if (!strcmp(i->name(), "mfi"))
 			output_format = i;
 	}
+	if (!output_format->create(variants, image.get())) {
+		image.reset();
+		return std::make_pair(image_error::UNSUPPORTED, "Image format unable to create new disk");
+	}
 
 	init_floppy_load(true);
 
@@ -905,13 +909,19 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 	}
 	int position = int(delta.as_double()*angular_speed + 0.5);
 
-	int new_idx = position < 2000000;
+	uint32_t last_index = 0, next_index = 200000000;
+	// if hard-sectored floppy, has extra IDX pulses
+	if (image) image->find_index_hole(position, last_index, next_index);
+	int new_idx = position - last_index < 2000000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_double(2000000/angular_speed);
+		uint32_t index_up = last_index + 2000000;
+		attotime index_up_time = attotime::from_double(index_up/angular_speed);
 		index_timer->adjust(index_up_time - delta);
-	} else
-		index_timer->adjust(rev_time - delta);
+	} else {
+		attotime next_index_time = attotime::from_double(next_index/angular_speed);
+		index_timer->adjust(next_index_time - delta);
+	}
 
 	if(new_idx != idx) {
 		idx = new_idx;
@@ -951,7 +961,9 @@ void floppy_image_device::check_led()
 
 double floppy_image_device::get_pos()
 {
-	return index_timer->elapsed().as_double();
+	if(revolution_start_time.is_never())
+		return 0;
+	return (machine().time() - revolution_start_time).as_double();
 }
 
 bool floppy_image_device::twosid_r()

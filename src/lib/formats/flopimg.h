@@ -80,6 +80,15 @@ public:
 	*/
 	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image) const;
 
+	/*! @brief Initialize an unformatted image.
+	 The create function initializes an image of a new, unformatted floppy.
+	 This can initialize physical characteristics of the disk, like
+	 hard-sector index holes.
+	 @param image floppy disk to configure
+	 @return true on success, false otherwise.
+	*/
+	virtual bool create(const std::vector<uint32_t> &variants, floppy_image *image) const;
+
 	//! @returns string containing name of format.
 	virtual const char *name() const = 0;
 	//! @returns string containing description of format.
@@ -563,6 +572,26 @@ public:
 	//! @param v the variant.
 	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
 
+	//! Sets additional index holes. Entries are absolute positions of index
+	//! holes in the same units as cell_data. The positions are the start of
+	//! the hole, not the center of the hole. The hole at angular position
+	//! 0 is implicit, so an empty list encodes a regular soft-sectored
+	//! disk. Additional holes are found on hard-sectored disks. Values must
+	//! be in increasing order.
+	//! @param arr
+	void set_index_array(std::vector<uint32_t> arr);
+
+	//! Find most recent and next index hole for provided angular position.
+	//! The most recent hole may be equal to provided position. The next
+	//! hole will be 200000000 if all holes of the current rotation are in
+	//! the past.
+
+	/*! @param pos angular position
+	    @param last most recent index hole
+	    @param next next index hole
+	*/
+	void find_index_hole(uint32_t pos, uint32_t &last, uint32_t &next);
+
 	/*!
 	  @param track
 	  @param subtrack
@@ -620,6 +649,8 @@ private:
 	// track number multiplied by 4 then head
 	// last array size may be bigger than actual track size
 	std::vector<std::vector<track_info> > track_array;
+
+	std::vector<uint32_t> index_array;
 };
 
 #endif // MAME_FORMATS_FLOPIMG_H

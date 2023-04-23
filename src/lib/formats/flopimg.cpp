@@ -35,6 +35,24 @@ floppy_image::~floppy_image()
 {
 }
 
+void floppy_image::set_index_array(std::vector<uint32_t> arr)
+{
+	uint32_t prev = 0;
+	for(uint32_t index : arr) {
+		if(prev > index || index > 200000000)
+			throw std::invalid_argument(util::string_format("Index outside expected range, expected %d-199999999, got %d", prev+1, index));
+		prev = index;
+	}
+	index_array = arr;
+}
+
+void floppy_image::find_index_hole(uint32_t pos, uint32_t &last, uint32_t &next)
+{
+	auto nexti = std::lower_bound(index_array.begin(), index_array.end(), pos+1);
+	next = nexti == index_array.end() ? 200000000 : *nexti;
+	last = nexti == index_array.begin() ? 0 : *--nexti;
+}
+
 void floppy_image::get_maximal_geometry(int &_tracks, int &_heads) const
 {
 	_tracks = tracks;
@@ -122,6 +140,11 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 bool floppy_image_format_t::save(util::random_read_write &io, const std::vector<uint32_t> &, floppy_image *) const
 {
 	return false;
+}
+
+bool floppy_image_format_t::create(const std::vector<uint32_t> &variants, floppy_image *image) const
+{
+	return true;
 }
 
 bool floppy_image_format_t::extension_matches(const char *file_name) const
