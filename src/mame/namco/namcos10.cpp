@@ -637,6 +637,8 @@ Known issues:
 - g13jnr: Needs MP3 decoder emulation
 - sugorotc, sekaikh(?): BGMs stop early and/or crash the game. Seems to be expecting an SPU-related IRQ?
 - nicetsuk: Hangs on boot due to suspected issues with the PSX's timers
+- knpuzzle: Audio/sound effects can be glitchy, sound glitches on the difficulty select screen for a moment
+- panikuru: Audio/sound effects can be glitchy
 - Fix medal games I/O and refactor code to separate MGEXIO states from namcos10_state
 
 
@@ -3688,15 +3690,15 @@ GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_sta
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // has some issues with sounds similar to knpuzzle
-GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // title guessed based on known game list and PCB sticker
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // uses MGEXIO
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state, init_nflclsfb,  ROT0, "Namco / Metro", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
