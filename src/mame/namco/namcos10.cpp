@@ -2253,7 +2253,29 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00115c68620401,0x00008102802094,0x000081a65270a8,0x00000000810010,
+			0x004c2c080f3059,0x000081470a9500,0x0000816a123009,0x000081a2b23038,
+			0x002d18a06b9000,0x0001186c02000c,0x000081a2b2704c,0x00702811016302,
+			0x000081470a1122,0x00000000006200,0x009170ac403013,0x00000000001044
+		},
+		{
+			0x00115c68620401,0x00008102802094,0x000081a65270a8,0x00000000810010,
+			0x004c2c080f3059,0x000081470a9500,0x0000816a123009,0x000081a2b23038,
+			0x002d18a06b9000,0x0001186c02000c,0x000081a2b2704c,0x00702811016302,
+			0x000081470a1122,0x00000000006200,0x009170ac403013,0x00000000001044
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return (1 & gf2_reduce(previous_masks & 0x120100400000) & gf2_reduce(previous_masks & 0x11800020000)) * 0x11;
+		},
+		[] (int iv) -> uint64_t {
+			constexpr uint64_t values[16]{ 0x0000, 0x0000, 0x0000, 0x2000, 0x801a, 0x6000, 0x0002, 0x0000, 0x0000, 0x0018, 0x0000, 0x0420, 0x0000, 0x8800, 0x0000, 0xc000 };
+			return values[iv];
+		}
+	});
 }
 
 void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
@@ -3656,7 +3678,7 @@ GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_sta
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND ) // sound glitches on the difficulty select screen for a moment
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
