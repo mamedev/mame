@@ -36,8 +36,25 @@
 ///
 #define BX_ENABLED(_x) BX_IGNORE_C4127(bx::isEnabled<!!(_x)>::value)
 
+///
+#define BX_DECLARE_TAG(_name)  \
+	struct    _name ## Tag {}; \
+	constexpr _name ## Tag _name
+
 namespace bx
 {
+	/// Placement new tag.
+	BX_DECLARE_TAG(PlacementNew);
+
+	/// Fields are left uninitialized.
+	BX_DECLARE_TAG(InitNone);
+
+	/// Fields are initialized to zero.
+	BX_DECLARE_TAG(InitZero);
+
+	/// Fields are initialized to identity value.
+	BX_DECLARE_TAG(InitIdentity);
+
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;

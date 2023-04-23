@@ -346,11 +346,11 @@ TEST_CASE("quaternion", "")
 	float mtxQ[16];
 	float mtx[16];
 
-	bx::Quaternion quat = bx::init::Identity;
-	bx::Quaternion q2 = bx::init::None;
+	bx::Quaternion quat = bx::InitIdentity;
+	bx::Quaternion q2 = bx::InitNone;
 
-	bx::Vec3 axis = bx::init::None;
-	bx::Vec3 euler = bx::init::None;
+	bx::Vec3 axis = bx::InitNone;
+	bx::Vec3 euler = bx::InitNone;
 	float angle;
 
 	bx::mtxFromQuaternion(mtxQ, quat);

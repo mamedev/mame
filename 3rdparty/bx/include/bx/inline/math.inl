@@ -390,7 +390,7 @@ namespace bx
 	template<typename Ty>
 	inline Ty load(const void* _ptr)
 	{
-		Ty result(init::None);
+		Ty result(InitNone);
 		memCopy(&result, _ptr, sizeof(Ty) );
 		return result;
 	}
@@ -401,18 +401,18 @@ namespace bx
 		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
-	inline Vec3::Vec3(init::NoneTag)
+	inline Vec3::Vec3(InitNoneTag)
 	{
 	}
 
-	constexpr Vec3::Vec3(init::ZeroTag)
+	constexpr Vec3::Vec3(InitZeroTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
 	{
 	}
 
-	constexpr Vec3::Vec3(init::IdentityTag)
+	constexpr Vec3::Vec3(InitIdentityTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
@@ -433,18 +433,18 @@ namespace bx
 	{
 	}
 
-	inline Plane::Plane(init::NoneTag)
-		: normal(init::None)
+	inline Plane::Plane(InitNoneTag)
+		: normal(InitNone)
 	{
 	}
 
-	constexpr Plane::Plane(init::ZeroTag)
-		: normal(init::Zero)
+	constexpr Plane::Plane(InitZeroTag)
+		: normal(InitZero)
 		, dist(0.0f)
 	{
 	}
 
-	constexpr Plane::Plane(init::IdentityTag)
+	constexpr Plane::Plane(InitIdentityTag)
 		: normal(0.0f, 1.0f, 0.0f)
 		, dist(0.0f)
 	{
@@ -456,11 +456,11 @@ namespace bx
 	{
 	}
 
-	inline Quaternion::Quaternion(init::NoneTag)
+	inline Quaternion::Quaternion(InitNoneTag)
 	{
 	}
 
-	constexpr Quaternion::Quaternion(init::ZeroTag)
+	constexpr Quaternion::Quaternion(InitZeroTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
@@ -468,7 +468,7 @@ namespace bx
 	{
 	}
 
-	constexpr Quaternion::Quaternion(init::IdentityTag)
+	constexpr Quaternion::Quaternion(InitIdentityTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
@@ -740,7 +740,7 @@ namespace bx
 
 	inline BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v)
 	{
-		Vec3 result(init::None);
+		Vec3 result(InitNone);
 		const float phi   = _u * kPi2;
 		const float theta = _v * kPi;
 
@@ -1098,8 +1098,8 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos)
 	{
-		Vec3 tangent(init::None);
-		Vec3 bitangent(init::None);
+		Vec3 tangent(InitNone);
+		Vec3 bitangent(InitNone);
 		calcTangentFrame(tangent, bitangent, _normal);
 
 		store(&_result[ 0], mul(bitangent, _scale) );
@@ -1117,8 +1117,8 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos, float _angle)
 	{
-		Vec3 tangent(init::None);
-		Vec3 bitangent(init::None);
+		Vec3 tangent(InitNone);
+		Vec3 bitangent(InitNone);
 		calcTangentFrame(tangent, bitangent, _normal, _angle);
 
 		store(&_result[0], mul(bitangent, _scale) );
@@ -1183,7 +1183,7 @@ namespace bx
 
 	inline Vec3 mul(const Vec3& _vec, const float* _mat)
 	{
-		Vec3 result(init::None);
+		Vec3 result(InitNone);
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
 		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9] + _mat[13];
 		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
@@ -1192,7 +1192,7 @@ namespace bx
 
 	inline Vec3 mulXyz0(const Vec3& _vec, const float* _mat)
 	{
-		Vec3 result(init::None);
+		Vec3 result(InitNone);
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8];
 		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9];
 		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10];
