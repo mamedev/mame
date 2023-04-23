@@ -667,8 +667,8 @@ WRITE_LINE_MEMBER(psikyo_state::screen_vblank)
 	// rising edge
 	if (state)
 	{
-		get_sprites();
 		m_spriteram->copy();
+		get_sprites();
 	}
 }
 
@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER(psikyo_state::screen_vblank_bootleg)
 	// rising edge
 	if (state)
 	{
-		get_sprites_bootleg(); // TODO : it's seems differ?
 		m_spriteram->copy();
+		get_sprites_bootleg(); // TODO : it's seems differ?
 	}
 }
