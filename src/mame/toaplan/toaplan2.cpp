@@ -6216,7 +6216,7 @@ GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, toaplan2_state, init_fixeightbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
-GAME( 1994, burgkids,    0,        pwrkick,    burgkids,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
+GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",         "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",       MACHINE_SUPPORTS_SAVE )
