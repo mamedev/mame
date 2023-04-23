@@ -31043,21 +31043,6 @@ rcorsair                        // (c) 1984 Nakasawa
 bs94                            // (c) 1994 Entretenimientos GEMINIS
 re900                           // (c) 1993 Entretenimientos GEMINIS
 
-@source:misc/rf51w14cg.cpp
-rf51w14cg                       // (c) 2003 Recreativos Franco
-
-@source:misc/rfslots8085.cpp
-bbombo                          // (c) 198? Recreativos Franco
-bformula2                       // (c) 1988 Recreativos Franco
-
-@source:misc/rfslotsmcs48.cpp
-ajofrin                         // (c) 1981 Recreativos Franco
-babyfrts                        // (c) 198? Recreativos Franco
-babyfrts25                      // (c) 198? recreativos Franco
-
-@source:misc/rfslotspcpent.cpp
-rfsantafeg                      // (c) 2014 Recreativos Franco
-
 @source:misc/rgum.cpp
 rgum                            //
 
@@ -37782,6 +37767,21 @@ visicom                         //
 @source:rca/vip.cpp
 vip                             // 1977 Cosmac VIP VP-711
 vp111                           // 1977 Cosmac VIP VP-111
+
+@source:rfranco/rf51w14cg.cpp
+rf51w14cg                       // (c) 2003 Recreativos Franco
+
+@source:rfranco/rfslots8085.cpp
+bbombo                          // (c) 198? Recreativos Franco
+bformula2                       // (c) 1988 Recreativos Franco
+
+@source:rfranco/rfslotsmcs48.cpp
+ajofrin                         // (c) 1981 Recreativos Franco
+babyfrts                        // (c) 198? Recreativos Franco
+babyfrts25                      // (c) 198? recreativos Franco
+
+@source:rfranco/rfslotspcpent.cpp
+rfsantafeg                      // (c) 2014 Recreativos Franco
 
 @source:regnecentralen/rc702.cpp
 rc702                           // 1979 RC702
