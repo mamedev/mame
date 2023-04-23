@@ -595,7 +595,7 @@ void bigevglf_state::bigevglf(machine_config &config)
 	YM2149(config, "aysnd", 8_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.15); // divider not verified
 
 	MSM5232(config, m_msm, 8_MHz_XTAL / 4); // divider not verified
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); // 0.65 (???) uF capacitors
+	m_msm->set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); // 1 uF capacitors ?
 	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
 	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
 	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
