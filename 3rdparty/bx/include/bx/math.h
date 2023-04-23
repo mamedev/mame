@@ -34,38 +34,19 @@ namespace bx
 		};
 	};
 
-	/// Structure initializer types.
-	namespace init
-	{
-		/// Fields are left uninitialized.
-		///
-		struct    NoneTag {};
-		constexpr NoneTag None;
-
-		/// Fields are initialized to zero.
-		///
-		struct    ZeroTag {};
-		constexpr ZeroTag Zero;
-
-		/// Fields are initialized to identity value.
-		///
-		struct    IdentityTag {};
-		constexpr IdentityTag Identity;
-	}
-
 	///
 	struct Vec3
 	{
 		Vec3() = delete;
 
 		///
-		Vec3(init::NoneTag);
+		Vec3(InitNoneTag);
 
 		///
-		constexpr Vec3(init::ZeroTag);
+		constexpr Vec3(InitZeroTag);
 
 		///
-		constexpr Vec3(init::IdentityTag);
+		constexpr Vec3(InitIdentityTag);
 
 		///
 		explicit constexpr Vec3(float _v);
@@ -82,13 +63,13 @@ namespace bx
 		Plane() = delete;
 
 		///
-		Plane(init::NoneTag);
+		Plane(InitNoneTag);
 
 		///
-		constexpr Plane(init::ZeroTag);
+		constexpr Plane(InitZeroTag);
 
 		///
-		constexpr Plane(init::IdentityTag);
+		constexpr Plane(InitIdentityTag);
 
 		///
 		constexpr Plane(Vec3 _normal, float _dist);
@@ -103,13 +84,13 @@ namespace bx
 		Quaternion() = delete;
 
 		///
-		Quaternion(init::NoneTag);
+		Quaternion(InitNoneTag);
 
 		///
-		constexpr Quaternion(init::ZeroTag);
+		constexpr Quaternion(InitZeroTag);
 
 		///
-		constexpr Quaternion(init::IdentityTag);
+		constexpr Quaternion(InitIdentityTag);
 
 		///
 		constexpr Quaternion(float _x, float _y, float _z, float _w);

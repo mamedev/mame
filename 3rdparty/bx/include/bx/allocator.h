@@ -33,13 +33,6 @@
 #define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align), _type)
 #define BX_PLACEMENT_NEW(_ptr, _type)             ::new(bx::PlacementNew, _ptr) _type
 
-namespace bx
-{
-	struct    PlacementNewTag {};
-	constexpr PlacementNewTag PlacementNew;
-
-} // namespace bx
-
 void* operator new(size_t, bx::PlacementNewTag, void* _ptr);
 void  operator delete(void*, bx::PlacementNewTag, void*) throw();
 

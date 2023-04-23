@@ -128,8 +128,8 @@ namespace bx
 
 	void toAabb(Aabb& _outAabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
 	{
-		Vec3 mn(init::None);
-		Vec3 mx(init::None);
+		Vec3 mn(InitNone);
+		Vec3 mx(InitNone);
 		uint8_t* vertex = (uint8_t*)_vertices;
 
 		mn = mx = load<Vec3>(vertex);
@@ -150,8 +150,8 @@ namespace bx
 
 	void toAabb(Aabb& _outAabb, const float* _mtx, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
 	{
-		Vec3 mn(init::None);
-		Vec3 mx(init::None);
+		Vec3 mn(InitNone);
+		Vec3 mx(InitNone);
 		uint8_t* vertex = (uint8_t*)_vertices;
 		mn = mx = mul(load<Vec3>(vertex), _mtx);
 
@@ -284,7 +284,7 @@ namespace bx
 
 		uint8_t* vertex = (uint8_t*)_vertices;
 
-		Vec3 center(init::None);
+		Vec3 center(InitNone);
 		float* position = (float*)&vertex[0];
 		center.x = position[0];
 		center.y = position[1];
@@ -592,8 +592,8 @@ namespace bx
 			return intersect(_ray, sphere, _hit);
 		}
 
-		Plane plane(init::None);
-		Vec3 pos(init::None);
+		Plane plane(InitNone);
+		Vec3 pos(InitNone);
 
 		if (0.0f >= height)
 		{
@@ -898,14 +898,14 @@ namespace bx
 
 	struct Srt
 	{
-		Quaternion rotation    = init::Identity;
-		Vec3       translation = init::Zero;
-		Vec3       scale       = init::Zero;
+		Quaternion rotation    = InitIdentity;
+		Vec3       translation = InitZero;
+		Vec3       scale       = InitZero;
 	};
 
 	Srt toSrt(const Aabb& _aabb)
 	{
-		return { init::Identity, getCenter(_aabb), getExtents(_aabb) };
+		return { InitIdentity, getCenter(_aabb), getExtents(_aabb) };
 	}
 
 	Srt toSrt(const void* _mtx)
@@ -1196,7 +1196,7 @@ namespace bx
 
 	Vec3 closestPoint(const Triangle& _triangle, const Vec3& _point)
 	{
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _triangle);
 
 		const Vec3 pos = closestPoint(plane, _point);
@@ -1255,7 +1255,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _triangle);
 
 		if (!overlap(_aabb, plane) )
@@ -1314,7 +1314,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		return overlap(_aabb, plane);
@@ -1366,10 +1366,10 @@ namespace bx
 		const Vec3 by = toYAxis(_srtB.rotation);
 		const Vec3 bz = toZAxis(_srtB.rotation);
 
-		Vec3 vertsA[8] = { init::None, init::None, init::None, init::None, init::None, init::None, init::None, init::None };
-		calcObbVertices(vertsA, ax, ay, az, init::Zero, _srtA.scale);
+		Vec3 vertsA[8] = { InitNone, InitNone, InitNone, InitNone, InitNone, InitNone, InitNone, InitNone };
+		calcObbVertices(vertsA, ax, ay, az, InitZero, _srtA.scale);
 
-		Vec3 vertsB[8] = { init::None, init::None, init::None, init::None, init::None, init::None, init::None, init::None };
+		Vec3 vertsB[8] = { InitNone, InitNone, InitNone, InitNone, InitNone, InitNone, InitNone, InitNone };
 		calcObbVertices(vertsB, bx, by, bz, sub(_srtB.translation, _srtA.translation), _srtB.scale);
 
 		return overlaps(ax,            vertsA, vertsB)
@@ -1543,7 +1543,7 @@ namespace bx
 
 	bool overlap(const Disk& _disk, const Vec3& _pos)
 	{
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		if (!isNearZero(distance(plane, _pos) ) )
@@ -1556,7 +1556,7 @@ namespace bx
 
 	bool overlap(const Disk& _disk, const Plane& _plane)
 	{
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		if (!overlap(plane, _plane) )
@@ -1574,7 +1574,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		return overlap(_capsule, plane);
@@ -1582,10 +1582,10 @@ namespace bx
 
 	bool overlap(const Disk& _diskA, const Disk& _diskB)
 	{
-		Plane planeA(init::None);
+		Plane planeA(InitNone);
 		calcPlane(planeA, _diskA.normal, _diskA.center);
 
-		Plane planeB(init::None);
+		Plane planeB(InitNone);
 		calcPlane(planeB, _diskB);
 
 		Line line;
@@ -1614,7 +1614,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		return overlap(_obb, plane);
@@ -1744,7 +1744,7 @@ namespace bx
 
 	bool overlap(const Sphere& _sphere, const Triangle& _triangle)
 	{
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _triangle);
 
 		if (!overlap(_sphere, plane) )
@@ -1782,7 +1782,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		return overlap(_sphere, plane);
@@ -1852,7 +1852,7 @@ namespace bx
 	template<typename Ty>
 	bool overlap(const Triangle& _triangle, const Ty& _ty)
 	{
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _triangle);
 
 		plane.normal = neg(plane.normal);
@@ -2011,7 +2011,7 @@ namespace bx
 			return false;
 		}
 
-		Plane plane(init::None);
+		Plane plane(InitNone);
 		calcPlane(plane, _disk.normal, _disk.center);
 
 		return overlap(_triangle, plane);

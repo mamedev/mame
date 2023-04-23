@@ -13,53 +13,53 @@ namespace bx
 	///
 	struct Line
 	{
-		Vec3 pos = init::None;
-		Vec3 dir = init::None;
+		Vec3 pos = InitNone;
+		Vec3 dir = InitNone;
 	};
 
 	///
 	struct LineSegment
 	{
-		Vec3 pos = init::None;
-		Vec3 end = init::None;
+		Vec3 pos = InitNone;
+		Vec3 end = InitNone;
 	};
 
 	///
 	struct Aabb
 	{
-		Vec3 min = init::None;
-		Vec3 max = init::None;
+		Vec3 min = InitNone;
+		Vec3 max = InitNone;
 	};
 
 	///
 	struct Capsule
 	{
-		Vec3  pos = init::None;
-		Vec3  end = init::None;
+		Vec3  pos = InitNone;
+		Vec3  end = InitNone;
 		float radius;
 	};
 
 	///
 	struct Cone
 	{
-		Vec3  pos = init::None;
-		Vec3  end = init::None;
+		Vec3  pos = InitNone;
+		Vec3  end = InitNone;
 		float radius;
 	};
 
 	///
 	struct Cylinder
 	{
-		Vec3  pos = init::None;
-		Vec3  end = init::None;
+		Vec3  pos = InitNone;
+		Vec3  end = InitNone;
 		float radius;
 	};
 
 	///
 	struct Disk
 	{
-		Vec3  center = init::None;
-		Vec3  normal = init::None;
+		Vec3  center = InitNone;
+		Vec3  normal = InitNone;
 		float radius;
 	};
 
@@ -72,30 +72,30 @@ namespace bx
 	///
 	struct Sphere
 	{
-		Vec3  center = init::None;
+		Vec3  center = InitNone;
 		float radius;
 	};
 
 	///
 	struct Triangle
 	{
-		Vec3 v0 = init::None;
-		Vec3 v1 = init::None;
-		Vec3 v2 = init::None;
+		Vec3 v0 = InitNone;
+		Vec3 v1 = InitNone;
+		Vec3 v2 = InitNone;
 	};
 
 	///
 	struct Ray
 	{
-		Vec3 pos = init::None;
-		Vec3 dir = init::None;
+		Vec3 pos = InitNone;
+		Vec3 dir = InitNone;
 	};
 
 	///
 	struct Hit
 	{
-		Vec3  pos   = init::None;
-		Plane plane = init::None;
+		Vec3  pos   = InitNone;
+		Plane plane = InitNone;
 	};
 
 	///
