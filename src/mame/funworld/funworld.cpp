@@ -103,6 +103,7 @@
   * Multi Win (EPM7032, encrypted),                                Amatic,               2001.
   * Power Card (Ver 0263, encrypted),                              Fun World,            1993.
   * Mega Card (Ver.0210, encrypted),                               Fun World,            1993.
+  * Mega Card (Ver.0053, encrypted),                               Fun World,            1992.
   * Joker Card 300 (Ver.A267BC, encrypted),                        Amatic Trading,       1993.
   * Royal Card (Evona, Polish, encrypted),                         Evona Electronic,     1991.
   * Saloon (French, encrypted),                                    unknown,              199?.
@@ -138,7 +139,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 118
+  Supported games: 119
 
 
 **********************************************************************************************
@@ -7007,6 +7008,42 @@ ROM_START( megacard )
 	ROM_LOAD( "megacard_pal16l8.bin",  0x0000, 0x0117, CRC(3159a548) SHA1(ad904fa35b78570e44323469967803e34ef4bc0c) )
 ROM_END
 
+/*
+
+  Mega Card (MC3).
+  Ver. 0053.
+  Fun World, 1992.
+  
+  CPU F - 10/03/1992.
+
+  Encrypted poker game.
+
+*/
+
+ROM_START( megacarda )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "megamc3_0057-f-1.ic37",  0x8000, 0x8000, CRC(ca3becc0) SHA1(04dd8cebc53241d35eab842766b59e0f0e091b86) )  // just the 2nd half
+	ROM_LOAD( "megamc3_0057-f-2.ic41",  0x0000, 0x8000, CRC(91add9f8) SHA1(b0fe9015fe4760de73f2ee00c89a16c19340a884) )  // just the 2nd half
+
+	ROM_REGION( 0x0300, "die_65sc02", 0 )   // from the 65SC02 die inside of the custom CPU, version 0210.
+	ROM_LOAD( "gteu65decoderom.bin",   0x0000, 0x02f1, CRC(089af0c6) SHA1(0f46a73a7859a694a07ebe74d476fae80e57e329) )
+
+	ROM_REGION( 0x0800, "decode", 0 )   // from the CY7C291A inside of the custom CPU, version 0210.
+	ROM_LOAD( "megacard_cy7291a.bin",  0x0000, 0x0800, CRC(596f01ac) SHA1(a8606a1dd385fbb46b1a96f11a759fa6580803d8) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
+	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+//  bit 01 fixed to 0 along the whole dump, plus a few different values...
+//	ROM_LOAD( "n82s147an.ic3",  0x0000, 0x0200, CRC(029b94b4) SHA1(2d7fc223e1765688c34bb9f77a4b3b7917e9f95d) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "megacarda_pal16l8.bin",  0x0000, 0x0117, BAD_DUMP CRC(3159a548) SHA1(ad904fa35b78570e44323469967803e34ef4bc0c) )  // waiting for the proper dump.
+ROM_END
+
 
 /*
   Joker Card 300
@@ -8804,6 +8841,7 @@ GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_in
 GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
+GAME(  1993, megacarda,  megacard, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0053, encrypted)",                 0 )
 GAME(  1993, jokercrd,   0,        jokercrd, funworld,  jokercrd_state, empty_init,    ROT0, "Amatic Trading",    "Joker Card 300 (Ver.A267BC, encrypted)",          0 )
 GAME(  1991, royalcrdf,  royalcrd, royalcrdf,royalcrdf, royalcrdf_state,driver_init,   ROT0, "Evona Electronic",  "Royal Card (Evona, Polish, encrypted)",           0 )
 GAME(  198?, saloon,     0,        saloon,   saloon,    funworld_state, init_saloon,   ROT0, "<unknown>",         "Saloon (French, encrypted)",                      0 )
