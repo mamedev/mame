@@ -37,7 +37,7 @@ namespace bx
 				BX_UNUSED(_filePath, _line);
 				_aligned_free(_ptr);
 #	else
-				alignedFree(this, _ptr, _align, _file, _line);
+				alignedFree(this, _ptr, _align, Location(_filePath, _line) );
 #	endif // BX_
 			}
 
@@ -54,7 +54,7 @@ namespace bx
 			BX_UNUSED(_filePath, _line);
 			return _aligned_malloc(_size, _align);
 #	else
-			return alignedAlloc(this, _size, _align, _file, _line);
+			return alignedAlloc(this, _size, _align, Location(_filePath, _line) );
 #	endif // BX_
 		}
 
@@ -67,7 +67,7 @@ namespace bx
 		BX_UNUSED(_filePath, _line);
 		return _aligned_realloc(_ptr, _size, _align);
 #	else
-		return alignedRealloc(this, _ptr, _size, _align, _file, _line);
+		return alignedRealloc(this, _ptr, _size, _align, Location(_filePath, _line) );
 #	endif // BX_
 	}
 
