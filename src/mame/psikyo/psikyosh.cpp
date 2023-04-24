@@ -1184,7 +1184,7 @@ ROM_START( s1945iiibla ) // SK000420 PCB
 
 	ROM_REGION( 0x0400, "pals", 0 )
 	ROM_LOAD( "gal16v8d_1", 0x0000, 0x0117, CRC(efac207d) SHA1(0e1ada029a90efbc557cad1b0ec81b7904e69bd4) ) // GAL16V8D - bruteforced
-	ROM_LOAD( "gal16v8d_1", 0x0200, 0x0117, CRC(72afa479) SHA1(959129da59d254c60e6e0e1061512d14a62ee2bf) ) // GAL16V8D - bruteforced
+	ROM_LOAD( "gal16v8d_2", 0x0200, 0x0117, CRC(72afa479) SHA1(959129da59d254c60e6e0e1061512d14a62ee2bf) ) // GAL16V8D - bruteforced
 
 ROM_END
 
