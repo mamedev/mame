@@ -45,7 +45,7 @@ Mr Driller 2 (DR23 Ver.A)                                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
 NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
 Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
-Panicuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
+Panikuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
 *Peter The Shepherd                                              (C) Namco, 2003
 *Photo Battle (PBT1 Ver.B)                                       (C) Namco, 2001
 Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
@@ -303,7 +303,7 @@ Medal no Tatsujin 2                                 MTA1  STMPR0A KC048A   8E, 8
 Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A           I/O board = none
 NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A           also has a Namco System10 EXIO PCB
 Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8D               N/A           I/O board = ?
-Panicuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A           I/O board = none
+Panikuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A           I/O board = none
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
 Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
@@ -3695,7 +3695,7 @@ GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_sta
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
 GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
