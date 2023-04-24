@@ -3299,7 +3299,7 @@ namespace bimg
 		const uint8_t numMips = _hasMips ? imageGetNumMips(_format, _width, _height, _depth) : 1;
 		uint32_t size = imageGetSize(NULL, _width, _height, _depth, _cubeMap, _hasMips, _numLayers, _format);
 
-		ImageContainer* imageContainer = (ImageContainer*)BX_ALIGNED_ALLOC(_allocator, size + bx::alignUp(sizeof(ImageContainer), 16), 16);
+		ImageContainer* imageContainer = (ImageContainer*)bx::alignedAlloc(_allocator, size + bx::alignUp(sizeof(ImageContainer), 16), 16);
 
 		imageContainer->m_allocator   = _allocator;
 		imageContainer->m_data        = bx::alignPtr(imageContainer + 1, 0, 16);
@@ -3330,7 +3330,7 @@ namespace bimg
 
 	void imageFree(ImageContainer* _imageContainer)
 	{
-		BX_ALIGNED_FREE(_imageContainer->m_allocator, _imageContainer, 16);
+		bx::alignedFree(_imageContainer->m_allocator, _imageContainer, 16);
 	}
 
 // DDS
@@ -4459,10 +4459,10 @@ namespace bimg
 			if (isCompressed(_srcFormat))
 			{
 				uint32_t size = imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, TextureFormat::RGBA8);
-				void* temp = BX_ALLOC(_allocator, size);
+				void* temp = bx::alloc(_allocator, size);
 				imageDecodeToRgba8(_allocator, temp, _src, _width, _height, _width*4, _srcFormat);
 				imageConvert(_allocator, dst, TextureFormat::R8, temp, TextureFormat::RGBA8, _width, _height, 1, _width*4, _dstPitch);
-				BX_FREE(_allocator, temp);
+				bx::free(_allocator, temp);
 			}
 			else
 			{
@@ -5149,10 +5149,10 @@ namespace bimg
 				if (isCompressed(_srcFormat) )
 				{
 					uint32_t size = imageGetSize(NULL, uint16_t(_width), uint16_t(_height), 0, false, false, 1, TextureFormat::RGBA8);
-					void* temp = BX_ALLOC(_allocator, size);
+					void* temp = bx::alloc(_allocator, size);
 					imageDecodeToRgba8(_allocator, temp, src, _width, _height, _width*4, _srcFormat);
 					imageRgba8ToRgba32f(dst, _width, _height, _width*4, temp);
-					BX_FREE(_allocator, temp);
+					bx::free(_allocator, temp);
 				}
 				else
 				{

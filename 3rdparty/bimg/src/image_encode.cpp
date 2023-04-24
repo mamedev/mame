@@ -279,7 +279,7 @@ namespace bimg
 		default:
 			if (!imageConvert(_allocator, _dst, _dstFormat, _src, TextureFormat::RGBA32F, _width, _height, _depth) )
 			{
-				uint8_t* temp = (uint8_t*)BX_ALLOC(_allocator, _width*_height*_depth*4);
+				uint8_t* temp = (uint8_t*)bx::alloc(_allocator, _width*_height*_depth*4);
 				if (imageConvert(_allocator, temp, TextureFormat::RGBA8, _src, TextureFormat::RGBA32F, _width, _height, _depth) )
 				{
 					for (uint32_t zz = 0; zz < _depth; ++zz)
@@ -310,7 +310,7 @@ namespace bimg
 					BX_ERROR_SET(_err, BIMG_ERROR, "Unable to convert between input/output formats!");
 				}
 
-				BX_FREE(_allocator, temp);
+				bx::free(_allocator, temp);
 			}
 			break;
 		}
@@ -344,20 +344,20 @@ namespace bimg
 			case TextureFormat::ASTC12x10:
 			case TextureFormat::ASTC12x12:
 				{
-					uint8_t* temp = (uint8_t*)BX_ALLOC(_allocator, _width*_height*_depth*4);
+					uint8_t* temp = (uint8_t*)bx::alloc(_allocator, _width*_height*_depth*4);
 					imageDecodeToRgba8(_allocator, temp, _src, _width, _height, _width*4, _srcFormat);
 					imageEncodeFromRgba8(_allocator, _dst, temp, _width, _height, _depth, _dstFormat, _quality, _err);
-					BX_FREE(_allocator, temp);
+					bx::free(_allocator, temp);
 				}
 				break;
 
 			case bimg::TextureFormat::BC6H:
 			case bimg::TextureFormat::BC7:
 				{
-					uint8_t* temp = (uint8_t*)BX_ALLOC(_allocator, _width*_height*_depth*16);
+					uint8_t* temp = (uint8_t*)bx::alloc(_allocator, _width*_height*_depth*16);
 					imageDecodeToRgba32f(_allocator, temp, _src, _width, _height, _depth, _width*16, _srcFormat);
 					imageEncodeFromRgba32f(_allocator, _dst, temp, _width, _height, _depth, _dstFormat, _quality, _err);
-					BX_FREE(_allocator, temp);
+					bx::free(_allocator, temp);
 				}
 				break;
 
@@ -449,10 +449,10 @@ namespace bimg
 	{
 		const uint32_t numPixels = _width*_height;
 
-		short* xdist = (short *)BX_ALLOC(_allocator, numPixels*sizeof(short) );
-		short* ydist = (short *)BX_ALLOC(_allocator, numPixels*sizeof(short) );
-		double* gx   = (double*)BX_ALLOC(_allocator, numPixels*sizeof(double) );
-		double* gy   = (double*)BX_ALLOC(_allocator, numPixels*sizeof(double) );
+		short* xdist = (short *)bx::alloc(_allocator, numPixels*sizeof(short) );
+		short* ydist = (short *)bx::alloc(_allocator, numPixels*sizeof(short) );
+		double* gx   = (double*)bx::alloc(_allocator, numPixels*sizeof(double) );
+		double* gy   = (double*)bx::alloc(_allocator, numPixels*sizeof(double) );
 
 		::computegradient(_src, _width, _height, gx, gy);
 		::edtaa3(_src, gx, gy, _width, _height, xdist, ydist, _dst);
@@ -465,19 +465,19 @@ namespace bimg
 			}
 		}
 
-		BX_FREE(_allocator, xdist);
-		BX_FREE(_allocator, ydist);
-		BX_FREE(_allocator, gx);
-		BX_FREE(_allocator, gy);
+		bx::free(_allocator, xdist);
+		bx::free(_allocator, ydist);
+		bx::free(_allocator, gx);
+		bx::free(_allocator, gy);
 	}
 
 	void imageMakeDist(bx::AllocatorI* _allocator, void* _dst, uint32_t _width, uint32_t _height, uint32_t _srcPitch, const void* _src)
 	{
 		const uint32_t numPixels = _width*_height;
 
-		double* imgIn   = (double*)BX_ALLOC(_allocator, numPixels*sizeof(double) );
-		double* outside = (double*)BX_ALLOC(_allocator, numPixels*sizeof(double) );
-		double* inside  = (double*)BX_ALLOC(_allocator, numPixels*sizeof(double) );
+		double* imgIn   = (double*)bx::alloc(_allocator, numPixels*sizeof(double) );
+		double* outside = (double*)bx::alloc(_allocator, numPixels*sizeof(double) );
+		double* inside  = (double*)bx::alloc(_allocator, numPixels*sizeof(double) );
 
 		for (uint32_t yy = 0; yy < _height; ++yy)
 		{
@@ -498,7 +498,7 @@ namespace bimg
 
 		edtaa3(_allocator, inside, _width, _height, imgIn);
 
-		BX_FREE(_allocator, imgIn);
+		bx::free(_allocator, imgIn);
 
 		uint8_t* dst = (uint8_t*)_dst;
 
@@ -508,8 +508,8 @@ namespace bimg
 			dst[ii] = 255-uint8_t(dist * 255.0);
 		}
 
-		BX_FREE(_allocator, inside);
-		BX_FREE(_allocator, outside);
+		bx::free(_allocator, inside);
+		bx::free(_allocator, outside);
 	}
 
 	static const iqa_ssim_args s_iqaArgs =
