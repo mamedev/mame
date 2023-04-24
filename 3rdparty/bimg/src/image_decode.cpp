@@ -519,7 +519,7 @@ namespace bimg
 						stepA  = 1;
 					}
 
-					data   = (uint8_t*)BX_ALLOC(_allocator, exrImage.width * exrImage.height * dstBpp/8);
+					data   = (uint8_t*)bx::alloc(_allocator, exrImage.width * exrImage.height * dstBpp/8);
 					width  = exrImage.width;
 					height = exrImage.height;
 
@@ -627,7 +627,7 @@ namespace bimg
 				, false
 				, data
 				);
-			BX_FREE(_allocator, data);
+			bx::free(_allocator, data);
 			output->m_hasAlpha = hasAlpha;
 		}
 
