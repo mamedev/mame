@@ -34,6 +34,7 @@
   * Jolly Card (Italian, bootleg, set 1),                          bootleg,              1990.
   * Jolly Card (Italian, bootleg, set 2),                          bootleg,              1993.
   * Jolly Card (Italian, bootleg, set 3),                          bootleg,              1990.
+  * Jolly Game (V1, Otti Karl logo),                               bootleg,              1993.
   * Bonus Card (German),                                           Fun World,            1986.
   * Bonus Card (German, ATG Electronic hack),                      Fun World,            1986.
   * Big Deal (Hungarian, set 1),                                   Fun World,            1986.
@@ -141,7 +142,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 121
+  Supported games: 122
 
 
 **********************************************************************************************
@@ -4533,6 +4534,28 @@ ROM_START( jolycdab )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
+/*
+  Jolly Game (V1, Otti Karl logo)
+  1993.
+
+  Color info in 2nd half of the Bipolar PROM.
+
+*/
+ROM_START( jolygame )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jg_99.1.bin", 0x8000, 0x8000, CRC(4154478f) SHA1(050340d75aa9a4b93025eef3507a8cfe220c466b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(db147426) SHA1(f97f3fed13e2723a3b32eb146cd7c16b54088d61) )
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(e7e7a0fd) SHA1(232190a0b2086e12ea3d77652ef98c9e107b3dc7) )
+
+	ROM_REGION( 0x0800, "ds1220", 0 )
+	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(4364b423) SHA1(01c8d5e3003f4a9cc8ec446ddc18ff83353688df) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s29apc.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
+ROM_END
+
 
 /******************************** Bonus Card based sets ************************************/
 
@@ -8803,6 +8826,7 @@ GAMEL( 1990, jolycdie,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_in
 GAMEL( 1990, jolycdif,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
 GAMEL( 1993, jolycdig,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_jolycdig, ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 2)",            0,                       layout_jollycrd ) // italian, CPLD. needs nvram.
 GAMEL( 1990, jolycdih,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 3)",            0,                       layout_jollycrd )
+GAMEL( 1993, jolygame,   jollycrd, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Game (V1, Otti Karl logo)",                 MACHINE_NOT_WORKING,     layout_jollycrd )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,   0,        fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",         "Bonus Card (German)",                             MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
