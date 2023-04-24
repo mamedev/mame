@@ -17660,7 +17660,7 @@ legacy FM implementations cannot find it.
 	</software>
 
 	<software name="whisitp" cloneof="whisit">
-		<description>Where Is It? The Quest for the 10th Island (proto)</description>
+		<description>Where Is It? The Quest for the 10th Island (prototype)</description>
 		<year>2021</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Eric Mendel"/>
