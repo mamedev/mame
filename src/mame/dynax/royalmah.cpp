@@ -176,9 +176,9 @@ protected:
 	optional_region_ptr<uint8_t> m_gfx_rom;
 
 	// used by most games
-	uint8_t m_dsw_select;
-	uint8_t m_palette_base;
-	uint8_t m_flip_screen;
+	uint8_t m_dsw_select = 0;
+	uint8_t m_palette_base = 0;
+	uint8_t m_flip_screen = 0;
 
 private:
 	void jansou_dsw_sel_w(uint8_t data);
@@ -210,16 +210,16 @@ private:
 	void jansou_sub_map(address_map &map) ATTR_COLD;
 
 	// used by most games
-	uint8_t m_input_port_select;
+	uint8_t m_input_port_select = 0;
 
 	// game-specific
-	uint8_t m_gfx_adr_l;
-	uint8_t m_gfx_adr_m;
-	uint8_t m_gfx_adr_h;
-	uint32_t m_gfx_adr;
-	uint8_t m_gfxdata0;
-	uint8_t m_gfxdata1;
-	uint8_t m_jansou_colortable[16];
+	uint8_t m_gfx_adr_l = 0;
+	uint8_t m_gfx_adr_m = 0;
+	uint8_t m_gfx_adr_h = 0;
+	uint32_t m_gfx_adr = 0;
+	uint8_t m_gfxdata0 = 0;
+	uint8_t m_gfxdata1 = 0;
+	uint8_t m_jansou_colortable[16] = { };
 };
 
 
@@ -389,13 +389,13 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	// used by most games
-	uint8_t m_rombank;
+	uint8_t m_rombank = 0;
 
 	// game-specific
 	std::unique_ptr<uint8_t[]> m_janptr96_nvram;
 
-	uint8_t m_suzume_bank;
-	uint8_t m_mjyarou_bank;
+	uint8_t m_suzume_bank = 0;
+	uint8_t m_mjyarou_bank = 0;
 };
 
 
@@ -405,8 +405,6 @@ void royalmah_state::machine_start()
 	save_item(NAME(m_dsw_select));
 	save_item(NAME(m_palette_base));
 	save_item(NAME(m_flip_screen));
-
-	m_palette_base = 0;
 }
 
 void royalmah_state::royalmah_palette(palette_device &palette) const
@@ -1088,11 +1086,10 @@ void royalmah_prgbank_state::mjsiyoub_audio_prg_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 }
 
+
 /****************************************************************************
                                 Jansou
 ****************************************************************************/
-
-
 
 void royalmah_state::jansou_dsw_sel_w(uint8_t data)
 {
@@ -1269,10 +1266,10 @@ void royalmah_prgbank_state::janptr96_iomap(address_map &map)
 	map(0xd9, 0xd9).portr("SYSTEM").nopw(); // second input select?
 }
 
+
 /****************************************************************************
                                 Mahjong If
 ****************************************************************************/
-
 
 void royalmah_prgbank_state::mjifb_coin_counter_w(uint8_t data)
 {
@@ -5729,7 +5726,6 @@ void royalmah_prgbank_state::init_mjtensin()
 	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_cafetime()
@@ -5737,7 +5733,6 @@ void royalmah_prgbank_state::init_cafetime()
 	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_mjvegasa()
@@ -5745,7 +5740,6 @@ void royalmah_prgbank_state::init_mjvegasa()
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_jongshin()
@@ -5758,7 +5752,6 @@ void royalmah_prgbank_state::init_mjifb()
 	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_tontonb()
