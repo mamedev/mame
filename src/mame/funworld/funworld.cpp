@@ -6557,11 +6557,14 @@ ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
 	ROM_LOAD( "jolly_joker_standard_09.90.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
-	ROM_LOAD( "02.bin", 0x0000, 0x10000, CRC(dedfdba6) SHA1(fe189dde83bd855f4a0b34b20c161a9addc15017) )
+	ROM_LOAD( "02.bin", 0x0000, 0x10000, CRC(dedf3bcc) SHA1(d534005ada564aae08c02422cdb405599489aa0a) )
 	ROM_CONTINUE(       0x0000, 0x10000)   // discarding 1st empty half (0000-ffff)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "jolyjokrs_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "63s481n.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
@@ -6577,6 +6580,9 @@ ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
+	ROM_LOAD( "jolyjokrt_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
