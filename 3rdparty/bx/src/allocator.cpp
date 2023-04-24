@@ -21,7 +21,7 @@ namespace bx
 	{
 	}
 
-	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _filePath, uint32_t _line)
 	{
 		if (0 == _size)
 		{
@@ -34,7 +34,7 @@ namespace bx
 				}
 
 #	if BX_COMPILER_MSVC
-				BX_UNUSED(_file, _line);
+				BX_UNUSED(_filePath, _line);
 				_aligned_free(_ptr);
 #	else
 				alignedFree(this, _ptr, _align, _file, _line);
@@ -51,7 +51,7 @@ namespace bx
 			}
 
 #	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
+			BX_UNUSED(_filePath, _line);
 			return _aligned_malloc(_size, _align);
 #	else
 			return alignedAlloc(this, _size, _align, _file, _line);
@@ -64,7 +64,7 @@ namespace bx
 		}
 
 #	if BX_COMPILER_MSVC
-		BX_UNUSED(_file, _line);
+		BX_UNUSED(_filePath, _line);
 		return _aligned_realloc(_ptr, _size, _align);
 #	else
 		return alignedRealloc(this, _ptr, _size, _align, _file, _line);

@@ -7,8 +7,8 @@
 
 namespace
 {
-#define INI_MALLOC(_ctx, _size)        (BX_ALLOC(reinterpret_cast<bx::AllocatorI*>(_ctx), _size) )
-#define INI_FREE(_ctx, _ptr)           (BX_FREE(reinterpret_cast<bx::AllocatorI*>(_ctx), _ptr) )
+#define INI_MALLOC(_ctx, _size)        (bx::alloc(reinterpret_cast<bx::AllocatorI*>(_ctx), _size) )
+#define INI_FREE(_ctx, _ptr)           (bx::free(reinterpret_cast<bx::AllocatorI*>(_ctx), _ptr) )
 #define INI_MEMCPY(_dst, _src, _count) (bx::memCopy(_dst, _src, _count) )
 #define INI_STRLEN(_str)               (bx::strLen(_str) )
 #define INI_STRNICMP(_s1, _s2, _len)   (bx::strCmpI(_s1, _s2, _len) )
@@ -170,12 +170,12 @@ int32_t Settings::read(ReaderSeekerI* _reader, Error* _err)
 {
 	int32_t size = int32_t(getRemain(_reader) );
 
-	void* data = BX_ALLOC(m_allocator, size);
+	void* data = bx::alloc(m_allocator, size);
 
 	int32_t total = bx::read(_reader, data, size, _err);
 	load(data, size);
 
-	BX_FREE(m_allocator, data);
+	bx::free(m_allocator, data);
 
 	return total;
 }
@@ -185,12 +185,12 @@ int32_t Settings::write(WriterI* _writer, Error* _err) const
 	ini_t* ini = INI_T(m_ini);
 
 	int32_t size = ini_save(ini, NULL, 0);
-	void* data = BX_ALLOC(m_allocator, size);
+	void* data = bx::alloc(m_allocator, size);
 
 	ini_save(ini, (char*)data, size);
 	int32_t total = bx::write(_writer, data, size-1, _err);
 
-	BX_FREE(m_allocator, data);
+	bx::free(m_allocator, data);
 
 	return total;
 }
