@@ -12,6 +12,16 @@
 
 namespace bx
 {
+	Location Location::current(const char* _filePath, uint32_t _line)
+	{
+		return Location(_filePath, _line);
+	}
+
+	LocationFull LocationFull::current(const char* _function, const char* _filePath, uint32_t _line)
+	{
+		return LocationFull(_function, _filePath, _line);
+	}
+
 	void swap(void* _a, void* _b, size_t _numBytes)
 	{
 		uint8_t* lhs = (uint8_t*)_a;

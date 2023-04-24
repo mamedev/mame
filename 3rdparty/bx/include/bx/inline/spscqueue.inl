@@ -27,7 +27,7 @@ namespace bx
 		{
 			Node* node = m_first;
 			m_first = node->m_next;
-			BX_DELETE(m_allocator, node);
+			bx::deleteObject(m_allocator, node);
 		}
 	}
 
@@ -39,7 +39,7 @@ namespace bx
 		{
 			Node* node = m_first;
 			m_first = m_first->m_next;
-			BX_DELETE(m_allocator, node);
+			bx::deleteObject(m_allocator, node);
 		}
 	}
 

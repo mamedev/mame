@@ -192,7 +192,7 @@ namespace bx
 			if (len+1 > m_capacity)
 			{
 				const int32_t capacity = alignUp(len+1, 256);
-				ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
+				ptr = (char*)bx::realloc(*AllocatorT, 0 != m_capacity ? ptr : NULL, capacity);
 
 				*const_cast<char**>(&m_ptr) = ptr;
 				m_capacity = capacity;
@@ -216,7 +216,7 @@ namespace bx
 
 		if (0 != m_capacity)
 		{
-			BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
+			bx::free(*AllocatorT, const_cast<char*>(m_ptr) );
 
 			StringView::clear();
 			m_capacity = 0;

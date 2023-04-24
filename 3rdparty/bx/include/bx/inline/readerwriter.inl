@@ -67,7 +67,7 @@ namespace bx
 
 	inline MemoryBlock::~MemoryBlock()
 	{
-		BX_FREE(m_allocator, m_data);
+		bx::free(m_allocator, m_data);
 	}
 
 	inline void* MemoryBlock::more(uint32_t _size)
@@ -75,7 +75,7 @@ namespace bx
 		if (0 < _size)
 		{
 			m_size += _size;
-			m_data = BX_REALLOC(m_allocator, m_data, m_size);
+			m_data = bx::realloc(m_allocator, m_data, m_size);
 		}
 
 		return m_data;

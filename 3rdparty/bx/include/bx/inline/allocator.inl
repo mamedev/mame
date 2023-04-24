@@ -32,46 +32,46 @@ namespace bx
 		return un.ptr;
 	}
 
-	inline void* alloc(AllocatorI* _allocator, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	inline void* alloc(AllocatorI* _allocator, size_t _size, size_t _align, const Location& _location)
 	{
-		return _allocator->realloc(NULL, _size, _align, _file, _line);
+		return _allocator->realloc(NULL, _size, _align, _location.filePath, _location.line);
 	}
 
-	inline void free(AllocatorI* _allocator, void* _ptr, size_t _align, const char* _file, uint32_t _line)
+	inline void free(AllocatorI* _allocator, void* _ptr, size_t _align, const Location& _location)
 	{
-		_allocator->realloc(_ptr, 0, _align, _file, _line);
+		_allocator->realloc(_ptr, 0, _align, _location.filePath, _location.line);
 	}
 
-	inline void* realloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	inline void* realloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const Location& _location)
 	{
-		return _allocator->realloc(_ptr, _size, _align, _file, _line);
+		return _allocator->realloc(_ptr, _size, _align, _location.filePath, _location.line);
 	}
 
-	inline void* alignedAlloc(AllocatorI* _allocator, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	inline void* alignedAlloc(AllocatorI* _allocator, size_t _size, size_t _align, const Location& _location)
 	{
 		const size_t align = max(_align, sizeof(uint32_t) );
 		const size_t total = _size + align;
-		uint8_t* ptr = (uint8_t*)alloc(_allocator, total, 0, _file, _line);
+		uint8_t* ptr = (uint8_t*)alloc(_allocator, total, 0, _location);
 		uint8_t* aligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), align);
 		uint32_t* header = (uint32_t*)aligned - 1;
 		*header = uint32_t(aligned - ptr);
 		return aligned;
 	}
 
-	inline void alignedFree(AllocatorI* _allocator, void* _ptr, size_t _align, const char* _file, uint32_t _line)
+	inline void alignedFree(AllocatorI* _allocator, void* _ptr, size_t _align, const Location& _location)
 	{
 		BX_UNUSED(_align);
 		uint8_t* aligned = (uint8_t*)_ptr;
 		uint32_t* header = (uint32_t*)aligned - 1;
 		uint8_t* ptr = aligned - *header;
-		free(_allocator, ptr, 0, _file, _line);
+		free(_allocator, ptr, 0, _location);
 	}
 
-	inline void* alignedRealloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	inline void* alignedRealloc(AllocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const Location& _location)
 	{
 		if (NULL == _ptr)
 		{
-			return alignedAlloc(_allocator, _size, _align, _file, _line);
+			return alignedAlloc(_allocator, _size, _align, _location);
 		}
 
 		uint8_t* aligned = (uint8_t*)_ptr;
@@ -80,7 +80,7 @@ namespace bx
 
 		const size_t align = max(_align, sizeof(uint32_t) );;
 		const size_t total = _size + align;
-		ptr = (uint8_t*)realloc(_allocator, ptr, total, 0, _file, _line);
+		ptr = (uint8_t*)realloc(_allocator, ptr, total, 0, _location);
 		uint8_t* newAligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), align);
 
 		if (newAligned == aligned)
@@ -96,12 +96,12 @@ namespace bx
 	}
 
 	template <typename ObjectT>
-	inline void deleteObject(AllocatorI* _allocator, ObjectT* _object, size_t _align, const char* _file, uint32_t _line)
+	inline void deleteObject(AllocatorI* _allocator, ObjectT* _object, size_t _align, const Location& _location)
 	{
 		if (NULL != _object)
 		{
 			_object->~ObjectT();
-			free(_allocator, _object, _align, _file, _line);
+			free(_allocator, _object, _align, _location);
 		}
 	}
 
