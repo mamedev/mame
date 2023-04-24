@@ -56,6 +56,7 @@ Mephisto III program module:
 - HCF4556BE (chip select?)
 
 ESB 6000 chessboard:
+- PCB label: DH 5000 00111 12 B
 - CD4017, 74373, 74374
 - 64 reed switches (magnet sensors)
 - 64 leds + power led
