@@ -97,6 +97,8 @@
   * Jolly Joker (Apple Time),                                      Apple Time,           199?.
   * Jolly Joker (original program, interleaved GFX, Impera logo),  Impera,               199?.
   * Jolly Joker (original program, interleaved GFX, no logo),      Impera,               199?.
+  * Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 1), Impera,      199?.
+  * Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 2), Impera,      199?.
   * Jolly Joker (Solid State module in suicide board).             Impera,               199?.
   * Multi Win (Ver.0167, encrypted),                               Fun World,            1992.
   * Multi Win (Ver.0091, encrypted),                               Fun World,            1991.
@@ -139,7 +141,7 @@
   * Royal Card (stealth with MSX multigame),                       bootleg,              1991.
 
 
-  Supported games: 119
+  Supported games: 121
 
 
 **********************************************************************************************
@@ -6211,7 +6213,7 @@ ROM_START( vegasslw )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasslw_nvram.bin", 0x0000, 0x0800, CRC(1aa043e3) SHA1(c93d071effb2f2fe95e9dc751174c2c765595f74) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6227,7 +6229,7 @@ ROM_START( vegasfst )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasfst_nvram.bin", 0x0000, 0x0800, CRC(5034de7a) SHA1(ab2077a49d94676531c73ad8d8ce9548bbfa2b81) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6243,7 +6245,7 @@ ROM_START( vegasfte )   // Royal Vegas Joker Card (fast deal, english gfx)
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "vegasfte_nvram.bin", 0x0000, 0x0800, CRC(166c6055) SHA1(db2143a2a3adc92578bd3707391d2f5030cc6a6f) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "jokercrd_prom.bin", 0x0000, 0x0200, CRC(e59fc06e) SHA1(88a3bb89f020fe2b20f768ca010a082e0b974831) )
 ROM_END
 
@@ -6511,7 +6513,7 @@ ROM_START( jolyjokro )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "impera2.bin", 0x0000, 0x10000, CRC(aa86dba6) SHA1(fe189dde83bd855f4a0b34b20c161a9addc15017) )
-	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1nd empty half (0000-ffff)
+	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1st empty half (0000-ffff)
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
@@ -6519,7 +6521,7 @@ ROM_START( jolyjokro )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokro_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "1_impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
 ROM_END
 
@@ -6529,7 +6531,7 @@ ROM_START( jolyjokrp )
 
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "9c_1ff1.bin", 0x00000, 0x10000, CRC(4b8f0821) SHA1(0821eed07f5e98b66d87a3079756dad72ffe9665) )
-	ROM_CONTINUE(            0x00000, 0x10000)  // discarding 1nd half (0000-ffff), but has some data. leftover?
+	ROM_CONTINUE(            0x00000, 0x10000)  // discarding 1st half (0000-ffff), but has some data. leftover?
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
@@ -6537,9 +6539,49 @@ ROM_START( jolyjokrp )
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrp_nvram.bin", 0x0000, 0x0800, CRC(c8706e75) SHA1(421420b1ee82615faf290d1204342cdde776ffaf) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "impera_color_ii.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
 ROM_END
+
+/*
+  Jolly Joker (Otti Karl logo)
+  Original Impera program.
+  
+  Both sets have graphics ROMs data interleaved
+  inside the second half of a 16bit 27C210 EPROM.
+  The second set has full garbage in the first half.
+
+*/
+ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jolly_joker_standard_09.90.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "02.bin", 0x0000, 0x10000, CRC(dedfdba6) SHA1(fe189dde83bd855f4a0b34b20c161a9addc15017) )
+	ROM_CONTINUE(       0x0000, 0x10000)   // discarding 1st empty half (0000-ffff)
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "63s481n.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+ROM_END
+
+ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.bin", 0x0000, 0x10000, CRC(3cad9fcf) SHA1(09f23ae8c04e6b461e17a8b3978fe44566ffc3aa) )
+
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "d27c210.bin", 0x0000, 0x10000, CRC(132e4747) SHA1(255976f672dd7cf755e198617f7d895f7b888ae7) )
+	ROM_CONTINUE(            0x0000, 0x10000)   // discarding 1st half (0000-ffff) full of garbage
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x10000, 0xff)   // deinterleaved GFX data will be placed here
+
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
+	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+ROM_END
+
 
 /*
   Jolly Joker
@@ -7550,7 +7592,7 @@ ROM_START( novoplay )   // Similar to Royal Vegas Joker Card
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "novoplay_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "np1_27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
@@ -7568,7 +7610,7 @@ ROM_START( novoplaya )
 //	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 //	ROM_LOAD( "novoplaya_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "n82s147an.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
@@ -7589,7 +7631,7 @@ ROM_START( novoplayb )
 //	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 //	ROM_LOAD( "novoplayb_nvram.bin", 0x0000, 0x0800, CRC(92019972) SHA1(e6d1e231cd2ce27e718ed9482dbe9ddc8612eb67) )
 
-	ROM_REGION( 0x0200, "proms", 0 )    // PLD address the 2nd half
+	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
@@ -8833,6 +8875,8 @@ GAMEL( 199?, jolyjokrb2, jolyjokr, fw1stpal, funworld,  funworld_state, empty_in
 GAMEL( 199?, jolyjokrc,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Apple Time",        "Jolly Joker (Apple Time)",                        MACHINE_NOT_WORKING,     layout_jollycrd )  // bad program ROM...
 GAMEL( 199?, jolyjokro,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Impera logo)",  0,         layout_jollycrd )
 GAMEL( 199?, jolyjokrp,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, no logo)",      0,         layout_jollycrd )
+GAMEL( 199?, jolyjokrs,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 1)", 0, layout_jollycrd )
+GAMEL( 199?, jolyjokrt,  jolyjokr, fw2ndpal, funworld,  funworld_state, init_impera16, ROT0, "Impera",            "Jolly Joker (original program, interleaved GFX, Otti Karl logo, set 2)", 0, layout_jollycrd )
 GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_init,    ROT0, "Impera",            "Jolly Joker (Solid State module in suicide board)", 0,                     layout_jollycrd )
 
 // Encrypted games...
