@@ -456,12 +456,12 @@ WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
+	uint16_t romdata = lten ? 0x3ff : vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	pen_t const *const pen = m_palette->pens();
 
 	for (int i = 0; i < 10; i++)
 	{
-		int color = ((romdata & 0xc0) != 0) ^ rvv;
+		int color = ((romdata & 0x300) != 0) ^ rvv;
 
 		bitmap.pix(y, x + i) = pen[color];
 		romdata <<= 1;
@@ -473,7 +473,7 @@ void wicat_state::wicat(machine_config &config)
 	M68000(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	MOS6522(config, m_via, 8_MHz_XTAL);
+	MOS6522(config, m_via, 8_MHz_XTAL / 10); // divider guessed
 	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
