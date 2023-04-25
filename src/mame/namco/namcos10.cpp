@@ -2583,11 +2583,11 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 		0x0000,
 		[](uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			return ((
-				((previous_cipherwords >> 4) & (gf2_reduce(previous_cipherwords & 0x242800000000) ^ gf2_reduce(previous_plainwords & 0x42100010000))) ^
-				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000) ^ gf2_reduce(previous_plainwords & 0x100084000))) ^
-				((previous_cipherwords >> 35) & (gf2_reduce(previous_cipherwords & 0x58200004) ^ gf2_reduce(previous_plainwords & 0x10000014))) ^
-				((previous_plainwords >> 24) & (gf2_reduce(previous_cipherwords & 0x101220000) ^ gf2_reduce(previous_plainwords & 0x800030010))) ^
-				((previous_cipherwords >> 24 ^ previous_plainwords >> 16 ^ previous_plainwords >> 32) & (gf2_reduce(previous_cipherwords & 0x40200000) ^ gf2_reduce(previous_plainwords & 0x40020010)))
+				((previous_cipherwords >> 4) & (gf2_reduce(previous_cipherwords & 0x242800000000ull) ^ gf2_reduce(previous_plainwords & 0x42100010000ull))) ^
+				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000ull) ^ gf2_reduce(previous_plainwords & 0x100084000ull))) ^
+				((previous_cipherwords >> 35) & (gf2_reduce(previous_cipherwords & 0x58200004ull) ^ gf2_reduce(previous_plainwords & 0x10000014ull))) ^
+				((previous_plainwords >> 24) & (gf2_reduce(previous_cipherwords & 0x101220000ull) ^ gf2_reduce(previous_plainwords & 0x800030010ull))) ^
+				((previous_cipherwords >> 24 ^ previous_plainwords >> 16 ^ previous_plainwords >> 32) & (gf2_reduce(previous_cipherwords & 0x40200000ull) ^ gf2_reduce(previous_plainwords & 0x40020010ull)))
 				) & 1) << 11;
 		}
 		});
