@@ -7116,7 +7116,7 @@ ROM_START( megacarda )
 	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
 
 	ROM_REGION( 0x0200, "proms", 0 )  // original BP has bit 1 = 0 along the dump. the device is damaged. rest of bits match the parent dump.
-	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+	ROM_LOAD( "n82s147an.ic3",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "megacarda_pal16l8.bin",  0x0000, 0x0117, CRC(fcda7872) SHA1(60acdb968e6229a8f71c2e29d22e132906a65bd5) )  // cracked.
