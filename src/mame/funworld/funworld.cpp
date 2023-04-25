@@ -6577,6 +6577,8 @@ ROM_END
   inside the second half of a 16bit 27C210 EPROM.
   The second set has full garbage in the first half.
 
+  The PLD (PAL16L8) was bruteforced.
+
 */
 ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6591,6 +6593,9 @@ ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
 
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrs_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrt one
+	ROM_LOAD( "jolyjokrs_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "63s481n.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
@@ -6609,6 +6614,9 @@ ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
 
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrt_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrs one
+	ROM_LOAD( "jolyjokrt_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
