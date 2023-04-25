@@ -251,7 +251,7 @@ int main(int _argc, const char* _argv[])
 		size = uint32_t(bx::getSize(&fr) );
 
 		bx::DefaultAllocator allocator;
-		data = BX_ALLOC(&allocator, size);
+		data = bx::alloc(&allocator, size);
 		bx::read(&fr, data, size, bx::ErrorAssert{});
 		bx::close(&fr);
 
@@ -270,7 +270,7 @@ int main(int _argc, const char* _argv[])
 			error("Failed to open output file '%.*s'.\n", path.getLength(), path.getPtr() );
 		}
 
-		BX_FREE(&allocator, data);
+		bx::free(&allocator, data);
 	}
 	else
 	{
