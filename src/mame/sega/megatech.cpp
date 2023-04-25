@@ -722,7 +722,7 @@ void mtech_state::megatech(machine_config &config)
 	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
 	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
 
-	config.set_default_layout(layout_dualhovu);
+	config.set_default_layout(layout_dualhuov);
 
 	screen_device &screen(*subdevice<screen_device>("megadriv"));
 	screen.set_raw(XTAL(10'738'635)/2,

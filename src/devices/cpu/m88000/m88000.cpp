@@ -794,7 +794,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2], data))
+				if (carry(m_r[S1], ~m_r[S2] + 1, data))
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -810,7 +810,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2], data))
+				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -901,7 +901,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2], data))
+				if (carry(m_r[S1], ~m_r[S2] + 1, data))
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -917,7 +917,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2], data))
+				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -1453,7 +1453,7 @@ u32 mc88100_device::cmp(u32 const src1, u32 const src2) const
 
 bool mc88100_device::carry(u32 const src1, u32 const src2, u32 const dest) const
 {
-	return ((BIT(src2, 31) && BIT(src1, 31)) || (!BIT(dest, 31) && (BIT(src2, 31) || BIT(src1, 31))));
+	return BIT((src1 & src2) ^ ((src1 ^ src2) & ~dest), 31);
 }
 
 bool mc88100_device::overflow(u32 const src1, u32 const src2, u32 const dest) const
