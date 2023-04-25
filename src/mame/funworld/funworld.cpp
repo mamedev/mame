@@ -4536,7 +4536,7 @@ ROM_END
 
 /*
   Jolly Game (V1, Otti Karl logo)
-  1993.
+  Bootleg. 1993.
 
   Color info in 2nd half of the Bipolar PROM.
 
@@ -4549,8 +4549,11 @@ ROM_START( jolygame )
 	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(db147426) SHA1(f97f3fed13e2723a3b32eb146cd7c16b54088d61) )
 	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(e7e7a0fd) SHA1(232190a0b2086e12ea3d77652ef98c9e107b3dc7) )
 
-	ROM_REGION( 0x0800, "ds1220", 0 )
+	ROM_REGION( 0x0800, "ds1220", 0 )  // to analyze...
 	ROM_LOAD( "ds1220.bin", 0x0000, 0x0800, CRC(4364b423) SHA1(01c8d5e3003f4a9cc8ec446ddc18ff83353688df) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM.
+	ROM_LOAD( "jolygame_nvram.bin", 0x0000, 0x0800, CRC(51213ede) SHA1(4da080e3b5ea8090609571883bbb04ea22774aa5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "am27s29apc.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
@@ -8826,7 +8829,7 @@ GAMEL( 1990, jolycdie,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_in
 GAMEL( 1990, jolycdif,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
 GAMEL( 1993, jolycdig,   jollycrd, cuoreuno, jolycdib,  funworld_state, init_jolycdig, ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 2)",            0,                       layout_jollycrd ) // italian, CPLD. needs nvram.
 GAMEL( 1990, jolycdih,   jollycrd, cuoreuno, jolycdib,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Card (Italian, bootleg, set 3)",            0,                       layout_jollycrd )
-GAMEL( 1993, jolygame,   jollycrd, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Game (V1, Otti Karl logo)",                 MACHINE_NOT_WORKING,     layout_jollycrd )
+GAMEL( 1993, jolygame,   jollycrd, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "bootleg",           "Jolly Game (V1, Otti Karl logo)",                 0,                       layout_jollycrd )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,   0,        fw2ndpal, bonuscrd,  funworld_state, empty_init,    ROT0, "Fun World",         "Bonus Card (German)",                             MACHINE_IMPERFECT_COLORS, layout_bonuscrd ) // use fw1stpal machine for green background
