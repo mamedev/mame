@@ -6594,11 +6594,11 @@ ROM_START( jolyjokrs )  // Jolly Joker (Otti Karl logo, set 1)
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrs_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
-	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrt one
-	ROM_LOAD( "jolyjokrs_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
-
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "63s481n.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrt one
+	ROM_LOAD( "jolyjokrs_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
 ROM_END
 
 ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
@@ -6615,11 +6615,11 @@ ROM_START( jolyjokrt )  // Jolly Joker (Otti Karl logo, set 2)
 	ROM_REGION( 0x0800, "nvram", 0 )    // default NVRAM
 	ROM_LOAD( "jolyjokrt_nvram.bin", 0x0000, 0x0800, CRC(1f69e567) SHA1(86695ca6f9f93c6badd092410611d8061edf8efa) )
 
-	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrs one
-	ROM_LOAD( "jolyjokrt_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
-
 	ROM_REGION( 0x0200, "proms", 0 )    // PLD addresses the 2nd half
 	ROM_LOAD( "am27s29.bin", 0x0000, 0x0200, CRC(9d62f9f5) SHA1(68300c25c7eaa13a3fdbf91ab0711d0bc530543d) )
+
+	ROM_REGION( 0x0200, "plds", 0 )    // identical to jolyjokrs one
+	ROM_LOAD( "jolyjokrt_pal16l8.bin",  0x0000, 0x0117, CRC(b235c40b) SHA1(69611fe15f54220efcdbce9efb3e2738242af692) )
 ROM_END
 
 
@@ -7096,9 +7096,7 @@ ROM_END
   Ver. 0053.
   Fun World, 1992.
   
-  CPU F - 10/03/1992.
-
-  Encrypted poker game.
+  Poker game with encrypted CPU: F - 10/03/1992.
 
 */
 
@@ -7117,13 +7115,11 @@ ROM_START( megacarda )
 	ROM_LOAD( "mega_zg2.ic11",   0x0000, 0x8000, CRC(0993d380) SHA1(e5e2386948fba2fb6b79339af27bd1d0f1e198ca) )
 	ROM_LOAD( "mega_zg1.ic10",   0x8000, 0x8000, CRC(de2e2dd0) SHA1(17962d84838f39de41bc7a41d399fd18cd0bd5b7) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
-//  bit 01 fixed to 0 along the whole dump, plus a few different values...
-//	ROM_LOAD( "n82s147an.ic3",  0x0000, 0x0200, CRC(029b94b4) SHA1(2d7fc223e1765688c34bb9f77a4b3b7917e9f95d) )
+	ROM_REGION( 0x0200, "proms", 0 )  // original BP has bit 1 = 0 along the dump. the device is damaged. rest of bits match the parent dump.
+	ROM_LOAD( "n82s147an.bin",  0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "megacarda_pal16l8.bin",  0x0000, 0x0117, BAD_DUMP CRC(3159a548) SHA1(ad904fa35b78570e44323469967803e34ef4bc0c) )  // waiting for the proper dump.
+	ROM_LOAD( "megacarda_pal16l8.bin",  0x0000, 0x0117, CRC(fcda7872) SHA1(60acdb968e6229a8f71c2e29d22e132906a65bd5) )  // cracked.
 ROM_END
 
 
