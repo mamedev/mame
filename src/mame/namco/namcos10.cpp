@@ -2512,8 +2512,29 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x000000016d0400ull, 0x0000001a002021ull, 0x00018884002000ull, 0x000000000040a0ull,
+			0x0000003010800cull, 0x00020504100842ull, 0x00008818148104ull, 0x00000053220100ull,
+			0x00000048000002ull, 0x00000000008060ull, 0x0000003010000cull, 0x003c00d8802c00ull,
+			0x0009a8ca110004ull, 0x0000003010d200ull, 0x00000000000450ull, 0x00000052001010ull,
+		}, {
+			0x00000000050400ull, 0x0000008a012028ull, 0x00050804002000ull, 0x000000000000a0ull,
+			0x0000003080800cull, 0x00108968100850ull, 0x00000050a08804ull, 0x000000c3292100ull,
+			0x00000048010000ull, 0x00000000008140ull, 0x00000030800044ull, 0x0018905a800800ull,
+			0x002a004a150020ull, 0x00000030804200ull, 0x00000000000610ull, 0x000000c2001080ull,
+		},
+		0x0000,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			return ((
+				((previous_cipherwords >> 35 ^ previous_cipherwords >> 39 ^ previous_plainwords >> 40 ^ previous_plainwords >> 42) & (gf2_reduce(previous_cipherwords & 0x820508000800ull) ^ gf2_reduce(previous_plainwords & 0x90c12c000800ull))) ^
+				((previous_cipherwords >> 35 ^ previous_cipherwords >> 39) & (previous_plainwords >> 40 ^ previous_plainwords >> 42)) ^
+				((previous_cipherwords >> 40 ^ previous_plainwords >> 35) & (gf2_reduce(previous_cipherwords & 0x520000041004ull) ^ gf2_reduce(previous_plainwords & 0xc20000201004ull)))
+				) & 1) * 0x60;
+		}
+	});
 }
+
 
 void namcos10_memn_state::ns10_taiko4(machine_config &config)
 {
@@ -2547,8 +2568,31 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00000000000244ull, 0x00000098880004ull, 0x00000018021806ull, 0x00000000004810ull,
+			0x0005800ac04002ull, 0x00000090044040ull, 0x00000098240025ull, 0x00000018022184ull,
+			0x00000000002420ull, 0x00000000002408ull, 0x00000088068204ull, 0x000b5001a02004ull,
+			0x00000018020214ull, 0x00218801801080ull, 0x00000000000009ull, 0x00000000000120ull
+		}, {
+			0x00000000001044ull, 0x000000d0930004ull, 0x00000050025006ull, 0x00000000004880ull,
+			0x000cc108804002ull, 0x00000000040040ull, 0x00000003042425ull, 0x00000050022884ull,
+			0x00000000000420ull, 0x00000000002440ull, 0x00000050060204ull, 0x00091205012020ull,
+			0x00000050020216ull, 0x00288101811400ull, 0x00000000000009ull, 0x00000000000124ull
+		},
+		0x0000,
+		[](uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+			return ((
+				((previous_cipherwords >> 4) & (gf2_reduce(previous_cipherwords & 0x242800000000) ^ gf2_reduce(previous_plainwords & 0x42100010000))) ^
+				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000) ^ gf2_reduce(previous_plainwords & 0x100084000))) ^
+				((previous_cipherwords >> 35) & (gf2_reduce(previous_cipherwords & 0x58200004) ^ gf2_reduce(previous_plainwords & 0x10000014))) ^
+				((previous_plainwords >> 24) & (gf2_reduce(previous_cipherwords & 0x101220000) ^ gf2_reduce(previous_plainwords & 0x800030010))) ^
+				((previous_cipherwords >> 24 ^ previous_plainwords >> 16 ^ previous_plainwords >> 32) & (gf2_reduce(previous_cipherwords & 0x40200000) ^ gf2_reduce(previous_plainwords & 0x40020010)))
+				) & 1) << 11;
+		}
+		});
 }
+
 
 void namcos10_memn_state::ns10_taiko6(machine_config &config)
 {
@@ -3710,10 +3754,10 @@ GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_sta
 GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // MEM(P3)
