@@ -251,14 +251,16 @@ void msm5232_device::init_tables()
 	for (i=0; i<8; i++)
 	{
 		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_ar_tbl[i]   = ((1<<i) / clockscale) * (double)R51;
+		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
+		m_ar_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R51;
 	}
 
 	for (i=0; i<8; i++)
 	{
 		double clockscale = (double)m_chip_clock / 2119040.0;
-		m_dr_tbl[i]   = ((1<<i) / clockscale) * (double)R52;
-		m_dr_tbl[i+8] = ((1<<i) / clockscale) * (double)R53;
+		int rcp_duty_cycle = 1 << ( i<6 ? i : i-2 );
+		m_dr_tbl[i]   = (rcp_duty_cycle / clockscale) * (double)R52;
+		m_dr_tbl[i+8] = (rcp_duty_cycle / clockscale) * (double)R53;
 	}
 
 
