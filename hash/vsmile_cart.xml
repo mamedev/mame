@@ -403,12 +403,12 @@ Regular game cartridges
 |   XX   | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label)                     |
 |        |          (CN)     | 海底总动员                                                                                      |
 +========+===================+================================================================================================+
-|   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
-|   XX   | 80-092441(IT)     | Spongebob - Un giorno da Spugna (no serial printed on cart)                                    |
-|   XX   | 80-092442(NL)     | Spongebob Squarepants - Een Dag uit het Leven van een Spons (52-92442(NL) on back label)       |
-|        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                                          |
-|   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                                                   |
-|   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms (rev. 1)                                          |
+|   XX   | 80-092440(US)     | SpongeBob SquarePants - A Day In The Life of A Sponge                                          |
+|   XX   | 80-092441(IT)     | SpongeBob - Un giorno da Spugna (no serial printed on cart)                                    |
+|   XX   | 80-092442(NL)     | SpongeBob SquarePants - Een Dag uit het Leven van een Spons (52-92442(NL) on back label)       |
+|        | 80-092443(UK)     | SpongeBob SquarePants - A Day In The Life of A Sponge                                          |
+|   XX   | 80-092444(GE)     | SpongeBob Schwammkopf - Der Tag des Schwamms                                                   |
+|   XX   | 80-092444(GE)     | SpongeBob Schwammkopf - Der Tag des Schwamms (rev. 1)                                          |
 |   XX   | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                                            |
 |   XX   | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)                    |
 +========+===================+================================================================================================+
@@ -4137,7 +4137,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="spongeb">
-		<description>Nickelodeon Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
+		<description>Nickelodeon SpongeBob SquarePants - A Day in the Life of a Sponge (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092440(US)" />
@@ -4154,7 +4154,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="spongebit" cloneof="spongeb">
-		<description>Nickelodeon Spongebob - Un giorno da Spugna (Italy)</description>
+		<description>Nickelodeon SpongeBob - Un giorno da Spugna (Italy)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092441(IT)" /> <!-- Serial not printed on cart -->
@@ -4163,13 +4163,13 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="0x800000">
-				<rom name="Spongebob - Un giorno da Spugna (Italy).bin" size="0x800000" crc="0f8708f3" sha1="0788e5d434299703ce61559eac32160bf4f51086" />
+				<rom name="SpongeBob - Un giorno da Spugna (Italy).bin" size="0x800000" crc="0f8708f3" sha1="0788e5d434299703ce61559eac32160bf4f51086" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebnl" cloneof="spongeb">
-		<description>Nickelodeon Spongebob Squarepants - Een Dag uit het Leven van een Spons (Netherlands)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Een Dag uit het Leven van een Spons (Netherlands)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092442(NL)" /> <!-- Serial not printed on cart -->
@@ -4178,13 +4178,13 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="0x800000">
-				<rom name="52-92442 - Spongebob Squarepants - Een Dag uit het Leven van een Spons (NL).bin" size="0x800000" crc="7b2ec510" sha1="d446c88dc557df23a51a48b11c8cee42e86ae1ac" />
+				<rom name="52-92442 - SpongeBob SquarePants - Een Dag uit het Leven van een Spons (NL).bin" size="0x800000" crc="7b2ec510" sha1="d446c88dc557df23a51a48b11c8cee42e86ae1ac" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebger1" cloneof="spongeb">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany, rev. 1)</description>
+		<description>Nickelodeon SpongeBob Schwammkopf - Der Tag des Schwamms (Germany, rev. 1)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />
@@ -4201,7 +4201,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="spongebge" cloneof="spongeb">
-		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Germany)</description>
+		<description>Nickelodeon SpongeBob Schwammkopf - Der Tag des Schwamms (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />

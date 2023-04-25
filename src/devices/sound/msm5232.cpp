@@ -110,7 +110,7 @@ void msm5232_device::device_reset()
 
 void msm5232_device::device_stop()
 {
-	#ifdef SAVE_SAMPLE
+#ifdef SAVE_SAMPLE
 	fclose(sample[8]);
 #endif
 #ifdef SAVE_SEPARATE_CHANNELS
@@ -127,22 +127,22 @@ void msm5232_device::device_stop()
 
 void msm5232_device::set_capacitors(double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8)
 {
-	m_external_capacity[0] = cap1;
-	m_external_capacity[1] = cap2;
-	m_external_capacity[2] = cap3;
-	m_external_capacity[3] = cap4;
-	m_external_capacity[4] = cap5;
-	m_external_capacity[5] = cap6;
-	m_external_capacity[6] = cap7;
-	m_external_capacity[7] = cap8;
+	m_external_capacitance[0] = cap1;
+	m_external_capacitance[1] = cap2;
+	m_external_capacitance[2] = cap3;
+	m_external_capacitance[3] = cap4;
+	m_external_capacitance[4] = cap5;
+	m_external_capacitance[5] = cap6;
+	m_external_capacitance[6] = cap7;
+	m_external_capacitance[7] = cap8;
 }
 
-/* Default chip clock is 2119040 Hz */
-/* At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21 */
+// Default chip clock is 2119040 Hz
+// At this clock chip generates exactly 440.0 Hz signal on 8' output when pitch data=0x21
 
 
-/* ROM table to convert from pitch data into data for programmable counter and binary counter */
-/* Chip has 88x12bits ROM   (addressing (in hex) from 0x00 to 0x57) */
+// ROM table to convert from pitch data into data for programmable counter and binary counter
+// Chip has 88x12bits ROM   (addressing (in hex) from 0x00 to 0x57)
 #define ROM(counter,bindiv) (counter|(bindiv<<9))
 
 static const uint16_t MSM5232_ROM[88]={
@@ -199,7 +199,7 @@ static FILE *sample[9];
 
 
 /*
- * Resistance values are guesswork, default capacity is mentioned in the datasheets
+ * Resistance values are guesswork, default capacitance is mentioned in the datasheets
  *
  * Two errors in the datasheet, one probable, one certain
  * - it mentions 0.39uF caps, but most boards have 1uF caps and expect datasheet timings
@@ -280,9 +280,9 @@ void msm5232_device::init_tables()
 
 void msm5232_device::init_voice(int i)
 {
-	m_voi[i].ar_rate= m_ar_tbl[0] * m_external_capacity[i];
-	m_voi[i].dr_rate= m_dr_tbl[0] * m_external_capacity[i];
-	m_voi[i].rr_rate= m_dr_tbl[0] * m_external_capacity[i]; /* this is constant value */
+	m_voi[i].ar_rate= m_ar_tbl[0] * m_external_capacitance[i];
+	m_voi[i].dr_rate= m_dr_tbl[0] * m_external_capacitance[i];
+	m_voi[i].rr_rate= m_dr_tbl[0] * m_external_capacitance[i]; /* this is constant value */
 	m_voi[i].eg_sect= -1;
 	m_voi[i].eg     = 0.0;
 	m_voi[i].eg_arm = 0;
@@ -387,22 +387,22 @@ void msm5232_device::write(offs_t offset, uint8_t data)
 		{
 		case 0x08:  /* group1 attack */
 			for (i=0; i<4; i++)
-				m_voi[i].ar_rate   = m_ar_tbl[data&0x7] * m_external_capacity[i];
+				m_voi[i].ar_rate   = m_ar_tbl[data&0x7] * m_external_capacitance[i];
 			break;
 
 		case 0x09:  /* group2 attack */
 			for (i=0; i<4; i++)
-				m_voi[i+4].ar_rate = m_ar_tbl[data&0x7] * m_external_capacity[i+4];
+				m_voi[i+4].ar_rate = m_ar_tbl[data&0x7] * m_external_capacitance[i+4];
 			break;
 
 		case 0x0a:  /* group1 decay */
 			for (i=0; i<4; i++)
-				m_voi[i].dr_rate   = m_dr_tbl[data&0xf] * m_external_capacity[i];
+				m_voi[i].dr_rate   = m_dr_tbl[data&0xf] * m_external_capacitance[i];
 			break;
 
 		case 0x0b:  /* group2 decay */
 			for (i=0; i<4; i++)
-				m_voi[i+4].dr_rate = m_dr_tbl[data&0xf] * m_external_capacity[i+4];
+				m_voi[i+4].dr_rate = m_dr_tbl[data&0xf] * m_external_capacitance[i+4];
 			break;
 
 		case 0x0c:  /* group1 control */
