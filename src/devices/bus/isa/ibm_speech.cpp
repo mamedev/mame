@@ -83,7 +83,6 @@ void isa8_ibm_speech_device::device_start()
 		read8smo_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_r)),
 		write8smo_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_w)));
 
-	m_rom_page = 0;
 	m_channel_mux = 0;
 	m_acl_int_ena = false;
 	m_acl_chan_ena = false;
@@ -99,11 +98,6 @@ void isa8_ibm_speech_device::device_start()
 void isa8_ibm_speech_device::device_reset()
 {
 	// Not configurable.
-	// m_isa->install_memory(0xce000, 0xcffff,
-	//  read8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_r)),
-	//  write8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_w)));
-
-	// m_isa->install_bank(0xce000, 0xcffff, m_rom);
 	rom_page_w(0);
 	m_cvsd_sr_bits_remaining = 0;
 }
@@ -189,14 +183,8 @@ void isa8_ibm_speech_device::device_reset_after_children()
     Bits 2-3 of PPI PORT.A control which page is visible.
     All pages contain the option ROM boot signature.
 ******************************************************************************/
-// uint8_t isa8_ibm_speech_device::rom_r(offs_t offset)
-// {
-//  return m_rom[offset + (0x2000 * m_rom_page)];
-// }
-
 void isa8_ibm_speech_device::rom_page_w(uint8_t data)
 {
-	//m_rom_page = data;
 	m_isa->install_bank(0xce000, 0xcffff, m_rom + (0x2000*data));
 }
 
@@ -366,7 +354,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::lpc_interrupt_w)
 	{
 		LOGMASKED(LOG_IRQ, "pulsing IRQ7\n");
 		m_isa->irq7_w(ASSERT_LINE);         // Raise IRQ...
-		m_pit->write_gate2(ASSERT_LINE); // ...CH2 gate open, triggering CH2 one-shot.
+		m_pit->write_gate2(ASSERT_LINE);    // ...CH2 gate open, triggering CH2 one-shot.
 	}
 	else if(!m_lpc_interrupt && !state)
 	{

@@ -28,9 +28,6 @@ public:
 	uint8_t shift_register_r();
 	void shift_register_w(uint8_t data);
 
-	uint8_t rom_r(offs_t offset);
-	void rom_w(offs_t offset, uint8_t data) {};
-
 	uint8_t pit_r(offs_t offset);
 	void pit_w(offs_t offset, uint8_t data);
 
@@ -81,7 +78,6 @@ private:
 
 	uint8_t m_cvsd_sr_bits_remaining;
 
-	uint8_t m_rom_page;
 	uint8_t m_channel_mux;
 
 	// CVSD serialization
