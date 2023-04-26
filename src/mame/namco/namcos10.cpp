@@ -27,7 +27,7 @@ GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro
 GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
 Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
 Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
-Gekitoride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
+GekiToride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
 Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
 *Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
@@ -292,7 +292,7 @@ GAHAHA Ippatsudou                                   GID2  Ver.A   KC005A   8E, 8
 GAHAHA Ippatsudou 2                                 GIS1  Ver.A   KC008A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB. 2 analog joysticks
 Gamshara                                            10021 Ver.A   KC020A   8E, 8D               N/A           I/O board = none
 Gegege no Kitaro Yokai Yokocho Matsuri De Batoru Ja GYM1  Ver.A   KC052A   8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
-Gekitoride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A           I/O board = none
+GekiToride-Jong Space                               10011 Ver.A   KC003A   8E, 8D, 7E, 7D       N/A           I/O board = none
 Gunbalina                                           GNN1  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 not populated
 Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu!  KRG1  Ver.A   KC047A1  8E, 8D               N/A           also has a Namco S10 MGEX10 8681960200 PCB
 Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8D               N/A           also has a Namco P-DRIVE PCB 1908961101 (1908971101) with an H8/3002
@@ -2527,9 +2527,9 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 		0x0000,
 		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
 			return ((
-				((previous_cipherwords >> 35 ^ previous_cipherwords >> 39 ^ previous_plainwords >> 40 ^ previous_plainwords >> 42) & (gf2_reduce(previous_cipherwords & 0x820508000800ULL) ^ gf2_reduce(previous_plainwords & 0x90c12c000800ULL))) ^
-				((previous_cipherwords >> 35 ^ previous_cipherwords >> 39) & (previous_plainwords >> 40 ^ previous_plainwords >> 42)) ^
-				((previous_cipherwords >> 40 ^ previous_plainwords >> 35) & (gf2_reduce(previous_cipherwords & 0x520000041004ULL) ^ gf2_reduce(previous_plainwords & 0xc20000201004ULL)))
+				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39) ^ (previous_plainwords >> 40) ^ (previous_plainwords >> 42)) & (gf2_reduce(previous_cipherwords & 0x820508000800ULL) ^ gf2_reduce(previous_plainwords & 0x90c12c000800ULL))) ^
+				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39)) & ((previous_plainwords >> 40) ^ (previous_plainwords >> 42))) ^
+				(((previous_cipherwords >> 40) ^ (previous_plainwords >> 35)) & (gf2_reduce(previous_cipherwords & 0x520000041004ULL) ^ gf2_reduce(previous_plainwords & 0xc20000201004ULL)))
 			) & 1) * 0x60;
 		}
 	});
@@ -2586,7 +2586,7 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000) ^ gf2_reduce(previous_plainwords & 0x100084000))) ^
 				((previous_cipherwords >> 35) & (gf2_reduce(previous_cipherwords & 0x58200004) ^ gf2_reduce(previous_plainwords & 0x10000014))) ^
 				((previous_plainwords >> 24) & (gf2_reduce(previous_cipherwords & 0x101220000) ^ gf2_reduce(previous_plainwords & 0x800030010))) ^
-				((previous_cipherwords >> 24 ^ previous_plainwords >> 16 ^ previous_plainwords >> 32) & (gf2_reduce(previous_cipherwords & 0x40200000) ^ gf2_reduce(previous_plainwords & 0x40020010)))
+				(((previous_cipherwords >> 24) ^ (previous_plainwords >> 16) ^ (previous_plainwords >> 32)) & (gf2_reduce(previous_cipherwords & 0x40200000) ^ gf2_reduce(previous_plainwords & 0x40020010)))
 			) & 1) << 11;
 		}
 	});
@@ -3270,14 +3270,13 @@ ROM_START( gamshara )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "10021a_e.8e", 0x0000000, 0x1080000, BAD_DUMP CRC(684ab324) SHA1(95c2e0a04c4f33039535fc451c5559d239b8fbc6) )
+	ROM_LOAD( "10021a_e.8e", 0x0000000, 0x1080000, CRC(1413b7d2) SHA1(595c77dfcba8074fff84b859870818aace530ed8) )
 
-	// Needs the proper matching ROM from the same board
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, BAD_DUMP CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
+	ROM_LOAD( "10021a.8d", 0x0000000, 0x1080000, CRC(73669ff7) SHA1(eb8bbf931f1f8a049208d081d040512a3ffa9c00) )
 ROM_END
 
-ROM_START( gamsharaj )
+ROM_START( gamsharao )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
@@ -3730,13 +3729,13 @@ GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_sta
 GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (World, 20020912A / 10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // Ver. 20020912A ETC
-GAME( 2002, gamsharaj, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (Japan, 20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
