@@ -45,12 +45,12 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	required_device<tms5220_device> m_lpc;
-	required_device<mc3418_device>  m_cvsd;
-	required_device<speaker_sound_device> m_8254_audio;
-	required_device<pit8254_device> m_timers;
-	required_device<i8255_device> m_ppi;
-	required_device<speaker_device> m_speaker;
+	required_device<tms5220_device>         m_lpc;
+	required_device<mc3418_device>          m_cvsd;
+	required_device<speaker_sound_device>   m_dac1bit;
+	required_device<pit8254_device>         m_pit;
+	required_device<i8255_device>           m_ppi;
+	required_device<speaker_device>         m_speaker;
 
 	required_region_ptr<uint8_t> m_rom;
 

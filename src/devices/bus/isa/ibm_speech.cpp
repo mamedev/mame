@@ -54,8 +54,8 @@ isa8_ibm_speech_device::isa8_ibm_speech_device(const machine_config &mconfig, co
 	device_isa8_card_interface(mconfig, *this),
 	m_lpc(*this, "lpc"),
 	m_cvsd(*this, "cvsd"),
-	m_8254_audio(*this, "8254_audio"),
-	m_timers(*this, "timers"),
+	m_dac1bit(*this, "8254_audio"),
+	m_pit(*this, "timers"),
 	m_ppi(*this, "ppi"),
 	m_speaker(*this, "speaker"),
 	m_rom(*this, "option")
@@ -74,8 +74,8 @@ void isa8_ibm_speech_device::device_start()
 		read8sm_delegate(m_ppi, FUNC(i8255_device::read)),
 		write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
 	m_isa->install_device(0xfb9c, 0xfb9f,
-		read8sm_delegate(m_timers, FUNC(pit8254_device::read)),
-		write8sm_delegate(m_timers, FUNC(pit8254_device::write)));
+		read8sm_delegate(m_pit, FUNC(pit8254_device::read)),
+		write8sm_delegate(m_pit, FUNC(pit8254_device::write)));
 	m_isa->install_device(0xff98, 0xff98,
 		read8smo_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_r)),
 		write8smo_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_w)));
@@ -99,10 +99,12 @@ void isa8_ibm_speech_device::device_start()
 void isa8_ibm_speech_device::device_reset()
 {
 	// Not configurable.
-	m_isa->install_memory(0xce000, 0xcffff,
-		read8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_r)),
-		write8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_w)));
+	// m_isa->install_memory(0xce000, 0xcffff,
+	//  read8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_r)),
+	//  write8sm_delegate(*this, FUNC(isa8_ibm_speech_device::rom_w)));
 
+	// m_isa->install_bank(0xce000, 0xcffff, m_rom);
+	rom_page_w(0);
 	m_cvsd_sr_bits_remaining = 0;
 }
 
@@ -129,24 +131,24 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 	// breakout box
 	SPEAKER(config, m_speaker);
 
-	PIT8254(config, m_timers, 0);
+	PIT8254(config, m_pit, 0);
 	// Channel 0: CVSD CLOCK.
 	//            Rising edge goes to the MC3418's clock pin.
 	//            Rising edge inverted goes to the shift register clock.
-	m_timers->set_clk<0>(XTAL_Y1);  // CVSD clock is the 4MHz crystal.
-	m_timers->out_handler<0>().set(FUNC(isa8_ibm_speech_device::cvsd_clock_w));
+	m_pit->set_clk<0>(XTAL_Y1);  // CVSD clock is the 4MHz crystal.
+	m_pit->out_handler<0>().set(FUNC(isa8_ibm_speech_device::cvsd_clock_w));
 	// Channel 1: CVSD FRAME.
 	//            PCjr: CVSD_CLOCK / 8, but seems to be just CVSD_CLOCK here.
-	m_timers->set_clk<1>(XTAL_Y1);
-	m_timers->out_handler<1>().set(FUNC(isa8_ibm_speech_device::cvsd_frame_w));
+	m_pit->set_clk<1>(XTAL_Y1);
+	m_pit->out_handler<1>().set(FUNC(isa8_ibm_speech_device::cvsd_frame_w));
 	// Channel 2: INT CLOCK.
 	//            Channel 2 can be configured either for interrupt mode or audio mode via the Audio Control Latch.
 	//            In interrupt mode, IRQ1 is signalled by the 5220.
 	//              The gate opens when the 5220 IRQ is signalled.
 	//            In audio mode, the timer output is multiplexed into audio output.
 	//              The gate is held open.
-	m_timers->set_clk<2>(XTAL_Y1);
-	m_timers->out_handler<2>().set(FUNC(isa8_ibm_speech_device::int_clock_w));
+	m_pit->set_clk<2>(XTAL_Y1);
+	m_pit->out_handler<2>().set(FUNC(isa8_ibm_speech_device::int_clock_w));
 
 	// TMS5220 LPC
 	// The 5220 has no direct-access speech ROM.
@@ -161,8 +163,8 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 	m_cvsd->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	// PIT CH2
-	SPEAKER_SOUND(config, m_8254_audio);
-	m_8254_audio->add_route(ALL_OUTPUTS, m_speaker, 1.0);
+	SPEAKER_SOUND(config, m_dac1bit);
+	m_dac1bit->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(isa8_ibm_speech_device::porta_r));
@@ -176,8 +178,8 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 
 void isa8_ibm_speech_device::device_reset_after_children()
 {
-	m_timers->write_gate0(ASSERT_LINE); // pulled high
-	m_timers->write_gate1(ASSERT_LINE); // pulled high
+	m_pit->write_gate0(ASSERT_LINE); // pulled high
+	m_pit->write_gate1(ASSERT_LINE); // pulled high
 }
 
 /******************************************************************************
@@ -187,14 +189,15 @@ void isa8_ibm_speech_device::device_reset_after_children()
     Bits 2-3 of PPI PORT.A control which page is visible.
     All pages contain the option ROM boot signature.
 ******************************************************************************/
-uint8_t isa8_ibm_speech_device::rom_r(offs_t offset)
-{
-	return m_rom[offset + (0x2000 * m_rom_page)];
-}
+// uint8_t isa8_ibm_speech_device::rom_r(offs_t offset)
+// {
+//  return m_rom[offset + (0x2000 * m_rom_page)];
+// }
 
 void isa8_ibm_speech_device::rom_page_w(uint8_t data)
 {
-	m_rom_page = data;
+	//m_rom_page = data;
+	m_isa->install_bank(0xce000, 0xcffff, m_rom + (0x2000*data));
 }
 
 /******************************************************************************
@@ -202,7 +205,7 @@ void isa8_ibm_speech_device::rom_page_w(uint8_t data)
 ******************************************************************************/
 uint8_t isa8_ibm_speech_device::pit_r(offs_t offset)
 {
-	uint8_t data = m_timers->read(offset);
+	uint8_t data = m_pit->read(offset);
 	LOGMASKED(LOG_PIT, "%s: O:%02X D:%02X\n", FUNCNAME, offset, data);
 	return data;
 }
@@ -210,7 +213,7 @@ uint8_t isa8_ibm_speech_device::pit_r(offs_t offset)
 void isa8_ibm_speech_device::pit_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_PIT, "%s: O:%02X D:%02X\n", FUNCNAME, offset, data);
-	m_timers->write(offset, data);
+	m_pit->write(offset, data);
 }
 
 /******************************************************************************
@@ -238,12 +241,12 @@ void isa8_ibm_speech_device::audio_control_latch_w(uint8_t data)
 	{
 		// IRQ7 enabled, close PIT CH2 gate.
 		// CH2 will be set up for one-shot mode.
-		m_timers->write_gate2(CLEAR_LINE);
+		m_pit->write_gate2(CLEAR_LINE);
 	}
 	else
 	{
 		// IRQ7 disabled, PIT CH2 is in audio output mode. Gate is held open.
-		m_timers->write_gate2(ASSERT_LINE);
+		m_pit->write_gate2(ASSERT_LINE);
 	}
 }
 
@@ -264,7 +267,7 @@ uint8_t isa8_ibm_speech_device::porta_r()
 {
 	uint8_t data = 0;
 
-	data |= (m_lpc_running ? 0x80 : 0x00);
+	data |= (m_lpc_running << 7);
 
 	return data;
 }
@@ -292,9 +295,9 @@ uint8_t isa8_ibm_speech_device::portc_r()
 {
 	uint8_t data = 0;
 
-	data |= (m_lpc->readyq_r()  ? (1 << 0) : 0);
-	data |= (m_lpc->intq_r()    ? (1 << 1) : 0);
-	data |= (m_cvsd_frame       ? (1 << 2) : 0);
+	data |= (m_lpc->readyq_r()  << 0);
+	data |= (m_lpc->intq_r()    << 1);
+	data |= (m_cvsd_frame       << 2);
 
 	// PCjr
 	//data |= (!m_cvsd_clock      ? (1 << 3) : 0);
@@ -305,10 +308,10 @@ uint8_t isa8_ibm_speech_device::portc_r()
 	}
 	else
 	{
-		data |= (!m_cvsd_clock      ? (1 << 3) : 0);
+		data |= (!m_cvsd_clock << 3);
 	}
 
-	data |= (m_cvsd_ed          ? (1 << 6) : 0); // 0: CVSD playback, 1: CVSD record
+	data |= (m_cvsd_ed << 6); // 0: CVSD playback, 1: CVSD record
 
 	return data;
 }
@@ -363,7 +366,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::lpc_interrupt_w)
 	{
 		LOGMASKED(LOG_IRQ, "pulsing IRQ7\n");
 		m_isa->irq7_w(ASSERT_LINE);         // Raise IRQ...
-		m_timers->write_gate2(ASSERT_LINE); // ...CH2 gate open, triggering CH2 one-shot.
+		m_pit->write_gate2(ASSERT_LINE); // ...CH2 gate open, triggering CH2 one-shot.
 	}
 	else if(!m_lpc_interrupt && !state)
 	{
@@ -373,7 +376,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::lpc_interrupt_w)
 	{
 		LOGMASKED(LOG_IRQ, "LPC INT pin going high, CH2 gate closed\n");
 		m_isa->irq7_w(CLEAR_LINE);
-		m_timers->write_gate2(CLEAR_LINE);
+		m_pit->write_gate2(CLEAR_LINE);
 	}
 
 	m_lpc_interrupt = state;
@@ -401,9 +404,9 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_clock_w)
 	m_cvsd->clock_w(state);         // Straight through to the CVSD CLK pin.
 
 	// Through an inverter and to:
-	//m_timers->write_clk1(state ? 0 : 1);  // PCjr: PIT CLK1
-	cvsd_shiftreg_clk_w(state ? 0 : 1);     // 74859 clock pin
-											// PPI PC.3 (handled over there)
+	//m_pit->write_clk1(state ? 0 : 1); // PCjr: PIT CLK1
+	cvsd_shiftreg_clk_w(state ? 0 : 1); // 74859 clock pin
+										// PPI PC.3 (handled over there)
 }
 
 /******************************************************************************
@@ -416,8 +419,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_clock_w)
 WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_frame_w)
 {
 	// PIT CH1 is the CVSD FRAME signal.
-	if(state)   LOGMASKED(LOG_CVSD, "*** CVSD frame going high\n");
-	else        LOGMASKED(LOG_CVSD, "*** CVSD frame going low\n");
+	LOGMASKED(LOG_CVSD, "*** CVSD frame going %s\n", (state ? "high" : "low"));
 
 	if(state && (m_cvsd_sr_bits_remaining == 0))
 	{
@@ -441,7 +443,7 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::int_clock_w)
 	{
 		// CH2 is now a beeper.
 		//LOGMASKED(LOG_IRQ, "%s: INT CLOCK: beeper mode\n", FUNCNAME);
-		m_8254_audio->level_w(state);
+		m_dac1bit->level_w(state);
 	}
 }
 
@@ -461,10 +463,6 @@ WRITE_LINE_MEMBER(isa8_ibm_speech_device::cvsd_shiftreg_clk_w)
 			m_cvsd_sr_serial >>= 1;
 
 			m_cvsd_sr_bits_remaining--;
-			if(m_cvsd_sr_bits_remaining == 0)
-			{
-
-			}
 		}
 	}
 
