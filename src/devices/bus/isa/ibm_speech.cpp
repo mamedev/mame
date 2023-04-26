@@ -112,7 +112,7 @@ void isa8_ibm_speech_device::device_reset()
 
 ROM_START( ibm_speech )
 	ROM_REGION( 0x8000, "option", 0 )
-	ROM_LOAD( "68x2838.zm10", 0x0000, 0x8000, CRC(39d4566d) SHA1(d275193a870250f212dc29768d4e68fb43770e95) )
+	ROM_LOAD( "68x2838.zm10", 0x0000, 0x8000, CRC(98ddf27f) SHA1(0cb41d490db2ed59989d2eae14a002ad0382e7ad) )
 ROM_END
 
 const tiny_rom_entry *isa8_ibm_speech_device::device_rom_region() const

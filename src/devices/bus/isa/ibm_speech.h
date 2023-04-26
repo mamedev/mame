@@ -74,7 +74,6 @@ private:
 	bool    m_cvsd_frame;
 	bool    m_cvsd_ed;
 	bool    m_sr_clk;
-	bool    m_sr_sck;
 	bool    m_beeper_gate;
 
 	bool    m_acl_int_ena;
