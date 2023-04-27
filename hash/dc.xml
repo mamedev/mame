@@ -2422,6 +2422,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<notes><![CDATA[
 Punts to BIOS at start of loading [GDROM READY], locks up (fixed)
 Has [redbook] audio
+Doesn't update [PVR] cursor on no [VMU] screen and title screen
 ]]></notes>
 		<info name="serial" value="T-38702M"/>
 		<info name="release" value="19991209"/>
@@ -5634,7 +5635,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<year>2001</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Crashes at "Produced by Sega"
+Crashes at "Produced by Sega" [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0176"/>
 		<info name="release" value="20010913"/>
@@ -15694,7 +15695,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		<year>2000</year>
 		<publisher>Sammy</publisher>
 		<notes><![CDATA[
-[PVR] tester for bare polygons wrong normals, cfr. HP bars in training
+[PVR] wrong normals for bare polygons HP bars in gameplay
 Has [redbook] audio
 ]]></notes>
 		<info name="serial" value="T-2402M"/>
@@ -17657,6 +17658,10 @@ Has [redbook] audio
 		<description>Jeremy McGrath Supercross 2000 (USA)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+[PVR] loading and main menu have no background images [drc]
+Fails loading when selecting race [drc]
+]]></notes>
 		<info name="serial" value="T-8104N"/>
 		<info name="release" value="20000808"/>
 		<info name="ring_code" value="1S T-8104N"/>
@@ -19267,6 +19272,10 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Legacy of Kain: Soul Reaver (USA)</description>
 		<year>2000</year>
 		<publisher>Eidos Interactive</publisher>
+		<notes><![CDATA[
+Heavy [PVR] texture issues
+Crashes after FMV on few seconds of (broken) GFXs [drc]
+]]></notes>
 		<info name="serial" value="T-36802N"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
@@ -19878,6 +19887,10 @@ Hangs after (skipped) FMV, keeps stuck at 0% on loading
 		<description>Maken X (USA)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[PVR] missing backface culling during new game intro
+[PVR] texture warps during gameplay
+]]></notes>
 		<info name="serial" value="51050"/>
 		<info name="release" value="19991031"/>
 		<part interface="cdrom" name="cdrom">
@@ -21541,7 +21554,7 @@ Built on Windows CE, requires [MMU] support
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Crashes at "Produced by Sega", PC=C010094
+Crashes at "Produced by Sega" [GDROM READY] (fixed)
 ]]></notes>
 		<info name="serial" value="HDR-0092"/>
 		<info name="release" value="20000928"/>
@@ -21623,6 +21636,9 @@ Crashes at "Produced by Sega", PC=C010094
 		<description>Mr. Driller (USA)</description>
 		<year>2000</year>
 		<publisher>Namco</publisher>
+		<notes><![CDATA[
+Has [redbook] audio
+]]></notes>
 		<info name="serial" value="T-1402N"/>
 		<info name="release" value="20000625"/>
 		<part interface="cdrom" name="cdrom">
