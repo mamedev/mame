@@ -699,8 +699,9 @@ LVS-DG2
 
 void hng64_state::hng_comm_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).rom().region("user2", 0);
-	map(0xf0000, 0xfffff).ram();
+	map(0x00000, 0x1ffff).rom().region("comm", 0);
+	map(0x20000, 0x3ffff).bankr(m_com_bank);
+	map(0x40000, 0x47fff).mirror(0xb8000).ram();
 }
 
 void hng64_state::hng_comm_io_map(address_map &map)
@@ -720,8 +721,10 @@ void hng64_state::hng_comm_io_map(address_map &map)
 //  map(0x3c, 0x3f).noprw();              /* Reserved */
 
 	/* General IO */
+//  map(0x40, 0x47).rw("ulanc", FUNC(com20020_device::read), FUNC(com20020_device::write));
 	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
-//  map(0x72, 0x72).w(hng64_state::));            /* dunno yet */
+	map(0x72, 0x72).w(FUNC(hng64_state::hng64_com_bank_w));
+//  map(0x73, 0x73).w(hng64_state::));            /* dunno yet */
 }
 
 
@@ -773,6 +776,11 @@ uint8_t hng64_state::hng64_com_share_r(offs_t offset)
 		return m_com_shared[offset] | 1; // some busy flag?
 
 	return m_com_shared[offset];
+}
+
+void hng64_state::hng64_com_bank_w(uint8_t data)
+{
+	m_com_bank->set_entry(data & 0x03);
 }
 
 
@@ -2173,6 +2181,9 @@ void hng64_state::machine_start()
 	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
+	m_com_bank->configure_entries(0, 4, memregion("comm")->base(), 0x20000);
+	m_com_bank->set_entry(0);
+
 	init_io();
 
 	save_pointer(NAME(m_com_virtual_mem), 0x100000);
@@ -2669,7 +2680,7 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
 	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",    0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
 	/* KL5C80 BIOS (network CPU) */ \
-	ROM_REGION( 0x0100000, "user2", 0 ) \
+	ROM_REGION( 0x080000, "comm", 0 ) \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	/* FPGA (unknown) */ \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
