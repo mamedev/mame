@@ -176,9 +176,9 @@ protected:
 	optional_region_ptr<uint8_t> m_gfx_rom;
 
 	// used by most games
-	uint8_t m_dsw_select;
-	uint8_t m_palette_base;
-	uint8_t m_flip_screen;
+	uint8_t m_dsw_select = 0;
+	uint8_t m_palette_base = 0;
+	uint8_t m_flip_screen = 0;
 
 private:
 	void jansou_dsw_sel_w(uint8_t data);
@@ -210,16 +210,16 @@ private:
 	void jansou_sub_map(address_map &map) ATTR_COLD;
 
 	// used by most games
-	uint8_t m_input_port_select;
+	uint8_t m_input_port_select = 0;
 
 	// game-specific
-	uint8_t m_gfx_adr_l;
-	uint8_t m_gfx_adr_m;
-	uint8_t m_gfx_adr_h;
-	uint32_t m_gfx_adr;
-	uint8_t m_gfxdata0;
-	uint8_t m_gfxdata1;
-	uint8_t m_jansou_colortable[16];
+	uint8_t m_gfx_adr_l = 0;
+	uint8_t m_gfx_adr_m = 0;
+	uint8_t m_gfx_adr_h = 0;
+	uint32_t m_gfx_adr = 0;
+	uint8_t m_gfxdata0 = 0;
+	uint8_t m_gfxdata1 = 0;
+	uint8_t m_jansou_colortable[16] = { };
 };
 
 
@@ -229,8 +229,7 @@ public:
 	royalmah_prgbank_state(const machine_config &mconfig, device_type type, const char *tag) :
 		royalmah_state(mconfig, type, tag),
 		m_mainbank(*this, "mainbank"),
-		m_mainopbank(*this, "mainopbank"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
+		m_mainopbank(*this, "mainopbank")
 	{
 	}
 
@@ -386,16 +385,15 @@ private:
 
 	required_memory_bank m_mainbank;
 	optional_memory_bank m_mainopbank;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	// used by most games
-	uint8_t m_rombank;
+	uint8_t m_rombank = 0;
 
 	// game-specific
 	std::unique_ptr<uint8_t[]> m_janptr96_nvram;
 
-	uint8_t m_suzume_bank;
-	uint8_t m_mjyarou_bank;
+	uint8_t m_suzume_bank = 0;
+	uint8_t m_mjyarou_bank = 0;
 };
 
 
@@ -405,8 +403,6 @@ void royalmah_state::machine_start()
 	save_item(NAME(m_dsw_select));
 	save_item(NAME(m_palette_base));
 	save_item(NAME(m_flip_screen));
-
-	m_palette_base = 0;
 }
 
 void royalmah_state::royalmah_palette(palette_device &palette) const
@@ -772,7 +768,7 @@ void royalmah_prgbank_state::mjsiyoub_map(address_map &map)
 
 void royalmah_prgbank_state::mjsenka_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x6bff).rom().share(m_decrypted_opcodes);
+	map(0x0000, 0x6bff).rom().region("decrypted", 0);
 	map(0x6c00, 0x6fff).bankr(m_mainopbank);
 	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
@@ -1088,11 +1084,10 @@ void royalmah_prgbank_state::mjsiyoub_audio_prg_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 }
 
+
 /****************************************************************************
                                 Jansou
 ****************************************************************************/
-
-
 
 void royalmah_state::jansou_dsw_sel_w(uint8_t data)
 {
@@ -1269,10 +1264,10 @@ void royalmah_prgbank_state::janptr96_iomap(address_map &map)
 	map(0xd9, 0xd9).portr("SYSTEM").nopw(); // second input select?
 }
 
+
 /****************************************************************************
                                 Mahjong If
 ****************************************************************************/
-
 
 void royalmah_prgbank_state::mjifb_coin_counter_w(uint8_t data)
 {
@@ -5354,13 +5349,15 @@ ROM_START( mjsenka )
 	ROM_LOAD( "1",       0x6000, 0x2000, CRC(83e943d1) SHA1(c4f9b5036627ccb369e7db03a743e496b149af85) )
 	ROM_LOAD( "2",       0x8000, 0x2000, CRC(cdb02fc5) SHA1(5de6b15b79ea7c4246a294b17f166e53be6a4abc) )
 
+	ROM_REGION( 0x10000, "decrypted", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "4.8k",  0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
 
 	ROM_REGION( 0x0220, "user1", 0 ) //?
 	ROM_LOAD( "1.2l",  0x0000, 0x0100, CRC(24599429) SHA1(6c93bb2e7bc9902cace0c9d482fc1584c4c1a114) )
 	ROM_LOAD( "3.1d",  0x0100, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
-	ROM_LOAD( "2.2k",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+	ROM_LOAD( "2.2k",  0x0200, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
 ROM_END
 
 /*
@@ -5729,7 +5726,6 @@ void royalmah_prgbank_state::init_mjtensin()
 	m_mainbank->configure_entries(0, 80, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_cafetime()
@@ -5737,7 +5733,6 @@ void royalmah_prgbank_state::init_cafetime()
 	m_mainbank->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_mjvegasa()
@@ -5745,7 +5740,6 @@ void royalmah_prgbank_state::init_mjvegasa()
 	m_mainbank->configure_entries(0, 128, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_jongshin()
@@ -5758,7 +5752,6 @@ void royalmah_prgbank_state::init_mjifb()
 	m_mainbank->configure_entries(0, 256, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_rombank));
-	m_rombank = 0;
 }
 
 void royalmah_prgbank_state::init_tontonb()
@@ -5779,28 +5772,29 @@ void royalmah_prgbank_state::init_janptr96()
 void royalmah_prgbank_state::init_mjsenka()
 {
 	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *decrypted = memregion("decrypted")->base();
 
 	for (int i = 0x0000; i < 0xa000; i++)
-		m_decrypted_opcodes[i] = rom[i];
+		decrypted[i] = rom[i];
 
 	for (int i = 0x6000; i < 0x8000; i++)
 	{
 		switch (i & 0x15)
 		{
-			case 0x00: m_decrypted_opcodes[i] ^= 0x03; break;
-			case 0x01: m_decrypted_opcodes[i] ^= 0x07; break;
-			case 0x04: m_decrypted_opcodes[i] ^= 0x01; break;
-			case 0x05: m_decrypted_opcodes[i] ^= 0x05; break;
-			case 0x10: m_decrypted_opcodes[i] ^= 0x02; break;
-			case 0x11: m_decrypted_opcodes[i] ^= 0x06; break;
-			case 0x14: m_decrypted_opcodes[i] ^= 0x00; break;
-			case 0x15: m_decrypted_opcodes[i] ^= 0x04; break;
+			case 0x00: decrypted[i] ^= 0x03; break;
+			case 0x01: decrypted[i] ^= 0x07; break;
+			case 0x04: decrypted[i] ^= 0x01; break;
+			case 0x05: decrypted[i] ^= 0x05; break;
+			case 0x10: decrypted[i] ^= 0x02; break;
+			case 0x11: decrypted[i] ^= 0x06; break;
+			case 0x14: decrypted[i] ^= 0x00; break;
+			case 0x15: decrypted[i] ^= 0x04; break;
 		}
 
 		if (i & 0x02)
-			m_decrypted_opcodes[i] ^= 0x80;
+			decrypted[i] ^= 0x80;
 
-		m_decrypted_opcodes[i] = bitswap<8>(m_decrypted_opcodes[i], 2, 6, 5, 4, 3, 0, 7, 1);
+		decrypted[i] = bitswap<8>(decrypted[i], 2, 6, 5, 4, 3, 0, 7, 1);
 	}
 
 	for (int i = 0x6000; i < 0x8000; i++)
@@ -5823,7 +5817,7 @@ void royalmah_prgbank_state::init_mjsenka()
 		rom[i] = bitswap<8>(rom[i], 0, 6, 5, 4, 3, 1, 2, 7);
 	}
 
-	m_mainopbank->configure_entries(0, 8, &m_decrypted_opcodes[0x8000], 0x400);
+	m_mainopbank->configure_entries(0, 8, &decrypted[0x8000], 0x400);
 
 	init_chalgirl();
 }
@@ -5833,7 +5827,6 @@ void royalmah_prgbank_state::init_mjsiyoub()
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x8000, 0x400);
 
 	save_item(NAME(m_mjyarou_bank));
-	m_mjyarou_bank = 0;
 }
 
 void royalmah_prgbank_state::init_chalgirl()
@@ -5841,7 +5834,6 @@ void royalmah_prgbank_state::init_chalgirl()
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x8000, 0x400);
 
 	save_item(NAME(m_mjyarou_bank));
-	m_mjyarou_bank = 0;
 }
 
 void royalmah_prgbank_state::init_ichiban()

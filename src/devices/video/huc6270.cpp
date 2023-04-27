@@ -536,8 +536,8 @@ WRITE_LINE_MEMBER( huc6270_device::hsync_changed )
 			m_byr_latched += 1;
 			m_raster_count += 1;
 			// raster count VSW latch happens one line earlier (cfr. +2 on assignment)
-			// This has been confirmed on real HW, where the last possible RCR with 
-			// 240 VDW is 0x130 (i.e. 64 + 240). m_vert_to_go == 1 will also 
+			// This has been confirmed on real HW, where the last possible RCR with
+			// 240 VDW is 0x130 (i.e. 64 + 240). m_vert_to_go == 1 will also
 			// cause several side effects, namely:
 			// - draculax Stage 4' "all blue" Richter;
 			// - faussete Stage 2 excessive slowdown;

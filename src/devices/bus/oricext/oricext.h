@@ -59,7 +59,7 @@ public:
 	void set_view(memory_view &view);
 	virtual void map_io(address_space_installer &space) = 0;
 	virtual void map_rom() = 0;
-	
+
 protected:
 	device_oricext_interface(const machine_config &mconfig, device_t &device);
 

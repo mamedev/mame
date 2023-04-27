@@ -126,6 +126,7 @@ public:
 	void bishjan(machine_config &config);
 	void saklove(machine_config &config);
 	void mtrain(machine_config &config);
+	void tbonusal(machine_config &config);
 	void humlan(machine_config &config);
 	void new2001(machine_config &config);
 	void expcard(machine_config &config);
@@ -215,7 +216,9 @@ private:
 	void expcard_io(address_map &map);
 	void humlan_map(address_map &map);
 	void mtrain_io(address_map &map);
+	void mtrain_base_map(address_map &map);
 	void mtrain_map(address_map &map);
+	void tbonusal_map(address_map &map);
 	void new2001_base_map(address_map &map);
 	void new2001_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -1312,7 +1315,7 @@ uint8_t subsino2_state::mtrain_prot_r(offs_t offset)
 	return "SUBSION"[offset];
 }
 
-void subsino2_state::mtrain_map(address_map &map)
+void subsino2_state::mtrain_base_map(address_map &map)
 {
 	map(0x00000, 0x077ff).rom();
 
@@ -1333,19 +1336,31 @@ void subsino2_state::mtrain_map(address_map &map)
 	map(0x09147, 0x09147).r(FUNC(subsino2_state::dsw_r));
 	map(0x09148, 0x09148).w(FUNC(subsino2_state::dsw_mask_w));
 
-	map(0x09152, 0x09152).r(FUNC(subsino2_state::vblank_bit2_r)).w(FUNC(subsino2_state::oki_bank_bit0_w));
+	map(0x09152, 0x09152).r(FUNC(subsino2_state::vblank_bit2_r));
 
 	map(0x09158, 0x0915e).r(FUNC(subsino2_state::mtrain_prot_r));
 
 	map(0x09160, 0x09160).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x09161, 0x09161).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x09162, 0x09162).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x09168, 0x09168).w(FUNC(subsino2_state::mtrain_tilesize_w));
 
 	map(0x09800, 0x09fff).ram();
 
 	map(0x0a000, 0x0ffff).rom();
+}
+
+void subsino2_state::mtrain_map(address_map &map)
+{
+	mtrain_base_map(map);
+	map(0x09152, 0x09152).w(FUNC(subsino2_state::oki_bank_bit0_w));
+	map(0x09164, 0x09164).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void subsino2_state::tbonusal_map(address_map &map)
+{
+	mtrain_base_map(map);
+	map(0x09166, 0x09167).w("ymsnd", FUNC(ym3812_device::write));
 }
 
 void subsino2_state::mtrain_io(address_map &map)
@@ -3012,6 +3027,15 @@ void subsino2_state::mtrain(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void subsino2_state::tbonusal(machine_config &config)
+{
+	mtrain(config);
+	config.device_remove("oki");
+	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::tbonusal_map);
+
+	YM3812(config, "ymsnd", 3'000'000).add_route(ALL_OUTPUTS, "mono", 0.80); // ? chip and clock unknown
+}
+
 /***************************************************************************
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
@@ -4003,7 +4027,7 @@ GAME( 1996, mtrain,   0,        mtrain,   mtrain,   subsino2_state, init_mtrain,
 
 GAME( 1996, strain,   0,        mtrain,   strain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Super Train (Ver. 1.9)",               MACHINE_NOT_WORKING )
 
-GAME( 1995, tbonusal, 0,        mtrain,   tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
+GAME( 1995, tbonusal, 0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
 

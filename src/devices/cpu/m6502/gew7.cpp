@@ -12,7 +12,9 @@
 #include "gew7.h"
 
 #include "m6502mcu.ipp"
+
 #include "bus/generic/slot.h"
+
 
 DEFINE_DEVICE_TYPE(GEW7, gew7_device, "gew7", "Yamaha YMW270-F (GEW7)")
 
@@ -47,12 +49,12 @@ void gew7_device::device_start()
 	m_out_cb.resolve_all_safe();
 
 	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
-		unsigned(m_rom->bytes() >> 14),
-		[this, base = &m_rom->as_u8()](unsigned entry, unsigned page)
-	{
-		m_bank[0]->configure_entry(entry, &base[page << 14]);
-		m_bank[1]->configure_entry(entry, &base[page << 14]);
-	});
+			unsigned(m_rom->bytes() >> 14),
+			[this, base = &m_rom->as_u8()] (unsigned entry, unsigned page)
+			{
+				m_bank[0]->configure_entry(entry, &base[page << 14]);
+				m_bank[1]->configure_entry(entry, &base[page << 14]);
+			});
 
 	m_timer_base[0] = m_timer_base[1] = 0;
 

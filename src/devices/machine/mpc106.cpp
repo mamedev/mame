@@ -165,9 +165,28 @@ void mpc106_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 template <u32 Base>
+u32 mpc106_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)
+{
+	const u32 result = m_cpu_space->read_dword(Base + (offset * 4), mem_mask);
+	return result;
+}
+
+template <u32 Base>
+void mpc106_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_cpu_space->write_dword(Base + (offset * 4), data, mem_mask);
+}
+
+template u32 mpc106_host_device::cpu_memory_r<0>(offs_t offset, u32 mem_mask);
+template u32 mpc106_host_device::cpu_memory_r<0xff800000>(offs_t offset, u32 mem_mask);
+
+template void mpc106_host_device::cpu_memory_w<0>(offs_t offset, u32 data, u32 mem_mask);
+template void mpc106_host_device::cpu_memory_w<0xff800000>(offs_t offset, u32 data, u32 mem_mask);
+
+template <u32 Base>
 u32 mpc106_host_device::pci_memory_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
+	const u32 result = this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
 	return result;
 }
 
@@ -208,8 +227,11 @@ template void mpc106_host_device::pci_io_w<0x00800000>(offs_t offset, u32 data, 
 void mpc106_host_device::map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 									 u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space)
 {
-	u64 rom_base = 0x100000000ULL - m_rom_size;
-	memory_space->install_rom(rom_base, 0xffffffff, m_rom);
+	// map RAM and ROM into the PCI memory space (because the PPC bus is 64 bits wide, and weirdness happens on DMA otherwise)
+	memory_space->install_read_handler(0xff800000, 0xffffffff, read32s_delegate(*this, FUNC(mpc106_host_device::cpu_memory_r<0xff800000>)));
+
+	memory_space->install_read_handler(0, m_ram_size - 1, read32s_delegate(*this, FUNC(mpc106_host_device::cpu_memory_r<0>)));
+	memory_space->install_write_handler(0, m_ram_size - 1, write32s_delegate(*this, FUNC(mpc106_host_device::cpu_memory_w<0>)));
 }
 
 u16 mpc106_host_device::pwrconfig1_r()

@@ -42,7 +42,8 @@ Supported games:
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
     enmadaio    TP-031        Toaplan       Enma Daio
     pwrkick     SW931201      Sunwise       Power Kick
-    othldrby    ??????        Sunwise       Othello Derby
+    burgkids    SW931201      Sunwise       Burger Kids
+    othldrby    S951060-VGP   Sunwise       Othello Derby
     snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
 
     * This version of Whoopee!! is on a board labeled TP-020
@@ -2466,6 +2467,88 @@ static INPUT_PORTS_START( pwrkick )
 	// The specific "Payout" button shown on the test screen and diagnostic menu does not exist.
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( burgkids )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x5c, 0x00, "Payout" ) PORT_DIPLOCATION("SW1:!3,!4,!5,!7")
+	PORT_DIPSETTING(    0x00, "110" ) // Service mode displays values as 1-8, ignoring SW1:7
+	PORT_DIPSETTING(    0x04, "105" )
+	PORT_DIPSETTING(    0x08, "100" )
+	PORT_DIPSETTING(    0x0c, "95" )
+	PORT_DIPSETTING(    0x10, "90" )
+	PORT_DIPSETTING(    0x14, "85" )
+	PORT_DIPSETTING(    0x18, "80" )
+	PORT_DIPSETTING(    0x1c, "75" )
+	PORT_DIPSETTING(    0x40, "70" )
+	PORT_DIPSETTING(    0x44, "65" )
+	PORT_DIPSETTING(    0x48, "60" )
+	PORT_DIPSETTING(    0x4c, "55" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x54, "45" )
+	PORT_DIPSETTING(    0x58, "40" )
+	PORT_DIPSETTING(    0x5c, "35" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x00, "Play Credit" ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(    0x00, u8"¥10" )
+	PORT_DIPSETTING(    0x01, u8"¥20" )
+	PORT_DIPSETTING(    0x02, u8"¥30" )
+	PORT_DIPSETTING(    0x03, u8"¥40" )
+	PORT_DIPNAME( 0x1c, 0x00, "Coin Exchange" ) PORT_DIPLOCATION("SW2:!3,!4,!5")
+	PORT_DIPSETTING(    0x00, "12" )
+	PORT_DIPSETTING(    0x04, "11" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x0c, "6" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x14, "4" )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x1c, DEF_STR ( Off ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
+
+	PORT_START("DSWC")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW3:!1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW3:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW3:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW3:!4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW3:!5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW3:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW3:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW3:!8" )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 ) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 ) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SLOT_STOP3 ) PORT_NAME("3")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME(u8"Coin 2 (¥10)")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SLOT_STOP4 ) PORT_NAME("Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SYS")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME(u8"Coin Exchange (¥100)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Key")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin 1 (Medal)")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( othldrby )
 	PORT_INCLUDE( toaplan2_3b )
 
@@ -3920,10 +4003,10 @@ void toaplan2_state::batsugunbl(machine_config &config)
 	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
 }
 
-void pwrkick_state::pwrkick(machine_config &config)
+void pwrkick_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (27.000MHz, 20.000MHz & 16.000MHz OSCs)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL);
+	M68000(config, m_maincpu, 20_MHz_XTAL/2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::pwrkick_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
@@ -3952,14 +4035,14 @@ void pwrkick_state::pwrkick(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	// empty YM2151 socket
-	OKIM6295(config, m_oki[0], 27_MHz_XTAL/8, okim6295_device::PIN7_HIGH); // not confirmed
+	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW); // verified on PCB
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void pwrkick_state::othldrby(machine_config &config)
+void pwrkick_state::othldrby(machine_config &config) // Sunwise S951060-VGP PCB (27.000MHz, 20.000MHz & 16.000MHz OSCs)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL);
+	M68000(config, m_maincpu, 20_MHz_XTAL/2); // assumed same as pwrkick
 	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::othldrby_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
@@ -3986,7 +4069,7 @@ void pwrkick_state::othldrby(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 27_MHz_XTAL/8, okim6295_device::PIN7_HIGH); // not confirmed
+	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW); // assumed same as pwrkick
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -5094,28 +5177,40 @@ ROM_START( batsugunbl )
 	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(1f8ec1b6) SHA1(28107a90d29613ceddc001df2556543b33c1294c) )
 ROM_END
 
-ROM_START( pwrkick )
+ROM_START( pwrkick ) // Sunwise SW931301-1 PCB - 8-liner connections
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "1.u61",        0x000000, 0x080000, CRC(118b5899) SHA1(7a1637a63eb17e3892d79aede5730013a1dc00f9) )
+	ROM_LOAD16_WORD_SWAP( "1.u61", 0x000000, 0x080000, CRC(118b5899) SHA1(7a1637a63eb17e3892d79aede5730013a1dc00f9) )
 
 	ROM_REGION( 0x100000, "gp9001_0", ROMREGION_ERASE00 )
-	ROM_LOAD( "2.u26",        0x000000, 0x080000, CRC(a190eaea) SHA1(2c7b8c8026873e0f591fbcbc2e72b196ef84e162) )
-	ROM_LOAD( "3.u27",        0x080000, 0x080000, CRC(0b81e038) SHA1(8376617ae519a8ef604f20b26e941aa5b8066602) )
+	ROM_LOAD( "2.u26", 0x000000, 0x080000, CRC(a190eaea) SHA1(2c7b8c8026873e0f591fbcbc2e72b196ef84e162) )
+	ROM_LOAD( "3.u27", 0x080000, 0x080000, CRC(0b81e038) SHA1(8376617ae519a8ef604f20b26e941aa5b8066602) )
 
 	ROM_REGION( 0x80000, "oki1", ROMREGION_ERASE00 )
-	ROM_LOAD( "4.u33",        0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
+	ROM_LOAD( "4.u33", 0x000000, 0x080000, CRC(3ab742f1) SHA1(ce8ca02ca57fd77872e421ce601afd017d3518a0) )
 ROM_END
 
-ROM_START( othldrby )
+ROM_START( burgkids ) // Sunwise SW931301-1 PCB - 8-liner connections
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ffk1.u61", 0x000000, 0x080000, CRC(ac96cb0d) SHA1(2ce5c06d61f3ff18b222619e41d09e46d44c5bab) )
+
+	ROM_REGION( 0x100000, "gp9001_0", ROMREGION_ERASE00 )
+	ROM_LOAD( "ffk2.u26", 0x000000, 0x080000, CRC(09f7b0ae) SHA1(f340f27a601ff89f143398263d822b8f340eea6e) )
+	ROM_LOAD( "ffk3.u27", 0x080000, 0x080000, CRC(63c761bc) SHA1(f0ee1dc6aaeacff23e55d072102b814c7ef30550) )
+
+	ROM_REGION( 0x80000, "oki1", ROMREGION_ERASE00 )
+	ROM_LOAD( "ffk4.u33", 0x000000, 0x080000,  CRC(3b032d4f) SHA1(69056bf205aadf6c9fee56ce396b11a5187caa03) )
+ROM_END
+
+ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components identical to Sunwise SW931301-1 PCB)
 	ROM_REGION( 0x080000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "db0.1",        0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
+	ROM_LOAD16_WORD_SWAP( "sunwise_db0_1.u61", 0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
-	ROM_LOAD( "db0-r2",       0x000000, 0x200000, CRC(4efff265) SHA1(4cd239ff42f532495946cb52bd1fee412f84e192) )
-	ROM_LOAD( "db0-r3",       0x200000, 0x200000, CRC(5c142b38) SHA1(5466a8b061a0f2545493de0f96fd4387beea276a) )
+	ROM_LOAD( "db0-r2.u26", 0x000000, 0x200000, CRC(4efff265) SHA1(4cd239ff42f532495946cb52bd1fee412f84e192) ) // mask ROMs
+	ROM_LOAD( "db0-r3.u27", 0x200000, 0x200000, CRC(5c142b38) SHA1(5466a8b061a0f2545493de0f96fd4387beea276a) )
 
 	ROM_REGION( 0x080000, "oki1", 0 )    /* OKIM6295 samples */
-	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
+	ROM_LOAD( "sunwise_db0_4.u33", 0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
 ROM_START( enmadaio )
@@ -6121,6 +6216,7 @@ GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, toaplan2_state, init_fixeightbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
+GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",         "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",       MACHINE_SUPPORTS_SAVE )

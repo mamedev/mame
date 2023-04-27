@@ -492,22 +492,22 @@ void m68000_mcu_device::execute_run()
 		for(;;) {
 			if(m_icount > m_bcount && m_inst_substate)
 				(this->*(m_handlers_p[m_inst_state]))();
-			
+
 			while(m_icount > m_bcount) {
 				if(m_inst_state >= S_first_instruction) {
 					m_ipc = m_pc - 2;
 					m_irdi = m_ird;
-					
+
 					if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 						debugger_instruction_hook(m_ipc);
 				}
 				(this->*(m_handlers_f[m_inst_state]))();
 			}
-			
+
 			if(m_post_run)
 				do_post_run();
 			else
-				break;			
+				break;
 		}
 		if(m_icount > 0)
 			while(m_bcount && m_icount <= m_bcount)

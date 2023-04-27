@@ -17888,6 +17888,7 @@ jolycdii                        // 1993 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
+jolygame                        // 1983 bootleg
 jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
 jolyjokrb1                      // (c) 1985 Impera
@@ -17896,6 +17897,8 @@ jolyjokrc                       // (c) 198? Apple Time
 jolyjokrm                       // (c) 198? Impera
 jolyjokro                       // (c) 198? Impera
 jolyjokrp                       // (c) 198? Impera
+jolyjokrs                       // (c) 198? Impera (Otti Karl logo)
+jolyjokrt                       // (c) 198? Impera (Otti Karl logo)
 lluck3x3                        // (c) 1991 TAB-Austria
 lluck4x1                        // (c) 1991 TAB-Austria
 lunapark                        // 1998 unknown.
@@ -17907,6 +17910,7 @@ magicrd2a                       // (c) 1996 Impera
 magicrd2b                       // (c) 1996 Impera
 magicrd2c                       // (c) 1996 Impera
 megacard                        // (c) 1993 Fun World
+megacarda                       // (c) 1992 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
 multiwina                       // (c) 1991 Fun World
@@ -17914,6 +17918,8 @@ multiwinb                       // (c) 2001 Amatic
 nevadafw                        // 199? unknown
 nkoulit                         // 1995 JK Amusement
 novoplay                        // (c) 1986 Novomatic
+novoplaya                       // (c) 1991 Novomatic
+novoplayb                       // (c) 1991 Novomatic
 pool10                          // (c) 1996 C.M.C.
 pool10b                         // (c) 1996 C.M.C.
 pool10c                         // (c) 1996 C.M.C.
@@ -32308,6 +32314,7 @@ ncv2j                           // (c) 1996 (Japan)
 abcheck                         // (c) 1996 (Japan)
 
 @source:namco/namcops2.cpp
+acedriv3                        //
 bldyr3b                         //
 cobrata                         //
 dragchrn                        //
@@ -32480,9 +32487,9 @@ g13jnr                          // 2001.07 Golgo 13: Juusei no Requiem (Japan, G
 gahaha                          // 2000.03 GAHAHA Ippatsudou (World, GID2 Ver.A)
 gahaha2                         // 2001.09 GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
-gamsharaj                       // 2002.08 Gamshara (10021 Ver.A)
+gamsharao                       // 2002.08 Gamshara (10021 Ver.A)
 gegemdb                         // 2007.12 Gegege no Kitarō Yōkai Yokochō Matsuri de Battle Ja (GYM1 Ver.A)
-gjspace                         // 2001.12 Gekitoride-Jong Space (10011 Ver.A)
+gjspace                         // 2001.12 GekiToride-Jong Space (10011 Ver.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
 kd2001                          // 2001.11 Knock Down 2001 (KD11 Ver.B)
 keroro                          // 2006.08 Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)
@@ -32497,7 +32504,7 @@ mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
 nicetsuk                        // 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)
 pacmball                        // 2003.?? Pacman Ball
-panikuru                        // 2002.03 Panicuru Panekuru
+panikuru                        // 2002.03 Panikuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 puzzball                        // 2002.02 Puzz Ball (Japan, PZB1 Ver.A)
 sekaikh                         // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
@@ -39448,6 +39455,7 @@ dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
+isshoni                         // 2008.?? Isshoni Wanwan Waiwai Puppy 2008
 huhimage                        // 2019.01 Heat Up Hockey Image (Ver.1.003R)
 kingyo                          // 2009.10 Yataimura Kingyosukui (1-player, Japan, Ver 1.005)
 kingyoch                        // 2009.03 Yataimura Kingyosukui (4-player, China, Ver 1.000)
@@ -43787,6 +43795,7 @@ bgaregganv                      // (c) 1996 Raizing/8ing
 bgareggat                       // (c) 1996 Raizing/8ing
 bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
+burgkids                        // (c) 1995 Sunwise
 dogyuun                         // TP-022 (c) 1992 Toaplan
 dogyuuna                        // TP-022 (c) 1992 Toaplan
 dogyuunb                        // TP-022 (c) 1992 Toaplan
