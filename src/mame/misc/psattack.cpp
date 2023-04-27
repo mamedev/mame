@@ -184,6 +184,7 @@ void psattack_state::cfcard_regs_w(offs_t offset, uint8_t data)
 
 uint16_t psattack_state::cfcard_data_r()
 {
+	// TODO: may not be it (pushes data into stack then never read it other than a comparison check from +0xfc)
 	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
