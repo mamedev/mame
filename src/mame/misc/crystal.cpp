@@ -571,13 +571,13 @@ INPUT_PORTS_END
 
 void crystal_state::crystal(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14318180 * 3); // TODO : different between each PCB
+	SE3208(config, m_maincpu, XTAL(14'318'181) * 3); // TODO : configurable with PLL?
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180);
+	VRENDER0_SOC(config, m_vr0soc, XTAL(14'318'181));
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
