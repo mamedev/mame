@@ -15406,7 +15406,7 @@ GAMEL( 1996, peps0716,  0,        peplus, peplus_slots,  peplus_state, init_pepl
 GAMEL( 1996, peps0722,  peps0716, peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Player's Edge Plus (PS0722) River Gambler Slots",              MACHINE_SUPPORTS_SAVE, layout_pe_slots )
 
 // IGT Sovereign slots (Australia)
-GAMEL( 1992, sv1pf434,  0,        peplus, peplus_fantasy, peplus_state, init_peplus,  ROT0, "IGT - International Game Technology", "Sovereign (1PF434A3) Fantasy",                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) // occasionally makes an alarm sound most likely related to the door
+GAMEL( 1992, sv1pf434,  0,        peplus, peplus_fantasy, peplus_state, init_peplus,  ROT0, "IGT - International Game Technology", "Sovereign (1PF434A3) Fantasy",                                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_fantasy ) // occasionally makes an alarm sound most likely related to the door
 
 // IGT Imperial slots (New Zealand)
 GAMEL( 1995, im1p1952,  0,        peplus, peplus_slots,  peplus_state, init_peplus,   ROT0, "IGT - International Game Technology", "Imperial (1P1952IZ) Blue Moon",                                MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_pe_slots ) // stuck during initialization, CAP not dumped

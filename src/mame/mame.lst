@@ -43276,7 +43276,8 @@ vballb                          // bootleg (of US set)
 
 @source:technos/wwfsstar.cpp
 wwfsstar                        // TA-0024 (c) 1989 (Europe)
-wwfsstarb                       // TA-0024 (c) 1989 (Japan)
+wwfsstarb                       // bootleg
+wwfsstarb2                      // bootleg
 wwfsstarc                       // TA-0024 (c) 1989 (Canada)
 wwfsstarj                       // TA-0024 (c) 1989 (Japan)
 wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
