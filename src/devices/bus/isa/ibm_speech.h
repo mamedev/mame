@@ -28,9 +28,6 @@ public:
 	uint8_t shift_register_r();
 	void shift_register_w(uint8_t data);
 
-	uint8_t pit_r(offs_t offset);
-	void pit_w(offs_t offset, uint8_t data);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

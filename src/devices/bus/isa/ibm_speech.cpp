@@ -189,22 +189,6 @@ void isa8_ibm_speech_device::rom_page_w(uint8_t data)
 }
 
 /******************************************************************************
-    PIT I/O
-******************************************************************************/
-uint8_t isa8_ibm_speech_device::pit_r(offs_t offset)
-{
-	uint8_t data = m_pit->read(offset);
-	LOGMASKED(LOG_PIT, "%s: O:%02X D:%02X\n", FUNCNAME, offset, data);
-	return data;
-}
-
-void isa8_ibm_speech_device::pit_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_PIT, "%s: O:%02X D:%02X\n", FUNCNAME, offset, data);
-	m_pit->write(offset, data);
-}
-
-/******************************************************************************
     Audio Control Latch
 
     This is for multiplexing interrupt and audio sources.
