@@ -121,7 +121,7 @@ void vrender0soc_device::frame_map(address_map &map)
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
 	for (required_device<vr0uart_device> &uart : m_uart)
-		VRENDER0_UART(config, uart, 3579500);
+		VRENDER0_UART(config, uart, DERIVED_CLOCK(1, 4));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// evolution soccer defaults
@@ -131,14 +131,14 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	// runs at double speed wrt of the CPU clock
-	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(2, 1));
+	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(6, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	SPEAKER(config, m_lspeaker).front_left();
 	SPEAKER(config, m_rspeaker).front_right();
 
-	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(1,1)); // Correct?
+	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(3, 1)); // Correct?
 	m_vr0snd->set_addrmap(vr0sound_device::AS_TEXTURE, &vrender0soc_device::texture_map);
 	m_vr0snd->set_addrmap(vr0sound_device::AS_FRAME, &vrender0soc_device::frame_map);
 	m_vr0snd->irq_callback().set(FUNC(vrender0soc_device::soundirq_cb));
@@ -637,7 +637,7 @@ void vrender0soc_device::crtc_update()
 	}
 
 	// ext vclk set up by Sealy games in menghong.cpp
-	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : m_ext_vclk;
+	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? clock() : m_ext_vclk;
 	if (pixel_clock == 0)
 		fatalerror("%s: Accessing external vclk in CRTC parameters, please set it up via setter in config\n",this->tag());
 
