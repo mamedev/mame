@@ -103,11 +103,9 @@ void pseudo_terminal_device::tra_complete()
 
 void pseudo_terminal_device::rcv_complete()
 {
-	u8 data;
-
 	receive_register_extract();
 
-	data = get_received_char();
+	uint8_t const data = get_received_char();
 	if (m_flow->read() != 4)
 	{
 		write(data);
@@ -138,17 +136,16 @@ TIMER_CALLBACK_MEMBER(pseudo_terminal_device::update_queue)
 		if (m_input_index == m_input_count)
 		{
 			m_input_index = 0;
-			int tmp = read(m_input_buffer , sizeof(m_input_buffer));
-			if (tmp > 0) {
+			int const tmp = read(m_input_buffer , sizeof(m_input_buffer));
+			if (tmp > 0)
 				m_input_count = tmp;
-			} else {
+			else
 				m_input_count = 0;
-			}
 		}
 
 		if (m_input_count != 0)
 		{
-			uint8_t fc = m_flow->read();
+			uint8_t const fc = m_flow->read();
 
 			if (fc == 0 || (fc == 1 && m_rts == 0) || (fc == 2 && m_dtr == 0) || (fc == 4 && m_xoff == 0))
 			{
@@ -158,7 +155,7 @@ TIMER_CALLBACK_MEMBER(pseudo_terminal_device::update_queue)
 			}
 		}
 
-		int txbaud = convert_baud(m_rs232_txbaud->read());
+		int const txbaud = convert_baud(m_rs232_txbaud->read());
 		m_timer_poll->adjust(attotime::from_hz(txbaud));
 	}
 }

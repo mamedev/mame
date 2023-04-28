@@ -26,14 +26,14 @@ void vector_sbc_video_device::spr_w(uint8_t data)
 void vector_sbc_video_device::res320_mapping_ram_w(offs_t offset, uint8_t data)
 {
 	// 7200-0001 page 209 (VI A-6) C6
-	m_res320_ram[offset & 0x3] = data & 0x0F;
+	m_res320_ram[offset & 0x3] = data & 0x0f;
 }
 
 static inline rgb_t raw_4bit_to_rgb(uint8_t enc, bool color)
 {
 	if (color) {
 		// 7200-0001 page 83. Ordering: IBGR
-		enc = (enc & 0xa) | (BIT(enc, 0) << 2) | BIT(enc, 2);
+		enc = bitswap<4>(enc, 3, 0, 1, 2);
 		return rgb_t(cga_palette[enc][0], cga_palette[enc][1], cga_palette[enc][2]);
 	} else {
 		// 7200-0001 page 209 C11
@@ -115,7 +115,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 		for (uint16_t x = 0; x < x_count*2; x++) {
 			// Character Generators. 7200-0001 page 69 (II 3-6) C4
 			uint8_t cell = m_buffer->read(x+addr);
-			uint8_t chr = cell & 0x7F;
+			uint8_t chr = cell & 0x7f;
 			uint8_t invert = BIT(cell, 7);
 			uint8_t gfxl = m_chrroml[chr | (ra << 7) | (chr1 << 11)];
 			uint8_t gfxr = m_chrromr[chr | (ra << 7) | (chr1 << 11)];
