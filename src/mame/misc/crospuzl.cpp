@@ -364,7 +364,7 @@ void crospuzl_state::crospuzl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3); // FIXME: 72 MHz-ish
+	VRENDER0_SOC(config, m_vr0soc, 14318180); // FIXME: 72 MHz-ish
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(14318180 * 2); // Unknown clock, should output ~70 Hz?
 

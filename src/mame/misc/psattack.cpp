@@ -247,7 +247,7 @@ void psattack_state::psattack(machine_config &config)
 
 	// PIC16C711
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14318180);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
 

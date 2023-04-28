@@ -577,7 +577,7 @@ void crystal_state::crystal(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14318180);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);

@@ -300,7 +300,7 @@ void trivrus_state::trivrus(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14318180);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(28636360);
 	m_vr0soc->tx_callback<0>().set(m_microtouch, FUNC(microtouch_device::rx));

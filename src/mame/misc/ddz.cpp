@@ -130,7 +130,7 @@ void ddz_state::ddz(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::ddz_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
-	VRENDER0_SOC(config, m_vr0soc, 14318180 * 3);
+	VRENDER0_SOC(config, m_vr0soc, 14318180);
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 }
 
