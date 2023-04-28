@@ -340,7 +340,7 @@ static const uint8_t cc_ex[0x100] = {
 } while (0)
 
 // T Memory Address
-#define MTM ((m_cc_op == nullptr ? 4 : m_cc_op[0])-1)
+#define MTM (m_mtm_cycles)
 
 #define EXEC(prefix,opcode) do { \
 	unsigned op = opcode; \
@@ -3811,6 +3811,12 @@ void z80_device::z80_set_cycle_tables(const uint8_t *op, const uint8_t *cb, cons
 	m_cc_xy = (xy != nullptr) ? xy : cc_xy;
 	m_cc_xycb = (xycb != nullptr) ? xycb : cc_xycb;
 	m_cc_ex = (ex != nullptr) ? ex : cc_ex;
+}
+
+
+void z80_device::set_mtm_cycles(uint8_t mtm_cycles)
+{
+	m_mtm_cycles = mtm_cycles;
 }
 
 
