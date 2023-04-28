@@ -82,6 +82,10 @@ ROM_START(bolsaint)
 	// Four sockets, only two populated
 	ROM_LOAD("bolsa_internacional_bisound01-1.ic4",       0x00000, 0x80000, CRC(4210a665) SHA1(2a8af1be8d8adfc1c630b8dd2babaa9e0f06f696))
 	ROM_LOAD("bolsa_internacional_bisound02-2.ic5",       0x80000, 0x80000, CRC(910fa2d3) SHA1(0d48e22ef01865947d4716926406f40c126d639a))
+
+	ROM_REGION(0x117, "plds", 0)
+	// On the "roulette" PCB ("SLEIC-PETACO 011-114")
+	ROM_LOAD("palce16v8h.bin", 0x000, 0x117, NO_DUMP)
 ROM_END
 
 } // anonymous namespace
