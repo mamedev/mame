@@ -344,7 +344,7 @@ void vrender0soc_device::TimerStart(int which)
 	int PD = (m_timer_control[which] >> 8) & 0xff;
 	int TCV = m_timer_count[which] & 0xffff;
 	// TODO: documentation claims this is bus clock, may be slower than the CPU itself
-	attotime period = attotime::from_hz(this->clock()) * ((PD + 1) * (TCV + 1));
+	attotime period = attotime::from_hz(this->clock() * 3) * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
 
 //  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
