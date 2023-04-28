@@ -220,27 +220,52 @@ namespace bx
 		return pow(_a, -0.5f);
 	}
 
-	inline BX_CONST_FUNC float sqrtRef(float _a)
-	{
-		return _a*pow(_a, -0.5f);
-	}
-
 	inline BX_CONST_FUNC float rsqrtSimd(float _a)
 	{
-		const simd128_t aa     = simd_splat(_a);
+		if (_a < kNearZero)
+		{
+			return kFloatInfinity;
+		}
+
+		const simd128_t aa = simd_splat(_a);
+#if BX_SIMD_NEON
 		const simd128_t rsqrta = simd_rsqrt_nr(aa);
+#else
+		const simd128_t rsqrta = simd_rsqrt_ni(aa);
+#endif // BX_SIMD_NEON
+
 		float result;
 		simd_stx(&result, rsqrta);
 
 		return result;
 	}
 
+	inline BX_CONST_FUNC float sqrtRef(float _a)
+	{
+		if (_a < 0.0F)
+		{
+			return bitsToFloat(kFloatExponentMask | kFloatMantissaMask);
+		}
+
+		return _a * pow(_a, -0.5f);
+	}
+
 	inline BX_CONST_FUNC float sqrtSimd(float _a)
 	{
-		const simd128_t aa    = simd_splat(_a);
-		const simd128_t sqrta = simd_sqrt(aa);
+		if (_a < 0.0F)
+		{
+			return bitsToFloat(kFloatExponentMask | kFloatMantissaMask);
+		}
+		else if (_a < kNearZero)
+		{
+			return 0.0f;
+		}
+
+		const simd128_t aa   = simd_splat(_a);
+		const simd128_t sqrt = simd_sqrt(aa);
+
 		float result;
-		simd_stx(&result, sqrta);
+		simd_stx(&result, sqrt);
 
 		return result;
 	}
