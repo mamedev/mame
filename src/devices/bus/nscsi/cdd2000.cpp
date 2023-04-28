@@ -46,7 +46,8 @@ void cdd2000_device::device_add_mconfig(machine_config &config)
 	cdcpu.set_default_config(0x0b);
 	cdcpu.out_pa_callback().set_membank(m_rombank).mask(0x60).rshift(5);
 
-	NCR53CF94(config, "scsic", 25'000'000); // type and clock guessed
+	ncr53cf94_device &scsic(NCR53CF94(config, "scsic", 25'000'000)); // type and clock guessed
+	scsic.irq_handler_cb().set_inputline(m_cdcpu, MC68HC11_IRQ_LINE);
 }
 
 ROM_START(cdd2000)

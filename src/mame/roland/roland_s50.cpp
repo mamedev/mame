@@ -14,6 +14,7 @@
 #include "formats/roland_dsk.h"
 
 //#include "bus/midi/midi.h"
+#include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/mcs96/i8x9x.h"
 #include "imagedev/floppy.h"
@@ -421,6 +422,7 @@ static void floppy_formats(format_registration &fr)
 
 static void scsi_devices(device_slot_interface &device)
 {
+	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
