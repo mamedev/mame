@@ -26479,6 +26479,9 @@ mmm_ldip                        // Lucky Dip
 @source:mc/mc68000.cpp
 mc68000                         // (c) 1984 mc / Franzis Verlag
 
+@source:mc/mccpm.cpp
+mccpm                           //
+
 @source:mchester/ssem.cpp
 ssem                            // Manchester Small-Scale Experimental Machine, "Baby"
 
@@ -41141,9 +41144,6 @@ lilith                          //
 
 @source:skeleton/lms46.cpp
 lms46                           //
-
-@source:skeleton/mccpm.cpp
-mccpm                           //
 
 @source:skeleton/mes.cpp
 mes                             //
