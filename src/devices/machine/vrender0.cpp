@@ -121,7 +121,7 @@ void vrender0soc_device::frame_map(address_map &map)
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
 	for (required_device<vr0uart_device> &uart : m_uart)
-		VRENDER0_UART(config, uart, DERIVED_CLOCK(1, 4));
+		VRENDER0_UART(config, uart, 3579500); // Internal or External clock (UCLK)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// evolution soccer defaults
