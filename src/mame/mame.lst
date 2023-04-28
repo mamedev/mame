@@ -26476,6 +26476,9 @@ screenpl                        // Screenplay
 @source:maygay/mmm.cpp
 mmm_ldip                        // Lucky Dip
 
+@source:mc/mc68000.cpp
+mc68000                         // (c) 1984 mc / Franzis Verlag
+
 @source:mchester/ssem.cpp
 ssem                            // Manchester Small-Scale Experimental Machine, "Baby"
 
