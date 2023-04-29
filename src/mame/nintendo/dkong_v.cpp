@@ -130,7 +130,7 @@ static const res_net_info radarscp_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470 * TRS_J1, 470*(1-TRS_J1), 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_EMITTER,    680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /*  radarscp */
+		{ RES_NET_AMP_DARLINGTON, 680 * TRS_J1, 680*(1-TRS_J1), 2, {  470, 220,   0 } }    /* TKG-02 (Radarscope Conversion) */
 	}
 };
 
