@@ -35,7 +35,6 @@ sgi_mc_device::sgi_mc_device(const machine_config &mconfig, const char *tag, dev
 	, m_eisa_present(*this)
 	, m_dma_timer(nullptr)
 	, m_last_update_time(attotime::zero)
-	, m_elapsed_time(attotime::zero)
 	, m_watchdog(0)
 	, m_sys_id(0)
 	, m_rpss_divider(0)
@@ -88,7 +87,6 @@ void sgi_mc_device::device_start()
 	m_dma_timer->adjust(attotime::never);
 
 	save_item(NAME(m_last_update_time));
-	save_item(NAME(m_elapsed_time));
 	save_item(NAME(m_cpu_control));
 	save_item(NAME(m_watchdog));
 	save_item(NAME(m_sys_id));
@@ -306,18 +304,11 @@ void sgi_mc_device::update_count()
 	const uint32_t divide = (m_rpss_divider & 0xff) + 1;
 	const uint32_t increment = (m_rpss_divider >> 8) & 0xff;
 	const uint32_t freq = clock() / divide;
-	attotime curr_time = machine().scheduler().time();
-	/* Quantise curr_time to the clock frequency */
-	curr_time = attotime::from_ticks(curr_time.as_ticks(freq), freq);
-	attotime time_delta = curr_time - m_last_update_time;
-	m_last_update_time = curr_time;
-	m_elapsed_time += time_delta;
-	uint32_t ticks = (uint32_t)m_elapsed_time.as_ticks(freq);
-	if (ticks > 0)
-	{
-		m_elapsed_time -= attotime::from_ticks(ticks, freq);
-		m_rpss_counter += ticks * increment;
-	}
+	const attotime elapsed = machine().scheduler().time() - m_last_update_time;
+	/* Quantise elapsed to the clock frequency */
+	const auto ticks = elapsed.as_ticks(freq);
+	m_last_update_time += attotime::from_ticks(ticks, freq);
+	m_rpss_counter += uint32_t(ticks * increment);
 }
 
 uint32_t sgi_mc_device::read(offs_t offset, uint32_t mem_mask)

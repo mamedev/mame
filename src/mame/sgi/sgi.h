@@ -75,7 +75,6 @@ private:
 	emu_timer *m_dma_timer;
 
 	attotime m_last_update_time;
-	attotime m_elapsed_time;
 
 	uint32_t m_cpu_control[2];
 	uint32_t m_watchdog;
