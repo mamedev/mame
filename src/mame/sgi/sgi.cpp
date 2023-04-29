@@ -515,8 +515,8 @@ void sgi_mc_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 	case 0x0028/4:
 		LOGMASKED(LOG_RPSS, "%s: RPSS Divider Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-		m_rpss_divider = data;
 		update_count();
+		m_rpss_divider = data;
 		break;
 	case 0x0030/4:
 		LOGMASKED(LOG_WRITES, "%s: R4000 EEPROM Write: CS:%d, SCK:%d, SO:%d\n", machine().describe_context(),
