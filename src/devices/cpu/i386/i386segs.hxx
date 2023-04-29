@@ -2133,7 +2133,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			newESP = READ32(ea+12);
 			newSS = READ32(ea+16) & 0xffff;
 			/* Return to v86 mode */
-			//LOGMASKED(LOG_PM_EVENTS, "IRET (%08x): Returning to Virtual 8086 mode.\n",m_pc);
+			LOGMASKED(LOG_PM_EVENTS, "IRET (%08x): Returning to Virtual 8086 mode.\n",m_pc);
 			if(CPL != 0)
 			{
 				uint32_t oldflags = get_flags();
@@ -2507,7 +2507,7 @@ inline void i386_device::dri_changed()
 				}
 				if(true_mask == 0)
 				{
-					LOGMASKED(LOG_GENERAL, "i386: Unknown breakpoint length value\n");
+					logerror("i386: Unknown breakpoint length value\n");
 				}
 				else if(breakpoint_type == 1)
 				{
