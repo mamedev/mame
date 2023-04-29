@@ -28,6 +28,21 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
+#define LOG_MSR				(1U <<	1)
+#define LOG_INVALID_OPCODE	(1U <<	2)
+#define LOG_LIMIT_CHECK		(1U <<	3)
+#define LOG_UNEMULATED		(1U	<<	4)
+#define LOG_PM_EVENTS		(1U <<	5)
+#define LOG_PM_FAULT_GP		(1U <<  6)
+#define LOG_PM_FAULT_SS		(1U << 	7)
+#define LOG_PM_FAULT_NP		(1U <<	8)
+#define LOG_PM_FAULT_TS		(1U <<  9)
+#define LOG_PM_FAULT_DF		(1U <<	10)
+#define LOG_PM_FAULT_UD		(1U <<	11)
+
+//#define VERBOSE (LOG_PM_FAULT_GP)
+#include "logmacro.h"
+
 /* seems to be defined on mingw-gcc */
 #undef i386
 
@@ -1552,7 +1567,7 @@ void i386_device::build_cycle_table()
 void i386_device::report_invalid_opcode()
 {
 #ifndef DEBUG_MISSING_OPCODE
-	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
+	LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
 	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
@@ -1567,7 +1582,7 @@ void i386_device::report_invalid_opcode()
 void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 {
 #ifndef DEBUG_MISSING_OPCODE
-	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
+	LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
 	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
@@ -2792,7 +2807,7 @@ void i386_device::execute_run()
 					phys_addr = (m_cr[0] & (1 << 31)) ? translate_address(m_CPL, TR_FETCH, &m_dr[i], &error) : m_dr[i];
 					if(breakpoint_length != 0) // Not one byte in length? logerror it, I have no idea how this works on real processors.
 					{
-						logerror("i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
+						LOGMASKED(LOG_INVALID_OPCODE, "i386: Breakpoint length not 1 byte on an instruction breakpoint\n");
 					}
 					if(m_pc == phys_addr)
 					{
@@ -2878,20 +2893,20 @@ std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 
 void i386_device::opcode_cpuid()
 {
-	logerror("CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
+	LOGMASKED(LOG_MSR, "CPUID called with unsupported EAX=%08x at %08x!\n", REG32(EAX), m_eip);
 }
 
 uint64_t i386_device::opcode_rdmsr(bool &valid_msr)
 {
 	valid_msr = false;
-	logerror("RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
+	LOGMASKED(LOG_MSR, "RDMSR called with unsupported ECX=%08x at %08x!\n", REG32(ECX), m_eip);
 	return -1;
 }
 
 void i386_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 {
 	valid_msr = false;
-	logerror("WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
+	LOGMASKED(LOG_MSR, "WRMSR called with unsupported ECX=%08x (%08x%08x) at %08x!\n", REG32(ECX), (uint32_t)(data >> 32), (uint32_t)data, m_eip);
 }
 
 /*****************************************************************************/
@@ -3386,7 +3401,7 @@ void pentium3_device::opcode_cpuid()
 			// (upper 32-bits part is in EAX=1 EAX return)
 			// NB: if this is triggered from an Arcade system then there's a very good chance
 			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
-			logerror("CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
+			LOGMASKED(LOG_MSR, "CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
 			REG32(EAX) = 0x00000000;
 			REG32(EBX) = 0x00000000;
 			REG32(ECX) = 0x01234567;
