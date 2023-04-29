@@ -853,31 +853,7 @@ public:
 	void ns10_taiko5(machine_config &config);
 	void ns10_taiko6(machine_config &config);
 
-	void init_ballpom();
-	void init_chocovdr();
-	void init_gahaha();
-	void init_gahaha2();
-	void init_gamshara();
-	void init_gjspace();
-	void init_gunbalina();
-	void init_keroro();
-	void init_knpuzzle();
-	void init_konotako();
-	void init_medalnt();
-	void init_medalnt2();
-	void init_mrdrilrg();
-	void init_nflclsfb();
-	void init_pacmball();
-	void init_panikuru();
-	void init_puzzball();
-	void init_sekaikh();
-	void init_startrgn();
-	void init_sugorotic();
-	void init_taiko2();
-	void init_taiko3();
-	void init_taiko4();
-	void init_taiko5();
-	void init_taiko6();
+	void memn_driver_init();
 
 protected:
 	virtual void machine_start() override;
@@ -890,8 +866,6 @@ protected:
 
 	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
 	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
-
-	void memn_driver_init();
 
 	void pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
@@ -936,10 +910,6 @@ public:
 	void ns10_g13jnr(machine_config &config);
 	void ns10_nicetsuk(machine_config &config);
 	void ns10_squizchs(machine_config &config);
-
-	void init_g13jnr();
-	void init_nicetsuk();
-	void init_squizchs();
 
 protected:
 	virtual void machine_start() override;
@@ -1794,155 +1764,6 @@ void namcos10_memn_state::memn_driver_init()
 	nand_copy(nand_base, (uint16_t *)(bios + 0x0020000), 0x120, 0x1f00);
 }
 
-void namcos10_memn_state::init_ballpom()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_chocovdr()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0x8, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gahaha()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xe, 0xc, 0xf, 0xa, 0x8, 0xb, 0x9, 0x6, 0x7, 0x4, 0x5, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gahaha2()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gamshara()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gjspace()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0x8, 0xa, 0x6, 0x5, 0x7, 0xe, 0x4, 0xf, 0xd, 0x9, 0x1, 0x0, 0x2, 0xb, 0xc, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_gunbalina()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_keroro()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_knpuzzle()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_konotako()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0x8, 0x9, 0xb, 0xa, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_medalnt()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_medalnt2()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0xa, 0x8, 0xb, 0x9, 0x4, 0x7, 0x6, 0x5, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_mrdrilrg()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_nflclsfb()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_pacmball()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0xb, 0xa, 0x9, 0x4, 0x5, 0x7, 0x6, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_panikuru()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x1, 0x0, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_puzzball()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x7, 0x6, 0x1, 0x0, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_sekaikh()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_startrgn()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_sugorotic()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x2, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko2()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xe, 0xf, 0x9, 0x8, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x2, 0x3, 0x0, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko3()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko4()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0x8, 0xb, 0xa, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko5()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
-	memn_driver_init();
-}
-
-void namcos10_memn_state::init_taiko6()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
-	memn_driver_init();
-}
 
 void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int nand_count)
 {
@@ -1960,23 +1781,27 @@ void namcos10_memn_state::namcos10_nand_k9f5608u0d(machine_config &config, int n
 	}
 }
 
+// nasty, but makes code more terse
+inline int gf2_reduce(uint64_t num) { return ns10_type2_decrypter_device::gf2_reduce(num); }
+
 void namcos10_memn_state::ns10_ballpom(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
+
 	/* decrypter device (CPLD in hardware?) */
 	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
 }
-
-// nasty, but makes code more terse
-inline int gf2_reduce(uint64_t num) { return ns10_type2_decrypter_device::gf2_reduce(num); }
 
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 5);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0x8, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x0, 0x3, 0x2, 0x1); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2004,6 +1829,8 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xe, 0xc, 0xf, 0xa, 0x8, 0xb, 0x9, 0x6, 0x7, 0x4, 0x5, 0x0, 0x3, 0x2, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000010a08200ULL, 0x00000000001b0204ULL, 0x00004ba503024016ULL, 0x0000000000000004ULL,
@@ -2029,6 +1856,8 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000080064001ULL, 0x000000000a000104ULL, 0x0000018220912000ULL, 0x0000000001822010ULL,
@@ -2053,6 +1882,8 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x0, 0x1, 0x2, 0x3); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2089,6 +1920,8 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 4);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0x8, 0xa, 0x6, 0x5, 0x7, 0xe, 0x4, 0xf, 0xd, 0x9, 0x1, 0x0, 0x2, 0xb, 0xc, 0x3); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000000240ULL, 0x0000d617eb0f1ab1ULL, 0x00000000451111c0ULL, 0x00000000013b1f44ULL,
@@ -2124,6 +1957,8 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000000024ULL, 0x0000000000000884ULL, 0x00000000000e0a00ULL, 0x0000000000000040ULL,
@@ -2156,6 +1991,8 @@ void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x00000000c0a4208cULL, 0x00000000204100a8ULL, 0x000000000c0306a0ULL, 0x000000000819e944ULL,
@@ -2180,6 +2017,8 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0x8, 0x9, 0xb, 0xa, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2207,6 +2046,8 @@ void namcos10_memn_state::ns10_medalnt(machine_config &config)
 	namcos10_exfinalio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000080601000ULL, 0x0000000000006020ULL, 0x0000000000004840ULL, 0x0000000000000201ULL,
@@ -2233,6 +2074,8 @@ void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 	namcos10_exfinalio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0xa, 0x8, 0xb, 0x9, 0x4, 0x7, 0x6, 0x5, 0x1, 0x3, 0x0, 0x2); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000000202ULL, 0x0000242000120110ULL, 0x0000000001624608ULL, 0x0000000000001820ULL,
@@ -2257,6 +2100,8 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2291,6 +2136,8 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 4);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x000034886e281880ULL, 0x0000000012c5e7baULL, 0x0000000000000200ULL, 0x000000002900002aULL,
@@ -2317,6 +2164,8 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x8, 0xb, 0xa, 0x9, 0x4, 0x5, 0x7, 0x6, 0x0, 0x3, 0x2, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000008028ULL, 0x0000000000000400ULL, 0x00000000a9100004ULL, 0x0000000028004200ULL,
@@ -2341,6 +2190,8 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x7, 0x6, 0x5, 0x1, 0x0, 0x3, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2373,6 +2224,8 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
+
 	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
 }
 
@@ -2381,6 +2234,8 @@ void namcos10_memn_state::ns10_puzzball(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x8, 0x9, 0xa, 0xb, 0x4, 0x5, 0x7, 0x6, 0x1, 0x0, 0x2, 0x3); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2408,6 +2263,8 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000000510ULL, 0x0000000000004000ULL, 0x0000000000000406ULL, 0x0000000000000400ULL,
@@ -2433,6 +2290,8 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 {
 	namcos10_memn_base(config);
 	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x3, 0x2, 0x1); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2460,6 +2319,8 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x2, 0x3); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000061402200010ULL, 0x0000000000b2a150ULL, 0x0000000080280021ULL, 0x0000000000000880ULL,
@@ -2486,6 +2347,8 @@ void namcos10_memn_state::ns10_taiko2(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xe, 0xf, 0x9, 0x8, 0xb, 0xa, 0x6, 0x4, 0x7, 0x5, 0x2, 0x3, 0x0, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000004011401ULL, 0x000000008c208806ULL, 0x000000008c200406ULL, 0x0000004a08002208ULL,
@@ -2511,6 +2374,8 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x9, 0x8, 0xb, 0x4, 0x5, 0x6, 0x7, 0x0, 0x1, 0x3, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2541,6 +2406,8 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0x8, 0xb, 0xa, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000042c82001ULL, 0x0000000000000200ULL, 0x000000000910405cULL, 0x0000000000000c00ULL,
@@ -2566,6 +2433,8 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xf, 0xc, 0xd, 0xa, 0x8, 0xb, 0x9, 0x4, 0x5, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2597,6 +2466,8 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 	namcos10_memn_base(config);
 	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 3);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0x9, 0xb, 0x8, 0xa, 0x5, 0x4, 0x7, 0x6, 0x2, 0x1, 0x0, 0x3); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2728,28 +2599,12 @@ void namcos10_memp3_state::machine_reset()
 	m_memp3_mcu->suspend(SUSPEND_REASON_HALT, 1);
 }
 
-void namcos10_memp3_state::init_g13jnr()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x7, 0x4, 0x5, 0x1, 0x3, 0x0, 0x2); };
-	memn_driver_init();
-}
-
-void namcos10_memp3_state::init_nicetsuk()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0xa, 0x8, 0xb, 0x9, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
-	memn_driver_init();
-}
-
-void namcos10_memp3_state::init_squizchs()
-{
-	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x8, 0xb, 0x9, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x3, 0x2); };
-	memn_driver_init();
-}
-
 void namcos10_memp3_state::ns10_g13jnr(machine_config &config)
 {
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 6);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0x9, 0xb, 0x8, 0xa, 0x6, 0x7, 0x4, 0x5, 0x1, 0x3, 0x0, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -2776,6 +2631,8 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 8);
 
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0xa, 0x8, 0xb, 0x9, 0x5, 0x4, 0x6, 0x7, 0x2, 0x3, 0x0, 0x1); };
+
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
 			0x0000000000000022ULL, 0x0000000000008082ULL, 0x0000808400d10000ULL, 0x0000000000000088ULL,
@@ -2800,6 +2657,8 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 {
 	namcos10_memp3_base(config);
 	namcos10_nand_k9f2808u0b(config, 14);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xc, 0xf, 0xd, 0xa, 0x8, 0xb, 0x9, 0x6, 0x4, 0x7, 0x5, 0x0, 0x1, 0x3, 0x2); };
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
@@ -3720,44 +3579,44 @@ ROM_END
 
 
 // MEM(M)
-GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state, init_mrdrilr2,  ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state,  init_mrdrilr2,    ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2j, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state,  init_mrdrilr2,    ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_state,  init_mrdrilr2,    ROT0, "Namco", "Mr. Driller 2 (US, DR23 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM(N)
-GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state, init_gahaha,    ROT0, "Namco / Metro", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state, init_gunbalina, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state, init_gahaha2,   ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state, init_gjspace,   ROT0, "Namco / Metro", "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state, empty_init,     ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state, init_knpuzzle,  ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state, init_mrdrilrg,  ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state, init_chocovdr,  ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state, init_gamshara,  ROT0, "Mitchell", "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state, init_panikuru,  ROT0, "Namco", "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state, init_puzzball,  ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state, init_startrgn,  ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state, init_sugorotic, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state, init_konotako,  ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state, init_nflclsfb,  ROT0, "Namco / Metro", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state, init_pacmball,  ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state, init_sekaikh,   ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state, init_ballpom,   ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
-GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state, init_medalnt,   ROT0, "Namco", "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state, init_keroro,    ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state, empty_init,     ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
-GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state, init_medalnt2,  ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
+GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell", "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
+GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  empty_init,       ROT0, "Namco", "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
-GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state, init_taiko2,    ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state, init_taiko3,    ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state, init_taiko4,    ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state, init_taiko5,    ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state, init_taiko6,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, taiko3,    0,        ns10_taiko3,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 3 (Japan, TK31 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, taiko4,    0,        ns10_taiko4,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 4 (Japan, TK41 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, taiko5,    0,        ns10_taiko5,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 5 (Japan, TK51 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, taiko6,    0,        ns10_taiko6,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // MEM(P3)
-GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, init_g13jnr,   ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, init_nicetsuk, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, init_squizchs, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro", "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco", "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

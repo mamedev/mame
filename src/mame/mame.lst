@@ -26476,6 +26476,12 @@ screenpl                        // Screenplay
 @source:maygay/mmm.cpp
 mmm_ldip                        // Lucky Dip
 
+@source:mc/mc68000.cpp
+mc68000                         // (c) 1984 mc / Franzis Verlag
+
+@source:mc/mccpm.cpp
+mccpm                           //
+
 @source:mchester/ssem.cpp
 ssem                            // Manchester Small-Scale Experimental Machine, "Baby"
 
@@ -37560,6 +37566,7 @@ tmachzac                        //
 tmachzacf                       //
 tmachzacg                       //
 zankor                          //
+zankor2i                        //
 
 @source:pinball/zac_proto.cpp
 skijump                         //
@@ -41139,9 +41146,6 @@ lilith                          //
 @source:skeleton/lms46.cpp
 lms46                           //
 
-@source:skeleton/mccpm.cpp
-mccpm                           //
-
 @source:skeleton/mes.cpp
 mes                             //
 
@@ -43273,7 +43277,8 @@ vballb                          // bootleg (of US set)
 
 @source:technos/wwfsstar.cpp
 wwfsstar                        // TA-0024 (c) 1989 (Europe)
-wwfsstarb                       // TA-0024 (c) 1989 (Japan)
+wwfsstarb                       // bootleg
+wwfsstarb2                      // bootleg
 wwfsstarc                       // TA-0024 (c) 1989 (Canada)
 wwfsstarj                       // TA-0024 (c) 1989 (Japan)
 wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)

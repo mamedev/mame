@@ -220,7 +220,7 @@ INPUT_PORTS_END
 
 void kpython_state::kpython(machine_config &config)
 {
-	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
+	R5000BE(config, m_maincpu, 294000000); // imported from namcops2.c driver
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpython_state::ps2_map);
@@ -241,8 +241,8 @@ void kpython_state::kpython(machine_config &config)
 }
 
 #define KPYTHON_BIOS  \
-		ROM_REGION32_LE(0x200000, "bios", 0) \
-		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
+		ROM_REGION64_BE(0x200000, "bios", 0) \
+		ROM_LOAD16_WORD_SWAP( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) ) \
 		ROM_REGION(0x8000, "io_mcu", 0) \
 		ROM_LOAD( "hd64f3664", 0x0000, 0x8000, NO_DUMP ) // Internal ROM not dumped
 
