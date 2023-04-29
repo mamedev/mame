@@ -40854,6 +40854,9 @@ bitgrphb                        //
 @source:skeleton/blit.cpp
 blit
 
+@source:skeleton/bolsaint.cpp
+bolsaint                        // (c) 2000 Sleic/Petaco
+
 @source:skeleton/bpmmicro.cpp
 bp1200                          // (c) 1991 BP Microsystems
 
