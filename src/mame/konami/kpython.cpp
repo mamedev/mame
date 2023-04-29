@@ -166,9 +166,15 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/mips1.h"
+#include "cpu/mips/ps2vu.h"
+#include "cpu/mips/ps2vif1.h"
 //#include "cpu/h8/h83664.h"
 //#include "machine/ds2430.h"
+#include "machine/ps2dma.h"
+#include "machine/ps2intc.h"
+#include "machine/ps2sif.h"
 #include "machine/timekpr.h"
+#include "video/ps2gs.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -181,7 +187,14 @@ public:
 	kpython_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_dmac(*this, "dmac")
+		, m_intc(*this, "intc")
+		, m_sif(*this, "sif")
+		, m_gs(*this, "gs")
+		, m_vu0(*this, "vu0")
+		, m_vu1(*this, "vu1")
 		, m_m48t58(*this, "m48t58")
+		, m_ram(*this, "ram")
 	{ }
 
 	void kpython(machine_config &config);
@@ -192,8 +205,15 @@ private:
 	void ps2_map(address_map &map);
 
 	// devices
-	required_device<mips3_device> m_maincpu;
+	required_device<r5900_device> m_maincpu;
+	required_device<ps2_dmac_device> m_dmac;
+	required_device<ps2_intc_device> m_intc;
+	required_device<ps2_sif_device> m_sif;
+	required_device<ps2_gs_device> m_gs;
+	required_device<sonyvu0_device> m_vu0;
+	required_device<sonyvu1_device> m_vu1;
 	required_device<m48t58_device> m_m48t58;
+	required_shared_ptr<uint64_t> m_ram;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -211,7 +231,7 @@ uint32_t kpython_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void kpython_state::ps2_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).ram(); // 32 MB RAM in consumer PS2s, do these have more?
+	map(0x00000000, 0x01ffffff).ram().share(m_ram); // 32 MB RAM in consumer PS2s, do these have more?
 	map(0x1fc00000, 0x1fdfffff).rom().region("bios", 0);
 }
 
@@ -220,10 +240,19 @@ INPUT_PORTS_END
 
 void kpython_state::kpython(machine_config &config)
 {
-	R5000BE(config, m_maincpu, 294000000); // imported from namcops2.c driver
+	R5900BE(config, m_maincpu, 294'912'000, m_vu0);
+	m_maincpu->set_force_no_drc(true);
 	m_maincpu->set_icache_size(16384);
 	m_maincpu->set_dcache_size(16384);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kpython_state::ps2_map);
+
+	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
+	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
+
+	SONYPS2_INTC(config, m_intc, m_maincpu);
+	SONYPS2_GS(config, m_gs, 294912000/2, m_intc, m_vu1);
+	SONYPS2_DMAC(config, m_dmac, 294912000/2, m_maincpu, m_ram, m_sif, m_gs, m_vu1);
+	SONYPS2_SIF(config, m_sif, m_intc);
 
 	//H83664(config, m_io_mcu, 14000000); // from filter board
 
