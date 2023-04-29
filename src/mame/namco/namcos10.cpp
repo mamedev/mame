@@ -681,6 +681,7 @@ public:
 		, m_io_system(*this, "SYSTEM")
 		, m_exio(*this, "exio")
 		, m_exio_analog(*this, "EXIO_ANALOG%u", 1U)
+		, m_exio_lightgun(*this, "EXIO_LIGHTGUN%u", 1)
 		, m_mgexio_hopper(*this, "mgexio_hopper%u", 1U)
 		, m_mgexio_outputs(*this, "MGEXIO_OUTPUT%u", 0U)
 		, m_mgexio_sensor(*this, "MGEXIO_SENSOR")
@@ -743,6 +744,8 @@ private:
 	void i2c_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void i2c_update();
 
+	template <int N> uint16_t exio_lightgun_io_r();
+
 	TIMER_DEVICE_CALLBACK_MEMBER(io_update_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(cdrom_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(cdrom_dmarq);
@@ -768,6 +771,7 @@ private:
 
 	// EXIO
 	optional_ioport_array<8> m_exio_analog;
+	optional_ioport_array<4> m_exio_lightgun;
 
 	// MGEXIO
 	template <int N> void mgexio_output_w(offs_t offset, uint16_t data);
@@ -1078,7 +1082,7 @@ void namcos10_state::namcos10_map_inner(address_map &map)
 	map(0xf500000, 0xf5fffff).ram().share("share3");
 
 	map(0xfb20000, 0xfb20003).nopw(); // written to when DMA are finished? maybe some kind of IRQ?
-	map(0xfb60000, 0xfb60003).noprw(); // ?
+	map(0xfb60000, 0xfb60003).noprw(); // watchdog
 	map(0xfba0000, 0xfba0001).r(FUNC(namcos10_state::io_system_r));
 	map(0xfba0002, 0xfba0003).rw(FUNC(namcos10_state::exio_ident_r), FUNC(namcos10_state::exio_ident_w));
 	map(0xfba0004, 0xfba0007).portr("IN1");
@@ -1265,8 +1269,16 @@ void namcos10_state::namcos10_map_exio_inner(address_map &map)
 	// map(0x48000, 0x48003).nopw();
 	map(0x50000, 0x50003).portr("EXIO_IN1");
 	map(0x58000, 0x58003).portr("EXIO_IN2");
-	// map(0xc0000, 0xc0003).nopw();
-	// map(0xc8000, 0xc8003).nopw();
+	map(0x80000, 0x80003).r(FUNC(namcos10_state::exio_lightgun_io_r<0>));
+	map(0x88000, 0x88003).r(FUNC(namcos10_state::exio_lightgun_io_r<1>));
+	map(0x90000, 0x90003).r(FUNC(namcos10_state::exio_lightgun_io_r<2>));
+	map(0x98000, 0x98003).r(FUNC(namcos10_state::exio_lightgun_io_r<3>));
+	map(0xa0000, 0xa0003).r(FUNC(namcos10_state::exio_lightgun_io_r<4>));
+	map(0xa8000, 0xa8003).r(FUNC(namcos10_state::exio_lightgun_io_r<5>));
+	map(0xb0000, 0xb0003).r(FUNC(namcos10_state::exio_lightgun_io_r<6>));
+	map(0xb8000, 0xb8003).r(FUNC(namcos10_state::exio_lightgun_io_r<7>));
+	// map(0xc0000, 0xc0003).nopw(); // related to updating P1 lightgun I/O? 0 written here before reading values
+	// map(0xc8000, 0xc8003).nopw(); // same as 0xc0000, except for P2
 }
 
 void namcos10_state::namcos10_map_exio(address_map &map)
@@ -1274,6 +1286,20 @@ void namcos10_state::namcos10_map_exio(address_map &map)
 	map(0x1fe00000, 0x1fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
 	map(0x9fe00000, 0x9fffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
 	map(0xbfe00000, 0xbfffffff).m(FUNC(namcos10_state::namcos10_map_exio_inner));
+}
+
+template <int N>
+uint16_t namcos10_state::exio_lightgun_io_r()
+{
+	const auto val = m_exio_lightgun[N / 2].read_safe(0);
+	const auto offset = N & 1;
+
+	switch (offset) {
+		default: case 0:
+			return BIT(val, 0, 6);
+		case 1:
+			return BIT(val, 6, 16);
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1656,6 +1682,10 @@ uint16_t namcos10_memn_state::nand_data_r()
 
 void namcos10_memn_state::nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// Hardware testing has shown that you can only write to specific parts of the NANDs.
+	// For NAND 0, it's not possible to write to any block besides block 1 which stores the EEP data for games.
+	// NAND 1 and beyond are untested, and it's unknown if block 1 on NAND 1 and beyond are writeable.
+
 	if (!m_nand[m_nand_device_idx])
 		return;
 
@@ -2222,6 +2252,7 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 {
 	namcos10_memn_base(config);
+	namcos10_exio(config);
 	namcos10_nand_k9f2808u0b(config, 2);
 
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa, 0x5, 0x7, 0x4, 0x6, 0x1, 0x0, 0x2, 0x3); };
@@ -3026,6 +3057,28 @@ static INPUT_PORTS_START( squizchs )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ptblank3 )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0fff6f6f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("EXIO_LIGHTGUN1") // P1 X
+	PORT_BIT( 0x3fffff, 0xa0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x000,0x13f) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("EXIO_LIGHTGUN2") // P1 Y
+	PORT_BIT( 0x3fffff, 0x78, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000,0xef) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(1)
+
+	PORT_START("EXIO_LIGHTGUN3") // P2 X
+	PORT_BIT( 0x3fffff, 0xa0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x000,0x13f) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+	PORT_START("EXIO_LIGHTGUN4") // P2 Y
+	PORT_BIT( 0x3fffff, 0x78, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000,0xef) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
 // MEM(M)
 ROM_START( mrdrilr2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
@@ -3184,6 +3237,9 @@ ROM_START( gunbalina )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
 	ROM_LOAD( "gnn1a.8e", 0x0000000, 0x1080000, CRC(981b03d4) SHA1(1c55458f1b2964afe2cf4e9d84548c0699808e9f) )
+	ROM_LOAD( "ptblank3_prog.bin", 0x00029400, 0x002de3f0, CRC(1612383d) SHA1(e2f339444fe01a4f51ee784692c6d7f989080dc7) ) // Program code is unencrypted but scrambled
+	ROM_CONTINUE( 0x1056c00, 0x25200 )
+	ROM_COPY( "nand0", 0x84000, 0x1052a00, 0x4200 ) // relocate block 0x20
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "gnn1a.8d", 0x0000000, 0x1080000, CRC(6cd343e0) SHA1(dcec44abae1504025895f42fe574549e5010f7d5) )
@@ -3323,6 +3379,8 @@ ROM_START( ptblank3 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
 	ROM_LOAD( "gnn2vera_0.8e", 0x0000000, 0x1080000, CRC(3777ef6b) SHA1(44dce83f75d10f843db0feef4c2a738442434246) )
+	ROM_LOAD( "ptblank3_prog.bin", 0x00029400, 0x002de3f0, CRC(1612383d) SHA1(e2f339444fe01a4f51ee784692c6d7f989080dc7) ) // Program code is unencrypted but scrambled
+	ROM_CONTINUE(0x1056c00, 0x25200)
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "gnn2vera_1.8d", 0x0000000, 0x1080000, CRC(82d2cfb5) SHA1(4b5e713a55e74a7b32b1b9b5811892df2df86256) )
@@ -3585,8 +3643,8 @@ GAME( 2000, mrdrilr2u, mrdrilr2, ns10_mrdrilr2,  mrdrilr2,     namcos10_memm_sta
 
 // MEM(N)
 GAME( 2000, gahaha,    0,        ns10_gahaha,    gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou (World, GID2 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, ptblank3,  0,        ns10_ptblank3,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // needs to hookup gun IO
-GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro", "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco", "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
