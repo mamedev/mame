@@ -2652,6 +2652,11 @@ void setaroul_state::setaroul_map(address_map &map)
                         Extreme Downhill / Sokonuke
 ***************************************************************************/
 
+// TODO: open bus for unmapped I/O areas?
+// extdwnhl wants to read non-zero at POST for watchdog (?) otherwise will mangle RAM boundaries
+// and fails booting.
+// It also perform a blantantly invalid access during ending, expecting anything that isn't a 0xffff
+// to skip it. (A0=0x20434f56, https://mametesters.org/view.php?id=8614)
 void seta_state::extdwnhl_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2664,6 +2669,7 @@ void seta_state::extdwnhl_map(address_map &map)
 	map(0x400004, 0x400005).portr("COINS");              // Coins
 	map(0x400008, 0x40000b).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x40000c, 0x40000d).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));    // Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
+	map(0x434f56, 0x434f57).lr16(NAME([]() { return 0; }));
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));       // Coin Counter (no lockout)
 	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500004, 0x500007).noprw();                             // IRQ Ack  (extdwnhl (R) & sokonuke (W))
