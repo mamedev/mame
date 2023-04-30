@@ -1317,8 +1317,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<!-- Software does not start. -->
-	<software name="m36" supported="no">
+	<software name="m36">
 		<description>A Life Planet - M36 - Mother Brain has been aliving (Japan)</description>
 		<year>1987</year>
 		<publisher>Pixel</publisher>
