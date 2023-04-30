@@ -57,7 +57,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nteg00.z64" size="0x1000000" crc="67e010d2" sha1="7266eef53af8f2c21f3e3288258121f97eddfa7e" />
-<!--            <rom name="nteg00.i64" size="64" crc="57c7bfe2" sha1="23e06350c61dccf3ffaade55873163adabf747f7"/> -->
+<!--                <rom name="nteg00.i64" size="64" crc="57c7bfe2" sha1="23e06350c61dccf3ffaade55873163adabf747f7"/> -->
 			</dataarea>
 
 		</part>
