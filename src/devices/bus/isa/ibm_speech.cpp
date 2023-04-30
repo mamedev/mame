@@ -21,15 +21,14 @@
 */
 
 #include "emu.h"
-#include "xtal.h"
 #include "ibm_speech.h"
 
-#define LOG_ROM         (1 << 0)
-#define LOG_MUX         (1 << 1)
-#define LOG_CVSD        (1 << 2)
-#define LOG_PIT         (1 << 3)
-#define LOG_IRQ         (1 << 4)
-#define LOG_PORTS       (1 << 5)
+#define LOG_ROM         (1U << 1)
+#define LOG_MUX         (1U << 2)
+#define LOG_CVSD        (1U << 3)
+#define LOG_PIT         (1U << 4)
+#define LOG_IRQ         (1U << 5)
+#define LOG_PORTS       (1U << 6)
 #define LOG_ALL         (LOG_ROM|LOG_MUX|LOG_CVSD|LOG_PIT|LOG_IRQ|LOG_PORTS)
 
 //#define VERBOSE         (LOG_PORTS)
@@ -40,8 +39,6 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
-
-#define XTAL_Y1     XTAL(4'000'000)
 
 DEFINE_DEVICE_TYPE(ISA8_IBM_SPEECH, isa8_ibm_speech_device, "isa_ibm_speech", "IBM PS/2 Speech Adapter")
 
@@ -71,17 +68,17 @@ void isa8_ibm_speech_device::device_start()
 
 	// Not configurable.
 	m_isa->install_device(0xfb98, 0xfb9b,
-		read8sm_delegate(m_ppi, FUNC(i8255_device::read)),
-		write8sm_delegate(m_ppi, FUNC(i8255_device::write)));
+		emu::rw_delegate(m_ppi, FUNC(i8255_device::read)),
+		emu::rw_delegate(m_ppi, FUNC(i8255_device::write)));
 	m_isa->install_device(0xfb9c, 0xfb9f,
-		read8sm_delegate(m_pit, FUNC(pit8254_device::read)),
-		write8sm_delegate(m_pit, FUNC(pit8254_device::write)));
+		emu::rw_delegate(m_pit, FUNC(pit8254_device::read)),
+		emu::rw_delegate(m_pit, FUNC(pit8254_device::write)));
 	m_isa->install_device(0xff98, 0xff98,
-		read8smo_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_r)),
-		write8smo_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_w)));
+		emu::rw_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_r)),
+		emu::rw_delegate(*this, FUNC(isa8_ibm_speech_device::shift_register_w)));
 	m_isa->install_device(0xff9f, 0xff9f,
-		read8smo_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_r)),
-		write8smo_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_w)));
+		emu::rw_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_r)),
+		emu::rw_delegate(*this, FUNC(isa8_ibm_speech_device::audio_control_latch_w)));
 
 	m_channel_mux = 0;
 	m_acl_int_ena = false;
@@ -122,6 +119,8 @@ const tiny_rom_entry *isa8_ibm_speech_device::device_rom_region() const
 
 void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 {
+	constexpr XTAL XTAL_Y1 = XTAL(4'000'000);
+
 	// breakout box
 	SPEAKER(config, m_speaker);
 
@@ -148,7 +147,7 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 	// The 5220 has no direct-access speech ROM.
 	// All data is transferred from the host PC via the 8255.
 	// The preset vocabulary is in the option ROM.
-	TMS5220(config, m_lpc, 640000); // confirm clock
+	TMS5220(config, m_lpc, 640000); // TODO: Confirm TMS clock
 	m_lpc->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 	m_lpc->irq_cb().set(FUNC(isa8_ibm_speech_device::lpc_interrupt_w));
 
