@@ -1111,6 +1111,7 @@ end
 				buildoptions_cpp {
 					"-Wno-dangling-reference",
 					"-Wno-dangling-pointer",
+					"-Wno-xor-used-as-pow",
 				}
 			end
 		end
