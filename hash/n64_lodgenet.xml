@@ -57,7 +57,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nteg00.z64" size="0x1000000" crc="67e010d2" sha1="7266eef53af8f2c21f3e3288258121f97eddfa7e" />
-<!--           <rom name="nteg00.i64" size="64" crc="57c7bfe2" sha1="23e06350c61dccf3ffaade55873163adabf747f7"/> -->
+<!--            <rom name="nteg00.i64" size="64" crc="57c7bfe2" sha1="23e06350c61dccf3ffaade55873163adabf747f7"/> -->
 			</dataarea>
 
 		</part>
@@ -73,7 +73,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="ndog00.z64" size="0x2000000" crc="acba2248" sha1="f39476827ccf7f03707de5d79949559a4dac390b"/>
-<!--           <rom name="ndog00.i64" size="0x40" crc="2e760dba" sha1="3ec335744c43823df3bff3dc5936f6c0611e5891"/> -->
+<!--                <rom name="ndog00.i64" size="0x40" crc="2e760dba" sha1="3ec335744c43823df3bff3dc5936f6c0611e5891"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -86,7 +86,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="nn6g00.z64" size="0x400000" crc="dd5190ee" sha1="e63b10abfaa37aa8c7f37643d6d4e82fadb511fe"/>
-<!--           <rom name="nn6g00.i64" size="0x40" crc="8f5aa504" sha1="87ab08a44a9df500650223a00fa067b5fa616e08"/> -->
+<!--                <rom name="nn6g00.i64" size="0x40" crc="8f5aa504" sha1="87ab08a44a9df500650223a00fa067b5fa616e08"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nmxg00.z64" size="0x1000000" crc="a1895884" sha1="3a043dc4c8b1351ca56c3ab9bb061bd7fa99c312"/>
-<!--           <rom name="nmxg00.i64" size="0x40" crc="ddd8f443" sha1="f78929fd62668cd0f0b7146b1e55f4430cb1f997"/> -->
+<!--                <rom name="nmxg00.i64" size="0x40" crc="ddd8f443" sha1="f78929fd62668cd0f0b7146b1e55f4430cb1f997"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nfzg00.z64" size="0x1000000" crc="1c753f3f" sha1="2a7cd80ce10a654f3844c602268d66cdbe78230d"/>
-<!--           <rom name="nfzg00.i64" size="0x40" crc="0ca548dc" sha1="4b7077c638883195ec8a0b94f5e96391c2fc68ab"/> -->
+<!--                <rom name="nfzg00.i64" size="0x40" crc="0ca548dc" sha1="4b7077c638883195ec8a0b94f5e96391c2fc68ab"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -126,7 +126,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="ngxg02.z64" size="0x1000000" crc="1f030279" sha1="45a8d42e17993d1009c858d1847b311197b04f8c"/>
-<!--           <rom name="ngxg02.i64" size="0x40" crc="195f583f" sha1="9ab84f08b4d54ccf627080e657afa3f1893fec92"/> -->
+<!--                <rom name="ngxg02.i64" size="0x40" crc="195f583f" sha1="9ab84f08b4d54ccf627080e657afa3f1893fec92"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="nhtg01.z64" size="0x2000000" crc="1ec49934" sha1="30794eb5c1c6a22fbb9dd530f22d153163a6ccda"/>
-<!--           <rom name="nhtg01.i64" size="0x40" crc="2e82689d" sha1="d77158239a249f4db34c31d6e2e15b9e3e948fe0"/> -->
+<!--                <rom name="nhtg01.i64" size="0x40" crc="2e82689d" sha1="d77158239a249f4db34c31d6e2e15b9e3e948fe0"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -152,7 +152,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="nk4g00.z64" size="0x2000000" crc="70ba28e4" sha1="f615c6e10d1044c944bd4965c5471bb3f1cf5c5b"/>
-<!--           <rom name="nk4g00.i64" size="0x40" crc="5a049d23" sha1="265413c4a08f7aead7ca7bd746f3897c74eb0029"/> -->
+<!--                <rom name="nk4g00.i64" size="0x40" crc="5a049d23" sha1="265413c4a08f7aead7ca7bd746f3897c74eb0029"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="nzsg00.z64" size="0x2000000" crc="e4b47e08" sha1="ecabc86f0de743c02ba3fa0c83ab163538b00be9"/>
-<!--           <rom name="nzsg00.i64" size="0x40" crc="8d23977d" sha1="f882460a888b8db76e8b163fd508d89e7b2e9e00"/> -->
+<!--                <rom name="nzsg00.i64" size="0x40" crc="8d23977d" sha1="f882460a888b8db76e8b163fd508d89e7b2e9e00"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="czlg00.z64" size="0x2000000" crc="c4d2ac1d" sha1="86ff85565e0e4f78d56f50e73df51ba29d36738a"/>
-<!--           <rom name="czlg00.i64" size="0x40" crc="0eb0198c" sha1="45185a1938db659ee6760117cd4f742aac5e18bf"/> -->
+<!--                <rom name="czlg00.i64" size="0x40" crc="0eb0198c" sha1="45185a1938db659ee6760117cd4f742aac5e18bf"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -192,7 +192,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="nmfg00.z64" size="0x2000000" crc="1c256575" sha1="47c5f700940bb65be1145e7d6543ddf1a816ddda"/>
-<!--           <rom name="nmfg00.i64" size="0x40" crc="df31532f" sha1="51db8e096b345ca306d34d114dc82bf36211db1d"/> -->
+<!--                <rom name="nmfg00.i64" size="0x40" crc="df31532f" sha1="51db8e096b345ca306d34d114dc82bf36211db1d"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="nktg00.z64" size="0xc00000" crc="407edef1" sha1="5b0a0c8b57881f43f9314b427a84d29a46a12607"/>
-<!--           <rom name="nktg00.i64" size="0x40" crc="de24f369" sha1="45ffe8cdac5266f261b7b1ca3d2cca7c48877bea"/> -->
+<!--                <rom name="nktg00.i64" size="0x40" crc="de24f369" sha1="45ffe8cdac5266f261b7b1ca3d2cca7c48877bea"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +219,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x2000000">
 				<rom name="nmvg00.z64" size="0x2000000" crc="9f929c0f" sha1="9be79ddb66a6306dec7404e934c6d9fe454f42f4"/>
-<!--           <rom name="nmvg00.i64" size="0x40" crc="80ee8f86" sha1="c2c18a6d2b2c098767d7015f06300a1fc5772a33"/> -->
+<!--                <rom name="nmvg00.i64" size="0x40" crc="80ee8f86" sha1="c2c18a6d2b2c098767d7015f06300a1fc5772a33"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nm8g00.z64" size="0x1000000" crc="02af0a24" sha1="1f76e775c5f2e247d6550aecc2666149c60259
-<!--           <rom name="nm8g00.i64" size="0x40" crc="fe9453db" sha1="0c1a3f857838c2f3c6268a825b9533725aabeec8"/> -->
+<!--                <rom name="nm8g00.i64" size="0x40" crc="fe9453db" sha1="0c1a3f857838c2f3c6268a825b9533725aabeec8"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -245,7 +245,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="naig01.z64" size="0x400000" crc="f3c48bb7" sha1="a36131328ad707800f6841289cdede17b3b9ee16"/>
-<!--           <rom name="naig01.i64" size="0x40" crc="ecd08883" sha1="7ece35ed1c97dfc8c1364dbf5f4a08475237dd45"/> -->
+<!--                <rom name="naig01.i64" size="0x40" crc="ecd08883" sha1="7ece35ed1c97dfc8c1364dbf5f4a08475237dd45"/> -->
 
 			</dataarea>
 		</part>
@@ -259,7 +259,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nm4g01.z64" size="0x1000000" crc="ea494c11" sha1="535429836cfd4b6f533dd6dda540a19286613518"/>
-<!--           <rom name="nm4g01.i64" size="0x40" crc="d8b7a45d" sha1="11c67fab63842aa58dc9bb41535d1924222d5a54"/> -->
+<!--                <rom name="nm4g01.i64" size="0x40" crc="d8b7a45d" sha1="11c67fab63842aa58dc9bb41535d1924222d5a54"/> -->
 
 			</dataarea>
 		</part>
@@ -273,7 +273,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="nrig00.z64" size="0xc00000" crc="d3523b37" sha1="cf52ba144788ecc9c1f7cfd61d7878c6173b1ef6"/>
-<!--           <rom name="nrig00.i64" size="0x40" crc="b120d9e4" sha1="18ebc23a139eea274333cce9635a2852bcf3ea2a"/> -->
+<!--                <rom name="nrig00.i64" size="0x40" crc="b120d9e4" sha1="18ebc23a139eea274333cce9635a2852bcf3ea2a"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -286,7 +286,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x4000000">
 				<rom name="nmqg00.z64" size="0x4000000" crc="f845af4e" sha1="c54905138e67daaddc6def94e76f626c4fbc81f7"/>
-<!--           <rom name="nmqg00.i64" size="0x40" crc="cb9f0acf" sha1="c0b890b570121defd863c1e01ef076091e0f5b44"/> -->
+<!--                <rom name="nmqg00.i64" size="0x40" crc="cb9f0acf" sha1="c0b890b570121defd863c1e01ef076091e0f5b44"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -299,7 +299,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="npwg01.z64" size="0x800000" crc="29fa9832" sha1="580d65f3d5cae595bf7c62456ff6ea60a4595798"/>
-<!--           <rom name="npwg01.i64" size="0x40" crc="8756a34a" sha1="7b623ec9ae5c7be5dd2830ba5d2d7c30f98ea57b"/> -->
+<!--                <rom name="npwg01.i64" size="0x40" crc="8756a34a" sha1="7b623ec9ae5c7be5dd2830ba5d2d7c30f98ea57b"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -312,7 +312,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="npfg00.z64" size="0x1000000" crc="8347c9bc" sha1="b624c57e4d9e7851b422475a200fe72a300e3b1c"/>
-<!--           <rom name="npfg00.i64" size="0x40" crc="a72187f0" sha1="7017d71fce3e1f9e55a143f530288caaa9ca0bb9"/> -->
+<!--                <rom name="npfg00.i64" size="0x40" crc="a72187f0" sha1="7017d71fce3e1f9e55a143f530288caaa9ca0bb9"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="n2pg01.z64" size="0xc00000" crc="c28afc5e" sha1="0a6c390b7d1a96b93fc28faa3b11cf18400b1773"/>
-<!--           <rom name="n2pg01.i64" size="0x40" crc="86a3477e" sha1="5aff7233b78eb203563353089be032037c9af651"/> -->
+<!--                <rom name="n2pg01.i64" size="0x40" crc="86a3477e" sha1="5aff7233b78eb203563353089be032037c9af651"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 			<dataarea name="rom" size="0x1FB5360">
 				<rom name="nrdg01.z64" size="0x1FB5360" crc="6d8dab04" sha1="2ad70a3243a20cd02d24103a2717c90654c173ac"/>
 				<!-- Dump size is 33,248,096. Underdump? -->
-<!--           <rom name="nrdg01.i64" size="0x40" crc="eda5e440" sha1="c8f691d1e88ddf1423685b593d3b6496728448ad"/> -->
+<!--                <rom name="nrdg01.i64" size="0x40" crc="eda5e440" sha1="c8f691d1e88ddf1423685b593d3b6496728448ad"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="nr2g02.z64" size="0xc00000" crc="c7e9d391" sha1="1556edd66c54bf6ec200915ac4265f078c1555a2"/>
-<!--           <rom name="nr2g02.i64" size="0x40" crc="889f42d1" sha1="78dff0630eba88816d0ddb45bb2af101e00b7f63"/> -->
+<!--                <rom name="nr2g02.i64" size="0x40" crc="889f42d1" sha1="78dff0630eba88816d0ddb45bb2af101e00b7f63"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -365,7 +365,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="nfxg01.z64" size="0xc00000" crc="637a422d" sha1="1b759465439297fbbe21c19df0924d8e75b1aa5a"/>
-<!--           <rom name="nfxg01.i64" size="0x40" crc="f89ccbcf" sha1="0de280df6c5ed6dd7c529c1784123a79514b3d74"/> -->
+<!--                <rom name="nfxg01.i64" size="0x40" crc="f89ccbcf" sha1="0de280df6c5ed6dd7c529c1784123a79514b3d74"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -378,7 +378,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nrsg00.z64" size="0x1000000" crc="b31c4197" sha1="80cdebe735d21589b692157633aae4be0b98c08e"/>
-<!--           <rom name="nrsg00.i64" size="0x40" crc="b2c4fd5d" sha1="dccd8a3aaecf1b3d8148f56dd51be31dc1048f27"/> -->
+<!--                <rom name="nrsg00.i64" size="0x40" crc="b2c4fd5d" sha1="dccd8a3aaecf1b3d8148f56dd51be31dc1048f27"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -391,7 +391,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="nsmg00.z64" size="0x800000" crc="35c02d9f" sha1="37f5ed5394d885de2aff705074bd76ddc95d3cc9"/>
-<!--           <rom name="nsmg00.i64" size="0x40" crc="1749981b" sha1="1530b8a818b0457847b9b79add0840c4c2fa0629"/> -->
+<!--                <rom name="nsmg00.i64" size="0x40" crc="1749981b" sha1="1530b8a818b0457847b9b79add0840c4c2fa0629"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nalg00.z64" size="0x1000000" crc="1c001a5d" sha1="a0aea7d219443209c6580a501601d3151c58d3ac"/>
-<!--           <rom name="nalg00.i64" size="0x40" crc="6c30334f" sha1="7ecf5ccbc981ecca414ebaa86eef57ce721c32e8"/> -->
+<!--                <rom name="nalg00.i64" size="0x40" crc="6c30334f" sha1="7ecf5ccbc981ecca414ebaa86eef57ce721c32e8"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="nvcg02.z64" size="0x400000" crc="ac7aa76d" sha1="90a012eb6a0cb1ac158492a6c2683f181c5b0205"/>
-<!--           <rom name="nvcg02.i64" size="0x40" crc="e59ad6fb" sha1="8ff65140eeb055798663a0cdcac8ebcdc90cefd8"/> -->
+<!--                <rom name="nvcg02.i64" size="0x40" crc="e59ad6fb" sha1="8ff65140eeb055798663a0cdcac8ebcdc90cefd8"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -430,7 +430,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x400000">
 				<rom name="nvrg03.z64" size="0x400000" crc="b58fc734" sha1="b595e31c1599d52ef363c974ea54e52f201795f2"/>
-<!--           <rom name="nvrg03.i64" size="0x40" crc="fdc31374" sha1="0ece94752fcb28e08c4c311bc3f5d545f3b7517a"/> -->
+<!--                <rom name="nvrg03.i64" size="0x40" crc="fdc31374" sha1="0ece94752fcb28e08c4c311bc3f5d545f3b7517a"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -443,7 +443,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="nwrg11.z64" size="0x800000" crc="6def22dc" sha1="895c70d2280d5d6cc0bd7013a135c21b688f9f80"/>
-<!--           <rom name="nwrg11.i64" size="0x40" crc="7940a187" sha1="7954964efb9f8cbba9d1385c2a24007714cd5966"/> -->
+<!--                <rom name="nwrg11.i64" size="0x40" crc="7940a187" sha1="7954964efb9f8cbba9d1385c2a24007714cd5966"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -457,7 +457,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="nysg00.z64" size="0x1000000" crc="19a7091e" sha1="f489a3cdef729cd1ade23996096fe88501e75079"/>
-<!--           <rom name="nysg00.i64" size="0x40" crc="57c2cf72" sha1="0c721086f560a6faf9e8b1476d033e261d3f24cc"/> -->
+<!--                <rom name="nysg00.i64" size="0x40" crc="57c2cf72" sha1="0c721086f560a6faf9e8b1476d033e261d3f24cc"/> -->
 			</dataarea>
 		</part>
 	</software>
@@ -471,7 +471,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x120000">
 				<rom name="eeerase.z64" size="0x120000" crc="2d5bc167" sha1="bcb439e41a997ee459a0b792cbbfe4a765894d67"/>
-<!--           <rom name="eeerase.i64" size="0x40" crc="8e89a3c6" sha1="9bc23e80b0737b0f9401f8512113f8284414538b"/> -->
+<!--                <rom name="eeerase.i64" size="0x40" crc="8e89a3c6" sha1="9bc23e80b0737b0f9401f8512113f8284414538b"/> -->
 			</dataarea>
 		</part>
 	</software>
