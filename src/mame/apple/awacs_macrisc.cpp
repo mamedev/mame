@@ -101,8 +101,8 @@ void awacs_macrisc_device::sound_stream_update(sound_stream &stream, std::vector
 	// if we're active and not muted
 	if ((m_active & ACTIVE_OUT) && !(m_registers[1] & REGISTER_1_MUTE))
 	{
-		const s16 atten_L = 0xf - (m_registers[2] >> 6) & 0xf;
-		const s16 atten_R = 0xf - m_registers[2] & 0xf;
+		const s16 atten_L = 0xf - ((m_registers[2] >> 6) & 0xf);
+		const s16 atten_R = 0xf - (m_registers[2] & 0xf);
 
 		const u32 data = swapendian_int32(m_output_cb(m_phase));
 		const s16 l_raw = (s16)(data >> 16);
