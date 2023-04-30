@@ -231,7 +231,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 		<info name="serial" value="nm8g00"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="nm8g00.z64" size="0x1000000" crc="02af0a24" sha1="1f76e775c5f2e247d6550aecc2666149c60259
+				<rom name="nm8g00.z64" size="0x1000000" crc="02af0a24" sha1="1f76e775c5f2e247d6550aecc2666149c6025989"/>
 <!--                <rom name="nm8g00.i64" size="0x40" crc="fe9453db" sha1="0c1a3f857838c2f3c6268a825b9533725aabeec8"/> -->
 			</dataarea>
 		</part>
