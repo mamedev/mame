@@ -3834,7 +3834,8 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_irqack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
-	m_halt_cb(*this)
+	m_halt_cb(*this),
+	m_mtm_cycles(3)
 {
 }
 

@@ -292,7 +292,7 @@ protected:
 	const uint8_t *   m_cc_xy;
 	const uint8_t *   m_cc_xycb;
 	const uint8_t *   m_cc_ex;
-	uint8_t           m_mtm_cycles = 3;
+	uint8_t           m_mtm_cycles;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
