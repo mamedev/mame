@@ -22,10 +22,10 @@ public:
 	isa8_ibm_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t audio_control_latch_r();
-	void 	audio_control_latch_w(uint8_t data);
+	void    audio_control_latch_w(uint8_t data);
 
 	uint8_t shift_register_r();
-	void 	shift_register_w(uint8_t data);
+	void    shift_register_w(uint8_t data);
 
 protected:
 	// device_t implementation
@@ -42,22 +42,22 @@ private:
 	required_device<pit8254_device>         m_pit;
 	required_device<i8255_device>           m_ppi;
 	required_device<speaker_device>         m_speaker;
-	required_region_ptr<uint8_t> 			m_rom;
+	required_region_ptr<uint8_t>            m_rom;
 
-	DECLARE_WRITE_LINE_MEMBER(cvsd_clock_w);    	// PIT CH0
-	DECLARE_WRITE_LINE_MEMBER(cvsd_frame_w);    	// PIT CH1
-	DECLARE_WRITE_LINE_MEMBER(int_clock_w);     	// PIT CH2
-	DECLARE_WRITE_LINE_MEMBER(lpc_interrupt_w);		// 5220 INT#
-	DECLARE_WRITE_LINE_MEMBER(cvsd_shiftreg_clk_w);	// SRCLK
+	DECLARE_WRITE_LINE_MEMBER(cvsd_clock_w);        // PIT CH0
+	DECLARE_WRITE_LINE_MEMBER(cvsd_frame_w);        // PIT CH1
+	DECLARE_WRITE_LINE_MEMBER(int_clock_w);         // PIT CH2
+	DECLARE_WRITE_LINE_MEMBER(lpc_interrupt_w);     // 5220 INT#
+	DECLARE_WRITE_LINE_MEMBER(cvsd_shiftreg_clk_w); // SRCLK
 
 	uint8_t porta_r();
 	uint8_t portc_r();
 
-	void 	porta_w(uint8_t data);
-	void 	portc_w(uint8_t data);
+	void    porta_w(uint8_t data);
+	void    portc_w(uint8_t data);
 
-	void 	rom_page_w(uint8_t data);
-	void 	channel_mux_w(uint8_t data);
+	void    rom_page_w(uint8_t data);
+	void    channel_mux_w(uint8_t data);
 
 	bool    m_lpc_interrupt;
 	bool    m_lpc_running;
