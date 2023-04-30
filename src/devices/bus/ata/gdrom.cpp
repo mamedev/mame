@@ -576,6 +576,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			data[1] = 0;
 			data[2] = 1; // number of sessions
 			// FAD
+			// TODO: should be CD size
 			data[3] = 0;
 			data[4] = 0;
 			data[5] = 0x96;
@@ -632,6 +633,21 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					data[0xd] = 0x96; // FAD >> 0
 					break;
 			}
+			break;
+
+		case 0x13: // REQ_ERROR
+			// cfr. Appendix I for possible error types
+			data[0] = 0xf0; // fixed?
+			data[1] = 0;
+			data[2] = 6; // Sense Key
+			data[3] = 0;
+			// 4-7 "specific command details" (?) or FAD
+			data[4] = 0;
+			data[5] = 0;
+			data[6] = 0;
+			data[7] = 0;
+			data[8] = 0x29; // ASC
+			data[9] = 0; // ASCQ
 			break;
 
 		default:
