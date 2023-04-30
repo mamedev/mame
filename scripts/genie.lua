@@ -1104,6 +1104,15 @@ end
 					"-Wno-error=uninitialized",   -- netlist
 				}
 			end
+			if version >= 130000 then
+				buildoptions_c {
+					"-Wno-dangling-pointer",
+				}
+				buildoptions_cpp {
+					"-Wno-dangling-reference",
+					"-Wno-dangling-pointer",
+				}
+			end
 		end
 	end
 
