@@ -2292,4 +2292,16 @@ if opt_tool(FORMATS, "FS_ISIS") then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/lib/formats/fs_hp98x5.h,FORMATS["FS_HP98X5"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_HP98X5") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_hp98x5.cpp",
+		MAME_DIR.. "src/lib/formats/fs_hp98x5.h",
+	}
+end
+
 end

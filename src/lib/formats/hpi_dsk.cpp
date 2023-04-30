@@ -68,17 +68,10 @@ constexpr uint32_t DATA_CD_PATTERN = 0x55552a44;    // C/D pattern of 0xff + DAT
 constexpr unsigned GAP1_SIZE    = 17;   // Size of gap 1 (+1)
 constexpr unsigned GAP2_SIZE    = 35;   // Size of gap 2 (+1)
 constexpr int ID_DATA_OFFSET = 30 * 16; // Nominal distance (in cells) between ID & DATA AM
-// Size of image file (holding 77 cylinders)
-constexpr unsigned HPI_IMAGE_SIZE = HPI_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 constexpr unsigned HPI_RED_TRACKS = 75; // Reduced number of tracks
-constexpr unsigned HPI_9885_TRACKS = 67;    // Tracks visible to HP9885 drives
-// Size of reduced image file (holding 75 cylinders)
-constexpr unsigned HPI_RED_IMAGE_SIZE = HPI_RED_TRACKS * HPI_HEADS * HPI_SECTORS * HPI_SECTOR_SIZE;
 
 hpi_format::hpi_format()
 {
-	(void)HPI_IMAGE_SIZE;
-	(void)HPI_RED_IMAGE_SIZE;
 }
 
 int hpi_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
