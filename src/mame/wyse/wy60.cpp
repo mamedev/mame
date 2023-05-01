@@ -2,12 +2,16 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-    Skeleton driver for Wyse WY-60 terminal.
+    Preliminary driver for Wyse WY-60 terminal.
+
+    If the terminal starts up without valid EEPROM data, it will just display the error code "E" on a mostly blank screen. At this
+    point, holding down the Set Up or Select key will cause the EEPROM to be initialized.
 
 ***********************************************************************************************************************************/
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+#include "bus/wysekbd/wysekbd.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "machine/scn_pci.h"
@@ -22,6 +26,7 @@ public:
 	wy60_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom")
+		, m_keyboard(*this, "keyboard")
 		, m_pvtc(*this, "pvtc")
 		, m_sio(*this, "sio")
 		, m_charram(*this, "charram")
@@ -58,6 +63,7 @@ private:
 	void row_buffer_map(address_map &map);
 
 	required_device<i2cmem_device> m_eeprom;
+	required_device<wyse_keyboard_port_device> m_keyboard;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2661b_device> m_sio;
 	required_shared_ptr<u8> m_charram;
@@ -82,10 +88,12 @@ SCN2672_DRAW_CHARACTER_MEMBER(wy60_state::draw_character)
 
 	// TODO: attributes
 	const u16 char_addr = u16(m_charram[0x0001] & 0x60) << 6 | u16(charcode & 0x7f) << 4 | linecount;
-	u8 dots = m_fontram[char_addr];
+	u16 dots = m_fontram[char_addr] << 1;
+	if (cursor)
+		dots = ~dots;
 	for (int i = 0; i < char_width; i++)
 	{
-		bitmap.pix(y, x++) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+		bitmap.pix(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
 		dots <<= 1;
 	}
 }
@@ -144,15 +152,15 @@ void wy60_state::p1_w(u8 data)
 	m_eeprom->write_scl(BIT(data, 2));
 	m_eeprom->write_sda(BIT(data, 1));
 
+	m_keyboard->cmd_w(!BIT(data, 5));
+
 	// TODO: P1.3 -> AUX DSR
-	// TODO: P1.5 -> KEYBOARD CMD
 }
 
 u8 wy60_state::p1_r()
 {
 	// TODO: P1.4 <- AUX DTR
-	// TODO: P1.6 <- KEYBOARD DATA
-	return (m_eeprom->read_sda() << 1) | 0xfd;
+	return (m_eeprom->read_sda() << 1) | (m_keyboard->data_r() ? 0 : 0x40) | 0xad;
 }
 
 WRITE_LINE_MEMBER(wy60_state::ea_w)
@@ -201,6 +209,8 @@ void wy60_state::wy60(machine_config &config)
 
 	I2C_X2404P(config, m_eeprom);
 
+	WYSE_KEYBOARD(config, m_keyboard, wy60_keyboards, "ascii");
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(26.58_MHz_XTAL, 1000, 0, 800 + 20, 443, 0, 416 + 16); // 26.580 kHz horizontal
 	//screen.set_raw(39.71_MHz_XTAL, 1494, 0, 1188 + 18, 443, 0, 416 + 16);
@@ -223,7 +233,7 @@ void wy60_state::wy60(machine_config &config)
 	m_sio->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_sio->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "loopback"));
 	modem.rxd_handler().set(m_sio, FUNC(scn2661b_device::rxd_w));
 	modem.cts_handler().set(m_sio, FUNC(scn2661b_device::cts_w));
 	modem.dcd_handler().set(m_sio, FUNC(scn2661b_device::dcd_w));
@@ -269,5 +279,5 @@ void wy60_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IS_SKELETON)
-COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IS_SKELETON)
+COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
