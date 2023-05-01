@@ -2267,6 +2267,26 @@ if opt_tool(CPUS, "RSP") then
 end
 
 --------------------------------------------------
+-- Matsushita (Panasonic) MN1400, disassembler only
+--@src/devices/cpu/mn1400/mn1400d.h,CPUS["MN1400"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1400") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1400/mn1400d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1400/mn1400d.h")
+end
+
+--------------------------------------------------
+-- Panafacom MN1610, disassembler only
+--@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN1610") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
+end
+
+--------------------------------------------------
 -- Panasonic MN1880
 --@src/devices/cpu/mn1880/mn1880.h,CPUS["MN1880"] = true
 --------------------------------------------------
@@ -3745,16 +3765,6 @@ end
 if opt_tool(CPUS, "V620") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/v620/v620dasm.h")
-end
-
---------------------------------------------------
--- Panafacom MN1610, disassembler only
---@src/devices/cpu/mn1610/mn1610d.h,CPUS["MN1610"] = true
---------------------------------------------------
-
-if opt_tool(CPUS, "MN1610") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn1610/mn1610d.h")
 end
 
 --------------------------------------------------

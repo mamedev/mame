@@ -84,6 +84,7 @@ BD-62     ms   SM512   Bomb Sweeper
 JB-63     ms   SM511   Safe Buster
 MV-64     ms   SM512   Gold Cliff
 ZL-65     ms   SM512   Zelda
+TR-66*    ms   SM512?  Tetris Jr. (prototype)
 CJ-71*    tt   SM511?  Donkey Kong Jr.
 CM-72     tt   SM511   Mario's Cement Factory
 SM-73*    tt   SM511?  Snoopy
