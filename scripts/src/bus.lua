@@ -5250,6 +5250,8 @@ if (BUSES["MC68000_SYSBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc68000/sysbus.h",
 		MAME_DIR .. "src/devices/bus/mc68000/cards.cpp",
 		MAME_DIR .. "src/devices/bus/mc68000/cards.h",
+		MAME_DIR .. "src/devices/bus/mc68000/floppy.cpp",
+		MAME_DIR .. "src/devices/bus/mc68000/floppy.h",
 		MAME_DIR .. "src/devices/bus/mc68000/ram.cpp",
 		MAME_DIR .. "src/devices/bus/mc68000/ram.h",
 	}

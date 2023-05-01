@@ -80,6 +80,24 @@ void mc68000_sysbus_device::slot_w(int slot, offs_t offset, uint16_t data, uint1
 		logerror("Write to unused slot %d: %06x = %04x & %04x\n", slot, offset, data, mem_mask);
 }
 
+uint16_t mc68000_sysbus_device::floppy_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t data = 0xffff;
+
+	for (int i = 0; i < 8; i++)
+		if (m_device_list[i])
+			data &= m_device_list[i]->floppy_r(offset, mem_mask);
+
+	return data;
+}
+
+void mc68000_sysbus_device::floppy_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	for (int i = 0; i < 8; i++)
+		if (m_device_list[i])
+			m_device_list[i]->floppy_w(offset, data, mem_mask);
+}
+
 
 //**************************************************************************
 //  SLOT DEVICE

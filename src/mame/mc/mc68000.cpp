@@ -14,7 +14,6 @@
 
     TODO:
     - Better keyboard
-    - Floppy
     - Cassette
     - Color/brightness levels
     - Sound
@@ -46,7 +45,7 @@
 #define LOG_IO_READ  (1U << 1)
 #define LOG_IO_WRITE (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_IO_WRITE)
+//#define VERBOSE (LOG_GENERAL | LOG_IO_WRITE | LOG_IO_READ)
 #include "logmacro.h"
 
 
@@ -167,8 +166,7 @@ uint16_t mc68000_state::memory_r(offs_t offset, uint16_t mem_mask)
 			break;
 
 		case 2:
-			LOGMASKED(LOG_IO_READ, "Unhandled floppy access\n");
-			data = 0xffff;
+			data = m_sysbus->floppy_r(offset >> 1, mem_mask);
 			break;
 
 		case 3:
@@ -259,7 +257,7 @@ void mc68000_state::memory_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 2:
-			LOGMASKED(LOG_IO_WRITE, "Unhandled floppy access\n");
+			m_sysbus->floppy_w(offset >> 1, data, mem_mask);
 			break;
 
 		case 3:
