@@ -14,7 +14,8 @@
     These keyboards generally use simple gate arrays rather than MCUs. The
     MCU in the terminal is responsible for scanning the entire key matrix
     one switch at a time, which it does by sending a series of pulses on
-    CMD and shifting bits in from the DATA return line.
+    CMD and shifting bits in from the DATA return line. The protocol is
+    further described in U.S. Patent 4,706,068.
 
     Each keyboard has a different matrix layout, so the same key may appear
     at different indices on different keyboards. The one consistent feature
