@@ -19,6 +19,7 @@ DEFINE_DEVICE_TYPE(WY60_ASCII_KEYBOARD, wy60_ascii_keyboard_device, "wy60_ascii_
 DEFINE_DEVICE_TYPE(WYSE_AT_KEYBOARD, wyse_at_keyboard_device, "wyse_at_kbd", "Wyse AT-Style Keyboard")
 DEFINE_DEVICE_TYPE(WYSE_316X_KEYBOARD, wyse_316x_keyboard_device, "wyse_316x_kbd", "Wyse IBM 316X-Style Keyboard")
 DEFINE_DEVICE_TYPE(WYSE_PCE_KEYBOARD, wyse_pce_keyboard_device, "wyse_pce_kbd", "Wyse Enhanced PC-Style Keyboard")
+DEFINE_DEVICE_TYPE(WYSE_PCEINT_KEYBOARD, wyse_pceint_keyboard_device, "wyse_pceint_kbd", "Wyse Enhanced PC-Style Keyboard (International)")
 
 
 //**************************************************************************
@@ -240,11 +241,16 @@ u8 wy60_ascii_keyboard_device::wysekbd_get_id()
 }
 
 
-wyse_at_keyboard_device::wyse_at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: wyse_gate_array_keyboard_device(mconfig, WYSE_AT_KEYBOARD, tag, owner, clock)
+wyse_at_keyboard_device::wyse_at_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: wyse_gate_array_keyboard_device(mconfig, type, tag, owner, clock)
 	, m_caps_led(*this, "caps_led")
 	, m_num_led(*this, "num_led")
 	, m_scroll_led(*this, "scroll_led")
+{
+}
+
+wyse_at_keyboard_device::wyse_at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: wyse_at_keyboard_device(mconfig, WYSE_AT_KEYBOARD, tag, owner, clock)
 {
 }
 
@@ -551,20 +557,8 @@ u8 wyse_316x_keyboard_device::wysekbd_get_id()
 
 
 wyse_pce_keyboard_device::wyse_pce_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: wyse_gate_array_keyboard_device(mconfig, WYSE_PCE_KEYBOARD, tag, owner, clock)
-	, m_caps_led(*this, "caps_led")
-	, m_num_led(*this, "num_led")
-	, m_scroll_led(*this, "scroll_led")
+	: wyse_at_keyboard_device(mconfig, WYSE_PCE_KEYBOARD, tag, owner, clock)
 {
-}
-
-void wyse_pce_keyboard_device::device_resolve_objects()
-{
-	wyse_gate_array_keyboard_device::device_resolve_objects();
-
-	m_caps_led.resolve();
-	m_num_led.resolve();
-	m_scroll_led.resolve();
 }
 
 static INPUT_PORTS_START(wyse_pce_keyboard)
@@ -596,7 +590,7 @@ static INPUT_PORTS_START(wyse_pce_keyboard)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) PORT_CODE(KEYCODE_NUMLOCK)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl (Left)") PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\  | (International)") PORT_CODE(KEYCODE_BACKSLASH2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("*  ;") PORT_CODE(KEYCODE_BACKSLASH2)
 
 	PORT_START("R3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad .  Del") PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) PORT_CODE(KEYCODE_DEL_PAD)
@@ -706,14 +700,31 @@ ioport_constructor wyse_pce_keyboard_device::device_input_ports() const
 
 u8 wyse_pce_keyboard_device::wysekbd_get_id()
 {
-	// WY-60 requires either 0x82 or 0x83 for shift keys to work
-	return 0x83 ^ 0xff;
+	// WY-60 requires either 0x82 or 0x83 for shift keys to work (0x83 is the international version)
+	return 0x82 ^ 0xff;
 }
 
-void wyse_pce_keyboard_device::wysekbd_update_leds(u8 index)
+wyse_pceint_keyboard_device::wyse_pceint_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: wyse_at_keyboard_device(mconfig, WYSE_PCEINT_KEYBOARD, tag, owner, clock)
 {
-	u8 const led_count = index >= 0x98 ? index & 0x07 : 0;
-	m_caps_led = !BIT(led_count, 2);
-	m_num_led = !BIT(led_count, 1);
-	m_scroll_led = !BIT(led_count, 0);
+}
+
+static INPUT_PORTS_START(wyse_pceint_keyboard)
+	PORT_INCLUDE(wyse_pce_keyboard)
+
+	PORT_MODIFY("R0")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("#  ~") PORT_CODE(KEYCODE_BACKSLASH)
+
+	PORT_MODIFY("R2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('\\') PORT_CHAR('|') PORT_CODE(KEYCODE_BACKSLASH2)
+INPUT_PORTS_END
+
+ioport_constructor wyse_pceint_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(wyse_pceint_keyboard);
+}
+
+u8 wyse_pceint_keyboard_device::wysekbd_get_id()
+{
+	return 0x83 ^ 0xff;
 }

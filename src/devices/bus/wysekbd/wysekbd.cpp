@@ -74,4 +74,5 @@ void wy60_keyboards(device_slot_interface &slot)
 	slot.option_add("at", WYSE_AT_KEYBOARD);
 	slot.option_add("316x", WYSE_316X_KEYBOARD);
 	slot.option_add("pce", WYSE_PCE_KEYBOARD);
+	slot.option_add("pceint", WYSE_PCEINT_KEYBOARD);
 }
