@@ -35,6 +35,8 @@ public:
 		, m_internal_view(*this, "8051_internal")
 		, m_char_addr(0)
 		, m_is_132(false)
+		, m_cur_attr(0)
+		, m_last_row_attr(0)
 	{
 	}
 
@@ -46,6 +48,7 @@ protected:
 
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
+	DECLARE_WRITE_LINE_MEMBER(mbc_attr_clock_w);
 	u8 mbc_char_r(offs_t offset);
 	u8 mbc_attr_r(offs_t offset);
 
@@ -73,6 +76,8 @@ private:
 
 	u16 m_char_addr;
 	bool m_is_132;
+	u8 m_cur_attr;
+	u8 m_last_row_attr;
 };
 
 
@@ -80,22 +85,62 @@ void wy60_state::machine_start()
 {
 	save_item(NAME(m_char_addr));
 	save_item(NAME(m_is_132));
+	save_item(NAME(m_cur_attr));
+	save_item(NAME(m_last_row_attr));
 }
 
 SCN2672_DRAW_CHARACTER_MEMBER(wy60_state::draw_character)
 {
-	const int char_width = m_is_132 ? 9 : 10;
-
-	// TODO: attributes
-	const u16 char_addr = u16(m_charram[0x0001] & 0x60) << 6 | u16(charcode & 0x7f) << 4 | linecount;
-	u16 dots = m_fontram[char_addr] << 1;
-	if (cursor)
-		dots = ~dots;
-	for (int i = 0; i < char_width; i++)
+	// TODO: line attributes
+	const u8 screen_attr = m_charram[0x0002];
+	if (!BIT(screen_attr, 4))
 	{
-		bitmap.pix(y, x++) = BIT(dots, 9) ? rgb_t::white() : rgb_t::black();
+		if ((charcode & 0xe0) == 0x80)
+		{
+			// Set nonhidden display attribute and blank the character
+			// (90 = blink, 88 = reverse, 84 = underline, 82 = dim, 81 = blank, 80 = normal)
+			m_cur_attr = charcode & 0x1f;
+			attrcode = 0x01;
+		}
+		else
+		{
+			if (x == 0)
+				m_cur_attr = m_last_row_attr;
+			attrcode = (m_cur_attr & 0x1c) << 1 | (m_cur_attr & 0x03);
+		}
+	}
+
+	u8 dots = 0;
+	if (!BIT(attrcode, 5) || !blink)
+	{
+		if (BIT(attrcode, 3) && ul)
+			dots = 0xff;
+		else if (!BIT(attrcode, 0))
+		{
+			const u16 char_addr = u16(attrcode & 0xc0) << 5 | u16(charcode & 0x7f) << 4 | linecount;
+			dots = m_fontram[char_addr];
+		}
+		if (BIT(attrcode, 4))
+			dots = ~dots;
+	}
+
+	const bool cur = cursor && (!BIT(screen_attr, 5) || blink) && (!BIT(screen_attr, 7) || ul);
+	if (cur)
+		dots = ~dots;
+
+	const rgb_t fg = (BIT(attrcode, 1) && !cur) ? rgb_t(0xc0, 0xc0, 0xc0) : rgb_t::white();
+	for (int i = 0; i < 7; i++)
+	{
+		bitmap.pix(y, x++) = BIT(dots, 7) ? fg : rgb_t::black();
 		dots <<= 1;
 	}
+	std::fill_n(&bitmap.pix(y, x), m_is_132 ? 2 : 3, BIT(dots, 7) ? fg : rgb_t::black());
+}
+
+WRITE_LINE_MEMBER(wy60_state::mbc_attr_clock_w)
+{
+	if (state)
+		m_last_row_attr = m_cur_attr;
 }
 
 u8 wy60_state::mbc_char_r(offs_t offset)
@@ -224,6 +269,7 @@ void wy60_state::wy60(machine_config &config)
 	m_pvtc->set_display_callback(FUNC(wy60_state::draw_character));
 	m_pvtc->intr_callback().set_inputline("maincpu", MCS51_T0_LINE);
 	m_pvtc->breq_callback().set_inputline("maincpu", MCS51_INT0_LINE);
+	m_pvtc->mbc_callback().set(FUNC(wy60_state::mbc_attr_clock_w));
 	m_pvtc->mbc_char_callback().set(FUNC(wy60_state::mbc_char_r));
 	m_pvtc->mbc_attr_callback().set(FUNC(wy60_state::mbc_attr_r));
 

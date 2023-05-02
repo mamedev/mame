@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(WY60_ASCII_KEYBOARD, wy60_ascii_keyboard_device, "wy60_ascii_
 DEFINE_DEVICE_TYPE(WYSE_AT_KEYBOARD, wyse_at_keyboard_device, "wyse_at_kbd", "Wyse AT-Style Keyboard")
 DEFINE_DEVICE_TYPE(WYSE_316X_KEYBOARD, wyse_316x_keyboard_device, "wyse_316x_kbd", "Wyse IBM 316X-Style Keyboard")
 DEFINE_DEVICE_TYPE(WYSE_PCE_KEYBOARD, wyse_pce_keyboard_device, "wyse_pce_kbd", "Wyse Enhanced PC-Style Keyboard")
-DEFINE_DEVICE_TYPE(WYSE_PCEINT_KEYBOARD, wyse_pceint_keyboard_device, "wyse_pceint_kbd", "Wyse Enhanced PC-Style Keyboard (International)")
+DEFINE_DEVICE_TYPE(WYSE_PCEINT_KEYBOARD, wyse_pceint_keyboard_device, "wyse_pceint_kbd", "Wyse Enhanced PC-Style International Keyboard")
 
 
 //**************************************************************************
