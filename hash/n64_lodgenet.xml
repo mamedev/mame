@@ -47,7 +47,7 @@ The existing roms are decrypted, and should be considered bad dumps.
 
 -->
 
-<softwarelist name="n64" description="LodgeNet 64 software">
+<softwarelist name="n64_lodgenet" description="LodgeNet 64 software">
 
 	<software name="1080snow">
 		<description>1080° Snowboarding</description>
