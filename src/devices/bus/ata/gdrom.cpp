@@ -16,7 +16,7 @@
 #define LOG_XFER    (1U << 4)
 #define LOG_TOC     (1U << 5) // TOC frame offsets
 
-#define VERBOSE (LOG_WARN | LOG_CMD | LOG_TOC)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CMD | LOG_TOC)
 #define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -253,6 +253,7 @@ void gdrom_device::ExecCommand()
 				{
 					m_cdda->stop_audio();
 					m_audio_sense = SCSI_SENSE_ASC_ASCQ_NO_SENSE;
+					m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
 				}
 
 				m_phase = SCSI_PHASE_DATAIN;
@@ -285,6 +286,7 @@ void gdrom_device::ExecCommand()
 			if (m_cdda != nullptr)
 			{
 				m_cdda->stop_audio();
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_STANDBY_STATE;
 			}
 
 			m_phase = SCSI_PHASE_DATAIN;
@@ -333,12 +335,13 @@ void gdrom_device::ExecCommand()
 			const u8 play_mode = command[1] & 7;
 
 			auto trk = m_cdrom->get_track(start_offs);
+			const u8 repeat = command[6] & 0xf;
 			LOGCMD("CD_PLAY 20h track %d FAD %d blocks %d type %02x repeat %01x\n"
 				, trk + 1
 				, start_offs
 				, end_offs - start_offs
 				, play_mode
-				, command[6] & 0xf
+				, repeat
 			);
 
 			if (play_mode == 7 && m_audio_sense == SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED)
@@ -346,18 +349,28 @@ void gdrom_device::ExecCommand()
 				m_cdda->pause_audio(0);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 				LOGCMD("\tPlayback resume\n");
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
 			}
 			else if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO && end_offs > start_offs)
 			{
 				// TODO: check end > start assertion
-				m_cdda->start_audio(start_offs - 150, (end_offs - start_offs));
+				m_cd_status.cdda_fad = start_offs - 150;
+				m_cd_status.cdda_blocks = (end_offs - start_offs);
+
+				m_cdda->start_audio(m_cd_status.cdda_fad, m_cd_status.cdda_blocks);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
+				m_cd_status.repeat_current = 0;
+				m_cd_status.repeat_count = repeat;
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
+
 				LOGCMD("\tPlayback started\n");
 			}
 			else
 			{
 				LOGWARN("track is NOT audio!\n");
 				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+				// TODO: unconfirmed state
+				m_sector_number = (m_sector_number & 0xf0) | GDROM_ERROR_STATE;
 				return;
 			}
 
@@ -391,6 +404,7 @@ void gdrom_device::ExecCommand()
 					LOGCMD("\tPlayback paused\n");
 					m_cdda->pause_audio(1);
 					m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_PAUSED;
+					m_sector_number = (m_sector_number & 0xf0) | GDROM_PAUSE_STATE;
 					break;
 			}
 
@@ -769,7 +783,7 @@ void gdrom_device::process_buffer()
 	const u8 cd_type = is_real_gdrom_disc == true ? 0x80 : 0x00;
 	// TODO: play/pause is required by audio CD player to detect end of track
 	// Requires an override to lba_address(), also a different variable name
-	m_sector_number = cd_type | GDROM_PLAY_STATE;
+	m_sector_number = cd_type | (m_sector_number & 0xf);
 }
 
 void gdrom_device::signature()
@@ -779,7 +793,7 @@ void gdrom_device::signature()
 	const u8 cd_type = is_real_gdrom_disc == true ? 0x80 : 0x00;
 
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
-	m_sector_number = cd_type | GDROM_PLAY_STATE;
+	m_sector_number = cd_type | (m_sector_number & 0xf);
 }
 
 //bool gdrom_device::set_features()
@@ -788,3 +802,31 @@ void gdrom_device::signature()
 //	m_status |= IDE_STATUS_DSC;
 //	return atapi_cdrom_device::set_features();
 //}
+
+WRITE_LINE_MEMBER(gdrom_device::cdda_end_mark_cb)
+{
+	if (state != ASSERT_LINE)
+		return;
+
+	m_cd_status.repeat_current ++;
+	m_cd_status.repeat_current &= 0xf;
+	LOG("end marker %d %d\n", m_cd_status.repeat_current, m_cd_status.repeat_count);
+
+	// repeat_count = 0xf: infinite, not unlike Saturn CD Block
+	// - ggx sound test track #20 (opening) is a good testing scenario.
+	// - audio cd player don't care about this:
+	//   it manually handle repeat modes depending on GD state alone.
+	if (m_cd_status.repeat_current > m_cd_status.repeat_count)
+	{
+		m_cdda->pause_audio(1);
+		m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_SUCCESSFULLY_COMPLETED;
+		LOG("\tCompleted\n");
+		m_sector_number = (m_sector_number & 0xf0) | GDROM_PAUSE_STATE;
+	}
+	else
+	{
+		m_cdda->start_audio(m_cd_status.cdda_fad, m_cd_status.cdda_blocks);
+		LOG("\tRestart playback\n");
+		m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
+	}
+}

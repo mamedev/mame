@@ -23,6 +23,7 @@ public:
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
+	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
 
 protected:
 	virtual void process_buffer() override;
@@ -38,11 +39,21 @@ protected:
 	virtual bool is_ready() override { return true; }
 
 private:
-	uint8_t GDROM_Cmd11_Reply[32];
+	uint8_t GDROM_Cmd11_Reply[32]{};
 	uint32_t read_type = 0;   // for command 0x30 only
 	uint32_t data_select = 0; // for command 0x30 only
 	uint32_t transferOffset = 0;
-	bool is_real_gdrom_disc;
+	bool is_real_gdrom_disc = false;
+
+	struct cd_status
+	{
+		u8 repeat_count = 0;
+		u8 repeat_current = 0;
+		u32 cdda_fad = 0;
+		u32 cdda_blocks = 0;
+	};
+
+	cd_status m_cd_status;
 };
 
 DECLARE_DEVICE_TYPE(GDROM, gdrom_device)
