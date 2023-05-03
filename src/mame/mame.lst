@@ -33745,6 +33745,9 @@ supergm3                        // 1996
 n64                             // Nintendo N64
 n64dd                           // Nintendo N64 (64DD Attachment)
 
+@source:nintendo/n64_lodgenet.cpp
+n64_lodgenet
+
 @source:nintendo/n8080.cpp
 bandido                         // (c) 1980 Exidy
 helifire                        // (c) 1980 Nintendo
