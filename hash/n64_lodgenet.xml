@@ -2,49 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
-
-LodgeNet was a pay-per-view system that allowed television, movie and video
-game rentals on hotels starting in 1993. They entered an agreement with
-Nintendo to allow the rental of their games on airplanes and hotels for a
-moderate fee.
-
-The LodgeNet 64 system was exclusively used in hotels, and consisted of a
-set-top box with a customized N64 system inside. You could choose one of
-several games via a TV-driven menu, which would then be downloaded to your
-room's system, and you would be charged a fee for one hour of playtime.
-
-The games were different from their retail counterparts; Games had to have
-their multiplayer modes, accessories and game save support removed, plus have
-additional support for the system's "halt" functions, so they would be allowed
-on the system. The game controllers were custom, with additional buttons for
-use with their rental system and a reset button, and did not allow the use of
-Rumble Paks or Memory Paks. While the hardware allowed temporary save files,
-these would be deleted from the system with a special utility before a new game
-was loaded. These files were stored in encrypted format in the LodgeNet
-servers, and were decrypted after being downloaded to the system. An extra file
-with additional info about the game, its encryption code, and EEPROM settings
-was also present.
-
-While the development info released mentions a requirement for PAL versions of
-the games, none are currently known to exist.
-
-38 Nintendo 64 titles were made available on the service, and 31 are currently
-dumped. The following games have not been found:
-
-  - Extreme-G
-  - Forsaken 64
-  - Iggy's Reckin' Balls
-  - Milo's Astro Lanes
-  - Namco Museum 64
-  - San Francisco Rush: Extreme Racing
-  - Turok 2: Seeds of Evil
-
-These games will function, but the actual LodgeNet system is not emulated,
-so the extra controller buttons and other system functions are not
-implemented.
-
-The existing roms are decrypted, and should be considered bad dumps.
-
 -->
 
 <softwarelist name="n64_lodgenet" description="LodgeNet 64 software">
