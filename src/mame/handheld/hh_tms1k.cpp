@@ -11719,13 +11719,12 @@ ROM_END
   * TMS5110AN2L-1 speech chip, 16KB VSM CM62088N2L
   * CD40114BE (4x16 RAM, battery-backed)
 
-  There's also an older version (BHP_8338A2 PCB, M34137N2, CM62074). It can
-  be identified by the missing (unpopulated) language switch.
+  There's also an older version (BHP_8338A2 PCB, M34137N2, CM62074). It can be
+  identified by the missing (unpopulated) language switch.
 
-  It has a normal mechanical scale hidden from view, with a quadrature
-  encoder. In MAME, it's simulated with a dial control. Turn it left to
-  increase pressure, right to decrease. After around 0.5s of inactivity,
-  it will tell your 'weight'.
+  It has a normal mechanical scale hidden from view, with a quadrature encoder.
+  In MAME, it's simulated with a dial control. Turn it left to increase pressure,
+  right to decrease. After around 0.5s of inactivity, it will tell your 'weight'.
 
 *******************************************************************************/
 

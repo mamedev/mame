@@ -67,7 +67,7 @@ public:
 
 	pippin_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<aspen_host_device> m_aspen;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
@@ -166,6 +166,7 @@ void pippin_state::pippin(machine_config &config)
 {
 	/* basic machine hardware */
 	PPC603(config, m_maincpu, 66000000);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pippin_state::pippin_map);
 
 	PCI_ROOT(config, "pci", 0);

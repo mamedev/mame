@@ -2623,6 +2623,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/wysekbd/wysekbd.h,BUSES["WYSEKBD"] = true
+---------------------------------------------------
+
+if (BUSES["WYSEKBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/wysekbd/wysegakb.cpp",
+		MAME_DIR .. "src/devices/bus/wysekbd/wysegakb.h",
+		MAME_DIR .. "src/devices/bus/wysekbd/wysekbd.cpp",
+		MAME_DIR .. "src/devices/bus/wysekbd/wysekbd.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/z29_kbd/keyboard.h,BUSES["Z29_KBD"] = true
 ---------------------------------------------------
 
@@ -5235,6 +5250,8 @@ if (BUSES["MC68000_SYSBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/mc68000/sysbus.h",
 		MAME_DIR .. "src/devices/bus/mc68000/cards.cpp",
 		MAME_DIR .. "src/devices/bus/mc68000/cards.h",
+		MAME_DIR .. "src/devices/bus/mc68000/floppy.cpp",
+		MAME_DIR .. "src/devices/bus/mc68000/floppy.h",
 		MAME_DIR .. "src/devices/bus/mc68000/ram.cpp",
 		MAME_DIR .. "src/devices/bus/mc68000/ram.h",
 	}
