@@ -11,13 +11,10 @@ and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
 continued by Systemhuset.
 
 TODO:
-- dump/add original Plymate Amsterdam module
 - dump/add Plymate Glasgow Plus version
 - dump/add concvicp library module (L/L16 don't work, manual says it has its own add-on)
 - concvicp unmapped reads/writes
 - verify irq/beeper for concvicp, though it is probably correct
-- official rom label for concams8
-- is concams8 actually 4MHz?
 
 --------------------------------------------------------------------------------
 
@@ -46,6 +43,7 @@ IRQ and beeper. On A0, IRQ is active for ~31.2us.
 A1(P) + A0(M) (Princhess, aka Glasgow)
 - dual-module, 2nd module has no CPU (according to the manual, A0 is modified and
   won't work stand-alone)
+- dual-module Amsterdam version also exists
 
 A2(C) (Plymate, aka Amsterdam)
 - R65C02P4 @ 5.5MHz (11MHz XTAL) (5.5MHz version)
@@ -58,6 +56,9 @@ A3 (Plymate Victoria)
 Library modules:
 - L: small PCB, PCB label: CCL L-2, 8KB EPROM no label
 - L16: 2*8KB EPROM (have no photo of PCB)
+
+There are also modern bootleg boards from SteveUK in circulation. The library ROM
+is integrated.
 
 *******************************************************************************/
 
@@ -96,8 +97,8 @@ public:
 	// machine configs
 	void conc(machine_config &config);
 	void concgla(machine_config &config);
+	void concams(machine_config &config);
 	void concams5(machine_config &config);
-	void concams8(machine_config &config);
 	void concvicp(machine_config &config);
 
 protected:
@@ -270,9 +271,17 @@ void conchess_state::concgla(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
-void conchess_state::concams5(machine_config &config)
+void conchess_state::concams(machine_config &config)
 {
 	concgla(config);
+
+	// basic machine hardware
+	subdevice<software_list_device>("cart_list")->set_filter("l16");
+}
+
+void conchess_state::concams5(machine_config &config)
+{
+	concams(config);
 
 	// basic machine hardware
 	m_maincpu->set_clock(11_MHz_XTAL/2);
@@ -280,25 +289,8 @@ void conchess_state::concams5(machine_config &config)
 	const attotime irq_period = attotime::from_hz(11_MHz_XTAL / 0x4000);
 	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
 
-	subdevice<software_list_device>("cart_list")->set_filter("l16");
-
 	// sound hardware
 	BEEP(config.replace(), m_beeper, 11_MHz_XTAL / 0x800);
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void conchess_state::concams8(machine_config &config)
-{
-	concams5(config);
-
-	// basic machine hardware
-	m_maincpu->set_clock(16_MHz_XTAL/2);
-
-	const attotime irq_period = attotime::from_hz(16_MHz_XTAL / 0x4000);
-	m_maincpu->set_periodic_int(FUNC(conchess_state::irq0_line_assert), irq_period);
-
-	// sound hardware
-	BEEP(config.replace(), m_beeper, 16_MHz_XTAL / 0x1000);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -339,14 +331,15 @@ ROM_START( concgla )
 	ROM_LOAD("9128c-0134", 0xc000, 0x4000, CRC(b694a275) SHA1(e4e49379b4eb45402ca8bb82c20d0169db62ed7a) ) // "
 ROM_END
 
+ROM_START( concams )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("8b_4.0_133", 0x8000, 0x4000, CRC(e021e3d8) SHA1(7a2c079664ed5cbaa7e5c55d4d2e8936b7be4219) ) // SEEQ DQ5143-250
+	ROM_LOAD("cf_4.0_134", 0xc000, 0x4000, CRC(fc827c7f) SHA1(51acd881c4d5fe29f2a83d35a48ba323344122db) ) // "
+ROM_END
+
 ROM_START( concams5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("s5.a1", 0x8000, 0x8000, CRC(9a9d1ec1) SHA1(75dbd1f96502775ed304f6b085d958f1b07d08f9) ) // AT27C256
-ROM_END
-
-ROM_START( concams8 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("amsterdam_8mhz.bin", 0x8000, 0x8000, CRC(85005b73) SHA1(edbc18d07552cab5951d8a6b738b2eacd73331c1) )
 ROM_END
 
 ROM_START( concvicp )
@@ -362,9 +355,9 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, conc,     0,        0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, concgla,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, concams5, 0,        0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, concams8, concams5, 0,      concams8, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 8.0MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, concvicp, 0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, conc,     0,       0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, concgla,  0,       0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, concams,  0,       0,      concams,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, concams5, concams, 0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, concvicp, 0,       0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

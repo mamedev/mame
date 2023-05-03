@@ -27,7 +27,8 @@ void jack_state::jack_colorram_w(offs_t offset, uint8_t data)
 
 uint8_t jack_state::jack_flipscreen_r(offs_t offset)
 {
-	flip_screen_set(offset);
+	if (!machine().side_effects_disabled())
+		flip_screen_set(offset);
 	return 0;
 }
 

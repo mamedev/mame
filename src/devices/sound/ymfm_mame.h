@@ -92,7 +92,7 @@ protected:
 	}
 
 	// the chip implementation calls this when the state of the IRQ signal has
-	// changed due to a status change; our responsibility is to respons as
+	// changed due to a status change; our responsibility is to response as
 	// needed to the change in IRQ state, signaling any consumers
 	virtual void ymfm_update_irq(bool asserted) override
 	{

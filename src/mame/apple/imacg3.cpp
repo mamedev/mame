@@ -37,7 +37,7 @@ public:
 
 	imac_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	required_device<mpc106_host_device> m_mpc106;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
@@ -114,7 +114,8 @@ void imac_state::imac_map(address_map &map)
 
 void imac_state::imac(machine_config &config)
 {
-	PPC604(config, m_maincpu, 66000000);    // actually PPC750
+	PPC740(config, m_maincpu, 66000000);    // actually 233 MHz
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
 	PCI_ROOT(config, "pci", 0);

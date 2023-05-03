@@ -15083,6 +15083,7 @@ sf2ce                           // 13/05/1992 (c) 1992 (World)
 sf2ceblp                        // hack
 sf2cebltw                       // hack
 sf2ceea                         // 13/03/1992 (c) 1992 (World)
+sf2ceec                         // 03/08/1992 (c) 1992 (World)
 sf2ceja                         // 22/03/1992 (c) 1992 (Japan)
 sf2cejb                         // 13/05/1992 (c) 1992 (Japan)
 sf2cejc                         // 03/08/1992 (c) 1992 (Japan)
@@ -15882,8 +15883,8 @@ cncchess
 
 @source:chess/conchess.cpp
 conc
+concams
 concams5
-concams8
 concgla
 concvicp
 
@@ -18884,6 +18885,7 @@ trobhood                        // Tiger
 trobocop2                       // Tiger
 trobocop3                       // Tiger
 trockteer                       // Tiger
+trsgkeep                        // Tronica
 trshutvoy                       // Tronica
 trspacmis                       // Tronica
 trspider                        // Tronica
@@ -22924,6 +22926,10 @@ hb_ringbd                       //
 hb_ringbe                       //
 hb_ydd                          // Yabba-Dabba-Dough (Qps)
 hb_ydda                         //
+
+@source:jpm/pluto6.cpp
+pl6_kfp                         //
+pl6_lgk                         //
 
 @source:kaneko/airbustr.cpp
 airbustr                        // (c) 1990 Kaneko + Namco

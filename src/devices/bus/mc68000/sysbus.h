@@ -85,6 +85,9 @@ public:
 	uint16_t slot_r(int slot, offs_t offset, uint16_t mem_mask = ~0);
 	void slot_w(int slot, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	uint16_t floppy_r(offs_t offset, uint16_t mem_mask = ~0);
+	void floppy_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 protected:
 	// device_t implementation
 	virtual void device_start() override;
@@ -152,6 +155,9 @@ public:
 
 	virtual uint16_t slot_r(offs_t offset, uint16_t mem_mask = ~0) { return 0xffff; }
 	virtual void slot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
+
+	virtual uint16_t floppy_r(offs_t offset, uint16_t mem_mask = ~0) { return 0xffff; }
+	virtual void floppy_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { }
 
 protected:
 	device_mc68000_sysbus_card_interface(const machine_config &mconfig, device_t &device);
