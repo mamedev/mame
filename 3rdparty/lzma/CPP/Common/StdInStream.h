@@ -13,18 +13,29 @@ class CStdInStream
   FILE *_stream;
   bool _streamIsOpen;
 public:
-  CStdInStream(): _stream(0), _streamIsOpen(false) {};
-  CStdInStream(FILE *stream): _stream(stream), _streamIsOpen(false) {};
+  int CodePage;
+
+  CStdInStream(FILE *stream = NULL):
+      _stream(stream),
+      _streamIsOpen(false),
+      CodePage(-1)
+      {};
+
   ~CStdInStream() { Close(); }
 
   bool Open(LPCTSTR fileName) throw();
   bool Close() throw();
 
-  AString ScanStringUntilNewLine(bool allowEOF = false);
-  void ReadToString(AString &resultString);
-  UString ScanUStringUntilNewLine();
+  // returns:
+  //   false, if ZERO character in stream
+  //   true, if EOF or '\n'
+  bool ScanAStringUntilNewLine(AString &s);
+  bool ScanUStringUntilNewLine(UString &s);
+  // bool ReadToString(AString &resultString);
 
-  bool Eof() throw();
+  bool Eof() const throw() { return (feof(_stream) != 0); }
+  bool Error() const throw() { return (ferror(_stream) != 0); }
+
   int GetChar();
 };
 

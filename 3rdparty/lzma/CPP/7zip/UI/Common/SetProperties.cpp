@@ -27,6 +27,21 @@ static void ParseNumberString(const UString &s, NCOM::CPropVariant &prop)
     prop = result;
 }
 
+
+struct CPropPropetiesVector
+{
+  CPropVariant *values;
+  CPropPropetiesVector(unsigned num)
+  {
+    values = new CPropVariant[num];
+  }
+  ~CPropPropetiesVector()
+  {
+    delete []values;
+  }
+};
+
+
 HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &properties)
 {
   if (properties.IsEmpty())
@@ -37,8 +52,7 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
     return S_OK;
 
   UStringVector realNames;
-  CPropVariant *values = new CPropVariant[properties.Size()];
-  try
+  CPropPropetiesVector values(properties.Size());
   {
     unsigned i;
     for (i = 0; i < properties.Size(); i++)
@@ -62,19 +76,12 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
       else
         ParseNumberString(property.Value, propVariant);
       realNames.Add(name);
-      values[i] = propVariant;
+      values.values[i] = propVariant;
     }
     CRecordVector<const wchar_t *> names;
     for (i = 0; i < realNames.Size(); i++)
       names.Add((const wchar_t *)realNames[i]);
     
-    RINOK(setProperties->SetProperties(&names.Front(), values, names.Size()));
+    return setProperties->SetProperties(&names.Front(), values.values, names.Size());
   }
-  catch(...)
-  {
-    delete []values;
-    throw;
-  }
-  delete []values;
-  return S_OK;
 }

@@ -15,11 +15,32 @@
 
 #include "OpenCallbackConsole.h"
 
+/*
+struct CErrorPathCodes2
+{
+  FStringVector Paths;
+  CRecordVector<DWORD> Codes;
+
+  void AddError(const FString &path, DWORD systemError)
+  {
+    Paths.Add(path);
+    Codes.Add(systemError);
+  }
+  void Clear()
+  {
+    Paths.Clear();
+    Codes.Clear();
+  }
+};
+*/
+
 class CExtractScanConsole: public IDirItemsCallback
 {
   CStdOutStream *_so;
   CStdOutStream *_se;
   CPercentPrinter _percent;
+
+  // CErrorPathCodes2 ScanErrors;
 
   bool NeedPercents() const { return _percent._so != NULL; }
   
@@ -32,6 +53,9 @@ class CExtractScanConsole: public IDirItemsCallback
   }
 
 public:
+
+  virtual ~CExtractScanConsole() {}
+
   void Init(CStdOutStream *outStream, CStdOutStream *errorStream, CStdOutStream *percentStream)
   {
     _so = outStream;

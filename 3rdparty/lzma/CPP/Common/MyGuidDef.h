@@ -18,6 +18,9 @@ typedef struct {
 #define REFGUID const GUID *
 #endif
 
+// typedef GUID IID;
+typedef GUID CLSID;
+
 #define REFCLSID REFGUID
 #define REFIID REFGUID
 

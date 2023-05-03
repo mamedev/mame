@@ -24,6 +24,7 @@ public:
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
 };
 
+
 struct CReferenceBuf:
   public IUnknown,
   public CMyUnknownImp
@@ -31,6 +32,7 @@ struct CReferenceBuf:
   CByteBuffer Buf;
   MY_UNKNOWN_IMP
 };
+
 
 class CBufInStream:
   public IInStream,
@@ -41,7 +43,7 @@ class CBufInStream:
   size_t _size;
   CMyComPtr<IUnknown> _ref;
 public:
-  void Init(const Byte *data, size_t size, IUnknown *ref = 0)
+  void Init(const Byte *data, size_t size, IUnknown *ref = NULL)
   {
     _data = data;
     _size = size;
@@ -55,17 +57,20 @@ public:
   STDMETHOD(Seek)(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition);
 };
 
+
 void Create_BufInStream_WithReference(const void *data, size_t size, IUnknown *ref, ISequentialInStream **stream);
 void Create_BufInStream_WithNewBuffer(const void *data, size_t size, ISequentialInStream **stream);
 inline void Create_BufInStream_WithNewBuffer(const CByteBuffer &buf, ISequentialInStream **stream)
   { Create_BufInStream_WithNewBuffer(buf, buf.Size(), stream); }
 
+
 class CByteDynBuffer
 {
   size_t _capacity;
   Byte *_buf;
+  CLASS_NO_COPY(CByteDynBuffer);
 public:
-  CByteDynBuffer(): _capacity(0), _buf(0) {};
+  CByteDynBuffer(): _capacity(0), _buf(NULL) {};
   // there is no copy constructor. So don't copy this object.
   ~CByteDynBuffer() { Free(); }
   void Free() throw();
@@ -74,6 +79,7 @@ public:
   operator const Byte*() const { return _buf; }
   bool EnsureCapacity(size_t capacity) throw();
 };
+
 
 class CDynBufSeqOutStream:
   public ISequentialOutStream,
@@ -93,6 +99,7 @@ public:
   MY_UNKNOWN_IMP1(ISequentialOutStream)
   STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
+
 
 class CBufPtrSeqOutStream:
   public ISequentialOutStream,
@@ -114,6 +121,7 @@ public:
   STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
 
+
 class CSequentialOutStreamSizeCount:
   public ISequentialOutStream,
   public CMyUnknownImp
@@ -129,6 +137,7 @@ public:
   STDMETHOD(Write)(const void *data, UInt32 size, UInt32 *processedSize);
 };
 
+
 class CCachedInStream:
   public IInStream,
   public CMyUnknownImp
@@ -143,7 +152,7 @@ class CCachedInStream:
 protected:
   virtual HRESULT ReadBlock(UInt64 blockIndex, Byte *dest, size_t blockSize) = 0;
 public:
-  CCachedInStream(): _tags(0), _data(0) {}
+  CCachedInStream(): _tags(NULL), _data(NULL) {}
   virtual ~CCachedInStream() { Free(); } // the destructor must be virtual (release calls it) !!!
   void Free() throw();
   bool Alloc(unsigned blockSizeLog, unsigned numBlocksLog) throw();

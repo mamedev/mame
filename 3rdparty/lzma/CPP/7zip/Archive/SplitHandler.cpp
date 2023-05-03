@@ -142,8 +142,8 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
   }
   
   int dotPos = name.ReverseFind_Dot();
-  const UString prefix = name.Left(dotPos + 1);
-  const UString ext = name.Ptr(dotPos + 1);
+  const UString prefix = name.Left((unsigned)(dotPos + 1));
+  const UString ext = name.Ptr((unsigned)(dotPos + 1));
   UString ext2 = ext;
   ext2.MakeLower_Ascii();
   
@@ -162,7 +162,10 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
       numLetters++;
     }
   }
-  else if (ext.Len() >= 2 && StringsAreEqual_Ascii(ext2.RightPtr(2), "01"))
+  else if (ext2.Len() >= 2 && (
+         StringsAreEqual_Ascii(ext2.RightPtr(2), "01")
+      || StringsAreEqual_Ascii(ext2.RightPtr(2), "00")
+      ))
   {
     while (numLetters < ext2.Len())
     {
@@ -170,7 +173,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
         break;
       numLetters++;
     }
-    if (numLetters != ext.Len())
+    if (numLetters != ext2.Len())
       return S_FALSE;
   }
   else
@@ -181,7 +184,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *callback)
   seqName._splitStyle = splitStyle;
   
   if (prefix.Len() < 1)
-    _subName.SetFromAscii("file");
+    _subName = "file";
   else
     _subName.SetFrom(prefix, prefix.Len() - 1);
   

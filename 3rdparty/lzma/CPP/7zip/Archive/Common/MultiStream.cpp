@@ -36,7 +36,7 @@ STDMETHODIMP CMultiStream::Read(void *data, UInt32 size, UInt32 *processedSize)
   UInt64 localPos = _pos - s.GlobalOffset;
   if (localPos != s.LocalPos)
   {
-    RINOK(s.Stream->Seek(localPos, STREAM_SEEK_SET, &s.LocalPos));
+    RINOK(s.Stream->Seek((Int64)localPos, STREAM_SEEK_SET, &s.LocalPos));
   }
   UInt64 rem = s.Size - localPos;
   if (size > rem)
@@ -60,9 +60,9 @@ STDMETHODIMP CMultiStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosi
   }
   if (offset < 0)
     return HRESULT_WIN32_ERROR_NEGATIVE_SEEK;
-  _pos = offset;
+  _pos = (UInt64)offset;
   if (newPosition)
-    *newPosition = offset;
+    *newPosition = (UInt64)offset;
   return S_OK;
 }
 

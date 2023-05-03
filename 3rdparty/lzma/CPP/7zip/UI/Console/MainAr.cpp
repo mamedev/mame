@@ -2,6 +2,10 @@
 
 #include "StdAfx.h"
 
+#ifdef _WIN32
+#include "../../../../C/DllSecur.h"
+#endif
+
 #include "../../../Common/MyException.h"
 #include "../../../Common/StdOutStream.h"
 
@@ -15,7 +19,11 @@
 
 using namespace NWindows;
 
+extern
+CStdOutStream *g_StdStream;
 CStdOutStream *g_StdStream = NULL;
+extern
+CStdOutStream *g_ErrStream;
 CStdOutStream *g_ErrStream = NULL;
 
 extern int Main2(
@@ -24,12 +32,12 @@ extern int Main2(
   #endif
 );
 
-static const char *kException_CmdLine_Error_Message = "Command Line Error:";
-static const char *kExceptionErrorMessage = "ERROR:";
-static const char *kUserBreakMessage  = "Break signaled";
-static const char *kMemoryExceptionMessage = "ERROR: Can't allocate required memory!";
-static const char *kUnknownExceptionMessage = "Unknown Error";
-static const char *kInternalExceptionMessage = "\n\nInternal Error #";
+static const char * const kException_CmdLine_Error_Message = "Command Line Error:";
+static const char * const kExceptionErrorMessage = "ERROR:";
+static const char * const kUserBreakMessage  = "Break signaled";
+static const char * const kMemoryExceptionMessage = "ERROR: Can't allocate required memory!";
+static const char * const kUnknownExceptionMessage = "Unknown Error";
+static const char * const kInternalExceptionMessage = "\n\nInternal Error #";
 
 static void FlushStreams()
 {
@@ -44,7 +52,9 @@ static void PrintError(const char *message)
     *g_ErrStream << "\n\n" << message << endl;
 }
 
+#if defined(_WIN32) && defined(_UNICODE) && !defined(_WIN64) && !defined(UNDER_CE)
 #define NT_CHECK_FAIL_ACTION *g_StdStream << "Unsupported Windows version"; return NExitCode::kFatalError;
+#endif
 
 int MY_CDECL main
 (
@@ -63,6 +73,10 @@ int MY_CDECL main
   
   try
   {
+    #ifdef _WIN32
+    My_SetDefaultDllDirectories();
+    #endif
+
     res = Main2(
     #ifndef _WIN32
     numArgs, args
@@ -79,7 +93,7 @@ int MY_CDECL main
     PrintError(kUserBreakMessage);
     return (NExitCode::kUserBreak);
   }
-  catch(const CArcCmdLineException &e)
+  catch(const CMessagePathException &e)
   {
     PrintError(kException_CmdLine_Error_Message);
     if (g_ErrStream)

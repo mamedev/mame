@@ -41,7 +41,7 @@ public:
   STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
-class CEncoder
+class CEncoder  MY_UNCOPYABLE
 {
   #ifdef USE_MIXER_ST
     NCoderMixer2::CMixerST *_mixerST;

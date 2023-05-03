@@ -25,10 +25,10 @@ static CSysString MyLoadStringA(HINSTANCE hInstance, UINT resourceID)
   do
   {
     size <<= 1;
-    len = ::LoadString(hInstance, resourceID, s.GetBuf(size - 1), size);
+    len = ::LoadString(hInstance, resourceID, s.GetBuf((unsigned)size - 1), size);
   }
   while (size - len <= 1);
-  s.ReleaseBuf_CalcLen(len);
+  s.ReleaseBuf_CalcLen((unsigned)len);
   return s;
 }
 
@@ -43,10 +43,10 @@ static void MyLoadString2(HINSTANCE hInstance, UINT resourceID, UString &s)
   do
   {
     size <<= 1;
-    len = ::LoadStringW(hInstance, resourceID, s.GetBuf(size - 1), size);
+    len = ::LoadStringW(hInstance, resourceID, s.GetBuf((unsigned)size - 1), size);
   }
   while (size - len <= 1);
-  s.ReleaseBuf_CalcLen(len);
+  s.ReleaseBuf_CalcLen((unsigned)len);
 }
 
 // NT4 doesn't support LoadStringW(,,, 0) to get pointer to resource string. So we don't use it.

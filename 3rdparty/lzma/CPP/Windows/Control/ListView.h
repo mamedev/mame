@@ -5,7 +5,7 @@
 
 #include "../../Common/MyWindows.h"
 
-#include <commctrl.h>
+#include <CommCtrl.h>
 
 #include "../Window.h"
 
@@ -32,7 +32,8 @@ public:
 
   int InsertColumn(int columnIndex, const LVCOLUMN *columnInfo) { return ListView_InsertColumn(_window, columnIndex, columnInfo); }
   int InsertColumn(int columnIndex, LPCTSTR text, int width);
-  bool SetColumnOrderArray(int count, const int *columns) { return BOOLToBool(ListView_SetColumnOrderArray(_window, count, columns)); }
+  bool SetColumnOrderArray(int count, const int *columns)
+    { return BOOLToBool(ListView_SetColumnOrderArray(_window, count, (int *)(void *)columns)); }
 
   /*
   int GetNumColumns()

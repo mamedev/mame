@@ -29,6 +29,16 @@ namespace NOverwriteMode
   };
 }
 
+namespace NZoneIdMode
+{
+  enum EEnum
+  {
+    kNone,
+    kAll,
+    kOffice
+  };
+}
+
 }
 
 #endif

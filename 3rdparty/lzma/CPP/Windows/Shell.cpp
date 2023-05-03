@@ -2,6 +2,11 @@
 
 #include "StdAfx.h"
 
+/*
+#include <stdio.h>
+#include <string.h>
+*/
+
 #include "../Common/MyCom.h"
 #ifndef _UNICODE
 #include "../Common/StringConvert.h"
@@ -114,9 +119,22 @@ UString CDrop::QueryFileName(UINT fileIndex)
 void CDrop::QueryFileNames(UStringVector &fileNames)
 {
   UINT numFiles = QueryCountOfFiles();
+  /*
+  char s[100];
+  sprintf(s, "QueryFileNames: %d files", numFiles);
+  OutputDebugStringA(s);
+  */
   fileNames.ClearAndReserve(numFiles);
   for (UINT i = 0; i < numFiles; i++)
-    fileNames.AddInReserved(QueryFileName(i));
+  {
+    const UString s2 = QueryFileName(i);
+    if (!s2.IsEmpty())
+      fileNames.AddInReserved(s2);
+    /*
+    OutputDebugStringW(L"file ---");
+    OutputDebugStringW(s2);
+    */
+  }
 }
 
 
@@ -153,8 +171,8 @@ bool BrowseForFolder(HWND /* owner */, LPCTSTR /* title */,
     MessageBoxW(0, L"yes", L"", 0);
   */
   /*
-  UString s = L"all files";
-  s += L" (*.*)";
+  UString s = "all files";
+  s += " (*.*)";
   return MyGetOpenFileName(owner, title, initialFolder, s, resultPath, true);
   */
   return false;
@@ -174,7 +192,7 @@ bool BrowseForFolder(LPBROWSEINFO browseInfo, CSysString &resultPath)
 }
 
 
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM /* lp */, LPARAM data)
+static int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM /* lp */, LPARAM data)
 {
   #ifndef UNDER_CE
   switch (uMsg)
@@ -203,7 +221,7 @@ int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM /* lp */, LPARAM da
 }
 
 
-bool BrowseForFolder(HWND owner, LPCTSTR title, UINT ulFlags,
+static bool BrowseForFolder(HWND owner, LPCTSTR title, UINT ulFlags,
     LPCTSTR initialFolder, CSysString &resultPath)
 {
   CSysString displayName;
@@ -240,14 +258,21 @@ bool BrowseForFolder(HWND owner, LPCTSTR title,
 
 #ifndef _UNICODE
 
-typedef BOOL (WINAPI * SHGetPathFromIDListWP)(LPCITEMIDLIST pidl, LPWSTR pszPath);
+extern "C" {
+typedef BOOL (WINAPI * Func_SHGetPathFromIDListW)(LPCITEMIDLIST pidl, LPWSTR pszPath);
+typedef LPITEMIDLIST (WINAPI * Func_SHBrowseForFolderW)(LPBROWSEINFOW lpbi);
+}
+
+#define MY_CAST_FUNC  (void(*)())
+// #define MY_CAST_FUNC
 
 bool GetPathFromIDList(LPCITEMIDLIST itemIDList, UString &path)
 {
   path.Empty();
-  SHGetPathFromIDListWP shGetPathFromIDListW = (SHGetPathFromIDListWP)
+  Func_SHGetPathFromIDListW shGetPathFromIDListW = (Func_SHGetPathFromIDListW)
+    MY_CAST_FUNC
     ::GetProcAddress(::GetModuleHandleW(L"shell32.dll"), "SHGetPathFromIDListW");
-  if (shGetPathFromIDListW == 0)
+  if (!shGetPathFromIDListW)
     return false;
   const unsigned len = MAX_PATH * 2;
   bool result = BOOLToBool(shGetPathFromIDListW(itemIDList, path.GetBuf(len)));
@@ -255,14 +280,14 @@ bool GetPathFromIDList(LPCITEMIDLIST itemIDList, UString &path)
   return result;
 }
 
-typedef LPITEMIDLIST (WINAPI * SHBrowseForFolderWP)(LPBROWSEINFOW lpbi);
 
-bool BrowseForFolder(LPBROWSEINFOW browseInfo, UString &resultPath)
+static bool BrowseForFolder(LPBROWSEINFOW browseInfo, UString &resultPath)
 {
   NWindows::NCOM::CComInitializer comInitializer;
-  SHBrowseForFolderWP shBrowseForFolderW = (SHBrowseForFolderWP)
+  Func_SHBrowseForFolderW shBrowseForFolderW = (Func_SHBrowseForFolderW)
+    MY_CAST_FUNC
     ::GetProcAddress(::GetModuleHandleW(L"shell32.dll"), "SHBrowseForFolderW");
-  if (shBrowseForFolderW == 0)
+  if (!shBrowseForFolderW)
     return false;
   LPITEMIDLIST itemIDList = shBrowseForFolderW(browseInfo);
   if (itemIDList == NULL)
@@ -272,7 +297,7 @@ bool BrowseForFolder(LPBROWSEINFOW browseInfo, UString &resultPath)
   return GetPathFromIDList(itemIDList, resultPath);
 }
 
-
+static
 int CALLBACK BrowseCallbackProc2(HWND hwnd, UINT uMsg, LPARAM /* lp */, LPARAM data)
 {
   switch (uMsg)
