@@ -44,8 +44,7 @@ enum
 {
 	MCS51_INT0_LINE = 0,    /* P3.2: External Interrupt 0 */
 	MCS51_INT1_LINE,        /* P3.3: External Interrupt 1 */
-	MCS51_RX_LINE,          /* P3.0: Serial Port Receive Line */
-	MCS51_T0_LINE,          /* P3,4: Timer 0 External Input */
+	MCS51_T0_LINE,          /* P3.4: Timer 0 External Input */
 	MCS51_T1_LINE,          /* P3.5: Timer 1 External Input */
 	MCS51_T2_LINE,          /* P1.0: Timer 2 External Input */
 	MCS51_T2EX_LINE,        /* P1.1: Timer 2 Capture Reload Trigger */
@@ -64,8 +63,6 @@ public:
 
 	template <unsigned N> auto port_in_cb() { return m_port_in_cb[N].bind(); }
 	template <unsigned N> auto port_out_cb() { return m_port_out_cb[N].bind(); }
-	auto serial_rx_cb() { return m_serial_rx_cb.bind(); }
-	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
 
 	void program_internal(address_map &map);
 	void data_internal(address_map &map);
@@ -132,12 +129,14 @@ protected:
 	struct mcs51_uart
 	{
 		uint8_t   data_out;       //Data to send out
-		uint8_t   bits_to_send;   //How many bits left to send when transmitting out the serial port
+		uint8_t   data_in;
+		uint8_t   txbit;
+		uint8_t   rxbit;
+		bool      rxb8;
 
 		int     smod_div;       /* signal divided by 2^SMOD */
 		int     rx_clk;         /* rx clock */
 		int     tx_clk;         /* tx clock */
-		uint8_t   delay_cycles;   //Gross Hack;
 	} m_uart;            /* internal uart */
 
 	/* Internal Ram */
@@ -148,6 +147,8 @@ protected:
 	virtual void sfr_write(size_t offset, uint8_t data);
 	virtual uint8_t sfr_read(size_t offset);
 
+	void transmit(bool state);
+
 	/* Memory spaces */
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
@@ -155,10 +156,6 @@ protected:
 
 	devcb_read8::array<4> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
-
-	/* Serial Port TX/RX Callbacks */
-	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
-	devcb_read8 m_serial_rx_cb;    //Call back function to retrieve data when receiving serial port data
 
 	/* DS5002FP */
 	struct {
@@ -197,9 +194,7 @@ protected:
 	void update_timer_t1(int cycles);
 	void update_timer_t2(int cycles);
 	void update_timers(int cycles);
-	void serial_transmit(uint8_t data);
-	void serial_receive();
-	void update_serial(int cycles);
+	void update_serial(int source);
 	void update_irq_prio(uint8_t ipl, uint8_t iph);
 	void execute_op(uint8_t op);
 	void check_irqs();
