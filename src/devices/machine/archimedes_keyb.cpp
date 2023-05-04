@@ -232,7 +232,6 @@ ioport_constructor archimedes_keyboard_device::device_input_ports() const
 
 archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ARCHIMEDES_KEYBOARD, tag, owner, clock)
-	, device_serial_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_kout(*this)
 	, m_keyboard(*this, "ROW.%u", 0U)
@@ -250,10 +249,6 @@ void archimedes_keyboard_device::device_resolve_objects()
 
 void archimedes_keyboard_device::device_start()
 {
-	// KART interface
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
-	set_rate(31250);
-
 	m_mouse_timer = timer_alloc(FUNC(archimedes_keyboard_device::update_mouse), this);
 
 	save_item(NAME(m_mouse_x));
@@ -265,6 +260,7 @@ void archimedes_keyboard_device::device_start()
 	save_item(NAME(m_mouse_yref));
 	save_item(NAME(m_mouse_ydir));
 	save_item(NAME(m_mux));
+	save_item(NAME(m_kin));
 }
 
 //-------------------------------------------------
@@ -282,9 +278,7 @@ void archimedes_keyboard_device::device_reset()
 	m_mouse_yref = 1;
 	m_mouse_ydir = 1;
 	m_mux = 0;
-
-	transmit_register_reset();
-	receive_register_reset();
+	m_kin = false;
 
 	m_mouse_timer->adjust(attotime::from_hz(1000 * 4), 0, attotime::from_hz(1000 * 4));
 }
@@ -299,11 +293,9 @@ void archimedes_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->port_in_cb<0>().set([this]() { return m_keyboard[m_mux]->read() & 0xff; });
 	m_mcu->port_in_cb<1>().set([this]() { return (m_keyboard[m_mux]->read() >> 8) & 0xff; });
 	m_mcu->port_in_cb<2>().set(FUNC(archimedes_keyboard_device::mouse_r));
-	m_mcu->port_in_cb<3>().set([this]() { return m_mouse[2]->read() & 0xff; });
+	m_mcu->port_in_cb<3>().set([this]() { return (m_mouse[2]->read() & 0xfe) | m_kin; });
 	m_mcu->port_out_cb<2>().set([this](uint8_t data) { m_mux = data & 0x0f; });
 	m_mcu->port_out_cb<3>().set(FUNC(archimedes_keyboard_device::leds_w));
-	m_mcu->serial_rx_cb().set([this]() { return get_received_char(); });
-	m_mcu->serial_tx_cb().set(FUNC(archimedes_keyboard_device::tx_w));
 }
 
 //-------------------------------------------------
@@ -319,22 +311,6 @@ ROM_END
 const tiny_rom_entry *archimedes_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( archimedes_keyboard );
-}
-
-void archimedes_keyboard_device::tra_complete()
-{
-}
-
-void archimedes_keyboard_device::rcv_complete()
-{
-	receive_register_extract();
-	m_mcu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	m_mcu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
-}
-
-void archimedes_keyboard_device::tra_callback()
-{
-	m_kout(transmit_register_get_data_bit());
 }
 
 TIMER_CALLBACK_MEMBER(archimedes_keyboard_device::update_mouse)
@@ -418,10 +394,12 @@ TIMER_CALLBACK_MEMBER(archimedes_keyboard_device::update_mouse)
 void archimedes_keyboard_device::leds_w(uint8_t data)
 {
 	// Keyboard LEDs
+	// --- --x- TXD
 	// --- -x-- Caps Lock
 	// --- x--- Scroll Lock
 	// --x ---- Num Lock
 
+	m_kout(BIT(data, 1));
 	for (int i = 0; i < 3; i++)
 		m_leds[i] = BIT(data, 2 + i);
 }
@@ -431,8 +409,7 @@ uint8_t archimedes_keyboard_device::mouse_r()
 	return (m_mouse_xref << 4) | (m_mouse_xdir << 5) | (m_mouse_yref << 6) | (m_mouse_ydir << 7);
 }
 
-void archimedes_keyboard_device::tx_w(uint8_t data)
+WRITE_LINE_MEMBER(archimedes_keyboard_device::kin_w)
 {
-	if (is_transmit_register_empty())
-		transmit_register_setup(data);
+	m_kin = state;
 }
