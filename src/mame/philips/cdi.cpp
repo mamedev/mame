@@ -591,7 +591,6 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousey().set_ioport("MOUSEY");
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
 }
 
