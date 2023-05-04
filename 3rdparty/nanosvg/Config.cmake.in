@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/NanoSVGTargets.cmake)
+    include("${CMAKE_CURRENT_LIST_DIR}/NanoSVGTargets.cmake")
+endif ()

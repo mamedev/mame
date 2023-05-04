@@ -78,6 +78,16 @@ By default, NanoSVG parses only the most common colors. In order to get support 
 #include "nanosvg.h"
 ```
 
+Alternatively, you can install the library using CMake and import it into your project using the standard CMake `find_package` command.
+
+```CMake
+add_executable(myexe main.c)
+
+find_package(NanoSVG REQUIRED)
+
+target_link_libraries(myexe NanoSVG::nanosvg NanoSVG::nanosvgrast)
+```
+
 ## Compiling Example Project
 
 In order to compile the demo project, your will need to install [GLFW](http://www.glfw.org/) to compile.
