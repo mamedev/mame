@@ -200,7 +200,6 @@ protected:
 	u8 m_mcu_p1;
 	u8 m_mcu_p2;
 	u8 m_mcu_p3;
-	u8 m_mcu_uart;
 
 	u8 m_ppi_pa;
 	u8 m_ppi_pb;
@@ -223,7 +222,6 @@ void rtpc_state::machine_start()
 	m_mcu_p1 = 0;
 	m_mcu_p2 = 0;
 	m_mcu_p3 = 0;
-	m_mcu_uart = 0;
 
 	m_ppi_pa = 0;
 	m_ppi_pb = 0;
@@ -374,6 +372,15 @@ void rtpc_state::mcu_port3_w(u8 data)
 	//  5    i   kbd data in
 	//  6    o   kbd data out
 	//  7    o   kbd clock out
+
+	// uart txd -> rxd wrap
+	if (BIT(m_kls_cmd, 5))
+	{
+		if (BIT(data, 1))
+			m_mcu_p3 |= 1;
+		else
+			m_mcu_p3 &= ~1;
+	}
 
 	m_kbd_con->data_write_from_mb(BIT(data, 6));
 	m_kbd_con->clock_write_from_mb(BIT(data, 7));
@@ -578,18 +585,6 @@ void rtpc_state::common(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(rtpc_state::mcu_port2_w));
 	m_mcu->port_in_cb<3>().set([this]() { return m_mcu_p3 | 0xce; });
 	m_mcu->port_out_cb<3>().set(FUNC(rtpc_state::mcu_port3_w));
-	m_mcu->serial_tx_cb().set(
-		[this](u8 data)
-		{
-			if (BIT(m_kls_cmd, 5))
-			{
-				m_mcu_uart = data;
-				m_mcu->set_input_line(MCS51_RX_LINE, 1);
-			}
-			else
-				LOGMASKED(LOG_KLS, "kls uart tx 0x%02x\n", data);
-		});
-	m_mcu->serial_rx_cb().set([this]() { return m_mcu_uart; });
 
 	TIMER(config, "mcu_timer").configure_periodic(FUNC(rtpc_state::mcu_timer), attotime::from_hz(32768));
 
