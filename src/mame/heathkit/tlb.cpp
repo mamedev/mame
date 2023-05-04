@@ -611,15 +611,9 @@ ROM_START( super19 )
 ROM_END
 
 ROM_START( watz19 )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	ROM_DEFAULT_BIOS("watzman-a")
-
 	// Watzman ROM
-	ROM_SYSTEM_BIOS(0, "watzman", "Watzman")
-	ROMX_LOAD("watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9), ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "watzman-a", "Watzman w/clock persists after reset")
-	ROMX_LOAD("watzman-a.bin", 0x0000, 0x1000, CRC(1f7553e9) SHA1(ac6ddb12b4fb46c1a0ad08ee43978ad3153b51aa), ROM_BIOS(1))
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
