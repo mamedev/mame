@@ -52,7 +52,6 @@ private:
 	void scan_load_w(u8 data);
 	u8 scan_shift_r();
 	void lcd_control_w(u8 data);
-	void serial_tx_w(u8 data) { logerror("Serial TX: %02X\n", data); }
 
 	void prog_map(address_map &map);
 	void ext_map(address_map &map);
@@ -163,7 +162,6 @@ void sk101bl_state::sk101bl(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);
-	m_maincpu->serial_tx_cb().set(FUNC(sk101bl_state::serial_tx_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);

@@ -235,7 +235,6 @@ void mephisto_state::mephisto(machine_config &config)
 	soundcpu.port_in_cb<1>().set(FUNC(mephisto_state::ay8910_read));
 	soundcpu.port_out_cb<1>().set(FUNC(mephisto_state::ay8910_write));
 	soundcpu.port_out_cb<3>().set(FUNC(mephisto_state::t0_t1_w));
-	soundcpu.serial_rx_cb().set_constant(0); // from MUART
 
 	/* Sound */
 	genpin_audio(config);
