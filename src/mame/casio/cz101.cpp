@@ -9,11 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7811.h"
 #include "machine/clock.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -53,11 +55,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<upd7810_device> m_maincpu;
-	required_device<hd44780_device> m_hd44780;
-	required_ioport_array<16> m_keys;
-	output_finder<32> m_leds;
-
 	void maincpu_map(address_map &map);
 
 	void port_b_w(uint8_t data);
@@ -69,6 +66,11 @@ private:
 	void led_4_w(uint8_t data);
 	uint8_t keys_r();
 	void sound_w(uint8_t data);
+
+	required_device<upd7810_device> m_maincpu;
+	required_device<hd44780_device> m_hd44780;
+	required_ioport_array<16> m_keys;
+	output_finder<32> m_leds;
 
 	uint8_t m_port_b;
 	uint8_t m_port_c;
@@ -243,8 +245,8 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LINE SELECT")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RING")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NOISE")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TUNE \xe2\x96\xbd") // ▽
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TUNE \xe2\x96\xb3") // △
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"TUNE \u9661") // ▽
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"TUNE \u9651") // △
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("APO ON/OFF")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -260,8 +262,8 @@ INPUT_PORTS_END
 void cz101_state::cz101_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // LCD pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
 }
 
 HD44780_PIXEL_UPDATE( cz101_state::lcd_pixel_update )
@@ -410,8 +412,8 @@ void cz101_state::cz101(machine_config &config)
 	CLOCK(config, "midi_clock", 2_MHz_XTAL).signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w));
 
 	midi_port_device& mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
-	mdin.rxd_handler().set([this](u8 state) { m_midi_rx = state; });
-	m_maincpu->rxd_func().set([this]() { return m_midi_rx; });
+	mdin.rxd_handler().set([this] (int state) { m_midi_rx = state; });
+	m_maincpu->rxd_func().set([this] () { return m_midi_rx; });
 
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
@@ -420,7 +422,7 @@ void cz101_state::cz101(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(6*16+1, 19);
+	screen.set_size(6*16 + 1, 19);
 	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
