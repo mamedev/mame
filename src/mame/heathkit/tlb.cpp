@@ -2,41 +2,41 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-		Heathkit Terminal Logic Board (TLB)
+        Heathkit Terminal Logic Board (TLB)
 
-		The board used in the H19 smart terminal designed and manufactured
-		by Heath Company. (and identical Z19 sold by Zenith Data Systems)
+        The board used in the H19 smart terminal designed and manufactured
+        by Heath Company. (and identical Z19 sold by Zenith Data Systems)
 
-		The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
-		mask-programmed keyboard controller. The output of this passes
-		through a rom.
+        The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
+        mask-programmed keyboard controller. The output of this passes
+        through a rom.
 
-		Input can also come from the serial port (a 8250).
-		Either device will signal an interrupt to the CPU when a key
-		is pressed/data is received.
+        Input can also come from the serial port (a 8250).
+        Either device will signal an interrupt to the CPU when a key
+        is pressed/data is received.
 
-		TODO:
-		- speed up emulation
-		- update SW401 baud rate options for Watz ROM
-		- update SW401 & SW402 definitions for Super-19 ROM
-		- update SW401 & SW402 definitions for ULTRA ROM
-		- add option for ULTRA ROMs second page of screen RAM
+        TODO:
+        - speed up emulation
+        - update SW401 baud rate options for Watz ROM
+        - update SW401 & SW402 definitions for Super-19 ROM
+        - update SW401 & SW402 definitions for ULTRA ROM
+        - add option for ULTRA ROMs second page of screen RAM
 
 ****************************************************************************/
 /***************************************************************************
  Memory Layout
-	 The U435 three-to-eight line decoder uses A14 and A15 to generate three memory addresses:
+     The U435 three-to-eight line decoder uses A14 and A15 to generate three memory addresses:
 
-	 1.   Program ROM        0x0000
+     1.   Program ROM        0x0000
 
-	 2.   Scratchpad RAM     0x4000
+     2.   Scratchpad RAM     0x4000
 
-	 3.   Display Memory     0xF800
+     3.   Display Memory     0xF800
 
 
  Port Layout
 
-	 Only address lines A5, A6, A7 are used by the U442 three-to-eight line decoder
+     Only address lines A5, A6, A7 are used by the U442 three-to-eight line decoder
 
 Address   Description
 ----------------------------------------------------
