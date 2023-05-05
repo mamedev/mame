@@ -53,10 +53,6 @@ public:
 
 	void coco(machine_config &config);
 	void cocoh(machine_config &config);
-	void cocoe(machine_config &config);
-	void cocoeh(machine_config &config);
-	void coco2(machine_config &config);
-	void coco2h(machine_config &config);
 	void coco2b(machine_config &config);
 	void coco2bh(machine_config &config);
 	void cp400(machine_config &config);
