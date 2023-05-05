@@ -772,9 +772,7 @@ void gdrom_device::process_buffer()
 	// 0011 CD-I
 	// 1000 GD-ROM
 	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
-	// TODO: play/pause is required by audio CD player to detect end of track
-	// Requires an override to lba_address(), also a different variable name
-	m_sector_number = cd_type | (m_sector_number & 0xf);
+	m_sector_number = cd_type | (m_image->exists() ? m_sector_number & 0xf : GDROM_NODISC_STATE);
 }
 
 void gdrom_device::signature()
@@ -784,7 +782,7 @@ void gdrom_device::signature()
 	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
 
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
-	m_sector_number = cd_type | (m_sector_number & 0xf);
+	m_sector_number = cd_type | (m_image->exists() ? m_sector_number & 0xf : GDROM_NODISC_STATE);
 }
 
 //bool gdrom_device::set_features()
