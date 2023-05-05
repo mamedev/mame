@@ -340,7 +340,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sm64u" cloneof="sm64">
+	<software name="sm64u">
 		<description>Super Mario 64</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
