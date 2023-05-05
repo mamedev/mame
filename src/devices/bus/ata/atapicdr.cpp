@@ -2,6 +2,7 @@
 // copyright-holders:smf
 #include "emu.h"
 #include "atapicdr.h"
+#include "gdrom.h"
 
 #define SCSI_SENSE_ASC_MEDIUM_NOT_PRESENT 0x3a
 #define SCSI_SENSE_ASC_NOT_READY_TO_READY_TRANSITION 0x28
@@ -47,6 +48,8 @@ void atapi_cdrom_device::device_add_mconfig(machine_config &config)
 {
 	if(type() == ATAPI_DVDROM || type() == ATAPI_FIXED_DVDROM)
 		DVDROM(config, "image").set_interface("cdrom");
+	else if(type() == ATAPI_GDROM)
+		GDROM(config, "image").set_interface("cdrom");
 	else
 		CDROM(config, "image").set_interface("cdrom");
 	CDDA(config, "cdda");

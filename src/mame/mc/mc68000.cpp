@@ -13,7 +13,6 @@
     - 8 expansion slots
 
     TODO:
-    - Better keyboard
     - Cassette
     - Color/brightness levels
     - Sound
@@ -31,6 +30,8 @@
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/mc68000/sysbus.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
@@ -104,13 +105,17 @@ private:
 
 	uint8_t m_uvia_porta;
 	uint8_t m_key;
+	bool m_ibmkbd_clock;
+	bool m_ibmkbd_data;
+	uint8_t m_ibmkbd_bits;
 
 	void mem_map(address_map &map);
 	void vector_map(address_map &map);
 	uint16_t memory_r(offs_t offset, uint16_t mem_mask = ~0);
 	void memory_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void kbd_put(uint8_t data);
+	void ibmkbd_clock_w(int state);
+	void ibmkbd_data_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -335,12 +340,35 @@ static INPUT_PORTS_START( mc68000 )
 	// DIL:3 and DIL:4 select parallel keyboard strobe polarity
 INPUT_PORTS_END
 
-void mc68000_state::kbd_put(uint8_t data)
+void mc68000_state::ibmkbd_clock_w(int state)
 {
-	m_key = data;
+	if (state && !m_ibmkbd_clock)
+	{
+		if (m_ibmkbd_bits >= 1 && m_ibmkbd_bits <= 8)
+		{
+			m_key <<= 1;
+			m_key |= m_ibmkbd_data ? 0x01 : 0x00;
+		}
 
-	m_via[0]->write_ca2(1);
-	m_via[0]->write_ca2(0);
+		if (m_ibmkbd_bits == 9)
+		{
+			m_ibmkbd_bits = 0;
+
+			m_via[0]->write_ca2(1);
+			m_via[0]->write_ca2(0);
+		}
+		else
+		{
+			m_ibmkbd_bits++;
+		}
+	}
+
+	m_ibmkbd_clock = bool(state);
+}
+
+void mc68000_state::ibmkbd_data_w(int state)
+{
+	m_ibmkbd_data = bool(state);
 }
 
 
@@ -434,11 +462,20 @@ void mc68000_state::machine_start()
 	save_pointer(NAME(m_addr_decode), 0x400);
 	save_item(NAME(m_uvia_porta));
 	save_item(NAME(m_key));
+	save_item(NAME(m_ibmkbd_clock));
+	save_item(NAME(m_ibmkbd_data));
+	save_item(NAME(m_ibmkbd_bits));
 }
 
 void mc68000_state::machine_reset()
 {
 	m_apm_view.select(0);
+
+	m_key = 0x00;
+	m_ibmkbd_bits = 0;
+
+	// enable ibm pc keyboard mode
+	m_via[0]->write_pa3(0);
 }
 
 
@@ -458,7 +495,7 @@ void mc68000_state::mc68000(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("512K");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16_MHz_XTAL / 2, 1024, 0, 312, 640, 0, 250);
+	screen.set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	MC6845(config, m_crtc, 16_MHz_XTAL / 8);
@@ -509,8 +546,9 @@ void mc68000_state::mc68000(machine_config &config)
 	m_serial->rxd_handler().append(m_via[0], FUNC(via6522_device::write_pa2));
 	m_serial->cts_handler().set(m_via[0], FUNC(via6522_device::write_pa7));
 
-	generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, "kbd", 0));
-	kbd.set_keyboard_callback(FUNC(mc68000_state::kbd_put));
+	pc_kbdc_device &ibmkbd(PC_KBDC(config, "ibmkbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	ibmkbd.out_clock_cb().set(FUNC(mc68000_state::ibmkbd_clock_w));
+	ibmkbd.out_data_cb().set(FUNC(mc68000_state::ibmkbd_data_w));
 }
 
 
@@ -537,4 +575,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                FULLNAME             FLAGS
-COMP( 1984, mc68000, 0,      0,      mc68000, mc68000, mc68000_state, empty_init, "mc / Franzis Verlag", "mc-68000-Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mc68000, 0,      0,      mc68000, mc68000, mc68000_state, empty_init, "mc / Franzis Verlag", "mc-68000-Computer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

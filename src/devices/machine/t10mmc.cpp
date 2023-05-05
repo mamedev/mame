@@ -12,6 +12,13 @@ static int to_msf(int frame)
 	return (m << 16) | (s << 8) | f;
 }
 
+void t10mmc::set_model(std::string model_name)
+{
+	m_model_name = model_name;
+	while(m_model_name.size() < 28)
+		m_model_name += ' ';
+}
+
 void t10mmc::t10_start(device_t &device)
 {
 	m_device = &device;
@@ -153,6 +160,12 @@ void t10mmc::ExecCommand()
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 8;
+		break;
+
+	case T10MMC_CMD_READ_DISC_STRUCTURE:
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = (command[8] << 8) | command[9];
 		break;
 
 	case T10SBC_CMD_READ_10:
@@ -606,10 +619,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		data[5] = 0;
 		data[6] = 0;
 		data[7] = 0;
-		memset(&data[8], ' ', 28);
-		memcpy(&data[8], "MAME", 4);
-		memcpy(&data[16], "Virtual CDROM", 13);
-		memcpy(&data[32], "1.0", 3);
+		memcpy(&data[8], m_model_name.data(), 28);
 		break;
 
 	case T10SBC_CMD_READ_CAPACITY:
@@ -913,6 +923,20 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 			default:
 				m_device->logerror("T10MMC: MODE SENSE unknown page %x\n", command[2] & 0x3f);
 				break;
+		}
+		break;
+
+	case T10MMC_CMD_READ_DISC_STRUCTURE:
+		m_device->machine().debug_break();
+		m_device->logerror("T10MMC: READ DISC STRUCTURE, data\n");
+		data[0] = data[1] = 0;
+		data[2] = data[3] = 0;
+
+		if((command[1] & 0x0f) == 0 && command[7] == 0x04) // DVD / DVD disc manufacturing information
+		{
+			data[1] = 0xe;
+			for(int i=4; i != 0xe; i++)
+				data[i] = 0;
 		}
 		break;
 
