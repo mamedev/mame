@@ -16,7 +16,6 @@
 #include "tsconfdma.h"
 
 #include "beta_m.h"
-#include "bus/spectrum/zxbus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 
