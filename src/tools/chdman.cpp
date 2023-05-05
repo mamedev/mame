@@ -75,6 +75,7 @@ const int MODE_GDI = 2;
 #define COMMAND_EXTRACT_RAW "extractraw"
 #define COMMAND_EXTRACT_HD "extracthd"
 #define COMMAND_EXTRACT_CD "extractcd"
+#define COMMAND_EXTRACT_DVD "extractdvd"
 #define COMMAND_EXTRACT_LD "extractld"
 #define COMMAND_COPY "copy"
 #define COMMAND_ADD_METADATA "addmeta"
@@ -130,6 +131,7 @@ static void do_create_ld(parameters_map &params);
 static void do_copy(parameters_map &params);
 static void do_extract_raw(parameters_map &params);
 static void do_extract_cd(parameters_map &params);
+static void do_extract_dvd(parameters_map &params);
 static void do_extract_ld(parameters_map &params);
 static void do_add_metadata(parameters_map &params);
 static void do_del_metadata(parameters_map &params);
@@ -753,6 +755,16 @@ static const command_description s_commands[] =
 	},
 
 	{ COMMAND_EXTRACT_CD, do_extract_cd, ": extract CD file from a CHD input file",
+		{
+			REQUIRED OPTION_OUTPUT,
+			OPTION_OUTPUT_BIN,
+			OPTION_OUTPUT_FORCE,
+			REQUIRED OPTION_INPUT,
+			OPTION_INPUT_PARENT,
+		}
+	},
+
+	{ COMMAND_EXTRACT_DVD, do_extract_dvd, ": extract DVD file from a CHD input file",
 		{
 			REQUIRED OPTION_OUTPUT,
 			OPTION_OUTPUT_BIN,
@@ -2723,6 +2735,87 @@ static void do_extract_cd(parameters_map &params)
 		throw;
 	}
 }
+
+
+//-------------------------------------------------
+//  do_extract_dvd - extract a DVD image from a
+//  CHD image, currently identical to extractraw
+//-------------------------------------------------
+
+static void do_extract_dvd(parameters_map &params)
+{
+	// parse out input files
+	chd_file input_parent_chd;
+	chd_file input_chd;
+	parse_input_chd_parameters(params, input_chd, input_parent_chd);
+
+	// parse out input start/end
+	uint64_t input_start;
+	uint64_t input_end;
+	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
+
+	// verify output file doesn't exist
+	auto output_file_str = params.find(OPTION_OUTPUT);
+	if (output_file_str != params.end())
+		check_existing_output_file(params, output_file_str->second->c_str());
+
+	// print some info
+	printf("Output File:  %s\n", output_file_str->second->c_str());
+	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
+	if (input_start != 0 || input_end != input_chd.logical_bytes())
+	{
+		printf("Input start:  %s\n", big_int_string(input_start).c_str());
+		printf("Input length: %s\n", big_int_string(input_end - input_start).c_str());
+	}
+
+	// catch errors so we can close & delete the output file
+	util::core_file::ptr output_file;
+	try
+	{
+		// process output file
+		std::error_condition const filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr)
+			report_error(1, "Unable to open file (%s): %s", *output_file_str->second, filerr.message());
+
+		// copy all data
+		std::vector<uint8_t> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+		for (uint64_t offset = input_start; offset < input_end; )
+		{
+			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
+
+			// determine how much to read
+			uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_end - offset);
+			std::error_condition err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
+			if (err)
+				report_error(1, "Error reading CHD file (%s): %s", *params.find(OPTION_INPUT)->second, err.message());
+
+			// write to the output
+			size_t count;
+			std::error_condition const writerr = output_file->write(&buffer[0], bytes_to_read, count);
+			if (writerr || (count != bytes_to_read))
+				report_error(1, "Error writing to file; check disk space (%s)", *output_file_str->second);
+
+			// advance
+			offset += bytes_to_read;
+		}
+
+		// finish up
+		output_file.reset();
+		printf("Extraction complete                                    \n");
+	}
+	catch (...)
+	{
+		// delete the output file
+		if (output_file != nullptr)
+		{
+			output_file.reset();
+			osd_file::remove(*output_file_str->second);
+		}
+		throw;
+	}
+}
+
+
 
 
 //-------------------------------------------------
