@@ -45,7 +45,10 @@ atapi_fixed_dvdrom_device::atapi_fixed_dvdrom_device(const machine_config &mconf
 
 void atapi_cdrom_device::device_add_mconfig(machine_config &config)
 {
-	CDROM(config, "image").set_interface("cdrom");
+	if(type() == ATAPI_DVDROM || type() == ATAPI_FIXED_DVDROM)
+		DVDROM(config, "image").set_interface("cdrom");
+	else
+		CDROM(config, "image").set_interface("cdrom");
 	CDDA(config, "cdda");
 }
 
