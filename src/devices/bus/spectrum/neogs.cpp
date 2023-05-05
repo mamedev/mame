@@ -39,6 +39,15 @@ TODO:
 #include "speaker.h"
 
 
+#define LOG_STATUS (1U << 1)
+#define LOG_WARN   (1U << 2)
+
+#define VERBOSE ( /*LOG_GENERAL | LOG_STATUS |*/ LOG_WARN )
+#include "logmacro.h"
+
+#define LOGSTATUS(...) LOGMASKED(LOG_STATUS, __VA_ARGS__)
+#define LOGWARN(...)   LOGMASKED(LOG_WARN,   __VA_ARGS__)
+
 namespace bus::spectrum::zxbus {
 
 namespace {
@@ -107,10 +116,10 @@ private:
 	template <u8 Bank> u8 ram_bank_r(offs_t offset);
 	template <u8 Bank> void ram_bank_w(offs_t offset, u8 data);
 
-	u8 status_r() { return m_status | 0x7e; }
-	void command_w(u8 data) { m_status |= 0x01; m_command_in = data; }
-	u8 data_r() { m_status &= ~0x80; return m_data_out; }
-	void data_w(u8 data) { m_status |= 0x80; m_data_in = data; }
+	u8 status_r() { LOGSTATUS(" read STAT & %02X\n", m_status); return m_status | 0x7e; }
+	void command_w(u8 data) { m_status |= 0x01; LOGSTATUS("write CMD & %02X, status: %02X\n", data, m_status); m_command_in = data; }
+	u8 data_r() { m_status &= ~0x80; LOGSTATUS(" read DATA & %02X, status: %02X\n", m_data_out, m_status); return m_data_out; }
+	void data_w(u8 data) { m_status |= 0x80; LOGSTATUS("write: DATA & %02X, status: %02X\n", data, m_status); m_data_in = data; }
 	void ctrl_w(u8 data);
 
 	void dac_flush();
@@ -158,9 +167,15 @@ void neogs_device::update_config()
 void neogs_device::ctrl_w(u8 data)
 {
 	if (data & 0x80)
+	{
+		LOG("Reset Request\n");
 		reset();
+	}
 	if (data & 0x40)
+	{
+		LOG("NMI Request\n");
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
 	if (data & 0x20)
 		; // LED data:0 - 1-on, 0-off
 }
@@ -282,14 +297,14 @@ void neogs_device::map_io(address_map &map)
 	map(0x0001, 0x0001).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_command_in; }));
 	map(0x0002, 0x0002).mirror(0xff00).lr8(
-		NAME([this](offs_t offset)          { m_status &= ~0x80; return m_data_in; }));
+		NAME([this](offs_t offset)          { m_status &= ~0x80; LOGSTATUS(" read: 02 & %02X, status: %02X\n", m_data_in, m_status); return m_data_in; }));
 	map(0x0003, 0x0003).mirror(0xff00).lw8(
-		NAME([this](offs_t offset, u8 data) { m_status |= 0x80; m_data_out = data; }));
+		NAME([this](offs_t offset, u8 data) { m_status |= 0x80; LOGSTATUS("write: 03 & %02X, status: %02X\n", data, m_status); m_data_out = data; }));
 	map(0x0004, 0x0004).mirror(0xff00).lr8(
 		NAME([this](offs_t offset)          { return m_status; }));
 	map(0x0005, 0x0005).mirror(0xff00).lrw8(
-		NAME([this](offs_t offset)          { m_status &= ~0x01; return ~0; }),
-		NAME([this](offs_t offset, u8 data) { m_status &= ~0x01; }));
+		NAME([this](offs_t offset)          { m_status &= ~0x01; LOGSTATUS(" read: 05, status: %02X\n", m_status); return ~0; }),
+		NAME([this](offs_t offset, u8 data) { m_status &= ~0x01; LOGSTATUS("write: 05, status: %02X\n", m_status); }));
 	map(0x0006, 0x0009).mirror(0xff00).lw8(
 		NAME([this](offs_t offset, u8 data) { m_vol[offset] = data & 0x3f; }));
 	map(0x0016, 0x0019).mirror(0xff00).lw8(
