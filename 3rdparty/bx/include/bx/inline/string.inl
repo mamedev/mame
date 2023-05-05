@@ -304,6 +304,11 @@ namespace bx
 		return m_line;
 	}
 
+	inline int32_t strLen(const StringView& _str, int32_t _max)
+	{
+		return min(_str.getLength(), _max);
+	}
+
 	inline bool hasPrefix(const StringView& _str, const StringView& _prefix)
 	{
 		const int32_t len = _prefix.getLength();

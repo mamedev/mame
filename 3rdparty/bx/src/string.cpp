@@ -302,11 +302,6 @@ namespace bx
 		return int32_t(ptr - _str);
 	}
 
-	int32_t strLen(const StringView& _str, int32_t _max)
-	{
-		return strLen(_str.getPtr(), min(_str.getLength(), _max) );
-	}
-
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_ASSERT(NULL != _dst, "_dst can't be NULL!");
