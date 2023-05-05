@@ -145,9 +145,10 @@ protected:
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_symbol(u8* mode, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash);
 	u8* as_mode(u8 a, u8 b);
 	std::pair<u8, u8> lookback_scroll(u8 a, u8 b);
 
@@ -250,7 +251,7 @@ private:
 	u8 m_rgmod;
 	u8 m_pg3;
 	u8 m_isa_addr_ext;
-	u8 m_hold;
+	std::pair<s8, s8> m_hold;
 	u8 m_kbd_data_cnt;
 
 	bool m_ata_selected; // 0-primary, 1-secondary
@@ -351,134 +352,109 @@ u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (m_conf)
 		screen_update_game(screen, bitmap, cliprect);
 	else
-	{
 		screen_update_graph(screen, bitmap, cliprect);
-		screen_update_txt(screen, bitmap, cliprect);
-	}
 
 	return 0;
 }
 
-void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const bool flash = BIT(screen.frame_number(), 4);
-	const s8 dy = 7 - (m_hold >> 4);
-	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
-	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom();)
 	{
-		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
-
-		u8* mode = nullptr;
-		u8 attr, symb;
-		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
-		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
+		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
+		for (u16 hpos = cliprect.left(); hpos <= cliprect.right();)
 		{
-			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((mode == nullptr) || (a16 & 7) == 0)
-			{
-				// 16x8 block descriptor
-				const bool do_init = mode == nullptr;
-				if (do_init || ((a16 & 15) == 0))
-					mode = as_mode(a16 >> 4, b8 >> 3);
-
-				if (BIT(mode[0], 4))
-				{
-					if (!BIT(mode[0], 5) && (((a16 & 15) == 8) || (do_init && (a16 & 8))))
-						mode = mode + 1024;
-
-					if ((mode[0] & 0xfc) == 0xfc) // blank
-						attr = symb = 0;
-					else
-					{
-						attr = m_vram[(mode[2] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | 0b11000 | BIT(mode[0], 6, 2)];
-						symb = m_vram[((mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3) | (b8 & 7))];
-					}
-				}
-			}
-
-			if (!BIT(mode[0], 4)) // skip graph block
-			{
-				hpos += 15 - (a16 & 15); // skip to the end of 16px block
-				pix += 16 - (a16 & 15);
-			}
+			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
+			u8* mode = as_mode(a16 >> 4, b8 >> 3);
+			const rectangle tile {hpos, std::min(cliprect.right(), hpos + 15 - (a16 & 15)), vpos, std::min(cliprect.bottom(), vpos + 7 - (b8 & 7))};
+			if(BIT(mode[0], 4))
+				draw_symbol(mode, bitmap, tile, flash);
 			else
-			{
-				u16 pal = 0x400;
-				if (~mode[0] & 0xfc) // !blank
-				{
-					if (BIT(mode[0], 5, 3) == 7) // border
-					{
-						if ((mode[0] & 0x0c) != 0x0c)
-							pal = 0x400 | ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07);
-					}
-					else
-					{
-						const u8 bit = 1 << (7 - ((a16 >> BIT(mode[0], 5)) & 7));
-						pal = attr + 0x400 + 0x100 * bool(symb & bit) + 0x200 * flash;
-					}
-				}
-				*pix++ = pal;
-			}
+				draw_tile(mode, bitmap, tile);
+
+			hpos += tile.width();
 		}
+		vpos += 8 - (b8 & 7);
 	}
 }
 
-void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sprinter_state::draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const s8 dy = 7 - (m_hold >> 4);
-	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
-	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	u16 *pix = &(bitmap.pix(cliprect.top(), cliprect.left()));
+	const u16 pal = BIT(mode[0], 6, 2) << 8;
+	u16 x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
+	u8 y = BIT(mode[1], 3, 5) << 3;
+	const bool lowres = BIT(mode[2], 2);
+	if (lowres)
 	{
-		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
-
-		u8* mode = nullptr;
-		u16 pal, x;
-		u8 y;
-		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
-
-		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
-		{
-			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((mode == nullptr) || ((a16 & 15) == 0))
-			{
-				// 16x8 block descriptor
-				mode = as_mode(a16 >> 4, b8 >> 3);
-				if(!BIT(mode[0], 4))
-				{
-					pal = BIT(mode[0], 6, 2) << 8;
-					x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
-					y = BIT(mode[1], 3, 5) << 3;
-					if (BIT(mode[2], 2)) // lowres
-					{
-						x += 4 * BIT(mode[2], 0);
-						y += 4 * BIT(mode[2], 1);
-					}
-				}
-			}
-
-			if (BIT(mode[0], 4)) // skip txt block
-			{
-				hpos += 15 - (a16 & 15); // skip to the last of 16px block
-				pix += 16 - (a16 & 15);
-			}
-			else
-			{
-				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[2], 2))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[2], 2)))];
-				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
-			}
-		}
+		x += 4 * BIT(mode[2], 0);
+		y += 4 * BIT(mode[2], 1);
 	}
+	for (auto dy = cliprect.top(); dy <= cliprect.bottom(); dy++)
+	{
+		for (auto dx = cliprect.left(); dx <= cliprect.right(); dx++)
+		{
+			const u8 color = m_vram[(y + ((dy & 7) >> lowres)) * 1024 + x + ((dx & 15) >> (1 + lowres))];
+			*pix++ = pal + (BIT(mode[0], 5) ? color : ((dx & 1) ? (color & 0x0f) : (color >> 4)));
+		}
+		pix += SPRINT_WIDTH - cliprect.width();
+	}
+}
+
+void sprinter_state::draw_symbol(u8* mode, bitmap_ind16 &bitmap, const rectangle &cliprect, bool flash)
+{
+	rectangle partrect = cliprect;
+	do
+	{
+		const bool is_partial = cliprect.right() != partrect.right();
+		if (is_partial)
+		{
+			partrect.setx(partrect.right() + 1, cliprect.right());
+			mode += 1024;
+		}
+		else if (!BIT(mode[0], 5))
+		{
+			if (BIT(cliprect.left() - m_hold.first, 3))
+				mode += 1024;
+			else
+				partrect.setx(partrect.left(), std::min(cliprect.right(), cliprect.left() + 7 - ((cliprect.left() - m_hold.first) & 7)));
+		}
+
+		u16 *pix = &(bitmap.pix(partrect.top(), partrect.left()));
+		u8 attr = 0;
+		u16 pal = 0x400;
+		if (~mode[0] & 0xfc) // !blank
+		{
+			attr = m_vram[(mode[2] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | 0b11000 | BIT(mode[0], 6, 2)];
+			if ((BIT(mode[0], 5, 3) == 7) && ((mode[0] & 0x0c) != 0x0c)) // border
+				pal = 0x400 | ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07);
+		}
+
+		for (auto dy = partrect.top(); dy <= partrect.bottom(); dy++)
+		{
+			const u8 symb = (~mode[0] & 0xfc) ? m_vram[(mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3) | ((dy - m_hold.second) & 7)] : 0;
+			for (auto dx = partrect.left(); dx <= partrect.right(); dx++)
+			{
+				if (BIT(mode[0], 5, 3) != 7)
+				{
+					const u8 bit = 1 << (7 - (((dx - m_hold.first) >> BIT(mode[0], 5)) & 7));
+					pal = attr + 0x400 + 0x100 * bool(symb & bit) + 0x200 * flash;
+				}
+				*pix++ = pal;
+			}
+			pix += SPRINT_WIDTH - partrect.width();
+		}
+	} while (cliprect.right() != partrect.right());
 }
 
  // Game Config - used in Thunder in the Deep
 void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const s8 dy = 7 - (m_hold >> 4);
-	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
-	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
-		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
+		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT) >> 3;
+		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH) >> 4;
 		std::pair<u8, u8> scroll = lookback_scroll(a, b);
 
 		u8* mode = nullptr;
@@ -486,15 +462,15 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 		u8 y;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 
-		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
+		for (u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
 			if ((mode != nullptr) && BIT(mode[0], 2) && (((a16 - (scroll.first << 1)) & 15) == 0))
 			{
 				scroll = {mode[3] & 0x0f, mode[3] >> 4};
-				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
 			}
-			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
 
 			if (mode == nullptr)
 			{
@@ -531,7 +507,7 @@ std::pair<u8, u8> sprinter_state::lookback_scroll(u8 a, u8 b)
 {
 	for (auto v = b; b; b--, a = 55)
 	{
-		for(auto h = a; a; a--)
+		for (auto h = a; a; a--)
 		{
 			const u8* mode = as_mode(h, v);
 			if (BIT(mode[0], 2) && (h != a) && (v != b))
@@ -806,7 +782,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_all_mode = data;
 		break;
 	case 0xcb:
-		m_hold = data;
+		m_hold = {(7 - (data & 0x0f)) * 2, 7 - (data >> 4)};
 		break;
 	case 0xc4:
 	case 0xcc:
@@ -1130,8 +1106,12 @@ void sprinter_state::vram_w(offs_t offset, u8 data)
 	const u16 laddr = offset & 0x3ff;
 	const bool is_int_updated = (laddr >= 0x300) && (laddr < 0x3a0) && ((offset & 0x403) == 0x400) && (((m_vram[offset] & 0xfc) == 0xfc) || ((data & 0xfc) == 0xfc)) && (m_vram[offset] ^ data);
 	m_vram[offset] = data;
-	m_tilemap->mark_all_dirty();
-	m_gfxdecode->gfx(1)->mark_all_dirty();
+
+	const u8 col = (offset >> 3) & 0x7f;
+	const u8 row = offset >> 13;
+	m_tilemap->mark_tile_dirty(row * 128 + col);
+	m_gfxdecode->gfx(1)->mark_dirty(row * 128 * 8 + col);
+
 	if (is_int_updated)
 		update_int(true);
 	else if (laddr >= 0x3e0)
@@ -1302,7 +1282,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_rgmod));
 	save_item(NAME(m_pg3));
 	save_item(NAME(m_isa_addr_ext));
-	save_item(NAME(m_hold));
+	//save_item(NAME(m_hold));
 	save_item(NAME(m_kbd_data_cnt));
 	save_item(NAME(m_ata_selected));
 	save_item(NAME(m_ata_data_latch));
@@ -1342,10 +1322,10 @@ void sprinter_state::machine_start()
 	};
 	std::copy(std::begin(port_default), std::end(port_default), std::begin(m_ram_pages));
 
-	m_all_mode = 0x00; // c3
-	m_port_y   = 0x00; // c4
-	m_rgmod    = 0x00; // c5
-	m_hold     = 0x77; // cb
+	m_all_mode = 0x00;   // c3
+	m_port_y   = 0x00;   // c4
+	m_rgmod    = 0x00;   // c5
+	m_hold     = {0, 0}; // cb
 	m_conf_loading = 1;
 	m_conf = 0;
 }
