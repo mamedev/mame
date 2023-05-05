@@ -166,6 +166,8 @@ void gdrom_device::device_reset()
 		GDROM_Cmd11_Reply[i] = GDROM_Def_Cmd11_Reply[i];
 
 	atapi_cdrom_device::device_reset();
+
+	m_cdda->set_cdrom(m_image);
 }
 
 // scsicd_exec_command
