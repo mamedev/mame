@@ -734,12 +734,12 @@ namespace bx
 			int32_t width;
 			int32_t base;
 			int32_t prec;
-			char fill;
+			char    fill;
 			uint8_t bits;
-			bool left;
-			bool upper;
-			bool spec;
-			bool sign;
+			bool    left;
+			bool    upper;
+			bool    spec;
+			bool    sign;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -956,7 +956,7 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[Flags][Width][.Precision][Leegth]Type
+				// %[Flags][Width][.Precision][Length]Type
 				read(&reader, ch, &err);
 
 				Param param;
@@ -1074,8 +1074,8 @@ namespace bx
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
-								case '3':
-								case '6':
+
+								case '3': case '6':
 									read(&reader, ch, &err);
 									switch (ch)
 									{
@@ -1134,12 +1134,9 @@ namespace bx
 						};
 						break;
 
-					case 'e':
-					case 'E':
-					case 'f':
-					case 'F':
-					case 'g':
-					case 'G':
+					case 'e': case 'E':
+					case 'f': case 'F':
+					case 'g': case 'G':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
@@ -1148,8 +1145,7 @@ namespace bx
 						size += write(_writer, va_arg(_argList, void*), param, _err);
 						break;
 
-					case 'x':
-					case 'X':
+					case 'x': case 'X':
 						param.base  = 16;
 						param.upper = isUpper(ch);
 						switch (param.bits)

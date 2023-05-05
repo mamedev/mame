@@ -37,9 +37,40 @@ namespace bx
 		va_end(argList);
 	}
 
+	inline constexpr StringLiteral::StringLiteral()
+		: m_ptr("")
+		, m_len(0)
+	{
+	}
+
+	template<int32_t SizeT>
+	inline constexpr StringLiteral::StringLiteral(const char (&str)[SizeT])
+		: m_ptr(str)
+		, m_len(SizeT - 1)
+	{
+		BX_ASSERT('\0' == m_ptr[SizeT - 1], "Must be 0 terminated.");
+	}
+
+	inline constexpr int32_t StringLiteral::getLength() const
+	{
+		return m_len;
+	}
+
+	inline constexpr const char* StringLiteral::getCPtr() const
+	{
+		return m_ptr;
+	}
+
 	inline StringView::StringView()
 	{
 		clear();
+	}
+
+	inline constexpr StringView::StringView(const StringLiteral& _str)
+		: m_ptr(_str.getCPtr() )
+		, m_len(_str.getLength() )
+		, m_0terminated(true)
+	{
 	}
 
 	inline StringView::StringView(const StringView& _rhs, int32_t _start, int32_t _len)

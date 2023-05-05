@@ -30,6 +30,12 @@ namespace bx
 	}
 
 	template<>
+	inline int32_t compareAscending<StringLiteral>(const void* _lhs, const void* _rhs)
+	{
+		return strCmp(*(const StringLiteral*)_lhs, *(const StringLiteral*)_rhs);
+	}
+
+	template<>
 	inline int32_t compareAscending<StringView>(const void* _lhs, const void* _rhs)
 	{
 		return strCmp(*(const StringView*)_lhs, *(const StringView*)_rhs);
