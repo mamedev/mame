@@ -19,25 +19,31 @@ TEST_CASE("StringLiteral", "")
 	REQUIRE(bx::isSorted(tmp, BX_COUNTOF(tmp) ) );
 
 	static_assert(4 == tmp[0].getLength() );
+	REQUIRE(4 == bx::strLen(tmp[0]) );
 	REQUIRE(0 == bx::strCmp("1389", tmp[0]) );
 
 	static_assert(5 == tmp[1].getLength() );
+	REQUIRE(5 == bx::strLen(tmp[1]) );
 	REQUIRE(0 == bx::strCmp("abvgd", tmp[1]) );
 
 	static_assert(3 == tmp[2].getLength() );
+	REQUIRE(3 == bx::strLen(tmp[2]) );
 	REQUIRE(0 == bx::strCmp("mac", tmp[2]) );
 
 	static_assert(3 == tmp[3].getLength() );
+	REQUIRE(3 == bx::strLen(tmp[3]) );
 	REQUIRE(0 == bx::strCmp("pod", tmp[3]) );
 
 	constexpr bx::StringLiteral copy = tmp[0];
 
 	static_assert(4 == copy.getLength() );
+	REQUIRE(4 == bx::strLen(copy) );
 	REQUIRE(0 == bx::strCmp("1389", copy) );
 
 	constexpr bx::StringView sv = tmp[1];
 
 	REQUIRE(5 == sv.getLength() );
+	REQUIRE(5 == bx::strLen(sv) );
 	REQUIRE(0 == bx::strCmp("abvgd", sv) );
 }
 
