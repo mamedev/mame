@@ -109,6 +109,8 @@ public:
 	void hrdvd_map(address_map &map);
 	void hrdvd_sub_io_map(address_map &map);
 	void hrdvd_sub_map(address_map &map);
+
+	static void dvdrom_config(device_t *device);
 };
 
 // Some kind of device a table is sent to
@@ -435,6 +437,12 @@ static void atapi_devs(device_slot_interface &device)
 	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
 }
 
+void hrdvd_state::dvdrom_config(device_t *device)
+{
+	auto *drive = downcast<atapi_fixed_dvdrom_device *>(device);
+	drive->set_model("PIONEER        DVD-A01  1.17"); // Wants firmware version between 1.14 and 1.19
+}
+
 void hrdvd_state::hrdvd(machine_config &config)
 {
 	/* basic machine hardware */
@@ -450,6 +458,7 @@ void hrdvd_state::hrdvd(machine_config &config)
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(m_maincpu, FUNC(tmp68301_device::rx0_w));
 
 	HRDVD_ATA_CONTROLLER_DEVICE(config, m_ata).options(atapi_devs, "dvdrom", nullptr, true);
+	m_ata->slot(0).set_option_machine_config("dvdrom", dvdrom_config);
 	m_ata->irq_handler().set(FUNC(hrdvd_state::ata_irq));
 	m_ata->dmarq_handler().set(FUNC(hrdvd_state::ata_drq));
 
