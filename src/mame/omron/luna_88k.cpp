@@ -9,9 +9,7 @@
  *  - OpenBSD source code
  *
  * TODO:
- *  - scsi controller
  *  - xp i/o controller
- *  - lance memory
  *  - crt controller
  *  - slotify graphics
  *  - expansion slots
@@ -19,7 +17,8 @@
  *  - multi-cpu configurations
  *
  * WIP:
- *  - scsi probe/boot hangs
+ *  - UniOS working
+ *  - scsi issues with OpenBSD
  */
 
 /*
@@ -165,8 +164,8 @@ private:
 
 	void irq_check();
 
-	u16 net_r(offs_t offset) { return m_nram[offset >> 1]; }
-	void net_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_nram[offset >> 1]); }
+	u16 net_r(offs_t offset) { return m_nram[u16(offset >> 1)]; }
+	void net_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_nram[u16(offset >> 1)]); }
 
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_cmmu;
@@ -221,6 +220,16 @@ void luna_88k_state::init()
 
 void luna_88k_state::machine_start()
 {
+	save_item(NAME(m_plane_active));
+	save_item(NAME(m_plane_func));
+	save_item(NAME(m_plane_mask));
+
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_irq_mask));
+
+	save_item(NAME(m_fzrom_addr));
+
 	m_nram = util::big_endian_cast<u16>(m_3port_ram.target());
 }
 
@@ -271,6 +280,7 @@ void luna_88k_state::cpu_map(address_map &map)
 		[this](offs_t offset, u32 data) { irq(offset, 1, 1); }, "softint_set");
 	map(0x6b00'0000, 0x6b00'000f).lr32([this](offs_t offset) { irq(offset, 1, 0); return 0xffffffff; }, "softint_clr");
 	// 0x6d00'0000 reset cpu 0-3, all
+	map(0x6d00'0010, 0x6d00'0013).lw32([this](u32 data) { machine().schedule_soft_reset(); }, "reset");
 
 	map(0x7100'0000, 0x7101'ffff).ram().share("3port_ram");
 
@@ -278,10 +288,7 @@ void luna_88k_state::cpu_map(address_map &map)
 	// 0x8300'0000 ext board B
 	// 0x9000'0000 pc-98 ext board
 	// 0x9100'0000 pc-9801 irq 4
-	//map(0x8000'0000, 0x9fff'ffff).noprw();
 	map(0x8000'0000, 0x9fff'ffff).lr32([this]() { m_cmmu[1]->bus_error_w(1); return 0; }, "bus_error");
-
-	// 0xa100'0000 mask rom 0x400000
 
 	//map(0xb100'0000, 0xb100'ffff); // rfcnt (pad,vert_loc,pad,horiz_loc)
 	map(0xb104'0000, 0xb104'ffff).lw8([this](u8 data) { LOG("plane_active 0x%02x\n", data); m_plane_active = data; }, "plane_active");
@@ -367,6 +374,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 	sys_clk.signal_handler().set([this](int state) { if (state) irq(0, 6, 1); });
 
 	DS1397(config, m_rtc, 32'768);
+	m_rtc->set_epoch(1990);
 
 	HD647180X(config, m_iop, 12'288'000);
 	m_iop->set_addrmap(AS_PROGRAM, &luna_88k_state::iop_map_mem);
@@ -503,7 +511,7 @@ void luna_88k_state::luna88k2(machine_config &config)
 
 	// TODO: crt timing control by HD6445CP4
 	screen_device &crt(SCREEN(config, "crt", SCREEN_TYPE_RASTER));
-	crt.set_raw(108'992'000, 2048, 0, 2048, 1024, 0, 1024);
+	crt.set_raw(108'992'000, 2048, 0, 1280, 1024, 0, 1024);
 	crt.set_screen_update(FUNC(luna_88k_state::screen_update));
 
 	BT458(config, m_ramdac, 108'992'000);
@@ -680,9 +688,9 @@ void luna_88k_state::irq_check()
 
 static INPUT_PORTS_START(luna88k)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x80, 0x00, "Start") PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(0x00, "Autoboot")
-	PORT_DIPSETTING(0x80, "Monitor")
+	PORT_DIPNAME(0x80, 0x80, "Start") PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(0x00, "Monitor")  // single-user
+	PORT_DIPSETTING(0x80, "Autoboot") // multi-user
 	PORT_DIPNAME(0x40, 0x40, "Console") PORT_DIPLOCATION("SW1:!2")
 	PORT_DIPSETTING(0x00, "Serial")
 	PORT_DIPSETTING(0x40, "Graphics")
@@ -777,5 +785,5 @@ ROM_END
 
 } // anonymous namespace
 
-/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME     FLAGS */
-COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", "Luna 88K²", MACHINE_NOT_WORKING)
+/*   YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT  COMPANY  FULLNAME       FLAGS */
+COMP(1992?, luna88k2, 0,      0,      luna88k2, luna88k, luna_88k_state, init, "Omron", u8"Luna 88K²", 0)

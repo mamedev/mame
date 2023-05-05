@@ -28,7 +28,7 @@ protected:
 private:
 	template <int Bank> void bank_w(u8 data);
 
-	required_device<dac_byte_interface> m_dac;
+	required_device<dac_8bit_r2r_device> m_dac;
 	memory_bank_array_creator<3> m_rombank;
 };
 

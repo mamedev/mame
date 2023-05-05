@@ -60,16 +60,16 @@ public:
 
 	~png_info() { free_data(); }
 
-	std::error_condition read_file(read_stream &fp);
-	std::error_condition copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha);
-	std::error_condition expand_buffer_8bit();
+	std::error_condition read_file(read_stream &fp) noexcept;
+	std::error_condition copy_to_bitmap(bitmap_argb32 &bitmap, bool &hasalpha) noexcept;
+	std::error_condition expand_buffer_8bit() noexcept;
 
-	std::error_condition add_text(std::string_view keyword, std::string_view text);
+	std::error_condition add_text(std::string_view keyword, std::string_view text) noexcept;
 
-	void free_data();
-	void reset() { free_data(); operator=(png_info()); }
+	void free_data() noexcept;
+	void reset() noexcept { free_data(); operator=(png_info()); }
 
-	static std::error_condition verify_header(read_stream &fp);
+	static std::error_condition verify_header(read_stream &fp) noexcept;
 
 	std::unique_ptr<std::uint8_t []>    image;
 	std::uint32_t                       width, height;
@@ -102,13 +102,13 @@ private:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-std::error_condition png_read_bitmap(read_stream &fp, bitmap_argb32 &bitmap);
+std::error_condition png_read_bitmap(read_stream &fp, bitmap_argb32 &bitmap) noexcept;
 
-std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette);
+std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t const &bitmap, int palette_length, const rgb_t *palette) noexcept;
 
-std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate);
-std::error_condition mng_capture_frame(random_write &fp, png_info &info, bitmap_t const &bitmap, int palette_length, rgb_t const *palette);
-std::error_condition mng_capture_stop(random_write &fp);
+std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate) noexcept;
+std::error_condition mng_capture_frame(random_write &fp, png_info &info, bitmap_t const &bitmap, int palette_length, rgb_t const *palette) noexcept;
+std::error_condition mng_capture_stop(random_write &fp) noexcept;
 
 } // namespace util
 

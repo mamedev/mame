@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/***************************************************************************
+/*******************************************************************************
 
-Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
-most of them are VFD electronic games/toys.
+Hitachi HMCS40 MCU tabletops/handhelds or other simple devices, most of them
+are VFD electronic games/toys.
 
 known chips:
 
@@ -97,7 +97,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-============================================================================
+================================================================================
 
 ROM source notes when dumped from another title, but confident it's the same:
 - gckong: CGL Super Kong
@@ -122,17 +122,17 @@ TODO:
 - improve/redo SVG for: bzaxxon, bbtime
 - add SVG for: ggdman, ktparman, tkjmaru, gdefender, bombman, wantgman, puckimon
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
-#include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -175,13 +175,13 @@ protected:
 	optional_ioport_array<7> m_inputs; // max 7
 
 	// misc common
-	u8 m_r[8] = { };                // MCU R ports write data (optional)
-	u16 m_d = 0;                    // MCU D port write data (optional)
-	u8 m_int[2] = { };              // MCU INT0/1 pins state
-	u16 m_inp_mux = 0;              // multiplexed inputs mask
+	u8 m_r[8] = { };   // MCU R ports write data (optional)
+	u16 m_d = 0;       // MCU D port write data (optional)
+	u8 m_int[2] = { }; // MCU INT0/1 pins state
+	u16 m_inp_mux = 0; // multiplexed inputs mask
 
-	u32 m_grid = 0;                 // VFD current row data
-	u64 m_plate = 0;                // VFD current column data
+	u32 m_grid = 0;    // VFD current row data
+	u64 m_plate = 0;   // VFD current column data
 
 	u16 read_inputs(int columns);
 	void refresh_interrupts(void);
@@ -209,11 +209,11 @@ void hh_hmcs40_state::machine_reset()
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Helper Functions
 
-***************************************************************************/
+*******************************************************************************/
 
 // generic input handlers
 
@@ -258,13 +258,13 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-***************************************************************************/
+*******************************************************************************/
 
-/***************************************************************************
+/*******************************************************************************
 
   Actronics / Hanzawa Wanted G-Man
   * Hitachi HD38800B24 MCU
@@ -274,7 +274,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   - World: Wanted G-Man, published by Actronics
   - France: Operation 'Z', published by Ludotronic
 
-***************************************************************************/
+*******************************************************************************/
 
 class wantgman_state : public hh_hmcs40_state
 {
@@ -385,7 +385,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Dribble Away Basketball (manufactured in Japan)
   * PCB label: Emix Corp. ET-05
@@ -393,7 +393,7 @@ ROM_END
   * cyan VFD Emix-106, with bezel overlay
   * color overlay: green (optional)
 
-***************************************************************************/
+*******************************************************************************/
 
 class bambball_state : public hh_hmcs40_state
 {
@@ -513,14 +513,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bambino Knock-Em Out Boxing
   * PCB label: Emix Corp. ET-06B
   * Hitachi HD38750A07 MCU
   * cyan VFD Emix-103, with blue or transparent window
 
-***************************************************************************/
+*******************************************************************************/
 
 class bmboxing_state : public hh_hmcs40_state
 {
@@ -663,14 +663,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Frisky Tom (manufactured in Japan)
   * PCB label: Kaken Corp., PT-327A
   * Hitachi HD38800A77 MCU
   * cyan/red/green VFD Futaba DM-43ZK 2E
 
-***************************************************************************/
+*******************************************************************************/
 
 class bfriskyt_state : public hh_hmcs40_state
 {
@@ -794,7 +794,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Packri Monster (manufactured in Japan)
   * PCB label: DM-21ZA2
@@ -807,7 +807,7 @@ ROM_END
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class packmon_state : public hh_hmcs40_state
 {
@@ -918,7 +918,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Zaxxon (manufactured in Japan, licensed from Sega)
   * PCB label: FL Zaxxon
@@ -926,7 +926,7 @@ ROM_END
   * cyan/red/blue VFD NEC FIP11BM24T no. 4-8, half of it reflected with a
     one-way mirror to give the illusion of a 3D display
 
-***************************************************************************/
+*******************************************************************************/
 
 class bzaxxon_state : public hh_hmcs40_state
 {
@@ -1047,7 +1047,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Zackman (manufactured in Japan)
   * Hitachi QFP HD38820A49 MCU
@@ -1060,7 +1060,7 @@ ROM_END
   - World: Zackman, published by Bandai
   - USA: Zackman, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class zackman_state : public hh_hmcs40_state
 {
@@ -1179,14 +1179,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Pengo (manufactured in Japan, licensed from Sega)
   * PCB label: FL Pengo(in katakana)
   * Hitachi QFP HD38820A63 MCU
   * cyan/red/blue VFD Futaba DM-68ZK 3D DM-63
 
-***************************************************************************/
+*******************************************************************************/
 
 class bpengo_state : public hh_hmcs40_state
 {
@@ -1314,14 +1314,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Burger Time (manufactured in Japan, licensed from Data East)
   * PCB label: Kaken Corp. PT-389 Burger Time
   * Hitachi QFP HD38820A65 MCU
   * cyan/red/green VFD NEC FIP6AM25T no. 21-21
 
-***************************************************************************/
+*******************************************************************************/
 
 class bbtime_state : public hh_hmcs40_state
 {
@@ -1445,13 +1445,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Kiteyo Parman
   * Hitachi HD38800B42 MCU
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class ktparman_state : public hh_hmcs40_state
 {
@@ -1541,14 +1541,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp PT-412 FL-Doreamon(in katakana)
   * Hitachi HD38800B43 MCU
   * cyan/red/blue VFD Futaba DM-71
 
-***************************************************************************/
+*******************************************************************************/
 
 class bdoramon_state : public hh_hmcs40_state
 {
@@ -1652,13 +1652,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Toukon Juohmaru
   * Hitachi HD38800B48 MCU
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class tkjmaru_state : public hh_hmcs40_state
 {
@@ -1767,14 +1767,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Ultraman Monster Battle (FL LSI Game Push Up) (manufactured in Japan)
   * PCB label: Kaken Corp. PT-424 FL Ultra Man
   * Hitachi HD38800B52 MCU
   * cyan/red/blue VFD NEC FIP8BM25T no. 21-8 2
 
-***************************************************************************/
+*******************************************************************************/
 
 class bultrman_state : public hh_hmcs40_state
 {
@@ -1870,7 +1870,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Go Go Dynaman
   * Hitachi HD38820A75 MCU
@@ -1880,7 +1880,7 @@ ROM_END
   - Japan: Go Go Dynaman, published by Bandai
   - Germany: Kampf der Monster, published by Bandai
 
-***************************************************************************/
+*******************************************************************************/
 
 class ggdman_state : public hh_hmcs40_state
 {
@@ -1996,14 +1996,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Machine Man (FL Flat Type) (manufactured in Japan)
   * PCB label: Kaken PT-438
   * Hitachi QFP HD38820A85 MCU
   * cyan/red/green VFD NEC FIP5CM33T no. 4 21
 
-***************************************************************************/
+*******************************************************************************/
 
 class machiman_state : public hh_hmcs40_state
 {
@@ -2099,7 +2099,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Pair Match (manufactured in Japan)
   * PCB label: Kaken Corp. PT-460
@@ -2111,7 +2111,7 @@ ROM_END
   shaped like a glossy black pyramid. Star Trek fans will recognize it as
   a prop used in TNG Ten Forward.
 
-***************************************************************************/
+*******************************************************************************/
 
 class pairmtch_state : public hh_hmcs40_state
 {
@@ -2279,7 +2279,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Alien Attack (manufactured in Taiwan)
   * Hitachi HD38800A25 MCU
@@ -2288,7 +2288,7 @@ ROM_END
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
-***************************************************************************/
+*******************************************************************************/
 
 class alnattck_state : public hh_hmcs40_state
 {
@@ -2406,7 +2406,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Donkey Kong (manufactured in Taiwan, licensed from Nintendo)
   * PCB label: Coleco Rev C 75790 DK
@@ -2415,7 +2415,7 @@ ROM_END
   * cyan/red VFD Futaba DM-47ZK 2K
   * color overlay: playfield: red1, donkey kong/princess: red2
 
-***************************************************************************/
+*******************************************************************************/
 
 class cdkong_state : public hh_hmcs40_state
 {
@@ -2553,7 +2553,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Galaxian (manufactured in Taiwan)
   * PCB label: Coleco Rev A 75718
@@ -2568,7 +2568,7 @@ ROM_END
   - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
   - P2 Right: Head-to-Head Galaxian (2-player mode, long)
 
-***************************************************************************/
+*******************************************************************************/
 
 class cgalaxn_state : public hh_hmcs40_state
 {
@@ -2694,7 +2694,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 75690
@@ -2714,7 +2714,7 @@ ROM_END
 
   BTANB: 1st version doesn't show the whole maze on power-on
 
-***************************************************************************/
+*******************************************************************************/
 
 class cpacman_state : public hh_hmcs40_state
 {
@@ -2838,7 +2838,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Coleco Ms. Pac-Man (manufactured in Taiwan, licensed from Midway)
   * PCB label: Coleco 911171
@@ -2853,7 +2853,7 @@ ROM_END
 
   BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
-***************************************************************************/
+*******************************************************************************/
 
 class cmspacmn_state : public hh_hmcs40_state
 {
@@ -2968,7 +2968,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Galaxian 2 (manufactured in Japan)
   * PCB labels: ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
@@ -2979,7 +2979,7 @@ ROM_END
   - USA: Galaxian 2, published by Entex
   - UK: Astro Invader, published by Hales/Entex
 
-***************************************************************************/
+*******************************************************************************/
 
 class egalaxn2_state : public hh_hmcs40_state
 {
@@ -3106,7 +3106,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Pac Man 2 (manufactured in Japan)
   * PCB labels: ENTEX PAC-MAN PB-093/094 80-210149/50/51
@@ -3115,7 +3115,7 @@ ROM_END
 
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
-***************************************************************************/
+*******************************************************************************/
 
 class epacman2_state : public egalaxn2_state
 {
@@ -3197,7 +3197,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Super Space Invader 2 (black version)
   * Hitachi HD38800A31 MCU
@@ -3209,7 +3209,7 @@ ROM_END
 
   Hold down the fire button at boot for demo mode to work.
 
-***************************************************************************/
+*******************************************************************************/
 
 class einvader2_state : public hh_hmcs40_state
 {
@@ -3326,7 +3326,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Turtles (manufactured in Japan)
   * PCB label: 560359
@@ -3334,7 +3334,7 @@ ROM_END
   * COP411L sub MCU for sound, label COP411L-KED/N
   * cyan/red/green VFD NEC FIP15BM32T
 
-***************************************************************************/
+*******************************************************************************/
 
 class eturtles_state : public hh_hmcs40_state
 {
@@ -3548,7 +3548,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Entex Stargate (manufactured in Japan)
   * PCB label: 5603521/31
@@ -3559,7 +3559,7 @@ ROM_END
 
   BTANB: when changing direction, player bullets remain and become obstacles
 
-***************************************************************************/
+*******************************************************************************/
 
 class estargte_state : public eturtles_state
 {
@@ -3689,7 +3689,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Heiankyo Alien (manufactured in Japan)
   * Hitachi HD38800A04 MCU
@@ -3699,7 +3699,7 @@ ROM_END
   - Japan: Heiankyo Alien, published by Gakken
   - USA: Earth Invaders, published by CGL
 
-***************************************************************************/
+*******************************************************************************/
 
 class ghalien_state : public hh_hmcs40_state
 {
@@ -3817,7 +3817,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Crazy Kong (manufactured in Japan)
   * PCB label: ZENY 5603601
@@ -3828,7 +3828,7 @@ ROM_END
   - Japan: Crazy Kong, published by Gakken
   - USA: Super Kong, published by CGL
 
-***************************************************************************/
+*******************************************************************************/
 
 class gckong_state : public hh_hmcs40_state
 {
@@ -3952,7 +3952,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Super Cobra
   * PCB label: SUPER COBRA 3000N
@@ -3968,7 +3968,7 @@ ROM_END
 
   BTANB(green version): 1 rocket seems out of place at the top-right area
 
-***************************************************************************/
+*******************************************************************************/
 
 class gscobra_state : public hh_hmcs40_state
 {
@@ -4090,7 +4090,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Defender
   * Hitachi HD38820L53 MCU (SDIP)
@@ -4098,7 +4098,7 @@ ROM_END
 
   Entex Defender is possibly the same game, but with a cyan/red VFD.
 
-***************************************************************************/
+*******************************************************************************/
 
 class gdefender_state : public hh_hmcs40_state
 {
@@ -4224,7 +4224,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Gakken Dig Dug (manufactured in Japan)
   * PCB label: Gakken DIG-DAG KS-004283(A/B)
@@ -4232,7 +4232,7 @@ ROM_END
   * cyan/red/yellow VFD Futaba DM-69Z 3F
   * color overlay: game row 1,2: orange1: row 3,4: o2, row 5,6: o3, row 7: o4
 
-***************************************************************************/
+*******************************************************************************/
 
 class gdigdug_state : public hh_hmcs40_state
 {
@@ -4354,7 +4354,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel World Championship Baseball (model 3201)
   * PCB label: MEL-001 Baseball Rev. B
@@ -4365,7 +4365,7 @@ ROM_END
   turn the game on. For 1-player, turn the game on while holding the 1-key
   and use the visitor's side keypad to play offsense.
 
-***************************************************************************/
+*******************************************************************************/
 
 class mwcbaseb_state : public hh_hmcs40_state
 {
@@ -4531,7 +4531,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Mattel Star Hawk (manufactured in Japan)
   * PCB label: Kaken, PT-317B
@@ -4544,7 +4544,7 @@ ROM_END
   games from the same era. It's likely that this was made under contract exclusively
   for Mattel. There is no indication that this game was released in Japan by Bandai.
 
-***************************************************************************/
+*******************************************************************************/
 
 class msthawk_state : public hh_hmcs40_state
 {
@@ -4672,14 +4672,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Parker Brothers Q*Bert
   * PCB label: 13662 REV-4
   * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD Itron CP5137
 
-***************************************************************************/
+*******************************************************************************/
 
 class pbqbert_state : public hh_hmcs40_state
 {
@@ -4774,13 +4774,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Romtec Pucki & Monsters
   * Hitachi HD38750A67 MCU
   * cyan/red/green VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class puckimon_state : public hh_hmcs40_state
 {
@@ -4873,14 +4873,14 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy(tronic) Tron (manufactured in Japan)
   * PCB label: THN-02 2E114E07
   * Hitachi HD38800A88 MCU
   * cyan/red/green VFD NEC FIP10AM24T no. 2-8 1
 
-***************************************************************************/
+*******************************************************************************/
 
 class tmtron_state : public hh_hmcs40_state
 {
@@ -5001,7 +5001,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Kingman (manufactured in Japan)
   * PCB label: THF-01II 2E138E01/2E128E02
@@ -5012,7 +5012,7 @@ ROM_END
   - World: Kingman, published by Tomy
   - USA: Kingman, published by Tandy
 
-***************************************************************************/
+*******************************************************************************/
 
 class kingman_state : public hh_hmcs40_state
 {
@@ -5133,13 +5133,13 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Tomy Bombman (Portable 6000 series)
   * Hitachi HD38800B29 MCU
   * cyan/red/blue VFD
 
-***************************************************************************/
+*******************************************************************************/
 
 class bombman_state : public hh_hmcs40_state
 {
@@ -5256,7 +5256,7 @@ ROM_END
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   VTech Invaders (manufactured in Taiwan)
   * Hitachi HD38750A45 MCU
@@ -5268,7 +5268,7 @@ ROM_END
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
-***************************************************************************/
+*******************************************************************************/
 
 class vinvader_state : public hh_hmcs40_state
 {
@@ -5365,61 +5365,61 @@ ROM_END
 
 } // anonymous namespace
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1982, wantgman,  0,        0, wantgman,  wantgman,  wantgman_state,  empty_init, "Actronics / Hanzawa", "Wanted G-Man", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, wantgman,  0,        0,      wantgman,  wantgman,  wantgman_state,  empty_init, "Actronics / Hanzawa", "Wanted G-Man", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1979, bambball,  0,        0, bambball,  bambball,  bambball_state,  empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmboxing,  0,        0, bmboxing,  bmboxing,  bmboxing_state,  empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bambball,  0,        0,      bambball,  bambball,  bambball_state,  empty_init, "Bambino", "Dribble Away Basketball", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, bmboxing,  0,        0,      bmboxing,  bmboxing,  bmboxing_state,  empty_init, "Bambino", "Knock-Em Out Boxing", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, bfriskyt,  0,        0, bfriskyt,  bfriskyt,  bfriskyt_state,  empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, packmon,   0,        0, packmon,   packmon,   packmon_state,   empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bzaxxon,   0,        0, bzaxxon,   bzaxxon,   bzaxxon_state,   empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, zackman,   0,        0, zackman,   zackman,   zackman_state,   empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bpengo,    0,        0, bpengo,    bpengo,    bpengo_state,    empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, bbtime,    0,        0, bbtime,    bbtime,    bbtime_state,    empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, ktparman,  0,        0, ktparman,  ktparman,  ktparman_state,  empty_init, "Bandai", "Kiteyo Parman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, bdoramon,  0,        0, bdoramon,  bdoramon,  bdoramon_state,  empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, tkjmaru,   0,        0, tkjmaru,   tkjmaru,   tkjmaru_state,   empty_init, "Bandai", "Toukon Juohmaru", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, bultrman,  0,        0, bultrman,  bultrman,  bultrman_state,  empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, ggdman,    0,        0, ggdman,    ggdman,    ggdman_state,    empty_init, "Bandai", "Go Go Dynaman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1984, machiman,  0,        0, machiman,  machiman,  machiman_state,  empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, pairmtch,  0,        0, pairmtch,  pairmtch,  pairmtch_state,  empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bfriskyt,  0,        0,      bfriskyt,  bfriskyt,  bfriskyt_state,  empty_init, "Bandai", "Frisky Tom (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, packmon,   0,        0,      packmon,   packmon,   packmon_state,   empty_init, "Bandai", "Packri Monster", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bzaxxon,   0,        0,      bzaxxon,   bzaxxon,   bzaxxon_state,   empty_init, "Bandai", "Zaxxon (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, zackman,   0,        0,      zackman,   zackman,   zackman_state,   empty_init, "Bandai", "Zackman", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, bpengo,    0,        0,      bpengo,    bpengo,    bpengo_state,    empty_init, "Bandai", "Pengo (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, bbtime,    0,        0,      bbtime,    bbtime,    bbtime_state,    empty_init, "Bandai", "Burger Time (Bandai)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, ktparman,  0,        0,      ktparman,  ktparman,  ktparman_state,  empty_init, "Bandai", "Kiteyo Parman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, bdoramon,  0,        0,      bdoramon,  bdoramon,  bdoramon_state,  empty_init, "Bandai", "Dokodemo Dorayaki Doraemon", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, tkjmaru,   0,        0,      tkjmaru,   tkjmaru,   tkjmaru_state,   empty_init, "Bandai", "Toukon Juohmaru", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, bultrman,  0,        0,      bultrman,  bultrman,  bultrman_state,  empty_init, "Bandai", "Ultraman Monster Battle", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, ggdman,    0,        0,      ggdman,    ggdman,    ggdman_state,    empty_init, "Bandai", "Go Go Dynaman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1984, machiman,  0,        0,      machiman,  machiman,  machiman_state,  empty_init, "Bandai", "Machine Man", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, pairmtch,  0,        0,      pairmtch,  pairmtch,  pairmtch_state,  empty_init, "Bandai", "Pair Match", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, alnattck,  0,        0, alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cdkong,    0,        0, cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1981, cpacman,   0,        0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, cmspacmn,  0,        0, cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, alnattck,  0,        0,      alnattck,  alnattck,  alnattck_state,  empty_init, "Coleco", "Alien Attack", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, cdkong,    0,        0,      cdkong,    cdkong,    cdkong_state,    empty_init, "Coleco", "Donkey Kong (Coleco)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, cgalaxn,   0,        0,      cgalaxn,   cgalaxn,   cgalaxn_state,   empty_init, "Coleco", "Galaxian (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1981, cpacman,   0,        0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 29)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, cpacmanr1, cpacman,  0,      cpacman,   cpacman,   cpacman_state,   empty_init, "Coleco", "Pac-Man (Coleco, Rev. 28)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, cmspacmn,  0,        0,      cmspacmn,  cmspacmn,  cmspacmn_state,  empty_init, "Coleco", "Ms. Pac-Man (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, egalaxn2,  0,        0, egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2,  0,        0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, epacman2r, epacman2, 0, epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, einvader2, 0,        0, einvader2, einvader2, einvader2_state, empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, eturtles,  0,        0, eturtles,  eturtles,  eturtles_state,  empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, estargte,  0,        0, estargte,  estargte,  estargte_state,  empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, egalaxn2,  0,        0,      egalaxn2,  egalaxn2,  egalaxn2_state,  empty_init, "Entex", "Galaxian 2 (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, epacman2,  0,        0,      epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, cyan Pacman)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, epacman2r, epacman2, 0,      epacman2,  epacman2,  epacman2_state,  empty_init, "Entex", "Pac Man 2 (Entex, red Pacman)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, einvader2, 0,        0,      einvader2, einvader2, einvader2_state, empty_init, "Entex", "Super Space Invader 2 (Entex, black version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, eturtles,  0,        0,      eturtles,  eturtles,  eturtles_state,  empty_init, "Entex", "Turtles (Entex)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, estargte,  0,        0,      estargte,  estargte,  estargte_state,  empty_init, "Entex", "Stargate (Entex)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, ghalien,   0,        0, ghalien,   ghalien,   ghalien_state,   empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gckong,    0,        0, gckong,    gckong,    gckong_state,    empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, gscobra,   0,        0, gscobra,   gscobra,   gscobra_state,   empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1983, gdefender, 0,        0, gdefender, gdefender, gdefender_state, empty_init, "Gakken", "Defender (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1983, gdigdug,   0,        0, gdigdug,   gdigdug,   gdigdug_state,   empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ghalien,   0,        0,      ghalien,   ghalien,   ghalien_state,   empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gckong,    0,        0,      gckong,    gckong,    gckong_state,    empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, gscobra,   0,        0,      gscobra,   gscobra,   gscobra_state,   empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, gdefender, 0,        0,      gdefender, gdefender, gdefender_state, empty_init, "Gakken", "Defender (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1983, gdigdug,   0,        0,      gdigdug,   gdigdug,   gdigdug_state,   empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, mwcbaseb,  0,        0, mwcbaseb,  mwcbaseb,  mwcbaseb_state,  empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, msthawk,   0,        0, msthawk,   msthawk,   msthawk_state,   empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, mwcbaseb,  0,        0,      mwcbaseb,  mwcbaseb,  mwcbaseb_state,  empty_init, "Mattel Electronics", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, msthawk,   0,        0,      msthawk,   msthawk,   msthawk_state,   empty_init, "Mattel Electronics", "Star Hawk (Mattel)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,   pbqbert,   pbqbert_state,   empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, pbqbert,   0,        0,      pbqbert,   pbqbert,   pbqbert_state,   empty_init, "Parker Brothers", "Q*Bert (Parker Brothers)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, puckimon,  0,        0, puckimon,  puckimon,  puckimon_state,  empty_init, "Romtec", "Pucki & Monsters", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1982, puckimon,  0,        0,      puckimon,  puckimon,  puckimon_state,  empty_init, "Romtec", "Pucki & Monsters", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1982, tmtron,    0,        0, tmtron,    tmtron,    tmtron_state,    empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, kingman,   0,        0, kingman,   kingman,   kingman_state,   empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, bombman,   0,        0, bombman,   bombman,   bombman_state,   empty_init, "Tomy", "Bombman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+SYST( 1982, tmtron,    0,        0,      tmtron,    tmtron,    tmtron_state,    empty_init, "Tomy", "Tron (Tomy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, kingman,   0,        0,      kingman,   kingman,   kingman_state,   empty_init, "Tomy", "Kingman", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, bombman,   0,        0,      bombman,   bombman,   bombman_state,   empty_init, "Tomy", "Bombman", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-CONS( 1981, vinvader,  0,        0, vinvader,  vinvader,  vinvader_state,  empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, vinvader,  0,        0,      vinvader,  vinvader,  vinvader_state,  empty_init, "VTech", "Invaders (VTech)", MACHINE_SUPPORTS_SAVE )

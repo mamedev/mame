@@ -216,8 +216,8 @@ WRITE_LINE_MEMBER( mm1_state::llen_w )
 WRITE_LINE_MEMBER( mm1_state::motor_on_w )
 {
 	LOG("MOTOR %u\n", state);
-	m_floppy0->mon_w(!state);
-	m_floppy1->mon_w(!state);
+	m_floppy[0]->mon_w(!state);
+	m_floppy[1]->mon_w(!state);
 }
 
 

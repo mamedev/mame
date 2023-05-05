@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, hap
 // thanks-to:Dan Boris, Kevin Horton, Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Milton Bradley Microvision, handheld game console
 
@@ -25,7 +25,7 @@ TODO:
 - dump/add remaining 8021 cartridges, which games have 8021 versions? An online
   FAQ mentions at least Block Buster, Connect Four, Bowling.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -130,9 +130,9 @@ void microvision_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge Init
-******************************************************************************/
+*******************************************************************************/
 
 static const u16 tms1100_output_pla[2][0x20] =
 {
@@ -160,31 +160,33 @@ u32 microvision_state::tms1100_micro_pla(offs_t offset)
 	// default TMS1100 microinstructions PLA - this should work for all games
 	// verified for: blckbstr, bowling, pinball, vegasslt
 
-	// TCY, YNEC, TMCIY, AxAAC
+	// TCY, YNEC, TCMIY, AxAAC
 	static const u16 micro1[4] = { 0x0108, 0x9080, 0x8068, 0x0136 };
 
-	// 0x20, 0x30, 0x00
+	// 0x00, 0x20, 0x30
 	static const u16 micro2[0x30] =
 	{
+		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
+		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
+
 		0x000a, 0x0404, 0x0408, 0x8004, 0xa019, 0xa038, 0x2004, 0x2000,
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 
 		0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400,
-
-		0x1402, 0x0c30, 0xd002, 0x2404, 0x8019, 0x8038, 0x0416, 0x0415,
-		0x0104, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x1100, 0x0000,
+		0x1580, 0x1580, 0x1580, 0x1580, 0x0c34, 0x0834, 0x0434, 0x1400
 	};
+
+	static const int micro2h[4] = { 0x00, -1, 0x10, 0x20 };
 
 	u16 data = 0;
 
 	if (offset >= 0x40 && offset < 0x80)
 	{
 		data = micro1[offset >> 4 & 3];
-		if (offset == 0x7f) data ^= 2;
+		if (offset == 0x7f) data ^= 2; // CLA
 	}
 	else if (offset < 0x40 && (offset & 0xf0) != 0x10)
-		data = micro2[offset ^ 0x20];
+		data = micro2[micro2h[offset >> 4] | (offset & 0xf)];
 
 	return (data == 0) ? 0x8fa3 : data;
 }
@@ -255,9 +257,9 @@ void microvision_state::apply_settings()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Video
-******************************************************************************/
+*******************************************************************************/
 
 uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -279,9 +281,9 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // TMS1100 interface
 
@@ -397,9 +399,9 @@ READ_LINE_MEMBER(microvision_state::i8021_t1_r)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( microvision )
 	PORT_START("COL0")
@@ -439,13 +441,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void microvision_state::microvision(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	TMS1100(config, m_tms1100, 0);
 	m_tms1100->set_output_pla(tms1100_output_pla[0]);
 	m_tms1100->set_decode_micro().set(FUNC(microvision_state::tms1100_micro_pla));
@@ -462,7 +464,7 @@ void microvision_state::microvision(machine_config &config)
 
 	TIMER(config, "paddle_timer").configure_generic(nullptr);
 
-	/* video hardware */
+	// video hardware
 	HLCD0488(config, m_lcd);
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
@@ -477,11 +479,11 @@ void microvision_state::microvision(machine_config &config)
 	screen.set_size(16, 16);
 	screen.set_visarea_full();
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_2BIT_ONES_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "microvision_cart");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(microvision_state::cart_load));
@@ -491,9 +493,9 @@ void microvision_state::microvision(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( microvsn )
 	// nothing here yet, ROM is on the cartridge
@@ -507,9 +509,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, microvsn, 0,      0, microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1979, microvsn, 0,      0,      microvision, microvision, microvision_state, empty_init, "Milton Bradley", "Microvision", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

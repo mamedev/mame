@@ -243,7 +243,7 @@ void mb87030_device::scsi_set_ctrl(uint32_t value, uint32_t mask)
 	}
 }
 
-uint32_t mb87030_device::scsi_get_ctrl(void)
+uint32_t mb87030_device::scsi_get_ctrl()
 {
 	if (m_sctl & SCTL_DIAG_MODE) {
 		uint32_t ret = 0;
@@ -280,8 +280,9 @@ void mb87030_device::step(bool timeout)
 			timeout ? " timeout" : "", data,
 					ctrl, m_tc);
 
-	if (m_sctl & SCTL_RESET_AND_DISABLE && m_state != State::Idle) {
+	if ((m_sctl & SCTL_RESET_AND_DISABLE) && m_state != State::Idle) {
 		scsi_set_ctrl(0, S_ALL);
+		m_ssts &= ~SSTS_SPC_BUSY;
 		update_state(State::Idle);
 		return;
 	}
@@ -906,7 +907,7 @@ void mb87030_device::dma_w(uint8_t data)
 	step(false);
 }
 
-uint8_t mb87030_device::dma_r(void)
+uint8_t mb87030_device::dma_r()
 {
 	uint8_t val = m_hdb;
 

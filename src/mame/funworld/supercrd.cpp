@@ -8,6 +8,8 @@
   Encrypted CPU (based on a Z80)
   plus 2x 8255 + YM3014 + YM3812 hardware.
 
+  Close to Amatic 8000-1 hardware.
+
 
   Driver by Roberto Fresca.
 
@@ -25,7 +27,7 @@
   To boot into the game...
 
   1) Let the initial test ends.
-  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5". 
+  2) Turn ON Service Key (key 9). The screen will show "Elektronik Defekt 5".
   3) Turn ON Personal A key (key 0).
   4) Turn OFF Personal A key.
 
@@ -404,7 +406,7 @@ static INPUT_PORTS_START( supercrd )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Personal A") PORT_TOGGLE  // Personal A key - Bookkeeping
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Service A (Personal A)") PORT_TOGGLE  // Service/Personal A key - Bookkeeping
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
 
 	PORT_START("IN2")
@@ -429,8 +431,8 @@ static INPUT_PORTS_START( supercrd )
 
 	PORT_START("SW1")
 	PORT_DIPNAME( 0x01, 0x01, "Personal A Settings" )
-	PORT_DIPSETTING(    0x01, "Brief" )					// Remote A, Abgeschrieben A.
-	PORT_DIPSETTING(    0x00, "Complete" )				// Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
+	PORT_DIPSETTING(    0x01, "Brief" )                 // Remote A, Abgeschrieben A.
+	PORT_DIPSETTING(    0x00, "Complete" )              // Remote A, Gewechselt A, Abgeschrieben A, Nachgefuellt A.
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -497,7 +499,7 @@ void supercrd_state::supercrd(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &supercrd_state::io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &supercrd_state::decrypted_opcodes_map);
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	ppi0.in_pa_callback().set_ioport("IN0");

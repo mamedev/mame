@@ -1289,6 +1289,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds2430a.h,MACHINES["DS2430A"] = true
+---------------------------------------------------
+
+if (MACHINES["DS2430A"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds2430a.cpp",
+		MAME_DIR .. "src/devices/machine/ds2430a.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds6417.h,MACHINES["DS6417"] = true
 ---------------------------------------------------
 
@@ -1909,6 +1921,18 @@ if (MACHINES["KB3600"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/kb3600.cpp",
 		MAME_DIR .. "src/devices/machine/kb3600.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/keytronic_l2207.h,MACHINES["KEYTRONIC_L2207"] = true
+---------------------------------------------------
+
+if (MACHINES["KEYTRONIC_L2207"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/keytronic_l2207.cpp",
+		MAME_DIR .. "src/devices/machine/keytronic_l2207.h",
 	}
 end
 

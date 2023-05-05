@@ -827,7 +827,7 @@ protected:
 	// actually performing any work.
 	// This will still be visible from the CPU as Blitter being busy, until the
 	// operation list has exited.
-	// 
+	//
 	// TODO: Having 64 bytes of non-drawing operations in a row will only cause the Blitter
 	//   to idle if the operations are read from the same 64 byte chunk (and not split between two).
 	//   More proper handling of this would be to change the reads from SRAM to be done 64 bytes at the time

@@ -8,8 +8,8 @@ license:CC0-1.0
 	<!-- This list is ordered by game description -->
 
 	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
-		80-250700 - Touch & Learn - Game Pack (US)
-		80-250704 - MobiGo 2 (GE) -->
+	    80-250700 - Touch & Learn - Game Pack (US)
+	    80-250704 - MobiGo 2 (GE) -->
 
 	<software name="ben10g" supported="no">
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
@@ -360,25 +360,25 @@ license:CC0-1.0
 	</software>
 
 	<software name="spongeb" supported="no">
-		<description>Nickelodeon Spongebob SquarePants - Defending the Secret Formula (USA)</description>
+		<description>Nickelodeon SpongeBob SquarePants - Defending the Secret Formula (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251500(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="80-251500 - Spongebob SquarePants - Defending the Secret Formula (US).bin" size="0x1000000" crc="85266243" sha1="4ffd4ca308d1d3419396e706892ff6eff23d8cd0"/>
+				<rom name="80-251500 - SpongeBob SquarePants - Defending the Secret Formula (US).bin" size="0x1000000" crc="85266243" sha1="4ffd4ca308d1d3419396e706892ff6eff23d8cd0"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="spongebg" cloneof="spongeb" supported="no">
-		<description>Nickelodeon Spongebob Schwammkopf - Rette das Geheimrezept (Germany)</description>
+		<description>Nickelodeon SpongeBob Schwammkopf - Rette das Geheimrezept (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251504(GER)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="80-251504 - Spongebob Schwammkopf - Rette das Geheimrezept (GER).bin" size="0x1000000" crc="19efae9e" sha1="5c3eeb04cdec48cb92c5410ceef57e4b60adeeee"/>
+				<rom name="80-251504 - SpongeBob Schwammkopf - Rette das Geheimrezept (GER).bin" size="0x1000000" crc="19efae9e" sha1="5c3eeb04cdec48cb92c5410ceef57e4b60adeeee"/>
 			</dataarea>
 		</part>
 	</software>

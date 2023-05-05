@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
 『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled by
 Data East, they titled it "Cosmo Gang".
@@ -19,7 +19,7 @@ TODO:
   on the real thing as a missed aim. It turns on the lightgun lamp but then
   doesn't read the lightsensor.
 
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 Hardware notes:
 
@@ -51,7 +51,7 @@ Cabinet:
 
 Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -253,9 +253,9 @@ void cgang_state::machine_reset()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // maincpu (misc)
 
@@ -597,9 +597,9 @@ u8 cgang_state::ppi5_c_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void cgang_state::main_map(address_map &map)
 {
@@ -633,9 +633,9 @@ void cgang_state::sound_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( cgang )
 	PORT_START("IN1")
@@ -731,13 +731,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void cgang_state::cgang(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	MC6809(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cgang_state::main_map);
 
@@ -810,7 +810,7 @@ void cgang_state::cgang(machine_config &config)
 
 	TIMER(config, "door_motor").configure_periodic(FUNC(cgang_state::door_motor_tick), attotime::from_msec(1));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
 	m_digits->set_segmask(0x3ff, 0x7f);
 
@@ -820,7 +820,7 @@ void cgang_state::cgang(machine_config &config)
 
 	config.set_default_layout(layout_cgang);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, m_ymsnd, 3.579545_MHz_XTAL);
@@ -834,9 +834,9 @@ void cgang_state::cgang(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cgang )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -856,9 +856,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-/*    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS */
+//    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS
 GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

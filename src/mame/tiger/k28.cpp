@@ -3,7 +3,7 @@
 // thanks-to:Kevin Horton
 /*******************************************************************************
 
-Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
+Tiger Electronics K-2-8: Talking Learning Computer (model 7-230/7-231)
 
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
@@ -11,15 +11,18 @@ Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
 - 7-232: this one is completely different hw --> driver k28m2.cpp
 
 Hardware notes:
-- PCB marked PB-123 WIZARD, TIGER
+- PCB label: PB-123 WIZARD, TIGER
 - Intel P8021 MCU with 1KB internal ROM
 - MM5445N VFD driver, 9-digit alphanumeric display same as snmath
 - 2*TMS6100 (32KB VSM)
 - SC-01-A speech chip
 - module slot
 
+6 modules were announced (see back of the box), but it's not known if they
+were actually released.
+
 TODO:
-- external module support (no dumps yet)
+- add module slot
 
 *******************************************************************************/
 
@@ -263,7 +266,7 @@ static INPUT_PORTS_START( k28 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 
 	PORT_START("IN.5")
@@ -327,11 +330,11 @@ void k28_state::k28(machine_config &config)
 
 ROM_START( k28 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "p8021", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
+	ROM_LOAD( "p8021_7-230-itl", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
 
 	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
-	ROM_LOAD( "cm62050.vsm", 0x0000, 0x4000, CRC(6afb8645) SHA1(e22435568ed11c6516a3b4008131f99cd4e47aa9) )
-	ROM_LOAD( "cm62051.vsm", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
+	ROM_LOAD( "cm62050u", 0x0000, 0x4000, CRC(6afb8645) SHA1(e22435568ed11c6516a3b4008131f99cd4e47aa9) )
+	ROM_LOAD( "cm62051u", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
 ROM_END
 
 } // anonymous namespace
@@ -343,4 +346,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, k28,  0,      0,      k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K-2-8: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

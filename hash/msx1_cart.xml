@@ -4138,6 +4138,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="cyborgz">
 		<description>Cyborg Z (Korea)</description>
 		<year>1991</year>
@@ -11524,6 +11525,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="sboy3">
 		<description>Super Boy 3 (Korea)</description>
 		<year>1991</year>
@@ -12716,6 +12718,21 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="warroida">
+		<description>Warroid (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="ウォーロイド" />
+		<info name="serial" value="2013302"/>
+		<info name="isbn" value="487148839X"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="warroid (japan, alt).rom" size="0x8000" crc="217a0c2d" sha1="b5d873b65140e0d573ba36cfb0e5ec242ec2a278" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="waterdrv">
 		<description>Water Driver (Spain)</description>
 		<year>1984</year>
@@ -12725,6 +12742,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="water driver (japan).rom" size="0x4000" crc="d5af9e82" sha1="28aaf59dadb425c1ef6fca860439f4e42e1737b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waterdrva" cloneof="waterdrv">
+		<description>Water Driver (Spain, alt)</description>
+		<year>1984</year>
+		<publisher>Sony Spain</publisher>
+		<info name="serial" value="HBS-I025"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="water driver (japan, alt).rom" size="0x4000" crc="6ac274be" sha1="6ae19b9a69da7d54cfeda2ef2a540e90f4b97f93" />
 			</dataarea>
 		</part>
 	</software>
@@ -12755,6 +12785,24 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="senjokama" cloneof="senjokam">
+		<description>Senjou no Ookami (Japan, alt)</description>
+		<year>1987</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="戦場の狼" />
+		<info name="serial" value="2019101"/>
+		<info name="gtin" value="04988606200191"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="pcb" value="TA-1M" />
+			<feature name="slot" value="ascii8" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="wolf of the battlefield - commando - capcom (1985) [a] [6017].rom" size="0x20000" crc="879e0e08" sha1="012b35984c418640609989bcddf2727571a3baf6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The rom image works on both MSX and SMS. -->
 	<software name="wonsiin">
 		<description>Wonsiin (Korea)</description>
 		<year>1991</year>
@@ -12765,6 +12813,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="wonsiin (kr).rom" size="0x20000" crc="a05258f5" sha1="f98f9c0fd32b2392b57b14105a9b730c8957d9b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordproc">
+		<description>Word Processor (United Kingdom)</description>
+		<year>1984</year>
+		<publisher>Computer Mates</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="word processor - computer mates (1984).rom" size="0x4000" crc="bec80460" sha1="69da8890e2b07fb7b3f74c2b5d63255af7fff70d" />
 			</dataarea>
 		</part>
 	</software>
@@ -12850,18 +12910,6 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="yabyum">
-		<description>Yab Yum (Netherlands)</description>
-		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="2"/>
-			<dataarea name="rom" size="0x2000">
-				<rom name="yab yum (netherlands).rom" size="0x2000" crc="2836cd86" sha1="1a6c5ba03e0cc76f7e001784e1a205375f5602b8" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- This might not exist on cartridge, no photographic evidence yet. -->
 	<software name="yakyukyo">
 		<description>Yakyu Kyo (Japan)</description>
@@ -12916,6 +12964,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="yellow submarine (japan).rom" size="0x4000" crc="71e6605f" sha1="939ed6053363112c34766335b93d0ddf25059468" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No photographic proof of a physical release; distributed through The Links network? -->
+	<software name="yellowsba" cloneof="yellowsb">
+		<description>Yellow Submarine (Japan, Jast)</description>
+		<year>1987</year>
+		<publisher>Jast</publisher>
+		<info name="alt_title" value="イエローサブマリン" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="yellow submarine (japan, jast).rom" size="0x4000" crc="d19a7881" sha1="637c11a7ae7690e175570bbc6a6dcbce0a42d965" />
 			</dataarea>
 		</part>
 	</software>
@@ -12989,8 +13051,21 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<!-- No photographic proof of a physical release. -->
+	<software name="yiear2k" cloneof="yiear2">
+		<description>Yie Ar Kung-Fu II - The Emperor Yie-Gah (Korea)</description>
+		<year>1985</year>
+		<publisher>Topia</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yie ar kung-fu ii - the emperor yie-gah (korea).rom" size="0x8000" crc="ebd380af" sha1="ff13c3221ba78fafe842ef7d0742a271b2644146" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chima">
-		<description>Youkai Tantei Chima Chima (Japan)</description>
+		<description>Youkai Tantei Chimachima (Japan)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -12999,6 +13074,34 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="yokai tanken chimachima (japan).rom" size="0x8000" crc="8d636963" sha1="c60a28a4048710ad3c63ef5bcf4ce03db54c00bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chimaa">
+		<description>Youkai Tantei Chimachima (Japan, alt)</description>
+		<year>1985</year>
+		<publisher>Bothtec</publisher>
+		<info name="serial" value="MK-7401" />
+		<info name="alt_title" value="妖怪探偵ちまちま" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yokai tanken chimachima (japan, alt).rom" size="0x8000" crc="39460ce0" sha1="a574bb9b668ae3bf40a0d57d9aed3cfa19b559bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- No photographic proof of a physical release. -->
+	<software name="chimak" cloneof="chima">
+		<description>Yogoetamjeong Chimagun Chimachima (Korea)</description>
+		<year>19??</year>
+		<publisher>Topia</publisher>
+		<info name="alt_title" value="요괴탐정 치마군 Chimachima"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yokai tanken chimachima (korea).rom" size="0x8000" crc="592a115d" sha1="3acba00fa8fd1a9f794adc0850a867fb51a48e64" />
 			</dataarea>
 		</part>
 	</software>
@@ -13014,6 +13117,21 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="haunted boynight (japan).rom" size="0x8000" crc="2faf6e26" sha1="15345c8745028c96fc79036b2e3e180ad2f62dab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="youkaiyaa" cloneof="youkaiya">
+		<description>Youkai Yashiki (Japan, alt)</description>
+		<year>1986</year>
+		<publisher>Casio</publisher>
+		<info name="serial" value="GPM-123" />
+		<info name="alt_title" value="妖怪屋敷" />
+		<info name="gtin" value="04971850104179"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="haunted boynight (japan, alt).rom" size="0x8000" crc="2cfc3eb4" sha1="8bf0d36a525e38aecb656a2d2d2486325b97b19f" />
 			</dataarea>
 		</part>
 	</software>
@@ -13045,6 +13163,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="zaiderk" cloneof="zaider">
+		<description>Chou Senshi Zaider - Battle of Peguss (Korea)</description>
+		<year>19??</year>
+		<publisher>Prosoft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zaider - battle of peguss (korea).rom" size="0x8000" crc="022345df" sha1="645ec2f28f08b3ca20f0dfe65fc7ca993da6bfbb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zanac2">
 		<description>Zanac A.I. - 2nd Version (Japan)</description>
 		<year>1987</year>
@@ -13066,6 +13196,19 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="zanac (japan) (v2) (alt 1).rom" size="0x8000" crc="8414ea0e" sha1="ffa8fc5756f7e1d1ef168618f5606aca10f8b2c7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Has text "PRESENTED BY PONY" replaced with "MASAKAZU MIYAMOTO" on credits screen and "COMPILE 2ND VERSION 1987" replaced by "GAME DESIGNED BY COMPILE". -->
+	<software name="zanac2b" cloneof="zanac2">
+		<description>Zanac A.I. - 2nd Version (Japan, alt 2)</description>
+		<year>1987</year>
+		<publisher>Takeru</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zanac (japan) (v2) (alt 2).rom" size="0x8000" crc="bc30a6ba" sha1="f4a57faaadb248a502249d40196237d9dd802eea" />
 			</dataarea>
 		</part>
 	</software>
@@ -13158,6 +13301,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="zenjia" cloneof="zenji">
+		<description>Zenji (Japan, alt 1)</description>
+		<year>1984</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="ゼンジー" />
+		<info name="serial" value="R48X5507"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zenji (japanm, alt 1).rom" size="0x8000" crc="1a4aebb2" sha1="2f4404d141acc40e48af0b12c70cd44b066ece10" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zexasltd">
 		<description>Zexas Limited (Japan)</description>
 		<year>1985</year>
@@ -13196,6 +13353,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="zexas limited (japan) (alt 2).rom" size="0x8000" crc="1e48edca" sha1="71442ac703c2966142b04071fedf180e81daab9a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zexasltdc" cloneof="zexasltd">
+		<description>Zexas Limited (Japan, alt 3)</description>
+		<year>1985</year>
+		<publisher>dB-Soft</publisher>
+		<info name="serial" value="MS1-G2109-L1" />
+		<info name="alt_title" value="ゼクサスリミテッド" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zexas limited (japan) (alt 3).rom" size="0x8000" crc="db6d6d12" sha1="74a2763d0eec3d81ba5b9e4760bd46cfe3997ab7" />
 			</dataarea>
 		</part>
 	</software>
@@ -16086,7 +16257,39 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<!-- Software does not start -->
+	<software name="xy" supported="no">
+		<description>X &amp; Y (Arab)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="س و ص"/>
+		<info name="serial" value="M022" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="x y (1987)(al alamiah).rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="youngart">
+		<description>Young Artist (Arab, v1.18)</description>
+		<year>1988</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="الفنان الصغير"/>
+		<info name="serial" value="P076" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="a_artist_1_18.rom" size="0x20000" crc="32b321a3" sha1="0faa296a860e15bb7a4537fb13373be861851be0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="youngart117" cloneof="youngart">
 		<description>Young Artist (Arab, v1.17)</description>
 		<year>1988</year>
 		<publisher>Al Alamiah</publisher>
@@ -17362,5 +17565,875 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+
+<!-- Homebrew / Doujin software -->
+
+	<software name="westenhs">
+		<description>Westen House (English, v1.3.1)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.3.1 - brain games (2021)(en).rom" size="0xc000" crc="cc2e7808" sha1="628ef3237469aa4e8a61259767da9bf35aa624ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westenhss" cloneof="westenhs">
+		<description>Westen House (Spanish, v1.3.1)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.3.1 - brain games (2021)(es).rom" size="0xc000" crc="c3eef607" sha1="2955777484bfb489682d9535a3ce8becec935cb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westenhsp" cloneof="westenhs">
+		<description>Westen House (Portuguese, v1.3.1)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.3.1 - brain games (2021)(pt).rom" size="0xc000" crc="45042115" sha1="478933f689d0e6d6df5b6a1387ed8a4056575dcc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westenhs13" cloneof="westenhs">
+		<description>Westen House (English, v1.3)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.3 - brain games (2021)(en).rom" size="0xc000" crc="d8010073" sha1="817c5e7db8925539fec7c8d859aef6fff9a3d6c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westenhss13" cloneof="westenhs">
+		<description>Westen House (Spanish, v1.3)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.3 - brain games (2021)(es).rom" size="0xc000" crc="aacdbbc6" sha1="e6d2ea762f820fe1a6f9fe56e56ae9139b73a6b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="westenhs12" cloneof="westenhs">
+		<description>Westen House (English, v1.2)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="westen house 1.2 - brain games (2021)(en).rom" size="0xc000" crc="2a74e34c" sha1="fc8e1a9b2da220e80b631aef5aac6753d4979458"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whisit">
+		<description>Where Is It? The Quest for the 10th Island</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Eric Mendel"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="where is it - jmeric (em) (2021).rom" size="0x8000" crc="e1abcfb8" sha1="0e6c12f499357ce22ceac909cae730eee63ac1e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whisitp" cloneof="whisit">
+		<description>Where Is It? The Quest for the 10th Island (prototype)</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Eric Mendel"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="where is it - jmeric (em) (2021)(proto).rom" size="0x7a46" crc="99525f70" sha1="9491d2d28be71c6b47c2b80cb16fea262b0fdf1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingwarr">
+		<description>Wing Warriors (Reprosoft)</description>
+		<year>2016</year>
+		<publisher>Reprosoft</publisher>
+		<info name="developer" value="Kitmaker"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="wing warriors - kitmaker entertainment inc (2016) [cartrdige edition].rom" size="0xc000" crc="a2cac073" sha1="9ddc0f9c0e4f0a72f6e034177db4fe382e6c2a8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingwarrm" cloneof="wingwarr">
+		<description>Wing Warriors (MSXDev)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Kitmaker"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="wing warriors - kitmaker entertainment inc (2016) [msxdev2015].rom" size="0xc000" crc="207d0e62" sha1="4b934f0c383136ff315d04a56d2a8631169f9628"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witchday">
+		<description>Witch Day (English, v1.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="witch day - dia de brujas - joesg (2020) [msxdev2020] [v1.2 (english)].rom" size="401408" crc="b2382244" sha1="af3c93e058b63f457a350871a027b1fadea2b0c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witchdays" cloneof="witchday">
+		<description>Dia de Brujas (Spanish, v1.2)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="witch day - dia de brujas - joesg (2020) [msxdev2020] [v1.2 (spanish)].rom" size="401408" crc="d04cefe3" sha1="537b2431a9be616ba992f420cc65cc5ff7f3875d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witchday10" cloneof="witchday">
+		<description>Witch Day (English, v1.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="witch day - dia de brujas - joesg (2020) [msxdev2020] [v1.0 (english)].rom" size="401408" crc="2759d592" sha1="f2ae148018a629b500b3244f76d74b1dbe5396c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witchdays10" cloneof="witchday">
+		<description>Dia de Brujas (Spanish, v1.0)</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="joesg"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="ascii8" />
+			<dataarea name="rom" size="0x80000">
+				<rom name="witch day - dia de brujas - joesg (2020) [msxdev2020] [v1.0 (spanish)].rom" size="401408" crc="48b828b1" sha1="3bd5ef9a14287a209fd2123c6bf5aa0e9951f87b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="witches">
+		<description>Witches</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="witches - cobinee (2019) [5990].rom" size="0x8000" crc="69e924d3" sha1="f3edc9ec13596ffa0b7a11e52055240c4d01d4f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordinv">
+		<description>Word Invaders</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="SapphiRe Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="word invaders - sapphire soft (2006) [msx-dev06].rom" size="0x2000" crc="fcfe9a16" sha1="da1f207466a88b347e995a6ed7d960c7cec5aa8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word">
+		<description>Wörd! (English, v1.1)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.1 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="4b608d0c" sha1="d5486e703ffebaaad873e38f57498f2b4a87c190"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordes" cloneof="word">
+		<description>Wörd! (Spanish, v1.1)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.1 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="f8eef078" sha1="7a88578fafae461a2268420f17d709977f58d911"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordnl" cloneof="word">
+		<description>Wörd! (Dutch, v1.1)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.1 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="94013997" sha1="84ed9f4e514bbc6d2801773acbe5d6db0e2c9ed8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordse" cloneof="word">
+		<description>Wörd! (Swedish, v1.1)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.1 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="d8766aaf" sha1="9aa70aa7b8e5aa454383ce1b81f809c2e5162b6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worden10" cloneof="word">
+		<description>Wörd! (English, v1.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.0 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="fe57e6a8" sha1="1bf4c71293c6ecf65862eca858baec8189963c86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordes10" cloneof="word">
+		<description>Wörd! (Spanish, v1.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.0 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="4237621f" sha1="68cfebaba6fb99930986cf61393143d88d493b6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordnl10" cloneof="word">
+		<description>Wörd! (Dutch, v1.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.0 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="fcec5a00" sha1="f90ca2098052dee403452c4f36af74b37ee53756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordse10" cloneof="word">
+		<description>Wörd! (Swedish, v1.0)</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Patrik's Retro Tech"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="word v1.0 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="6af9a4a0" sha1="68ba3b6adb31fcc713a436ed7c33cb90c2aa6eb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x0rz">
+		<description>X0rz (v3)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="x0rz_v3.rom" size="0x4000" crc="91f500f3" sha1="58d510e572130db643b6115da40edcdd33280017" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x0rzv1" cloneof="x0rz">
+		<description>X0rz (v1)</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Metal Soft"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="x0rz_v1.rom" size="0x4000" crc="f474c68c" sha1="607059ef3247771f1bbee5c38d4f43cef8856712" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xor2021">
+		<description>XOR 2021</description>
+		<year>2021</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="xoe 2021 - timmy (2021).rom" size="0x8000" crc="8f90e4e0" sha1="0aab1fd742b40bff9b68d1fb32074dcdb1a8ec65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing">
+		<description>XRacing (v1.0.5)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.5.rom" size="0xc000" crc="74ac3ce1" sha1="f2b4590570276c0b44f8b695a155d6bfadcaac41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing104" cloneof="xracing">
+		<description>XRacing (v1.0.4)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.4.rom" size="0xc000" crc="164feacb" sha1="246ac053230bc1f3e42a00347fcb42c390eb4a7c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing103" cloneof="xracing">
+		<description>XRacing (v1.0.3)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.3.rom" size="0xc000" crc="a61eae07" sha1="66aaf627941bbd15940f5838861208becdb787ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing102" cloneof="xracing">
+		<description>XRacing (v1.0.2)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.2.rom" size="0xc000" crc="58d4c383" sha1="6a95f4ffe21259e5757240e5015800efd6d9bc21" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing101" cloneof="xracing">
+		<description>XRacing (v1.0.1)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.1.rom" size="0xc000" crc="3a4932f3" sha1="16083c0e1cb167c55f2317b152d17684d62902a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xracing10" cloneof="xracing">
+		<description>XRacing (v1.0)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="xracing_v1.0.rom" size="0xc000" crc="9f0a1b14" sha1="fa5cc49fbd073ea4b2f09e0083083db4534ac5de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk">
+		<description>XSpelunker (v1.4.3)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.4.3.rom" size="0x8000" crc="2cd7d688" sha1="cb1ed9d5383561d18a92a91ede08275cea1e66dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunka" cloneof="xspelunk">
+		<description>XSpelunker (alt)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en (alt).rom" size="0x8000" crc="a5ca6778" sha1="5a79d8383f8c481b20b6b844939c2a0e4761f53b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk142" cloneof="xspelunk">
+		<description>XSpelunker (v1.4.2)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.4.2.rom" size="0x8000" crc="0a7c288c" sha1="2b2818e56243caf7713442dc9f54f67a780b6ff6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk141" cloneof="xspelunk">
+		<description>XSpelunker (v1.4.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.4.1.rom" size="0x8000" crc="10d50a26" sha1="252b744bf5d852c37daa85fa5c353ef392ca4f68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk14" cloneof="xspelunk">
+		<description>XSpelunker (v1.4)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.4.rom" size="0x8000" crc="70abd310" sha1="e594a70dbbeebd488ef8fd69063e945b55589865" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk13" cloneof="xspelunk">
+		<description>XSpelunker (v1.3)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.3.rom" size="0x8000" crc="48c7fccd" sha1="be2d537460b72ef72cd27f81400fc6ceb8e85836" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk12" cloneof="xspelunk">
+		<description>XSpelunker (v1.2)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.2.rom" size="0x8000" crc="7d7b5fe0" sha1="dfa24e388fc9f3618e1f573e9ad1f449b0e31e06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk11" cloneof="xspelunk">
+		<description>XSpelunker (v1.1)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.1.rom" size="0x8000" crc="e873e64f" sha1="87988f44d228b3e62ed6d42db9f2c51362a73e8d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xspelunk10" cloneof="xspelunk">
+		<description>XSpelunker (v1.0)</description>
+		<year>2017</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Brain Games"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="spelunk-en_v1.0.rom" size="0x8000" crc="858e5e78" sha1="6e82d8031c3a4569964ec1f4d48af13cfcf945fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yabyum">
+		<description>Yab Yum (Netherlands)</description>
+		<year>1985</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tom Gerritsen"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="yab yum (netherlands).rom" size="0x2000" crc="2836cd86" sha1="1a6c5ba03e0cc76f7e001784e1a205375f5602b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yabyuma" cloneof="yabyum">
+		<description>Yab Yum (Netherlands, alt)</description>
+		<year>1985</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tom Gerritsen"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="yab yum (netherlands, alt).rom" size="0x2000" crc="28cf97ab" sha1="1c38e64981ce6ff167b4c7414d3742bb288f8d86" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yabyumb" cloneof="yabyum">
+		<description>Yab Yum (Netherlands, alt 2)</description>
+		<year>1985</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Tom Gerritsen"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="yab yum (netherlands, alt 2).rom" size="0x2000" crc="3b98913c" sha1="6deaf41604f39b59655d6b6822d48d34e6d7883d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yahtzee">
+		<description>Yahtzee</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="DVIK &amp; Joyrex productions"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="yahtzee - dvik &amp; joyrex productions (2007) [msx-dev07].rom" size="0x4000" crc="c32c7037" sha1="720054d7ab4da46db8c9fb47d17fb7e0aa79d25b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yazzie">
+		<description>Yazzie</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroSouls"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yazzie - retrosouls (2019).rom" size="0x8000" crc="d659d039" sha1="f6e6b0690f06470e521d975d03145ec858589c9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yazziea" cloneof="yazzie">
+		<description>Yazzie (alt, older?)</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroSouls"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yazzie - retrosouls (2019) [v1.0].rom" size="0x8000" crc="19d65509" sha1="fd531c8eb96e6cca6c4e1fb04c8a6570be9a2bbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yazzier">
+		<description>Yazzie Remastered</description>
+		<year>2020</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="RetroSouls &amp; FRS"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="yazzie - retrosouls (2019) [remastered (frs)].rom" size="0x8000" crc="dd488abc" sha1="248829e6f8813236f67832d12e813756e4e560cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z">
+		<description>Z (English)</description>
+		<year>2018</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="z - cobinee (2019) [english].rom" size="0x8000" crc="c4c64d02" sha1="1a42d65e750995f94bb0aac7134ef7c1df57f043"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zk" cloneof="z">
+		<description>Z (Korean)</description>
+		<year>2018</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="z - cobinee (2019) [korean].rom" size="0x8000" crc="9d0e3940" sha1="865b98b87ec4f1b7c3b506277057a738ef4ec00f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z2">
+		<description>Z2 (Japan)</description>
+		<year>2019</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Cobinee"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="z2 - cobinee (2019) [japanese].rom" size="0x8000" crc="f7892aee" sha1="71c14f486223790ff10e714518daf9838c26b460"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z80rogue">
+		<description>z80rogue</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Oscar Toledo Gutierrez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="z80rogue - oscar toledo gutierrez (2019).rom" size="0x2000" crc="e55df13c" sha1="2c00b7e214e9bbaa5c6e3df31c4ebb5a56375067"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeroinfs">
+		<description>ZERO and the Castle of Infinite Sadness (Matra)</description>
+		<year>2017</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="zero and the castle of infinite sadness - dioniso (2014) [matra].rom" size="0xc000" crc="7b6f90ef" sha1="b61b66e14574b683f75807a6aa18b7868cd628d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeroinfsa" cloneof="zeroinfs">
+		<description>ZERO and the Castle of Infinite Sadness (MSXDev)</description>
+		<year>2014</year>
+		<publisher>Dioniso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zero and the castle of infinite sadness - dioniso (2014) [msxdev2014].rom" size="0x8000" crc="f6cfdb93" sha1="a1fe1f9489ab188561beb2816a83a7a9fc347623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeroinfsb" cloneof="zeroinfs">
+		<description>ZERO and the Castle of Infinite Sadness (MSXDev, with bug)</description>
+		<year>2014</year>
+		<publisher>Dioniso</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zero and the castle of infinite sadness - dioniso (2014) [msxdev2014 - with bug].rom" size="0x8000" crc="27cf8493" sha1="a44934434a761721f70873b1851de2dfca19bd99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombiecp">
+		<description>Zombie Calavera Prologue</description>
+		<year>2021</year>
+		<publisher>Nanochess</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zombie calavera prologue - nanochess (2021).rom" size="0x8000" crc="254e500c" sha1="c3c2a134928f69c721bb2d2773d9372f5d8b23e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombiein">
+		<description>Zombie Incident (v1.2)</description>
+		<year>2012</year>
+		<publisher>Nenefranz</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="zombie incident - nenefranz (2012) [msxdev11] [version 1.3].rom" size="0xc000" crc="0d5c497a" sha1="f9bdee10f019d8cd06b5a9dcb39fa5d10a62687e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombiein11" cloneof="zombiein">
+		<description>Zombie Incident (v1.1)</description>
+		<year>2012</year>
+		<publisher>Nenefranz</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="zombie incident - nenefranz (2012) [msxdev11] [version 1.1].rom" size="0xc000" crc="68c6018e" sha1="daf6574ea74d44a98a02e3ee25994f9779a9e65c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombiein10" cloneof="zombiein">
+		<description>Zombie Incident (v1.0)</description>
+		<year>2012</year>
+		<publisher>Nenefranz</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0xc000">
+				<rom name="zombie incident - nenefranz (2012) [msxdev11] [version 1.0].rom" size="0xc000" crc="38fe2726" sha1="bfc22015dcedf9100647869dbaf36f0d6165bf3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombienr">
+		<description>Zombie Near (v1.1)</description>
+		<year>2011</year>
+		<publisher>Oscar Toledo Gutierrez</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="zombie near - oscar toledo gutierrez (2011) [msxdev10] [version 1.1].rom" size="0x20000" crc="edea8c56" sha1="32c84735c30e0679733d5d1918ccec9a625c4d3b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombienr10" cloneof="zombienr">
+		<description>Zombie Near (v1.0)</description>
+		<year>2011</year>
+		<publisher>Oscar Toledo Gutierrez</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami"/>
+			<dataarea name="rom" size="0x20000">
+				<rom name="zombie near - oscar toledo gutierrez (2011) [msxdev10] [version 1.0].rom" size="0x20000" crc="9ff2eafb" sha1="ecfc5f25368c3eb9ba827f920822c047d9e1128a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zonetnt">
+		<description>Zone TNT</description>
+		<year>2011</year>
+		<publisher>AG Software</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="zone tnt - ag software (2011) [msxdev11].rom" size="0x10000" crc="e743902b" sha1="6414563c0dd0e9b3cf093d37cfb4ab5eca06f322"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+
+ Sets below are hacked games "converted" from their original format into cartridge.
+ However, we currently don't have the real dumps for these so we keep them in this format for the moment
+ They can be removed once the actual real dumps are obtained
+
+-->
+
+	<software name="wildcat">
+		<description>Wild Cat (Japan, cas2crt conversion)</description>
+		<year>1984</year>
+		<publisher>Colpax</publisher>
+		<info name="alt_title" value="ワイルドキャット"/>
+		<info name="serial" value="48C99-1006"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="wild cat - colpax (1984)[converted from tape].rom" size="0x4000" crc="04b90104" sha1="10c087e3999651b6efbad743359a4228ffc4cedc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xadrez">
+		<description>Xadrez (Brazil, cas2crt conversion)</description>
+		<year>1986</year>
+		<publisher>MSX Editorial Ltda</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="xadrez (1986)(disprosoft).rom" size="0x8000" crc="c690d9ae" sha1="3541381699a11bc384365d720c77a31c9f7ece11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xvm">
+		<description>XVM (Japan, flop2crt conversion)</description>
+		<year>1989</year>
+		<publisher>Namcot</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="xvm - namco (1989).rom" size="0x8000" crc="dafe4e75" sha1="802b4949ae57b7c9cc8f0a4df10b1dd592312c82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeta2000">
+		<description>Zeta 2000 (Japan, cas2crt conversion)</description>
+		<year>1985</year>
+		<publisher>Pixel</publisher>
+		<info name="usage" value="Requires a Japanese system."/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="zeta 2000 - pixel (1985).rom" size="0x8000" crc="3b057a42" sha1="3ffbddc453a612492f969db674d2eacb6022b232"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

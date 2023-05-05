@@ -25,6 +25,8 @@ class spu_device : public device_t, public device_sound_interface
 		dirtyflag_irq=0x04000000
 	};
 
+	sound_stream_flags m_stream_flags;
+
 protected:
 	class reverb;
 
@@ -214,6 +216,7 @@ public:
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
+	void set_stream_flags(sound_stream_flags flags) { m_stream_flags = flags; }
 
 	void dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );

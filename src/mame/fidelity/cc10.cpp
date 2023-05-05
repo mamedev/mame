@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu, Sandro Ronco, hap
 // thanks-to:Berger, Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Fidelity CC10 / Fidelity ACR
 
@@ -9,7 +9,7 @@ TODO:
 - What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
   there is no CC3 with 16 buttons, and things get glitchy in this mode.
 
-*******************************************************************************
+********************************************************************************
 
 Fidelity Chess Challenger 10 (CCX)
 -------------------
@@ -24,7 +24,7 @@ Checker Challenger (ACR) is on the same PCB, twice less RAM and the beeper gone.
 In the 1980s, Fidelity started naming it Checker Challenger "4" in some of their
 advertisements, but box and manual still simply name it Checker Challenger.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -111,9 +111,9 @@ void ccx_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // I8255 PPI
 
@@ -165,9 +165,9 @@ void ccx_state::ppi_portc_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void ccx_state::acr_map(address_map &map)
 {
@@ -219,9 +219,9 @@ void ccx_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( ccx )
 	PORT_START("IN.0")
@@ -283,13 +283,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void ccx_state::acr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ccx_state::main_trampoline);
 	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&ccx_state::acr_map).set_options(ENDIANNESS_LITTLE, 8, 16);
@@ -304,7 +304,7 @@ void ccx_state::acr(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(ccx_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(ccx_state::ppi_portc_w));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_acr);
@@ -314,12 +314,12 @@ void ccx_state::ccx(machine_config &config)
 {
 	acr(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_mainmap->set_addrmap(AS_PROGRAM, &ccx_state::ccx_map);
 
 	config.set_default_layout(layout_fidel_cc10);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 1360); // approximation, from 556 timer ic
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -328,9 +328,9 @@ void ccx_state::ccx(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( cc10 ) // model CCX, PCB label P241C-1
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -352,12 +352,12 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1978, cc10,    0,      0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1978, cc10a,   cc10,   0, ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1978, cc10,    0,      0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, cc10a,   cc10,   0,      ccx,     ccx,   ccx_state, empty_init, "Fidelity Electronics", "Chess Challenger \"10\" (model CCX)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version A
 
-CONS( 1978, checkc4, 0,      0, acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger (model ACR, 4 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1978, checkc4, 0,      0,      acr,     acr,   ccx_state, empty_init, "Fidelity Electronics", "Checker Challenger (model ACR, 4 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

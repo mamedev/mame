@@ -41,8 +41,9 @@ const tiny_rom_entry *msx_cart_easispeech_device::device_rom_region() const
 
 void msx_cart_easispeech_device::device_add_mconfig(machine_config &config)
 {
-	SP0256(config, m_speech, 3120000); // frequency unknown
-	m_speech->add_route(ALL_OUTPUTS, ":speaker", 1.00);
+	SP0256(config, m_speech, DERIVED_CLOCK(1, 1)); // appears to be connected to slot CLOCK pin
+	if (parent_slot())
+		m_speech->add_route(ALL_OUTPUTS, soundin(), 1.0);
 }
 
 std::error_condition msx_cart_easispeech_device::initialize_cartridge(std::string &message)
@@ -60,8 +61,8 @@ std::error_condition msx_cart_easispeech_device::initialize_cartridge(std::strin
 	}
 
 	page(1)->install_rom(0x4000, 0x5fff, 0x2000, cart_rom_region()->base());
-	page(2)->install_read_handler(0x8000, 0x8000, read8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
-	page(2)->install_write_handler(0x8000, 0x8000, write8smo_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
+	page(2)->install_read_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_easispeech_device::speech_r)));
+	page(2)->install_write_handler(0x8000, 0x8000, emu::rw_delegate(*this, FUNC(msx_cart_easispeech_device::speech_w)));
 
 	return std::error_condition();
 }

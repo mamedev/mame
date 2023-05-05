@@ -5022,7 +5022,7 @@ editor.prg hangs when creating a folder, [FDC] write
 		<description>Trash Heap (Europe)</description>
 		<year>1987</year>
 		<publisher>Robtek</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 First two copy protection codes are always W/16 - A/5 (verify)
 ]]></notes>
 		<info name="usage" value="Sports code wheel copy protection" />
@@ -5048,7 +5048,7 @@ First two copy protection codes are always W/16 - A/5 (verify)
 		<description>Trauma (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails [disk swap] after title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5208,7 +5208,7 @@ White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
 		<description>Universe 3 (Euro, v1.0)</description>
 		<year>1990</year>
 		<publisher>Impressions</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Fails [disk swap] when launching univers3.prg
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5262,7 +5262,7 @@ Fails [disk swap] when launching univers3.prg
 		<description>Vectorball (Europe)</description>
 		<year>1988</year>
 		<publisher>MAD</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 2 or 3 [bombs] bus error by pressing fire on title screen
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5316,7 +5316,7 @@ Fails [disk swap] when launching univers3.prg
 		<description>Wanderer 3D (Euro, Budget)</description>
 		<year>1988</year>
 		<publisher>Encore</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Unsupported optional 3d glasses
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5430,7 +5430,7 @@ Fails to recognize [disk swap] after title screen
 		<description>Where Time Stood Still (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Randomly hangs after few seconds in gameplay or doesn't recognize fire button on title screen, likely [GPIO4] irq
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5479,7 +5479,7 @@ Randomly hangs after few seconds in gameplay or doesn't recognize fire button on
 		<description>World Championship Boxing Manager (Europe)</description>
 		<year>1990</year>
 		<publisher>Krisalis</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Prompts user to insert the "other" disk, fails [disk swap]
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -5504,7 +5504,7 @@ Prompts user to insert the "other" disk, fails [disk swap]
 		<description>World Class Leader Board (Euro, Budget)</description>
 		<year>1990</year>
 		<publisher>Klassix</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Randomly hangs on main menu, [joystick] or [keyboard] becomes unresponsive, likely [GPIO4] irq
 ]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>

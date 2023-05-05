@@ -38,12 +38,10 @@ WRITE_LINE_MEMBER( bml3bus_mp1802_device::nmi_w )
 		lower_slot_nmi();
 }
 
-#define MP1802_ROM_REGION  "mp1802_rom"
-
 ROM_START( mp1802 )
-	ROM_REGION(0x10000, MP1802_ROM_REGION, 0)
+	ROM_REGION(0x800, "mp1802_rom", 0)
 	// MP-1802 disk controller ROM, which replaces part of the system ROM
-	ROM_LOAD( "mp1802.rom", 0xf800, 0x800, BAD_DUMP CRC(8d0dc101) SHA1(92f7d1cebecafa7472e45c4999520de5c01c6dbc))
+	ROM_LOAD( "mp1802.rom", 0x000, 0x800, BAD_DUMP CRC(8d0dc101) SHA1(92f7d1cebecafa7472e45c4999520de5c01c6dbc))
 ROM_END
 
 
@@ -113,7 +111,7 @@ bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, cons
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%u", 0U),
 	m_nmigate(*this, "nmigate"),
-	m_rom(nullptr)
+	m_rom(*this, "mp1802_rom")
 {
 }
 
@@ -124,18 +122,22 @@ bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, cons
 
 void bml3bus_mp1802_device::device_start()
 {
-	m_rom = memregion(MP1802_ROM_REGION)->base();
-
-	// install into memory
-	address_space &space_prg = space();
-	space_prg.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(*m_fdc, FUNC(mb8866_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8866_device::write)));
-	space_prg.install_readwrite_handler(0xff04, 0xff04, read8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
-	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
-	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
-	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);
 }
 
 void bml3bus_mp1802_device::device_reset()
 {
 	bml3_mp1802_w(0);
+}
+
+void bml3bus_mp1802_device::map_exrom(address_space_installer &space)
+{
+	space.install_rom(0xf800, 0xfeff, &m_rom[0]);
+	space.install_rom(0xfff0, 0xffff, &m_rom[0x7f0]);
+}
+
+void bml3bus_mp1802_device::map_io(address_space_installer &space)
+{
+	// install into memory
+	space.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(*m_fdc, FUNC(mb8866_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8866_device::write)));
+	space.install_readwrite_handler(0xff04, 0xff04, read8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
 }

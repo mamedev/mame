@@ -74,6 +74,8 @@ private:
 	uint8_t m_superio_cfg[0x10];
 	uint8_t m_superio_cfg_idx;
 	uint16_t m_baud_divisor;
+
+	bool m_initialized;
 };
 
 // device type definition

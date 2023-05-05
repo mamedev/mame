@@ -988,14 +988,19 @@ wtigernz                        // (c) 1996
 @source:aristocrat/aristmk6.cpp
 aristmk6                        // (c) 2000
 5drag                           // (c) 2004
+5draga                          // (c) 2004
+5dragnz                         // (c) 2005
 5dragsp                         // (c) 2004
 5dragce                         // (c) 2007
-5koipp                          // (c) 2007
+5koi                            // (c) 2007
+5koia                           // (c) 2007
 15lions                         // (c) 2004
 50lions                         // (c) 2002
-50lionsm                        // (c) 2003
+50lionsa                        // (c) 2003
+50lionsu                        // (c) 2005
 50lionrr                        // (c) 2012
 100lions                        // (c) 2006
+100lionsa                       // (c) 2006
 adonisa6                        // (c) 2005
 aduskcm                         // (c) 2001
 afterhrs                        // (c) 2004
@@ -1004,9 +1009,10 @@ atkgld                          // (c) 2007
 amzqueen                        // (c) 2001
 amztempl                        // (c) 2009
 antcleo                         // (c) 2004
-antcleom                        // (c) 2004
+antcleoa                        // (c) 2004
 apocof                          // (c) 2003
 arabnga6                        // (c) 2001
+arabnga6a                       // (c) 2001
 arabnga6u                       // (c) 2004
 arwincm                         // (c) 2003
 arish                           // (c) 2003
@@ -1015,6 +1021,7 @@ beavbuk                         // (c) 2008
 betzoo                          // (c) 2003
 bigben                          // (c) 2003
 bigbena                         // (c) 2003
+bigbenb                         // (c) 2004
 bigbenq                         // (c) 2005
 bigheart                        // (c) 1999
 bigred                          // (c) 2002
@@ -1025,10 +1032,13 @@ blkmust                         // (c) 200?
 bluetigr                        // (c) 2007
 bobdolly                        // (c) 2007
 brazil                          // (c) 2005
+brazila                         // (c) 2006
 bucaneer                        // (c) 2004
+bucaneera                       // (c) 2004
 bucaneeru                       // (c) 2005
 buckstop                        // (c) 2010
 buffalo                         // (c) 2006
+buffaloa                        // (c) 2006
 buffalou                        // (c) 2006
 bmbugs                          // (c) 2005
 bushrngr                        // (c) 2001
@@ -1041,31 +1051,36 @@ cmtonig                         // (c) 2005
 cinhell                         // (c) 2004
 corrida                         // (c) 2005
 cryspri                         // (c) 2003
-crysprim                        // (c) 2003
+cryspria                        // (c) 2003
 cryspriu                        // (c) 2006
 csd                             // (c) 2002
+csda                            // (c) 2003
 csdce                           // (c) 2003
 csdjc                           // (c) 2003
-csdm                            // (c) 2003
 csdq                            // (c) 2002
 csret                           // (c) 2006
 csdsp                           // (c) 2002
 deepfrz                         // (c) 2009
-deepfrzu                        // (c) 2009
+deepfrzu                        // (c) 2010
 deltabel                        // (c) 2005
 deltaqn                         // (c) 2004
 diamhrts                        // (c) 2007
-dimeye                          // (c) 2004
+dimeye                          // (c) 2002
 dimeyece                        // (c) 2004
+dimeyeu                         // (c) 2004
 di4ever                         // (c) 2002
 dinosa6                         // (c) 2003
 dblagent                        // (c) 2005
 dbldolph                        // (c) 2000
 dbldolphq                       // (c) 2000
+doltra6                         // (c) 2004
+doltra6nz                       // (c) 2004
 drgnlord                        // (c) 2004
 drgnmgic                        // (c) 2006
 drmcatch                        // (c) 2003
+drmcatcha                       // (c) 2004
 drmred                          // (c) 2008
+dstgold                         // (c) 2005
 eaglrock                        // (c) 2004
 estrike                         // (c) 2010
 eastland                        // (c) 2004
@@ -1075,36 +1090,50 @@ encspell                        // (c) 2007
 enchantr                        // (c) 2000
 eott                            // (c) 2000
 firednc                         // (c) 2004
+firednca                        // (c) 2005
 flamolce                        // (c) 2002
 flamoljc                        // (c) 2002
 followst                        // (c) 2000
 fortath                         // (c) 2007
+fortking                        // (c) 2006
 frogwld                         // (c) 2004
 gambjack                        // (c) 2005
 gwnn                            // (c) 2004
 geishaa6                        // (c) 2000
+geishaa6a                       // (c) 2001
+geishaa6b                       // (c) 2001
 geishajc                        // (c) 2001
 goape                           // (c) 2001
 gogreen                         // (c) 2001
+gogreena                        // (c) 2001
 goldarch                        // (c) 2005
 gldnflc                         // (c) 2003
 gldgong                         // (c) 2005
 gldgongq                        // (c) 2005
+gldgongu                        // (c) 2005
 goldinc                         // (c) 2004
 goldincu                        // (c) 2005
+goldpya6                        // (c) 2004
 goldpym                         // (c) 2002
 goldsam                         // (c) 2007
 gbmoney                         // (c) 2002
 grizzly                         // (c) 2006
 heartgld                        // (c) 2003
+heartglda                       // (c) 2004
 heartveg                        // (c) 2006
 hlntroy                         // (c) 2002
+hlntroya                        // (c) 2002
+hlntroyb                        // (c) 2002
+hlntroyc                        // (c) 2002
 hlntroyu                        // (c) 2004
 highnoon                        // (c) 2001
-holdrma                         // (c) 2002
+holdrma6                        // (c) 2002
+holdrma6a                       // (c) 2002
 househrt                        // (c) 2004
+househrta                       // (c) 2005
 incachf                         // (c) 2005
 indream                         // (c) 2001
+indreama                        // (c) 2004
 indremce                        // (c) 2002
 indremll                        // (c) 2003
 indrem2c                        // (c) 2003
@@ -1117,11 +1146,13 @@ jewelcm                         // (c) 2003
 kingnep                         // (c) 2005
 kingnile                        // (c) 2003
 kingnilea                       // (c) 2002
+kingnileb                       // (c) 2003
 kingpeng                        // (c) 2002
 kingpengsp                      // (c) 2002
 koalama6                        // (c) 2000
 kohinoor                        // (c) 2003
 lgfish                          // (c) 2006
+lgfisha                         // (c) 2006
 lemrol                          // (c) 2004
 lineking                        // (c) 2005
 lordleo                         // (c) 2002
@@ -1138,6 +1169,7 @@ metestrm                        // (c) 2007
 milkin                          // (c) 2007
 mskitty                         // (c) 2005
 mnytree                         // (c) 2000
+mnytreea                        // (c) 2001
 moonfire                        // (c) 2004
 moonwalt                        // (c) 2007
 mrwoo                           // (c) 200?
@@ -1152,10 +1184,13 @@ outbackj                        // (c) 2005
 owlcap                          // (c) 2001
 pandpays                        // (c) 2004
 parislgt                        // (c) 2001
+parislgta                       // (c) 2001
 parislgtu                       // (c) 2002
 pcockmag                        // (c) 2002
+pcockmaga                       // (c) 2002
 pcockmagu                       // (c) 2004
 pelipete                        // (c) 2004
+pelipetea                       // (c) 2005
 pelipetejc                      // (c) 2006
 pelipeteu                       // (c) 2005
 pennyar                         // (c) 2005
@@ -1163,6 +1198,7 @@ pengpyce                        // (c) 2003
 pharfor                         // (c) 2000
 phxfant                         // (c) 2005
 pirata6                         // (c) 2000
+pirata6a                        // (c) 2001
 pcbydem                         // (c) 2006
 pcfavor                         // (c) 2004
 pcgold                          // (c) 2010
@@ -1171,17 +1207,22 @@ pcorig                          // (c) 2004
 pcplat                          // (c) 2009
 pwsuper                         // (c) 200?
 pompeia6                        // (c) 2001
+pompeia6a                       // (c) 2002
 pompeia6u                       // (c) 2005
 pompeia6ua                      // (c) 2002
 prideaf                         // (c) 2005
 prophecy                        // (c) 2004
 qnilea6                         // (c) 2005
+qnilea6a                        // (c) 2005
+qnilea6b                        // (c) 2005
 qnilese                         // (c) 2001
 qnilesea                        // (c) 2001
+qnileseb                        // (c) 2001
 qnilejc                         // (c) 2002
 qnilejcsp                       // (c) 2002
 qnilemt2                        // (c) 2005
 qsheba                          // (c) 2003
+qshebaa                         // (c) 2003
 raprichs                        // (c) 2005
 redbara6                        // (c) 2002
 redbarfl                        // (c) 2003
@@ -1189,10 +1230,12 @@ redbarjc                        // (c) 2003
 reelrkfl                        // (c) 201?
 retsama6                        // (c) 2002
 roadtrip                        // (c) 2005
-ruprup                          // (c) 2002
 rubymag                         // (c) 2002
+rubymaga                        // (c) 2003
 rumbreel                        // (c) 2010
+ruprup                          // (c) 2002
 scatmag2                        // (c) 2000
+scatmag2a                       // (c) 2001
 scatmag2sa                      // (c) 2001
 scatmag3                        // (c) 2006
 sealdeal                        // (c) 2002
@@ -1201,13 +1244,16 @@ shamnmg                         // (c) 2006
 shamnmgu                        // (c) 200?
 smtma6                          // (c) 2001
 smtma6q                         // (c) 2001
-silkrda6                        // (c) 2006
+silkrda6                        // (c) 2004
+silkrda6u                       // (c) 2006
 silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
+snapshot                        // (c) 200?
 spgcarn                         // (c) 1999
 spgcarnjc                       // (c) 2003
 spgcarnq                        // (c) 2001
 spgfest                         // (c) 2008
+spgfestnz                       // (c) 2008
 stardrft                        // (c) 2003
 stardrftu                       // (c) 2004
 starqst                         // (c) 2001
@@ -1221,45 +1267,56 @@ swhr2a6                         // (c) 2005
 swh2ld                          // (c) 2002
 tahitim                         // (c) 2006
 thaiprnc                        // (c) 2002
-thaiprncm                       // (c) 2003
+thaiprnca                       // (c) 2003
 thndrhrt                        // (c) 2004
 tigress                         // (c) 2007
+tigressa                        // (c) 2007
 tikitalk                        // (c) 2007
-tiktorch                        // (c) 2001
+tiktorch                        // (c) 2003
+tiktorchnz                      // (c) 2003
 timbwolf                        // (c) 200?
 topshta6                        // (c) 2002
 torgods                         // (c) 2000
+torgodsa                        // (c) 2004
 toprdice                        // (c) 2001
-trsking                         // (c) 200?
+trsking                         // (c) 2006
 turtreas                        // (c) 2006
+turtreasa                       // (c) 2006
 venetian                        // (c) 2002
 venice                          // (c) 2004
+wcougpp                         // (c) 2006
 werewild                        // (c) 2009
 werewildq                       // (c) 2010
 whalecsh                        // (c) 2002
 whalecshu                       // (c) 2003
 whalecshua                      // (c) 2005
 wheregld                        // (c) 2004
-wheregldsp                      // (c) 2004
-wheregldm                       // (c) 2004
+whereglda                       // (c) 2004
+wheregldb                       // (c) 2004
 wheregldq                       // (c) 2005
+wheregldsp                      // (c) 2004
 whtwater                        // (c) 2003
 wikwin2                         // (c) 2006
+wingoly                         // (c) 2004
+wingolyu                        // (c) 2005
 wldafr                          // (c) 2002
 wldcata6                        // (c) 2006
+wldcata6a                       // (c) 2007
 wldgoos                         // (c) 2003
+wldgoosa                        // (c) 2003
 wgorilla                        // (c) 2009
 wldpanda                        // (c) 2006
+wldpandaa                       // (c) 2006
 wldpanth                        // (c) 2004
 wldstall                        // (c) 2006
 wtepee                          // (c) 2007
 wwaratah                        // (c) 2006
 wwaratahsp                      // (c) 2006
 wways                           // (c) 2002
-wwaysm                          // (c) 2003
+wwaysa                          // (c) 2003
 wzwaysll                        // (c) 2003
-wingoly                         // (c) 2005
 zorroa6                         // (c) 2003
+zorroa6a                        // (c) 2006
 zorroa6u                        // (c) 2005
 
 @source:aristocrat/caswin.cpp
@@ -14795,6 +14852,10 @@ ax145                           // Brother AX-145 (c) 198? Brother Industries, L
 @source:brother/lw30.cpp
 lw30                            // Brother LW-30 (c) 1991 Brother Industries, Ltd.
 
+@source:brother/lw350.cpp
+lw350                           // Brother LW-350 (c) 1995 Brother Industries, Ltd.
+lw450                           // Brother LW-450 (c) 1992 Brother Industries, Ltd.
+
 @source:brother/lw700i.cpp
 lw700i                          // (c) 1995 Brother
 
@@ -17827,6 +17888,7 @@ jolycdii                        // 1993 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
+jolygame                        // 1983 bootleg
 jolyjokr                        // (c) 198? Impera
 jolyjokra                       // (c) 198? Impera
 jolyjokrb1                      // (c) 1985 Impera
@@ -17835,6 +17897,8 @@ jolyjokrc                       // (c) 198? Apple Time
 jolyjokrm                       // (c) 198? Impera
 jolyjokro                       // (c) 198? Impera
 jolyjokrp                       // (c) 198? Impera
+jolyjokrs                       // (c) 198? Impera (Otti Karl logo)
+jolyjokrt                       // (c) 198? Impera (Otti Karl logo)
 lluck3x3                        // (c) 1991 TAB-Austria
 lluck4x1                        // (c) 1991 TAB-Austria
 lunapark                        // 1998 unknown.
@@ -17846,6 +17910,7 @@ magicrd2a                       // (c) 1996 Impera
 magicrd2b                       // (c) 1996 Impera
 magicrd2c                       // (c) 1996 Impera
 megacard                        // (c) 1993 Fun World
+megacarda                       // (c) 1992 Fun World
 mongolnw                        // 199? bootleg
 multiwin                        // (c) 1992 Fun World
 multiwina                       // (c) 1991 Fun World
@@ -17853,6 +17918,8 @@ multiwinb                       // (c) 2001 Amatic
 nevadafw                        // 199? unknown
 nkoulit                         // 1995 JK Amusement
 novoplay                        // (c) 1986 Novomatic
+novoplaya                       // (c) 1991 Novomatic
+novoplayb                       // (c) 1991 Novomatic
 pool10                          // (c) 1996 C.M.C.
 pool10b                         // (c) 1996 C.M.C.
 pool10c                         // (c) 1996 C.M.C.
@@ -18844,6 +18911,10 @@ txmenpx                         // Tiger
 vespovar                        // Elektronika
 vfutbol                         // Elektronika
 
+@source:handheld/hh_smc1k.cpp
+tkkongq                         // Tiger
+tlluke2                         // Tiger
+
 @source:handheld/hh_tms1k.cpp
 alphie                          // Playskool
 arcmania                        // Milton Bradley
@@ -18930,6 +19001,7 @@ ssimon                          // Milton Bradley
 ssports4                        // US Games
 starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
+starwlb                         // Kenner
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
 subwars                         // Tiger Electronics
@@ -20592,6 +20664,7 @@ pexmp017a                       // (c) 1997 IGT - International Game Technology
 pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
+sv1pf434                        // (c) 1992 IGT - International Game Technology
 
 @source:igt/splus.cpp
 spset005                        // (c) 1993 IGT - International Game Technology
@@ -23310,6 +23383,9 @@ gijoej                          // GX069 (c) 1991 (Japan)
 gijoeu                          // GX069 (c) 1991 (US)
 gijoeua                         // GX069 (c) 1991 (US)
 
+@source:konami/goldenregion.cpp
+glregion
+
 @source:konami/gradius3.cpp
 gradius3                        // GX945 (c) 1989 (World)
 gradius3a                       // GX945 (c) 1989 (Asia)
@@ -24409,6 +24485,13 @@ adm31                           //
 
 @source:learsiegler/adm36.cpp
 adm36                           //
+
+@source:liberty/freedom120.cpp
+free120                         // (c) 1993 Liberty Electronics
+
+@source:liberty/freedom200.cpp
+free200                         // (c) 1983 Liberty Electronics
+free220                         // (c) 1984 Liberty Electronics
 
 @source:lsi/m3.cpp
 m3                              //
@@ -26803,6 +26886,7 @@ spaceph                         // Zilec Games
 spacerng                        // bootleg
 spacewr3                        // bootleg
 spacmiss                        // bootleg?
+spcebttl                        // bootleg
 spceking                        // (c) 1978 Leijac Corporation (Konami)
 spcewarl                        // (c) 1979 Leijac Corporation (Konami)
 spcewarla                       //
@@ -31248,6 +31332,9 @@ version4v                       // (c) 2006 Amcoe
 version4v2                      // (c) 2006 Amcoe
 version4v3                      // (c) 2006 Amcoe
 
+@source:misc/shambros.cpp
+shambros
+
 @source:misc/shangkid.cpp
 chinhero                        // (c) 1984 Taiyo
 chinhero2                       // (c) 1984 Taiyo
@@ -32227,6 +32314,7 @@ ncv2j                           // (c) 1996 (Japan)
 abcheck                         // (c) 1996 (Japan)
 
 @source:namco/namcops2.cpp
+acedriv3                        //
 bldyr3b                         //
 cobrata                         //
 dragchrn                        //
@@ -32393,33 +32481,42 @@ sws93                           // (c) 1993 (Japan)
 valkyrie                        // (c) 1989 (Japan)
 
 @source:namco/namcos10.cpp
+ballpom                         // 2005.02 Ball Pom Line
 chocovdr                        // 2002.10 Uchuu Daisakusen : Chocovader Contactee
-g13jnc                          // 2001.?? Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)
+g13jnr                          // 2001.07 Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)
+gahaha                          // 2000.03 GAHAHA Ippatsudou (World, GID2 Ver.A)
+gahaha2                         // 2001.09 GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)
 gamshara                        // 2002.08 Gamshara (10021 Ver.A)
-gamsharaj                       // 2002.08 Gamshara (10021 Ver.A)
-gegemdb                         // 2007.?? Gegege no Kitarō Yōkai Yokochō Matsuri De Batoru Ja (GYM1 Ver.A)
-gjspace                         // 2001.12 Gekitoride-Jong Space (10011 Ver.A)
+gamsharao                       // 2002.08 Gamshara (10021 Ver.A)
+gegemdb                         // 2007.12 Gegege no Kitarō Yōkai Yokochō Matsuri de Battle Ja (GYM1 Ver.A)
+gjspace                         // 2001.12 GekiToride-Jong Space (10011 Ver.A)
 gunbalina                       // 2000.12 Gunbalina (GNN1 Ver.A)
-kd2001                          // 2001.1? Knock Down 2001 (KD11 Ver.B)
-keroro                          // 2006.?? Keroro Gunso Chikyu Shinryaku Shirei Dearimasu! (KRG1 Ver.A)
+kd2001                          // 2001.11 Knock Down 2001 (KD11 Ver.B)
+keroro                          // 2006.08 Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)
 knpuzzle                        // 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
-konotako                        // 2003.?? Kono e Tako (10021 Ver.A)
-mrdrilr2                        // 2000.?? Mr Driller 2 (DR22 Ver.A)
+konotako                        // 2003.11 Kono e Tako (10021 Ver.A)
+medalnt                         // 2005.04 Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)
+medalnt2                        // 2007.02 Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)
+mrdrilr2                        // 2000.07 Mr Driller 2 (DR22 Ver.A)
 mrdrilr2j                       // 2000.07 Mr Driller 2 (DR21 Ver.A)
-mrdrilr2u                       // 2000.?? Mr Driller 2 (DR23 Ver.A)
+mrdrilr2u                       // 2000.07 Mr Driller 2 (DR23 Ver.A)
 mrdrilrg                        // 2001.03 Mr. Driller G (DRG1 Ver.A)
-mrdrilrga                       // 2001.03 Mr. Driller G ALT (DRG1 Ver.A)
 nflclsfb                        // 2003.?? NFL Classic Football
+nicetsuk                        // 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)
 pacmball                        // 2003.?? Pacman Ball
-panikuru                        // 2002.03 Panicuru Panekuru
+panikuru                        // 2002.03 Panikuru Panekuru
 ptblank3                        // 2000.12 Point Blank 3 (GNN2 Ver.A)
 puzzball                        // 2002.02 Puzz Ball (Japan, PZB1 Ver.A)
-sekaikh                         // 2004.0? Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
-sekaikha                        // 2004.04 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+sekaikh                         // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.B)
+sekaikha                        // 2004.03 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)
+squizchs                        // 2003.03 Seishun-Quiz Colorful High School (CHS1 Ver.A)
 startrgn                        // 2002.07 Star Trigon (STT1 Ver.A)
-taiko6                          // 2004.?? Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
-unks10md                        // 200?.?? unknown Namco System 10 medal game (MTL1 SPRB0)
-unks10md2                       // 2005.02 unknown Namco System 10 medal game
+sugorotc                        // 2002.02 Sugorotic JAPAN (STJ1 Ver.C)
+taiko2                          // 2001.08 Taiko no Tatsujin 2 (Japan, TK21 Ver.C)
+taiko3                          // 2002.03 Taiko no Tatsujin 3 (Japan, TK31 Ver.A)
+taiko4                          // 2002.12 Taiko no Tatsujin 4 (Japan, TK41 Ver.A)
+taiko5                          // 2003.10 Taiko no Tatsujin 5 (Japan, TK51 Ver.A)
+taiko6                          // 2004.07 Taiko no Tatsujin 6 (Japan, TK61 Ver.A)
 
 @source:namco/namcos11.cpp
 danceyes                        // 1996.09 Dancing Eyes (World, DC2/VER.B)
@@ -32427,6 +32524,7 @@ danceyesu                       // 1996.10 Dancing Eyes (US, DC3/VER.C)
 danceyesj                       // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
 dunkmnia                        // 1996.05 Dunk Mania (World, DM2/VER.C)
 dunkmniajc                      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
+fambowl                         // 1997.?? Family Bowl (Ver. 1.00)
 gunbarla                        // 1999.?? Gunbarl (Japan, GNB1/VER.A)
 myangel3                        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
 pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
@@ -35729,6 +35827,7 @@ tmnt_101                        //
 tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
+tmnt_a07                        //
 tomy_102                        //
 tomy_102be                      //
 tomy_300h                       //
@@ -37578,6 +37677,7 @@ mjgtaste                        // (c) 2002
 s1945ii                         // (c) 1997
 s1945iii                        // (c) 1999
 s1945iiibl                      // bootleg
+s1945iiibla                     // bootleg
 sbomber                         // (c) 1998
 sbombera                        // (c) 1998
 soldivid                        // (c) 1997
@@ -38008,6 +38108,9 @@ st1714                          //
 @source:sega/angelkds.cpp
 angelkds                        // 833-6599 (c) 1988 Sega / Nasco?
 spcpostn                        // (c) 1986 Sega / Nasco
+
+@source:sega/anyworks.cpp
+unkanyw
 
 @source:sega/bingoc.cpp
 bingoc                          // (c) 1989 Sega
@@ -38893,7 +38996,10 @@ transfrm                        // 834-5803 (c) 1986
 
 @source:sega/segafruit.cpp
 m3001
+m3004
 m4001
+m4002
+m5001
 
 @source:sega/segag80r.cpp
 005                             // (c) 1981
@@ -39172,6 +39278,7 @@ wb33                            // (c) 1988 Sega / Westone (FD1094)
 wb33d                           //
 wb34                            // (c) 1988 Sega / Westone (FD1094)
 wb34d                           //
+wfishing                        // (c) 1996 (Unprotected)
 wrestwar                        // (c) 1989 (8751)
 wrestwar1                       // (c) 1989 (FD1094)
 wrestwar1d                      //
@@ -39348,6 +39455,7 @@ dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
+isshoni                         // 2008.?? Isshoni Wanwan Waiwai Puppy 2008
 huhimage                        // 2019.01 Heat Up Hockey Image (Ver.1.003R)
 kingyo                          // 2009.10 Yataimura Kingyosukui (1-player, Japan, Ver 1.005)
 kingyoch                        // 2009.03 Yataimura Kingyosukui (4-player, China, Ver 1.000)
@@ -40911,9 +41019,6 @@ fc100                           //
 @source:skeleton/fk1.cpp
 fk1                             //
 
-@source:skeleton/freedom120.cpp
-free120                         // (c) 1993 Liberty Electronics
-
 @source:skeleton/fs3216.cpp
 fs3216                          //
 
@@ -41221,6 +41326,9 @@ sagitta180                      // 1979?
 
 @source:skeleton/seattlecmp.cpp
 scp300f                         // Seattle SCP-300F
+
+@source:skeleton/semcrossw.cpp
+semcrossw                       // Semaphore controller from Etra
 
 @source:skeleton/sh4robot.cpp
 sh4robot                        //
@@ -43578,6 +43686,10 @@ ti990_4v                        // 1976 TI 990/4 with video display terminal
 990189                          // 1978 TM 990/189
 990189v                         // 1980 TM 990/189 with Color Video Board
 
+@source:tiger/bingobear.cpp
+bbear
+monkmonk
+
 @source:tiger/gamecom.cpp
 gamecom                         // Tiger Game.com
 
@@ -43686,6 +43798,7 @@ bgaregganv                      // (c) 1996 Raizing/8ing
 bgareggat                       // (c) 1996 Raizing/8ing
 bgareggat2                      // (c) 1996 Raizing/8ing
 bgareggatw                      // (c) 1996 Raizing/8ing
+burgkids                        // (c) 1995 Sunwise
 dogyuun                         // TP-022 (c) 1992 Toaplan
 dogyuuna                        // TP-022 (c) 1992 Toaplan
 dogyuunb                        // TP-022 (c) 1992 Toaplan
@@ -44852,7 +44965,8 @@ crshrace2a                      // (c) 1993 Video System Co.
 f1gp                            // (c) 1991 Video System Co.
 f1gp2                           // (c) 1992 Video System Co.
 f1gpa                           // (c) 1991 Video System Co.
-f1gpb                           // bootleg
+f1gpb                           // (c) 1991 Video System Co.
+f1gpbl                          // bootleg
 
 @source:vsystem/fromanc2.cpp
 fromanc2                        // (c) 1995 Video System Co. (Japan)
@@ -45230,14 +45344,29 @@ psr40                           // 1985 PSR-40
 psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
+@source:yamaha/ympsr150.cpp
+psr110                          // 1993
+psr150                          // 1992
+psr180                          // 1994
+psr75                           // 1992
+psr76                           // 1994
+psr78                           // 1996
+pss11                           // 1992
+pss12                           // 1994
+pss21                           // 1992
+pss31                           // 1992
+pss6                            // 1994
+
+@source:yamaha/ympsr260.cpp
+psr160                          // 2000
+psr260                          // 2000
+psr79                           // 1998
+
 @source:yamaha/ympsr340.cpp
 psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
-
-@source:yamaha/ympss12.cpp
-pss12                           //
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

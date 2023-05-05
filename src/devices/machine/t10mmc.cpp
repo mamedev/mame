@@ -345,11 +345,17 @@ void t10mmc::ExecCommand()
 			break;
 		}
 
+		// [4] track start
+		// [5] index start
+		// [7] track end
+		// [8] index end
 		if (command[4] > command[7])
 		{
 			// TODO: check error
 			set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_STOPPED_DUE_TO_ERROR);
 			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+
+			m_device->logerror("Error: start TNO (%d,%d) > end TNO (%d,%d)\n", command[4], command[5], command[7], command[8]);
 		}
 		else
 		{
@@ -360,12 +366,16 @@ void t10mmc::ExecCommand()
 			if (end_track > command[7])
 				end_track = command[7];
 
-			// HACK: assume index 0 & 1 means beginning of track and anything else means end of track
-			if (command[8] <= 1)
-				end_track--;
+			// konamigv lacrazyc just sends same track start/end
+			if (command[4] != command[7] && command[5] != command[8])
+			{
+				// HACK: assume index 0 & 1 means beginning of track and anything else means end of track
+				if (command[8] <= 1)
+					end_track--;
 
-			if (m_sotc)
-				end_track = command[4];
+				if (m_sotc)
+					end_track = command[4];
+			}
 
 			m_lba = m_cdrom->get_track_start(command[4] - 1);
 			m_blocks = m_cdrom->get_track_start(end_track) - m_lba;
@@ -376,6 +386,7 @@ void t10mmc::ExecCommand()
 				m_cdda->start_audio(m_lba, m_blocks);
 				m_audio_sense = SCSI_SENSE_ASC_ASCQ_AUDIO_PLAY_OPERATION_IN_PROGRESS;
 				m_status_code = SCSI_STATUS_CODE_GOOD;
+				m_device->logerror("Starting audio TNO %d LBA %d blocks %d\n", trk, m_lba, m_blocks);
 			}
 			else
 			{
@@ -506,6 +517,71 @@ void t10mmc::ExecCommand()
 		m_transfer_length = 0;
 		break;
 
+	case T10MMC_CMD_READ_CD:
+	{
+		if (m_cdrom == nullptr)
+		{
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
+		// TODO: Implement reladr bit, flag bits, test and handle other conditions besides reads to "any type" sector types
+		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
+		m_blocks = command[6]<<16 | command[7]<<8 | command[8];
+
+		// m_device->logerror("T10MMC: READ CD start_lba[%08x] block_len[%06x] %02x %02x %02x %02x\n", m_lba, m_blocks, command[1], command[9], command[10], command[11]);
+
+		auto expected_sector_type = BIT(command[1], 2, 3);
+		auto trk = m_cdrom->get_track(m_lba);
+		auto track_type = m_cdrom->get_track_type(trk);
+		if (expected_sector_type != 0)
+		{
+			m_device->logerror("T10MMC: READ CD requested a sector type of %d which is unhandled\n", expected_sector_type);
+
+			if ((expected_sector_type == 1 && track_type != cdrom_file::CD_TRACK_AUDIO)
+			|| (expected_sector_type == 2 && track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW)
+			|| (expected_sector_type == 3 && track_type != cdrom_file::CD_TRACK_MODE2 && track_type != cdrom_file::CD_TRACK_MODE2_RAW)
+			|| (expected_sector_type == 4 && track_type != cdrom_file::CD_TRACK_MODE2_FORM1)
+			|| (expected_sector_type == 5 && track_type != cdrom_file::CD_TRACK_MODE2_FORM2))
+			{
+				set_sense(SCSI_SENSE_KEY_ILLEGAL_REQUEST, SCSI_SENSE_ASC_ASCQ_ILLEGAL_MODE_FOR_THIS_TRACK);
+
+				m_phase = SCSI_PHASE_STATUS;
+				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+				m_transfer_length = 0;
+				break;
+			}
+		}
+
+		if ((track_type != cdrom_file::CD_TRACK_MODE1 && track_type != cdrom_file::CD_TRACK_MODE1_RAW) || command[9] != 0x10)
+		{
+			// TODO: Only mode 1 user data reads are supported for now
+			m_device->logerror("T10MMC: READ CD called with unimplemented parameters\n");
+
+			m_phase = SCSI_PHASE_STATUS;
+			m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
+			m_transfer_length = 0;
+			break;
+		}
+
+		if (m_num_subblocks > 1)
+		{
+			m_cur_subblock = m_lba % m_num_subblocks;
+			m_lba /= m_num_subblocks;
+		}
+		else
+		{
+			m_cur_subblock = 0;
+		}
+
+		m_phase = SCSI_PHASE_DATAIN;
+		m_status_code = SCSI_STATUS_CODE_GOOD;
+		m_transfer_length = m_blocks * m_sector_bytes;
+		break;
+	}
+
 	default:
 		t10spc::ExecCommand();
 	}
@@ -555,6 +631,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SBC_CMD_READ_10:
 	case T10SBC_CMD_READ_12:
+	case T10MMC_CMD_READ_CD: // TODO: Will need its own logic once more support is implemented
 		//m_device->logerror("T10MMC: read %x dataLength lba=%x\n", dataLength, m_lba);
 		if ((m_cdrom) && (m_blocks))
 		{
@@ -881,8 +958,8 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
 				m_device->logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
-				m_cdda->set_output_gain(0, data[17] / 255.0f);
-				m_cdda->set_output_gain(1, data[19] / 255.0f);
+				m_cdda->set_output_gain(0, data[9] / 255.0f);
+				m_cdda->set_output_gain(1, data[11] / 255.0f);
 				break;
 		}
 		break;

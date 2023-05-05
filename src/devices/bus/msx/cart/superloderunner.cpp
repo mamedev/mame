@@ -16,7 +16,7 @@ msx_cart_superloderunner_device::msx_cart_superloderunner_device(const machine_c
 void msx_cart_superloderunner_device::device_start()
 {
 	// Install evil system wide memory write handler
-	memory_space().install_write_handler(0x0000, 0x0000, write8smo_delegate(*this, FUNC(msx_cart_superloderunner_device::bank_w)));
+	memory_space().install_write_handler(0x0000, 0x0000, emu::rw_delegate(*this, FUNC(msx_cart_superloderunner_device::bank_w)));
 }
 
 std::error_condition msx_cart_superloderunner_device::initialize_cartridge(std::string &message)

@@ -581,6 +581,19 @@ void psikyosh_state::s1945iiibl_map(address_map &map)
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x200000); // data ROM
 }
 
+void psikyosh_state::s1945iiibla_map(address_map &map)
+{
+	ps5_map(map);
+
+	map(0x04003000, 0x040031ff).ram().share("zoomram");
+	map(0x04030000, 0x040301ff).ram(); // fails RAM test otherwise
+	map(0x04053fdc, 0x04053fdf).nopr().w(FUNC(psikyosh_state::irqctrl_w));
+	map(0x04053fe0, 0x04053fff).ram().w(FUNC(psikyosh_state::vidregs_w)).share("vidregs");
+	map(0x0405ffdc, 0x0405ffdf).unmaprw();
+	map(0x0405ffe0, 0x0405ffff).unmaprw();
+}
+
+
 static INPUT_PORTS_START( common )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -785,7 +798,7 @@ static INPUT_PORTS_START( mjgtaste )
 	PORT_CONFSETTING(          0x00000000, DEF_STR( Joystick ) )
 	PORT_CONFSETTING(          0x00000001, "Mahjong Panel" )
 
-	PORT_START("MAHJONG") /* articifial enumeration for mahjong encoder */
+	PORT_START("MAHJONG") /* artificial enumeration for mahjong encoder */
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_PLAYER(1)
@@ -883,6 +896,16 @@ void psikyosh_state::s1945iiibl(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::s1945iiibl_map);
+
+	// TODO: this uses a YMF268-F sound chip. Seems compatible with YMF278B but verify if it has differences.
+}
+
+void psikyosh_state::s1945iiibla(machine_config &config)
+{
+	psikyo5(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::s1945iiibla_map);
 
 	// TODO: this uses a YMF268-F sound chip. Seems compatible with YMF278B but verify if it has differences.
 }
@@ -1137,6 +1160,34 @@ ROM_START( s1945iiibl ) // BM1045 PCB - has HD6417098 CPU + YMF268-F sound chip 
 	ROM_LOAD( "eeprom-s1945iii.bin", 0x0000, 0x0100, CRC(b39f3604) SHA1(d7c66210598096fcafb20adac2f0b293755f4926) )
 ROM_END
 
+ROM_START( s1945iiibla ) // SK000420 PCB
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD32_WORD_SWAP( "u3", 0x000002, 0x080000, CRC(c111ed1a) SHA1(45125287641373f7b9184846de9b4b9262cbf602) ) // 27C240 EPROM with no lables, marked in pencil as 1, 2 & 3
+	ROM_LOAD32_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(f67016d0) SHA1(3b52690c450524d54a0c74639049f1b648b6ceb9) )
+	ROM_LOAD16_WORD_SWAP( "u2", 0x100000, 0x080000, CRC(4922685b) SHA1(9af39abeed55459981d6dd74aaeff35293c66892) )
+
+	ROM_REGION( 0x3800000, "gfx1", 0 ) // data verified same as original PCB
+	ROM_LOAD32_WORD( "0l",  0x0000000, 0x800000, CRC(70a0d52c) SHA1(c9d9534da59123b577dc22020273b94ccdeeb67d) ) // mask ROMs with silkscreened labels
+	ROM_LOAD32_WORD( "0h",  0x0000002, 0x800000, CRC(4dcd22b4) SHA1(2df7a7d08df17d2a62d574fccc8ba40aaae21a13) )
+	ROM_LOAD32_WORD( "1l",  0x1000000, 0x800000, CRC(de1042ff) SHA1(468f6dfd5c1f2084c573b6851e314ff2826dc350) )
+	ROM_LOAD32_WORD( "1h",  0x1000002, 0x800000, CRC(b51a4430) SHA1(b51117591b0e351e922f9a6a7930e8b50237e54e) )
+	ROM_LOAD32_WORD( "2l",  0x2000000, 0x800000, CRC(23b02dca) SHA1(0249dceca02b312301a917d98fac481b6a0a9122) )
+	ROM_LOAD32_WORD( "2h",  0x2000002, 0x800000, CRC(9933ab04) SHA1(710e6b20e111c1898666b4466554d039309883cc) )
+	ROM_LOAD32_WORD( "3ll", 0x3000000, 0x400000, CRC(f693438c) SHA1(d70e25a3f56aae6575c696d9b7b6d7a9d04f0104) )
+	ROM_LOAD32_WORD( "3hl", 0x3000002, 0x400000, CRC(2d0c334f) SHA1(74d94abb34484c7b79dbb989645f53124e53e3b7) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // data verified same as original PCB
+	ROM_LOAD( "sound.u9", 0x000000, 0x400000, CRC(c5374beb) SHA1(d13e12cbd249246d953c45bb3bfa576a0ec75595) )
+
+	ROM_REGION( 0x100, "eeprom", 0 )
+	ROM_LOAD( "eeprom-s1945iii.bin", 0x0000, 0x0100, CRC(b39f3604) SHA1(d7c66210598096fcafb20adac2f0b293755f4926) )
+
+	ROM_REGION( 0x0400, "pals", 0 )
+	ROM_LOAD( "gal16v8d_1", 0x0000, 0x0117, CRC(efac207d) SHA1(0e1ada029a90efbc557cad1b0ec81b7904e69bd4) ) // GAL16V8D - bruteforced
+	ROM_LOAD( "gal16v8d_2", 0x0200, 0x0117, CRC(72afa479) SHA1(959129da59d254c60e6e0e1061512d14a62ee2bf) ) // GAL16V8D - bruteforced
+
+ROM_END
+
 /* PS5v2 */
 
 ROM_START( dragnblz )
@@ -1333,7 +1384,7 @@ void psikyosh_state::init_s1945iiibl()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_maincpu->sh2drc_add_fastram(0x04000000, 0x0400ffff, 0, &m_spriteram[0]);
-	//m_maincpu->sh2drc_add_fastram(0x04003000, 0x040031ff, 0, &m_zoomram[0]); // zoomram is in spriteram here
+	m_maincpu->sh2drc_add_fastram(0x04003000, 0x040031ff, 0, &m_zoomram[0]); // zoomram is in spriteram here
 	m_maincpu->sh2drc_add_fastram(0x06000000, 0x060fffff, 0, &m_ram[0]);
 }
 
@@ -1352,7 +1403,8 @@ GAME( 1998, sbombera,   sbomber,  psikyo3v1,       sbomber,   psikyosh_state, in
 GAME( 1998, gunbird2,   0,        psikyo5,         gunbird2,  psikyosh_state, init_ps5,        ROT270, "Psikyo",  "Gunbird 2 (set 1)",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gunbird2a,  gunbird2, psikyo5,         gunbird2,  psikyosh_state, init_ps5,        ROT270, "Psikyo",  "Gunbird 2 (set 2)",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, s1945iii,   0,        psikyo5,         s1945iii,  psikyosh_state, init_ps5,        ROT270, "Psikyo",  "Strikers 1945 III (World) / Strikers 1999 (Japan)",                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, s1945iiibl, s1945iii, s1945iiibl,      s1945iii,  psikyosh_state, init_s1945iiibl, ROT270, "bootleg", "Strikers 1945 III (World) / Strikers 1999 (Japan) (bootleg)",           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites don't show up in
+GAME( 1999, s1945iiibl, s1945iii, s1945iiibl,      s1945iii,  psikyosh_state, init_s1945iiibl, ROT270, "bootleg", "Strikers 1945 III (World) / Strikers 1999 (Japan) (bootleg, set 1)",    MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites don't show up if MAME is started without debugger active
+GAME( 1999, s1945iiibla,s1945iii, s1945iiibla,     s1945iii,  psikyosh_state, init_s1945iiibl, ROT270, "bootleg", "Strikers 1945 III (World) / Strikers 1999 (Japan) (bootleg, set 2)",    MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites don't show up if MAME is started without debugger active
 
 /* ps5v2 */
 GAME( 2000, dragnblz,   0,        psikyo5,         dragnblz,  psikyosh_state, init_ps5,        ROT270, "Psikyo",  "Dragon Blaze",                                                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

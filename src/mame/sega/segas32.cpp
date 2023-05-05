@@ -540,6 +540,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "315_5296.h"
+#include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
 #include "speaker.h"
@@ -2498,13 +2499,13 @@ void segas32_cd_state::lamps2_w(uint8_t data)
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
 {
-	printf("%02x IRQ\n",state);
+	//printf("%02x IRQ\n",state);
 	// TODO: sent!
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 {
-	printf("%02x DRQ\n",state);
+	//printf("%02x DRQ\n",state);
 }
 
 void segas32_state::system32_cd_map(address_map &map)
@@ -2527,7 +2528,12 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("cdrom", NSCSI_CDROM).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+		});
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
@@ -2539,7 +2545,7 @@ void segas32_cd_state::device_add_mconfig(machine_config &config)
 		{
 			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(8000000);
+			spc.set_clock(8_MHz_XTAL);
 			spc.out_irq_callback().set(*this, FUNC(segas32_cd_state::scsi_irq_w));
 			spc.out_dreq_callback().set(*this, FUNC(segas32_cd_state::scsi_drq_w));
 		});
@@ -5968,7 +5974,7 @@ GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_ne
 GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z: V.R. V.S. (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS)
 
 GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US, Rev A)", MACHINE_IMPERFECT_GRAPHICS )

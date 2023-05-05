@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton, Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 Entex Select-A-Game Machine, handheld game console.
 Technically, the main unit is the peripheral(buttons, display, speaker, power),
@@ -21,7 +21,7 @@ orientation can be rotated in the video options. By default, the "visitor" side
 is at the bottom. This is how most of the games are played, Space Invader 2 is
 an exception.
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -91,9 +91,9 @@ void sag_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge Init
-******************************************************************************/
+*******************************************************************************/
 
 DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 {
@@ -149,9 +149,9 @@ DEVICE_IMAGE_LOAD_MEMBER(sag_state::cart_load)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // main unit
 
@@ -239,9 +239,9 @@ u8 sag_state::tms1k_read_k()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( sag ) // P1 = Visitor (left side), P2 = Home (right side)
 	PORT_START("IN.0")
@@ -287,13 +287,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void sag_state::sag(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD38800(config, m_hmcs40_cpu, 0);
 	m_hmcs40_cpu->write_r<0>().set(FUNC(sag_state::hmcs40_write_r));
 	m_hmcs40_cpu->write_r<1>().set(FUNC(sag_state::hmcs40_write_r));
@@ -307,16 +307,16 @@ void sag_state::sag(machine_config &config)
 	m_tms1k_cpu->write_r().set(FUNC(sag_state::tms1k_write_r));
 	m_tms1k_cpu->write_o().set(FUNC(sag_state::tms1k_write_o));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+6, 14);
 	m_display->set_segmask(0x3f00, 0x7f);
 	config.set_default_layout(layout_sag);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "sag_cart");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(sag_state::cart_load));
@@ -326,9 +326,9 @@ void sag_state::sag(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( sag )
 	// nothing here yet, ROM is on the cartridge
@@ -342,9 +342,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, sag,  0,      0, sag,    sag,   sag_state, empty_init, "Entex", "Select-A-Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, sag,  0,      0,      sag,     sag,   sag_state, empty_init, "Entex", "Select-A-Game Machine", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

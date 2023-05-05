@@ -366,7 +366,7 @@ void wd_fdc_device_base::command_end()
 	main_state = sub_state = IDLE;
 	motor_timeout = 0;
 
-	if(!drq && (status & S_BUSY)) {
+	if(status & S_BUSY) {
 		if (!t_cmd->enabled()) {
 			status &= ~S_BUSY;
 		}
@@ -1094,6 +1094,7 @@ void wd_fdc_device_base::interrupt_start()
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
+		drop_drq();
 	}
 
 	intrq_cond = command & 0x0f;
@@ -2046,7 +2047,7 @@ void wd_fdc_device_base::live_run(attotime limit)
 				//FM Prefix match
 				if(cur_live.shift_reg_low<17>() == 0xabd5) { // 17-bit match
 					cur_live.data_separator_phase = false;
-					cur_live.bit_counter = 5*2;	// prefix is 5 of 8 bits
+					cur_live.bit_counter = 5*2; // prefix is 5 of 8 bits
 					cur_live.data_reg = 0xff;
 					break;
 				} else if(cur_live.bit_counter == 16) {

@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-/******************************************************************************
+/*******************************************************************************
 
 AVR-Max Chess Computer, aka "SHAH"
 In Germany it was named AVR-Max-Schachzwerg
@@ -41,7 +41,7 @@ TODO:
 - AVR8 SLEEP opcode is not working, it's used for power-saving here and was
   harmless to hack out, but needs to be put back when it's emulated
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -111,9 +111,9 @@ void avrmax_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // common
 
@@ -199,9 +199,9 @@ void avrmax_state::lcd_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void avrmax_state::main_map(address_map &map)
 {
@@ -215,9 +215,9 @@ void avrmax_state::data_map(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( avrmax )
 	PORT_START("IN.0")
@@ -243,9 +243,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void avrmax_state::base(machine_config &config)
 {
@@ -293,9 +293,9 @@ void avrmax_state::atm18mcc(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( avrmax )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -361,13 +361,13 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME       PARENT   CMP MACHINE   INPUT   STATE         INIT        COMPANY, FULLNAME, FLAGS
-CONS( 2009, avrmax,    0,        0, avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 2009, avrmaxg,   avrmax,   0, avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 2009, avrmax,    0,        0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 2009, avrmaxg,   avrmax,   0,      avrmax,   avrmax, avrmax_state, empty_init, "Elektor", "AVR-Max-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // German 'text'
 
-CONS( 2009, atm18mcc,  0,        0, atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "ATM18 Mini Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 2009, cc2schach, atm18mcc, 0, atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "CC2-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 2009, atm18mcc,  0,        0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "ATM18 Mini Chess Computer (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 2009, cc2schach, atm18mcc, 0,      atm18mcc, avrmax, avrmax_state, empty_init, "Elektor", "CC2-Schachzwerg (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )

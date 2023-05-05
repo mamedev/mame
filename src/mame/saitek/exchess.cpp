@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/******************************************************************************
+/*******************************************************************************
 
 SciSys Executive Chess, handheld chesscomputer.
 Also known as Senator Chess in Germany.
@@ -11,7 +11,7 @@ Hardware notes:
 - 1KB RAM (2*TC5514P)
 - HLCD0538, HLCD0539, LCD screen
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -90,9 +90,9 @@ void exchess_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // LCD
 
@@ -151,9 +151,9 @@ u8 exchess_state::ram_data_r()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Address Maps
-******************************************************************************/
+*******************************************************************************/
 
 void exchess_state::main_map(address_map &map)
 {
@@ -170,9 +170,9 @@ void exchess_state::main_io(address_map &map)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( exchess )
 	PORT_START("IN.0")
@@ -206,13 +206,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void exchess_state::exchess(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	F8(config, m_maincpu, 4500000/2); // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &exchess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &exchess_state::main_io);
@@ -226,7 +226,7 @@ void exchess_state::exchess(machine_config &config)
 	psu.write_a().append(FUNC(exchess_state::lcd_data_w));
 	psu.read_b().set_ioport("IN.1");
 
-	/* video hardware */
+	// video hardware
 	HLCD0538(config, m_lcd1, 310); // measured
 	m_lcd1->write_cols().set(FUNC(exchess_state::lcd_output_w<0>));
 	m_lcd1->write_interrupt().set(m_lcd2, FUNC(hlcd0539_device::lcd_w));
@@ -247,9 +247,9 @@ void exchess_state::exchess(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( exchess )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -263,9 +263,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
-//    YEAR  NAME     PARENT CMP MACHINE  INPUT    STATE          INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, exchess, 0,      0, exchess, exchess, exchess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1981, exchess, 0,      0,      exchess, exchess, exchess_state, empty_init, "SciSys", "Executive Chess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

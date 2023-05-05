@@ -15,8 +15,8 @@ Memory mapped:
 0000-dfff   ROM
 e000-e7ff   RAM, battery backed
 e800-ebff   Sprite RAM
-f000-fbff   Background Video RAM
-f400-ffff   Background Color RAM
+f000-f3ff   Background Video RAM
+f400-f7ff   Background Color RAM
 f800-fbff   Foreground Video RAM
 fc00-ffff   Foreground Color RAM
 

@@ -40,11 +40,11 @@ tms1000_base_disassembler::tms1000_base_disassembler(const u8 *lut_mnemonic, boo
 	}
 }
 
-tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
-{ }
-
 tms1100_disassembler::tms1100_disassembler(const u8 *lut_mnemonic, bool opcode_9bits, int pc_bits) :
 	tms1000_base_disassembler(lut_mnemonic, opcode_9bits, pc_bits)
+{ }
+
+tms1000_disassembler::tms1000_disassembler() : tms1000_base_disassembler(tms1000_mnemonic, false, 6)
 { }
 
 tms1100_disassembler::tms1100_disassembler() : tms1100_disassembler(tms1100_mnemonic, false, 6)

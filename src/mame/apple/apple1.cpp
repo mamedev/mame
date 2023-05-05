@@ -194,7 +194,7 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 		return std::make_pair(image_error::UNSPECIFIED, "Internal error loading snapshot");
 
 	if ((memcmp(hd1, &data[0], 5)) || (memcmp(hd2, &data[7], 5)))
-		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid\n");
+		return std::make_pair(image_error::INVALIDIMAGE, "Snapshot is invalid");
 
 	uint16_t start = (data[5]<<8) | data[6];
 	uint16_t end = (snapsize - 12) + start;
@@ -216,7 +216,7 @@ SNAPSHOT_LOAD_MEMBER(apple1_state::snapshot_cb)
 	{
 		return std::make_pair(
 				image_error::INVALIDIMAGE,
-				util::string_format("Snapshot has invalid load address %04x\n", start));
+				util::string_format("Snapshot has invalid load address %04x", start));
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

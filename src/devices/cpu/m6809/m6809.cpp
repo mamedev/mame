@@ -23,8 +23,8 @@
     History:
 
 January 2023 tlindner:
-	Add 6809 undocumented opcodes as described here:
-	https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
+    Add 6809 undocumented opcodes as described here:
+    https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours
 
 July 2016 ErikGav:
     Unify with 6309 pairs and quads (A+B=D, E+F=W, D+W=Q)
@@ -245,8 +245,7 @@ void m6809_base_device::device_reset()
 	m_cc |= CC_I;       // IRQ disabled
 	m_cc |= CC_F;       // FIRQ disabled
 
-	m_pc.b.h = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 0);
-	m_pc.b.l = space(AS_PROGRAM).read_byte(VECTOR_RESET_FFFE + 1);
+	set_ea(VECTOR_RESET_FFFE);
 
 	// reset sub-instruction state
 	reset_state();

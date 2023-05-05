@@ -674,7 +674,7 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 
 	// music
 	msm5232_device &msm(MSM5232(config, "msm", 2_MHz_XTAL)); // 2MHz - Clock verified
-	msm.set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); /* default 0.39 uF capacitors (not verified) */
+	msm.set_capacitors(1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6); /* default 1 uF capacitors (not verified) */
 	msm.add_route(0, "mono", 0.5);   // pin 28  2'-1
 	msm.add_route(1, "mono", 0.5);   // pin 29  4'-1
 	msm.add_route(2, "mono", 0.5);   // pin 30  8'-1
