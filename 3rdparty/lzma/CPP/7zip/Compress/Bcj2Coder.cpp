@@ -234,14 +234,14 @@ HRESULT CEncoder::CodeReal(ISequentialInStream * const *inStreams, const UInt64 
 
     Bcj2Enc_Encode(&enc);
 
-    currentInPos = totalStreamRead - numBytes_in_ReadBuf + (enc.src - _bufs[BCJ2_NUM_STREAMS]) - enc.tempPos;
+    currentInPos = totalStreamRead - numBytes_in_ReadBuf + (size_t)(enc.src - _bufs[BCJ2_NUM_STREAMS]) - enc.tempPos;
     
     if (Bcj2Enc_IsFinished(&enc))
       break;
 
     if (enc.state < BCJ2_NUM_STREAMS)
     {
-      size_t curSize = enc.bufs[enc.state] - _bufs[enc.state];
+      const size_t curSize = (size_t)(enc.bufs[enc.state] - _bufs[enc.state]);
       // printf("Write stream = %2d %6d\n", enc.state, curSize);
       RINOK(WriteStream(outStreams[enc.state], _bufs[enc.state], curSize));
       if (enc.state == BCJ2_STREAM_RC)
@@ -286,7 +286,7 @@ HRESULT CEncoder::CodeReal(ISequentialInStream * const *inStreams, const UInt64 
 
     if (progress && currentInPos - prevProgress >= (1 << 20))
     {
-      UInt64 outSize2 = currentInPos + outSizeRc + enc.bufs[BCJ2_STREAM_RC] - enc.bufs[BCJ2_STREAM_RC];
+      const UInt64 outSize2 = currentInPos + outSizeRc + (size_t)(enc.bufs[BCJ2_STREAM_RC] - enc.bufs[BCJ2_STREAM_RC]);
       prevProgress = currentInPos;
       // printf("progress %8d, %8d\n", (int)inSize2, (int)outSize2);
       RINOK(progress->SetRatioInfo(&currentInPos, &outSize2));
@@ -295,7 +295,7 @@ HRESULT CEncoder::CodeReal(ISequentialInStream * const *inStreams, const UInt64 
 
   for (int i = 0; i < BCJ2_NUM_STREAMS; i++)
   {
-    RINOK(WriteStream(outStreams[i], _bufs[i], enc.bufs[i] - _bufs[i]));
+    RINOK(WriteStream(outStreams[i], _bufs[i], (size_t)(enc.bufs[i] - _bufs[i])));
   }
 
   // if (currentInPos != subStreamStartPos + subStreamSize) return E_FAIL;
@@ -440,7 +440,7 @@ HRESULT CDecoder::Code(ISequentialInStream * const *inStreams, const UInt64 * co
     }
     else // if (dec.state <= BCJ2_STATE_ORIG)
     {
-      size_t curSize = dec.dest - _bufs[BCJ2_NUM_STREAMS];
+      const size_t curSize = (size_t)(dec.dest - _bufs[BCJ2_NUM_STREAMS]);
       if (curSize != 0)
       {
         outSizeProcessed += curSize;
@@ -463,17 +463,17 @@ HRESULT CDecoder::Code(ISequentialInStream * const *inStreams, const UInt64 * co
 
     if (progress)
     {
-      UInt64 outSize2 = outSizeProcessed + (dec.dest - _bufs[BCJ2_NUM_STREAMS]);
+      const UInt64 outSize2 = outSizeProcessed + (size_t)(dec.dest - _bufs[BCJ2_NUM_STREAMS]);
       if (outSize2 - prevProgress >= (1 << 22))
       {
-        UInt64 inSize2 = outSize2 + _inStreamsProcessed[BCJ2_STREAM_RC] - (dec.lims[BCJ2_STREAM_RC] - dec.bufs[BCJ2_STREAM_RC]);
+        const UInt64 inSize2 = outSize2 + _inStreamsProcessed[BCJ2_STREAM_RC] - (size_t)(dec.lims[BCJ2_STREAM_RC] - dec.bufs[BCJ2_STREAM_RC]);
         RINOK(progress->SetRatioInfo(&inSize2, &outSize2));
         prevProgress = outSize2;
       }
     }
   }
 
-  size_t curSize = dec.dest - _bufs[BCJ2_NUM_STREAMS];
+  const size_t curSize = (size_t)(dec.dest - _bufs[BCJ2_NUM_STREAMS]);
   if (curSize != 0)
   {
     outSizeProcessed += curSize;
@@ -498,7 +498,7 @@ HRESULT CDecoder::Code(ISequentialInStream * const *inStreams, const UInt64 * co
     {
       for (int i = 0; i < BCJ2_NUM_STREAMS; i++)
       {
-        size_t rem = dec.lims[i] - dec.bufs[i] + _extraReadSizes[i];
+        const size_t rem = (size_t)(dec.lims[i] - dec.bufs[i]) + _extraReadSizes[i];
         /*
         if (rem != 0)
           return S_FALSE;
@@ -653,6 +653,14 @@ STDMETHODIMP CDecoder::Read(void *data, UInt32 size, UInt32 *processedSize)
   }
 
   return res;
+}
+
+
+STDMETHODIMP CDecoder::GetInStreamProcessedSize2(UInt32 streamIndex, UInt64 *value)
+{
+  const size_t rem = (size_t)(dec.lims[streamIndex] - dec.bufs[streamIndex]) + _extraReadSizes[streamIndex];
+  *value = _inStreamsProcessed[streamIndex] - rem;
+  return S_OK;
 }
 
 }}

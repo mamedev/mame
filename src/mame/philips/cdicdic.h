@@ -26,11 +26,10 @@ TODO:
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/scc68070.h"
 #include "sound/cdda.h"
 #include "sound/dmadac.h"
-#include "cdrom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -156,7 +155,7 @@ private:
 	required_address_space m_memory_space;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<scc68070_device> m_scc;
-	optional_device<cdrom_image_device> m_cdrom_dev;
+	required_device<cdrom_image_device> m_cdrom;
 
 	uint32_t m_clock2;
 
@@ -174,7 +173,6 @@ private:
 	uint16_t m_interrupt_vector;  // CDIC Interrupt Vector Register   (0x303ffc)
 	uint16_t m_data_buffer;       // CDIC Data Buffer Register        (0x303ffe)
 
-	cdrom_file *m_cd;
 	bool m_cd_byteswap;
 
 	emu_timer *m_sector_timer;

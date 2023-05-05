@@ -35,6 +35,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (state) m_input_data |= 0x40; else m_input_data &= ~0x40; }
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
+	virtual bool exists() const = 0;
+
 protected:
 	// construction/destruction
 	scsihle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

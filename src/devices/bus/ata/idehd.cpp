@@ -821,11 +821,9 @@ void ide_hdd_device::device_start()
 
 void ide_hdd_device::device_reset()
 {
-	m_disk = m_image->get_hard_disk_file();
-
-	if (m_disk != nullptr && !m_can_identify_device)
+	if (m_image->exists() && !m_can_identify_device)
 	{
-		const auto &hdinfo = m_disk->get_info();
+		const auto &hdinfo = m_image->get_info();
 		if (hdinfo.sectorbytes == IDE_DISK_SECTOR_SIZE)
 		{
 			m_num_cylinders = hdinfo.cylinders;
@@ -837,7 +835,7 @@ void ide_hdd_device::device_reset()
 
 		// build the features page
 		std::vector<u8> ident;
-		m_disk->get_inquiry_data(ident);
+		m_image->get_inquiry_data(ident);
 		if (ident.size() == 512)
 		{
 			for( int w = 0; w < 256; w++ )

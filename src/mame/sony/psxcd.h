@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/spu.h"
 
 

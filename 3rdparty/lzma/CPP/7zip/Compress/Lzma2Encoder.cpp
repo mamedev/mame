@@ -21,18 +21,20 @@ namespace NLzma2 {
 
 CEncoder::CEncoder()
 {
-  _encoder = 0;
-  _encoder = Lzma2Enc_Create(&g_Alloc, &g_BigAlloc);
-  if (_encoder == 0)
+  _encoder = NULL;
+  _encoder = Lzma2Enc_Create(&g_AlignedAlloc, &g_BigAlloc);
+  if (!_encoder)
     throw 1;
 }
 
 CEncoder::~CEncoder()
 {
-  if (_encoder != 0)
+  if (_encoder)
     Lzma2Enc_Destroy(_encoder);
 }
 
+
+HRESULT SetLzma2Prop(PROPID propID, const PROPVARIANT &prop, CLzma2EncProps &lzma2Props);
 HRESULT SetLzma2Prop(PROPID propID, const PROPVARIANT &prop, CLzma2EncProps &lzma2Props)
 {
   switch (propID)
@@ -42,23 +44,22 @@ HRESULT SetLzma2Prop(PROPID propID, const PROPVARIANT &prop, CLzma2EncProps &lzm
       if (prop.vt == VT_UI4)
         lzma2Props.blockSize = prop.ulVal;
       else if (prop.vt == VT_UI8)
-      {
-        size_t v = (size_t)prop.uhVal.QuadPart;
-        if (v != prop.uhVal.QuadPart)
-          return E_INVALIDARG;
-        lzma2Props.blockSize = v;
-      }
+        lzma2Props.blockSize = prop.uhVal.QuadPart;
       else
         return E_INVALIDARG;
       break;
     }
     case NCoderPropID::kNumThreads:
-      if (prop.vt != VT_UI4) return E_INVALIDARG; lzma2Props.numTotalThreads = (int)(prop.ulVal); break;
+      if (prop.vt != VT_UI4)
+        return E_INVALIDARG;
+      lzma2Props.numTotalThreads = (int)(prop.ulVal);
+      break;
     default:
       RINOK(NLzma::SetLzmaProp(propID, prop, lzma2Props.lzmaProps));
   }
   return S_OK;
 }
+
 
 STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
     const PROPVARIANT *coderProps, UInt32 numProps)
@@ -73,26 +74,52 @@ STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs,
   return SResToHRESULT(Lzma2Enc_SetProps(_encoder, &lzma2Props));
 }
 
+
+STDMETHODIMP CEncoder::SetCoderPropertiesOpt(const PROPID *propIDs,
+    const PROPVARIANT *coderProps, UInt32 numProps)
+{
+  for (UInt32 i = 0; i < numProps; i++)
+  {
+    const PROPVARIANT &prop = coderProps[i];
+    PROPID propID = propIDs[i];
+    if (propID == NCoderPropID::kExpectedDataSize)
+      if (prop.vt == VT_UI8)
+        Lzma2Enc_SetDataSize(_encoder, prop.uhVal.QuadPart);
+  }
+  return S_OK;
+}
+
+
 STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
 {
   Byte prop = Lzma2Enc_WriteProperties(_encoder);
   return WriteStream(outStream, &prop, 1);
 }
 
+
+#define RET_IF_WRAP_ERROR(wrapRes, sRes, sResErrorCode) \
+  if (wrapRes != S_OK /* && (sRes == SZ_OK || sRes == sResErrorCode) */) return wrapRes;
+
 STDMETHODIMP CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
     const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress)
 {
-  CSeqInStreamWrap inWrap(inStream);
-  CSeqOutStreamWrap outWrap(outStream);
-  CCompressProgressWrap progressWrap(progress);
+  CSeqInStreamWrap inWrap;
+  CSeqOutStreamWrap outWrap;
+  CCompressProgressWrap progressWrap;
 
-  SRes res = Lzma2Enc_Encode(_encoder, &outWrap.p, &inWrap.p, progress ? &progressWrap.p : NULL);
-  if (res == SZ_ERROR_READ && inWrap.Res != S_OK)
-    return inWrap.Res;
-  if (res == SZ_ERROR_WRITE && outWrap.Res != S_OK)
-    return outWrap.Res;
-  if (res == SZ_ERROR_PROGRESS && progressWrap.Res != S_OK)
-    return progressWrap.Res;
+  inWrap.Init(inStream);
+  outWrap.Init(outStream);
+  progressWrap.Init(progress);
+
+  SRes res = Lzma2Enc_Encode2(_encoder,
+      &outWrap.vt, NULL, NULL,
+      &inWrap.vt, NULL, 0,
+      progress ? &progressWrap.vt : NULL);
+
+  RET_IF_WRAP_ERROR(inWrap.Res, res, SZ_ERROR_READ)
+  RET_IF_WRAP_ERROR(outWrap.Res, res, SZ_ERROR_WRITE)
+  RET_IF_WRAP_ERROR(progressWrap.Res, res, SZ_ERROR_PROGRESS)
+
   return SResToHRESULT(res);
 }
   

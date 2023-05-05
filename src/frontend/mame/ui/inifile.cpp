@@ -58,7 +58,8 @@ inifile_manager::inifile_manager(ui_options &options)
 			}
 		}
 	}
-	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+	std::locale const lcl;
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 	std::stable_sort(
 			m_ini_index.begin(),
 			m_ini_index.end(),
@@ -132,7 +133,8 @@ void inifile_manager::init_category(std::string &&filename, util::core_file &fil
 	}
 	if (!index.empty())
 	{
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::locale const lcl;
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
 		std::stable_sort(
 				index.begin(),
 				index.end(),

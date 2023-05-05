@@ -156,14 +156,13 @@ void bandit_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 template <u32 Base>
 u32 bandit_host_device::pci_memory_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	return swapendian_int32(this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
 }
 
 template <u32 Base>
 void bandit_host_device::pci_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
 
 template u32 bandit_host_device::pci_memory_r<0x80000000>(offs_t offset, u32 mem_mask);
@@ -180,14 +179,13 @@ template void bandit_host_device::pci_memory_w<0xf7000000>(offs_t offset, u32 da
 template <u32 Base>
 u32 bandit_host_device::pci_io_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_IO).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	return swapendian_int32(this->space(AS_PCI_IO).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
 }
 
 template <u32 Base>
 void bandit_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), data, mem_mask);
+	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
 
 // map PCI memory and I/O space stuff here

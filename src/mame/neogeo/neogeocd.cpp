@@ -28,7 +28,7 @@
 
 #include "megacdcd.h"
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 

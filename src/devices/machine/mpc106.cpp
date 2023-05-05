@@ -22,6 +22,8 @@ enum
 	AS_PCI_IO = 2
 };
 
+constexpr u32 PICR1_LE_MODE	= 0x00000020;	// Host CPU is little-endian if set, big-endian if clear
+
 DEFINE_DEVICE_TYPE(MPC106, mpc106_host_device, "mpc106", "Motorola MPC106 PCI Bridge/Memory Controller")
 
 void mpc106_host_device::config_map(address_map &map)
@@ -32,6 +34,7 @@ void mpc106_host_device::config_map(address_map &map)
 	map(0x80, 0x8f).rw(FUNC(mpc106_host_device::memory_start_r), FUNC(mpc106_host_device::memory_start_w));
 	map(0x90, 0x9f).rw(FUNC(mpc106_host_device::memory_end_r), FUNC(mpc106_host_device::memory_end_w));
 	map(0xa0, 0xa0).rw(FUNC(mpc106_host_device::memory_enable_r), FUNC(mpc106_host_device::memory_enable_w));
+	map(0xa8, 0xab).rw(FUNC(mpc106_host_device::picr1_r), FUNC(mpc106_host_device::picr1_w));
 }
 
 mpc106_host_device::mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -42,6 +45,7 @@ mpc106_host_device::mpc106_host_device(const machine_config &mconfig, const char
 {
 	set_ids_host(0x10570002, 0x40, 0x000006);
 	m_memory_bank_enable = 0;
+	m_picr1 = 0;
 }
 
 void mpc106_host_device::set_ram_info(u8 *ram_ptr, int ram_size)
@@ -108,7 +112,14 @@ void mpc106_host_device::device_start()
 		m_cpu_space->install_read_handler (0xfe800000, 0xfebfffff, read32s_delegate(*this, FUNC(mpc106_host_device::pci_io_r<0x00800000>)));
 		m_cpu_space->install_write_handler(0xfe800000, 0xfebfffff, write32s_delegate(*this, FUNC(mpc106_host_device::pci_io_w<0x00800000>)));
 
-		m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map);
+		if (m_picr1 & PICR1_LE_MODE)
+		{
+			m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_le);
+		}
+		else
+		{
+			m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map_be);
+		}
 	}
 
 	save_item(NAME(m_pwrconfig1));
@@ -116,6 +127,7 @@ void mpc106_host_device::device_start()
 	save_item(NAME(m_memory_starts));
 	save_item(NAME(m_memory_ends));
 	save_item(NAME(m_memory_bank_enable));
+	save_item(NAME(m_picr1));
 }
 
 device_memory_interface::space_config_vector mpc106_host_device::memory_space_config() const
@@ -136,7 +148,13 @@ void mpc106_host_device::device_reset()
 	pci_host_device::device_reset();
 }
 
-void mpc106_host_device::access_map(address_map &map)
+void mpc106_host_device::access_map_le(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rw(FUNC(mpc106_host_device::config_address_r), FUNC(mpc106_host_device::config_address_w));
+	map(0x00200000, 0x002fffff).rw(FUNC(mpc106_host_device::config_data_r), FUNC(mpc106_host_device::config_data_w));
+}
+
+void mpc106_host_device::access_map_be(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rw(FUNC(mpc106_host_device::be_config_address_r), FUNC(mpc106_host_device::be_config_address_w));
 	map(0x00200000, 0x002fffff).rw(FUNC(mpc106_host_device::be_config_data_r), FUNC(mpc106_host_device::be_config_data_w));
@@ -149,32 +167,43 @@ u32 mpc106_host_device::be_config_address_r()
 
 void mpc106_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	const u32 tempdata = swapendian_int32(data);
-	pci_host_device::config_address_w(offset, tempdata, mem_mask);
+	pci_host_device::config_address_w(offset, swapendian_int32(data), swapendian_int32(mem_mask));
 }
 
 u32 mpc106_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
 {
-	return swapendian_int32(pci_host_device::config_data_r(offset, mem_mask));
+	return swapendian_int32(pci_host_device::config_data_r(offset, swapendian_int32(mem_mask)));
 }
 
 void mpc106_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	const u32 tempdata = swapendian_int32(data);
-	pci_host_device::config_data_w(offset, tempdata, mem_mask);
+	pci_host_device::config_data_w(offset, swapendian_int32(data), swapendian_int32(mem_mask));
 }
 
 template <u32 Base>
 u32 mpc106_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)
 {
-	const u32 result = m_cpu_space->read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		return m_cpu_space->read_dword(Base + (offset * 4), mem_mask);
+	}
+	else
+	{
+		return swapendian_int32(m_cpu_space->read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
+	}
 }
 
 template <u32 Base>
 void mpc106_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_cpu_space->write_dword(Base + (offset * 4), data, mem_mask);
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		m_cpu_space->write_dword(Base + (offset * 4), data, mem_mask);
+	}
+	else
+	{
+		m_cpu_space->write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32(mem_mask));
+	}
 }
 
 template u32 mpc106_host_device::cpu_memory_r<0>(offs_t offset, u32 mem_mask);
@@ -186,14 +215,27 @@ template void mpc106_host_device::cpu_memory_w<0xff800000>(offs_t offset, u32 da
 template <u32 Base>
 u32 mpc106_host_device::pci_memory_r(offs_t offset, u32 mem_mask)
 {
-	const u32 result = this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		return this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), mem_mask);
+	}
+	else
+	{
+		return swapendian_int32(this->space(AS_PCI_MEM).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
+	}
 }
 
 template <u32 Base>
 void mpc106_host_device::pci_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), data, mem_mask);
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), data, mem_mask);
+	}
+	else
+	{
+		this->space(AS_PCI_MEM).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
+	}
 }
 
 template u32 mpc106_host_device::pci_memory_r<0>(offs_t offset, u32 mem_mask);
@@ -205,14 +247,27 @@ template void mpc106_host_device::pci_memory_w<0x80000000>(offs_t offset, u32 da
 template <u32 Base>
 u32 mpc106_host_device::pci_io_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = this->space(AS_PCI_IO).read_dword(Base + (offset * 4), mem_mask);
-	return result;
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		return this->space(AS_PCI_IO).read_dword(Base + (offset * 4), mem_mask);
+	}
+	else
+	{
+		return swapendian_int32(this->space(AS_PCI_IO).read_dword(Base + (offset * 4), swapendian_int32(mem_mask)));
+	}
 }
 
 template <u32 Base>
 void mpc106_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), data, mem_mask);
+	if (m_picr1 & PICR1_LE_MODE)
+	{
+		this->space(AS_PCI_IO).write_dword(Base + (offset * 4), data, mem_mask);
+	}
+	else
+	{
+		this->space(AS_PCI_IO).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
+	}
 }
 
 template u32 mpc106_host_device::pci_io_r<0>(offs_t offset, u32 mem_mask);
@@ -318,4 +373,14 @@ void mpc106_host_device::memory_enable_w(offs_t offset, u8 data)
 		end >>= 8;
 		end2 >>= 8;
 	}
+}
+
+u32 mpc106_host_device::picr1_r()
+{
+	return m_picr1;
+}
+
+void mpc106_host_device::picr1_w(u32 data)
+{
+	m_picr1 = data;
 }

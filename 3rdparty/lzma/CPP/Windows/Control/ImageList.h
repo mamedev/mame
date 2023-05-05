@@ -3,7 +3,7 @@
 #ifndef __WINDOWS_CONTROL_IMAGE_LIST_H
 #define __WINDOWS_CONTROL_IMAGE_LIST_H
 
-#include <commctrl.h>
+#include <CommCtrl.h>
 
 #include "../Defs.h"
 

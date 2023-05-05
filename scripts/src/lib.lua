@@ -65,6 +65,8 @@ end
 		MAME_DIR .. "src/lib/util/delegate.h",
 		MAME_DIR .. "src/lib/util/disasmintf.cpp",
 		MAME_DIR .. "src/lib/util/disasmintf.h",
+		MAME_DIR .. "src/lib/util/dvdrom.cpp",
+		MAME_DIR .. "src/lib/util/dvdrom.h",
 		MAME_DIR .. "src/lib/util/dynamicclass.cpp",
 		MAME_DIR .. "src/lib/util/dynamicclass.h",
 		MAME_DIR .. "src/lib/util/dynamicclass.ipp",

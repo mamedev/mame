@@ -111,7 +111,7 @@ void i386_device::pentium_rsm()
 {
 	if(!m_smm)
 	{
-		logerror("i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
+		LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
 		i386_trap(6, 0, 0);
 		return;
 	}
@@ -1011,7 +1011,7 @@ void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
 
 void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
 {
-	logerror("Unemulated 0x0f 0x74 opcode called\n");
+	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
 
 	CYCLES(1);
 }
@@ -2791,7 +2791,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 {
 	uint8_t modm = FETCH();
 	if( modm == 0xf8 ) {
-		logerror("Unemulated SFENCE opcode called\n");
+		LOGMASKED(LOG_UNEMULATED, "Unemulated SFENCE opcode called\n");
 		CYCLES(1); // sfence instruction
 	} else if( modm == 0xf0 ) {
 		CYCLES(1); // mfence instruction

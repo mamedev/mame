@@ -14,14 +14,10 @@
 
     TODO:
     - Better keyboard
-    - Floppy
     - Cassette
     - Color/brightness levels
     - Sound
     - Joysticks
-    - Centronics
-    - Serial
-    - Expansion slots
 
     Notes:
     - This computer was described in the "mc" magazine by Franzis Verlag.
@@ -33,6 +29,9 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/mc68000/sysbus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/input_merger.h"
@@ -46,7 +45,7 @@
 #define LOG_IO_READ  (1U << 1)
 #define LOG_IO_WRITE (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_IO_WRITE)
+//#define VERBOSE (LOG_GENERAL | LOG_IO_WRITE | LOG_IO_READ)
 #include "logmacro.h"
 
 
@@ -67,6 +66,11 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via%u", 0U),
+		m_sysbus(*this, "sysbus"),
+		m_centronics_latch(*this, "centronics_latch"),
+		m_centronics_error(*this, "centronics_error"),
+		m_centronics(*this, "centronics"),
+		m_serial(*this, "serial"),
 		m_apm_view(*this, "apm"),
 		m_eprom(*this, "eprom%u", 0U),
 		m_switches(*this, "switches")
@@ -84,6 +88,11 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_crtc;
 	required_device_array<via6522_device, 2> m_via;
+	required_device<mc68000_sysbus_device> m_sysbus;
+	required_device<output_latch_device> m_centronics_latch;
+	required_device<input_merger_device> m_centronics_error;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_serial;
 	memory_view m_apm_view;
 	required_memory_region_array<2> m_eprom;
 	required_ioport m_switches;
@@ -105,6 +114,7 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void lvia_porta_w(uint8_t data);
 	void uvia_porta_w(uint8_t data);
 	void addr_decode_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
@@ -165,8 +175,7 @@ uint16_t mc68000_state::memory_r(offs_t offset, uint16_t mem_mask)
 			break;
 
 		case 2:
-			LOGMASKED(LOG_IO_READ, "Unhandled floppy access\n");
-			data = 0xffff;
+			data = m_sysbus->floppy_r(offset >> 1, mem_mask);
 			break;
 
 		case 3:
@@ -201,6 +210,18 @@ uint16_t mc68000_state::memory_r(offs_t offset, uint16_t mem_mask)
 	case 0x6:
 		if (!machine().side_effects_disabled())
 			m_maincpu->trigger_bus_error();
+		break;
+
+	// expansion slots
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
+	case 0xc:
+	case 0xd:
+	case 0xe:
+	case 0xf:
+		data = m_sysbus->slot_r(code - 0x8, offset, mem_mask);
 		break;
 
 	default:
@@ -245,13 +266,13 @@ void mc68000_state::memory_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 2:
-			LOGMASKED(LOG_IO_WRITE, "Unhandled floppy access\n");
+			m_sysbus->floppy_w(offset >> 1, data, mem_mask);
 			break;
 
 		case 3:
 			if (ACCESSING_BITS_8_15 && (BIT(offset, 1) == 0))
 			{
-				LOGMASKED(LOG_IO_WRITE, "Centronics latch write\n");
+				m_centronics_latch->write(data >> 8);
 
 				// a write here also selects switch 0 to be read from cb1
 				m_via[1]->write_cb1(1);
@@ -277,6 +298,18 @@ void mc68000_state::memory_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// bus error
 	case 0x6:
 		m_maincpu->trigger_bus_error();
+		break;
+
+	// expansion slots
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
+	case 0xc:
+	case 0xd:
+	case 0xe:
+	case 0xf:
+		m_sysbus->slot_w(code - 0x8, offset, data, mem_mask);
 		break;
 
 	default:
@@ -351,9 +384,31 @@ MC6845_UPDATE_ROW( mc68000_state::crtc_update_row )
 //  MACHINE EMULATION
 //**************************************************************************
 
+void mc68000_state::lvia_porta_w(uint8_t data)
+{
+	// 7-------  serial cts (read)
+	// -6------  40/80 char mode
+	// --5-----  serial tx
+	// ---4----  serial dtr
+	// ----3---  ibm/pc keyboard (read)
+	// -----2--  serial rx (read)
+	// ------1-  cassette write
+	// -------0  cassette read (read)
+
+	m_serial->write_dtr(BIT(data, 4));
+	m_serial->write_txd(BIT(~data, 5));
+}
+
 void mc68000_state::uvia_porta_w(uint8_t data)
 {
+	// 7-------  centronics error (read)
+	// -6------  centronics strobe
+	// --5-----  joystick control
+	// ---43---  color helper bits
+	// -----210  video base address
+
 	m_uvia_porta = data;
+	m_centronics->write_strobe(BIT(data, 6));
 }
 
 void mc68000_state::addr_decode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -413,12 +468,46 @@ void mc68000_state::mc68000(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(mc68000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_via[1], FUNC(via6522_device::write_ca1));
 
-	MOS6522(config, m_via[0], 16_MHz_XTAL / 16); // ic55
+	MOS6522(config, m_via[0], 16_MHz_XTAL / 2 / 10); // ic55
 	m_via[0]->irq_handler().set(m_irq3, FUNC(input_merger_device::in_w<0>));
+	m_via[0]->writepa_handler().set(FUNC(mc68000_state::lvia_porta_w));
 
-	MOS6522(config, m_via[1], 16_MHz_XTAL / 16); // ic56
+	MOS6522(config, m_via[1], 16_MHz_XTAL / 2 / 10); // ic56
 	m_via[1]->irq_handler().set(m_irq3, FUNC(input_merger_device::in_w<1>));
 	m_via[1]->writepa_handler().set(FUNC(mc68000_state::uvia_porta_w));
+
+	MC68000_SYSBUS(config, m_sysbus, 16_MHz_XTAL);
+	m_sysbus->irq1_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_sysbus->irq2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+	m_sysbus->irq3_cb().set(m_irq3, FUNC(input_merger_device::in_w<2>));
+	m_sysbus->irq4_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ4);
+	m_sysbus->irq5_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
+	m_sysbus->irq6_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+	m_sysbus->irq7_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ7);
+	MC68000_SYSBUS_SLOT(config, "sysbus:0", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:1", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:2", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:3", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:4", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:5", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:6", mc68000_sysbus_cards, nullptr);
+	MC68000_SYSBUS_SLOT(config, "sysbus:7", mc68000_sysbus_cards, nullptr);
+
+	OUTPUT_LATCH(config, m_centronics_latch); // ic85
+
+	INPUT_MERGER_ANY_LOW(config, m_centronics_error);
+	m_centronics_error->output_handler().set(m_via[1], FUNC(via6522_device::write_pa7)).invert();
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_output_latch(*m_centronics_latch);
+	m_centronics->ack_handler().set(m_via[1], FUNC(via6522_device::write_ca2)); // alternatively connected to busy
+	m_centronics->fault_handler().set(m_centronics_error, FUNC(input_merger_device::in_w<0>));
+	m_centronics->perror_handler().set(m_centronics_error, FUNC(input_merger_device::in_w<1>)).invert();
+
+	RS232_PORT(config, m_serial, default_rs232_devices, nullptr);
+	m_serial->rxd_handler().set(m_via[0], FUNC(via6522_device::write_ca1));
+	m_serial->rxd_handler().append(m_via[0], FUNC(via6522_device::write_pa2));
+	m_serial->cts_handler().set(m_via[0], FUNC(via6522_device::write_pa7));
 
 	generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, "kbd", 0));
 	kbd.set_keyboard_callback(FUNC(mc68000_state::kbd_put));

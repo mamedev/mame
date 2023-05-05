@@ -1,3 +1,4 @@
+--
 -- license:BSD-3-Clause
 -- copyright-holders:MAMEdev Team
 
@@ -745,10 +746,20 @@ project "7z"
 			"-Wno-strict-prototypes",
 			"-Wno-undef",
 		}
-if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
-		buildoptions_c {
-			"-Wno-misleading-indentation",
-		}
+if _OPTIONS["gcc"]~=nil then
+	if string.find(_OPTIONS["gcc"], "clang") then
+		if str_to_version(_OPTIONS["gcc_version"]) >= 100000 then
+			buildoptions_c {
+				"-Wno-misleading-indentation",
+			}
+		end
+	else
+		if str_to_version(_OPTIONS["gcc_version"]) >= 130000 then
+			buildoptions_c {
+				"-Wno-error=dangling-pointer",
+			}
+		end
+	end
 end
 
 	configuration { "android-*" }
@@ -811,18 +822,22 @@ end
 			-- MAME_DIR .. "3rdparty/lzma/C/DllSecur.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzFind.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzFindMt.c",
+			MAME_DIR .. "3rdparty/lzma/C/LzFindOpt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma86Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma86Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma2DecMt.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma86Dec.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Lzma86Enc.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzmaDec.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzmaEnc.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzmaLib.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/MtCoder.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/MtDec.c",
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7.c",
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
-			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Enc.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/Ppmd7Enc.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sha256.c",
+			MAME_DIR .. "3rdparty/lzma/C/Sha256Opt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Sort.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Threads.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/Xz.c",

@@ -46,7 +46,7 @@ static inline HRESULT SetPropGUID(const GUID &guid, PROPVARIANT *value)
   return SetPropStrFromBin((const char *)&guid, sizeof(guid), value);
 }
 
-int FindFormatCalssId(const GUID *clsid)
+static int FindFormatCalssId(const GUID *clsid)
 {
   GUID cls = *clsid;
   CLS_ARC_ID_ITEM(cls) = 0;
@@ -59,6 +59,7 @@ int FindFormatCalssId(const GUID *clsid)
   return -1;
 }
 
+STDAPI CreateArchiver(const GUID *clsid, const GUID *iid, void **outObject);
 STDAPI CreateArchiver(const GUID *clsid, const GUID *iid, void **outObject)
 {
   COM_TRY_BEGIN
@@ -89,6 +90,7 @@ STDAPI CreateArchiver(const GUID *clsid, const GUID *iid, void **outObject)
   return S_OK;
 }
 
+STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value);
 STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value)
 {
   COM_TRY_BEGIN
@@ -113,6 +115,7 @@ STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value
     case NArchive::NHandlerPropID::kAltStreams: prop = ((arc.Flags & NArcInfoFlags::kAltStreams) != 0); break;
     case NArchive::NHandlerPropID::kNtSecure:   prop = ((arc.Flags & NArcInfoFlags::kNtSecure) != 0); break;
     case NArchive::NHandlerPropID::kFlags: prop = (UInt32)arc.Flags; break;
+    case NArchive::NHandlerPropID::kTimeFlags: prop = (UInt32)arc.TimeFlags; break;
     case NArchive::NHandlerPropID::kSignatureOffset: prop = (UInt32)arc.SignatureOffset; break;
     // case NArchive::NHandlerPropID::kVersion: prop = (UInt32)MY_VER_MIX; break;
 
@@ -130,17 +133,20 @@ STDAPI GetHandlerProperty2(UInt32 formatIndex, PROPID propID, PROPVARIANT *value
   COM_TRY_END
 }
 
+STDAPI GetHandlerProperty(PROPID propID, PROPVARIANT *value);
 STDAPI GetHandlerProperty(PROPID propID, PROPVARIANT *value)
 {
   return GetHandlerProperty2(g_DefaultArcIndex, propID, value);
 }
 
+STDAPI GetNumberOfFormats(UINT32 *numFormats);
 STDAPI GetNumberOfFormats(UINT32 *numFormats)
 {
   *numFormats = g_NumArcs;
   return S_OK;
 }
 
+STDAPI GetIsArc(UInt32 formatIndex, Func_IsArc *isArc);
 STDAPI GetIsArc(UInt32 formatIndex, Func_IsArc *isArc)
 {
   *isArc = NULL;

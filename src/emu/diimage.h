@@ -94,6 +94,15 @@ public:
 	virtual const char *image_type_name() const noexcept = 0;
 	virtual const char *image_brief_type_name() const noexcept = 0;
 
+	// Set block device image regions for arcade systems
+	void add_region(std::string name, bool is_default = false);
+	bool has_preset_images() const;
+	bool has_preset_images_selection() const;
+	std::vector<std::string> preset_images_list() const;
+	int current_preset_image_id() const;
+	void switch_preset_image(int id);
+	chd_file *current_preset_image_chd() const;
+
 	const image_device_format *device_get_indexed_creatable_format(int index) const noexcept { return (index < m_formatlist.size()) ? m_formatlist.at(index).get() : nullptr;  }
 	const image_device_format *device_get_named_creatable_format(std::string_view format_name) const noexcept;
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
@@ -110,6 +119,7 @@ public:
 	bool is_open() const noexcept { return bool(m_file); }
 	util::core_file &image_core_file() const noexcept { assert(is_open()); return *m_file; }
 	bool is_readonly() const noexcept { return m_readonly; }
+	u32 sequence_counter() const { return m_sequence_counter; } // Increments on media load/unload/etc
 
 	// image file I/O wrappers
 	// TODO: move away from using these and let implementations use the I/O interface directly
@@ -211,6 +221,7 @@ public:
 protected:
 	// interface-level overrides
 	virtual void interface_config_complete() override;
+	virtual void interface_pre_start() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }
@@ -221,6 +232,7 @@ protected:
 	bool is_loaded() const noexcept { return m_file != nullptr; }
 
 	void set_image_filename(std::string_view filename);
+	void set_image_tag();
 
 	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
@@ -242,6 +254,11 @@ private:
 	std::string m_basename;
 	std::string m_basename_noext;
 	std::string m_filetype;
+
+	// preset images regions
+	std::vector<std::string> m_possible_preset_regions;
+	std::vector<chd_file *> m_preset_images;
+	int m_default_region, m_current_region;
 
 	// Software information
 	std::string m_full_software_name;
@@ -266,6 +283,7 @@ private:
 	std::string m_working_directory;
 
 	// flags
+	u32 m_sequence_counter;
 	bool m_readonly;
 	bool m_created;
 

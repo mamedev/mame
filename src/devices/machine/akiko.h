@@ -18,7 +18,7 @@
 #pragma once
 
 #include "cdrom.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/cdda.h"
 
 
@@ -84,8 +84,7 @@ private:
 	uint8_t m_cdrom_cmd_resp;
 
 	required_device<cdda_device> m_cdda;
-	optional_device<cdrom_image_device> m_cddevice;
-	cdrom_file *m_cdrom;
+	optional_device<cdrom_image_device> m_cdrom;
 
 	std::unique_ptr<uint8_t[]> m_cdrom_toc;
 

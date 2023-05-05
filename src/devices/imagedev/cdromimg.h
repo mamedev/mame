@@ -2,9 +2,9 @@
 // copyright-holders:Nathan Woods, R. Belmont, Miodrag Milanovic
 /*********************************************************************
 
-    chd_cd.h
+    cdromimg.h
 
-    Interface to the CHD CDROM code
+    CD/DVD reader
 
 *********************************************************************/
 
@@ -16,11 +16,17 @@
 #include "softlist_dev.h"
 
 #include "cdrom.h"
+#include "dvdrom.h"
 
 #include <memory>
 #include <string>
 #include <system_error>
 #include <utility>
+
+// device type definition
+DECLARE_DEVICE_TYPE(CDROM,  cdrom_image_device)
+DECLARE_DEVICE_TYPE(GDROM,  gdrom_image_device)  // Includes CDROM compatibility (but not DVDROM)
+DECLARE_DEVICE_TYPE(DVDROM, dvdrom_image_device) // Includes CDROM compatibility (but not GDROM)
 
 
 /***************************************************************************
@@ -52,11 +58,21 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "cdrom"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cdrm"; }
 
-	// specific implementation
-	cdrom_file *get_cdrom_file() { return m_cdrom_handle.get(); }
+	int get_last_track() const;
+	uint32_t get_track(uint32_t frame) const;
+	uint32_t get_track_start(uint32_t track) const;
+	bool read_data(uint32_t lbasector, void *buffer, uint32_t datatype, bool phys=false);
+	bool read_subcode(uint32_t lbasector, void *buffer, bool phys=false);
+	int get_adr_control(int track) const;
+	const cdrom_file::toc &get_toc() const;
+	int get_track_type(int track) const;
+
+	bool is_cd() const;
+	bool is_gd() const;
+	bool is_dvd() const;
 
 protected:
-	cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool dvd_compat = false, bool gd_compat = false);
 
 	// device_t implementation
 	virtual void device_config_complete() override;
@@ -66,13 +82,34 @@ protected:
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
+	void setup_current_preset_image();	
+
+	bool        m_gd_compat;
+	bool        m_dvd_compat;
 	chd_file    m_self_chd;
 	std::unique_ptr<cdrom_file> m_cdrom_handle;
+	std::unique_ptr<dvdrom_file> m_dvdrom_handle;
 	const char  *m_extension_list;
 	const char  *m_interface;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(CDROM, cdrom_image_device)
+class gdrom_image_device : public cdrom_image_device
+{
+public:
+	// construction/destruction
+	gdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
+		cdrom_image_device(mconfig, GDROM, tag, owner, clock, false, true) {}
+	virtual ~gdrom_image_device() = default;
+};
+
+class dvdrom_image_device : public cdrom_image_device
+{
+public:
+	// construction/destruction
+	dvdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
+		cdrom_image_device(mconfig, DVDROM, tag, owner, clock, true, false) {}
+	virtual ~dvdrom_image_device() = default;
+};
+
 
 #endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H

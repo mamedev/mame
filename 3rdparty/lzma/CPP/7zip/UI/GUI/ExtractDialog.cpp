@@ -28,6 +28,8 @@ using namespace NName;
 
 extern HINSTANCE g_hInstance;
 
+#ifndef _SFX
+
 static const UInt32 kPathMode_IDs[] =
 {
   IDS_EXTRACT_PATHS_FULL,
@@ -43,8 +45,6 @@ static const UInt32 kOverwriteMode_IDs[] =
   IDS_EXTRACT_OVERWRITE_RENAME,
   IDS_EXTRACT_OVERWRITE_RENAME_EXISTING
 };
-
-#ifndef _SFX
 
 static const
   // NExtract::NPathMode::EEnum
@@ -94,6 +94,7 @@ static const unsigned kHistorySize = 16;
 #ifndef _SFX
 
 // it's used in CompressDialog also
+void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned numItems, const int *values, int curVal);
 void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned numItems, const int *values, int curVal)
 {
   int curSel = 0;
@@ -110,6 +111,7 @@ void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned n
 }
 
 // it's used in CompressDialog also
+bool GetBoolsVal(const CBoolPair &b1, const CBoolPair &b2);
 bool GetBoolsVal(const CBoolPair &b1, const CBoolPair &b2)
 {
   if (b1.Def) return b1.Val;
@@ -143,7 +145,7 @@ bool CExtractDialog::OnInit()
       GetText(s);
     if (!ArcPath.IsEmpty())
     {
-      s.AddAscii(" : ");
+      s += " : ";
       s += ArcPath;
     }
     SetText(s);
@@ -286,6 +288,7 @@ void CExtractDialog::OnButtonSetPath()
   _path.SetText(resultPath);
 }
 
+void AddUniqueString(UStringVector &list, const UString &s);
 void AddUniqueString(UStringVector &list, const UString &s)
 {
   FOR_VECTOR (i, list)
@@ -357,7 +360,7 @@ void CExtractDialog::OnOK()
   if (currentItem == CB_ERR)
   {
     _path.GetText(s);
-    if (_path.GetCount() >= kHistorySize)
+    if (_path.GetCount() >= (int)kHistorySize)
       currentItem = _path.GetCount() - 1;
   }
   else
@@ -409,10 +412,10 @@ void CExtractDialog::OnOK()
 }
 
 #ifndef NO_REGISTRY
-static LPCWSTR kHelpTopic = L"fm/plugins/7-zip/extract.htm";
+#define kHelpTopic "fm/plugins/7-zip/extract.htm"
 void CExtractDialog::OnHelp()
 {
-  ShowHelpWindow(NULL, kHelpTopic);
+  ShowHelpWindow(kHelpTopic);
   CModalDialog::OnHelp();
 }
 #endif

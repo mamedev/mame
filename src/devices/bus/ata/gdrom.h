@@ -28,7 +28,6 @@ public:
 protected:
 	virtual void process_buffer() override;
 	virtual void signature() override;
-	virtual void SetDevice(void *device) override;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -43,7 +42,6 @@ private:
 	uint32_t read_type = 0;   // for command 0x30 only
 	uint32_t data_select = 0; // for command 0x30 only
 	uint32_t transferOffset = 0;
-	bool is_real_gdrom_disc = false;
 
 	struct cd_status
 	{
@@ -56,6 +54,6 @@ private:
 	cd_status m_cd_status;
 };
 
-DECLARE_DEVICE_TYPE(GDROM, gdrom_device)
+DECLARE_DEVICE_TYPE(ATAPI_GDROM, gdrom_device)
 
 #endif // MAME_BUS_ATA_GDROM_H

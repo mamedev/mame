@@ -12,19 +12,17 @@ t10mmc.h
 #pragma once
 
 #include "t10spc.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "sound/cdda.h"
 
 class t10mmc : public virtual t10spc
 {
 public:
 	t10mmc()
-		: t10spc(), m_image(nullptr), m_cdda(nullptr), m_cdrom(nullptr), m_lba(0), m_blocks(0), m_last_lba(0), m_num_subblocks(0), m_cur_subblock(0), m_audio_sense(0), m_device(nullptr)
+		: t10spc(), m_image(nullptr), m_cdda(nullptr), m_lba(0), m_blocks(0), m_last_lba(0), m_num_subblocks(0), m_cur_subblock(0), m_audio_sense(0), m_device(nullptr)
 	{
 	}
 
-	virtual void SetDevice( void *device ) override;
-	virtual void GetDevice( void **device ) override;
 	virtual void ExecCommand() override;
 	virtual void WriteData( uint8_t *data, int dataLength ) override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
@@ -59,7 +57,6 @@ protected:
 
 	cdrom_image_device *m_image;
 	cdda_device *m_cdda;
-	cdrom_file *m_cdrom;
 
 	uint32_t m_lba;
 	uint32_t m_blocks;

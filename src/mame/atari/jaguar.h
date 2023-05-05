@@ -15,7 +15,7 @@
 #include "jag_blitter.h"
 #include "cdrom.h"
 #include "bus/generic/slot.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "screen.h"
 #include "emupal.h"
 
@@ -405,7 +405,4 @@ private:
 	uint32_t m_butch_cmd_response[0x102]{};
 	uint8_t m_butch_cmd_index = 0U;
 	uint8_t m_butch_cmd_size = 0U;
-
-	cdrom_file  *m_cd_file = nullptr;
-	//const cdrom_toc*    m_toc = nullptr;
 };

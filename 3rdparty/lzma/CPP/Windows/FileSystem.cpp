@@ -19,6 +19,8 @@ namespace NWindows {
 namespace NFile {
 namespace NSystem {
 
+#ifdef _WIN32
+
 bool MyGetVolumeInformation(
     CFSTR rootPath,
     UString &volumeName,
@@ -90,7 +92,7 @@ bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, 
   #ifndef _UNICODE
   if (!g_IsNT)
   {
-    GetDiskFreeSpaceExA_Pointer pGetDiskFreeSpaceEx = (GetDiskFreeSpaceExA_Pointer)GetProcAddress(
+    GetDiskFreeSpaceExA_Pointer pGetDiskFreeSpaceEx = (GetDiskFreeSpaceExA_Pointer)(void *)GetProcAddress(
         GetModuleHandle(TEXT("kernel32.dll")), "GetDiskFreeSpaceExA");
     if (pGetDiskFreeSpaceEx)
     {
@@ -105,7 +107,7 @@ bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, 
   else
   #endif
   {
-    GetDiskFreeSpaceExW_Pointer pGetDiskFreeSpaceEx = (GetDiskFreeSpaceExW_Pointer)GetProcAddress(
+    GetDiskFreeSpaceExW_Pointer pGetDiskFreeSpaceEx = (GetDiskFreeSpaceExW_Pointer)(void *)GetProcAddress(
         GetModuleHandle(TEXT("kernel32.dll")), "GetDiskFreeSpaceExW");
     if (pGetDiskFreeSpaceEx)
     {
@@ -125,6 +127,8 @@ bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, 
   }
   return true;
 }
+
+#endif
 
 }}}
 

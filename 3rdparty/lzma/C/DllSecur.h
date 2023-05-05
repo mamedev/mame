@@ -1,5 +1,5 @@
 /* DllSecur.h -- DLL loading for security
-2016-06-08 : Igor Pavlov : Public domain */
+2018-02-19 : Igor Pavlov : Public domain */
 
 #ifndef __DLL_SECUR_H
 #define __DLL_SECUR_H
@@ -10,7 +10,8 @@ EXTERN_C_BEGIN
 
 #ifdef _WIN32
 
-void LoadSecurityDlls();
+void My_SetDefaultDllDirectories(void);
+void LoadSecurityDlls(void);
 
 #endif
 

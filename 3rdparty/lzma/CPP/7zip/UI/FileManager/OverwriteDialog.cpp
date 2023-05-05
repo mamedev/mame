@@ -40,6 +40,12 @@ void COverwriteDialog::ReduceString(UString &s)
     s.Delete(size / 2, s.Len() - size);
     s.Insert(size / 2, L" ... ");
   }
+  if (!s.IsEmpty() && s.Back() == ' ')
+  {
+    // s += (wchar_t)(0x2423);
+    s.InsertAtFront(L'\"');
+    s += L'\"';
+  }
 }
 
 void COverwriteDialog::SetFileInfoControl(int textID, int iconID,
@@ -51,8 +57,8 @@ void COverwriteDialog::SetFileInfoControl(int textID, int iconID,
 
   const UString &fileName = fileInfo.Name;
   int slashPos = fileName.ReverseFind_PathSepar();
-  UString s1 = fileName.Left(slashPos + 1);
-  UString s2 = fileName.Ptr(slashPos + 1);
+  UString s1 = fileName.Left((unsigned)(slashPos + 1));
+  UString s2 = fileName.Ptr((unsigned)(slashPos + 1));
 
   ReduceString(s1);
   ReduceString(s2);
@@ -66,13 +72,10 @@ void COverwriteDialog::SetFileInfoControl(int textID, int iconID,
 
   if (fileInfo.TimeIsDefined)
   {
-    FILETIME localFileTime;
-    if (!FileTimeToLocalFileTime(&fileInfo.Time, &localFileTime))
-      throw 4190402;
     AddLangString(s, IDS_PROP_MTIME);
-    s += L": ";
-    wchar_t t[32];
-    ConvertFileTimeToString(localFileTime, t);
+    s += ": ";
+    char t[32];
+    ConvertUtcFileTimeToString(fileInfo.Time, t);
     s += t;
   }
 
@@ -100,6 +103,22 @@ bool COverwriteDialog::OnInit()
   SetFileInfoControl(IDT_OVERWRITE_OLD_FILE_SIZE_TIME, IDI_OVERWRITE_OLD_FILE, OldFileInfo);
   SetFileInfoControl(IDT_OVERWRITE_NEW_FILE_SIZE_TIME, IDI_OVERWRITE_NEW_FILE, NewFileInfo);
   NormalizePosition();
+
+  if (!ShowExtraButtons)
+  {
+    HideItem(IDB_YES_TO_ALL);
+    HideItem(IDB_NO_TO_ALL);
+    HideItem(IDB_AUTO_RENAME);
+  }
+
+  if (DefaultButton_is_NO)
+  {
+    PostMsg(DM_SETDEFID, IDNO);
+    HWND h = GetItem(IDNO);
+    PostMsg(WM_NEXTDLGCTL, (WPARAM)h, TRUE);
+    // ::SetFocus(h);
+  }
+
   return CModalDialog::OnInit();
 }
 

@@ -111,7 +111,7 @@ u8 hh_smc1k_state::read_inputs(int columns)
 
 INPUT_CHANGED_MEMBER(hh_smc1k_state::acl_button)
 {
-	// for when an input is directly tied to MCU INIT pin
+	// ACL button is directly tied to MCU INIT pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -179,10 +179,13 @@ static INPUT_PORTS_START( tkkongq )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_16WAY
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Set")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Set")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Mode")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Game B")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Game A")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tkkongq_state, acl_button, 0) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 // config

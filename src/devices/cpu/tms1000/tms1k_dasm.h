@@ -27,18 +27,18 @@ public:
 protected:
 	enum e_mnemonics
 	{
-		zILL = 0,
-		zAC0AC, zAC1AC, zACACC, zACNAA, zALEC, zALEM, zAMAAC, zBRANCH,
-		zCALL, zCCLA, zCLA, zCLO, zCOMC, zCOMX, zCOMX8, zCPAIZ, zCTMDYN,
-		zDAN, zDMAN, zDMEA, zDNAA, zDYN, zHALT,
-		zIA, zIMAC, zINTDIS, zINTEN, zINTRTN, zIYC,
-		zKNEZ, zLDP, zLDX2, zLDX3, zLDX4, zMNEA, zMNEZ,
-		zNDMEA, zOFF, zRBIT, zREAC, zRETN, zRSTR,
-		zSAL, zSAMAN, zSBIT, zSBL, zSEAC, zSELIN, zSETR,
-		zTAC, zTADM, zTAM, zTAMACS, zTAMDYN, zTAMIY, zTAMIYC, zTAMZA,
-		zTASR, zTAX, zTAY, zTBIT, zTCA, zTCMIY, zTCY, zTDO, zTKA,
-		zTKM, zTMA, zTMSET, zTMY, zTPC, zTRA, zTSG, zTXA, zTYA,
-		zXDA, zXMA, zYMCY, zYNEA, zYNEC
+		mILL = 0,
+		mAC0AC, mAC1AC, mACACC, mACNAA, mALEC, mALEM, mAMAAC, mBRANCH,
+		mCALL, mCCLA, mCLA, mCLO, mCOMC, mCOMX, mCOMX8, mCPAIZ, mCTMDYN,
+		mDAN, mDMAN, mDMEA, mDNAA, mDYN, mHALT,
+		mIA, mIMAC, mINTDIS, mINTEN, mINTRTN, mIYC,
+		mKNEZ, mLDP, mLDX2, mLDX3, mLDX4, mMNEA, mMNEZ,
+		mNDMEA, mOFF, mRBIT, mREAC, mRETN, mRSTR,
+		mSAL, mSAMAN, mSBIT, mSBL, mSEAC, mSELIN, mSETR,
+		mTAC, mTADM, mTAM, mTAMACS, mTAMDYN, mTAMIY, mTAMIYC, mTAMZA,
+		mTASR, mTAX, mTAY, mTBIT, mTCA, mTCMIY, mTCY, mTDO, mTKA,
+		mTKM, mTMA, mTMSET, mTMY, mTPC, mTRA, mTSG, mTXA, mTYA,
+		mXDA, mXMA, mYMCY, mYNEA, mYNEC
 	};
 
 	static const char *const s_mnemonic[];
@@ -142,4 +142,4 @@ private:
 	static const u8 tp0320_mnemonic[512];
 };
 
-#endif
+#endif // MAME_CPU_TMS1000_TMS1K_DASM_H

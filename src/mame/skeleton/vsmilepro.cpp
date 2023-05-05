@@ -22,7 +22,7 @@
 #include "cdrom.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "softlist.h"
 
 

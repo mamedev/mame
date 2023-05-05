@@ -3,7 +3,7 @@
 #ifndef MAME_SHARED_SEGACDCD_H
 #define MAME_SHARED_SEGACDCD_H
 
-#include "imagedev/chd_cd.h"
+#include "imagedev/cdromimg.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
@@ -91,7 +91,6 @@ protected:
 
 	struct segacd_t
 	{
-		cdrom_file  *cd;
 		const cdrom_file::toc   *toc;
 		uint32_t current_frame;
 	};

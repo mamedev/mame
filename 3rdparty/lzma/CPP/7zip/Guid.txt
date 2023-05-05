@@ -19,9 +19,11 @@
   0F  IOutFolderArchive
   10  IFolderArchiveUpdateCallback2
   11  IFolderScanProgress
+  12  IFolderSetZoneIdMode
   
   20  IFileExtractCallback.h::IGetProp
-  30  IFileExtractCallback.h::IFolderExtractToStreamCallback
+  30  IFileExtractCallback.h::IFolderExtractToStreamCallback (old)
+  31  IFileExtractCallback.h::IFolderExtractToStreamCallback (new 21.04)
 
 03 IStream.h
 
@@ -33,6 +35,7 @@
   07  IOutStreamFinish
   08  IStreamGetProps
   09  IStreamGetProps2
+  0A  IStreamGetProp
 
 
 04 ICoder.h
@@ -40,6 +43,7 @@
   04  ICompressProgressInfo
   05  ICompressCoder
   18  ICompressCoder2
+  1F  ICompressSetCoderPropertiesOpt
   20  ICompressSetCoderProperties
   21  ICompressSetDecoderProperties //
   22  ICompressSetDecoderProperties2
@@ -47,6 +51,9 @@
   24  ICompressGetInStreamProcessedSize
   25  ICompressSetCoderMt
   26  ICompressSetFinishMode
+  27  ICompressGetInStreamProcessedSize2
+  28  ICompressSetMemLimit
+  29  ICompressReadUnusedFromInBuf
 
   30  ICompressGetSubStreamSize
   31  ICompressSetInStream
@@ -100,6 +107,9 @@
   80  IArchiveUpdateCallback
   82  IArchiveUpdateCallback2
   83  IArchiveUpdateCallbackFile
+  84  IArchiveGetDiskProperty
+  85  IArchiveUpdateCallbackArcProp (Reserved)
+
 
   A0  IOutArchive
 
@@ -163,6 +173,13 @@ Handler GUIDs:
   0C xz
   0D ppmd
 
+  C0 AVB
+  C1 LP
+  C2 Sparse
+  C3 APFS
+  C4 Vhdx
+  C5 Base64
+  C6 COFF
   C7 Ext
   C8 VMDK
   C9 VDI

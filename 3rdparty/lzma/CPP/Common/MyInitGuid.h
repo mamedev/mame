@@ -19,13 +19,17 @@ Also we need IID_IUnknown that is initialized in some file for linking:
   Other: we define IID_IUnknown in this file
 */
 
+#ifdef __clang__
+  #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
+
 #ifdef _WIN32
 
 #ifdef UNDER_CE
 #include <basetyps.h>
 #endif
 
-#include <initguid.h>
+#include <InitGuid.h>
 
 #ifdef UNDER_CE
 DEFINE_GUID(IID_IUnknown,

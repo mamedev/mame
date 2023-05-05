@@ -264,7 +264,7 @@ void gdrom_device::ExecCommand()
 
 		case 0x14:
 		{
-			if (m_cdrom == nullptr)
+			if (!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -320,7 +320,7 @@ void gdrom_device::ExecCommand()
 
 		case 0x20: // CD_PLAY
 		{
-			if (m_cdrom == nullptr)
+			if (!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -334,7 +334,7 @@ void gdrom_device::ExecCommand()
 
 			const u8 play_mode = command[1] & 7;
 
-			auto trk = m_cdrom->get_track(start_offs);
+			auto trk = m_image->get_track(start_offs);
 			const u8 repeat = command[6] & 0xf;
 			LOGCMD("CD_PLAY 20h track %d FAD %d blocks %d type %02x repeat %01x\n"
 				, trk + 1
@@ -351,7 +351,7 @@ void gdrom_device::ExecCommand()
 				LOGCMD("\tPlayback resume\n");
 				m_sector_number = (m_sector_number & 0xf0) | GDROM_PLAY_STATE;
 			}
-			else if (m_cdrom->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO && end_offs > start_offs)
+			else if (m_image->get_track_type(trk) == cdrom_file::CD_TRACK_AUDIO && end_offs > start_offs)
 			{
 				// TODO: check end > start assertion
 				m_cd_status.cdda_fad = start_offs - 150;
@@ -382,7 +382,7 @@ void gdrom_device::ExecCommand()
 
 		case 0x21:
 		{
-			if (m_cdrom == nullptr)
+			if (!m_image->exists())
 			{
 				m_phase = SCSI_PHASE_STATUS;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
@@ -483,11 +483,11 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 
 		case 0x30: // CD_READ
 			LOGXFER("CD_READ read %x dataLength,\n", dataLength);
-			if ((m_cdrom) && (m_blocks))
+			if ((m_image->exists()) && (m_blocks))
 			{
 				while (dataLength > 0)
 				{
-					if (!m_cdrom->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
+					if (!m_image->read_data(m_lba, tmp_buffer, cdrom_file::CD_TRACK_MODE1))
 					{
 						LOGWARN("CD read error!\n");
 						return;
@@ -528,7 +528,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 				case 0:     // normal
 				{
 					int start_trk = 1;
-					int end_trk = m_cdrom->get_last_track();
+					int end_trk = m_image->get_last_track();
 					int len = 408;
 					//int in_len;
 					int dptr = 0;
@@ -546,10 +546,10 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					LOGTOC("TOC: Start track %d end track %d\n", start_trk, end_trk);
 					for (i = start_trk; i <= end_trk; i++)
 					{
-						u8 adr = m_cdrom->get_adr_control(i - 1) | 1;
+						u8 adr = m_image->get_adr_control(i - 1) | 1;
 						data[dptr++] = adr;
 
-						tstart = m_cdrom->get_track_start(i - 1) + 150;
+						tstart = m_image->get_track_start(i - 1) + 150;
 						//if ((command[1]&2)>>1)
 						//	tstart = cdrom_file::lba_to_msf(tstart);
 						data[dptr++] = (tstart>>16) & 0xff;
@@ -559,18 +559,18 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 					}
 
 					dptr = 396;
-					data[dptr++] = m_cdrom->get_adr_control(0) | 1;
+					data[dptr++] = m_image->get_adr_control(0) | 1;
 					data[dptr++] = start_trk;
 					data[dptr++] = 0;
 					data[dptr++] = 0;
-					data[dptr++] = m_cdrom->get_adr_control(end_trk) | 1;
+					data[dptr++] = m_image->get_adr_control(end_trk) | 1;
 					data[dptr++] = end_trk;
 					data[dptr++] = 0;
 					data[dptr++] = 0;
-					const u32 tend = m_cdrom->get_track_start(0xaa) + 150;
+					const u32 tend = m_image->get_track_start(0xaa) + 150;
 					//if ((command[1]&2)>>1)
 					//	tstart = cdrom_file::lba_to_msf(tstart);
-					data[dptr++] = m_cdrom->get_adr_control(0xaa) | 1;
+					data[dptr++] = m_image->get_adr_control(0xaa) | 1;
 					data[dptr++] = (tend>>16) & 0xff;
 					data[dptr++] = (tend>>8) & 0xff;
 					data[dptr++] = (tend & 0xff);
@@ -600,7 +600,7 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 		case 0x71:
 			LOGCMD("SYS_REQ_SECU\n");
 			memcpy(data, &GDROM_Cmd71_Reply[0], sizeof(GDROM_Cmd71_Reply));
-			if (is_real_gdrom_disc)
+			if (m_image->is_gd())
 				data[10] = 0x1f; // needed by dimm board firmware
 			break;
 
@@ -608,15 +608,15 @@ void gdrom_device::ReadData( uint8_t *data, int dataLength )
 			// TODO: stub, needs to derive most data coming from CD status
 			switch (command[2] & 0x0f)
 			{
-				case 0: // Subcode PW
+				case 0: // Subcode P-W
 				{
 					data[0] = 0; // Reserved
 					data[1] = 0x12; // Audio Playback status (todo)
 					data[2] = 0;
 					data[3] = m_transfer_length; // header size
-					auto trk = m_cdrom->get_track(m_lba+150);
+					auto trk = m_image->get_track(m_lba+150);
 					//printf("%d %d\n", trk, m_lba);
-					data[4] = m_cdrom->get_adr_control(trk - 1) | 1;
+					data[4] = m_image->get_adr_control(trk - 1) | 1;
 					data[5] = 1; // Track Number
 					data[6] = 1; // index #1
 					data[7] = 0;
@@ -704,22 +704,11 @@ void gdrom_device::WriteData( uint8_t *data, int dataLength )
 	}
 }
 
-void gdrom_device::SetDevice(void *device)
-{
-	t10mmc::SetDevice(device);
-
-	// try to find if the mounted chd is from an actual gd-rom disc
-	if (m_cdrom)
-		if (m_cdrom->get_toc().flags & cdrom_file::CD_FLAG_GDROM)
-			is_real_gdrom_disc = true;
-}
-
 // device type definition
-DEFINE_DEVICE_TYPE(GDROM, gdrom_device, "gdrom", "GD-ROM")
+DEFINE_DEVICE_TYPE(ATAPI_GDROM, gdrom_device, "gdrom", "GD-ROM")
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, GDROM, tag, owner, clock),
-	is_real_gdrom_disc(false)
+	atapi_cdrom_device(mconfig, ATAPI_GDROM, tag, owner, clock)
 {
 }
 
@@ -780,7 +769,7 @@ void gdrom_device::process_buffer()
 	// 0010 CD-ROM XA / CD Extra
 	// 0011 CD-I
 	// 1000 GD-ROM
-	const u8 cd_type = is_real_gdrom_disc == true ? 0x80 : 0x00;
+	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
 	// TODO: play/pause is required by audio CD player to detect end of track
 	// Requires an override to lba_address(), also a different variable name
 	m_sector_number = cd_type | (m_sector_number & 0xf);
@@ -790,7 +779,7 @@ void gdrom_device::signature()
 {
 	atapi_hle_device::signature();
 
-	const u8 cd_type = is_real_gdrom_disc == true ? 0x80 : 0x00;
+	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
 
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning
 	m_sector_number = cd_type | (m_sector_number & 0xf);

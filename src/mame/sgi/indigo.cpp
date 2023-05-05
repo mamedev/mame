@@ -222,7 +222,7 @@ void indigo4k_state::indigo4k(machine_config &config)
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);
 
-	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom);
+	SGI_MC(config, m_mem_ctrl, m_maincpu, m_eeprom, 50000000);
 	m_mem_ctrl->eisa_present().set_constant(0);
 	SGI_HPC1(config, m_hpc, m_maincpu, m_eeprom);
 }

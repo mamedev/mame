@@ -16,8 +16,10 @@ typedef UInt32 (MY_FAST_CALL *CRC_FUNC)(UInt32 v, const void *data, size_t size,
 UInt32 MY_FAST_CALL CrcUpdateT1(UInt32 v, const void *data, size_t size, const UInt32 *table);
 
 extern CRC_FUNC g_CrcUpdate;
-extern CRC_FUNC g_CrcUpdateT8;
 extern CRC_FUNC g_CrcUpdateT4;
+extern CRC_FUNC g_CrcUpdateT8;
+extern CRC_FUNC g_CrcUpdateT0_32;
+extern CRC_FUNC g_CrcUpdateT0_64;
 
 EXTERN_C_END
 
@@ -41,25 +43,20 @@ public:
 
 bool CCrcHasher::SetFunctions(UInt32 tSize)
 {
-  _updateFunc = g_CrcUpdate;
+  CRC_FUNC f = NULL;
+       if (tSize ==  0) f = g_CrcUpdate;
+  else if (tSize ==  1) f = CrcUpdateT1;
+  else if (tSize ==  4) f = g_CrcUpdateT4;
+  else if (tSize ==  8) f = g_CrcUpdateT8;
+  else if (tSize == 32) f = g_CrcUpdateT0_32;
+  else if (tSize == 64) f = g_CrcUpdateT0_64;
   
-  if (tSize == 1)
-    _updateFunc = CrcUpdateT1;
-  else if (tSize == 4)
+  if (!f)
   {
-    if (g_CrcUpdateT4)
-      _updateFunc = g_CrcUpdateT4;
-    else
-      return false;
+    _updateFunc = g_CrcUpdate;
+    return false;
   }
-  else if (tSize == 8)
-  {
-    if (g_CrcUpdateT8)
-      _updateFunc = g_CrcUpdateT8;
-    else
-      return false;
-  }
-  
+  _updateFunc = f;
   return true;
 }
 
