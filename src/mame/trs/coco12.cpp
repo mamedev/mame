@@ -556,6 +556,7 @@ void coco12_state::coco(machine_config &config)
 	SOFTWARE_LIST(config, "coco_flop_list").set_original("coco_flop").set_filter("COCO");
 	SOFTWARE_LIST(config, "dragon_cart_list").set_compatible("dragon_cart");
 
+	// virtual hard disks
 	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
@@ -656,30 +657,29 @@ ROM_START(coco)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_DEFAULT_BIOS("b12e11")
 	ROM_SYSTEM_BIOS(0, "b10", "Color BASIC v1.0")
-	ROMX_LOAD("bas10.rom", 0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(0))
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "b11", "Color BASIC v1.1")
-	ROMX_LOAD("bas11.rom", 0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(1))
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "b12", "Color BASIC v1.2")
-	ROMX_LOAD("bas12.rom", 0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(2))
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "b10e10", "Color BASIC v1.0 / Extended Color BASIC v1.0")
-	ROMX_LOAD("bas10.rom", 0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(3))
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(3))
 	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "b10e11", "Color BASIC v1.0 / Extended Color BASIC v1.1")
-	ROMX_LOAD("bas10.rom", 0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(4))
+	ROMX_LOAD("bas10.rom",    0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539), ROM_BIOS(4))
 	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "b11e10", "Color BASIC v1.1 / Extended Color BASIC v1.0")
-	ROMX_LOAD("bas11.rom", 0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(5))
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(5))
 	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(6, "b11e11", "Color BASIC v1.1 / Extended Color BASIC v1.1")
-	ROMX_LOAD("bas11.rom", 0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(6))
+	ROMX_LOAD("bas11.rom",    0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3), ROM_BIOS(6))
 	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(7, "b12e10", "Color BASIC v1.2 / Extended Color BASIC v1.0")
-	ROMX_LOAD("bas12.rom", 0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(7))
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(7))
 	ROMX_LOAD("extbas10.rom", 0x0000, 0x2000, CRC(6111a086) SHA1(8aa58f2eb3e8bcfd5470e3e35e2b359e9a72848e), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS(8, "b12e11", "Color BASIC v1.2 / Extended Color BASIC v1.1")
-	ROMX_LOAD("bas12.rom", 0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(8))
+	ROMX_LOAD("bas12.rom",    0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f), ROM_BIOS(8))
 	ROMX_LOAD("extbas11.rom", 0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea), ROM_BIOS(8))
-
 ROM_END
 
 ROM_START(deluxecoco)
@@ -750,8 +750,8 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                      MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                  MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",         MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
 COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
